@@ -1,0 +1,222 @@
+package splitstree6.io.readers.characters;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import jloda.util.FileLineIterator;
+import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.ProgressListener;
+import splitstree6.data.CharactersBlock;
+import splitstree6.data.TaxaBlock;
+import splitstree6.data.parts.CharactersType;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+
+/**
+ * Import Characters in FastA format.
+ * Daria Evseeva, 07.2017
+ * Daniel Huson, 10.2021
+ */
+public class FastAReader extends CharactersReader {
+	private static final String[] possibleIDs =
+			{"gb", "emb", "ena", "dbj", "pir", "prf", "sp", "pdb", "pat", "bbs", "gnl", "ref", "lcl"};
+
+	private final BooleanProperty optionFullLabels = new SimpleBooleanProperty(false);
+	private final BooleanProperty optionPIRFormat = new SimpleBooleanProperty(false);
+
+	private char gap = '-';
+	private char missing = 0; // is set when charactersType is set
+	private final CharactersType charactersType = CharactersType.Unknown;
+
+	/**
+	 * parse a file
+	 */
+	public void read(ProgressListener progressListener, String inputFile, TaxaBlock taxa, CharactersBlock characters) throws IOException {
+		final ArrayList<String> taxonNamesFound = new ArrayList<>();
+		final ArrayList<String> matrix = new ArrayList<>();
+		int ntax = 0;
+		int nchar = 0;
+		int counter = 0;
+
+		try (FileLineIterator it = new FileLineIterator(inputFile)) {
+			progressListener.setMaximum(it.getMaximumProgress());
+			progressListener.setProgress(0);
+			int currentSequenceLength = 0;
+			StringBuilder currentSequence = new StringBuilder();
+			boolean ignoreNext = false;
+
+			while (it.hasNext()) {
+				final String line = it.next();
+
+				counter++;
+				if (line.startsWith(";") || line.isEmpty())
+					continue;
+				if (line.equals(">"))
+					throw new IOExceptionWithLineNumber("No taxa label given", counter);
+
+				if (line.startsWith(">")) {
+					if (isOptionPIRFormat()) ignoreNext = true;
+
+					if (isOptionFullLabels())
+						addTaxaName(line, taxonNamesFound, counter);
+					else
+						addTaxaName(cutLabel(line), taxonNamesFound, counter);
+
+					ntax++;
+
+					if (ntax > 1 && currentSequence.toString().isEmpty())
+						throw new IOExceptionWithLineNumber("No sequence", counter);
+
+					if (nchar != 0 && nchar != currentSequenceLength)
+						throw new IOExceptionWithLineNumber("Sequences must be the same length. " +
+								"Wrong number of chars, Length " + nchar + " expected", counter - 1);
+
+					if (!currentSequence.toString().equals("")) matrix.add(currentSequence.toString());
+					nchar = currentSequenceLength;
+					currentSequenceLength = 0;
+					currentSequence = new StringBuilder();
+				} else {
+					if (ignoreNext) {
+						ignoreNext = false;
+						continue;
+					}
+					String tmpLine;
+					if (isOptionPIRFormat() && line.charAt(line.length() - 1) == '*')
+						tmpLine = line.substring(0, line.length() - 1); // cut the last symbol
+					else
+						tmpLine = line;
+					String allowedChars = "" + missing + gap;
+					checkIfCharactersValid(tmpLine, counter, allowedChars);
+					String add = tmpLine.replaceAll("\\s+", "");
+					currentSequenceLength += add.length();
+					currentSequence.append(add);
+				}
+				progressListener.setProgress(it.getProgress());
+			}
+
+			if (currentSequence.length() == 0)
+				throw new IOExceptionWithLineNumber("Sequence " + ntax + " is zero", counter);
+			matrix.add(currentSequence.toString());
+			if (nchar != currentSequenceLength)
+				throw new IOExceptionWithLineNumber("Wrong number of chars. Length " + nchar + " expected", counter);
+		}
+
+		taxa.addTaxaByNames(taxonNamesFound);
+		characters.setDimension(ntax, nchar);
+		characters.setGapCharacter(gap);
+		characters.setMissingCharacter(missing);
+		readMatrix(matrix, characters);
+	}
+
+	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) {
+		StringBuilder foundSymbols = new StringBuilder();
+		for (int i = 1; i <= characters.getNtax(); i++) {
+			for (int j = 1; j <= characters.getNchar(); j++) {
+				char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
+				if (foundSymbols.toString().indexOf(symbol) == -1) {
+					foundSymbols.append(symbol);
+				}
+				characters.set(i, j, symbol);
+			}
+		}
+		characters.setDataType(CharactersType.guessType(CharactersType.union(foundSymbols.toString())));
+	}
+
+	private static String cutLabel(String infoLine) {
+
+		if (infoLine.contains("[organism=")) {
+			int index1 = infoLine.indexOf("[organism=") + 10;
+			int index2 = infoLine.indexOf(']');
+			return ">" + infoLine.substring(index1, index2);
+		}
+
+		// check if the info line contains any of databases IDs
+		infoLine = infoLine.toLowerCase();
+		String foundID = "";
+		for (String id : possibleIDs) {
+			if (infoLine.contains(">" + id + "|") || infoLine.contains("|" + id + "|")) {
+				foundID = id;
+				break;
+			}
+		}
+
+		if (!foundID.equals("")) {
+			String afterID = infoLine.substring(infoLine.indexOf(foundID) + foundID.length());
+			int index1;
+			int index2;
+			if (foundID.equals("pir") || foundID.equals("prf") || foundID.equals("pat") || foundID.equals("gnl")) {
+				if (foundID.equals("pir") || foundID.equals("prf"))
+					index1 = afterID.indexOf('|') + 2;
+				else
+					index1 = afterID.indexOf('|') + 1;
+				return ">" + afterID.substring(index1).toUpperCase();
+			} else {
+				index1 = afterID.indexOf('|') + 1;
+				index2 = afterID.substring(index1 + 1).indexOf('|') + 2;
+				return ">" + afterID.substring(index1, index2).toUpperCase();
+			}
+		}
+		return ">" + infoLine.substring(1).toUpperCase();
+	}
+
+	public boolean isOptionFullLabels() {
+		return optionFullLabels.get();
+	}
+
+	public BooleanProperty optionFullLabelsProperty() {
+		return optionFullLabels;
+	}
+
+	public void setOptionFullLabels(boolean optionFullLabels) {
+		this.optionFullLabels.set(optionFullLabels);
+	}
+
+	public boolean isOptionPIRFormat() {
+		return optionPIRFormat.get();
+	}
+
+	public BooleanProperty optionPIRFormatProperty() {
+		return optionPIRFormat;
+	}
+
+	public void setOptionPIRFormat(boolean optionPIRFormat) {
+		this.optionPIRFormat.set(optionPIRFormat);
+	}
+
+	protected static void checkIfCharactersValid(String line, int counter, String allowedChars) throws IOException {
+		if (line.isEmpty())
+			throw new IOExceptionWithLineNumber("No characters sequence is given", counter);
+
+		String regex = "[^a-z0-9 \t" + allowedChars + "]";
+		Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+		Matcher m = p.matcher(line);
+		boolean found = m.find();
+		if (found) {
+			throw new IOExceptionWithLineNumber("Unexpected character: " + m.group(), counter);
+		}
+	}
+
+
+	/**
+	 * add new taxa taxon to a given list of taxa labels
+	 * if repeating taxa label is found, convert to "label + number" form
+	 */
+	static void addTaxaName(String line, ArrayList<String> taxonNames, int linesCounter) {
+		int sameNamesCounter = 0;
+		if (taxonNames.contains(line.substring(1))) {
+			System.err.println("Warning: Repeated taxon name " + line.substring(1) + ". Line: " + linesCounter);
+			sameNamesCounter++;
+		}
+		while (taxonNames.contains(line.substring(1) + "(" + sameNamesCounter + ")")) {
+			sameNamesCounter++;
+		}
+
+		if (sameNamesCounter == 0)
+			taxonNames.add(line.substring(1));
+		else
+			taxonNames.add(line.substring(1) + "(" + sameNamesCounter + ")");
+	}
+}
