@@ -4,7 +4,7 @@ import jloda.util.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.TopFilter;
 
 import java.io.IOException;
 
@@ -17,8 +17,8 @@ public class CharactersTopFilter extends TopFilter<CharactersBlock, CharactersBl
 	public void filter(ProgressListener progress, TaxaBlock originalTaxaBlock, TaxaBlock modifiedTaxaBlock, CharactersBlock inputData, CharactersBlock outputData) throws IOException {
 		// todo: implement direct copy?
 		{
+			System.err.println("******* CharactersTopFilter");
 			progress.setMaximum(modifiedTaxaBlock.size());
-			System.err.println("NOT IMPLEMENTED");
 			/*
 			final StringWriter w = new StringWriter();
 			try {
@@ -41,6 +41,17 @@ public class CharactersTopFilter extends TopFilter<CharactersBlock, CharactersBl
 			outputData.copyRow(inputData, originalI, modifiedI);
 			progress.incrementProgress();
 		}
+		outputData.setMissingCharacter(inputData.getMissingCharacter());
+		outputData.setGapCharacter(inputData.getGapCharacter());
+		outputData.setHasAmbiguityCodes(inputData.isHasAmbiguityCodes());
+		outputData.setDataType(inputData.getDataType());
+		outputData.setSymbols(inputData.getSymbols());
+		outputData.setCharacterWeights(inputData.getCharacterWeights());
+		outputData.setStateLabeler(inputData.getStateLabeler());
+		outputData.setCharLabeler(inputData.getCharLabeler());
+		outputData.setRespectCase(inputData.isRespectCase());
+		outputData.setUseCharacterWeights(inputData.isUseCharacterWeights());
+
 		if (modifiedTaxaBlock.size() == originalTaxaBlock.size())
 			setShortDescription("using all " + modifiedTaxaBlock.size() + " sequences");
 		else

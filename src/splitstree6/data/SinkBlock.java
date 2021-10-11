@@ -4,7 +4,8 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 
 
 public class SinkBlock extends DataBlock {
@@ -19,11 +20,6 @@ public class SinkBlock extends DataBlock {
 	@Override
 	public String getInfo() {
 		return (isSinkSet() ? getSink() : " not set");
-	}
-
-	@Override
-	public String getDisplayText() {
-		return getSink();
 	}
 
 	public String getSink() {
@@ -47,7 +43,7 @@ public class SinkBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTopFilter() {
+	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return null;
 	}
 }

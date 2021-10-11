@@ -4,7 +4,8 @@ import splitstree6.algorithms.characters.characters2characters.CharactersTopFilt
 import splitstree6.data.parts.AmbiguityCodes;
 import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.StateLabeler;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -369,12 +370,7 @@ public class CharactersBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTopFilter() {
+	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return new CharactersTopFilter(CharactersBlock.class, CharactersBlock.class);
-	}
-
-	@Override
-	public String getDisplayText() {
-		return "Not implemented";
 	}
 }

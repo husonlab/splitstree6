@@ -2,8 +2,8 @@ package splitstree6.data;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import jloda.util.Basic;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 
 
 public class SourceBlock extends DataBlock {
@@ -20,11 +20,6 @@ public class SourceBlock extends DataBlock {
 		return "Sources: " + sources.size();
 	}
 
-	@Override
-	public String getDisplayText() {
-		return Basic.toString(sources, "\n");
-	}
-
 	public ObservableList<String> getSources() {
 		return sources;
 	}
@@ -34,7 +29,7 @@ public class SourceBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTopFilter() {
+	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return null;
 	}
 }

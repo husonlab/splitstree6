@@ -27,9 +27,9 @@ public class FastAReader extends CharactersReader {
 	private final BooleanProperty optionFullLabels = new SimpleBooleanProperty(false);
 	private final BooleanProperty optionPIRFormat = new SimpleBooleanProperty(false);
 
-	private char gap = '-';
-	private char missing = 0; // is set when charactersType is set
-	private final CharactersType charactersType = CharactersType.Unknown;
+	public FastAReader() {
+		setFileExtensions("fasta", "fas", "fa", "seq", "fsa", "fna", "dna");
+	}
 
 	/**
 	 * parse a file
@@ -88,7 +88,7 @@ public class FastAReader extends CharactersReader {
 						tmpLine = line.substring(0, line.length() - 1); // cut the last symbol
 					else
 						tmpLine = line;
-					String allowedChars = "" + missing + gap;
+					String allowedChars = "" + getMissing() + getGap();
 					checkIfCharactersValid(tmpLine, counter, allowedChars);
 					String add = tmpLine.replaceAll("\\s+", "");
 					currentSequenceLength += add.length();
@@ -106,8 +106,8 @@ public class FastAReader extends CharactersReader {
 
 		taxa.addTaxaByNames(taxonNamesFound);
 		characters.setDimension(ntax, nchar);
-		characters.setGapCharacter(gap);
-		characters.setMissingCharacter(missing);
+		characters.setGapCharacter(getGap());
+		characters.setMissingCharacter(getMissing());
 		readMatrix(matrix, characters);
 	}
 
@@ -198,7 +198,6 @@ public class FastAReader extends CharactersReader {
 			throw new IOExceptionWithLineNumber("Unexpected character: " + m.group(), counter);
 		}
 	}
-
 
 	/**
 	 * add new taxa taxon to a given list of taxa labels

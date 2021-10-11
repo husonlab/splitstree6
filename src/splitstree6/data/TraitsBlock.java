@@ -1,7 +1,8 @@
 package splitstree6.data;
 
 import splitstree6.data.parts.Taxon;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 
 import java.util.Collection;
 
@@ -102,11 +103,6 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return "";
 	}
 
-	@Override
-	public String getDisplayText() {
-		return "Not implemented";
-	}
-
 	public boolean isSetLatitudeLongitude() {
 		return traitLatitude != null;
 	}
@@ -143,7 +139,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTopFilter() {
+	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return null;
 	}
 }

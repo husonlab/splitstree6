@@ -5,7 +5,7 @@ import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.TopFilter;
 
 import java.io.IOException;
 import java.util.BitSet;

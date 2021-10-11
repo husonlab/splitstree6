@@ -6,8 +6,8 @@ import jloda.util.BitSetUtils;
 import jloda.util.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.sflow.TopFilter;
 import splitstree6.utils.TreesUtilities;
-import splitstree6.workflow.TopFilter;
 
 import java.io.IOException;
 

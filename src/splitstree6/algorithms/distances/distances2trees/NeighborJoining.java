@@ -48,24 +48,20 @@ public class NeighborJoining extends Distances2Trees {
 	 * compute the neighbor joining tree
 	 */
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances, TreesBlock trees) throws CanceledException {
-		progress.setTasks("Neighbor Joining", "Init.");
-		progress.setMaximum(distances.getNtax());
-
-		PhyloTree tree = computeNJTree(progress, taxaBlock, distances);
-		trees.getTrees().setAll(tree);
-
-		progress.close();
+		trees.setPartial(false);
+		trees.setRooted(true);
+		trees.getTrees().setAll(computeNJTree(progress, taxaBlock, distances));
 	}
 
 	private PhyloTree computeNJTree(ProgressListener progressListener, TaxaBlock taxaBlock, DistancesBlock distances) throws CanceledException {
-		final int ntax = distances.getNtax();
-		final PhyloTree tree = new PhyloTree();
+		final var ntax = distances.getNtax();
+		final var tree = new PhyloTree();
 
-		final BitSet alive = new BitSet(); // o-based
+		final var alive = new BitSet(); // o-based
 
-		final Node[] nodes = new Node[ntax]; // 0-based
-		for (int t = 1; t <= ntax; t++) {
-			final Node v = tree.newNode();
+		final var nodes = new Node[ntax]; // 0-based
+		for (var t = 1; t <= ntax; t++) {
+			var v = tree.newNode();
 			tree.addTaxon(v, t);
 			tree.setLabel(v, taxaBlock.getLabel(t));
 			nodes[t - 1] = v;
@@ -78,33 +74,33 @@ public class NeighborJoining extends Distances2Trees {
 		progressListener.setMaximum(ntax);
 		progressListener.setProgress(0);
 
-		final float[][] matrix = new float[ntax][ntax]; // 0-based
+		final var matrix = new float[ntax][ntax]; // 0-based
 
-		final float[] rowSum = new float[ntax]; // 0-based
+		final var rowSum = new float[ntax]; // 0-based
 
-		for (int i : BitSetUtils.members(alive)) {
-			for (int j : BitSetUtils.members(alive, i + 1)) {
+		for (var i : BitSetUtils.members(alive)) {
+			for (var j : BitSetUtils.members(alive, i + 1)) {
 				matrix[i][j] = matrix[j][i] = (float) distances.get(i + 1, j + 1);
 			}
 		}
 
-		for (int i : BitSetUtils.members(alive)) {
+		for (var i : BitSetUtils.members(alive)) {
 			rowSum[i] = computeRowSum(alive, i, matrix);
 		}
 
-		boolean verbose = false;
+		var verbose = false;
 
 		while (alive.cardinality() > 2) {
-			int minI = -1;
-			int minJ = -1;
-			float minQ = Float.MAX_VALUE;
+			var minI = -1;
+			var minJ = -1;
+			var minQ = Float.MAX_VALUE;
 
 			if (verbose) {
 				System.err.println("\nTaxa: " + alive.cardinality());
 				System.err.println("Distances:");
-				for (int i : BitSetUtils.members(alive)) {
+				for (var i : BitSetUtils.members(alive)) {
 					System.err.print(i + 1 + ":");
-					for (int j : BitSetUtils.members(alive, i + 1)) {
+					for (var j : BitSetUtils.members(alive, i + 1)) {
 						System.err.printf(" %d", (int) matrix[i][j]);
 					}
 					System.err.println();
@@ -114,12 +110,12 @@ public class NeighborJoining extends Distances2Trees {
 			if (verbose)
 				System.err.println("Q:");
 
-			for (int i : BitSetUtils.members(alive)) {
+			for (var i : BitSetUtils.members(alive)) {
 				if (verbose) System.err.print(i + 1 + ":");
-				for (int j : BitSetUtils.members(alive, i + 1)) {
-					final float q = (alive.cardinality() - 2) * matrix[i][j] - rowSum[i] - rowSum[j];
+				for (var j : BitSetUtils.members(alive, i + 1)) {
+					final var q = (alive.cardinality() - 2) * matrix[i][j] - rowSum[i] - rowSum[j];
 
-					if (verbose) System.err.printf(" %d", q);
+					if (verbose) System.err.printf(" %f%n", q);
 
 					if (q < minQ) {
 						minQ = q;
@@ -132,10 +128,10 @@ public class NeighborJoining extends Distances2Trees {
 			if (verbose) System.err.println("minI=" + (minI + 1) + " minJ=" + (minJ + 1) + " minQ=" + (int) minQ);
 
 
-			final Node u = tree.newNode();
-			final double weightIU = 0.5f * matrix[minI][minJ] + 0.5f * (rowSum[minI] - rowSum[minJ]) / (alive.cardinality() - 2);
+			final var u = tree.newNode();
+			final var weightIU = 0.5f * matrix[minI][minJ] + 0.5f * (rowSum[minI] - rowSum[minJ]) / (alive.cardinality() - 2);
 			tree.setWeight(tree.newEdge(u, nodes[minI]), weightIU);
-			final double weightJU = matrix[minI][minJ] - weightIU;
+			final var weightJU = matrix[minI][minJ] - weightIU;
 			tree.setWeight(tree.newEdge(u, nodes[minJ]), weightJU);
 
 			nodes[minI] = u;
@@ -143,16 +139,16 @@ public class NeighborJoining extends Distances2Trees {
 			alive.clear(minI);
 			alive.clear(minJ);
 
-			for (int k : BitSetUtils.members(alive)) {
+			for (var k : BitSetUtils.members(alive)) {
 				rowSum[k] -= matrix[k][minI];
 				rowSum[k] -= matrix[k][minJ];
 			}
 
-			for (int k : BitSetUtils.members(alive)) {
+			for (var k : BitSetUtils.members(alive)) {
 				matrix[minI][k] = matrix[k][minI] = (float) (0.5 * (matrix[minI][k] + matrix[minJ][k] - matrix[minI][minJ]));
 			}
 
-			for (int k : BitSetUtils.members(alive)) {
+			for (var k : BitSetUtils.members(alive)) {
 				rowSum[k] += matrix[k][minI];
 			}
 
@@ -164,10 +160,10 @@ public class NeighborJoining extends Distances2Trees {
 		}
 
 		if (alive.cardinality() == 2) {
-			final int i = BitSetUtils.min(alive);
-			final int j = BitSetUtils.max(alive);
+			var i = BitSetUtils.min(alive);
+			var j = BitSetUtils.max(alive);
 
-			tree.setWeight(tree.newEdge(nodes[i], nodes[j]), (double) matrix[i][j]);
+			tree.setWeight(tree.newEdge(nodes[i], nodes[j]), matrix[i][j]);
 			tree.setRoot(nodes[i]);
 		}
 		progressListener.setProgress(ntax);
@@ -178,8 +174,8 @@ public class NeighborJoining extends Distances2Trees {
 	}
 
 	private float computeRowSum(BitSet alive, int i, float[][] matrix) {
-		float r = 0;
-		for (int j : BitSetUtils.members(alive)) {
+		var r = 0f;
+		for (var j : BitSetUtils.members(alive)) {
 			r += matrix[i][j];
 		}
 		return r;

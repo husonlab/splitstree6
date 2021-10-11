@@ -1,7 +1,7 @@
 package splitstree6.algorithms.splits.splits2splits;
 
 import splitstree6.data.SplitsBlock;
-import splitstree6.workflow.Algorithm;
+import splitstree6.sflow.Algorithm;
 
 public abstract class Splits2Splits extends Algorithm<SplitsBlock, SplitsBlock> {
 	public Splits2Splits() {

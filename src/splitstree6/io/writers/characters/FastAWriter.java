@@ -1,5 +1,6 @@
 package splitstree6.io.writers.characters;
 
+import jloda.util.FastA;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 
@@ -12,15 +13,13 @@ public class FastAWriter extends CharactersWriter {
 	}
 
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
+		var fasta = new FastA();
+		var ntax = taxa.getNtax();
+		var nchar = characters.getNchar();
 
-		jloda.util.FastA fasta = new jloda.util.FastA();
-
-		int ntax = taxa.getNtax();
-		int nchar = characters.getNchar();
-
-		for (int i = 1; i <= ntax; i++) {
+		for (var i = 1; i <= ntax; i++) {
 			var sequence = new StringBuilder("");
-			for (int j = 1; j <= nchar; j++) {
+			for (var j = 1; j <= nchar; j++) {
 				sequence.append(characters.get(i, j));
 			}
 			fasta.add(taxa.getLabel(i), sequence.toString().toUpperCase());

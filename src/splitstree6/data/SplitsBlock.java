@@ -5,8 +5,9 @@ import jloda.util.Basic;
 import splitstree6.algorithms.splits.splits2splits.SplitsTopFilter;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 import splitstree6.utils.SplitsUtilities;
-import splitstree6.workflow.TopFilter;
 
 import java.util.*;
 
@@ -215,12 +216,7 @@ public class SplitsBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTopFilter() {
+	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return new SplitsTopFilter(SplitsBlock.class, SplitsBlock.class);
-	}
-
-	@Override
-	public String getDisplayText() {
-		return "Not implemented";
 	}
 }

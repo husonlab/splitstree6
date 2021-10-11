@@ -9,7 +9,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import splitstree6.data.parts.Taxon;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 
 import java.io.IOException;
 import java.util.*;
@@ -68,7 +69,6 @@ public class TaxaBlock extends DataBlock {
 	public Object clone() {
 		return new TaxaBlock(this);
 	}
-
 
 	@Override
 	public void clear() {
@@ -312,12 +312,7 @@ public class TaxaBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTopFilter() {
-		return null;
-	}
-
-	@Override
-	public String getDisplayText() {
+	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return null;
 	}
 }

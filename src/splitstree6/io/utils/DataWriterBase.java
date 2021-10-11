@@ -1,9 +1,9 @@
 package splitstree6.io.utils;
 
 import jloda.util.Basic;
-import splitstree6.data.DataBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.workflow.interfaces.HasFromClass;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.interfaces.HasFromClass;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;

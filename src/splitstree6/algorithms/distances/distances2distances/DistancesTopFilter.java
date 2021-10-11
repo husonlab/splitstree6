@@ -4,7 +4,7 @@ import jloda.util.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.TopFilter;
 
 import java.io.IOException;
 

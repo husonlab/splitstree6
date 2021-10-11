@@ -1,8 +1,8 @@
 package splitstree6.io.utils;
 
 import jloda.util.ProgressListener;
-import splitstree6.data.DataBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.sflow.DataBlock;
 
 import java.io.IOException;
 

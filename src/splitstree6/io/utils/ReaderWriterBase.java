@@ -18,12 +18,15 @@ public class ReaderWriterBase {
 		}
 	}
 
-
 	public boolean accepts(String file) {
-		for (var ex : fileExtensions) {
-			if (file.endsWith(ex))
-				return true;
+		if (fileExtensions.size() == 0)
+			return true;
+		else {
+			for (var ex : fileExtensions) {
+				if (file.endsWith(ex))
+					return true;
+			}
+			return false;
 		}
-		return false;
 	}
 }

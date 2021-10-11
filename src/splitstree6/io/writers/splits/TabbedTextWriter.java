@@ -1,0 +1,61 @@
+/*
+ *  Copyright (C) 2018. Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package splitstree6.io.writers.splits;
+
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.TaxaBlock;
+
+import java.io.IOException;
+import java.io.Writer;
+import java.util.BitSet;
+
+public class TabbedTextWriter extends SplitsWriter {
+	public TabbedTextWriter() {
+		setFileExtensions("tab", "txt");
+	}
+
+	@Override
+	public void write(Writer w, TaxaBlock taxa, SplitsBlock splits) throws IOException {
+		w.write("Splits\n");
+		w.write("\tWeights");
+
+		for (int i = 1; i <= taxa.getNtax(); i++)
+			w.write("\t" + taxa.getLabel(i));
+		w.write("\n");
+
+		//Now we loop through the splits, one split per row.
+		int nsplits = splits.getNsplits();
+		int ntax = taxa.getNtax();
+		for (int s = 1; s <= nsplits; s++) {
+
+			//Split number
+			w.write(Integer.toString(s));
+			w.write("\t" + splits.get(s).getWeight());
+			BitSet A = splits.get(s).getA();
+			for (int j = 1; j <= ntax; j++) {
+				char ch = A.get(j) ? '1' : '0';
+				w.write("\t" + ch);
+			}
+
+			w.write("\n");
+		}
+		w.write("\n");
+	}
+}

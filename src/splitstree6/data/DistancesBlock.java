@@ -1,7 +1,8 @@
 package splitstree6.data;
 
 import splitstree6.algorithms.distances.distances2distances.DistancesTopFilter;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 
 public class DistancesBlock extends DataBlock {
 	private double[][] distances;
@@ -166,12 +167,7 @@ public class DistancesBlock extends DataBlock {
 	}
 
 	@Override
-	public String getDisplayText() {
-		return "Not implemented";
-	}
-
-	@Override
-	public TopFilter<DistancesBlock, DistancesBlock> createTopFilter() {
+	public TopFilter<DistancesBlock, DistancesBlock> createTaxaDataFilter() {
 		return new DistancesTopFilter(DistancesBlock.class, DistancesBlock.class);
 	}
 }

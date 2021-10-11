@@ -5,7 +5,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import jloda.phylo.PhyloTree;
 import splitstree6.algorithms.trees.trees2trees.TreesTopFilter;
-import splitstree6.workflow.TopFilter;
+import splitstree6.sflow.DataBlock;
+import splitstree6.sflow.TopFilter;
 
 public class TreesBlock extends DataBlock {
 	private final ObservableList<PhyloTree> trees;
@@ -69,7 +70,7 @@ public class TreesBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTopFilter() {
+	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return new TreesTopFilter(TreesBlock.class, TreesBlock.class);
 	}
 
@@ -95,11 +96,5 @@ public class TreesBlock extends DataBlock {
 	@Override
 	public String getInfo() {
 		return (getNTrees() == 1 ? "one tree" : getNTrees() + " trees") + (isPartial() ? ", partial" : "");
-	}
-
-
-	@Override
-	public String getDisplayText() {
-		return "Not implemented";
 	}
 }

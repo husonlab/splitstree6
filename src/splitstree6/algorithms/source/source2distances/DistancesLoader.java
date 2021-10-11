@@ -4,29 +4,23 @@ import jloda.util.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.io.readers.distances.DistancesReader;
-import splitstree6.io.readers.distances.PhylipReader;
-import splitstree6.workflow.Loader;
+import splitstree6.sflow.Loader;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class DistancesLoader extends Loader<SourceBlock, DistancesBlock> {
-	private final ArrayList<DistancesReader> readers = new ArrayList<>();
 
 	public DistancesLoader() {
 		super(SourceBlock.class, DistancesBlock.class);
-		// todo: load all by reflection
-		readers.add(new PhylipReader());
 	}
 
 	@Override
-	public void load(ProgressListener progress, SourceBlock inputData, TaxaBlock outputTaxa, DistancesBlock distancesBlock) throws IOException {
+	public void load(ProgressListener progress, SourceBlock inputData, TaxaBlock outputTaxa, DistancesBlock outputBlock) throws IOException {
 		var file = inputData.getSources().get(0);
-		for (var reader : readers) {
+		for (var reader : getReaders()) {
 			if (reader.accepts(file)) {
-				reader.read(progress, file, outputTaxa, distancesBlock);
-				System.err.println("Loaded: Taxa: " + outputTaxa.getInfo() + " Distances: " + distancesBlock.getInfo());
+				reader.read(progress, file, outputTaxa, outputBlock);
+				System.err.println("Loaded: Taxa: " + outputTaxa.getInfo() + " Distances: " + outputBlock.getInfo());
 				break;
 			}
 		}

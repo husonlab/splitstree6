@@ -20,11 +20,13 @@
 
 package splitstree6.utils;
 
+import java.io.IOException;
+
 /**
  * splits exception
  * Daniel Huson, 1/26/17.
  */
-public class SplitsException extends Exception {
+public class SplitsException extends IOException {
 	public SplitsException(String message) {
 		super(message);
 	}
