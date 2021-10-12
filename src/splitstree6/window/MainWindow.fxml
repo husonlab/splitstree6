@@ -454,6 +454,7 @@
                                 <Menu fx:id="windowMenu" text="Window">
                                     <items>
                                         <MenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."/>
+                                        <SeparatorMenuItem mnemonicParsing="false"/>
                                     </items>
                                 </Menu>
                                 <Menu text="Help">

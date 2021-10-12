@@ -30,7 +30,6 @@ import java.util.ArrayList;
 
 /**
  * data load algorithm
- *
  * @param <S>
  * @param <T>
  */

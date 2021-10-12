@@ -33,7 +33,6 @@ import java.util.List;
 /**
  * SplitsTree algorithm
  * Daniel Huson, 10.2021
- *
  * @param <S>
  * @param <T>
  */
