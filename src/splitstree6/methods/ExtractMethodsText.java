@@ -24,10 +24,10 @@ import jloda.util.Basic;
 import jloda.util.Pair;
 import splitstree6.algorithms.IFilter;
 import splitstree6.main.Version;
-import splitstree6.sflow.Algorithm;
-import splitstree6.sflow.AlgorithmNode;
-import splitstree6.sflow.DataNode;
-import splitstree6.sflow.Workflow;
+import splitstree6.workflow.Algorithm;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataNode;
+import splitstree6.workflow.Workflow;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,7 +41,7 @@ import java.util.TreeSet;
 public class ExtractMethodsText {
 	private static ExtractMethodsText instance;
 
-	public static String preambleTemplate = "Analysis was performed using SplitsTree5 %s%s.\n";
+	public static String preambleTemplate = "Analysis was performed using SplitsTree6 %s%s.\n";
 	public static String inputDataTemplate = "The original input consisted of %s and %s.\n";
 	public static String taxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.\n";
 	public static String taxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s.\n";
@@ -73,7 +73,7 @@ public class ExtractMethodsText {
 	 * @return method text
 	 */
 	public String apply(Workflow workflow) {
-		if (workflow.getTopTaxaNode() == null || workflow.getTopDataNode() == null)
+		if (workflow.getInputTaxaNode() == null || workflow.getInputDataNode() == null)
 			return "";
 
 		var buf = new StringBuilder();
@@ -85,9 +85,9 @@ public class ExtractMethodsText {
 
 		final Set<String> set = new HashSet<>(); // use this to avoid duplicate lines
 
-		buf.append(String.format(inputDataTemplate, workflow.getTopTaxaNode().getDataBlock().getInfo(), workflow.getTopDataNode().getDataBlock().getInfo()));
+		buf.append(String.format(inputDataTemplate, workflow.getInputTaxaNode().getDataBlock().getInfo(), workflow.getInputDataNode().getDataBlock().getInfo()));
 
-		var topTaxaBlock = workflow.getTopTaxonBlock();
+		var topTaxaBlock = workflow.getInputTaxonBlock();
 		var workingTaxaBlock = workflow.getWorkingTaxaBlock();
 		if (workingTaxaBlock != null && workingTaxaBlock.getNtax() < topTaxaBlock.getNtax()) {
 			int removed = (topTaxaBlock.getNtax() - workingTaxaBlock.getNtax());

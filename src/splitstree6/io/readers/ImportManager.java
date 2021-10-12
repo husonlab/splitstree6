@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
+ *  ImportManager.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -21,7 +21,7 @@ package splitstree6.io.readers;
 
 import jloda.util.PluginClassLoader;
 import splitstree6.io.utils.DataReaderBase;
-import splitstree6.sflow.DataBlock;
+import splitstree6.workflow.DataBlock;
 
 import java.util.ArrayList;
 

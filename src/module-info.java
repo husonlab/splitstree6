@@ -9,16 +9,9 @@ module splitstreesix {
 
 	requires Jama;
 
-    /*
-    exports splitstree6.resources.css;
-    exports splitstree6.resources.icons;
-    exports splitstree6.resources.images;
-
-
-    opens splitstree6.resources.css;
+	// opens splitstree6.resources.css;
     opens splitstree6.resources.icons;
     opens splitstree6.resources.images;
-    */
 
 	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
@@ -56,6 +49,10 @@ module splitstreesix {
 	opens splitstree6.io.writers.trees;
 	opens splitstree6.io.writers.network;
 
+	exports splitstree6.main;
+
 	exports splitstree6.xtra;
 	opens splitstree6.algorithms.utils;
+
+	opens splitstree6.window;
 }

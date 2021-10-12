@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
+ *  NetworkBlock.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -24,8 +24,8 @@ import jloda.graph.EdgeArray;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloGraph;
-import splitstree6.sflow.DataBlock;
-import splitstree6.sflow.TopFilter;
+import splitstree6.workflow.DataBlock;
+import splitstree6.workflow.DataTaxaFilter;
 
 import java.util.HashMap;
 
@@ -110,7 +110,7 @@ public class NetworkBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
+	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return null;
 	}
 
@@ -120,5 +120,10 @@ public class NetworkBlock extends DataBlock {
 
 	public static class EdgeData extends HashMap<String, String> {
 		public enum BasicKey {type, c1, c2, label}
+	}
+
+	@Override
+	public NetworkBlock newInstance() {
+		return (NetworkBlock) super.newInstance();
 	}
 }

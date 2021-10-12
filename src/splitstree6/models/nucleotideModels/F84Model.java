@@ -22,7 +22,7 @@
  * Created on Jun 9, 2004
  *
  * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * MainWindow&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 package splitstree6.models.nucleotideModels;
 
@@ -32,7 +32,7 @@ import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDis
  * @author bryant
  * <p/>
  * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * MainWindow&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class F84Model extends NucleotideModel {
 	/**

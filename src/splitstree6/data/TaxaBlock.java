@@ -1,3 +1,22 @@
+/*
+ *  TaxaBlock.java Copyright (C) 2021 Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package splitstree6.data;
 
 import javafx.application.Platform;
@@ -9,8 +28,8 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import splitstree6.data.parts.Taxon;
-import splitstree6.sflow.DataBlock;
-import splitstree6.sflow.TopFilter;
+import splitstree6.workflow.DataBlock;
+import splitstree6.workflow.DataTaxaFilter;
 
 import java.io.IOException;
 import java.util.*;
@@ -312,7 +331,12 @@ public class TaxaBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
+	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
 		return null;
+	}
+
+	@Override
+	public TaxaBlock newInstance() {
+		return (TaxaBlock) super.newInstance();
 	}
 }

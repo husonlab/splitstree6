@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
+ *  ExtractOptions.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -21,7 +21,7 @@ package splitstree6.methods;
 
 import javafx.beans.property.Property;
 import jloda.util.Basic;
-import splitstree6.sflow.Algorithm;
+import splitstree6.workflow.Algorithm;
 
 import java.util.ArrayList;
 

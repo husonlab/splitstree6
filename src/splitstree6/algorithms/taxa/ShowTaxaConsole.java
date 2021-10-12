@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
+ *  ShowTaxaConsole.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -24,8 +24,8 @@ import splitstree6.data.SinkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.writers.taxa.TabbedTextWriter;
 import splitstree6.methods.IgnoredInMethodsText;
-import splitstree6.sflow.Algorithm;
-import splitstree6.sflow.DataBlock;
+import splitstree6.workflow.Algorithm;
+import splitstree6.workflow.DataBlock;
 
 import java.io.IOException;
 import java.io.StringWriter;

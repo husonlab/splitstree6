@@ -1,3 +1,22 @@
+/*
+ *  SimplePipeline.java Copyright (C) 2021 Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package splitstree6.xtra;
 
 import javafx.application.Application;
@@ -19,7 +38,7 @@ import splitstree6.algorithms.trees.trees2sink.ShowTreesConsole;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.methods.ExtractMethodsText;
-import splitstree6.sflow.Workflow;
+import splitstree6.workflow.Workflow;
 
 public class SimplePipeline extends Application {
 	private static Workflow setupWorkflow() {
@@ -35,7 +54,7 @@ public class SimplePipeline extends Application {
 		}
 
 		{
-			workflow.setupTopAndWorkingNodes(source, new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
+			workflow.setupInputAndWorkingNodes(source, new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
 			workflow.newAlgorithmNode(new ShowTaxaConsole(), null, workflow.getWorkingTaxaNode(), workflow.newDataNode(new SinkBlock()));
 		}
 
@@ -59,7 +78,7 @@ public class SimplePipeline extends Application {
 			workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), treesNode, workflow.newDataNode(new SinkBlock()));
 		}
 
-		if (false) {
+		if (true) {
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
 			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new SinkBlock()));
@@ -93,7 +112,7 @@ public class SimplePipeline extends Application {
 			ProgramExecutorService.submit(1000, () -> {
 				for (var node : workflow.getNodes(TaxaFilter.class)) {
 					var taxaFilter = (TaxaFilter) node.getAlgorithm();
-					taxaFilter.getOptionDisabledTaxa().add(workflow.getTopTaxonBlock().getLabel(1));
+					taxaFilter.getOptionDisabledTaxa().add(workflow.getInputTaxonBlock().getLabel(1));
 
 					if (!workflow.getBusy()) {
 						System.err.println("Rerunning Analysis");

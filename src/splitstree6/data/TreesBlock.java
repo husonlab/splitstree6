@@ -1,12 +1,31 @@
+/*
+ *  TreesBlock.java Copyright (C) 2021 Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package splitstree6.data;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import jloda.phylo.PhyloTree;
-import splitstree6.algorithms.trees.trees2trees.TreesTopFilter;
-import splitstree6.sflow.DataBlock;
-import splitstree6.sflow.TopFilter;
+import splitstree6.algorithms.trees.trees2trees.TreesTaxaFilter;
+import splitstree6.workflow.DataBlock;
+import splitstree6.workflow.DataTaxaFilter;
 
 public class TreesBlock extends DataBlock {
 	private final ObservableList<PhyloTree> trees;
@@ -70,8 +89,8 @@ public class TreesBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
-		return new TreesTopFilter(TreesBlock.class, TreesBlock.class);
+	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
+		return new TreesTaxaFilter(TreesBlock.class, TreesBlock.class);
 	}
 
 	@Override
@@ -97,4 +116,10 @@ public class TreesBlock extends DataBlock {
 	public String getInfo() {
 		return (getNTrees() == 1 ? "one tree" : getNTrees() + " trees") + (isPartial() ? ", partial" : "");
 	}
+
+	@Override
+	public TreesBlock newInstance() {
+		return (TreesBlock) super.newInstance();
+	}
+
 }

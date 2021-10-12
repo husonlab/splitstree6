@@ -76,7 +76,7 @@ public class NeXMLWriter extends TreesWriter {
 		xmlStreamWriter.writeNamespace("nex", "http://www.nexml.org/2009");
 		xmlStreamWriter.writeDefaultNamespace("http://www.nexml.org/2009");
 		xmlStreamWriter.writeNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-		xmlStreamWriter.writeNamespace("sp5", "https://github.com/danielhuson/splitstree5");
+		xmlStreamWriter.writeNamespace("sp5", "https://github.com/danielhuson/splitstree6");
 		//w.write("\n\t");
 		//xmlStreamWriter.writeNamespace("xml", "http://www.w3.org/XML/1998/namespace");
 		writeNewLineWithTabs(xmlStreamWriter, 0);

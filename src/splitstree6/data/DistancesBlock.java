@@ -1,8 +1,27 @@
+/*
+ *  DistancesBlock.java Copyright (C) 2021 Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package splitstree6.data;
 
-import splitstree6.algorithms.distances.distances2distances.DistancesTopFilter;
-import splitstree6.sflow.DataBlock;
-import splitstree6.sflow.TopFilter;
+import splitstree6.algorithms.distances.distances2distances.DistancesTaxaFilter;
+import splitstree6.workflow.DataBlock;
+import splitstree6.workflow.DataTaxaFilter;
 
 public class DistancesBlock extends DataBlock {
 	private double[][] distances;
@@ -167,7 +186,12 @@ public class DistancesBlock extends DataBlock {
 	}
 
 	@Override
-	public TopFilter<DistancesBlock, DistancesBlock> createTaxaDataFilter() {
-		return new DistancesTopFilter(DistancesBlock.class, DistancesBlock.class);
+	public DataTaxaFilter<DistancesBlock, DistancesBlock> createTaxaDataFilter() {
+		return new DistancesTaxaFilter(DistancesBlock.class, DistancesBlock.class);
+	}
+
+	@Override
+	public DistancesBlock newInstance() {
+		return (DistancesBlock) super.newInstance();
 	}
 }
