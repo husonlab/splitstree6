@@ -88,7 +88,7 @@ public class SplitsTree6 extends Application {
 
 	protected static void parseArguments(String[] args) throws CanceledException, UsageException {
 		final ArgsOptions options = new ArgsOptions(args, SplitsTree6.class, Version.NAME + " - Phylogenetic analysis using trees and networks");
-		options.setAuthors("Daniel H. Huson");
+		options.setAuthors("Daniel H. Huson and David J. Bryant");
 		options.setLicense(ProgramProperties.getProgramLicence());
 		options.setVersion(ProgramProperties.getProgramVersion());
 
