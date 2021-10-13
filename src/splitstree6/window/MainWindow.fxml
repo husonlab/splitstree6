@@ -95,7 +95,7 @@
                                         <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="pageSetupMenuItem" text="Page Setup..."/>
-                                        <MenuItem fx:id="printMenuitem" text="Print...">
+                                        <MenuItem fx:id="printMenuItem" text="Print...">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP"
                                                                     shift="DOWN" shortcut="DOWN"/>

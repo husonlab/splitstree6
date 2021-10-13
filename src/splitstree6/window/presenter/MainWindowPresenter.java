@@ -20,31 +20,67 @@
 package splitstree6.window.presenter;
 
 
-import jloda.fx.util.BasicFX;
-import jloda.fx.window.MainWindowManager;
+import javafx.scene.control.Menu;
+import javafx.scene.control.SeparatorMenuItem;
+import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.window.MainWindow;
 
 public class MainWindowPresenter {
-	private final MenusPresenter menusPresenter;
-	private final SplitPanePresenter splitPanePresenter;
+	private final MainWindow mainWindow;
+	private final WorkflowTabPresenter workflowTabPresenter;
 
 	public MainWindowPresenter(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
 		var controller = mainWindow.getController();
 
-		this.menusPresenter = new MenusPresenter(mainWindow);
-		this.splitPanePresenter = new SplitPanePresenter(controller);
+		this.workflowTabPresenter = new WorkflowTabPresenter(mainWindow);
 
-		controller.getUseDarkThemeMenuItem().selectedProperty().bindBidirectional(MainWindowManager.useDarkThemeProperty());
-		controller.getUseDarkThemeMenuItem().setSelected(MainWindowManager.isUseDarkTheme());
-
-		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
+		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+			disableAllMenuItems();
+			CommonMenuPresenter.apply(mainWindow);
+			if (n instanceof WorkflowTab workflowTab) {
+				workflowTabPresenter.apply(workflowTab);
+			}
+			enableAllMenuItemsWithDefinedAction();
+		});
 	}
 
-	public MenusPresenter getMenusPresenter() {
-		return menusPresenter;
+	public void disableAllMenuItems() {
+		for (var menu : mainWindow.getController().getMenuBar().getMenus()) {
+			disableAllMenuItems(menu);
+		}
+
 	}
 
-	public SplitPanePresenter getSplitPanePresenter() {
-		return splitPanePresenter;
+	public void disableAllMenuItems(Menu menu) {
+		if (!menu.getText().equals("Open Recent") && !menu.getText().equals("Window") && !menu.getText().equals("Help"))
+			for (var item : menu.getItems()) {
+				if (item instanceof Menu other) {
+					disableAllMenuItems(other);
+				} else if (!(item instanceof SeparatorMenuItem)) {
+					item.setOnAction(null);
+					item.disableProperty().unbind();
+					item.setDisable(true);
+				}
+			}
+	}
+
+	public void enableAllMenuItemsWithDefinedAction() {
+		for (var menu : mainWindow.getController().getMenuBar().getMenus()) {
+			enableAllMenuItemsWithDefinedAction(menu);
+		}
+	}
+
+	public void enableAllMenuItemsWithDefinedAction(Menu menu) {
+		if (!menu.getText().equals("Open Recent") && !menu.getText().equals("Window") && !menu.getText().equals("Help"))
+			for (var item : menu.getItems()) {
+				if (item instanceof Menu other) {
+					enableAllMenuItemsWithDefinedAction(other);
+				} else if (!(item instanceof SeparatorMenuItem)) {
+					if (item.getOnAction() != null && !item.disableProperty().isBound()) {
+						item.setDisable(false);
+					}
+				}
+			}
 	}
 }

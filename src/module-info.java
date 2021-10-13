@@ -55,4 +55,7 @@ module splitstreesix {
 	opens splitstree6.algorithms.utils;
 
 	opens splitstree6.window;
+
+	opens splitstree6.tabs.workflow;
+
 }

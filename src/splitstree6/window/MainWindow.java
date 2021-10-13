@@ -34,6 +34,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
 import splitstree6.data.parts.Taxon;
+import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.window.presenter.MainWindowPresenter;
 import splitstree6.workflow.Workflow;
 
@@ -99,6 +100,9 @@ public class MainWindow implements IMainWindow {
 		stage.titleProperty().addListener((e) -> MainWindowManager.getInstance().fireChanged());
 
 		presenter = new MainWindowPresenter(this);
+
+		getController().getMainTabPane().getTabs().add(new WorkflowTab(this));
+
 
 		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
 

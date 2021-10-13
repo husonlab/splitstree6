@@ -84,7 +84,7 @@ public class MainWindowController {
 	private MenuItem pageSetupMenuItem;
 
 	@FXML
-	private MenuItem printMenuitem;
+	private MenuItem printMenuItem;
 
 	@FXML
 	private Menu toolsMenu;
@@ -587,8 +587,8 @@ public class MainWindowController {
 		return pageSetupMenuItem;
 	}
 
-	public MenuItem getPrintMenuitem() {
-		return printMenuitem;
+	public MenuItem getPrintMenuItem() {
+		return printMenuItem;
 	}
 
 	public Menu getToolsMenu() {
