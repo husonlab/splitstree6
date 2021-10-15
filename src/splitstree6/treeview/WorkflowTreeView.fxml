@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  WorkflowTreeView.fxml Copyright (C) 2021 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.BorderPane?>
+<BorderPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.treeview.WorkflowTreeViewController">
+    <top>
+        <ToolBar fx:id="treeViewToolBar" prefHeight="28.0" BorderPane.alignment="CENTER">
+            <items>
+                <Button fx:id="expandAllButton" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
+                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/splitstree6/resources/icons/ExpandTreeView16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Button fx:id="collapseAllButton" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
+                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/splitstree6/resources/icons/CollapseTreeView16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+                <Separator/>
+                <Button fx:id="showButton" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
+                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Preferences16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+            </items>
+
+        </ToolBar>
+    </top>
+    <center>
+        <TreeView fx:id="workflowTreeView" BorderPane.alignment="CENTER"/>
+    </center>
+</BorderPane>

@@ -1,5 +1,5 @@
 /*
- *  WorkflowTab.java Copyright (C) 2021 Daniel H. Huson
+ *  TextDisplayTab.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.workflow;
+package splitstree6.tabs.textdisplay;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -29,31 +29,28 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
-import splitstree6.workflow.Workflow;
 
-public class WorkflowTab extends Tab implements IDisplayTab {
-	private final WorkflowTabController controller;
-	private final WorkflowTabPresenter presenter;
+public class TextDisplayTab extends Tab implements IDisplayTab {
+	private final TextDisplayTabController controller;
+	private final TextDisplayTabPresenter presenter;
 
 	private final UndoManager undoManager = new UndoManager();
 	private final MainWindow mainWindow;
-	private final Workflow workflow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
 	/**
 	 * constructor
 	 */
-	public WorkflowTab(MainWindow mainWindow) {
+	public TextDisplayTab(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
-		this.workflow = mainWindow.getWorkflow();
-		presenter = new WorkflowTabPresenter(mainWindow, this);
+		presenter = new TextDisplayTabPresenter(mainWindow, this);
 
-		var extendedFXMLLoader = new ExtendedFXMLLoader<WorkflowTabController>(this.getClass());
+		var extendedFXMLLoader = new ExtendedFXMLLoader<TextDisplayTabController>(this.getClass());
 		controller = extendedFXMLLoader.getController();
 
-		empty.bind(workflow.numberOfNodesProperty().isEqualTo(0));
+		//empty.bind();
 
-		setText("Workflow");
+		setText("TextDisplay");
 		setClosable(false);
 	}
 
@@ -69,7 +66,7 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getMainPane();
+		return null;
 	}
 
 	@Override
@@ -77,7 +74,7 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 		return presenter;
 	}
 
-	public WorkflowTabController getController() {
+	public TextDisplayTabController getController() {
 		return controller;
 	}
 }

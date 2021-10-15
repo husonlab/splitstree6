@@ -34,6 +34,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
 import splitstree6.data.parts.Taxon;
+import splitstree6.tabs.algorithms.taxa.TaxaFilterTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.window.presenter.MainWindowPresenter;
 import splitstree6.workflow.Workflow;
@@ -101,16 +102,15 @@ public class MainWindow implements IMainWindow {
 
 		presenter = new MainWindowPresenter(this);
 
-		getController().getMainTabPane().getTabs().add(new WorkflowTab(this));
+		getController().getAlgorithmTabPane().getTabs().add(new TaxaFilterTab(this));
 
+		getController().getMainTabPane().getTabs().add(new WorkflowTab(this));
 
 		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
 
-		name.addListener(c -> stage.setTitle(Basic.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "")
-				+ " - " + ProgramProperties.getProgramName()));
+		name.addListener(c -> stage.setTitle(Basic.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
 
-		dirtyProperty().addListener(c -> stage.setTitle(Basic.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "")
-				+ " - " + ProgramProperties.getProgramName()));
+		dirtyProperty().addListener(c -> stage.setTitle(Basic.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
 
 		setName("Empty");
 

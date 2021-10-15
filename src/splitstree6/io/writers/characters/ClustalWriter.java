@@ -30,49 +30,49 @@ import java.io.Writer;
 
 public class ClustalWriter extends CharactersWriter {
 
-    public ClustalWriter() {
-        setFileExtensions("aln", "clustal");
-    }
+	public ClustalWriter() {
+		setFileExtensions("aln", "clustal");
+	}
 
-    private final IntegerProperty optionLineLength = new SimpleIntegerProperty(40);
+	private final IntegerProperty optionLineLength = new SimpleIntegerProperty(40);
 
-    public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
-        w.write("CLUSTAL multiple sequence alignment (Produced by SplitsTree 6)\n\n\n");
+	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
+		w.write("CLUSTAL multiple sequence alignment (Produced by SplitsTree 6)\n\n\n");
 
-        var ntax = taxa.getNtax();
-        var nchar = characters.getNchar();
+		var ntax = taxa.getNtax();
+		var nchar = characters.getNchar();
 
-        var lineLength = getOptionLineLength();
-        int iterations;
-        if (nchar % getOptionLineLength() == 0)
-            iterations = nchar / lineLength;
-        else
-            iterations = nchar / lineLength + 1;
+		var lineLength = getOptionLineLength();
+		int iterations;
+		if (nchar % getOptionLineLength() == 0)
+			iterations = nchar / lineLength;
+		else
+			iterations = nchar / lineLength + 1;
 
-        for (var i = 1; i <= iterations; i++) {
-            var startIndex = lineLength * (i - 1) + 1;
-            for (var t = 1; t <= ntax; t++) {
-                var buf = new StringBuilder();
-                int stopIndex = lineLength;
-                for (int j = startIndex; j <= lineLength * i && j <= nchar; j++) {
-                    buf.append(characters.get(t, j));
-                    stopIndex = j;
-                }
-                w.write(taxa.get(t) + " \t" + buf.toString().toUpperCase() + " \t" + stopIndex + "\n");
-            }
-            w.write("\n");
-        }
-    }
+		for (var i = 1; i <= iterations; i++) {
+			var startIndex = lineLength * (i - 1) + 1;
+			for (var t = 1; t <= ntax; t++) {
+				var buf = new StringBuilder();
+				int stopIndex = lineLength;
+				for (int j = startIndex; j <= lineLength * i && j <= nchar; j++) {
+					buf.append(characters.get(t, j));
+					stopIndex = j;
+				}
+				w.write(taxa.get(t) + " \t" + buf.toString().toUpperCase() + " \t" + stopIndex + "\n");
+			}
+			w.write("\n");
+		}
+	}
 
-    public int getOptionLineLength() {
-        return optionLineLength.get();
-    }
+	public int getOptionLineLength() {
+		return optionLineLength.get();
+	}
 
-    public IntegerProperty optionLineLengthProperty() {
-        return optionLineLength;
-    }
+	public IntegerProperty optionLineLengthProperty() {
+		return optionLineLength;
+	}
 
-    public void setOptionLineLength(int optionLineLength) {
-        this.optionLineLength.set(optionLineLength);
-    }
+	public void setOptionLineLength(int optionLineLength) {
+		this.optionLineLength.set(optionLineLength);
+	}
 }

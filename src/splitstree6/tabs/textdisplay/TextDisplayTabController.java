@@ -1,5 +1,5 @@
 /*
- *  WorkflowTreeItem.java Copyright (C) 2021 Daniel H. Huson
+ *  TextDisplayTabController.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.gui.treeview;
+package splitstree6.tabs.textdisplay;
 
-public class WorkflowTreeItem {
+import javafx.fxml.FXML;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+
+public class TextDisplayTabController {
+
+	@FXML
+	private AnchorPane anchorPane;
+
+	@FXML
+	private BorderPane borderPane;
+
+	@FXML
+	private Pane mainPane;
+
+	@FXML
+	private VBox topVBox;
+
+	public AnchorPane getAnchorPane() {
+		return anchorPane;
+	}
+
+	public BorderPane getBorderPane() {
+		return borderPane;
+	}
+
+	public Pane getMainPane() {
+		return mainPane;
+	}
+
+	public VBox getTopVBox() {
+		return topVBox;
+	}
 }

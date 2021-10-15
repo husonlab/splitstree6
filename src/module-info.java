@@ -8,9 +8,10 @@ module splitstreesix {
 	requires transitive java.desktop;
 
 	requires Jama;
+	requires richtextfx.fat;
 
-	// opens splitstree6.resources.css;
-    opens splitstree6.resources.icons;
+	opens splitstree6.resources.css;
+	opens splitstree6.resources.icons;
     opens splitstree6.resources.images;
 
 	opens splitstree6.algorithms.characters.characters2characters;
@@ -49,13 +50,19 @@ module splitstreesix {
 	opens splitstree6.io.writers.trees;
 	opens splitstree6.io.writers.network;
 
-	exports splitstree6.main;
-
-	exports splitstree6.xtra;
-	opens splitstree6.algorithms.utils;
 
 	opens splitstree6.window;
 
+	opens splitstree6.treeview;
+
+	opens splitstree6.tabs.inputeditor;
+	opens splitstree6.tabs.network;
+	opens splitstree6.tabs.textdisplay;
+	opens splitstree6.tabs.tree;
 	opens splitstree6.tabs.workflow;
 
+	opens splitstree6.tabs.algorithms.taxa;
+
+	exports splitstree6.xtra;
+	exports splitstree6.main;
 }

@@ -33,7 +33,6 @@ import jloda.fx.control.SplittableTabPane;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.ProgramProperties;
-import splitstree6.gui.treeview.WorkflowTreeItem;
 
 import java.util.ArrayList;
 
@@ -439,19 +438,7 @@ public class MainWindowController {
 	private AnchorPane leftAnchorPane;
 
 	@FXML
-	private ToolBar treeViewToolBar;
-
-	@FXML
-	private Button expandAllButton;
-
-	@FXML
-	private Button collapseAllButton;
-
-	@FXML
-	private Button showButton;
-
-	@FXML
-	private TreeView<WorkflowTreeItem> workflowTreeView;
+	private AnchorPane treeViewAnchorPane;
 
 	@FXML
 	private BorderPane algorithmsBorderPane;
@@ -1063,24 +1050,8 @@ public class MainWindowController {
 		return leftAnchorPane;
 	}
 
-	public ToolBar getTreeViewToolBar() {
-		return treeViewToolBar;
-	}
-
-	public Button getExpandAllButton() {
-		return expandAllButton;
-	}
-
-	public Button getCollapseAllButton() {
-		return collapseAllButton;
-	}
-
-	public Button getShowButton() {
-		return showButton;
-	}
-
-	public TreeView<WorkflowTreeItem> getWorkflowTreeView() {
-		return workflowTreeView;
+	public AnchorPane getTreeViewAnchorPane() {
+		return treeViewAnchorPane;
 	}
 
 	public BorderPane getAlgorithmsBorderPane() {

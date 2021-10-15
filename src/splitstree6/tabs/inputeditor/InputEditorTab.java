@@ -1,5 +1,5 @@
 /*
- *  WorkflowTab.java Copyright (C) 2021 Daniel H. Huson
+ *  WorkflowTreeView.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.workflow;
+package splitstree6.tabs.inputeditor;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -29,37 +29,34 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
-import splitstree6.workflow.Workflow;
 
-public class WorkflowTab extends Tab implements IDisplayTab {
-	private final WorkflowTabController controller;
-	private final WorkflowTabPresenter presenter;
+public class InputEditorTab extends Tab implements IDisplayTab {
+	public static final String NAME = "Input Editor";
+	private final InputEditorTabController controller;
+	private final InputEditorTabPresenter presenter;
 
-	private final UndoManager undoManager = new UndoManager();
-	private final MainWindow mainWindow;
-	private final Workflow workflow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
 	/**
 	 * constructor
 	 */
-	public WorkflowTab(MainWindow mainWindow) {
-		this.mainWindow = mainWindow;
-		this.workflow = mainWindow.getWorkflow();
-		presenter = new WorkflowTabPresenter(mainWindow, this);
+	public InputEditorTab(MainWindow mainWindow) {
+		var loader = new ExtendedFXMLLoader<InputEditorTabController>(this.getClass());
 
-		var extendedFXMLLoader = new ExtendedFXMLLoader<WorkflowTabController>(this.getClass());
-		controller = extendedFXMLLoader.getController();
+		controller = loader.getController();
+		presenter = new InputEditorTabPresenter(mainWindow, this);
 
-		empty.bind(workflow.numberOfNodesProperty().isEqualTo(0));
+		setContent(loader.getRoot());
 
-		setText("Workflow");
+		//empty.bind();
+
+		setText(NAME);
 		setClosable(false);
 	}
 
 	@Override
 	public UndoManager getUndoManager() {
-		return undoManager;
+		return null;
 	}
 
 	@Override
@@ -69,7 +66,7 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getMainPane();
+		return null;
 	}
 
 	@Override
@@ -77,8 +74,41 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 		return presenter;
 	}
 
-	public WorkflowTabController getController() {
+	public InputEditorTabController getController() {
 		return controller;
+	}
+
+	/**
+	 * go to given line and given col
+	 *
+	 * @param col if col<=1 or col>line length, will select the whole line, else selects line starting at given col
+	 */
+	public void gotoLine(long lineNumber, int col) {
+		if (col < 0)
+			col = 0;
+		else if (col > 0)
+			col--; // because col is 1-based
+
+		lineNumber = Math.max(1, lineNumber);
+		final String text = controller.getCodeArea().getText();
+		int start = 0;
+		for (int i = 1; i < lineNumber; i++) {
+			start = text.indexOf('\n', start + 1);
+			if (start == -1) {
+				System.err.println("No such line number: " + lineNumber);
+				return;
+			}
+		}
+		start++;
+		if (start < text.length()) {
+			int end = text.indexOf('\n', start);
+			if (end == -1)
+				end = text.length();
+			if (start + col < end)
+				start = start + col;
+			controller.getScrollPane().requestFocus();
+			controller.getCodeArea().selectRange(start, end);
+		}
 	}
 }
 

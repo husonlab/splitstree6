@@ -1,5 +1,5 @@
 /*
- *  WorkflowTabPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  InputEditorTabPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,44 +17,34 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.workflow;
+package splitstree6.treeview;
 
-
+import javafx.beans.binding.Bindings;
+import javafx.scene.control.TreeItem;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
-public class WorkflowTabPresenter implements IDisplayTabPresenter {
-	private final MainWindow mainWindow;
-	private final WorkflowTab tab;
+import java.util.LinkedList;
 
-	public WorkflowTabPresenter(MainWindow mainWindow, WorkflowTab tab) {
+public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
+	private final MainWindow mainWindow;
+	private final WorkflowTreeView tab;
+
+	public WorkflowTreeViewPresenter(MainWindow mainWindow, WorkflowTreeView tab) {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
+
+		tab.getController().getWorkflowTreeView().setRoot(new WorkflowTreeItem(mainWindow));
 	}
 
 	public void setup() {
 		var controller = mainWindow.getController();
+		var tabController = tab.getController();
 
-		controller.getCutMenuItem().setOnAction(null);
 		controller.getCopyMenuItem().setOnAction(null);
-
-		controller.getCopyImageMenuItem().setOnAction(null);
-
-		controller.getPasteMenuItem().setOnAction(null);
-
-		controller.getUndoMenuItem().setOnAction(e -> tab.getUndoManager().undo());
-		controller.getUndoMenuItem().disableProperty().bind(tab.getUndoManager().undoableProperty().not());
-		controller.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
-		controller.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
-
-		controller.getDuplicateMenuItem().setOnAction(null);
-		controller.getDeleteMenuItem().setOnAction(null);
 
 		controller.getFindMenuItem().setOnAction(null);
 		controller.getFindAgainMenuItem().setOnAction(null);
-
-		// controller.getReplaceMenuItem().setOnAction(null);
-
 
 		controller.getSelectAllMenuItem().setOnAction(null);
 		controller.getSelectNoneMenuItem().setOnAction(null);
@@ -64,5 +54,29 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		controller.getZoomInMenuItem().setOnAction(null);
 		controller.getZoomOutMenuItem().setOnAction(null);
+
+
+		var treeView = tabController.getWorkflowTreeView();
+
+		tabController.getCollapseAllButton().setOnAction((e) -> treeView.getRoot().setExpanded(false));
+
+		tabController.getExpandAllButton().setOnAction((e) -> {
+			final var queue = new LinkedList<TreeItem<String>>();
+			queue.add(treeView.getRoot());
+			while (queue.size() > 0) {
+				final var item = queue.poll();
+				item.setExpanded(true);
+				queue.addAll(item.getChildren());
+			}
+		});
+
+		tabController.getShowButton().setOnAction((e) -> {
+			for (var item : treeView.getSelectionModel().getSelectedItems()) {
+				//final Point2D point2D = item.getGraphic().localToScreen(item.getGraphic().getLayoutX(), item.getGraphic().getLayoutY());
+				((WorkflowTreeItem) item).showView();
+			}
+		});
+		tabController.getShowButton().disableProperty().bind(Bindings.isEmpty(treeView.getSelectionModel().getSelectedItems()));
+
 	}
 }

@@ -1,5 +1,5 @@
 /*
- *  IDisplayTab.java Copyright (C) 2021 Daniel H. Huson
+ *  TreeTabController.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,20 +17,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+package splitstree6.tabs.tree;
 
-package splitstree6.tabs;
+import javafx.fxml.FXML;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.scene.Node;
-import jloda.fx.undo.UndoManager;
+public class TreeTabController {
 
-public interface IDisplayTab {
+	@FXML
+	private AnchorPane anchorPane;
 
-	UndoManager getUndoManager();
+	@FXML
+	private BorderPane borderPane;
 
-	ReadOnlyBooleanProperty isEmptyProperty();
+	@FXML
+	private Pane mainPane;
 
-	Node getImageNode();
+	@FXML
+	private VBox topVBox;
 
-	IDisplayTabPresenter getPresenter();
+	public AnchorPane getAnchorPane() {
+		return anchorPane;
+	}
+
+	public BorderPane getBorderPane() {
+		return borderPane;
+	}
+
+	public Pane getMainPane() {
+		return mainPane;
+	}
+
+	public VBox getTopVBox() {
+		return topVBox;
+	}
 }

@@ -720,72 +720,8 @@
                                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <items>
-                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                                            <children>
-                                                <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                                            AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                    <top>
-                                                        <ToolBar fx:id="treeViewToolBar" prefHeight="28.0"
-                                                                 BorderPane.alignment="CENTER">
-                                                            <items>
-                                                                <Button fx:id="expandAllButton" maxHeight="18.0"
-                                                                        maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                                                        mnemonicParsing="false" prefHeight="18.0"
-                                                                        prefWidth="18.0">
-                                                                    <graphic>
-                                                                        <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                                   pickOnBounds="true"
-                                                                                   preserveRatio="true">
-                                                                            <image>
-                                                                                <Image smooth="false"
-                                                                                       url="@/splitstree6/resources/icons/ExpandTreeView16.gif"/>
-                                                                            </image>
-                                                                        </ImageView>
-                                                                    </graphic>
-                                                                </Button>
-                                                                <Button fx:id="collapseAllButton" maxHeight="18.0"
-                                                                        maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                                                        mnemonicParsing="false" prefHeight="18.0"
-                                                                        prefWidth="18.0">
-                                                                    <graphic>
-                                                                        <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                                   pickOnBounds="true"
-                                                                                   preserveRatio="true">
-                                                                            <image>
-                                                                                <Image smooth="false"
-                                                                                       url="@/splitstree6/resources/icons/CollapseTreeView16.gif"/>
-                                                                            </image>
-                                                                        </ImageView>
-                                                                    </graphic>
-                                                                </Button>
-                                                                <Separator/>
-                                                                <Button fx:id="showButton" maxHeight="18.0"
-                                                                        maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                                                        mnemonicParsing="false" prefHeight="18.0"
-                                                                        prefWidth="18.0">
-                                                                    <graphic>
-                                                                        <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                                   pickOnBounds="true"
-                                                                                   preserveRatio="true">
-                                                                            <image>
-                                                                                <Image smooth="false"
-                                                                                       url="@/jloda/resources/icons/sun/Preferences16.gif"/>
-                                                                            </image>
-                                                                        </ImageView>
-                                                                    </graphic>
-                                                                </Button>
-
-                                                            </items>
-
-                                                        </ToolBar>
-                                                    </top>
-                                                    <center>
-                                                        <TreeView fx:id="workflowTreeView"
-                                                                  BorderPane.alignment="CENTER"/>
-                                                    </center>
-                                                </BorderPane>
-                                            </children>
-                                        </AnchorPane>
+                                        <AnchorPane fx:id="treeViewAnchorPane" minHeight="0.0" minWidth="0.0"
+                                                    prefHeight="100.0" prefWidth="160.0"/>
                                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                             <children>
                                                 <BorderPane fx:id="algorithmsBorderPane" AnchorPane.bottomAnchor="0.0"

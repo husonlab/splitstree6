@@ -1,5 +1,5 @@
 /*
- *  WorkflowTab.java Copyright (C) 2021 Daniel H. Huson
+ *  WorkflowTreeView.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,44 +17,46 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.workflow;
+package splitstree6.treeview;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
-import javafx.scene.control.Tab;
+import javafx.scene.layout.AnchorPane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
-import splitstree6.workflow.Workflow;
 
-public class WorkflowTab extends Tab implements IDisplayTab {
-	private final WorkflowTabController controller;
-	private final WorkflowTabPresenter presenter;
+public class WorkflowTreeView extends AnchorPane implements IDisplayTab {
+	private final WorkflowTreeViewController controller;
+	private final WorkflowTreeViewPresenter presenter;
 
 	private final UndoManager undoManager = new UndoManager();
 	private final MainWindow mainWindow;
-	private final Workflow workflow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
 	/**
 	 * constructor
 	 */
-	public WorkflowTab(MainWindow mainWindow) {
+	public WorkflowTreeView(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
-		this.workflow = mainWindow.getWorkflow();
-		presenter = new WorkflowTabPresenter(mainWindow, this);
 
-		var extendedFXMLLoader = new ExtendedFXMLLoader<WorkflowTabController>(this.getClass());
+		var extendedFXMLLoader = new ExtendedFXMLLoader<WorkflowTreeViewController>(this.getClass());
 		controller = extendedFXMLLoader.getController();
 
-		empty.bind(workflow.numberOfNodesProperty().isEqualTo(0));
+		presenter = new WorkflowTreeViewPresenter(mainWindow, this);
 
-		setText("Workflow");
-		setClosable(false);
+		var root = extendedFXMLLoader.getRoot();
+		getChildren().add(root);
+		AnchorPane.setTopAnchor(root, 0.0);
+		AnchorPane.setBottomAnchor(root, 0.0);
+		AnchorPane.setLeftAnchor(root, 0.0);
+		AnchorPane.setRightAnchor(root, 0.0);
+
+		empty.bind(mainWindow.getWorkflow().numberOfNodesProperty().isEqualTo(0));
 	}
 
 	@Override
@@ -69,7 +71,7 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getMainPane();
+		return null;
 	}
 
 	@Override
@@ -77,7 +79,7 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 		return presenter;
 	}
 
-	public WorkflowTabController getController() {
+	public WorkflowTreeViewController getController() {
 		return controller;
 	}
 }

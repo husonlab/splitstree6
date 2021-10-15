@@ -1,0 +1,132 @@
+/*
+ * styles.css Copyright (C) 2020. Daniel H. Huson
+ *
+ * (Some code written by other authors, as named in code.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ */
+
+.text-area {
+    -fx-font-family: "Courier New";
+    -fx-font-size: 12;
+}
+
+.text-area:focused {
+    -fx-font-family: "Courier New";
+    -fx-font-size: 12;
+}
+
+/* Data/Input blocks styles */
+
+.keyword {
+    -fx-fill: purple;
+    -fx-font-weight: bold;
+}
+
+.option {
+    -fx-fill: darkviolet;
+}
+
+.block {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+}
+
+.block-collapse-able {
+    -fx-fill: darkblue;
+    -fx-font-weight: bold;
+    -fx-underline: true;
+}
+
+.collapsed {
+    -fx-fill: blue;
+    -fx-underline: true;
+}
+
+.number {
+    -fx-fill: green;
+    -fx-font-weight: bold;
+}
+
+.semicolon {
+    -fx-font-weight: bold;
+}
+
+.paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+.bracket {
+    -fx-fill: darkgreen;
+    -fx-font-weight: bold;
+}
+
+.brace {
+    -fx-fill: teal;
+    -fx-font-weight: bold;
+}
+
+.string {
+    -fx-fill: gray;
+}
+
+.comment {
+    -fx-fill: cadetblue;
+}
+
+.fasta {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+.fasta-comment {
+    -fx-fill: cadetblue;
+}
+
+.paragraph-box:has-caret {
+    -fx-background-color: #f2f9fc;
+}
+
+/* XML styles */
+.xml-tagmark {
+    -fx-fill: gray;
+}
+
+.xml-anytag {
+    -fx-fill: crimson;
+}
+
+.xml-paren {
+    -fx-fill: firebrick;
+    -fx-font-weight: bold;
+}
+
+.xml-attribute {
+    -fx-fill: darkviolet;
+}
+
+.xml-avalue {
+    -fx-font-weight: bold;
+    -fx-fill: black;
+}
+
+.xml-namespace {
+    -fx-fill: darkblue;
+}
+
+.xml-comment {
+    -fx-fill: teal;
+}

@@ -1,5 +1,5 @@
 /*
- *  WorkflowTabPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  TreeTabPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,26 +17,22 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.workflow;
-
+package splitstree6.tabs.tree;
 
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
-public class WorkflowTabPresenter implements IDisplayTabPresenter {
+public class TreeTabPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
-	private final WorkflowTab tab;
+	private final TreeTab tab;
 
-	public WorkflowTabPresenter(MainWindow mainWindow, WorkflowTab tab) {
+	public TreeTabPresenter(MainWindow mainWindow, TreeTab tab) {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
 	}
 
 	public void setup() {
 		var controller = mainWindow.getController();
-
-		controller.getCutMenuItem().setOnAction(null);
-		controller.getCopyMenuItem().setOnAction(null);
 
 		controller.getCopyImageMenuItem().setOnAction(null);
 
@@ -47,22 +43,43 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		controller.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
 		controller.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
 
-		controller.getDuplicateMenuItem().setOnAction(null);
-		controller.getDeleteMenuItem().setOnAction(null);
-
 		controller.getFindMenuItem().setOnAction(null);
 		controller.getFindAgainMenuItem().setOnAction(null);
 
-		// controller.getReplaceMenuItem().setOnAction(null);
-
+		controller.getReplaceMenuItem().setOnAction(null);
 
 		controller.getSelectAllMenuItem().setOnAction(null);
 		controller.getSelectNoneMenuItem().setOnAction(null);
+
+		controller.getSelectAllNodesMenuItem().setOnAction(null);
+		controller.getSelectAllLabeledNodesMenuItem().setOnAction(null);
+		controller.getSelectAllBelowMenuItem().setOnAction(null);
+
+		controller.getInvertNodeSelectionMenuItem().setOnAction(null);
+		controller.getDeselectAllNodesMenuItem().setOnAction(null);
+		controller.getSelectAllEdgesMenuItem().setOnAction(null);
+		controller.getSelectAllLabeledEdgesMenuItem().setOnAction(null);
+		controller.getSelectAllEdgesBelowMenuItem().setOnAction(null);
+		controller.getInvertEdgeSelectionMenuItem().setOnAction(null);
+		controller.getDeselectEdgesMenuItem().setOnAction(null);
+		controller.getSelectFromPreviousMenuItem().setOnAction(null);
 
 		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
 		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
 
 		controller.getZoomInMenuItem().setOnAction(null);
 		controller.getZoomOutMenuItem().setOnAction(null);
+
+
+		controller.getResetMenuItem().setOnAction(null);
+		controller.getRotateLeftMenuItem().setOnAction(null);
+		controller.getRotateRightMenuItem().setOnAction(null);
+		controller.getFlipMenuItem().setOnAction(null);
+		controller.getWrapTextMenuItem().setOnAction(null);
+		controller.getFormatNodesMenuItem().setOnAction(null);
+		controller.getLayoutLabelsMenuItem().setOnAction(null);
+		controller.getSparseLabelsCheckMenuItem().setOnAction(null);
+		controller.getShowScaleBarMenuItem().setOnAction(null);
+
 	}
 }
