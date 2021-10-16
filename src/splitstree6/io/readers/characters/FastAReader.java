@@ -21,6 +21,7 @@ package splitstree6.io.readers.characters;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import jloda.util.Basic;
 import jloda.util.FileLineIterator;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.ProgressListener;
@@ -28,6 +29,7 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -236,5 +238,16 @@ public class FastAReader extends CharactersReader {
 			taxonNames.add(line.substring(1));
 		else
 			taxonNames.add(line.substring(1) + "(" + sameNamesCounter + ")");
+	}
+
+
+	@Override
+	public boolean accepts(String fileName) {
+		if (!super.accepts(fileName))
+			return false;
+		else {
+			String line = Basic.getFirstLineFromFileIgnoreEmptyLines(new File(fileName), ";", 20);
+			return line != null && line.startsWith(">");
+		}
 	}
 }

@@ -28,6 +28,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.io.utils.SimpleNewickParser;
 import splitstree6.utils.TreesUtilities;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -163,5 +164,15 @@ public class NewickReader extends TreesReader {
 
 	public void setOptionConvertMultiLabeledTree(boolean optionConvertMultiLabeledTree) {
 		this.optionConvertMultiLabeledTree.set(optionConvertMultiLabeledTree);
+	}
+
+	@Override
+	public boolean accepts(String file) {
+		if (!super.accepts(file))
+			return false;
+		else {
+			String line = Basic.getFirstLineFromFileIgnoreEmptyLines(new File(file), "#", 20);
+			return line != null && line.startsWith("(");
+		}
 	}
 }

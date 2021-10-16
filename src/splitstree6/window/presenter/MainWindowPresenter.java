@@ -33,6 +33,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
+import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.WindowGeometry;
 import jloda.util.Basic;
@@ -114,6 +115,8 @@ public class MainWindowPresenter {
 				Basic.caught(ex);
 			}
 		});
+
+		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {

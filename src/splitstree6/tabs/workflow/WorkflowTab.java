@@ -36,16 +36,13 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 	private final WorkflowTabPresenter presenter;
 
 	private final UndoManager undoManager = new UndoManager();
-	private final MainWindow mainWindow;
-	private final Workflow workflow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
 	/**
 	 * constructor
 	 */
 	public WorkflowTab(MainWindow mainWindow) {
-		this.mainWindow = mainWindow;
-		this.workflow = mainWindow.getWorkflow();
+		Workflow workflow = mainWindow.getWorkflow();
 		presenter = new WorkflowTabPresenter(mainWindow, this);
 
 		var extendedFXMLLoader = new ExtendedFXMLLoader<WorkflowTabController>(this.getClass());

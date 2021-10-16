@@ -19,73 +19,89 @@
 
 package splitstree6.tabs.inputeditor;
 
-import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.HBox;
-import javafx.stage.StageStyle;
-import jloda.fx.find.FindToolBar;
+import javafx.stage.FileChooser;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.window.NotificationManager;
-import jloda.util.Basic;
-import jloda.util.FileLineIterator;
 import jloda.util.ProgramProperties;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
-import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.io.readers.ImportManager;
+import splitstree6.tabs.textdisplay.TextDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
-import java.io.IOException;
-import java.util.Optional;
+import java.io.File;
+import java.util.ArrayList;
 
 /**
  * input editor tab presenter
  * Daniel Huson, 10.2021
  */
-public class InputEditorTabPresenter implements IDisplayTabPresenter {
+public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final InputEditorTab tab;
-	private final BooleanBinding textEmpty;
+
 	private final BooleanBinding selectionEmpty;
-	private final FindToolBar findToolBar;
+
+	private final ReadOnlyBooleanProperty TRUE = new SimpleBooleanProperty(true);
 
 	public InputEditorTabPresenter(MainWindow mainWindow, InputEditorTab tab) {
+		super(mainWindow, tab, true);
 		this.mainWindow = mainWindow;
 		this.tab = tab;
 
-		tab.setGraphic(new HBox(new ImageView(ResourceManagerFX.getIcon("sun/Import16.gif")), new Label(tab.getText())));
+		tab.setShowLineNumbers(true);
+		tab.setWrapText(false);
+
+		tab.setGraphic(new ImageView(ResourceManagerFX.getIcon("sun/Import16.gif")));
 
 		var tabController = tab.getController();
+		var toolBarController = tab.getToolBarController();
 
 		var codeArea = tabController.getCodeArea();
-
-		codeArea.setParagraphGraphicFactory(LineNumberFactory.get(codeArea));
-
-		var css = ResourceManagerFX.getCssURL("styles.css");
-		if (css != null)
-			tabController.getScrollPane().getStylesheets().add(css.toString());
-
 		codeArea.setEditable(true);
 
-		findToolBar = new FindToolBar(null, new CodeAreaSearcher("Text", codeArea));
-		tabController.getTopVBox().getChildren().add(findToolBar);
+		var list = new ArrayList<>(toolBarController.getFirstToolBar().getItems());
+		list.addAll(tabController.getToolBar().getItems());
+		list.addAll(toolBarController.getLastToolBar().getItems());
+		tabController.getToolBar().getItems().setAll(list);
 
-		textEmpty = new BooleanBinding() {
-			{
-				super.bind(codeArea.lengthProperty());
-			}
+		toolBarController.getParseAndLoadButton().setOnAction(e -> tab.parseAndLoad());
+		toolBarController.getParseAndLoadButton().disableProperty().bind(tab.isEmptyProperty().or(mainWindow.getWorkflow().busyProperty()));
 
-			@Override
-			protected boolean computeValue() {
-				return codeArea.getLength() == 0;
+		toolBarController.getOpenButton().setOnAction(e -> {
+			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
+			final var fileChooser = new FileChooser();
+			if (previousDir.isDirectory())
+				fileChooser.setInitialDirectory(previousDir);
+			fileChooser.setTitle("Open input file");
+			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
+			final var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
+			if (selectedFile != null) {
+				if (selectedFile.getParentFile().isDirectory())
+					ProgramProperties.put("InputDir", selectedFile.getParent());
+				tab.importFromFile(selectedFile.getPath());
 			}
-		};
+		});
+		toolBarController.getOpenButton().disableProperty().bind(tab.isEmptyProperty().not());
+
+		toolBarController.getSaveButton().setOnAction(e -> {
+			var fileChooser = new FileChooser();
+			fileChooser.setTitle("Save input text");
+			var previousDir = new File(ProgramProperties.get("InputDir", ""));
+			if (previousDir.isDirectory()) {
+				fileChooser.setInitialDirectory(previousDir);
+			}
+			fileChooser.setInitialFileName(tab.getInputFileName());
+			var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
+			if (selectedFile != null) {
+				tab.saveToFile(selectedFile);
+			}
+		});
+		toolBarController.getSaveButton().disableProperty().bind(tab.isEmptyProperty());
 
 		selectionEmpty = new BooleanBinding() {
 			{
@@ -97,7 +113,6 @@ public class InputEditorTabPresenter implements IDisplayTabPresenter {
 				return codeArea.getSelection().getLength() == 0;
 			}
 		};
-
 
 		// prevent double paste:
 		{
@@ -115,109 +130,21 @@ public class InputEditorTabPresenter implements IDisplayTabPresenter {
 	}
 
 	public void setup() {
+		super.setup();
+
 		var controller = mainWindow.getController();
-		var tabController = tab.getController();
+		var toolBarController = tab.getToolBarController();
 
-		tabController.getParseAndLoadButton().setOnAction(null);
-		tabController.getParseAndLoadButton().disableProperty().bind(textEmpty);
+		controller.getOpenMenuItem().setOnAction(toolBarController.getOpenButton().getOnAction());
+		controller.getOpenMenuItem().disableProperty().bind(toolBarController.getOpenButton().disableProperty());
 
-		var codeArea = tabController.getCodeArea();
+		controller.getImportMenuItem().disableProperty().bind(TRUE);
+		controller.getReplaceDataMenuItem().disableProperty().bind(TRUE);
+		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(TRUE);
+		controller.getInputEditorMenuItem().disableProperty().bind(TRUE);
 
-		controller.getCutMenuItem().setOnAction(e -> codeArea.cut());
-		controller.getCutMenuItem().disableProperty().bind(selectionEmpty);
+		controller.getOpenRecentMenu().disableProperty().bind(TRUE);
 
-		controller.getCopyMenuItem().setOnAction(e -> codeArea.copy());
-		controller.getCopyMenuItem().disableProperty().bind(selectionEmpty);
-
-		controller.getPasteMenuItem().setOnAction(e -> codeArea.paste());
-
-		controller.getUndoMenuItem().setOnAction(e -> codeArea.undo());
-		{
-			var undoAvailable = new SimpleBooleanProperty();
-			undoAvailable.bind(codeArea.undoAvailableProperty());
-			controller.getUndoMenuItem().disableProperty().bind(undoAvailable.not());
-		}
-
-		controller.getRedoMenuItem().setOnAction(e -> codeArea.redo());
-		{
-			var redoAvailable = new SimpleBooleanProperty();
-			redoAvailable.bind(codeArea.redoAvailableProperty());
-			controller.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
-		}
-
-		controller.getFindMenuItem().setOnAction((e) -> findToolBar.setShowFindToolBar(true));
-		controller.getFindAgainMenuItem().setOnAction((e) -> findToolBar.findAgain());
-		controller.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		controller.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-
-		controller.getGotoLineMenuItem().setOnAction((e) -> {
-			final TextInputDialog dialog = new TextInputDialog("");
-			dialog.setTitle("Go to Line - " + ProgramProperties.getProgramName());
-			dialog.initStyle(StageStyle.UTILITY);
-			dialog.setX(mainWindow.getStage().getX() + 0.5 * mainWindow.getStage().getWidth());
-			dialog.setY(mainWindow.getStage().getY() + 0.5 * mainWindow.getStage().getHeight());
-			dialog.setHeaderText("Select line by number");
-			dialog.setContentText("[line] [:column]:");
-			Optional<String> result = dialog.showAndWait();
-			if (result.isPresent()) {
-				final String[] tokens = result.get().split(":");
-				if (tokens.length > 0 && Basic.isInteger(tokens[0]))
-					tab.gotoLine(Basic.parseInt(tokens[0]), tokens.length == 2 && Basic.isInteger(tokens[1]) ? Basic.parseInt(tokens[1]) : 0);
-			}
-		});
-
-		controller.getSelectAllMenuItem().setOnAction(e -> codeArea.selectAll());
-		controller.getSelectAllMenuItem().disableProperty().bind(textEmpty);
-
-		controller.getSelectNoneMenuItem().setOnAction(e -> codeArea.selectRange(0, 0));
-		controller.getSelectNoneMenuItem().disableProperty().bind(textEmpty);
-
-		controller.getSelectBracketsMenuItem().setOnAction(e -> selectBrackets(codeArea));
-		controller.getSelectBracketsMenuItem().disableProperty().bind(textEmpty);
-
-		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
-		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
-
-		controller.getZoomInMenuItem().setOnAction(null);
-		controller.getZoomOutMenuItem().setOnAction(null);
-
-		controller.getWrapTextMenuItem().setOnAction(null);
-	}
-
-	public void loadFile(String fileName) {
-		try (FileLineIterator it = new FileLineIterator(fileName)) {
-			tab.getController().getCodeArea().replaceText(Basic.toString(it.lines(), "\n"));
-		} catch (IOException ex) {
-			NotificationManager.showError("Input file failed: " + ex.getMessage());
-		}
-	}
-
-	/**
-	 * select matching brackets
-	 */
-	protected void selectBrackets(CodeArea codeArea) {
-		int pos = codeArea.getCaretPosition() - 1;
-		while (pos > 0 && pos < codeArea.getText().length()) {
-			final char close = codeArea.getText().charAt(pos);
-			if (close == ')' || close == ']' || close == '}') {
-				final int closePos = pos;
-				final int open = (close == ')' ? '(' : (close == ']' ? '[' : '}'));
-
-				int balance = 0;
-				for (; pos >= 0; pos--) {
-					char ch = codeArea.getText().charAt(pos);
-					if (ch == open)
-						balance--;
-					else if (ch == close)
-						balance++;
-					if (balance == 0) {
-						final int fpos = pos;
-						Platform.runLater(() -> codeArea.selectRange(fpos, closePos + 1));
-						return;
-					}
-				}
-			}
-			pos++;
-		}
+		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(TRUE);
 	}
 }

@@ -19,6 +19,8 @@
 
 package splitstree6.workflow;
 
+import javafx.concurrent.WorkerStateEvent;
+import javafx.event.EventHandler;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
@@ -36,10 +38,10 @@ import splitstree6.io.readers.ImportManager;
  */
 public class WorkflowSetup {
 	public static Workflow apply(String fileName) {
-		return apply(fileName, new Workflow());
+		return apply(fileName, new Workflow(), null);
 	}
 
-	public static Workflow apply(String fileName, Workflow workflow) {
+	public static Workflow apply(String fileName, Workflow workflow, EventHandler<WorkerStateEvent> failedHandler) {
 		workflow.clear();
 
 		var sourceBlock = new SourceBlock();
@@ -80,6 +82,12 @@ public class WorkflowSetup {
 		workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), workflow.newDataNode(new SinkBlock()));
 		// todo: replace by calculation of network
 		 */
+		System.err.println("Workflow: " + workflow.size());
+		if (workflow.size() > 0) {
+			if (failedHandler != null)
+				workflow.getLoaderNode().getService().setOnFailed(failedHandler);
+			workflow.getSourceNode().setValid(true);
+		}
 		return workflow;
 	}
 }

@@ -209,9 +209,6 @@ public class MainWindowController {
 	private MenuItem flipMenuItem;
 
 	@FXML
-	private CheckMenuItem wrapTextMenuItem;
-
-	@FXML
 	private MenuItem formatNodesMenuItem;
 
 	@FXML
@@ -740,10 +737,6 @@ public class MainWindowController {
 
 	public MenuItem getFlipMenuItem() {
 		return flipMenuItem;
-	}
-
-	public CheckMenuItem getWrapTextMenuItem() {
-		return wrapTextMenuItem;
 	}
 
 	public MenuItem getFormatNodesMenuItem() {

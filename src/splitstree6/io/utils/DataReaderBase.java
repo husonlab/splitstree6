@@ -29,6 +29,7 @@ public abstract class DataReaderBase<T extends DataBlock> extends ReaderWriterBa
 	private final Class<T> toClass;
 
 	public DataReaderBase(Class<T> toClass) {
+		super(toClass.getSimpleName());
 		this.toClass = toClass;
 	}
 

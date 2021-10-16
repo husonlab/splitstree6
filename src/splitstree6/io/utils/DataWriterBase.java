@@ -32,6 +32,7 @@ public abstract class DataWriterBase<T extends DataBlock> extends ReaderWriterBa
 	private final Class<T> fromClass;
 
 	public DataWriterBase(Class<T> fromClass) {
+		super(fromClass.getSimpleName());
 		this.fromClass = fromClass;
 	}
 

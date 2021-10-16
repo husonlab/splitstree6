@@ -21,59 +21,41 @@ package splitstree6.tabs.inputeditor;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
-
+import javafx.scene.control.ToolBar;
 
 public class InputEditorTabController {
+	@FXML
+	private ToolBar firstToolBar;
 
 	@FXML
-	private AnchorPane anchorPane;
+	private Button openButton;
 
 	@FXML
-	private BorderPane borderPane;
+	private Button saveButton;
 
 	@FXML
-	private VBox topVBox;
+	private ToolBar lastToolBar;
 
 	@FXML
 	private Button parseAndLoadButton;
 
-	private CodeArea codeArea;
-
-	private VirtualizedScrollPane<CodeArea> scrollPane;
-
-	@FXML
-	private void initialize() {
-		codeArea = new CodeArea("");
-		scrollPane = new VirtualizedScrollPane<>(codeArea);
-		borderPane.setCenter(scrollPane);
+	public ToolBar getFirstToolBar() {
+		return firstToolBar;
 	}
 
-	public AnchorPane getAnchorPane() {
-		return anchorPane;
+	public Button getOpenButton() {
+		return openButton;
 	}
 
-	public BorderPane getBorderPane() {
-		return borderPane;
+	public Button getSaveButton() {
+		return saveButton;
 	}
 
-	public VBox getTopVBox() {
-		return topVBox;
-	}
-
-	public CodeArea getCodeArea() {
-		return codeArea;
+	public ToolBar getLastToolBar() {
+		return lastToolBar;
 	}
 
 	public Button getParseAndLoadButton() {
 		return parseAndLoadButton;
-	}
-
-	public VirtualizedScrollPane<CodeArea> getScrollPane() {
-		return scrollPane;
 	}
 }

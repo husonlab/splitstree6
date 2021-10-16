@@ -20,10 +20,14 @@
 package splitstree6.tabs.textdisplay;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import org.fxmisc.flowless.VirtualizedScrollPane;
+import org.fxmisc.richtext.CodeArea;
 
 public class TextDisplayTabController {
 
@@ -34,10 +38,33 @@ public class TextDisplayTabController {
 	private BorderPane borderPane;
 
 	@FXML
-	private Pane mainPane;
+	private ToolBar toolBar;
+
+	@FXML
+	private Button findButton;
+
+	@FXML
+	private Button findAndReplaceButton;
+
+	@FXML
+	private ToggleButton wrapTextToggle;
+
+	@FXML
+	private ToggleButton lineNumbersToggle;
 
 	@FXML
 	private VBox topVBox;
+
+	private CodeArea codeArea;
+
+	private VirtualizedScrollPane<CodeArea> scrollPane;
+
+	@FXML
+	private void initialize() {
+		codeArea = new CodeArea();
+		scrollPane = new VirtualizedScrollPane<>(codeArea);
+		borderPane.setCenter(scrollPane);
+	}
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -47,11 +74,35 @@ public class TextDisplayTabController {
 		return borderPane;
 	}
 
-	public Pane getMainPane() {
-		return mainPane;
+	public ToolBar getToolBar() {
+		return toolBar;
+	}
+
+	public Button getFindButton() {
+		return findButton;
+	}
+
+	public Button getFindAndReplaceButton() {
+		return findAndReplaceButton;
+	}
+
+	public ToggleButton getWrapTextToggle() {
+		return wrapTextToggle;
+	}
+
+	public ToggleButton getLineNumbersToggle() {
+		return lineNumbersToggle;
 	}
 
 	public VBox getTopVBox() {
 		return topVBox;
+	}
+
+	public CodeArea getCodeArea() {
+		return codeArea;
+	}
+
+	public VirtualizedScrollPane<CodeArea> getScrollPane() {
+		return scrollPane;
 	}
 }

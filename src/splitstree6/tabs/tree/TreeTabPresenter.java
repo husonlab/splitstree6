@@ -75,7 +75,6 @@ public class TreeTabPresenter implements IDisplayTabPresenter {
 		controller.getRotateLeftMenuItem().setOnAction(null);
 		controller.getRotateRightMenuItem().setOnAction(null);
 		controller.getFlipMenuItem().setOnAction(null);
-		controller.getWrapTextMenuItem().setOnAction(null);
 		controller.getFormatNodesMenuItem().setOnAction(null);
 		controller.getLayoutLabelsMenuItem().setOnAction(null);
 		controller.getSparseLabelsCheckMenuItem().setOnAction(null);

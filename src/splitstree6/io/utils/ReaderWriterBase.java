@@ -19,10 +19,19 @@
 
 package splitstree6.io.utils;
 
+import javafx.stage.FileChooser;
+import jloda.util.Basic;
+
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class ReaderWriterBase {
 	private final ArrayList<String> fileExtensions = new ArrayList<>();
+	private final String dataType;
+
+	public ReaderWriterBase(String dataType) {
+		this.dataType = dataType;
+	}
 
 	public ArrayList<String> getFileExtensions() {
 		return fileExtensions;
@@ -38,7 +47,7 @@ public class ReaderWriterBase {
 	}
 
 	public boolean accepts(String file) {
-		if (fileExtensions.size() == 0)
+		if (fileExtensions.size() == 0 || file.endsWith(".tmp"))
 			return true;
 		else {
 			for (var ex : fileExtensions) {
@@ -47,5 +56,9 @@ public class ReaderWriterBase {
 			}
 			return false;
 		}
+	}
+
+	public FileChooser.ExtensionFilter getExtensionFilter() {
+		return new FileChooser.ExtensionFilter(dataType + " (" + Basic.toString(getFileExtensions(), " ") + ")", getFileExtensions().stream().map(s -> "*." + s).collect(Collectors.toList()));
 	}
 }

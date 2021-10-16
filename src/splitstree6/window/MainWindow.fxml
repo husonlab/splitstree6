@@ -330,15 +330,12 @@
                                         <MenuItem fx:id="flipMenuItem" text="Flip">
                                         </MenuItem>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <CheckMenuItem fx:id="wrapTextMenuItem" text="Wrap Text">
-                                        </CheckMenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="formatNodesMenuItem" text="Format...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="J" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
+                                          <MenuItem fx:id="formatNodesMenuItem" text="Format...">
+                                              <accelerator>
+                                                  <KeyCodeCombination alt="UP" code="J" control="UP" meta="UP"
+                                                                      shift="DOWN" shortcut="DOWN"/>
+                                              </accelerator>
+                                          </MenuItem>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels">
                                             <accelerator>

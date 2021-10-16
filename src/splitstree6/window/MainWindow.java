@@ -34,7 +34,10 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
 import splitstree6.data.parts.Taxon;
+import splitstree6.methods.ExtractMethodsText;
+import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.algorithms.taxa.TaxaFilterTab;
+import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.window.presenter.MainWindowPresenter;
 import splitstree6.workflow.Workflow;
@@ -48,6 +51,9 @@ public class MainWindow implements IMainWindow {
 	private final BooleanProperty dirty = new SimpleBooleanProperty(false);
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 	private final StringProperty name = new SimpleStringProperty("");
+
+	private final WorkflowTab workflowTab;
+	private final TextDisplayTab methodsTab;
 
 	private Stage stage;
 
@@ -70,6 +76,10 @@ public class MainWindow implements IMainWindow {
 
 		FileOpenManager.setFileOpener(FileLoader.fileOpener());
 		*/
+
+		workflowTab = new WorkflowTab(this);
+		methodsTab = new TextDisplayTab(this, "Methods", false, false);
+		workflow.busyProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? "" : ExtractMethodsText.getInstance().apply(workflow)));
 	}
 
 	@Override
@@ -84,12 +94,12 @@ public class MainWindow implements IMainWindow {
 
 	@Override
 	public void show(Stage stage0, double screenX, double screenY, double width, double height) {
-		if (stage == null)
-			stage = new Stage();
+		if (stage0 == null)
+			stage0 = new Stage();
 		this.stage = stage0;
 		stage.getIcons().addAll(ProgramProperties.getProgramIconsFX());
 
-		final Scene scene = new Scene(root, width, height);
+		var scene = new Scene(root, width, height);
 
 		stage.setScene(scene);
 		stage.sizeToScene();
@@ -104,7 +114,7 @@ public class MainWindow implements IMainWindow {
 
 		getController().getAlgorithmTabPane().getTabs().add(new TaxaFilterTab(this));
 
-		getController().getMainTabPane().getTabs().add(new WorkflowTab(this));
+		getController().getMainTabPane().getTabs().addAll(workflowTab, methodsTab);
 
 		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
 
@@ -168,6 +178,18 @@ public class MainWindow implements IMainWindow {
 		for (var tab : controller.getMainTabPane().getTabs()) {
 			if (tab.getClass().isAssignableFrom(clazz))
 				return tab;
+		}
+		return null;
+	}
+
+	public IDisplayTab getBy(String name) {
+		for (var tab : controller.getMainTabPane().getTabs()) {
+			if (tab instanceof IDisplayTab displayTab)
+				return displayTab;
+		}
+		for (var tab : controller.getAlgorithmTabPane().getTabs()) {
+			if (tab instanceof IDisplayTab displayTab)
+				return displayTab;
 		}
 		return null;
 	}

@@ -19,16 +19,21 @@
 
 package splitstree6.io.readers;
 
+import javafx.stage.FileChooser;
 import jloda.util.PluginClassLoader;
 import splitstree6.io.utils.DataReaderBase;
 import splitstree6.workflow.DataBlock;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashSet;
 
 public class ImportManager {
 	private static ImportManager instance;
 
 	private final ArrayList<DataReaderBase> readers = new ArrayList<>();
+	private final ArrayList<String> extensions = new ArrayList<>();
 
 	public synchronized static ImportManager getInstance() {
 		if (instance == null)
@@ -42,6 +47,8 @@ public class ImportManager {
 				"splitstree6.io.readers.distances",
 				"splitstree6.io.readers.splits",
 				"splitstree6.io.readers.trees"));
+		for (var reader : readers)
+			extensions.addAll(reader.getFileExtensions());
 	}
 
 	public Class<DataBlock> determineInputType(String fileName) {
@@ -67,6 +74,23 @@ public class ImportManager {
 			if (reader.getToClass().equals(clazz))
 				list.add(reader);
 		}
+		return list;
+	}
+
+	public Collection<String> getFileExtensions() {
+		return extensions;
+	}
+
+	public Collection<FileChooser.ExtensionFilter> getExtensionFilters() {
+		var filters = new HashSet<FileChooser.ExtensionFilter>();
+		for (var reader : readers) {
+			if (reader.getFileExtensions().size() > 0)
+				filters.add(reader.getExtensionFilter());
+		}
+		var list = new ArrayList<>(filters);
+		list.sort(Comparator.comparing(FileChooser.ExtensionFilter::getDescription));
+		list.add(0, new FileChooser.ExtensionFilter("Text (*.txt, *.txt.gz)", "*.txt,*.txt.gz"));
+		list.add(0, new FileChooser.ExtensionFilter("All (*.*)", "*.*"));
 		return list;
 	}
 }

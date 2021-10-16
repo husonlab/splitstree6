@@ -56,8 +56,8 @@ module splitstreesix {
 	opens splitstree6.treeview;
 
 	opens splitstree6.tabs.inputeditor;
-	opens splitstree6.tabs.network;
 	opens splitstree6.tabs.textdisplay;
+	opens splitstree6.tabs.network;
 	opens splitstree6.tabs.tree;
 	opens splitstree6.tabs.workflow;
 
