@@ -209,4 +209,9 @@ public class MainWindow implements IMainWindow {
 	public Parent getRoot() {
 		return root;
 	}
+
+	public void addTabToMainTabPane(Tab tab) {
+		controller.getMainTabPane().getTabs().add(tab);
+
+	}
 }

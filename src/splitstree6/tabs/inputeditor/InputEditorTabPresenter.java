@@ -28,12 +28,24 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.util.Basic;
 import jloda.util.ProgramProperties;
+import splitstree6.data.CharactersBlock;
+import splitstree6.data.DistancesBlock;
+import splitstree6.io.nexus.AlgorithmNexusOutput;
+import splitstree6.io.nexus.CharactersNexusOutput;
+import splitstree6.io.nexus.DistancesNexusOutput;
+import splitstree6.io.nexus.TaxaNexusOutput;
 import splitstree6.io.readers.ImportManager;
+import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.tabs.textdisplay.TextDisplayTabPresenter;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.Algorithm;
+import splitstree6.workflow.DataBlock;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 
 /**
@@ -63,6 +75,8 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 
 		var codeArea = tabController.getCodeArea();
 		codeArea.setEditable(true);
+
+		codeArea.getStyleClass().add("text");
 
 		var list = new ArrayList<>(toolBarController.getFirstToolBar().getItems());
 		list.addAll(tabController.getToolBar().getItems());
@@ -126,6 +140,74 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 		codeArea.focusedProperty().addListener((c, o, n) -> {
 			if (n)
 				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
+		});
+
+		// todo: for testing:
+		mainWindow.getWorkflow().busyProperty().addListener((v, o, n) -> {
+			if (!n) {
+				if (true) {
+					if (mainWindow.getWorkflow().getWorkingTaxaNode() != null) {
+						try (var w = new StringWriter()) {
+							var textTab = new TextDisplayTab(mainWindow, "Working taxa", true, false);
+							(new TaxaNexusOutput()).write(w, mainWindow.getWorkflow().getWorkingTaxaNode().getDataBlock());
+							textTab.replaceText(w.toString());
+							mainWindow.addTabToMainTabPane(textTab);
+						} catch (IOException ex) {
+							Basic.caught(ex);
+						}
+					}
+				}
+				if (true) {
+					for (var node : mainWindow.getWorkflow().dataNodes()) {
+						var data = (DataBlock) node.getDataBlock();
+						if (data instanceof DistancesBlock distancesBlock) {
+							try (var w = new StringWriter()) {
+								var textTab = new TextDisplayTab(mainWindow, distancesBlock.getName(), true, false);
+								(new DistancesNexusOutput()).write(w, mainWindow.getWorkflow().getWorkingTaxaNode().getDataBlock(), distancesBlock);
+								textTab.replaceText(w.toString());
+								mainWindow.addTabToMainTabPane(textTab);
+							} catch (IOException ex) {
+								Basic.caught(ex);
+							}
+						}
+					}
+				}
+				if (true) {
+					for (var node : mainWindow.getWorkflow().dataNodes()) {
+						var data = (DataBlock) node.getDataBlock();
+						if (data instanceof CharactersBlock charactersBlock) {
+							try (var w = new StringWriter()) {
+								String name;
+								if (node == mainWindow.getWorkflow().getInputDataNode())
+									name = "Input Characters";
+								else if (node == mainWindow.getWorkflow().getWorkingDataNode())
+									name = "Working Characters";
+								else
+									name = "Characters";
+								var textTab = new TextDisplayTab(mainWindow, name, true, false);
+								(new CharactersNexusOutput()).write(w, mainWindow.getWorkflow().getWorkingTaxaNode().getDataBlock(), charactersBlock);
+								textTab.replaceText(w.toString());
+								mainWindow.addTabToMainTabPane(textTab);
+							} catch (IOException ex) {
+								Basic.caught(ex);
+							}
+						}
+					}
+				}
+				if (false) {
+					for (var node : mainWindow.getWorkflow().algorithmNodes()) {
+						var algorithm = (Algorithm) node.getAlgorithm();
+						try (var w = new StringWriter()) {
+							var textTab = new TextDisplayTab(mainWindow, algorithm.getName(), true, false);
+							(new AlgorithmNexusOutput()).write(w, algorithm);
+							textTab.replaceText(w.toString());
+							mainWindow.addTabToMainTabPane(textTab);
+						} catch (IOException ex) {
+							Basic.caught(ex);
+						}
+					}
+				}
+			}
 		});
 	}
 

@@ -1,5 +1,5 @@
 /*
- *  ExtractOptions.java Copyright (C) 2021 Daniel H. Huson
+ *  ExtractOptionsText.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -29,7 +29,7 @@ import java.util.ArrayList;
  * report options used by algorithm
  * Daniel Huson, 10.2021
  */
-public class ExtractOptions {
+public class ExtractOptionsText {
 	public static String apply(Algorithm algorithm) {
 		var list = new ArrayList<String>();
 		var hasDefaultOption = false;

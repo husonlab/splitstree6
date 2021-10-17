@@ -114,7 +114,7 @@ public class ExtractMethodsText {
 									if (algorithm instanceof IFilter filter) {
 										if (filter.isActive()) {
 											var name = Basic.fromCamelCase(algorithm.getName());
-											var optionsReport = ExtractOptions.apply(algorithm);
+											var optionsReport = ExtractOptionsText.apply(algorithm);
 											var line = String.format(filterTemplate, name, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "", algorithm.getShortDescription());
 											if (!set.contains(line)) {
 												buf.append(line);
@@ -129,7 +129,7 @@ public class ExtractMethodsText {
 												allKeysAndPapers.addAll(keysAndPapers);
 											var name = Basic.fromCamelCase(algorithm.getName());
 
-											var optionsReport = ExtractOptions.apply(algorithm);
+											var optionsReport = ExtractOptionsText.apply(algorithm);
 											String line;
 											if (targetNode != null) {
 												line = String.format(methodWithOutputTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "", targetNode.getDataBlock().getInfo());

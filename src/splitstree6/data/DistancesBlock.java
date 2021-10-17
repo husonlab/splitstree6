@@ -26,6 +26,9 @@ import splitstree6.workflow.DataTaxaFilter;
 public class DistancesBlock extends DataBlock {
 	private double[][] distances;
 	private double[][] variances;
+	private String varType = "ols";
+
+	private DistancesFormat format = new DistancesFormat();
 
 	/**
 	 * constructor
@@ -36,12 +39,11 @@ public class DistancesBlock extends DataBlock {
 
 	/**
 	 * shallow copy
-	 *
-	 * @param that
 	 */
 	public void copy(DistancesBlock that) {
 		distances = that.getDistances();
 		variances = that.getVariances();
+		format = that.getFormat();
 	}
 
 	@Override
@@ -74,11 +76,7 @@ public class DistancesBlock extends DataBlock {
 	}
 
 	/**
-	 * sets the value
-	 *
-	 * @param i     in range 1-nTax
-	 * @param j     in range 1-nTax
-	 * @param value
+	 * sets the value, 1-based
 	 */
 	public void set(int i, int j, double value) {
 		distances[i - 1][j - 1] = value;
@@ -89,11 +87,7 @@ public class DistancesBlock extends DataBlock {
 	}
 
 	/**
-	 * sets the value for (s,t) and (t,s), indices 1-based
-	 *
-	 * @param s
-	 * @param t
-	 * @param value
+	 * sets the value for s and t, and t and s, 1-based
 	 */
 	public void setBoth(int s, int t, double value) {
 		distances[s - 1][t - 1] = distances[t - 1][s - 1] = value;
@@ -102,8 +96,6 @@ public class DistancesBlock extends DataBlock {
 	/**
 	 * gets the variances,  indices 1-based
 	 *
-	 * @param s
-	 * @param t
 	 * @return variances or -1, if not set
 	 */
 	public double getVariance(int s, int t) {
@@ -113,12 +105,16 @@ public class DistancesBlock extends DataBlock {
 			return -1;
 	}
 
+	public String getVarType() {
+		return varType;
+	}
+
+	public void setVarType(String varType) {
+		this.varType = varType;
+	}
+
 	/**
 	 * sets the variances,  indices 1-based
-	 *
-	 * @param s
-	 * @param t
-	 * @param value
 	 */
 	public void setVariance(int s, int t, double value) {
 		synchronized (this) {
@@ -139,8 +135,6 @@ public class DistancesBlock extends DataBlock {
 
 	/**
 	 * set distances, change dimensions if necessary. If dimensions are changed, delete variances
-	 *
-	 * @param distances
 	 */
 	public void set(double[][] distances) {
 		if (this.distances.length != distances.length) {
@@ -155,9 +149,6 @@ public class DistancesBlock extends DataBlock {
 
 	/**
 	 * set values, change dimensions if necessary
-	 *
-	 * @param distances
-	 * @param variances
 	 */
 	public void set(double[][] distances, double[][] variances) {
 		if (this.distances == null || this.distances.length != distances.length)
@@ -193,5 +184,9 @@ public class DistancesBlock extends DataBlock {
 	@Override
 	public DistancesBlock newInstance() {
 		return (DistancesBlock) super.newInstance();
+	}
+
+	public DistancesFormat getFormat() {
+		return format;
 	}
 }

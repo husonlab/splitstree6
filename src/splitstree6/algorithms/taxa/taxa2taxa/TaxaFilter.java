@@ -19,8 +19,8 @@
 
 package splitstree6.algorithms.taxa.taxa2taxa;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableSet;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.Basic;
 import jloda.util.ProgressListener;
 import splitstree6.algorithms.IFilter;
@@ -28,12 +28,10 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class TaxaFilter extends Taxa2Taxa implements IFilter {
-	private final ObservableSet<String> optionDisabledTaxa = FXCollections.observableSet();
+	private final ObjectProperty<String[]> optionDisabledTaxa = new SimpleObjectProperty<>(new String[0]);
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputData, TaxaBlock outputData) throws IOException {
@@ -49,7 +47,7 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 			setShortDescription(Basic.fromCamelCase(getClass().getSimpleName()));
 		} else {
 			for (String name : inputData.getLabels()) {
-				if (!getOptionDisabledTaxa().contains(name)) {
+				if (!isDisabled(name)) {
 					outputData.addTaxaByNames(Collections.singleton(name));
 					if (inputData.get(name).getDisplayLabel() != null)
 						outputData.get(name).setDisplayLabel(inputData.get(name).getDisplayLabel());
@@ -61,16 +59,43 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 		}
 	}
 
-	public void clear() {
-		getOptionDisabledTaxa().clear();
+	public boolean isDisabled(String name) {
+		return Arrays.asList(getOptionDisabledTaxa()).contains(name);
 	}
 
-	public ObservableSet<String> getOptionDisabledTaxa() {
+	public void setDisabled(String name, boolean state) {
+		if (state && !isDisabled(name)) {
+			var disabled = new ArrayList<>(Arrays.asList(getOptionDisabledTaxa()));
+			disabled.add(name);
+			setOptionDisabledTaxa(disabled.toArray(new String[0]));
+		} else if (!state && isDisabled(name)) {
+			var disabled = new ArrayList<>(Arrays.asList(getOptionDisabledTaxa()));
+			disabled.remove(name);
+			setOptionDisabledTaxa(disabled.toArray(new String[0]));
+		}
+	}
+
+	public void clear() {
+		setOptionDisabledTaxa(new String[0]);
+	}
+
+	public String[] getOptionDisabledTaxa() {
+		if (optionDisabledTaxa.get() == null)
+			return new String[0];
+		else
+			return optionDisabledTaxa.get();
+	}
+
+	public ObjectProperty<String[]> optionDisabledTaxaProperty() {
 		return optionDisabledTaxa;
 	}
 
+	public void setOptionDisabledTaxa(String[] optionDisabledTaxa) {
+		this.optionDisabledTaxa.set(optionDisabledTaxa);
+	}
+
 	public int getNumberDisabledTaxa() {
-		return optionDisabledTaxa.size();
+		return getOptionDisabledTaxa().length;
 	}
 
 	@Override
