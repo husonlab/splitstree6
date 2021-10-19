@@ -20,7 +20,10 @@
 
 package splitstree6.io.readers.distances;
 
-import jloda.util.*;
+import jloda.util.FileLineIterator;
+import jloda.util.FileUtils;
+import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.NumberUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
@@ -77,7 +80,7 @@ public class PhylipReader extends DistancesReader {
 							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 						taxa.addTaxaByNames(Collections.singleton(tokens[0]));
 						for (int col = 1; col < tokens.length; col++) {
-							final double value = Basic.parseDouble(tokens[col]);
+							final double value = NumberUtils.parseDouble(tokens[col]);
 							distances.set(row, col, value);
 						}
 					} else if (triangle == Triangle.Upper) {
@@ -86,7 +89,7 @@ public class PhylipReader extends DistancesReader {
 						taxa.addTaxaByNames(Collections.singleton(tokens[0]));
 						for (int i = 1; i < tokens.length; i++) {
 							final int col = row + i;
-							final double value = Basic.parseDouble(tokens[i]);
+							final double value = NumberUtils.parseDouble(tokens[i]);
 							distances.set(row, col, value);
 							distances.set(col, row, value);
 						}
@@ -95,7 +98,7 @@ public class PhylipReader extends DistancesReader {
 							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 						taxa.addTaxaByNames(Collections.singleton(tokens[0]));
 						for (int col = 1; col < tokens.length; col++) {
-							final double value = Basic.parseDouble(tokens[col]);
+							final double value = NumberUtils.parseDouble(tokens[col]);
 							distances.set(row, col, value);
 							distances.set(col, row, value);
 						}
@@ -115,7 +118,7 @@ public class PhylipReader extends DistancesReader {
 			if (line == null) return false;
 
 			final StringTokenizer tokens = new StringTokenizer(line);
-			return tokens.countTokens() == 1 && Basic.isInteger(tokens.nextToken());
+			return tokens.countTokens() == 1 && NumberUtils.isInteger(tokens.nextToken());
 		}
 	}
 }

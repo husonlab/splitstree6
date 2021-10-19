@@ -20,8 +20,8 @@
 
 package splitstree6.methods;
 
-import jloda.util.Basic;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 
@@ -73,15 +73,15 @@ public enum OptionValueType {
     public static boolean isType(OptionValueType type, String text) {
         switch (type) {
             case Integer:
-                return Basic.isInteger(text);
+                return NumberUtils.isInteger(text);
             case Float:
-                return Basic.isFloat(text);
+                return NumberUtils.isFloat(text);
             case Double:
             case doubleArray:
             case doubleSquareMatrix:
-                return Basic.isDouble(text);
+                return NumberUtils.isDouble(text);
             case Boolean:
-                return Basic.isBoolean(text);
+                return NumberUtils.isBoolean(text);
             case String:
                 return text.length() > 0;
             case stringArray:
@@ -100,16 +100,16 @@ public enum OptionValueType {
     public static Object parseType(OptionValueType type, String text) {
         switch (type) {
             case Integer:
-                return Basic.parseInt(text);
+                return NumberUtils.parseInt(text);
             case Float:
-                return Basic.parseFloat(text);
+                return NumberUtils.parseFloat(text);
             case Double:
-                return Basic.parseDouble(text);
+                return NumberUtils.parseDouble(text);
             case doubleArray: {
                 final String[] tokens = text.split("\\s+");
                 final double[] array = new double[tokens.length];
                 for (int i = 0; i < tokens.length; i++)
-                    array[i] = Basic.parseDouble(tokens[i]);
+                    array[i] = NumberUtils.parseDouble(tokens[i]);
                 return array;
             }
             case doubleSquareMatrix: {
@@ -121,13 +121,13 @@ public enum OptionValueType {
                 int count = 0;
                 for (int i = 0; i < length; i++) {
                     for (int j = 0; j < length; j++) {
-                        matrix[i][j] = Basic.parseDouble(tokens[count++]);
+                        matrix[i][j] = NumberUtils.parseDouble(tokens[count++]);
                     }
                 }
                 return matrix;
             }
             case Boolean:
-                return Basic.parseBoolean(text);
+                return NumberUtils.parseBoolean(text);
             case String:
                 return text;
             case stringArray: {

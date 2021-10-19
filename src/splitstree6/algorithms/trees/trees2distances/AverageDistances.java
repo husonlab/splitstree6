@@ -21,7 +21,9 @@
 package splitstree6.algorithms.trees.trees2distances;
 
 import jloda.fx.util.ProgramExecutorService;
-import jloda.util.*;
+import jloda.util.CanceledException;
+import jloda.util.NumberUtils;
+import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.trees.trees2splits.TreeSelectorSplits;
@@ -49,7 +51,7 @@ public class AverageDistances extends Trees2Distances {
 
 		final var trees = treesBlock.getTrees();
 
-		final var numberOfThreads = Basic.min(trees.size(), ProgramExecutorService.getNumberOfCoresToUse());
+		final var numberOfThreads = NumberUtils.min(trees.size(), ProgramExecutorService.getNumberOfCoresToUse());
 
 		var count = new int[numberOfThreads][nTax + 1][nTax + 1];
 		var distances = new double[numberOfThreads][nTax + 1][nTax + 1];

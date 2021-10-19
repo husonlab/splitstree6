@@ -92,7 +92,7 @@ public class ConsensusNetwork extends Trees2Splits {
 		progress.setProgress(0);
 
 		{
-			final int numberOfThreads = Math.max(1, Basic.min(trees.size(), ProgramExecutorService.getNumberOfCoresToUse(), Runtime.getRuntime().availableProcessors()));
+			final int numberOfThreads = Math.max(1, NumberUtils.min(trees.size(), ProgramExecutorService.getNumberOfCoresToUse(), Runtime.getRuntime().availableProcessors()));
 			final CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
 			final Single<CanceledException> exception = new Single<>();
 

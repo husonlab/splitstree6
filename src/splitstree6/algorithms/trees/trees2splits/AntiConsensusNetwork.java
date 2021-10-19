@@ -191,7 +191,7 @@ public class AntiConsensusNetwork extends Trees2Splits {
 		final ArrayList<SIN> listOfSins = new ArrayList<>();
 
 		final ExecutorService executor = ProgramExecutorService.getInstance();
-		final int numberOfThreads = Math.max(1, Basic.min(lastTreeToUse - firstTreeToUse + 1,
+		final int numberOfThreads = Math.max(1, NumberUtils.min(lastTreeToUse - firstTreeToUse + 1,
 				ProgramExecutorService.getNumberOfCoresToUse(), Runtime.getRuntime().availableProcessors()));
 		final CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
 		final Single<IOException> exception = new Single<>();

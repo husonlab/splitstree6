@@ -20,8 +20,8 @@
 
 package splitstree6.io.nexus;
 
-import jloda.util.Basic;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.TaxaBlock;
@@ -158,8 +158,8 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
                 } else {
                     final String word = np.getWordRespectCase();
 
-                    if (Basic.isInteger(word))
-                        traitsBlock.setTraitValue(taxonId, traitId, Basic.parseInt(word));
+                    if (NumberUtils.isInteger(word))
+                        traitsBlock.setTraitValue(taxonId, traitId, NumberUtils.parseInt(word));
                     else {
                         Map<String, Integer> map = trait2map[traitId];
                         if (map == null) {

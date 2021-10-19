@@ -24,7 +24,8 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NotOwnerException;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
+import jloda.util.NumberUtils;
+import jloda.util.StringUtils;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -84,14 +85,14 @@ public class SimpleNewickParser {
 	 */
 	private int parseBracketNotationRecursively(int depth, Node v, int pos, String str) throws IOException {
 		try {
-			for (pos = Basic.skipSpaces(str, pos); pos < str.length(); pos = Basic.skipSpaces(str, pos + 1)) {
+			for (pos = StringUtils.skipSpaces(str, pos); pos < str.length(); pos = StringUtils.skipSpaces(str, pos + 1)) {
 				final Node w = tree.newNode();
 
 				if (str.charAt(pos) == '(') {
 					pos = parseBracketNotationRecursively(depth + 1, w, pos + 1, str);
 					if (str.charAt(pos) != ')')
 						throw new IOException("Expected ')' at position " + pos);
-					pos = Basic.skipSpaces(str, pos + 1);
+					pos = StringUtils.skipSpaces(str, pos + 1);
 					while (pos < str.length() && punctuationCharacters.indexOf(str.charAt(pos)) == -1) {
 						int i0 = pos;
 						StringBuilder buf = new StringBuilder();
@@ -148,13 +149,13 @@ public class SimpleNewickParser {
 				}
 
 				// detect and read embedded bootstrap values:
-				pos = Basic.skipSpaces(str, pos);
+				pos = StringUtils.skipSpaces(str, pos);
 
 				// read edge weights
 
 				if (pos < str.length() && str.charAt(pos) == ':') // edge weight is following
 				{
-					pos = Basic.skipSpaces(str, pos + 1);
+					pos = StringUtils.skipSpaces(str, pos + 1);
 					int i0 = pos;
 					final StringBuilder buf = new StringBuilder();
 					while (pos < str.length() && (punctuationCharacters.indexOf(str.charAt(pos)) == -1 && str.charAt(pos) != '['))
@@ -196,7 +197,7 @@ public class SimpleNewickParser {
 			private Node v = tree.getFirstNode();
 
 			{
-				while (v != null && v.getOutDegree() > 0 && (tree.getLabel(v) == null || Basic.isDouble(tree.getLabel(v))))
+				while (v != null && v.getOutDegree() > 0 && (tree.getLabel(v) == null || NumberUtils.isDouble(tree.getLabel(v))))
 					v = v.getNext();
 			}
 
@@ -210,7 +211,7 @@ public class SimpleNewickParser {
 				final String result = (v != null ? tree.getLabel(v) : null);
 				if (v != null)
 					v = v.getNext();
-				while (v != null && v.getOutDegree() > 0 && (tree.getLabel(v) == null || Basic.isDouble(tree.getLabel(v))))
+				while (v != null && v.getOutDegree() > 0 && (tree.getLabel(v) == null || NumberUtils.isDouble(tree.getLabel(v))))
 					v = v.getNext();
 				return result;
 			}

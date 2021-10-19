@@ -31,7 +31,7 @@ import javafx.stage.StageStyle;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.Print;
 import jloda.fx.window.MainWindowManager;
-import jloda.util.Basic;
+import jloda.util.NumberUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
@@ -169,8 +169,8 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 			Optional<String> result = dialog.showAndWait();
 			if (result.isPresent()) {
 				final String[] tokens = result.get().split(":");
-				if (tokens.length > 0 && Basic.isInteger(tokens[0]))
-					tab.gotoLine(Basic.parseInt(tokens[0]), tokens.length == 2 && Basic.isInteger(tokens[1]) ? Basic.parseInt(tokens[1]) : 0);
+				if (tokens.length > 0 && NumberUtils.isInteger(tokens[0]))
+					tab.gotoLine(NumberUtils.parseInt(tokens[0]), tokens.length == 2 && NumberUtils.isInteger(tokens[1]) ? NumberUtils.parseInt(tokens[1]) : 0);
 			}
 		});
 

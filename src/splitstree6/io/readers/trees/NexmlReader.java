@@ -24,8 +24,8 @@ import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.algorithms.IsTree;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
 import jloda.util.FileUtils;
+import jloda.util.NumberUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -98,12 +98,12 @@ public class NexmlReader extends TreesReader {
 				var labels = new HashSet<String>();
 				for (var tree : trees.getTrees()) {
 					labels.addAll(tree.nodeStream()
-							.filter(v -> v.getLabel() != null && (v.getOutDegree() == 0 || !Basic.isDouble(v.getLabel())))
+							.filter(v -> v.getLabel() != null && (v.getOutDegree() == 0 || !NumberUtils.isDouble(v.getLabel())))
 							.map(Node::getLabel).collect(Collectors.toList()));
 				}
 				taxa.addTaxaByNames(labels);
 				for (var tree : trees.getTrees()) {
-					tree.nodeStream().filter(v -> v.getLabel() != null && (v.getOutDegree() == 0 || !Basic.isDouble(v.getLabel()))).forEach(v -> {
+					tree.nodeStream().filter(v -> v.getLabel() != null && (v.getOutDegree() == 0 || !NumberUtils.isDouble(v.getLabel()))).forEach(v -> {
 						tree.clearTaxa(v);
 						tree.addTaxon(v, taxa.indexOf(v.getLabel()));
 					});
