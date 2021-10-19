@@ -20,7 +20,7 @@
 package splitstree6.io.utils;
 
 import javafx.stage.FileChooser;
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
@@ -59,6 +59,6 @@ public class ReaderWriterBase {
 	}
 
 	public FileChooser.ExtensionFilter getExtensionFilter() {
-		return new FileChooser.ExtensionFilter(dataType + " (" + Basic.toString(getFileExtensions(), " ") + ")", getFileExtensions().stream().map(s -> "*." + s).collect(Collectors.toList()));
+		return new FileChooser.ExtensionFilter(dataType + " (" + StringUtils.toString(getFileExtensions(), " ") + ")", getFileExtensions().stream().map(s -> "*." + s).collect(Collectors.toList()));
 	}
 }

@@ -22,8 +22,8 @@ package splitstree6.algorithms.splits.splits2splits;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.util.ProgressListener;
-import jloda.util.ProgressPercentage;
+import jloda.util.progress.ProgressListener;
+import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.utils.LeastSquares;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;

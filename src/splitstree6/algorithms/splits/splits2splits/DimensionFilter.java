@@ -30,7 +30,7 @@ import jloda.graph.NodeSet;
 import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.Pair;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;

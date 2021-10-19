@@ -100,7 +100,7 @@ public class SimplePipeline extends Application {
 
 		workflow.getSourceNode().setValid(true);
 
-		workflow.busyProperty().addListener((v, o, n) -> {
+		workflow.validProperty().addListener((v, o, n) -> {
 			if (!n) {
 				System.err.println(workflow.toReportString());
 				System.err.println(ExtractMethodsText.getInstance().apply(workflow));
@@ -114,7 +114,7 @@ public class SimplePipeline extends Application {
 					var taxaFilter = (TaxaFilter) node.getAlgorithm();
 					taxaFilter.setDisabled(workflow.getInputTaxonBlock().getLabel(1), true);
 
-					if (!workflow.getBusy()) {
+					if (!workflow.isValid()) {
 						System.err.println("Rerunning Analysis");
 						Platform.runLater(node::restart);
 					} else
@@ -122,7 +122,7 @@ public class SimplePipeline extends Application {
 					break;
 				}
 				if (true)
-					workflow.busyProperty().addListener((v, o, n) -> {
+					workflow.validProperty().addListener((v, o, n) -> {
 						if (!n) ProgramExecutorService.submit(5000, () -> System.exit(0));
 					});
 			});

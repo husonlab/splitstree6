@@ -19,7 +19,7 @@
 
 package splitstree6.algorithms.distances.distances2distances;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;

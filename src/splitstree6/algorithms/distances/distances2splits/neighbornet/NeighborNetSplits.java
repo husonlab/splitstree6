@@ -21,7 +21,7 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.util.CanceledException;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.NeighborNetBlockPivot;
 import splitstree6.data.parts.ASplit;

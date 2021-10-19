@@ -22,7 +22,7 @@ package splitstree6.algorithms.characters.characters2characters;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;

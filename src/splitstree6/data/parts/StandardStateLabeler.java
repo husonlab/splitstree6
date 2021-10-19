@@ -20,7 +20,7 @@
 
 package splitstree6.data.parts;
 
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -134,7 +134,7 @@ public class StandardStateLabeler extends StateLabeler {
         int max = 0;
         for (int i = 1; i < token2charMaps.length; i++)
             for (String token : token2charMaps[i].keySet())
-                max = Math.max(max, Basic.quoteIfNecessary(token).length());
+				max = Math.max(max, StringUtils.quoteIfNecessary(token).length());
         return max;
     }
 

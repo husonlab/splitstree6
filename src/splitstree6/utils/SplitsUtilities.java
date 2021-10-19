@@ -21,6 +21,8 @@
 package splitstree6.utils;
 
 import jloda.util.*;
+import jloda.util.progress.ProgressListener;
+import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.data.DistancesBlock;

@@ -19,7 +19,7 @@
 
 package splitstree6.algorithms.taxa;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.SinkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.writers.taxa.TabbedTextWriter;

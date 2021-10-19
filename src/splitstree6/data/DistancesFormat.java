@@ -20,7 +20,7 @@
 
 package splitstree6.data;
 
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 
 /**
  * Distances display format
@@ -58,7 +58,7 @@ public class DistancesFormat {
 	 * @param triangleLabel the label of triangle
 	 */
 	public void setOptionTriangleByLabel(String triangleLabel) {
-		this.optionTriangle = Basic.valueOfIgnoreCase(Triangle.class, triangleLabel);
+		this.optionTriangle = StringUtils.valueOfIgnoreCase(Triangle.class, triangleLabel);
 	}
 
 	public void setOptionTriangle(Triangle triangle) {

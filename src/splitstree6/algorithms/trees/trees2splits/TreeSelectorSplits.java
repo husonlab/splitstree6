@@ -23,7 +23,7 @@ package splitstree6.algorithms.trees.trees2splits;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import jloda.phylo.PhyloTree;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;

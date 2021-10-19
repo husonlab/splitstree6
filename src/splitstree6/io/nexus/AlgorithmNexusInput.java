@@ -38,14 +38,14 @@ import java.util.Map;
  */
 public class AlgorithmNexusInput extends NexusIOBase {
     public static final String SYNTAX = """
-            BEGIN ALGORITHM;
-            \t[TITLE <title>;]
-            \t[LINK <parent-block-type> = <parent-title>;]
-            \tALGORITHM <name>;
-            \t\t[OPTIONS <name>=<value>,\t\t ...\t\t<name>=<value>
-            \t;
-            END;
-            """;
+			BEGIN ALGORITHM;
+				[TITLE <title>;]
+				[LINK <parent-block-type> = <parent-title>;]
+				ALGORITHM <name>;
+					[OPTIONS <name>=<value>,		 ...		<name>=<value>
+				;
+			END;
+			""";
 
     /**
      * get syntax

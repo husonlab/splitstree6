@@ -21,11 +21,11 @@
 package splitstree6.io.nexus;
 
 import jloda.fx.window.NotificationManager;
-import jloda.util.Basic;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.CharactersBlock;
-import splitstree6.data.CharactersNexusFormat;
+import splitstree6.data.CharactersFormat;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.*;
 
@@ -42,29 +42,29 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
     private boolean treatUnknownAsError = false;
 
     public static final String SYNTAX = """
-            BEGIN CHARACTERS;
-            \t[TITLE {title};]
-            \t[LINK {type} = {title};]
-            \tDIMENSIONS [NTAX=number-of-taxa] NCHAR=number-of-characters;
-            \t[FORMAT
-            \t\t[DATATYPE={STANDARD|DNA|RNA|PROTEIN|MICROSAT}]
-            \t\t[RESPECTCASE]
-            \t\t[MISSING=symbol]
-            \t\t[GAP=symbol]
-            \t\t[MatchChar=symbol]
-            \t\t[SYMBOLS="symbol symbol ..."]
-            \t\t[LABELS={NO|LEFT}]
-            \t\t[TRANSPOSE={NO|YES}]
-            \t\t[INTERLEAVE={NO|YES}]
-            \t\t[TOKENS=NO]
-            \t;]
-            \t[CHARWEIGHTS wgt_1 wgt_2 ... wgt_nchar;]
-            \t[CHARSTATELABELS character-number [ character-name ][ /state-name [ state-name... ] ], ...;]
-            \tMATRIX
-            \t\tsequence data in specified format
-            \t;
-            END;
-            """;
+			BEGIN CHARACTERS;
+				[TITLE {title};]
+				[LINK {type} = {title};]
+				DIMENSIONS [NTAX=number-of-taxa] NCHAR=number-of-characters;
+				[FORMAT
+					[DATATYPE={STANDARD|DNA|RNA|PROTEIN|MICROSAT}]
+					[RESPECTCASE]
+					[MISSING=symbol]
+					[GAP=symbol]
+					[MatchChar=symbol]
+					[SYMBOLS="symbol symbol ..."]
+					[LABELS={NO|LEFT}]
+					[TRANSPOSE={NO|YES}]
+					[INTERLEAVE={NO|YES}]
+					[TOKENS=NO]
+				;]
+				[CHARWEIGHTS wgt_1 wgt_2 ... wgt_nchar;]
+				[CHARSTATELABELS character-number [ character-name ][ /state-name [ state-name... ] ], ...;]
+				MATRIX
+					sequence data in specified format
+				;
+			END;
+			""";
 
     @Override
     public String getSyntax() {
@@ -82,7 +82,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 
         final boolean hasTaxonNames = taxa.getLabels().size() > 0;
 
-        final CharactersNexusFormat format = (CharactersNexusFormat) charactersBlock.getFormat();
+		final CharactersFormat format = (CharactersFormat) charactersBlock.getFormat();
 
         if (np.peekMatchIgnoreCase("#nexus"))
             np.matchIgnoreCase("#nexus");
@@ -127,7 +127,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
         if (np.peekMatchIgnoreCase("FORMAT")) {
             final List<String> formatTokens = np.getTokensLowerCase("FORMAT", ";");
             {
-                final String dataType = np.findIgnoreCase(formatTokens, "dataType=", Basic.toString(CharactersType.values(), " ") + " nucleotide", CharactersType.Unknown.toString());
+				final String dataType = np.findIgnoreCase(formatTokens, "dataType=", StringUtils.toString(CharactersType.values(), " ") + " nucleotide", CharactersType.Unknown.toString());
                 charactersBlock.setDataType(dataType.equalsIgnoreCase("nucleotide") ? CharactersType.DNA : CharactersType.valueOfIgnoreCase(dataType));
             }
 
@@ -196,7 +196,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
             }
 
             if (formatTokens.size() != 0)
-                throw new IOExceptionWithLineNumber("Unexpected in FORMAT: '" + Basic.toString(formatTokens, " ") + "'", np.lineno());
+				throw new IOExceptionWithLineNumber("Unexpected in FORMAT: '" + StringUtils.toString(formatTokens, " ") + "'", np.lineno());
         }
 
         if (np.peekMatchIgnoreCase("CharWeights")) {
@@ -232,7 +232,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
             np.matchIgnoreCase(";");
 
             if (charactersBlock.getSymbols() == null || charactersBlock.getSymbols().length() == 0)
-                charactersBlock.setSymbols(Basic.toString(charactersBlock.getCharLabeler().keySet(), ""));
+				charactersBlock.setSymbols(StringUtils.toString(charactersBlock.getCharLabeler().keySet(), ""));
         }
 
         ArrayList<String> taxonNamesFound;
@@ -256,35 +256,35 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 
         if (unknownStates.size() > 0)  // warn that stuff has been replaced!
         {
-            NotificationManager.showWarning("Unknown states encountered in matrix:\n" + Basic.toString(unknownStates, " ") + "\n"
-                                            + "All replaced by the gap-char '" + charactersBlock.getGapCharacter() + "'");
+			NotificationManager.showWarning("Unknown states encountered in matrix:\n" + StringUtils.toString(unknownStates, " ") + "\n"
+											+ "All replaced by the gap-char '" + charactersBlock.getGapCharacter() + "'");
         }
 
         return taxonNamesFound;
     }
 
     /**
-     * read the matrix
-     *
-     * @param np
-     * @param taxa
-     * @param characters
-     * @param format
-     * @param unknownStates
-     * @return
-     * @throws IOException
-     */
-    private ArrayList<String> readMatrix(NexusStreamParser np, boolean hasTaxonNames, TaxaBlock taxa, CharactersBlock characters, CharactersNexusFormat format,
-                                         Set<Character> unknownStates) throws IOException {
-        final boolean checkStates = characters.getDataType() == CharactersType.Protein ||
-                                    characters.getDataType() == CharactersType.DNA || characters.getDataType() == CharactersType.RNA;
-        final ArrayList<String> taxonNamesFound = new ArrayList<>(characters.getNtax());
+	 * read the matrix
+	 *
+	 * @param np
+	 * @param taxa
+	 * @param characters
+	 * @param format
+	 * @param unknownStates
+	 * @return
+	 * @throws IOException
+	 */
+	private ArrayList<String> readMatrix(NexusStreamParser np, boolean hasTaxonNames, TaxaBlock taxa, CharactersBlock characters, CharactersFormat format,
+										 Set<Character> unknownStates) throws IOException {
+		final boolean checkStates = characters.getDataType() == CharactersType.Protein ||
+									characters.getDataType() == CharactersType.DNA || characters.getDataType() == CharactersType.RNA;
+		final ArrayList<String> taxonNamesFound = new ArrayList<>(characters.getNtax());
 
-        for (int t = 1; t <= characters.getNtax(); t++) {
-            if (format.isOptionLabels()) {
-                if (hasTaxonNames) {
-                    np.matchLabelRespectCase(taxa.getLabel(t));
-                    taxonNamesFound.add(taxa.getLabel(t));
+		for (int t = 1; t <= characters.getNtax(); t++) {
+			if (format.isOptionLabels()) {
+				if (hasTaxonNames) {
+					np.matchLabelRespectCase(taxa.getLabel(t));
+					taxonNamesFound.add(taxa.getLabel(t));
                 } else
                     taxonNamesFound.add(np.getLabelRespectCase());
             }
@@ -344,27 +344,27 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
     }
 
     /**
-     * read the matrix
-     *
-     * @param np
-     * @param taxa
-     * @param characters
-     * @param format
-     * @param unknownStates
-     * @return
-     * @throws IOException
-     */
-    private ArrayList<String> readMatrixTransposed(NexusStreamParser np, boolean hasTaxonNames, TaxaBlock taxa, CharactersBlock characters, CharactersNexusFormat format,
-                                                   Set<Character> unknownStates) throws IOException {
-        final boolean checkStates = characters.getDataType() == CharactersType.Protein ||
-                                    characters.getDataType() == CharactersType.DNA || characters.getDataType() == CharactersType.RNA;
-        final ArrayList<String> taxonNamesFound = new ArrayList<>(characters.getNtax());
+	 * read the matrix
+	 *
+	 * @param np
+	 * @param taxa
+	 * @param characters
+	 * @param format
+	 * @param unknownStates
+	 * @return
+	 * @throws IOException
+	 */
+	private ArrayList<String> readMatrixTransposed(NexusStreamParser np, boolean hasTaxonNames, TaxaBlock taxa, CharactersBlock characters, CharactersFormat format,
+												   Set<Character> unknownStates) throws IOException {
+		final boolean checkStates = characters.getDataType() == CharactersType.Protein ||
+									characters.getDataType() == CharactersType.DNA || characters.getDataType() == CharactersType.RNA;
+		final ArrayList<String> taxonNamesFound = new ArrayList<>(characters.getNtax());
 
-        if (format.isOptionLabels()) {
-            for (int t = 1; t <= characters.getNtax(); t++) {
-                if (hasTaxonNames) {
-                    np.matchLabelRespectCase(taxa.getLabel(t));
-                    taxonNamesFound.add(taxa.getLabel(t));
+		if (format.isOptionLabels()) {
+			for (int t = 1; t <= characters.getNtax(); t++) {
+				if (hasTaxonNames) {
+					np.matchLabelRespectCase(taxa.getLabel(t));
+					taxonNamesFound.add(taxa.getLabel(t));
                 } else
                     taxonNamesFound.add(np.getLabelRespectCase());
             }
@@ -428,27 +428,27 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
     }
 
     /**
-     * read the matrix
-     *
-     * @param np
-     * @param taxa
-     * @param characters
-     * @param format
-     * @param unknownStates
-     * @return
-     * @throws IOException
-     */
-    private ArrayList<String> readMatrixInterleaved(NexusStreamParser np, boolean hasTaxonNames, TaxaBlock taxa, CharactersBlock characters, CharactersNexusFormat format,
-                                                    Set<Character> unknownStates) throws IOException {
-        final boolean checkStates = characters.getDataType() == CharactersType.Protein ||
-                                    characters.getDataType() == CharactersType.DNA || characters.getDataType() == CharactersType.RNA;
-        final ArrayList<String> taxonNamesFound = new ArrayList<>(characters.getNtax());
+	 * read the matrix
+	 *
+	 * @param np
+	 * @param taxa
+	 * @param characters
+	 * @param format
+	 * @param unknownStates
+	 * @return
+	 * @throws IOException
+	 */
+	private ArrayList<String> readMatrixInterleaved(NexusStreamParser np, boolean hasTaxonNames, TaxaBlock taxa, CharactersBlock characters, CharactersFormat format,
+													Set<Character> unknownStates) throws IOException {
+		final boolean checkStates = characters.getDataType() == CharactersType.Protein ||
+									characters.getDataType() == CharactersType.DNA || characters.getDataType() == CharactersType.RNA;
+		final ArrayList<String> taxonNamesFound = new ArrayList<>(characters.getNtax());
 
-        try {
-            int c = 0;
-            boolean firstBlock = true;
-            while (c < characters.getNchar()) {
-                int lineLength = 0;
+		try {
+			int c = 0;
+			boolean firstBlock = true;
+			while (c < characters.getNchar()) {
+				int lineLength = 0;
                 for (int t = 1; t <= characters.getNtax(); t++) {
                     if (format.isOptionLabels()) {
                         if (!hasTaxonNames) {
@@ -568,18 +568,18 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
     }
 
 
-    /**
-     * Checks if the character is a valid state symbol. Will always return
-     * true if the datatype is UNKNOWN.
-     *
-     * @param ch character to check
-     * @return boolean  true if character consistent with the symbol list of the block's datatype
-     */
-    private boolean isValidState(CharactersBlock characters, CharactersNexusFormat format, char ch) {
-        return characters.getDataType() == CharactersType.Unknown || ch == characters.getMissingCharacter() || ch == characters.getGapCharacter() || ch == format.getOptionMatchCharacter()
-               || characters.getSymbols().indexOf(ch) >= 0
-               || (characters.getDataType() == CharactersType.DNA && AmbiguityCodes.isAmbiguityCode(ch));
-    }
+	/**
+	 * Checks if the character is a valid state symbol. Will always return
+	 * true if the datatype is UNKNOWN.
+	 *
+	 * @param ch character to check
+	 * @return boolean  true if character consistent with the symbol list of the block's datatype
+	 */
+	private boolean isValidState(CharactersBlock characters, CharactersFormat format, char ch) {
+		return characters.getDataType() == CharactersType.Unknown || ch == characters.getMissingCharacter() || ch == characters.getGapCharacter() || ch == format.getOptionMatchCharacter()
+			   || characters.getSymbols().indexOf(ch) >= 0
+			   || (characters.getDataType() == CharactersType.DNA && AmbiguityCodes.isAmbiguityCode(ch));
+	}
 
     public boolean isIgnoreMatrix() {
         return ignoreMatrix;

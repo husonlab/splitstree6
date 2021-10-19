@@ -22,7 +22,7 @@ package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;

@@ -23,7 +23,7 @@ package splitstree6.algorithms.trees.trees2trees;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jloda.phylo.PhyloTree;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;

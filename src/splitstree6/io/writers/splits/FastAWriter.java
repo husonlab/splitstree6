@@ -19,6 +19,7 @@
 
 package splitstree6.io.writers.splits;
 
+import jloda.seq.FastA;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 
@@ -33,7 +34,7 @@ public class FastAWriter extends SplitsWriter {
 
 	public void write(Writer w, TaxaBlock taxa, SplitsBlock splits) throws IOException {
 
-		jloda.util.FastA fasta = new jloda.util.FastA();
+		FastA fasta = new FastA();
 		for (int t = 1; t <= taxa.getNtax(); t++) {
 			char[] seq = new char[splits.getNsplits()];
 			for (int s = 1; s <= splits.getNsplits(); s++) {

@@ -21,7 +21,7 @@ package splitstree6.io.writers.network;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 
@@ -39,7 +39,7 @@ public class TGFWriter extends NetworkWriter {
 			if (v.getLabel() != null)
 				w.write(" tax=" + v.getLabel());
 			if (isOptionShowAllDetails()) {
-				var label = Basic.toString(dataBlock.getNodeData(v).entrySet(), " ");
+				var label = StringUtils.toString(dataBlock.getNodeData(v).entrySet(), " ");
 				if (!label.isBlank())
 					w.write(" " + label);
 			}
@@ -50,7 +50,7 @@ public class TGFWriter extends NetworkWriter {
 			w.write(e.getSource().getId() + " " + e.getTarget().getId());
 			w.write(" wgt=" + graph.getWeight(e));
 			if (isOptionShowAllDetails()) {
-				var label = Basic.toString(dataBlock.getEdgeData(e).entrySet(), " ");
+				var label = StringUtils.toString(dataBlock.getEdgeData(e).entrySet(), " ");
 				if (!label.isBlank())
 					w.write(" " + label);
 			}

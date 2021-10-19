@@ -20,9 +20,9 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
 import jloda.util.BitSetUtils;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
+import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.TreesUtilities;
@@ -54,8 +54,8 @@ public class TreesTaxaFilter extends DataTaxaFilter<TreesBlock, TreesBlock> {
 				if (inducedTree != null) {
 					outputData.getTrees().add(inducedTree);
 					if (false && !BitSetUtils.contains(modifiedTaxaBlock.getTaxaSet(), TreesUtilities.getTaxa(inducedTree))) {
-						System.err.println("taxa:" + Basic.toString(modifiedTaxaBlock.getTaxaSet()));
-						System.err.println("tree:" + Basic.toString(TreesUtilities.getTaxa(inducedTree)));
+						System.err.println("taxa:" + StringUtils.toString(modifiedTaxaBlock.getTaxaSet()));
+						System.err.println("tree:" + StringUtils.toString(TreesUtilities.getTaxa(inducedTree)));
 						throw new RuntimeException("Induce tree failed");
 					}
 				}

@@ -24,7 +24,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.CanceledException;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
 import splitstree6.data.DistancesBlock;

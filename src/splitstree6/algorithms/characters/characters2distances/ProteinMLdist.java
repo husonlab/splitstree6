@@ -22,7 +22,7 @@ package splitstree6.algorithms.characters.characters2distances;
 
 import javafx.beans.property.*;
 import jloda.fx.window.NotificationManager;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 import splitstree6.data.CharactersBlock;

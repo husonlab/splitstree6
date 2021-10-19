@@ -31,7 +31,7 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
-import jloda.util.Basic;
+import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.data.parts.Taxon;
 import splitstree6.methods.ExtractMethodsText;
@@ -79,7 +79,7 @@ public class MainWindow implements IMainWindow {
 
 		workflowTab = new WorkflowTab(this);
 		methodsTab = new TextDisplayTab(this, "Methods", false, false);
-		workflow.busyProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? "" : ExtractMethodsText.getInstance().apply(workflow)));
+		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? "" : ExtractMethodsText.getInstance().apply(workflow)));
 	}
 
 	@Override
@@ -118,9 +118,9 @@ public class MainWindow implements IMainWindow {
 
 		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
 
-		name.addListener(c -> stage.setTitle(Basic.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
+		name.addListener(c -> stage.setTitle(FileUtils.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
 
-		dirtyProperty().addListener(c -> stage.setTitle(Basic.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
+		dirtyProperty().addListener(c -> stage.setTitle(FileUtils.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
 
 		setName("Empty");
 
@@ -171,7 +171,7 @@ public class MainWindow implements IMainWindow {
 	}
 
 	public void setName(String name) {
-		this.name.set(Basic.replaceFileSuffix(Basic.getFileNameWithoutPath(name), ""));
+		this.name.set(FileUtils.replaceFileSuffix(FileUtils.getFileNameWithoutPath(name), ""));
 	}
 
 	public Tab getTabByClass(Class clazz) {

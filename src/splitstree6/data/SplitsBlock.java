@@ -20,7 +20,7 @@
 package splitstree6.data;
 
 import javafx.collections.FXCollections;
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 import splitstree6.algorithms.splits.splits2splits.SplitsTaxaFilter;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
@@ -42,6 +42,8 @@ public class SplitsBlock extends DataBlock {
 
 	private int[] cycle;
 
+	private SplitsFormat format;
+
 	private final Map<Integer, String> splitLabels;
 
 	/**
@@ -50,6 +52,7 @@ public class SplitsBlock extends DataBlock {
 	public SplitsBlock() {
 		splits = new ArrayList<>();
 		splitLabels = FXCollections.observableMap(new TreeMap<>());
+		format = new SplitsFormat();
 	}
 
 	public SplitsBlock(SplitsBlock that) {
@@ -64,8 +67,6 @@ public class SplitsBlock extends DataBlock {
 
 	/**
 	 * shallow copy
-	 *
-	 * @param that
 	 */
 	public void copy(SplitsBlock that) {
 		clear();
@@ -78,6 +79,7 @@ public class SplitsBlock extends DataBlock {
 		if (that.getCycle() != null)
 			cycle = that.getCycle().clone();
 		splitLabels.putAll(that.splitLabels);
+		format = that.format;
 	}
 
 	@Override
@@ -223,7 +225,7 @@ public class SplitsBlock extends DataBlock {
 
 	@Override
 	public String getInfo() {
-		return getNsplits() + " splits" + (compatibility != Compatibility.unknown ? ", " + Basic.fromCamelCase(compatibility.toString()).toLowerCase() : "");
+		return getNsplits() + " splits" + (compatibility != Compatibility.unknown ? ", " + StringUtils.fromCamelCase(compatibility.toString()).toLowerCase() : "");
 	}
 
 	public int indexOf(ASplit split) {
@@ -242,5 +244,9 @@ public class SplitsBlock extends DataBlock {
 	@Override
 	public SplitsBlock newInstance() {
 		return (SplitsBlock) super.newInstance();
+	}
+
+	public SplitsFormat getFormat() {
+		return format;
 	}
 }

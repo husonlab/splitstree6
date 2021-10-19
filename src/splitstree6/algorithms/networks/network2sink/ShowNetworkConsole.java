@@ -21,7 +21,7 @@ package splitstree6.algorithms.networks.network2sink;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.SinkBlock;
 import splitstree6.data.TaxaBlock;

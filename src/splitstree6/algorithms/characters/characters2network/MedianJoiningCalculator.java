@@ -27,7 +27,7 @@ import jloda.graph.NodeSet;
 import jloda.phylo.PhyloGraph;
 import jloda.util.CanceledException;
 import jloda.util.Pair;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 
 import java.util.*;
 

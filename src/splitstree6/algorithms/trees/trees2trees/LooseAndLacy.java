@@ -25,8 +25,8 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
+import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import splitstree6.data.TreesBlock;
@@ -77,9 +77,9 @@ public class LooseAndLacy extends Trees2Trees {
 
 		if (isOptionUseAllTraits()) {
 			upper = computeLeastUpperBound(taxaBlock.getNtax(), traitsBlock);
-			System.err.println("Upper: " + Basic.toString(upper, " "));
+			System.err.println("Upper: " + StringUtils.toString(upper, " "));
 			lower = computeGreatestLowerBound(taxaBlock.getNtax(), traitsBlock);
-			System.err.println("Lower: " + Basic.toString(lower, " "));
+			System.err.println("Lower: " + StringUtils.toString(lower, " "));
 			System.err.printf("Species definitions based on all %d traits%n", traitsBlock.getNTraits());
 		} else {
 			upper = lower = computeTax2ValueForTrait(taxaBlock.getNtax(), getOptionTraitNumber(), traitsBlock);
@@ -107,7 +107,7 @@ public class LooseAndLacy extends Trees2Trees {
 			{
 				int count = 0;
 				for (BitSet set : looseSpecies) {
-					System.err.println(format("[%d] %s", ++count, Basic.toString(set, " ")));
+					System.err.println(format("[%d] %s", ++count, StringUtils.toString(set, " ")));
 				}
 			}
 
@@ -131,7 +131,7 @@ public class LooseAndLacy extends Trees2Trees {
 			{
 				int count = 0;
 				for (BitSet set : lacySpecies) {
-					System.err.printf("[%d] %s%n", ++count, Basic.toString(set, " "));
+					System.err.printf("[%d] %s%n", ++count, StringUtils.toString(set, " "));
 				}
 			}
 			child.getTrees().add(lacyTree);

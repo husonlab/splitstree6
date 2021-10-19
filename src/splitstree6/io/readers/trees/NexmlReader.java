@@ -25,7 +25,8 @@ import jloda.graph.Node;
 import jloda.graph.algorithms.IsTree;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
-import jloda.util.ProgressListener;
+import jloda.util.FileUtils;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.readers.trees.utils.NexmlTreesHandler;
@@ -119,11 +120,11 @@ public class NexmlReader extends TreesReader {
 		if (!super.accepts(fileName))
 			return false;
 		else {
-			String firstLine = Basic.getFirstLineFromFile(new File(fileName));
+			String firstLine = FileUtils.getFirstLineFromFile(new File(fileName));
 			if (firstLine == null || !firstLine.equals("<nex:nexml") && !firstLine.startsWith("<?xml version="))
 				return false;
 
-			try (BufferedReader ins = new BufferedReader(new InputStreamReader(Basic.getInputStreamPossiblyZIPorGZIP(fileName)))) {
+			try (BufferedReader ins = new BufferedReader(new InputStreamReader(FileUtils.getInputStreamPossiblyZIPorGZIP(fileName)))) {
 				String aLine;
 				while ((aLine = ins.readLine()) != null) {
 					if (aLine.contains("<tree"))

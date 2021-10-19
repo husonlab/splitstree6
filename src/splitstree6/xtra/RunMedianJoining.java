@@ -57,7 +57,7 @@ public class RunMedianJoining extends Application {
 	public void start(Stage stage) throws Exception {
 		var workflow = setupWorkflow();
 
-		workflow.busyProperty().addListener((v, o, n) -> {
+		workflow.validProperty().addListener((v, o, n) -> {
 			if (!n) {
 				System.err.println(workflow.toReportString());
 				System.err.println(ExtractMethodsText.getInstance().apply(workflow));

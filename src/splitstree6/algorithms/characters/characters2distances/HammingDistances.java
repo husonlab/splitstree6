@@ -25,7 +25,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.util.Counter;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import jloda.util.Single;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.data.CharactersBlock;

@@ -19,7 +19,7 @@
 
 package splitstree6.algorithms.characters.characters2characters;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;

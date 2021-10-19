@@ -25,9 +25,7 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.window.NotificationManager;
-import jloda.util.Basic;
-import jloda.util.FileLineIterator;
-import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.*;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.window.MainWindow;
@@ -61,7 +59,7 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 		toolBarController = loader.getController();
 		toolBarPresenter = new InputEditorTabPresenter(mainWindow, this);
 
-		mainWindow.getWorkflow().busyProperty().addListener((v, o, n) -> {
+		mainWindow.getWorkflow().validProperty().addListener((v, o, n) -> {
 			if (!n)
 				if (importException == null)
 					NotificationManager.showInformation("Import: created " + mainWindow.getWorkflow().getNumberOfNodes() + " of nodes in workflow");
@@ -111,7 +109,7 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 
 	public void importFromFile(String fileName) {
 		try (FileLineIterator it = new FileLineIterator(fileName)) {
-			replaceText(Basic.toString(it.lines(), "\n"));
+			replaceText(StringUtils.toString(it.lines(), "\n"));
 			setInputFileName((new File(fileName)).getName());
 		} catch (IOException ex) {
 			NotificationManager.showError("Import text failed: " + ex.getMessage());
@@ -131,7 +129,7 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 		try {
 			importException = null;
 			if (tmpFile == null) {
-				tmpFile = Basic.getUniqueFileName(System.getProperty("user.dir"), "Untitled", "tmp");
+				tmpFile = FileUtils.getUniqueFileName(System.getProperty("user.dir"), "Untitled", "tmp");
 				tmpFile.deleteOnExit();
 			}
 			try (BufferedWriter w = new BufferedWriter(new FileWriter(tmpFile))) {

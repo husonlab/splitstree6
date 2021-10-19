@@ -35,20 +35,20 @@ import java.util.ArrayList;
  */
 public class TaxaNexusInput extends NexusIOBase {
     public static final String SYNTAX = """
-            BEGIN TAXA;
-            \t[TITLE title;]
-            \tDIMENSIONS NTAX=number-of-taxa;
-            \t[TAXLABELS
-            \t\tlist-of-labels
-            \t;]
-            \t[TAXINFO
-            \t\tlist-of-info-items (use 'null' for missing item)
-            \t;]
-            \t[DISPLAYLABELS
-            \t\tlist-of-html-strings (use 'null' for missing item)
-            \t;]
-            END;
-            """;
+			BEGIN TAXA;
+				[TITLE title;]
+				DIMENSIONS NTAX=number-of-taxa;
+				[TAXLABELS
+					list-of-labels
+				;]
+				[TAXINFO
+					list-of-info-items (use 'null' for missing item)
+				;]
+				[DISPLAYLABELS
+					list-of-html-strings (use 'null' for missing item)
+				;]
+			END;
+			""";
 
     public String getSyntax() {
         return SYNTAX;

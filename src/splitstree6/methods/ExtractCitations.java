@@ -19,8 +19,8 @@
 
 package splitstree6.methods;
 
-import jloda.util.Basic;
 import jloda.util.Pair;
+import jloda.util.StringUtils;
 import splitstree6.workflow.Algorithm;
 
 import java.util.Collection;
@@ -40,7 +40,7 @@ public class ExtractCitations {
 			return null;
 		else {
 			Set<Pair<String, String>> set = new TreeSet<>();
-			var tokens = Basic.split(algorithm.getCitation(), ';');
+			var tokens = StringUtils.split(algorithm.getCitation(), ';');
 			if (tokens.length % 2 == 1)
 				System.err.println("Internal error: Citation string has odd number of tokens: " + algorithm.getCitation());
 			for (int i = 0; i < tokens.length - 1; i += 2) {

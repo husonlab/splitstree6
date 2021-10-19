@@ -22,7 +22,7 @@ package splitstree6.algorithms.splits.splits2splits;
 
 import javafx.beans.property.*;
 import jloda.fx.window.NotificationManager;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;

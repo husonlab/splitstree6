@@ -23,7 +23,7 @@ package splitstree6.io.writers.trees;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
@@ -135,7 +135,7 @@ public class NeXMLWriter extends TreesWriter {
 				final int externalId = (++nodesCounter);
 				nodeId2externalId.put(v.getId(), externalId);
 				xmlWriter.writeAttribute("id", "n" + externalId);
-				if (Basic.notBlank(tree.getLabel(v)))
+				if (StringUtils.notBlank(tree.getLabel(v)))
 					xmlWriter.writeAttribute("label", tree.getLabel(v));
 				if (tree.getRoot() != null && tree.getRoot().equals(v))
 					xmlWriter.writeAttribute("root", "true");

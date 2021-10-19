@@ -20,8 +20,8 @@
 
 package splitstree6.io.nexus;
 
-import jloda.util.Basic;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.DistancesFormat;
@@ -37,24 +37,24 @@ import java.util.List;
  */
 public class DistancesNexusInput extends NexusIOBase implements INexusInput<DistancesBlock> {
     public static final String SYNTAX =
-            """
-                    BEGIN DISTANCES;
-                    \t[TITLE {title};]
-                    \t[LINK {type} = {title};]
-                    \t[DIMENSIONS NTAX=number-of-taxa;]
-                    \t[FORMAT
-                    \t\t[TRIANGLE={LOWER|UPPER|BOTH}]
-                    \t\t[[NO] DIAGONAL]
-                    \t\t[LABELS={LEFT|NO}]
-                    \t;]
-                    \tMATRIX
-                    \t\tdistance data in specified format
-                    \t;
-                    \t[VARMATRIX
-                    \t\tvariance data in same specified format
-                    \t;]
-                    END;
-                    """;
+			"""
+					BEGIN DISTANCES;
+						[TITLE {title};]
+						[LINK {type} = {title};]
+						[DIMENSIONS NTAX=number-of-taxa;]
+						[FORMAT
+							[TRIANGLE={LOWER|UPPER|BOTH}]
+							[[NO] DIAGONAL]
+							[LABELS={LEFT|NO}]
+						;]
+						MATRIX
+							distance data in specified format
+						;
+						[VARMATRIX
+							variance data in same specified format
+						;]
+					END;
+					""";
 
 
     @Override
@@ -95,7 +95,7 @@ public class DistancesNexusInput extends NexusIOBase implements INexusInput<Dist
                 format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal=no", false, format.isOptionDiagonal()));
                 format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal=yes", true, format.isOptionDiagonal()));
 
-                format.setOptionTriangleByLabel(np.findIgnoreCase(tokens, "triangle=", Basic.toString(DistancesFormat.Triangle.values(), " "), format.getOptionTriangle().toString()));
+				format.setOptionTriangleByLabel(np.findIgnoreCase(tokens, "triangle=", StringUtils.toString(DistancesFormat.Triangle.values(), " "), format.getOptionTriangle().toString()));
 
                 // backward compatibility:
                 format.setOptionLabels(np.findIgnoreCase(tokens, "no labels", false, format.isOptionLabels()));

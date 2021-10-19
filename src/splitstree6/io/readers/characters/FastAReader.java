@@ -21,10 +21,8 @@ package splitstree6.io.readers.characters;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.util.Basic;
-import jloda.util.FileLineIterator;
-import jloda.util.IOExceptionWithLineNumber;
-import jloda.util.ProgressListener;
+import jloda.util.*;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
@@ -246,7 +244,7 @@ public class FastAReader extends CharactersReader {
 		if (!super.accepts(fileName))
 			return false;
 		else {
-			String line = Basic.getFirstLineFromFileIgnoreEmptyLines(new File(fileName), ";", 20);
+			String line = FileUtils.getFirstLineFromFileIgnoreEmptyLines(new File(fileName), ";", 20);
 			return line != null && line.startsWith(">");
 		}
 	}

@@ -32,7 +32,7 @@ public class RunSequences extends Application {
 		var file = "/Users/huson/IdeaProjects/community/splitstree6/examples/bees.fasta";
 		var workflow = WorkflowSetup.apply(file);
 
-		workflow.busyProperty().addListener((v, o, n) -> {
+		workflow.validProperty().addListener((v, o, n) -> {
 			if (!n) {
 				System.err.println(workflow.toReportString());
 				System.err.println(ExtractMethodsText.getInstance().apply(workflow));

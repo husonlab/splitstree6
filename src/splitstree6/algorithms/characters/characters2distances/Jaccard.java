@@ -20,7 +20,7 @@
 
 package splitstree6.algorithms.characters.characters2distances;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.data.CharactersBlock;

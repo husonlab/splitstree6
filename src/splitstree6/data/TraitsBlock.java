@@ -35,11 +35,13 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	private String[] labels = {};
 	private float[] traitLatitude = null;
 	private float[] traitLongitude = null;
+	private TraitsNexusFormat format;
 
 	/**
 	 * default constructor
 	 */
 	public TraitsBlock() {
+		format = new TraitsNexusFormat();
 	}
 
 	public void setDimensions(int ntax, int ntraits) {
@@ -167,4 +169,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return (TraitsBlock) super.newInstance();
 	}
 
+	public TraitsNexusFormat getFormat() {
+		return format;
+	}
 }

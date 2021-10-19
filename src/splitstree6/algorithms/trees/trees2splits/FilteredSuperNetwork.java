@@ -26,8 +26,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import jloda.phylo.Distortion;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
+import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -63,7 +63,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 
 	@Override
 	public String getToolTip(String optionName) {
-		return "Set the " + Basic.fromCamelCase(optionName).toLowerCase();
+		return "Set the " + StringUtils.fromCamelCase(optionName).toLowerCase();
 	}
 
 	@Override

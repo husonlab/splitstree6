@@ -19,7 +19,7 @@
 
 package splitstree6.algorithms.splits.splits2sink;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.SinkBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;

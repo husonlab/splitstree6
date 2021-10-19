@@ -21,7 +21,7 @@
 package splitstree6.algorithms.trees.trees2trees;
 
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;

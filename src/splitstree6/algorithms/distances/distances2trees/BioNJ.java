@@ -23,7 +23,7 @@ package splitstree6.algorithms.distances.distances2trees;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;

@@ -25,7 +25,8 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
+import jloda.util.StringUtils;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -96,7 +97,7 @@ public class RootByOutGroupAlgorithm extends Trees2Trees implements IFilter {
 		}
 
 		if (optionInGroupTaxa.size() == 0 || optionOutGroupTaxa.size() == 0)
-			setShortDescription(Basic.fromCamelCase(Basic.getShortName(this.getClass())));
+			setShortDescription(StringUtils.fromCamelCase(Basic.getShortName(this.getClass())));
 		else
 			setShortDescription("using " + optionOutGroupTaxa.size() + " of " + (taxa.getNtax() + " for tree rooting"));
 

@@ -54,7 +54,7 @@ public class CharactersBlock extends DataBlock {
 	private StateLabeler stateLabeler; // manages state labels
 	private Map<Integer, String> charLabeler; // manages character labels
 
-	private CharactersNexusFormat format;
+	private CharactersFormat format;
 
 	/**
 	 * Number of colors used.
@@ -74,7 +74,7 @@ public class CharactersBlock extends DataBlock {
 		matrix = new char[0][0];
 		symbol2color = new HashMap<>();
 		color2symbols = new HashMap<>();
-		format = new CharactersNexusFormat();
+		format = new CharactersFormat();
 	}
 
 	@Override
@@ -401,11 +401,11 @@ public class CharactersBlock extends DataBlock {
 		return (CharactersBlock) super.newInstance();
 	}
 
-	public CharactersNexusFormat getFormat() {
+	public CharactersFormat getFormat() {
 		return format;
 	}
 
-	public void setFormat(CharactersNexusFormat format) {
+	public void setFormat(CharactersFormat format) {
 		this.format = format;
 	}
 }

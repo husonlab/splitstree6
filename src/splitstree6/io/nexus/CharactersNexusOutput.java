@@ -20,9 +20,9 @@
 
 package splitstree6.io.nexus;
 
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 import splitstree6.data.CharactersBlock;
-import splitstree6.data.CharactersNexusFormat;
+import splitstree6.data.CharactersFormat;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
@@ -41,7 +41,7 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 	 */
 	@Override
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
-		final CharactersNexusFormat format = characters.getFormat();
+		final CharactersFormat format = characters.getFormat();
 
 		w.write("\nBEGIN CHARACTERS;\n");
 		writeTitleAndLink(w);
@@ -108,14 +108,14 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 					w.write("\t" + i + " ");
 					String label = characters.getCharLabeler().get(i);
 					if (label != null) {
-						w.write("" + Basic.quoteIfNecessary(label) + "");
+						w.write("" + StringUtils.quoteIfNecessary(label) + "");
 						if (first)
 							first = false;
 					}
 					if (characters.getStateLabeler().hasStates(i)) {
 						w.write("/");
 						for (String str : characters.getStateLabeler().getStates(i)) {
-							w.write(" " + Basic.quoteIfNecessary(str));
+							w.write(" " + StringUtils.quoteIfNecessary(str));
 						}
 						if (first)
 							first = false;
@@ -141,7 +141,7 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 	/**
 	 * write the character matrix
 	 */
-	private void writeMatrix(Writer w, TaxaBlock taxa, CharactersBlock characters, CharactersNexusFormat format) throws IOException {
+	private void writeMatrix(Writer w, TaxaBlock taxa, CharactersBlock characters, CharactersFormat format) throws IOException {
 		//Determine width of matrix columns (if appropriate) and taxa column (if appropriate)
 		int columnWidth = 0;
 		if (format.isOptionTokens()) {
@@ -183,7 +183,7 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 	/**
 	 * write character matrix in transposed format
 	 */
-	private void writeMatrixTranposed(Writer w, TaxaBlock taxa, CharactersBlock characters, CharactersNexusFormat format) throws IOException {
+	private void writeMatrixTranposed(Writer w, TaxaBlock taxa, CharactersBlock characters, CharactersFormat format) throws IOException {
 		//Get the max width of a column, given taxa and token labels
 
 		//Determine width of matrix columns (if appropriate) and taxa column (if appropriate)
@@ -239,7 +239,7 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 	/**
 	 * write matrix in interleaved format
 	 */
-	private void writeMatrixInterleaved(Writer w, TaxaBlock taxa, CharactersBlock characters, CharactersNexusFormat format) throws IOException {
+	private void writeMatrixInterleaved(Writer w, TaxaBlock taxa, CharactersBlock characters, CharactersFormat format) throws IOException {
 		//Determine width of matrix columns (if appropriate) and taxa column (if appropriate)
 		int columnWidth = 1;
 		if (format.isOptionTokens()) {
@@ -302,7 +302,7 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 	 * @return String of given length, or longer if the label + quotes exceed the length.
 	 */
 	public static String padLabel(String label, int length) {
-		label = Basic.quoteIfNecessary(label);
+		label = StringUtils.quoteIfNecessary(label);
 		if (label.length() >= length)
 			return label;
 		char[] padding = new char[length - label.length()];
@@ -319,7 +319,7 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 	private static int maxLabelLength(TaxaBlock taxa) {
 		int maxLength = 0;
 		for (int i = 1; i <= taxa.getNtax(); i++) {
-			maxLength = Math.max(maxLength, Basic.quoteIfNecessary(taxa.getLabel(i)).length());
+			maxLength = Math.max(maxLength, StringUtils.quoteIfNecessary(taxa.getLabel(i)).length());
 		}
 		return maxLength;
 	}

@@ -20,9 +20,8 @@
 
 package splitstree6.io.readers.characters;
 
-import jloda.util.Basic;
-import jloda.util.FileLineIterator;
-import jloda.util.ProgressListener;
+import jloda.util.*;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
@@ -106,7 +105,7 @@ public class PhylipReader extends CharactersReader {
 						} else {
 							if (taxonName == null) {
 								taxonName = line.substring(0, 10).trim();
-								taxonName = Basic.getUniqueName(taxonName, taxaSet);
+								taxonName = StringUtils.getUniqueName(taxonName, taxaSet);
 								taxaSet.add(taxonName);
 								sequence.setLength(0);
 								sequence.append(line.substring(10).replaceAll("\\s+", ""));
@@ -177,7 +176,7 @@ public class PhylipReader extends CharactersReader {
 							continue;
 						} else if (taxonNames.size() < nTax) {
 							var name = line.substring(0, 10).trim();
-							name = Basic.getUniqueName(name, taxaSet);
+							name = StringUtils.getUniqueName(name, taxaSet);
 							taxaSet.add(name);
 							taxonNames.add(name);
 							sequenceBuffers.add(new StringBuilder());
@@ -215,7 +214,7 @@ public class PhylipReader extends CharactersReader {
 	public boolean accepts(String fileName) {
 		if (!super.accepts(fileName))
 			return false;
-		var line = Basic.getFirstLineFromFile(new File(fileName));
+		var line = FileUtils.getFirstLineFromFile(new File(fileName));
 		if (line == null)
 			return false;
 		var tokens = line.trim().split("\\s+");

@@ -20,7 +20,7 @@
 
 package splitstree6.io.nexus;
 
-import jloda.util.Basic;
+import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
@@ -45,7 +45,7 @@ public class TaxaNexusOutput extends NexusIOBase {
 		if (TaxaBlock.hasDisplayLabels(taxaBlock)) {
 			w.write("DISPLAYLABELS\n");
 			for (var i = 1; i <= taxaBlock.getNtax(); i++)
-				w.write("\t[" + i + "] '" + Basic.protectBackSlashes(taxaBlock.get(i).getDisplayLabelOrName()) + "'\n");
+				w.write("\t[" + i + "] '" + StringUtils.protectBackSlashes(taxaBlock.get(i).getDisplayLabelOrName()) + "'\n");
 			w.write(";\n");
 		}
 		if (TaxaBlock.hasInfos(taxaBlock)) {

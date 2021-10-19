@@ -1,5 +1,5 @@
 /*
- * CharactersNexusFormat.java Copyright (C) 2021. Daniel H. Huson
+ * CharactersFormat.java Copyright (C) 2021. Daniel H. Huson
  *
  * (Some code written by other authors, as named in code.)
  *
@@ -24,19 +24,19 @@ package splitstree6.data;
  * Characters nexus format
  * Daniel Huson, 12/22/16.
  */
-public class CharactersNexusFormat {
-    private boolean optionTranspose;
-    private boolean optionInterleave = true;
-    private boolean optionLabels = true;
-    private boolean optionTokens;
-    private char optionMatchCharacter = 0;
-    private int optionColumnsPerBlock = 80;
+public class CharactersFormat {
+	private boolean optionTranspose;
+	private boolean optionInterleave = true;
+	private boolean optionLabels = true;
+	private boolean optionTokens;
+	private char optionMatchCharacter = 0;
+	private int optionColumnsPerBlock = 80;
 
-    /**
-     * the Constructor
-     */
-    public CharactersNexusFormat() {
-    }
+	/**
+	 * the Constructor
+	 */
+	public CharactersFormat() {
+	}
 
     public boolean isOptionTranspose() {
         return optionTranspose;

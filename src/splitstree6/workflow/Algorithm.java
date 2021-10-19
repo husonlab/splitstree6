@@ -19,7 +19,7 @@
 
 package splitstree6.workflow;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.data.TaxaBlock;
 import splitstree6.workflow.interfaces.HasFromClass;

@@ -21,6 +21,7 @@ package splitstree6.methods;
 
 import javafx.beans.property.Property;
 import jloda.util.Basic;
+import jloda.util.StringUtils;
 import splitstree6.workflow.Algorithm;
 
 import java.util.ArrayList;
@@ -56,12 +57,12 @@ public class ExtractOptionsText {
 		if (hasDefaultOption) {
 			if (list.size() == 0)
 				return "default options";
-			else return "default options, except " + Basic.toString(list, ", ");
+			else return "default options, except " + StringUtils.toString(list, ", ");
 		} else {
 			if (list.size() == 0)
 				return "";
 			else
-				return Basic.toString(list, ", ");
+				return StringUtils.toString(list, ", ");
 		}
 	}
 }

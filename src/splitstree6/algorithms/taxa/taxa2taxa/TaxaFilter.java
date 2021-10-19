@@ -21,8 +21,8 @@ package splitstree6.algorithms.taxa.taxa2taxa;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.util.Basic;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
+import jloda.util.StringUtils;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -44,7 +44,7 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 
 		if (getNumberDisabledTaxa() == 0) {
 			outputData.getTaxa().addAll(inputData.getTaxa());
-			setShortDescription(Basic.fromCamelCase(getClass().getSimpleName()));
+			setShortDescription(StringUtils.fromCamelCase(getClass().getSimpleName()));
 		} else {
 			for (String name : inputData.getLabels()) {
 				if (!isDisabled(name)) {

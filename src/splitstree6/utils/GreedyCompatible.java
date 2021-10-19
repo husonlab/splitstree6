@@ -40,7 +40,7 @@
 package splitstree6.utils;
 
 import jloda.util.CanceledException;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 

@@ -22,6 +22,7 @@ package splitstree6.methods;
 
 import javafx.beans.property.Property;
 import jloda.util.Basic;
+import jloda.util.StringUtils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,7 +52,7 @@ public class Option<T> {
         if (toolTipText != null && toolTipText.length() > 0)
             this.toolTipText = toolTipText;
         else
-            this.toolTipText = Basic.fromCamelCase(name);
+			this.toolTipText = StringUtils.fromCamelCase(name);
 
         if (property.getValue() != null && property.getValue().getClass().isEnum()) {
             legalValues = new ArrayList<>();

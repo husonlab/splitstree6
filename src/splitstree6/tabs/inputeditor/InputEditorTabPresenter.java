@@ -28,6 +28,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
 import splitstree6.data.CharactersBlock;
@@ -84,7 +85,7 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 		tabController.getToolBar().getItems().setAll(list);
 
 		toolBarController.getParseAndLoadButton().setOnAction(e -> tab.parseAndLoad());
-		toolBarController.getParseAndLoadButton().disableProperty().bind(tab.isEmptyProperty().or(mainWindow.getWorkflow().busyProperty()));
+		toolBarController.getParseAndLoadButton().disableProperty().bind(tab.isEmptyProperty().or(mainWindow.getWorkflow().runningProperty()));
 
 		toolBarController.getOpenButton().setOnAction(e -> {
 			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
@@ -143,13 +144,16 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 		});
 
 		// todo: for testing:
-		mainWindow.getWorkflow().busyProperty().addListener((v, o, n) -> {
+		mainWindow.getWorkflow().runningProperty().addListener((v, o, n) -> {
 			if (!n) {
+				var workflow = mainWindow.getWorkflow();
+				if (workflow.getException() != null)
+					NotificationManager.showError("Workflow failed: " + workflow.getException().getMessage());
 				if (true) {
-					if (mainWindow.getWorkflow().getWorkingTaxaNode() != null) {
+					if (workflow.getWorkingTaxaNode() != null) {
 						try (var w = new StringWriter()) {
 							var textTab = new TextDisplayTab(mainWindow, "Working taxa", true, false);
-							(new TaxaNexusOutput()).write(w, mainWindow.getWorkflow().getWorkingTaxaNode().getDataBlock());
+							(new TaxaNexusOutput()).write(w, workflow.getWorkingTaxaNode().getDataBlock());
 							textTab.replaceText(w.toString());
 							mainWindow.addTabToMainTabPane(textTab);
 						} catch (IOException ex) {
@@ -158,12 +162,12 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 					}
 				}
 				if (true) {
-					for (var node : mainWindow.getWorkflow().dataNodes()) {
+					for (var node : workflow.dataNodes()) {
 						var data = (DataBlock) node.getDataBlock();
 						if (data instanceof DistancesBlock distancesBlock) {
 							try (var w = new StringWriter()) {
 								var textTab = new TextDisplayTab(mainWindow, distancesBlock.getName(), true, false);
-								(new DistancesNexusOutput()).write(w, mainWindow.getWorkflow().getWorkingTaxaNode().getDataBlock(), distancesBlock);
+								(new DistancesNexusOutput()).write(w, workflow.getWorkingTaxaNode().getDataBlock(), distancesBlock);
 								textTab.replaceText(w.toString());
 								mainWindow.addTabToMainTabPane(textTab);
 							} catch (IOException ex) {
@@ -173,19 +177,19 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 					}
 				}
 				if (true) {
-					for (var node : mainWindow.getWorkflow().dataNodes()) {
+					for (var node : workflow.dataNodes()) {
 						var data = (DataBlock) node.getDataBlock();
 						if (data instanceof CharactersBlock charactersBlock) {
 							try (var w = new StringWriter()) {
 								String name;
-								if (node == mainWindow.getWorkflow().getInputDataNode())
+								if (node == workflow.getInputDataNode())
 									name = "Input Characters";
-								else if (node == mainWindow.getWorkflow().getWorkingDataNode())
+								else if (node == workflow.getWorkingDataNode())
 									name = "Working Characters";
 								else
 									name = "Characters";
 								var textTab = new TextDisplayTab(mainWindow, name, true, false);
-								(new CharactersNexusOutput()).write(w, mainWindow.getWorkflow().getWorkingTaxaNode().getDataBlock(), charactersBlock);
+								(new CharactersNexusOutput()).write(w, workflow.getWorkingTaxaNode().getDataBlock(), charactersBlock);
 								textTab.replaceText(w.toString());
 								mainWindow.addTabToMainTabPane(textTab);
 							} catch (IOException ex) {
@@ -195,7 +199,7 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 					}
 				}
 				if (false) {
-					for (var node : mainWindow.getWorkflow().algorithmNodes()) {
+					for (var node : workflow.algorithmNodes()) {
 						var algorithm = (Algorithm) node.getAlgorithm();
 						try (var w = new StringWriter()) {
 							var textTab = new TextDisplayTab(mainWindow, algorithm.getName(), true, false);

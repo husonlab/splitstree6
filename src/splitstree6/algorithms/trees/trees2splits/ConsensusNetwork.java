@@ -28,6 +28,7 @@ import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;

@@ -20,7 +20,7 @@
 
 package splitstree6.algorithms.characters.characters2distances.nucleotide;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;

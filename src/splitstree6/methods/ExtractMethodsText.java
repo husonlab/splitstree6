@@ -20,8 +20,8 @@
 
 package splitstree6.methods;
 
-import jloda.util.Basic;
 import jloda.util.Pair;
+import jloda.util.StringUtils;
 import splitstree6.algorithms.IFilter;
 import splitstree6.main.Version;
 import splitstree6.workflow.Algorithm;
@@ -113,7 +113,7 @@ public class ExtractMethodsText {
 								if (!(algorithm instanceof IgnoredInMethodsText)) {
 									if (algorithm instanceof IFilter filter) {
 										if (filter.isActive()) {
-											var name = Basic.fromCamelCase(algorithm.getName());
+											var name = StringUtils.fromCamelCase(algorithm.getName());
 											var optionsReport = ExtractOptionsText.apply(algorithm);
 											var line = String.format(filterTemplate, name, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "", algorithm.getShortDescription());
 											if (!set.contains(line)) {
@@ -127,7 +127,7 @@ public class ExtractMethodsText {
 											var keysAndPapers = ExtractCitations.apply(algorithm);
 											if (keysAndPapers != null)
 												allKeysAndPapers.addAll(keysAndPapers);
-											var name = Basic.fromCamelCase(algorithm.getName());
+											var name = StringUtils.fromCamelCase(algorithm.getName());
 
 											var optionsReport = ExtractOptionsText.apply(algorithm);
 											String line;
@@ -174,7 +174,7 @@ public class ExtractMethodsText {
 		if (algorithm.getCitation() == null || algorithm.getCitation().length() < 2)
 			return "";
 		else {
-			var tokens = Basic.split(algorithm.getCitation(), ';');
+			var tokens = StringUtils.split(algorithm.getCitation(), ';');
 			var buf = new StringBuilder();
 			buf.append(" (");
 			for (int i = 0; i < tokens.length; i += 2) {

@@ -23,6 +23,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.utils.SimpleNewickParser;
@@ -64,12 +65,12 @@ public class NewickReader extends TreesReader {
 			// read in the trees
 			while (it.hasNext()) {
 				lineno++;
-				final var line = Basic.removeComments(it.next(), '[', ']');
+				final var line = StringUtils.removeComments(it.next(), '[', ']');
 				if (line.endsWith(";")) {
 					final String treeLine;
 					if (parts.size() > 0) {
 						parts.add(line);
-						treeLine = Basic.toString(parts, "");
+						treeLine = StringUtils.toString(parts, "");
 						parts.clear();
 					} else
 						treeLine = line;
@@ -147,7 +148,7 @@ public class NewickReader extends TreesReader {
 					parts.add(line);
 			}
 			if (parts.size() > 0)
-				System.err.println("Ignoring trailing lines at end of file:\n" + Basic.abbreviateDotDotDot(Basic.toString(parts, "\n"), 400));
+				System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
 			taxa.addTaxaByNames(orderedTaxonNames);
 			trees.setPartial(partial);
 			trees.setRooted(true);
@@ -171,7 +172,7 @@ public class NewickReader extends TreesReader {
 		if (!super.accepts(file))
 			return false;
 		else {
-			String line = Basic.getFirstLineFromFileIgnoreEmptyLines(new File(file), "#", 20);
+			String line = FileUtils.getFirstLineFromFileIgnoreEmptyLines(new File(file), "#", 20);
 			return line != null && line.startsWith("(");
 		}
 	}

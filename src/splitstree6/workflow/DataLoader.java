@@ -19,7 +19,7 @@
 
 package splitstree6.workflow;
 
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.readers.ImportManager;

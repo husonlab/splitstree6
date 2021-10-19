@@ -41,7 +41,7 @@ package splitstree6.algorithms.utils;
 
 import Jama.Matrix;
 import jloda.util.CanceledException;
-import jloda.util.ProgressListener;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 

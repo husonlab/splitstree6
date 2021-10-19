@@ -22,6 +22,7 @@ package splitstree6.methods;
 
 import jloda.util.Basic;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 
 import java.io.StringReader;
@@ -152,16 +153,16 @@ public enum OptionValueType {
             case Integer:
                 return java.lang.String.format("%d", (Integer) object);
             case Float:
-                return Basic.removeTrailingZerosAfterDot(java.lang.String.format("%.6f", (Float) object));
+				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.6f", (Float) object));
             case Double:
-                return Basic.removeTrailingZerosAfterDot(java.lang.String.format("%.8f", (Double) object));
+				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.8f", (Double) object));
             case doubleArray: {
                 StringBuilder buf = new StringBuilder();
                 final double[] array = (double[]) object;
                 for (double value : array) {
                     if (buf.length() > 0)
                         buf.append(" ");
-                    buf.append(Basic.removeTrailingZerosAfterDot(java.lang.String.format("%.4f", value)));
+					buf.append(StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.4f", value)));
                 }
                 return buf.toString();
             }
@@ -172,7 +173,7 @@ public enum OptionValueType {
                     for (int j = 0; j < matrix.length; j++) {
                         if (j > 0)
                             buf.append(" ");
-                        buf.append(Basic.removeTrailingZerosAfterDot(java.lang.String.format("%.4f", row[j])));
+						buf.append(StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.4f", row[j])));
                     }
                     buf.append(" "); // could also put \n here
                 }
@@ -183,7 +184,7 @@ public enum OptionValueType {
                 if (array.length == 0)
                     return "";
                 else
-                    return "'" + Basic.toString(array, "' '") + "'";
+					return "'" + StringUtils.toString(array, "' '") + "'";
             }
             default:
                 return object.toString();

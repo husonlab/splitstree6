@@ -19,7 +19,7 @@
 
 package splitstree6.io.utils;
 
-import jloda.util.Basic;
+import jloda.util.FileUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.interfaces.HasFromClass;
@@ -39,7 +39,7 @@ public abstract class DataWriterBase<T extends DataBlock> extends ReaderWriterBa
 	public abstract void write(Writer w, TaxaBlock taxaBlock, T dataBlock) throws IOException;
 
 	public void write(String fileName, TaxaBlock taxaBlock, T dataBlock) throws IOException {
-		try (var w = new OutputStreamWriter(Basic.getOutputStreamPossiblyZIPorGZIP(fileName))) {
+		try (var w = new OutputStreamWriter(FileUtils.getOutputStreamPossiblyZIPorGZIP(fileName))) {
 			write(w, taxaBlock, dataBlock);
 		}
 	}

@@ -20,8 +20,8 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG;
 
 import jloda.util.CanceledException;
-import jloda.util.ProgressListener;
-import jloda.util.ProgressSilent;
+import jloda.util.progress.ProgressListener;
+import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
 
 import java.util.Arrays;

@@ -32,6 +32,8 @@ public class TreesBlock extends DataBlock {
 	private boolean partial = false; // are partial trees present?
 	private boolean rooted = false; // are the trees explicitly rooted?
 
+	private TreesFormat format;
+
 	public TreesBlock() {
 		trees = FXCollections.observableArrayList();
 		trees.addListener((ListChangeListener<? super PhyloTree>) c -> setShortDescription(getInfo()));
@@ -47,6 +49,7 @@ public class TreesBlock extends DataBlock {
 		trees.addAll(that.getTrees());
 		partial = that.isPartial();
 		rooted = that.isRooted();
+		format = new TreesFormat();
 	}
 
 	/**
@@ -122,4 +125,7 @@ public class TreesBlock extends DataBlock {
 		return (TreesBlock) super.newInstance();
 	}
 
+	public TreesFormat getFormat() {
+		return format;
+	}
 }

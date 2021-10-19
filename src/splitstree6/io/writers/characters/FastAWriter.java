@@ -19,7 +19,7 @@
 
 package splitstree6.io.writers.characters;
 
-import jloda.util.FastA;
+import jloda.seq.FastA;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 
