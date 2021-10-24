@@ -37,8 +37,8 @@ public class NeiMiller extends Characters2Distances {
 	@Override
 	public String getCitation() {
 		return "Nei and Miller 1990; M. Nei and J.C. Miller. " +
-				"A simple method for estimating average number of nucleotide substitutions within and between populations from restriction data. " +
-				"Genetics, 125:873–879, 1990.";
+			   "A simple method for estimating average number of nucleotide substitutions within and between populations from restriction data. " +
+			   "Genetics, 125:873–879, 1990.";
 	}
 
 	@Override

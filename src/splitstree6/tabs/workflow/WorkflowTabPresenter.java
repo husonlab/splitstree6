@@ -20,20 +20,65 @@
 package splitstree6.tabs.workflow;
 
 
+import javafx.collections.SetChangeListener;
+import javafx.scene.Group;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import jloda.fx.util.SelectionEffectBlue;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
+import java.util.stream.Collectors;
+
+/**
+ * workflow tab presenter
+ * Daniel Huson, 10.2021
+ */
 public class WorkflowTabPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
-	private final WorkflowTab tab;
+	private final WorkflowTab workflowTab;
+	private final Group nodeItemsGroup = new Group();
+	private final WorkflowTabLayout workflowTabLayout;
 
-	public WorkflowTabPresenter(MainWindow mainWindow, WorkflowTab tab) {
+	public WorkflowTabPresenter(MainWindow mainWindow, WorkflowTab workflowTab) {
 		this.mainWindow = mainWindow;
-		this.tab = tab;
+		this.workflowTab = workflowTab;
+		var tabController = workflowTab.getController();
+
+		var edgeItemsGroup = new Group();
+		tabController.getMainPane().getChildren().addAll(edgeItemsGroup, nodeItemsGroup);
+
+		workflowTabLayout = new WorkflowTabLayout(workflowTab, nodeItemsGroup, edgeItemsGroup);
+
+		{
+			var scrollPane = tabController.getScrollPane();
+
+			scrollPane.prefWidthProperty().bind(tabController.getMainPane().widthProperty());
+			scrollPane.prefHeightProperty().bind(tabController.getMainPane().heightProperty());
+
+			scrollPane.setLockAspectRatio(true);
+			scrollPane.setRequireShiftOrControlToZoom(true);
+			tabController.getZoomButton().setOnAction(e -> scrollPane.resetZoom());
+			tabController.getZoomInButton().setOnAction(e -> scrollPane.zoomBy(1.1, 1.1));
+			tabController.getZoomOutButton().setOnAction(e -> scrollPane.zoomBy(1 / 1.1, 1 / 1.1));
+		}
+
+		workflowTab.getSelectionModel().getSelectedItems().addListener((SetChangeListener<? super Pane>) e -> {
+			if (e.wasAdded()) {
+				e.getElementAdded().setEffect(SelectionEffectBlue.getInstance());
+			} else if (e.wasRemoved()) {
+				e.getElementRemoved().setEffect(getDropShadow());
+			}
+		});
+
+		tabController.getMainPane().setOnMouseClicked(e -> workflowTab.getSelectionModel().clearSelection());
 	}
+
 
 	public void setup() {
 		var controller = mainWindow.getController();
+		var tabController = workflowTab.getController();
 
 		controller.getCutMenuItem().setOnAction(null);
 		controller.getCopyMenuItem().setOnAction(null);
@@ -42,10 +87,10 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		controller.getPasteMenuItem().setOnAction(null);
 
-		controller.getUndoMenuItem().setOnAction(e -> tab.getUndoManager().undo());
-		controller.getUndoMenuItem().disableProperty().bind(tab.getUndoManager().undoableProperty().not());
-		controller.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
-		controller.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
+		controller.getUndoMenuItem().setOnAction(e -> workflowTab.getUndoManager().undo());
+		controller.getUndoMenuItem().disableProperty().bind(workflowTab.getUndoManager().undoableProperty().not());
+		controller.getRedoMenuItem().setOnAction(e -> workflowTab.getUndoManager().redo());
+		controller.getRedoMenuItem().disableProperty().bind(workflowTab.getUndoManager().redoableProperty().not());
 
 		controller.getDuplicateMenuItem().setOnAction(null);
 		controller.getDeleteMenuItem().setOnAction(null);
@@ -55,14 +100,26 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		// controller.getReplaceMenuItem().setOnAction(null);
 
-
-		controller.getSelectAllMenuItem().setOnAction(null);
-		controller.getSelectNoneMenuItem().setOnAction(null);
+		controller.getSelectAllMenuItem().setOnAction(e -> workflowTab.getSelectionModel().selectAll(nodeItemsGroup.getChildren().stream().map(a -> (WorkflowNodeItem) a).collect(Collectors.toList())));
+		controller.getSelectNoneMenuItem().setOnAction(e -> workflowTab.getSelectionModel().clearSelection());
 
 		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
 		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
 
-		controller.getZoomInMenuItem().setOnAction(null);
-		controller.getZoomOutMenuItem().setOnAction(null);
+		controller.getZoomInMenuItem().setOnAction(tabController.getZoomInButton().getOnAction());
+		controller.getZoomOutMenuItem().setOnAction(tabController.getZoomOutButton().getOnAction());
+		controller.getResetMenuItem().setOnAction(tabController.getZoomButton().getOnAction());
+	}
+
+	public static DropShadow getDropShadow() {
+		var dropShadow = new DropShadow();
+		dropShadow.setOffsetX(0.5);
+		dropShadow.setOffsetY(0.5);
+		dropShadow.setColor(Color.DARKGREY);
+		return dropShadow;
+	}
+
+	public WorkflowTabLayout getWorkflowTabLayout() {
+		return workflowTabLayout;
 	}
 }

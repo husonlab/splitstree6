@@ -31,7 +31,7 @@
             <items>
                 <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
                         minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                        text="Open">
+                        text="Open" style="-fx-border-style: none; -fx-background-color: transparent;">
                     <font>
                         <Font size="10.0"/>
                     </font>
@@ -48,7 +48,7 @@
                 </Button>
                 <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" layoutX="10.0" layoutY="11.0" maxHeight="18.0"
                         maxWidth="18.0" minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
-                        prefWidth="18.0" text="Save">
+                        prefWidth="18.0" text="Save" style="-fx-border-style: none; -fx-background-color: transparent;">
                     <font>
                         <Font size="10.0"/>
                     </font>
@@ -74,7 +74,7 @@
 
                 <Button fx:id="parseAndLoadButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
                         minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                        text="Parse and Load">
+                        text="Parse and Load" style="-fx-border-style: none; -fx-background-color: transparent;">
                     <font>
                         <Font size="10.0"/>
                     </font>

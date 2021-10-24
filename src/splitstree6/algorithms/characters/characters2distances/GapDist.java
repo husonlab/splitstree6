@@ -73,7 +73,7 @@ public class GapDist extends Characters2Distances {
 					double weight = charactersBlock.getCharacterWeight(c);
 					len += weight;
 					if (((sc == gapChar && tc == gapChar) ||
-							(sc != gapChar && tc != gapChar)))
+						 (sc != gapChar && tc != gapChar)))
 						sim += weight;
 				}
 				double v = 1.0;

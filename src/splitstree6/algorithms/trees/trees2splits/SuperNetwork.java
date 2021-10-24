@@ -66,7 +66,7 @@ public class SuperNetwork extends Trees2Splits {
 	@Override
 	public String getCitation() {
 		return "Huson et al 2004;D.H. Huson, T. Dezulian, T. Kloepper, and M. A. Steel. Phylogenetic super-networks from partial trees. " +
-				"IEEE/ACM Transactions in Computational Biology and Bioinformatics, 1(4):151–158, 2004.";
+			   "IEEE/ACM Transactions in Computational Biology and Bioinformatics, 1(4):151–158, 2004.";
 	}
 
 	@Override
@@ -366,7 +366,7 @@ public class SuperNetwork extends Trees2Splits {
 				PartialSplit projection = current.getInduced(supportSet[t]);
 
 				weight += ((PartialSplit) pSplits[t].get(projection)).getWeight()
-						/ averageWeight[t];
+						  / averageWeight[t];
 			}
 			weight /= activeTrees.cardinality();
 			splits.getSplits().get(s - 1).setWeight(weight); //setWeight(s, weight);
@@ -611,8 +611,8 @@ public class SuperNetwork extends Trees2Splits {
 								Bb = psb.getA();
 							}
 							if (Aa.intersects(Ab)
-									&& !Ba.intersects(Ab) && !Bb.intersects(Aa)
-									&& Ba.intersects(Bb)) {
+								&& !Ba.intersects(Ab) && !Bb.intersects(Aa)
+								&& Ba.intersects(Bb)) {
 								PartialSplit ps = new PartialSplit(PartialSplit.union(Aa, Ab), PartialSplit.union(Ba, Bb));
 								if (!partialSplits.contains(ps)) {
 									partialSplits.add(ps);

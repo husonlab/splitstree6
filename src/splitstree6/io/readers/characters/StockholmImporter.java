@@ -20,7 +20,9 @@
 
 package splitstree6.io.readers.characters;
 
-import jloda.util.*;
+import jloda.util.FileLineIterator;
+import jloda.util.FileUtils;
+import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
@@ -82,7 +84,7 @@ public class StockholmImporter extends CharactersReader {
 					nchar = seq.length();
 				else if (nchar != seq.length())
 					throw new IOExceptionWithLineNumber("Sequences must be the same length." +
-							"Length " + nchar + " expected.", counter);
+														"Length " + nchar + " expected.", counter);
 
 				progressListener.setProgress(it.getProgress());
 			}

@@ -21,8 +21,8 @@ package splitstree6.algorithms.trees.trees2trees;
 
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
-import jloda.util.progress.ProgressListener;
 import jloda.util.StringUtils;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.TreesUtilities;

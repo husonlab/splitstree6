@@ -138,7 +138,7 @@ public enum Compatibility {
 		final BitSet B3 = split3.getB();
 
 		return !((intersects(A1, A2, A3) && intersects(A1, B2, B3) && intersects(B1, A2, B3) && intersects(B1, B2, A3))
-				|| (intersects(B1, B2, B3) && intersects(B1, A2, A3) && intersects(A1, B2, A3) && intersects(A1, A2, B3)));
+				 || (intersects(B1, B2, B3) && intersects(B1, A2, A3) && intersects(A1, B2, A3) && intersects(A1, A2, B3)));
 	}
 
 	/**

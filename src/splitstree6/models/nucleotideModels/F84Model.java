@@ -92,6 +92,6 @@ public class F84Model extends NucleotideModel {
 		final double Q = (F[0][1] + F[0][3] + F[1][0] + F[1][2]) + (F[2][1] + F[2][3] + F[3][0] + F[3][2]);
 
 		return (-2.0 * A * mInverse(1.0 - P / (2.0 * A) - (A - B) * Q / (2.0 * A * C), getPropInvariableSites(), getGamma()))
-				+ (2.0 * (A - B - C) * mInverse((1.0 - Q / (2.0 * C)), getPropInvariableSites(), getGamma()));
+			   + (2.0 * (A - B - C) * mInverse((1.0 - Q / (2.0 * C)), getPropInvariableSites(), getGamma()));
 	}
 }

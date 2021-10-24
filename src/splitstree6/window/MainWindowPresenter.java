@@ -17,16 +17,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.window.presenter;
+package splitstree6.window;
 
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.TabPane;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -36,6 +36,7 @@ import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.WindowGeometry;
+import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
 import splitstree6.dialog.SaveBeforeClosingDialog;
@@ -43,14 +44,16 @@ import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.treeview.WorkflowTreeView;
-import splitstree6.window.MainWindow;
-import splitstree6.window.MainWindowController;
 
 import java.util.Stack;
 
 public class MainWindowPresenter {
 	private final MainWindow mainWindow;
 	private final ObjectProperty<IDisplayTab> focusedDisplayTab = new SimpleObjectProperty<>();
+
+	private final ObservableMap<WorkflowNode, Tab> workFlowTabs = FXCollections.observableHashMap();
+
+	private final SplitPanePresenter splitPanePresenter;
 
 	public MainWindowPresenter(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
@@ -69,8 +72,6 @@ public class MainWindowPresenter {
 				var displayTab = getContainingDisplayTab(n);
 				if (displayTab != null) {
 					focusedDisplayTab.set(displayTab);
-					System.err.println("Focus owner: " + focusedDisplayTab.get());
-					System.err.println("initializing presenter");
 					disableAllMenuItems(controller);
 					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 					if (focusedDisplayTab.get() != null)
@@ -84,11 +85,9 @@ public class MainWindowPresenter {
 
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
-				System.err.println("selected: " + n);
 				disableAllMenuItems(controller);
 				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 				if (n instanceof IDisplayTab displayTab) {
-					System.err.println("Setting up presenter for " + displayTab);
 					displayTab.getPresenter().setup();
 					focusedDisplayTab.set(displayTab);
 				} else
@@ -101,11 +100,9 @@ public class MainWindowPresenter {
 
 		controller.getAlgorithmTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
-				System.err.println("initializing presenter");
 				disableAllMenuItems(controller);
 				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 				if (n instanceof IDisplayTab displayTab) {
-					System.err.println("Setting up presenter for " + displayTab);
 					displayTab.getPresenter().setup();
 					focusedDisplayTab.set(displayTab);
 				} else
@@ -116,7 +113,24 @@ public class MainWindowPresenter {
 			}
 		});
 
+		controller.getMainTabPane().getTabs().addListener((ListChangeListener<? super Tab>) e -> {
+			while (e.next()) {
+				if (e.wasRemoved()) {
+					for (var tab : e.getRemoved()) {
+						for (var workflowNode : workFlowTabs.keySet()) {
+							if (workFlowTabs.get(workflowNode) == tab) {
+								workFlowTabs.remove(workflowNode);
+								break;
+							}
+						}
+					}
+				}
+			}
+		});
+
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
+
+		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
@@ -166,8 +180,6 @@ public class MainWindowPresenter {
 		if (focusedDisplayTab.get() != null) {
 			controller.getPrintMenuItem().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().getImageNode()));
 			controller.getPrintMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
-			controller.getPrintButton().setOnAction(controller.getPrintMenuItem().getOnAction());
-			controller.getPrintButton().disableProperty().bind(controller.getPrintMenuItem().disableProperty());
 		}
 
 		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> {
@@ -217,9 +229,6 @@ public class MainWindowPresenter {
 
 		controller.getFindMenuItem().setOnAction(null);
 		controller.getFindAgainMenuItem().setOnAction(null);
-
-		controller.getFindButton().setOnAction(e -> controller.getFindMenuItem().getOnAction().handle(e));
-		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
 
 		controller.getReplaceMenuItem().setOnAction(null);
 
@@ -393,5 +402,17 @@ public class MainWindowPresenter {
 			node = node.getParent();
 		}
 		return null;
+	}
+
+	public void displayInMainTabPaneUniquely(WorkflowNode workflowNode, Tab tab) {
+		if (!workFlowTabs.containsKey(workflowNode)) {
+			mainWindow.getController().getMainTabPane().getTabs().add(tab);
+			workFlowTabs.put(workflowNode, tab);
+		}
+		mainWindow.getController().getMainTabPane().getSelectionModel().select(tab);
+	}
+
+	public SplitPanePresenter getSplitPanePresenter() {
+		return splitPanePresenter;
 	}
 }

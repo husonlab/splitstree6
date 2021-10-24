@@ -60,9 +60,9 @@ public class ProteinMLdist extends Characters2Distances {
 	@Override
 	public String getCitation() {
 		return "Swofford et al 1996; " +
-				"D.L. Swofford, G.J. Olsen, P.J. Waddell, and  D.M. Hillis. " +
-				"Chapter  11:  Phylogenetic inference. In D. M. Hillis, C. Moritz, and B. K. Mable, editors, " +
-				"Molecular Systematics, pages 407–514. Sinauer Associates, Inc., 2nd edition, 1996.";
+			   "D.L. Swofford, G.J. Olsen, P.J. Waddell, and  D.M. Hillis. " +
+			   "Chapter  11:  Phylogenetic inference. In D. M. Hillis, C. Moritz, and B. K. Mable, editors, " +
+			   "Molecular Systematics, pages 407–514. Sinauer Associates, Inc., 2nd edition, 1996.";
 	}
 
 	public List<String> listOptions() {

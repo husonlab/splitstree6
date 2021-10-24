@@ -40,20 +40,7 @@ public interface INexusInput<D extends DataBlock> {
 	public abstract String getSyntax();
 
 	/**
-	 * parse a nexus block
-	 *
-	 * @param np
-	 * @param taxaBlock
-	 * @param dataBlock
 	 * @return taxon names, if found
 	 */
 	List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, D dataBlock) throws IOException;
-
-	/**
-	 * is the parser at the beginning of a block that this class can parse?
-	 *
-	 * @param np
-	 * @return true, if can parse from here
-	 */
-	boolean atBeginOfBlock(NexusStreamParser np);
 }

@@ -70,7 +70,7 @@ public class HammingDistancesAmbigStates extends Characters2Distances {
 		distances.setNtax(characters.getNtax());
 
 		if (optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.MatchStates)
-				&& characters.getDataType().isNucleotides() && characters.isHasAmbiguityCodes())
+			&& characters.getDataType().isNucleotides() && characters.isHasAmbiguityCodes())
 			computeMatchStatesHamming(taxa, characters, distances);
 		else {
 			// all the same here

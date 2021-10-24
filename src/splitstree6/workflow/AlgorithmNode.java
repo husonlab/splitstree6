@@ -32,8 +32,12 @@ import splitstree6.data.TaxaBlock;
  */
 public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jloda.fx.workflow.AlgorithmNode {
 
-	public AlgorithmNode(Workflow owner) {
+	AlgorithmNode(Workflow owner) {
 		super(owner);
+		try {
+			owner.getServiceConfigurator().accept(getService());
+		} catch (Exception ignored) {
+		}
 	}
 
 	public void setAlgorithm(Algorithm<S, T> algorithm) {
@@ -74,7 +78,7 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 	public S getSourceBlock() {
 		for (var parent : getParents()) {
 			if (parent instanceof DataNode dataNode
-					&& (!(dataNode.getDataBlock() instanceof TaxaBlock)
+				&& (!(dataNode.getDataBlock() instanceof TaxaBlock)
 					|| (getAlgorithm() != null && super.getAlgorithm() instanceof Algorithm algorithm && algorithm.getFromClass().equals(TaxaBlock.class)))) {
 				return (S) dataNode.getDataBlock();
 			}
@@ -86,10 +90,18 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 	public DataNode<T> getTargetNode() {
 		for (var child : getChildren()) {
 			if (child instanceof DataNode dataNode
-					&& (!(dataNode.getDataBlock() instanceof TaxaBlock)
+				&& (!(dataNode.getDataBlock() instanceof TaxaBlock)
 					|| (getAlgorithm() != null && super.getAlgorithm() instanceof Algorithm algorithm && algorithm.getToClass().equals(TaxaBlock.class)))) {
 				return (DataNode<T>) dataNode;
 			}
+		}
+		return null;
+	}
+
+	public DataNode getPreferredParent() {
+		for (var p : getParents()) {
+			if (p instanceof DataNode dataNode && !(dataNode.getDataBlock() instanceof TaxaBlock))
+				return dataNode;
 		}
 		return null;
 	}

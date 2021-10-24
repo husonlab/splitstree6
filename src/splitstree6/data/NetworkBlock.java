@@ -24,6 +24,7 @@ import jloda.graph.EdgeArray;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloGraph;
+import splitstree6.algorithms.networks.network2network.NetworkTaxaFilter;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
@@ -52,6 +53,20 @@ public class NetworkBlock extends DataBlock {
 		networkType = Type.Other;
 	}
 
+	public void copy(NetworkBlock sourceBlock) {
+		clear();
+		NodeArray<Node> oldNode2new = sourceBlock.getGraph().newNodeArray();
+		EdgeArray<Edge> oldEdge2new = sourceBlock.getGraph().newEdgeArray();
+		graph.copy(sourceBlock.getGraph(), oldNode2new, oldEdge2new);
+		this.networkType = sourceBlock.getNetworkType();
+		for (var v : oldNode2new.keys()) {
+			getNodeData(oldNode2new.get(v)).putAll((sourceBlock.getNodeData(v)));
+		}
+		for (var e : oldEdge2new.keys()) {
+			getEdgeData(oldEdge2new.get(e)).putAll((sourceBlock.getEdgeData(e)));
+		}
+	}
+
 	public PhyloGraph getGraph() {
 		return graph;
 	}
@@ -70,11 +85,6 @@ public class NetworkBlock extends DataBlock {
 
 	public void setNetworkType(Type networkType) {
 		this.networkType = networkType;
-	}
-
-	@Override
-	public String getInfo() {
-		return graph.getNumberOfNodes() + " nodes and " + graph.getNumberOfEdges() + " edges";
 	}
 
 	public NodeData getNodeData(Node v) {
@@ -111,7 +121,7 @@ public class NetworkBlock extends DataBlock {
 
 	@Override
 	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
-		return null;
+		return new NetworkTaxaFilter(NetworkBlock.class, NetworkBlock.class);
 	}
 
 	public static class NodeData extends HashMap<String, String> {
@@ -125,5 +135,17 @@ public class NetworkBlock extends DataBlock {
 	@Override
 	public NetworkBlock newInstance() {
 		return (NetworkBlock) super.newInstance();
+	}
+
+	public static final String BLOCK_NAME = "NETWORK";
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(String.format("%,d nodes and %,d edges", graph.getNumberOfNodes(), graph.getNumberOfEdges()));
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
 	}
 }

@@ -19,77 +19,95 @@
 
 package splitstree6.workflow;
 
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import jloda.fx.util.AService;
+import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.util.Collection;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 /**
  * splitstree workflow
  * Daniel Huson, 10.2021
  */
 public class Workflow extends jloda.fx.workflow.Workflow {
-	private final SimpleObjectProperty<DataNode<SourceBlock>> sourceNode = new SimpleObjectProperty<>();
-	private final SimpleObjectProperty<AlgorithmNode<SourceBlock, ? extends DataBlock>> loaderNode = new SimpleObjectProperty<>();
+	public static final String INPUT_SOURCE = "Input Source";
+	public static final String INPUT_TAXA = "Input Taxa";
+	public static final String INPUT_TAXA_FILTER = "Input Taxa Filter";
+	public static final String INPUT_TAXA_DATA_FILTER = "Input Data Filter";
+	public static final String WORKING_TAXA = "Working Taxa";
+	public static final String INPUT_DATA_LOADER = "Input Data Loader";
+	public static final String INPUT_PREFIX = "Input ";
+	public static final String WORKING_PREFIX = "Working ";
 
-	private final SimpleObjectProperty<DataNode<TaxaBlock>> inputTaxaNode = new SimpleObjectProperty<>();
-	private final SimpleObjectProperty<DataNode<TaxaBlock>> workingTaxaNode = new SimpleObjectProperty<>();
-	private final SimpleObjectProperty<AlgorithmNode<TaxaBlock, TaxaBlock>> taxaFilterNode = new SimpleObjectProperty<>();
+	private Consumer<AService<Boolean>> serviceConfigurator;
 
-	private final SimpleObjectProperty<DataNode<? extends DataBlock>> inputDataNode = new SimpleObjectProperty<>();
-	private final SimpleObjectProperty<DataNode<? extends DataBlock>> workingDataNode = new SimpleObjectProperty<>();
-	private final SimpleObjectProperty<AlgorithmNode<? extends DataBlock, ? extends DataBlock>> taxaDataFilterNode = new SimpleObjectProperty<>();
+	public Workflow() {
+	}
 
-	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, DataLoader<SourceBlock, T> dataLoader, TaxaBlock topTaxaBlock, T topDataBlock) {
-		setSourceNode(newDataNode(source));
-		setInputTaxaNode(newDataNode(topTaxaBlock));
-		setInputDataNode(newDataNode(topDataBlock));
+	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, DataLoader<SourceBlock, T> dataLoader, TaxaBlock inputTaxaBlock, T inputDataBlock) {
+		var sourceNode = newDataNode(source, INPUT_SOURCE);
+		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
+		var inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
 
-		setLoaderNode(newAlgorithmNode(dataLoader, null, getSourceNode(), getInputDataNode()));
-		getLoaderNode().addChild(getInputTaxaNode());
+		var loaderNode = newAlgorithmNode(dataLoader, null, sourceNode, inputDataNode, INPUT_DATA_LOADER);
+		loaderNode.addChild(inputTaxaNode);
 
-		setWorkingTaxaNode(newDataNode(topTaxaBlock.newInstance()));
-		setWorkingDataNode(newDataNode(topDataBlock.newInstance()));
-		setTaxaFilterNode(newAlgorithmNode(new TaxaFilter(), null, getInputTaxaNode(), getWorkingTaxaNode()));
+		var workingTaxaNode = newDataNode(inputTaxaBlock.newInstance(), WORKING_TAXA);
+		var workingData = inputDataBlock.newInstance();
+		var workingDataNode = newDataNode(inputDataBlock.newInstance(), WORKING_PREFIX + workingData.getName());
+		newAlgorithmNode(new TaxaFilter(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
 
-		var dataFilterNode = newAlgorithmNode(topDataBlock.createTaxaDataFilter());
-		dataFilterNode.addParent(getInputTaxaNode());
-		dataFilterNode.addParent(getWorkingTaxaNode());
-		dataFilterNode.addParent(getInputDataNode());
-		dataFilterNode.addChild(getWorkingDataNode());
-		setTaxaDataFilterNode(dataFilterNode);
+		var dataFilterNode = newAlgorithmNode(inputDataBlock.createTaxaDataFilter(), INPUT_TAXA_DATA_FILTER);
+		dataFilterNode.addParent(inputTaxaNode);
+		dataFilterNode.addParent(workingTaxaNode);
+		dataFilterNode.addParent(inputDataNode);
+		dataFilterNode.addChild(workingDataNode);
 	}
 
 	public <D extends DataBlock> DataNode<D> newDataNode(D dataBlock) {
-		var v = new DataNode<D>(this);
-		v.setDataBlock(dataBlock);
-		addDataNode(v);
-		return v;
+		return newDataNode(dataBlock, null);
 	}
 
-	public AlgorithmNode<DataBlock, DataBlock> newAlgorithmNode() {
-		var v = new AlgorithmNode<>(this);
-		addAlgorithmNode(v);
+	public <D extends DataBlock> DataNode<D> newDataNode(D dataBlock, String name) {
+		var v = new DataNode<D>(this);
+		v.setDataBlock(dataBlock);
+		if (name != null)
+			v.setName(name);
+		addNode(v);
 		return v;
 	}
 
 	public <S extends DataBlock, T extends DataBlock> AlgorithmNode<S, T> newAlgorithmNode(Algorithm<S, T> algorithm) {
 		var v = new AlgorithmNode<>(this);
 		v.setAlgorithm(algorithm);
-		addAlgorithmNode(v);
+		addNode(v);
+		return (AlgorithmNode<S, T>) v;
+	}
+
+	public <S extends DataBlock, T extends DataBlock> AlgorithmNode<S, T> newAlgorithmNode(Algorithm<S, T> algorithm, String name) {
+		var v = new AlgorithmNode<>(this);
+		v.setAlgorithm(algorithm);
+		if (name != null)
+			algorithm.setName(name);
+		addNode(v);
 		return (AlgorithmNode<S, T>) v;
 	}
 
 	public AlgorithmNode newAlgorithmNode(Algorithm algorithm, DataNode<TaxaBlock> taxa, DataNode<? extends DataBlock> inputData, DataNode<? extends DataBlock> outputData) {
+		return newAlgorithmNode(algorithm, taxa, inputData, outputData, null);
+	}
+
+	public AlgorithmNode newAlgorithmNode(Algorithm algorithm, DataNode<TaxaBlock> taxa, DataNode<? extends DataBlock> inputData, DataNode<? extends DataBlock> outputData, String name) {
 		if (inputData != null && !algorithm.getFromClass().isAssignableFrom(inputData.getDataBlock().getClass()))
 			throw new IllegalArgumentException("newAlgorithmNode(): algorithm and inputData mismatch");
 		if (outputData != null && !algorithm.getToClass().isAssignableFrom(outputData.getDataBlock().getClass()))
 			throw new IllegalArgumentException("newAlgorithmNode(): algorithm and outputData mismatch");
 
-		var v = newAlgorithmNode(algorithm);
+		var v = newAlgorithmNode(algorithm, name);
 		if (taxa != null)
 			v.addParent(taxa);
 		if (inputData != null)
@@ -100,103 +118,46 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	}
 
 	public DataNode<SourceBlock> getSourceNode() {
-		return sourceNode.get();
-	}
-
-	public SourceBlock getSourceBlock() {
-		return getSourceNode().getDataBlock();
-	}
-
-	public ReadOnlyObjectProperty<DataNode<SourceBlock>> sourceNodeProperty() {
-		return sourceNode;
-	}
-
-	public void setSourceNode(DataNode<SourceBlock> sourceNode) {
-		this.sourceNode.set(sourceNode);
+		return dataNodesStream().filter(v -> v.getName().equals(INPUT_SOURCE)).findFirst().orElse(null);
 	}
 
 	public AlgorithmNode getLoaderNode() {
-		return loaderNode.get();
+		return algorithmNodesStream().filter(v -> v.getName().equals(INPUT_DATA_LOADER)).findFirst().orElse(null);
 	}
 
-	public ReadOnlyObjectProperty<AlgorithmNode<SourceBlock, ? extends DataBlock>> loaderNodeProperty() {
-		return loaderNode;
-	}
-
-	public void setLoaderNode(AlgorithmNode loaderNode) {
-		this.loaderNode.set(loaderNode);
-	}
 
 	public DataNode<TaxaBlock> getInputTaxaNode() {
-		return inputTaxaNode.get();
+		return dataNodesStream().filter(v -> v.getName().equals(INPUT_TAXA)).findFirst().orElse(null);
 	}
 
-	public ReadOnlyObjectProperty<DataNode<TaxaBlock>> inputTaxaNodeProperty() {
-		return inputTaxaNode;
-	}
-
-	public void setInputTaxaNode(DataNode<TaxaBlock> node) {
-		this.inputTaxaNode.set(node);
-	}
 
 	public DataNode<? extends DataBlock> getInputDataNode() {
-		return inputDataNode.get();
-	}
-
-	public ReadOnlyObjectProperty<DataNode<? extends DataBlock>> inputDataNodeProperty() {
-		return inputDataNode;
-	}
-
-	public void setInputDataNode(DataNode<? extends DataBlock> node) {
-		this.inputDataNode.set(node);
+		return dataNodesStream().filter(v -> v.getName().startsWith(INPUT_PREFIX)).filter(v -> !v.getName().equals(INPUT_TAXA)).findFirst().orElse(null);
 	}
 
 	public DataNode<TaxaBlock> getWorkingTaxaNode() {
-		return workingTaxaNode.get();
-	}
-
-	public ReadOnlyObjectProperty<DataNode<TaxaBlock>> workingTaxaNodeProperty() {
-		return workingTaxaNode;
-	}
-
-	public void setWorkingTaxaNode(DataNode<TaxaBlock> node) {
-		this.workingTaxaNode.set(node);
+		return dataNodesStream().filter(v -> v.getName().equals(WORKING_TAXA)).findFirst().orElse(null);
 	}
 
 	public DataNode<? extends DataBlock> getWorkingDataNode() {
-		return workingDataNode.get();
+		return dataNodesStream().filter(v -> v.getName().startsWith(WORKING_PREFIX)).filter(v -> !v.getName().equals(WORKING_TAXA)).findFirst().orElse(null);
+
 	}
 
-	public ReadOnlyObjectProperty<DataNode<? extends DataBlock>> workingDataNodeProperty() {
-		return workingDataNode;
+	public AlgorithmNode<TaxaBlock, TaxaBlock> getInputTaxaFilterNode() {
+		return algorithmNodesStream().filter(v -> v.getName().startsWith(INPUT_TAXA_FILTER)).findFirst().orElse(null);
 	}
 
-	public void setWorkingDataNode(DataNode<? extends DataBlock> node) {
-		this.workingDataNode.set(node);
+	public AlgorithmNode<? extends DataBlock, ? extends DataBlock> getInputDataFilterNode() {
+		return algorithmNodesStream().filter(v -> v.getName().startsWith(INPUT_TAXA_DATA_FILTER)).findFirst().orElse(null);
 	}
 
-	public AlgorithmNode<TaxaBlock, TaxaBlock> getTaxaFilterNode() {
-		return taxaFilterNode.get();
-	}
-
-	public ReadOnlyObjectProperty<AlgorithmNode<TaxaBlock, TaxaBlock>> taxaFilterNodeProperty() {
-		return taxaFilterNode;
-	}
-
-	public void setTaxaFilterNode(AlgorithmNode<TaxaBlock, TaxaBlock> node) {
-		this.taxaFilterNode.set(node);
-	}
-
-	public AlgorithmNode<? extends DataBlock, ? extends DataBlock> getTaxaDataFilterNode() {
-		return taxaDataFilterNode.get();
-	}
-
-	public ReadOnlyObjectProperty<AlgorithmNode<? extends DataBlock, ? extends DataBlock>> taxaDataFilterNodeProperty() {
-		return taxaDataFilterNode;
-	}
-
-	public void setTaxaDataFilterNode(AlgorithmNode<? extends DataBlock, ? extends DataBlock> node) {
-		this.taxaDataFilterNode.set(node);
+	public SourceBlock getSourceBlock() {
+		var sourceNode = getSourceNode();
+		if (sourceNode != null)
+			return sourceNode.getDataBlock();
+		else
+			return null;
 	}
 
 	public TaxaBlock getInputTaxonBlock() {
@@ -213,29 +174,61 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 			return null;
 	}
 
-	public DataBlock getInputDataBlock() {
-		if (getInputDataNode() != null)
-			return getInputDataNode().getDataBlock();
-		else
-			return null;
-	}
-
-
-	public DataBlock getWorkingDataBlock() {
-		if (getWorkingDataNode() != null)
-			return getWorkingDataNode().getDataBlock();
-		else
-			return null;
-	}
-
-	public TaxaFilter getTaxaFilter() {
-		if (getTaxaFilterNode() != null)
-			return (TaxaFilter) getTaxaFilterNode().getAlgorithm();
-		else
-			return null;
-	}
-
 	public <S extends DataBlock, T extends DataBlock> Collection<AlgorithmNode<S, T>> getNodes(Class<? extends Algorithm<S, T>> clazz) {
 		return nodeStream().filter(n -> n instanceof AlgorithmNode algorithmNode && algorithmNode.getAlgorithm().getClass().equals(clazz)).map(n -> (AlgorithmNode<S, T>) n).toList();
+	}
+
+	public Stream<? extends DataNode> dataNodesStream() {
+		return nodeStream().filter(v -> v instanceof DataNode).map(v -> (DataNode) v);
+	}
+
+	public Stream<? extends AlgorithmNode> algorithmNodesStream() {
+		return nodeStream().filter(v -> v instanceof AlgorithmNode).map(v -> (AlgorithmNode) v);
+	}
+
+	public boolean isInputSourceNode(WorkflowNode v) {
+		return v instanceof DataNode dataNode && dataNode.getName().equals(INPUT_SOURCE);
+	}
+
+	public boolean isInputTaxaNode(WorkflowNode v) {
+		return v instanceof DataNode dataNode && dataNode.getName().equals(INPUT_TAXA);
+	}
+
+	public boolean isInputDataNode(WorkflowNode v) {
+		return v instanceof DataNode dataNode && dataNode.getName().startsWith(INPUT_PREFIX) && !isInputTaxaNode(v);
+	}
+
+	public boolean isWorkingTaxaNode(WorkflowNode v) {
+		return v instanceof DataNode dataNode && dataNode.getName().equals(WORKING_TAXA);
+
+	}
+
+	public boolean isWorkingDataNode(WorkflowNode v) {
+		return v instanceof DataNode dataNode && dataNode.getName().startsWith(WORKING_PREFIX) && !isWorkingTaxaNode(v);
+	}
+
+	public boolean isInputTaxaFilter(WorkflowNode v) {
+		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getName().equals(INPUT_TAXA_FILTER);
+	}
+
+	public boolean isInputDataLoader(WorkflowNode v) {
+		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getName().equals(INPUT_DATA_LOADER);
+	}
+
+	public boolean isInputTaxaDataFilter(WorkflowNode v) {
+		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getName().equals(INPUT_TAXA_DATA_FILTER);
+	}
+
+	public boolean isDerivedNode(WorkflowNode v) {
+		return !isInputSourceNode(v) && !isInputTaxaNode(v) && !isInputDataNode(v) && !isWorkingTaxaNode(v) && !isWorkingDataNode(v)
+			   && !isInputTaxaFilter(v) && !isInputDataLoader(v) && !isInputTaxaDataFilter(v);
+	}
+
+	public Consumer<AService<Boolean>> getServiceConfigurator() {
+		return serviceConfigurator;
+	}
+
+	public void setServiceConfigurator(Consumer<AService<Boolean>> serviceConfigurator) {
+		this.serviceConfigurator = serviceConfigurator;
 	}
 }

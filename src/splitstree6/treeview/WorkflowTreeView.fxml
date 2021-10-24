@@ -29,7 +29,8 @@
         <ToolBar fx:id="treeViewToolBar" prefHeight="28.0" BorderPane.alignment="CENTER">
             <items>
                 <Button fx:id="expandAllButton" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0">
+                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                        style="-fx-border-style: none; -fx-background-color: transparent;">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                             <image>
@@ -39,7 +40,8 @@
                     </graphic>
                 </Button>
                 <Button fx:id="collapseAllButton" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0">
+                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                        style="-fx-border-style: none; -fx-background-color: transparent;">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                             <image>
@@ -50,7 +52,8 @@
                 </Button>
                 <Separator/>
                 <Button fx:id="showButton" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0">
+                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                        style="-fx-border-style: none; -fx-background-color: transparent;">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                             <image>

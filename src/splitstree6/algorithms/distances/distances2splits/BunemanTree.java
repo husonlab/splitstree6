@@ -44,7 +44,7 @@ public class BunemanTree extends Distances2Splits {
 	@Override
 	public String getCitation() {
 		return "Bandelt and Dress 1992; H.-J. Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. " +
-				"Advances in Mathematics, 92:47–105, 1992.";
+			   "Advances in Mathematics, 92:47–105, 1992.";
 	}
 
 	@Override

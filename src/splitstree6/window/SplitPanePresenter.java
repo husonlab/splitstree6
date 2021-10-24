@@ -17,14 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.window.presenter;
+package splitstree6.window;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.scene.control.SplitPane;
 import javafx.util.Duration;
-import splitstree6.window.MainWindowController;
 
 /**
  * split pane presenter
@@ -106,6 +105,5 @@ public class SplitPanePresenter {
 		timeline.play();
 		timeline.setOnFinished((x) -> runnable.run());
 	}
-
 
 }

@@ -19,8 +19,13 @@
 
 package splitstree6.tabs.algorithms.taxa;
 
+import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
+
+import java.util.ArrayList;
 
 public class TaxaFilterPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
@@ -29,6 +34,60 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 	public TaxaFilterPresenter(MainWindow mainWindow, TaxaFilterTab tab) {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
+
+		var controller = tab.getTaxaFilterController();
+
+		var workflow = mainWindow.getWorkflow();
+		var inputTaxa = workflow.getInputTaxaNode().getDataBlock();
+		var taxaFilter = (TaxaFilter) tab.getAlgorithmNode().getAlgorithm();
+
+		workflow.getInputTaxaNode().validProperty().addListener((v, o, n) -> {
+			controller.getActiveListView().getItems().setAll(inputTaxa.getLabels());
+			controller.getInactiveListView().getItems().clear();
+		});
+
+		controller.getInactiveListView().getItems().addListener((ListChangeListener<? super String>) e -> {
+			while (e.next()) {
+				if (e.getAddedSize() > 0)
+					taxaFilter.setDisabled(e.getAddedSubList(), true);
+				if (e.getRemovedSize() > 0)
+					taxaFilter.setDisabled(e.getRemoved(), false);
+			}
+		});
+
+		controller.getMoveAllLeftButton().setOnAction(e -> {
+			var list = new ArrayList<>(controller.getInactiveListView().getItems());
+			controller.getInactiveListView().getItems().clear();
+			controller.getActiveListView().getItems().addAll(list);
+		});
+		controller.getMoveAllLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getItems()));
+
+		controller.getMoveSelectedLeftButton().setOnAction(e -> {
+			var list = new ArrayList<>(controller.getInactiveListView().getSelectionModel().getSelectedItems());
+			controller.getInactiveListView().getItems().removeAll(list);
+			controller.getActiveListView().getItems().addAll(list);
+
+		});
+		controller.getMoveSelectedLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getSelectionModel().getSelectedItems()));
+
+		controller.getMoveAllRightButton().setOnAction(e -> {
+			var list = new ArrayList<>(controller.getActiveListView().getItems());
+			controller.getActiveListView().getItems().clear();
+			controller.getInactiveListView().getItems().addAll(list);
+		});
+		controller.getMoveAllRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
+
+		controller.getMoveSelectedRightButton().setOnAction(e -> {
+			var list = new ArrayList<>(controller.getActiveListView().getSelectionModel().getSelectedItems());
+			controller.getActiveListView().getItems().removeAll(list);
+			controller.getInactiveListView().getItems().addAll(list);
+		});
+		controller.getMoveSelectedRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getSelectionModel().getSelectedItems()));
+
+		tab.getController().getReset().setOnAction(controller.getMoveAllLeftButton().getOnAction());
+		tab.getController().getReset().disableProperty().bind(controller.getMoveAllLeftButton().disableProperty());
+
+		tab.getController().getApplyButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
 	}
 
 	public void setup() {

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  AlgorithmItem.fxml Copyright (C) 2021 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane fx:id="anchorPane" prefHeight="50.0" prefWidth="160.0" style="-fx-border-color: lightgray;"
+            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.tabs.workflow.data.DataItemController">
+    <children>
+        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0">
+            <top>
+                <BorderPane fx:id="borderPane" minHeight="-Infinity" BorderPane.alignment="CENTER">
+                    <left>
+                        <Label fx:id="nameLabel" minHeight="-Infinity" text="Data" BorderPane.alignment="CENTER"/>
+                    </left>
+                    <right>
+                        <ImageView fx:id="statusImageView" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                   preserveRatio="true" BorderPane.alignment="CENTER">
+                            <image>
+                                <Image url="@/jloda/resources/icons/Done.png"/>
+                            </image>
+                        </ImageView>
+                    </right>
+                </BorderPane>
+            </top>
+            <padding>
+                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
+            </padding>
+            <center>
+                <Label fx:id="infoLabel" prefHeight="32.0" text="Label" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets right="16.0"/>
+                    </BorderPane.margin>
+                </Label>
+            </center>
+            <left>
+                <Button fx:id="editButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                        minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Edit"
+                        BorderPane.alignment="CENTER">
+                    <font>
+                        <Font size="10.0"/>
+                    </font>
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                            <image>
+                                <Image url="@/jloda/resources/icons/sun/Server16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="View data as text"/>
+                    </tooltip>
+                </Button>
+            </left>
+        </BorderPane>
+    </children>
+</AnchorPane>

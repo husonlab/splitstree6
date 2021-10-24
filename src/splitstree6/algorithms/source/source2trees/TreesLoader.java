@@ -39,7 +39,7 @@ public class TreesLoader extends DataLoader<SourceBlock, TreesBlock> {
 		for (var reader : getReaders()) {
 			if (reader.accepts(file)) {
 				reader.read(progress, file, outputTaxa, outputBlock);
-				System.err.println("Loaded: Taxa: " + outputTaxa.getInfo() + " Trees: " + outputBlock.getInfo());
+				System.err.println("Loaded: Taxa: " + outputTaxa.getShortDescription() + " Trees: " + outputBlock.getShortDescription());
 				break;
 			}
 		}

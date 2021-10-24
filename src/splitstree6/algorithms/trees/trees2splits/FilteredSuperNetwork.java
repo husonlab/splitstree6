@@ -26,8 +26,8 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import jloda.phylo.Distortion;
 import jloda.phylo.PhyloTree;
-import jloda.util.progress.ProgressListener;
 import jloda.util.StringUtils;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -53,8 +53,8 @@ public class FilteredSuperNetwork extends SuperNetwork {
 	@Override
 	public String getCitation() {
 		return "Whitfield et al.;James B. Whitfield, Sydney A. Cameron, Daniel H. Huson, Mike A. Steel. " +
-				"Filtered Z-Closure Supernetworks for Extracting and Visualizing Recurrent Signal from Incongruent Gene Trees, " +
-				"Systematic Biology, Volume 57, Issue 6, 1 December 2008, Pages 939–947.";
+			   "Filtered Z-Closure Supernetworks for Extracting and Visualizing Recurrent Signal from Incongruent Gene Trees, " +
+			   "Systematic Biology, Volume 57, Issue 6, 1 December 2008, Pages 939–947.";
 	}
 
 	public List<String> listOptions() {
@@ -133,7 +133,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 						if (count + (trees.getNTrees() - t) < getOptionMinNumberTrees())
 							break; // no hope to get above threshold
 					} else if ((A.cardinality() == 1 || B.cardinality() == 1)
-							&& treeTaxaAndB.cardinality() > 0 && treeTaxaAndB.cardinality() > 0) {
+							   && treeTaxaAndB.cardinality() > 0 && treeTaxaAndB.cardinality() > 0) {
 						count++; // is confirmed split
 						//System.err.print(" +");
 					} else {
@@ -143,7 +143,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 				}
 				//System.err.println(" sum=" + count);
 				if ((isOptionAllTrivial() && (A.cardinality() == 1 || B.cardinality() == 1))
-						|| count >= getOptionMinNumberTrees()) {
+					|| count >= getOptionMinNumberTrees()) {
 					final ASplit aSplit = splits.get(s);
 					child.getSplits().add(new ASplit(aSplit.getA(), aSplit.getB(), aSplit.getWeight(), (float) count / (float) trees.getNTrees()));
 				}

@@ -34,7 +34,7 @@ import java.util.ArrayList;
  * Daniel Huson, 2.2018
  */
 public class TaxaNexusInput extends NexusIOBase {
-    public static final String SYNTAX = """
+	public static final String SYNTAX = """
 			BEGIN TAXA;
 				[TITLE title;]
 				DIMENSIONS NTAX=number-of-taxa;
@@ -50,109 +50,99 @@ public class TaxaNexusInput extends NexusIOBase {
 			END;
 			""";
 
-    public String getSyntax() {
-        return SYNTAX;
-    }
+	public String getSyntax() {
+		return SYNTAX;
+	}
 
-    /**
-     * parse a taxa block
-     *
-     * @return list of taxon names found
-     */
-    public ArrayList<String> parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
-        final var taxonNamesFound = new ArrayList<String>();
+	/**
+	 * parse a taxa block
+	 *
+	 * @return list of taxon names found
+	 */
+	public ArrayList<String> parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
+		final var taxonNamesFound = new ArrayList<String>();
 
-        taxaBlock.getTaxa().clear();
+		taxaBlock.getTaxa().clear();
 
-        np.setCollectAllComments(true);
+		np.setCollectAllComments(true);
 
-        if (np.peekMatchIgnoreCase("#nexus"))
-            np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
+		if (np.peekMatchIgnoreCase("#nexus"))
+			np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
 
-        var comment = np.getComment();
-        if (comment != null && comment.startsWith("!")) {
-            NotificationManager.showInformation(comment);
-        }
-        np.setCollectAllComments(false);
+		var comment = np.getComment();
+		if (comment != null && comment.startsWith("!")) {
+			NotificationManager.showInformation(comment);
+		}
+		np.setCollectAllComments(false);
 
-        np.matchBeginBlock("TAXA");
-        parseTitleAndLink(np);
+		np.matchBeginBlock("TAXA");
+		parseTitleAndLink(np);
 
-        np.matchIgnoreCase("DIMENSIONS ntax=");
-        final var ntax = np.getInt();
-        taxaBlock.setNtax(ntax);
-        np.matchIgnoreCase(";");
+		np.matchIgnoreCase("DIMENSIONS ntax=");
+		final var ntax = np.getInt();
+		taxaBlock.setNtax(ntax);
+		np.matchIgnoreCase(";");
 
-        var labelsDetected = false;
+		var labelsDetected = false;
 
-        if (np.peekMatchIgnoreCase("taxLabels")) // grab labels now
-        {
-            np.matchIgnoreCase("taxLabels");
-            if (np.peekMatchIgnoreCase("_detect_")) // for compatibility with SplitsTree3:
-            {
-                np.matchIgnoreCase("_detect_");
-            } else {
-                for (var t = 1; t <= ntax; t++) {
-                    final var taxonName = np.getLabelRespectCase();
-                    if (taxonName.equals(";"))
-                        throw new IOExceptionWithLineNumber("expected " + ntax + " taxon names, found: " + (t - 1), np.lineno());
-                    final Taxon taxon = new Taxon(taxonName);
+		if (np.peekMatchIgnoreCase("taxLabels")) // grab labels now
+		{
+			np.matchIgnoreCase("taxLabels");
+			if (np.peekMatchIgnoreCase("_detect_")) // for compatibility with SplitsTree3:
+			{
+				np.matchIgnoreCase("_detect_");
+			} else {
+				for (var t = 1; t <= ntax; t++) {
+					final var taxonName = np.getLabelRespectCase();
+					if (taxonName.equals(";"))
+						throw new IOExceptionWithLineNumber("expected " + ntax + " taxon names, found: " + (t - 1), np.lineno());
+					final Taxon taxon = new Taxon(taxonName);
 
-                    if (taxaBlock.indexOf(taxon) != -1) {
-                        throw new IOExceptionWithLineNumber("taxon name '" + taxonName + "' appears multiple times, at " + taxaBlock.indexOf(taxon) + " and " + t, np.lineno());
-                    }
-                    taxaBlock.add(taxon);
-                    taxonNamesFound.add(taxon.getName());
-                }
-                labelsDetected = true;
-            }
-            if (!np.peekMatchIgnoreCase(";")) {
-                int count = ntax;
-                while (!np.peekMatchIgnoreCase(";")) {
-                    np.getWordRespectCase();
-                    count++;
-                }
-                throw new IOExceptionWithLineNumber(np.lineno(), "expected " + ntax + " taxon names, found: " + count);
+					if (taxaBlock.indexOf(taxon) != -1) {
+						throw new IOExceptionWithLineNumber("taxon name '" + taxonName + "' appears multiple times, at " + taxaBlock.indexOf(taxon) + " and " + t, np.lineno());
+					}
+					taxaBlock.add(taxon);
+					taxonNamesFound.add(taxon.getName());
+				}
+				labelsDetected = true;
+			}
+			if (!np.peekMatchIgnoreCase(";")) {
+				int count = ntax;
+				while (!np.peekMatchIgnoreCase(";")) {
+					np.getWordRespectCase();
+					count++;
+				}
+				throw new IOExceptionWithLineNumber(np.lineno(), "expected " + ntax + " taxon names, found: " + count);
 
-            }
-            np.matchIgnoreCase(";");
-        }
+			}
+			np.matchIgnoreCase(";");
+		}
 
-        if (labelsDetected && np.peekMatchIgnoreCase("displayLabels")) // get display labels
-        {
-            np.matchIgnoreCase("displayLabels");
+		if (labelsDetected && np.peekMatchIgnoreCase("displayLabels")) // get display labels
+		{
+			np.matchIgnoreCase("displayLabels");
 
-            for (var t = 1; t <= ntax; t++) {
-                final var displayLabel = np.getLabelRespectCase();
-                if (!displayLabel.equals("null")) //  explicitly the word "null"
-                    taxaBlock.get(t).setDisplayLabel(displayLabel);
-            }
-            np.matchIgnoreCase(";");
-        }
+			for (var t = 1; t <= ntax; t++) {
+				final var displayLabel = np.getLabelRespectCase();
+				if (!displayLabel.equals("null")) //  explicitly the word "null"
+					taxaBlock.get(t).setDisplayLabel(displayLabel);
+			}
+			np.matchIgnoreCase(";");
+		}
 
-        if (labelsDetected && np.peekMatchIgnoreCase("taxInfo")) // get info for labels
-        {
-            np.matchIgnoreCase("taxInfo");
+		if (labelsDetected && np.peekMatchIgnoreCase("taxInfo")) // get info for labels
+		{
+			np.matchIgnoreCase("taxInfo");
 
-            for (var t = 1; t <= ntax; t++) {
-                final String info = np.getLabelRespectCase();
-                if (!info.equals("null")) //  explicitly the word "null"
-                    taxaBlock.get(t).setInfo(info);
-            }
-            np.matchIgnoreCase(";");
-        }
+			for (var t = 1; t <= ntax; t++) {
+				final String info = np.getLabelRespectCase();
+				if (!info.equals("null")) //  explicitly the word "null"
+					taxaBlock.get(t).setInfo(info);
+			}
+			np.matchIgnoreCase(";");
+		}
 
-        np.matchEndBlock();
-        return taxonNamesFound;
-    }
-
-    /**
-     * is the parser at the beginning of a block that this class can parse?
-     *
-     * @param np
-     * @return true, if can parse from here
-     */
-    public boolean atBeginOfBlock(NexusStreamParser np) {
-        return np.peekMatchIgnoreCase("begin TAXA;");
-    }
+		np.matchEndBlock();
+		return taxonNamesFound;
+	}
 }

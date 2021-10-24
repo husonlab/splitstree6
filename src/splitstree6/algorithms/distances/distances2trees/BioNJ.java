@@ -46,8 +46,8 @@ public class BioNJ extends Distances2Trees {
 	@Override
 	public String getCitation() {
 		return "Gascuel 1997; " +
-				"O. Gascuel, BIONJ: an improved version of the NJ algorithm based on a simple model of sequence data. " +
-				"Molecular Biology and Evolution. 1997 14:685-695.";
+			   "O. Gascuel, BIONJ: an improved version of the NJ algorithm based on a simple model of sequence data. " +
+			   "Molecular Biology and Evolution. 1997 14:685-695.";
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class BioNJ extends Distances2Trees {
 				}
 			}
 			var dist_e = 0.5 * (h[i_min][j_min] + b[i_min] / ((double) actual - 2.0)
-					- b[j_min] / ((double) actual - 2.0));
+								- b[j_min] / ((double) actual - 2.0));
 			var dist_f = h[i_min][j_min] - dist_e;
 			//dist_f=0.5*(h[i_min][j_min] + b[j_min]/((double)actual-2.0)
 			//	- b[i_min]/((double)actual-2.0) );

@@ -20,7 +20,9 @@
 
 package splitstree6.io.readers.characters;
 
-import jloda.util.*;
+import jloda.util.FileLineIterator;
+import jloda.util.FileUtils;
+import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
@@ -118,7 +120,7 @@ public class MSFReader extends CharactersReader {
 		for (String label : taxa2seq.keySet()) {
 			if (taxa2seq.get(label).length() != nchar)
 				throw new IOException("The sequences in the alignment have different lengths! " +
-						"Length of sequence: " + label + " differ from the length of previous sequences :" + nchar);
+									  "Length of sequence: " + label + " differ from the length of previous sequences :" + nchar);
 
 			for (int j = 1; j <= nchar; j++) {
 				char symbol = Character.toLowerCase(taxa2seq.get(label).charAt(j - 1));
@@ -144,9 +146,9 @@ public class MSFReader extends CharactersReader {
 		else {
 			var line = FileUtils.getFirstLineFromFile(new File(fileName));
 			return line != null &&
-					(line.equalsIgnoreCase("!!NA_MULTIPLE_ALIGNMENT 1.0")
-							|| line.equalsIgnoreCase("!!AA_MULTIPLE_ALIGNMENT 1.0")
-							|| line.equalsIgnoreCase("!!??_MULTIPLE_ALIGNMENT 1.0"));
+				   (line.equalsIgnoreCase("!!NA_MULTIPLE_ALIGNMENT 1.0")
+					|| line.equalsIgnoreCase("!!AA_MULTIPLE_ALIGNMENT 1.0")
+					|| line.equalsIgnoreCase("!!??_MULTIPLE_ALIGNMENT 1.0"));
 		}
 	}
 }

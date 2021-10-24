@@ -36,7 +36,7 @@ import java.util.List;
  * Daniel Huson, 2.2018
  */
 public class DistancesNexusInput extends NexusIOBase implements INexusInput<DistancesBlock> {
-    public static final String SYNTAX =
+	public static final String SYNTAX =
 			"""
 					BEGIN DISTANCES;
 						[TITLE {title};]
@@ -57,199 +57,189 @@ public class DistancesNexusInput extends NexusIOBase implements INexusInput<Dist
 					""";
 
 
-    @Override
-    public String getSyntax() {
-        return SYNTAX;
-    }
+	@Override
+	public String getSyntax() {
+		return SYNTAX;
+	}
 
-    /**
-     * parse a distances block
-     *
-     * @return taxon names, if found
-     */
-    @Override
-    public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, DistancesBlock distancesBlock) throws IOException {
-        try {
-            distancesBlock.clear();
+	/**
+	 * parse a distances block
+	 *
+	 * @return taxon names, if found
+	 */
+	@Override
+	public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, DistancesBlock distancesBlock) throws IOException {
+		try {
+			distancesBlock.clear();
 
-            final DistancesFormat format = distancesBlock.getFormat();
+			final DistancesFormat format = distancesBlock.getFormat();
 
-            np.matchBeginBlock("DISTANCES");
-            parseTitleAndLink(np);
+			np.matchBeginBlock("DISTANCES");
+			parseTitleAndLink(np);
 
-            if (taxaBlock.getNtax() == 0) {
-                np.matchIgnoreCase("dimensions nTax=");
-                taxaBlock.setNtax(np.getInt());
-                np.matchIgnoreCase(";");
-            } else if (np.peekMatchIgnoreCase("dimensions")) {
-                np.matchIgnoreCase("dimensions nTax=" + taxaBlock.getNtax() + ";");
-            }
-            distancesBlock.setNtax(taxaBlock.getNtax());
+			if (taxaBlock.getNtax() == 0) {
+				np.matchIgnoreCase("dimensions nTax=");
+				taxaBlock.setNtax(np.getInt());
+				np.matchIgnoreCase(";");
+			} else if (np.peekMatchIgnoreCase("dimensions")) {
+				np.matchIgnoreCase("dimensions nTax=" + taxaBlock.getNtax() + ";");
+			}
+			distancesBlock.setNtax(taxaBlock.getNtax());
 
-            if (np.peekMatchIgnoreCase("FORMAT")) {
-                final var tokens = np.getTokensLowerCase("format", ";");
+			if (np.peekMatchIgnoreCase("FORMAT")) {
+				final var tokens = np.getTokensLowerCase("format", ";");
 
-                format.setOptionLabels(np.findIgnoreCase(tokens, "labels=left", true, format.isOptionLabels()));
-                format.setOptionLabels(np.findIgnoreCase(tokens, "labels=no", false, format.isOptionLabels())); //DJB 14mar03
+				format.setOptionLabels(np.findIgnoreCase(tokens, "labels=left", true, format.isOptionLabels()));
+				format.setOptionLabels(np.findIgnoreCase(tokens, "labels=no", false, format.isOptionLabels())); //DJB 14mar03
 
-                format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal=no", false, format.isOptionDiagonal()));
-                format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal=yes", true, format.isOptionDiagonal()));
+				format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal=no", false, format.isOptionDiagonal()));
+				format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal=yes", true, format.isOptionDiagonal()));
 
 				format.setOptionTriangleByLabel(np.findIgnoreCase(tokens, "triangle=", StringUtils.toString(DistancesFormat.Triangle.values(), " "), format.getOptionTriangle().toString()));
 
-                // backward compatibility:
-                format.setOptionLabels(np.findIgnoreCase(tokens, "no labels", false, format.isOptionLabels()));
-                format.setOptionLabels(np.findIgnoreCase(tokens, "nolabels", false, format.isOptionLabels())); //DJB 14mar03
-                format.setOptionLabels(np.findIgnoreCase(tokens, "labels", true, format.isOptionLabels()));
+				// backward compatibility:
+				format.setOptionLabels(np.findIgnoreCase(tokens, "no labels", false, format.isOptionLabels()));
+				format.setOptionLabels(np.findIgnoreCase(tokens, "nolabels", false, format.isOptionLabels())); //DJB 14mar03
+				format.setOptionLabels(np.findIgnoreCase(tokens, "labels", true, format.isOptionLabels()));
 
-                format.setOptionDiagonal(np.findIgnoreCase(tokens, "no diagonal", false, format.isOptionDiagonal()));
-                format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal", true, format.isOptionDiagonal()));
-                format.setOptionDiagonal(np.findIgnoreCase(tokens, "noDiagonal", false, format.isOptionDiagonal())); //DJB 14mar03
+				format.setOptionDiagonal(np.findIgnoreCase(tokens, "no diagonal", false, format.isOptionDiagonal()));
+				format.setOptionDiagonal(np.findIgnoreCase(tokens, "diagonal", true, format.isOptionDiagonal()));
+				format.setOptionDiagonal(np.findIgnoreCase(tokens, "noDiagonal", false, format.isOptionDiagonal())); //DJB 14mar03
 
-                // for compatibilty with splitstree3, swallow missing=?
-                np.findIgnoreCase(tokens, "missing=", null, '?');
+				// for compatibilty with splitstree3, swallow missing=?
+				np.findIgnoreCase(tokens, "missing=", null, '?');
 
-                if (tokens.size() != 0)
-                    throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in FORMAT");
-            }
+				if (tokens.size() != 0)
+					throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in FORMAT");
+			}
 
-            final var both = format.getOptionTriangle().equals(DistancesFormat.Triangle.Both);
-            final var upper = format.getOptionTriangle().equals(DistancesFormat.Triangle.Upper);
-            final var lower = format.getOptionTriangle().equals(DistancesFormat.Triangle.Lower);
-            final var diag = format.isOptionDiagonal() ? 0 : 1;
+			final var both = format.getOptionTriangle().equals(DistancesFormat.Triangle.Both);
+			final var upper = format.getOptionTriangle().equals(DistancesFormat.Triangle.Upper);
+			final var lower = format.getOptionTriangle().equals(DistancesFormat.Triangle.Lower);
+			final var diag = format.isOptionDiagonal() ? 0 : 1;
 
-            final ArrayList<String> taxonNamesFound = new ArrayList<>(distancesBlock.getNtax());
+			final ArrayList<String> taxonNamesFound = new ArrayList<>(distancesBlock.getNtax());
 
-            {
-                np.matchIgnoreCase("MATRIX");
-                final var hasTaxonNames = taxaBlock.size() > 0;
-                for (var t = 1; t <= distancesBlock.getNtax(); t++) {
-                    if (format.isOptionLabels()) {
-                        if (hasTaxonNames) {
-                            np.matchLabelRespectCase(taxaBlock.getLabel(t));
-                            taxonNamesFound.add(taxaBlock.getLabel(t));
-                        } else
-                            taxonNamesFound.add(np.getLabelRespectCase());
-                    }
-                    distancesBlock.set(t, t, 0);
+			{
+				np.matchIgnoreCase("MATRIX");
+				final var hasTaxonNames = taxaBlock.size() > 0;
+				for (var t = 1; t <= distancesBlock.getNtax(); t++) {
+					if (format.isOptionLabels()) {
+						if (hasTaxonNames) {
+							np.matchLabelRespectCase(taxaBlock.getLabel(t));
+							taxonNamesFound.add(taxaBlock.getLabel(t));
+						} else
+							taxonNamesFound.add(np.getLabelRespectCase());
+					}
+					distancesBlock.set(t, t, 0);
 
-                    final int left;
-                    final int right;
+					final int left;
+					final int right;
 
-                    if (lower) {
-                        left = 1;
-                        right = t - diag;
-                    } else if (upper) {
-                        left = t + diag;
-                        right = distancesBlock.getNtax();
-                    } else // both
-                    {
-                        left = 1;
-                        right = distancesBlock.getNtax();
-                    }
+					if (lower) {
+						left = 1;
+						right = t - diag;
+					} else if (upper) {
+						left = t + diag;
+						right = distancesBlock.getNtax();
+					} else // both
+					{
+						left = 1;
+						right = distancesBlock.getNtax();
+					}
 
-                    for (int q = left; q <= right; q++) {
-                        double z = np.getDouble();
+					for (int q = left; q <= right; q++) {
+						double z = np.getDouble();
 
-                        if (both)
-                            distancesBlock.set(t, q, z);
-                        else
-                            distancesBlock.setBoth(t, q, z);
+						if (both)
+							distancesBlock.set(t, q, z);
+						else
+							distancesBlock.setBoth(t, q, z);
 
-                    }
-                }
-                np.matchIgnoreCase(";");
-            }
+					}
+				}
+				np.matchIgnoreCase(";");
+			}
 
-            if (np.peekMatchIgnoreCase("VARMATRIX")) {
-                np.matchIgnoreCase("VARMATRIX");
-                for (var t = 1; t <= distancesBlock.getNtax(); t++) {
-                    if (format.isOptionLabels()) {
-                        np.matchLabelRespectCase(taxaBlock.getLabel(t));
-                    }
+			if (np.peekMatchIgnoreCase("VARMATRIX")) {
+				np.matchIgnoreCase("VARMATRIX");
+				for (var t = 1; t <= distancesBlock.getNtax(); t++) {
+					if (format.isOptionLabels()) {
+						np.matchLabelRespectCase(taxaBlock.getLabel(t));
+					}
 
-                    if (format.isOptionVariancesIO())
-                        distancesBlock.setVariance(t, t, 0);
+					if (format.isOptionVariancesIO())
+						distancesBlock.setVariance(t, t, 0);
 
-                    final int left;
-                    final int right;
+					final int left;
+					final int right;
 
-                    if (lower) {
-                        left = 1;
-                        right = t - diag;
-                    } else if (upper) {
-                        left = t + diag;
-                        right = distancesBlock.getNtax();
-                    } else // both
-                    {
-                        left = 1;
-                        right = distancesBlock.getNtax();
-                    }
+					if (lower) {
+						left = 1;
+						right = t - diag;
+					} else if (upper) {
+						left = t + diag;
+						right = distancesBlock.getNtax();
+					} else // both
+					{
+						left = 1;
+						right = distancesBlock.getNtax();
+					}
 
-                    for (var q = left; q <= right; q++) {
-                        var z = np.getDouble();
+					for (var q = left; q <= right; q++) {
+						var z = np.getDouble();
 
-                        if (format.isOptionVariancesIO()) {
-                            if (both)
-                                distancesBlock.setVariance(t, q, z);
-                            else
-                                distancesBlock.setVariance(t, q, z);
-                        }
-                    }
-                }
-                np.matchIgnoreCase(";");
-            }
+						if (format.isOptionVariancesIO()) {
+							if (both)
+								distancesBlock.setVariance(t, q, z);
+							else
+								distancesBlock.setVariance(t, q, z);
+						}
+					}
+				}
+				np.matchIgnoreCase(";");
+			}
 
-            np.matchEndBlock();
+			np.matchEndBlock();
 
-            if (both) {
-                if (!isSymmetric(distancesBlock)) {
-                    symmetrize(distancesBlock);
-                    System.err.println("Warning: Distance matrix not symmetric: averaging between upper and lower parts");
-                }
-            }
-            return taxonNamesFound;
-        } catch (Exception ex) {
-            throw new IOException(ex);
-        }
-    }
+			if (both) {
+				if (!isSymmetric(distancesBlock)) {
+					symmetrize(distancesBlock);
+					System.err.println("Warning: Distance matrix not symmetric: averaging between upper and lower parts");
+				}
+			}
+			return taxonNamesFound;
+		} catch (Exception ex) {
+			throw new IOException(ex);
+		}
+	}
 
-    /**
-     * Check if the matrix is symmetric.
-     *
-     * @return boolean. True if it is symmetric.
-     */
-    private boolean isSymmetric(DistancesBlock distancesBlock) {
-        int ntax = distancesBlock.getNtax();
-        for (var i = 1; i <= ntax; i++) {
-            for (var j = 1; j < i; j++)
-                if (distancesBlock.get(i, j) != distancesBlock.get(j, i))
-                    return false;
-        }
-        return true;
-    }
+	/**
+	 * Check if the matrix is symmetric.
+	 *
+	 * @return boolean. True if it is symmetric.
+	 */
+	private boolean isSymmetric(DistancesBlock distancesBlock) {
+		int ntax = distancesBlock.getNtax();
+		for (var i = 1; i <= ntax; i++) {
+			for (var j = 1; j < i; j++)
+				if (distancesBlock.get(i, j) != distancesBlock.get(j, i))
+					return false;
+		}
+		return true;
+	}
 
-    /**
-     * Symmetrize the matrix. Replace d_ij and d_ji with (d_ij+d_ji)/2
-     */
-    private void symmetrize(DistancesBlock distancesBlock) {
-        int ntax = distancesBlock.getNtax();
-        for (var i = 1; i <= ntax; i++) {
-            for (var j = 1; j < i; j++) {
-                var d_ij = (distancesBlock.get(i, j) + distancesBlock.get(j, i)) / 2.0;
-                distancesBlock.set(i, j, d_ij);
-                distancesBlock.set(j, i, d_ij);
-            }
-        }
-    }
-
-
-    /**
-     * is the parser at the beginning of a block that this class can parse?
-     *
-     * @return true, if can parse from here
-     */
-    public boolean atBeginOfBlock(NexusStreamParser np) {
-        return np.peekMatchIgnoreCase("begin DISTANCES;");
-    }
+	/**
+	 * Symmetrize the matrix. Replace d_ij and d_ji with (d_ij+d_ji)/2
+	 */
+	private void symmetrize(DistancesBlock distancesBlock) {
+		int ntax = distancesBlock.getNtax();
+		for (var i = 1; i <= ntax; i++) {
+			for (var j = 1; j < i; j++) {
+				var d_ij = (distancesBlock.get(i, j) + distancesBlock.get(j, i)) / 2.0;
+				distancesBlock.set(i, j, d_ij);
+				distancesBlock.set(j, i, d_ij);
+			}
+		}
+	}
 }

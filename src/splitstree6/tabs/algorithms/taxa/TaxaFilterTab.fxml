@@ -19,23 +19,61 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.tabs.algorithms.taxa.TaxaFilterController">
+<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.tabs.algorithms.taxa.TaxaFilterController">
     <children>
-        <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <center>
-                <StackPane BorderPane.alignment="CENTER">
-                    <children>
-                        <Pane fx:id="mainPane"/>
-                    </children>
-                </StackPane>
-            </center>
-            <top>
-                <VBox fx:id="topVBox" BorderPane.alignment="CENTER"/>
-            </top>
-        </BorderPane>
+        <GridPane vgap="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                  AnchorPane.topAnchor="0.0">
+            <columnConstraints>
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
+            </columnConstraints>
+            <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                <RowConstraints minHeight="10.0" vgrow="ALWAYS"/>
+            </rowConstraints>
+            <children>
+                <Label text="Active">
+                    <GridPane.margin>
+                        <Insets/>
+                    </GridPane.margin>
+                </Label>
+                <Label text="Inactive" GridPane.columnIndex="2"/>
+                <ListView fx:id="activeListView" GridPane.rowIndex="1"/>
+                <ListView fx:id="inactiveListView" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                <BorderPane GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <center>
+                        <VBox alignment="CENTER" minWidth="-Infinity" spacing="25.0">
+                            <children>
+                                <VBox alignment="BOTTOM_CENTER">
+                                    <children>
+                                        <Button fx:id="moveSelectedRightButton" mnemonicParsing="false" text="&gt;"/>
+                                        <Button fx:id="moveAllRightButton" mnemonicParsing="false" text="&gt;&gt;">
+                                            <VBox.margin>
+                                                <Insets top="10.0"/>
+                                            </VBox.margin>
+                                        </Button>
+                                    </children>
+                                </VBox>
+                                <VBox alignment="TOP_CENTER">
+                                    <children>
+                                        <Button fx:id="moveSelectedLeftButton" mnemonicParsing="false" text="&lt;">
+                                            <VBox.margin>
+                                                <Insets bottom="10.0"/>
+                                            </VBox.margin>
+                                        </Button>
+                                        <Button fx:id="moveAllLeftButton" mnemonicParsing="false" text="&lt;&lt;"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </VBox>
+                    </center>
+                </BorderPane>
+            </children>
+        </GridPane>
     </children>
 </AnchorPane>

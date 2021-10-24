@@ -57,8 +57,8 @@ public class NeighborNet extends Distances2Splits {
 	@Override
 	public String getCitation() {
 		return "Bryant & Moulton 2004; " +
-				"D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. " +
-				"Molecular Biology and Evolution, 21(2):255– 265, 2004.";
+			   "D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. " +
+			   "Molecular Biology and Evolution, 21(2):255– 265, 2004.";
 	}
 
 	/**
@@ -66,6 +66,13 @@ public class NeighborNet extends Distances2Splits {
 	 */
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws CanceledException {
+
+		// todo: this is for testing the WorkflowTab
+		if (false)
+			try {
+				Thread.sleep(4000);
+			} catch (InterruptedException ignored) {
+			}
 
 		if (SplitsUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;

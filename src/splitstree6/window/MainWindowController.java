@@ -394,39 +394,6 @@ public class MainWindowController {
 	private Button openCloseLeftButton;
 
 	@FXML
-	private Button openButton;
-
-	@FXML
-	private Button saveButton;
-
-	@FXML
-	private Button printButton;
-
-	@FXML
-	private Button findButton;
-
-	@FXML
-	private Button zoomButton;
-
-	@FXML
-	private Button zoomInButton;
-
-	@FXML
-	private Button zoomOutButton;
-
-	@FXML
-	private Button rotateLeftButton;
-
-	@FXML
-	private Button rotateRightButton;
-
-	@FXML
-	private Button treeButton;
-
-	@FXML
-	private Button networkButton;
-
-	@FXML
 	private SplitPane mainSplitPane;
 
 	@FXML
@@ -985,50 +952,6 @@ public class MainWindowController {
 
 	public Button getOpenCloseLeftButton() {
 		return openCloseLeftButton;
-	}
-
-	public Button getOpenButton() {
-		return openButton;
-	}
-
-	public Button getSaveButton() {
-		return saveButton;
-	}
-
-	public Button getPrintButton() {
-		return printButton;
-	}
-
-	public Button getFindButton() {
-		return findButton;
-	}
-
-	public Button getZoomButton() {
-		return zoomButton;
-	}
-
-	public Button getZoomInButton() {
-		return zoomInButton;
-	}
-
-	public Button getZoomOutButton() {
-		return zoomOutButton;
-	}
-
-	public Button getRotateLeftButton() {
-		return rotateLeftButton;
-	}
-
-	public Button getRotateRightButton() {
-		return rotateRightButton;
-	}
-
-	public Button getTreeButton() {
-		return treeButton;
-	}
-
-	public Button getNetworkButton() {
-		return networkButton;
 	}
 
 	public SplitPane getMainSplitPane() {

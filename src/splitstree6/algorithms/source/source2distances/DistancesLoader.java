@@ -39,7 +39,7 @@ public class DistancesLoader extends DataLoader<SourceBlock, DistancesBlock> {
 		for (var reader : getReaders()) {
 			if (reader.accepts(file)) {
 				reader.read(progress, file, outputTaxa, outputBlock);
-				System.err.println("Loaded: Taxa: " + outputTaxa.getInfo() + " Distances: " + outputBlock.getInfo());
+				System.err.println("Loaded: Taxa: " + outputTaxa.getShortDescription() + " Distances: " + outputBlock.getShortDescription());
 				break;
 			}
 		}

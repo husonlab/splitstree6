@@ -38,52 +38,52 @@ public class CharactersFormat {
 	public CharactersFormat() {
 	}
 
-    public boolean isOptionTranspose() {
-        return optionTranspose;
-    }
+	public boolean isOptionTranspose() {
+		return optionTranspose;
+	}
 
-    public void setOptionTranspose(boolean optionTranspose) {
-        this.optionTranspose = optionTranspose;
-    }
+	public void setOptionTranspose(boolean optionTranspose) {
+		this.optionTranspose = optionTranspose;
+	}
 
-    public boolean isOptionInterleave() {
-        return optionInterleave;
-    }
+	public boolean isOptionInterleave() {
+		return optionInterleave;
+	}
 
-    public void setOptionInterleave(boolean optionInterleave) {
-        this.optionInterleave = optionInterleave;
-    }
+	public void setOptionInterleave(boolean optionInterleave) {
+		this.optionInterleave = optionInterleave;
+	}
 
-    public boolean isOptionLabels() {
-        return optionLabels;
-    }
+	public boolean isOptionLabels() {
+		return optionLabels;
+	}
 
-    public void setOptionLabels(boolean optionLabels) {
-        this.optionLabels = optionLabels;
-    }
+	public void setOptionLabels(boolean optionLabels) {
+		this.optionLabels = optionLabels;
+	}
 
 
-    public boolean isOptionTokens() {
-        return optionTokens;
-    }
+	public boolean isOptionTokens() {
+		return optionTokens;
+	}
 
-    public void setOptionTokens(boolean optionTokens) {
-        this.optionTokens = optionTokens;
-    }
+	public void setOptionTokens(boolean optionTokens) {
+		this.optionTokens = optionTokens;
+	}
 
-    public char getOptionMatchCharacter() {
-        return optionMatchCharacter;
-    }
+	public char getOptionMatchCharacter() {
+		return optionMatchCharacter;
+	}
 
-    public void setOptionMatchCharacter(char optionMatchCharacter) {
-        this.optionMatchCharacter = optionMatchCharacter;
-    }
+	public void setOptionMatchCharacter(char optionMatchCharacter) {
+		this.optionMatchCharacter = optionMatchCharacter;
+	}
 
-    public int getOptionColumnsPerBlock() {
-        return this.optionColumnsPerBlock;
-    }
+	public int getOptionColumnsPerBlock() {
+		return this.optionColumnsPerBlock;
+	}
 
-    public void setOptionColumnsPerBlock(int optionColumnsPerBlock) {
-        this.optionColumnsPerBlock = optionColumnsPerBlock;
-    }
+	public void setOptionColumnsPerBlock(int optionColumnsPerBlock) {
+		this.optionColumnsPerBlock = optionColumnsPerBlock;
+	}
 }

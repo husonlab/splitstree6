@@ -12,7 +12,7 @@ module splitstreesix {
 
 	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
-    opens splitstree6.resources.images;
+	opens splitstree6.resources.images;
 
 	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
@@ -24,6 +24,8 @@ module splitstreesix {
 	opens splitstree6.algorithms.distances.distances2sink;
 	opens splitstree6.algorithms.distances.distances2splits;
 	opens splitstree6.algorithms.distances.distances2trees;
+	opens splitstree6.algorithms.networks.network2network;
+	opens splitstree6.algorithms.networks.network2sink;
 	opens splitstree6.algorithms.source.source2characters;
 	opens splitstree6.algorithms.source.source2distances;
 	opens splitstree6.algorithms.source.source2splits;
@@ -43,6 +45,7 @@ module splitstreesix {
 	opens splitstree6.io.readers.distances;
 	opens splitstree6.io.readers.splits;
 	opens splitstree6.io.readers.trees;
+	opens splitstree6.io.readers.network;
 
 	opens splitstree6.io.writers.characters;
 	opens splitstree6.io.writers.distances;
@@ -60,9 +63,12 @@ module splitstreesix {
 	opens splitstree6.tabs.network;
 	opens splitstree6.tabs.tree;
 	opens splitstree6.tabs.workflow;
+	opens splitstree6.tabs.workflow.algorithm;
+	opens splitstree6.tabs.workflow.data;
 
-	opens splitstree6.tabs.algorithms.taxa;
 
 	exports splitstree6.xtra;
 	exports splitstree6.main;
+	opens splitstree6.tabs.algorithms;
+	opens splitstree6.tabs.algorithms.taxa;
 }

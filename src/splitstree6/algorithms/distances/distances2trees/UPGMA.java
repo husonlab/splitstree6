@@ -43,8 +43,8 @@ public class UPGMA extends Distances2Trees {
 	@Override
 	public String getCitation() {
 		return "Sokal and Michener 1958; " +
-				"R.R. Sokal and C.D.Michener. A statistical method for evaluating systematic relationships. " +
-				"University of Kansas Scientific Bulletin, 28:1409-1438, 1958.";
+			   "R.R. Sokal and C.D.Michener. A statistical method for evaluating systematic relationships. " +
+			   "University of Kansas Scientific Bulletin, 28:1409-1438, 1958.";
 	}
 
 	@Override

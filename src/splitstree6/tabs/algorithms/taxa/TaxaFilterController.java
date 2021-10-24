@@ -20,38 +20,57 @@
 package splitstree6.tabs.algorithms.taxa;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ListView;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.VBox;
 
 public class TaxaFilterController {
-
 	@FXML
 	private AnchorPane anchorPane;
 
 	@FXML
-	private BorderPane borderPane;
+	private ListView<String> activeListView;
 
 	@FXML
-	private Pane mainPane;
+	private ListView<String> inactiveListView;
 
 	@FXML
-	private VBox topVBox;
+	private Button moveSelectedRightButton;
+
+	@FXML
+	private Button moveAllRightButton;
+
+	@FXML
+	private Button moveSelectedLeftButton;
+
+	@FXML
+	private Button moveAllLeftButton;
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
 	}
 
-	public BorderPane getBorderPane() {
-		return borderPane;
+	public ListView<String> getActiveListView() {
+		return activeListView;
 	}
 
-	public Pane getMainPane() {
-		return mainPane;
+	public ListView<String> getInactiveListView() {
+		return inactiveListView;
 	}
 
-	public VBox getTopVBox() {
-		return topVBox;
+	public Button getMoveSelectedRightButton() {
+		return moveSelectedRightButton;
+	}
+
+	public Button getMoveAllRightButton() {
+		return moveAllRightButton;
+	}
+
+	public Button getMoveSelectedLeftButton() {
+		return moveSelectedLeftButton;
+	}
+
+	public Button getMoveAllLeftButton() {
+		return moveAllLeftButton;
 	}
 }

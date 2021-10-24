@@ -306,8 +306,8 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 	public boolean isExtensionOf(PartialSplit ps) {
 		return (contains(getA(), ps.getA()) && contains(getB(), ps.getB())
 				&& (getA().cardinality() != ps.getA().cardinality() || getB().cardinality() != ps.getB().cardinality()))
-				|| (contains(getA(), ps.getB()) && contains(getB(), ps.getA())
-				&& (getA().cardinality() != ps.getB().cardinality() || getB().cardinality() != ps.getA().cardinality()));
+			   || (contains(getA(), ps.getB()) && contains(getB(), ps.getA())
+				   && (getA().cardinality() != ps.getB().cardinality() || getB().cardinality() != ps.getA().cardinality()));
 	}
 
 	/**
@@ -479,7 +479,7 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 		Ap.and(bitSet);
 		Bp.and(bitSet);
 		if (Ap.cardinality() > 0 && Bp.cardinality() > 0
-				&& Ap.cardinality() + Bp.cardinality() == bitSet.cardinality())
+			&& Ap.cardinality() + Bp.cardinality() == bitSet.cardinality())
 			return new PartialSplit(Ap, Bp, getWeight(), getConfidence());
 		else
 			return null;

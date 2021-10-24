@@ -42,14 +42,14 @@ class NetNode {
 	@Override
 	public String toString() {
 		return "[id=" + id
-				+ " nbr=" + (nbr == null ? "null" : ("" + nbr.id))
-				+ " ch1=" + (ch1 == null ? "null" : ("" + ch1.id))
-				+ " ch2=" + (ch2 == null ? "null" : ("" + ch2.id))
-				+ " prev=" + (prev == null ? "null" : ("" + prev.id))
-				+ " next=" + (next == null ? "null" : ("" + next.id))
-				+ " Rx=" + Rx
-				+ " Sx=" + Sx
-				+ "]";
+			   + " nbr=" + (nbr == null ? "null" : ("" + nbr.id))
+			   + " ch1=" + (ch1 == null ? "null" : ("" + ch1.id))
+			   + " ch2=" + (ch2 == null ? "null" : ("" + ch2.id))
+			   + " prev=" + (prev == null ? "null" : ("" + prev.id))
+			   + " next=" + (next == null ? "null" : ("" + next.id))
+			   + " Rx=" + Rx
+			   + " Sx=" + Sx
+			   + "]";
 	}
 
 	@Override

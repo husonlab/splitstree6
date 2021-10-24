@@ -38,6 +38,7 @@ public class WorkflowTreeView extends AnchorPane implements IDisplayTab {
 	private final MainWindow mainWindow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
+
 	/**
 	 * constructor
 	 */
@@ -81,6 +82,10 @@ public class WorkflowTreeView extends AnchorPane implements IDisplayTab {
 
 	public WorkflowTreeViewController getController() {
 		return controller;
+	}
+
+	public WorkflowTreeItem getRoot() {
+		return (WorkflowTreeItem) controller.getWorkflowTreeView().getRoot();
 	}
 }
 

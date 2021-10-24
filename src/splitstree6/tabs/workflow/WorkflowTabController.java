@@ -20,10 +20,13 @@
 package splitstree6.tabs.workflow;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import jloda.fx.control.ZoomableScrollPane;
 
 public class WorkflowTabController {
 
@@ -39,6 +42,48 @@ public class WorkflowTabController {
 	@FXML
 	private VBox topVBox;
 
+	@FXML
+	private ToolBar toolBar;
+
+	@FXML
+	private Button openButton;
+
+	@FXML
+	private Button saveButton;
+
+	@FXML
+	private Button printButton;
+
+	@FXML
+	private Button findButton;
+
+	@FXML
+	private Button zoomButton;
+
+	@FXML
+	private Button zoomInButton;
+
+	@FXML
+	private Button zoomOutButton;
+
+	private ZoomableScrollPane scrollPane;
+
+	@FXML
+	private void initialize() {
+		borderPane.getChildren().remove(mainPane);
+		var anchorPane = new AnchorPane(mainPane);
+		AnchorPane.setRightAnchor(mainPane, 20.0);
+		AnchorPane.setLeftAnchor(mainPane, 20.0);
+		AnchorPane.setTopAnchor(mainPane, 20.0);
+		AnchorPane.setBottomAnchor(mainPane, 20.0);
+		scrollPane = new ZoomableScrollPane(anchorPane);
+		borderPane.setCenter(scrollPane);
+	}
+
+	public ZoomableScrollPane getScrollPane() {
+		return scrollPane;
+	}
+
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
 	}
@@ -53,5 +98,37 @@ public class WorkflowTabController {
 
 	public VBox getTopVBox() {
 		return topVBox;
+	}
+
+	public ToolBar getToolBar() {
+		return toolBar;
+	}
+
+	public Button getOpenButton() {
+		return openButton;
+	}
+
+	public Button getSaveButton() {
+		return saveButton;
+	}
+
+	public Button getPrintButton() {
+		return printButton;
+	}
+
+	public Button getFindButton() {
+		return findButton;
+	}
+
+	public Button getZoomButton() {
+		return zoomButton;
+	}
+
+	public Button getZoomInButton() {
+		return zoomInButton;
+	}
+
+	public Button getZoomOutButton() {
+		return zoomOutButton;
 	}
 }

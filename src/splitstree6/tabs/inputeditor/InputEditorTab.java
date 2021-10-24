@@ -25,7 +25,10 @@ import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.window.NotificationManager;
-import jloda.util.*;
+import jloda.util.FileLineIterator;
+import jloda.util.FileUtils;
+import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.window.MainWindow;
@@ -58,12 +61,6 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 		var loader = new ExtendedFXMLLoader<InputEditorTabController>(this.getClass());
 		toolBarController = loader.getController();
 		toolBarPresenter = new InputEditorTabPresenter(mainWindow, this);
-
-		mainWindow.getWorkflow().validProperty().addListener((v, o, n) -> {
-			if (!n)
-				if (importException == null)
-					NotificationManager.showInformation("Import: created " + mainWindow.getWorkflow().getNumberOfNodes() + " of nodes in workflow");
-		});
 	}
 
 	public InputEditorTabController getToolBarController() {
@@ -110,7 +107,9 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 	public void importFromFile(String fileName) {
 		try (FileLineIterator it = new FileLineIterator(fileName)) {
 			replaceText(StringUtils.toString(it.lines(), "\n"));
-			setInputFileName((new File(fileName)).getName());
+			var name = FileUtils.getFileBaseName(fileName);
+			setInputFileName(name);
+			mainWindow.setName(name);
 		} catch (IOException ex) {
 			NotificationManager.showError("Import text failed: " + ex.getMessage());
 		}
@@ -147,8 +146,9 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 				NotificationManager.showError("Parse failed: " + exception.getMessage());
 			};
 			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler);
+			mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen();
 		} catch (Exception ex) {
-			NotificationManager.showError("Enter data failed: " + ex.getMessage());
+			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
 		}
 	}
 

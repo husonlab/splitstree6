@@ -24,6 +24,8 @@ import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
 public class DistancesBlock extends DataBlock {
+	public static final String BLOCK_NAME = "DISTANCES";
+
 	private double[][] distances;
 	private double[][] variances;
 	private String varType = "ols";
@@ -56,7 +58,6 @@ public class DistancesBlock extends DataBlock {
 	public void setNtax(int n) {
 		distances = new double[n][n];
 		variances = null;
-		setShortDescription(getInfo());
 	}
 
 	@Override
@@ -172,11 +173,6 @@ public class DistancesBlock extends DataBlock {
 	}
 
 	@Override
-	public String getInfo() {
-		return "a " + getNtax() + "x" + getNtax() + " distance matrix";
-	}
-
-	@Override
 	public DataTaxaFilter<DistancesBlock, DistancesBlock> createTaxaDataFilter() {
 		return new DistancesTaxaFilter(DistancesBlock.class, DistancesBlock.class);
 	}
@@ -188,5 +184,19 @@ public class DistancesBlock extends DataBlock {
 
 	public DistancesFormat getFormat() {
 		return format;
+	}
+
+	public void setFormat(DistancesFormat format) {
+		this.format = format;
+	}
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(String.format("a %,d x %,d distance matrix", getNtax(), getNtax()));
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
 	}
 }

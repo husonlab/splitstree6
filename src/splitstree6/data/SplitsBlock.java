@@ -60,11 +60,6 @@ public class SplitsBlock extends DataBlock {
 		copy(that);
 	}
 
-	@Override
-	public String getShortDescription() {
-		return getInfo();
-	}
-
 	/**
 	 * shallow copy
 	 */
@@ -172,7 +167,6 @@ public class SplitsBlock extends DataBlock {
 	/**
 	 * get the i-th split, 1-based
 	 *
-	 * @param i
 	 * @return i-th split
 	 */
 	public ASplit get(int i) {
@@ -223,11 +217,6 @@ public class SplitsBlock extends DataBlock {
 	}
 
 
-	@Override
-	public String getInfo() {
-		return getNsplits() + " splits" + (compatibility != Compatibility.unknown ? ", " + StringUtils.fromCamelCase(compatibility.toString()).toLowerCase() : "");
-	}
-
 	public int indexOf(ASplit split) {
 		for (int s = 1; s <= getNsplits(); s++) {
 			if (get(s).equals(split))
@@ -249,4 +238,21 @@ public class SplitsBlock extends DataBlock {
 	public SplitsFormat getFormat() {
 		return format;
 	}
+
+	public void setFormat(SplitsFormat format) {
+		this.format = format;
+	}
+
+	public static final String BLOCK_NAME = "SPLITS";
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(String.format("%,d splits", getNsplits()) + (compatibility != Compatibility.unknown ? ", " + StringUtils.fromCamelCase(compatibility.toString()).toLowerCase() : ""));
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
+	}
+
 }

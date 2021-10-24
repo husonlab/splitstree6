@@ -41,7 +41,7 @@ public class HKY85model extends NucleotideModel {
 	public HKY85model(double[] basefreqs, double TsTv) {
 		final double a = basefreqs[0] * basefreqs[2] + basefreqs[1] * basefreqs[3];
 		final double b = (basefreqs[0] * basefreqs[1] + basefreqs[0] * basefreqs[3])
-				+ (basefreqs[1] * basefreqs[2] + basefreqs[2] * basefreqs[3]);
+						 + (basefreqs[1] * basefreqs[2] + basefreqs[2] * basefreqs[3]);
 
 		/* We have the identity
 		 *    a * kappa =  TsTv * b

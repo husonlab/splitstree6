@@ -39,7 +39,7 @@ public class CharactersLoader extends DataLoader<SourceBlock, CharactersBlock> {
 		for (var reader : getReaders()) {
 			if (reader.accepts(file)) {
 				reader.read(progress, file, outputTaxa, outputBlock);
-				System.err.println("Loaded: Taxa: " + outputTaxa.getInfo() + " Characters: " + outputBlock.getInfo());
+				System.err.println("Loaded: Taxa: " + outputTaxa.getShortDescription() + " Characters: " + outputBlock.getShortDescription());
 				break;
 			}
 		}

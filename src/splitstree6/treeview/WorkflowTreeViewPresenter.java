@@ -28,18 +28,20 @@ import java.util.LinkedList;
 
 public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
-	private final WorkflowTreeView tab;
+	private final WorkflowTreeView treeView;
 
-	public WorkflowTreeViewPresenter(MainWindow mainWindow, WorkflowTreeView tab) {
+	public WorkflowTreeViewPresenter(MainWindow mainWindow, WorkflowTreeView treeView) {
 		this.mainWindow = mainWindow;
-		this.tab = tab;
+		this.treeView = treeView;
 
-		tab.getController().getWorkflowTreeView().setRoot(new WorkflowTreeItem(mainWindow));
+		treeView.getController().getWorkflowTreeView().setRoot(new WorkflowTreeItem(mainWindow));
+
+		new WorkflowTreeViewLayout(mainWindow, treeView);
 	}
 
 	public void setup() {
 		var controller = mainWindow.getController();
-		var tabController = tab.getController();
+		var tabController = treeView.getController();
 
 		controller.getCopyMenuItem().setOnAction(null);
 
@@ -78,6 +80,5 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		tabController.getShowButton().disableProperty().bind(Bindings.isEmpty(treeView.getSelectionModel().getSelectedItems()));
-
 	}
 }

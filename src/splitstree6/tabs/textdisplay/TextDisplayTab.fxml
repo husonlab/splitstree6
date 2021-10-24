@@ -35,7 +35,8 @@
                             <items>
                                 <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" layoutX="98.0" layoutY="11.0"
                                         maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0" text="Find">
+                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0" text="Find"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;">
                                     <font>
                                         <Font size="10.0"/>
                                     </font>
@@ -54,7 +55,8 @@
                                 <Button fx:id="findAndReplaceButton" contentDisplay="GRAPHIC_ONLY" layoutX="98.0"
                                         layoutY="11.0" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
                                         mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                                        text="Find and Replace">
+                                        text="Find and Replace"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;">
                                     <font>
                                         <Font size="10.0"/>
                                     </font>
@@ -73,7 +75,7 @@
                                 <ToggleButton fx:id="wrapTextToggle" contentDisplay="GRAPHIC_ONLY" layoutX="98.0"
                                               layoutY="11.0" maxHeight="18.0" maxWidth="18.0" minHeight="18.0"
                                               minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                                              selected="true" text="Wrap">
+                                              selected="true" text="Wrap" style="-fx-border-style: none;">
                                     <font>
                                         <Font size="10.0"/>
                                     </font>
@@ -92,7 +94,7 @@
                                 <ToggleButton fx:id="lineNumbersToggle" contentDisplay="GRAPHIC_ONLY" layoutX="98.0"
                                               layoutY="11.0" maxHeight="18.0" maxWidth="18.0" minHeight="18.0"
                                               minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                                              text="Line Numbers">
+                                              text="Line Numbers" style="-fx-border-style: none;">
                                     <font>
                                         <Font size="10.0"/>
                                     </font>

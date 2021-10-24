@@ -34,11 +34,6 @@ public class SourceBlock extends DataBlock {
 		return sources.size();
 	}
 
-	@Override
-	public String getInfo() {
-		return "Sources: " + sources.size();
-	}
-
 	public ObservableList<String> getSources() {
 		return sources;
 	}
@@ -57,4 +52,15 @@ public class SourceBlock extends DataBlock {
 		return (SourceBlock) super.newInstance();
 	}
 
+	public static final String BLOCK_NAME = "SOURCE";
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(size() == 1 ? "1 file" : String.format("%,d files", size()));
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
+	}
 }

@@ -21,23 +21,29 @@ package splitstree6.workflow;
 
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
+import jloda.fx.window.NotificationManager;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
+import splitstree6.algorithms.networks.network2sink.ShowNetworkConsole;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
 import splitstree6.algorithms.source.source2distances.DistancesLoader;
+import splitstree6.algorithms.source.source2network.NetworkLoader;
 import splitstree6.algorithms.source.source2splits.SplitsLoader;
 import splitstree6.algorithms.source.source2trees.TreesLoader;
 import splitstree6.algorithms.splits.splits2sink.ShowSplitsConsole;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
+import splitstree6.window.MainWindow;
 
 /**
  * methods for setting up different splitstree workflows
  * Daniel Huson, 10.2021
  */
 public class WorkflowSetup {
-	public static Workflow apply(String fileName) {
+	public static Workflow apply(String fileName, MainWindow mainWindow) {
+		var workflow = new Workflow();
+		workflow.setServiceConfigurator(s -> s.setProgressParentPane(mainWindow.getController().getBottomFlowPane()));
 		return apply(fileName, new Workflow(), null);
 	}
 
@@ -47,6 +53,10 @@ public class WorkflowSetup {
 		var sourceBlock = new SourceBlock();
 		sourceBlock.getSources().add(fileName);
 		var clazz = ImportManager.getInstance().determineInputType(fileName);
+		if (clazz == null) {
+			NotificationManager.showError("No suitable importer found");
+			return workflow;
+		}
 		if (clazz.equals(CharactersBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
 			var distancesNode = workflow.newDataNode(new DistancesBlock());
@@ -72,6 +82,11 @@ public class WorkflowSetup {
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new ConsensusNetwork(), workflow.getWorkingTaxaNode(), workflow.getInputDataNode(), splitsNode);
 			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new SinkBlock()));
+			// todo: replace by calculation of network
+		} else if (clazz.equals(NetworkBlock.class)) {
+			workflow.setupInputAndWorkingNodes(sourceBlock, new NetworkLoader(), new TaxaBlock(), new NetworkBlock());
+			var dataNode = workflow.getWorkingDataNode();
+			workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), dataNode, workflow.newDataNode(new SinkBlock()));
 			// todo: replace by calculation of network
 		}
 		/*

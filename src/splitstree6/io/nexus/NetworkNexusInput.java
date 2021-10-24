@@ -29,12 +29,8 @@ import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 
-
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * network block nexus input
@@ -81,11 +77,30 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		np.matchBeginBlock("NETWORK");
 		parseTitleAndLink(np);
 
-		np.matchIgnoreCase("dimensions nNodes=");
-		final int nNodes = np.getInt(0, Integer.MAX_VALUE);
-		np.matchIgnoreCase("nEdges=");
-		final int nEdges = np.getInt(0, Integer.MAX_VALUE);
+		np.matchIgnoreCase("dimensions");
+		final int nNodes;
+		final int nEdges;
+		if (np.peekMatchIgnoreCase("nTax=")) {
+			if (taxaBlock.getNtax() == 0) {
+				np.matchIgnoreCase("nTax=");
+				taxaBlock.setNtax(np.getInt());
+			} else {
+				np.matchIgnoreCase("nTax=" + taxaBlock.getNtax());
+			}
+			np.matchIgnoreCase("nVertices=");
+			nNodes = np.getInt(0, Integer.MAX_VALUE);
+			np.matchIgnoreCase("nEdges=");
+			nEdges = np.getInt(0, Integer.MAX_VALUE);
+			np.matchIgnoreCase(";");
+			return readSplitsTree4(np, nNodes, nEdges, taxaBlock, networkBlock);
+		} else {
+			np.matchIgnoreCase("nNodes=");
+			nNodes = np.getInt(0, Integer.MAX_VALUE);
+			np.matchIgnoreCase("nEdges=");
+			nEdges = np.getInt(0, Integer.MAX_VALUE);
+		}
 		np.matchIgnoreCase(";");
+
 
 		if (np.peekMatchIgnoreCase("TYPE")) {
 			np.matchIgnoreCase("TYPE=");
@@ -166,7 +181,6 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				if (!id2node.containsKey(sid))
 					throw new IOExceptionWithLineNumber("Unknown node id: " + sid, np.lineno());
 
-
 				np.matchIgnoreCase("tid=");
 				final int tid = np.getInt();
 				if (!id2node.containsKey(tid))
@@ -197,11 +211,113 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 	}
 
 	/**
-	 * is the parser at the beginning of a block that this class can parse?
-	 *
-	 * @return true, if can parse from here
+	 * reads in a network block in SplitsTree4 format
 	 */
-	public boolean atBeginOfBlock(NexusStreamParser np) {
-		return np.peekMatchIgnoreCase("begin NETWORK;");
+	private static List<String> readSplitsTree4(NexusStreamParser np, int nVertices, int nEdges, TaxaBlock taxaBlock, NetworkBlock networkBlock) throws IOException {
+		var taxonNamesFound = new ArrayList<String>();
+
+		var graph = networkBlock.getGraph();
+
+		if (np.peekMatchIgnoreCase("draw")) {
+			np.getWordsRespectCase("draw", ";");// skip draw
+		}
+
+		var nodeId2TaxonLabel = new HashMap<Integer, String>();
+
+		if (np.peekMatchIgnoreCase("translate")) {
+			np.matchIgnoreCase("translate");
+			while (!np.peekMatchIgnoreCase(";")) {
+				var id = np.getInt();
+				var label = np.getLabelRespectCase();
+
+				if (nodeId2TaxonLabel.containsKey(id))
+					throw new IOExceptionWithLineNumber("Repeated id", np.lineno());
+				nodeId2TaxonLabel.put(id, label);
+				if (taxaBlock.getLabels().size() == 0) {
+					taxonNamesFound.add(label);
+				}
+
+				while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
+					np.getWordRespectCase();
+				if (np.peekMatchIgnoreCase(","))
+					np.matchIgnoreCase(",");
+			}
+			np.matchIgnoreCase(";");
+		}
+
+		var nodeId2Node = new HashMap<Integer, Node>();
+		{
+			np.matchIgnoreCase("vertices");
+			for (int i = 1; i <= nVertices; i++) {
+				var v = graph.newNode();
+
+				var id = np.getInt();
+				if (nodeId2Node.containsKey(id))
+					throw new IOExceptionWithLineNumber("Repeated id", np.lineno());
+				var x = np.getDouble();
+				var y = np.getDouble();
+
+				networkBlock.getNodeData(v).put(NetworkBlock.NodeData.BasicKey.x.name(), String.valueOf(x));
+				networkBlock.getNodeData(v).put(NetworkBlock.NodeData.BasicKey.y.name(), String.valueOf(y));
+				nodeId2Node.put(id, v);
+				graph.setLabel(v, nodeId2TaxonLabel.get(id));
+
+				while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
+					np.getWordRespectCase();
+				if (np.peekMatchIgnoreCase(","))
+					np.matchIgnoreCase(",");
+			}
+			np.matchIgnoreCase(";");
+		}
+
+		if (np.peekMatchIgnoreCase("vLabels")) {
+			np.matchIgnoreCase("vLabels");
+			while (!np.peekMatchIgnoreCase(";")) {
+				var id = np.getInt();
+				var label = np.getLabelRespectCase();
+
+				var nodeData = networkBlock.getNodeData(nodeId2Node.get(id));
+				nodeData.put(NetworkBlock.NodeData.BasicKey.label.name(), label);
+
+				while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
+					np.getWordRespectCase();
+				if (np.peekMatchIgnoreCase(","))
+					np.matchIgnoreCase(",");
+			}
+			np.matchIgnoreCase(";");
+		}
+
+		{
+			np.matchIgnoreCase("EDGES");
+			var found = new BitSet();
+			for (var i = 0; i < nEdges; i++) {
+				var id = np.getInt();
+				if (found.get(id))
+					throw new IOExceptionWithLineNumber("Multiple occurrence of edge id: " + id, np.lineno());
+				else
+					found.set(id);
+
+				var vId = np.getInt();
+				var wId = np.getInt();
+				var e = graph.newEdge(nodeId2Node.get(vId), nodeId2Node.get(wId));
+
+				if (np.peekMatchIgnoreCase("s=")) {
+					np.matchIgnoreCase("s=");
+					networkBlock.getEdgeData(e).put("s", String.valueOf(np.getInt()));
+				}
+				if (np.peekMatchIgnoreCase("w=")) {
+					np.matchIgnoreCase("w=");
+					networkBlock.getEdgeData(e).put("w", String.valueOf(np.getDouble()));
+				}
+
+				while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
+					np.getWordRespectCase();
+				if (np.peekMatchIgnoreCase(","))
+					np.matchIgnoreCase(",");
+			}
+			np.matchIgnoreCase(";");
+		}
+		np.matchEndBlock();
+		return taxonNamesFound;
 	}
 }

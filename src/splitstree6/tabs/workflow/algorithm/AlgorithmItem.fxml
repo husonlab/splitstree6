@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  AlgorithmItem.fxml Copyright (C) 2021 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<AnchorPane fx:id="anchorPane" prefHeight="50.0" prefWidth="160.0" style="-fx-border-color: lightgray;"
+            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.tabs.workflow.algorithm.AlgorithmItemController">
+    <children>
+        <VBox spacing="5.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="0.0">
+            <children>
+                <BorderPane VBox.vgrow="NEVER">
+                    <left>
+                        <Label fx:id="nameLabel" minHeight="-Infinity" text="Algorithm" BorderPane.alignment="CENTER"/>
+                    </left>
+                    <right>
+                        <Pane fx:id="iconPane" maxHeight="16.0" maxWidth="16.0" minHeight="16.0" minWidth="16.0"
+                              prefHeight="16.0" prefWidth="16.0" BorderPane.alignment="CENTER"/>
+                    </right>
+                </BorderPane>
+                <BorderPane VBox.vgrow="NEVER">
+                    <left>
+                        <Button fx:id="editButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
+                                prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                text="Edit" BorderPane.alignment="CENTER">
+                            <font>
+                                <Font size="10.0"/>
+                            </font>
+                            <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image smooth="false" url="@/jloda/resources/icons/sun/Edit16.gif"/>
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="Configure this algorithm"/>
+                            </tooltip>
+                        </Button>
+                    </left>
+                    <right>
+                        <Button fx:id="playButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
+                                prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                text="Play" BorderPane.alignment="CENTER">
+                            <font>
+                                <Font size="10.0"/>
+                            </font>
+                            <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image smooth="false" url="@/jloda/resources/icons/sun/Play16.gif"/>
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="Run this algorithm"/>
+                            </tooltip>
+                        </Button>
+                    </right>
+                </BorderPane>
+            </children>
+            <padding>
+                <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
+            </padding>
+        </VBox>
+    </children>
+</AnchorPane>

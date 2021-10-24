@@ -407,7 +407,7 @@ public class AntiConsensusNetwork extends Trees2Splits {
 	 */
 	private boolean isBetter(SIN sin, Node u, SIN other, Node otherNode) {
 		return (sin.getSpanPercent() > other.getSpanPercent() || (sin.getSpanPercent() == other.getSpanPercent() && sin.getTotalWeight() > other.getTotalWeight()))
-				&& SetUtils.intersection(allBelow(u), allBelow(otherNode)).iterator().hasNext();
+			   && SetUtils.intersection(allBelow(u), allBelow(otherNode)).iterator().hasNext();
 	}
 
 	/**
@@ -455,8 +455,8 @@ public class AntiConsensusNetwork extends Trees2Splits {
 				if (!split1.equals(split2)) {
 					final BitSet incompatibilities2 = split2incompatibilities.get(split2.getSmallerPart());
 					if (BitSetUtils.contains(incompatibilities1, incompatibilities2) &&
-							((incompatibilities1.cardinality() > incompatibilities2.cardinality())
-									|| (incompatibilities1.cardinality() == incompatibilities2.cardinality() && ASplit.compare(split1, split2) == -1)))
+						((incompatibilities1.cardinality() > incompatibilities2.cardinality())
+						 || (incompatibilities1.cardinality() == incompatibilities2.cardinality() && ASplit.compare(split1, split2) == -1)))
 						graph.newEdge(v, split2nodeMap.get(split2.getSmallerPart()));
 				}
 			}

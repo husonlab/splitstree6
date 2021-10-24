@@ -85,16 +85,16 @@ public class ExtractMethodsText {
 
 		final Set<String> set = new HashSet<>(); // use this to avoid duplicate lines
 
-		buf.append(String.format(inputDataTemplate, workflow.getInputTaxaNode().getDataBlock().getInfo(), workflow.getInputDataNode().getDataBlock().getInfo()));
+		buf.append(String.format(inputDataTemplate, workflow.getInputTaxaNode().getDataBlock().getShortDescription(), workflow.getInputDataNode().getDataBlock().getShortDescription()));
 
 		var topTaxaBlock = workflow.getInputTaxonBlock();
 		var workingTaxaBlock = workflow.getWorkingTaxaBlock();
 		if (workingTaxaBlock != null && workingTaxaBlock.getNtax() < topTaxaBlock.getNtax()) {
 			int removed = (topTaxaBlock.getNtax() - workingTaxaBlock.getNtax());
 			if (removed == 1)
-				buf.append(String.format(taxonFilterTemplateOne, workflow.getWorkingTaxaBlock().getInfo(), workflow.getWorkingDataNode().getDataBlock().getInfo()));
+				buf.append(String.format(taxonFilterTemplateOne, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
 			else
-				buf.append(String.format(taxonFilterTemplate, removed, workflow.getWorkingTaxaBlock().getInfo(), workflow.getWorkingDataNode().getDataBlock().getInfo()));
+				buf.append(String.format(taxonFilterTemplate, removed, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
 		}
 		final var root = workflow.getWorkingDataNode();
 		if (root.isValid()) {
@@ -132,7 +132,7 @@ public class ExtractMethodsText {
 											var optionsReport = ExtractOptionsText.apply(algorithm);
 											String line;
 											if (targetNode != null) {
-												line = String.format(methodWithOutputTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "", targetNode.getDataBlock().getInfo());
+												line = String.format(methodWithOutputTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "", targetNode.getDataBlock().getShortDescription());
 											} else {
 												line = String.format(methodTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "");
 											}

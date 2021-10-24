@@ -47,7 +47,7 @@ public class K3ST extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
 		return "Kimura 1981; M. Kimura, Estimation of evolutionary sequences between homologous nucleotide sequences, " +
-				"Proc. Natl. Acad. Sci. USA 78 (1981) 454–45";
+			   "Proc. Natl. Acad. Sci. USA 78 (1981) 454–45";
 	}
 
 	public List<String> listOptions() {

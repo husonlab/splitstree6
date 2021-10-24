@@ -40,8 +40,8 @@ public class NeighborJoining extends Distances2Trees {
 	@Override
 	public String getCitation() {
 		return "Saitou and Nei 1987; " +
-				"N. Saitou and M. Nei. The Neighbor-Joining method: a new method for reconstructing phylogenetic trees. " +
-				"Molecular Biology and Evolution, 4:406-425, 1987.";
+			   "N. Saitou and M. Nei. The Neighbor-Joining method: a new method for reconstructing phylogenetic trees. " +
+			   "Molecular Biology and Evolution, 4:406-425, 1987.";
 	}
 
 	/**

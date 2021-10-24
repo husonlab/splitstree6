@@ -28,40 +28,40 @@ import java.util.TreeSet;
  * Daria Evseeva,30.10.2016.
  */
 public class MicrostatStateLabeler extends StateLabeler {
-    private final static int OFFSET = 256; //Offset for chars used to store microsattelite alleles (to avoid conflicts)
-    private final TreeSet<Character> charsUsed = new TreeSet<>(); //Set of characters used in microsatelite data.
+	private final static int OFFSET = 256; //Offset for chars used to store microsattelite alleles (to avoid conflicts)
+	private final TreeSet<Character> charsUsed = new TreeSet<>(); //Set of characters used in microsatelite data.
 
-    @Override
-    public char token2char(int site, String token) {
-        int val = Integer.parseInt(token);
-        char ch = (char) (val + OFFSET);
-        charsUsed.add(ch);
-        return ch;
-    }
+	@Override
+	public char token2char(int site, String token) {
+		int val = Integer.parseInt(token);
+		char ch = (char) (val + OFFSET);
+		charsUsed.add(ch);
+		return ch;
+	}
 
-    @Override
-    public String char2token(int site, char ch) {
-        return "" + (((int) ch - OFFSET));
-    }
+	@Override
+	public String char2token(int site, char ch) {
+		return "" + (((int) ch - OFFSET));
+	}
 
-    @Override
-    public int getMaximumLabelLength() {
-        Character ch = charsUsed.last();
-        Integer maxVal = (int) ch;
-        return (maxVal.toString()).length();
-    }
+	@Override
+	public int getMaximumLabelLength() {
+		Character ch = charsUsed.last();
+		Integer maxVal = (int) ch;
+		return (maxVal.toString()).length();
+	}
 
-    @Override
-    public String getSymbolsUsed() {
-        StringBuilder symbols = new StringBuilder();
-        for (Object aCharsUsed : charsUsed) {
-            symbols.append(((Character) aCharsUsed).charValue());
-        }
-        return symbols.toString();
-    }
+	@Override
+	public String getSymbolsUsed() {
+		StringBuilder symbols = new StringBuilder();
+		for (Object aCharsUsed : charsUsed) {
+			symbols.append(((Character) aCharsUsed).charValue());
+		}
+		return symbols.toString();
+	}
 
-    @Override
-    public boolean hasStates(int pos) {
-        return false;
-    }
+	@Override
+	public boolean hasStates(int pos) {
+		return false;
+	}
 }

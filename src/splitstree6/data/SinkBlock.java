@@ -36,11 +36,6 @@ public class SinkBlock extends DataBlock {
 		return isSinkSet() ? 1 : 0;
 	}
 
-	@Override
-	public String getInfo() {
-		return (isSinkSet() ? getSink() : " not set");
-	}
-
 	public String getSink() {
 		return sink.get();
 	}
@@ -70,4 +65,17 @@ public class SinkBlock extends DataBlock {
 	public SinkBlock newInstance() {
 		return (SinkBlock) super.newInstance();
 	}
+
+	public static final String BLOCK_NAME = "SINK";
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(isSinkSet() ? "set" : "not set");
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
+	}
+
 }

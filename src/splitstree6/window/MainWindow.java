@@ -36,10 +36,8 @@ import jloda.util.ProgramProperties;
 import splitstree6.data.parts.Taxon;
 import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
-import splitstree6.tabs.algorithms.taxa.TaxaFilterTab;
 import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.tabs.workflow.WorkflowTab;
-import splitstree6.window.presenter.MainWindowPresenter;
 import splitstree6.workflow.Workflow;
 
 public class MainWindow implements IMainWindow {
@@ -47,6 +45,10 @@ public class MainWindow implements IMainWindow {
 	private MainWindowPresenter presenter;
 	private final MainWindowController controller;
 	private final Workflow workflow = new Workflow();
+
+	private final TextTabsManager textTabsManager;
+	private final AlgorithmTabsManager algorithmTabsManager;
+
 	private final SelectionModel<Taxon> selectionModel = new SetSelectionModel<>();
 	private final BooleanProperty dirty = new SimpleBooleanProperty(false);
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
@@ -60,11 +62,11 @@ public class MainWindow implements IMainWindow {
 	public MainWindow() {
 		Platform.setImplicitExit(false);
 
-		{
-			final ExtendedFXMLLoader<MainWindowController> extendedFXMLLoader = new ExtendedFXMLLoader<>(this.getClass());
-			root = extendedFXMLLoader.getRoot();
-			controller = extendedFXMLLoader.getController();
-		}
+		final ExtendedFXMLLoader<MainWindowController> loader = new ExtendedFXMLLoader<>(this.getClass());
+		root = loader.getRoot();
+		controller = loader.getController();
+
+		workflow.setServiceConfigurator(s -> s.setProgressParentPane(controller.getBottomFlowPane()));
 
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
@@ -80,6 +82,9 @@ public class MainWindow implements IMainWindow {
 		workflowTab = new WorkflowTab(this);
 		methodsTab = new TextDisplayTab(this, "Methods", false, false);
 		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? "" : ExtractMethodsText.getInstance().apply(workflow)));
+
+		textTabsManager = new TextTabsManager(this);
+		algorithmTabsManager = new AlgorithmTabsManager(this);
 	}
 
 	@Override
@@ -111,8 +116,6 @@ public class MainWindow implements IMainWindow {
 		stage.titleProperty().addListener((e) -> MainWindowManager.getInstance().fireChanged());
 
 		presenter = new MainWindowPresenter(this);
-
-		getController().getAlgorithmTabPane().getTabs().add(new TaxaFilterTab(this));
 
 		getController().getMainTabPane().getTabs().addAll(workflowTab, methodsTab);
 
@@ -212,6 +215,13 @@ public class MainWindow implements IMainWindow {
 
 	public void addTabToMainTabPane(Tab tab) {
 		controller.getMainTabPane().getTabs().add(tab);
+	}
 
+	public TextTabsManager getTextTabsManager() {
+		return textTabsManager;
+	}
+
+	public AlgorithmTabsManager getAlgorithmTabsManager() {
+		return algorithmTabsManager;
 	}
 }

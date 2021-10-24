@@ -42,11 +42,7 @@ public class ImportManager {
 	}
 
 	private ImportManager() {
-		readers.addAll(PluginClassLoader.getInstances(DataReaderBase.class,
-				"splitstree6.io.readers.characters",
-				"splitstree6.io.readers.distances",
-				"splitstree6.io.readers.splits",
-				"splitstree6.io.readers.trees"));
+		readers.addAll(PluginClassLoader.getInstances(DataReaderBase.class, "splitstree6.io.readers"));
 		for (var reader : readers)
 			extensions.addAll(reader.getFileExtensions());
 	}

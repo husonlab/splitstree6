@@ -249,9 +249,4 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			}
 		}
 	}
-
-	@Override
-	public boolean atBeginOfBlock(NexusStreamParser np) {
-		return np.peekMatchIgnoreCase("begin TREES;");
-	}
 }

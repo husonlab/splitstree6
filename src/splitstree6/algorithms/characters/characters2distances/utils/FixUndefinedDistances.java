@@ -47,8 +47,8 @@ public class FixUndefinedDistances {
 			}
 		if (numUndefined > 0)
 			NotificationManager.showWarning("Distance matrix contains " + numUndefined + " undefined " +
-					"distances. These have been arbitrarily set to 2 times the maximum" +
-					" defined distance (= " + (2.0 * maxDist) + ").");
+											"distances. These have been arbitrarily set to 2 times the maximum" +
+											" defined distance (= " + (2.0 * maxDist) + ").");
 
 	}
 }

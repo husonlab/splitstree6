@@ -37,7 +37,7 @@ import java.util.Map;
  * Daniel Huson, 2.2018
  */
 public class AlgorithmNexusInput extends NexusIOBase {
-    public static final String SYNTAX = """
+	public static final String SYNTAX = """
 			BEGIN ALGORITHM;
 				[TITLE <title>;]
 				[LINK <parent-block-type> = <parent-title>;]
@@ -47,120 +47,120 @@ public class AlgorithmNexusInput extends NexusIOBase {
 			END;
 			""";
 
-    /**
-     * get syntax
-     */
-    public String getSyntax() {
-        return SYNTAX;
-    }
+	/**
+	 * get syntax
+	 */
+	public String getSyntax() {
+		return SYNTAX;
+	}
 
-    /**
-     * parse and create an algorithm
-     *
-     * @param np
-     * @throws IOException
-     */
-    public Algorithm parse(NexusStreamParser np) throws IOException {
-        np.matchBeginBlock("ALGORITHM");
-        parseTitleAndLink(np);
+	/**
+	 * parse and create an algorithm
+	 *
+	 * @param np
+	 * @throws IOException
+	 */
+	public Algorithm parse(NexusStreamParser np) throws IOException {
+		np.matchBeginBlock("ALGORITHM");
+		parseTitleAndLink(np);
 
-        np.matchIgnoreCase("ALGORITHM");
-        final String algorithmName = np.getWordRespectCase();
-        np.matchIgnoreCase(";");
+		np.matchIgnoreCase("ALGORITHM");
+		final String algorithmName = np.getWordRespectCase();
+		np.matchIgnoreCase(";");
 
-        final Algorithm algorithm = createAlgorithmFromName(algorithmName);
-        if (algorithm == null)
-            throw new IOExceptionWithLineNumber("Unknown algorithm: " + algorithmName, np.lineno());
+		final Algorithm algorithm = createAlgorithmFromName(algorithmName);
+		if (algorithm == null)
+			throw new IOExceptionWithLineNumber("Unknown algorithm: " + algorithmName, np.lineno());
 
-        if (np.peekMatchIgnoreCase("OPTIONS")) {
-            np.matchIgnoreCase("OPTIONS");
+		if (np.peekMatchIgnoreCase("OPTIONS")) {
+			np.matchIgnoreCase("OPTIONS");
 
-            if (!np.peekMatchIgnoreCase(";")) {
-                final ArrayList<Option> optionsNext = new ArrayList<>(Option.getAllOptions(algorithm));
-                if (optionsNext.size() > 0) {
-                    final Map<String, Option> legalOptions = new HashMap<>();
-                    for (Option option : optionsNext) {
-                        legalOptions.put(option.getName(), option);
-                    }
-                    while (true) {
-                        final String name = np.getWordRespectCase();
-                        np.matchIgnoreCase("=");
-                        final Option option = legalOptions.get(name);
-                        if (option != null) {
-                            final OptionValueType type = option.getOptionValueType();
-                            switch (type) {
-                                case doubleArray: {
-                                    final double[] array = (double[]) option.getProperty().getValue();
-                                    for (int i = 0; i < array.length; i++) {
-                                        array[i] = np.getDouble();
-                                    }
-                                    break;
-                                }
-                                case doubleSquareMatrix: {
-                                    final double[][] matrix = (double[][]) option.getProperty().getValue();
-                                    for (int i = 0; i < matrix.length; i++) {
-                                        for (int j = 0; j < matrix.length; j++)
-                                            matrix[i][j] = np.getDouble();
-                                    }
-                                    break;
-                                }
-                                case Enum: {
-                                    option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
-                                    break;
-                                }
-                                case stringArray: {
-                                    final ArrayList<String> list = new ArrayList<>();
-                                    while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
-                                        list.add(np.getWordRespectCase());
-                                    option.getProperty().setValue(list.toArray(new String[0]));
-                                    break;
-                                }
-                                default: {
-                                    option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
-                                    break;
-                                }
-                            }
+			if (!np.peekMatchIgnoreCase(";")) {
+				final ArrayList<Option> optionsNext = new ArrayList<>(Option.getAllOptions(algorithm));
+				if (optionsNext.size() > 0) {
+					final Map<String, Option> legalOptions = new HashMap<>();
+					for (Option option : optionsNext) {
+						legalOptions.put(option.getName(), option);
+					}
+					while (true) {
+						final String name = np.getWordRespectCase();
+						np.matchIgnoreCase("=");
+						final Option option = legalOptions.get(name);
+						if (option != null) {
+							final OptionValueType type = option.getOptionValueType();
+							switch (type) {
+								case doubleArray: {
+									final double[] array = (double[]) option.getProperty().getValue();
+									for (int i = 0; i < array.length; i++) {
+										array[i] = np.getDouble();
+									}
+									break;
+								}
+								case doubleSquareMatrix: {
+									final double[][] matrix = (double[][]) option.getProperty().getValue();
+									for (int i = 0; i < matrix.length; i++) {
+										for (int j = 0; j < matrix.length; j++)
+											matrix[i][j] = np.getDouble();
+									}
+									break;
+								}
+								case Enum: {
+									option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
+									break;
+								}
+								case stringArray: {
+									final ArrayList<String> list = new ArrayList<>();
+									while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
+										list.add(np.getWordRespectCase());
+									option.getProperty().setValue(list.toArray(new String[0]));
+									break;
+								}
+								default: {
+									option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
+									break;
+								}
+							}
 
-                        } else {
+						} else {
 
-                            final StringBuilder buf = new StringBuilder();
-                            while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
-                                buf.append(" ").append(np.getWordRespectCase());
-                            System.err.println("WARNING: skipped unknown option for algorithm '" + algorithmName + "': '" + name + "=" + buf.toString() + "' in line " + np.lineno());
+							final StringBuilder buf = new StringBuilder();
+							while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
+								buf.append(" ").append(np.getWordRespectCase());
+							System.err.println("WARNING: skipped unknown option for algorithm '" + algorithmName + "': '" + name + "=" + buf.toString() + "' in line " + np.lineno());
 
-                        }
-                        if (np.peekMatchIgnoreCase(";"))
-                            break; // finished reading options
-                        else
-                            np.matchIgnoreCase(",");
-                    }
-                }
-            }
-            np.matchIgnoreCase(";");
-        }
-        np.matchEndBlock();
-        return algorithm;
-    }
+						}
+						if (np.peekMatchIgnoreCase(";"))
+							break; // finished reading options
+						else
+							np.matchIgnoreCase(",");
+					}
+				}
+			}
+			np.matchIgnoreCase(";");
+		}
+		np.matchEndBlock();
+		return algorithm;
+	}
 
-    /**
-     * creates an instance of the named algorithm
-     *
-     * @return instance or null
-     */
-    public static Algorithm createAlgorithmFromName(String algorithmName) {
-        var algorithms = PluginClassLoader.getInstances(algorithmName, Algorithm.class, null, "splitstree6.algorithms");
-        if (algorithms.size() == 1)
-            return algorithms.get(0);
-        else
-            return null;
-    }
+	/**
+	 * creates an instance of the named algorithm
+	 *
+	 * @return instance or null
+	 */
+	public static Algorithm createAlgorithmFromName(String algorithmName) {
+		var algorithms = PluginClassLoader.getInstances(algorithmName, Algorithm.class, null, "splitstree6.algorithms");
+		if (algorithms.size() == 1)
+			return algorithms.get(0);
+		else
+			return null;
+	}
 
-    /**
-     * is the parser at the beginning of a block that this class can parse?
-     *
-     * @return true, if can parse from here
-     */
-    public boolean atBeginOfBlock(NexusStreamParser np) {
-        return np.peekMatchIgnoreCase("begin ALGORITHM;");
-    }
+	/**
+	 * is the parser at the beginning of a block that this class can parse?
+	 *
+	 * @return true, if can parse from here
+	 */
+	public boolean atBeginOfBlock(NexusStreamParser np) {
+		return np.peekMatchIgnoreCase("begin ALGORITHM;");
+	}
 }

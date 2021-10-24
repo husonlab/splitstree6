@@ -245,7 +245,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 		Set<Node> active = new HashSet<>();
 		for (Node v : graph.nodes()) {
 			if (v.getDegree() < maxDegree
-					|| (maxDegree <= maxDegreeHeuristicThreshold && hasDegreeDButNotInClique(maxDegree + 1, graph, v)))
+				|| (maxDegree <= maxDegreeHeuristicThreshold && hasDegreeDButNotInClique(maxDegree + 1, graph, v)))
 				active.add(v);
 		}
 

@@ -21,8 +21,8 @@ package splitstree6.algorithms.taxa.taxa2taxa;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.util.progress.ProgressListener;
 import jloda.util.StringUtils;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -63,14 +63,19 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 		return Arrays.asList(getOptionDisabledTaxa()).contains(name);
 	}
 
+
 	public void setDisabled(String name, boolean state) {
-		if (state && !isDisabled(name)) {
-			var disabled = new ArrayList<>(Arrays.asList(getOptionDisabledTaxa()));
-			disabled.add(name);
+		setDisabled(Collections.singleton(name), state);
+	}
+
+	public void setDisabled(Collection<? extends String> names, boolean state) {
+		if (state) {
+			var disabled = new TreeSet<>(Arrays.asList(getOptionDisabledTaxa()));
+			disabled.addAll(names);
 			setOptionDisabledTaxa(disabled.toArray(new String[0]));
-		} else if (!state && isDisabled(name)) {
-			var disabled = new ArrayList<>(Arrays.asList(getOptionDisabledTaxa()));
-			disabled.remove(name);
+		} else {
+			var disabled = new TreeSet<>(Arrays.asList(getOptionDisabledTaxa()));
+			disabled.removeAll(names);
 			setOptionDisabledTaxa(disabled.toArray(new String[0]));
 		}
 	}
@@ -101,5 +106,10 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 	@Override
 	public boolean isActive() {
 		return true;
+	}
+
+	@Override
+	public void reset() {
+		optionDisabledTaxa.set(new String[0]);
 	}
 }

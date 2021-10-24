@@ -26,17 +26,33 @@ package splitstree6.workflow;
  * @param <S> the data block type
  */
 public class DataNode<S extends DataBlock> extends jloda.fx.workflow.DataNode {
-	public DataNode(Workflow workflow) {
+
+	DataNode(Workflow workflow) {
 		super(workflow);
 
 		validProperty().addListener((v, o, n) -> {
 			if (!n && getDataBlock() != null)
 				getDataBlock().clear();
 		});
+
+		dataBlockProperty().addListener((v, o, n) -> {
+			if (n != null)
+				shortDescriptionProperty().bind(n.shortDescriptionProperty());
+			else
+				shortDescriptionProperty().unbind();
+		});
 	}
 
 	@Override
 	public S getDataBlock() {
 		return (S) super.getDataBlock();
+	}
+
+	public AlgorithmNode getPreferredParent() {
+		for (var p : getParents()) {
+			if (p instanceof AlgorithmNode algorithmNode)
+				return algorithmNode;
+		}
+		return null;
 	}
 }

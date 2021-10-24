@@ -46,7 +46,6 @@ public class RunMedianJoining extends Application {
 			var networkNode = workflow.newDataNode(new NetworkBlock());
 			workflow.newAlgorithmNode(new MedianJoining(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
 			var show = new ShowNetworkConsole();
-			show.setOptionShowAllDetails(true);
 			workflow.newAlgorithmNode(show, workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new SinkBlock()));
 		}
 

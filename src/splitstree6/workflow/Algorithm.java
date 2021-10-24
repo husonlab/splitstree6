@@ -22,6 +22,7 @@ package splitstree6.workflow;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.data.TaxaBlock;
+import splitstree6.methods.Option;
 import splitstree6.workflow.interfaces.HasFromClass;
 import splitstree6.workflow.interfaces.HasToClass;
 
@@ -97,5 +98,21 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	}
 
 	public void clear() {
+	}
+
+	public String toString() {
+		return getName();
+	}
+
+	public void reset() {
+		try {
+			var allOptions = Option.getAllOptions(this);
+			var instance = this.getClass().getConstructor().newInstance();
+			for (var defaultOption : Option.getAllOptions(instance)) {
+				var option = allOptions.stream().filter(o -> o.getName().equals(defaultOption.getName())).findFirst();
+				option.ifPresent(value -> value.getProperty().setValue(defaultOption.getProperty().getValue()));
+			}
+		} catch (Exception ignored) {
+		}
 	}
 }

@@ -31,6 +31,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CharactersBlock extends DataBlock {
+	public static final String BLOCK_NAME = "CHARACTERS";
+
 	// characters matrix
 	private char[][] matrix;
 
@@ -94,7 +96,6 @@ public class CharactersBlock extends DataBlock {
 
 	public void setDimension(int ntax, int nchar) {
 		matrix = new char[ntax][nchar];
-		setShortDescription(getInfo());
 	}
 
 	/**
@@ -189,8 +190,6 @@ public class CharactersBlock extends DataBlock {
 			setMissingCharacter('x');
 		else
 			setMissingCharacter('?');
-
-		setShortDescription(getInfo());
 	}
 
 	public boolean isDiploid() {
@@ -332,10 +331,6 @@ public class CharactersBlock extends DataBlock {
 
 	/**
 	 * make a shallow copy of a row
-	 *
-	 * @param parent
-	 * @param parentIndex
-	 * @param targetIndex
 	 */
 	public void copyRow(CharactersBlock parent, int parentIndex, int targetIndex) {
 		matrix[targetIndex - 1] = parent.matrix[parentIndex - 1];
@@ -350,8 +345,8 @@ public class CharactersBlock extends DataBlock {
 	public char[] getRow1(int t) {
 		if (t == 0)
 			throw new IllegalArgumentException("" + t);
-		final char[] src = matrix[t - 1];
-		final char[] dest = new char[src.length + 1];
+		final var src = matrix[t - 1];
+		final var dest = new char[src.length + 1];
 		System.arraycopy(src, 0, dest, 1, src.length);
 		return dest;
 	}
@@ -367,13 +362,6 @@ public class CharactersBlock extends DataBlock {
 		return matrix[t];
 	}
 
-	@Override
-	public String getInfo() {
-		if (getDataType().equals(CharactersType.Unknown))
-			return getNtax() + " character sequences of length " + getNchar();
-		else
-			return getNtax() + " " + getDataType().toString() + " character sequences of length " + getNchar();
-	}
 
 	/**
 	 * "On demand" ambiguity check.
@@ -407,5 +395,18 @@ public class CharactersBlock extends DataBlock {
 
 	public void setFormat(CharactersFormat format) {
 		this.format = format;
+	}
+
+	@Override
+	public void updateShortDescription() {
+		if (getDataType().equals(CharactersType.Unknown))
+			setShortDescription(String.format("%,d character sequences of length %,d", getNtax(), getNchar()));
+		else
+			setShortDescription(String.format("%,d %s sequences of length %,d", getNtax(), getDataType().toString(), getNchar()));
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
 	}
 }

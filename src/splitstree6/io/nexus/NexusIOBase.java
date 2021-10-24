@@ -32,60 +32,60 @@ import java.io.Writer;
  * Daniel Huson, 3.2018
  */
 public class NexusIOBase {
-    private String title;
-    private Pair<String, String> link;
+	private String title;
+	private Pair<String, String> link;
 
-    /**
-     * write the block title and link, if set
-     */
-    public void writeTitleAndLink(Writer w) throws IOException {
-        if (getTitle() != null && getTitle().length() > 0) {
-            w.write("TITLE " + getTitle() + ";\n");
-            if (getLink() != null)
-                w.write("LINK " + getLink().getFirst() + " = " + getLink().getSecond() + ";\n");
-        }
-    }
+	/**
+	 * write the block title and link, if set
+	 */
+	public void writeTitleAndLink(Writer w) throws IOException {
+		if (getTitle() != null && getTitle().length() > 0) {
+			w.write("TITLE " + getTitle() + ";\n");
+			if (getLink() != null)
+				w.write("LINK " + getLink().getFirst() + " = " + getLink().getSecond() + ";\n");
+		}
+	}
 
-    /**
-     * parse the title and link, if present
-     */
-    public void parseTitleAndLink(NexusStreamParser np) throws IOExceptionWithLineNumber {
-        setTitle(null);
-        setLink(null);
+	/**
+	 * parse the title and link, if present
+	 */
+	public void parseTitleAndLink(NexusStreamParser np) throws IOExceptionWithLineNumber {
+		setTitle(null);
+		setLink(null);
 
-        if (np.peekMatchIgnoreCase("TITLE")) {
-            np.matchIgnoreCase("TITLE");
-            setTitle(np.getWordRespectCase());
-            np.matchIgnoreCase(";");
-            if (np.peekMatchIgnoreCase("LINK")) {
-                np.matchIgnoreCase("LINK");
-                final String parentType = np.getWordRespectCase();
-                np.matchIgnoreCase("=");
-                final String parentTitle = np.getWordRespectCase();
-                setLink(new Pair<>(parentType, parentTitle));
-                np.matchIgnoreCase(";");
-            }
-        }
-    }
+		if (np.peekMatchIgnoreCase("TITLE")) {
+			np.matchIgnoreCase("TITLE");
+			setTitle(np.getWordRespectCase());
+			np.matchIgnoreCase(";");
+			if (np.peekMatchIgnoreCase("LINK")) {
+				np.matchIgnoreCase("LINK");
+				final String parentType = np.getWordRespectCase();
+				np.matchIgnoreCase("=");
+				final String parentTitle = np.getWordRespectCase();
+				setLink(new Pair<>(parentType, parentTitle));
+				np.matchIgnoreCase(";");
+			}
+		}
+	}
 
-    public String getTitle() {
-        return title;
-    }
+	public String getTitle() {
+		return title;
+	}
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public Pair<String, String> getLink() {
-        return link;
-    }
+	public Pair<String, String> getLink() {
+		return link;
+	}
 
-    public void setLink(Pair<String, String> link) {
-        this.link = link;
-    }
+	public void setLink(Pair<String, String> link) {
+		this.link = link;
+	}
 
-    public void setTitleAndLink(String title, Pair<String, String> link) {
-        this.title = title;
-        this.link = link;
-    }
+	public void setTitleAndLink(String title, Pair<String, String> link) {
+		this.title = title;
+		this.link = link;
+	}
 }

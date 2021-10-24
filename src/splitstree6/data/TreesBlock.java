@@ -20,7 +20,6 @@
 package splitstree6.data;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import jloda.phylo.PhyloTree;
 import splitstree6.algorithms.trees.trees2trees.TreesTaxaFilter;
@@ -36,7 +35,6 @@ public class TreesBlock extends DataBlock {
 
 	public TreesBlock() {
 		trees = FXCollections.observableArrayList();
-		trees.addListener((ListChangeListener<? super PhyloTree>) c -> setShortDescription(getInfo()));
 	}
 
 	/**
@@ -110,17 +108,6 @@ public class TreesBlock extends DataBlock {
 	}
 
 	@Override
-	public String getShortDescription() {
-		return "Number of trees: " + getTrees().size();
-	}
-
-
-	@Override
-	public String getInfo() {
-		return (getNTrees() == 1 ? "one tree" : getNTrees() + " trees") + (isPartial() ? ", partial" : "");
-	}
-
-	@Override
 	public TreesBlock newInstance() {
 		return (TreesBlock) super.newInstance();
 	}
@@ -128,4 +115,21 @@ public class TreesBlock extends DataBlock {
 	public TreesFormat getFormat() {
 		return format;
 	}
+
+	public void setFormat(TreesFormat format) {
+		this.format = format;
+	}
+
+	public static final String BLOCK_NAME = "TREES";
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription((getNTrees() == 1 ? "one tree" : String.format("%,d trees", getNTrees())) + (isPartial() ? ", partial" : ""));
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
+	}
+
 }

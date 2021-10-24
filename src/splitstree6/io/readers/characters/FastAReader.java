@@ -21,7 +21,9 @@ package splitstree6.io.readers.characters;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.util.*;
+import jloda.util.FileLineIterator;
+import jloda.util.FileUtils;
+import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
@@ -91,7 +93,7 @@ public class FastAReader extends CharactersReader {
 
 					if (nchar != 0 && nchar != currentSequenceLength)
 						throw new IOExceptionWithLineNumber("Sequences must be the same length. " +
-								"Wrong number of chars, Length " + nchar + " expected", counter - 1);
+															"Wrong number of chars, Length " + nchar + " expected", counter - 1);
 
 					if (!currentSequence.toString().equals("")) matrix.add(currentSequence.toString());
 					nchar = currentSequenceLength;

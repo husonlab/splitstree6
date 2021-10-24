@@ -30,11 +30,11 @@ import javafx.concurrent.Worker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.workflow.WorkflowNode;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -44,16 +44,20 @@ import splitstree6.workflow.DataNode;
  * Daniel Huson, 10.21
  */
 public class WorkflowTreeItem extends TreeItem<String> {
+	private final MainWindow mainWindow;
+	private final WorkflowNode workflowNode;
 	private final Tooltip tooltip = new Tooltip();
 	private final BooleanProperty disable = new SimpleBooleanProperty();
 	private final ChangeListener<Worker.State> stateChangeListener;
 
 	public WorkflowTreeItem(MainWindow mainWindow) {
-		final Label label = new Label();
+		super("");
+		this.mainWindow = mainWindow;
+		workflowNode = null;
+		Label label = new Label();
 		label.textProperty().bind(mainWindow.nameProperty());
+		label.setGraphic(ResourceManagerFX.getIconAsImageView("Document16.gif", 16));
 		setGraphic(label);
-		label.setGraphic(ResourceManagerFX.getIconAsImageView("sun/War16.gif", 16));
-		setValue("");
 
 		label.setOnMouseClicked(e -> {
 			if (mainWindow.isEmpty() && e.getClickCount() == 2) {
@@ -65,8 +69,12 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		stateChangeListener = null;
 	}
 
-	public WorkflowTreeItem(AlgorithmNode node) {
-		final Label label = new Label();
+	public WorkflowTreeItem(MainWindow mainWindow, AlgorithmNode node) {
+		super("");
+		this.mainWindow = mainWindow;
+		workflowNode = node;
+
+		final var label = new Label();
 		setGraphic(label);
 
 		label.textProperty().bind(node.nameProperty());
@@ -75,9 +83,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		tooltip.textProperty().bind(node.shortDescriptionProperty());
 		Tooltip.install(getGraphic(), new Tooltip(node.getShortDescription()));
 
-		final Image icon = ResourceManagerFX.getIcon(node.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif");
-
-		final ImageView imageView = new ImageView(icon);
+		final var imageView = ResourceManagerFX.getIconAsImageView(node.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16);
 		var rotateTransition = new RotateTransition(Duration.millis(1000), imageView);
 		rotateTransition.setByAngle(360);
 		rotateTransition.setCycleCount(Animation.INDEFINITE);
@@ -123,11 +129,21 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		});
 	}
 
-	public WorkflowTreeItem(DataNode node) {
+	public WorkflowTreeItem(MainWindow mainWindow, DataNode node) {
+		super("");
+		this.mainWindow = mainWindow;
+		workflowNode = node;
+
 		final Label label = new Label();
 		setGraphic(label);
 
 		label.textProperty().bind(node.nameProperty());
+
+		var icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").
+													 replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
+		if (icon != null) {
+			label.setGraphic(new ImageView(icon));
+		}
 
 		disable.bind(node.validProperty().not());
 		tooltip.textProperty().bind(node.shortDescriptionProperty());
@@ -154,7 +170,13 @@ public class WorkflowTreeItem extends TreeItem<String> {
 	 * show the view for this node
 	 */
 	public void showView() {
-		System.err.println("Not implemented");
+		if (workflowNode instanceof DataNode)
+			mainWindow.getTextTabsManager().showTab(workflowNode, true);
+		else if (workflowNode instanceof AlgorithmNode algorithmNode)
+			mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 	}
 
+	public String toString() {
+		return ((Label) getGraphic()).getText();
+	}
 }

@@ -19,40 +19,23 @@
 
 package splitstree6.algorithms.networks.network2sink;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.SinkBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.io.writers.network.TGFWriter;
+import splitstree6.io.nexus.NetworkNexusOutput;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
 public class ShowNetworkConsole extends Network2Sink {
-	private final BooleanProperty optionShowAllDetails = new SimpleBooleanProperty(false);
-
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock inputData, SinkBlock outputData) throws IOException {
 		try (var w = new StringWriter()) {
 			w.write(inputData.getName() + ":\n");
-			var writer = new TGFWriter();
-			writer.setOptionShowAllDetails(isOptionShowAllDetails());
+			var writer = new NetworkNexusOutput();
 			writer.write(w, taxaBlock, inputData);
 			System.out.println(w);
 		}
-	}
-
-	public boolean isOptionShowAllDetails() {
-		return optionShowAllDetails.get();
-	}
-
-	public BooleanProperty optionShowAllDetailsProperty() {
-		return optionShowAllDetails;
-	}
-
-	public void setOptionShowAllDetails(boolean optionShowAllDetails) {
-		this.optionShowAllDetails.set(optionShowAllDetails);
 	}
 }

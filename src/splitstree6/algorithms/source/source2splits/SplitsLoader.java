@@ -39,7 +39,7 @@ public class SplitsLoader extends DataLoader<SourceBlock, SplitsBlock> {
 		for (var reader : getReaders()) {
 			if (reader.accepts(file)) {
 				reader.read(progress, file, outputTaxa, outputBlock);
-				System.err.println("Loaded: Taxa: " + outputTaxa.getInfo() + " Splits: " + outputBlock.getInfo());
+				System.err.println("Loaded: Taxa: " + outputTaxa.getShortDescription() + " Splits: " + outputBlock.getShortDescription());
 				break;
 			}
 		}

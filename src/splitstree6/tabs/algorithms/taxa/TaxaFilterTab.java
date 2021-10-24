@@ -19,63 +19,37 @@
 
 package splitstree6.tabs.algorithms.taxa;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.Node;
-import javafx.scene.control.Tab;
-import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import splitstree6.data.TaxaBlock;
 import splitstree6.tabs.IDisplayTab;
-import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.tabs.algorithms.AlgorithmTab;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.AlgorithmNode;
 
-public class TaxaFilterTab extends Tab implements IDisplayTab {
-	private final TaxaFilterController controller;
-	private final TaxaFilterPresenter presenter;
+public class TaxaFilterTab extends AlgorithmTab implements IDisplayTab {
 
-	private final UndoManager undoManager = new UndoManager();
-	private final MainWindow mainWindow;
-	private final BooleanProperty empty = new SimpleBooleanProperty(true);
+	private final TaxaFilterController taxaFilterController;
+	private final TaxaFilterPresenter taxaFilterPresenter;
+
 
 	/**
 	 * constructor
 	 */
-	public TaxaFilterTab(MainWindow mainWindow) {
-		this.mainWindow = mainWindow;
-		presenter = new TaxaFilterPresenter(mainWindow, this);
-
-		var extendedFXMLLoader = new ExtendedFXMLLoader<TaxaFilterController>(this.getClass());
-		controller = extendedFXMLLoader.getController();
-
-		//empty.bind();
-
+	public TaxaFilterTab(MainWindow mainWindow, AlgorithmNode<TaxaBlock, TaxaBlock> taxaFilterNode) {
+		super(mainWindow, taxaFilterNode);
 		setText("Taxa Filter");
-		setClosable(false);
+
+		var loader = new ExtendedFXMLLoader<TaxaFilterController>(TaxaFilterTab.class);
+		taxaFilterController = loader.getController();
+		taxaFilterPresenter = new TaxaFilterPresenter(mainWindow, this);
+
+		getController().getMainPane().getChildren().add(taxaFilterController.getAnchorPane());
+		taxaFilterController.getAnchorPane().prefWidthProperty().bind(getController().getMainPane().widthProperty());
+		taxaFilterController.getAnchorPane().prefHeightProperty().bind(getController().getMainPane().heightProperty());
 	}
 
-	@Override
-	public UndoManager getUndoManager() {
-		return undoManager;
-	}
-
-	@Override
-	public ReadOnlyBooleanProperty isEmptyProperty() {
-		return empty;
-	}
-
-	@Override
-	public Node getImageNode() {
-		return null;
-	}
-
-	@Override
-	public IDisplayTabPresenter getPresenter() {
-		return presenter;
-	}
-
-	public TaxaFilterController getController() {
-		return controller;
+	public TaxaFilterController getTaxaFilterController() {
+		return taxaFilterController;
 	}
 }
 

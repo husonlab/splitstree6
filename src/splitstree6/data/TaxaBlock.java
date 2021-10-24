@@ -19,7 +19,6 @@
 
 package splitstree6.data;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -35,6 +34,8 @@ import java.io.IOException;
 import java.util.*;
 
 public class TaxaBlock extends DataBlock {
+	public static final String BLOCK_NAME = "TAXA";
+
 	private int ntax;
 	private final ObservableList<Taxon> taxa;
 	private final ObservableMap<Taxon, Integer> taxon2index;
@@ -60,8 +61,6 @@ public class TaxaBlock extends DataBlock {
 			}
 		});
 		taxa.addListener((InvalidationListener) observable -> {
-			if (Platform.isFxApplicationThread())
-				setShortDescription(getInfo());
 			ntax = size();
 		});
 	}
@@ -288,11 +287,6 @@ public class TaxaBlock extends DataBlock {
 	}
 
 
-	@Override
-	public String getInfo() {
-		return getNtax() + " taxa";
-	}
-
 	public TraitsBlock getTraitsBlock() {
 		return traitsBlock.get();
 	}
@@ -339,4 +333,16 @@ public class TaxaBlock extends DataBlock {
 	public TaxaBlock newInstance() {
 		return (TaxaBlock) super.newInstance();
 	}
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(String.format("%,d taxa", getNtax()));
+	}
+
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
+	}
+
 }

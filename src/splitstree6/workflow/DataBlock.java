@@ -27,12 +27,14 @@ import jloda.util.Basic;
  */
 public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
 
+	public DataBlock() {
+		setName(getClass().getSimpleName().replaceAll("Block$", ""));
+	}
+
 	public void clear() {
 	}
 
 	public abstract int size();
-
-	public abstract String getInfo();
 
 	public abstract DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter();
 
@@ -50,4 +52,5 @@ public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
 		}
 	}
 
+	public abstract String blockName();
 }

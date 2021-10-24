@@ -260,14 +260,4 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 			splitsBlock.getSplits().add(split);
 		}
 	}
-
-	/**
-	 * is the parser at the beginning of a block that this class can parse?
-	 *
-	 * @param np
-	 * @return true, if can parse from here
-	 */
-	public boolean atBeginOfBlock(NexusStreamParser np) {
-		return np.peekMatchIgnoreCase("begin SPLITS;");
-	}
 }

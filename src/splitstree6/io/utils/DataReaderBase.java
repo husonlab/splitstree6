@@ -26,7 +26,7 @@ import splitstree6.workflow.DataBlock;
 import java.io.IOException;
 
 public abstract class DataReaderBase<T extends DataBlock> extends ReaderWriterBase {
-	private final Class<T> toClass;
+	protected Class<T> toClass;
 
 	public DataReaderBase(Class<T> toClass) {
 		super(toClass.getSimpleName());

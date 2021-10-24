@@ -30,7 +30,7 @@ public class RunSequences extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		var file = "/Users/huson/IdeaProjects/community/splitstree6/examples/bees.fasta";
-		var workflow = WorkflowSetup.apply(file);
+		var workflow = WorkflowSetup.apply(file, null);
 
 		workflow.validProperty().addListener((v, o, n) -> {
 			if (!n) {

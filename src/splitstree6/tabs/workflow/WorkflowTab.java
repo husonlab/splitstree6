@@ -24,29 +24,39 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
+import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.tabs.IDisplayTab;
-import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.tabs.workflow.algorithm.AlgorithmItem;
+import splitstree6.tabs.workflow.data.DataItem;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
 
 public class WorkflowTab extends Tab implements IDisplayTab {
+	private final MainWindow mainWindow;
 	private final WorkflowTabController controller;
 	private final WorkflowTabPresenter presenter;
 
 	private final UndoManager undoManager = new UndoManager();
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
+	private final SelectionModel<WorkflowNodeItem> selectionModel = new SetSelectionModel<>();
+
 	/**
 	 * constructor
 	 */
 	public WorkflowTab(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
 		Workflow workflow = mainWindow.getWorkflow();
-		presenter = new WorkflowTabPresenter(mainWindow, this);
+		var loader = new ExtendedFXMLLoader<WorkflowTabController>(this.getClass());
+		controller = loader.getController();
+		setContent(loader.getRoot());
 
-		var extendedFXMLLoader = new ExtendedFXMLLoader<WorkflowTabController>(this.getClass());
-		controller = extendedFXMLLoader.getController();
+		presenter = new WorkflowTabPresenter(mainWindow, this);
 
 		empty.bind(workflow.numberOfNodesProperty().isEqualTo(0));
 
@@ -70,12 +80,30 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 	}
 
 	@Override
-	public IDisplayTabPresenter getPresenter() {
+	public WorkflowTabPresenter getPresenter() {
 		return presenter;
 	}
 
 	public WorkflowTabController getController() {
 		return controller;
 	}
+
+	public SelectionModel<WorkflowNodeItem> getSelectionModel() {
+		return selectionModel;
+	}
+
+	public AlgorithmItem newAlgorithmItem(AlgorithmNode algorithmNode) {
+		return new AlgorithmItem(mainWindow, this, algorithmNode);
+	}
+
+	public DataItem newDataItem(DataNode dataNode) {
+		return new DataItem(mainWindow, this, dataNode);
+	}
+
+	public MainWindow getMainWindow() {
+		return mainWindow;
+	}
+
+
 }
 

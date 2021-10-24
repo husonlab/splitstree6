@@ -119,11 +119,6 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return matrix.length == 0 ? 0 : matrix[0].length;
 	}
 
-	@Override
-	public String getInfo() {
-		return "";
-	}
-
 	public boolean isSetLatitudeLongitude() {
 		return traitLatitude != null;
 	}
@@ -134,11 +129,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 	/**
-	 * copy subset of taxa
 	 *
-	 * @param srcTaxa
-	 * @param srcTraits
-	 * @param enabledTaxa
 	 */
 	public void copySubset(TaxaBlock srcTaxa, TraitsBlock srcTraits, Collection<Taxon> enabledTaxa) {
 		labels = srcTraits.labels;
@@ -172,4 +163,21 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	public TraitsNexusFormat getFormat() {
 		return format;
 	}
+
+	public void setFormat(TraitsNexusFormat format) {
+		this.format = format;
+	}
+
+	public static final String BLOCK_NAME = "TRAITS";
+
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(String.format("%,d traits", size()));
+	}
+
+	@Override
+	public String blockName() {
+		return BLOCK_NAME;
+	}
+
 }
