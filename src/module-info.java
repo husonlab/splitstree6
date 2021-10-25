@@ -53,7 +53,6 @@ module splitstreesix {
 	opens splitstree6.io.writers.trees;
 	opens splitstree6.io.writers.network;
 
-
 	opens splitstree6.window;
 
 	opens splitstree6.treeview;
@@ -71,4 +70,6 @@ module splitstreesix {
 	exports splitstree6.main;
 	opens splitstree6.tabs.algorithms;
 	opens splitstree6.tabs.algorithms.taxa;
+
+	opens splitstree6.densitree;
 }
