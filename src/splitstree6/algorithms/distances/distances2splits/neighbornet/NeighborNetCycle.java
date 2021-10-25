@@ -69,6 +69,9 @@ public class NeighborNetCycle {
 
 	/**
 	 * compute the cycle
+	 *
+	 * @param nTax number of taxa
+	 * @param dist 0-1base
 	 */
 	static public int[] computeNeighborNetCycle(int nTax, double[][] dist) {
 		try {

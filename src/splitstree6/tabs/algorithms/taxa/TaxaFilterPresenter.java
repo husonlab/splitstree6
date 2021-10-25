@@ -21,6 +21,8 @@ package splitstree6.tabs.algorithms.taxa;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
+import javafx.scene.control.SelectionMode;
+import jloda.fx.find.ListViewTypeSearcher;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
@@ -40,6 +42,11 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		var workflow = mainWindow.getWorkflow();
 		var inputTaxa = workflow.getInputTaxaNode().getDataBlock();
 		var taxaFilter = (TaxaFilter) tab.getAlgorithmNode().getAlgorithm();
+
+		controller.getActiveListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		ListViewTypeSearcher.setup(controller.getActiveListView());
+		controller.getInactiveListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		ListViewTypeSearcher.setup(controller.getInactiveListView());
 
 		workflow.getInputTaxaNode().validProperty().addListener((v, o, n) -> {
 			controller.getActiveListView().getItems().setAll(inputTaxa.getLabels());

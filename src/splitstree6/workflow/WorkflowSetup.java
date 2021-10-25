@@ -80,7 +80,7 @@ public class WorkflowSetup {
 		} else if (clazz.equals(TreesBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new TreesLoader(), new TaxaBlock(), new TreesBlock());
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
-			workflow.newAlgorithmNode(new ConsensusNetwork(), workflow.getWorkingTaxaNode(), workflow.getInputDataNode(), splitsNode);
+			workflow.newAlgorithmNode(new ConsensusNetwork(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), splitsNode);
 			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new SinkBlock()));
 			// todo: replace by calculation of network
 		} else if (clazz.equals(NetworkBlock.class)) {

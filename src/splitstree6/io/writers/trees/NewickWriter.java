@@ -27,7 +27,7 @@ import java.io.Writer;
 
 public class NewickWriter extends TreesWriter {
 	public NewickWriter() {
-		setFileExtensions("tree", "tre", "new", "nwk", "treefile");
+		setFileExtensions("tree", "tre", "trees", "new", "nwk", "treefile");
 	}
 
 	@Override

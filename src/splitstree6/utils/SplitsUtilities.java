@@ -43,9 +43,6 @@ import java.util.*;
 public class SplitsUtilities {
 	/**
 	 * computes the least squares fit
-	 *
-	 * @param distancesBlock
-	 * @param splits
 	 * @return squares fit
 	 */
 	public static float computeLeastSquaresFit(DistancesBlock distancesBlock, List<ASplit> splits) {
@@ -106,13 +103,25 @@ public class SplitsUtilities {
 	/**
 	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
 	 *
-	 * @param ntax
-	 * @param splits
-	 * @return distance matrix indexed 0 .. nTax-1 and 0 .. nTax-1
+	 * @param ntax   number of taxa
+	 * @param splits with 1-based taxa
+	 * @return distance matrix, 0-based
 	 */
 	public static double[][] splitsToDistances(int ntax, List<ASplit> splits) {
-		final double[][] dist = new double[ntax][ntax];
+		return splitsToDistances(ntax, splits, null);
+	}
 
+	/**
+	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
+	 *
+	 * @param ntax   number of taxa
+	 * @param splits with 1-based taxa
+	 * @param dist   matrix, 0-based
+	 * @return distance matrix, 0-based
+	 */
+	public static double[][] splitsToDistances(int ntax, List<ASplit> splits, double[][] dist) {
+		if (dist == null)
+			dist = new double[ntax][ntax];
 		for (int i = 1; i <= ntax; i++) {
 			for (int j = i + 1; j <= ntax; j++) {
 				for (ASplit split : splits) {
@@ -127,6 +136,7 @@ public class SplitsUtilities {
 		}
 		return dist;
 	}
+
 
 	/**
 	 * normalize cycle so that it is lexicographically smallest

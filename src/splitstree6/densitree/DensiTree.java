@@ -59,7 +59,7 @@ public class DensiTree {
 
 			var cx = 20;
 			var cy = 40;
-			
+
 			for (int value : model.getCircularOrdering()) {
 				if (value > 0) {
 					gc.strokeText(String.valueOf(value), cx, cy);

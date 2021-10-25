@@ -132,7 +132,8 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 
 
 	public DataNode<? extends DataBlock> getInputDataNode() {
-		return dataNodesStream().filter(v -> v.getName().startsWith(INPUT_PREFIX)).filter(v -> !v.getName().equals(INPUT_TAXA)).findFirst().orElse(null);
+		return dataNodesStream().filter(v -> v.getName().startsWith(INPUT_PREFIX)).filter(v -> !v.getName().equals(INPUT_SOURCE))
+				.filter(v -> !v.getName().equals(INPUT_TAXA)).findFirst().orElse(null);
 	}
 
 	public DataNode<TaxaBlock> getWorkingTaxaNode() {

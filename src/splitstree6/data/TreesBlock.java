@@ -31,7 +31,7 @@ public class TreesBlock extends DataBlock {
 	private boolean partial = false; // are partial trees present?
 	private boolean rooted = false; // are the trees explicitly rooted?
 
-	private TreesFormat format;
+	private TreesFormat format = new TreesFormat();
 
 	public TreesBlock() {
 		trees = FXCollections.observableArrayList();
@@ -80,9 +80,9 @@ public class TreesBlock extends DataBlock {
 	}
 
 	/**
-	 * get t-th tree, starting with 1
+	 * get t-th tree
 	 *
-	 * @param t index
+	 * @param t index, 1-based
 	 * @return tree
 	 */
 	public PhyloTree getTree(int t) {

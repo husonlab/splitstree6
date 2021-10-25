@@ -83,7 +83,6 @@ public class SplitsTree6 extends Application {
 		}
 
 		launch(args);
-
 	}
 
 	protected static void parseArguments(String[] args) throws CanceledException, UsageException {

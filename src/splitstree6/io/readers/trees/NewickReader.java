@@ -43,7 +43,7 @@ public class NewickReader extends TreesReader {
 	private final BooleanProperty optionConvertMultiLabeledTree = new SimpleBooleanProperty(false);
 
 	public NewickReader() {
-		setFileExtensions("tree", "tre", "new", "nwk", "treefile");
+		setFileExtensions("tree", "tre", "trees", "new", "nwk", "treefile");
 	}
 
 	@Override
@@ -151,8 +151,8 @@ public class NewickReader extends TreesReader {
 				System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
 			taxa.addTaxaByNames(orderedTaxonNames);
 			trees.setPartial(partial);
-			trees.setRooted(true);
 		}
+		trees.setRooted(true);
 	}
 
 	public boolean isOptionConvertMultiLabeledTree() {
