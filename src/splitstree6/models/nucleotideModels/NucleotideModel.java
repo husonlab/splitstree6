@@ -412,7 +412,7 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	}
 
 	/**
-	 * apply the model and fill the distance
+	 * computeCycle the model and fill the distance
 	 *
 	 * @param progress   used to display the progress
 	 * @param characters

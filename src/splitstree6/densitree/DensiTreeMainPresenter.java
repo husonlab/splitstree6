@@ -79,11 +79,11 @@ public class DensiTreeMainPresenter {
 					newickReader.read(service.getProgressListener(), selectedFile.getPath(), model.getTaxaBlock(), model.getTreesBlock());
 					if (model.getTreesBlock().isPartial())
 						throw new IOException("Partial trees not acceptable");
-					model.setCircularOrdering(Utilities.apply(model.getTaxaBlock().getNtax(), model.getTreesBlock()));
+					model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getNtax(), model.getTreesBlock()));
 					return model.getTreesBlock().getNTrees();
 				});
 				service.setOnSucceeded(a -> {
-					controller.getMessageLabel().setText(String.format("Trees %,d", service.getValue()));
+					controller.getMessageLabel().setText(String.format("Trees: %,d", service.getValue()));
 				});
 				service.setOnFailed(a -> controller.getMessageLabel().setText("Failed: " + service.getException()));
 				service.start();

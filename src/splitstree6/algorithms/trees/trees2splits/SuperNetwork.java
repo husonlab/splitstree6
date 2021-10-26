@@ -244,7 +244,7 @@ public class SuperNetwork extends Trees2Splits {
 		// todo how do we get here ?
 		if (getNoOptionLeastSquare()) {
 			if (!TreesUtilities.hasAllPairs(taxaBlock, treesBlock)) {
-				NotificationManager.showWarning("Partial trees don't have the 'All Pairs' property, can't apply Least Squares");
+				NotificationManager.showWarning("Partial trees don't have the 'All Pairs' property, can't computeCycle Least Squares");
 				setNoOptionLeastSquare(false);
 			} else {
 				DistancesBlock distances = new DistancesBlock();

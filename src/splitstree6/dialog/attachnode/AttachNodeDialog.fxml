@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  Copyright (C) 2018. Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<!--
+  ~  AttachNodeDialog.fxml Copyright (C) 2021 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<DialogPane fx:id="dialogPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.dialog.attachnode.AttachNodeDialogController">
+   <content>
+      <VBox alignment="TOP_CENTER" spacing="10.0">
+         <children>
+            <ChoiceBox fx:id="algorithmCBox" prefWidth="200.0"/>
+            <Label alignment="CENTER" disable="true" text="Resulting data type:">
+               <VBox.margin>
+                  <Insets/>
+               </VBox.margin>
+            </Label>
+            <Label fx:id="dataTypeLabel" text="Data type"/>
+         </children>
+         <padding>
+            <Insets left="5.0" right="5.0" top="10.0"/>
+         </padding>
+      </VBox>
+   </content>
+   <header>
+      <Label text="Choose algorithm to attach:">
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+         </padding>
+      </Label>
+   </header>
+</DialogPane>

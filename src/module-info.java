@@ -64,6 +64,7 @@ module splitstreesix {
 	opens splitstree6.tabs.workflow;
 	opens splitstree6.tabs.workflow.algorithm;
 	opens splitstree6.tabs.workflow.data;
+	opens splitstree6.dialog.attachnode;
 
 
 	exports splitstree6.xtra;

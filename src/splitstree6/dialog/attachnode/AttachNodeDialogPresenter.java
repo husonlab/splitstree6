@@ -18,7 +18,7 @@
  */
 
 /*
- *  DensiTree.java Copyright (C) 2021 Daniel H. Huson
+ *  AttachNodeDialogPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -36,57 +36,38 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.dialog.attachnode;
 
-import javafx.scene.canvas.Canvas;
-import javafx.scene.text.Font;
+import javafx.util.Pair;
+import jloda.util.PluginClassLoader;
 import jloda.util.StringUtils;
+import splitstree6.workflow.Algorithm;
+import splitstree6.workflow.DataNode;
 
-/**
- * draw the densi-tree
- */
-public class DensiTree {
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
-	public static void draw(Parameters parameters, Model model, Canvas canvas) {
-		System.err.println("Width: " + canvas.getWidth());
-		System.err.println("Height: " + canvas.getHeight());
+public class AttachNodeDialogPresenter {
 
-		var gc = canvas.getGraphicsContext2D();
-		gc.setFont(Font.font("Courier New", 11));
-		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+	public AttachNodeDialogPresenter(DataNode dataNode, AttachNodeDialogController controller) {
 
-		if (model.getTreesBlock().size() > 0) {
-			gc.strokeText("nTax: " + model.getTaxaBlock().getNtax(), 20, 20);
+		controller.getAlgorithmCBox().getItems().addAll(getAllAlgorithms(dataNode));
+		controller.getAlgorithmCBox().valueProperty().addListener((v, o, n) ->
+				controller.getDataTypeLabel().setText(n == null ? "" : StringUtils.fromCamelCase(n.getToClass().getSimpleName().replaceAll("Block", ""))));
 
-			var cx = 20;
-			var cy = 40;
-
-			for (int value : model.getCircularOrdering()) {
-				if (value > 0) {
-					gc.strokeText(String.valueOf(value), cx, cy);
-					cx += 20;
-					if (cx > canvas.getWidth())
-						break;
-				}
-			}
-
-			var tree = model.getTreesBlock().getTree(1);
-			var x = 20;
-			var y = 60;
-			for (var node : tree.nodes()) {
-				if (node.getLabel() != null) {
-					gc.strokeText(StringUtils.toString(tree.getTaxa(node), " ") + ": " + node.getLabel(), x, y);
-					y += 30;
-					if (y > canvas.getHeight())
-						break;
-				}
-			}
-		}
+		if (controller.getAlgorithmCBox().getItems().size() > 0)
+			controller.getAlgorithmCBox().setValue(controller.getAlgorithmCBox().getItems().get(0));
 	}
 
-	/**
-	 * this contains all the parameters used for drawing
-	 */
-	public record Parameters(boolean toScale) {
+	private Collection<Algorithm> getAllAlgorithms(DataNode dataNode) {
+		var list = new ArrayList<Pair<String, Algorithm>>();
+		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+			if (algorithm.getFromClass() == dataNode.getDataBlock().getClass())
+				list.add(new Pair<>(algorithm.getName(), algorithm));
+		}
+		list.sort(Comparator.comparing(Pair::getKey)); // sort alphabetically
+		return list.stream().map(Pair::getValue).collect(Collectors.toList());
 	}
 }

@@ -149,11 +149,11 @@ public class WorkflowTreeViewLayout {
 					//System.err.println("Skipped: " + algorithmNode);
 					// ignore
 				} else if (workflow.isInputTaxaFilter(algorithmNode)) {
-					var item = new WorkflowTreeItem(mainWindow, algorithmNode);
+					var item = new WorkflowTreeItem(mainWindow, treeView, algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					inputTaxaItem.getChildren().add(1, item);
 				} else {
-					var item = new WorkflowTreeItem(mainWindow, algorithmNode);
+					var item = new WorkflowTreeItem(mainWindow, treeView, algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					algorithmNode.getParents().addListener(createParentsChangeListener(algorithmNode));
 					algorithmNode.getChildren().addListener(createChildrenChangeListener(algorithmNode));
@@ -235,11 +235,13 @@ public class WorkflowTreeViewLayout {
 										var parentParentItem = item.getParent();
 										if (parentParentItem != null) {
 											parentParentItem.getChildren().add(childItem);
+											parentParentItem.setExpanded(true);
 											break;
 										}
 									} else if (node instanceof DataNode dataNode) {
 										if (workflow.isWorkingDataNode(dataNode)) {
 											item.getChildren().add(childItem);
+											item.setExpanded(true);
 											break;
 										} else {
 											var added = false;
@@ -248,11 +250,15 @@ public class WorkflowTreeViewLayout {
 												var count = parentParentItem.getChildren().size();
 												if (count == 0 || parentParentItem.getChildren().get(count - 1) == item) {
 													parentParentItem.getChildren().add(childItem);
+													parentParentItem.setExpanded(true);
+
 													added = true;
 												}
 											}
-											if (!added)
+											if (!added) {
 												item.getChildren().add(childItem);
+												item.setExpanded(true);
+											}
 											break;
 										}
 									}

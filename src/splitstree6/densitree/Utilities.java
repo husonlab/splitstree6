@@ -39,20 +39,15 @@
 package splitstree6.densitree;
 
 import javafx.stage.FileChooser;
-import jloda.phylo.PhyloTree;
-import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
-import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.io.readers.trees.NewickReader;
 import splitstree6.utils.SplitsUtilities;
 import splitstree6.utils.TreesUtilities;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.Collection;
 
 public class Utilities {
 
@@ -60,17 +55,7 @@ public class Utilities {
 		return (new NewickReader()).getExtensionFilter();
 	}
 
-	public static Collection<PhyloTree> read(ProgressListener progress, String inputFile, boolean allowPartialTrees) throws IOException {
-		var taxaBlock = new TaxaBlock();
-		var treesBlock = new TreesBlock();
-		var reader = new NewickReader();
-		reader.read(progress, inputFile, taxaBlock, treesBlock);
-		if (!allowPartialTrees && treesBlock.isPartial())
-			throw new IOException("Some trees do not contain all taxa");
-		return treesBlock.getTrees();
-	}
-
-	public static int[] apply(int ntax, TreesBlock treesBlock) {
+	public static int[] computeCycle(int ntax, TreesBlock treesBlock) {
 		var taxa = new BitSet();
 		for (var t = 1; t <= ntax; t++)
 			taxa.set(t);

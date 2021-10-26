@@ -29,7 +29,7 @@ import splitstree6.data.DistancesBlock;
  */
 public class FixUndefinedDistances {
 	/**
-	 * apply
+	 * computeCycle
 	 *
 	 * @param ntax
 	 * @param maxDist

@@ -19,6 +19,7 @@
 
 package splitstree6.workflow;
 
+import jloda.util.Basic;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.data.TaxaBlock;
@@ -113,6 +114,29 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 				option.ifPresent(value -> value.getProperty().setValue(defaultOption.getProperty().getValue()));
 			}
 		} catch (Exception ignored) {
+		}
+	}
+
+	/**
+	 * creates a new instance
+	 *
+	 * @return new instance
+	 */
+	public Algorithm newInstance() {
+		return newInstance(getClass());
+	}
+
+	/**
+	 * creates a new instance
+	 *
+	 * @return new instance
+	 */
+	public static Algorithm newInstance(Class<? extends Algorithm> clazz) {
+		try {
+			return clazz.getConstructor().newInstance();
+		} catch (Exception e) {
+			Basic.caught(e);
+			return null;
 		}
 	}
 }

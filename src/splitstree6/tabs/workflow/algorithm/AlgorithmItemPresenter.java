@@ -24,17 +24,13 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.util.Pair;
-import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Workflow;
-
-import java.util.*;
+import splitstree6.workflow.commands.DeleteCommand;
+import splitstree6.workflow.commands.DuplicateCommand;
 
 public class AlgorithmItemPresenter {
 
@@ -55,6 +51,20 @@ public class AlgorithmItemPresenter {
 
 		controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
 		controller.getPlayButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()).or(selected.not()));
+
+		algorithmNode.getService().runningProperty().addListener((v, o, n) -> {
+			if (n) {
+				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Stop16.gif", 16));
+				controller.getPlayButton().setOnAction(e -> algorithmNode.getService().cancel());
+				controller.getPlayButton().disableProperty().bind(algorithmNode.getService().runningProperty().not());
+				controller.getPlayButton().getTooltip().setText("Stop this algorithm");
+			} else {
+				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
+				controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
+				controller.getPlayButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()).or(selected.not()));
+				controller.getPlayButton().getTooltip().setText("Run this algorithm");
+			}
+		});
 
 		controller.getNameLabel().setGraphic(ResourceManagerFX.getIconAsImageView(algorithmNode.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16));
 
@@ -96,50 +106,29 @@ public class AlgorithmItemPresenter {
 		var algorithmNode = item.getWorkflowNode();
 
 		var playMenuItem = new MenuItem("Run");
-		playMenuItem.setGraphic(item.getController().getPlayButton().getGraphic());
-		playMenuItem.setOnAction(item.getController().getPlayButton().getOnAction());
-		playMenuItem.disableProperty().bind(item.getController().getPlayButton().disableProperty());
+		playMenuItem.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
+		playMenuItem.setOnAction(e -> algorithmNode.restart());
+		playMenuItem.disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()));
+
+		var cancelMenuItem = new MenuItem("Cancel");
+		cancelMenuItem.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Stop16.gif", 16));
+		cancelMenuItem.setOnAction(e -> item.getWorkflowNode().getService().cancel());
+		cancelMenuItem.disableProperty().bind(item.getWorkflowNode().getService().runningProperty());
+
+		var duplicateMenuItem = new MenuItem("Duplicate");
+		duplicateMenuItem.setOnAction(e -> workflowTab.getUndoManager().doAndAdd(new DuplicateCommand(workflow, algorithmNode)));
+		if (workflow.isDerivedNode(algorithmNode))
+			duplicateMenuItem.disableProperty().bind(workflow.runningProperty());
+		else
+			duplicateMenuItem.setDisable(true);
 
 		var deleteMenuItem = new MenuItem("Delete");
-		deleteMenuItem.setOnAction(e -> workflowTab.getUndoManager().doAndAdd(createDeleteCommand(workflow, algorithmNode)));
+		deleteMenuItem.setOnAction(e -> workflowTab.getUndoManager().doAndAdd(new DeleteCommand(workflow, algorithmNode)));
 		if (workflow.isDerivedNode(algorithmNode))
 			deleteMenuItem.disableProperty().bind(workflow.runningProperty());
 		else
 			deleteMenuItem.setDisable(true);
 
-		return new ContextMenu(playMenuItem, new SeparatorMenuItem(), deleteMenuItem);
-	}
-
-	public UndoableRedoableCommand createDeleteCommand(Workflow workflow, WorkflowNode node) {
-		return new UndoableRedoableCommand("delete") {
-			private final Collection<WorkflowNode> nodes = workflow.getAllDescendants(node, true);
-			private final Collection<Pair<WorkflowNode, WorkflowNode>> parentChildPairs = getParentChildPairs(nodes);
-
-			@Override
-			public void undo() {
-				workflow.addNodes(nodes, parentChildPairs);
-			}
-
-			@Override
-			public void redo() {
-				var reverse = new ArrayList<>(nodes);
-				Collections.reverse(reverse);
-				workflow.deleteNodes(reverse);
-			}
-		};
-	}
-
-	public static Set<Pair<WorkflowNode, WorkflowNode>> getParentChildPairs(Collection<WorkflowNode> nodes) {
-		var set = new HashSet<Pair<WorkflowNode, WorkflowNode>>();
-
-		for (var node : nodes) {
-			for (var parent : node.getParents()) {
-				set.add(new Pair<>(parent, node));
-			}
-			for (var child : node.getChildren()) {
-				set.add(new Pair<>(node, child));
-			}
-		}
-		return set;
+		return new ContextMenu(playMenuItem, duplicateMenuItem, deleteMenuItem);
 	}
 }

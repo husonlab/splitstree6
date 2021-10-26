@@ -254,7 +254,7 @@ public class LogDet extends Characters2Distances {
 
 	public boolean isApplicable(TaxaBlock taxa, CharactersBlock characters) {
 
-		/* We can apply as long as there is more than one symbol */
+		/* We can computeCycle as long as there is more than one symbol */
 		return characters.getSymbols().length() > 1;
 	}
 

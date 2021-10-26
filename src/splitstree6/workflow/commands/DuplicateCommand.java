@@ -1,0 +1,110 @@
+/*
+ *  DuplicateCommand.java Copyright (C) 2021 Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package splitstree6.workflow.commands;
+
+import jloda.fx.undo.UndoableRedoableCommand;
+import jloda.fx.workflow.WorkflowNode;
+import jloda.util.Basic;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataNode;
+import splitstree6.workflow.Workflow;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Stack;
+
+/**
+ * duplicate an algorithm and all dependent nodes
+ * Daniel Huson, 10.2021
+ */
+public class DuplicateCommand extends UndoableRedoableCommand {
+	private final Runnable undo;
+	private final Runnable redo;
+	private final Collection<WorkflowNode> addedNodes = new ArrayList<>();
+
+
+	public DuplicateCommand(Workflow workflow, AlgorithmNode node) {
+		super("duplicate nodes");
+
+		undo = () -> workflow.deleteNodes(addedNodes);
+
+		redo = () -> {
+			try {
+				addedNodes.clear();
+
+				var stack = new Stack<DataNode>();
+				stack.push(node.getPreferredParent());
+
+				var first = true;
+
+				var dataNode2CopyNodeMap = new HashMap<DataNode, DataNode>();
+				dataNode2CopyNodeMap.put(node.getPreferredParent(), node.getPreferredParent());
+
+				while (stack.size() > 0) {
+					var sourceNode = (DataNode) stack.pop();
+					var algorithmNodes = new ArrayList<splitstree6.workflow.AlgorithmNode>();
+					if (first) {
+						algorithmNodes.add(node);
+						first = false;
+					} else {
+						algorithmNodes.addAll(sourceNode.getChildren().stream().map(v -> (AlgorithmNode) v).toList());
+					}
+					for (var algorithmNode : algorithmNodes) {
+						var targetNode = algorithmNode.getTargetNode();
+						var copySourceNode = dataNode2CopyNodeMap.get(sourceNode);
+						var copyTargetNode = workflow.newDataNode(targetNode.getDataBlock().newInstance());
+						copyTargetNode.setValid(false);
+						addedNodes.add(copyTargetNode);
+						var copyAlgorithmNode = workflow.newAlgorithmNode(algorithmNode.getAlgorithm().newInstance(), workflow.getWorkingTaxaNode(), copySourceNode, copyTargetNode);
+						copyAlgorithmNode.setValid(false);
+						addedNodes.add(copyAlgorithmNode);
+
+						dataNode2CopyNodeMap.put(targetNode, copyTargetNode);
+						stack.add(algorithmNode.getTargetNode());
+					}
+				}
+			} catch (Exception ex) {
+				Basic.caught(ex);
+			}
+		};
+	}
+
+	@Override
+	public void undo() {
+		undo.run();
+
+	}
+
+	@Override
+	public void redo() {
+		redo.run();
+	}
+
+	@Override
+	public boolean isUndoable() {
+		return addedNodes.size() > 0;
+	}
+
+	@Override
+	public boolean isRedoable() {
+		return true;
+	}
+}

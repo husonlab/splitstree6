@@ -44,8 +44,17 @@ public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
 	 * @return new instance
 	 */
 	public DataBlock newInstance() {
+		return newInstance(getClass());
+	}
+
+	/**
+	 * creates a new instance
+	 *
+	 * @return new instance
+	 */
+	public static DataBlock newInstance(Class<? extends DataBlock> clazz) {
 		try {
-			return getClass().getConstructor().newInstance();
+			return clazz.getConstructor().newInstance();
 		} catch (Exception e) {
 			Basic.caught(e);
 			return null;

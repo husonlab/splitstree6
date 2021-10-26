@@ -49,7 +49,7 @@ public class RootByMidpointAlgorithm extends Trees2Trees implements IFilter {
 	@Override
 	public String getToolTip(String optionName) {
 		if ("UseMidpoint".equals(optionName)) {
-			return "Determine whether to apply midpoint rooting";
+			return "Determine whether to computeCycle midpoint rooting";
 		}
 		return optionName;
 	}

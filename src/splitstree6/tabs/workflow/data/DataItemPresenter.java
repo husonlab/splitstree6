@@ -25,12 +25,18 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
 import jloda.fx.util.ResourceManagerFX;
+import splitstree6.dialog.attachnode.AttachNodeDialog;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.Workflow;
 
+/**
+ * datat
+ *
+ * @param <D>
+ */
 public class DataItemPresenter<D extends DataBlock> {
 
 	public DataItemPresenter(MainWindow mainWindow, WorkflowTab workflowTab, DataItem<D> dataItem) {
@@ -76,14 +82,14 @@ public class DataItemPresenter<D extends DataBlock> {
 	}
 
 	private ContextMenu createContextMenu(Workflow workflow, WorkflowTab workflowTab, DataItem<D> item) {
-		var dataNode = item.getWorkflowNode();
+		var attachAlgorithmMenuItem = new MenuItem("Attach Algorithm...");
+		attachAlgorithmMenuItem.setOnAction(e -> {
+			var screenLocation = item.localToScreen(item.getLayoutX(), item.getLayoutY());
+			new AttachNodeDialog(workflow, item.getWorkflowNode(), screenLocation);
+		});
+		attachAlgorithmMenuItem.disableProperty().bind(workflow.runningProperty());
 
-		var addNewAlgorithmMenuItem = new MenuItem("Add Algorithm...");
-		// todo: implement
-		addNewAlgorithmMenuItem.setOnAction(e -> System.err.print("Not implemented"));
-		addNewAlgorithmMenuItem.disableProperty().bind(workflow.runningProperty());
-
-		return new ContextMenu(addNewAlgorithmMenuItem);
+		return new ContextMenu(attachAlgorithmMenuItem);
 
 	}
 }

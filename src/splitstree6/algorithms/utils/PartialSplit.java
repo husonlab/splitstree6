@@ -311,7 +311,7 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 	}
 
 	/**
-	 * apply the zig-zag rule, if applicable. That is, replaces A1/B1 and A2/B2
+	 * computeCycle the zig-zag rule, if applicable. That is, replaces A1/B1 and A2/B2
 	 * by  A1/(B1uB2)  and (A1uA2)/B2
 	 *
 	 * @param ps1 input partial split 1
@@ -345,7 +345,7 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 	}
 
 	/**
-	 * apply the zig-zag rule, if applicable. That is, replaces A1/B1 and A2/B2
+	 * computeCycle the zig-zag rule, if applicable. That is, replaces A1/B1 and A2/B2
 	 * by  A1/(B1uB2)  and (A1uA2)/B2
 	 *
 	 * @param ps1 input partial split 1
