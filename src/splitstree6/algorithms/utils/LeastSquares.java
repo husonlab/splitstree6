@@ -239,8 +239,8 @@ public class LeastSquares {
 				J.and(I);
 				int x = J.cardinality(); //Size of intersection
 				int Aij = x * (ntaxa - Isize - Jsize + x) + (Isize - x) * (Jsize - x);
-				Amat.set(i, j, (double) Aij);
-				Amat.set(j, i, (double) Aij);
+				Amat.set(i, j, Aij);
+				Amat.set(j, i, Aij);
 			}
 			Amat.set(i, i, Isize * (ntaxa - Isize));
 			progress.incrementProgress();
