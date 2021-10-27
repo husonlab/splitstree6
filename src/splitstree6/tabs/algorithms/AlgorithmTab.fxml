@@ -30,7 +30,11 @@
         <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                     AnchorPane.topAnchor="0.0">
             <center>
-                <VBox fx:id="mainPane" alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER"/>
+                <VBox fx:id="mainPane" alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                    </BorderPane.margin>
+                </VBox>
             </center>
             <top>
                 <GridPane BorderPane.alignment="CENTER">
@@ -52,8 +56,8 @@
                             <children>
                                 <Button fx:id="Reset" contentDisplay="GRAPHIC_ONLY" layoutX="98.0" layoutY="11.0"
                                         maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0" text="Reset"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;">
+                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Reset">
                                     <graphic>
                                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                                    preserveRatio="true">
@@ -68,8 +72,8 @@
                                 </Button>
                                 <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" layoutX="98.0" layoutY="11.0"
                                         maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0" text="Apply"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;">
+                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Apply">
                                     <graphic>
                                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                                    preserveRatio="true">

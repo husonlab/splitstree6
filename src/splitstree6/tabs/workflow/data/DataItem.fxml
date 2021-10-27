@@ -69,7 +69,7 @@
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                             <image>
-                                <Image url="@/jloda/resources/icons/sun/Server16.gif"/>
+                                <Image url="@/jloda/resources/icons/sun/Edit16.gif"/>
                             </image>
                         </ImageView>
                     </graphic>

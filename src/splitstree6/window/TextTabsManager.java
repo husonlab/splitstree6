@@ -112,6 +112,7 @@ public class TextTabsManager {
 					taxaBlock = workflow.getWorkingTaxaBlock();
 				}
 				try (var w = new StringWriter()) {
+					nexusExporter.setPrependTaxa(false);
 					nexusExporter.export(w, taxaBlock, dataBlock);
 					return w.toString();
 				} catch (IOException ignored) {

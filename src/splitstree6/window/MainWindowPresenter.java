@@ -43,7 +43,6 @@ import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
-import splitstree6.treeview.WorkflowTreeView;
 
 import java.util.Stack;
 
@@ -59,7 +58,8 @@ public class MainWindowPresenter {
 		this.mainWindow = mainWindow;
 		var controller = mainWindow.getController();
 
-		var workflowTreeView = new WorkflowTreeView(mainWindow);
+		var workflowTreeView = mainWindow.getWorkflowTreeView();
+
 
 		controller.getTreeViewAnchorPane().getChildren().add(workflowTreeView);
 		AnchorPane.setRightAnchor(workflowTreeView, 0.0);

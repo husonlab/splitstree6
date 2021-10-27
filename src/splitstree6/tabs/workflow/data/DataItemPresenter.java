@@ -21,16 +21,14 @@ package splitstree6.tabs.workflow.data;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
+import javafx.geometry.Point2D;
 import javafx.scene.image.ImageView;
 import jloda.fx.util.ResourceManagerFX;
-import splitstree6.dialog.attachnode.AttachNodeDialog;
+import splitstree6.contextmenus.datanode.DataNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataBlock;
-import splitstree6.workflow.Workflow;
 
 /**
  * datat
@@ -49,12 +47,12 @@ public class DataItemPresenter<D extends DataBlock> {
 		workflowTab.getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(workflowTab.getSelectionModel().isSelected(dataItem)));
 
 		controller.getEditButton().setOnAction(e -> mainWindow.getTextTabsManager().showTab(dataNode, true));
-		controller.getEditButton().disableProperty().bind(selected.not());
+		controller.getEditButton().disableProperty().bind((selected.and(dataNode.validProperty()).not()));
 
 		controller.getNameLabel().textProperty().bind(dataNode.nameProperty());
 
-		dataNode.validProperty().addListener((v, o, n) -> {
-			if (n) {
+		dataNode.allParentsValidProperty().addListener((v, o, n) -> {
+			if (n && dataNode.isValid()) {
 				controller.getInfoLabel().setText(String.format("size: %,d", dataNode.getDataBlock().size()));
 				controller.getStatusImageView().setImage(ResourceManagerFX.getIcon("Done.png"));
 			} else {
@@ -78,18 +76,9 @@ public class DataItemPresenter<D extends DataBlock> {
 				controller.getNameLabel().getGraphic().setOpacity(0.5);
 		}
 
-		dataItem.setOnContextMenuRequested(e -> createContextMenu(mainWindow.getWorkflow(), workflowTab, dataItem).show(dataItem, e.getScreenX(), e.getScreenY()));
-	}
-
-	private ContextMenu createContextMenu(Workflow workflow, WorkflowTab workflowTab, DataItem<D> item) {
-		var attachAlgorithmMenuItem = new MenuItem("Attach Algorithm...");
-		attachAlgorithmMenuItem.setOnAction(e -> {
-			var screenLocation = item.localToScreen(item.getLayoutX(), item.getLayoutY());
-			new AttachNodeDialog(workflow, item.getWorkflowNode(), screenLocation);
+		dataItem.setOnContextMenuRequested(e -> {
+			if (selected.get())
+				DataNodeContextMenu.create(mainWindow, new Point2D(e.getScreenX(), e.getScreenY()), dataNode).show(dataItem, e.getScreenX(), e.getScreenY());
 		});
-		attachAlgorithmMenuItem.disableProperty().bind(workflow.runningProperty());
-
-		return new ContextMenu(attachAlgorithmMenuItem);
-
 	}
 }

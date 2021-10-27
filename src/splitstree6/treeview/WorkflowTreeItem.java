@@ -28,18 +28,19 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
 import javafx.geometry.Point2D;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
+import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.workflow.WorkflowNode;
-import splitstree6.dialog.attachnode.AttachNodeDialog;
+import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
+import splitstree6.contextmenus.datanode.DataNodeContextMenu;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
-import splitstree6.workflow.commands.DeleteCommand;
-import splitstree6.workflow.commands.DuplicateCommand;
 
 /**
  * work flow node in tree
@@ -130,31 +131,10 @@ public class WorkflowTreeItem extends TreeItem<String> {
 				label.setTextFill(Color.BLACK);
 		});
 
-		label.setOnContextMenuRequested(a -> {
-			var workflow = mainWindow.getWorkflow();
 
-			var viewMenuItem = new MenuItem("View");
-			viewMenuItem.setOnAction(e -> showView());
-
-			var playMenuItem = new MenuItem("Run");
-			playMenuItem.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
-			playMenuItem.setOnAction(e -> node.restart());
-			playMenuItem.disableProperty().bind(node.getService().runningProperty().or(node.allParentsValidProperty().not()));
-
-			var duplicateMenuItem = new MenuItem("Duplicate");
-			duplicateMenuItem.setOnAction(e -> treeView.getUndoManager().doAndAdd(new DuplicateCommand(workflow, node)));
-			if (workflow.isDerivedNode(node))
-				duplicateMenuItem.disableProperty().bind(workflow.runningProperty());
-			else
-				duplicateMenuItem.setDisable(true);
-			var deleteMenuItem = new MenuItem("Delete");
-			deleteMenuItem.setOnAction(e -> treeView.getUndoManager().doAndAdd(new DeleteCommand(workflow, node)));
-			if (workflow.isDerivedNode(node))
-				deleteMenuItem.disableProperty().bind(workflow.runningProperty());
-			else
-				deleteMenuItem.setDisable(true);
-			var contextMenu = new ContextMenu(viewMenuItem, playMenuItem, duplicateMenuItem, deleteMenuItem);
-			contextMenu.show(label, a.getScreenX(), a.getScreenY());
+		label.setOnContextMenuRequested(me -> {
+			var contextMenu = AlgorithmNodeContextMenu.create(mainWindow, mainWindow.getWorkflowTreeView().getUndoManager(), node);
+			contextMenu.show(label, me.getScreenX(), me.getScreenY());
 		});
 	}
 
@@ -194,22 +174,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 				label.setTextFill(Color.BLACK);
 		});
 
-		{
-			label.setOnContextMenuRequested(me -> {
-				var viewMenuItem = new MenuItem("View");
-				viewMenuItem.setOnAction(e -> showView());
-
-				var attachAlgorithmMenuItem = new MenuItem("Attach Algorithm...");
-				attachAlgorithmMenuItem.setOnAction(e -> {
-					var screenLocation = new Point2D(me.getScreenX(), me.getScreenY());
-					new AttachNodeDialog(mainWindow.getWorkflow(), node, screenLocation);
-				});
-				attachAlgorithmMenuItem.disableProperty().bind(mainWindow.getWorkflow().runningProperty());
-				var contextMenu = new ContextMenu(viewMenuItem, new SeparatorMenuItem(), attachAlgorithmMenuItem);
-				contextMenu.show(label, me.getScreenX(), me.getScreenY());
-			});
-		}
-
+		label.setOnContextMenuRequested(e -> DataNodeContextMenu.create(mainWindow, new Point2D(e.getScreenX(), e.getScreenY()), node).show(label, e.getScreenX(), e.getScreenY()));
 	}
 
 	/**

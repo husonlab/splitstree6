@@ -21,16 +21,13 @@ package splitstree6.tabs.workflow.algorithm;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.ProgressIndicator;
 import jloda.fx.util.ResourceManagerFX;
+import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Workflow;
-import splitstree6.workflow.commands.DeleteCommand;
-import splitstree6.workflow.commands.DuplicateCommand;
 
 public class AlgorithmItemPresenter {
 
@@ -50,18 +47,18 @@ public class AlgorithmItemPresenter {
 		controller.getEditButton().disableProperty().bind(selected.not());
 
 		controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
-		controller.getPlayButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()).or(selected.not()));
+		controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
 
 		algorithmNode.getService().runningProperty().addListener((v, o, n) -> {
 			if (n) {
 				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Stop16.gif", 16));
 				controller.getPlayButton().setOnAction(e -> algorithmNode.getService().cancel());
-				controller.getPlayButton().disableProperty().bind(algorithmNode.getService().runningProperty().not());
+				controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Stop this algorithm");
 			} else {
 				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
 				controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
-				controller.getPlayButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()).or(selected.not()));
+				controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).and(selected).not()));
 				controller.getPlayButton().getTooltip().setText("Run this algorithm");
 			}
 		});
@@ -85,6 +82,8 @@ public class AlgorithmItemPresenter {
 		progressIndicator.setPrefHeight(16);
 		progressIndicator.setPrefWidth(16);
 
+		controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Scheduled.png", 16));
+
 		algorithmNode.getService().stateProperty().addListener((v, o, n) -> {
 			switch (n) {
 				case CANCELLED, FAILED -> controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Failed.png", 16));
@@ -99,36 +98,10 @@ public class AlgorithmItemPresenter {
 			controller.getPlayButton().setVisible(false);
 		}
 
-		algorithmItem.setOnContextMenuRequested(e -> createContextMenu(mainWindow.getWorkflow(), workflowTab, algorithmItem).show(algorithmItem, e.getScreenX(), e.getScreenY()));
-	}
-
-	private ContextMenu createContextMenu(Workflow workflow, WorkflowTab workflowTab, AlgorithmItem item) {
-		var algorithmNode = item.getWorkflowNode();
-
-		var playMenuItem = new MenuItem("Run");
-		playMenuItem.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
-		playMenuItem.setOnAction(e -> algorithmNode.restart());
-		playMenuItem.disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()));
-
-		var cancelMenuItem = new MenuItem("Cancel");
-		cancelMenuItem.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Stop16.gif", 16));
-		cancelMenuItem.setOnAction(e -> item.getWorkflowNode().getService().cancel());
-		cancelMenuItem.disableProperty().bind(item.getWorkflowNode().getService().runningProperty());
-
-		var duplicateMenuItem = new MenuItem("Duplicate");
-		duplicateMenuItem.setOnAction(e -> workflowTab.getUndoManager().doAndAdd(new DuplicateCommand(workflow, algorithmNode)));
-		if (workflow.isDerivedNode(algorithmNode))
-			duplicateMenuItem.disableProperty().bind(workflow.runningProperty());
-		else
-			duplicateMenuItem.setDisable(true);
-
-		var deleteMenuItem = new MenuItem("Delete");
-		deleteMenuItem.setOnAction(e -> workflowTab.getUndoManager().doAndAdd(new DeleteCommand(workflow, algorithmNode)));
-		if (workflow.isDerivedNode(algorithmNode))
-			deleteMenuItem.disableProperty().bind(workflow.runningProperty());
-		else
-			deleteMenuItem.setDisable(true);
-
-		return new ContextMenu(playMenuItem, duplicateMenuItem, deleteMenuItem);
+		algorithmItem.setOnContextMenuRequested(e -> {
+					if (selected.get())
+						AlgorithmNodeContextMenu.create(mainWindow, workflowTab.getUndoManager(), algorithmNode).show(algorithmItem, e.getScreenX(), e.getScreenY());
+				}
+		);
 	}
 }

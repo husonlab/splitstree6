@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  DataNodeContextMenu.fxml Copyright (C) 2021 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<MenuButton mnemonicParsing="false" text="MenuButton" xmlns="http://javafx.com/javafx/16"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.contextmenus.datanode.DataNodeContextMenuController">
+
+    <contextMenu>
+        <ContextMenu fx:id="contextMenu">
+            <items>
+                <MenuItem fx:id="editMenuItem" mnemonicParsing="false" text="View">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Edit16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </MenuItem>
+                <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export...">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Export16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </MenuItem>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <MenuItem fx:id="attachAlgorithmMenuItem" mnemonicParsing="false" text="Attach Algorithm...">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </MenuItem>
+            </items>
+        </ContextMenu>
+    </contextMenu>
+</MenuButton>

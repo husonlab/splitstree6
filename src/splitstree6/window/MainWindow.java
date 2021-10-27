@@ -38,6 +38,7 @@ import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.tabs.workflow.WorkflowTab;
+import splitstree6.treeview.WorkflowTreeView;
 import splitstree6.workflow.Workflow;
 
 public class MainWindow implements IMainWindow {
@@ -56,6 +57,7 @@ public class MainWindow implements IMainWindow {
 
 	private final WorkflowTab workflowTab;
 	private final TextDisplayTab methodsTab;
+	private final WorkflowTreeView workflowTreeView;
 
 	private Stage stage;
 
@@ -85,6 +87,8 @@ public class MainWindow implements IMainWindow {
 
 		textTabsManager = new TextTabsManager(this);
 		algorithmTabsManager = new AlgorithmTabsManager(this);
+
+		workflowTreeView = new WorkflowTreeView(this);
 	}
 
 	@Override
@@ -223,5 +227,9 @@ public class MainWindow implements IMainWindow {
 
 	public AlgorithmTabsManager getAlgorithmTabsManager() {
 		return algorithmTabsManager;
+	}
+
+	public WorkflowTreeView getWorkflowTreeView() {
+		return workflowTreeView;
 	}
 }
