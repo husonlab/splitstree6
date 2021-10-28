@@ -58,6 +58,8 @@ public class DuplicateCommand extends UndoableRedoableCommand {
 				var dataNode2CopyNodeMap = new HashMap<DataNode, DataNode>();
 				dataNode2CopyNodeMap.put(node.getPreferredParent(), node.getPreferredParent());
 
+				AlgorithmNode firstCopyAlgorithmNode = null;
+
 				while (stack.size() > 0) {
 					var sourceNode = (DataNode) stack.pop();
 					var algorithmNodes = new ArrayList<splitstree6.workflow.AlgorithmNode>();
@@ -74,13 +76,16 @@ public class DuplicateCommand extends UndoableRedoableCommand {
 						copyTargetNode.setValid(false);
 						addedNodes.add(copyTargetNode);
 						var copyAlgorithmNode = workflow.newAlgorithmNode(algorithmNode.getAlgorithm().newInstance(), workflow.getWorkingTaxaNode(), copySourceNode, copyTargetNode);
+						if (firstCopyAlgorithmNode == null)
+							firstCopyAlgorithmNode = copyAlgorithmNode;
 						copyAlgorithmNode.setValid(false);
 						addedNodes.add(copyAlgorithmNode);
-
 						dataNode2CopyNodeMap.put(targetNode, copyTargetNode);
 						stack.add(algorithmNode.getTargetNode());
 					}
 				}
+				if (firstCopyAlgorithmNode != null)
+					firstCopyAlgorithmNode.restart();
 			} catch (Exception ex) {
 				Basic.caught(ex);
 			}

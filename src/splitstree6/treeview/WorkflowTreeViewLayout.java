@@ -122,12 +122,12 @@ public class WorkflowTreeViewLayout {
 				} else if (workflow.isInputDataNode(dataNode)) {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
-					inputTaxaItem.getChildren().add(item);
+					inputTaxaItem.getChildren().add(0, item);
 					treeView.getRoot().setExpanded(true);
 				} else if (workflow.isWorkingTaxaNode(dataNode)) {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
-					inputTaxaItem.getChildren().add(0, item);
+					inputTaxaItem.getChildren().add(item);
 					treeView.getRoot().setExpanded(true);
 				} else if (workflow.isWorkingDataNode(dataNode)) {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);

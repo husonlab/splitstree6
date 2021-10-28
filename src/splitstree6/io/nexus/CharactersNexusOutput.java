@@ -256,9 +256,9 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 		int maxColumns;
 		if (format.getOptionColumnsPerBlock() == 0)
 			// will use 60 columns per block
-			maxColumns = Math.max(1, 60 / columnWidth); //Maximum number of sites to print on one line.
+			maxColumns = Math.max(1, 60 / columnWidth); //Maximum number of sites to printText on one line.
 		else
-			maxColumns = Math.max(1, format.getOptionColumnsPerBlock() / columnWidth); //Maximum number of sites to print on one line.
+			maxColumns = Math.max(1, format.getOptionColumnsPerBlock() / columnWidth); //Maximum number of sites to printText on one line.
 
 		for (int c0 = 1; c0 <= characters.getNchar(); c0 += maxColumns) {
 			final int cMax = Math.min(c0 + maxColumns - 1, characters.getNchar());

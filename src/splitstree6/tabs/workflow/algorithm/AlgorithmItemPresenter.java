@@ -47,7 +47,7 @@ public class AlgorithmItemPresenter {
 		controller.getEditButton().disableProperty().bind(selected.not());
 
 		controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
-		controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
+		controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
 
 		algorithmNode.getService().runningProperty().addListener((v, o, n) -> {
 			if (n) {
@@ -58,7 +58,7 @@ public class AlgorithmItemPresenter {
 			} else {
 				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
 				controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
-				controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).and(selected).not()));
+				controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Run this algorithm");
 			}
 		});

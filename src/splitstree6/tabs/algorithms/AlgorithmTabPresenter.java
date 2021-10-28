@@ -58,6 +58,7 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		controller.getAlgorithmCBox().valueProperty().addListener((v, o, n) -> {
 			algorithmTab.getAlgorithmNode().setAlgorithm((Algorithm) n);
 		});
+		controller.getAlgorithmCBox().disableProperty().bind(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1));
 
 		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null)
 			setupOptionControls(controller, algorithmTab.getAlgorithmNode().getAlgorithm());

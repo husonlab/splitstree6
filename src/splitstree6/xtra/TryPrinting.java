@@ -18,66 +18,43 @@
  */
 
 package splitstree6.xtra;
+//Code from: https://coderanch.com/t/709329/java/JavaFX-approach-dividing-text-blob
 
 import javafx.application.Application;
-import javafx.print.PageLayout;
-import javafx.print.PrinterJob;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
 import javafx.stage.Stage;
+import jloda.fx.util.Print;
 
 public class TryPrinting extends Application {
-	private static PageLayout pageLayoutSelected;
 
-	@Override
-	public void start(Stage stage) throws Exception {
+	public static void main(String[] args) {
+		launch();
+	}
 
+	public void start(Stage stage) {
+		var textArea = new TextArea(createTextBlob());
 
-		var textArea = new TextArea("Please implement multi-page printing\n".repeat(100));
-		textArea.setWrapText(true);
+		var printButton = new Button("Print");                         // Print Button
+		printButton.setOnAction(e -> Print.printText(stage, textArea.getText()));
 
-		var pageLayoutButton = new Button("Page Layout");
-		pageLayoutButton.setOnAction(e -> {
-			final PrinterJob job = PrinterJob.createPrinterJob();
-			if (job.showPageSetupDialog(stage)) {
-				pageLayoutSelected = (job.getJobSettings().getPageLayout());
-			}
-		});
-		var printButton = new Button("Print");
-		printButton.setOnAction(e -> printText(stage, textArea.getText()));
-		var quitButton = new Button("Quit");
-		quitButton.setOnAction(e -> System.exit(0));
+		var borderPane = new BorderPane();
+		borderPane.setTop(printButton);
+		borderPane.setCenter(textArea);
 
-		var borderPane = new BorderPane(textArea);
-		borderPane.setBottom(new HBox(new Separator(), pageLayoutButton, new Separator(), printButton, new Separator(), quitButton));
-
-		stage.setScene(new Scene(borderPane, 800, 800));
-		stage.sizeToScene();
+		stage.setScene(new Scene(borderPane));
+		stage.setWidth(600);
+		stage.setHeight(600);
+		stage.setTitle("TryPrinting");
 		stage.show();
 	}
 
-	public static void printText(Stage owner, String text) {
-		final PrinterJob printerJob = PrinterJob.createPrinterJob();
-		if (printerJob != null && printerJob.showPrintDialog(owner)) {
-
-			var printArea = new TextFlow(new Text(text));
-			printArea.setStyle("-fx-font-family: 'Courier New'; -fx-font-size: 10");
-
-			PageLayout pageLayout = pageLayoutSelected != null ? pageLayoutSelected : printerJob.getJobSettings().getPageLayout();
-			printArea.setMaxWidth(pageLayout.getPrintableWidth());
-
-			if (printerJob.printPage(printArea)) {
-				printerJob.endJob();
-				// done printing
-			} else {
-				System.err.println("Print failed");
-			}
-		}
+	private String createTextBlob() {
+		var buf = new StringBuilder();
+		for (int i = 1; i <= 100; i++)
+			buf.append(String.format("Line %03d%n", i));
+		return buf.toString();
 	}
 }

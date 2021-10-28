@@ -107,7 +107,7 @@ public class LeastSquares {
         int n;
 
         //System.out.println("Matrix argument passed is\n");
-        //XtX.print(4,4);
+        //XtX.printText(4,4);
 
         DynamicCholesky A = new DynamicCholesky(XtX);
 
@@ -116,7 +116,7 @@ public class LeastSquares {
         //System.out.println("Checking Cholesky Decomposition!");
         //A.CheckCholesky();
 
-        //Xty.print(10,4);
+        //Xty.printText(10,4);
 
         if (!constrain) {
             //Unconstrained solution. Just solve using Cholesky decomposition and exit.
@@ -126,7 +126,7 @@ public class LeastSquares {
                 if (x.get(i, 0) < 0.0)
                     x.set(i, 0, 0.0);
             }
-            //x.print(4,4);
+            //x.printText(4,4);
             return;
         }
         //Constrained solution required.
@@ -135,12 +135,12 @@ public class LeastSquares {
         //Initial solution is arbitrary - all 1's.
         Matrix old_x = new Matrix(n, 1, 1.0);
         //System.out.println("Initial feasible solution");
-        //old_x.print(10,4);
+        //old_x.printText(10,4);
         for (; ; ) {
             for (; ; ) {
                 x = A.solve(Xty); // Solve current constrained solution.
                 //System.out.println("Current unconstrained solution:");
-                //x.print(10,4);
+                //x.printText(10,4);
                 //Find the last point on the path from old_x to x that is non-negative.
                 int bad_i = -1;
                 double min_delta = 100000000000.0;
@@ -174,7 +174,7 @@ public class LeastSquares {
 
                 //old_x.plusEquals(x.times(bad_val));
                 //System.out.println("This feasible solution");
-                //old_x.print(10,4);
+                //old_x.printText(10,4);
                 A.maskRow(bad_i);
 
             }
@@ -189,7 +189,7 @@ public class LeastSquares {
 
             //System.out.println("Gradient");
             grad = XtX.times(x).minus(Xty).times(2.0);
-            //grad.print(10,4);
+            //grad.printText(10,4);
 
             for (int i = 0; i < n; i++) {
                 if (A.getmask(i)) {

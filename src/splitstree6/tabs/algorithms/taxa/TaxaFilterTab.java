@@ -37,7 +37,6 @@ public class TaxaFilterTab extends AlgorithmTab implements IDisplayTab {
 	 */
 	public TaxaFilterTab(MainWindow mainWindow, AlgorithmNode<TaxaBlock, TaxaBlock> taxaFilterNode) {
 		super(mainWindow, taxaFilterNode);
-		setText("Taxa Filter");
 
 		var loader = new ExtendedFXMLLoader<TaxaFilterController>(TaxaFilterTab.class);
 		taxaFilterController = loader.getController();

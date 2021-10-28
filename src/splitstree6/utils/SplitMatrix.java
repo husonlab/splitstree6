@@ -209,7 +209,7 @@ public class SplitMatrix {
 
 
 	public void print() {
-		System.out.println("print Split matrix:");
+		System.out.println("printText Split matrix:");
 		for (int i = 0; i <= allSplits.getNsplits(); i++) {
 			for (int j = 0; j <= nblocks; j++) {
 				System.out.print(matrix.get(i, j) + " ");

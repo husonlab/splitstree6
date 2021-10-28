@@ -32,7 +32,7 @@ public class AlgorithmNodeContextMenuPresenter {
 		controller.getEditMenuItem().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true));
 
 		controller.getRunMenuItem().setOnAction(e -> algorithmNode.restart());
-		controller.getRunMenuItem().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()));
+		controller.getRunMenuItem().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).not()));
 
 		controller.getStopMenuItem().setOnAction(e -> algorithmNode.getService().cancel());
 		controller.getStopMenuItem().disableProperty().bind(algorithmNode.getService().runningProperty().not());

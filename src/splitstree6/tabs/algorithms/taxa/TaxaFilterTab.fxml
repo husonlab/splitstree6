@@ -74,6 +74,9 @@
                     </center>
                 </BorderPane>
             </children>
+            <padding>
+                <Insets bottom="5.0"/>
+            </padding>
         </GridPane>
     </children>
 </AnchorPane>
