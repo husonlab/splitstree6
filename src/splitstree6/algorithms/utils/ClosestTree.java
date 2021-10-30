@@ -1,5 +1,5 @@
 /*
- *  GreedyCompatible.java Copyright (C) 2021 Daniel H. Huson
+ *  ClosestTree.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -18,7 +18,7 @@
  */
 
 /*
- * GreedyCompatible.java Copyright (C) 2021. Daniel H. Huson
+ * ClosestTree.java Copyright (C) 2021. Daniel H. Huson
  *
  * (Some code written by other authors, as named in code.)
  *
@@ -37,7 +37,7 @@
  *
  */
 
-package splitstree6.utils;
+package splitstree6.algorithms.utils;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
@@ -48,38 +48,51 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * greedily compute compatible splits
+ * computes the closest tree
  * Daniel Huson, 12/31/16.
  */
-public class GreedyCompatible {
+public class ClosestTree {
 	/**
-	 * greedily computes compatible splits
+	 * computes the closest tree
 	 *
-	 * @param progress
-	 * @param splits
-	 * @return compatible splits
-	 * @throws CanceledException
+	 * @return closest tree
 	 */
-	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits) throws CanceledException {
-		progress.setSubtask("Greedy compatible");
-		progress.setMaximum(splits.size());
-		progress.setProgress(0);
+	public static ArrayList<ASplit> apply(ProgressListener progress, final int ntax, final List<ASplit> splits, int[] cycle) throws CanceledException {
+		progress.setSubtask("Closest tree");
+		progress.setMaximum(100);
 
-		final ArrayList<ASplit> sorted = SplitsUtilities.sortByDecreasingWeight(splits);
+		final boolean[][] AdjMatrix = Compatibility.getCompatibilityMatrix(splits);
+		final double[] vertexWeights = new double[splits.size() + 1];
+		for (int i = 1; i <= splits.size(); i++) {
+			vertexWeights[i] = splits.get(i - 1).getWeight();
+		}
+
+		if (cycle == null)
+			cycle = SplitsUtilities.computeCycle(ntax, splits);
+
 		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
-		for (ASplit aSplit : sorted) {
-			boolean ok = true;
-			for (ASplit bSplit : result) {
-				if (!Compatibility.areCompatible(aSplit, bSplit)) {
-					ok = false;
-					break;
-				}
-				progress.incrementProgress();
-			}
-			if (ok) {
-				result.add(aSplit);
+		if (Compatibility.isCyclic(ntax, splits, cycle)) {
+			result.addAll(CircularMaxClique.getMaxClique(ntax, splits, vertexWeights, cycle));
+		} else {
+			MaxWeightClique maxClique = new MaxWeightClique(AdjMatrix, vertexWeights);
+			boolean[] clique = maxClique.getMaxClique();
+			for (int i = 1; i <= splits.size(); i++) {
+				if (clique[i])
+					result.add(splits.get(i - 1).clone());
 			}
 		}
+
+		double totalSquaredWeight = 0.0;
+		for (ASplit split : splits) {
+			totalSquaredWeight += split.getWeight() * split.getWeight();
+		}
+		for (ASplit split : result) {
+			totalSquaredWeight -= split.getWeight() * split.getWeight();
+		}
+		double diff = Math.sqrt(totalSquaredWeight);
+		System.err.println("Distance to closest tree = " + diff);
+		progress.setProgress(100);
+
 		return result;
 	}
 }

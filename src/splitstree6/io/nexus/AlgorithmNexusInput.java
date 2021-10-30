@@ -148,6 +148,7 @@ public class AlgorithmNexusInput extends NexusIOBase {
 	 * @return instance or null
 	 */
 	public static Algorithm createAlgorithmFromName(String algorithmName) {
+		algorithmName = algorithmName.replaceAll(" ", "");
 		var algorithms = PluginClassLoader.getInstances(algorithmName, Algorithm.class, null, "splitstree6.algorithms");
 		if (algorithms.size() == 1)
 			return algorithms.get(0);

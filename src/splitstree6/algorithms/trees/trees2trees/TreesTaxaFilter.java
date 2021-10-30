@@ -23,16 +23,16 @@ import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.utils.TreesUtilities;
 import splitstree6.workflow.DataTaxaFilter;
 
 import java.io.IOException;
 
 public class TreesTaxaFilter extends DataTaxaFilter<TreesBlock, TreesBlock> {
-	public TreesTaxaFilter(Class<TreesBlock> fromClass, Class<TreesBlock> toClass) {
-		super(fromClass, toClass);
+	public TreesTaxaFilter() {
+		super(TreesBlock.class, TreesBlock.class);
 	}
 
 	@Override

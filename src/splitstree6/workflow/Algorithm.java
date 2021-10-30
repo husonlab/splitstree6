@@ -40,6 +40,8 @@ import java.util.List;
  * @param <T>
  */
 public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extends jloda.fx.workflow.Algorithm implements HasFromClass<S>, HasToClass<T> {
+	public static final String BLOCK_NAME = "ALGORITHM";
+
 	private final Class<S> fromClass;
 	private final Class<T> toClass;
 

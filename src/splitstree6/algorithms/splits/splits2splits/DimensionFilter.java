@@ -32,11 +32,11 @@ import jloda.util.CanceledException;
 import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
+import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.utils.SplitsUtilities;
 
 import java.io.IOException;
 import java.util.*;

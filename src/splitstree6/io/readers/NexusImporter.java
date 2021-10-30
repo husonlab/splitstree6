@@ -84,7 +84,7 @@ public class NexusImporter {
 				}
 			}
 
-			while (!np.isAtBeginOfBlock(dataBlock.blockName()))
+			while (!np.isAtBeginOfBlock(dataBlock.getBlockName()))
 				np.skipBlock();
 
 			if (dataBlock instanceof DistancesBlock distancesBlock) {

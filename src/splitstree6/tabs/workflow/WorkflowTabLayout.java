@@ -197,7 +197,7 @@ public class WorkflowTabLayout {
 				}
 			} else if (node instanceof AlgorithmNode algorithmNode) {
 				if (workflow.isInputDataLoader(algorithmNode)) {
-					System.err.println("Skipped: " + algorithmNode);
+					System.err.println("Skipped: " + algorithmNode.getTitle());
 					// ignore
 				} else if (workflow.isInputTaxaDataFilter(algorithmNode)) {
 					var item = workflowTab.newAlgorithmItem(algorithmNode);

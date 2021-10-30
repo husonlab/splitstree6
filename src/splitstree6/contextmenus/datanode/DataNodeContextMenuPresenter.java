@@ -20,10 +20,24 @@
 package splitstree6.contextmenus.datanode;
 
 import javafx.geometry.Point2D;
-import splitstree6.dialog.attachnode.AttachNodeDialog;
+import javafx.scene.control.MenuItem;
+import javafx.util.Pair;
+import jloda.fx.window.NotificationManager;
+import jloda.util.PluginClassLoader;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.Algorithm;
+import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
+import splitstree6.workflow.Workflow;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+/**
+ * data node context menu
+ * Daniel Huson, 10.2021
+ */
 public class DataNodeContextMenuPresenter {
 
 	public DataNodeContextMenuPresenter(MainWindow mainWindow, Point2D screenLocation, DataNodeContextMenuController controller, DataNode dataNode) {
@@ -35,11 +49,39 @@ public class DataNodeContextMenuPresenter {
 			System.err.println("Export: not implemented");
 		});
 
-		controller.getAttachAlgorithmMenuItem().setOnAction(e -> {
-			new AttachNodeDialog(workflow, dataNode, screenLocation);
-		});
-		controller.getAttachAlgorithmMenuItem().disableProperty().bind(workflow.runningProperty());
+		controller.getAttachAlgorithmMenu().getItems().addAll(createAttachAlgorithmMenuItems(workflow, dataNode));
+		controller.getAttachAlgorithmMenu().disableProperty().bind(workflow.runningProperty());
+	}
 
+	private List<MenuItem> createAttachAlgorithmMenuItems(Workflow workflow, DataNode dataNode) {
+		// todo: sort items logically
 
+		var list = new ArrayList<Pair<String, Algorithm>>();
+		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+			if (algorithm.getFromClass() == dataNode.getDataBlock().getClass())
+				list.add(new Pair<>(algorithm.getName(), algorithm));
+		}
+		list.sort(Comparator.comparing(Pair::getKey)); // sort alphabetically
+
+		var result = new ArrayList<MenuItem>();
+		for (var pair : list) {
+			var menuItem = new MenuItem(pair.getKey());
+			menuItem.setOnAction(e -> attachAlgorithm(workflow, dataNode, pair.getValue()));
+			result.add(menuItem);
+		}
+		return result;
+	}
+
+	private void attachAlgorithm(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
+		try {
+			if (workflow.isRunning())
+				throw new RuntimeException("Workflow is currently running");
+			var targetDataNode = workflow.newDataNode((DataBlock) algorithm.getToClass().getConstructor().newInstance());
+			var algorithmNode = workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), dataNode, targetDataNode);
+			algorithmNode.restart();
+			NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
+		} catch (Exception ex) {
+			NotificationManager.showError("Attach algorithm failed: " + ex);
+		}
 	}
 }

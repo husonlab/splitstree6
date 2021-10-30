@@ -40,9 +40,9 @@ public class NexusIOBase {
 	 */
 	public void writeTitleAndLink(Writer w) throws IOException {
 		if (getTitle() != null && getTitle().length() > 0) {
-			w.write("TITLE " + getTitle() + ";\n");
+			w.write("TITLE '" + getTitle() + "';\n");
 			if (getLink() != null)
-				w.write("LINK " + getLink().getFirst() + " = " + getLink().getSecond() + ";\n");
+				w.write("LINK " + getLink().getFirst() + " = '" + getLink().getSecond() + "';\n");
 		}
 	}
 

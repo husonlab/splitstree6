@@ -381,7 +381,7 @@ public class CharactersBlock extends DataBlock {
 
 	@Override
 	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
-		return new CharactersTaxaFilter(CharactersBlock.class, CharactersBlock.class);
+		return new CharactersTaxaFilter();
 	}
 
 	@Override
@@ -406,7 +406,7 @@ public class CharactersBlock extends DataBlock {
 	}
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
 	}
 }

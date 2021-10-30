@@ -20,6 +20,8 @@
 package splitstree6.workflow;
 
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import splitstree6.data.TaxaBlock;
 
 
@@ -31,9 +33,11 @@ import splitstree6.data.TaxaBlock;
  * @param <T> output data
  */
 public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jloda.fx.workflow.AlgorithmNode {
+	private final StringProperty title = new SimpleStringProperty();
 
 	AlgorithmNode(Workflow owner) {
 		super(owner);
+		title.set(getName());
 		try {
 			owner.getServiceConfigurator().accept(getService());
 		} catch (Exception ignored) {
@@ -104,5 +108,17 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 				return dataNode;
 		}
 		return null;
+	}
+
+	public String getTitle() {
+		return title.get();
+	}
+
+	public StringProperty titleProperty() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title.set(title);
 	}
 }

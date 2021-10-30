@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
+ *  GreedyCompatible.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -18,9 +18,9 @@
  */
 
 /*
- *  AttachNodeDialogController.java Copyright (C) 2021 Daniel H. Huson
+ * GreedyCompatible.java Copyright (C) 2021. Daniel H. Huson
  *
- *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ * (Some code written by other authors, as named in code.)
  *
  *  This program is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -34,36 +34,52 @@
  *
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  */
-package splitstree6.dialog.attachnode;
 
+package splitstree6.algorithms.utils;
 
-import javafx.fxml.FXML;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.DialogPane;
-import javafx.scene.control.Label;
-import splitstree6.workflow.Algorithm;
+import jloda.util.CanceledException;
+import jloda.util.progress.ProgressListener;
+import splitstree6.data.parts.ASplit;
+import splitstree6.data.parts.Compatibility;
 
-public class AttachNodeDialogController {
+import java.util.ArrayList;
+import java.util.List;
 
-	@FXML
-	private DialogPane dialogPane;
+/**
+ * greedily compute compatible splits
+ * Daniel Huson, 12/31/16.
+ */
+public class GreedyCompatible {
+	/**
+	 * greedily computes compatible splits
+	 *
+	 * @param progress
+	 * @param splits
+	 * @return compatible splits
+	 * @throws CanceledException
+	 */
+	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits) throws CanceledException {
+		progress.setSubtask("Greedy compatible");
+		progress.setMaximum(splits.size());
+		progress.setProgress(0);
 
-	@FXML
-	private ChoiceBox<Algorithm> algorithmCBox;
-
-	@FXML
-	private Label dataTypeLabel;
-
-	public DialogPane getDialogPane() {
-		return dialogPane;
-	}
-
-	public ChoiceBox<Algorithm> getAlgorithmCBox() {
-		return algorithmCBox;
-	}
-
-	public Label getDataTypeLabel() {
-		return dataTypeLabel;
+		final ArrayList<ASplit> sorted = SplitsUtilities.sortByDecreasingWeight(splits);
+		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
+		for (ASplit aSplit : sorted) {
+			boolean ok = true;
+			for (ASplit bSplit : result) {
+				if (!Compatibility.areCompatible(aSplit, bSplit)) {
+					ok = false;
+					break;
+				}
+				progress.incrementProgress();
+			}
+			if (ok) {
+				result.add(aSplit);
+			}
+		}
+		return result;
 	}
 }

@@ -176,7 +176,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
 	}
 

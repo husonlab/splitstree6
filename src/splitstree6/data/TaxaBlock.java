@@ -341,7 +341,7 @@ public class TaxaBlock extends DataBlock {
 
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
 	}
 

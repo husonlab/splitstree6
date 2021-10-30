@@ -22,8 +22,6 @@ package splitstree6.treeview;
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
@@ -32,6 +30,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import jloda.fx.util.ResourceManagerFX;
@@ -50,7 +49,6 @@ public class WorkflowTreeItem extends TreeItem<String> {
 	private final MainWindow mainWindow;
 	private final WorkflowNode workflowNode;
 	private final Tooltip tooltip = new Tooltip();
-	private final BooleanProperty disable = new SimpleBooleanProperty();
 	private final ChangeListener<Worker.State> stateChangeListener;
 
 	public WorkflowTreeItem(MainWindow mainWindow) {
@@ -72,17 +70,17 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		stateChangeListener = null;
 	}
 
-	public WorkflowTreeItem(MainWindow mainWindow, WorkflowTreeView treeView, AlgorithmNode node) {
+	public WorkflowTreeItem(MainWindow mainWindow, AlgorithmNode node) {
 		super("");
 		this.mainWindow = mainWindow;
 		workflowNode = node;
 
 		final var label = new Label();
-		setGraphic(label);
+		final var vBox = new VBox(label);
+		setGraphic(vBox);
 
-		label.textProperty().bind(node.nameProperty());
+		label.textProperty().bind(node.titleProperty());
 
-		disable.bind(node.validProperty().not());
 		tooltip.textProperty().bind(node.shortDescriptionProperty());
 		Tooltip.install(getGraphic(), new Tooltip(node.getShortDescription()));
 
@@ -117,22 +115,16 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		};
 		node.getService().stateProperty().addListener(new WeakChangeListener<>(stateChangeListener));
 
-		label.setOnMouseClicked((e) -> {
+		vBox.setOnMouseClicked((e) -> {
 			if (e.getClickCount() == 2) {
 				showView();
 				e.consume();
 			}
 		});
 
-		disable.addListener((c, o, n) -> {
-			if (n)
-				label.setTextFill(Color.LIGHTGRAY);
-			else
-				label.setTextFill(Color.BLACK);
-		});
+		label.disableProperty().bind(node.validProperty().not());
 
-
-		label.setOnContextMenuRequested(me -> {
+		vBox.setOnContextMenuRequested(me -> {
 			var contextMenu = AlgorithmNodeContextMenu.create(mainWindow, mainWindow.getWorkflowTreeView().getUndoManager(), node);
 			contextMenu.show(label, me.getScreenX(), me.getScreenY());
 		});
@@ -143,10 +135,11 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		this.mainWindow = mainWindow;
 		workflowNode = node;
 
-		final Label label = new Label();
-		setGraphic(label);
+		final var label = new Label();
+		final var vBox = new VBox(label);
+		setGraphic(vBox);
 
-		label.textProperty().bind(node.nameProperty());
+		label.textProperty().bind(node.titleProperty());
 
 		var icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").
 													 replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
@@ -154,27 +147,21 @@ public class WorkflowTreeItem extends TreeItem<String> {
 			label.setGraphic(new ImageView(icon));
 		}
 
-		disable.bind(node.validProperty().not());
 		tooltip.textProperty().bind(node.shortDescriptionProperty());
 		Tooltip.install(getGraphic(), new Tooltip(node.getShortDescription()));
 
 		stateChangeListener = null;
 
-		label.setOnMouseClicked((e) -> {
+		vBox.setOnMouseClicked((e) -> {
 			if (e.getClickCount() == 2) {
 				showView();
 				e.consume();
 			}
 		});
 
-		disable.addListener((c, o, n) -> {
-			if (n)
-				label.setTextFill(Color.LIGHTGRAY);
-			else
-				label.setTextFill(Color.BLACK);
-		});
+		label.disableProperty().bind(node.validProperty().not());
 
-		label.setOnContextMenuRequested(e -> DataNodeContextMenu.create(mainWindow, new Point2D(e.getScreenX(), e.getScreenY()), node).show(label, e.getScreenX(), e.getScreenY()));
+		vBox.setOnContextMenuRequested(e -> DataNodeContextMenu.create(mainWindow, new Point2D(e.getScreenX(), e.getScreenY()), node).show(label, e.getScreenX(), e.getScreenY()));
 	}
 
 	/**
@@ -189,5 +176,9 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 	public String toString() {
 		return ((Label) getGraphic()).getText();
+	}
+
+	public WorkflowNode getWorkflowNode() {
+		return workflowNode;
 	}
 }

@@ -24,10 +24,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.utils.SimpleNewickParser;
-import splitstree6.utils.TreesUtilities;
 
 import java.io.File;
 import java.io.IOException;

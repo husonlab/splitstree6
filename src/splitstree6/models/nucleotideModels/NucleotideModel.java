@@ -33,10 +33,10 @@ import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
+import splitstree6.algorithms.utils.SplitsException;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.models.SubstitutionModel;
-import splitstree6.utils.SplitsException;
 
 /**
  * @author bryant

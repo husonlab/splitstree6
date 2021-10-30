@@ -42,7 +42,7 @@ public class AlgorithmNexusOutput extends NexusIOBase {
 	public void write(Writer w, Algorithm algorithm) throws IOException {
 		w.write("\nBEGIN ALGORITHM;\n");
 		writeTitleAndLink(w);
-		w.write("ALGORITHM " + algorithm.getName() + ";\n");
+		w.write("ALGORITHM '" + algorithm.getName() + "';\n");
 
 		final ArrayList<Option> options = new ArrayList<>(Option.getAllOptions(algorithm));
 		if (options.size() > 0) {

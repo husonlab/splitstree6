@@ -21,6 +21,7 @@ package splitstree6.tabs.workflow;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -67,6 +68,10 @@ public class WorkflowTabController {
 	private Button zoomOutButton;
 
 	private ZoomableScrollPane scrollPane;
+
+	@FXML
+	private ProgressIndicator progressIndicator;
+
 
 	@FXML
 	private void initialize() {
@@ -130,5 +135,9 @@ public class WorkflowTabController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
+	}
+
+	public ProgressIndicator getProgressIndicator() {
+		return progressIndicator;
 	}
 }

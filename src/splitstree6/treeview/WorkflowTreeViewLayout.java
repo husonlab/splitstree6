@@ -133,7 +133,6 @@ public class WorkflowTreeViewLayout {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
 					treeView.getRoot().getChildren().add(item);
-					dataNode.getChildren().addListener(createChildrenChangeListener(dataNode));
 					workingDataItem = item;
 					treeView.getRoot().setExpanded(true);
 				} else {
@@ -142,21 +141,22 @@ public class WorkflowTreeViewLayout {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
 					dataNode.getParents().addListener(createParentsChangeListener(dataNode));
-					dataNode.getChildren().addListener(createChildrenChangeListener(dataNode));
 				}
 			} else if (node instanceof AlgorithmNode algorithmNode) {
 				if (workflow.isInputDataLoader(algorithmNode) || workflow.isInputTaxaDataFilter(algorithmNode)) {
 					//System.err.println("Skipped: " + algorithmNode);
 					// ignore
 				} else if (workflow.isInputTaxaFilter(algorithmNode)) {
-					var item = new WorkflowTreeItem(mainWindow, treeView, algorithmNode);
+					var item = new WorkflowTreeItem(mainWindow, algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
-					inputTaxaItem.getChildren().add(1, item);
+					if (inputTaxaItem.getChildren().size() > 1)
+						inputTaxaItem.getChildren().add(1, item);
+					else
+						inputTaxaItem.getChildren().add(item);
 				} else {
-					var item = new WorkflowTreeItem(mainWindow, treeView, algorithmNode);
+					var item = new WorkflowTreeItem(mainWindow, algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					algorithmNode.getParents().addListener(createParentsChangeListener(algorithmNode));
-					algorithmNode.getChildren().addListener(createChildrenChangeListener(algorithmNode));
 				}
 			}
 		} catch (Exception ex) {
@@ -175,34 +175,19 @@ public class WorkflowTreeViewLayout {
 							for (var parentNode : e.getAddedSubList()) {
 								if (parentNode instanceof AlgorithmNode && node instanceof DataNode dataNode && parentNode == dataNode.getPreferredParent()) {
 									var parentItem = nodeItemMap.get(parentNode);
-									if (parentItem != null) {
-										var parentParentItem = parentItem.getParent();
-										if (parentParentItem != null) {
-											if (parentParentItem == treeView.getRoot()) {
-												if (workingDataItem != null)
-													workingDataItem.getChildren().add(item);
-											} else
-												parentParentItem.getChildren().add(item);
-										}
-										// don't add data node as child of parent
-									}
+									parentItem.getChildren().add(item);
+									compress(parentItem);
+									break;
+
 								} else if (parentNode instanceof DataNode && node instanceof AlgorithmNode algorithmNode && parentNode == algorithmNode.getPreferredParent()) {
 									var parentItem = nodeItemMap.get(parentNode);
-									var parentParentItem = parentItem.getParent();
-									var added = false;
-									if (parentParentItem != null) {
-										var count = parentParentItem.getChildren().size();
-										if (count == 0 || parentParentItem.getChildren().get(count - 1) == parentItem) {
-											parentParentItem.getChildren().add(item);
-											added = true;
-										}
-									}
-									if (!added)
-										parentItem.getChildren().add(item);
+									parentItem.getChildren().add(item);
+									compress(parentItem);
 									break;
 								}
 							}
 						}
+
 						if (workingDataItem != null)
 							workingDataItem.setExpanded(true);
 					} else if (e.wasRemoved()) {
@@ -221,66 +206,23 @@ public class WorkflowTreeViewLayout {
 		};
 	}
 
-	private ListChangeListener<WorkflowNode> createChildrenChangeListener(WorkflowNode node) {
-		return e -> {
-			try {
-				var item = nodeItemMap.get(node);
-				if (item != null) {
-					while (e.next()) {
-						if (e.wasAdded()) {
-							for (var child : e.getAddedSubList()) {
-								var childItem = nodeItemMap.get(child);
-								if (isNotContainedInTreeView(childItem)) {
-									if (node instanceof AlgorithmNode) {
-										var parentParentItem = item.getParent();
-										if (parentParentItem != null) {
-											parentParentItem.getChildren().add(childItem);
-											parentParentItem.setExpanded(true);
-											break;
-										}
-									} else if (node instanceof DataNode dataNode) {
-										if (workflow.isWorkingDataNode(dataNode)) {
-											item.getChildren().add(childItem);
-											item.setExpanded(true);
-											break;
-										} else {
-											var added = false;
-											var parentParentItem = item.getParent();
-											if (parentParentItem != null) {
-												var count = parentParentItem.getChildren().size();
-												if (count == 0 || parentParentItem.getChildren().get(count - 1) == item) {
-													parentParentItem.getChildren().add(childItem);
-													parentParentItem.setExpanded(true);
-
-													added = true;
-												}
-											}
-											if (!added) {
-												item.getChildren().add(childItem);
-												item.setExpanded(true);
-											}
-											break;
-										}
-									}
-								}
-							}
-							if (workingDataItem != null)
-								workingDataItem.setExpanded(true);
-						} else if (e.wasRemoved()) {
-							for (var child : e.getRemoved()) {
-								var childItem = nodeItemMap.get(child);
-								if (childItem != null) {
-									item.getChildren().remove(childItem);
-									deletedItemParentMap.put(item, childItem);
-								}
-							}
-						}
+	private void compress(WorkflowTreeItem item) {
+		var changed = true;
+		do {
+			changed = false;
+			if (item.getWorkflowNode().getPreferredParent() != null && item.getWorkflowNode().getPreferredParent().getChildren().size() == 1 && item.getChildren().size() == 1) {
+				var parent = (WorkflowTreeItem) item.getParent();
+				if (parent != null && parent.getChildren().size() > 0) {
+					if (parent.getChildren().indexOf(item) == parent.getChildren().size() - 1) {
+						var childOfItem = (WorkflowTreeItem) item.getChildren().remove(0);
+						parent.getChildren().add(childOfItem);
+						item = childOfItem;
+						changed = true;
 					}
 				}
-			} catch (Exception ex) {
-				Basic.caught(ex);
 			}
-		};
+		}
+		while (changed);
 	}
 
 	private boolean isNotContainedInTreeView(WorkflowTreeItem item) {

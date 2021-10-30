@@ -145,4 +145,5 @@ public class TaxaNexusInput extends NexusIOBase {
 		np.matchEndBlock();
 		return taxonNamesFound;
 	}
+
 }

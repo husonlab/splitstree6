@@ -21,6 +21,7 @@ package splitstree6.contextmenus.datanode;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.ContextMenu;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
 
 public class DataNodeContextMenuController {
@@ -35,7 +36,7 @@ public class DataNodeContextMenuController {
 	private MenuItem exportMenuItem;
 
 	@FXML
-	private MenuItem attachAlgorithmMenuItem;
+	private Menu attachAlgorithmMenu;
 
 	public ContextMenu getContextMenu() {
 		return contextMenu;
@@ -49,7 +50,7 @@ public class DataNodeContextMenuController {
 		return exportMenuItem;
 	}
 
-	public MenuItem getAttachAlgorithmMenuItem() {
-		return attachAlgorithmMenuItem;
+	public Menu getAttachAlgorithmMenu() {
+		return attachAlgorithmMenu;
 	}
 }

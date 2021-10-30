@@ -174,7 +174,7 @@ public class DistancesBlock extends DataBlock {
 
 	@Override
 	public DataTaxaFilter<DistancesBlock, DistancesBlock> createTaxaDataFilter() {
-		return new DistancesTaxaFilter(DistancesBlock.class, DistancesBlock.class);
+		return new DistancesTaxaFilter();
 	}
 
 	@Override
@@ -196,7 +196,7 @@ public class DistancesBlock extends DataBlock {
 	}
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
 	}
 }

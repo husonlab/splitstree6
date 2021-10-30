@@ -91,7 +91,7 @@ public class TreesBlock extends DataBlock {
 
 	@Override
 	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
-		return new TreesTaxaFilter(TreesBlock.class, TreesBlock.class);
+		return new TreesTaxaFilter();
 	}
 
 	@Override
@@ -128,7 +128,7 @@ public class TreesBlock extends DataBlock {
 	}
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
 	}
 

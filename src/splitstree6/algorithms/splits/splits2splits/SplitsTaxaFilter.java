@@ -31,8 +31,9 @@ import java.util.BitSet;
 import java.util.Map;
 
 public class SplitsTaxaFilter extends DataTaxaFilter<SplitsBlock, SplitsBlock> {
-	public SplitsTaxaFilter(Class<SplitsBlock> fromClass, Class<SplitsBlock> toClass) {
-		super(fromClass, toClass);
+
+	public SplitsTaxaFilter() {
+		super(SplitsBlock.class, SplitsBlock.class);
 	}
 
 	@Override

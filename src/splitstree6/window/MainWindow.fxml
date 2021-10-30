@@ -483,7 +483,7 @@
                                 <AnchorPane fx:id="leftAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0"
                                             prefWidth="100.0">
                                     <children>
-                                        <SplitPane fx:id="leftSplitPane" dividerPositions="0.5" orientation="VERTICAL"
+                                        <SplitPane fx:id="leftSplitPane" dividerPositions="1.0" orientation="VERTICAL"
                                                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <items>

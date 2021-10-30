@@ -28,10 +28,10 @@ import jloda.util.Basic;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
+import splitstree6.algorithms.utils.RerootingUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.utils.RerootingUtils;
 
 import java.io.IOException;
 import java.util.Arrays;

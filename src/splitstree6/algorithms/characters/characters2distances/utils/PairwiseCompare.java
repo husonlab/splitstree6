@@ -20,10 +20,10 @@
 
 package splitstree6.algorithms.characters.characters2distances.utils;
 
+import splitstree6.algorithms.utils.SplitsException;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.parts.AmbiguityCodes;
 import splitstree6.models.SubstitutionModel;
-import splitstree6.utils.SplitsException;
 
 /**
  * Computes pairwise distances

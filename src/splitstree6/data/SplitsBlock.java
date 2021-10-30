@@ -22,9 +22,9 @@ package splitstree6.data;
 import javafx.collections.FXCollections;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.splits.splits2splits.SplitsTaxaFilter;
+import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.utils.SplitsUtilities;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
@@ -227,7 +227,7 @@ public class SplitsBlock extends DataBlock {
 
 	@Override
 	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
-		return new SplitsTaxaFilter(SplitsBlock.class, SplitsBlock.class);
+		return new SplitsTaxaFilter();
 	}
 
 	@Override
@@ -251,7 +251,7 @@ public class SplitsBlock extends DataBlock {
 	}
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
 	}
 

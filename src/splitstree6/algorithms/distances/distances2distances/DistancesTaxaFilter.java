@@ -28,8 +28,9 @@ import splitstree6.workflow.DataTaxaFilter;
 import java.io.IOException;
 
 public class DistancesTaxaFilter extends DataTaxaFilter<DistancesBlock, DistancesBlock> {
-	public DistancesTaxaFilter(Class<DistancesBlock> fromClass, Class<DistancesBlock> toClass) {
-		super(fromClass, toClass);
+
+	public DistancesTaxaFilter() {
+		super(DistancesBlock.class, DistancesBlock.class);
 	}
 
 	@Override

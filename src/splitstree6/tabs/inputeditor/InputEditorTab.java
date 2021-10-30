@@ -21,9 +21,8 @@ package splitstree6.tabs.inputeditor;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileLineIterator;
 import jloda.util.FileUtils;
@@ -39,6 +38,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.function.Consumer;
 
 public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 	public static final String NAME = "Input Editor";
@@ -48,8 +48,6 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 	private File tmpFile;
 
 	private final StringProperty inputFileName = new SimpleStringProperty("");
-
-	private Throwable importException;
 
 	/**
 	 * constructor
@@ -110,6 +108,7 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 			var name = FileUtils.getFileBaseName(fileName);
 			setInputFileName(name);
 			mainWindow.setName(name);
+			RecentFilesManager.getInstance().insertRecentFile(fileName);
 		} catch (IOException ex) {
 			NotificationManager.showError("Import text failed: " + ex.getMessage());
 		}
@@ -126,7 +125,6 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 
 	public void parseAndLoad() {
 		try {
-			importException = null;
 			if (tmpFile == null) {
 				tmpFile = FileUtils.getUniqueFileName(System.getProperty("user.dir"), "Untitled", "tmp");
 				tmpFile.deleteOnExit();
@@ -135,17 +133,16 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 				w.write(getController().getCodeArea().getText());
 			}
 
-			EventHandler<WorkerStateEvent> failedHandler = e -> {
-				var exception = e.getSource().getException();
-				if (exception instanceof IOExceptionWithLineNumber exceptionWithLineNumber) {
+			Consumer<Throwable> failedHandler = ex -> {
+				if (ex instanceof IOExceptionWithLineNumber exceptionWithLineNumber) {
 					getTabPane().getSelectionModel().select(this);
 					getController().getCodeArea().requestFocus();
 					gotoLine(exceptionWithLineNumber.getLineNumber(), 0);
-					importException = exception;
 				}
-				NotificationManager.showError("Parse failed: " + exception.getMessage());
+				NotificationManager.showError("Parse failed: " + ex.getMessage());
 			};
 			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler);
+			mainWindow.setDirty(true);
 			mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen();
 		} catch (Exception ex) {
 			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());

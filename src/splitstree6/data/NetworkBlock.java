@@ -145,7 +145,7 @@ public class NetworkBlock extends DataBlock {
 	}
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
 	}
 }

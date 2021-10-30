@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.utils;
+package splitstree6.algorithms.utils;
 
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
@@ -43,6 +43,7 @@ import java.util.*;
 public class SplitsUtilities {
 	/**
 	 * computes the least squares fit
+	 *
 	 * @return squares fit
 	 */
 	public static float computeLeastSquaresFit(DistancesBlock distancesBlock, List<ASplit> splits) {

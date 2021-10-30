@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.utils;
+package splitstree6.algorithms.utils;
 
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;

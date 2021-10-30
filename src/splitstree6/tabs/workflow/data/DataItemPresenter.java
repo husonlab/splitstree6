@@ -31,9 +31,8 @@ import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataBlock;
 
 /**
- * datat
- *
- * @param <D>
+ * data item presenter
+ * Daniel Huson, 10.21
  */
 public class DataItemPresenter<D extends DataBlock> {
 
@@ -49,7 +48,10 @@ public class DataItemPresenter<D extends DataBlock> {
 		controller.getEditButton().setOnAction(e -> mainWindow.getTextTabsManager().showTab(dataNode, true));
 		controller.getEditButton().disableProperty().bind((selected.and(dataNode.validProperty()).not()));
 
-		controller.getNameLabel().textProperty().bind(dataNode.nameProperty());
+		controller.getNameLabel().textProperty().bind(dataNode.titleProperty());
+
+		controller.getInfoLabel().setText(String.format("size: %,d", dataNode.getDataBlock().size()));
+		controller.getStatusImageView().setImage(dataNode.getDataBlock().size() > 0 ? ResourceManagerFX.getIcon("Done.png") : ResourceManagerFX.getIcon("Scheduled.png"));
 
 		dataNode.allParentsValidProperty().addListener((v, o, n) -> {
 			if (n && dataNode.isValid()) {

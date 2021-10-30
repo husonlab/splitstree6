@@ -48,6 +48,8 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		controller.getInactiveListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		ListViewTypeSearcher.setup(controller.getInactiveListView());
 
+		controller.getActiveListView().getItems().setAll(inputTaxa.getLabels());
+
 		workflow.getInputTaxaNode().validProperty().addListener((v, o, n) -> {
 			controller.getActiveListView().getItems().setAll(inputTaxa.getLabels());
 			controller.getInactiveListView().getItems().clear();

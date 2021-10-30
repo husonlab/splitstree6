@@ -28,8 +28,9 @@ import splitstree6.workflow.DataTaxaFilter;
 import java.io.IOException;
 
 public class CharactersTaxaFilter extends DataTaxaFilter<CharactersBlock, CharactersBlock> {
-	public CharactersTaxaFilter(Class<CharactersBlock> fromClass, Class<CharactersBlock> toClass) {
-		super(fromClass, toClass);
+
+	public CharactersTaxaFilter() {
+		super(CharactersBlock.class, CharactersBlock.class);
 	}
 
 	@Override

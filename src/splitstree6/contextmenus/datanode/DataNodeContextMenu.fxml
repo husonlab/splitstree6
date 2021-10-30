@@ -50,7 +50,7 @@
                     </graphic>
                 </MenuItem>
                 <SeparatorMenuItem mnemonicParsing="false"/>
-                <MenuItem fx:id="attachAlgorithmMenuItem" mnemonicParsing="false" text="Attach Algorithm...">
+                <Menu fx:id="attachAlgorithmMenu" text="Attach Algorithm">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">
@@ -59,7 +59,7 @@
                             </image>
                         </ImageView>
                     </graphic>
-                </MenuItem>
+                </Menu>
             </items>
         </ContextMenu>
     </contextMenu>

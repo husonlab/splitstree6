@@ -19,15 +19,27 @@
 
 package splitstree6.data;
 
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
-
+/**
+ * represents the input source for the analysis
+ * Daniel Huson, 10.2021
+ */
 public class SourceBlock extends DataBlock {
 	private final ObservableList<String> sources = FXCollections.observableArrayList();
 	private final ObservableList<String> fileExtensions = FXCollections.observableArrayList();
+	private final BooleanProperty allowMultiFileInput = new SimpleBooleanProperty(false);
+	private final BooleanProperty usingInputEditor = new SimpleBooleanProperty(false);
+
+	private final ObjectProperty<Class<? extends DataBlock>> supportedDataBlockClass = new SimpleObjectProperty<>(DataBlock.class);
+
+	public SourceBlock() {
+		allowMultiFileInput.bind(supportedDataBlockClass.isEqualTo(TreesBlock.class));
+	}
 
 	@Override
 	public int size() {
@@ -60,7 +72,39 @@ public class SourceBlock extends DataBlock {
 	}
 
 	@Override
-	public String blockName() {
+	public String getBlockName() {
 		return BLOCK_NAME;
+	}
+
+	public Class<? extends DataBlock> getSupportedDataBlockClass() {
+		return supportedDataBlockClass.get();
+	}
+
+	public ObjectProperty<Class<? extends DataBlock>> supportedDataBlockClassProperty() {
+		return supportedDataBlockClass;
+	}
+
+	public void setSupportedDataBlockClass(Class<? extends DataBlock> supportedDataBlockClass) {
+		this.supportedDataBlockClass.set(supportedDataBlockClass);
+	}
+
+	public boolean isAllowMultiFileInput() {
+		return allowMultiFileInput.get();
+	}
+
+	public ReadOnlyBooleanProperty allowMultiFileInputProperty() {
+		return allowMultiFileInput;
+	}
+
+	public boolean isUsingInputEditor() {
+		return usingInputEditor.get();
+	}
+
+	public BooleanProperty usingInputEditorProperty() {
+		return usingInputEditor;
+	}
+
+	public void setUsingInputEditor(boolean usingInputEditor) {
+		this.usingInputEditor.set(usingInputEditor);
 	}
 }

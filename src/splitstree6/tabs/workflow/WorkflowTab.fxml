@@ -183,5 +183,7 @@
                 </VBox>
             </top>
         </BorderPane>
+        <ProgressIndicator fx:id="progressIndicator" layoutX="10.0" layoutY="10.0" prefHeight="16.0" prefWidth="16.0"
+                           AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="8.0"/>
     </children>
 </AnchorPane>

@@ -24,12 +24,12 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.utils.SplitsUtilities;
-import splitstree6.utils.TreesUtilities;
 
 import java.io.IOException;
 import java.util.BitSet;

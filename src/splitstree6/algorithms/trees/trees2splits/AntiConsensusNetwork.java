@@ -34,12 +34,12 @@ import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.utils.TreesUtilities;
 
 import java.io.IOException;
 import java.util.*;

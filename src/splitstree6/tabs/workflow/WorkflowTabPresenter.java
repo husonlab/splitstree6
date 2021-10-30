@@ -20,6 +20,8 @@
 package splitstree6.tabs.workflow;
 
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
 import javafx.scene.effect.DropShadow;
@@ -28,6 +30,9 @@ import javafx.scene.paint.Color;
 import jloda.fx.util.SelectionEffectBlue;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.commands.DeleteCommand;
+import splitstree6.workflow.commands.DuplicateCommand;
 
 import java.util.stream.Collectors;
 
@@ -40,6 +45,8 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 	private final WorkflowTab workflowTab;
 	private final Group nodeItemsGroup = new Group();
 	private final WorkflowTabLayout workflowTabLayout;
+
+	private final ObjectProperty<AlgorithmNode> nodeToDuplicateOrDelete = new SimpleObjectProperty<>(null);
 
 	public WorkflowTabPresenter(MainWindow mainWindow, WorkflowTab workflowTab) {
 		this.mainWindow = mainWindow;
@@ -70,9 +77,20 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 			} else if (e.wasRemoved()) {
 				e.getElementRemoved().setEffect(getDropShadow());
 			}
+			if (workflowTab.getSelectionModel().size() == 1) {
+				var node = workflowTab.getSelectionModel().getSelectedItem().getWorkflowNode();
+				nodeToDuplicateOrDelete.set(node instanceof AlgorithmNode && mainWindow.getWorkflow().isDerivedNode(node) ? (AlgorithmNode) node : null);
+			} else
+				nodeToDuplicateOrDelete.set(null);
 		});
 
 		tabController.getMainPane().setOnMouseClicked(e -> workflowTab.getSelectionModel().clearSelection());
+
+		tabController.getOpenButton().setOnAction(e -> mainWindow.getController().getOpenMenuItem().getOnAction().handle(e));
+		tabController.getSaveButton().setOnAction(e -> mainWindow.getController().getSaveAsMenuItem().getOnAction().handle(e));
+		tabController.getPrintButton().setOnAction(e -> mainWindow.getController().getPrintMenuItem().getOnAction().handle(e));
+
+		tabController.getProgressIndicator().visibleProperty().bind(mainWindow.getWorkflow().runningProperty());
 	}
 
 
@@ -92,8 +110,13 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		controller.getRedoMenuItem().setOnAction(e -> workflowTab.getUndoManager().redo());
 		controller.getRedoMenuItem().disableProperty().bind(workflowTab.getUndoManager().redoableProperty().not());
 
-		controller.getDuplicateMenuItem().setOnAction(null);
-		controller.getDeleteMenuItem().setOnAction(null);
+		controller.getDuplicateMenuItem().setOnAction(e -> {
+			workflowTab.getUndoManager().doAndAdd(new DuplicateCommand(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get()));
+		});
+		controller.getDuplicateMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+
+		controller.getDeleteMenuItem().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(new DeleteCommand(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
+		controller.getDeleteMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
 
 		controller.getFindMenuItem().setOnAction(null);
 		controller.getFindAgainMenuItem().setOnAction(null);
@@ -108,6 +131,7 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		controller.getZoomInMenuItem().setOnAction(tabController.getZoomInButton().getOnAction());
 		controller.getZoomOutMenuItem().setOnAction(tabController.getZoomOutButton().getOnAction());
+
 		controller.getResetMenuItem().setOnAction(tabController.getZoomButton().getOnAction());
 	}
 

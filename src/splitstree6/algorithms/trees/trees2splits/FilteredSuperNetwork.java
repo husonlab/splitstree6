@@ -28,11 +28,11 @@ import jloda.phylo.Distortion;
 import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
-import splitstree6.utils.TreesUtilities;
 
 import java.io.IOException;
 import java.util.Arrays;

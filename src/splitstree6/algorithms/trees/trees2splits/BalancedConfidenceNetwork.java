@@ -24,10 +24,10 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.ConfidenceNetwork;
+import splitstree6.algorithms.utils.SplitMatrix;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.utils.SplitMatrix;
 
 import java.io.IOException;
 import java.util.Collections;

@@ -38,7 +38,7 @@ public class AlgorithmItemPresenter {
 
 		algorithmItem.setEffect(WorkflowTabPresenter.getDropShadow());
 
-		controller.getNameLabel().textProperty().bind(algorithmNode.nameProperty());
+		controller.getNameLabel().textProperty().bind(algorithmNode.titleProperty());
 
 		var selected = new SimpleBooleanProperty(false);
 		workflowTab.getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(workflowTab.getSelectionModel().isSelected(algorithmItem)));
@@ -82,7 +82,7 @@ public class AlgorithmItemPresenter {
 		progressIndicator.setPrefHeight(16);
 		progressIndicator.setPrefWidth(16);
 
-		controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Scheduled.png", 16));
+		controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Done.png", 16));
 
 		algorithmNode.getService().stateProperty().addListener((v, o, n) -> {
 			switch (n) {

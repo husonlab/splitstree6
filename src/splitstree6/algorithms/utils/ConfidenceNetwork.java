@@ -43,7 +43,6 @@ import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.ASplit;
-import splitstree6.utils.SplitMatrix;
 
 import java.util.Arrays;
 import java.util.BitSet;

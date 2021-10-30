@@ -31,19 +31,25 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
+import jloda.fx.window.NotificationManager;
 import jloda.fx.window.WindowGeometry;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
 import splitstree6.dialog.SaveBeforeClosingDialog;
+import splitstree6.dialog.SaveDialog;
+import splitstree6.io.FileLoader;
+import splitstree6.io.readers.ImportManager;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 
+import java.io.File;
 import java.util.Stack;
 
 public class MainWindowPresenter {
@@ -130,6 +136,10 @@ public class MainWindowPresenter {
 
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 
+		RecentFilesManager.getInstance().setFileOpener(fileName -> {
+			FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex));
+		});
+
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 	}
 
@@ -138,7 +148,16 @@ public class MainWindowPresenter {
 		controller.getNewMenuItem().setOnAction(e -> MainWindowManager.getInstance().createAndShowWindow(false));
 
 		controller.getOpenMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
+			final File previousDir = new File(ProgramProperties.get("InputDir", ""));
+			final FileChooser fileChooser = new FileChooser();
+			if (previousDir.isDirectory())
+				fileChooser.setInitialDirectory(previousDir);
+			fileChooser.setTitle("Open input file");
+			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
+			final File selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
+			if (selectedFile != null) {
+				FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
+			}
 		});
 
 		controller.getImportMenuItem().setOnAction(e -> {
@@ -155,14 +174,15 @@ public class MainWindowPresenter {
 		});
 
 		controller.getSaveMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
+			SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName()));
 		});
+		controller.getSaveMenuItem().disableProperty().bind((mainWindow.dirtyProperty().and(mainWindow.fileNameProperty().isNotEmpty()).and(mainWindow.hasSplitsTree6FileProperty())).not());
 
-		controller.getSaveMenuItem().disableProperty().bind(mainWindow.dirtyProperty().not().or(mainWindow.emptyProperty()));
+
 		controller.getSaveAsMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
+			SaveDialog.showSaveDialog(mainWindow, false);
 		});
-		controller.getSaveMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
 
 		controller.getExportMenuItem().setOnAction(e -> {
 			System.err.println("Not implemented");
@@ -170,9 +190,9 @@ public class MainWindowPresenter {
 		controller.getExportMenuItem().disableProperty().bind(mainWindow.emptyProperty());
 
 		controller.getExportWorkflowMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
+			SaveDialog.showSaveDialog(mainWindow, true);
 		});
-		controller.getExportWorkflowMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
 
 
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
@@ -205,7 +225,8 @@ public class MainWindowPresenter {
 		controller.getCloseMenuItem().setOnAction(e -> {
 			if (SaveBeforeClosingDialog.apply(mainWindow) != SaveBeforeClosingDialog.Result.cancel) {
 				ProgramProperties.put("WindowGeometry", (new WindowGeometry(mainWindow.getStage())).toString());
-				MainWindowManager.getInstance().closeMainWindow(mainWindow);
+				if (MainWindowManager.getInstance().closeMainWindow(mainWindow))
+					mainWindow.getWorkflow().cancel();
 			}
 		});
 

@@ -61,5 +61,5 @@ public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
 		}
 	}
 
-	public abstract String blockName();
+	public abstract String getBlockName();
 }

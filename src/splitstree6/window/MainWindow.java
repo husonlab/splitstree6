@@ -20,6 +20,7 @@
 package splitstree6.window;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -59,6 +60,9 @@ public class MainWindow implements IMainWindow {
 	private final TextDisplayTab methodsTab;
 	private final WorkflowTreeView workflowTreeView;
 
+	private final StringProperty fileName = new SimpleStringProperty("");
+	private final BooleanProperty hasSplitsTree6File = new SimpleBooleanProperty(false);
+
 	private Stage stage;
 
 	public MainWindow() {
@@ -69,6 +73,8 @@ public class MainWindow implements IMainWindow {
 		controller = loader.getController();
 
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(controller.getBottomFlowPane()));
+
+		empty.bind(Bindings.isEmpty(workflow.nodes()));
 
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
@@ -83,7 +89,7 @@ public class MainWindow implements IMainWindow {
 
 		workflowTab = new WorkflowTab(this);
 		methodsTab = new TextDisplayTab(this, "Methods", false, false);
-		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? "" : ExtractMethodsText.getInstance().apply(workflow)));
+		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? ExtractMethodsText.getInstance().apply(workflow) : ""));
 
 		textTabsManager = new TextTabsManager(this);
 		algorithmTabsManager = new AlgorithmTabsManager(this);
@@ -183,7 +189,7 @@ public class MainWindow implements IMainWindow {
 
 	public Tab getTabByClass(Class clazz) {
 		for (var tab : controller.getMainTabPane().getTabs()) {
-			if (tab.getClass().isAssignableFrom(clazz))
+			if (tab.getClass() == clazz)
 				return tab;
 		}
 		return null;
@@ -205,12 +211,8 @@ public class MainWindow implements IMainWindow {
 		return selectionModel;
 	}
 
-	public BooleanProperty emptyProperty() {
+	public ReadOnlyBooleanProperty emptyProperty() {
 		return empty;
-	}
-
-	public void setEmpty(boolean empty) {
-		this.empty.set(empty);
 	}
 
 	public Parent getRoot() {
@@ -231,5 +233,29 @@ public class MainWindow implements IMainWindow {
 
 	public WorkflowTreeView getWorkflowTreeView() {
 		return workflowTreeView;
+	}
+
+	public String getFileName() {
+		return fileName.get();
+	}
+
+	public StringProperty fileNameProperty() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName.set(fileName);
+	}
+
+	public boolean isHasSplitsTree6File() {
+		return hasSplitsTree6File.get();
+	}
+
+	public BooleanProperty hasSplitsTree6FileProperty() {
+		return hasSplitsTree6File;
+	}
+
+	public void setHasSplitsTree6File(boolean hasSplitsTree6File) {
+		this.hasSplitsTree6File.set(hasSplitsTree6File);
 	}
 }

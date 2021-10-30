@@ -31,14 +31,14 @@ import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.splits.splits2splits.LeastSquaresWeights;
 import splitstree6.algorithms.trees.trees2distances.AverageDistances;
 import splitstree6.algorithms.utils.PartialSplit;
+import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.utils.SplitsUtilities;
-import splitstree6.utils.TreesUtilities;
 
 import java.io.IOException;
 import java.util.*;

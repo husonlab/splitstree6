@@ -25,10 +25,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.utils.LeastSquares;
+import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.utils.SplitsUtilities;
 
 import java.io.IOException;
 import java.util.Collections;

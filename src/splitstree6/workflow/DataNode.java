@@ -19,6 +19,9 @@
 
 package splitstree6.workflow;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 /**
  * a workflow node that contains data
  * Daniel Huson, 10.2021
@@ -26,9 +29,11 @@ package splitstree6.workflow;
  * @param <S> the data block type
  */
 public class DataNode<S extends DataBlock> extends jloda.fx.workflow.DataNode {
+	private final StringProperty title = new SimpleStringProperty();
 
 	DataNode(Workflow workflow) {
 		super(workflow);
+		title.set(getName());
 
 		validProperty().addListener((v, o, n) -> {
 			if (!n && getDataBlock() != null)
@@ -54,5 +59,17 @@ public class DataNode<S extends DataBlock> extends jloda.fx.workflow.DataNode {
 				return algorithmNode;
 		}
 		return null;
+	}
+
+	public String getTitle() {
+		return title.get();
+	}
+
+	public StringProperty titleProperty() {
+		return title;
+	}
+
+	public void setTitle(String title) {
+		this.title.set(title);
 	}
 }

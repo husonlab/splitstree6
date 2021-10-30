@@ -19,8 +19,6 @@
 
 package splitstree6.workflow;
 
-import javafx.concurrent.WorkerStateEvent;
-import javafx.event.EventHandler;
 import jloda.fx.window.NotificationManager;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
@@ -36,6 +34,8 @@ import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.window.MainWindow;
 
+import java.util.function.Consumer;
+
 /**
  * methods for setting up different splitstree workflows
  * Daniel Huson, 10.2021
@@ -47,7 +47,7 @@ public class WorkflowSetup {
 		return apply(fileName, new Workflow(), null);
 	}
 
-	public static Workflow apply(String fileName, Workflow workflow, EventHandler<WorkerStateEvent> failedHandler) {
+	public static Workflow apply(String fileName, Workflow workflow, Consumer<Throwable> exceptionHandler) {
 		workflow.clear();
 
 		var sourceBlock = new SourceBlock();
@@ -99,9 +99,10 @@ public class WorkflowSetup {
 		 */
 		System.err.println("Workflow: " + workflow.size());
 		if (workflow.size() > 0) {
-			if (failedHandler != null)
-				workflow.getLoaderNode().getService().setOnFailed(failedHandler);
+			if (exceptionHandler != null)
+				workflow.getLoaderNode().getService().setOnFailed(e -> exceptionHandler.accept(e.getSource().getException()));
 			workflow.getSourceNode().setValid(true);
+			workflow.getInputDataLoaderNode().restart();
 		}
 		return workflow;
 	}

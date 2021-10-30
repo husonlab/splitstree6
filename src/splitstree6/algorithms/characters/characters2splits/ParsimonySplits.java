@@ -23,13 +23,13 @@ package splitstree6.algorithms.characters.characters2splits;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.AmbiguityCodes;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.utils.SplitsUtilities;
 
 import java.io.IOException;
 import java.util.ArrayList;

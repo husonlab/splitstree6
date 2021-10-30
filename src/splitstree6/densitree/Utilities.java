@@ -40,11 +40,11 @@ package splitstree6.densitree;
 
 import javafx.stage.FileChooser;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.io.readers.trees.NewickReader;
-import splitstree6.utils.SplitsUtilities;
-import splitstree6.utils.TreesUtilities;
 
 import java.util.ArrayList;
 import java.util.BitSet;
