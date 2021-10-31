@@ -46,6 +46,7 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 
 	public void setAlgorithm(Algorithm<S, T> algorithm) {
 		super.setAlgorithm(algorithm);
+		algorithm.setNode(this);
 	}
 
 	public Algorithm getAlgorithm() {
@@ -120,5 +121,9 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 
 	public void setTitle(String title) {
 		this.title.set(title);
+	}
+
+	public Workflow getOwner() {
+		return (Workflow) super.getOwner();
 	}
 }

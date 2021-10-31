@@ -37,13 +37,13 @@ public class AlgorithmNodeContextMenuPresenter {
 		controller.getStopMenuItem().setOnAction(e -> algorithmNode.getService().cancel());
 		controller.getStopMenuItem().disableProperty().bind(algorithmNode.getService().runningProperty().not());
 
-		controller.getDuplicateMenuItem().setOnAction(e -> undoManager.doAndAdd(new DuplicateCommand(workflow, algorithmNode)));
+		controller.getDuplicateMenuItem().setOnAction(e -> undoManager.doAndAdd(DuplicateCommand.create(workflow, algorithmNode)));
 		if (workflow.isDerivedNode(algorithmNode))
 			controller.getDuplicateMenuItem().disableProperty().bind(workflow.runningProperty());
 		else
 			controller.getDuplicateMenuItem().setDisable(true);
 
-		controller.getDeleteMenuItem().setOnAction(e -> undoManager.doAndAdd(new DeleteCommand(workflow, algorithmNode)));
+		controller.getDeleteMenuItem().setOnAction(e -> undoManager.doAndAdd(DeleteCommand.create(workflow, algorithmNode)));
 		if (workflow.isDerivedNode(algorithmNode))
 			controller.getDeleteMenuItem().disableProperty().bind(workflow.runningProperty());
 		else

@@ -72,7 +72,7 @@ public class WorkflowNexusInput {
 		} else {
 			var service = new AService<Workflow>(mainWindow.getController().getBottomFlowPane());
 			service.setCallable(() -> {
-				var inputWorkFlow = new Workflow();
+				var inputWorkFlow = new Workflow(null);
 				try (var reader = new BufferedReader(new FileReader(fileName))) {
 					input(service.getProgressListener(), inputWorkFlow, reader);
 				}

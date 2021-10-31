@@ -28,6 +28,7 @@ import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.FloatStringConverter;
 import javafx.util.converter.IntegerStringConverter;
 import jloda.util.Basic;
+import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.methods.Option;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -91,7 +92,10 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				var control = new TextField();
 				control.setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
-				control.textProperty().addListener((v, o, n) -> option.getProperty().setValue(Integer.parseInt(n)));
+				control.textProperty().addListener((v, o, n) -> {
+					if (NumberUtils.isInteger(n))
+						option.getProperty().setValue(NumberUtils.parseInt(n));
+				});
 				final ChangeListener changeListener = (v, o, n) -> control.setText(n.toString());
 				option.getProperty().addListener(new WeakChangeListener(changeListener));
 				return control;
@@ -100,7 +104,10 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				var control = new TextField();
 				control.setTextFormatter(new TextFormatter<>(new FloatStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
-				control.textProperty().addListener((v, o, n) -> option.getProperty().setValue(Float.parseFloat(n)));
+				control.textProperty().addListener((v, o, n) -> {
+					if (NumberUtils.isFloat(n))
+						option.getProperty().setValue(NumberUtils.parseFloat(n));
+				});
 				final ChangeListener changeListener = (v, o, n) -> control.setText(n.toString());
 				option.getProperty().addListener(new WeakChangeListener(changeListener));
 				return control;
@@ -109,7 +116,11 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				var control = new TextField();
 				control.setTextFormatter(new TextFormatter<>(new DoubleStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
-				control.textProperty().addListener((v, o, n) -> option.getProperty().setValue(Double.parseDouble(n)));
+				control.textProperty().addListener((v, o, n) -> {
+							if (NumberUtils.isDouble(n))
+								option.getProperty().setValue(NumberUtils.parseDouble(n));
+						}
+				);
 				ChangeListener changeListener = (v, o, n) -> control.setText(n.toString());
 				option.getProperty().addListener(new WeakChangeListener(changeListener));
 				return control;

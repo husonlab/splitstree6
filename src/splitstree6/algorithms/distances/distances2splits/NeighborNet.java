@@ -27,6 +27,7 @@ import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
+import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
@@ -38,20 +39,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class NeighborNet extends Distances2Splits {
+public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	// public enum WeightsAlgorithm {NNet2004, NNet2021, LP}
 	public enum WeightsAlgorithm {NNet2004, NNet2021}
 
-	private final ObjectProperty<WeightsAlgorithm> optionWeights = new SimpleObjectProperty<>(WeightsAlgorithm.NNet2004);
+	private final ObjectProperty<WeightsAlgorithm> optionWeights = new SimpleObjectProperty<>(this, "optionWeights", WeightsAlgorithm.NNet2004);
 
 	public enum InferenceAlgorithm {ActiveSet, BlockPivot}
 
-	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(InferenceAlgorithm.BlockPivot);
+	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.BlockPivot);
 
-	private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(true);
+	private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", true);
 
 	public List<String> listOptions() {
-		return Arrays.asList("optionInferenceAlgorithm", "optionUsePreconditioner", "optionWeights");
+		return Arrays.asList(optionInferenceAlgorithm.getName(), optionUsePreconditioner.getName(), optionWeights.getName());
 	}
 
 	@Override

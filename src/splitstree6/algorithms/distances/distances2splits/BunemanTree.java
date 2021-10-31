@@ -21,6 +21,7 @@
 package splitstree6.algorithms.distances.distances2splits;
 
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.splits.IToCompatibleSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
@@ -40,7 +41,7 @@ import java.util.BitSet;
  * @author Daniel Huson, David Bryant, Tobias Kloepper and Daria Evseeva
  */
 
-public class BunemanTree extends Distances2Splits {
+public class BunemanTree extends Distances2Splits implements IToCompatibleSplits {
 	@Override
 	public String getCitation() {
 		return "Bandelt and Dress 1992; H.-J. Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. " +

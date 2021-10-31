@@ -237,4 +237,7 @@ public class WorkflowTreeViewLayout {
 		return true;
 	}
 
+	public Map<WorkflowNode, WorkflowTreeItem> getNodeItemMap() {
+		return nodeItemMap;
+	}
 }

@@ -23,7 +23,7 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
-import splitstree6.algorithms.networks.network2sink.ShowNetworkConsole;
+import splitstree6.algorithms.network.network2sink.ShowNetworkConsole;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
 import splitstree6.algorithms.taxa.ShowTaxaConsole;
 import splitstree6.data.*;
@@ -33,7 +33,7 @@ import splitstree6.workflow.Workflow;
 
 public class RunMedianJoining extends Application {
 	private static Workflow setupWorkflow() {
-		var workflow = new Workflow();
+		var workflow = new Workflow(null);
 
 		{
 			workflow.setupInputAndWorkingNodes(new SourceBlock(), new CharactersLoader(), new TaxaBlock(), new CharactersBlock());

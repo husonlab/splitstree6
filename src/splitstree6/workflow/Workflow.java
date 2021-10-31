@@ -19,12 +19,15 @@
 
 package splitstree6.workflow;
 
-import javafx.beans.InvalidationListener;
+import javafx.collections.ListChangeListener;
+import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.window.MainWindow;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -44,16 +47,39 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	public static final String INPUT_PREFIX = "Input ";
 	public static final String WORKING_PREFIX = "Working ";
 
-	private final Map<String, Integer> dataBlockName2Count = new HashMap<>();
-	private final Map<String, Integer> algorithmName2Count = new HashMap<>();
+	private final Map<String, List<String>> dataBlockNameTitleMap = new HashMap<>();
+	private final Map<String, List<String>> algorithmNameTitleMap = new HashMap<>();
+
+	private final SelectionModel<WorkflowNode> selectionModel = new SetSelectionModel<>();
 
 	private Consumer<AService<Boolean>> serviceConfigurator;
 
-	public Workflow() {
-		nodes().addListener((InvalidationListener) e -> {
-			if (getNumberOfNodes() == 0) {
-				dataBlockName2Count.clear();
-				algorithmName2Count.clear();
+	private final MainWindow mainWindow;
+
+	public Workflow(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
+
+		nodes().addListener((ListChangeListener<? super WorkflowNode>) e -> {
+			while (e.next()) {
+				if (e.wasRemoved()) {
+					for (var node : e.getRemoved()) {
+						selectionModel.clearSelection(node);
+						if (node instanceof DataNode dataNode) {
+							var names = dataBlockNameTitleMap.get(dataNode.getName());
+							if (names != null)
+								names.remove(dataNode.getTitle());
+						} else if (node instanceof AlgorithmNode algorithmNode) {
+							var names = algorithmNameTitleMap.get(algorithmNode.getName());
+							if (names != null)
+								names.remove(algorithmNode.getTitle());
+						}
+					}
+
+					if (getNumberOfNodes() == 0) {
+						dataBlockNameTitleMap.clear();
+						algorithmNameTitleMap.clear();
+					}
+				}
 			}
 		});
 	}
@@ -108,12 +134,18 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	public <D extends DataBlock> DataNode<D> newDataNode(D dataBlock, String title) {
 		var node = new DataNode<D>(this);
 		node.setDataBlock(dataBlock);
-		if (title != null)
+		if (title != null) {
 			node.setTitle(title);
-		else {
-			var copyNumber = dataBlockName2Count.computeIfAbsent(node.getName(), a -> 0) + 1;
-			dataBlockName2Count.put(node.getName(), copyNumber);
-			node.setTitle(copyNumber == 1 ? node.getName() : node.getName() + "-" + copyNumber);
+			dataBlockNameTitleMap.computeIfAbsent(dataBlock.getName(), n -> new ArrayList<>()).add(title);
+		} else {
+			title = dataBlock.getName();
+			var t = 1;
+			var list = dataBlockNameTitleMap.computeIfAbsent(dataBlock.getName(), n -> new ArrayList<>());
+			while (list.contains(title)) {
+				title = dataBlock.getName() + "-" + (++t);
+			}
+			list.add(title);
+			node.setTitle(title);
 		}
 
 		addNode(node);
@@ -127,12 +159,18 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	public <S extends DataBlock, T extends DataBlock> AlgorithmNode<S, T> newAlgorithmNode(Algorithm<S, T> algorithm, String title) {
 		var node = new AlgorithmNode<>(this);
 		node.setAlgorithm(algorithm);
-		if (title != null)
+		if (title != null) {
 			node.setTitle(title);
-		else {
-			var copyNumber = algorithmName2Count.computeIfAbsent(node.getName(), a -> 0) + 1;
-			algorithmName2Count.put(node.getName(), copyNumber);
-			node.setTitle(copyNumber == 1 ? node.getName() : node.getName() + "-" + copyNumber);
+			algorithmNameTitleMap.computeIfAbsent(algorithm.getName(), n -> new ArrayList<>()).add(title);
+		} else {
+			title = algorithm.getName();
+			var t = 1;
+			var list = algorithmNameTitleMap.computeIfAbsent(algorithm.getName(), n -> new ArrayList<>());
+			while (list.contains(title)) {
+				title = algorithm.getName() + "-" + (++t);
+			}
+			list.add(title);
+			node.setTitle(title);
 		}
 		addNode(node);
 		return (AlgorithmNode<S, T>) node;
@@ -279,6 +317,10 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		this.serviceConfigurator = serviceConfigurator;
 	}
 
+	public SelectionModel<WorkflowNode> getSelectionModel() {
+		return selectionModel;
+	}
+
 	/**
 	 * make a copy that is shallow in the sense that we reference the original datablocks and algorithms, rather than copy them
 	 *
@@ -313,13 +355,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		setValid(true);
 	}
 
-	private void addAfterParentsRec(WorkflowNode node, HashSet<WorkflowNode> visited, ArrayList<WorkflowNode> list) {
-		visited.add(node);
-		for (var parent : node.getParents()) {
-			if (!visited.contains(parent)) {
-				addAfterParentsRec(parent, visited, list);
-			}
-		}
-		list.add(node);
+	public MainWindow getMainWindow() {
+		return mainWindow;
 	}
 }

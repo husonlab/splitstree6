@@ -36,7 +36,13 @@ public class DataNodeContextMenuController {
 	private MenuItem exportMenuItem;
 
 	@FXML
-	private Menu attachAlgorithmMenu;
+	private Menu addTreeMenu;
+
+	@FXML
+	private Menu addNetworkMenu;
+
+	@FXML
+	private Menu addAlgorithmMenu;
 
 	public ContextMenu getContextMenu() {
 		return contextMenu;
@@ -50,7 +56,15 @@ public class DataNodeContextMenuController {
 		return exportMenuItem;
 	}
 
-	public Menu getAttachAlgorithmMenu() {
-		return attachAlgorithmMenu;
+	public Menu getAddTreeMenu() {
+		return addTreeMenu;
+	}
+
+	public Menu getAddNetworkMenu() {
+		return addNetworkMenu;
+	}
+
+	public Menu getAddAlgorithmMenu() {
+		return addAlgorithmMenu;
 	}
 }

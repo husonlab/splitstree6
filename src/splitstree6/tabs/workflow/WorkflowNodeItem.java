@@ -43,23 +43,26 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.workflow.Workflow;
 
-import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 abstract public class WorkflowNodeItem extends Pane {
 	static private double mouseDownX;
 	static private double mouseDownY;
 	static private double mouseMovedX;
 	static private double mouseMovedY;
+	protected final WorkflowNode node;
 
 	private final Workflow workflow;
 	private final WorkflowTab workflowTab;
 
 
-	public WorkflowNodeItem(Workflow workflow, WorkflowTab workflowTab) {
+	public WorkflowNodeItem(Workflow workflow, WorkflowTab workflowTab, WorkflowNode node) {
 		this.workflow = workflow;
 		this.workflowTab = workflowTab;
-		setupMouseInteraction(workflowTab.getSelectionModel());
+		setupMouseInteraction(workflow.getSelectionModel());
+		this.node = node;
 	}
 
 	public void move(double dx, double dy) {
@@ -67,7 +70,9 @@ abstract public class WorkflowNodeItem extends Pane {
 		setTranslateY(getTranslateY() + dy);
 	}
 
-	public void setupMouseInteraction(SelectionModel<WorkflowNodeItem> selectionModel) {
+	public void setupMouseInteraction(SelectionModel<WorkflowNode> selectionModel) {
+		var nodeItemMap = workflowTab.getPresenter().getWorkflowTabLayout().getNodeItemMap();
+
 		setOnMousePressed(e -> {
 			mouseDownX = mouseMovedX = e.getScreenX();
 			mouseDownY = mouseMovedY = e.getScreenY();
@@ -79,23 +84,25 @@ abstract public class WorkflowNodeItem extends Pane {
 					if (!e.isShiftDown() && !e.isShortcutDown())
 						selectionModel.clearSelection();
 					if (e.isShiftDown()) {
-						selectionModel.setSelected(this, true);
-						var toSelect = new HashSet<WorkflowNodeItem>();
+						selectionModel.setSelected(getWorkflowNode(), true);
+						var toSelect = new HashSet<WorkflowNode>();
 						collectAllToSelectRec(false, this, selectionModel, new HashSet<>(), toSelect);
 						collectAllToSelectRec(true, this, selectionModel, new HashSet<>(), toSelect);
 						selectionModel.selectAll(toSelect);
 					} else
-						selectionModel.toggleSelection(this);
+						selectionModel.toggleSelection(getWorkflowNode());
 				}
 				e.consume();
 			}
 		});
 		setOnMouseDragged(e -> {
-			if (selectionModel.isSelected(this)) {
+			if (selectionModel.isSelected(getWorkflowNode())) {
 				var deltaX = e.getScreenX() - mouseMovedX;
 				var deltaY = e.getScreenY() - mouseMovedY;
 				for (var other : selectionModel.getSelectedItems()) {
-					other.move(deltaX, deltaY);
+					var otherItem = nodeItemMap.get(other);
+					if (otherItem != null)
+						otherItem.move(deltaX, deltaY);
 				}
 				mouseMovedX = e.getScreenX();
 				mouseMovedY = e.getScreenY();
@@ -103,10 +110,11 @@ abstract public class WorkflowNodeItem extends Pane {
 			e.consume();
 		});
 		setOnMouseReleased(e -> {
-			if (!e.isStillSincePress() && selectionModel.isSelected(this)) {
+			if (!e.isStillSincePress() && selectionModel.isSelected(getWorkflowNode())) {
 				var deltaX = e.getScreenX() - mouseDownX;
 				var deltaY = e.getScreenY() - mouseDownY;
-				var items = new ArrayList<>(selectionModel.getSelectedItems());
+				var items = selectionModel.getSelectedItems().stream()
+						.map(nodeItemMap::get).filter(Objects::nonNull).collect(Collectors.toList());
 				workflowTab.getUndoManager().add("move",
 						() -> items.forEach(item -> item.move(-deltaX, -deltaY)),
 						() -> items.forEach(item -> item.move(deltaX, deltaY)));
@@ -118,15 +126,15 @@ abstract public class WorkflowNodeItem extends Pane {
 	/**
 	 * collect all other nodes to select above or below
 	 */
-	private void collectAllToSelectRec(boolean up, WorkflowNodeItem item, SelectionModel<WorkflowNodeItem> selectionModel, HashSet<WorkflowNodeItem> path, HashSet<WorkflowNodeItem> toSelect) {
+	private void collectAllToSelectRec(boolean up, WorkflowNodeItem item, SelectionModel<WorkflowNode> selectionModel, HashSet<WorkflowNode> path, HashSet<WorkflowNode> toSelect) {
 		for (var other : up ? item.getWorkflowNode().getParents() : item.getWorkflowNode().getChildren()) {
 			var otherItem = workflowTab.getPresenter().getWorkflowTabLayout().getNodeItemMap().get(other);
 			if (otherItem != null) {
-				if (selectionModel.isSelected(otherItem))
+				if (selectionModel.isSelected(otherItem.getWorkflowNode()))
 					toSelect.addAll(path);
-				path.add(otherItem);
+				path.add(otherItem.getWorkflowNode());
 				collectAllToSelectRec(up, otherItem, selectionModel, path, toSelect);
-				path.remove(otherItem);
+				path.remove(otherItem.getWorkflowNode());
 			}
 		}
 	}

@@ -38,7 +38,6 @@ public class WorkflowTreeView extends AnchorPane implements IDisplayTab {
 	private final MainWindow mainWindow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
-
 	/**
 	 * constructor
 	 */

@@ -1,5 +1,5 @@
 /*
- *  ShowNetworkConsole.java Copyright (C) 2021 Daniel H. Huson
+ *  Splits2Trees.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,25 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.networks.network2sink;
+package splitstree6.algorithms.splits.splits2network;
 
-import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
-import splitstree6.data.SinkBlock;
-import splitstree6.data.TaxaBlock;
-import splitstree6.io.nexus.NetworkNexusOutput;
+import splitstree6.data.SplitsBlock;
+import splitstree6.workflow.Algorithm;
 
-import java.io.IOException;
-import java.io.StringWriter;
-
-public class ShowNetworkConsole extends Network2Sink {
-	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock inputData, SinkBlock outputData) throws IOException {
-		try (var w = new StringWriter()) {
-			w.write(inputData.getName() + ":\n");
-			var writer = new NetworkNexusOutput();
-			writer.write(w, taxaBlock, inputData);
-			System.out.println(w);
-		}
+public abstract class Splits2Network extends Algorithm<SplitsBlock, NetworkBlock> {
+	public Splits2Network() {
+		super(SplitsBlock.class, NetworkBlock.class);
 	}
 }

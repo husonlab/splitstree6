@@ -28,11 +28,9 @@ import splitstree6.workflow.DataNode;
 
 public class DataItem<D extends DataBlock> extends WorkflowNodeItem {
 	private final DataItemController controller;
-	private final DataNode<D> dataNode;
 
 	public DataItem(MainWindow mainWindow, WorkflowTab workflowTab, DataNode<D> dataNode) {
-		super(mainWindow.getWorkflow(), workflowTab);
-		this.dataNode = dataNode;
+		super(mainWindow.getWorkflow(), workflowTab, dataNode);
 
 		var loader = new ExtendedFXMLLoader<DataItemController>(this.getClass());
 		controller = loader.getController();
@@ -47,6 +45,6 @@ public class DataItem<D extends DataBlock> extends WorkflowNodeItem {
 	}
 
 	public DataNode<D> getWorkflowNode() {
-		return dataNode;
+		return (DataNode<D>) node;
 	}
 }

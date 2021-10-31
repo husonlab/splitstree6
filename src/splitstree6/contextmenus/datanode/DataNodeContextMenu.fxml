@@ -50,7 +50,28 @@
                     </graphic>
                 </MenuItem>
                 <SeparatorMenuItem mnemonicParsing="false"/>
-                <Menu fx:id="attachAlgorithmMenu" text="Attach Algorithm">
+                <Menu fx:id="addTreeMenu" text="Add Tree">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Menu>
+                <Menu fx:id="addNetworkMenu" text="Add Network">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                   preserveRatio="true">
+                            <image>
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
+                            </image>
+                        </ImageView>
+                    </graphic>
+                </Menu>
+                <SeparatorMenuItem mnemonicParsing="false"/>
+                <Menu fx:id="addAlgorithmMenu" text="Add Algorithm">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">

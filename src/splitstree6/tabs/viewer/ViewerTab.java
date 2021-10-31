@@ -1,5 +1,5 @@
 /*
- *  Trees2Sink.java Copyright (C) 2021 Daniel H. Huson
+ *  ViewerTab.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,14 +17,31 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2sink;
+package splitstree6.tabs.viewer;
 
-import splitstree6.data.SinkBlock;
-import splitstree6.data.TreesBlock;
-import splitstree6.workflow.Algorithm;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.scene.Node;
+import javafx.scene.control.Tab;
+import jloda.fx.undo.UndoManager;
+import splitstree6.tabs.IDisplayTab;
+import splitstree6.tabs.IDisplayTabPresenter;
 
-public abstract class Trees2Sink extends Algorithm<TreesBlock, SinkBlock> {
-	public Trees2Sink() {
-		super(TreesBlock.class, SinkBlock.class);
+public abstract class ViewerTab extends Tab implements IDisplayTab {
+
+	private final UndoManager undoManager = new UndoManager();
+
+	@Override
+	public UndoManager getUndoManager() {
+		return undoManager;
 	}
+
+	@Override
+	abstract public ReadOnlyBooleanProperty isEmptyProperty();
+
+
+	@Override
+	abstract public Node getImageNode();
+
+	@Override
+	abstract public IDisplayTabPresenter getPresenter();
 }

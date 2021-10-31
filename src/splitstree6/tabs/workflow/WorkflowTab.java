@@ -22,12 +22,13 @@ package splitstree6.tabs.workflow;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
-import jloda.fx.selection.SelectionModel;
-import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.workflow.algorithm.AlgorithmItem;
 import splitstree6.tabs.workflow.data.DataItem;
@@ -35,6 +36,8 @@ import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
+
+import java.util.Map;
 
 public class WorkflowTab extends Tab implements IDisplayTab {
 	private final MainWindow mainWindow;
@@ -44,7 +47,7 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 	private final UndoManager undoManager = new UndoManager();
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
-	private final SelectionModel<WorkflowNodeItem> selectionModel = new SetSelectionModel<>();
+	private final ObservableMap<WorkflowNode, WorkflowNodeItem> nodeItemMap = FXCollections.observableHashMap();
 
 	/**
 	 * constructor
@@ -88,22 +91,24 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 		return controller;
 	}
 
-	public SelectionModel<WorkflowNodeItem> getSelectionModel() {
-		return selectionModel;
-	}
-
 	public AlgorithmItem newAlgorithmItem(AlgorithmNode algorithmNode) {
-		return new AlgorithmItem(mainWindow, this, algorithmNode);
+		var item = new AlgorithmItem(mainWindow, this, algorithmNode);
+		nodeItemMap.put(algorithmNode, item);
+		return item;
 	}
 
 	public DataItem newDataItem(DataNode dataNode) {
-		return new DataItem(mainWindow, this, dataNode);
+		var item = new DataItem(mainWindow, this, dataNode);
+		nodeItemMap.put(dataNode, item);
+		return item;
 	}
 
 	public MainWindow getMainWindow() {
 		return mainWindow;
 	}
 
-
+	public Map<WorkflowNode, WorkflowNodeItem> getNodeItemMap() {
+		return nodeItemMap;
+	}
 }
 

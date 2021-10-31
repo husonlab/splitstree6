@@ -59,7 +59,7 @@ public class SparseTable<V> {
 	/**
 	 * erase
 	 * <p/>
-	 * Delete all entries
+	 * DeleteCommand all entries
 	 */
 	public void clear() {
 		map.clear();

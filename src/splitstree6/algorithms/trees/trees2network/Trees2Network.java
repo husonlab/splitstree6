@@ -17,14 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2sink;
+package splitstree6.algorithms.trees.trees2network;
 
-import splitstree6.data.SinkBlock;
+import splitstree6.data.NetworkBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.workflow.Algorithm;
 
-public abstract class Trees2Sink extends Algorithm<TreesBlock, SinkBlock> {
-	public Trees2Sink() {
-		super(TreesBlock.class, SinkBlock.class);
+public abstract class Trees2Network extends Algorithm<TreesBlock, NetworkBlock> {
+	public Trees2Network() {
+		super(TreesBlock.class, NetworkBlock.class);
 	}
 }

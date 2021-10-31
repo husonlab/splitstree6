@@ -21,11 +21,12 @@ module splitstreesix {
 	opens splitstree6.algorithms.characters.characters2splits;
 	opens splitstree6.algorithms.characters.characters2trees;
 	opens splitstree6.algorithms.distances.distances2distances;
+	opens splitstree6.algorithms.distances.distances2network;
 	opens splitstree6.algorithms.distances.distances2sink;
 	opens splitstree6.algorithms.distances.distances2splits;
 	opens splitstree6.algorithms.distances.distances2trees;
-	opens splitstree6.algorithms.networks.network2network;
-	opens splitstree6.algorithms.networks.network2sink;
+	opens splitstree6.algorithms.network.network2network;
+	opens splitstree6.algorithms.network.network2sink;
 	opens splitstree6.algorithms.source.source2characters;
 	opens splitstree6.algorithms.source.source2distances;
 	opens splitstree6.algorithms.source.source2splits;
@@ -34,12 +35,15 @@ module splitstreesix {
 	opens splitstree6.algorithms.splits.splits2sink;
 	opens splitstree6.algorithms.splits.splits2splits;
 	opens splitstree6.algorithms.splits.splits2trees;
+	opens splitstree6.algorithms.splits.splits2network;
 	opens splitstree6.algorithms.taxa;
 	opens splitstree6.algorithms.taxa.taxa2taxa;
 	opens splitstree6.algorithms.trees.trees2distances;
+	opens splitstree6.algorithms.trees.trees2network;
 	opens splitstree6.algorithms.trees.trees2sink;
 	opens splitstree6.algorithms.trees.trees2splits;
 	opens splitstree6.algorithms.trees.trees2trees;
+
 
 	opens splitstree6.io.readers.characters;
 	opens splitstree6.io.readers.distances;
@@ -52,6 +56,8 @@ module splitstreesix {
 	opens splitstree6.io.writers.splits;
 	opens splitstree6.io.writers.trees;
 	opens splitstree6.io.writers.network;
+
+	opens splitstree6.viewers.multitreesviewer;
 
 	opens splitstree6.window;
 

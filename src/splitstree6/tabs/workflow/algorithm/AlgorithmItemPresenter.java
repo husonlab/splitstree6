@@ -33,46 +33,49 @@ public class AlgorithmItemPresenter {
 
 	public AlgorithmItemPresenter(MainWindow mainWindow, WorkflowTab workflowTab, AlgorithmItem algorithmItem) {
 
-		var algorithmNode = algorithmItem.getWorkflowNode();
+		var node = algorithmItem.getWorkflowNode();
 		var controller = algorithmItem.getController();
 
 		algorithmItem.setEffect(WorkflowTabPresenter.getDropShadow());
 
-		controller.getNameLabel().textProperty().bind(algorithmNode.titleProperty());
+		controller.getNameLabel().textProperty().bind(node.titleProperty());
 
 		var selected = new SimpleBooleanProperty(false);
-		workflowTab.getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(workflowTab.getSelectionModel().isSelected(algorithmItem)));
+		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> {
+			selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node));
+		});
 
-		controller.getEditButton().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true));
+
+		controller.getEditButton().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(node, true));
 		controller.getEditButton().disableProperty().bind(selected.not());
 
-		controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
-		controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
+		controller.getPlayButton().setOnAction(e -> node.restart());
+		controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().not().and(node.allParentsValidProperty()).and(selected)).not());
 
-		algorithmNode.getService().runningProperty().addListener((v, o, n) -> {
+		node.getService().runningProperty().addListener((v, o, n) -> {
 			if (n) {
 				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Stop16.gif", 16));
-				controller.getPlayButton().setOnAction(e -> algorithmNode.getService().cancel());
-				controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
+				controller.getPlayButton().setOnAction(e -> node.getService().cancel());
+				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Stop this algorithm");
 			} else {
 				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
-				controller.getPlayButton().setOnAction(e -> algorithmNode.restart());
-				controller.getPlayButton().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).and(selected)).not());
+				controller.getPlayButton().setOnAction(e -> node.restart());
+				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().not().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Run this algorithm");
 			}
 		});
 
-		controller.getNameLabel().setGraphic(ResourceManagerFX.getIconAsImageView(algorithmNode.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16));
+		controller.getNameLabel().setGraphic(ResourceManagerFX.getIconAsImageView(node.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16));
 
 		controller.getAnchorPane().getStyleClass().add("background");
-		if (!mainWindow.getWorkflow().isDerivedNode(algorithmNode)) {
+		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");
 			if (controller.getNameLabel().getGraphic() != null)
 				controller.getNameLabel().getGraphic().setOpacity(0.5);
 		}
 
-		algorithmNode.validProperty().addListener((v, o, n) -> {
+		node.validProperty().addListener((v, o, n) -> {
 			if (!n)
 				controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Scheduled.png", 16));
 		});
@@ -84,7 +87,7 @@ public class AlgorithmItemPresenter {
 
 		controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Done.png", 16));
 
-		algorithmNode.getService().stateProperty().addListener((v, o, n) -> {
+		node.getService().stateProperty().addListener((v, o, n) -> {
 			switch (n) {
 				case CANCELLED, FAILED -> controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Failed.png", 16));
 				case READY, SCHEDULED -> controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Scheduled.png", 16));
@@ -93,14 +96,14 @@ public class AlgorithmItemPresenter {
 			}
 		});
 
-		if (algorithmNode.getName().equals(Workflow.INPUT_TAXA_DATA_FILTER)) {
+		if (node.getName().equals(Workflow.INPUT_TAXA_DATA_FILTER)) {
 			controller.getEditButton().setVisible(false);
 			controller.getPlayButton().setVisible(false);
 		}
 
 		algorithmItem.setOnContextMenuRequested(e -> {
 					if (selected.get())
-						AlgorithmNodeContextMenu.create(mainWindow, workflowTab.getUndoManager(), algorithmNode).show(algorithmItem, e.getScreenX(), e.getScreenY());
+						AlgorithmNodeContextMenu.create(mainWindow, workflowTab.getUndoManager(), node).show(algorithmItem, e.getScreenX(), e.getScreenY());
 				}
 		);
 	}

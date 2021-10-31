@@ -1,5 +1,5 @@
 /*
- *  Trees2Sink.java Copyright (C) 2021 Daniel H. Huson
+ *  IToCircularSplits.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,14 +17,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2sink;
+package splitstree6.algorithms.splits;
 
-import splitstree6.data.SinkBlock;
-import splitstree6.data.TreesBlock;
-import splitstree6.workflow.Algorithm;
-
-public abstract class Trees2Sink extends Algorithm<TreesBlock, SinkBlock> {
-	public Trees2Sink() {
-		super(TreesBlock.class, SinkBlock.class);
-	}
+/**
+ * algorithm that produces circular splits
+ * Daniel Huson, 10.2021
+ */
+public interface IToCircularSplits {
 }

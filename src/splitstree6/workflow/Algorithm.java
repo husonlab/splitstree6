@@ -45,6 +45,8 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	private final Class<S> fromClass;
 	private final Class<T> toClass;
 
+	private AlgorithmNode node;
+
 	protected Algorithm(Class<S> fromClass, Class<T> toClass) {
 		this.fromClass = fromClass;
 		this.toClass = toClass;
@@ -125,20 +127,21 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	 * @return new instance
 	 */
 	public Algorithm newInstance() {
-		return newInstance(getClass());
-	}
-
-	/**
-	 * creates a new instance
-	 *
-	 * @return new instance
-	 */
-	public static Algorithm newInstance(Class<? extends Algorithm> clazz) {
 		try {
-			return clazz.getConstructor().newInstance();
+			var algorithm = getClass().getConstructor().newInstance();
+			algorithm.setNode(node);
+			return algorithm;
 		} catch (Exception e) {
 			Basic.caught(e);
 			return null;
 		}
+	}
+
+	public AlgorithmNode getNode() {
+		return node;
+	}
+
+	public void setNode(AlgorithmNode node) {
+		this.node = node;
 	}
 }

@@ -19,16 +19,18 @@
 
 package splitstree6.contextmenus.datanode;
 
-import javafx.geometry.Point2D;
+import javafx.beans.binding.Bindings;
 import javafx.scene.control.MenuItem;
 import javafx.util.Pair;
-import jloda.fx.window.NotificationManager;
+import jloda.fx.undo.UndoManager;
 import jloda.util.PluginClassLoader;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
-import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
+import splitstree6.workflow.commands.AddAlgorithmCommand;
+import splitstree6.workflow.commands.AddNetworkPipelineCommand;
+import splitstree6.workflow.commands.AddTreePipelineCommand;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -40,7 +42,7 @@ import java.util.List;
  */
 public class DataNodeContextMenuPresenter {
 
-	public DataNodeContextMenuPresenter(MainWindow mainWindow, Point2D screenLocation, DataNodeContextMenuController controller, DataNode dataNode) {
+	public DataNodeContextMenuPresenter(MainWindow mainWindow, UndoManager undoManager, DataNodeContextMenuController controller, DataNode dataNode) {
 		var workflow = mainWindow.getWorkflow();
 
 		controller.getEditMenuItem().setOnAction(e -> mainWindow.getTextTabsManager().showTab(dataNode, true));
@@ -49,39 +51,71 @@ public class DataNodeContextMenuPresenter {
 			System.err.println("Export: not implemented");
 		});
 
-		controller.getAttachAlgorithmMenu().getItems().addAll(createAttachAlgorithmMenuItems(workflow, dataNode));
-		controller.getAttachAlgorithmMenu().disableProperty().bind(workflow.runningProperty());
+		controller.getAddTreeMenu().getItems().setAll(createAddTreeMenuItems(workflow, undoManager, dataNode));
+		controller.getAddTreeMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddTreeMenu().getItems())));
+
+		controller.getAddNetworkMenu().getItems().setAll(createAddNetworkMenuItems(workflow, undoManager, dataNode));
+		controller.getAddNetworkMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddNetworkMenu().getItems())));
+
+		controller.getAddAlgorithmMenu().getItems().setAll(createAddAlgorithmMenuItems(workflow, undoManager, dataNode));
+		controller.getAddAlgorithmMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddAlgorithmMenu().getItems())));
 	}
 
-	private List<MenuItem> createAttachAlgorithmMenuItems(Workflow workflow, DataNode dataNode) {
+	private List<MenuItem> createAddTreeMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (algorithm.getFromClass() == dataNode.getDataBlock().getClass())
+			if (AddTreePipelineCommand.isApplicable(dataNode, algorithm))
 				list.add(new Pair<>(algorithm.getName(), algorithm));
 		}
-		list.sort(Comparator.comparing(Pair::getKey)); // sort alphabetically
+		list.sort(Comparator.comparing(Pair::getKey));
 
 		var result = new ArrayList<MenuItem>();
 		for (var pair : list) {
 			var menuItem = new MenuItem(pair.getKey());
-			menuItem.setOnAction(e -> attachAlgorithm(workflow, dataNode, pair.getValue()));
+			menuItem.setOnAction(e -> undoManager.doAndAdd(AddTreePipelineCommand.create(workflow, dataNode, pair.getValue())));
 			result.add(menuItem);
 		}
 		return result;
 	}
 
-	private void attachAlgorithm(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
-		try {
-			if (workflow.isRunning())
-				throw new RuntimeException("Workflow is currently running");
-			var targetDataNode = workflow.newDataNode((DataBlock) algorithm.getToClass().getConstructor().newInstance());
-			var algorithmNode = workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), dataNode, targetDataNode);
-			algorithmNode.restart();
-			NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
-		} catch (Exception ex) {
-			NotificationManager.showError("Attach algorithm failed: " + ex);
+	private List<MenuItem> createAddNetworkMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
+		// todo: sort items logically
+
+		var list = new ArrayList<Pair<String, Algorithm>>();
+		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+			if (AddNetworkPipelineCommand.isApplicable(dataNode, algorithm)) {
+				list.add(new Pair<>(algorithm.getName(), algorithm));
+			}
 		}
+		list.sort(Comparator.comparing(Pair::getKey));
+
+		var result = new ArrayList<MenuItem>();
+		for (var pair : list) {
+			var menuItem = new MenuItem(pair.getKey());
+			menuItem.setOnAction(e -> undoManager.doAndAdd(AddNetworkPipelineCommand.create(workflow, dataNode, pair.getValue())));
+			result.add(menuItem);
+		}
+		return result;
+	}
+
+	private List<MenuItem> createAddAlgorithmMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
+		// todo: sort items logically
+
+		var list = new ArrayList<Pair<String, Algorithm>>();
+		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+			if (AddAlgorithmCommand.isApplicable(dataNode, algorithm))
+				list.add(new Pair<>(algorithm.getName(), algorithm));
+		}
+		list.sort(Comparator.comparing(Pair::getKey));
+
+		var result = new ArrayList<MenuItem>();
+		for (var pair : list) {
+			var menuItem = new MenuItem(pair.getKey());
+			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(workflow, dataNode, pair.getValue())));
+			result.add(menuItem);
+		}
+		return result;
 	}
 }

@@ -24,7 +24,7 @@ import jloda.graph.EdgeArray;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloGraph;
-import splitstree6.algorithms.networks.network2network.NetworkTaxaFilter;
+import splitstree6.algorithms.network.network2network.NetworkTaxaFilter;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 

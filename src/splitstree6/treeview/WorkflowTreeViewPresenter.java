@@ -20,28 +20,65 @@
 package splitstree6.treeview;
 
 import javafx.beans.binding.Bindings;
+import javafx.collections.ListChangeListener;
+import javafx.collections.SetChangeListener;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
+import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
 import java.util.LinkedList;
+import java.util.stream.Collectors;
 
 public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
-	private final WorkflowTreeView treeView;
+	private final WorkflowTreeView workflowTreeView;
 
-	public WorkflowTreeViewPresenter(MainWindow mainWindow, WorkflowTreeView treeView) {
+	public WorkflowTreeViewPresenter(MainWindow mainWindow, WorkflowTreeView workflowTreeView) {
 		this.mainWindow = mainWindow;
-		this.treeView = treeView;
+		this.workflowTreeView = workflowTreeView;
+		var workflow = mainWindow.getWorkflow();
+		var treeView = workflowTreeView.getController().getWorkflowTreeView();
 
-		treeView.getController().getWorkflowTreeView().setRoot(new WorkflowTreeItem(mainWindow));
+		treeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
-		new WorkflowTreeViewLayout(mainWindow, treeView);
+		treeView.setRoot(new WorkflowTreeItem(mainWindow));
+
+		var layout = new WorkflowTreeViewLayout(mainWindow, workflowTreeView);
+
+		treeView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<String>>) e -> {
+			while (e.next()) {
+				if (e.wasAdded()) {
+					workflow.getSelectionModel().selectAll(e.getAddedSubList().stream()
+							.map(a -> ((WorkflowTreeItem) a).getWorkflowNode()).collect(Collectors.toList()));
+				}
+				if (e.wasRemoved()) {
+					workflow.getSelectionModel().clearSelection(e.getRemoved().stream()
+							.map(a -> ((WorkflowTreeItem) a).getWorkflowNode()).collect(Collectors.toList()));
+				}
+			}
+		});
+
+		workflow.getSelectionModel().getSelectedItems().addListener((SetChangeListener<? super WorkflowNode>) e -> {
+			if (e.wasAdded()) {
+				var item = layout.getNodeItemMap().get(e.getElementAdded());
+				if (item != null)
+					treeView.getSelectionModel().select(item);
+			}
+			if (e.wasRemoved()) {
+				var item = layout.getNodeItemMap().get(e.getElementRemoved());
+				if (item != null) {
+					var index = treeView.getRow(item);
+					treeView.getSelectionModel().clearSelection(index);
+				}
+			}
+		});
 	}
 
 	public void setup() {
 		var controller = mainWindow.getController();
-		var tabController = treeView.getController();
+		var tabController = workflowTreeView.getController();
 
 		controller.getCopyMenuItem().setOnAction(null);
 
@@ -57,11 +94,11 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomInMenuItem().setOnAction(null);
 		controller.getZoomOutMenuItem().setOnAction(null);
 
-		controller.getUndoMenuItem().setOnAction(e -> treeView.getUndoManager().undo());
-		controller.getUndoMenuItem().disableProperty().bind(treeView.getUndoManager().undoableProperty().not());
+		controller.getUndoMenuItem().setOnAction(e -> workflowTreeView.getUndoManager().undo());
+		controller.getUndoMenuItem().disableProperty().bind(workflowTreeView.getUndoManager().undoableProperty().not());
 
-		controller.getRedoMenuItem().setOnAction(e -> treeView.getUndoManager().redo());
-		controller.getRedoMenuItem().disableProperty().bind(treeView.getUndoManager().redoableProperty().not());
+		controller.getRedoMenuItem().setOnAction(e -> workflowTreeView.getUndoManager().redo());
+		controller.getRedoMenuItem().disableProperty().bind(workflowTreeView.getUndoManager().redoableProperty().not());
 
 
 		var treeView = tabController.getWorkflowTreeView();

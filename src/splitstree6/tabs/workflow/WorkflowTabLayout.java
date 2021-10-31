@@ -121,7 +121,6 @@ public class WorkflowTabLayout {
 						var item = nodeItemMap.get(node);
 						if (item != null) {
 							usedLocations.remove(new Point2D(item.getTranslateX(), item.getTranslateY()));
-							workflowTab.getSelectionModel().clearSelection(item);
 							nodeItems.remove(item);
 							nodeItemMap.remove(node);
 							deletedNodeItemMap.put(node, item);

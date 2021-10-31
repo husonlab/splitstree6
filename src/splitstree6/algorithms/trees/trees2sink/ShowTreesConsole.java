@@ -24,11 +24,12 @@ import splitstree6.data.SinkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.writers.trees.NewickWriter;
+import splitstree6.methods.IgnoredInMethodsText;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
-public class ShowTreesConsole extends Trees2Sink {
+public class ShowTreesConsole extends Trees2Sink implements IgnoredInMethodsText {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treeData, SinkBlock outputData) throws IOException {
 		try (var w = new StringWriter()) {

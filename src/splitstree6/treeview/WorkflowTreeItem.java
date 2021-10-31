@@ -25,7 +25,6 @@ import javafx.animation.RotateTransition;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
-import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
@@ -47,6 +46,7 @@ import splitstree6.workflow.DataNode;
  */
 public class WorkflowTreeItem extends TreeItem<String> {
 	private final MainWindow mainWindow;
+	private final WorkflowTreeView workflowTreeView;
 	private final WorkflowNode workflowNode;
 	private final Tooltip tooltip = new Tooltip();
 	private final ChangeListener<Worker.State> stateChangeListener;
@@ -54,6 +54,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 	public WorkflowTreeItem(MainWindow mainWindow) {
 		super("");
 		this.mainWindow = mainWindow;
+		this.workflowTreeView = mainWindow.getWorkflowTreeView();
 		workflowNode = null;
 		Label label = new Label();
 		label.textProperty().bind(mainWindow.nameProperty());
@@ -73,6 +74,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 	public WorkflowTreeItem(MainWindow mainWindow, AlgorithmNode node) {
 		super("");
 		this.mainWindow = mainWindow;
+		this.workflowTreeView = mainWindow.getWorkflowTreeView();
 		workflowNode = node;
 
 		final var label = new Label();
@@ -125,14 +127,20 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		label.disableProperty().bind(node.validProperty().not());
 
 		vBox.setOnContextMenuRequested(me -> {
-			var contextMenu = AlgorithmNodeContextMenu.create(mainWindow, mainWindow.getWorkflowTreeView().getUndoManager(), node);
+			var contextMenu = AlgorithmNodeContextMenu.create(mainWindow, workflowTreeView.getUndoManager(), node);
 			contextMenu.show(label, me.getScreenX(), me.getScreenY());
+		});
+
+		expandedProperty().addListener((v, o, n) -> {
+			if (n && mainWindow.getWorkflow().getSelectionModel().isSelected(node))
+				workflowTreeView.getController().getWorkflowTreeView().getSelectionModel().select(this);
 		});
 	}
 
 	public WorkflowTreeItem(MainWindow mainWindow, DataNode node) {
 		super("");
 		this.mainWindow = mainWindow;
+		this.workflowTreeView = mainWindow.getWorkflowTreeView();
 		workflowNode = node;
 
 		final var label = new Label();
@@ -161,7 +169,12 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 		label.disableProperty().bind(node.validProperty().not());
 
-		vBox.setOnContextMenuRequested(e -> DataNodeContextMenu.create(mainWindow, new Point2D(e.getScreenX(), e.getScreenY()), node).show(label, e.getScreenX(), e.getScreenY()));
+		vBox.setOnContextMenuRequested(e -> DataNodeContextMenu.create(mainWindow, workflowTreeView.getUndoManager(), node).show(label, e.getScreenX(), e.getScreenY()));
+
+		expandedProperty().addListener((v, o, n) -> {
+			if (n && mainWindow.getWorkflow().getSelectionModel().isSelected(node))
+				workflowTreeView.getController().getWorkflowTreeView().getSelectionModel().select(this);
+		});
 	}
 
 	/**

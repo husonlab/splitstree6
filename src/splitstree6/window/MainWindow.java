@@ -46,7 +46,7 @@ public class MainWindow implements IMainWindow {
 	private final Parent root;
 	private MainWindowPresenter presenter;
 	private final MainWindowController controller;
-	private final Workflow workflow = new Workflow();
+	private final Workflow workflow = new Workflow(this);
 
 	private final TextTabsManager textTabsManager;
 	private final AlgorithmTabsManager algorithmTabsManager;
@@ -222,6 +222,11 @@ public class MainWindow implements IMainWindow {
 	public void addTabToMainTabPane(Tab tab) {
 		controller.getMainTabPane().getTabs().add(tab);
 	}
+
+	public void removeTabFromMainTabPane(Tab tab) {
+		controller.getMainTabPane().getTabs().remove(tab);
+	}
+
 
 	public TextTabsManager getTextTabsManager() {
 		return textTabsManager;

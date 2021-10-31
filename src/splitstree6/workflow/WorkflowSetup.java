@@ -22,7 +22,7 @@ package splitstree6.workflow;
 import jloda.fx.window.NotificationManager;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
-import splitstree6.algorithms.networks.network2sink.ShowNetworkConsole;
+import splitstree6.algorithms.network.network2sink.ShowNetworkConsole;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
 import splitstree6.algorithms.source.source2distances.DistancesLoader;
 import splitstree6.algorithms.source.source2network.NetworkLoader;
@@ -41,10 +41,11 @@ import java.util.function.Consumer;
  * Daniel Huson, 10.2021
  */
 public class WorkflowSetup {
+
 	public static Workflow apply(String fileName, MainWindow mainWindow) {
-		var workflow = new Workflow();
+		var workflow = new Workflow(mainWindow);
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(mainWindow.getController().getBottomFlowPane()));
-		return apply(fileName, new Workflow(), null);
+		return apply(fileName, workflow, null);
 	}
 
 	public static Workflow apply(String fileName, Workflow workflow, Consumer<Throwable> exceptionHandler) {

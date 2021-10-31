@@ -30,37 +30,18 @@ import java.util.*;
  * delete an algorithm node and all dependent nodes
  * Daniel Huson, 10.2021
  */
-public class DeleteCommand extends UndoableRedoableCommand {
-	private final Collection<WorkflowNode> nodes;
-	private Collection<Pair<WorkflowNode, WorkflowNode>> parentChildPairs;
+public class DeleteCommand {
+	public static UndoableRedoableCommand create(Workflow workflow, WorkflowNode node) {
+		final Collection<WorkflowNode> nodes = workflow.getAllDescendants(node, true);
+		Collection<Pair<WorkflowNode, WorkflowNode>> parentChildPairs = getParentChildPairs(nodes);
 
-
-	private final Runnable undo;
-	private final Runnable redo;
-
-	public DeleteCommand(Workflow workflow, WorkflowNode node) {
-		super("delete nodes");
-		nodes = workflow.getAllDescendants(node, true);
-		parentChildPairs = getParentChildPairs(nodes);
-		undo = () -> {
-			workflow.addNodes(nodes, parentChildPairs);
-		};
-
-		redo = () -> {
-			var reverse = new ArrayList<>(nodes);
-			Collections.reverse(reverse);
-			workflow.deleteNodes(reverse);
-		};
-	}
-
-	@Override
-	public void undo() {
-		undo.run();
-	}
-
-	@Override
-	public void redo() {
-		redo.run();
+		return UndoableRedoableCommand.create("delete nodes",
+				() -> workflow.addNodes(nodes, parentChildPairs),
+				() -> {
+					var reverse = new ArrayList<>(nodes);
+					Collections.reverse(reverse);
+					workflow.deleteNodes(reverse);
+				});
 	}
 
 	public static Set<Pair<WorkflowNode, WorkflowNode>> getParentChildPairs(Collection<WorkflowNode> nodes) {

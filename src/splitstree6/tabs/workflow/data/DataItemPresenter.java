@@ -21,7 +21,6 @@ package splitstree6.tabs.workflow.data;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.geometry.Point2D;
 import javafx.scene.image.ImageView;
 import jloda.fx.util.ResourceManagerFX;
 import splitstree6.contextmenus.datanode.DataNodeContextMenu;
@@ -37,25 +36,27 @@ import splitstree6.workflow.DataBlock;
 public class DataItemPresenter<D extends DataBlock> {
 
 	public DataItemPresenter(MainWindow mainWindow, WorkflowTab workflowTab, DataItem<D> dataItem) {
-		var dataNode = dataItem.getWorkflowNode();
+		var node = dataItem.getWorkflowNode();
 		var controller = dataItem.getController();
 
 		dataItem.setEffect(WorkflowTabPresenter.getDropShadow());
 
 		var selected = new SimpleBooleanProperty(false);
-		workflowTab.getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(workflowTab.getSelectionModel().isSelected(dataItem)));
+		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> {
+			selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node));
+		});
 
-		controller.getEditButton().setOnAction(e -> mainWindow.getTextTabsManager().showTab(dataNode, true));
-		controller.getEditButton().disableProperty().bind((selected.and(dataNode.validProperty()).not()));
+		controller.getEditButton().setOnAction(e -> mainWindow.getTextTabsManager().showTab(node, true));
+		controller.getEditButton().disableProperty().bind((selected.and(node.validProperty()).not()));
 
-		controller.getNameLabel().textProperty().bind(dataNode.titleProperty());
+		controller.getNameLabel().textProperty().bind(node.titleProperty());
 
-		controller.getInfoLabel().setText(String.format("size: %,d", dataNode.getDataBlock().size()));
-		controller.getStatusImageView().setImage(dataNode.getDataBlock().size() > 0 ? ResourceManagerFX.getIcon("Done.png") : ResourceManagerFX.getIcon("Scheduled.png"));
+		controller.getInfoLabel().setText(String.format("size: %,d", node.getDataBlock().size()));
+		controller.getStatusImageView().setImage(node.getDataBlock().size() > 0 ? ResourceManagerFX.getIcon("Done.png") : ResourceManagerFX.getIcon("Scheduled.png"));
 
-		dataNode.allParentsValidProperty().addListener((v, o, n) -> {
-			if (n && dataNode.isValid()) {
-				controller.getInfoLabel().setText(String.format("size: %,d", dataNode.getDataBlock().size()));
+		node.allParentsValidProperty().addListener((v, o, n) -> {
+			if (n && node.isValid()) {
+				controller.getInfoLabel().setText(String.format("size: %,d", node.getDataBlock().size()));
 				controller.getStatusImageView().setImage(ResourceManagerFX.getIcon("Done.png"));
 			} else {
 				controller.getInfoLabel().setText("-");
@@ -64,14 +65,14 @@ public class DataItemPresenter<D extends DataBlock> {
 			}
 		});
 
-		var icon = ResourceManagerFX.getIcon(dataNode.getName().replaceAll("Input", "").
+		var icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").
 													 replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
 		if (icon != null) {
 			controller.getNameLabel().setGraphic(new ImageView(icon));
 		}
 
 		controller.getAnchorPane().getStyleClass().add("background");
-		if (!mainWindow.getWorkflow().isDerivedNode(dataNode)) {
+		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");
 			controller.getInfoLabel().setStyle("-fx-text-fill: darkgray");
 			if (controller.getNameLabel().getGraphic() != null)
@@ -80,7 +81,7 @@ public class DataItemPresenter<D extends DataBlock> {
 
 		dataItem.setOnContextMenuRequested(e -> {
 			if (selected.get())
-				DataNodeContextMenu.create(mainWindow, new Point2D(e.getScreenX(), e.getScreenY()), dataNode).show(dataItem, e.getScreenX(), e.getScreenY());
+				DataNodeContextMenu.create(mainWindow, workflowTab.getUndoManager(), node).show(dataItem, e.getScreenX(), e.getScreenY());
 		});
 	}
 }

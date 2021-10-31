@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.networks.network2sink;
+package splitstree6.algorithms.network.network2sink;
 
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.SinkBlock;

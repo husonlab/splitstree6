@@ -19,8 +19,8 @@
 
 package splitstree6.contextmenus.datanode;
 
-import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataNode;
@@ -28,12 +28,12 @@ import splitstree6.workflow.DataNode;
 public class DataNodeContextMenu {
 	private final ContextMenu contextMenu;
 
-	public DataNodeContextMenu(MainWindow mainWindow, Point2D screenLocation, DataNode dataNode) {
+	public DataNodeContextMenu(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode) {
 		var loader = new ExtendedFXMLLoader<DataNodeContextMenuController>(DataNodeContextMenuController.class);
 
 		var controller = loader.getController();
 
-		new DataNodeContextMenuPresenter(mainWindow, screenLocation, controller, dataNode);
+		new DataNodeContextMenuPresenter(mainWindow, undoManager, controller, dataNode);
 
 		contextMenu = controller.getContextMenu();
 	}
@@ -42,8 +42,8 @@ public class DataNodeContextMenu {
 		return contextMenu;
 	}
 
-	public static ContextMenu create(MainWindow mainWindow, Point2D screenLocation, DataNode dataNode) {
-		var menu = new DataNodeContextMenu(mainWindow, screenLocation, dataNode);
+	public static ContextMenu create(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode) {
+		var menu = new DataNodeContextMenu(mainWindow, undoManager, dataNode);
 		return menu.getContextMenu();
 	}
 }

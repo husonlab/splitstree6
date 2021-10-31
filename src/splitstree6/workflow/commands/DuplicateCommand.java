@@ -35,28 +35,24 @@ import java.util.Stack;
  * duplicate an algorithm and all dependent nodes
  * Daniel Huson, 10.2021
  */
-public class DuplicateCommand extends UndoableRedoableCommand {
-	private final Runnable undo;
-	private final Runnable redo;
-	private final Collection<WorkflowNode> addedNodes = new ArrayList<>();
+public class DuplicateCommand {
 
+	public static UndoableRedoableCommand create(Workflow workflow, AlgorithmNode node) {
+		final Collection<WorkflowNode> addedNodes = new ArrayList<>();
 
-	public DuplicateCommand(Workflow workflow, AlgorithmNode node) {
-		super("duplicate nodes");
+		return UndoableRedoableCommand.create("duplicate nodes",
+				() -> workflow.deleteNodes(addedNodes),
+				() -> {
+					try {
+						addedNodes.clear();
 
-		undo = () -> workflow.deleteNodes(addedNodes);
+						var stack = new Stack<DataNode>();
+						stack.push(node.getPreferredParent());
 
-		redo = () -> {
-			try {
-				addedNodes.clear();
+						var first = true;
 
-				var stack = new Stack<DataNode>();
-				stack.push(node.getPreferredParent());
-
-				var first = true;
-
-				var dataNode2CopyNodeMap = new HashMap<DataNode, DataNode>();
-				dataNode2CopyNodeMap.put(node.getPreferredParent(), node.getPreferredParent());
+						var dataNode2CopyNodeMap = new HashMap<DataNode, DataNode>();
+						dataNode2CopyNodeMap.put(node.getPreferredParent(), node.getPreferredParent());
 
 				AlgorithmNode firstCopyAlgorithmNode = null;
 
@@ -84,32 +80,11 @@ public class DuplicateCommand extends UndoableRedoableCommand {
 						stack.add(algorithmNode.getTargetNode());
 					}
 				}
-				if (firstCopyAlgorithmNode != null)
-					firstCopyAlgorithmNode.restart();
-			} catch (Exception ex) {
-				Basic.caught(ex);
-			}
-		};
-	}
-
-	@Override
-	public void undo() {
-		undo.run();
-
-	}
-
-	@Override
-	public void redo() {
-		redo.run();
-	}
-
-	@Override
-	public boolean isUndoable() {
-		return addedNodes.size() > 0;
-	}
-
-	@Override
-	public boolean isRedoable() {
-		return true;
+						if (firstCopyAlgorithmNode != null)
+							firstCopyAlgorithmNode.restart();
+					} catch (Exception ex) {
+						Basic.caught(ex);
+					}
+				});
 	}
 }

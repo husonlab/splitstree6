@@ -26,13 +26,10 @@ import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 
 public class AlgorithmItem extends WorkflowNodeItem {
-	private final AlgorithmNode algorithmNode;
 	private final AlgorithmItemController controller;
 
-	public AlgorithmItem(MainWindow mainWindow, WorkflowTab workflowTab, AlgorithmNode algorithmNode) {
-		super(mainWindow.getWorkflow(), workflowTab);
-
-		this.algorithmNode = algorithmNode;
+	public AlgorithmItem(MainWindow mainWindow, WorkflowTab workflowTab, AlgorithmNode node) {
+		super(mainWindow.getWorkflow(), workflowTab, node);
 
 		var loader = new ExtendedFXMLLoader<AlgorithmItemController>(this.getClass());
 		controller = loader.getController();
@@ -44,7 +41,7 @@ public class AlgorithmItem extends WorkflowNodeItem {
 
 
 	public AlgorithmNode getWorkflowNode() {
-		return algorithmNode;
+		return (AlgorithmNode) node;
 	}
 
 	public AlgorithmItemController getController() {

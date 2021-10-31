@@ -29,7 +29,7 @@ import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
-import splitstree6.algorithms.networks.network2sink.ShowNetworkConsole;
+import splitstree6.algorithms.network.network2sink.ShowNetworkConsole;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
 import splitstree6.algorithms.splits.splits2sink.ShowSplitsConsole;
 import splitstree6.algorithms.taxa.ShowTaxaConsole;
@@ -42,7 +42,7 @@ import splitstree6.workflow.Workflow;
 
 public class SimplePipeline extends Application {
 	private static Workflow setupWorkflow() {
-		var workflow = new Workflow();
+		var workflow = new Workflow(null);
 
 		var source = new SourceBlock();
 
