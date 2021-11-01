@@ -25,6 +25,7 @@ import javafx.beans.property.*;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
@@ -62,6 +63,8 @@ public class MainWindow implements IMainWindow {
 
 	private final StringProperty fileName = new SimpleStringProperty("");
 	private final BooleanProperty hasSplitsTree6File = new SimpleBooleanProperty(false);
+
+	private final ObjectProperty<Font> displayFont = new SimpleObjectProperty<>(new Font("Arial", 12));
 
 	private Stage stage;
 
@@ -220,7 +223,8 @@ public class MainWindow implements IMainWindow {
 	}
 
 	public void addTabToMainTabPane(Tab tab) {
-		controller.getMainTabPane().getTabs().add(tab);
+		if (!controller.getMainTabPane().getTabs().contains(tab))
+			controller.getMainTabPane().getTabs().add(tab);
 	}
 
 	public void removeTabFromMainTabPane(Tab tab) {
@@ -262,5 +266,17 @@ public class MainWindow implements IMainWindow {
 
 	public void setHasSplitsTree6File(boolean hasSplitsTree6File) {
 		this.hasSplitsTree6File.set(hasSplitsTree6File);
+	}
+
+	public Font getDisplayFont() {
+		return displayFont.get();
+	}
+
+	public ObjectProperty<Font> displayFontProperty() {
+		return displayFont;
+	}
+
+	public void setDisplayFont(Font displayFont) {
+		this.displayFont.set(displayFont);
 	}
 }

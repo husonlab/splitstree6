@@ -22,7 +22,9 @@ package splitstree6.viewers.multitreesviewer;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
@@ -33,27 +35,26 @@ import splitstree6.window.MainWindow;
 
 
 public class MultiTreesViewerPresenter implements IDisplayTabPresenter {
-	private final MultiTreesViewer multiTreesViewer;
+	private static final ObservableList<String> gridValues = FXCollections.observableArrayList();
 
 	public MultiTreesViewerPresenter(MainWindow mainWindow, MultiTreesViewer multiTreesViewer, ObservableList<PhyloTree> phyloTrees) {
-		this.multiTreesViewer = multiTreesViewer;
 		var controller = multiTreesViewer.getController();
 
-		controller.getRowsColsCBox().setOnAction(e -> {
-			try {
-				var tokens = controller.getPageTextField().getText().split("x");
-				multiTreesViewer.setRows(Integer.parseInt(tokens[0].trim()));
-				multiTreesViewer.setCols(Integer.parseInt(tokens[1].trim()));
-				var text = String.format("%d x %d", multiTreesViewer.getRows(), multiTreesViewer.getCols());
-				if (!controller.getRowsColsCBox().getItems().contains(text))
-					Platform.runLater(() -> controller.getRowsColsCBox().getItems().add(text));
-			} catch (Exception ex) {
-				var text = String.format("%d x %d", multiTreesViewer.getRows(), multiTreesViewer.getCols());
-				Platform.runLater(() -> controller.getRowsColsCBox().setValue(text));
-			}
+		updateRowsColsFromText(multiTreesViewer.getOptionGrid(), multiTreesViewer.rowsProperty(), multiTreesViewer.colsProperty());
+
+		multiTreesViewer.optionGridProperty().addListener((v, o, n) -> {
+			var text = updateRowsColsFromText(n, multiTreesViewer.rowsProperty(), multiTreesViewer.colsProperty());
+			Platform.runLater(() -> {
+				if (!gridValues.contains(text))
+					gridValues.add(0, text);
+				Platform.runLater(() -> multiTreesViewer.setOptionGrid(text));
+			});
 		});
 
 		controller.getRowsColsCBox().valueProperty().bindBidirectional(multiTreesViewer.optionGridProperty());
+		controller.getRowsColsCBox().getItems().setAll(gridValues);
+		gridValues.addListener((InvalidationListener) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
+
 
 		var numberOfTrees = new SimpleIntegerProperty(0);
 		numberOfTrees.bind(Bindings.size(phyloTrees));
@@ -75,14 +76,19 @@ public class MultiTreesViewerPresenter implements IDisplayTabPresenter {
 
 		multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> controller.getPageTextField().setText(n.toString()));
 		controller.getPageTextField().setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
-		controller.getPageTextField().textProperty().addListener((v, o, n) -> {
-			if (NumberUtils.isInteger(n)) {
-				var page = NumberUtils.parseInt(n);
-				if (page >= 1 && page <= phyloTrees.size()) {
-					multiTreesViewer.setPageNumber(page);
-				}
+		controller.getPageTextField().setOnAction(e -> {
+			if (NumberUtils.isInteger(controller.getPageTextField().getText())) {
+				var page = NumberUtils.parseInt((controller.getPageTextField().getText()));
+				multiTreesViewer.setPageNumber(page);
 			}
 		});
+		multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> {
+			if (n.intValue() < 1)
+				Platform.runLater(() -> multiTreesViewer.setPageNumber(1));
+			else if (n.intValue() >= numberOfPages.get())
+				Platform.runLater(() -> multiTreesViewer.setPageNumber((Math.max(1, numberOfPages.get()))));
+		});
+
 		controller.getPageTextField().disableProperty().bind(Bindings.size(phyloTrees).lessThanOrEqualTo(1));
 
 		controller.getNextPageButton().setOnAction(e -> multiTreesViewer.setPageNumber(multiTreesViewer.getPageNumber() + 1));
@@ -92,12 +98,55 @@ public class MultiTreesViewerPresenter implements IDisplayTabPresenter {
 		controller.getLastPage().disableProperty().bind(controller.getNextPageButton().disableProperty());
 
 		{
+			multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
+			controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> multiTreesViewer.setPageNumber(n.intValue() + 1));
 
+			controller.getPagination().setPageFactory(page -> {
+				var treePane = new MultiTreesPane(multiTreesViewer);
+
+				Platform.runLater(() -> treePane.addTrees(multiTreesViewer.getTrees(), page + 1));
+				multiTreesViewer.setImageNode(treePane);
+				return treePane;
+			});
+
+			controller.getPagination().pageCountProperty().bind(numberOfPages);
 		}
+
+		multiTreesViewer.tabPaneProperty().addListener((v, o, n) -> {
+			if (n != null) {
+				controller.getPagination().prefWidthProperty().unbind();
+				controller.getPagination().prefHeightProperty().unbind();
+
+				controller.getPagination().setPrefWidth(multiTreesViewer.getTabPane().getWidth());
+				controller.getPagination().setPrefHeight(multiTreesViewer.getTabPane().getHeight());
+
+				controller.getPagination().prefWidthProperty().bind(n.widthProperty());
+				controller.getPagination().prefHeightProperty().bind(n.heightProperty());
+			}
+		});
 	}
 
+	/**
+	 * updates the rows and cols from the given text and returns the text nicely formatted
+	 *
+	 * @param text text to be parsed
+	 * @param rows rows to update
+	 * @param cols cols to update
+	 * @return nicely formatted text
+	 */
+	private static String updateRowsColsFromText(String text, IntegerProperty rows, IntegerProperty cols) {
+		try {
+			var tokens = text.split("x");
+			rows.set(Integer.parseInt(tokens[0].trim()));
+			cols.set(Integer.parseInt(tokens[1].trim()));
+		} catch (Exception ignored) {
+		}
+		return String.format("%d x %d", rows.get(), cols.get());
+	}
+
+
 	@Override
-	public void setup() {
+	public void setupMenuItems() {
 
 	}
 }

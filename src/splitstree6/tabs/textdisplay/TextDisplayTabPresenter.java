@@ -112,7 +112,7 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 		});
 	}
 
-	public void setup() {
+	public void setupMenuItems() {
 		var controller = mainWindow.getController();
 		var tabController = tab.getController();
 

@@ -99,7 +99,7 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		tab.getController().getApplyButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
 	}
 
-	public void setup() {
+	public void setupMenuItems() {
 
 		var controller = mainWindow.getController();
 

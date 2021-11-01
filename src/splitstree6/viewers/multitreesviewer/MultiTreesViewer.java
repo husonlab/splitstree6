@@ -24,9 +24,10 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
+import javafx.scene.text.Font;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
-import splitstree6.algorithms.trees.trees2sink.MultiTreeDisplay;
 import splitstree6.tabs.viewer.ViewerTab;
 import splitstree6.window.MainWindow;
 
@@ -43,15 +44,25 @@ public class MultiTreesViewer extends ViewerTab {
 	private final IntegerProperty rows = new SimpleIntegerProperty(1);
 	private final IntegerProperty cols = new SimpleIntegerProperty(1);
 
-	private final IntegerProperty pageNumber = new SimpleIntegerProperty(1);
+	private final IntegerProperty pageNumber = new SimpleIntegerProperty(1); // 1-based
 
-	private final ObjectProperty<MultiTreeDisplay.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "diagramOption", MultiTreeDisplay.Diagram.Unrooted);
-	private final ObjectProperty<MultiTreeDisplay.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "rootSideOption", MultiTreeDisplay.RootSide.Left);
+	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "diagramOption", TreePane.Diagram.Unrooted);
+	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "rootSideOption", TreePane.RootSide.Left);
 
-	public MultiTreesViewer(MainWindow mainWindow) {
+	private final ObjectProperty<Font> font = new SimpleObjectProperty<>();
+
+	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
+
+	public MultiTreesViewer(MainWindow mainWindow, StringProperty titleProperty) {
 		var loader = new ExtendedFXMLLoader<MultiTreesViewerController>(MultiTreesViewerController.class);
 		controller = loader.getController();
 
+		var label = new Label();
+		label.textProperty().bind(titleProperty);
+		setGraphic(label);
+		setClosable(false);
+
+		font.bind(mainWindow.displayFontProperty());
 
 		presenter = new MultiTreesViewerPresenter(mainWindow, this, trees);
 
@@ -105,30 +116,30 @@ public class MultiTreesViewer extends ViewerTab {
 	}
 
 	public void setPageNumber(int pageNumber) {
-		this.pageNumber.set(Math.max(1, pageNumber));
+		this.pageNumber.set(pageNumber);
 	}
 
-	public MultiTreeDisplay.Diagram getOptionDiagram() {
+	public TreePane.Diagram getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<MultiTreeDisplay.Diagram> optionDiagramProperty() {
+	public ObjectProperty<TreePane.Diagram> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(MultiTreeDisplay.Diagram optionDiagram) {
+	public void setOptionDiagram(TreePane.Diagram optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public MultiTreeDisplay.RootSide getOptionRootSide() {
+	public TreePane.RootSide getOptionRootSide() {
 		return optionRootSide.get();
 	}
 
-	public ObjectProperty<MultiTreeDisplay.RootSide> optionRootSideProperty() {
+	public ObjectProperty<TreePane.RootSide> optionRootSideProperty() {
 		return optionRootSide;
 	}
 
-	public void setOptionRootSide(MultiTreeDisplay.RootSide optionRootSide) {
+	public void setOptionRootSide(TreePane.RootSide optionRootSide) {
 		this.optionRootSide.set(optionRootSide);
 	}
 
@@ -152,8 +163,18 @@ public class MultiTreesViewer extends ViewerTab {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getPagination();
+		return imageNode.get();
 	}
 
+	public ObjectProperty<Node> imageNodeProperty() {
+		return imageNode;
+	}
 
+	public void setImageNode(Node imageNode) {
+		this.imageNode.set(imageNode);
+	}
+
+	public ObjectProperty<Font> fontProperty() {
+		return font;
+	}
 }

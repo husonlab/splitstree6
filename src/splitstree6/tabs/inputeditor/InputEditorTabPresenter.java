@@ -131,8 +131,8 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 		});
 	}
 
-	public void setup() {
-		super.setup();
+	public void setupMenuItems() {
+		super.setupMenuItems();
 
 		var controller = mainWindow.getController();
 		var toolBarController = tab.getToolBarController();

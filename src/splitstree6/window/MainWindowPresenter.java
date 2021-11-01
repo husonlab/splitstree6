@@ -81,7 +81,7 @@ public class MainWindowPresenter {
 					disableAllMenuItems(controller);
 					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 					if (focusedDisplayTab.get() != null)
-						focusedDisplayTab.get().getPresenter().setup();
+						focusedDisplayTab.get().getPresenter().setupMenuItems();
 					enableAllMenuItemsWithDefinedAction(controller);
 				}
 			} catch (Exception ex) {
@@ -94,7 +94,7 @@ public class MainWindowPresenter {
 				disableAllMenuItems(controller);
 				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 				if (n instanceof IDisplayTab displayTab) {
-					displayTab.getPresenter().setup();
+					displayTab.getPresenter().setupMenuItems();
 					focusedDisplayTab.set(displayTab);
 				} else
 					focusedDisplayTab.set(null);
@@ -109,7 +109,7 @@ public class MainWindowPresenter {
 				disableAllMenuItems(controller);
 				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 				if (n instanceof IDisplayTab displayTab) {
-					displayTab.getPresenter().setup();
+					displayTab.getPresenter().setupMenuItems();
 					focusedDisplayTab.set(displayTab);
 				} else
 					focusedDisplayTab.set(null);

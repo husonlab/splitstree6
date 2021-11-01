@@ -1,5 +1,5 @@
 /*
- *  IDisplayTabPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  TreePane.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,8 +17,24 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs;
+package splitstree6.viewers.multitreesviewer;
 
-public interface IDisplayTabPresenter {
-	void setupMenuItems();
+import javafx.beans.property.ObjectProperty;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
+import javafx.scene.text.Font;
+import jloda.phylo.PhyloTree;
+
+public class TreePane extends Pane {
+	public enum Diagram {Unrooted, Circular, Rectangular, Triangular}
+
+	public enum RootSide {Left, Right, Bottom, Top}
+
+	public TreePane(Diagram diagram, RootSide rootSide, ObjectProperty<Font> fontProperty) {
+		setStyle("-fx-border-color: lightgray;");
+	}
+
+	public void drawTree(PhyloTree phyloTree) {
+		getChildren().add(new Label(phyloTree.getName()));
+	}
 }

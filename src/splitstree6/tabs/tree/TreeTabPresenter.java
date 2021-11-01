@@ -31,7 +31,7 @@ public class TreeTabPresenter implements IDisplayTabPresenter {
 		this.tab = tab;
 	}
 
-	public void setup() {
+	public void setupMenuItems() {
 		var controller = mainWindow.getController();
 
 		controller.getCopyImageMenuItem().setOnAction(null);

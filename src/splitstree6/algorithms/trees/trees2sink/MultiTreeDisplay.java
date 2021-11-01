@@ -20,12 +20,16 @@
 package splitstree6.algorithms.trees.trees2sink;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
+import jloda.util.ProgramProperties;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SinkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.viewers.multitreesviewer.MultiTreesViewer;
+import splitstree6.viewers.multitreesviewer.TreePane;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -36,17 +40,16 @@ import java.util.List;
  * Daniel Huson, 10.2021
  */
 public class MultiTreeDisplay extends Trees2Sink {
-	public enum Diagram {Unrooted, Circular, Rectangular, Triangular}
 
-	public enum RootSide {Left, Right, Bottom, Top}
-
-	private final ObjectProperty<Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", Diagram.Unrooted);
-	private final ObjectProperty<RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", RootSide.Left);
+	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreePane.Diagram.Unrooted);
+	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.Left);
 
 	private final StringProperty optionGrid = new SimpleStringProperty(this, "optionGrid", "1 x 1");
 	private final IntegerProperty optionPageNumber = new SimpleIntegerProperty(this, "optionPageNumber", 1);
 
 	private final ObjectProperty<MultiTreesViewer> viewer = new SimpleObjectProperty<>();
+
+	private InvalidationListener invalidationListener;
 
 	@Override
 	public List<String> listOptions() {
@@ -59,12 +62,20 @@ public class MultiTreeDisplay extends Trees2Sink {
 		Platform.runLater(() -> {
 			if (viewer.get() == null) {
 				var mainWindow = getNode().getOwner().getMainWindow();
-				var multiTreesViewer = new MultiTreesViewer(mainWindow);
+				var multiTreesViewer = new MultiTreesViewer(mainWindow, getNode().titleProperty());
 
+				multiTreesViewer.setOptionDiagram(optionDiagram.get());
 				multiTreesViewer.optionDiagramProperty().bindBidirectional(optionDiagram);
+
+				multiTreesViewer.setOptionRootSide(optionRootSide.get());
 				multiTreesViewer.optionRootSideProperty().bindBidirectional(optionRootSide);
 
+				var value = ProgramProperties.get("TreeGridDimensions", optionGrid.getValue());
 				multiTreesViewer.optionGridProperty().bindBidirectional(optionGrid);
+				multiTreesViewer.setOptionGrid(value);
+				multiTreesViewer.optionGridProperty().addListener((v, o, n) -> ProgramProperties.put("TreeGridDimensions", n));
+
+				multiTreesViewer.setPageNumber(optionPageNumber.get());
 				multiTreesViewer.pageNumberProperty().bindBidirectional(optionPageNumber);
 
 				mainWindow.addTabToMainTabPane(multiTreesViewer);
@@ -74,29 +85,43 @@ public class MultiTreeDisplay extends Trees2Sink {
 			multiTreesViewer.getTrees().clear();
 			multiTreesViewer.getTrees().addAll(inputData.getTrees());
 		});
+
+		if (invalidationListener == null) {
+			var mainWindow = getNode().getOwner().getMainWindow();
+			var workflow = mainWindow.getWorkflow();
+			invalidationListener = e -> {
+				if (!workflow.nodes().contains(getNode())) {
+					mainWindow.removeTabFromMainTabPane(viewer.get());
+				} else {
+					mainWindow.addTabToMainTabPane(viewer.get());
+				}
+			};
+			workflow.nodes().addListener(new WeakInvalidationListener(invalidationListener));
+		}
+
 	}
 
-	public Diagram getOptionDiagram() {
+	public TreePane.Diagram getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<Diagram> optionDiagramProperty() {
+	public ObjectProperty<TreePane.Diagram> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(Diagram optionDiagram) {
+	public void setOptionDiagram(TreePane.Diagram optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public RootSide getOptionRootSide() {
+	public TreePane.RootSide getOptionRootSide() {
 		return optionRootSide.get();
 	}
 
-	public ObjectProperty<RootSide> optionRootSideProperty() {
+	public ObjectProperty<TreePane.RootSide> optionRootSideProperty() {
 		return optionRootSide;
 	}
 
-	public void setOptionRootSide(RootSide optionRootSide) {
+	public void setOptionRootSide(TreePane.RootSide optionRootSide) {
 		this.optionRootSide.set(optionRootSide);
 	}
 

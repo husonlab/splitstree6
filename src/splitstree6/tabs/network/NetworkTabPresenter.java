@@ -31,7 +31,7 @@ public class NetworkTabPresenter implements IDisplayTabPresenter {
 		this.tab = tab;
 	}
 
-	public void setup() {
+	public void setupMenuItems() {
 		var controller = mainWindow.getController();
 
 		controller.getCutMenuItem().setOnAction(null);

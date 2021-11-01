@@ -76,7 +76,7 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 		});
 	}
 
-	public void setup() {
+	public void setupMenuItems() {
 		var controller = mainWindow.getController();
 		var tabController = workflowTreeView.getController();
 
