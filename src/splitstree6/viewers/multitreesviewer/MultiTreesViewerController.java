@@ -48,6 +48,15 @@ public class MultiTreesViewerController {
 	private Button findButton;
 
 	@FXML
+	private ChoiceBox<TreePane.Diagram> diagramCBox;
+
+	@FXML
+	private ComboBox<TreePane.RootSide> rootSideCBox;
+
+	@FXML
+	private ToggleButton toScaleToggleButton;
+
+	@FXML
 	private ComboBox<String> rowsColsCBox;
 
 	@FXML
@@ -94,6 +103,18 @@ public class MultiTreesViewerController {
 
 	public Button getFindButton() {
 		return findButton;
+	}
+
+	public ChoiceBox<TreePane.Diagram> getDiagramCBox() {
+		return diagramCBox;
+	}
+
+	public ComboBox<TreePane.RootSide> getRootSideCBox() {
+		return rootSideCBox;
+	}
+
+	public ToggleButton getToScaleToggleButton() {
+		return toScaleToggleButton;
 	}
 
 	public ComboBox<String> getRowsColsCBox() {

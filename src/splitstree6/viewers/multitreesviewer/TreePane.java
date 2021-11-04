@@ -24,17 +24,30 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.text.Font;
 import jloda.phylo.PhyloTree;
+import splitstree6.data.TaxaBlock;
 
 public class TreePane extends Pane {
 	public enum Diagram {Unrooted, Circular, Rectangular, Triangular}
 
 	public enum RootSide {Left, Right, Bottom, Top}
 
-	public TreePane(Diagram diagram, RootSide rootSide, ObjectProperty<Font> fontProperty) {
+
+	private final Diagram diagram;
+	private final RootSide rootSide;
+	private final boolean toScale;
+	private final ObjectProperty<Font> font;
+
+	public TreePane(Diagram diagram, RootSide rootSide, boolean toScale, ObjectProperty<Font> font) {
+		this.diagram = diagram;
+		this.rootSide = rootSide;
+		this.toScale = toScale;
+		this.font = font;
 		setStyle("-fx-border-color: lightgray;");
 	}
 
-	public void drawTree(PhyloTree phyloTree) {
-		getChildren().add(new Label(phyloTree.getName()));
+	public void drawTree(TaxaBlock taxaBlock, PhyloTree phyloTree) {
+		var group = RectangularOrTriangularTreeEmbedding.apply(taxaBlock, phyloTree, diagram, true, getPrefWidth(), getPrefHeight());
+
+		getChildren().add(new Label(phyloTree.getName(), group));
 	}
 }

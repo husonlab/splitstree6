@@ -39,15 +39,17 @@ public class MultiTreesViewer extends ViewerTab {
 	private final ObservableList<PhyloTree> trees = FXCollections.observableArrayList();
 	private final BooleanProperty isEmpty = new SimpleBooleanProperty(true);
 
+	private final IntegerProperty pageNumber = new SimpleIntegerProperty(1); // 1-based
+
+	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "diagramOption", TreePane.Diagram.Unrooted);
+	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "rootSideOption", TreePane.RootSide.Left);
+
+	private final BooleanProperty optionToScale = new SimpleBooleanProperty(this, "toScale", false);
 	private final StringProperty optionGrid = new SimpleStringProperty("1 x 1");
 
 	private final IntegerProperty rows = new SimpleIntegerProperty(1);
 	private final IntegerProperty cols = new SimpleIntegerProperty(1);
 
-	private final IntegerProperty pageNumber = new SimpleIntegerProperty(1); // 1-based
-
-	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "diagramOption", TreePane.Diagram.Unrooted);
-	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "rootSideOption", TreePane.RootSide.Left);
 
 	private final ObjectProperty<Font> font = new SimpleObjectProperty<>();
 
@@ -143,6 +145,17 @@ public class MultiTreesViewer extends ViewerTab {
 		this.optionRootSide.set(optionRootSide);
 	}
 
+	public boolean isOptionToScale() {
+		return optionToScale.get();
+	}
+
+	public BooleanProperty optionToScaleProperty() {
+		return optionToScale;
+	}
+
+	public void setOptionToScale(boolean optionToScale) {
+		this.optionToScale.set(optionToScale);
+	}
 
 	public String getOptionGrid() {
 		return optionGrid.get();

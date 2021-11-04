@@ -563,7 +563,7 @@
                 <HBox spacing="5.0" BorderPane.alignment="TOP_LEFT">
                     <children>
                         <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="30.0"
-                                  style="-fx-border-color-fx-border-color: lightgray; -fx-border-width-fx-border-width-fx-border-width-fx-border-width: 1 0 0 0;"
+                                  style="-fx-border-color: lightgray; -fx-border-width: 1 0 0 0;"
                                   vgap="5.0" HBox.hgrow="ALWAYS">
                             <padding>
                                 <Insets bottom="2.0" right="50.0" top="2.0"/>

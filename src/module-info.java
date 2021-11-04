@@ -80,4 +80,5 @@ module splitstreesix {
 	opens splitstree6.tabs.algorithms.taxa;
 
 	opens splitstree6.densitree;
+	opens splitstree6.viewers.multitreesviewer.tree_try;
 }

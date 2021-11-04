@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -39,6 +40,16 @@ public class MultiTreesViewerPresenter implements IDisplayTabPresenter {
 
 	public MultiTreesViewerPresenter(MainWindow mainWindow, MultiTreesViewer multiTreesViewer, ObservableList<PhyloTree> phyloTrees) {
 		var controller = multiTreesViewer.getController();
+
+		controller.getDiagramCBox().getItems().addAll(TreePane.Diagram.values());
+		controller.getDiagramCBox().valueProperty().bindBidirectional(multiTreesViewer.optionDiagramProperty());
+
+		controller.getRootSideCBox().getItems().addAll(TreePane.RootSide.values());
+		controller.getRootSideCBox().valueProperty().bindBidirectional(multiTreesViewer.optionRootSideProperty());
+		controller.getRootSideCBox().disableProperty().bind(multiTreesViewer.optionDiagramProperty().isEqualTo(TreePane.Diagram.Unrooted)
+				.or((multiTreesViewer.optionDiagramProperty().isEqualTo(TreePane.Diagram.Circular))));
+
+		controller.getToScaleToggleButton().selectedProperty().bindBidirectional(multiTreesViewer.optionToScaleProperty());
 
 		updateRowsColsFromText(multiTreesViewer.getOptionGrid(), multiTreesViewer.rowsProperty(), multiTreesViewer.colsProperty());
 
@@ -58,8 +69,42 @@ public class MultiTreesViewerPresenter implements IDisplayTabPresenter {
 
 		var numberOfTrees = new SimpleIntegerProperty(0);
 		numberOfTrees.bind(Bindings.size(phyloTrees));
-
 		var numberOfPages = new SimpleIntegerProperty(0);
+
+		{
+			multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
+			controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> multiTreesViewer.setPageNumber(n.intValue() + 1));
+
+			var hGap = 10.0;
+			var vGap = 10.0;
+			var boxWidth = new SimpleDoubleProperty();
+			boxWidth.bind((controller.getAnchorPane().widthProperty().divide(multiTreesViewer.rowsProperty())).subtract(hGap));
+			var boxHeight = new SimpleDoubleProperty();
+			boxHeight.bind((controller.getAnchorPane().heightProperty().divide(multiTreesViewer.colsProperty())).subtract(vGap));
+
+			controller.getPagination().setPageFactory(page -> {
+				var treePane = new MultiTreesPane(multiTreesViewer, boxWidth, boxHeight);
+				treePane.setHgap(hGap);
+				treePane.setVgap(vGap);
+				treePane.prefWidthProperty().bind(controller.getPagination().widthProperty());
+				treePane.prefHeightProperty().bind(controller.getPagination().heightProperty());
+
+				Platform.runLater(() -> treePane.addTrees(mainWindow.getWorkflow().getWorkingTaxaBlock(), multiTreesViewer.getTrees(), page + 1));
+				multiTreesViewer.setImageNode(treePane);
+				return treePane;
+			});
+
+			controller.getPagination().pageCountProperty().bind(numberOfPages);
+
+			multiTreesViewer.tabPaneProperty().addListener((v, o, n) -> {
+				if (n != null) {
+					controller.getPagination().prefWidthProperty().bind(n.widthProperty());
+					controller.getPagination().prefHeightProperty().bind(n.heightProperty());
+				}
+			});
+		}
+
+
 		{
 			InvalidationListener invalidationListener = e -> numberOfPages.set(1 + (phyloTrees.size() - 1) / (multiTreesViewer.getRows() * multiTreesViewer.getCols()));
 			multiTreesViewer.rowsProperty().addListener(invalidationListener);
@@ -68,62 +113,38 @@ public class MultiTreesViewerPresenter implements IDisplayTabPresenter {
 			invalidationListener.invalidated(null);
 		}
 
-		controller.getFirstPageButton().setOnAction(e -> multiTreesViewer.setPageNumber(1));
-		controller.getFirstPageButton().disableProperty().bind(multiTreesViewer.isEmptyProperty().or(multiTreesViewer.pageNumberProperty().lessThanOrEqualTo(1)));
-
-		controller.getPreviousPageButton().setOnAction(e -> multiTreesViewer.setPageNumber(multiTreesViewer.getPageNumber() - 1));
-		controller.getPreviousPageButton().disableProperty().bind(controller.getFirstPageButton().disableProperty());
-
-		multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> controller.getPageTextField().setText(n.toString()));
-		controller.getPageTextField().setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
-		controller.getPageTextField().setOnAction(e -> {
-			if (NumberUtils.isInteger(controller.getPageTextField().getText())) {
-				var page = NumberUtils.parseInt((controller.getPageTextField().getText()));
-				multiTreesViewer.setPageNumber(page);
-			}
-		});
-		multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> {
-			if (n.intValue() < 1)
-				Platform.runLater(() -> multiTreesViewer.setPageNumber(1));
-			else if (n.intValue() >= numberOfPages.get())
-				Platform.runLater(() -> multiTreesViewer.setPageNumber((Math.max(1, numberOfPages.get()))));
-		});
-
-		controller.getPageTextField().disableProperty().bind(Bindings.size(phyloTrees).lessThanOrEqualTo(1));
-
-		controller.getNextPageButton().setOnAction(e -> multiTreesViewer.setPageNumber(multiTreesViewer.getPageNumber() + 1));
-		controller.getNextPageButton().disableProperty().bind(multiTreesViewer.isEmptyProperty().or(multiTreesViewer.pageNumberProperty().greaterThanOrEqualTo(numberOfPages)));
-
-		controller.getLastPage().setOnAction(e -> multiTreesViewer.setPageNumber(phyloTrees.size()));
-		controller.getLastPage().disableProperty().bind(controller.getNextPageButton().disableProperty());
-
 		{
-			multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
-			controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> multiTreesViewer.setPageNumber(n.intValue() + 1));
+			controller.getFirstPageButton().setOnAction(e -> multiTreesViewer.setPageNumber(1));
+			controller.getFirstPageButton().disableProperty().bind(multiTreesViewer.isEmptyProperty().or(multiTreesViewer.pageNumberProperty().lessThanOrEqualTo(1)));
 
-			controller.getPagination().setPageFactory(page -> {
-				var treePane = new MultiTreesPane(multiTreesViewer);
+			controller.getPreviousPageButton().setOnAction(e -> multiTreesViewer.setPageNumber(multiTreesViewer.getPageNumber() - 1));
+			controller.getPreviousPageButton().disableProperty().bind(controller.getFirstPageButton().disableProperty());
 
-				Platform.runLater(() -> treePane.addTrees(multiTreesViewer.getTrees(), page + 1));
-				multiTreesViewer.setImageNode(treePane);
-				return treePane;
+			multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> controller.getPageTextField().setText(n.toString()));
+			controller.getPageTextField().setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
+			controller.getPageTextField().setText(String.valueOf(multiTreesViewer.getPageNumber()));
+			controller.getPageTextField().setOnAction(e -> {
+				if (NumberUtils.isInteger(controller.getPageTextField().getText())) {
+					var page = NumberUtils.parseInt((controller.getPageTextField().getText()));
+					multiTreesViewer.setPageNumber(page);
+				}
+			});
+			multiTreesViewer.pageNumberProperty().addListener((v, o, n) -> {
+				if (n.intValue() < 1)
+					Platform.runLater(() -> multiTreesViewer.setPageNumber(1));
+				else if (n.intValue() >= numberOfPages.get())
+					Platform.runLater(() -> multiTreesViewer.setPageNumber((Math.max(1, numberOfPages.get()))));
 			});
 
-			controller.getPagination().pageCountProperty().bind(numberOfPages);
+			controller.getPageTextField().disableProperty().bind(Bindings.size(phyloTrees).lessThanOrEqualTo(1));
+
+			controller.getNextPageButton().setOnAction(e -> multiTreesViewer.setPageNumber(multiTreesViewer.getPageNumber() + 1));
+			controller.getNextPageButton().disableProperty().bind(multiTreesViewer.isEmptyProperty().or(multiTreesViewer.pageNumberProperty().greaterThanOrEqualTo(numberOfPages)));
+
+			controller.getLastPage().setOnAction(e -> multiTreesViewer.setPageNumber(phyloTrees.size()));
+			controller.getLastPage().disableProperty().bind(controller.getNextPageButton().disableProperty());
 		}
 
-		multiTreesViewer.tabPaneProperty().addListener((v, o, n) -> {
-			if (n != null) {
-				controller.getPagination().prefWidthProperty().unbind();
-				controller.getPagination().prefHeightProperty().unbind();
-
-				controller.getPagination().setPrefWidth(multiTreesViewer.getTabPane().getWidth());
-				controller.getPagination().setPrefHeight(multiTreesViewer.getTabPane().getHeight());
-
-				controller.getPagination().prefWidthProperty().bind(n.widthProperty());
-				controller.getPagination().prefHeightProperty().bind(n.heightProperty());
-			}
-		});
 	}
 
 	/**

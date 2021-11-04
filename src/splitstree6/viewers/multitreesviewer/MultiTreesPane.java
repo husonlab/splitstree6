@@ -19,39 +19,35 @@
 
 package splitstree6.viewers.multitreesviewer;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.layout.GridPane;
 import jloda.phylo.PhyloTree;
+import splitstree6.data.TaxaBlock;
 
 public class MultiTreesPane extends GridPane {
 	private final MultiTreesViewer multiTreesViewer;
-	private final DoubleProperty boxWidth = new SimpleDoubleProperty();
-	private final DoubleProperty boxHeight = new SimpleDoubleProperty();
+	private final ReadOnlyDoubleProperty boxWidth;
+	private final ReadOnlyDoubleProperty boxHeight;
 
-	public MultiTreesPane(MultiTreesViewer multiTreesViewer) {
+	public MultiTreesPane(MultiTreesViewer multiTreesViewer, ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight) {
 		this.multiTreesViewer = multiTreesViewer;
 
-		setHgap(10);
-		setVgap(10);
-
-		// todo: fix this circular dependency in sizing:
-		boxWidth.bind((widthProperty().divide(multiTreesViewer.rowsProperty()).subtract(hgapProperty())));
-		boxHeight.bind((heightProperty().divide(multiTreesViewer.colsProperty()).subtract(vgapProperty())));
+		this.boxWidth = boxWidth;
+		this.boxHeight = boxHeight;
 	}
 
-	public Runnable addTrees(ObservableList<PhyloTree> trees, Integer page) {
+	public Runnable addTrees(TaxaBlock taxaBlock, ObservableList<PhyloTree> trees, Integer page) {
 		var start = (page - 1) * multiTreesViewer.getRows() * multiTreesViewer.getCols();
 
 		var row = 0;
 		var col = 0;
 		for (var t = start; t < trees.size(); t++) {
-			var treePane = new TreePane(multiTreesViewer.getOptionDiagram(), multiTreesViewer.getOptionRootSide(), multiTreesViewer.fontProperty());
+			var treePane = new TreePane(multiTreesViewer.getOptionDiagram(), multiTreesViewer.getOptionRootSide(), multiTreesViewer.isOptionToScale(), multiTreesViewer.fontProperty());
 			treePane.prefWidthProperty().bind(boxWidth);
 			treePane.prefHeightProperty().bind(boxHeight);
 			trees.get(t).setName("tree-" + (t + 1));
-			treePane.drawTree(trees.get(t));
+			treePane.drawTree(taxaBlock, trees.get(t));
 			getChildren().add(treePane);
 			GridPane.setRowIndex(treePane, row);
 			GridPane.setColumnIndex(treePane, col);

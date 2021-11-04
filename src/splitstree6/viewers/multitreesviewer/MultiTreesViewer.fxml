@@ -110,6 +110,11 @@
                                     </tooltip>
                                 </Button>
                                 <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                                <ChoiceBox fx:id="diagramCBox" prefWidth="100.0"/>
+                                <ComboBox fx:id="rootSideCBox" prefWidth="100.0"/>
+                                <ToggleButton fx:id="toScaleToggleButton" mnemonicParsing="false" text="To Scale"/>
+                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
                                 <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="110.0"
                                           promptText="rows x cols"/>
                                 <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"

@@ -43,6 +43,7 @@ public class MultiTreeDisplay extends Trees2Sink {
 
 	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreePane.Diagram.Unrooted);
 	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.Left);
+	private final BooleanProperty optionToScale = new SimpleBooleanProperty(this, "optionToScale", true);
 
 	private final StringProperty optionGrid = new SimpleStringProperty(this, "optionGrid", "1 x 1");
 	private final IntegerProperty optionPageNumber = new SimpleIntegerProperty(this, "optionPageNumber", 1);
@@ -53,7 +54,7 @@ public class MultiTreeDisplay extends Trees2Sink {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList(optionDiagram.getName(), optionRootSide.getName(), optionGrid.getName(), optionPageNumber.getName());
+		return Arrays.asList(optionDiagram.getName(), optionRootSide.getName(), optionToScale.getName(), optionGrid.getName(), optionPageNumber.getName());
 	}
 
 	@Override
@@ -64,18 +65,17 @@ public class MultiTreeDisplay extends Trees2Sink {
 				var mainWindow = getNode().getOwner().getMainWindow();
 				var multiTreesViewer = new MultiTreesViewer(mainWindow, getNode().titleProperty());
 
-				multiTreesViewer.setOptionDiagram(optionDiagram.get());
 				multiTreesViewer.optionDiagramProperty().bindBidirectional(optionDiagram);
 
-				multiTreesViewer.setOptionRootSide(optionRootSide.get());
 				multiTreesViewer.optionRootSideProperty().bindBidirectional(optionRootSide);
+
+				multiTreesViewer.optionToScaleProperty().bindBidirectional(optionToScale);
 
 				var value = ProgramProperties.get("TreeGridDimensions", optionGrid.getValue());
 				multiTreesViewer.optionGridProperty().bindBidirectional(optionGrid);
 				multiTreesViewer.setOptionGrid(value);
 				multiTreesViewer.optionGridProperty().addListener((v, o, n) -> ProgramProperties.put("TreeGridDimensions", n));
 
-				multiTreesViewer.setPageNumber(optionPageNumber.get());
 				multiTreesViewer.pageNumberProperty().bindBidirectional(optionPageNumber);
 
 				mainWindow.addTabToMainTabPane(multiTreesViewer);
@@ -90,15 +90,16 @@ public class MultiTreeDisplay extends Trees2Sink {
 			var mainWindow = getNode().getOwner().getMainWindow();
 			var workflow = mainWindow.getWorkflow();
 			invalidationListener = e -> {
-				if (!workflow.nodes().contains(getNode())) {
-					mainWindow.removeTabFromMainTabPane(viewer.get());
-				} else {
-					mainWindow.addTabToMainTabPane(viewer.get());
-				}
+				Platform.runLater(() -> {
+					if (!workflow.nodes().contains(getNode())) {
+						mainWindow.removeTabFromMainTabPane(viewer.get());
+					} else if (!mainWindow.getController().getMainTabPane().getTabs().contains(viewer.get())) {
+						mainWindow.addTabToMainTabPane(viewer.get());
+					}
+				});
 			};
 			workflow.nodes().addListener(new WeakInvalidationListener(invalidationListener));
 		}
-
 	}
 
 	public TreePane.Diagram getOptionDiagram() {
@@ -123,6 +124,18 @@ public class MultiTreeDisplay extends Trees2Sink {
 
 	public void setOptionRootSide(TreePane.RootSide optionRootSide) {
 		this.optionRootSide.set(optionRootSide);
+	}
+
+	public boolean isOptionToScale() {
+		return optionToScale.get();
+	}
+
+	public BooleanProperty optionToScaleProperty() {
+		return optionToScale;
+	}
+
+	public void setOptionToScale(boolean optionToScale) {
+		this.optionToScale.set(optionToScale);
 	}
 
 	public String getOptionGrid() {
