@@ -29,6 +29,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
+import jloda.fx.util.AService;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -40,6 +41,7 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 
 	public MultiTreesViewPresenter(MainWindow mainWindow, MultiTreesView multiTreesView, ObservableList<PhyloTree> phyloTrees) {
 		var controller = multiTreesView.getController();
+
 
 		controller.getDiagramCBox().getItems().addAll(TreePane.Diagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(multiTreesView.optionDiagramProperty());
@@ -55,7 +57,6 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 		multiTreesView.optionToScaleProperty().addListener(e -> redraw(controller));
 
 		updateRowsColsFromText(multiTreesView.getOptionGrid(), multiTreesView.rowsProperty(), multiTreesView.colsProperty());
-
 		multiTreesView.optionGridProperty().addListener((v, o, n) -> {
 			var text = updateRowsColsFromText(n, multiTreesView.rowsProperty(), multiTreesView.colsProperty());
 			Platform.runLater(() -> {
@@ -64,6 +65,23 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 				Platform.runLater(() -> multiTreesView.setOptionGrid(text));
 			});
 		});
+
+		var targetWidth = new SimpleDoubleProperty();
+		var targetHeight = new SimpleDoubleProperty();
+		{
+			// use a service with a delay to redraw so that we don't redraw too often
+			var redrawService = new AService<>(() -> {
+				Thread.sleep(500);
+				redraw(controller);
+				return true;
+			});
+
+			mainWindow.getController().getMainBorderPane().layoutBoundsProperty().addListener((v, o, n) -> {
+				targetWidth.set(n.getWidth() - 10);
+				targetHeight.set(n.getHeight() - 110);
+				redrawService.restart();
+			});
+		}
 
 		controller.getRowsColsCBox().valueProperty().bindBidirectional(multiTreesView.optionGridProperty());
 		controller.getRowsColsCBox().getItems().setAll(gridValues);
@@ -80,9 +98,9 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			var hGap = 10.0;
 			var vGap = 10.0;
 			var boxWidth = new SimpleDoubleProperty();
-			boxWidth.bind((controller.getAnchorPane().widthProperty().divide(multiTreesView.rowsProperty())).subtract(hGap));
+			boxWidth.bind((targetWidth.divide(multiTreesView.colsProperty())).subtract(hGap));
 			var boxHeight = new SimpleDoubleProperty();
-			boxHeight.bind((controller.getAnchorPane().heightProperty().divide(multiTreesView.colsProperty())).subtract(vGap));
+			boxHeight.bind((targetHeight.divide(multiTreesView.rowsProperty())).subtract(vGap));
 
 			controller.getAnchorPane().widthProperty().addListener((v, o, n) -> System.err.println("anchor width: " + n));
 			controller.getAnchorPane().heightProperty().addListener((v, o, n) -> System.err.println("anchor height: " + n));
@@ -101,15 +119,6 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			});
 
 			controller.getPagination().pageCountProperty().bind(numberOfPages);
-
-			multiTreesView.tabPaneProperty().addListener((v, o, n) -> {
-				if (n != null) {
-					controller.getAnchorPane().maxWidthProperty().bind(n.widthProperty());
-					controller.getPagination().prefWidthProperty().bind(n.widthProperty());
-					controller.getAnchorPane().maxHeightProperty().bind(n.heightProperty());
-					controller.getPagination().prefHeightProperty().bind(n.heightProperty());
-				}
-			});
 		}
 
 		{

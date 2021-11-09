@@ -25,6 +25,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.algorithms.Traversals;
@@ -44,8 +45,7 @@ public class RectangularOrTriangularTreeEmbedding {
 	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreePane.Diagram diagram, boolean toScale, double width, double height) {
 		var parentPlacement = ParentPlacement.ChildrenAverage;
 
-		System.err.println("Width: " + width);
-		System.err.println("Height: " + height);
+		var color = (MainWindowManager.isUseDarkTheme() ? Color.LIGHTGRAY : Color.BLACK);
 
 		var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
 		var fontHeight = Math.min(12, height / (numberOfLeaves + 1));
@@ -57,6 +57,7 @@ public class RectangularOrTriangularTreeEmbedding {
 			if (text != null) {
 				var label = new RichTextLabel(text);
 				label.setFont(new Font("Serif", fontHeight));
+				label.setTextFill(color);
 				nodeLabelMap.put(v, label);
 
 				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
@@ -83,12 +84,13 @@ public class RectangularOrTriangularTreeEmbedding {
 
 		for (var v : tree.nodes()) {
 			var point = node2point.get(v);
-			var nodeView = new Circle(2);
-			nodeGroup.getChildren().add(nodeView);
-			nodeView.setCenterX(point.getFirst());
-			nodeView.setCenterY(point.getSecond());
-			nodeXMap.put(v, nodeView.centerXProperty());
-			nodeYMap.put(v, nodeView.centerYProperty());
+			var circle = new Circle();
+			circle.setStroke(color);
+			nodeGroup.getChildren().add(circle);
+			circle.setCenterX(point.getFirst());
+			circle.setCenterY(point.getSecond());
+			nodeXMap.put(v, circle.centerXProperty());
+			nodeYMap.put(v, circle.centerYProperty());
 
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
@@ -113,9 +115,9 @@ public class RectangularOrTriangularTreeEmbedding {
 				var line = new Path(moveTo, lineTo2);
 
 				line.setFill(Color.TRANSPARENT);
-				line.setStroke(Color.YELLOW);
+				line.setStroke(color);
 				line.setStrokeLineCap(StrokeLineCap.ROUND);
-				line.setStrokeWidth(1);
+				line.setStrokeWidth(0.5);
 
 				edgeGroup.getChildren().add(line);
 			}
@@ -136,9 +138,9 @@ public class RectangularOrTriangularTreeEmbedding {
 				var line = new Path(moveTo, lineTo1, lineTo2);
 
 				line.setFill(Color.TRANSPARENT);
-				line.setStroke(Color.YELLOW);
+				line.setStroke(color);
 				line.setStrokeLineCap(StrokeLineCap.ROUND);
-				line.setStrokeWidth(1);
+				line.setStrokeWidth(0.5);
 
 				edgeGroup.getChildren().add(line);
 			}
@@ -216,7 +218,6 @@ public class RectangularOrTriangularTreeEmbedding {
 		var maxX = nodePointMap.values().parallelStream().mapToDouble(Pair::getFirst).max().orElse(0);
 		var minY = nodePointMap.values().parallelStream().mapToDouble(Pair::getSecond).min().orElse(0);
 		var maxY = nodePointMap.values().parallelStream().mapToDouble(Pair::getSecond).max().orElse(0);
-
 
 		var scaleX = (maxX > minX ? width / (maxX - minX) : 1);
 		var scaleY = (maxY > minY ? height / (maxY - minY) : 1);

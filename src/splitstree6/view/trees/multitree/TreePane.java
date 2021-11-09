@@ -21,15 +21,18 @@ package splitstree6.view.trees.multitree;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Point3D;
+import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import jloda.fx.control.RichTextLabel;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 
-public class TreePane extends Pane {
+import java.util.LinkedList;
+
+public class TreePane extends StackPane {
 	public enum Diagram {Unrooted, Circular, Rectangular, Triangular}
 
 	public enum RootSide {Left, Right, Bottom, Top}
@@ -46,7 +49,7 @@ public class TreePane extends Pane {
 		this.rootSide = rootSide;
 		this.toScale = toScale;
 		this.font = font;
-		setStyle("-fx-border-color: lightgray;");
+		//setStyle("-fx-border-color: lightgray;");
 
 		widthProperty().addListener((v, o, n) -> {
 			if (redraw != null) {
@@ -87,9 +90,22 @@ public class TreePane extends Pane {
 
 			pane.getChildren().setAll(RectangularOrTriangularTreeEmbedding.apply(taxaBlock, phyloTree, diagram, toScale, width, height));
 
+			if (rootSide == RootSide.Right || rootSide == RootSide.Top) {
+				var queue = new LinkedList<>(pane.getChildren());
+				while (queue.size() > 0) {
+					var node = queue.pop();
+					if (node instanceof RichTextLabel) {
+						node.setRotationAxis(new Point3D(0, 0, 1));
+						node.setRotate(180);
+					} else if (node instanceof Parent parent) {
+						queue.addAll(parent.getChildrenUnmodifiable());
+					}
+				}
+			}
+
 			var label = new Label(phyloTree.getName());
 
-			getChildren().setAll(new VBox(label, pane));
+			getChildren().setAll(new AnchorPane(label, pane));
 
 		};
 		redraw.run();
