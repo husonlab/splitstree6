@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.multitree_old.tree_try;
+package splitstree6.view.trees.multitree.tree_try;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Group;

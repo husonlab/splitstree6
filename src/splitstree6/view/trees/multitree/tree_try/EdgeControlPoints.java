@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.view.trees.multitree_old.tree_try;
+package splitstree6.view.trees.multitree.tree_try;
 
 import javafx.geometry.Point2D;
 
