@@ -23,6 +23,7 @@ import javafx.beans.property.DoubleProperty;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -43,8 +44,35 @@ public class RectangularOrTriangularTreeEmbedding {
 	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreePane.Diagram diagram, boolean toScale, double width, double height) {
 		var parentPlacement = ParentPlacement.ChildrenAverage;
 
+		System.err.println("Width: " + width);
+		System.err.println("Height: " + height);
+
+		var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
+		var fontHeight = Math.min(12, height / (numberOfLeaves + 1));
+
+		var maxLabelWidth = 0.0;
+		NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
+		for (var v : tree.nodes()) {
+			var text = getLabelText(taxaBlock, tree, v);
+			if (text != null) {
+				var label = new RichTextLabel(text);
+				label.setFont(new Font("Serif", fontHeight));
+				nodeLabelMap.put(v, label);
+
+				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
+			}
+		}
+		if (maxLabelWidth > 0.25 * width) {
+			fontHeight = Math.min(12, fontHeight * 0.25 * width / maxLabelWidth);
+			maxLabelWidth = 0;
+			for (var label : nodeLabelMap.values()) {
+				label.setFont(new Font("Serif", fontHeight));
+				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
+			}
+		}
+
 		var node2point = computeCoordinates(tree, toScale, parentPlacement);
-		normalize(width, height, node2point);
+		normalize(width - maxLabelWidth - 5, height - fontHeight, node2point);
 
 		var nodeGroup = new Group();
 		var nodeLabelGroup = new Group();
@@ -62,9 +90,8 @@ public class RectangularOrTriangularTreeEmbedding {
 			nodeXMap.put(v, nodeView.centerXProperty());
 			nodeYMap.put(v, nodeView.centerYProperty());
 
-			var text = getLabelText(taxaBlock, tree, v);
-			if (text != null) {
-				var label = new RichTextLabel(text);
+			var label = nodeLabelMap.get(v);
+			if (label != null) {
 				if (v.isLeaf())
 					label.translateXProperty().bind(nodeXMap.get(v).add(2));
 				else

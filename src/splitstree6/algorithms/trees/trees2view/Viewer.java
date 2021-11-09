@@ -45,7 +45,7 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class Viewer extends Trees2View {
-	public enum ViewType {SingleTree, MultiTree, DensiTree, Console}
+	public enum ViewType {SingleTree, MultiTree, DensiTree, Tanglegram, Console}
 
 	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.Console);
 
@@ -77,17 +77,13 @@ public class Viewer extends Trees2View {
 		viewBlock.setName(inputData.getNode().getTitle());
 
 		switch (getOptionView()) {
-			case SingleTree -> {
-				NotificationManager.showWarning("Not implemented: " + getOptionView());
-				viewBlock.setView(null);
-			}
 			case MultiTree -> {
 				var mainWindow = getNode().getOwner().getMainWindow();
 				var view = new MultiTreesView(mainWindow, getNode().titleProperty());
 				view.getTrees().setAll(inputData.getTrees());
 				viewBlock.setView(view);
 			}
-			case DensiTree -> {
+			case SingleTree, DensiTree, Tanglegram -> {
 				NotificationManager.showWarning("Not implemented: " + getOptionView());
 				viewBlock.setView(null);
 			}

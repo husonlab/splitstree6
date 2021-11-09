@@ -84,6 +84,9 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			var boxHeight = new SimpleDoubleProperty();
 			boxHeight.bind((controller.getAnchorPane().heightProperty().divide(multiTreesView.colsProperty())).subtract(vGap));
 
+			controller.getAnchorPane().widthProperty().addListener((v, o, n) -> System.err.println("anchor width: " + n));
+			controller.getAnchorPane().heightProperty().addListener((v, o, n) -> System.err.println("anchor height: " + n));
+
 			controller.getPagination().setPageFactory(page -> {
 				var treePane = new MultiTreesPane(multiTreesView, boxWidth, boxHeight);
 				treePane.setHgap(hGap);
@@ -101,7 +104,9 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 
 			multiTreesView.tabPaneProperty().addListener((v, o, n) -> {
 				if (n != null) {
+					controller.getAnchorPane().maxWidthProperty().bind(n.widthProperty());
 					controller.getPagination().prefWidthProperty().bind(n.widthProperty());
+					controller.getAnchorPane().maxHeightProperty().bind(n.heightProperty());
 					controller.getPagination().prefHeightProperty().bind(n.heightProperty());
 				}
 			});

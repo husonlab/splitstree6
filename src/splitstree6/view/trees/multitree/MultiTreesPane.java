@@ -21,7 +21,9 @@ package splitstree6.view.trees.multitree;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.collections.ObservableList;
+import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.RowConstraints;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 
@@ -35,6 +37,15 @@ public class MultiTreesPane extends GridPane {
 
 		this.boxWidth = boxWidth;
 		this.boxHeight = boxHeight;
+
+		for (var i = 0; i < multiTreesView.getCols(); i++) {
+			var column = new ColumnConstraints(boxWidth.get());
+			getColumnConstraints().add(column);
+		}
+		for (var i = 0; i < multiTreesView.getRows(); i++) {
+			var row = new RowConstraints(boxHeight.get());
+			getRowConstraints().add(row);
+		}
 	}
 
 	public void addTrees(TaxaBlock taxaBlock, ObservableList<PhyloTree> trees, Integer page) {

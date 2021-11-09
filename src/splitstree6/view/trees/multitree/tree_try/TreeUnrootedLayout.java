@@ -27,7 +27,7 @@ import jloda.graph.*;
 import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
-import splitstree6.view.trees.multitree_old.TreePane;
+import splitstree6.view.trees.multitree.TreePane;
 
 public class TreeUnrootedLayout {
 	public enum ParentPlacement {LeafAverage, ChildrenAverage}

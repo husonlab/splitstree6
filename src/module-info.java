@@ -79,7 +79,6 @@ module splitstreesix {
 
 	opens splitstree6.densitree;
 	opens splitstree6.view.trees.multitree.tree_try;
-	opens splitstree6.view.trees.multitree_old;
 	opens splitstree6.view.trees.multitree;
 	opens splitstree6.algorithms.taxa.taxa2view;
 	opens splitstree6.view;
