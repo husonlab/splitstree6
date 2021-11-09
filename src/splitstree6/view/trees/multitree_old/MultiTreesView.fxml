@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  MultiTreesView.fxml Copyright (C) 2021 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.view.trees.multitree_old.MultiTreesViewController">
+    <children>
+        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0">
+            <top>
+                <VBox fx:id="vBox" BorderPane.alignment="CENTER">
+                    <children>
+                        <ToolBar fx:id="toolBar" prefHeight="32.0">
+                            <items>
+                                <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Open">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Open16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Open a file"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Save">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Save16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Save file"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="printButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Print">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Print16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Print the selected tab"/>
+                                    </tooltip>
+                                </Button>
+                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Find in selected tab"/>
+                                    </tooltip>
+                                </Button>
+                                <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                                <ChoiceBox fx:id="diagramCBox" prefWidth="100.0"/>
+                                <ComboBox fx:id="rootSideCBox" prefWidth="100.0"/>
+                                <ToggleButton fx:id="toScaleToggleButton" mnemonicParsing="false" text="To Scale"/>
+                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="110.0"
+                                          promptText="rows x cols"/>
+                                <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <Button fx:id="firstPageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="First Page">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Rewind16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Show first page"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="previousPageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Previous Page">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Back16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Show previous page"/>
+                                    </tooltip>
+                                </Button>
+                                <TextField fx:id="pageTextField" prefWidth="50.0" promptText="Page"/>
+                                <Button fx:id="nextPageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Next page">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Forward16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Show next page"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="lastPage" contentDisplay="GRAPHIC_ONLY" layoutX="232.0" layoutY="12.0"
+                                        maxHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Last Page">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false"
+                                                       url="@/jloda/resources/icons/sun/FastForward16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Show last page"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="updateButton" mnemonicParsing="false" text="Update"/>
+                            </items>
+
+                        </ToolBar>
+                    </children>
+                </VBox>
+            </top>
+            <center>
+                <Pagination fx:id="pagination" pageCount="1" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                    </BorderPane.margin>
+                </Pagination>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>

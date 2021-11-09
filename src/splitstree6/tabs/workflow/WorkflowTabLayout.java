@@ -182,7 +182,7 @@ public class WorkflowTabLayout {
 					usedLocations.add(new Point2D(item.getTranslateX(), item.getTranslateY()));
 					dataNode.getParents().addListener(createParentsChangeListenerForInputAndWorkingNodes(dataNode));
 				} else {
-					//	if (dataNode.getDataBlock() instanceof SinkBlock) return; // todo: what to do with sink blocks?
+					//	if (dataNode.getDataBlock() instanceof ViewBlock) return; // todo: what to do with sink blocks?
 
 					var item = nodeItemMap.get(dataNode);
 					if (item == null) {

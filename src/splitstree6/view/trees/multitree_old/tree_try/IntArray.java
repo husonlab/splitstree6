@@ -1,5 +1,5 @@
 /*
- * AlgorithmNexusOutput.java Copyright (C) 2021. Daniel H. Huson
+ * IntArray.java Copyright (C) 2021. Daniel H. Huson
  *
  * (Some code written by other authors, as named in code.)
  *
@@ -18,27 +18,41 @@
  *
  */
 
-package splitstree6.io.nexus;
+package splitstree6.view.trees.multitree_old.tree_try;
 
-import splitstree6.options.OptionIO;
-import splitstree6.workflow.Algorithm;
-
-import java.io.IOException;
-import java.io.Writer;
+import java.util.Arrays;
 
 /**
- * algorithm nexus output
- * Daniel Huson, 2.2018
+ * dynamic int array
+ * Daniel Huson, 10.2017
  */
-public class AlgorithmNexusOutput extends NexusIOBase {
-	/**
-	 * write a description of the algorithm
-	 */
-	public void write(Writer w, Algorithm algorithm) throws IOException {
-		w.write("\nBEGIN ALGORITHM;\n");
-		writeTitleAndLink(w);
-		w.write("NAME '" + algorithm.getName() + "';\n");
-		OptionIO.writeOptions(w, algorithm);
-		w.write("END; [ALGORITHM]\n");
+public class IntArray {
+	private int[] array;
+
+	public IntArray() {
+		this(1024);
+	}
+
+	public IntArray(int initialCapacity) {
+		array = new int[initialCapacity];
+	}
+
+	public void clear() {
+		Arrays.fill(array, 0);
+	}
+
+	public int get(int index) {
+		if (index >= array.length)
+			return 0;
+		return array[index];
+	}
+
+	public void set(int index, int value) {
+		if (index >= array.length) {
+			var tmp = new int[2 * index];
+			System.arraycopy(array, 0, tmp, 0, array.length);
+			array = tmp;
+		}
+		array[index] = value;
 	}
 }

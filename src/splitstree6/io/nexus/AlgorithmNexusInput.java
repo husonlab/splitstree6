@@ -23,14 +23,10 @@ package splitstree6.io.nexus;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.PluginClassLoader;
 import jloda.util.parse.NexusStreamParser;
-import splitstree6.methods.Option;
-import splitstree6.methods.OptionValueType;
+import splitstree6.options.OptionIO;
 import splitstree6.workflow.Algorithm;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * algorithm nexus input
@@ -41,9 +37,12 @@ public class AlgorithmNexusInput extends NexusIOBase {
 			BEGIN ALGORITHM;
 				[TITLE <title>;]
 				[LINK <parent-block-type> = <parent-title>;]
-				ALGORITHM <name>;
-					[OPTIONS <name>=<value>,		 ...		<name>=<value>
-				;
+				NAME <name>;
+				[OPTIONS
+					<name>=<value>,
+					...
+					<name>=<value>
+				;]
 			END;
 			""";
 
@@ -64,7 +63,7 @@ public class AlgorithmNexusInput extends NexusIOBase {
 		np.matchBeginBlock("ALGORITHM");
 		parseTitleAndLink(np);
 
-		np.matchIgnoreCase("ALGORITHM");
+		np.peekMatchAnyTokenIgnoreCase("NAME ALGORITHM"); // ALGORITHM for SplitsTree5 compatiblity
 		final String algorithmName = np.getWordRespectCase();
 		np.matchIgnoreCase(";");
 
@@ -73,70 +72,7 @@ public class AlgorithmNexusInput extends NexusIOBase {
 			throw new IOExceptionWithLineNumber("Unknown algorithm: " + algorithmName, np.lineno());
 
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
-			np.matchIgnoreCase("OPTIONS");
-
-			if (!np.peekMatchIgnoreCase(";")) {
-				final ArrayList<Option> optionsNext = new ArrayList<>(Option.getAllOptions(algorithm));
-				if (optionsNext.size() > 0) {
-					final Map<String, Option> legalOptions = new HashMap<>();
-					for (Option option : optionsNext) {
-						legalOptions.put(option.getName(), option);
-					}
-					while (true) {
-						final String name = np.getWordRespectCase();
-						np.matchIgnoreCase("=");
-						final Option option = legalOptions.get(name);
-						if (option != null) {
-							final OptionValueType type = option.getOptionValueType();
-							switch (type) {
-								case doubleArray: {
-									final double[] array = (double[]) option.getProperty().getValue();
-									for (int i = 0; i < array.length; i++) {
-										array[i] = np.getDouble();
-									}
-									break;
-								}
-								case doubleSquareMatrix: {
-									final double[][] matrix = (double[][]) option.getProperty().getValue();
-									for (int i = 0; i < matrix.length; i++) {
-										for (int j = 0; j < matrix.length; j++)
-											matrix[i][j] = np.getDouble();
-									}
-									break;
-								}
-								case Enum: {
-									option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
-									break;
-								}
-								case stringArray: {
-									final ArrayList<String> list = new ArrayList<>();
-									while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
-										list.add(np.getWordRespectCase());
-									option.getProperty().setValue(list.toArray(new String[0]));
-									break;
-								}
-								default: {
-									option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
-									break;
-								}
-							}
-
-						} else {
-
-							final StringBuilder buf = new StringBuilder();
-							while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
-								buf.append(" ").append(np.getWordRespectCase());
-							System.err.println("WARNING: skipped unknown option for algorithm '" + algorithmName + "': '" + name + "=" + buf.toString() + "' in line " + np.lineno());
-
-						}
-						if (np.peekMatchIgnoreCase(";"))
-							break; // finished reading options
-						else
-							np.matchIgnoreCase(",");
-					}
-				}
-			}
-			np.matchIgnoreCase(";");
+			OptionIO.parseOptions(np, algorithm);
 		}
 		np.matchEndBlock();
 		return algorithm;

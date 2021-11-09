@@ -31,7 +31,7 @@ import javafx.util.converter.IntegerStringConverter;
 import jloda.util.Basic;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
-import splitstree6.methods.Option;
+import splitstree6.options.Option;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.workflow.Algorithm;
 

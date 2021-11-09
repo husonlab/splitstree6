@@ -23,9 +23,9 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
-import splitstree6.algorithms.network.network2sink.ShowNetworkConsole;
+import splitstree6.algorithms.network.network2view.ShowNetworkConsole;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
-import splitstree6.algorithms.taxa.ShowTaxaConsole;
+import splitstree6.algorithms.taxa.taxa2view.ShowTaxaConsole;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.methods.ExtractMethodsText;
@@ -37,7 +37,7 @@ public class RunMedianJoining extends Application {
 
 		{
 			workflow.setupInputAndWorkingNodes(new SourceBlock(), new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
-			workflow.newAlgorithmNode(new ShowTaxaConsole(), workflow.getWorkingTaxaNode(), workflow.getWorkingTaxaNode(), workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(new ShowTaxaConsole(), workflow.getWorkingTaxaNode(), workflow.getWorkingTaxaNode(), workflow.newDataNode(new ViewBlock()));
 		}
 		var distancesNode = workflow.newDataNode(new DistancesBlock());
 		workflow.newAlgorithmNode(new LogDet(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
@@ -46,7 +46,7 @@ public class RunMedianJoining extends Application {
 			var networkNode = workflow.newDataNode(new NetworkBlock());
 			workflow.newAlgorithmNode(new MedianJoining(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
 			var show = new ShowNetworkConsole();
-			workflow.newAlgorithmNode(show, workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(show, workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new ViewBlock()));
 		}
 
 		return workflow;

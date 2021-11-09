@@ -29,12 +29,12 @@ import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
-import splitstree6.algorithms.network.network2sink.ShowNetworkConsole;
+import splitstree6.algorithms.network.network2view.ShowNetworkConsole;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
-import splitstree6.algorithms.splits.splits2sink.ShowSplitsConsole;
-import splitstree6.algorithms.taxa.ShowTaxaConsole;
+import splitstree6.algorithms.splits.splits2view.ShowSplitsConsole;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
-import splitstree6.algorithms.trees.trees2sink.ShowTreesConsole;
+import splitstree6.algorithms.taxa.taxa2view.ShowTaxaConsole;
+import splitstree6.algorithms.trees.trees2view.ShowTreesConsole;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.methods.ExtractMethodsText;
@@ -55,7 +55,7 @@ public class SimplePipeline extends Application {
 
 		{
 			workflow.setupInputAndWorkingNodes(source, new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
-			workflow.newAlgorithmNode(new ShowTaxaConsole(), null, workflow.getWorkingTaxaNode(), workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(new ShowTaxaConsole(), null, workflow.getWorkingTaxaNode(), workflow.newDataNode(new ViewBlock()));
 		}
 
 		var distancesNode = workflow.newDataNode(new DistancesBlock());
@@ -64,29 +64,29 @@ public class SimplePipeline extends Application {
 		if (false) {
 			var treesNode = workflow.newDataNode(new TreesBlock());
 			workflow.newAlgorithmNode(new NeighborJoining(), workflow.getWorkingTaxaNode(), distancesNode, treesNode);
-			workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), treesNode, workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), treesNode, workflow.newDataNode(new ViewBlock()));
 		}
 
 		if (true) {
 			var treesNode = workflow.newDataNode(new TreesBlock());
 			workflow.newAlgorithmNode(new BioNJ(), workflow.getWorkingTaxaNode(), distancesNode, treesNode);
-			workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), treesNode, workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), treesNode, workflow.newDataNode(new ViewBlock()));
 		}
 		if (false) {
 			var treesNode = workflow.newDataNode(new TreesBlock());
 			workflow.newAlgorithmNode(new UPGMA(), workflow.getWorkingTaxaNode(), distancesNode, treesNode);
-			workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), treesNode, workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), treesNode, workflow.newDataNode(new ViewBlock()));
 		}
 
 		if (true) {
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
-			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new ViewBlock()));
 		}
 		if (false) {
 			var networkNode = workflow.newDataNode(new NetworkBlock());
 			workflow.newAlgorithmNode(new MedianJoining(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), networkNode);
-			workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new SinkBlock()));
+			workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), networkNode, workflow.newDataNode(new ViewBlock()));
 		}
 
 		return workflow;

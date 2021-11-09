@@ -23,7 +23,8 @@ import jloda.util.Basic;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.data.TaxaBlock;
-import splitstree6.methods.Option;
+import splitstree6.options.IHasOptions;
+import splitstree6.options.Option;
 import splitstree6.workflow.interfaces.HasFromClass;
 import splitstree6.workflow.interfaces.HasToClass;
 
@@ -39,7 +40,7 @@ import java.util.List;
  * @param <S>
  * @param <T>
  */
-public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extends jloda.fx.workflow.Algorithm implements HasFromClass<S>, HasToClass<T> {
+public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extends jloda.fx.workflow.Algorithm implements HasFromClass<S>, HasToClass<T>, IHasOptions {
 	public static final String BLOCK_NAME = "ALGORITHM";
 
 	private final Class<S> fromClass;

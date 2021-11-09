@@ -187,7 +187,7 @@ public class NexusExporter {
 	public void export(Writer w, Algorithm algorithm) throws IOException {
 		final AlgorithmNexusOutput output = new AlgorithmNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
-		if (algorithm.getToClass() != SinkBlock.class) // todo: ignore sink blocks
+		if (algorithm.getToClass() != ViewBlock.class) // todo: ignore sink blocks
 			output.write(w, algorithm);
 	}
 
@@ -211,7 +211,7 @@ public class NexusExporter {
 			export(w, taxaBlock, (TraitsBlock) dataBlock);
 			//else if (dataBlock instanceof ViewerBlock)
 			//    export(w, taxaBlock, (ViewerBlock) dataBlock);
-		else if (dataBlock instanceof SinkBlock) {
+		else if (dataBlock instanceof ViewBlock) {
 			// todo: ignore sink blocks
 		} else
 			throw new IOException("Export " + Basic.getShortName(dataBlock.getClass()) + ": not implemented");

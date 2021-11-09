@@ -27,6 +27,8 @@ import jloda.util.Basic;
  */
 public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
 
+	private DataNode node;
+
 	public DataBlock() {
 		setName(getClass().getSimpleName().replaceAll("Block$", ""));
 	}
@@ -62,4 +64,12 @@ public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
 	}
 
 	public abstract String getBlockName();
+
+	public DataNode getNode() {
+		return node;
+	}
+
+	public void setNode(DataNode node) {
+		this.node = node;
+	}
 }

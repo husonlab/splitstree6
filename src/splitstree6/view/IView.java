@@ -1,5 +1,5 @@
 /*
- *  Trees2View.java Copyright (C) 2021 Daniel H. Huson
+ *  IView.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,14 +17,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2network;
+package splitstree6.view;
 
-import splitstree6.data.NetworkBlock;
-import splitstree6.data.TreesBlock;
-import splitstree6.workflow.Algorithm;
+import javafx.scene.Node;
+import splitstree6.options.IHasOptions;
 
-public abstract class Trees2Network extends Algorithm<TreesBlock, NetworkBlock> {
-	public Trees2Network() {
-		super(TreesBlock.class, NetworkBlock.class);
-	}
+public interface IView extends IHasOptions {
+	String getName();
+
+	Node getRoot();
+
+	void setupMenuItems();
+
+	int size();
 }

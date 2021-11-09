@@ -20,25 +20,26 @@
 
 package splitstree6.io.nexus;
 
+import splitstree6.data.ViewBlock;
 import splitstree6.options.OptionIO;
-import splitstree6.workflow.Algorithm;
 
 import java.io.IOException;
 import java.io.Writer;
 
 /**
- * algorithm nexus output
- * Daniel Huson, 2.2018
+ * view nexus output
+ * Daniel Huson, 10.2021
  */
-public class AlgorithmNexusOutput extends NexusIOBase {
+public class ViewNexusOutput extends NexusIOBase {
 	/**
-	 * write a description of the algorithm
+	 * view nexus output
 	 */
-	public void write(Writer w, Algorithm algorithm) throws IOException {
-		w.write("\nBEGIN ALGORITHM;\n");
+	public void write(Writer w, ViewBlock viewBlock) throws IOException {
+		w.write("\nBEGIN VIEW;\n");
 		writeTitleAndLink(w);
-		w.write("NAME '" + algorithm.getName() + "';\n");
-		OptionIO.writeOptions(w, algorithm);
-		w.write("END; [ALGORITHM]\n");
+		w.write("NAME '" + viewBlock.getName() + "';\n");
+		w.write("INPUT '" + viewBlock.getInputBlockName() + "';\n");
+		OptionIO.writeOptions(w, viewBlock.getView());
+		w.write("END; [VIEW]\n");
 	}
 }

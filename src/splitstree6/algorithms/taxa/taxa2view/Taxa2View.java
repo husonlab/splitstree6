@@ -1,5 +1,5 @@
 /*
- *  Trees2View.java Copyright (C) 2021 Daniel H. Huson
+ *  Taxa2Taxa.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,14 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2network;
+package splitstree6.algorithms.taxa.taxa2view;
 
-import splitstree6.data.NetworkBlock;
-import splitstree6.data.TreesBlock;
+import splitstree6.data.TaxaBlock;
+import splitstree6.data.ViewBlock;
 import splitstree6.workflow.Algorithm;
 
-public abstract class Trees2Network extends Algorithm<TreesBlock, NetworkBlock> {
-	public Trees2Network() {
-		super(TreesBlock.class, NetworkBlock.class);
+public abstract class Taxa2View extends Algorithm<TaxaBlock, ViewBlock> {
+	public Taxa2View() {
+		super(TaxaBlock.class, ViewBlock.class);
 	}
 }

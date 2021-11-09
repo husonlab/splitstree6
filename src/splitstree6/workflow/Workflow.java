@@ -134,6 +134,8 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	public <D extends DataBlock> DataNode<D> newDataNode(D dataBlock, String title) {
 		var node = new DataNode<D>(this);
 		node.setDataBlock(dataBlock);
+		dataBlock.setNode(node);
+
 		if (title != null) {
 			node.setTitle(title);
 			dataBlockNameTitleMap.computeIfAbsent(dataBlock.getName(), n -> new ArrayList<>()).add(title);

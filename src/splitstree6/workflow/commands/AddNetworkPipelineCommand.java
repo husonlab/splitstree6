@@ -22,7 +22,7 @@ package splitstree6.workflow.commands;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
-import splitstree6.algorithms.network.network2sink.ShowNetworkConsole;
+import splitstree6.algorithms.network.network2view.ShowNetworkConsole;
 import splitstree6.algorithms.splits.splits2network.SplitsNetworkAlgorithm;
 import splitstree6.data.*;
 import splitstree6.workflow.Algorithm;
@@ -61,7 +61,7 @@ public class AddNetworkPipelineCommand {
 
 			if (algorithm.getToClass() == NetworkBlock.class) {
 				// todo: replace sink block by  view block
-				var targetDataNode2 = workflow.newDataNode(new SinkBlock());
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
 				var algorithmNode2 = workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				algorithmNode.restart();
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
@@ -70,7 +70,7 @@ public class AddNetworkPipelineCommand {
 				// todo: replace sink block by  view block
 				var targetDataNode2 = workflow.newDataNode(new NetworkBlock());
 				var algorithmNode2 = workflow.newAlgorithmNode(new SplitsNetworkAlgorithm(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
-				var targetDataNode3 = workflow.newDataNode(new SinkBlock());
+				var targetDataNode3 = workflow.newDataNode(new ViewBlock());
 				var algorithmNode3 = workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), targetDataNode2, targetDataNode3);
 				algorithmNode.restart();
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());

@@ -460,7 +460,7 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 		try {
 			result = A.cardinality() > 1 && B.cardinality() > 1;
 		} catch (Exception e) {
-			e.printStackTrace();  //To change body of catch statement use Options | File Templates.
+			e.printStackTrace();  //To change body of catch statement use OptionIO | File Templates.
 		}
 
 		return result;

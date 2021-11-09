@@ -136,7 +136,7 @@ public class WorkflowTreeViewLayout {
 					workingDataItem = item;
 					treeView.getRoot().setExpanded(true);
 				} else {
-					// if (dataNode.getDataBlock() instanceof SinkBlock) return; // todo: what to do with sink blocks?
+					// if (dataNode.getDataBlock() instanceof ViewBlock) return; // todo: what to do with sink blocks?
 
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);

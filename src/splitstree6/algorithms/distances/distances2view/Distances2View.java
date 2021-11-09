@@ -1,5 +1,5 @@
 /*
- *  Trees2View.java Copyright (C) 2021 Daniel H. Huson
+ *  Distances2View.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,14 +17,15 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2network;
+package splitstree6.algorithms.distances.distances2view;
 
-import splitstree6.data.NetworkBlock;
-import splitstree6.data.TreesBlock;
+import splitstree6.data.DistancesBlock;
+import splitstree6.data.ViewBlock;
+import splitstree6.methods.IgnoredInMethodsText;
 import splitstree6.workflow.Algorithm;
 
-public abstract class Trees2Network extends Algorithm<TreesBlock, NetworkBlock> {
-	public Trees2Network() {
-		super(TreesBlock.class, NetworkBlock.class);
+public abstract class Distances2View extends Algorithm<DistancesBlock, ViewBlock> implements IgnoredInMethodsText {
+	public Distances2View() {
+		super(DistancesBlock.class, ViewBlock.class);
 	}
 }

@@ -1,5 +1,5 @@
 /*
- *  Trees2View.java Copyright (C) 2021 Daniel H. Huson
+ *  IHasOptions.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,14 +17,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2network;
+package splitstree6.options;
 
-import splitstree6.data.NetworkBlock;
-import splitstree6.data.TreesBlock;
-import splitstree6.workflow.Algorithm;
-
-public abstract class Trees2Network extends Algorithm<TreesBlock, NetworkBlock> {
-	public Trees2Network() {
-		super(TreesBlock.class, NetworkBlock.class);
-	}
+/**
+ * marker interface for classes that have options
+ * Daniel Huson, 11.2021
+ */
+public interface IHasOptions {
 }

@@ -17,14 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2network;
+package splitstree6.algorithms.trees.trees2view;
 
-import splitstree6.data.NetworkBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.data.ViewBlock;
 import splitstree6.workflow.Algorithm;
 
-public abstract class Trees2Network extends Algorithm<TreesBlock, NetworkBlock> {
-	public Trees2Network() {
-		super(TreesBlock.class, NetworkBlock.class);
+public abstract class Trees2View extends Algorithm<TreesBlock, ViewBlock> {
+	public Trees2View() {
+		super(TreesBlock.class, ViewBlock.class);
 	}
 }
