@@ -72,7 +72,7 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 		tabController.getToolBar().getItems().setAll(list);
 
 		toolBarController.getParseAndLoadButton().setOnAction(e -> tab.parseAndLoad());
-		toolBarController.getParseAndLoadButton().disableProperty().bind(tab.isEmptyProperty().or(mainWindow.getWorkflow().runningProperty()));
+		toolBarController.getParseAndLoadButton().disableProperty().bind(tab.emptyProperty().or(mainWindow.getWorkflow().runningProperty()));
 
 		toolBarController.getOpenButton().setOnAction(e -> {
 			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
@@ -88,7 +88,7 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 				tab.importFromFile(selectedFile.getPath());
 			}
 		});
-		toolBarController.getOpenButton().disableProperty().bind(tab.isEmptyProperty().not());
+		toolBarController.getOpenButton().disableProperty().bind(tab.emptyProperty().not());
 
 		toolBarController.getSaveButton().setOnAction(e -> {
 			var fileChooser = new FileChooser();
@@ -103,7 +103,7 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 				tab.saveToFile(selectedFile);
 			}
 		});
-		toolBarController.getSaveButton().disableProperty().bind(tab.isEmptyProperty());
+		toolBarController.getSaveButton().disableProperty().bind(tab.emptyProperty());
 
 		selectionEmpty = new BooleanBinding() {
 			{

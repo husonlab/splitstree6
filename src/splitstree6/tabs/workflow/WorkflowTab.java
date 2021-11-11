@@ -19,9 +19,7 @@
 
 package splitstree6.tabs.workflow;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.scene.Node;
@@ -73,13 +71,13 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 	}
 
 	@Override
-	public ReadOnlyBooleanProperty isEmptyProperty() {
+	public ReadOnlyBooleanProperty emptyProperty() {
 		return empty;
 	}
 
 	@Override
-	public Node getImageNode() {
-		return controller.getMainPane();
+	public ReadOnlyObjectProperty<Node> imageNodeProperty() {
+		return new SimpleObjectProperty<>(controller.getMainPane());
 	}
 
 	@Override

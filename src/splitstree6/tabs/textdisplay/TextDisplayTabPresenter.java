@@ -119,7 +119,7 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 		var codeArea = tabController.getCodeArea();
 
 		controller.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
-		controller.getPrintMenuItem().disableProperty().bind(tab.isEmptyProperty());
+		controller.getPrintMenuItem().disableProperty().bind(tab.emptyProperty());
 
 		if (editable) {
 			controller.getCutMenuItem().setOnAction(e -> codeArea.cut());
@@ -133,7 +133,7 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 			controller.getPasteMenuItem().setOnAction(e -> codeArea.paste());
 
 			controller.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
-			controller.getDeleteMenuItem().disableProperty().bind(tab.isEmptyProperty().not());
+			controller.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());
 
 			controller.getUndoMenuItem().setOnAction(e -> codeArea.undo());
 			{
@@ -175,10 +175,10 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 		});
 
 		controller.getSelectAllMenuItem().setOnAction(e -> codeArea.selectAll());
-		controller.getSelectAllMenuItem().disableProperty().bind(tab.isEmptyProperty());
+		controller.getSelectAllMenuItem().disableProperty().bind(tab.emptyProperty());
 
 		controller.getSelectNoneMenuItem().setOnAction(e -> codeArea.selectRange(0, 0));
-		controller.getSelectNoneMenuItem().disableProperty().bind(tab.isEmptyProperty());
+		controller.getSelectNoneMenuItem().disableProperty().bind(tab.emptyProperty());
 
 		controller.getSelectFromPreviousMenuItem().setOnAction(e -> {
 			for (String word : MainWindowManager.getPreviousSelection()) {
@@ -195,7 +195,7 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 		controller.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		controller.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
-		controller.getSelectBracketsMenuItem().disableProperty().bind(tab.isEmptyProperty());
+		controller.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
 
 		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
 		controller.getDecreaseFontSizeMenuItem().setOnAction(null);

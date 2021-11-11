@@ -19,8 +19,11 @@
 
 package splitstree6.view;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
+import jloda.fx.undo.UndoManager;
 import splitstree6.options.IHasOptions;
+import splitstree6.tabs.IDisplayTabPresenter;
 
 public interface IView extends IHasOptions {
 	String getName();
@@ -30,4 +33,12 @@ public interface IView extends IHasOptions {
 	void setupMenuItems();
 
 	int size();
+
+	UndoManager getUndoManager();
+
+	ObservableValue<Boolean> emptyProperty();
+
+	ObservableValue<? extends Node> imageNodeProperty();
+
+	IDisplayTabPresenter getPresenter();
 }

@@ -52,7 +52,7 @@ public class MainWindow implements IMainWindow {
 	private final TextTabsManager textTabsManager;
 	private final AlgorithmTabsManager algorithmTabsManager;
 
-	private final SelectionModel<Taxon> selectionModel = new SetSelectionModel<>();
+	private final SelectionModel<Taxon> taxonSelectionModel = new SetSelectionModel<>();
 	private final BooleanProperty dirty = new SimpleBooleanProperty(false);
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 	private final StringProperty name = new SimpleStringProperty("");
@@ -210,8 +210,8 @@ public class MainWindow implements IMainWindow {
 		return null;
 	}
 
-	public SelectionModel<Taxon> getSelectionModel() {
-		return selectionModel;
+	public SelectionModel<Taxon> getTaxonSelectionModel() {
+		return taxonSelectionModel;
 	}
 
 	public ReadOnlyBooleanProperty emptyProperty() {

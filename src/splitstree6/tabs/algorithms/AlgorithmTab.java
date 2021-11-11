@@ -20,6 +20,8 @@
 package splitstree6.tabs.algorithms;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import jloda.fx.undo.UndoManager;
@@ -68,13 +70,13 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 	}
 
 	@Override
-	public ReadOnlyBooleanProperty isEmptyProperty() {
+	public ReadOnlyBooleanProperty emptyProperty() {
 		return null;
 	}
 
 	@Override
-	public Node getImageNode() {
-		return null;
+	public ReadOnlyObjectProperty<Node> imageNodeProperty() {
+		return new SimpleObjectProperty<>(controller.getMainPane());
 	}
 
 	@Override

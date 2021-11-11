@@ -25,15 +25,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.control.TabPane;
-import javafx.scene.text.Font;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
+import java.util.Collection;
 import java.util.List;
 
 public class MultiTreesView implements IView {
+	private final UndoManager undoManager = new UndoManager();
 
 	private final MultiTreesViewController controller;
 	private final MultiTreesViewPresenter presenter;
@@ -45,15 +47,12 @@ public class MultiTreesView implements IView {
 	private final ObservableList<PhyloTree> trees = FXCollections.observableArrayList();
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
-
 	private final IntegerProperty rows = new SimpleIntegerProperty(1);
 	private final IntegerProperty cols = new SimpleIntegerProperty(1);
 
-	private final ObjectProperty<Font> font = new SimpleObjectProperty<>();
-
 	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
 
-	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreePane.Diagram.Unrooted);
+	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreePane.Diagram.Rectangular);
 	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.Left);
 
 	private final BooleanProperty optionToScale = new SimpleBooleanProperty(this, "optionToScale", false);
@@ -61,16 +60,16 @@ public class MultiTreesView implements IView {
 
 	private final IntegerProperty optionPageNumber = new SimpleIntegerProperty(this, "optionPageNumber", 1); // 1-based
 
+	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
+
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionToScale.getName(), optionGrid.getName(), optionPageNumber.getName());
+		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionToScale.getName(), optionGrid.getName(), optionPageNumber.getName(), optionFontScaleFactor.getName());
 	}
 
 	public MultiTreesView(MainWindow mainWindow, StringProperty titleProperty) {
 		nameProperty.bind(titleProperty);
 		var loader = new ExtendedFXMLLoader<MultiTreesViewController>(MultiTreesViewController.class);
 		controller = loader.getController();
-
-		font.bind(mainWindow.displayFontProperty());
 
 		presenter = new MultiTreesViewPresenter(mainWindow, this, trees);
 
@@ -181,10 +180,6 @@ public class MultiTreesView implements IView {
 		this.imageNode.set(imageNode);
 	}
 
-	public ObjectProperty<Font> fontProperty() {
-		return font;
-	}
-
 	public Node getRoot() {
 		return controller.getAnchorPane();
 	}
@@ -222,5 +217,34 @@ public class MultiTreesView implements IView {
 
 	public void setTabPane(TabPane tabPane) {
 		this.tabPane.set(tabPane);
+	}
+
+	public double getOptionFontScaleFactor() {
+		return optionFontScaleFactor.get();
+	}
+
+	public DoubleProperty optionFontScaleFactorProperty() {
+		return optionFontScaleFactor;
+	}
+
+	public void setOptionFontScaleFactor(double optionFontScaleFactor) {
+		this.optionFontScaleFactor.set(optionFontScaleFactor);
+	}
+
+	@Override
+	public UndoManager getUndoManager() {
+		return undoManager;
+	}
+
+	public void setTrees(Collection<PhyloTree> trees) {
+		if (false)
+			this.trees.setAll(trees);
+		else {
+			var pageFactory = controller.getPagination().getPageFactory();
+			controller.getPagination().setPageFactory(null);
+			this.trees.setAll(trees);
+			controller.getPagination().setPageFactory(pageFactory);
+		}
+		presenter.redraw();
 	}
 }

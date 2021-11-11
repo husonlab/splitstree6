@@ -19,7 +19,10 @@
 
 package splitstree6.view;
 
+import javafx.beans.value.ObservableValue;
 import javafx.scene.Node;
+import jloda.fx.undo.UndoManager;
+import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.window.MainWindow;
 
@@ -59,5 +62,25 @@ public class ConsoleView implements IView {
 
 	public void setText(String text) {
 		textDisplayTab.getController().getCodeArea().replaceText(text);
+	}
+
+	@Override
+	public UndoManager getUndoManager() {
+		return textDisplayTab.getUndoManager();
+	}
+
+	@Override
+	public ObservableValue<Boolean> emptyProperty() {
+		return textDisplayTab.emptyProperty();
+	}
+
+	@Override
+	public ObservableValue<? extends Node> imageNodeProperty() {
+		return textDisplayTab.imageNodeProperty();
+	}
+
+	@Override
+	public IDisplayTabPresenter getPresenter() {
+		return null;
 	}
 }

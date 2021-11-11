@@ -19,11 +19,16 @@
 
 package splitstree6.tabs.algorithms.taxa;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
+import javafx.collections.SetChangeListener;
+import javafx.collections.WeakSetChangeListener;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import jloda.fx.find.ListViewTypeSearcher;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
+import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
@@ -68,6 +73,10 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			var list = new ArrayList<>(controller.getInactiveListView().getItems());
 			controller.getInactiveListView().getItems().clear();
 			controller.getActiveListView().getItems().addAll(list);
+			Platform.runLater(() -> {
+				controller.getActiveListView().getSelectionModel().clearSelection();
+				controller.getInactiveListView().getSelectionModel().clearSelection();
+			});
 		});
 		controller.getMoveAllLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getItems()));
 
@@ -75,7 +84,11 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			var list = new ArrayList<>(controller.getInactiveListView().getSelectionModel().getSelectedItems());
 			controller.getInactiveListView().getItems().removeAll(list);
 			controller.getActiveListView().getItems().addAll(list);
-
+			Platform.runLater(() -> {
+				controller.getActiveListView().getSelectionModel().clearSelection();
+				list.forEach(label -> controller.getActiveListView().getSelectionModel().select(label));
+				controller.getInactiveListView().getSelectionModel().clearSelection();
+			});
 		});
 		controller.getMoveSelectedLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getSelectionModel().getSelectedItems()));
 
@@ -83,6 +96,10 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			var list = new ArrayList<>(controller.getActiveListView().getItems());
 			controller.getActiveListView().getItems().clear();
 			controller.getInactiveListView().getItems().addAll(list);
+			Platform.runLater(() -> {
+				controller.getActiveListView().getSelectionModel().clearSelection();
+				controller.getInactiveListView().getSelectionModel().clearSelection();
+			});
 		});
 		controller.getMoveAllRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
 
@@ -90,6 +107,11 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			var list = new ArrayList<>(controller.getActiveListView().getSelectionModel().getSelectedItems());
 			controller.getActiveListView().getItems().removeAll(list);
 			controller.getInactiveListView().getItems().addAll(list);
+			Platform.runLater(() -> {
+				controller.getActiveListView().getSelectionModel().clearSelection();
+				controller.getInactiveListView().getSelectionModel().clearSelection();
+				list.forEach(label -> controller.getInactiveListView().getSelectionModel().select(label));
+			});
 		});
 		controller.getMoveSelectedRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getSelectionModel().getSelectedItems()));
 
@@ -97,7 +119,10 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		tab.getController().getReset().disableProperty().bind(controller.getMoveAllLeftButton().disableProperty());
 
 		tab.getController().getApplyButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
+
+		setupSelection(mainWindow, controller.getActiveListView());
 	}
+
 
 	public void setupMenuItems() {
 
@@ -126,5 +151,34 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 
 		controller.getZoomInMenuItem().setOnAction(null);
 		controller.getZoomOutMenuItem().setOnAction(null);
+	}
+
+	private SetChangeListener<Taxon> selectionChangedListener;
+
+	private void setupSelection(MainWindow mainWindow, ListView<String> activeListView) {
+		activeListView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super String>) e -> {
+			while (e.next()) {
+				for (var label : e.getAddedSubList()) {
+					var taxon = mainWindow.getWorkflow().getWorkingTaxaBlock().get(label);
+					if (taxon != null)
+						mainWindow.getTaxonSelectionModel().select(taxon);
+				}
+				for (var label : e.getRemoved()) {
+					var taxon = mainWindow.getWorkflow().getWorkingTaxaBlock().get(label);
+					if (taxon != null)
+						mainWindow.getTaxonSelectionModel().clearSelection(taxon);
+				}
+			}
+		});
+		selectionChangedListener = e -> {
+			if (e.wasAdded()) {
+				activeListView.getSelectionModel().select(e.getElementAdded().getName());
+			} else if (e.wasRemoved()) {
+				var index = activeListView.getSelectionModel().getSelectedItems().indexOf(e.getElementRemoved().getName());
+				if (index != -1)
+					activeListView.getSelectionModel().clearSelection(index);
+			}
+		};
+		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangedListener));
 	}
 }

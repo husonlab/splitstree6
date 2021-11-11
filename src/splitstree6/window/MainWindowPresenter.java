@@ -80,7 +80,7 @@ public class MainWindowPresenter {
 					focusedDisplayTab.set(displayTab);
 					disableAllMenuItems(controller);
 					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
-					if (focusedDisplayTab.get() != null)
+					if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null)
 						focusedDisplayTab.get().getPresenter().setupMenuItems();
 					enableAllMenuItemsWithDefinedAction(controller);
 				}
@@ -94,7 +94,8 @@ public class MainWindowPresenter {
 				disableAllMenuItems(controller);
 				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 				if (n instanceof IDisplayTab displayTab) {
-					displayTab.getPresenter().setupMenuItems();
+					if (displayTab.getPresenter() != null)
+						displayTab.getPresenter().setupMenuItems();
 					focusedDisplayTab.set(displayTab);
 				} else
 					focusedDisplayTab.set(null);
@@ -198,8 +199,8 @@ public class MainWindowPresenter {
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
 
 		if (focusedDisplayTab.get() != null) {
-			controller.getPrintMenuItem().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().getImageNode()));
-			controller.getPrintMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
+			controller.getPrintMenuItem().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().imageNodeProperty().get()));
+			controller.getPrintMenuItem().disableProperty().bind(focusedDisplayTab.isNull().or(focusedDisplayTab.get().imageNodeProperty().isNull()));
 		}
 
 		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> {
@@ -233,14 +234,14 @@ public class MainWindowPresenter {
 		controller.getCutMenuItem().setDisable(false);
 		controller.getCopyMenuItem().setDisable(false);
 
-		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getImageNode() != null) {
+		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().imageNodeProperty().get() != null) {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
-				final Image snapshot = focusedDisplayTab.get().getImageNode().snapshot(null, null);
+				final Image snapshot = focusedDisplayTab.get().imageNodeProperty().get().snapshot(null, null);
 				final ClipboardContent clipboardContent = new ClipboardContent();
 				clipboardContent.putImage(snapshot);
 				Clipboard.getSystemClipboard().setContent(clipboardContent);
 			});
-			controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull().or(focusedDisplayTab.get().isEmptyProperty()));
+			controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 		}
 
 		controller.getPasteMenuItem().setDisable(false);

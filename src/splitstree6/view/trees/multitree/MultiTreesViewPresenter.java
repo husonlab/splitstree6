@@ -25,36 +25,50 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.scene.control.TextFormatter;
 import javafx.util.converter.IntegerStringConverter;
 import jloda.fx.util.AService;
+import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
-
+/**
+ * multi tree view presenter
+ * Daniel Huson, 11.2021
+ */
 public class MultiTreesViewPresenter implements IDisplayTabPresenter {
-	private static final ObservableList<String> gridValues = FXCollections.observableArrayList();
+	private final ObservableList<String> gridValues = FXCollections.observableArrayList();
+
+	private final MainWindow mainWindow;
+	private final MultiTreesView multiTreesView;
+
+	private final MultiTreesViewController controller;
 
 	public MultiTreesViewPresenter(MainWindow mainWindow, MultiTreesView multiTreesView, ObservableList<PhyloTree> phyloTrees) {
-		var controller = multiTreesView.getController();
+		this.mainWindow = mainWindow;
+		this.multiTreesView = multiTreesView;
 
+		controller = multiTreesView.getController();
 
 		controller.getDiagramCBox().getItems().addAll(TreePane.Diagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(multiTreesView.optionDiagramProperty());
-		multiTreesView.optionDiagramProperty().addListener(e -> redraw(controller));
+		multiTreesView.optionDiagramProperty().addListener(e -> redraw());
 
 		controller.getRootSideCBox().getItems().addAll(TreePane.RootSide.values());
 		controller.getRootSideCBox().valueProperty().bindBidirectional(multiTreesView.optionRootSideProperty());
 		controller.getRootSideCBox().disableProperty().bind(multiTreesView.optionDiagramProperty().isEqualTo(TreePane.Diagram.Unrooted)
 				.or((multiTreesView.optionDiagramProperty().isEqualTo(TreePane.Diagram.Circular))));
-		multiTreesView.optionRootSideProperty().addListener(e -> redraw(controller));
+		multiTreesView.optionRootSideProperty().addListener(e -> redraw());
 
 		controller.getToScaleToggleButton().selectedProperty().bindBidirectional(multiTreesView.optionToScaleProperty());
-		multiTreesView.optionToScaleProperty().addListener(e -> redraw(controller));
+		multiTreesView.optionToScaleProperty().addListener(e -> redraw());
 
 		updateRowsColsFromText(multiTreesView.getOptionGrid(), multiTreesView.rowsProperty(), multiTreesView.colsProperty());
 		multiTreesView.optionGridProperty().addListener((v, o, n) -> {
@@ -72,15 +86,17 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			// use a service with a delay to redraw so that we don't redraw too often
 			var redrawService = new AService<>(() -> {
 				Thread.sleep(500);
-				redraw(controller);
+				redraw();
 				return true;
 			});
 
-			mainWindow.getController().getMainBorderPane().layoutBoundsProperty().addListener((v, o, n) -> {
+			ChangeListener<Bounds> boundsChangeListener = (v, o, n) -> {
 				targetWidth.set(n.getWidth() - 10);
 				targetHeight.set(n.getHeight() - 110);
 				redrawService.restart();
-			});
+			};
+			mainWindow.getController().getMainBorderPane().layoutBoundsProperty().addListener(new WeakChangeListener<>(boundsChangeListener));
+
 		}
 
 		controller.getRowsColsCBox().valueProperty().bindBidirectional(multiTreesView.optionGridProperty());
@@ -102,11 +118,8 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			var boxHeight = new SimpleDoubleProperty();
 			boxHeight.bind((targetHeight.divide(multiTreesView.rowsProperty())).subtract(vGap));
 
-			controller.getAnchorPane().widthProperty().addListener((v, o, n) -> System.err.println("anchor width: " + n));
-			controller.getAnchorPane().heightProperty().addListener((v, o, n) -> System.err.println("anchor height: " + n));
-
 			controller.getPagination().setPageFactory(page -> {
-				var treePane = new MultiTreesPane(multiTreesView, boxWidth, boxHeight);
+				var treePane = new MultiTreesPage(mainWindow.getTaxonSelectionModel(), multiTreesView, boxWidth, boxHeight);
 				treePane.setHgap(hGap);
 				treePane.setVgap(vGap);
 				treePane.prefWidthProperty().bind(controller.getPagination().widthProperty());
@@ -160,17 +173,25 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			controller.getLastPage().setOnAction(e -> multiTreesView.setOptionPageNumber(phyloTrees.size()));
 			controller.getLastPage().disableProperty().bind(controller.getNextPageButton().disableProperty());
 		}
+
+		MainWindowManager.useDarkThemeProperty().addListener(e -> redraw());
+
+		Platform.runLater(this::setupMenuItems);
 	}
 
-	private void redraw(MultiTreesViewController controller) {
-		var pageFactory = controller.getPagination().getPageFactory();
-		var pageIndex = controller.getPagination().getCurrentPageIndex();
-		Platform.runLater(() -> {
-			controller.getPagination().setPageFactory(null);
-			controller.getPagination().setPageFactory(pageFactory);
-			controller.getPagination().setCurrentPageIndex(pageIndex);
-		});
+	public void redraw() {
+		var root = controller.getAnchorPane();
+		if (root.getParent() != null && root.getParent().getChildrenUnmodifiable().contains(root)) {
+			var pageFactory = controller.getPagination().getPageFactory();
+			var pageIndex = controller.getPagination().getCurrentPageIndex();
+			Platform.runLater(() -> {
+				controller.getPagination().setPageFactory(null);
+				controller.getPagination().setPageFactory(pageFactory);
+				controller.getPagination().setCurrentPageIndex(pageIndex);
+			});
+		}
 	}
+
 
 	/**
 	 * updates the rows and cols from the given text and returns the text nicely formatted
@@ -193,6 +214,9 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 
 	@Override
 	public void setupMenuItems() {
-
+		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> multiTreesView.setOptionFontScaleFactor(1.2 * multiTreesView.getOptionFontScaleFactor()));
+		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(multiTreesView.emptyProperty());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> multiTreesView.setOptionFontScaleFactor((1.0 / 1.2) * multiTreesView.getOptionFontScaleFactor()));
+		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(multiTreesView.emptyProperty());
 	}
 }

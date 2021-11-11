@@ -34,6 +34,9 @@ import jloda.util.Counter;
 import jloda.util.Pair;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.parts.Taxon;
+
+import java.util.Map;
 
 /**
  * computes a rectangular or triangular tree embedding
@@ -42,13 +45,16 @@ import splitstree6.data.TaxaBlock;
 public class RectangularOrTriangularTreeEmbedding {
 	public enum ParentPlacement {LeafAverage, ChildrenAverage}
 
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreePane.Diagram diagram, boolean toScale, double width, double height) {
+	public static double MAX_FONT_SIZE = 24;
+
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreePane.Diagram diagram, boolean toScale, double width, double height,
+							  Map<Taxon, javafx.scene.Node[]> taxonNodesMap) {
 		var parentPlacement = ParentPlacement.ChildrenAverage;
 
-		var color = (MainWindowManager.isUseDarkTheme() ? Color.LIGHTGRAY : Color.BLACK);
+		var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
 
 		var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
-		var fontHeight = Math.min(12, height / (numberOfLeaves + 1));
+		var fontHeight = Math.min(MAX_FONT_SIZE, height / (numberOfLeaves + 1));
 
 		var maxLabelWidth = 0.0;
 		NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
@@ -64,7 +70,7 @@ public class RectangularOrTriangularTreeEmbedding {
 			}
 		}
 		if (maxLabelWidth > 0.25 * width) {
-			fontHeight = Math.min(12, fontHeight * 0.25 * width / maxLabelWidth);
+			fontHeight = Math.min(MAX_FONT_SIZE, fontHeight * 0.25 * width / maxLabelWidth);
 			maxLabelWidth = 0;
 			for (var label : nodeLabelMap.values()) {
 				label.setFont(new Font("Serif", fontHeight));
@@ -100,6 +106,10 @@ public class RectangularOrTriangularTreeEmbedding {
 					label.translateXProperty().bind(nodeXMap.get(v).subtract(label.widthProperty()).subtract(0.5));
 				label.translateYProperty().bind(nodeYMap.get(v).subtract(label.heightProperty().multiply(0.5)));
 				nodeLabelGroup.getChildren().add(label);
+				for (var t : tree.getTaxa(v)) {
+					if (t <= taxaBlock.getNtax())
+						taxonNodesMap.put(taxaBlock.get(t), new javafx.scene.Node[]{circle, label});
+				}
 			}
 		}
 		if (diagram == TreePane.Diagram.Triangular) {
