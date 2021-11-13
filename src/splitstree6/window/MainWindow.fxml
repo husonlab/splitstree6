@@ -560,11 +560,10 @@
                 </AnchorPane>
             </center>
             <bottom>
-                <HBox spacing="5.0" BorderPane.alignment="TOP_LEFT">
+                <HBox spacing="5.0" style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
+                      BorderPane.alignment="TOP_LEFT">
                     <children>
-                        <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="30.0"
-                                  style="-fx-border-color: lightgray; -fx-border-width: 1 0 0 0;"
-                                  vgap="5.0" HBox.hgrow="ALWAYS">
+                        <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="30.0" vgap="5.0" HBox.hgrow="ALWAYS">
                             <padding>
                                 <Insets bottom="2.0" right="50.0" top="2.0"/>
                             </padding>

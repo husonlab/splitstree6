@@ -29,7 +29,7 @@ import splitstree6.algorithms.source.source2network.NetworkLoader;
 import splitstree6.algorithms.source.source2splits.SplitsLoader;
 import splitstree6.algorithms.source.source2trees.TreesLoader;
 import splitstree6.algorithms.splits.splits2view.ShowSplitsConsole;
-import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
+import splitstree6.algorithms.trees.trees2view.Viewer;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.window.MainWindow;
@@ -80,10 +80,9 @@ public class WorkflowSetup {
 			// todo: replace by calculation of network
 		} else if (clazz.equals(TreesBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new TreesLoader(), new TaxaBlock(), new TreesBlock());
-			var splitsNode = workflow.newDataNode(new SplitsBlock());
-			workflow.newAlgorithmNode(new ConsensusNetwork(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), splitsNode);
-			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new ViewBlock()));
-			// todo: replace by calculation of network
+			var viewerNode = workflow.newDataNode(new ViewBlock());
+			workflow.newAlgorithmNode(new Viewer(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), viewerNode);
+			// todo: add calculation of network?
 		} else if (clazz.equals(NetworkBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new NetworkLoader(), new TaxaBlock(), new NetworkBlock());
 			var dataNode = workflow.getWorkingDataNode();

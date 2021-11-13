@@ -64,7 +64,7 @@ public class MultiTreesPage extends GridPane {
 		var col = 0;
 		for (var t = start; t < trees.size(); t++) {
 			var treePane = new TreePane(taxaBlock, trees.get(t), taxonSelectionModel, boxWidth, boxHeight,
-					multiTreesView.getOptionDiagram(), multiTreesView.getOptionRootSide(), multiTreesView.isOptionToScale(), multiTreesView.optionFontScaleFactorProperty());
+					multiTreesView.getOptionDiagram(), multiTreesView.getOptionRootSide(), multiTreesView.optionFontScaleFactorProperty());
 			trees.get(t).setName("tree-" + (t + 1));
 			treePane.drawTree();
 			getChildren().add(treePane);

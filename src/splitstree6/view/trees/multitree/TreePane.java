@@ -19,6 +19,7 @@
 
 package splitstree6.view.trees.multitree;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -35,8 +36,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.util.AService;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.phylo.PhyloTree;
+import jloda.util.ProgramProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 
@@ -45,21 +48,29 @@ import java.util.LinkedList;
 import java.util.Map;
 
 public class TreePane extends StackPane {
-	public enum Diagram {Unrooted, Circular, Rectangular, Triangular}
 
-	public enum RootSide {Left, Right, Bottom, Top}
+	public enum RootSide {
+		Left, Right, Down, Up;
+
+		public static RootSide getDefault() {
+			return valueOf(ProgramProperties.get("DefaultTreeRootSide", Left.name()));
+		}
+
+		public static void setDefault(RootSide rootSide) {
+			ProgramProperties.put("DefaultTreeRootSide", rootSide.name());
+		}
+	}
 
 	private final TaxaBlock taxaBlock;
 	private final PhyloTree phyloTree;
 	private final SelectionModel<Taxon> taxonSelectionModel;
-	private final Map<Taxon, javafx.scene.Node[]> taxonNodesMap = new HashMap<>();
+	private final Map<Taxon, TreeEmbedding.ShapeAndLabel> taxonNodesMap = new HashMap<>();
 	private final ReadOnlyDoubleProperty fontScaleFactor;
 
-	private final Diagram diagram;
+	private final TreeEmbedding.TreeDiagram treeDiagram;
 	private final RootSide rootSide;
-	private final boolean toScale;
 
-	private Runnable redraw;
+	private final AService<Boolean> redrawService;
 
 	private final InvalidationListener dimensionsChangeListener;
 	private final SetChangeListener<Taxon> selectionChangeListener;
@@ -69,15 +80,16 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
-					Diagram diagram, RootSide rootSide, boolean toScale, ReadOnlyDoubleProperty fontScaleFactor) {
+					TreeEmbedding.TreeDiagram diagram, RootSide rootSide, ReadOnlyDoubleProperty fontScaleFactor) {
 		this.taxaBlock = taxaBlock;
 		this.phyloTree = phyloTree;
 		this.taxonSelectionModel = taxonSelectionModel;
-		this.diagram = diagram;
+		this.treeDiagram = diagram;
 		this.rootSide = rootSide;
-		this.toScale = toScale;
 		this.fontScaleFactor = fontScaleFactor;
-		//setStyle("-fx-border-color: lightgray;");
+		// setStyle("-fx-border-color: lightgray;");
+
+		redrawService = new AService<>();
 
 		getStyleClass().add("background");
 
@@ -87,8 +99,8 @@ public class TreePane extends StackPane {
 		dimensionsChangeListener = e -> {
 			setPrefWidth(boxWidth.get());
 			setPrefHeight(boxHeight.get());
-			if (redraw != null)
-				redraw.run();
+			if (redrawService.getCallable() != null)
+				redrawService.restart();
 		};
 		boxWidth.addListener(new WeakInvalidationListener(dimensionsChangeListener));
 		boxHeight.addListener(new WeakInvalidationListener(dimensionsChangeListener));
@@ -117,7 +129,7 @@ public class TreePane extends StackPane {
 	}
 
 	public void drawTree() {
-		redraw = () -> {
+		Runnable redraw = () -> {
 			var pane = new StackPane();
 			double width;
 			double height;
@@ -127,30 +139,31 @@ public class TreePane extends StackPane {
 			} else {
 				height = getPrefWidth();
 				width = getPrefHeight() - 12;
+
 			}
 
-			var group = RectangularOrTriangularTreeEmbedding.apply(taxaBlock, phyloTree, diagram, toScale, width, height, taxonNodesMap);
+			var group = TreeEmbedding.apply(taxaBlock, phyloTree, treeDiagram, width - 4, height - 4, taxonNodesMap);
 
 			applyFontScaleFactor(group, fontScaleFactor.get());
 
 			switch (rootSide) {
 				case Right -> {
-					group.setRotationAxis(new Point3D(0, 0, 1));
 					group.setRotate(180);
 				}
-				case Top -> {
-					group.setRotationAxis(new Point3D(0, 0, 1));
+				case Up -> {
 					group.setRotate(90);
 				}
-				case Bottom -> {
-					group.setRotationAxis(new Point3D(0, 0, 1));
+				case Down -> {
 					group.setRotate(-90);
 				}
 			}
 
+			pane.setMinHeight(getPrefHeight() - 12);
+			pane.setMinWidth(getPrefWidth());
+
 			pane.getChildren().setAll(group);
 
-			if (rootSide == RootSide.Right || rootSide == RootSide.Top) {
+			if (rootSide == RootSide.Right || rootSide == RootSide.Up) {
 				var queue = new LinkedList<>(group.getChildren());
 				while (queue.size() > 0) {
 					var node = queue.pop();
@@ -164,21 +177,30 @@ public class TreePane extends StackPane {
 			}
 
 			var label = new Label(phyloTree.getName());
-			// todo: label is incorrectly placed when tree is rotated
 			getChildren().setAll(new VBox(label, pane));
 
 			setupSelection(taxonSelectionModel, taxonNodesMap);
 
 			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-				if (!e.isShiftDown())
-					taxonSelectionModel.clearSelection();
+				if (e.isStillSincePress() && !e.isShiftDown()) {
+					Platform.runLater(taxonSelectionModel::clearSelection);
+				}
 				e.consume();
 			});
+
+			SetupDragSelectedLabels.apply(taxonSelectionModel, taxonNodesMap);
 		};
+
 		redraw.run();
+
+		redrawService.setCallable(() -> {
+			Thread.sleep(10);
+			redraw.run();
+			return true;
+		});
 	}
 
-	private static void setupSelection(SelectionModel<Taxon> selectionModel, Map<Taxon, javafx.scene.Node[]> taxonNodesMap) {
+	private static void setupSelection(SelectionModel<Taxon> selectionModel, Map<Taxon, TreeEmbedding.ShapeAndLabel> taxonNodesMap) {
 		for (var taxon : taxonNodesMap.keySet()) {
 			var nodes = taxonNodesMap.get(taxon);
 			for (var node : nodes) {

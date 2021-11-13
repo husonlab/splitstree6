@@ -23,7 +23,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.multitree.MultiTreesViewController">
     <children>
@@ -109,93 +109,23 @@
                                     </tooltip>
                                 </Button>
                                 <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                                <ChoiceBox fx:id="diagramCBox" prefWidth="100.0"/>
-                                <ComboBox fx:id="rootSideCBox" prefWidth="100.0"/>
-                                <ToggleButton fx:id="toScaleToggleButton" mnemonicParsing="false" text="To Scale"/>
+                                <ComboBox fx:id="diagramCBox" prefWidth="50.0">
+                                    <tooltip>
+                                        <Tooltip text="Choose diagram"/>
+                                    </tooltip>
+                                </ComboBox>
+                                <ComboBox fx:id="rootSideCBox" prefWidth="50.0">
+                                    <tooltip>
+                                        <Tooltip text="Choose root side"/>
+                                    </tooltip>
+                                </ComboBox>
                                 <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="110.0"
-                                          promptText="rows x cols"/>
-                                <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
-                                <Button fx:id="firstPageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;"
-                                        text="First Page">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Rewind16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
+                                <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
                                     <tooltip>
-                                        <Tooltip text="Show first page"/>
+                                        <Tooltip text="Set rows x columns"/>
                                     </tooltip>
-                                </Button>
-                                <Button fx:id="previousPageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;"
-                                        text="Previous Page">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Back16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Show previous page"/>
-                                    </tooltip>
-                                </Button>
-                                <TextField fx:id="pageTextField" prefWidth="50.0" promptText="Page"/>
-                                <Button fx:id="nextPageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;"
-                                        text="Next page">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Forward16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Show next page"/>
-                                    </tooltip>
-                                </Button>
-                                <Button fx:id="lastPage" contentDisplay="GRAPHIC_ONLY" layoutX="232.0" layoutY="12.0"
-                                        maxHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;"
-                                        text="Last Page">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false"
-                                                       url="@/jloda/resources/icons/sun/FastForward16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Show last page"/>
-                                    </tooltip>
-                                </Button>
+                                </ComboBox>
                             </items>
                         </ToolBar>
                     </children>

@@ -30,12 +30,10 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
-import javafx.scene.control.TextFormatter;
-import javafx.util.converter.IntegerStringConverter;
 import jloda.fx.util.AService;
+import jloda.fx.util.Print;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
-import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
@@ -44,12 +42,14 @@ import splitstree6.window.MainWindow;
  * Daniel Huson, 11.2021
  */
 public class MultiTreesViewPresenter implements IDisplayTabPresenter {
-	private final ObservableList<String> gridValues = FXCollections.observableArrayList();
+	private final static ObservableList<String> gridValues = FXCollections.observableArrayList("1 x 1");
 
 	private final MainWindow mainWindow;
 	private final MultiTreesView multiTreesView;
 
 	private final MultiTreesViewController controller;
+
+	private final ChangeListener<Bounds> boundsChangeListener;
 
 	public MultiTreesViewPresenter(MainWindow mainWindow, MultiTreesView multiTreesView, ObservableList<PhyloTree> phyloTrees) {
 		this.mainWindow = mainWindow;
@@ -57,18 +57,26 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 
 		controller = multiTreesView.getController();
 
-		controller.getDiagramCBox().getItems().addAll(TreePane.Diagram.values());
+		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell());
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback());
+		controller.getDiagramCBox().getItems().addAll(TreeEmbedding.TreeDiagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(multiTreesView.optionDiagramProperty());
-		multiTreesView.optionDiagramProperty().addListener(e -> redraw());
+		multiTreesView.optionDiagramProperty().addListener((v, o, n) -> {
+			TreeEmbedding.TreeDiagram.setDefault(n);
+			redraw();
+		});
 
+		controller.getRootSideCBox().setButtonCell(ComboBoxUtils.createRootSideComboBoxListCell());
+		controller.getRootSideCBox().setCellFactory(ComboBoxUtils.createRootSideComboBoxCallback());
 		controller.getRootSideCBox().getItems().addAll(TreePane.RootSide.values());
-		controller.getRootSideCBox().valueProperty().bindBidirectional(multiTreesView.optionRootSideProperty());
-		controller.getRootSideCBox().disableProperty().bind(multiTreesView.optionDiagramProperty().isEqualTo(TreePane.Diagram.Unrooted)
-				.or((multiTreesView.optionDiagramProperty().isEqualTo(TreePane.Diagram.Circular))));
-		multiTreesView.optionRootSideProperty().addListener(e -> redraw());
 
-		controller.getToScaleToggleButton().selectedProperty().bindBidirectional(multiTreesView.optionToScaleProperty());
-		multiTreesView.optionToScaleProperty().addListener(e -> redraw());
+		controller.getRootSideCBox().valueProperty().bindBidirectional(multiTreesView.optionRootSideProperty());
+		controller.getRootSideCBox().disableProperty().bind(multiTreesView.optionDiagramProperty().isEqualTo(TreeEmbedding.TreeDiagram.RadialPhylogram)
+				.or((multiTreesView.optionDiagramProperty().isEqualTo(TreeEmbedding.TreeDiagram.CircularPhylogram))));
+		multiTreesView.optionRootSideProperty().addListener((v, o, n) -> {
+			TreePane.RootSide.setDefault(n);
+			redraw();
+		});
 
 		updateRowsColsFromText(multiTreesView.getOptionGrid(), multiTreesView.rowsProperty(), multiTreesView.colsProperty());
 		multiTreesView.optionGridProperty().addListener((v, o, n) -> {
@@ -85,12 +93,12 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 		{
 			// use a service with a delay to redraw so that we don't redraw too often
 			var redrawService = new AService<>(() -> {
-				Thread.sleep(500);
+				Thread.sleep(10);
 				redraw();
 				return true;
 			});
 
-			ChangeListener<Bounds> boundsChangeListener = (v, o, n) -> {
+			boundsChangeListener = (v, o, n) -> {
 				targetWidth.set(n.getWidth() - 10);
 				targetHeight.set(n.getHeight() - 110);
 				redrawService.restart();
@@ -142,41 +150,19 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			invalidationListener.invalidated(null);
 		}
 
-		{
-			controller.getFirstPageButton().setOnAction(e -> multiTreesView.setOptionPageNumber(1));
-			controller.getFirstPageButton().disableProperty().bind(multiTreesView.emptyProperty().or(multiTreesView.optionPageNumberProperty().lessThanOrEqualTo(1)));
-
-			controller.getPreviousPageButton().setOnAction(e -> multiTreesView.setOptionPageNumber(multiTreesView.getOptionPageNumber() - 1));
-			controller.getPreviousPageButton().disableProperty().bind(controller.getFirstPageButton().disableProperty());
-
-			multiTreesView.optionPageNumberProperty().addListener((v, o, n) -> controller.getPageTextField().setText(n.toString()));
-			controller.getPageTextField().setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
-			controller.getPageTextField().setText(String.valueOf(multiTreesView.getOptionPageNumber()));
-			controller.getPageTextField().setOnAction(e -> {
-				if (NumberUtils.isInteger(controller.getPageTextField().getText())) {
-					var page = NumberUtils.parseInt((controller.getPageTextField().getText()));
-					multiTreesView.setOptionPageNumber(page);
-				}
-			});
-			multiTreesView.optionPageNumberProperty().addListener((v, o, n) -> {
-				if (n.intValue() < 1)
-					Platform.runLater(() -> multiTreesView.setOptionPageNumber(1));
-				else if (n.intValue() >= numberOfPages.get())
-					Platform.runLater(() -> multiTreesView.setOptionPageNumber((Math.max(1, numberOfPages.get()))));
-			});
-
-			controller.getPageTextField().disableProperty().bind(Bindings.size(phyloTrees).lessThanOrEqualTo(1));
-
-			controller.getNextPageButton().setOnAction(e -> multiTreesView.setOptionPageNumber(multiTreesView.getOptionPageNumber() + 1));
-			controller.getNextPageButton().disableProperty().bind(multiTreesView.emptyProperty().or(multiTreesView.optionPageNumberProperty().greaterThanOrEqualTo(numberOfPages)));
-
-			controller.getLastPage().setOnAction(e -> multiTreesView.setOptionPageNumber(phyloTrees.size()));
-			controller.getLastPage().disableProperty().bind(controller.getNextPageButton().disableProperty());
-		}
+		multiTreesView.optionPageNumberProperty().addListener((v, o, n) -> {
+			if (n.intValue() < 1)
+				Platform.runLater(() -> multiTreesView.setOptionPageNumber(1));
+			else if (n.intValue() >= numberOfPages.get())
+				Platform.runLater(() -> multiTreesView.setOptionPageNumber((Math.max(1, numberOfPages.get()))));
+		});
 
 		MainWindowManager.useDarkThemeProperty().addListener(e -> redraw());
 
 		Platform.runLater(this::setupMenuItems);
+
+		controller.getPrintButton().setOnAction(e -> Print.print(mainWindow.getStage(), multiTreesView.imageNodeProperty().get()));
+		controller.getPrintButton().disableProperty().bind(multiTreesView.emptyProperty());
 	}
 
 	public void redraw() {
@@ -191,7 +177,6 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 	}
-
 
 	/**
 	 * updates the rows and cols from the given text and returns the text nicely formatted
@@ -218,5 +203,13 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(multiTreesView.emptyProperty());
 		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> multiTreesView.setOptionFontScaleFactor((1.0 / 1.2) * multiTreesView.getOptionFontScaleFactor()));
 		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(multiTreesView.emptyProperty());
+
+		mainWindow.getController().getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
+		mainWindow.getController().getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
+
+		mainWindow.getController().getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
+		mainWindow.getController().getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
+		mainWindow.getController().getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 	}
+
 }

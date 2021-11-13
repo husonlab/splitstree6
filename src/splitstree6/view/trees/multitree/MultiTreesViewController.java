@@ -20,7 +20,10 @@
 package splitstree6.view.trees.multitree;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Pagination;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 
@@ -48,31 +51,13 @@ public class MultiTreesViewController {
 	private Button findButton;
 
 	@FXML
-	private ChoiceBox<TreePane.Diagram> diagramCBox;
+	private ComboBox<TreeEmbedding.TreeDiagram> diagramCBox;
 
 	@FXML
 	private ComboBox<TreePane.RootSide> rootSideCBox;
 
 	@FXML
-	private ToggleButton toScaleToggleButton;
-
-	@FXML
 	private ComboBox<String> rowsColsCBox;
-
-	@FXML
-	private Button firstPageButton;
-
-	@FXML
-	private Button previousPageButton;
-
-	@FXML
-	private TextField pageTextField;
-
-	@FXML
-	private Button nextPageButton;
-
-	@FXML
-	private Button lastPage;
 
 	@FXML
 	private Pagination pagination;
@@ -105,7 +90,7 @@ public class MultiTreesViewController {
 		return findButton;
 	}
 
-	public ChoiceBox<TreePane.Diagram> getDiagramCBox() {
+	public ComboBox<TreeEmbedding.TreeDiagram> getDiagramCBox() {
 		return diagramCBox;
 	}
 
@@ -113,32 +98,8 @@ public class MultiTreesViewController {
 		return rootSideCBox;
 	}
 
-	public ToggleButton getToScaleToggleButton() {
-		return toScaleToggleButton;
-	}
-
 	public ComboBox<String> getRowsColsCBox() {
 		return rowsColsCBox;
-	}
-
-	public Button getFirstPageButton() {
-		return firstPageButton;
-	}
-
-	public Button getPreviousPageButton() {
-		return previousPageButton;
-	}
-
-	public TextField getPageTextField() {
-		return pageTextField;
-	}
-
-	public Button getNextPageButton() {
-		return nextPageButton;
-	}
-
-	public Button getLastPage() {
-		return lastPage;
 	}
 
 	public Pagination getPagination() {

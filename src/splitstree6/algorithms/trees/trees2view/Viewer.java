@@ -50,7 +50,7 @@ import java.util.List;
 public class Viewer extends Trees2View {
 	public enum ViewType {SingleTree, MultiTree, DensiTree, Tanglegram, Console}
 
-	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.Console);
+	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.MultiTree);
 
 	private final ObjectProperty<DisplayTab> displayTab = new SimpleObjectProperty<>();
 
@@ -87,10 +87,11 @@ public class Viewer extends Trees2View {
 					Platform.runLater(() -> multiTreesView.setTrees(inputData.getTrees()));
 					return;
 				} else {
-					var mainWindow = getNode().getOwner().getMainWindow();
-					var view = new MultiTreesView(mainWindow, getNode().titleProperty());
-					view.getTrees().setAll(inputData.getTrees());
-					viewBlock.setView(view);
+					Platform.runLater(() -> {
+						var mainWindow = getNode().getOwner().getMainWindow();
+						var view = new MultiTreesView(mainWindow, getNode().titleProperty());
+						viewBlock.setView(view);
+					});
 				}
 			}
 			case SingleTree, DensiTree, Tanglegram -> {
@@ -131,6 +132,7 @@ public class Viewer extends Trees2View {
 				displayTab.get().setView(viewBlock.getView());
 			if (viewBlock.getView() instanceof MultiTreesView multiTreesView) {
 				multiTreesView.tabPaneProperty().bind(getDisplayTab().tabPaneProperty());
+				multiTreesView.getTrees().setAll(inputData.getTrees());
 			}
 		});
 

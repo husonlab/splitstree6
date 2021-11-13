@@ -28,6 +28,7 @@ import javafx.scene.control.TabPane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
+import jloda.util.ProgramProperties;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
@@ -52,18 +53,17 @@ public class MultiTreesView implements IView {
 
 	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
 
-	private final ObjectProperty<TreePane.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreePane.Diagram.Rectangular);
-	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.Left);
+	private final ObjectProperty<TreeEmbedding.TreeDiagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeEmbedding.TreeDiagram.getDefault());
+	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.getDefault());
 
-	private final BooleanProperty optionToScale = new SimpleBooleanProperty(this, "optionToScale", false);
-	private final StringProperty optionGrid = new SimpleStringProperty(this, "optionGrid", "1 x 1");
+	private final StringProperty optionGrid = new SimpleStringProperty(this, "optionGrid", ProgramProperties.get("OptionGrid", "1 x 1"));
 
 	private final IntegerProperty optionPageNumber = new SimpleIntegerProperty(this, "optionPageNumber", 1); // 1-based
 
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionToScale.getName(), optionGrid.getName(), optionPageNumber.getName(), optionFontScaleFactor.getName());
+		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionGrid.getName(), optionPageNumber.getName(), optionFontScaleFactor.getName());
 	}
 
 	public MultiTreesView(MainWindow mainWindow, StringProperty titleProperty) {
@@ -71,9 +71,11 @@ public class MultiTreesView implements IView {
 		var loader = new ExtendedFXMLLoader<MultiTreesViewController>(MultiTreesViewController.class);
 		controller = loader.getController();
 
-		presenter = new MultiTreesViewPresenter(mainWindow, this, trees);
+		presenter = new MultiTreesViewPresenter(mainWindow, this, getTrees());
 
-		empty.bind(Bindings.isEmpty(trees));
+		empty.bind(Bindings.isEmpty(getTrees()));
+
+		optionGrid.addListener((v, o, n) -> ProgramProperties.put("OptionGrid", n));
 	}
 
 	public MultiTreesViewController getController() {
@@ -124,15 +126,15 @@ public class MultiTreesView implements IView {
 		this.optionPageNumber.set(optionPageNumber);
 	}
 
-	public TreePane.Diagram getOptionDiagram() {
+	public TreeEmbedding.TreeDiagram getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<TreePane.Diagram> optionDiagramProperty() {
+	public ObjectProperty<TreeEmbedding.TreeDiagram> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(TreePane.Diagram optionDiagram) {
+	public void setOptionDiagram(TreeEmbedding.TreeDiagram optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 
@@ -146,18 +148,6 @@ public class MultiTreesView implements IView {
 
 	public void setOptionRootSide(TreePane.RootSide optionRootSide) {
 		this.optionRootSide.set(optionRootSide);
-	}
-
-	public boolean isOptionToScale() {
-		return optionToScale.get();
-	}
-
-	public BooleanProperty optionToScaleProperty() {
-		return optionToScale;
-	}
-
-	public void setOptionToScale(boolean optionToScale) {
-		this.optionToScale.set(optionToScale);
 	}
 
 	public String getOptionGrid() {

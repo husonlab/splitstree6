@@ -56,7 +56,6 @@ module splitstreesix {
 	opens splitstree6.io.writers.trees;
 	opens splitstree6.io.writers.network;
 
-
 	opens splitstree6.window;
 
 	opens splitstree6.treeview;
