@@ -283,13 +283,13 @@
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="PLUS" control="UP" meta="UP"
+                                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="MINUS" control="UP" meta="UP"
+                                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
@@ -317,13 +317,13 @@
                                         <MenuItem fx:id="rotateLeftMenuItem" text="Rotate Left">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
+                                                                    shift="DOWN" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <MenuItem fx:id="rotateRightMenuItem" text="Rotate Right">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
+                                                                    shift="DOWN" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <MenuItem fx:id="flipMenuItem" text="Flip">

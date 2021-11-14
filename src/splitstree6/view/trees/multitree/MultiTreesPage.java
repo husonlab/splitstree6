@@ -38,6 +38,9 @@ public class MultiTreesPage extends GridPane {
 	private final MultiTreesView multiTreesView;
 	private final ReadOnlyDoubleProperty boxWidth;
 	private final ReadOnlyDoubleProperty boxHeight;
+	private TaxaBlock taxaBlock;
+	private ObservableList<PhyloTree> trees;
+	private Integer page;
 
 	public MultiTreesPage(SelectionModel<Taxon> taxonSelectionModel, MultiTreesView multiTreesView, ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight) {
 		this.taxonSelectionModel = taxonSelectionModel;
@@ -53,11 +56,15 @@ public class MultiTreesPage extends GridPane {
 			var row = new RowConstraints(boxHeight.get());
 			getRowConstraints().add(row);
 		}
-
 		getStyleClass().add("background");
 	}
 
-	public void addTrees(TaxaBlock taxaBlock, ObservableList<PhyloTree> trees, Integer page) {
+	public void setTrees(TaxaBlock taxaBlock, ObservableList<PhyloTree> trees, Integer page) {
+		this.taxaBlock = taxaBlock;
+		this.trees = trees;
+		this.page = page;
+
+		getChildren().clear();
 		var start = (page - 1) * multiTreesView.getRows() * multiTreesView.getCols();
 
 		var row = 0;
@@ -70,6 +77,7 @@ public class MultiTreesPage extends GridPane {
 			getChildren().add(treePane);
 			GridPane.setRowIndex(treePane, row);
 			GridPane.setColumnIndex(treePane, col);
+
 			if (++col == multiTreesView.getCols()) {
 				if (row + 1 < multiTreesView.getRows()) {
 					row++;
@@ -77,6 +85,12 @@ public class MultiTreesPage extends GridPane {
 				} else
 					break;
 			}
+		}
+	}
+
+	public void redraw() {
+		if (taxaBlock != null && trees != null && page != null) {
+			setTrees(taxaBlock, trees, page);
 		}
 	}
 }

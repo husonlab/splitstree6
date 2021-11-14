@@ -51,7 +51,7 @@ public class MultiTreesViewController {
 	private Button findButton;
 
 	@FXML
-	private ComboBox<TreeEmbedding.TreeDiagram> diagramCBox;
+	private ComboBox<ComputeTreeEmbedding.TreeDiagram> diagramCBox;
 
 	@FXML
 	private ComboBox<TreePane.RootSide> rootSideCBox;
@@ -90,7 +90,7 @@ public class MultiTreesViewController {
 		return findButton;
 	}
 
-	public ComboBox<TreeEmbedding.TreeDiagram> getDiagramCBox() {
+	public ComboBox<ComputeTreeEmbedding.TreeDiagram> getDiagramCBox() {
 		return diagramCBox;
 	}
 

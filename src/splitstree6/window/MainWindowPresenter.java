@@ -66,7 +66,6 @@ public class MainWindowPresenter {
 
 		var workflowTreeView = mainWindow.getWorkflowTreeView();
 
-
 		controller.getTreeViewAnchorPane().getChildren().add(workflowTreeView);
 		AnchorPane.setRightAnchor(workflowTreeView, 0.0);
 		AnchorPane.setLeftAnchor(workflowTreeView, 0.0);

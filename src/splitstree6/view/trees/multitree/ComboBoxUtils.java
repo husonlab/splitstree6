@@ -29,14 +29,14 @@ public class ComboBoxUtils {
 	/**
 	 * create list cell for diagram combo box
 	 */
-	public static ListCell<TreeEmbedding.TreeDiagram> createDiagramComboBoxListCell() {
+	public static ListCell<ComputeTreeEmbedding.TreeDiagram> createDiagramComboBoxListCell() {
 		return new ListCell<>() {
 			{
 				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 			}
 
 			@Override
-			protected void updateItem(TreeEmbedding.TreeDiagram item, boolean empty) {
+			protected void updateItem(ComputeTreeEmbedding.TreeDiagram item, boolean empty) {
 				super.updateItem(item, empty);
 
 				if (item == null || empty) {
@@ -51,7 +51,7 @@ public class ComboBoxUtils {
 	/**
 	 * creates the callback method for diagraom combo box
 	 */
-	public static Callback<ListView<TreeEmbedding.TreeDiagram>, ListCell<TreeEmbedding.TreeDiagram>> createDiagramComboxBoxCallback() {
+	public static Callback<ListView<ComputeTreeEmbedding.TreeDiagram>, ListCell<ComputeTreeEmbedding.TreeDiagram>> createDiagramComboxBoxCallback() {
 		return p -> createDiagramComboBoxListCell();
 	}
 

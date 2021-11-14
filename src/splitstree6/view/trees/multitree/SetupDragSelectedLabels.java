@@ -36,7 +36,7 @@ public class SetupDragSelectedLabels {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public static void apply(SelectionModel<Taxon> taxonSelectionModel, Map<Taxon, TreeEmbedding.ShapeAndLabel> taxonShapeAndLabelMap) {
+	public static void apply(SelectionModel<Taxon> taxonSelectionModel, Map<Taxon, ComputeTreeEmbedding.ShapeAndLabel> taxonShapeAndLabelMap) {
 		final EventHandler<MouseEvent> mousePressedHandler = e -> {
 			if (e.getSource() instanceof Pane pane && pane.getEffect() != null) { // need a better way to determine whether this label is selected
 				mouseDownX = e.getScreenX();

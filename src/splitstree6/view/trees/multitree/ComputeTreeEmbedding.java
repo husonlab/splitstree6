@@ -1,5 +1,5 @@
 /*
- *  TreeEmbedding.java Copyright (C) 2021 Daniel H. Huson
+ *  ComputeTreeEmbedding.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,7 +19,9 @@
 
 package splitstree6.view.trees.multitree;
 
+import javafx.beans.InvalidationListener;
 import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -29,6 +31,7 @@ import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.graph.NodeDoubleArray;
 import jloda.graph.algorithms.Traversals;
 import jloda.phylo.PhyloTree;
 import jloda.util.Counter;
@@ -46,9 +49,9 @@ import java.util.Map;
  * computes a rectangular or triangular tree embedding
  * Daniel Huson, 10.2021
  */
-public class TreeEmbedding {
+public class ComputeTreeEmbedding {
 	public enum TreeDiagram {
-		RectangularPhylogram, RectangularCladogram, TriangularCladogram, RadialPhylogram, RadialCladogram, CircularPhylogram, CircularCladogram;
+		RectangularCladogram, RectangularPhylogram, TriangularCladogram, RadialCladogram, RadialPhylogram, CircularCladogram, CircularPhylogram;
 
 		public static TreeDiagram getDefault() {
 			return TreeDiagram.valueOf(ProgramProperties.get("DefaultTreeDiagram", RectangularPhylogram.name()));
@@ -58,8 +61,12 @@ public class TreeEmbedding {
 			ProgramProperties.put("DefaultTreeDiagram", diagram.name());
 		}
 
-		public static boolean isRadial(TreeDiagram diagram) {
-			return diagram == RadialPhylogram || diagram == RadialCladogram || diagram == CircularPhylogram || diagram == CircularCladogram;
+		public boolean isRadial() {
+			return this == RadialPhylogram || this == RadialCladogram || this == CircularPhylogram || this == CircularCladogram;
+		}
+
+		public boolean isCladogram() {
+			return this == RectangularCladogram || this == TriangularCladogram || this == RadialCladogram || this == CircularCladogram;
 		}
 	}
 
@@ -67,15 +74,29 @@ public class TreeEmbedding {
 
 	public static double MAX_FONT_SIZE = 24;
 
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagram diagram, double width, double height,
-							  Map<Taxon, ShapeAndLabel> taxonNodesMap) {
-		var parentPlacement = ParentPlacement.LeafAverage;
-		// child-average broken for radial layout
+	private static final double LINEAR_LABEL_GAP = 5;
+	private static final double RADIAL_LABEL_GAP = 15;
 
-		var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
+	private static int count = 0;
 
-		var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
-		var fontHeight = Math.min(MAX_FONT_SIZE, height / (numberOfLeaves + 1));
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagram diagram, double width, double height, Map<Taxon, ShapeAndLabel> taxonNodesMap) {
+
+		//System.err.println("Computing embedding "+(++count)+": "+tree.getName());
+
+		var parentPlacement = ParentPlacement.ChildrenAverage;
+
+		parentPlacement = ParentPlacement.LeafAverage;
+
+		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
+
+		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
+
+		double fontHeight;
+
+		if (diagram.isRadial())
+			fontHeight = Math.min(MAX_FONT_SIZE, 0.5 * Math.min(width, height) * Math.PI / (numberOfLeaves + 1));
+		else
+			fontHeight = Math.min(MAX_FONT_SIZE, height / (numberOfLeaves + 1));
 
 		var maxLabelWidth = 0.0;
 		NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
@@ -87,7 +108,7 @@ public class TreeEmbedding {
 				label.setTextFill(color);
 				nodeLabelMap.put(v, label);
 
-				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
+				maxLabelWidth = Math.max(maxLabelWidth, label.getEstimatedWidth());
 			}
 		}
 		if (maxLabelWidth > 0.25 * width) {
@@ -99,21 +120,23 @@ public class TreeEmbedding {
 			}
 		}
 
-		var normalizeWidth = width - maxLabelWidth - 5;
-		var normalizeHeight = height - fontHeight;
+		final double normalizeWidth;
+		final double normalizeHeight;
 
-		if (TreeDiagram.isRadial(diagram))
-			normalizeHeight = normalizeWidth = Math.min(width - 2 * maxLabelWidth - 5, height - 2 * fontHeight - 5);
-
+		if (diagram.isRadial()) {
+			normalizeHeight = normalizeWidth = Math.min(width - 2 * (maxLabelWidth + RADIAL_LABEL_GAP) - 5, height - 2 * (maxLabelWidth + RADIAL_LABEL_GAP) - 5);
+		} else {
+			normalizeWidth = width - maxLabelWidth - LINEAR_LABEL_GAP;
+			normalizeHeight = height - fontHeight;
+		}
 
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
 			case RectangularPhylogram -> computeCoordinatesRectangular(tree, true, parentPlacement);
 			case RectangularCladogram -> computeCoordinatesRectangular(tree, false, parentPlacement);
-			case TriangularCladogram -> computeCoordinatesTriangular(tree);
-			case RadialPhylogram -> computeCoordinatesRadial(tree, true, parentPlacement);
-			case RadialCladogram -> computeCoordinatesRadial(tree, false, parentPlacement);
-
-			default -> throw new RuntimeException("Diagram type not supported");
+			case TriangularCladogram -> computeCoordinatesTriangularCladogram(tree);
+			case RadialPhylogram -> computeCoordinatesRadialPhylogram(tree, parentPlacement);
+			case RadialCladogram, CircularCladogram -> computeCoordinatesRadialCladogram(tree, false);
+			case CircularPhylogram -> computeCoordinatesRadialCladogram(tree, true);
 		};
 
 		normalize(normalizeWidth, normalizeHeight, nodePointMap);
@@ -127,7 +150,8 @@ public class TreeEmbedding {
 		for (var v : tree.nodes()) {
 			var point = nodePointMap.get(v);
 			var circle = new Circle(0.25);
-			circle.setStroke(color);
+			circle.setFill(color);
+			circle.setStroke(Color.TRANSPARENT);
 			nodeGroup.getChildren().add(circle);
 			circle.setTranslateX(point.getX());
 			circle.setTranslateY(point.getY());
@@ -142,7 +166,48 @@ public class TreeEmbedding {
 				}
 			}
 		}
-		if (diagram == TreeDiagram.TriangularCladogram || diagram == TreeDiagram.RadialPhylogram || diagram == TreeDiagram.RadialCladogram) {
+
+		if (diagram == TreeDiagram.CircularCladogram || diagram == TreeDiagram.CircularPhylogram) {
+			var rootPt = nodePointMap.get(tree.getRoot());
+			Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
+				for (var w : v.children()) {
+					var vPt = nodePointMap.get(v);
+					var wPt = nodePointMap.get(w);
+
+					var line = new Path();
+					line.setFill(Color.TRANSPARENT);
+					line.setStroke(color);
+					line.setStrokeLineCap(StrokeLineCap.ROUND);
+					line.setStrokeWidth(0.5);
+
+					line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));
+
+					var vPt0 = vPt.subtract(rootPt);
+					var wPt0 = wPt.subtract(rootPt);
+					if (vPt0.magnitude() > 0 && wPt0.magnitude() > 0) {
+						var corner = rootPt.add(wPt0.multiply(vPt0.magnitude() / wPt0.magnitude()));
+
+						var arcTo = new ArcTo();
+						arcTo.setX(corner.getX());
+						arcTo.setY(corner.getY());
+						arcTo.setRadiusX(vPt0.magnitude());
+						arcTo.setRadiusY(vPt0.magnitude());
+						arcTo.setLargeArcFlag(GeometryUtilsFX.computeObservedAngle(rootPt, vPt, wPt) > 180);
+						arcTo.setSweepFlag(GeometryUtilsFX.computeObservedAngle(rootPt, vPt, wPt) > 0);
+
+						line.getElements().add(arcTo);
+					}
+
+					var lineTo2 = new LineTo();
+					lineTo2.setX(wPt.getX());
+					lineTo2.setY(wPt.getY());
+
+					line.getElements().add(lineTo2);
+
+					edgeGroup.getChildren().add(line);
+				}
+			});
+		} else if (diagram == TreeDiagram.TriangularCladogram || diagram == TreeDiagram.RadialPhylogram || diagram == TreeDiagram.RadialCladogram) {
 			for (var e : tree.edges()) {
 				var sourceShape = nodeShapeMap.get(e.getSource());
 				var targetShape = nodeShapeMap.get(e.getTarget());
@@ -191,8 +256,8 @@ public class TreeEmbedding {
 			}
 		}
 
-		if (diagram == TreeDiagram.RadialPhylogram || diagram == TreeDiagram.RadialCladogram)
-			layoutNodeLabelsRadial(tree, nodeShapeMap, nodeLabelMap);
+		if (diagram.isRadial())
+			layoutNodeLabelsRadial(tree, diagram == TreeDiagram.RadialPhylogram, nodeShapeMap, nodeLabelMap);
 		else
 			layoutNodeLabelsRectangular(tree, nodeShapeMap, nodeLabelMap);
 
@@ -250,7 +315,7 @@ public class TreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesTriangular(PhyloTree tree) {
+	private static NodeArray<Point2D> computeCoordinatesTriangularCladogram(PhyloTree tree) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 		final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
 
@@ -279,94 +344,153 @@ public class TreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesRadial(PhyloTree tree, boolean toScale, ParentPlacement parentPlacement) {
+	private static NodeArray<Point2D> computeCoordinatesRadialCladogram(PhyloTree tree, boolean scaleByEdgeWeights) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
-		var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
+		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
 		if (numberOfLeaves > 0) {
-			NodeArray<Double> nodeAngleMap = tree.newNodeArray();
+			final var leafNumber = new Counter();
+			final var delta = 360.0 / numberOfLeaves;
 
-			final NodeArray<Pair<Double, Double>> firstLastAngleBelowMap = tree.newNodeArray();
+			final NodeDoubleArray nodeRadiusMap = tree.newNodeDoubleArray();
 
-			var leafNumber = new Counter();
-			var delta = 360.0 / numberOfLeaves;
-
+			final var maxDepth = tree.computeMaxDepth();
 			Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
 				if (v.isLeaf()) {
-					var angle = leafNumber.getAndIncrement() * delta;
-					nodeAngleMap.put(v, angle);
-					firstLastAngleBelowMap.put(v, new Pair<>(angle, angle));
+					nodeRadiusMap.put(v, (double) maxDepth);
 				} else {
-					var firstAngleBelow = firstLastAngleBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
-					var lastAngleBelow = firstLastAngleBelowMap.get(v.getLastOutEdge().getTarget()).getSecond();
-
-					var swap = firstAngleBelow < lastAngleBelow;
-
-					if (swap)
-						nodeAngleMap.put(v, 0.5 * (firstAngleBelow + lastAngleBelow));
-					else
-						nodeAngleMap.put(v, GeometryUtilsFX.modulo360(180 + 0.5 * (firstAngleBelow + lastAngleBelow)));
-
-					if (parentPlacement == ParentPlacement.LeafAverage)
-						firstLastAngleBelowMap.put(v, new Pair<>(firstAngleBelow, lastAngleBelow));
-					else {
-						if (!swap)
-							firstLastAngleBelowMap.put(v, new Pair<>(nodeAngleMap.get(v.getFirstOutEdge().getTarget()),
-									nodeAngleMap.get(v.getLastOutEdge().getTarget())));
-						else
-							firstLastAngleBelowMap.put(v, new Pair<>(nodeAngleMap.get(v.getLastOutEdge().getTarget()),
-									nodeAngleMap.get(v.getFirstOutEdge().getTarget())));
-					}
+					nodeRadiusMap.put(v, v.childrenStream().mapToDouble(nodeRadiusMap::get).min().orElse(maxDepth) - 1);
 				}
 			});
 
-			nodePointMap.put(tree.getRoot(), new Point2D(0.0, 0.0));
+			final NodeArray<PolarCoordinates> polarCoordinates = tree.newNodeArray();
+			polarCoordinates.put(tree.getRoot(), new PolarCoordinates(0, 0));
+			final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
+			Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
+				final double angle;
+				if (v.isLeaf()) {
+					firstLastLeafBelowMap.put(v, new Pair<>(v, v));
+					angle = leafNumber.getAndIncrement() * delta;
+				} else {
+					var firstLeafBelow = firstLastLeafBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
+					var lastLeafBelow = firstLastLeafBelowMap.get(v.getLastOutEdge().getTarget()).getSecond();
+					firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
+					angle = 0.5 * (polarCoordinates.get(firstLeafBelow).angle() + polarCoordinates.get(lastLeafBelow).angle());
+				}
+				polarCoordinates.put(v, new PolarCoordinates(nodeRadiusMap.get(v), angle));
+			});
 
+			if (scaleByEdgeWeights) {
+				Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
+					var vRadius = polarCoordinates.get(v).radius();
+					for (var e : v.outEdges()) {
+						var w = e.getTarget();
+						polarCoordinates.put(w, new PolarCoordinates(vRadius + tree.getWeight(e), polarCoordinates.get(w).angle()));
+					}
+				});
+			}
+
+			tree.nodeStream().forEach(v -> nodePointMap.put(v, polarCoordinates.get(v).toCartesianCoordinates()));
+		}
+		return nodePointMap;
+	}
+
+	private static NodeArray<Point2D> computeCoordinatesRadialPhylogram(PhyloTree tree, ParentPlacement parentPlacement) {
+		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+
+		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
+		if (numberOfLeaves > 0) {
+			final var leafNumber = new Counter();
+			final var delta = 360.0 / numberOfLeaves;
+
+			final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
+			if (parentPlacement == ParentPlacement.LeafAverage) {
+				final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
+				Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
+					final double angle;
+					if (v.isLeaf()) {
+						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
+						angle = leafNumber.getAndIncrement() * delta;
+					} else {
+						var firstLeafBelow = firstLastLeafBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
+						var lastLeafBelow = firstLastLeafBelowMap.get(v.getLastOutEdge().getTarget()).getSecond();
+						firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
+						angle = 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow));
+					}
+					nodeAngleMap.put(v, angle);
+				});
+			} else {
+				Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
+					final double angle;
+					if (v.isLeaf())
+						angle = leafNumber.getAndIncrement() * delta;
+					else
+						angle = v.childrenStream().mapToDouble(nodeAngleMap::get).sum() / v.getOutDegree();
+					nodeAngleMap.put(v, angle);
+				});
+			}
+			nodePointMap.put(tree.getRoot(), new Point2D(0, 0));
 			Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
+				var p = nodePointMap.get(v);
 				for (var e : v.outEdges()) {
-					var w = e.getTarget();
-					var vPt = nodePointMap.get(v);
-					var wPt = GeometryUtilsFX.translateByAngle(vPt.getX(), vPt.getY(), nodeAngleMap.get(w), toScale ? tree.getWeight(e) : 1.0);
-					nodePointMap.put(w, new Point2D(wPt.getX(), wPt.getY()));
+					nodePointMap.put(e.getTarget(), GeometryUtilsFX.translateByAngle(p, nodeAngleMap.get(e.getTarget()), tree.getWeight(e)));
 				}
 			});
 		}
 		return nodePointMap;
 	}
 
+
 	private static void layoutNodeLabelsRectangular(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap) {
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
-				if (v.isLeaf())
-					label.translateXProperty().bind(shape.translateXProperty().add(2));
-				else
-					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(0.5));
-				label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+				InvalidationListener changeListener = a -> {
+					if (label.getWidth() > 0 && label.getHeight() > 0) {
+						if (v.isLeaf())
+							label.translateXProperty().bind(shape.translateXProperty().add(LINEAR_LABEL_GAP));
+						else
+							label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(0.5));
+						label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+					}
+				};
+				label.widthProperty().addListener(changeListener);
+				label.heightProperty().addListener(changeListener);
 			}
 		}
 	}
 
-	private static void layoutNodeLabelsRadial(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap) {
+	private static void layoutNodeLabelsRadial(PhyloTree tree, boolean isRadialPhylogram, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap) {
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
-				var angle = GeometryUtilsFX.computeAngle(shape.getTranslateX(), shape.getTranslateY());
-				if (angle <= 45 || angle >= 315) { // right
-					label.translateXProperty().bind(shape.translateXProperty().add(2));
-					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
-				} else if (angle <= 135) { // botto,
-					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
-					label.translateYProperty().bind(shape.translateYProperty().add(2));
-				} else if (angle <= 225) { // left
-					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(2));
-					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
-				} else if (angle <= 315) { // top
-					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
-					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty()));
-				}
+				InvalidationListener changeListener = a -> {
+					if (label.getWidth() > 0 && label.getHeight() > 0) {
+						double angle;
+						if (!isRadialPhylogram)
+							angle = GeometryUtilsFX.computeAngle(shape.getTranslateX(), shape.getTranslateY());
+						else if (v.getParent() != null) {
+							var vPoint = new Point2D(shape.getTranslateX(), shape.getTranslateY());
+							var w = v.getParent();
+							var wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
+							while (vPoint.distance(wPoint) == 0 && w.getParent() != null) {
+								w = w.getParent();
+								wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
+							}
+							angle = GeometryUtilsFX.computeAngle(shape.getTranslateX() - wPoint.getX(), shape.getTranslateY() - wPoint.getY());
+						} else
+							angle = 0;
+						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, RADIAL_LABEL_GAP + 0.5 * label.getWidth());
+						label.translateXProperty().bind(shape.translateXProperty().subtract(0.5 * label.getWidth()).add(offset.getX()));
+						label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()).add(offset.getY()));
+						label.setRotationAxis(new Point3D(0, 0, 1));
+						label.setRotate(angle > 90 && angle < 270 ? angle + 180 : angle);
+					}
+				};
+				label.widthProperty().addListener(changeListener);
+				label.heightProperty().addListener(changeListener);
 			}
 		}
 	}
@@ -411,6 +535,14 @@ public class TreeEmbedding {
 		@Override
 		public Iterator<javafx.scene.Node> iterator() {
 			return List.of(shape, label).iterator();
+		}
+	}
+
+	public static record PolarCoordinates(double radius, double angle) {
+		public final static Point2D ORIGIN = new Point2D(0, 0);
+
+		public Point2D toCartesianCoordinates() {
+			return radius == 0 ? ORIGIN : GeometryUtilsFX.translateByAngle(ORIGIN, angle, radius);
 		}
 	}
 }

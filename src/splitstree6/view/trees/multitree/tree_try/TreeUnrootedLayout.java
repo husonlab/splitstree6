@@ -27,12 +27,12 @@ import jloda.graph.*;
 import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
-import splitstree6.view.trees.multitree.TreeEmbedding;
+import splitstree6.view.trees.multitree.ComputeTreeEmbedding;
 
 public class TreeUnrootedLayout {
 	public enum ParentPlacement {LeafAverage, ChildrenAverage}
 
-	public static Group compute(TreeEmbedding.TreeDiagram diagram, TaxaBlock taxaBlock, PhyloTree tree, boolean toScale, Font font) {
+	public static Group compute(ComputeTreeEmbedding.TreeDiagram diagram, TaxaBlock taxaBlock, PhyloTree tree, boolean toScale, Font font) {
 		final var PARENT_PLACEMENT_DEFAULT = ParentPlacement.LeafAverage;
 		final var LEAF_GROUP_GAP_DEFAULT = 20;
 		final var CUBIC_CURVE_PARENT_CONTROL_DEFAULT = 20;
@@ -51,7 +51,7 @@ public class TreeUnrootedLayout {
 			final EdgeFloatArray edgeLengths = EdgeLengthsCalculation.computeEdgeLengths(tree, toScale ? EdgeLengthsCalculation.EdgeLengths.Weights : EdgeLengthsCalculation.EdgeLengths.Uniform);
 
 
-			if (diagram == TreeEmbedding.TreeDiagram.RadialPhylogram)
+			if (diagram == ComputeTreeEmbedding.TreeDiagram.RadialPhylogram)
 				computeNodeLocationsForRadialRec(tree.getRoot(), new Point2D(0, 0), edgeLengths, edge2Angle, node2point);
 			else
 				computeNodeLocationsForCircular(tree.getRoot(), edgeLengths, edge2Angle, node2point);

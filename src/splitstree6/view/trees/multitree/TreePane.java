@@ -20,8 +20,6 @@
 package splitstree6.view.trees.multitree;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
@@ -31,12 +29,12 @@ import javafx.geometry.Point3D;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
-import jloda.fx.util.AService;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
@@ -64,15 +62,12 @@ public class TreePane extends StackPane {
 	private final TaxaBlock taxaBlock;
 	private final PhyloTree phyloTree;
 	private final SelectionModel<Taxon> taxonSelectionModel;
-	private final Map<Taxon, TreeEmbedding.ShapeAndLabel> taxonNodesMap = new HashMap<>();
+	private final Map<Taxon, ComputeTreeEmbedding.ShapeAndLabel> taxonNodesMap = new HashMap<>();
 	private final ReadOnlyDoubleProperty fontScaleFactor;
 
-	private final TreeEmbedding.TreeDiagram treeDiagram;
+	private final ComputeTreeEmbedding.TreeDiagram treeDiagram;
 	private final RootSide rootSide;
 
-	private final AService<Boolean> redrawService;
-
-	private final InvalidationListener dimensionsChangeListener;
 	private final SetChangeListener<Taxon> selectionChangeListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 
@@ -80,7 +75,7 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
-					TreeEmbedding.TreeDiagram diagram, RootSide rootSide, ReadOnlyDoubleProperty fontScaleFactor) {
+					ComputeTreeEmbedding.TreeDiagram diagram, RootSide rootSide, ReadOnlyDoubleProperty fontScaleFactor) {
 		this.taxaBlock = taxaBlock;
 		this.phyloTree = phyloTree;
 		this.taxonSelectionModel = taxonSelectionModel;
@@ -89,21 +84,12 @@ public class TreePane extends StackPane {
 		this.fontScaleFactor = fontScaleFactor;
 		// setStyle("-fx-border-color: lightgray;");
 
-		redrawService = new AService<>();
-
 		getStyleClass().add("background");
 
 		setPrefWidth(boxWidth.get());
 		setPrefHeight(boxHeight.get());
-
-		dimensionsChangeListener = e -> {
-			setPrefWidth(boxWidth.get());
-			setPrefHeight(boxHeight.get());
-			if (redrawService.getCallable() != null)
-				redrawService.restart();
-		};
-		boxWidth.addListener(new WeakInvalidationListener(dimensionsChangeListener));
-		boxHeight.addListener(new WeakInvalidationListener(dimensionsChangeListener));
+		setMinWidth(Pane.USE_PREF_SIZE);
+		setMinHeight(Pane.USE_PREF_SIZE);
 
 		selectionChangeListener = e -> {
 			if (e.wasAdded()) {
@@ -129,7 +115,6 @@ public class TreePane extends StackPane {
 	}
 
 	public void drawTree() {
-		Runnable redraw = () -> {
 			var pane = new StackPane();
 			double width;
 			double height;
@@ -139,10 +124,9 @@ public class TreePane extends StackPane {
 			} else {
 				height = getPrefWidth();
 				width = getPrefHeight() - 12;
-
 			}
 
-			var group = TreeEmbedding.apply(taxaBlock, phyloTree, treeDiagram, width - 4, height - 4, taxonNodesMap);
+		var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, treeDiagram, width - 4, height - 4, taxonNodesMap);
 
 			applyFontScaleFactor(group, fontScaleFactor.get());
 
@@ -189,18 +173,9 @@ public class TreePane extends StackPane {
 			});
 
 			SetupDragSelectedLabels.apply(taxonSelectionModel, taxonNodesMap);
-		};
-
-		redraw.run();
-
-		redrawService.setCallable(() -> {
-			Thread.sleep(10);
-			redraw.run();
-			return true;
-		});
 	}
 
-	private static void setupSelection(SelectionModel<Taxon> selectionModel, Map<Taxon, TreeEmbedding.ShapeAndLabel> taxonNodesMap) {
+	private static void setupSelection(SelectionModel<Taxon> selectionModel, Map<Taxon, ComputeTreeEmbedding.ShapeAndLabel> taxonNodesMap) {
 		for (var taxon : taxonNodesMap.keySet()) {
 			var nodes = taxonNodesMap.get(taxon);
 			for (var node : nodes) {

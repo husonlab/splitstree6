@@ -77,7 +77,7 @@ public class SplitPanePresenter {
 			}
 		});
 
-		openCloseLeft(false);
+		//openCloseLeft(false);
 	}
 
 	public void openCloseLeft(boolean animate) {

@@ -125,14 +125,13 @@ public class Viewer extends Trees2View {
 			if (getDisplayTab() == null) {
 				var mainWindow = getNode().getOwner().getMainWindow();
 				displayTab.set(new DisplayTab(mainWindow, viewBlock.getView()));
-
 				mainWindow.getWorkflow().nodes().addListener(new WeakInvalidationListener(invalidationListener));
 				mainWindow.addTabToMainTabPane(getDisplayTab());
 			} else
 				displayTab.get().setView(viewBlock.getView());
 			if (viewBlock.getView() instanceof MultiTreesView multiTreesView) {
-				multiTreesView.tabPaneProperty().bind(getDisplayTab().tabPaneProperty());
 				multiTreesView.getTrees().setAll(inputData.getTrees());
+				multiTreesView.tabPaneProperty().bind(getDisplayTab().tabPaneProperty());
 			}
 		});
 

@@ -53,7 +53,7 @@ public class MultiTreesView implements IView {
 
 	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
 
-	private final ObjectProperty<TreeEmbedding.TreeDiagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeEmbedding.TreeDiagram.getDefault());
+	private final ObjectProperty<ComputeTreeEmbedding.TreeDiagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeEmbedding.TreeDiagram.getDefault());
 	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.getDefault());
 
 	private final StringProperty optionGrid = new SimpleStringProperty(this, "optionGrid", ProgramProperties.get("OptionGrid", "1 x 1"));
@@ -126,15 +126,15 @@ public class MultiTreesView implements IView {
 		this.optionPageNumber.set(optionPageNumber);
 	}
 
-	public TreeEmbedding.TreeDiagram getOptionDiagram() {
+	public ComputeTreeEmbedding.TreeDiagram getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<TreeEmbedding.TreeDiagram> optionDiagramProperty() {
+	public ObjectProperty<ComputeTreeEmbedding.TreeDiagram> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(TreeEmbedding.TreeDiagram optionDiagram) {
+	public void setOptionDiagram(ComputeTreeEmbedding.TreeDiagram optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 

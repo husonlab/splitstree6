@@ -26,7 +26,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -51,6 +50,9 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 
 	private final ChangeListener<Bounds> boundsChangeListener;
 
+	/**
+	 * multi tree view presenter
+	 */
 	public MultiTreesViewPresenter(MainWindow mainWindow, MultiTreesView multiTreesView, ObservableList<PhyloTree> phyloTrees) {
 		this.mainWindow = mainWindow;
 		this.multiTreesView = multiTreesView;
@@ -59,10 +61,10 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell());
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback());
-		controller.getDiagramCBox().getItems().addAll(TreeEmbedding.TreeDiagram.values());
+		controller.getDiagramCBox().getItems().addAll(ComputeTreeEmbedding.TreeDiagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(multiTreesView.optionDiagramProperty());
 		multiTreesView.optionDiagramProperty().addListener((v, o, n) -> {
-			TreeEmbedding.TreeDiagram.setDefault(n);
+			ComputeTreeEmbedding.TreeDiagram.setDefault(n);
 			redraw();
 		});
 
@@ -71,8 +73,7 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 		controller.getRootSideCBox().getItems().addAll(TreePane.RootSide.values());
 
 		controller.getRootSideCBox().valueProperty().bindBidirectional(multiTreesView.optionRootSideProperty());
-		controller.getRootSideCBox().disableProperty().bind(multiTreesView.optionDiagramProperty().isEqualTo(TreeEmbedding.TreeDiagram.RadialPhylogram)
-				.or((multiTreesView.optionDiagramProperty().isEqualTo(TreeEmbedding.TreeDiagram.CircularPhylogram))));
+		controller.getRootSideCBox().disableProperty().bind(Bindings.createObjectBinding(() -> multiTreesView.getOptionDiagram().isRadial(), multiTreesView.optionDiagramProperty()));
 		multiTreesView.optionRootSideProperty().addListener((v, o, n) -> {
 			TreePane.RootSide.setDefault(n);
 			redraw();
@@ -88,25 +89,6 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			});
 		});
 
-		var targetWidth = new SimpleDoubleProperty();
-		var targetHeight = new SimpleDoubleProperty();
-		{
-			// use a service with a delay to redraw so that we don't redraw too often
-			var redrawService = new AService<>(() -> {
-				Thread.sleep(10);
-				redraw();
-				return true;
-			});
-
-			boundsChangeListener = (v, o, n) -> {
-				targetWidth.set(n.getWidth() - 10);
-				targetHeight.set(n.getHeight() - 110);
-				redrawService.restart();
-			};
-			mainWindow.getController().getMainBorderPane().layoutBoundsProperty().addListener(new WeakChangeListener<>(boundsChangeListener));
-
-		}
-
 		controller.getRowsColsCBox().valueProperty().bindBidirectional(multiTreesView.optionGridProperty());
 		controller.getRowsColsCBox().getItems().setAll(gridValues);
 		gridValues.addListener((InvalidationListener) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
@@ -114,6 +96,9 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 		var numberOfTrees = new SimpleIntegerProperty(0);
 		numberOfTrees.bind(Bindings.size(phyloTrees));
 		var numberOfPages = new SimpleIntegerProperty(0);
+
+		var targetWidth = new SimpleDoubleProperty();
+		var targetHeight = new SimpleDoubleProperty();
 
 		{
 			multiTreesView.optionPageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
@@ -126,17 +111,17 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 			var boxHeight = new SimpleDoubleProperty();
 			boxHeight.bind((targetHeight.divide(multiTreesView.rowsProperty())).subtract(vGap));
 
-			controller.getPagination().setPageFactory(page -> {
-				var treePane = new MultiTreesPage(mainWindow.getTaxonSelectionModel(), multiTreesView, boxWidth, boxHeight);
-				treePane.setHgap(hGap);
-				treePane.setVgap(vGap);
-				treePane.prefWidthProperty().bind(controller.getPagination().widthProperty());
-				treePane.prefHeightProperty().bind(controller.getPagination().heightProperty());
-
-				Platform.runLater(() -> treePane.addTrees(mainWindow.getWorkflow().getWorkingTaxaBlock(), multiTreesView.getTrees(), page + 1));
-
-				multiTreesView.setImageNode(treePane);
-				return treePane;
+			Platform.runLater(() -> {
+				controller.getPagination().setPageFactory(page -> {
+					var treePage = new MultiTreesPage(mainWindow.getTaxonSelectionModel(), multiTreesView, boxWidth, boxHeight);
+					treePage.setHgap(hGap);
+					treePage.setVgap(vGap);
+					treePage.prefWidthProperty().bind(controller.getPagination().widthProperty());
+					treePage.prefHeightProperty().bind(controller.getPagination().heightProperty());
+					treePage.setTrees(mainWindow.getWorkflow().getWorkingTaxaBlock(), multiTreesView.getTrees(), page + 1);
+					multiTreesView.setImageNode(treePage);
+					return treePage;
+				});
 			});
 
 			controller.getPagination().pageCountProperty().bind(numberOfPages);
@@ -163,6 +148,31 @@ public class MultiTreesViewPresenter implements IDisplayTabPresenter {
 
 		controller.getPrintButton().setOnAction(e -> Print.print(mainWindow.getStage(), multiTreesView.imageNodeProperty().get()));
 		controller.getPrintButton().disableProperty().bind(multiTreesView.emptyProperty());
+
+		{
+			// use a service with a delay to redraw so that we don't redraw too often
+			var redrawService = new AService<>(() -> {
+				try {
+					Thread.sleep(500);
+					Platform.runLater(this::redraw);
+				} catch (InterruptedException ignored) {
+				}
+				return true;
+			});
+
+
+			boundsChangeListener = (v, o, n) -> {
+				targetWidth.set(n.getWidth() - 10);
+				targetHeight.set(n.getHeight() - 110);
+				redrawService.restart();
+			};
+
+			multiTreesView.tabPaneProperty().addListener((v, o, n) -> {
+				if (o != null)
+					o.layoutBoundsProperty().removeListener(boundsChangeListener);
+				n.layoutBoundsProperty().addListener(boundsChangeListener);
+			});
+		}
 	}
 
 	public void redraw() {
