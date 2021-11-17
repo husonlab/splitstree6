@@ -1,5 +1,5 @@
 /*
- *  MultiTreesView.java Copyright (C) 2021 Daniel H. Huson
+ *  TreePagesView.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.multitree;
+package splitstree6.view.trees.treepages;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -29,17 +29,18 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
+import splitstree6.tabs.tab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.Collection;
 import java.util.List;
 
-public class MultiTreesView implements IView {
+public class TreePagesView implements IView {
 	private final UndoManager undoManager = new UndoManager();
 
-	private final MultiTreesViewController controller;
-	private final MultiTreesViewPresenter presenter;
+	private final TreePagesViewController controller;
+	private final TreePagesViewPresenter presenter;
 
 	private final StringProperty nameProperty = new SimpleStringProperty();
 
@@ -66,23 +67,23 @@ public class MultiTreesView implements IView {
 		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionGrid.getName(), optionPageNumber.getName(), optionFontScaleFactor.getName());
 	}
 
-	public MultiTreesView(MainWindow mainWindow, StringProperty titleProperty) {
-		nameProperty.bind(titleProperty);
-		var loader = new ExtendedFXMLLoader<MultiTreesViewController>(MultiTreesViewController.class);
+	public TreePagesView(MainWindow mainWindow, String name, ViewTab viewTab) {
+		nameProperty.set(name);
+		var loader = new ExtendedFXMLLoader<TreePagesViewController>(TreePagesViewController.class);
 		controller = loader.getController();
 
-		presenter = new MultiTreesViewPresenter(mainWindow, this, getTrees());
+		presenter = new TreePagesViewPresenter(mainWindow, this, viewTab, getTrees());
 
 		empty.bind(Bindings.isEmpty(getTrees()));
 
 		optionGrid.addListener((v, o, n) -> ProgramProperties.put("OptionGrid", n));
 	}
 
-	public MultiTreesViewController getController() {
+	public TreePagesViewController getController() {
 		return controller;
 	}
 
-	public MultiTreesViewPresenter getPresenter() {
+	public TreePagesViewPresenter getPresenter() {
 		return presenter;
 	}
 
@@ -235,6 +236,6 @@ public class MultiTreesView implements IView {
 			this.trees.setAll(trees);
 			controller.getPagination().setPageFactory(pageFactory);
 		}
-		presenter.redraw();
+		presenter.updatePageContent();
 	}
 }

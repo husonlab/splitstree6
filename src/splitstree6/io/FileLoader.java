@@ -61,8 +61,8 @@ public class FileLoader {
 			else {
 				var importManager = ImportManager.getInstance();
 				if (importManager.getReaders(fileName).size() == 1) { // unique input format
+					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler);
-					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen();
 					newWindow.setDirty(true);
 				} else {
 					// ImportDialog.show(mainWindow, fileName);

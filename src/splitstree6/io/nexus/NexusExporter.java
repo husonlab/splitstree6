@@ -121,7 +121,6 @@ public class NexusExporter {
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
 			output.write(w, taxa, block);
-
 	}
 
 	public void export(Writer w, TaxaBlock taxa, SplitsBlock block) throws IOException {
@@ -158,24 +157,23 @@ public class NexusExporter {
 		if (asWorkflowOnly) {
 			final TraitsBlock newBlock = new TraitsBlock();
 			newBlock.setFormat(block.getFormat());
-			output.write(w, taxa, newBlock);
+			output.write(w, new TaxaBlock(), newBlock);
+		} else
+			output.write(w, taxa, block);
+	}
+
+	public void export(Writer w, TaxaBlock taxa, ViewBlock block) throws IOException {
+		if (prependTaxa)
+			new TaxaNexusOutput().write(w, taxa);
+		final var output = new ViewNexusOutput();
+		output.setTitleAndLink(getTitle(), getLink());
+		if (asWorkflowOnly) {
+			final var newBlock = new ViewBlock();
+			output.write(w, new TaxaBlock(), newBlock);
 		} else
 			output.write(w, taxa, block);
 
 	}
-
-    /*
-    public void export(Writer w, TaxaBlock taxa, ViewerBlock block) throws IOException {
-        if (prependTaxa)
-            new TaxaNexusOutput().write(w, taxa);
-        final ViewerNexusOutput output = new ViewerNexusOutput();
-        output.setTitleAndLink(getTitle(), getLink());
-        if (asWorkflowOnly) {
-            output.write(w, taxa, ViewerBlock.create(block.getType()));
-        } else
-            output.write(w, taxa, block);
-    }
-     */
 
 	/**
 	 * save an algorithms block
@@ -187,33 +185,32 @@ public class NexusExporter {
 	public void export(Writer w, Algorithm algorithm) throws IOException {
 		final AlgorithmNexusOutput output = new AlgorithmNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
-		if (algorithm.getToClass() != ViewBlock.class) // todo: ignore sink blocks
-			output.write(w, algorithm);
+		output.write(w, algorithm);
 	}
 
 	/**
 	 * export a datablock
 	 */
 	public void export(Writer w, TaxaBlock taxaBlock, DataBlock dataBlock) throws IOException {
-		if (dataBlock instanceof CharactersBlock)
-			export(w, taxaBlock, (CharactersBlock) dataBlock);
+		if (dataBlock instanceof CharactersBlock charactersBlock)
+			export(w, taxaBlock, charactersBlock);
 			// else if (dataBlock instanceof GenomesBlock)
 			//     export(w, taxaBlock, (GenomesBlock) dataBlock);
-		else if (dataBlock instanceof DistancesBlock)
-			export(w, taxaBlock, (DistancesBlock) dataBlock);
-		else if (dataBlock instanceof SplitsBlock)
-			export(w, taxaBlock, (SplitsBlock) dataBlock);
-		else if (dataBlock instanceof TreesBlock)
-			export(w, taxaBlock, (TreesBlock) dataBlock);
-		else if (dataBlock instanceof NetworkBlock)
-			export(w, taxaBlock, (NetworkBlock) dataBlock);
+		else if (dataBlock instanceof DistancesBlock distancesBlock)
+			export(w, taxaBlock, distancesBlock);
+		else if (dataBlock instanceof SplitsBlock splitsBlock)
+			export(w, taxaBlock, splitsBlock);
+		else if (dataBlock instanceof TreesBlock treesBlock)
+			export(w, taxaBlock, treesBlock);
+		else if (dataBlock instanceof NetworkBlock networkBlock)
+			export(w, taxaBlock, networkBlock);
+		else if (dataBlock instanceof ViewBlock viewBlock)
+			export(w, taxaBlock, viewBlock);
 		else if (dataBlock instanceof TraitsBlock)
 			export(w, taxaBlock, (TraitsBlock) dataBlock);
 			//else if (dataBlock instanceof ViewerBlock)
 			//    export(w, taxaBlock, (ViewerBlock) dataBlock);
-		else if (dataBlock instanceof ViewBlock) {
-			// todo: ignore sink blocks
-		} else
+		else
 			throw new IOException("Export " + Basic.getShortName(dataBlock.getClass()) + ": not implemented");
 	}
 

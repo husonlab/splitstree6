@@ -116,9 +116,9 @@ public class WorkflowNexusOutput {
 				setupExporter(dataNode, nexusExporter);
 				nexusExporter.export(w, workflow.getWorkingTaxaBlock(), dataNode.getDataBlock());
 			} else {
-				final var connector = (AlgorithmNode) node;
-				setupExporter(connector, nexusExporter);
-				nexusExporter.export(w, connector.getAlgorithm());
+				final var algorithm = (AlgorithmNode) node;
+				setupExporter(algorithm, nexusExporter);
+				nexusExporter.export(w, algorithm.getAlgorithm());
 			}
 			queue.addAll(node.getChildren());
 		}

@@ -17,13 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.multitree;
+package splitstree6.view.trees.treepages;
 
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
 import jloda.fx.util.ResourceManagerFX;
+
 
 public class ComboBoxUtils {
 	/**

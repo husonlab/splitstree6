@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.multitree;
+package splitstree6.view.trees.treepages;
 
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Point2D;
@@ -130,13 +130,15 @@ public class ComputeTreeEmbedding {
 			normalizeHeight = height - fontHeight;
 		}
 
+		NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
+
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
 			case RectangularPhylogram -> computeCoordinatesRectangular(tree, true, parentPlacement);
 			case RectangularCladogram -> computeCoordinatesRectangular(tree, false, parentPlacement);
 			case TriangularCladogram -> computeCoordinatesTriangularCladogram(tree);
 			case RadialPhylogram -> computeCoordinatesRadialPhylogram(tree, parentPlacement);
-			case RadialCladogram, CircularCladogram -> computeCoordinatesRadialCladogram(tree, false);
-			case CircularPhylogram -> computeCoordinatesRadialCladogram(tree, true);
+			case RadialCladogram, CircularCladogram -> computeCoordinatesRadialCladogram(tree, nodeAngleMap, false);
+			case CircularPhylogram -> computeCoordinatesRadialCladogram(tree, nodeAngleMap, true);
 		};
 
 		normalize(normalizeWidth, normalizeHeight, nodePointMap);
@@ -149,7 +151,7 @@ public class ComputeTreeEmbedding {
 
 		for (var v : tree.nodes()) {
 			var point = nodePointMap.get(v);
-			var circle = new Circle(0.25);
+			var circle = new Circle(v.isLeaf() ? 4 : 0.25);
 			circle.setFill(color);
 			circle.setStroke(Color.TRANSPARENT);
 			nodeGroup.getChildren().add(circle);
@@ -196,6 +198,17 @@ public class ComputeTreeEmbedding {
 						arcTo.setSweepFlag(GeometryUtilsFX.computeObservedAngle(rootPt, vPt, wPt) > 0);
 
 						line.getElements().add(arcTo);
+
+						{
+							var other = new Line(vPt.getX(), vPt.getY(), wPt.getX(), wPt.getY());
+							other.setStroke(Color.BLUE);
+							edgeGroup.getChildren().add(other);
+						}
+						{
+							var other = new Line(rootPt.getX(), rootPt.getY(), wPt.getX(), wPt.getY());
+							other.setStroke(Color.RED);
+							edgeGroup.getChildren().add(other);
+						}
 					}
 
 					var lineTo2 = new LineTo();
@@ -257,7 +270,7 @@ public class ComputeTreeEmbedding {
 		}
 
 		if (diagram.isRadial())
-			layoutNodeLabelsRadial(tree, diagram == TreeDiagram.RadialPhylogram, nodeShapeMap, nodeLabelMap);
+			layoutNodeLabelsRadial(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap);
 		else
 			layoutNodeLabelsRectangular(tree, nodeShapeMap, nodeLabelMap);
 
@@ -344,7 +357,7 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesRadialCladogram(PhyloTree tree, boolean scaleByEdgeWeights) {
+	private static NodeArray<Point2D> computeCoordinatesRadialCladogram(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean scaleByEdgeWeights) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
@@ -362,9 +375,9 @@ public class ComputeTreeEmbedding {
 					nodeRadiusMap.put(v, v.childrenStream().mapToDouble(nodeRadiusMap::get).min().orElse(maxDepth) - 1);
 				}
 			});
+			nodeRadiusMap.put(tree.getRoot(), 0.0);
 
-			final NodeArray<PolarCoordinates> polarCoordinates = tree.newNodeArray();
-			polarCoordinates.put(tree.getRoot(), new PolarCoordinates(0, 0));
+			nodeAngleMap.put(tree.getRoot(), 0.0);
 			final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
 			Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
 				final double angle;
@@ -375,22 +388,35 @@ public class ComputeTreeEmbedding {
 					var firstLeafBelow = firstLastLeafBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
 					var lastLeafBelow = firstLastLeafBelowMap.get(v.getLastOutEdge().getTarget()).getSecond();
 					firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
-					angle = 0.5 * (polarCoordinates.get(firstLeafBelow).angle() + polarCoordinates.get(lastLeafBelow).angle());
+					angle = 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow));
 				}
-				polarCoordinates.put(v, new PolarCoordinates(nodeRadiusMap.get(v), angle));
+				nodeAngleMap.put(v, angle);
 			});
 
 			if (scaleByEdgeWeights) {
-				Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
-					var vRadius = polarCoordinates.get(v).radius();
-					for (var e : v.outEdges()) {
-						var w = e.getTarget();
-						polarCoordinates.put(w, new PolarCoordinates(vRadius + tree.getWeight(e), polarCoordinates.get(w).angle()));
+				Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
+					if (v.getInDegree() == 1) {
+						var e = v.getFirstInEdge();
+						var parentRadius = nodeRadiusMap.get(e.getSource());
+						nodeRadiusMap.put(v, parentRadius + Math.max(0, tree.getWeight(e)));
+						{
+
+							if (GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v)).magnitude() + 0.000001 < GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(e.getSource()), nodeAngleMap.get(e.getSource())).magnitude()) {
+								System.err.println("WTF");
+								System.err.println("Parent radius: " + parentRadius);
+								System.err.println("Parent mag: " + GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(e.getSource()), nodeAngleMap.get(e.getSource())).magnitude());
+								System.err.println("Edge length: " + tree.getWeight(e));
+								System.err.println("v radius: " + nodeRadiusMap.get(v));
+								System.err.println("v mag: " + GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v)).magnitude());
+							}
+						}
 					}
 				});
+				tree.nodeStream().forEach(v -> nodeRadiusMap.put(v, nodeAngleMap.get(v) + 0.0001));
+
 			}
 
-			tree.nodeStream().forEach(v -> nodePointMap.put(v, polarCoordinates.get(v).toCartesianCoordinates()));
+			tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
 		}
 		return nodePointMap;
 	}
@@ -440,7 +466,6 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-
 	private static void layoutNodeLabelsRectangular(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap) {
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
@@ -461,27 +486,27 @@ public class ComputeTreeEmbedding {
 		}
 	}
 
-	private static void layoutNodeLabelsRadial(PhyloTree tree, boolean isRadialPhylogram, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap) {
+	private static void layoutNodeLabelsRadial(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap) {
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
 				InvalidationListener changeListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
-						double angle;
-						if (!isRadialPhylogram)
-							angle = GeometryUtilsFX.computeAngle(shape.getTranslateX(), shape.getTranslateY());
-						else if (v.getParent() != null) {
-							var vPoint = new Point2D(shape.getTranslateX(), shape.getTranslateY());
-							var w = v.getParent();
-							var wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
-							while (vPoint.distance(wPoint) == 0 && w.getParent() != null) {
-								w = w.getParent();
-								wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
-							}
-							angle = GeometryUtilsFX.computeAngle(shape.getTranslateX() - wPoint.getX(), shape.getTranslateY() - wPoint.getY());
-						} else
-							angle = 0;
+						Double angle = nodeAngleMap.get(v);
+						if (angle == null) {
+							if (v.getParent() != null) {
+								var vPoint = new Point2D(shape.getTranslateX(), shape.getTranslateY());
+								var w = v.getParent();
+								var wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
+								while (vPoint.distance(wPoint) == 0 && w.getParent() != null) {
+									w = w.getParent();
+									wPoint = new Point2D(nodeShapeMap.get(w).getTranslateX(), nodeShapeMap.get(w).getTranslateY());
+								}
+								angle = GeometryUtilsFX.computeAngle(shape.getTranslateX() - wPoint.getX(), shape.getTranslateY() - wPoint.getY());
+							} else
+								angle = 0.0;
+						}
 						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, RADIAL_LABEL_GAP + 0.5 * label.getWidth());
 						label.translateXProperty().bind(shape.translateXProperty().subtract(0.5 * label.getWidth()).add(offset.getX()));
 						label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()).add(offset.getY()));
@@ -518,15 +543,12 @@ public class ComputeTreeEmbedding {
 		var minY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).min().orElse(0);
 		var maxY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).max().orElse(0);
 
-		var centerX = 0.5 * (minX + maxX);
-		var centerY = 0.5 * (minY + maxY);
-
 		var scaleX = (maxX > minX ? width / (maxX - minX) : 1);
 		var scaleY = (maxY > minY ? height / (maxY - minY) : 1);
 		if (minX != 0 || scaleX != 1 || minY != 0 || scaleY != 1) {
 			for (var v : nodePointMap.keySet()) {
 				var point = nodePointMap.get(v);
-				nodePointMap.put(v, new Point2D((point.getX() - centerX) * scaleX, (point.getY() - centerY) * scaleY));
+				nodePointMap.put(v, new Point2D(point.getX() * scaleX, point.getY() * scaleY));
 			}
 		}
 	}
@@ -538,12 +560,5 @@ public class ComputeTreeEmbedding {
 		}
 	}
 
-	public static record PolarCoordinates(double radius, double angle) {
-		public final static Point2D ORIGIN = new Point2D(0, 0);
-
-		public Point2D toCartesianCoordinates() {
-			return radius == 0 ? ORIGIN : GeometryUtilsFX.translateByAngle(ORIGIN, angle, radius);
-		}
-	}
 }
 

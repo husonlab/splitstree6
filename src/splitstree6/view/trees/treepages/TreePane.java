@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.multitree;
+package splitstree6.view.trees.treepages;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -61,6 +61,7 @@ public class TreePane extends StackPane {
 
 	private final TaxaBlock taxaBlock;
 	private final PhyloTree phyloTree;
+	private final String name;
 	private final SelectionModel<Taxon> taxonSelectionModel;
 	private final Map<Taxon, ComputeTreeEmbedding.ShapeAndLabel> taxonNodesMap = new HashMap<>();
 	private final ReadOnlyDoubleProperty fontScaleFactor;
@@ -74,10 +75,11 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
+	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					ComputeTreeEmbedding.TreeDiagram diagram, RootSide rootSide, ReadOnlyDoubleProperty fontScaleFactor) {
 		this.taxaBlock = taxaBlock;
 		this.phyloTree = phyloTree;
+		this.name = name;
 		this.taxonSelectionModel = taxonSelectionModel;
 		this.treeDiagram = diagram;
 		this.rootSide = rootSide;
@@ -86,8 +88,8 @@ public class TreePane extends StackPane {
 
 		getStyleClass().add("background");
 
-		setPrefWidth(boxWidth.get());
-		setPrefHeight(boxHeight.get());
+		setPrefWidth(boxWidth);
+		setPrefHeight(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);
 		setMinHeight(Pane.USE_PREF_SIZE);
 
@@ -160,9 +162,10 @@ public class TreePane extends StackPane {
 				}
 			}
 
-			var label = new Label(phyloTree.getName());
+		var label = new Label(name);
 			getChildren().setAll(new VBox(label, pane));
 
+		Platform.runLater(() -> {
 			setupSelection(taxonSelectionModel, taxonNodesMap);
 
 			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
@@ -173,6 +176,7 @@ public class TreePane extends StackPane {
 			});
 
 			SetupDragSelectedLabels.apply(taxonSelectionModel, taxonNodesMap);
+		});
 	}
 
 	private static void setupSelection(SelectionModel<Taxon> selectionModel, Map<Taxon, ComputeTreeEmbedding.ShapeAndLabel> taxonNodesMap) {

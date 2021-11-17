@@ -20,6 +20,7 @@
 
 package splitstree6.io.nexus;
 
+import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.options.OptionIO;
 
@@ -34,10 +35,10 @@ public class ViewNexusOutput extends NexusIOBase {
 	/**
 	 * view nexus output
 	 */
-	public void write(Writer w, ViewBlock viewBlock) throws IOException {
+	public void write(Writer w, TaxaBlock taxaBlock, ViewBlock viewBlock) throws IOException {
 		w.write("\nBEGIN VIEW;\n");
 		writeTitleAndLink(w);
-		w.write("NAME '" + viewBlock.getName() + "';\n");
+		w.write("NAME '" + viewBlock.getViewName() + "';\n");
 		w.write("INPUT '" + viewBlock.getInputBlockName() + "';\n");
 		OptionIO.writeOptions(w, viewBlock.getView());
 		w.write("END; [VIEW]\n");

@@ -20,10 +20,10 @@
 
 package splitstree6.io.nexus;
 
+import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.options.OptionIO;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -62,21 +62,16 @@ public class ViewNexusInput extends NexusIOBase {
 		parseTitleAndLink(np);
 
 		np.matchIgnoreCase("NAME");
-		var name = np.getLabelRespectCase();
+		viewBlock.setViewName(np.getLabelRespectCase());
 		np.matchIgnoreCase(";");
 		np.matchIgnoreCase("INPUT");
-		var inputBlockName = np.getWordMatchesIgnoringCase("TAXA TRAITS CHARACTERS DISTANCES SPLITS TREES NETWORK");
+		viewBlock.setInputBlockName(np.getWordMatchesIgnoringCase("TAXA TRAITS CHARACTERS DISTANCES SPLITS TREES NETWORK"));
 		np.matchIgnoreCase(";");
 
-		var view = ViewBlock.createView(inputBlockName, name);
-
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
-			OptionIO.parseOptions(np, view);
+			viewBlock.setInitializationLines(StringUtils.toString(np.getTokensLowerCase("OPTIONS", ";"), " "));
 		}
 		np.matchEndBlock();
-
-		viewBlock.setView(view);
-		viewBlock.setInputBlockName(inputBlockName);
 
 		return taxonNamesFound;
 	}

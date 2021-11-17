@@ -19,10 +19,12 @@
 
 package splitstree6.options;
 
+import javafx.beans.property.StringProperty;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.parse.NexusStreamParser;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -104,6 +106,16 @@ public class OptionIO {
 			}
 		}
 		np.matchIgnoreCase(";");
+	}
+
+	public static void parseOptions(StringProperty initialization, IHasOptions optionsCarrier) throws IOException {
+		if (!initialization.get().isBlank()) {
+			try (var np = new NexusStreamParser(new StringReader(initialization.get()))) {
+				parseOptions(np, optionsCarrier);
+			} finally {
+				initialization.set("");
+			}
+		}
 	}
 
 	/**

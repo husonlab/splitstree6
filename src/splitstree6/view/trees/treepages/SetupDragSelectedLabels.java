@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.multitree;
+package splitstree6.view.trees.treepages;
 
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;

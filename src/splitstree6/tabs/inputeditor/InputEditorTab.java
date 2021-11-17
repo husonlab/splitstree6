@@ -143,7 +143,7 @@ public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
 			};
 			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler);
 			mainWindow.setDirty(true);
-			mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen();
+			mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 		} catch (Exception ex) {
 			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
 		}

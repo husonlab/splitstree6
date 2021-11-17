@@ -1,5 +1,5 @@
 /*
- *  MultiTreesViewController.java Copyright (C) 2021 Daniel H. Huson
+ *  TreePagesViewController.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.multitree;
+package splitstree6.view.trees.treepages;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -25,9 +25,10 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.Pagination;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 
-public class MultiTreesViewController {
+public class TreePagesViewController {
 
 	@FXML
 	private AnchorPane anchorPane;
@@ -58,6 +59,9 @@ public class MultiTreesViewController {
 
 	@FXML
 	private ComboBox<String> rowsColsCBox;
+
+	@FXML
+	private Pane pane;
 
 	@FXML
 	private Pagination pagination;
@@ -100,6 +104,10 @@ public class MultiTreesViewController {
 
 	public ComboBox<String> getRowsColsCBox() {
 		return rowsColsCBox;
+	}
+
+	public Pane getPane() {
+		return pane;
 	}
 
 	public Pagination getPagination() {

@@ -22,6 +22,7 @@ package splitstree6.window;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.scene.control.SplitPane;
 import javafx.util.Duration;
 
@@ -49,7 +50,7 @@ public class SplitPanePresenter {
 
 		var openCloseRightButton = controller.getOpenCloseRightButton();
 		openCloseRightButton.setOnAction((e) -> {
-			ensureTreeViewIsOpen();
+			ensureTreeViewIsOpen(true);
 			if (leftSplitPane.getDividerPositions()[0] >= 0.99)
 				animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight(), () -> openCloseRightButton.setText(("<")), true);
 			else
@@ -68,16 +69,21 @@ public class SplitPanePresenter {
 		});
 		mainSplitPane.heightProperty().addListener((c, o, n) -> {
 			if (n.doubleValue() > 0) {
-				double[] dividerPositions = leftSplitPane.getDividerPositions();
-				{
-					double oldHeight = (1 - dividerPositions[0]) * o.doubleValue();
+				var dividerPositions = leftSplitPane.getDividerPositions();
+				if (dividerPositions[0] <= 0.05)
+					dividerPositions[0] = 0;
+				else if (dividerPositions[0] >= 0.95)
+					dividerPositions[0] = 1;
+				else {
+					var oldHeight = (1 - dividerPositions[0]) * o.doubleValue();
 					dividerPositions[0] = 1 - oldHeight / n.doubleValue();
 				}
 				leftSplitPane.setDividerPositions(dividerPositions);
 			}
 		});
 
-		//openCloseLeft(false);
+		openCloseLeft(false);
+		Platform.runLater(() -> leftSplitPane.setDividerPositions(1.0));
 	}
 
 	public void openCloseLeft(boolean animate) {
@@ -88,13 +94,15 @@ public class SplitPanePresenter {
 			animateSplitPane(mainSplitPane, 0, () -> openCloseLeftButton.setText(">"), animate);
 	}
 
-	public void ensureTreeViewIsOpen() {
+	public void ensureTreeViewIsOpen(boolean animate) {
 		if (mainSplitPane.getDividerPositions()[0] <= 0.01)
-			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> controller.getOpenCloseLeftButton().setText("<"), true);
+			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> controller.getOpenCloseLeftButton().setText("<"), animate);
+		Platform.runLater(() -> leftSplitPane.setDividerPositions(1.0));
 	}
 
+
 	public void ensureAlgorithmsTabPaneIsOpen() {
-		ensureTreeViewIsOpen();
+		ensureTreeViewIsOpen(true);
 		if (leftSplitPane.getDividerPositions()[0] >= (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight())
 			animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight(), () -> controller.getOpenCloseLeftButton().setText("<"), true);
 	}

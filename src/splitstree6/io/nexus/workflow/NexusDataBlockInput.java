@@ -40,17 +40,12 @@ public class NexusDataBlockInput {
 
 	/**
 	 * parse a nexus datablock
-	 *
-	 * @param np
-	 * @param taxa
-	 * @return datablock
-	 * @throws IOException
 	 */
 	public DataBlock parse(NexusStreamParser np, TaxaBlock taxa) throws IOException {
 		try {
 			if (np.peekMatchBeginBlock(TaxaBlock.BLOCK_NAME)) {
-				final TaxaNexusInput input = new TaxaNexusInput();
-				final TaxaBlock dataBlock = new TaxaBlock();
+				final var input = new TaxaNexusInput();
+				final var dataBlock = new TaxaBlock();
 				input.parse(np, dataBlock);
 				dataBlock.updateShortDescription();
 				title = input.getTitle();
@@ -68,8 +63,8 @@ public class NexusDataBlockInput {
             }
             */
 			else if (np.peekMatchBeginBlock(CharactersBlock.BLOCK_NAME)) {
-				final CharactersNexusInput input = new CharactersNexusInput();
-				final CharactersBlock dataBlock = new CharactersBlock();
+				final var input = new CharactersNexusInput();
+				final var dataBlock = new CharactersBlock();
 				input.parse(np, taxa, dataBlock);
 				dataBlock.updateShortDescription();
 				title = input.getTitle();
@@ -85,47 +80,46 @@ public class NexusDataBlockInput {
                 return dataBlock;
             }
             */ else if (np.peekMatchBeginBlock(DistancesBlock.BLOCK_NAME)) {
-				final DistancesNexusInput input = new DistancesNexusInput();
-				final DistancesBlock dataBlock = new DistancesBlock();
+				final var input = new DistancesNexusInput();
+				final var dataBlock = new DistancesBlock();
 				input.parse(np, taxa, dataBlock);
 				dataBlock.updateShortDescription();
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
 			} else if (np.peekMatchBeginBlock(SplitsBlock.BLOCK_NAME)) {
-				final SplitsNexusInput input = new SplitsNexusInput();
-				final SplitsBlock dataBlock = new SplitsBlock();
+				final var input = new SplitsNexusInput();
+				final var dataBlock = new SplitsBlock();
 				input.parse(np, taxa, dataBlock);
 				dataBlock.updateShortDescription();
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
 			} else if (np.peekMatchBeginBlock(TreesBlock.BLOCK_NAME)) {
-				final TreesNexusInput input = new TreesNexusInput();
-				final TreesBlock dataBlock = new TreesBlock();
+				final var input = new TreesNexusInput();
+				final var dataBlock = new TreesBlock();
 				dataBlock.updateShortDescription();
 				input.parse(np, taxa, dataBlock);
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
 			} else if (np.peekMatchBeginBlock(NetworkBlock.BLOCK_NAME)) {
-				final NetworkNexusInput input = new NetworkNexusInput();
-				final NetworkBlock dataBlock = new NetworkBlock();
+				final var input = new NetworkNexusInput();
+				final var dataBlock = new NetworkBlock();
 				dataBlock.updateShortDescription();
 				input.parse(np, taxa, dataBlock);
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
-			} /*
-            else if (np.peekMatchBeginBlock(ViewerBlock.BLOCK_NAME)) {
-                final ViewerNexusInput input = new ViewerNexusInput();
-                final ViewerBlock dataBlock = input.parse(np, taxa);
-                dataBlock.setDocument(taxa.getDocument());
-                title = input.getTitle();
-                link = input.getLink();
-                return dataBlock;
-            }
-            */
+			} else if (np.peekMatchBeginBlock(ViewBlock.BLOCK_NAME)) {
+				final var input = new ViewNexusInput();
+				final var dataBlock = new ViewBlock();
+				dataBlock.updateShortDescription();
+				input.parse(np, taxa, dataBlock);
+				title = input.getTitle();
+				link = input.getLink();
+				return dataBlock;
+			}
 		} catch (Exception ex) {
 			throw new IOExceptionWithLineNumber("Input failed: " + Basic.getShortName(ex.getClass()) + ": " + ex.getMessage(), np.lineno());
 

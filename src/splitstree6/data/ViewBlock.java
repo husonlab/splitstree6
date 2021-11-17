@@ -19,16 +19,37 @@
 
 package splitstree6.data;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import splitstree6.tabs.tab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.workflow.DataBlock;
+import splitstree6.workflow.DataNode;
 import splitstree6.workflow.DataTaxaFilter;
+import splitstree6.workflow.Workflow;
 
 
 public class ViewBlock extends DataBlock {
-	private final ObjectProperty<String> inputBlockName = new SimpleObjectProperty<>();
-	private final ObjectProperty<IView> view = new SimpleObjectProperty<>();
+	private final StringProperty inputBlockName = new SimpleStringProperty();
+	private final StringProperty initializationLines = new SimpleStringProperty("");
+
+	private ViewTab viewTab;
+
+	@Override
+	public void setNode(DataNode node) {
+		super.setNode(node);
+		if (node.getOwner() != null) {
+			var mainWindow = ((Workflow) node.getOwner()).getMainWindow();
+			Platform.runLater(() -> viewTab = new ViewTab(mainWindow, node.getTitle(), false));
+		}
+	}
+
+	public ViewTab getViewTab() {
+		return viewTab;
+	}
+
 
 	@Override
 	public int size() {
@@ -61,8 +82,20 @@ public class ViewBlock extends DataBlock {
 		return inputBlockName.get();
 	}
 
-	public ObjectProperty<String> inputBlockNameProperty() {
+	public StringProperty inputBlockNameProperty() {
 		return inputBlockName;
+	}
+
+	public String getViewName() {
+		return viewTab.getText();
+	}
+
+	public StringProperty viewNameProperty() {
+		return viewTab.textProperty();
+	}
+
+	public void setViewName(String viewName) {
+		viewTab.setText(viewName);
 	}
 
 	public void setInputBlockName(String inputBlockName) {
@@ -70,18 +103,30 @@ public class ViewBlock extends DataBlock {
 	}
 
 	public IView getView() {
-		return view.get();
+		return viewTab == null ? null : viewTab.getView();
 	}
 
 	public ObjectProperty<IView> viewProperty() {
-		return view;
+		return viewTab.viewProperty();
 	}
 
 	public void setView(IView view) {
-		this.view.set(view);
+		viewTab.setView(view);
 	}
 
 	public static IView createView(String inputBlockName, String name) {
 		return null;
+	}
+
+	public String getInitializationLines() {
+		return initializationLines.get();
+	}
+
+	public StringProperty initializationLinesProperty() {
+		return initializationLines;
+	}
+
+	public void setInitializationLines(String initializationLines) {
+		this.initializationLines.set(initializationLines);
 	}
 }

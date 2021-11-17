@@ -63,7 +63,7 @@ public class AlgorithmNexusInput extends NexusIOBase {
 		np.matchBeginBlock("ALGORITHM");
 		parseTitleAndLink(np);
 
-		np.peekMatchAnyTokenIgnoreCase("NAME ALGORITHM"); // ALGORITHM for SplitsTree5 compatiblity
+		np.matchAnyTokenIgnoreCase("NAME ALGORITHM"); // ALGORITHM for SplitsTree5 compatiblity
 		final String algorithmName = np.getWordRespectCase();
 		np.matchIgnoreCase(";");
 

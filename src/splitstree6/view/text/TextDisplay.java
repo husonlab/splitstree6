@@ -1,5 +1,5 @@
 /*
- *  TextDisplayTab.java Copyright (C) 2021 Daniel H. Huson
+ *  TextDisplay.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,27 +17,27 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.textdisplay;
+package splitstree6.view.text;
 
 import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.scene.Node;
-import javafx.scene.control.Tab;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
-public class TextDisplayTab extends Tab implements IDisplayTab {
+public class TextDisplay implements IView {
 	private final TextDisplayController controller;
-	private final TextDisplayTabPresenter presenter;
+	private final TextDisplayPresenter presenter;
 
 	private final UndoManager undoManager = new UndoManager();
-	private final MainWindow mainWindow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
+
+	private final String name;
 
 	private final BooleanProperty showLineNumbers = new SimpleBooleanProperty(false);
 	private final BooleanProperty wrapText = new SimpleBooleanProperty(true);
@@ -45,15 +45,13 @@ public class TextDisplayTab extends Tab implements IDisplayTab {
 	/**
 	 * constructor
 	 */
-	public TextDisplayTab(MainWindow mainWindow, String name, boolean closable, boolean editable) {
-		this.mainWindow = mainWindow;
+	public TextDisplay(MainWindow mainWindow, String name, boolean editable) {
+		this.name = name;
 
-		var loader = new ExtendedFXMLLoader<TextDisplayController>(TextDisplayTab.class);
+		var loader = new ExtendedFXMLLoader<TextDisplayController>(TextDisplay.class);
 		controller = loader.getController();
 
-		presenter = new TextDisplayTabPresenter(mainWindow, this, editable);
-
-		setContent(loader.getRoot());
+		presenter = new TextDisplayPresenter(mainWindow, this, editable);
 
 		controller.getCodeArea().lengthProperty().addListener((v, o, n) -> empty.set(n == 0));
 		controller.getCodeArea().setWrapText(true);
@@ -63,9 +61,6 @@ public class TextDisplayTab extends Tab implements IDisplayTab {
 		// todo: use darker line numbers in dark theme
 		showLineNumbers.addListener((v, o, n) -> controller.getCodeArea().setParagraphGraphicFactory(n ? LineNumberFactory.get(controller.getCodeArea()) : null));
 		wrapText.bindBidirectional(controller.getCodeArea().wrapTextProperty());
-
-		setText(name);
-		setClosable(closable);
 	}
 
 	public void replaceText(String text) {
@@ -155,6 +150,26 @@ public class TextDisplayTab extends Tab implements IDisplayTab {
 	@Override
 	public IDisplayTabPresenter getPresenter() {
 		return presenter;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public Node getRoot() {
+		return controller.getAnchorPane();
+	}
+
+	@Override
+	public void setupMenuItems() {
+		presenter.setupMenuItems();
+	}
+
+	@Override
+	public int size() {
+		return controller.getCodeArea().getLength();
 	}
 
 	public TextDisplayController getController() {
