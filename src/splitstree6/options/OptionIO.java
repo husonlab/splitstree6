@@ -28,7 +28,6 @@ import java.io.StringReader;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Input and output of options
@@ -44,54 +43,48 @@ public class OptionIO {
 			np.matchIgnoreCase("OPTIONS");
 
 			if (!np.peekMatchIgnoreCase(";")) {
-				final ArrayList<Option> optionsNext = new ArrayList<>(Option.getAllOptions(optionsCarrier));
+				final var optionsNext = new ArrayList<>(Option.getAllOptions(optionsCarrier));
 				if (optionsNext.size() > 0) {
-					final Map<String, Option> legalOptions = new HashMap<>();
-					for (Option option : optionsNext) {
+					final var legalOptions = new HashMap<String, Option>();
+					for (var option : optionsNext) {
 						legalOptions.put(option.getName(), option);
 					}
 					while (true) {
-						final String name = np.getWordRespectCase();
+						final var name = np.getWordRespectCase();
 						np.matchIgnoreCase("=");
-						final Option option = legalOptions.get(name);
+						final var option = legalOptions.get(name);
 						if (option != null) {
 							final OptionValueType type = option.getOptionValueType();
 							switch (type) {
-								case doubleArray: {
+								case doubleArray -> {
 									final double[] array = (double[]) option.getProperty().getValue();
 									for (int i = 0; i < array.length; i++) {
 										array[i] = np.getDouble();
 									}
-									break;
 								}
-								case doubleSquareMatrix: {
+								case doubleSquareMatrix -> {
 									final double[][] matrix = (double[][]) option.getProperty().getValue();
 									for (int i = 0; i < matrix.length; i++) {
 										for (int j = 0; j < matrix.length; j++)
 											matrix[i][j] = np.getDouble();
 									}
-									break;
 								}
-								case Enum: {
+								case Enum -> {
 									option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
-									break;
 								}
-								case stringArray: {
+								case stringArray -> {
 									final ArrayList<String> list = new ArrayList<>();
 									while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
 										list.add(np.getWordRespectCase());
 									option.getProperty().setValue(list.toArray(new String[0]));
-									break;
 								}
-								default: {
+								default -> {
 									option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
-									break;
 								}
 							}
 
 						} else {
-
-							final StringBuilder buf = new StringBuilder();
+							final var buf = new StringBuilder();
 							while (!np.peekMatchIgnoreCase(",") && !np.peekMatchIgnoreCase(";"))
 								buf.append(" ").append(np.getWordRespectCase());
 							System.err.println("WARNING: skipped unknown option for '" + optionsCarrier.getClass().getSimpleName() + "': '" + name + "=" + buf + "' in line " + np.lineno());
@@ -110,7 +103,7 @@ public class OptionIO {
 
 	public static void parseOptions(StringProperty initialization, IHasOptions optionsCarrier) throws IOException {
 		if (!initialization.get().isBlank()) {
-			try (var np = new NexusStreamParser(new StringReader(initialization.get()))) {
+			try (var np = new NexusStreamParser(new StringReader("OPTIONS " + initialization.get() + ";"))) {
 				parseOptions(np, optionsCarrier);
 			} finally {
 				initialization.set("");
@@ -122,18 +115,18 @@ public class OptionIO {
 	 * write options
 	 */
 	public static void writeOptions(Writer w, IHasOptions optionsCarrier) throws IOException {
-		final ArrayList<Option> options = new ArrayList<>(Option.getAllOptions(optionsCarrier));
+		final var options = new ArrayList<>(Option.getAllOptions(optionsCarrier));
 		if (options.size() > 0) {
 			w.write("OPTIONS\n");
 			boolean first = true;
-			for (Option option : options) {
-				final String valueString = OptionValueType.toStringType(option.getOptionValueType(), option.getProperty().getValue());
+			for (var option : options) {
+				final var valueString = OptionValueType.toStringType(option.getOptionValueType(), option.getProperty().getValue());
 				if (valueString.length() > 0) {
 					if (first)
 						first = false;
 					else
 						w.write(",\n");
-					w.write("\t" + option.getName() + " = " + valueString);
+					w.write("\t" + option.getName() + " = '" + valueString + "'");
 				}
 			}
 			w.write(";\n");

@@ -102,7 +102,8 @@ public class SplitPanePresenter {
 
 
 	public void ensureAlgorithmsTabPaneIsOpen() {
-		ensureTreeViewIsOpen(true);
+		if (mainSplitPane.getDividerPositions()[0] <= 0.01)
+			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> controller.getOpenCloseLeftButton().setText("<"), false);
 		if (leftSplitPane.getDividerPositions()[0] >= (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight())
 			animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight(), () -> controller.getOpenCloseLeftButton().setText("<"), true);
 	}
@@ -111,7 +112,7 @@ public class SplitPanePresenter {
 		KeyValue keyValue = new KeyValue(splitPane.getDividers().get(0).positionProperty(), target);
 		Timeline timeline = new Timeline(new KeyFrame(Duration.millis(animate ? 500 : 1), keyValue));
 		timeline.play();
-		timeline.setOnFinished((x) -> runnable.run());
+		timeline.setOnFinished(x -> runnable.run());
 	}
 
 }

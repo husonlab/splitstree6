@@ -255,8 +255,8 @@ public class TaxaBlock extends DataBlock {
 	 * @return labels
 	 */
 	public static ArrayList<String> getLabels(Collection<Taxon> taxa) {
-		final ArrayList<String> labels = new ArrayList<>();
-		for (Taxon taxon : taxa) {
+		final var labels = new ArrayList<String>();
+		for (var taxon : taxa) {
 			labels.add(taxon.getName());
 		}
 		return labels;
@@ -268,8 +268,8 @@ public class TaxaBlock extends DataBlock {
 	 * @return labels
 	 */
 	public ArrayList<String> getLabels(Iterable<Integer> taxa) {
-		final ArrayList<String> labels = new ArrayList<>();
-		for (Integer t : taxa) {
+		final var labels = new ArrayList<String>();
+		for (var t : taxa) {
 			labels.add(getLabel(t));
 		}
 		return labels;
@@ -277,8 +277,6 @@ public class TaxaBlock extends DataBlock {
 
 	/**
 	 * get the current set of taxa as a bit set
-	 *
-	 * @return
 	 */
 	public BitSet getTaxaSet() {
 		final BitSet taxa = new BitSet();
@@ -322,6 +320,13 @@ public class TaxaBlock extends DataBlock {
 			if (taxaBlock.get(t).getInfo() != null && taxaBlock.get(t).getInfo().length() > 0)
 				return true;
 		return false;
+	}
+
+	/**
+	 * compare two taxon names by the order of their occurrence
+	 */
+	public int compare(String taxonName1, String taxonName2) {
+		return Integer.compare(taxa.indexOf(get(taxonName1)), taxa.indexOf(get(taxonName2)));
 	}
 
 	@Override

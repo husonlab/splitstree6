@@ -178,8 +178,8 @@ public class Next implements IView {
 	}
 
 	@Override
-	public ObservableValue<? extends Node> imageNodeProperty() {
-		return new SimpleObjectProperty<>(stackPane);
+	public Node getImageNode() {
+		return stackPane;
 	}
 
 	@Override

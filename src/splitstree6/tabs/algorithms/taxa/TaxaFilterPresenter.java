@@ -26,6 +26,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import jloda.fx.find.ListViewTypeSearcher;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
+import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
@@ -49,7 +50,9 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
 
+
 		var controller = tab.getTaxaFilterController();
+
 
 		var workflow = mainWindow.getWorkflow();
 		var inputTaxa = workflow.getInputTaxaNode().getDataBlock();
@@ -77,12 +80,14 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		});
 
 		controller.getMoveAllLeftButton().setOnAction(e -> {
+			var selected = new ArrayList<>(selectedTaxa);
 			var list = new ArrayList<>(controller.getInactiveListView().getItems());
 			controller.getInactiveListView().getItems().clear();
 			controller.getActiveListView().getItems().addAll(list);
+			sort(controller.getActiveListView().getItems(), workflow.getInputTaxonBlock());
 			Platform.runLater(() -> {
-				controller.getActiveListView().getSelectionModel().clearSelection();
-				controller.getInactiveListView().getSelectionModel().clearSelection();
+				selectedTaxa.clear();
+				selectedTaxa.addAll(selected);
 			});
 		});
 		controller.getMoveAllLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getItems()));
@@ -92,6 +97,7 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			controller.getInactiveListView().getItems().removeAll(list);
 			controller.getInactiveListView().refresh();
 			controller.getActiveListView().getItems().addAll(list);
+			sort(controller.getActiveListView().getItems(), workflow.getInputTaxonBlock());
 			controller.getActiveListView().refresh();
 			Platform.runLater(() -> {
 				controller.getActiveListView().getSelectionModel().clearSelection();
@@ -102,14 +108,18 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		controller.getMoveSelectedLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getSelectionModel().getSelectedItems()));
 
 		controller.getMoveAllRightButton().setOnAction(e -> {
+			var selected = new ArrayList<>(selectedTaxa);
 			var list = new ArrayList<>(controller.getActiveListView().getItems());
 			controller.getActiveListView().getItems().clear();
 			controller.getActiveListView().refresh();
 			controller.getInactiveListView().getItems().addAll(list);
-			controller.getInactiveListView().refresh();
+			sort(controller.getInactiveListView().getItems(), workflow.getInputTaxonBlock());
 			Platform.runLater(() -> {
-				controller.getActiveListView().getSelectionModel().clearSelection();
-				controller.getInactiveListView().getSelectionModel().clearSelection();
+				selectedTaxa.clear();
+				selectedTaxa.addAll(selected);
+			});
+			Platform.runLater(() -> {
+				controller.getInactiveListView().refresh();
 			});
 		});
 		controller.getMoveAllRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
@@ -119,12 +129,16 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			controller.getActiveListView().getItems().removeAll(list);
 			controller.getActiveListView().refresh();
 			controller.getInactiveListView().getItems().addAll(list);
-			controller.getInactiveListView().refresh();
+			sort(controller.getInactiveListView().getItems(), workflow.getInputTaxonBlock());
 			Platform.runLater(() -> {
 				controller.getActiveListView().getSelectionModel().clearSelection();
 				controller.getInactiveListView().getSelectionModel().clearSelection();
 				list.forEach(label -> controller.getInactiveListView().getSelectionModel().select(label));
 			});
+			Platform.runLater(() -> {
+				controller.getInactiveListView().refresh();
+			});
+
 		});
 		controller.getMoveSelectedRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getSelectionModel().getSelectedItems()));
 
@@ -250,6 +264,9 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			}
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(taxonSelectionChangeListener));
+	}
 
+	private void sort(ObservableList<String> list, TaxaBlock taxaBlock) {
+		list.sort(taxaBlock::compare);
 	}
 }

@@ -19,13 +19,13 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.tabs.algorithms.taxa.TaxaFilterController">
     <children>
-        <GridPane vgap="2.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+        <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                   AnchorPane.topAnchor="0.0">
             <columnConstraints>
                 <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
@@ -43,8 +43,17 @@
                     </GridPane.margin>
                 </Label>
                 <Label text="Inactive" GridPane.columnIndex="2"/>
-                <ListView fx:id="activeListView" GridPane.rowIndex="1"/>
-                <ListView fx:id="inactiveListView" GridPane.columnIndex="2" GridPane.rowIndex="1"/>
+                <ListView fx:id="activeListView" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+                    <GridPane.margin>
+                        <Insets/>
+                    </GridPane.margin>
+                </ListView>
+                <ListView fx:id="inactiveListView" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS"
+                          GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
+                    <GridPane.margin>
+                        <Insets/>
+                    </GridPane.margin>
+                </ListView>
                 <BorderPane GridPane.columnIndex="1" GridPane.rowIndex="1">
                     <center>
                         <VBox alignment="CENTER" minWidth="-Infinity" spacing="25.0">
@@ -54,7 +63,7 @@
                                         <Button fx:id="moveSelectedRightButton" mnemonicParsing="false" text="&gt;"/>
                                         <Button fx:id="moveAllRightButton" mnemonicParsing="false" text="&gt;&gt;">
                                             <VBox.margin>
-                                                <Insets top="10.0"/>
+                                                <Insets left="1.0" right="1.0" top="10.0"/>
                                             </VBox.margin>
                                         </Button>
                                     </children>
@@ -66,7 +75,11 @@
                                                 <Insets bottom="10.0"/>
                                             </VBox.margin>
                                         </Button>
-                                        <Button fx:id="moveAllLeftButton" mnemonicParsing="false" text="&lt;&lt;"/>
+                                        <Button fx:id="moveAllLeftButton" mnemonicParsing="false" text="&lt;&lt;">
+                                            <VBox.margin>
+                                                <Insets left="1.0" right="1.0"/>
+                                            </VBox.margin>
+                                        </Button>
                                     </children>
                                 </VBox>
                             </children>
@@ -75,7 +88,7 @@
                 </BorderPane>
             </children>
             <padding>
-                <Insets bottom="5.0"/>
+                <Insets bottom="5.0" left="2.0" right="2.0"/>
             </padding>
         </GridPane>
     </children>

@@ -28,7 +28,6 @@ import javafx.scene.control.TabPane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
-import jloda.util.ProgramProperties;
 import splitstree6.tabs.tab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
@@ -49,22 +48,20 @@ public class TreePagesView implements IView {
 	private final ObservableList<PhyloTree> trees = FXCollections.observableArrayList();
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
-	private final IntegerProperty rows = new SimpleIntegerProperty(1);
-	private final IntegerProperty cols = new SimpleIntegerProperty(1);
+	private final IntegerProperty optionRows = new SimpleIntegerProperty(this, "optionRows", 1);
+	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", 1);
 
 	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
 
 	private final ObjectProperty<ComputeTreeEmbedding.TreeDiagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeEmbedding.TreeDiagram.getDefault());
 	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.getDefault());
 
-	private final StringProperty optionGrid = new SimpleStringProperty(this, "optionGrid", ProgramProperties.get("OptionGrid", "1 x 1"));
-
 	private final IntegerProperty optionPageNumber = new SimpleIntegerProperty(this, "optionPageNumber", 1); // 1-based
 
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionGrid.getName(), optionPageNumber.getName(), optionFontScaleFactor.getName());
+		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionRows.getName(), optionCols.getName(), optionPageNumber.getName(), optionFontScaleFactor.getName());
 	}
 
 	public TreePagesView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -75,8 +72,6 @@ public class TreePagesView implements IView {
 		presenter = new TreePagesViewPresenter(mainWindow, this, viewTab, getTrees());
 
 		empty.bind(Bindings.isEmpty(getTrees()));
-
-		optionGrid.addListener((v, o, n) -> ProgramProperties.put("OptionGrid", n));
 	}
 
 	public TreePagesViewController getController() {
@@ -91,28 +86,28 @@ public class TreePagesView implements IView {
 		return trees;
 	}
 
-	public int getRows() {
-		return rows.get();
+	public int getOptionRows() {
+		return optionRows.get();
 	}
 
-	public IntegerProperty rowsProperty() {
-		return rows;
+	public IntegerProperty optionRowsProperty() {
+		return optionRows;
 	}
 
-	public void setRows(int rows) {
-		this.rows.set(Math.max(1, rows));
+	public void setOptionRows(int optionRows) {
+		this.optionRows.set(Math.max(1, optionRows));
 	}
 
-	public int getCols() {
-		return cols.get();
+	public int getOptionCols() {
+		return optionCols.get();
 	}
 
-	public IntegerProperty colsProperty() {
-		return cols;
+	public IntegerProperty optionColsProperty() {
+		return optionCols;
 	}
 
-	public void setCols(int cols) {
-		this.cols.set(Math.max(1, cols));
+	public void setOptionCols(int optionCols) {
+		this.optionCols.set(Math.max(1, optionCols));
 	}
 
 	public int getOptionPageNumber() {
@@ -149,18 +144,6 @@ public class TreePagesView implements IView {
 
 	public void setOptionRootSide(TreePane.RootSide optionRootSide) {
 		this.optionRootSide.set(optionRootSide);
-	}
-
-	public String getOptionGrid() {
-		return optionGrid.get();
-	}
-
-	public StringProperty optionGridProperty() {
-		return optionGrid;
-	}
-
-	public void setOptionGrid(String optionGrid) {
-		this.optionGrid.set(optionGrid);
 	}
 
 	public ObjectProperty<Node> imageNodeProperty() {
@@ -228,14 +211,12 @@ public class TreePagesView implements IView {
 	}
 
 	public void setTrees(Collection<PhyloTree> trees) {
-		if (false)
-			this.trees.setAll(trees);
-		else {
-			var pageFactory = controller.getPagination().getPageFactory();
-			controller.getPagination().setPageFactory(null);
-			this.trees.setAll(trees);
-			controller.getPagination().setPageFactory(pageFactory);
-		}
+		this.trees.setAll(trees);
 		presenter.updatePageContent();
+	}
+
+	@Override
+	public Node getImageNode() {
+		return controller.getPagination();
 	}
 }

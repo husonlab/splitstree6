@@ -1,5 +1,5 @@
 /*
- *  IView.java Copyright (C) 2021 Daniel H. Huson
+ *  PolarCoordinates.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,28 +17,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view;
+package splitstree6.view.trees.treepages;
 
-import javafx.beans.value.ObservableValue;
-import javafx.scene.Node;
-import jloda.fx.undo.UndoManager;
-import splitstree6.options.IHasOptions;
-import splitstree6.tabs.IDisplayTabPresenter;
+import javafx.geometry.Point2D;
+import jloda.fx.util.GeometryUtilsFX;
 
-public interface IView extends IHasOptions {
-	String getName();
+/**
+ * polar coordinates
+ * Daniel Huson, 11.2021
+ */
+public record PolarCoordinates(double radius, double angle) {
+	public Point2D toCartesian() {
+		return new Point2D(radius * Math.cos(GeometryUtilsFX.deg2rad(angle)), radius * Math.sin(GeometryUtilsFX.deg2rad(angle)));
+	}
 
-	Node getRoot();
-
-	void setupMenuItems();
-
-	int size();
-
-	UndoManager getUndoManager();
-
-	ObservableValue<Boolean> emptyProperty();
-
-	Node getImageNode();
-
-	IDisplayTabPresenter getPresenter();
+	public static PolarCoordinates fromCartesian(Point2D point) {
+		return new PolarCoordinates(point.magnitude(), point.angle(1, 0));
+	}
 }

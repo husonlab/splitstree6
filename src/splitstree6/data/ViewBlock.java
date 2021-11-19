@@ -20,9 +20,10 @@
 package splitstree6.data;
 
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import jloda.util.StringUtils;
 import splitstree6.tabs.tab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.workflow.DataBlock;
@@ -42,14 +43,13 @@ public class ViewBlock extends DataBlock {
 		super.setNode(node);
 		if (node.getOwner() != null) {
 			var mainWindow = ((Workflow) node.getOwner()).getMainWindow();
-			Platform.runLater(() -> viewTab = new ViewTab(mainWindow, node.getTitle(), false));
+			Platform.runLater(() -> viewTab = new ViewTab(mainWindow, false));
 		}
 	}
 
 	public ViewTab getViewTab() {
 		return viewTab;
 	}
-
 
 	@Override
 	public int size() {
@@ -70,7 +70,7 @@ public class ViewBlock extends DataBlock {
 
 	@Override
 	public void updateShortDescription() {
-		setShortDescription("a visualization of the " + getName().toLowerCase());
+		setShortDescription("a " + StringUtils.fromCamelCase(getName()) + " visualization");
 	}
 
 	@Override
@@ -86,17 +86,6 @@ public class ViewBlock extends DataBlock {
 		return inputBlockName;
 	}
 
-	public String getViewName() {
-		return viewTab.getText();
-	}
-
-	public StringProperty viewNameProperty() {
-		return viewTab.textProperty();
-	}
-
-	public void setViewName(String viewName) {
-		viewTab.setText(viewName);
-	}
 
 	public void setInputBlockName(String inputBlockName) {
 		this.inputBlockName.set(inputBlockName);
@@ -106,16 +95,16 @@ public class ViewBlock extends DataBlock {
 		return viewTab == null ? null : viewTab.getView();
 	}
 
-	public ObjectProperty<IView> viewProperty() {
+	public ReadOnlyObjectProperty<IView> viewProperty() {
 		return viewTab.viewProperty();
 	}
 
 	public void setView(IView view) {
 		viewTab.setView(view);
-	}
-
-	public static IView createView(String inputBlockName, String name) {
-		return null;
+		setName(view.getName());
+		updateShortDescription();
+		if (getNode() != null)
+			getNode().setTitle(getName());
 	}
 
 	public String getInitializationLines() {

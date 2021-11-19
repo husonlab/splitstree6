@@ -30,6 +30,7 @@ import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.SplitsTree6Block;
+import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.AlgorithmNexusInput;
 import splitstree6.io.nexus.SplitsTree6NexusInput;
 import splitstree6.window.MainWindow;
@@ -72,7 +73,7 @@ public class WorkflowNexusInput {
 		} else {
 			var service = new AService<Workflow>(mainWindow.getController().getBottomFlowPane());
 			service.setCallable(() -> {
-				var inputWorkFlow = new Workflow(null);
+				var inputWorkFlow = new Workflow(mainWindow);
 				try (var reader = new BufferedReader(new FileReader(fileName))) {
 					input(service.getProgressListener(), inputWorkFlow, reader);
 				}
@@ -82,7 +83,11 @@ public class WorkflowNexusInput {
 				var inputWorkFlow = service.getValue();
 				NotificationManager.showInformation("Loaded file: " + fileName + ", workflow nodes: " + inputWorkFlow.size());
 				workflow.shallowCopy(inputWorkFlow);
-
+				for (var node : workflow.algorithmNodes()) {
+					if (((AlgorithmNode) node).getAlgorithm().getToClass() == ViewBlock.class) {
+						node.restart();
+					}
+				}
 			});
 
 			service.setOnFailed(e -> NotificationManager.showError("Open file failed : " + service.getException()));

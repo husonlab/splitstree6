@@ -57,7 +57,7 @@ public class RunAfterAWhile {
 					toDelete.forEach(keyTimeRunnableMap.keySet()::remove);
 				}
 			}
-		}, 100, 100);
+		}, 250, 250);
 	}
 
 	/**

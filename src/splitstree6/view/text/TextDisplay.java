@@ -20,7 +20,9 @@
 package splitstree6.view.text;
 
 import javafx.application.Platform;
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
@@ -143,8 +145,8 @@ public class TextDisplay implements IView {
 	}
 
 	@Override
-	public ReadOnlyObjectProperty<Node> imageNodeProperty() {
-		return new SimpleObjectProperty<>(controller.getCodeArea());
+	public Node getImageNode() {
+		return controller.getCodeArea();
 	}
 
 	@Override

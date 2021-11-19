@@ -23,8 +23,6 @@ import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
-import javafx.collections.SetChangeListener;
-import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Point3D;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -35,15 +33,13 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
-import jloda.fx.util.SelectionEffectBlue;
+import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Map;
 
 public class TreePane extends StackPane {
 
@@ -63,13 +59,13 @@ public class TreePane extends StackPane {
 	private final PhyloTree phyloTree;
 	private final String name;
 	private final SelectionModel<Taxon> taxonSelectionModel;
-	private final Map<Taxon, ComputeTreeEmbedding.ShapeAndLabel> taxonNodesMap = new HashMap<>();
 	private final ReadOnlyDoubleProperty fontScaleFactor;
+
+	private final InteractionSetup interactionSetup;
 
 	private final ComputeTreeEmbedding.TreeDiagram treeDiagram;
 	private final RootSide rootSide;
 
-	private final SetChangeListener<Taxon> selectionChangeListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 
 	/**
@@ -84,6 +80,8 @@ public class TreePane extends StackPane {
 		this.treeDiagram = diagram;
 		this.rootSide = rootSide;
 		this.fontScaleFactor = fontScaleFactor;
+
+		this.interactionSetup = new InteractionSetup(taxaBlock, phyloTree, taxonSelectionModel);
 		// setStyle("-fx-border-color: lightgray;");
 
 		getStyleClass().add("background");
@@ -93,42 +91,30 @@ public class TreePane extends StackPane {
 		setMinWidth(Pane.USE_PREF_SIZE);
 		setMinHeight(Pane.USE_PREF_SIZE);
 
-		selectionChangeListener = e -> {
-			if (e.wasAdded()) {
-				var nodes = taxonNodesMap.get(e.getElementAdded());
-				if (nodes != null) {
-					for (var node : nodes) {
-						node.setEffect(SelectionEffectBlue.getInstance());
-					}
-				}
-			} else if (e.wasRemoved()) {
-				var nodes = taxonNodesMap.get(e.getElementRemoved());
-				if (nodes != null) {
-					for (var node : nodes) {
-						node.setEffect(null);
-					}
-				}
-			}
-		};
-		taxonSelectionModel.getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
-
 		fontScaleChangeListener = (v, o, n) -> applyFontScaleFactor(this, n.doubleValue() / o.doubleValue());
 		fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 	}
 
 	public void drawTree() {
 			var pane = new StackPane();
-			double width;
-			double height;
-			if (rootSide == RootSide.Left || rootSide == RootSide.Right) {
-				width = getPrefWidth();
-				height = getPrefHeight() - 12;
-			} else {
-				height = getPrefWidth();
-				width = getPrefHeight() - 12;
-			}
+		double width;
+		double height;
+		if (rootSide == RootSide.Left || rootSide == RootSide.Right) {
+			width = getPrefWidth();
+			height = getPrefHeight() - 12;
+		} else {
+			height = getPrefWidth();
+			width = getPrefHeight() - 12;
+		}
 
-		var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, treeDiagram, width - 4, height - 4, taxonNodesMap);
+
+		pane.setMinHeight(getPrefHeight() - 12);
+		pane.setMinWidth(getPrefWidth());
+
+		// compute the tree in a separate thread:
+		ProgramExecutorService.submit(() -> {
+			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, treeDiagram, width - 4, height - 4,
+					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback());
 
 			applyFontScaleFactor(group, fontScaleFactor.get());
 
@@ -144,11 +130,6 @@ public class TreePane extends StackPane {
 				}
 			}
 
-			pane.setMinHeight(getPrefHeight() - 12);
-			pane.setMinWidth(getPrefWidth());
-
-			pane.getChildren().setAll(group);
-
 			if (rootSide == RootSide.Right || rootSide == RootSide.Up) {
 				var queue = new LinkedList<>(group.getChildren());
 				while (queue.size() > 0) {
@@ -162,40 +143,19 @@ public class TreePane extends StackPane {
 				}
 			}
 
-		var label = new Label(name);
-			getChildren().setAll(new VBox(label, pane));
+			Platform.runLater(() -> {
+				pane.getChildren().setAll(group);
+				var label = new Label(name);
+				getChildren().setAll(new VBox(label, pane));
 
-		Platform.runLater(() -> {
-			setupSelection(taxonSelectionModel, taxonNodesMap);
-
-			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(taxonSelectionModel::clearSelection);
-				}
-				e.consume();
-			});
-
-			SetupDragSelectedLabels.apply(taxonSelectionModel, taxonNodesMap);
-		});
-	}
-
-	private static void setupSelection(SelectionModel<Taxon> selectionModel, Map<Taxon, ComputeTreeEmbedding.ShapeAndLabel> taxonNodesMap) {
-		for (var taxon : taxonNodesMap.keySet()) {
-			var nodes = taxonNodesMap.get(taxon);
-			for (var node : nodes) {
-				if (selectionModel.isSelected(taxon)) {
-					node.setEffect(SelectionEffectBlue.getInstance());
-				}
-				node.setOnMouseClicked(e -> {
-					if (e.isStillSincePress()) {
-						if (!e.isShiftDown())
-							selectionModel.clearSelection();
-						selectionModel.toggleSelection(taxon);
-						e.consume();
+				pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+					if (e.isStillSincePress() && !e.isShiftDown()) {
+						Platform.runLater(taxonSelectionModel::clearSelection);
 					}
+					e.consume();
 				});
-			}
-		}
+			});
+		});
 	}
 
 	private static void applyFontScaleFactor(Parent root, double factor) {

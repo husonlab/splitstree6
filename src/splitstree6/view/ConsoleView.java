@@ -75,8 +75,8 @@ public class ConsoleView implements IView {
 	}
 
 	@Override
-	public ObservableValue<? extends Node> imageNodeProperty() {
-		return textDisplayTab.imageNodeProperty();
+	public Node getImageNode() {
+		return textDisplayTab.getImageNode();
 	}
 
 	@Override

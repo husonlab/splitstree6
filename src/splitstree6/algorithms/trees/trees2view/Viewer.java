@@ -29,7 +29,6 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.TreesNexusOutput;
 import splitstree6.options.OptionIO;
-import splitstree6.tabs.tab.ViewTab;
 import splitstree6.view.ConsoleView;
 import splitstree6.view.trees.next.Next;
 import splitstree6.view.trees.treepages.TreePagesView;
@@ -60,9 +59,7 @@ public class Viewer extends Trees2View {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, ViewBlock viewBlock) throws IOException {
 		viewBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
 
-
 		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
-
 
 		switch (getOptionView()) {
 			case TreePages -> {
@@ -71,7 +68,7 @@ public class Viewer extends Trees2View {
 				} else {
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new TreePagesView(mainWindow, "MultiTree", viewBlock.getViewTab());
+						var view = new TreePagesView(mainWindow, "TreePages", viewBlock.getViewTab());
 						try {
 							OptionIO.parseOptions(viewBlock.initializationLinesProperty(), view);
 						} catch (IOException e) {
@@ -79,19 +76,17 @@ public class Viewer extends Trees2View {
 						}
 						viewBlock.setView(view);
 						view.getTrees().setAll(inputData.getTrees());
-						viewBlock.getViewTab().setView(view);
 					});
 				}
 			}
 			case Tanglegram -> {
-				var mainWindow = getNode().getOwner().getMainWindow();
-				var nextView = new ViewTab(mainWindow, "Next", true);
-				nextView.setView(new Next(mainWindow));
-				mainWindow.addTabToMainTabPane(nextView);
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					var view = new Next(mainWindow);
+					viewBlock.setView(view);
+				});
 			}
-			case SingleTree, DensiTree -> {
-				throw new IOException("Not implemented: " + getOptionView());
-			}
+			case SingleTree, DensiTree -> throw new IOException("Not implemented: " + getOptionView());
 			case Console -> {
 				if (viewBlock.getView() instanceof ConsoleView consoleView) {
 					try {

@@ -19,7 +19,9 @@
 
 package splitstree6.tabs.network;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import jloda.fx.undo.UndoManager;
@@ -63,8 +65,8 @@ public class NetworkTab extends Tab implements IDisplayTab {
 	}
 
 	@Override
-	public ReadOnlyObjectProperty<Node> imageNodeProperty() {
-		return new SimpleObjectProperty<>(controller.getMainPane());
+	public Node getImageNode() {
+		return controller.getMainPane();
 	}
 
 	@Override

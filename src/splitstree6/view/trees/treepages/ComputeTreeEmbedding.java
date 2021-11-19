@@ -28,7 +28,9 @@ import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.fx.util.TriConsumer;
 import jloda.fx.window.MainWindowManager;
+import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
@@ -39,11 +41,8 @@ import jloda.util.Pair;
 import jloda.util.ProgramProperties;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.Taxon;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * computes a rectangular or triangular tree embedding
@@ -79,7 +78,8 @@ public class ComputeTreeEmbedding {
 
 	private static int count = 0;
 
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagram diagram, double width, double height, Map<Taxon, ShapeAndLabel> taxonNodesMap) {
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> setupNodeInteraction,
+							  BiConsumer<Edge, Shape> setupEdgeInteraction) {
 
 		//System.err.println("Computing embedding "+(++count)+": "+tree.getName());
 
@@ -151,7 +151,7 @@ public class ComputeTreeEmbedding {
 
 		for (var v : tree.nodes()) {
 			var point = nodePointMap.get(v);
-			var circle = new Circle(v.isLeaf() ? 4 : 0.25);
+			var circle = new Circle(v.isLeaf() || tree.getRoot() == v ? 1 : 0.5);
 			circle.setFill(color);
 			circle.setStroke(Color.TRANSPARENT);
 			nodeGroup.getChildren().add(circle);
@@ -162,17 +162,15 @@ public class ComputeTreeEmbedding {
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
 				nodeLabelGroup.getChildren().add(label);
-				for (var t : tree.getTaxa(v)) {
-					if (t <= taxaBlock.getNtax())
-						taxonNodesMap.put(taxaBlock.get(t), new ShapeAndLabel(circle, label));
-				}
+				setupNodeInteraction.accept(v, circle, label);
 			}
 		}
 
 		if (diagram == TreeDiagram.CircularCladogram || diagram == TreeDiagram.CircularPhylogram) {
 			var rootPt = nodePointMap.get(tree.getRoot());
 			Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
-				for (var w : v.children()) {
+				for (var e : v.outEdges()) {
+					var w = e.getTarget();
 					var vPt = nodePointMap.get(v);
 					var wPt = nodePointMap.get(w);
 
@@ -180,7 +178,7 @@ public class ComputeTreeEmbedding {
 					line.setFill(Color.TRANSPARENT);
 					line.setStroke(color);
 					line.setStrokeLineCap(StrokeLineCap.ROUND);
-					line.setStrokeWidth(0.5);
+					line.setStrokeWidth(1);
 
 					line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));
 
@@ -198,17 +196,6 @@ public class ComputeTreeEmbedding {
 						arcTo.setSweepFlag(GeometryUtilsFX.computeObservedAngle(rootPt, vPt, wPt) > 0);
 
 						line.getElements().add(arcTo);
-
-						{
-							var other = new Line(vPt.getX(), vPt.getY(), wPt.getX(), wPt.getY());
-							other.setStroke(Color.BLUE);
-							edgeGroup.getChildren().add(other);
-						}
-						{
-							var other = new Line(rootPt.getX(), rootPt.getY(), wPt.getX(), wPt.getY());
-							other.setStroke(Color.RED);
-							edgeGroup.getChildren().add(other);
-						}
 					}
 
 					var lineTo2 = new LineTo();
@@ -216,8 +203,8 @@ public class ComputeTreeEmbedding {
 					lineTo2.setY(wPt.getY());
 
 					line.getElements().add(lineTo2);
-
 					edgeGroup.getChildren().add(line);
+					setupEdgeInteraction.accept(e, line);
 				}
 			});
 		} else if (diagram == TreeDiagram.TriangularCladogram || diagram == TreeDiagram.RadialPhylogram || diagram == TreeDiagram.RadialCladogram) {
@@ -237,9 +224,10 @@ public class ComputeTreeEmbedding {
 				line.setFill(Color.TRANSPARENT);
 				line.setStroke(color);
 				line.setStrokeLineCap(StrokeLineCap.ROUND);
-				line.setStrokeWidth(0.5);
+				line.setStrokeWidth(1);
 
 				edgeGroup.getChildren().add(line);
+				setupEdgeInteraction.accept(e, line);
 			}
 		} else { // if (diagram == TreePane.Diagram.Rectangular) {
 			for (var e : tree.edges()) {
@@ -263,9 +251,10 @@ public class ComputeTreeEmbedding {
 				line.setFill(Color.TRANSPARENT);
 				line.setStroke(color);
 				line.setStrokeLineCap(StrokeLineCap.ROUND);
-				line.setStrokeWidth(0.5);
+				line.setStrokeWidth(1);
 
 				edgeGroup.getChildren().add(line);
+				setupEdgeInteraction.accept(e, line);
 			}
 		}
 
@@ -357,7 +346,7 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesRadialCladogram(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean scaleByEdgeWeights) {
+	private static NodeArray<Point2D> computeCoordinatesRadialCladogram(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean toScale) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
@@ -390,31 +379,13 @@ public class ComputeTreeEmbedding {
 					firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
 					angle = 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow));
 				}
+				if (toScale && v.getInDegree() > 0) {
+					var e = v.getFirstInEdge();
+					var parentRadius = nodeRadiusMap.get(e.getSource());
+					nodeRadiusMap.put(v, parentRadius + tree.getWeight(e));
+				}
 				nodeAngleMap.put(v, angle);
 			});
-
-			if (scaleByEdgeWeights) {
-				Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
-					if (v.getInDegree() == 1) {
-						var e = v.getFirstInEdge();
-						var parentRadius = nodeRadiusMap.get(e.getSource());
-						nodeRadiusMap.put(v, parentRadius + Math.max(0, tree.getWeight(e)));
-						{
-
-							if (GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v)).magnitude() + 0.000001 < GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(e.getSource()), nodeAngleMap.get(e.getSource())).magnitude()) {
-								System.err.println("WTF");
-								System.err.println("Parent radius: " + parentRadius);
-								System.err.println("Parent mag: " + GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(e.getSource()), nodeAngleMap.get(e.getSource())).magnitude());
-								System.err.println("Edge length: " + tree.getWeight(e));
-								System.err.println("v radius: " + nodeRadiusMap.get(v));
-								System.err.println("v mag: " + GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v)).magnitude());
-							}
-						}
-					}
-				});
-				tree.nodeStream().forEach(v -> nodeRadiusMap.put(v, nodeAngleMap.get(v) + 0.0001));
-
-			}
 
 			tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
 		}
@@ -552,13 +523,5 @@ public class ComputeTreeEmbedding {
 			}
 		}
 	}
-
-	public static record ShapeAndLabel(Shape shape, RichTextLabel label) implements Iterable<javafx.scene.Node> {
-		@Override
-		public Iterator<javafx.scene.Node> iterator() {
-			return List.of(shape, label).iterator();
-		}
-	}
-
 }
 

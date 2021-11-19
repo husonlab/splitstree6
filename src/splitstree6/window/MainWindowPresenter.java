@@ -198,8 +198,8 @@ public class MainWindowPresenter {
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
 
 		if (focusedDisplayTab.get() != null) {
-			controller.getPrintMenuItem().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().imageNodeProperty().get()));
-			controller.getPrintMenuItem().disableProperty().bind(focusedDisplayTab.isNull().or(focusedDisplayTab.get().imageNodeProperty().isNull()));
+			controller.getPrintMenuItem().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().getImageNode()));
+			controller.getPrintMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 		}
 
 		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> {
@@ -233,9 +233,9 @@ public class MainWindowPresenter {
 		controller.getCutMenuItem().setDisable(false);
 		controller.getCopyMenuItem().setDisable(false);
 
-		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().imageNodeProperty().get() != null) {
+		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getImageNode() != null) {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
-				final Image snapshot = focusedDisplayTab.get().imageNodeProperty().get().snapshot(null, null);
+				final Image snapshot = focusedDisplayTab.get().getImageNode().snapshot(null, null);
 				final ClipboardContent clipboardContent = new ClipboardContent();
 				clipboardContent.putImage(snapshot);
 				Clipboard.getSystemClipboard().setContent(clipboardContent);

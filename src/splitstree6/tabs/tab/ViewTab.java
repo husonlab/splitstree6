@@ -19,19 +19,17 @@
 
 package splitstree6.tabs.tab;
 
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.Tab;
-import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
+import splitstree6.tabs.IDisplayTab;
+import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
@@ -39,7 +37,7 @@ import splitstree6.window.MainWindow;
  * tab to be shown in main tab-pane
  * Daniel Huson, 11.2021
  */
-public class ViewTab extends Tab {
+public class ViewTab extends Tab implements IDisplayTab {
 	private final UndoManager undoManager = new UndoManager();
 	private final MainWindow mainWindow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
@@ -51,10 +49,9 @@ public class ViewTab extends Tab {
 	/**
 	 * constructor
 	 */
-	public ViewTab(MainWindow mainWindow, String name, boolean closable) {
+	public ViewTab(MainWindow mainWindow, boolean closable) {
 		this.mainWindow = mainWindow;
-
-		setText(name);
+		setText("ViewTab");
 		setClosable(closable);
 		setOnCloseRequest(v -> mainWindow.removeTabFromMainTabPane(this));
 
@@ -68,34 +65,6 @@ public class ViewTab extends Tab {
 		viewProperty().addListener((v, o, n) -> {
 			setContent(n.getRoot());
 		});
-
-		{
-			var pane = new Pane();
-			pane.prefWidthProperty().bind(Bindings.createDoubleBinding(() -> getLayoutBounds().getWidth(), layoutBounds));
-			pane.prefHeightProperty().bind(Bindings.createDoubleBinding(() -> getLayoutBounds().getHeight() - 32, layoutBounds));
-
-			BasicFX.reportChanges(pane.widthProperty());
-			BasicFX.reportChanges(pane.heightProperty());
-
-			{
-				var rectangle = new Rectangle(2, 2, pane.getPrefWidth() - 4, pane.getPrefHeight() - 4);
-				rectangle.widthProperty().bind(pane.prefWidthProperty().subtract(4));
-				rectangle.heightProperty().bind(pane.prefHeightProperty().subtract(4));
-				rectangle.setFill(Color.BLUE);
-
-				pane.getChildren().add(rectangle);
-			}
-			{
-				var rectangle = new Rectangle(20, 20, pane.getPrefWidth() - 40, pane.getPrefHeight() - 40);
-				rectangle.widthProperty().bind(pane.prefWidthProperty().subtract(40));
-				rectangle.heightProperty().bind(pane.prefHeightProperty().subtract(40));
-				rectangle.setFill(Color.YELLOW);
-
-				pane.getChildren().add(rectangle);
-			}
-			setContent(pane);
-		}
-
 		mainWindow.addTabToMainTabPane(this);
 	}
 
@@ -137,6 +106,18 @@ public class ViewTab extends Tab {
 
 	public void setView(IView view) {
 		this.view.set(view);
+		this.setText(view.getName());
+
+	}
+
+	@Override
+	public Node getImageNode() {
+		return getView() == null ? null : getView().getImageNode();
+	}
+
+	@Override
+	public IDisplayTabPresenter getPresenter() {
+		return getView() == null ? null : getView().getPresenter();
 	}
 }
 

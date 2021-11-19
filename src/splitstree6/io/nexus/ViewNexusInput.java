@@ -62,14 +62,14 @@ public class ViewNexusInput extends NexusIOBase {
 		parseTitleAndLink(np);
 
 		np.matchIgnoreCase("NAME");
-		viewBlock.setViewName(np.getLabelRespectCase());
+		viewBlock.setName(np.getLabelRespectCase());
 		np.matchIgnoreCase(";");
 		np.matchIgnoreCase("INPUT");
 		viewBlock.setInputBlockName(np.getWordMatchesIgnoringCase("TAXA TRAITS CHARACTERS DISTANCES SPLITS TREES NETWORK"));
 		np.matchIgnoreCase(";");
 
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
-			viewBlock.setInitializationLines(StringUtils.toString(np.getTokensLowerCase("OPTIONS", ";"), " "));
+			viewBlock.setInitializationLines(StringUtils.toString(np.getTokensRespectCase("OPTIONS", ";"), " "));
 		}
 		np.matchEndBlock();
 

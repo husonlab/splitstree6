@@ -69,8 +69,6 @@ public class TreePageFactory implements Callback<Integer, Node> {
 	}
 
 	private void update() {
-		System.err.println("Update");
-
 		var taxaBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
 		var taxonSelectionModel = mainWindow.getTaxonSelectionModel();
 
@@ -87,7 +85,6 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(taxaBlock, tree, name, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.getOptionRootSide(), treePagesView.optionFontScaleFactorProperty());
-				// todo: draw tree in separate thread
 				treePane.drawTree();
 				pane = treePane;
 			} else

@@ -21,7 +21,6 @@
 package splitstree6.tabs;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 
@@ -31,7 +30,7 @@ public interface IDisplayTab {
 
 	ReadOnlyBooleanProperty emptyProperty();
 
-	ReadOnlyObjectProperty<Node> imageNodeProperty();
+	Node getImageNode();
 
 	IDisplayTabPresenter getPresenter();
 }
