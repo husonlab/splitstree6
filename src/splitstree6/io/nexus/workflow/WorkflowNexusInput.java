@@ -62,6 +62,7 @@ public class WorkflowNexusInput {
 	public static void open(MainWindow mainWindow, String fileName) {
 		var workflow = mainWindow.getWorkflow();
 		workflow.clear();
+		mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 
 		if (false) {
 			try (var reader = new BufferedReader(new FileReader(fileName))) {
@@ -81,6 +82,7 @@ public class WorkflowNexusInput {
 			});
 			service.setOnSucceeded(e -> {
 				var inputWorkFlow = service.getValue();
+				mainWindow.setFileName(fileName);
 				NotificationManager.showInformation("Loaded file: " + fileName + ", workflow nodes: " + inputWorkFlow.size());
 				workflow.shallowCopy(inputWorkFlow);
 				for (var node : workflow.algorithmNodes()) {

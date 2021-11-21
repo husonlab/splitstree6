@@ -24,6 +24,7 @@ import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import splitstree6.options.IHasOptions;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.tabs.viewtab.ViewTab;
 
 public interface IView extends IHasOptions {
 	String getName();
@@ -31,6 +32,8 @@ public interface IView extends IHasOptions {
 	Node getRoot();
 
 	void setupMenuItems();
+
+	void setViewTab(ViewTab viewTab);
 
 	int size();
 

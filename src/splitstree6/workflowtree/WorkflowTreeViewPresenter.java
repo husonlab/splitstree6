@@ -1,5 +1,5 @@
 /*
- *  InputEditorTabPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  InputEditorViewPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.treeview;
+package splitstree6.workflowtree;
 
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;

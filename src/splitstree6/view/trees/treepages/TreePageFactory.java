@@ -84,7 +84,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(taxaBlock, tree, name, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-						treePagesView.getOptionDiagram(), treePagesView.getOptionRootSide(), treePagesView.optionFontScaleFactorProperty());
+						treePagesView.getOptionDiagram(), treePagesView.getOptionRootSide(), treePagesView.optionFontScaleFactorProperty(), treePagesView.optionShowTreeNamesProperty());
 				treePane.drawTree();
 				pane = treePane;
 			} else
@@ -104,9 +104,11 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 	@Override
 	public Node call(Integer page) {
-		this.page = page;
 		gridPane = new GridPane();
-		update();
+		if (page >= 0) {
+			this.page = page;
+			update();
+		}
 		return gridPane;
 	}
 }

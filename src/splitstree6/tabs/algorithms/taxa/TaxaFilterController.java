@@ -21,7 +21,9 @@ package splitstree6.tabs.algorithms.taxa;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SelectionMode;
 import javafx.scene.layout.AnchorPane;
 
 public class TaxaFilterController {
@@ -38,13 +40,28 @@ public class TaxaFilterController {
 	private Button moveSelectedRightButton;
 
 	@FXML
-	private Button moveAllRightButton;
+	private Button moveUnselectedRightButton;
 
 	@FXML
 	private Button moveSelectedLeftButton;
 
 	@FXML
-	private Button moveAllLeftButton;
+	private Button moveUnselectedLeftButton;
+
+	@FXML
+	private Label activeLabel;
+
+	@FXML
+	private Label inactiveLabel;
+
+	@FXML
+	void initialize() {
+		activeListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		inactiveListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+		activeListView.setPlaceholder(new Label("- Empty -"));
+		inactiveListView.setPlaceholder(new Label("- Empty -"));
+	}
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -62,15 +79,23 @@ public class TaxaFilterController {
 		return moveSelectedRightButton;
 	}
 
-	public Button getMoveAllRightButton() {
-		return moveAllRightButton;
+	public Button getMoveUnselectedRightButton() {
+		return moveUnselectedRightButton;
 	}
 
 	public Button getMoveSelectedLeftButton() {
 		return moveSelectedLeftButton;
 	}
 
-	public Button getMoveAllLeftButton() {
-		return moveAllLeftButton;
+	public Button getMoveUnselectedLeftButton() {
+		return moveUnselectedLeftButton;
+	}
+
+	public Label getActiveLabel() {
+		return activeLabel;
+	}
+
+	public Label getInactiveLabel() {
+		return inactiveLabel;
 	}
 }

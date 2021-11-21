@@ -17,25 +17,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.treeview;
+package splitstree6.workflowtree;
 
 import javafx.animation.Animation;
 import javafx.animation.Interpolator;
 import javafx.animation.RotateTransition;
+import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.workflow.WorkflowNode;
+import jloda.util.FileUtils;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.contextmenus.datanode.DataNodeContextMenu;
+import splitstree6.data.ViewBlock;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -57,7 +61,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		this.workflowTreeView = mainWindow.getWorkflowTreeView();
 		workflowNode = null;
 		Label label = new Label();
-		label.textProperty().bind(mainWindow.nameProperty());
+		label.textProperty().bind(Bindings.createStringBinding(() -> FileUtils.getFileNameWithoutPath(mainWindow.getFileName()), mainWindow.fileNameProperty()));
 		label.setGraphic(ResourceManagerFX.getIconAsImageView("Document16.gif", 16));
 		setGraphic(label);
 
@@ -149,10 +153,15 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 		label.textProperty().bind(node.titleProperty());
 
-		var icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").
+		Image icon;
+		if (node.getDataBlock() instanceof ViewBlock)
+			icon = ResourceManagerFX.getIcon("ViewBlock16.png");
+		else
+			icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").
 													 replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
 		if (icon != null) {
-			label.setGraphic(new ImageView(icon));
+			var iconView = new ImageView(icon);
+			label.setGraphic(iconView);
 		}
 
 		tooltip.textProperty().bind(node.shortDescriptionProperty());
@@ -160,12 +169,13 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 		stateChangeListener = null;
 
-		vBox.setOnMouseClicked((e) -> {
-			if (e.getClickCount() == 2) {
-				showView();
-				e.consume();
-			}
-		});
+		if (false)
+			vBox.setOnMouseClicked((e) -> {
+				if (e.getClickCount() == 2) {
+					showView();
+					e.consume();
+				}
+			});
 
 		label.disableProperty().bind(node.validProperty().not());
 

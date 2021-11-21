@@ -25,7 +25,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
@@ -35,7 +34,6 @@ import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.Pair;
 import splitstree6.tabs.IDisplayTabPresenter;
-import splitstree6.tabs.tab.ViewTab;
 import splitstree6.window.MainWindow;
 
 /**
@@ -57,7 +55,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	/**
 	 * constructor
 	 */
-	public TreePagesViewPresenter(MainWindow mainWindow, TreePagesView treePagesView, ViewTab viewTab, ObservableList<PhyloTree> phyloTrees) {
+	public TreePagesViewPresenter(MainWindow mainWindow, TreePagesView treePagesView, ObjectProperty<Bounds> targetBounds, ObservableList<PhyloTree> phyloTrees) {
 		this.mainWindow = mainWindow;
 		this.treePageView = treePagesView;
 
@@ -65,7 +63,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell());
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback());
-		controller.getDiagramCBox().getItems().addAll(ComputeTreeEmbedding.TreeDiagram.values());
+		controller.getDiagramCBox().getItems().addAll(ComputeTreeEmbedding.Diagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
 
 		controller.getRootSideCBox().setButtonCell(ComboBoxUtils.createRootSideComboBoxListCell());
@@ -75,14 +73,22 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getRootSideCBox().valueProperty().bindBidirectional(treePagesView.optionRootSideProperty());
 		controller.getRootSideCBox().disableProperty().bind(Bindings.createObjectBinding(() -> treePagesView.getOptionDiagram().isRadial(), treePagesView.optionDiagramProperty()));
 
-		controller.getRowsColsCBox().getItems().setAll(gridValues);
+		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowTreeNamesProperty());
+		{
+			controller.getRowsColsCBox().getItems().setAll(gridValues);
+			var text = String.format("%d x %d", treePagesView.getOptionRows(), treePagesView.getOptionCols());
+			if (gridValues.contains(text))
+				gridValues.set(0, text);
+			controller.getRowsColsCBox().setValue(text);
+		}
+
 		gridValues.addListener((InvalidationListener) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
 
 		treePagesView.optionRowsProperty().addListener((v, o, n) -> {
 			var text = String.format("%d x %d", treePagesView.getOptionRows(), treePagesView.getOptionCols());
-			controller.getRowsColsCBox().setValue(text);
 			if (!gridValues.contains(text))
 				gridValues.set(0, text);
+			controller.getRowsColsCBox().setValue(text);
 		});
 
 		controller.getRowsColsCBox().valueProperty().addListener((v, o, n) -> {
@@ -96,16 +102,12 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		final ChangeListener<Bounds> changeListener = (v, o, n) -> {
-			if (n.getWidth() > 0 && n.getHeight() > 0) {
-				boxDimensions.set(new Dimension2D(n.getWidth() / treePagesView.getOptionCols() - 5, (n.getHeight() - 100) / treePagesView.getOptionRows() - 5));
-			}
-		};
-		treePagesView.getRoot().parentProperty().addListener((v, o, n) -> {
-			if (o != null)
-				o.boundsInLocalProperty().removeListener(changeListener);
-			if (n != null)
-				n.boundsInLocalProperty().addListener(changeListener);
+		targetBounds.addListener((v, o, n) -> {
+			var width = n.getWidth() - 4;
+			var height = n.getHeight() - 120;
+			controller.getPagination().setPrefWidth(width);
+			controller.getPagination().setPrefHeight(height);
+			boxDimensions.set(new Dimension2D(width / treePagesView.getOptionCols() - 5, height / treePagesView.getOptionRows() - 5));
 		});
 
 		treePagesView.optionRowsProperty().addListener((v, o, n) ->
@@ -116,8 +118,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		var numberOfPages = new SimpleIntegerProperty(0);
 
-		treePagesView.optionPageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
-		controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> treePagesView.setOptionPageNumber(n.intValue() + 1));
+		treePagesView.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
+		controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> treePagesView.setPageNumber(n.intValue() + 1));
 
 		treePageFactory.set(new TreePageFactory(mainWindow, treePagesView, phyloTrees, treePagesView.optionRowsProperty(), treePagesView.optionColsProperty(), boxDimensions));
 
@@ -132,11 +134,11 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			invalidationListener.invalidated(null);
 		}
 
-		treePagesView.optionPageNumberProperty().addListener((v, o, n) -> {
+		treePagesView.pageNumberProperty().addListener((v, o, n) -> {
 			if (n.intValue() < 1)
-				Platform.runLater(() -> treePagesView.setOptionPageNumber(1));
+				Platform.runLater(() -> treePagesView.setPageNumber(1));
 			else if (n.intValue() >= numberOfPages.get())
-				Platform.runLater(() -> treePagesView.setOptionPageNumber((Math.max(1, numberOfPages.get()))));
+				Platform.runLater(() -> treePagesView.setPageNumber((Math.max(1, numberOfPages.get()))));
 		});
 
 		Platform.runLater(this::setupMenuItems);
@@ -166,13 +168,5 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
 		mainWindow.getController().getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
 		mainWindow.getController().getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-	}
-
-	public void updatePageContent() {
-		if (false) {
-			var save = treePageFactory.get();
-			treePageFactory.set(null);
-			treePageFactory.set(save);
-		}
 	}
 }

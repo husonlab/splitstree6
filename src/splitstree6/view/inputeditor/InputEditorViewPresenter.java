@@ -1,5 +1,5 @@
 /*
- *  InputEditorTabPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  InputEditorViewPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,20 +17,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.inputeditor;
+package splitstree6.view.inputeditor;
 
-import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.util.ProgramProperties;
 import splitstree6.io.readers.ImportManager;
-import splitstree6.tabs.textdisplay.TextDisplayTabPresenter;
+import splitstree6.view.displaytext.DisplayTextViewPresenter;
 import splitstree6.window.MainWindow;
 
 import java.io.File;
@@ -40,26 +37,23 @@ import java.util.ArrayList;
  * input editor tab presenter
  * Daniel Huson, 10.2021
  */
-public class InputEditorTabPresenter extends TextDisplayTabPresenter {
+public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 	private final MainWindow mainWindow;
-	private final InputEditorTab tab;
-
-	private final BooleanBinding selectionEmpty;
+	private final InputEditorView view;
 
 	private final ReadOnlyBooleanProperty TRUE = new SimpleBooleanProperty(true);
 
-	public InputEditorTabPresenter(MainWindow mainWindow, InputEditorTab tab) {
-		super(mainWindow, tab, true);
+	public InputEditorViewPresenter(MainWindow mainWindow, InputEditorView view) {
+		super(mainWindow, view, true);
 		this.mainWindow = mainWindow;
-		this.tab = tab;
+		this.view = view;
 
-		tab.setShowLineNumbers(true);
-		tab.setWrapText(false);
+		view.setShowLineNumbers(true);
+		view.setWrapText(false);
 
-		tab.setGraphic(new ImageView(ResourceManagerFX.getIcon("sun/Import16.gif")));
 
-		var tabController = tab.getController();
-		var toolBarController = tab.getToolBarController();
+		var tabController = view.getController();
+		var toolBarController = view.getToolBarController();
 
 		var codeArea = tabController.getCodeArea();
 		codeArea.setEditable(true);
@@ -71,8 +65,8 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 		list.addAll(toolBarController.getLastToolBar().getItems());
 		tabController.getToolBar().getItems().setAll(list);
 
-		toolBarController.getParseAndLoadButton().setOnAction(e -> tab.parseAndLoad());
-		toolBarController.getParseAndLoadButton().disableProperty().bind(tab.emptyProperty().or(mainWindow.getWorkflow().runningProperty()));
+		toolBarController.getParseAndLoadButton().setOnAction(e -> view.parseAndLoad());
+		toolBarController.getParseAndLoadButton().disableProperty().bind(view.emptyProperty());
 
 		toolBarController.getOpenButton().setOnAction(e -> {
 			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
@@ -85,10 +79,10 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 			if (selectedFile != null) {
 				if (selectedFile.getParentFile().isDirectory())
 					ProgramProperties.put("InputDir", selectedFile.getParent());
-				tab.importFromFile(selectedFile.getPath());
+				view.importFromFile(selectedFile.getPath());
 			}
 		});
-		toolBarController.getOpenButton().disableProperty().bind(tab.emptyProperty().not());
+		toolBarController.getOpenButton().disableProperty().bind(view.emptyProperty().not());
 
 		toolBarController.getSaveButton().setOnAction(e -> {
 			var fileChooser = new FileChooser();
@@ -97,33 +91,20 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 			if (previousDir.isDirectory()) {
 				fileChooser.setInitialDirectory(previousDir);
 			}
-			fileChooser.setInitialFileName(tab.getInputFileName());
+			fileChooser.setInitialFileName(mainWindow.getFileName());
 			var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
 			if (selectedFile != null) {
-				tab.saveToFile(selectedFile);
+				view.saveToFile(selectedFile);
 			}
 		});
-		toolBarController.getSaveButton().disableProperty().bind(tab.emptyProperty());
-
-		selectionEmpty = new BooleanBinding() {
-			{
-				super.bind(codeArea.selectionProperty());
-			}
-
-			@Override
-			protected boolean computeValue() {
-				return codeArea.getSelection().getLength() == 0;
-			}
-		};
+		toolBarController.getSaveButton().disableProperty().bind(view.emptyProperty());
 
 		// prevent double paste:
-		{
-			codeArea.addEventFilter(KeyEvent.ANY, e -> {
-				if (e.getCode() == KeyCode.V && e.isShortcutDown()) {
-					e.consume();
-				}
-			});
-		}
+		codeArea.addEventHandler(KeyEvent.ANY, e -> {
+			if (e.getCode() == KeyCode.V && e.isShortcutDown()) {
+				e.consume();
+			}
+		});
 
 		codeArea.focusedProperty().addListener((c, o, n) -> {
 			if (n)
@@ -135,7 +116,7 @@ public class InputEditorTabPresenter extends TextDisplayTabPresenter {
 		super.setupMenuItems();
 
 		var controller = mainWindow.getController();
-		var toolBarController = tab.getToolBarController();
+		var toolBarController = view.getToolBarController();
 
 		controller.getOpenMenuItem().setOnAction(toolBarController.getOpenButton().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(toolBarController.getOpenButton().disableProperty());

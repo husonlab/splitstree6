@@ -1,5 +1,5 @@
 /*
- *  Viewer.java Copyright (C) 2021 Daniel H. Huson
+ *  ShowTrees.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -28,8 +28,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.TreesNexusOutput;
-import splitstree6.options.OptionIO;
-import splitstree6.view.ConsoleView;
+import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.trees.next.Next;
 import splitstree6.view.trees.treepages.TreePagesView;
 
@@ -41,8 +40,8 @@ import java.util.List;
  * trees viewer selection
  * Daniel Huson, 11.2021
  */
-public class Viewer extends Trees2View {
-	public enum ViewType {SingleTree, TreePages, DensiTree, Tanglegram, Console}
+public class ShowTrees extends Trees2View {
+	public enum ViewType {SingleTree, TreePages, DensiTree, Tanglegram, Text}
 
 	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.TreePages);
 
@@ -51,7 +50,7 @@ public class Viewer extends Trees2View {
 		return List.of(optionView.getName());
 	}
 
-	public Viewer() {
+	public ShowTrees() {
 		super();
 	}
 
@@ -63,56 +62,46 @@ public class Viewer extends Trees2View {
 
 		switch (getOptionView()) {
 			case TreePages -> {
-				if (viewBlock.getView() instanceof TreePagesView view) {
-					Platform.runLater(() -> view.setTrees(inputData.getTrees()));
-				} else {
+				if (!(viewBlock.getView() instanceof TreePagesView)) {
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new TreePagesView(mainWindow, "TreePages", viewBlock.getViewTab());
-						try {
-							OptionIO.parseOptions(viewBlock.initializationLinesProperty(), view);
-						} catch (IOException e) {
-							NotificationManager.showError("Error parsing options");
-						}
+						var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
 						viewBlock.setView(view);
 						view.getTrees().setAll(inputData.getTrees());
 					});
 				}
+				Platform.runLater(() -> {
+					if (viewBlock.getView() instanceof TreePagesView view) {
+						view.setTrees(inputData.getTrees());
+					}
+				});
 			}
 			case Tanglegram -> {
 				Platform.runLater(() -> {
 					var mainWindow = getNode().getOwner().getMainWindow();
-					var view = new Next(mainWindow);
+					var view = new Next(mainWindow, viewBlock.getViewTab());
 					viewBlock.setView(view);
 				});
 			}
 			case SingleTree, DensiTree -> throw new IOException("Not implemented: " + getOptionView());
-			case Console -> {
-				if (viewBlock.getView() instanceof ConsoleView consoleView) {
-					try {
-						OptionIO.parseOptions(viewBlock.initializationLinesProperty(), viewBlock.getView());
-					} catch (IOException e) {
-						NotificationManager.showError("Error parsing options");
-					}
+			case Text -> {
+				if (!(viewBlock.getView() instanceof DisplayTextView)) {
 					Platform.runLater(() -> {
+						var mainWindow = getNode().getOwner().getMainWindow();
+						var view = new DisplayTextView(mainWindow, inputData.getName() + " text", false);
+						viewBlock.setView(view);
+					});
+				}
+				Platform.runLater(() -> {
+					if (viewBlock.getView() instanceof DisplayTextView view) {
 						try (var w = new StringWriter()) {
 							(new TreesNexusOutput()).write(w, taxaBlock, inputData);
-							consoleView.setText(w.toString());
+							view.replaceText(w.toString());
 						} catch (IOException ex) {
 							NotificationManager.showError("Internal error: " + ex);
 						}
-					});
-					return;
-				} else {
-					var mainWindow = getNode().getOwner().getMainWindow();
-					var view = new ConsoleView(mainWindow, inputData.getName() + " text");
-					try (var w = new StringWriter()) {
-						(new TreesNexusOutput()).write(w, taxaBlock, inputData);
-						view.setText(w.toString());
 					}
-					viewBlock.setView(view);
-					viewBlock.getViewTab().setView(view);
-				}
+				});
 			}
 		}
 

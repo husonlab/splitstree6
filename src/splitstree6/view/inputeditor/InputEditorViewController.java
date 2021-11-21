@@ -1,5 +1,5 @@
 /*
- *  WorkflowTreeViewController.java Copyright (C) 2021 Daniel H. Huson
+ *  InputEditorViewController.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,47 +17,45 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.treeview;
+package splitstree6.view.inputeditor;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
-import javafx.scene.control.TreeView;
 
-public class WorkflowTreeViewController {
+public class InputEditorViewController {
+	@FXML
+	private ToolBar firstToolBar;
 
 	@FXML
-	private ToolBar treeViewToolBar;
+	private Button openButton;
 
 	@FXML
-	private Button expandAllButton;
+	private Button saveButton;
 
 	@FXML
-	private Button collapseAllButton;
+	private ToolBar lastToolBar;
 
 	@FXML
-	private Button showButton;
+	private Button parseAndLoadButton;
 
-	@FXML
-	private TreeView<String> workflowTreeView;
-
-	public ToolBar getTreeViewToolBar() {
-		return treeViewToolBar;
+	public ToolBar getFirstToolBar() {
+		return firstToolBar;
 	}
 
-	public Button getExpandAllButton() {
-		return expandAllButton;
+	public Button getOpenButton() {
+		return openButton;
 	}
 
-	public Button getCollapseAllButton() {
-		return collapseAllButton;
+	public Button getSaveButton() {
+		return saveButton;
 	}
 
-	public Button getShowButton() {
-		return showButton;
+	public ToolBar getLastToolBar() {
+		return lastToolBar;
 	}
 
-	public TreeView<String> getWorkflowTreeView() {
-		return workflowTreeView;
+	public Button getParseAndLoadButton() {
+		return parseAndLoadButton;
 	}
 }

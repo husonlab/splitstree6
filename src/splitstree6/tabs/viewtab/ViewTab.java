@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.tab;
+package splitstree6.tabs.viewtab;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -58,8 +58,9 @@ public class ViewTab extends Tab implements IDisplayTab {
 		tabPaneProperty().addListener((v, o, n) -> {
 			if (n == null)
 				layoutBounds.unbind();
-			else
+			else {
 				layoutBounds.bind(n.layoutBoundsProperty());
+			}
 		});
 
 		viewProperty().addListener((v, o, n) -> {
@@ -106,7 +107,10 @@ public class ViewTab extends Tab implements IDisplayTab {
 
 	public void setView(IView view) {
 		this.view.set(view);
-		this.setText(view.getName());
+		if (view != null) {
+			view.setViewTab(this);
+			this.setText(view.getName());
+		}
 
 	}
 

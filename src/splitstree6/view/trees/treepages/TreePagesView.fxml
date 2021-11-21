@@ -44,7 +44,7 @@
                                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                                    preserveRatio="true">
                                             <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Open16.gif"/>
+                                                <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
                                             </image>
                                         </ImageView>
                                     </graphic>
@@ -126,6 +126,22 @@
                                         <Tooltip text="Set rows x columns"/>
                                     </tooltip>
                                 </ComboBox>
+                                <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="GRAPHIC_ONLY"
+                                              maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                                              minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
+                                              prefWidth="24.0" text="Show Tree Names">
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image url="@/splitstree6/resources/icons/Text16.png"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Show tree names"/>
+                                    </tooltip>
+                                </ToggleButton>
                             </items>
                         </ToolBar>
                     </children>

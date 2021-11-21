@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.view.text;
+package splitstree6.view.displaytext;
 
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;

@@ -37,11 +37,14 @@ import javafx.util.Callback;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ProgramExecutorService;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
 public class Next implements IView {
 	private final UndoManager undoManager = new UndoManager();
+
+	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>();
 
 	private final Pagination pagination = new Pagination();
 	private final StackPane stackPane = new StackPane(pagination);
@@ -49,7 +52,7 @@ public class Next implements IView {
 	private final IntegerProperty size = new SimpleIntegerProperty(100);
 	private final BooleanProperty empty = new SimpleBooleanProperty(false);
 
-	public Next(MainWindow mainWindow) {
+	public Next(MainWindow mainWindow, ViewTab viewTab) {
 		ObjectProperty<PageFactory> pageFactory = new SimpleObjectProperty<>();
 		pagination.pageFactoryProperty().bind(pageFactory);
 
@@ -63,17 +66,27 @@ public class Next implements IView {
 
 		final ChangeListener<Bounds> changeListener = (v, o, n) -> {
 			if (n.getWidth() > 0 && n.getHeight() > 0) {
-				box.set(new Dimension2D(n.getWidth() / cols.get() - 5, (n.getHeight() - 50) / rows.get() - 5));
+				box.set(new Dimension2D(n.getWidth() / cols.get() - 5, (n.getHeight() - 70) / rows.get() - 5));
 			}
 		};
-		getRoot().parentProperty().addListener((v, o, n) -> {
+
+		this.viewTab.addListener((v, o, n) -> {
 			if (o != null)
-				o.boundsInLocalProperty().removeListener(changeListener);
-			if (n != null)
-				n.boundsInLocalProperty().addListener(changeListener);
+				o.layoutBoundsProperty().removeListener(changeListener);
+			if (n != null) {
+				n.layoutBoundsProperty().addListener(changeListener);
+				changeListener.changed(null, null, n.getLayoutBounds());
+			}
 		});
+		setViewTab(viewTab);
 
 		pageFactory.set(new PageFactory(rows, cols, size, box));
+	}
+
+	@Override
+	public void setViewTab(ViewTab viewTab) {
+		this.viewTab.set(viewTab);
+
 	}
 
 	private static class PageFactory implements Callback<Integer, Node> {
@@ -81,7 +94,7 @@ public class Next implements IView {
 		private final IntegerProperty cols;
 		private final IntegerProperty itemCount;
 		private final ObjectProperty<Dimension2D> dimensions;
-		private final GridPane gridPane;
+		private GridPane gridPane;
 		private int page;
 
 		public PageFactory(IntegerProperty rows, IntegerProperty cols, IntegerProperty itemCount, ObjectProperty<Dimension2D> dimensions) {
@@ -141,6 +154,9 @@ public class Next implements IView {
 		@Override
 		public Node call(Integer page) {
 			this.page = page;
+			gridPane = new GridPane();
+			gridPane.setHgap(5);
+			gridPane.setVgap(5);
 			update();
 			return gridPane;
 		}

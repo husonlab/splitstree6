@@ -23,7 +23,7 @@ import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
-import splitstree6.algorithms.trees.trees2view.ShowTreesConsole;
+import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
@@ -65,7 +65,7 @@ public class AddTreePipelineCommand {
 			if (algorithm.getToClass() == TreesBlock.class) {
 				// replace sink block by tree view block
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				var algorithmNode2 = workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				var algorithmNode2 = workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				algorithmNode.restart();
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
 				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2);
@@ -74,7 +74,7 @@ public class AddTreePipelineCommand {
 				var targetDataNode2 = workflow.newDataNode(new TreesBlock());
 				var algorithmNode2 = workflow.newAlgorithmNode(new GreedyTree(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				var targetDataNode3 = workflow.newDataNode(new ViewBlock());
-				var algorithmNode3 = workflow.newAlgorithmNode(new ShowTreesConsole(), workflow.getWorkingTaxaNode(), targetDataNode2, targetDataNode3);
+				var algorithmNode3 = workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode2, targetDataNode3);
 				algorithmNode.restart();
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
 				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2, algorithmNode3, targetDataNode3);

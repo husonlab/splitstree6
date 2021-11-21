@@ -105,8 +105,6 @@ public class OptionIO {
 		if (!initialization.get().isBlank()) {
 			try (var np = new NexusStreamParser(new StringReader("OPTIONS " + initialization.get() + ";"))) {
 				parseOptions(np, optionsCarrier);
-			} finally {
-				initialization.set("");
 			}
 		}
 	}
@@ -126,7 +124,7 @@ public class OptionIO {
 						first = false;
 					else
 						w.write(",\n");
-					w.write("\t" + option.getName() + " = '" + valueString + "'");
+					w.write("\t" + option.getName() + " = " + valueString);
 				}
 			}
 			w.write(";\n");

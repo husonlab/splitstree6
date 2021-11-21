@@ -19,146 +19,37 @@
 
 package splitstree6.tabs.inputeditor;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.RecentFilesManager;
-import jloda.fx.window.NotificationManager;
-import jloda.util.FileLineIterator;
-import jloda.util.FileUtils;
-import jloda.util.IOExceptionWithLineNumber;
-import jloda.util.StringUtils;
-import splitstree6.tabs.IDisplayTab;
-import splitstree6.tabs.textdisplay.TextDisplayTab;
+import javafx.application.Platform;
+import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.window.MainWindow;
-import splitstree6.workflow.WorkflowSetup;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.util.function.Consumer;
+/**
+ * input editor tab
+ * Daniel Huson, 11.2021
+ */
+public class InputEditorTab extends ViewTab {
+	public static final String NAME = "Input Editor`";
 
-public class InputEditorTab extends TextDisplayTab implements IDisplayTab {
-	public static final String NAME = "Input Editor";
-	private final MainWindow mainWindow;
-	private final InputEditorTabController toolBarController;
-	private final InputEditorTabPresenter toolBarPresenter;
-	private File tmpFile;
-
-	private final StringProperty inputFileName = new SimpleStringProperty("");
+	private final InputEditorView inputEditorView;
 
 	/**
 	 * constructor
 	 */
 	public InputEditorTab(MainWindow mainWindow) {
-		super(mainWindow, "Input Editor", false, true);
-		this.mainWindow = mainWindow;
-
-		var loader = new ExtendedFXMLLoader<InputEditorTabController>(this.getClass());
-		toolBarController = loader.getController();
-		toolBarPresenter = new InputEditorTabPresenter(mainWindow, this);
-	}
-
-	public InputEditorTabController getToolBarController() {
-		return toolBarController;
-	}
-
-	public InputEditorTabPresenter getToolBarPresenter() {
-		return toolBarPresenter;
-	}
-
-	/**
-	 * go to given line and given col
-	 *
-	 * @param col if col<=1 or col>line length, will select the whole line, else selects line starting at given col
-	 */
-	public void gotoLine(long lineNumber, int col) {
-		if (col < 0)
-			col = 0;
-		else if (col > 0)
-			col--; // because col is 1-based
-
-		lineNumber = Math.max(1, lineNumber);
-		final String text = getController().getCodeArea().getText();
-		int start = 0;
-		for (int i = 1; i < lineNumber; i++) {
-			start = text.indexOf('\n', start + 1);
-			if (start == -1) {
-				System.err.println("No such line number: " + lineNumber);
-				return;
-			}
+		super(mainWindow, false);
+		if (false) {
+			inputEditorView = null;
+			setText(NAME);
+		} else {
+			this.inputEditorView = new InputEditorView(mainWindow, this);
+			Platform.runLater(() -> setView(inputEditorView));
 		}
-		start++;
-		if (start < text.length()) {
-			int end = text.indexOf('\n', start);
-			if (end == -1)
-				end = text.length();
-			if (start + col < end)
-				start = start + col;
-			getController().getScrollPane().requestFocus();
-			getController().getCodeArea().selectRange(start, end);
-		}
+		//setGraphic(new ImageView(ResourceManagerFX.getIcon("sun/Import16.gif")));
 	}
 
 	public void importFromFile(String fileName) {
-		try (FileLineIterator it = new FileLineIterator(fileName)) {
-			replaceText(StringUtils.toString(it.lines(), "\n"));
-			var name = FileUtils.getFileBaseName(fileName);
-			setInputFileName(name);
-			mainWindow.setName(name);
-			RecentFilesManager.getInstance().insertRecentFile(fileName);
-		} catch (IOException ex) {
-			NotificationManager.showError("Import text failed: " + ex.getMessage());
-		}
-	}
-
-	public void saveToFile(File file) {
-		try {
-			Files.writeString(file.toPath(), getController().getCodeArea().getText());
-			setInputFileName(file.getName());
-		} catch (IOException ex) {
-			NotificationManager.showError("Save text failed: " + ex.getMessage());
-		}
-	}
-
-	public void parseAndLoad() {
-		try {
-			if (tmpFile == null) {
-				tmpFile = FileUtils.getUniqueFileName(System.getProperty("user.dir"), "Untitled", "tmp");
-				tmpFile.deleteOnExit();
-			}
-			try (BufferedWriter w = new BufferedWriter(new FileWriter(tmpFile))) {
-				w.write(getController().getCodeArea().getText());
-			}
-
-			Consumer<Throwable> failedHandler = ex -> {
-				if (ex instanceof IOExceptionWithLineNumber exceptionWithLineNumber) {
-					getTabPane().getSelectionModel().select(this);
-					getController().getCodeArea().requestFocus();
-					gotoLine(exceptionWithLineNumber.getLineNumber(), 0);
-				}
-				NotificationManager.showError("Parse failed: " + ex.getMessage());
-			};
-			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler);
-			mainWindow.setDirty(true);
-			mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
-		} catch (Exception ex) {
-			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
-		}
-	}
-
-	public String getInputFileName() {
-		return inputFileName.get();
-	}
-
-	public StringProperty inputFileNameProperty() {
-		return inputFileName;
-	}
-
-	public void setInputFileName(String inputFileName) {
-		this.inputFileName.set(inputFileName);
+		inputEditorView.importFromFile(fileName);
 	}
 }
 

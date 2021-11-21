@@ -33,6 +33,7 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
+import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.data.parts.Taxon;
@@ -40,8 +41,8 @@ import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.textdisplay.TextDisplayTab;
 import splitstree6.tabs.workflow.WorkflowTab;
-import splitstree6.treeview.WorkflowTreeView;
 import splitstree6.workflow.Workflow;
+import splitstree6.workflowtree.WorkflowTreeView;
 
 public class MainWindow implements IMainWindow {
 	private final Parent root;
@@ -82,20 +83,14 @@ public class MainWindow implements IMainWindow {
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
-		/*
-		FileOpenManager.setExtensions(Arrays.asList(new FileChooser.ExtensionFilter("GFA", "*.gfa", "*.fga.gz"),
-				new FileChooser.ExtensionFilter("Alora", "*.alora"),
-				new FileChooser.ExtensionFilter("All", "*.*")));
-
-		FileOpenManager.setFileOpener(FileLoader.fileOpener());
-		*/
-
 		workflowTab = new WorkflowTab(this);
 		methodsTab = new TextDisplayTab(this, "Methods", false, false);
 		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? ExtractMethodsText.getInstance().apply(workflow) : ""));
 
 		textTabsManager = new TextTabsManager(this);
 		algorithmTabsManager = new AlgorithmTabsManager(this);
+
+		fileName.addListener((v, o, n) -> name.set(n == null || n.isBlank() ? "Empty" : FileUtils.replaceFileSuffix(FileUtils.getFileNameWithoutPath(n), "")));
 
 		workflowTreeView = new WorkflowTreeView(this);
 	}
@@ -137,9 +132,6 @@ public class MainWindow implements IMainWindow {
 		name.addListener(c -> stage.setTitle(FileUtils.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
 
 		dirtyProperty().addListener(c -> stage.setTitle(FileUtils.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
-
-		setName("Empty");
-
 		stage.show();
 	}
 
@@ -186,10 +178,6 @@ public class MainWindow implements IMainWindow {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name.set(FileUtils.replaceFileSuffix(FileUtils.getFileNameWithoutPath(name), ""));
-	}
-
 	public Tab getTabByClass(Class clazz) {
 		for (var tab : controller.getMainTabPane().getTabs()) {
 			if (tab.getClass() == clazz)
@@ -198,7 +186,7 @@ public class MainWindow implements IMainWindow {
 		return null;
 	}
 
-	public IDisplayTab getBy(String name) {
+	public IDisplayTab getByName(String name) {
 		for (var tab : controller.getMainTabPane().getTabs()) {
 			if (tab instanceof IDisplayTab displayTab)
 				return displayTab;
@@ -223,14 +211,17 @@ public class MainWindow implements IMainWindow {
 	}
 
 	public void addTabToMainTabPane(Tab tab) {
-		if (!controller.getMainTabPane().getTabs().contains(tab))
-			controller.getMainTabPane().getTabs().add(tab);
+		try {
+			if (tab != null && !controller.getMainTabPane().getTabs().contains(tab))
+				controller.getMainTabPane().getTabs().add(tab);
+		} catch (Exception ex) {
+			Basic.caught(ex);
+		}
 	}
 
 	public void removeTabFromMainTabPane(Tab tab) {
 		controller.getMainTabPane().getTabs().remove(tab);
 	}
-
 
 	public TextTabsManager getTextTabsManager() {
 		return textTabsManager;

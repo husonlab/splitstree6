@@ -38,6 +38,7 @@
 
 package splitstree6.window;
 
+import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
@@ -45,7 +46,8 @@ import jloda.fx.control.SplittableTabPane;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.nexus.NexusExporter;
-import splitstree6.tabs.textdisplay.TextDisplayTab;
+import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
@@ -54,35 +56,22 @@ import java.io.IOException;
 import java.io.StringWriter;
 
 public class TextTabsManager {
+	private final MainWindow mainWindow;
 	private final SplittableTabPane tabPane;
 	private final Workflow workflow;
 	private final NexusExporter nexusExporter = new NexusExporter();
 
-	private final ObservableMap<WorkflowNode, TextDisplayTab> nodeTabMap = FXCollections.observableHashMap();
+	private final ObservableMap<WorkflowNode, ViewTab> nodeTabMap = FXCollections.observableHashMap();
 
 	public TextTabsManager(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
 		this.workflow = mainWindow.getWorkflow();
-		;
 
 		tabPane = mainWindow.getController().getMainTabPane();
 
 		workflow.nodes().addListener((ListChangeListener<? super WorkflowNode>) e -> {
 			while (e.next()) {
-				if (e.wasAdded()) {
-					for (var node : e.getAddedSubList()) {
-						var tab = new TextDisplayTab(mainWindow, node.getName(), true, false);
-						tab.setOnCloseRequest(t -> showTab(node, false));
-						node.validProperty().addListener((v, o, n) -> {
-							if (!n)
-								tab.replaceText("");
-							else if (tabPane.getTabs().contains(tab)) {
-								tab.replaceText(createText(node));
-							}
-						});
-						nodeTabMap.put(node, tab);
-					}
-
-				} else if (e.wasRemoved()) {
+				if (e.wasRemoved()) {
 					for (var node : e.getRemoved()) {
 						var tab = nodeTabMap.get(node);
 						if (tab != null) {
@@ -131,16 +120,23 @@ public class TextTabsManager {
 	}
 
 	public void showTab(WorkflowNode node, boolean show) {
-		var tab = nodeTabMap.get(node);
-		if (tab != null) {
-			if (show) {
-				if (!tabPane.getTabs().contains(tab)) {
-					tabPane.getTabs().add(tab);
-				}
-				tab.replaceText(createText(node));
-				tabPane.getSelectionModel().select(tab);
-			} else
-				tabPane.getTabs().remove(tab);
+		final ViewTab tab;
+		if (nodeTabMap.containsKey(node))
+			tab = nodeTabMap.get(node);
+		else {
+			tab = new ViewTab(mainWindow, true);
+			var view = new DisplayTextView(mainWindow, node.getName() + " text", false);
+			tab.setView(view);
+			tab.setOnCloseRequest(t -> nodeTabMap.remove(node));
+			nodeTabMap.put(node, tab);
 		}
+		if (show) {
+			if (!tabPane.getTabs().contains(tab)) {
+				tabPane.getTabs().add(tab);
+			}
+			tabPane.getSelectionModel().select(tab);
+			Platform.runLater(() -> ((DisplayTextView) tab.getView()).replaceText(createText(node)));
+		} else
+			tabPane.getTabs().remove(tab);
 	}
 }

@@ -20,16 +20,21 @@
 package splitstree6.data;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
-import splitstree6.tabs.tab.ViewTab;
+import splitstree6.options.OptionIO;
+import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
+
+import java.io.IOException;
 
 
 public class ViewBlock extends DataBlock {
@@ -44,6 +49,19 @@ public class ViewBlock extends DataBlock {
 		if (node.getOwner() != null) {
 			var mainWindow = ((Workflow) node.getOwner()).getMainWindow();
 			Platform.runLater(() -> viewTab = new ViewTab(mainWindow, false));
+			node.getParents().addListener((InvalidationListener) e -> {
+				if (getViewTab() != null) {
+					if (node.getParents().size() == 0) {
+						mainWindow.removeTabFromMainTabPane(getViewTab());
+					} else {
+						var view = viewTab.getView();
+						viewTab = new ViewTab(mainWindow, false);
+						viewTab.setView(view);
+						mainWindow.addTabToMainTabPane(viewTab);
+
+					}
+				}
+			});
 		}
 	}
 
@@ -105,6 +123,15 @@ public class ViewBlock extends DataBlock {
 		updateShortDescription();
 		if (getNode() != null)
 			getNode().setTitle(getName());
+
+		// process an option lines that may have been provided
+		try {
+			OptionIO.parseOptions(initializationLinesProperty(), view);
+		} catch (IOException e) {
+			NotificationManager.showError("Error parsing options");
+		} finally {
+			initializationLinesProperty().set("");
+		}
 	}
 
 	public String getInitializationLines() {

@@ -29,7 +29,7 @@ import splitstree6.algorithms.source.source2network.NetworkLoader;
 import splitstree6.algorithms.source.source2splits.SplitsLoader;
 import splitstree6.algorithms.source.source2trees.TreesLoader;
 import splitstree6.algorithms.splits.splits2view.ShowSplitsConsole;
-import splitstree6.algorithms.trees.trees2view.Viewer;
+import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.window.MainWindow;
@@ -81,7 +81,7 @@ public class WorkflowSetup {
 		} else if (clazz.equals(TreesBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new TreesLoader(), new TaxaBlock(), new TreesBlock());
 			var viewerNode = workflow.newDataNode(new ViewBlock());
-			workflow.newAlgorithmNode(new Viewer(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), viewerNode);
+			workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), viewerNode);
 			// todo: add calculation of network?
 		} else if (clazz.equals(NetworkBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new NetworkLoader(), new TaxaBlock(), new NetworkBlock());

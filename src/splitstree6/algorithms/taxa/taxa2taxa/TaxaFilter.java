@@ -31,7 +31,11 @@ import java.io.IOException;
 import java.util.*;
 
 public class TaxaFilter extends Taxa2Taxa implements IFilter {
-	private final ObjectProperty<String[]> optionDisabledTaxa = new SimpleObjectProperty<>(new String[0]);
+	private final ObjectProperty<String[]> optionDisabledTaxa = new SimpleObjectProperty<>(this, "optionDisabledTaxa", new String[0]);
+
+	public List<String> listOptions() {
+		return List.of(optionDisabledTaxa.getName());
+	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputData, TaxaBlock outputData) throws IOException {

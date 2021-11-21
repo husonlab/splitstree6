@@ -1,5 +1,5 @@
 /*
- *  TextDisplay.java Copyright (C) 2021 Daniel H. Huson
+ *  DisplayTextView.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.text;
+package splitstree6.view.displaytext;
 
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
@@ -28,13 +28,13 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
-public class TextDisplay implements IView {
-	private final TextDisplayController controller;
-	private final TextDisplayPresenter presenter;
+public class DisplayTextView implements IView {
+	private final DisplayTextViewController controller;
+	private final DisplayTextViewPresenter presenter;
 
 	private final UndoManager undoManager = new UndoManager();
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
@@ -47,13 +47,13 @@ public class TextDisplay implements IView {
 	/**
 	 * constructor
 	 */
-	public TextDisplay(MainWindow mainWindow, String name, boolean editable) {
+	public DisplayTextView(MainWindow mainWindow, String name, boolean editable) {
 		this.name = name;
 
-		var loader = new ExtendedFXMLLoader<TextDisplayController>(TextDisplay.class);
+		var loader = new ExtendedFXMLLoader<DisplayTextViewController>(DisplayTextViewController.class);
 		controller = loader.getController();
 
-		presenter = new TextDisplayPresenter(mainWindow, this, editable);
+		presenter = new DisplayTextViewPresenter(mainWindow, this, editable);
 
 		controller.getCodeArea().lengthProperty().addListener((v, o, n) -> empty.set(n == 0));
 		controller.getCodeArea().setWrapText(true);
@@ -68,6 +68,10 @@ public class TextDisplay implements IView {
 	public void replaceText(String text) {
 		controller.getCodeArea().clear();
 		controller.getCodeArea().replaceText(text);
+	}
+
+	@Override
+	public void setViewTab(ViewTab viewTab) {
 	}
 
 	/**
@@ -150,7 +154,7 @@ public class TextDisplay implements IView {
 	}
 
 	@Override
-	public IDisplayTabPresenter getPresenter() {
+	public DisplayTextViewPresenter getPresenter() {
 		return presenter;
 	}
 
@@ -174,7 +178,7 @@ public class TextDisplay implements IView {
 		return controller.getCodeArea().getLength();
 	}
 
-	public TextDisplayController getController() {
+	public DisplayTextViewController getController() {
 		return controller;
 	}
 

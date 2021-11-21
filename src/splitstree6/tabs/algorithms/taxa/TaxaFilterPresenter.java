@@ -20,18 +20,21 @@
 package splitstree6.tabs.algorithms.taxa;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.collections.*;
 import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
 import jloda.fx.find.ListViewTypeSearcher;
+import jloda.util.Basic;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.AlgorithmNode;
 
-import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
 
 /**
  * taxa filter presenter
@@ -40,34 +43,111 @@ import java.util.ArrayList;
 public class TaxaFilterPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final TaxaFilterTab tab;
+	private final TaxaFilterController controller;
+
 	private final ObservableSet<Taxon> selectedTaxa = FXCollections.observableSet();
 
+	private final TaxaFilter taxaFilter;
 
 	/**
 	 * constructor
 	 */
-	public TaxaFilterPresenter(MainWindow mainWindow, TaxaFilterTab tab) {
+	public TaxaFilterPresenter(MainWindow mainWindow, TaxaFilterTab tab, AlgorithmNode<TaxaBlock, TaxaBlock> taxaFilterNode) {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
+		this.taxaFilter = (TaxaFilter) taxaFilterNode.getAlgorithm();
+		this.controller = tab.getTaxaFilterController();
 
-
-		var controller = tab.getTaxaFilterController();
-
+		// todo: this addresses the bug that list views don't always reflect change of list content:
+		controller.getActiveListView().getItems().addListener((InvalidationListener) e -> {
+			var pos = mainWindow.getController().getLeftSplitPane().getDividerPositions()[0];
+			var reverseDir = new Random().nextBoolean();
+			Platform.runLater(() -> mainWindow.getController().getLeftSplitPane().setDividerPositions(pos + (reverseDir ? -1 : 1) * 0.0001));
+		});
 
 		var workflow = mainWindow.getWorkflow();
 		var inputTaxa = workflow.getInputTaxaNode().getDataBlock();
-		var taxaFilter = (TaxaFilter) tab.getAlgorithmNode().getAlgorithm();
 
-		controller.getActiveListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		ListViewTypeSearcher.setup(controller.getActiveListView());
-		controller.getInactiveListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		ListViewTypeSearcher.setup(controller.getInactiveListView());
 
-		controller.getActiveListView().getItems().setAll(inputTaxa.getLabels());
+		controller.getMoveSelectedRightButton().setOnAction(e -> {
+			var set = new HashSet<>(controller.getActiveListView().getSelectionModel().getSelectedItems());
+			controller.getActiveListView().getItems().removeAll(set);
+			controller.getInactiveListView().getItems().forEach(set::remove);
+			controller.getInactiveListView().getItems().addAll(set);
+			sort(controller.getInactiveListView().getItems(), inputTaxa);
+			Platform.runLater(() -> {
+				controller.getActiveListView().getSelectionModel().clearSelection();
+				controller.getInactiveListView().getSelectionModel().clearSelection();
+				set.forEach(label -> controller.getInactiveListView().getSelectionModel().select(label));
+			});
+			Platform.runLater(() -> {
+				controller.getInactiveListView().refresh();
+			});
 
-		workflow.getInputTaxaNode().validProperty().addListener((v, o, n) -> {
-			controller.getActiveListView().getItems().setAll(inputTaxa.getLabels());
+		});
+		controller.getMoveSelectedRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getSelectionModel().getSelectedItems()));
+
+		controller.getMoveUnselectedRightButton().setOnAction(e -> {
+			try {
+				var set = new HashSet<>(controller.getActiveListView().getItems());
+				selectedTaxa.stream().map(Taxon::getName).forEach(set::remove);
+				controller.getActiveListView().getItems().removeAll(set);
+				controller.getInactiveListView().getItems().forEach(set::remove);
+				controller.getInactiveListView().getItems().addAll(set);
+				sort(controller.getInactiveListView().getItems(), inputTaxa);
+				controller.getInactiveListView().refresh();
+			} catch (Exception ex) {
+				Basic.caught(ex);
+			}
+		});
+		controller.getMoveUnselectedRightButton().disableProperty().bind(Bindings.createBooleanBinding(() ->
+						controller.getActiveListView().getSelectionModel().getSelectedItems().size() == controller.getActiveListView().getItems().size(),
+				controller.getActiveListView().getItems(), controller.getActiveListView().getSelectionModel().getSelectedItems()));
+
+		controller.getMoveSelectedLeftButton().setOnAction(e -> {
+			var set = new HashSet<>(controller.getInactiveListView().getSelectionModel().getSelectedItems());
+			controller.getInactiveListView().getItems().removeAll(set);
+			controller.getActiveListView().getItems().forEach(set::remove);
+			controller.getActiveListView().getItems().addAll(set);
+			sort(controller.getActiveListView().getItems(), inputTaxa);
+			controller.getActiveListView().refresh();
+			Platform.runLater(() -> {
+				controller.getActiveListView().getSelectionModel().clearSelection();
+				set.forEach(label -> controller.getActiveListView().getSelectionModel().select(label));
+				controller.getInactiveListView().getSelectionModel().clearSelection();
+			});
+		});
+		controller.getMoveSelectedLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getSelectionModel().getSelectedItems()));
+
+		controller.getMoveUnselectedLeftButton().setOnAction(e -> {
+			var set = new HashSet<>(controller.getInactiveListView().getItems());
+			selectedTaxa.stream().map(Taxon::getName).forEach(set::remove);
+			controller.getInactiveListView().getItems().removeAll(set);
+			controller.getActiveListView().getItems().forEach(set::remove);
+			controller.getActiveListView().getItems().addAll(set);
+			sort(controller.getActiveListView().getItems(), inputTaxa);
+		});
+		controller.getMoveUnselectedLeftButton().disableProperty().bind(Bindings.createBooleanBinding(() ->
+						controller.getInactiveListView().getSelectionModel().getSelectedItems().size() == controller.getInactiveListView().getItems().size(),
+				controller.getInactiveListView().getItems(), controller.getInactiveListView().getSelectionModel().getSelectedItems()));
+
+		tab.getController().getReset().setOnAction(e -> {
+			var set = new HashSet<>(controller.getInactiveListView().getItems());
 			controller.getInactiveListView().getItems().clear();
+			controller.getActiveListView().getItems().forEach(set::remove);
+			controller.getActiveListView().getItems().addAll(set);
+			sort(controller.getActiveListView().getItems(), inputTaxa);
+		});
+		tab.getController().getReset().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getItems()));
+
+		tab.getController().getApplyButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
+
+		setupSelection(mainWindow, controller.getActiveListView(), controller.getInactiveListView());
+
+		controller.getActiveListView().getItems().addListener((InvalidationListener) e -> {
+			controller.getActiveLabel().setText(String.format("Active (%d)", controller.getActiveListView().getItems().size()));
 		});
 
 		controller.getInactiveListView().getItems().addListener((ListChangeListener<? super String>) e -> {
@@ -77,81 +157,29 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 				if (e.getRemovedSize() > 0)
 					taxaFilter.setDisabled(e.getRemoved(), false);
 			}
+			controller.getInactiveLabel().setText(String.format("Inactive (%d)", controller.getInactiveListView().getItems().size()));
 		});
 
-		controller.getMoveAllLeftButton().setOnAction(e -> {
-			var selected = new ArrayList<>(selectedTaxa);
-			var list = new ArrayList<>(controller.getInactiveListView().getItems());
-			controller.getInactiveListView().getItems().clear();
-			controller.getActiveListView().getItems().addAll(list);
-			sort(controller.getActiveListView().getItems(), workflow.getInputTaxonBlock());
-			Platform.runLater(() -> {
-				selectedTaxa.clear();
-				selectedTaxa.addAll(selected);
-			});
+		updateView();
+
+		workflow.getInputTaxaNode().validProperty().addListener((v, o, n) -> {
+			updateView();
 		});
-		controller.getMoveAllLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getItems()));
 
-		controller.getMoveSelectedLeftButton().setOnAction(e -> {
-			var list = new ArrayList<>(controller.getInactiveListView().getSelectionModel().getSelectedItems());
-			controller.getInactiveListView().getItems().removeAll(list);
-			controller.getInactiveListView().refresh();
-			controller.getActiveListView().getItems().addAll(list);
-			sort(controller.getActiveListView().getItems(), workflow.getInputTaxonBlock());
-			controller.getActiveListView().refresh();
-			Platform.runLater(() -> {
-				controller.getActiveListView().getSelectionModel().clearSelection();
-				list.forEach(label -> controller.getActiveListView().getSelectionModel().select(label));
-				controller.getInactiveListView().getSelectionModel().clearSelection();
-			});
+		taxaFilterNode.validProperty().addListener((v, o, n) -> {
+			if (n) { // make sure taxa selection is applied
+				controller.getActiveListView().getSelectionModel().getSelectedItems().stream().map(inputTaxa::get).filter(t -> !selectedTaxa.contains(t)).forEach(selectedTaxa::add);
+			}
 		});
-		controller.getMoveSelectedLeftButton().disableProperty().bind(Bindings.isEmpty(controller.getInactiveListView().getSelectionModel().getSelectedItems()));
+	}
 
-		controller.getMoveAllRightButton().setOnAction(e -> {
-			var selected = new ArrayList<>(selectedTaxa);
-			var list = new ArrayList<>(controller.getActiveListView().getItems());
-			controller.getActiveListView().getItems().clear();
-			controller.getActiveListView().refresh();
-			controller.getInactiveListView().getItems().addAll(list);
-			sort(controller.getInactiveListView().getItems(), workflow.getInputTaxonBlock());
-			Platform.runLater(() -> {
-				selectedTaxa.clear();
-				selectedTaxa.addAll(selected);
-			});
-			Platform.runLater(() -> {
-				controller.getInactiveListView().refresh();
-			});
-		});
-		controller.getMoveAllRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
-
-		controller.getMoveSelectedRightButton().setOnAction(e -> {
-			var list = new ArrayList<>(controller.getActiveListView().getSelectionModel().getSelectedItems());
-			controller.getActiveListView().getItems().removeAll(list);
-			controller.getActiveListView().refresh();
-			controller.getInactiveListView().getItems().addAll(list);
-			sort(controller.getInactiveListView().getItems(), workflow.getInputTaxonBlock());
-			Platform.runLater(() -> {
-				controller.getActiveListView().getSelectionModel().clearSelection();
-				controller.getInactiveListView().getSelectionModel().clearSelection();
-				list.forEach(label -> controller.getInactiveListView().getSelectionModel().select(label));
-			});
-			Platform.runLater(() -> {
-				controller.getInactiveListView().refresh();
-			});
-
-		});
-		controller.getMoveSelectedRightButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getSelectionModel().getSelectedItems()));
-
-		tab.getController().getReset().setOnAction(controller.getMoveAllLeftButton().getOnAction());
-		tab.getController().getReset().disableProperty().bind(controller.getMoveAllLeftButton().disableProperty());
-
-		tab.getController().getApplyButton().disableProperty().bind(Bindings.isEmpty(controller.getActiveListView().getItems()));
-
-		setupSelection(mainWindow, controller.getActiveListView(), controller.getInactiveListView());
-
-		controller.getActiveListView().refresh();
-		controller.getInactiveListView().refresh();
-		controller.getInactiveListView().requestLayout();
+	public void updateView() {
+		var inputTaxa = mainWindow.getWorkflow().getInputTaxaNode().getDataBlock();
+		controller.getActiveListView().getItems().setAll(inputTaxa.getLabels());
+		for (var label : taxaFilter.getOptionDisabledTaxa()) {
+			controller.getActiveListView().getItems().remove(label);
+			controller.getInactiveListView().getItems().add(label);
+		}
 	}
 
 	// todo: need to ensure that this gets called

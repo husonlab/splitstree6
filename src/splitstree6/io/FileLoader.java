@@ -63,11 +63,11 @@ public class FileLoader {
 				if (importManager.getReaders(fileName).size() == 1) { // unique input format
 					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler);
+					mainWindow.setFileName(fileName);
 					newWindow.setDirty(true);
 				} else {
 					// ImportDialog.show(mainWindow, fileName);
 					System.err.println("Import dialog: not implemented");
-					newWindow.setFileName(fileName);
 				}
 			}
 		}

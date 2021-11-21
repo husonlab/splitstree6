@@ -23,12 +23,15 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
-import splitstree6.tabs.tab.ViewTab;
+import jloda.util.ProgramProperties;
+import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
@@ -41,6 +44,8 @@ public class TreePagesView implements IView {
 	private final TreePagesViewController controller;
 	private final TreePagesViewPresenter presenter;
 
+	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>();
+
 	private final StringProperty nameProperty = new SimpleStringProperty();
 
 	private final ObjectProperty<TabPane> tabPane = new SimpleObjectProperty<>(null);
@@ -48,20 +53,22 @@ public class TreePagesView implements IView {
 	private final ObservableList<PhyloTree> trees = FXCollections.observableArrayList();
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
-	private final IntegerProperty optionRows = new SimpleIntegerProperty(this, "optionRows", 1);
-	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", 1);
+	private final IntegerProperty optionRows = new SimpleIntegerProperty(this, "optionRows", ProgramProperties.get("TreePagesRows", 1));
+	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
 	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
 
-	private final ObjectProperty<ComputeTreeEmbedding.TreeDiagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeEmbedding.TreeDiagram.getDefault());
+	private final ObjectProperty<ComputeTreeEmbedding.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeEmbedding.Diagram.getDefault());
 	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.getDefault());
 
-	private final IntegerProperty optionPageNumber = new SimpleIntegerProperty(this, "optionPageNumber", 1); // 1-based
+	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
+
+	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames", ProgramProperties.get("TreePagesShowTreeNames", true));
 
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionRows.getName(), optionCols.getName(), optionPageNumber.getName(), optionFontScaleFactor.getName());
+		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionRows.getName(), optionCols.getName(), pageNumber.getName(), optionFontScaleFactor.getName());
 	}
 
 	public TreePagesView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -69,9 +76,28 @@ public class TreePagesView implements IView {
 		var loader = new ExtendedFXMLLoader<TreePagesViewController>(TreePagesViewController.class);
 		controller = loader.getController();
 
-		presenter = new TreePagesViewPresenter(mainWindow, this, viewTab, getTrees());
+		// this is the target area for the tree page:
+		final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>();
+		presenter = new TreePagesViewPresenter(mainWindow, this, targetBounds, getTrees());
+
+		this.viewTab.addListener((v, o, n) -> {
+			targetBounds.unbind();
+			if (n != null)
+				targetBounds.bind(n.layoutBoundsProperty());
+		});
+		setViewTab(viewTab);
 
 		empty.bind(Bindings.isEmpty(getTrees()));
+
+		optionDiagram.addListener((v, o, n) -> ComputeTreeEmbedding.Diagram.setDefault(n));
+		optionRootSide.addListener((v, o, n) -> TreePane.RootSide.setDefault(n));
+		optionRows.addListener((v, o, n) -> ProgramProperties.put("TreePagesRows", n.intValue()));
+		optionCols.addListener((v, o, n) -> ProgramProperties.put("TreePagesCols", n.intValue()));
+		optionShowTreeNames.addListener((v, o, n) -> ProgramProperties.put("TreePagesShowTreeNames", n));
+	}
+
+	public void setViewTab(ViewTab viewTab) {
+		this.viewTab.set(viewTab);
 	}
 
 	public TreePagesViewController getController() {
@@ -110,27 +136,27 @@ public class TreePagesView implements IView {
 		this.optionCols.set(Math.max(1, optionCols));
 	}
 
-	public int getOptionPageNumber() {
-		return optionPageNumber.get();
+	public int getPageNumber() {
+		return pageNumber.get();
 	}
 
-	public IntegerProperty optionPageNumberProperty() {
-		return optionPageNumber;
+	public IntegerProperty pageNumberProperty() {
+		return pageNumber;
 	}
 
-	public void setOptionPageNumber(int optionPageNumber) {
-		this.optionPageNumber.set(optionPageNumber);
+	public void setPageNumber(int pageNumber) {
+		this.pageNumber.set(pageNumber);
 	}
 
-	public ComputeTreeEmbedding.TreeDiagram getOptionDiagram() {
+	public ComputeTreeEmbedding.Diagram getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<ComputeTreeEmbedding.TreeDiagram> optionDiagramProperty() {
+	public ObjectProperty<ComputeTreeEmbedding.Diagram> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(ComputeTreeEmbedding.TreeDiagram optionDiagram) {
+	public void setOptionDiagram(ComputeTreeEmbedding.Diagram optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 
@@ -154,7 +180,7 @@ public class TreePagesView implements IView {
 		this.imageNode.set(imageNode);
 	}
 
-	public Node getRoot() {
+	public Pane getRoot() {
 		return controller.getAnchorPane();
 	}
 
@@ -205,6 +231,18 @@ public class TreePagesView implements IView {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
 	}
 
+	public boolean isOptionShowTreeNames() {
+		return optionShowTreeNames.get();
+	}
+
+	public BooleanProperty optionShowTreeNamesProperty() {
+		return optionShowTreeNames;
+	}
+
+	public void setOptionShowTreeNames(boolean optionShowTreeNames) {
+		this.optionShowTreeNames.set(optionShowTreeNames);
+	}
+
 	@Override
 	public UndoManager getUndoManager() {
 		return undoManager;
@@ -212,7 +250,6 @@ public class TreePagesView implements IView {
 
 	public void setTrees(Collection<PhyloTree> trees) {
 		this.trees.setAll(trees);
-		presenter.updatePageContent();
 	}
 
 	@Override

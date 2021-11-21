@@ -27,7 +27,6 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.io.utils.SimpleNewickParser;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,8 +56,6 @@ public class NewickReader extends TreesReader {
 			final var taxonNamesFound = new HashSet<String>();
 			final ArrayList<String> orderedTaxonNames = new ArrayList<>();
 
-			var newickParser = new SimpleNewickParser();
-			newickParser.setEnforceLabelDoesNotStartWithADigit(true);
 			var partial = false;
 			final var parts = new ArrayList<String>();
 
@@ -74,9 +71,9 @@ public class NewickReader extends TreesReader {
 						parts.clear();
 					} else
 						treeLine = line;
-					final PhyloTree tree;
+					final PhyloTree tree = new PhyloTree();
 					try {
-						tree = newickParser.parse(treeLine);
+						tree.parseBracketNotation(treeLine, true);
 					} catch (IOException ex) {
 						throw new IOExceptionWithLineNumber(lineno, ex);
 					}
@@ -86,9 +83,9 @@ public class NewickReader extends TreesReader {
 					if (TreesUtilities.hasNumbersOnInternalNodes(tree)) {
 						TreesUtilities.changeNumbersOnInternalNodesToEdgeConfidencies(tree);
 					}
-					final var leafLabelList = IteratorUtils.asList(newickParser.labels());
-					final var leafLabelSet = new HashSet<String>(leafLabelList);
-					final var multiLabeled = (leafLabelSet.size() < leafLabelList.size());
+					final var labelList = tree.listNodeLabels(true);
+					final var labelSet = new HashSet<>(labelList);
+					final var multiLabeled = (labelSet.size() < labelList.size());
 
 					if (multiLabeled) {
 						if (isOptionConvertMultiLabeledTree()) {
@@ -106,23 +103,23 @@ public class NewickReader extends TreesReader {
 								}
 							}
 						} else {
-							for (var z : leafLabelSet) {
-								leafLabelList.remove(z);
+							for (var z : labelSet) {
+								labelSet.remove(z);
 							}
-							throw new IOExceptionWithLineNumber(lineno, "Name appears multiple times in tree:" + leafLabelList.get(0));
+							throw new IOExceptionWithLineNumber(lineno, "Name appears multiple times in tree:" + labelList.get(0));
 						}
 					}
 
 					if (taxonNamesFound.size() == 0) {
-						for (var name : newickParser.labels()) {
+						for (var name : labelList) {
 							taxonNamesFound.add(name);
 							orderedTaxonNames.add(name);
 							taxName2Id.put(name, orderedTaxonNames.size());
 						}
 					} else {
-						if (!taxonNamesFound.equals(IteratorUtils.asSet(newickParser.labels()))) {
+						if (!taxonNamesFound.equals(IteratorUtils.asSet(labelList))) {
 							partial = true;
-							for (var name : newickParser.labels()) {
+							for (var name : labelList) {
 								if (!taxonNamesFound.contains(name)) {
 									System.err.println("Additional taxon name: " + name);
 									taxonNamesFound.add(name);

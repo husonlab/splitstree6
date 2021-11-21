@@ -1,5 +1,5 @@
 /*
- *  TextDisplayPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  DisplayTextViewPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.text;
+package splitstree6.view.displaytext;
 
 
 import javafx.beans.binding.Bindings;
@@ -40,9 +40,9 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TextDisplayPresenter implements IDisplayTabPresenter {
+public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
-	private final TextDisplay tab;
+	private final DisplayTextView tab;
 
 	private final FindToolBar findToolBar;
 
@@ -50,7 +50,7 @@ public class TextDisplayPresenter implements IDisplayTabPresenter {
 
 	private final BooleanBinding selectionEmpty;
 
-	public TextDisplayPresenter(MainWindow mainWindow, TextDisplay tab, boolean editable) {
+	public DisplayTextViewPresenter(MainWindow mainWindow, DisplayTextView tab, boolean editable) {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
 		this.editable = editable;

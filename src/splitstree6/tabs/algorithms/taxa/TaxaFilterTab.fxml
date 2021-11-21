@@ -28,21 +28,25 @@
         <GridPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                   AnchorPane.topAnchor="0.0">
             <columnConstraints>
-                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
-                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
-                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="100.0"/>
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="150.0"/>
+                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity"/>
+                <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0" prefWidth="150.0"/>
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="NEVER"/>
+                <RowConstraints maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" vgrow="NEVER"/>
                 <RowConstraints minHeight="10.0" vgrow="ALWAYS"/>
             </rowConstraints>
             <children>
-                <Label text="Active">
+                <Label fx:id="activeLabel" text="Active">
                     <GridPane.margin>
-                        <Insets/>
+                        <Insets bottom="2.0"/>
                     </GridPane.margin>
                 </Label>
-                <Label text="Inactive" GridPane.columnIndex="2"/>
+                <Label fx:id="inactiveLabel" text="Inactive" GridPane.columnIndex="2">
+                    <GridPane.margin>
+                        <Insets bottom="2.0"/>
+                    </GridPane.margin>
+                </Label>
                 <ListView fx:id="activeListView" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" GridPane.vgrow="ALWAYS">
                     <GridPane.margin>
                         <Insets/>
@@ -60,11 +64,19 @@
                             <children>
                                 <VBox alignment="BOTTOM_CENTER">
                                     <children>
-                                        <Button fx:id="moveSelectedRightButton" mnemonicParsing="false" text="&gt;"/>
-                                        <Button fx:id="moveAllRightButton" mnemonicParsing="false" text="&gt;&gt;">
+                                        <Button fx:id="moveSelectedRightButton" mnemonicParsing="false" text="&gt;">
+                                            <tooltip>
+                                                <Tooltip text="Move selected active taxa to inactive"/>
+                                            </tooltip>
+                                        </Button>
+                                        <Button fx:id="moveUnselectedRightButton" mnemonicParsing="false"
+                                                text="&gt;&gt;">
                                             <VBox.margin>
                                                 <Insets left="1.0" right="1.0" top="10.0"/>
                                             </VBox.margin>
+                                            <tooltip>
+                                                <Tooltip text="Move unselected active taxa to inactive"/>
+                                            </tooltip>
                                         </Button>
                                     </children>
                                 </VBox>
@@ -74,11 +86,18 @@
                                             <VBox.margin>
                                                 <Insets bottom="10.0"/>
                                             </VBox.margin>
+                                            <tooltip>
+                                                <Tooltip text="Move selected inactive taxa to active"/>
+                                            </tooltip>
                                         </Button>
-                                        <Button fx:id="moveAllLeftButton" mnemonicParsing="false" text="&lt;&lt;">
+                                        <Button fx:id="moveUnselectedLeftButton" mnemonicParsing="false"
+                                                text="&lt;&lt;">
                                             <VBox.margin>
                                                 <Insets left="1.0" right="1.0"/>
                                             </VBox.margin>
+                                            <tooltip>
+                                                <Tooltip text="Move unselected inactive taxa to active"/>
+                                            </tooltip>
                                         </Button>
                                     </children>
                                 </VBox>

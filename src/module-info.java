@@ -58,7 +58,7 @@ module splitstreesix {
 
 	opens splitstree6.window;
 
-	opens splitstree6.treeview;
+	opens splitstree6.workflowtree;
 
 	opens splitstree6.tabs.inputeditor;
 	opens splitstree6.tabs.textdisplay;
@@ -76,8 +76,13 @@ module splitstreesix {
 	opens splitstree6.tabs.algorithms.taxa;
 
 	opens splitstree6.densitree;
-	opens splitstree6.view.trees.treepages;
 
 	opens splitstree6.algorithms.taxa.taxa2view;
+
+	opens splitstree6.view.trees.treepages;
+	opens splitstree6.view.displaytext;
+	opens splitstree6.view.inputeditor;
 	opens splitstree6.view;
+
+
 }

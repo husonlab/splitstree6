@@ -26,7 +26,6 @@ import jloda.util.NumberUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.io.utils.SimpleNewickParser;
 
 import java.io.IOException;
 import java.util.*;
@@ -140,8 +139,6 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 
 		final var knownTaxonNames = new HashSet<String>(taxonNamesFound);
 
-		final var parser = new SimpleNewickParser();
-
 		int treeNumber = 1;
 		while (np.peekMatchIgnoreCase("tree")) {
 			np.matchIgnoreCase("tree");
@@ -152,7 +149,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			name = name.replaceAll("\\s+", "_");
 			name = name.replaceAll("[:;,]+", ".");
 			name = name.replaceAll("\\[", "(");
-			name = name.replaceAll("\\]", ")");
+			name = name.replaceAll("]", ")");
 			name = name.trim();
 
 			if (name.length() == 0)
@@ -168,7 +165,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 				buf.append(s);
 			}
 
-			final boolean isRooted; // In SplitsTree5 we ignore this because trees are now always rooted
+			final boolean isRooted; // In SplitsTree6 we ignore this because trees are now always rooted
 			if (rootedExplicitySet)
 				isRooted = treesBlock.isRooted();
 			else {
@@ -177,7 +174,8 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			}
 
 			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
-			final var tree = parser.parse(buf.toString());
+			final var tree = new PhyloTree();
+			tree.parseBracketNotation(buf.toString(), true);
 
 			if (translator != null)
 				tree.changeLabels(translator);

@@ -20,10 +20,7 @@
 package splitstree6.view.trees.treepages;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Pagination;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
@@ -52,7 +49,7 @@ public class TreePagesViewController {
 	private Button findButton;
 
 	@FXML
-	private ComboBox<ComputeTreeEmbedding.TreeDiagram> diagramCBox;
+	private ComboBox<ComputeTreeEmbedding.Diagram> diagramCBox;
 
 	@FXML
 	private ComboBox<TreePane.RootSide> rootSideCBox;
@@ -65,6 +62,10 @@ public class TreePagesViewController {
 
 	@FXML
 	private Pagination pagination;
+
+	@FXML
+	private ToggleButton showTreeNamesToggleButton;
+
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -94,7 +95,7 @@ public class TreePagesViewController {
 		return findButton;
 	}
 
-	public ComboBox<ComputeTreeEmbedding.TreeDiagram> getDiagramCBox() {
+	public ComboBox<ComputeTreeEmbedding.Diagram> getDiagramCBox() {
 		return diagramCBox;
 	}
 
@@ -112,5 +113,9 @@ public class TreePagesViewController {
 
 	public Pagination getPagination() {
 		return pagination;
+	}
+
+	public ToggleButton getShowTreeNamesToggleButton() {
+		return showTreeNamesToggleButton;
 	}
 }

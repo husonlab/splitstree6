@@ -20,6 +20,7 @@
 package splitstree6.window;
 
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -365,19 +366,20 @@ public class MainWindowPresenter {
 	}
 
 	public void showInputEditor() {
-		final MainWindow otherWindow;
+		final MainWindow emptyWindow;
 		if (mainWindow.isEmpty())
-			otherWindow = mainWindow;
+			emptyWindow = mainWindow;
+		else
+			emptyWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(false);
+
+		final Tab tab;
+		if (emptyWindow.getController().getMainTabPane().findTab(InputEditorTab.NAME) != null)
+			tab = emptyWindow.getController().getMainTabPane().findTab(InputEditorTab.NAME);
 		else {
-			otherWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(false);
+			tab = new InputEditorTab(emptyWindow);
+			//emptyWindow.getController().getMainTabPane().getTabs().add(tab);
 		}
-		var otherController = otherWindow.getController();
-		var tab = otherController.getMainTabPane().findTab(InputEditorTab.NAME);
-		if (tab == null) {
-			tab = new InputEditorTab(otherWindow);
-			otherController.getMainTabPane().getTabs().add(tab);
-		}
-		mainWindow.getController().getMainTabPane().getSelectionModel().select(tab);
+		Platform.runLater(() -> mainWindow.getController().getMainTabPane().getSelectionModel().select(tab));
 	}
 
 	private void disableAllMenuItems(MainWindowController controller) {

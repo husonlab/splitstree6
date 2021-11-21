@@ -36,7 +36,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.treeview;
+package splitstree6.workflowtree;
 
 import javafx.collections.ListChangeListener;
 import javafx.scene.control.TreeItem;

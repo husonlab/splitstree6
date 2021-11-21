@@ -187,7 +187,7 @@ public enum OptionValueType {
 					return "'" + StringUtils.toString(array, "' '") + "'";
 			}
 			default:
-				return object.toString();
+				return "'" + object.toString() + "'";
 		}
 	}
 }

@@ -20,19 +20,21 @@
 package splitstree6.view.trees.treepages;
 
 import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.geometry.Point3D;
+import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.util.AService;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
@@ -41,8 +43,11 @@ import splitstree6.data.parts.Taxon;
 
 import java.util.LinkedList;
 
+/**
+ * display an individual phylogenetic tree
+ * Daniel Huson, 11.2021
+ */
 public class TreePane extends StackPane {
-
 	public enum RootSide {
 		Left, Right, Down, Up;
 
@@ -59,27 +64,31 @@ public class TreePane extends StackPane {
 	private final PhyloTree phyloTree;
 	private final String name;
 	private final SelectionModel<Taxon> taxonSelectionModel;
-	private final ReadOnlyDoubleProperty fontScaleFactor;
+	private final ReadOnlyDoubleProperty labelScaleFactor;
+	private final ReadOnlyBooleanProperty showTreeName;
 
 	private final InteractionSetup interactionSetup;
 
-	private final ComputeTreeEmbedding.TreeDiagram treeDiagram;
+	private final ComputeTreeEmbedding.Diagram diagram;
 	private final RootSide rootSide;
 
 	private final ChangeListener<Number> fontScaleChangeListener;
+
+	private final AService<Group> service;
 
 	/**
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					ComputeTreeEmbedding.TreeDiagram diagram, RootSide rootSide, ReadOnlyDoubleProperty fontScaleFactor) {
+					ComputeTreeEmbedding.Diagram diagram, RootSide rootSide, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
 		this.taxaBlock = taxaBlock;
 		this.phyloTree = phyloTree;
 		this.name = name;
 		this.taxonSelectionModel = taxonSelectionModel;
-		this.treeDiagram = diagram;
+		this.diagram = diagram;
 		this.rootSide = rootSide;
-		this.fontScaleFactor = fontScaleFactor;
+		this.labelScaleFactor = labelScaleFactor;
+		this.showTreeName = showTreeName;
 
 		this.interactionSetup = new InteractionSetup(taxaBlock, phyloTree, taxonSelectionModel);
 		// setStyle("-fx-border-color: lightgray;");
@@ -91,32 +100,28 @@ public class TreePane extends StackPane {
 		setMinWidth(Pane.USE_PREF_SIZE);
 		setMinHeight(Pane.USE_PREF_SIZE);
 
-		fontScaleChangeListener = (v, o, n) -> applyFontScaleFactor(this, n.doubleValue() / o.doubleValue());
-		fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
-	}
-
-	public void drawTree() {
-			var pane = new StackPane();
-		double width;
-		double height;
-		if (rootSide == RootSide.Left || rootSide == RootSide.Right) {
-			width = getPrefWidth();
-			height = getPrefHeight() - 12;
-		} else {
-			height = getPrefWidth();
-			width = getPrefHeight() - 12;
-		}
-
-
-		pane.setMinHeight(getPrefHeight() - 12);
-		pane.setMinWidth(getPrefWidth());
+		fontScaleChangeListener = (v, o, n) -> applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
+		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 
 		// compute the tree in a separate thread:
-		ProgramExecutorService.submit(() -> {
-			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, treeDiagram, width - 4, height - 4,
+		service = new AService<>();
+		service.setExecutor(ProgramExecutorService.getInstance());
+
+		service.setCallable(() -> {
+			double width;
+			double height;
+			if (rootSide == RootSide.Left || rootSide == RootSide.Right) {
+				width = getPrefWidth();
+				height = getPrefHeight() - 12;
+			} else {
+				height = getPrefWidth();
+				width = getPrefHeight() - 12;
+			}
+
+			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4,
 					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback());
 
-			applyFontScaleFactor(group, fontScaleFactor.get());
+			applyLabelScaleFactor(group, labelScaleFactor.get());
 
 			switch (rootSide) {
 				case Right -> {
@@ -141,31 +146,45 @@ public class TreePane extends StackPane {
 						queue.addAll(parent.getChildrenUnmodifiable());
 					}
 				}
+
 			}
+			return group;
+		});
 
-			Platform.runLater(() -> {
-				pane.getChildren().setAll(group);
-				var label = new Label(name);
-				getChildren().setAll(new VBox(label, pane));
+		service.setOnSucceeded(a -> {
+			var pane = new StackPane();
 
-				pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-					if (e.isStillSincePress() && !e.isShiftDown()) {
-						Platform.runLater(taxonSelectionModel::clearSelection);
-					}
-					e.consume();
-				});
+			pane.setMinHeight(getPrefHeight() - 12);
+			pane.setMinWidth(getPrefWidth());
+
+			pane.getChildren().setAll(service.getValue());
+			var label = new Label(name);
+			label.visibleProperty().bind(showTreeName);
+			getChildren().setAll(new VBox(label, pane));
+
+			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+				if (e.isStillSincePress() && !e.isShiftDown()) {
+					Platform.runLater(taxonSelectionModel::clearSelection);
+				}
+				e.consume();
 			});
 		});
+
+		service.setOnFailed(a -> System.err.println("Draw tree failed: " + service.getException()));
 	}
 
-	private static void applyFontScaleFactor(Parent root, double factor) {
+	public void drawTree() {
+		service.restart();
+	}
+
+	private static void applyLabelScaleFactor(Parent root, double factor) {
 		if (factor > 0 && factor != 1) {
 			var queue = new LinkedList<>(root.getChildrenUnmodifiable());
 			while (queue.size() > 0) {
 				var node = queue.pop();
 				if (node instanceof RichTextLabel richTextLabel) {
-					var newSize = factor * richTextLabel.getFont().getSize();
-					richTextLabel.setFont(new Font(richTextLabel.getFont().getName(), newSize));
+					richTextLabel.setScaleX(factor * richTextLabel.getScaleX());
+					richTextLabel.setScaleY(factor * richTextLabel.getScaleY());
 				} else if (node instanceof Parent parent)
 					queue.addAll(parent.getChildrenUnmodifiable());
 			}

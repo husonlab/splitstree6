@@ -45,18 +45,18 @@ import splitstree6.data.TaxaBlock;
 import java.util.function.BiConsumer;
 
 /**
- * computes a rectangular or triangular tree embedding
+ * computes an embedding of a tree
  * Daniel Huson, 10.2021
  */
 public class ComputeTreeEmbedding {
-	public enum TreeDiagram {
+	public enum Diagram {
 		RectangularCladogram, RectangularPhylogram, TriangularCladogram, RadialCladogram, RadialPhylogram, CircularCladogram, CircularPhylogram;
 
-		public static TreeDiagram getDefault() {
-			return TreeDiagram.valueOf(ProgramProperties.get("DefaultTreeDiagram", RectangularPhylogram.name()));
+		public static Diagram getDefault() {
+			return Diagram.valueOf(ProgramProperties.get("DefaultTreeDiagram", RectangularPhylogram.name()));
 		}
 
-		public static void setDefault(TreeDiagram diagram) {
+		public static void setDefault(Diagram diagram) {
 			ProgramProperties.put("DefaultTreeDiagram", diagram.name());
 		}
 
@@ -76,13 +76,19 @@ public class ComputeTreeEmbedding {
 	private static final double LINEAR_LABEL_GAP = 5;
 	private static final double RADIAL_LABEL_GAP = 15;
 
-	private static int count = 0;
-
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> setupNodeInteraction,
-							  BiConsumer<Edge, Shape> setupEdgeInteraction) {
-
-		//System.err.println("Computing embedding "+(++count)+": "+tree.getName());
-
+	/**
+	 * compute a tree embedding
+	 *
+	 * @param taxaBlock    set of working taxa
+	 * @param tree         tree
+	 * @param diagram      diagram type
+	 * @param width        target width
+	 * @param height       target height
+	 * @param nodeCallback callback to set up additional node stuff
+	 * @param edgeCallback callback to set up additional edges stuff
+	 * @return group of all edges, nodes and node-labels
+	 */
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, Diagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback, BiConsumer<Edge, Shape> edgeCallback) {
 		var parentPlacement = ParentPlacement.ChildrenAverage;
 
 		parentPlacement = ParentPlacement.LeafAverage;
@@ -162,11 +168,11 @@ public class ComputeTreeEmbedding {
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
 				nodeLabelGroup.getChildren().add(label);
-				setupNodeInteraction.accept(v, circle, label);
+				nodeCallback.accept(v, circle, label);
 			}
 		}
 
-		if (diagram == TreeDiagram.CircularCladogram || diagram == TreeDiagram.CircularPhylogram) {
+		if (diagram == Diagram.CircularCladogram || diagram == Diagram.CircularPhylogram) {
 			var rootPt = nodePointMap.get(tree.getRoot());
 			Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
 				for (var e : v.outEdges()) {
@@ -204,10 +210,10 @@ public class ComputeTreeEmbedding {
 
 					line.getElements().add(lineTo2);
 					edgeGroup.getChildren().add(line);
-					setupEdgeInteraction.accept(e, line);
+					edgeCallback.accept(e, line);
 				}
 			});
-		} else if (diagram == TreeDiagram.TriangularCladogram || diagram == TreeDiagram.RadialPhylogram || diagram == TreeDiagram.RadialCladogram) {
+		} else if (diagram == Diagram.TriangularCladogram || diagram == Diagram.RadialPhylogram || diagram == Diagram.RadialCladogram) {
 			for (var e : tree.edges()) {
 				var sourceShape = nodeShapeMap.get(e.getSource());
 				var targetShape = nodeShapeMap.get(e.getTarget());
@@ -227,7 +233,7 @@ public class ComputeTreeEmbedding {
 				line.setStrokeWidth(1);
 
 				edgeGroup.getChildren().add(line);
-				setupEdgeInteraction.accept(e, line);
+				edgeCallback.accept(e, line);
 			}
 		} else { // if (diagram == TreePane.Diagram.Rectangular) {
 			for (var e : tree.edges()) {
@@ -254,7 +260,7 @@ public class ComputeTreeEmbedding {
 				line.setStrokeWidth(1);
 
 				edgeGroup.getChildren().add(line);
-				setupEdgeInteraction.accept(e, line);
+				edgeCallback.accept(e, line);
 			}
 		}
 

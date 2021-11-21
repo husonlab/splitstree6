@@ -40,11 +40,12 @@ public class TaxaFilterTab extends AlgorithmTab implements IDisplayTab {
 
 		var loader = new ExtendedFXMLLoader<TaxaFilterController>(TaxaFilterTab.class);
 		taxaFilterController = loader.getController();
-		taxaFilterPresenter = new TaxaFilterPresenter(mainWindow, this);
+		taxaFilterPresenter = new TaxaFilterPresenter(mainWindow, this, taxaFilterNode);
 
 		getController().getMainPane().getChildren().add(taxaFilterController.getAnchorPane());
 		taxaFilterController.getAnchorPane().prefWidthProperty().bind(getController().getMainPane().widthProperty());
 		taxaFilterController.getAnchorPane().prefHeightProperty().bind(getController().getMainPane().heightProperty());
+
 	}
 
 	public TaxaFilterController getTaxaFilterController() {

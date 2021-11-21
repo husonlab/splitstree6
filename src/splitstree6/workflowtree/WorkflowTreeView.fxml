@@ -23,7 +23,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="splitstree6.treeview.WorkflowTreeViewController">
+            fx:controller="splitstree6.workflowtree.WorkflowTreeViewController">
     <top>
         <ToolBar fx:id="treeViewToolBar" prefHeight="28.0" BorderPane.alignment="CENTER">
             <items>
