@@ -30,7 +30,7 @@ import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.algorithms.taxa.taxa2view.ShowTaxaConsole;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
@@ -108,8 +108,8 @@ public class SimplePipeline extends Application {
 
 		if (true)
 			ProgramExecutorService.submit(1000, () -> {
-				for (var node : workflow.getNodes(TaxaFilter.class)) {
-					var taxaFilter = (TaxaFilter) node.getAlgorithm();
+				for (var node : workflow.getNodes(TaxaEditor.class)) {
+					var taxaFilter = (TaxaEditor) node.getAlgorithm();
 					taxaFilter.setDisabled(workflow.getInputTaxonBlock().getLabel(1), true);
 
 					if (!workflow.isValid()) {

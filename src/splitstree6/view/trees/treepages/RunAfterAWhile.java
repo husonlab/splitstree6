@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.next;
+package splitstree6.view.trees.treepages;
 
 import jloda.fx.util.ProgramExecutorService;
 import jloda.util.Pair;

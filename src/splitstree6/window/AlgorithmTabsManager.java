@@ -43,9 +43,9 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.workflow.WorkflowNode;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.tabs.algorithms.AlgorithmTab;
-import splitstree6.tabs.algorithms.taxa.TaxaFilterTab;
+import splitstree6.tabs.algorithms.taxaedit.TaxaEditTab;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.Workflow;
 
@@ -66,8 +66,8 @@ public class AlgorithmTabsManager {
 					for (var node : e.getAddedSubList()) {
 						if (node instanceof AlgorithmNode algorithmNode) {
 							AlgorithmTab tab;
-							if (algorithmNode.getAlgorithm().getClass().equals(TaxaFilter.class))
-								tab = new TaxaFilterTab(mainWindow, algorithmNode);
+							if (algorithmNode.getAlgorithm().getClass().equals(TaxaEditor.class))
+								tab = new TaxaEditTab(mainWindow, algorithmNode);
 							else
 								tab = new AlgorithmTab(mainWindow, algorithmNode);
 							tab.setOnCloseRequest(t -> showTab(algorithmNode, false));

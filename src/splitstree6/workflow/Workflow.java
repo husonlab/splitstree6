@@ -24,7 +24,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.workflow.WorkflowNode;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.window.MainWindow;
@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 public class Workflow extends jloda.fx.workflow.Workflow {
 	public static final String INPUT_SOURCE = "Input Source";
 	public static final String INPUT_TAXA = "Input Taxa";
-	public static final String INPUT_TAXA_FILTER = "Input Taxa Filter";
+	public static final String INPUT_TAXA_EDITOR = "Taxa Editor";
 	public static final String INPUT_TAXA_DATA_FILTER = "Input Data Filter";
 	public static final String WORKING_TAXA = "Working Taxa";
 	public static final String INPUT_DATA_LOADER = "Input Data Loader";
@@ -95,7 +95,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		var workingTaxaNode = newDataNode(inputTaxaBlock.newInstance(), WORKING_TAXA);
 		var workingData = inputDataBlock.newInstance();
 		var workingDataNode = newDataNode(inputDataBlock.newInstance(), WORKING_PREFIX + workingData.getName());
-		newAlgorithmNode(new TaxaFilter(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
+		newAlgorithmNode(new TaxaEditor(), null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_EDITOR);
 
 		var dataFilterNode = newAlgorithmNode(inputDataBlock.createTaxaDataFilter(), INPUT_TAXA_DATA_FILTER);
 		dataFilterNode.addParent(inputTaxaNode);
@@ -104,7 +104,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		dataFilterNode.addChild(workingDataNode);
 	}
 
-	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, TaxaBlock inputTaxaBlock, TaxaFilter taxaFilter, TaxaBlock workingTaxaBlock,
+	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, TaxaBlock inputTaxaBlock, TaxaEditor taxaEditor, TaxaBlock workingTaxaBlock,
 																DataBlock inputDataBlock, DataTaxaFilter dataTaxaFilter, DataBlock workingDataBlock) {
 		var sourceNode = newDataNode(source, INPUT_SOURCE); // what is the purpose of the source node?
 		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
@@ -118,7 +118,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 
 		var workingTaxaNode = newDataNode(workingTaxaBlock, WORKING_TAXA);
 		var workingDataNode = newDataNode(workingDataBlock, WORKING_PREFIX + workingDataBlock.getName());
-		newAlgorithmNode(taxaFilter, null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_FILTER);
+		newAlgorithmNode(taxaEditor, null, inputTaxaNode, workingTaxaNode, INPUT_TAXA_EDITOR);
 
 		var dataFilterNode = newAlgorithmNode(dataTaxaFilter, INPUT_TAXA_DATA_FILTER);
 		dataFilterNode.addParent(inputTaxaNode);
@@ -239,7 +239,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	}
 
 	public AlgorithmNode<TaxaBlock, TaxaBlock> getInputTaxaFilterNode() {
-		return algorithmNodesStream().filter(v -> v.getTitle().startsWith(INPUT_TAXA_FILTER)).findFirst().orElse(null);
+		return algorithmNodesStream().filter(v -> v.getTitle().startsWith(INPUT_TAXA_EDITOR)).findFirst().orElse(null);
 	}
 
 	public AlgorithmNode<? extends DataBlock, ? extends DataBlock> getInputDataFilterNode() {
@@ -295,7 +295,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	}
 
 	public boolean isInputTaxaFilter(WorkflowNode v) {
-		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getTitle().equals(INPUT_TAXA_FILTER);
+		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getTitle().equals(INPUT_TAXA_EDITOR);
 	}
 
 	public boolean isInputDataLoader(WorkflowNode v) {

@@ -169,10 +169,10 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 		stateChangeListener = null;
 
-		if (false)
+		if (node.getDataBlock() instanceof ViewBlock viewBlock)
 			vBox.setOnMouseClicked((e) -> {
 				if (e.getClickCount() == 2) {
-					showView();
+					mainWindow.getController().getMainTabPane().getSelectionModel().select(viewBlock.getViewTab());
 					e.consume();
 				}
 			});

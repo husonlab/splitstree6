@@ -71,12 +71,13 @@ public class NewickReader extends TreesReader {
 						parts.clear();
 					} else
 						treeLine = line;
-					final PhyloTree tree = new PhyloTree();
+					final var tree = new PhyloTree();
 					try {
 						tree.parseBracketNotation(treeLine, true);
 					} catch (IOException ex) {
 						throw new IOExceptionWithLineNumber(lineno, ex);
 					}
+
 					if (TreesUtilities.hasNumbersOnLeafNodes(tree)) {
 						throw new IOExceptionWithLineNumber(lineno, "Leaf labels must not be numbers");
 					}
@@ -137,6 +138,7 @@ public class NewickReader extends TreesReader {
 							}
 						}
 					}
+
 					trees.getTrees().add(tree);
 					tree.setName("tree-" + trees.size());
 

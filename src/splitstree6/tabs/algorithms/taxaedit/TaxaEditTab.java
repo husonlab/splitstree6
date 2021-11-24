@@ -1,5 +1,5 @@
 /*
- *  TaxaFilterTab.java Copyright (C) 2021 Daniel H. Huson
+ *  TaxaEditTab.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.algorithms.taxa;
+package splitstree6.tabs.algorithms.taxaedit;
 
 import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.data.TaxaBlock;
@@ -26,30 +26,30 @@ import splitstree6.tabs.algorithms.AlgorithmTab;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 
-public class TaxaFilterTab extends AlgorithmTab implements IDisplayTab {
+public class TaxaEditTab extends AlgorithmTab implements IDisplayTab {
 
-	private final TaxaFilterController taxaFilterController;
-	private final TaxaFilterPresenter taxaFilterPresenter;
+	private final TaxaEditController taxaEditController;
+	private final TaxaEditPresenter taxaEditPresenter;
 
 
 	/**
 	 * constructor
 	 */
-	public TaxaFilterTab(MainWindow mainWindow, AlgorithmNode<TaxaBlock, TaxaBlock> taxaFilterNode) {
+	public TaxaEditTab(MainWindow mainWindow, AlgorithmNode<TaxaBlock, TaxaBlock> taxaFilterNode) {
 		super(mainWindow, taxaFilterNode);
 
-		var loader = new ExtendedFXMLLoader<TaxaFilterController>(TaxaFilterTab.class);
-		taxaFilterController = loader.getController();
-		taxaFilterPresenter = new TaxaFilterPresenter(mainWindow, this, taxaFilterNode);
+		var loader = new ExtendedFXMLLoader<TaxaEditController>(TaxaEditTab.class);
+		taxaEditController = loader.getController();
+		taxaEditPresenter = new TaxaEditPresenter(mainWindow, this, taxaFilterNode);
 
-		getController().getMainPane().getChildren().add(taxaFilterController.getAnchorPane());
-		taxaFilterController.getAnchorPane().prefWidthProperty().bind(getController().getMainPane().widthProperty());
-		taxaFilterController.getAnchorPane().prefHeightProperty().bind(getController().getMainPane().heightProperty());
+		getController().getMainPane().getChildren().add(taxaEditController.getAnchorPane());
+		taxaEditController.getAnchorPane().prefWidthProperty().bind(getController().getMainPane().widthProperty());
+		taxaEditController.getAnchorPane().prefHeightProperty().bind(getController().getMainPane().heightProperty());
 
 	}
 
-	public TaxaFilterController getTaxaFilterController() {
-		return taxaFilterController;
+	public TaxaEditController getTaxaFilterController() {
+		return taxaEditController;
 	}
 }
 

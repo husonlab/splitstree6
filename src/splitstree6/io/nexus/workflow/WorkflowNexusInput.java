@@ -27,7 +27,7 @@ import jloda.util.Pair;
 import jloda.util.parse.NexusStreamParser;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.SplitsTree6Block;
 import splitstree6.data.ViewBlock;
@@ -114,8 +114,8 @@ public class WorkflowNexusInput {
 
 			var inputTaxaBlock = dataInput.parse(np);
 			var taxaFilter = (new AlgorithmNexusInput()).parse(np);
-			if (!(taxaFilter instanceof TaxaFilter))
-				throw new IOExceptionWithLineNumber("Excepted TaxaFilter", np.lineno());
+			if (!(taxaFilter instanceof TaxaEditor))
+				throw new IOExceptionWithLineNumber("Excepted TaxaEditor", np.lineno());
 			var workingTaxaBlock = dataInput.parse(np);
 			var workingTaxaTitle = dataInput.getTitle();
 			var inputDataBlock = dataInput.parse(np, inputTaxaBlock);
@@ -129,7 +129,7 @@ public class WorkflowNexusInput {
 			if (dataTaxaFilter.getToClass() != workingDataBlock.getClass())
 				throw new IOExceptionWithLineNumber("Working data and DataTaxaFilter of incompatible types", np.lineno());
 
-			workflow.setupInputAndWorkingNodes(new SourceBlock(), inputTaxaBlock, (TaxaFilter) taxaFilter, workingTaxaBlock, inputDataBlock, (DataTaxaFilter) dataTaxaFilter, workingDataBlock);
+			workflow.setupInputAndWorkingNodes(new SourceBlock(), inputTaxaBlock, (TaxaEditor) taxaFilter, workingTaxaBlock, inputDataBlock, (DataTaxaFilter) dataTaxaFilter, workingDataBlock);
 
 			final var titleNodeMap = new HashMap<String, DataNode>();
 			titleNodeMap.put(workingTaxaTitle, workflow.getWorkingTaxaNode());

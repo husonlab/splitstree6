@@ -31,7 +31,6 @@ import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
-import splitstree6.view.trees.next.RunAfterAWhile;
 import splitstree6.window.MainWindow;
 
 public class TreePageFactory implements Callback<Integer, Node> {

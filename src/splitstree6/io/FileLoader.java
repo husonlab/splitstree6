@@ -39,11 +39,12 @@ public class FileLoader {
 	 * open the named file
 	 */
 	public static void apply(boolean reload, MainWindow mainWindow, String fileName, Consumer<Throwable> exceptionHandler) {
+		var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+
 		if (!(new File(fileName)).canRead())
 			NotificationManager.showError("File not found or unreadable: " + fileName);
-		else if (mainWindow.getTabByClass(InputEditorTab.class) != null) {
-			var inputEditor = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
-			inputEditor.importFromFile(fileName);
+		else if (editorTab != null && !editorTab.getText().isBlank()) {
+			editorTab.importFromFile(fileName);
 			mainWindow.setFileName(fileName);
 			/* todo: should use source node
 			var sourceNode = mainWindow.getWorkflow().getSourceNode();

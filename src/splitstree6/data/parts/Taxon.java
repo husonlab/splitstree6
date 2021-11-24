@@ -71,9 +71,8 @@ public class Taxon {
 
 	@Override
 	public boolean equals(Object other) {
-		if (other instanceof Taxon) {
-			Taxon that = (Taxon) other;
-			return this.getName().equals(that.getName());
+		if (other instanceof Taxon taxon) {
+			return this.getName().equals(taxon.getName());
 		} else
 			return false;
 	}

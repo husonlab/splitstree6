@@ -1,5 +1,5 @@
 /*
- *  TaxaFilter.java Copyright (C) 2021 Daniel H. Huson
+ *  TaxaEditor.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -30,7 +30,7 @@ import splitstree6.data.parts.Taxon;
 import java.io.IOException;
 import java.util.*;
 
-public class TaxaFilter extends Taxa2Taxa implements IFilter {
+public class TaxaEditor extends Taxa2Taxa implements IFilter {
 	private final ObjectProperty<String[]> optionDisabledTaxa = new SimpleObjectProperty<>(this, "optionDisabledTaxa", new String[0]);
 
 	public List<String> listOptions() {

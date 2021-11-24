@@ -183,8 +183,14 @@ public class TreePane extends StackPane {
 			while (queue.size() > 0) {
 				var node = queue.pop();
 				if (node instanceof RichTextLabel richTextLabel) {
-					richTextLabel.setScaleX(factor * richTextLabel.getScaleX());
-					richTextLabel.setScaleY(factor * richTextLabel.getScaleY());
+					if (false) {
+						richTextLabel.setScaleX(factor * richTextLabel.getScaleX());
+						richTextLabel.setScaleY(factor * richTextLabel.getScaleY());
+					} else {
+						richTextLabel.setScale(factor * richTextLabel.getScale());
+						//var newSize = factor * richTextLabel.getFont().getSize();
+						//richTextLabel.setFont(new Font(richTextLabel.getFont().getName(), newSize));
+					}
 				} else if (node instanceof Parent parent)
 					queue.addAll(parent.getChildrenUnmodifiable());
 			}

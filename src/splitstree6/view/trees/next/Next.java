@@ -39,6 +39,7 @@ import jloda.fx.util.ProgramExecutorService;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
+import splitstree6.view.trees.treepages.RunAfterAWhile;
 import splitstree6.window.MainWindow;
 
 public class Next implements IView {
