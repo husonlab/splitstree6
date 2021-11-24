@@ -104,7 +104,6 @@ public class ViewBlock extends DataBlock {
 		return inputBlockName;
 	}
 
-
 	public void setInputBlockName(String inputBlockName) {
 		this.inputBlockName.set(inputBlockName);
 	}

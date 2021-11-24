@@ -26,6 +26,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.PluginClassLoader;
 import splitstree6.tabs.IDisplayTab;
+import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
@@ -34,6 +35,7 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 	private final MainWindow mainWindow;
 	private final AlgorithmTabController controller;
 	private final AlgorithmTabPresenter presenter;
+	private final UndoManager undoManager = new UndoManager();
 
 	private final AlgorithmNode algorithmNode;
 
@@ -64,7 +66,7 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 
 	@Override
 	public UndoManager getUndoManager() {
-		return null;
+		return undoManager;
 	}
 
 	@Override
@@ -78,7 +80,7 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 	}
 
 	@Override
-	public AlgorithmTabPresenter getPresenter() {
+	public IDisplayTabPresenter getPresenter() {
 		return presenter;
 	}
 

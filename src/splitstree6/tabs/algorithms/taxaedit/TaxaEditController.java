@@ -58,13 +58,7 @@ public class TaxaEditController {
 	private TableColumn<TaxaEditTableItem, String> displayLabelColumn;
 
 	@FXML
-	private MenuItem findAndReplaceMenuItem;
-
-	@FXML
-	private MenuItem clearSelectedMenuItem;
-
-	@FXML
-	private MenuItem clearAllMenuItem;
+	private RadioMenuItem findAndReplaceRadioMenuItem;
 
 	@FXML
 	private RadioMenuItem showHTMLInfoMenuItem;
@@ -115,16 +109,8 @@ public class TaxaEditController {
 		return displayLabelColumn;
 	}
 
-	public MenuItem getFindAndReplaceMenuItem() {
-		return findAndReplaceMenuItem;
-	}
-
-	public MenuItem getClearSelectedMenuItem() {
-		return clearSelectedMenuItem;
-	}
-
-	public MenuItem getClearAllMenuItem() {
-		return clearAllMenuItem;
+	public RadioMenuItem getFindAndReplaceRadioMenuItem() {
+		return findAndReplaceRadioMenuItem;
 	}
 
 	public RadioMenuItem getShowHTMLInfoMenuItem() {

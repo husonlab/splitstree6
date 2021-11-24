@@ -22,6 +22,7 @@ package splitstree6.tabs.algorithms.taxaedit;
 import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.data.TaxaBlock;
 import splitstree6.tabs.IDisplayTab;
+import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.algorithms.AlgorithmTab;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
@@ -30,7 +31,6 @@ public class TaxaEditTab extends AlgorithmTab implements IDisplayTab {
 
 	private final TaxaEditController taxaEditController;
 	private final TaxaEditPresenter taxaEditPresenter;
-
 
 	/**
 	 * constructor
@@ -45,11 +45,15 @@ public class TaxaEditTab extends AlgorithmTab implements IDisplayTab {
 		getController().getMainPane().getChildren().add(taxaEditController.getAnchorPane());
 		taxaEditController.getAnchorPane().prefWidthProperty().bind(getController().getMainPane().widthProperty());
 		taxaEditController.getAnchorPane().prefHeightProperty().bind(getController().getMainPane().heightProperty());
-
 	}
 
 	public TaxaEditController getTaxaFilterController() {
 		return taxaEditController;
+	}
+
+	@Override
+	public IDisplayTabPresenter getPresenter() {
+		return taxaEditPresenter;
 	}
 }
 

@@ -92,15 +92,10 @@
                             <contextMenu>
                                 <ContextMenu>
                                     <items>
+                                        <RadioMenuItem fx:id="findAndReplaceRadioMenuItem" mnemonicParsing="false"
+                                                       text="Find/Replace..."/>
                                         <RadioMenuItem fx:id="showHTMLInfoMenuItem" mnemonicParsing="false"
                                                        text="Show HTML Help"/>
-                                        <SeparatorMenuItem/>
-                                        <MenuItem fx:id="findAndReplaceMenuItem" mnemonicParsing="false"
-                                                  text="Find/Replace..."/>
-                                        <SeparatorMenuItem/>
-                                        <MenuItem fx:id="clearSelectedMenuItem" mnemonicParsing="false"
-                                                  text="Clear Selected"/>
-                                        <MenuItem fx:id="clearAllMenuItem" mnemonicParsing="false" text="Clear All"/>
                                     </items>
                                 </ContextMenu>
                             </contextMenu>

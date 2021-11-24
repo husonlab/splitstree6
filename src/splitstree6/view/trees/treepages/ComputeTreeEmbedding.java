@@ -25,7 +25,6 @@ import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.TriConsumer;
@@ -110,7 +109,7 @@ public class ComputeTreeEmbedding {
 			var text = getLabelText(taxaBlock, tree, v);
 			if (text != null) {
 				var label = new RichTextLabel(text);
-				label.setFont(new Font("Serif", fontHeight));
+				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTextFill(color);
 				nodeLabelMap.put(v, label);
 
@@ -121,7 +120,7 @@ public class ComputeTreeEmbedding {
 			fontHeight = Math.min(MAX_FONT_SIZE, fontHeight * 0.25 * width / maxLabelWidth);
 			maxLabelWidth = 0;
 			for (var label : nodeLabelMap.values()) {
-				label.setFont(new Font("Serif", fontHeight));
+				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
 			}
 		}
