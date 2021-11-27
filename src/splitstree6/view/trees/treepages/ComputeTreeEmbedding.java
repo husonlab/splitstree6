@@ -86,7 +86,8 @@ public class ComputeTreeEmbedding {
 	 * @param edgeCallback callback to set up additional edges stuff
 	 * @return group of all edges, nodes and node-labels
 	 */
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, Diagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, Diagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
+							  BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels) {
 		var parentPlacement = ParentPlacement.ChildrenAverage;
 
 		parentPlacement = ParentPlacement.LeafAverage;
@@ -108,8 +109,6 @@ public class ComputeTreeEmbedding {
 			var text = getLabelText(taxaBlock, tree, v);
 			if (text != null) {
 				var label = new RichTextLabel(text);
-				//label.setKeepTextUpright(false);
-
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTextFill(color);
 				nodeLabelMap.put(v, label);
@@ -177,6 +176,9 @@ public class ComputeTreeEmbedding {
 			Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
 				for (var e : v.outEdges()) {
 					var w = e.getTarget();
+
+					// todo: need to implemented linked
+
 					var vPt = nodePointMap.get(v);
 					var wPt = nodePointMap.get(w);
 
@@ -187,6 +189,7 @@ public class ComputeTreeEmbedding {
 					line.setStrokeWidth(1);
 
 					line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));
+
 
 					var vPt0 = vPt.subtract(rootPt);
 					var wPt0 = wPt.subtract(rootPt);
@@ -218,12 +221,22 @@ public class ComputeTreeEmbedding {
 				var sourceShape = nodeShapeMap.get(e.getSource());
 				var targetShape = nodeShapeMap.get(e.getTarget());
 				var moveTo = new MoveTo();
-				moveTo.xProperty().bind(sourceShape.translateXProperty());
-				moveTo.yProperty().bind(sourceShape.translateYProperty());
+				if (linkNodesEdgesLabels) {
+					moveTo.xProperty().bind(sourceShape.translateXProperty());
+					moveTo.yProperty().bind(sourceShape.translateYProperty());
+				} else {
+					moveTo.setX(sourceShape.getTranslateX());
+					moveTo.setY(sourceShape.getTranslateY());
+				}
 
 				var lineTo2 = new LineTo();
-				lineTo2.xProperty().bind(targetShape.translateXProperty());
-				lineTo2.yProperty().bind(targetShape.translateYProperty());
+				if (linkNodesEdgesLabels) {
+					lineTo2.xProperty().bind(targetShape.translateXProperty());
+					lineTo2.yProperty().bind(targetShape.translateYProperty());
+				} else {
+					lineTo2.setX(targetShape.getTranslateX());
+					lineTo2.setY(targetShape.getTranslateY());
+				}
 
 				var line = new Path(moveTo, lineTo2);
 
@@ -241,16 +254,33 @@ public class ComputeTreeEmbedding {
 				var targetShape = nodeShapeMap.get(e.getTarget());
 
 				var moveTo = new MoveTo();
-				moveTo.xProperty().bind(sourceShape.translateXProperty());
-				moveTo.yProperty().bind(sourceShape.translateYProperty());
+				if (linkNodesEdgesLabels) {
+					moveTo.xProperty().bind(sourceShape.translateXProperty());
+					moveTo.yProperty().bind(sourceShape.translateYProperty());
+				} else {
+					moveTo.setX(sourceShape.getTranslateX());
+					moveTo.setY(sourceShape.getTranslateY());
+				}
 
 				var lineTo1 = new LineTo();
-				lineTo1.xProperty().bind(sourceShape.translateXProperty());
-				lineTo1.yProperty().bind(targetShape.translateYProperty());
+
+				if (linkNodesEdgesLabels) {
+					lineTo1.xProperty().bind(sourceShape.translateXProperty());
+					lineTo1.yProperty().bind(targetShape.translateYProperty());
+				} else {
+					lineTo1.setX(sourceShape.getTranslateX());
+					lineTo1.setY(targetShape.getTranslateY());
+				}
 
 				var lineTo2 = new LineTo();
-				lineTo2.xProperty().bind(targetShape.translateXProperty());
-				lineTo2.yProperty().bind(targetShape.translateYProperty());
+
+				if (linkNodesEdgesLabels) {
+					lineTo2.xProperty().bind(targetShape.translateXProperty());
+					lineTo2.yProperty().bind(targetShape.translateYProperty());
+				} else {
+					lineTo2.setX(targetShape.getTranslateX());
+					lineTo2.setY(targetShape.getTranslateY());
+				}
 
 				var line = new Path(moveTo, lineTo1, lineTo2);
 
@@ -265,9 +295,9 @@ public class ComputeTreeEmbedding {
 		}
 
 		if (diagram.isRadial())
-			layoutNodeLabelsRadial(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap);
+			layoutNodeLabelsRadial(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, linkNodesEdgesLabels);
 		else
-			layoutNodeLabelsRectangular(tree, nodeShapeMap, nodeLabelMap);
+			layoutNodeLabelsRectangular(tree, nodeShapeMap, nodeLabelMap, linkNodesEdgesLabels);
 
 		return new Group(edgeGroup, nodeGroup, nodeLabelGroup);
 	}
@@ -443,19 +473,27 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static void layoutNodeLabelsRectangular(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap) {
+	private static void layoutNodeLabelsRectangular(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, boolean linkNodesEdgesLabels) {
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
-				label.setKeepTextUpright(false);
 				InvalidationListener changeListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
-						if (v.isLeaf())
-							label.translateXProperty().bind(shape.translateXProperty().add(LINEAR_LABEL_GAP));
-						else
-							label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(0.5));
-						label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+						if (linkNodesEdgesLabels) {
+							if (v.isLeaf())
+								label.translateXProperty().bind(shape.translateXProperty().add(LINEAR_LABEL_GAP));
+							else
+								label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(0.5));
+							label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+						} else {
+							if (v.isLeaf())
+								label.setTranslateX(shape.getTranslateX() + LINEAR_LABEL_GAP);
+							else
+								label.setTranslateX(shape.getTranslateX() - label.getWidth() - 0.5);
+							label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
+
+						}
 					}
 				};
 				label.widthProperty().addListener(changeListener);
@@ -464,7 +502,7 @@ public class ComputeTreeEmbedding {
 		}
 	}
 
-	private static void layoutNodeLabelsRadial(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap) {
+	private static void layoutNodeLabelsRadial(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap, boolean linkNodesEdgesLabels) {
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
@@ -486,8 +524,13 @@ public class ComputeTreeEmbedding {
 								angle = 0.0;
 						}
 						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, RADIAL_LABEL_GAP + 0.5 * label.getWidth());
-						label.translateXProperty().bind(shape.translateXProperty().subtract(0.5 * label.getWidth()).add(offset.getX()));
-						label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()).add(offset.getY()));
+						if (linkNodesEdgesLabels) {
+							label.translateXProperty().bind(shape.translateXProperty().subtract(0.5 * label.getWidth()).add(offset.getX()));
+							label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()).add(offset.getY()));
+						} else {
+							label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
+							label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY());
+						}
 						//label.setRotate(angle > 90 && angle < 270 ? angle + 180 : angle);
 						label.setRotate(angle);
 					}

@@ -50,6 +50,8 @@ public class InteractionSetup {
 	private final TaxaBlock taxaBlock;
 	private final SelectionModel<Taxon> taxonSelectionModel;
 
+	private final TreePane.Orientation orientation;
+
 	private final Map<Taxon, Pair<Shape, RichTextLabel>> taxonShapeLabelMap;
 	private final EventHandler<MouseEvent> mousePressedHandler;
 	private final EventHandler<MouseEvent> mouseDraggedHandler;
@@ -59,10 +61,11 @@ public class InteractionSetup {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel) {
+	public InteractionSetup(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, TreePane.Orientation orientation) {
 		this.phyloTree = phyloTree;
 		this.taxaBlock = taxaBlock;
 		this.taxonSelectionModel = taxonSelectionModel;
+		this.orientation = orientation;
 		taxonShapeLabelMap = new HashMap<>();
 
 		mousePressedHandler = e -> {
@@ -78,8 +81,46 @@ public class InteractionSetup {
 				for (var taxon : taxonSelectionModel.getSelectedItems()) {
 					var shapeLabel = taxonShapeLabelMap.get(taxon);
 					if (shapeLabel != null) {
-						shapeLabel.getSecond().setLayoutX(shapeLabel.getSecond().getLayoutX() + e.getScreenX() - mouseDownX);
-						shapeLabel.getSecond().setLayoutY(shapeLabel.getSecond().getLayoutY() + e.getScreenY() - mouseDownY);
+						var label = shapeLabel.getSecond();
+
+						var dx = e.getScreenX() - mouseDownX;
+						var dy = e.getScreenY() - mouseDownY;
+
+						switch (orientation) {
+							case Rotate90Deg -> {
+								var tmp = dx;
+								dx = -dy;
+								dy = tmp;
+							}
+							case Rotate180Deg -> {
+								dx = -dx;
+								dy = -dy;
+							}
+							case Rotate270Deg -> {
+								var tmp = dx;
+								dx = dy;
+								dy = -tmp;
+							}
+							case FlipRotate0Deg -> {
+								dx = -dx;
+							}
+							case FlipRotate90Deg -> {
+								var tmp = dx;
+								dx = dy;
+								dy = tmp;
+							}
+							case FlipRotate180Deg -> {
+								dy = -dy;
+							}
+							case FlipRotate270Deg -> {
+								var tmp = dx;
+								dx = -dy;
+								dy = -tmp;
+							}
+						}
+
+						label.setLayoutX(label.getLayoutX() + dx);
+						label.setLayoutY(label.getLayoutY() + dy);
 					}
 				}
 				mouseDownX = e.getScreenX();

@@ -78,7 +78,7 @@ public class TreePane extends StackPane {
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					ComputeTreeEmbedding.Diagram diagram, Orientation orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
 
-		this.interactionSetup = new InteractionSetup(taxaBlock, phyloTree, taxonSelectionModel);
+		this.interactionSetup = new InteractionSetup(taxaBlock, phyloTree, taxonSelectionModel, orientation);
 		// setStyle("-fx-border-color: lightgray;");
 
 		getStyleClass().add("background");
@@ -87,6 +87,8 @@ public class TreePane extends StackPane {
 		setPrefHeight(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);
 		setMinHeight(Pane.USE_PREF_SIZE);
+		setMaxWidth(Pane.USE_PREF_SIZE);
+		setMaxHeight(Pane.USE_PREF_SIZE);
 
 		fontScaleChangeListener = (v, o, n) -> applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
 		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
@@ -114,18 +116,25 @@ public class TreePane extends StackPane {
 				height = getPrefHeight() - 12;
 			}
 
-			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback());
+			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false);
 
 			applyLabelScaleFactor(group, labelScaleFactor.get());
 
 			switch (orientation) {
+				case Rotate90Deg -> {
+					group.setRotate(-90);
+				}
 				case Rotate180Deg -> {
 					group.setRotate(180);
 				}
 				case Rotate270Deg -> {
 					group.setRotate(90);
 				}
-				case Rotate90Deg -> {
+				case FlipRotate0Deg -> {
+					group.setScaleX(-1);
+				}
+				case FlipRotate90Deg -> {
+					group.setScaleX(-1);
 					group.setRotate(-90);
 				}
 				case FlipRotate180Deg -> {
@@ -136,37 +145,18 @@ public class TreePane extends StackPane {
 					group.setScaleX(-1);
 					group.setRotate(90);
 				}
-				case FlipRotate90Deg -> {
-					group.setScaleX(-1);
-					group.setRotate(-90);
-				}
-				case FlipRotate0Deg -> {
-					group.setScaleX(-1);
-				}
 			}
 
-			if (orientation != Orientation.Rotate0Deg) {
+			if (group.getScaleX() != 1) { // if we have flipped the group, we need to flip each label to remain readable
 				var queue = new LinkedList<>(group.getChildren());
 				while (queue.size() > 0) {
 					var node = queue.pop();
 					if (node instanceof RichTextLabel) {
-						Platform.runLater(() -> {
-							if (diagram.isRadial()) {
-								node.setScaleX(group.getScaleX());
-							} else {
-								if (!orientation.isWidthHeightSwitched()) {
-									node.setRotate(-group.getRotate());
-								} else if (orientation == Orientation.FlipRotate270Deg) {
-									node.setRotate(group.getRotate() + 90);
-								}
-								node.setScaleX(group.getScaleX());
-							}
-						});
+						Platform.runLater(() -> node.setScaleX(group.getScaleX()));
 					} else if (node instanceof Parent parent) {
 						queue.addAll(parent.getChildrenUnmodifiable());
 					}
 				}
-
 			}
 			return group;
 		});
