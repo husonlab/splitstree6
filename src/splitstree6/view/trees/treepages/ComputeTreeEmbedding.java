@@ -21,7 +21,6 @@ package splitstree6.view.trees.treepages;
 
 import javafx.beans.InvalidationListener;
 import javafx.geometry.Point2D;
-import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -109,6 +108,8 @@ public class ComputeTreeEmbedding {
 			var text = getLabelText(taxaBlock, tree, v);
 			if (text != null) {
 				var label = new RichTextLabel(text);
+				//label.setKeepTextUpright(false);
+
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTextFill(color);
 				nodeLabelMap.put(v, label);
@@ -447,6 +448,7 @@ public class ComputeTreeEmbedding {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
+				label.setKeepTextUpright(false);
 				InvalidationListener changeListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
 						if (v.isLeaf())
@@ -486,8 +488,8 @@ public class ComputeTreeEmbedding {
 						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, RADIAL_LABEL_GAP + 0.5 * label.getWidth());
 						label.translateXProperty().bind(shape.translateXProperty().subtract(0.5 * label.getWidth()).add(offset.getX()));
 						label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()).add(offset.getY()));
-						label.setRotationAxis(new Point3D(0, 0, 1));
-						label.setRotate(angle > 90 && angle < 270 ? angle + 180 : angle);
+						//label.setRotate(angle > 90 && angle < 270 ? angle + 180 : angle);
+						label.setRotate(angle);
 					}
 				};
 				label.widthProperty().addListener(changeListener);

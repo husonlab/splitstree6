@@ -388,7 +388,7 @@ public class MainWindowPresenter {
 		while (stack.size() > 0) {
 			var item = stack.pop();
 			if (item instanceof Menu menu) {
-				if (!menu.getText().equals("Open Recent") && !menu.getText().equals("Window") && !menu.getText().equals("Help"))
+				if (menu != controller.getOpenRecentMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
 					stack.addAll(menu.getItems());
 			} else if (!(item instanceof SeparatorMenuItem)) {
 				item.setOnAction(null);
@@ -404,7 +404,7 @@ public class MainWindowPresenter {
 		while (stack.size() > 0) {
 			var item = stack.pop();
 			if (item instanceof Menu menu) {
-				if (!menu.getText().equals("Open Recent") && !menu.getText().equals("Window") && !menu.getText().equals("Help"))
+				if (menu != controller.getOpenRecentMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
 					stack.addAll(menu.getItems());
 			} else if (!(item instanceof SeparatorMenuItem)) {
 				if (item.getOnAction() != null && !item.disableProperty().isBound()) {
@@ -425,14 +425,6 @@ public class MainWindowPresenter {
 			node = node.getParent();
 		}
 		return null;
-	}
-
-	public void displayInMainTabPaneUniquely(WorkflowNode workflowNode, Tab tab) {
-		if (!workFlowTabs.containsKey(workflowNode)) {
-			mainWindow.getController().getMainTabPane().getTabs().add(tab);
-			workFlowTabs.put(workflowNode, tab);
-		}
-		mainWindow.getController().getMainTabPane().getSelectionModel().select(tab);
 	}
 
 	public SplitPanePresenter getSplitPanePresenter() {

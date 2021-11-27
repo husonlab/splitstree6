@@ -379,6 +379,9 @@ public class MainWindowController {
 	private Menu windowMenu;
 
 	@FXML
+	private Menu helpMenu;
+
+	@FXML
 	private MenuItem showMessageWindowMenuItem;
 
 	@FXML
@@ -932,6 +935,10 @@ public class MainWindowController {
 
 	public Menu getWindowMenu() {
 		return windowMenu;
+	}
+
+	public Menu getHelpMenu() {
+		return helpMenu;
 	}
 
 	public MenuItem getShowMessageWindowMenuItem() {

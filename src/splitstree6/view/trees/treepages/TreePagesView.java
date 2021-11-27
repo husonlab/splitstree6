@@ -59,16 +59,17 @@ public class TreePagesView implements IView {
 	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
 
 	private final ObjectProperty<ComputeTreeEmbedding.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeEmbedding.Diagram.getDefault());
-	private final ObjectProperty<TreePane.RootSide> optionRootSide = new SimpleObjectProperty<>(this, "optionRootSide", TreePane.RootSide.getDefault());
+	private final ObjectProperty<TreePane.Orientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", TreePane.Orientation.getDefault());
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
 	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames", ProgramProperties.get("TreePagesShowTreeNames", true));
 
+	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionRootSide.getName(), optionRows.getName(), optionCols.getName(), pageNumber.getName(), optionFontScaleFactor.getName());
+		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(), pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName());
 	}
 
 	public TreePagesView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -90,7 +91,7 @@ public class TreePagesView implements IView {
 		empty.bind(Bindings.isEmpty(getTrees()));
 
 		optionDiagram.addListener((v, o, n) -> ComputeTreeEmbedding.Diagram.setDefault(n));
-		optionRootSide.addListener((v, o, n) -> TreePane.RootSide.setDefault(n));
+		optionOrientation.addListener((v, o, n) -> TreePane.Orientation.setDefault(n));
 		optionRows.addListener((v, o, n) -> ProgramProperties.put("TreePagesRows", n.intValue()));
 		optionCols.addListener((v, o, n) -> ProgramProperties.put("TreePagesCols", n.intValue()));
 		optionShowTreeNames.addListener((v, o, n) -> ProgramProperties.put("TreePagesShowTreeNames", n));
@@ -160,16 +161,16 @@ public class TreePagesView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public TreePane.RootSide getOptionRootSide() {
-		return optionRootSide.get();
+	public TreePane.Orientation getOptionOrientation() {
+		return optionOrientation.get();
 	}
 
-	public ObjectProperty<TreePane.RootSide> optionRootSideProperty() {
-		return optionRootSide;
+	public ObjectProperty<TreePane.Orientation> optionOrientationProperty() {
+		return optionOrientation;
 	}
 
-	public void setOptionRootSide(TreePane.RootSide optionRootSide) {
-		this.optionRootSide.set(optionRootSide);
+	public void setOptionOrientation(TreePane.Orientation optionOrientation) {
+		this.optionOrientation.set(optionOrientation);
 	}
 
 	public ObjectProperty<Node> imageNodeProperty() {
@@ -217,6 +218,18 @@ public class TreePagesView implements IView {
 
 	public void setTabPane(TabPane tabPane) {
 		this.tabPane.set(tabPane);
+	}
+
+	public double getOptionZoomFactor() {
+		return optionZoomFactor.get();
+	}
+
+	public DoubleProperty optionZoomFactorProperty() {
+		return optionZoomFactor;
+	}
+
+	public void setOptionZoomFactor(double optionZoomFactor) {
+		this.optionZoomFactor.set(optionZoomFactor);
 	}
 
 	public double getOptionFontScaleFactor() {

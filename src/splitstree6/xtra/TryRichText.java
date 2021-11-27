@@ -21,8 +21,10 @@ package splitstree6.xtra;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 
@@ -34,9 +36,16 @@ public class TryRichText extends Application {
 		var textField = new TextField();
 		textField.setOnAction(e -> richText.setText(textField.getText()));
 
+		var rotate = new Button("Rotate");
+		rotate.setOnAction(e -> richText.setRotate(richText.getRotate() + 20));
+		var unRotate = new Button("Un-Rotate");
+		unRotate.setOnAction(e -> richText.setRotate(richText.getRotate() - 20));
+
 		var root = new BorderPane();
 		root.setTop(textField);
 		root.setCenter(richText);
+		root.setBottom(new HBox(rotate, unRotate));
+
 
 		var scene = new Scene(root, 300, 300);
 		primaryStage.setScene(scene);

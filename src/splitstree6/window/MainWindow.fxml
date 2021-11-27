@@ -453,7 +453,7 @@
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                     </items>
                                 </Menu>
-                                <Menu text="Help">
+                                <Menu fx:id="helpMenu" text="Help">
                                     <items>
                                         <MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>

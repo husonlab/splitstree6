@@ -21,11 +21,11 @@ package splitstree6.view.trees.treepages;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
@@ -68,12 +68,13 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		controller.getRootSideCBox().setButtonCell(ComboBoxUtils.createRootSideComboBoxListCell());
 		controller.getRootSideCBox().setCellFactory(ComboBoxUtils.createRootSideComboBoxCallback());
-		controller.getRootSideCBox().getItems().addAll(TreePane.RootSide.values());
+		controller.getRootSideCBox().getItems().addAll(TreePane.Orientation.values());
 
-		controller.getRootSideCBox().valueProperty().bindBidirectional(treePagesView.optionRootSideProperty());
-		controller.getRootSideCBox().disableProperty().bind(Bindings.createObjectBinding(() -> treePagesView.getOptionDiagram().isRadial(), treePagesView.optionDiagramProperty()));
+		controller.getRootSideCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
+		//controller.getRootSideCBox().disableProperty().bind(Bindings.createObjectBinding(() -> treePagesView.getOptionDiagram().isRadial(), treePagesView.optionDiagramProperty()));
 
 		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowTreeNamesProperty());
+
 		{
 			controller.getRowsColsCBox().getItems().setAll(gridValues);
 			var text = String.format("%d x %d", treePagesView.getOptionRows(), treePagesView.getOptionCols());
@@ -82,7 +83,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			controller.getRowsColsCBox().setValue(text);
 		}
 
-		gridValues.addListener((InvalidationListener) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
+		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
 
 		treePagesView.optionRowsProperty().addListener((v, o, n) -> {
 			var text = String.format("%d x %d", treePagesView.getOptionRows(), treePagesView.getOptionCols());
@@ -103,7 +104,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		});
 
 		targetBounds.addListener((v, o, n) -> {
-			var width = n.getWidth() - 4;
+			var width = n.getWidth();
 			var height = n.getHeight() - 120;
 			controller.getPagination().setPrefWidth(width);
 			controller.getPagination().setPrefHeight(height);
@@ -161,6 +162,12 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
 		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
 		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
+
+		mainWindow.getController().getZoomInMenuItem().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
+		mainWindow.getController().getZoomInMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(1.0 / 1.1)));
+		mainWindow.getController().getZoomOutMenuItem().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
+		mainWindow.getController().getZoomOutMenuItem().disableProperty().bind(treePageView.emptyProperty());
+
 
 		mainWindow.getController().getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
 		mainWindow.getController().getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());

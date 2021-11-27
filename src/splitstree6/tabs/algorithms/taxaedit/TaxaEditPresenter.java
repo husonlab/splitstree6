@@ -71,8 +71,8 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 			if (taxaEditor.getNumberDisabledTaxa() == 0)
 				controller.getInfoLabel().setText("Active: " + inputTaxonBlock.getNtax());
 			else
-				controller.getInfoLabel().setText(String.format("Active: %d (of %d)",
-						(inputTaxonBlock.getNtax() - taxaEditor.getNumberDisabledTaxa()), inputTaxonBlock.getNtax()));
+				controller.getInfoLabel().setText(String.format("Checked: %d, active: %d (of %d)",
+						(inputTaxonBlock.getNtax() - taxaEditor.getNumberDisabledTaxa()), mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(), inputTaxonBlock.getNtax()));
 		};
 		taxaEditor.optionDisabledTaxaProperty().addListener(activeChangedListener);
 		activeChangedListener.invalidated(null);

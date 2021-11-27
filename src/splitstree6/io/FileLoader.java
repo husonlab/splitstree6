@@ -19,6 +19,7 @@
 
 package splitstree6.io;
 
+import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
@@ -46,6 +47,7 @@ public class FileLoader {
 		else if (editorTab != null && !editorTab.getText().isBlank()) {
 			editorTab.importFromFile(fileName);
 			mainWindow.setFileName(fileName);
+			RecentFilesManager.getInstance().insertRecentFile(fileName);
 			/* todo: should use source node
 			var sourceNode = mainWindow.getWorkflow().getSourceNode();
 			if (sourceNode != null) {
@@ -57,14 +59,16 @@ public class FileLoader {
 			 */
 		} else {
 			var newWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(mainWindow);
-			if (WorkflowNexusInput.isApplicable(fileName))
+			if (WorkflowNexusInput.isApplicable(fileName)) {
 				WorkflowNexusInput.open(newWindow, fileName);
-			else {
+				RecentFilesManager.getInstance().insertRecentFile(fileName);
+			} else {
 				var importManager = ImportManager.getInstance();
 				if (importManager.getReaders(fileName).size() == 1) { // unique input format
 					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler);
 					mainWindow.setFileName(fileName);
+					RecentFilesManager.getInstance().insertRecentFile(fileName);
 					newWindow.setDirty(true);
 				} else {
 					// ImportDialog.show(mainWindow, fileName);

@@ -21,8 +21,10 @@ package splitstree6.view.trees.treepages;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Node;
@@ -33,6 +35,10 @@ import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import splitstree6.window.MainWindow;
 
+/**
+ * tree-page factory
+ * Daniel Huson, 11.2021
+ */
 public class TreePageFactory implements Callback<Integer, Node> {
 	private final MainWindow mainWindow;
 	private final TreePagesView treePagesView;
@@ -42,7 +48,8 @@ public class TreePageFactory implements Callback<Integer, Node> {
 	private final ReadOnlyIntegerProperty cols;
 	private final ReadOnlyObjectProperty<Dimension2D> dimensions;
 
-	private GridPane gridPane;
+	private final ObjectProperty<GridPane> gridPane = new SimpleObjectProperty<>();
+
 	private int page;
 
 	public TreePageFactory(MainWindow mainWindow, TreePagesView treePagesView, ObservableList<PhyloTree> trees, ReadOnlyIntegerProperty rows, ReadOnlyIntegerProperty cols, ReadOnlyObjectProperty<Dimension2D> dimensions) {
@@ -53,13 +60,17 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		this.cols = cols;
 		this.dimensions = dimensions;
 
-		gridPane = new GridPane();
-		gridPane.setHgap(5);
-		gridPane.setVgap(5);
+		gridPane.addListener((v, o, n) -> {
+			if (n != null) {
+				n.setHgap(5);
+				n.setVgap(5);
+			}
+		});
+		gridPane.set(new GridPane());
 
 		final InvalidationListener updater = e -> RunAfterAWhile.apply(this, this::update);
 		treePagesView.optionDiagramProperty().addListener(updater);
-		treePagesView.optionRootSideProperty().addListener(updater);
+		treePagesView.optionOrientationProperty().addListener(updater);
 		rows.addListener(updater);
 		cols.addListener(updater);
 
@@ -71,7 +82,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		var taxaBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
 		var taxonSelectionModel = mainWindow.getTaxonSelectionModel();
 
-		Platform.runLater(() -> gridPane.getChildren().clear());
+		Platform.runLater(() -> gridPane.get().getChildren().clear());
 		var start = page * rows.get() * cols.get();
 		var top = Math.min(trees.size(), start + rows.get() * cols.get());
 		var r = 0;
@@ -83,17 +94,19 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(taxaBlock, tree, name, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-						treePagesView.getOptionDiagram(), treePagesView.getOptionRootSide(), treePagesView.optionFontScaleFactorProperty(), treePagesView.optionShowTreeNamesProperty());
+						treePagesView.getOptionDiagram(), treePagesView.getOptionOrientation(), treePagesView.optionZoomFactorProperty(), treePagesView.optionFontScaleFactorProperty(),
+						treePagesView.optionShowTreeNamesProperty());
 				treePane.drawTree();
 				pane = treePane;
 			} else
 				pane = new Pane();
+
 			pane.setPrefSize(dimensions.get().getWidth(), dimensions.get().getHeight());
 			pane.setMinSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
 			pane.setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
 			GridPane.setRowIndex(pane, r);
 			GridPane.setColumnIndex(pane, c);
-			Platform.runLater(() -> gridPane.getChildren().add(pane));
+			Platform.runLater(() -> gridPane.get().getChildren().add(pane));
 			if (++c == cols.get()) {
 				r++;
 				c = 0;
@@ -103,11 +116,12 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 	@Override
 	public Node call(Integer page) {
-		gridPane = new GridPane();
+		gridPane.set(new GridPane());
+
 		if (page >= 0) {
 			this.page = page;
 			update();
 		}
-		return gridPane;
+		return gridPane.get();
 	}
 }

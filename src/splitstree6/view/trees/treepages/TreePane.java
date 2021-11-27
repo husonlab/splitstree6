@@ -24,7 +24,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
-import javafx.geometry.Point3D;
 import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -48,30 +47,27 @@ import java.util.LinkedList;
  * Daniel Huson, 11.2021
  */
 public class TreePane extends StackPane {
-	public enum RootSide {
-		Left, Right, Down, Up;
+	public enum Orientation {
+		Rotate0Deg, Rotate90Deg, Rotate180Deg, Rotate270Deg, FlipRotate0Deg, FlipRotate90Deg, FlipRotate180Deg, FlipRotate270Deg;
 
-		public static RootSide getDefault() {
-			return valueOf(ProgramProperties.get("DefaultTreeRootSide", Left.name()));
+		public boolean isWidthHeightSwitched() {
+			return this == Rotate90Deg || this == FlipRotate90Deg || this == Rotate270Deg || this == FlipRotate270Deg;
 		}
 
-		public static void setDefault(RootSide rootSide) {
-			ProgramProperties.put("DefaultTreeRootSide", rootSide.name());
+		public static Orientation getDefault() {
+			return valueOf(ProgramProperties.get("DefaultTreeRootSide", Rotate0Deg.name()));
+		}
+
+		public static void setDefault(Orientation orientation) {
+			ProgramProperties.put("DefaultTreeRootSide", orientation.name());
 		}
 	}
 
-	private final TaxaBlock taxaBlock;
-	private final PhyloTree phyloTree;
-	private final String name;
-	private final SelectionModel<Taxon> taxonSelectionModel;
-	private final ReadOnlyDoubleProperty labelScaleFactor;
-	private final ReadOnlyBooleanProperty showTreeName;
+	private Pane treePane;
 
 	private final InteractionSetup interactionSetup;
 
-	private final ComputeTreeEmbedding.Diagram diagram;
-	private final RootSide rootSide;
-
+	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 
 	private final AService<Group> service;
@@ -80,15 +76,7 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					ComputeTreeEmbedding.Diagram diagram, RootSide rootSide, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
-		this.taxaBlock = taxaBlock;
-		this.phyloTree = phyloTree;
-		this.name = name;
-		this.taxonSelectionModel = taxonSelectionModel;
-		this.diagram = diagram;
-		this.rootSide = rootSide;
-		this.labelScaleFactor = labelScaleFactor;
-		this.showTreeName = showTreeName;
+					ComputeTreeEmbedding.Diagram diagram, Orientation orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
 
 		this.interactionSetup = new InteractionSetup(taxaBlock, phyloTree, taxonSelectionModel);
 		// setStyle("-fx-border-color: lightgray;");
@@ -103,6 +91,14 @@ public class TreePane extends StackPane {
 		fontScaleChangeListener = (v, o, n) -> applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
 		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 
+		zoomChangedListener = (v, o, n) -> {
+			if (treePane != null) {
+				treePane.setScaleX(treePane.getScaleX() / o.doubleValue() * n.doubleValue());
+				treePane.setScaleY(treePane.getScaleY() / o.doubleValue() * n.doubleValue());
+			}
+		};
+		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
+
 		// compute the tree in a separate thread:
 		service = new AService<>();
 		service.setExecutor(ProgramExecutorService.getInstance());
@@ -110,38 +106,62 @@ public class TreePane extends StackPane {
 		service.setCallable(() -> {
 			double width;
 			double height;
-			if (rootSide == RootSide.Left || rootSide == RootSide.Right) {
-				width = getPrefWidth();
-				height = getPrefHeight() - 12;
-			} else {
+			if (orientation.isWidthHeightSwitched()) {
 				height = getPrefWidth();
 				width = getPrefHeight() - 12;
+			} else {
+				width = getPrefWidth();
+				height = getPrefHeight() - 12;
 			}
 
-			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4,
-					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback());
+			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback());
 
 			applyLabelScaleFactor(group, labelScaleFactor.get());
 
-			switch (rootSide) {
-				case Right -> {
+			switch (orientation) {
+				case Rotate180Deg -> {
 					group.setRotate(180);
 				}
-				case Up -> {
+				case Rotate270Deg -> {
 					group.setRotate(90);
 				}
-				case Down -> {
+				case Rotate90Deg -> {
 					group.setRotate(-90);
+				}
+				case FlipRotate180Deg -> {
+					group.setScaleX(-1);
+					group.setRotate(180);
+				}
+				case FlipRotate270Deg -> {
+					group.setScaleX(-1);
+					group.setRotate(90);
+				}
+				case FlipRotate90Deg -> {
+					group.setScaleX(-1);
+					group.setRotate(-90);
+				}
+				case FlipRotate0Deg -> {
+					group.setScaleX(-1);
 				}
 			}
 
-			if (rootSide == RootSide.Right || rootSide == RootSide.Up) {
+			if (orientation != Orientation.Rotate0Deg) {
 				var queue = new LinkedList<>(group.getChildren());
 				while (queue.size() > 0) {
 					var node = queue.pop();
 					if (node instanceof RichTextLabel) {
-						node.setRotationAxis(new Point3D(0, 0, 1));
-						node.setRotate(180);
+						Platform.runLater(() -> {
+							if (diagram.isRadial()) {
+								node.setScaleX(group.getScaleX());
+							} else {
+								if (!orientation.isWidthHeightSwitched()) {
+									node.setRotate(-group.getRotate());
+								} else if (orientation == Orientation.FlipRotate270Deg) {
+									node.setRotate(group.getRotate() + 90);
+								}
+								node.setScaleX(group.getScaleX());
+							}
+						});
 					} else if (node instanceof Parent parent) {
 						queue.addAll(parent.getChildrenUnmodifiable());
 					}
@@ -152,17 +172,22 @@ public class TreePane extends StackPane {
 		});
 
 		service.setOnSucceeded(a -> {
-			var pane = new StackPane();
+			treePane = new StackPane();
+			treePane.setId("treeView");
+			if (zoomFactor.get() != 1) {
+				treePane.setScaleX(zoomFactor.get());
+				treePane.setScaleY(zoomFactor.get());
+			}
 
-			pane.setMinHeight(getPrefHeight() - 12);
-			pane.setMinWidth(getPrefWidth());
+			treePane.setMinHeight(getPrefHeight() - 12);
+			treePane.setMinWidth(getPrefWidth());
 
-			pane.getChildren().setAll(service.getValue());
+			treePane.getChildren().setAll(service.getValue());
 			var label = new Label(name);
 			label.visibleProperty().bind(showTreeName);
-			getChildren().setAll(new VBox(label, pane));
+			getChildren().setAll(new VBox(label, treePane));
 
-			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+			treePane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				if (e.isStillSincePress() && !e.isShiftDown()) {
 					Platform.runLater(taxonSelectionModel::clearSelection);
 				}
@@ -183,14 +208,7 @@ public class TreePane extends StackPane {
 			while (queue.size() > 0) {
 				var node = queue.pop();
 				if (node instanceof RichTextLabel richTextLabel) {
-					if (false) {
-						richTextLabel.setScaleX(factor * richTextLabel.getScaleX());
-						richTextLabel.setScaleY(factor * richTextLabel.getScaleY());
-					} else {
-						richTextLabel.setScale(factor * richTextLabel.getScale());
-						//var newSize = factor * richTextLabel.getFont().getSize();
-						//richTextLabel.setFont(new Font(richTextLabel.getFont().getName(), newSize));
-					}
+					richTextLabel.setScale(factor * richTextLabel.getScale());
 				} else if (node instanceof Parent parent)
 					queue.addAll(parent.getChildrenUnmodifiable());
 			}

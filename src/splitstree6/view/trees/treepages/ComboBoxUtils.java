@@ -22,8 +22,10 @@ package splitstree6.view.trees.treepages;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Tooltip;
 import javafx.util.Callback;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.util.StringUtils;
 
 
 public class ComboBoxUtils {
@@ -59,20 +61,22 @@ public class ComboBoxUtils {
 	/**
 	 * create list cell for root side combo box
 	 */
-	public static ListCell<TreePane.RootSide> createRootSideComboBoxListCell() {
+	public static ListCell<TreePane.Orientation> createRootSideComboBoxListCell() {
 		return new ListCell<>() {
 			{
 				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 			}
 
 			@Override
-			protected void updateItem(TreePane.RootSide item, boolean empty) {
+			protected void updateItem(TreePane.Orientation item, boolean empty) {
 				super.updateItem(item, empty);
 
 				if (item == null || empty) {
 					setGraphic(null);
 				} else {
-					setGraphic(ResourceManagerFX.getIconAsImageView("sun/" + item.name() + "16.gif", 16));
+					var graphic = ResourceManagerFX.getIconAsImageView(item.name() + ".png", 16);
+					setGraphic(graphic);
+					Tooltip.install(graphic, new Tooltip(StringUtils.fromCamelCase(item.name())));
 				}
 			}
 		};
@@ -81,7 +85,7 @@ public class ComboBoxUtils {
 	/**
 	 * creates the callback method for diagraom combo box
 	 */
-	public static Callback<ListView<TreePane.RootSide>, ListCell<TreePane.RootSide>> createRootSideComboBoxCallback() {
+	public static Callback<ListView<TreePane.Orientation>, ListCell<TreePane.Orientation>> createRootSideComboBoxCallback() {
 		return p -> createRootSideComboBoxListCell();
 	}
 }
