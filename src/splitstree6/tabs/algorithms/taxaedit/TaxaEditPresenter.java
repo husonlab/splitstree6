@@ -59,22 +59,21 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 	/**
 	 * constructor
 	 */
-	public TaxaEditPresenter(MainWindow mainWindow, TaxaEditTab tab, AlgorithmNode<TaxaBlock, TaxaBlock> taxaFilterNode) {
+	public TaxaEditPresenter(MainWindow mainWindow, TaxaEditTab tab, AlgorithmNode<TaxaBlock, TaxaBlock> taxaEditorNode) {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
-		this.taxaEditor = (TaxaEditor) taxaFilterNode.getAlgorithm();
+		this.taxaEditor = (TaxaEditor) taxaEditorNode.getAlgorithm();
 		this.controller = tab.getTaxaFilterController();
 
 		var inputTaxonBlock = mainWindow.getWorkflow().getInputTaxonBlock();
 
-		final InvalidationListener activeChangedListener = e -> {
-			if (taxaEditor.getNumberDisabledTaxa() == 0)
-				controller.getInfoLabel().setText("Active: " + inputTaxonBlock.getNtax());
-			else
+		final InvalidationListener activeChangedListener = e ->
 				controller.getInfoLabel().setText(String.format("Checked: %d, active: %d (of %d)",
-						(inputTaxonBlock.getNtax() - taxaEditor.getNumberDisabledTaxa()), mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(), inputTaxonBlock.getNtax()));
-		};
+						(inputTaxonBlock.getNtax() - taxaEditor.getNumberDisabledTaxa()),
+						mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(), inputTaxonBlock.getNtax()));
+
 		taxaEditor.optionDisabledTaxaProperty().addListener(activeChangedListener);
+		taxaEditorNode.validProperty().addListener(activeChangedListener);
 		activeChangedListener.invalidated(null);
 
 		var tableView = controller.getTableView();
@@ -223,6 +222,17 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		mainWindowController.getRedoMenuItem().textProperty().bind(tab.getUndoManager().redoNameProperty());
 		mainWindowController.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
 		mainWindowController.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
+
+		mainWindowController.getSelectAllMenuItem().setOnAction(e -> controller.getTableView().getSelectionModel().selectAll());
+		mainWindowController.getSelectAllMenuItem().disableProperty().bind(Bindings.size(controller.getTableView().getSelectionModel().getSelectedItems()).isEqualTo(
+				Bindings.size(controller.getTableView().getItems())));
+		mainWindowController.getSelectNoneMenuItem().setOnAction(e -> controller.getTableView().getSelectionModel().clearSelection());
+		mainWindowController.getSelectNoneMenuItem().disableProperty().bind(Bindings.isEmpty(controller.getTableView().getSelectionModel().getSelectedItems()));
+
+		mainWindowController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
+		mainWindowController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+		mainWindowController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+		mainWindowController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));
 	}
 
 	private static void updateColumnWidths(TableView<TaxaEditTableItem> tableView, TableColumn<TaxaEditTableItem, String> displayCol) {

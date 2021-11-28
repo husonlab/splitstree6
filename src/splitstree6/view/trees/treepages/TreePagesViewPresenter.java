@@ -48,8 +48,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 	private final TreePagesViewController controller;
 
-	private final ObjectProperty<TreePageFactory> treePageFactory = new SimpleObjectProperty<>(null);
-
 	private final ObjectProperty<Dimension2D> boxDimensions = new SimpleObjectProperty<>(new Dimension2D(0, 0));
 
 	/**
@@ -122,6 +120,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		treePagesView.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
 		controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> treePagesView.setPageNumber(n.intValue() + 1));
 
+		ObjectProperty<TreePageFactory> treePageFactory = new SimpleObjectProperty<>(null);
 		treePageFactory.set(new TreePageFactory(mainWindow, treePagesView, phyloTrees, treePagesView.optionRowsProperty(), treePagesView.optionColsProperty(), boxDimensions));
 
 		controller.getPagination().pageFactoryProperty().bind(treePageFactory);
