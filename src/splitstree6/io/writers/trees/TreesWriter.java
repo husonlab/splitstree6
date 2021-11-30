@@ -20,10 +20,10 @@
 package splitstree6.io.writers.trees;
 
 import splitstree6.data.TreesBlock;
-import splitstree6.io.utils.DataWriterBase;
+import splitstree6.io.utils.DataBlockWriter;
 
 
-public abstract class TreesWriter extends DataWriterBase<TreesBlock> {
+public abstract class TreesWriter extends DataBlockWriter<TreesBlock> {
 	public TreesWriter() {
 		super(TreesBlock.class);
 	}

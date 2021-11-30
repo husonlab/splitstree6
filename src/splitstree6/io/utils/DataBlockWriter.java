@@ -1,5 +1,5 @@
 /*
- *  DataWriterBase.java Copyright (C) 2021 Daniel H. Huson
+ *  DataBlockWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -28,10 +28,10 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-public abstract class DataWriterBase<T extends DataBlock> extends ReaderWriterBase implements HasFromClass<T> {
+public abstract class DataBlockWriter<T extends DataBlock> extends ReaderWriterBase implements HasFromClass<T> {
 	private final Class<T> fromClass;
 
-	public DataWriterBase(Class<T> fromClass) {
+	public DataBlockWriter(Class<T> fromClass) {
 		super(fromClass.getSimpleName());
 		this.fromClass = fromClass;
 	}

@@ -20,6 +20,7 @@
 
 package splitstree6.data;
 
+import jloda.util.ProgramProperties;
 import splitstree6.io.nexus.INexusFormat;
 
 /**
@@ -30,12 +31,21 @@ public class TreesFormat implements INexusFormat {
 	private boolean optionTranslate = true; // use translation table
 	private boolean optionWeights = true;
 
+	public TreesFormat() {
+	}
+
+	public TreesFormat(TreesFormat other) {
+		setOptionTranslate(other.isOptionTranslate());
+		setOptionWeights(other.isOptionWeights());
+	}
+
 	public boolean isOptionTranslate() {
 		return optionTranslate;
 	}
 
 	public void setOptionTranslate(boolean optionTranslate) {
 		this.optionTranslate = optionTranslate;
+		ProgramProperties.put("NexusTreeOptionTranslate", optionTranslate);
 	}
 
 	public boolean isOptionWeights() {
@@ -44,5 +54,6 @@ public class TreesFormat implements INexusFormat {
 
 	public void setOptionWeights(boolean optionWeights) {
 		this.optionWeights = optionWeights;
+		ProgramProperties.put("NexusTreeOptionWeights", optionWeights);
 	}
 }

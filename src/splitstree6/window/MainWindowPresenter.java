@@ -21,6 +21,7 @@ package splitstree6.window;
 
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
@@ -42,6 +43,12 @@ import jloda.fx.window.WindowGeometry;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
+import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
+import splitstree6.algorithms.trees.trees2trees.ConsensusTree;
+import splitstree6.algorithms.trees.trees2trees.RerootTrees;
+import splitstree6.algorithms.trees.trees2trees.TreeSelector;
+import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
 import splitstree6.io.FileLoader;
@@ -145,6 +152,7 @@ public class MainWindowPresenter {
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
+		var workflow = mainWindow.getWorkflow();
 
 		controller.getNewMenuItem().setOnAction(e -> MainWindowManager.getInstance().createAndShowWindow(false));
 
@@ -300,10 +308,16 @@ public class MainWindowPresenter {
 
 		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
 
-		controller.getFilterTaxaMenuItem().setOnAction(null);
-		controller.getFilterCharactersMenuItem().setOnAction(null);
-		controller.getFilterTreesMenuItem().setOnAction(null);
-		controller.getFilterSplitsMenuItem().setOnAction(null);
+		controller.getEditTaxaMenuItem().setOnAction(e -> {
+			var nodes = workflow.getNodes(TaxaEditor.class);
+			if (nodes.size() == 1)
+				mainWindow.getAlgorithmTabsManager().showTab(nodes.iterator().next(), true);
+		});
+		controller.getEditTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> workflow.getNodes(TaxaEditor.class).size() != 1, workflow.nodes()));
+
+		controller.getEditCharactersMenuItem().setOnAction(null);
+		controller.getEditTreesMenuItem().setOnAction(null);
+		controller.getEditSplitsMenuItem().setOnAction(null);
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
@@ -324,13 +338,27 @@ public class MainWindowPresenter {
 		controller.getUpgmaMenuItem().setOnAction(null);
 		controller.getBunemanTreeMenuItem().setOnAction(null);
 
-		controller.getSelectTreeMenuItem().setOnAction(null);
-		controller.getConsensusTreeMenuItem().setOnAction(null);
-		controller.getRootByOutgroupMenuItem().setOnAction(null);
-		controller.getRootByMidpointMenuItem().setOnAction(null);
-		controller.getTreeViewMenuItem().setOnAction(null);
-		controller.getTreeGridMenuItem().setOnAction(null);
-		controller.getTanglegramMenuItem().setOnAction(null);
+		controller.getSelectTreeMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1)));
+		controller.getConsensusTreeMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTreeSplits.Consensus.Majority)));
+
+		controller.getRerootTreesMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new RerootTrees(), null));
+
+		controller.getViewSingleTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
+				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.SingleTree))));
+		controller.getViewSingleTreeMenuItem().disableProperty().bind(workflow.runningProperty());
+
+		controller.getViewTreePagesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
+				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.TreePages))));
+		controller.getViewTreePagesMenuItem().disableProperty().bind(workflow.runningProperty());
+
+		controller.getViewTanglegramMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
+				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.Tanglegram))));
+		controller.getViewTanglegramMenuItem().disableProperty().bind(workflow.runningProperty());
+
+		controller.getViewDensiTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
+				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.DensiTree))));
+		controller.getViewDensiTreeMenuItem().disableProperty().bind(workflow.runningProperty());
+
 		controller.getNeighborNetMenuItem().setOnAction(null);
 		controller.getSplitDecompositionMenuItem().setOnAction(null);
 		controller.getParsimonySplitsMenuItem().setOnAction(null);

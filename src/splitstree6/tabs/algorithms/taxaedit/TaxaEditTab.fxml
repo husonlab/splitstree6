@@ -65,6 +65,12 @@
                                                   text="Activate None"/>
                                         <MenuItem fx:id="activateSelectedMenuItem" mnemonicParsing="false"
                                                   text="Activate Selected"/>
+                                        <SeparatorMenuItem/>
+                                        <MenuItem fx:id="selectCurrentlyActiveMenuItem" mnemonicParsing="false"
+                                                  text="Select Currently Active"/>
+                                        <MenuItem fx:id="selectActivatedMenuItem" mnemonicParsing="false"
+                                                  text="Select Activated"/>
+
                                     </items>
                                 </ContextMenu>
                             </contextMenu>
@@ -92,8 +98,8 @@
                             <contextMenu>
                                 <ContextMenu>
                                     <items>
-                                        <RadioMenuItem fx:id="findAndReplaceRadioMenuItem" mnemonicParsing="false"
-                                                       text="Find/Replace..."/>
+                                        <MenuItem fx:id="findAndReplaceRadioMenuItem" mnemonicParsing="false"
+                                                  text="Find/Replace..."/>
                                         <RadioMenuItem fx:id="showHTMLInfoMenuItem" mnemonicParsing="false"
                                                        text="Show HTML Help"/>
                                     </items>

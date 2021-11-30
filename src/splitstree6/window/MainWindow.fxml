@@ -349,10 +349,10 @@
                                 </Menu>
                                 <Menu text="Data">
                                     <items>
-                                        <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa"/>
-                                        <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters"/>
-                                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees"/>
-                                        <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits"/>
+                                        <MenuItem fx:id="editTaxaMenuItem" text="Edit Taxa..."/>
+                                        <MenuItem fx:id="editCharactersMenuItem" text="Edit Characters..."/>
+                                        <MenuItem fx:id="editTreesMenuItem" text="Edit Trees..."/>
+                                        <MenuItem fx:id="editSplitsMenuItem" text="Edit Splits..."/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="traitsMenuItem" text="Traits"/>
                                     </items>
@@ -385,13 +385,13 @@
                                         <MenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
                                         <MenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="rootByOutgroupMenuItem" text="Root By Outgroup"/>
-                                        <MenuItem fx:id="rootByMidpointMenuItem" text="Root By Midpoint"/>
+                                        <MenuItem fx:id="rerootTreesMenuItem" text="Reroot Trees"/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="treeViewMenuItem" text="Tree View"/>
-                                        <MenuItem fx:id="treeGridMenuItem" text="Tree Grid"/>
+                                        <MenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
+                                        <MenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="tanglegramMenuItem" text="Tanglegram"/>
+                                        <MenuItem fx:id="viewTanglegramMenuItem" text="Show Tanglegram"/>
+                                        <MenuItem fx:id="viewDensiTreeMenuItem" text="Show DensiTree"/>
                                     </items>
                                 </Menu>
                                 <Menu text="Network">

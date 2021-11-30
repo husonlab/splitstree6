@@ -20,9 +20,9 @@
 package splitstree6.io.writers.taxa;
 
 import splitstree6.data.TaxaBlock;
-import splitstree6.io.utils.DataWriterBase;
+import splitstree6.io.utils.DataBlockWriter;
 
-public abstract class TaxaWriter extends DataWriterBase<TaxaBlock> {
+public abstract class TaxaWriter extends DataBlockWriter<TaxaBlock> {
 	public TaxaWriter() {
 		super(TaxaBlock.class);
 	}

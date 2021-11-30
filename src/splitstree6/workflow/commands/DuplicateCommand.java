@@ -54,32 +54,32 @@ public class DuplicateCommand {
 						var dataNode2CopyNodeMap = new HashMap<DataNode, DataNode>();
 						dataNode2CopyNodeMap.put(node.getPreferredParent(), node.getPreferredParent());
 
-				AlgorithmNode firstCopyAlgorithmNode = null;
+						AlgorithmNode firstCopyAlgorithmNode = null;
 
-				while (stack.size() > 0) {
-					var sourceNode = (DataNode) stack.pop();
-					var algorithmNodes = new ArrayList<splitstree6.workflow.AlgorithmNode>();
-					if (first) {
-						algorithmNodes.add(node);
-						first = false;
-					} else {
-						algorithmNodes.addAll(sourceNode.getChildren().stream().map(v -> (AlgorithmNode) v).toList());
-					}
-					for (var algorithmNode : algorithmNodes) {
-						var targetNode = algorithmNode.getTargetNode();
-						var copySourceNode = dataNode2CopyNodeMap.get(sourceNode);
-						var copyTargetNode = workflow.newDataNode(targetNode.getDataBlock().newInstance());
-						copyTargetNode.setValid(false);
-						addedNodes.add(copyTargetNode);
-						var copyAlgorithmNode = workflow.newAlgorithmNode(algorithmNode.getAlgorithm().newInstance(), workflow.getWorkingTaxaNode(), copySourceNode, copyTargetNode);
-						if (firstCopyAlgorithmNode == null)
-							firstCopyAlgorithmNode = copyAlgorithmNode;
-						copyAlgorithmNode.setValid(false);
-						addedNodes.add(copyAlgorithmNode);
-						dataNode2CopyNodeMap.put(targetNode, copyTargetNode);
-						stack.add(algorithmNode.getTargetNode());
-					}
-				}
+						while (stack.size() > 0) {
+							var sourceNode = (DataNode) stack.pop();
+							var algorithmNodes = new ArrayList<splitstree6.workflow.AlgorithmNode>();
+							if (first) {
+								algorithmNodes.add(node);
+								first = false;
+							} else {
+								algorithmNodes.addAll(sourceNode.getChildren().stream().map(v -> (AlgorithmNode) v).toList());
+							}
+							for (var algorithmNode : algorithmNodes) {
+								var targetNode = algorithmNode.getTargetNode();
+								var copySourceNode = dataNode2CopyNodeMap.get(sourceNode);
+								var copyTargetNode = workflow.newDataNode(targetNode.getDataBlock().newInstance());
+								copyTargetNode.setValid(false);
+								addedNodes.add(copyTargetNode);
+								var copyAlgorithmNode = workflow.newAlgorithmNode(algorithmNode.getAlgorithm().newInstance(), workflow.getWorkingTaxaNode(), copySourceNode, copyTargetNode);
+								if (firstCopyAlgorithmNode == null)
+									firstCopyAlgorithmNode = copyAlgorithmNode;
+								copyAlgorithmNode.setValid(false);
+								addedNodes.add(copyAlgorithmNode);
+								dataNode2CopyNodeMap.put(targetNode, copyTargetNode);
+								stack.add(algorithmNode.getTargetNode());
+							}
+						}
 						if (firstCopyAlgorithmNode != null)
 							firstCopyAlgorithmNode.restart();
 					} catch (Exception ex) {

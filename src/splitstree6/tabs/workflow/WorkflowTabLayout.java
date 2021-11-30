@@ -55,6 +55,10 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * workflow tab presenter
+ * Daniel Huson, 11.2021
+ */
 public class WorkflowTabLayout {
 	private static final double dx = 185;
 	private static final double dy = 75;
@@ -206,7 +210,7 @@ public class WorkflowTabLayout {
 					item.setTranslateY(3 * dy);
 					usedLocations.add(new Point2D(item.getTranslateX(), item.getTranslateY()));
 					algorithmNode.getParents().addListener(createParentsChangeListenerForInputAndWorkingNodes(algorithmNode));
-				} else if (workflow.isInputTaxaFilter(algorithmNode)) {
+				} else if (workflow.isInputTaxaEditor(algorithmNode)) {
 					var item = workflowTab.newAlgorithmItem(algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					algorithmNode.getParents().addListener(createParentsChangeListenerForInputAndWorkingNodes(algorithmNode));
@@ -240,17 +244,28 @@ public class WorkflowTabLayout {
 				var item = nodeItemMap.get(node);
 				if (item != null) {
 					while (e.next()) {
-						if (item.getTranslateX() == NOT_SET) {
-							if (e.wasAdded()) {
-								for (var parent : e.getAddedSubList()) {
-									updateAllBelow(parent);
+						if (e.wasAdded()) {
+							for (var parentNode : e.getAddedSubList()) {
+								if (!workflow.isWorkingTaxaNode(parentNode)) {
+									var parentItem = nodeItemMap.get(parentNode);
+									var edgeItem = new WorkflowEdgeItem(parentItem, item);
+									edgeItemTable.put(parentNode, node, edgeItem);
+									edgeItems.add(edgeItem);
+									updateAllBelow(parentNode);
 								}
 							}
 						} else if (e.wasRemoved()) {
 							for (var parentNode : e.getRemoved()) {
 								var parentItem = nodeItemMap.get(parentNode);
-								if (parentItem != null)
+								if (parentItem != null) {
 									parentItem.getChildren().remove(item);
+									var edgeItem = edgeItemTable.get(parentNode, node);
+									if (edgeItem != null) {
+										edgeItemTable.remove(parentNode, node);
+										edgeItems.remove(edgeItem);
+										deletedEdgeItemTable.put(parentNode, node, edgeItem);
+									}
+								}
 							}
 						}
 					}

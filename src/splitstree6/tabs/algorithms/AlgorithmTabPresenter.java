@@ -19,19 +19,14 @@
 
 package splitstree6.tabs.algorithms;
 
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import javafx.util.converter.DoubleStringConverter;
-import javafx.util.converter.FloatStringConverter;
-import javafx.util.converter.IntegerStringConverter;
 import jloda.util.Basic;
-import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.options.Option;
+import splitstree6.options.OptionControlCreator;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.workflow.Algorithm;
 
@@ -75,9 +70,10 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 
 	public void setupOptionControls(AlgorithmTabController controller, Algorithm algorithm) {
 		controller.getMainPane().getChildren().clear();
+		changeListeners.clear();
 
 		for (var option : Option.getAllOptions(algorithm)) {
-			var control = createControl(option);
+			var control = OptionControlCreator.apply(option, changeListeners);
 			if (control != null) {
 				var label = new Label(StringUtils.fromCamelCase(option.getName()));
 				label.setPrefWidth(120);
@@ -92,92 +88,4 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 	public void setupMenuItems() {
 	}
 
-	/**
-	 * creates the control for an algorithm option
-	 *
-	 * @param option the option
-	 * @return the corresponding control
-	 */
-	private Control createControl(Option option) {
-		switch (option.getOptionValueType()) {
-			case Integer -> {
-				var control = new TextField();
-				control.setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
-				control.setText(option.getProperty().getValue().toString());
-				control.setOnAction(e -> {
-					if (NumberUtils.isInteger(control.getText()))
-						option.getProperty().setValue(NumberUtils.parseInt(control.getText()));
-					else
-						Platform.runLater(() -> control.setText(String.valueOf(option.getProperty().getValue())));
-				});
-				ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "0" : n.toString());
-				changeListeners.add(changeListener);
-				option.getProperty().addListener(new WeakChangeListener(changeListener));
-				return control;
-			}
-			case Float -> {
-				var control = new TextField();
-				control.setTextFormatter(new TextFormatter<>(new FloatStringConverter()));
-				control.setText(option.getProperty().getValue().toString());
-				control.setOnAction(e -> {
-					if (NumberUtils.isFloat(control.getText()))
-						option.getProperty().setValue(NumberUtils.parseFloat(control.getText()));
-					else
-						Platform.runLater(() -> control.setText(String.valueOf(option.getProperty().getValue())));
-				});
-				ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "0" : n.toString());
-				changeListeners.add(changeListener);
-				option.getProperty().addListener(new WeakChangeListener(changeListener));
-				return control;
-			}
-			case Double -> {
-				var control = new TextField();
-				control.setTextFormatter(new TextFormatter<>(new DoubleStringConverter()));
-				control.setText(option.getProperty().getValue().toString());
-				control.setOnAction(e -> {
-					if (NumberUtils.isDouble(control.getText()))
-						option.getProperty().setValue(NumberUtils.parseDouble(control.getText()));
-					else
-						Platform.runLater(() -> control.setText(String.valueOf(option.getProperty().getValue())));
-				});
-				ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "0" : n.toString());
-				changeListeners.add(changeListener);
-				option.getProperty().addListener(new WeakChangeListener(changeListener));
-				return control;
-			}
-			case String -> {
-				var control = new TextField(option.getProperty().getValue().toString());
-				control.setOnAction(e -> option.getProperty().setValue(control.getText()));
-				ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "" : n.toString());
-				changeListeners.add(changeListener);
-				option.getProperty().addListener(new WeakChangeListener(changeListener));
-				return control;
-			}
-			case Boolean -> {
-				var control = new CheckBox();
-				control.setSelected((Boolean) option.getProperty().getValue());
-				ChangeListener changeListener = (v, o, n) -> control.setSelected(n != null && (Boolean) n);
-				changeListeners.add(changeListener);
-				option.getProperty().addListener(new WeakChangeListener(changeListener));
-				return control;
-			}
-			case stringArray -> {
-			}
-			case doubleArray -> {
-			}
-			case doubleSquareMatrix -> {
-			}
-			case Enum -> {
-				var control = new ChoiceBox<String>();
-				control.getItems().addAll(option.getLegalValues());
-				control.setValue(option.getProperty().getValue().toString());
-				control.valueProperty().addListener((v, o, n) -> option.getProperty().setValue(option.getEnumValueForName(n)));
-				ChangeListener changeListener = (v, o, n) -> control.setValue(n.toString());
-				changeListeners.add(changeListener);
-				option.getProperty().addListener(new WeakChangeListener(changeListener));
-				return control;
-			}
-		}
-		return null;
-	}
 }

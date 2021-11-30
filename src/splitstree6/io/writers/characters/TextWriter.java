@@ -1,5 +1,5 @@
 /*
- *  ShowSplitsConsole.java Copyright (C) 2021 Daniel H. Huson
+ *  TextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,25 +17,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.splits.splits2view;
+package splitstree6.io.writers.characters;
 
-import jloda.util.progress.ProgressListener;
-import splitstree6.data.SplitsBlock;
+import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.ViewBlock;
-import splitstree6.io.writers.splits.TextWriter;
 
 import java.io.IOException;
-import java.io.StringWriter;
+import java.io.Writer;
 
-public class ShowSplitsConsole extends Splits2View {
+public class TextWriter extends CharactersWriter {
+	public TextWriter() {
+		setFileExtensions("tab", "txt");
+	}
+
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock outputData) throws IOException {
-		try (var w = new StringWriter()) {
-			w.write(inputData.getName() + ":\n");
-			var writer = new TextWriter();
-			writer.write(w, taxaBlock, inputData);
-			System.out.println(w);
+	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
+		w.write("Characters\n");
+		for (int i = 1; i <= taxa.getNtax(); i++)
+			w.write(taxa.getLabel(i) + "\t");
+		w.write("\n");
+
+		for (int j = 1; j <= characters.getNchar(); j++) {
+			w.write(j + "");
+			for (int i = 1; i <= taxa.getNtax(); i++) {
+				w.write("\t" + characters.get(i, j));
+			}
+			w.write("\n");
 		}
+
+		w.write("\n");
+		w.flush();
+
 	}
 }

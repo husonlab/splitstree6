@@ -47,6 +47,7 @@ import jloda.fx.workflow.WorkflowNode;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.nexus.NexusExporter;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.displaydatablock.DisplayData;
 import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -125,7 +126,7 @@ public class TextTabsManager {
 			tab = nodeTabMap.get(node);
 		else {
 			tab = new ViewTab(mainWindow, true);
-			var view = new DisplayTextView(mainWindow, node.getName() + " text", false);
+			var view = new DisplayData(mainWindow, (DataNode) node, node.getName() + " text", false);
 			tab.setView(view);
 			tab.setOnCloseRequest(t -> nodeTabMap.remove(node));
 			nodeTabMap.put(node, tab);

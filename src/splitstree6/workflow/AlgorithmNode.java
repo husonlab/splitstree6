@@ -126,4 +126,8 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 	public Workflow getOwner() {
 		return (Workflow) super.getOwner();
 	}
+
+	public String toString() {
+		return getTitle();
+	}
 }

@@ -198,7 +198,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		return v;
 	}
 
-	public <S extends DataBlock, T extends DataBlock> Collection<AlgorithmNode<S, T>> getNodes(Class<? extends Algorithm<S, T>> clazz) {
+	public <S extends DataBlock, T extends DataBlock> Collection<AlgorithmNode<S, T>> getNodes(Class<? extends Algorithm> clazz) {
 		return nodeStream().filter(n -> n instanceof AlgorithmNode algorithmNode && algorithmNode.getAlgorithm().getClass().equals(clazz)).map(n -> (AlgorithmNode<S, T>) n).toList();
 	}
 
@@ -294,7 +294,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		return v instanceof DataNode dataNode && dataNode.getTitle().startsWith(WORKING_PREFIX) && !isWorkingTaxaNode(v);
 	}
 
-	public boolean isInputTaxaFilter(WorkflowNode v) {
+	public boolean isInputTaxaEditor(WorkflowNode v) {
 		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getTitle().equals(INPUT_TAXA_EDITOR);
 	}
 
@@ -308,7 +308,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 
 	public boolean isDerivedNode(WorkflowNode v) {
 		return !isInputSourceNode(v) && !isInputTaxaNode(v) && !isInputDataNode(v) && !isWorkingTaxaNode(v) && !isWorkingDataNode(v)
-			   && !isInputTaxaFilter(v) && !isInputDataLoader(v) && !isInputTaxaDataFilter(v);
+			   && !isInputTaxaEditor(v) && !isInputDataLoader(v) && !isInputTaxaDataFilter(v);
 	}
 
 	public Consumer<AService<Boolean>> getServiceConfigurator() {

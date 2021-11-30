@@ -226,16 +226,16 @@ public class MainWindowController {
 	private MenuItem useFullScreenMenuItem;
 
 	@FXML
-	private MenuItem filterTaxaMenuItem;
+	private MenuItem editTaxaMenuItem;
 
 	@FXML
-	private MenuItem filterCharactersMenuItem;
+	private MenuItem editCharactersMenuItem;
 
 	@FXML
-	private MenuItem filterTreesMenuItem;
+	private MenuItem editTreesMenuItem;
 
 	@FXML
-	private MenuItem filterSplitsMenuItem;
+	private MenuItem editSplitsMenuItem;
 
 	@FXML
 	private MenuItem traitsMenuItem;
@@ -289,19 +289,19 @@ public class MainWindowController {
 	private MenuItem consensusTreeMenuItem;
 
 	@FXML
-	private MenuItem rootByOutgroupMenuItem;
+	private MenuItem rerootTreesMenuItem;
 
 	@FXML
-	private MenuItem rootByMidpointMenuItem;
+	private MenuItem viewTreePagesMenuItem;
 
 	@FXML
-	private MenuItem treeViewMenuItem;
+	private MenuItem viewSingleTreeMenuItem;
 
 	@FXML
-	private MenuItem treeGridMenuItem;
+	private MenuItem viewTanglegramMenuItem;
 
 	@FXML
-	private MenuItem tanglegramMenuItem;
+	private MenuItem viewDensiTreeMenuItem;
 
 	@FXML
 	private MenuItem neighborNetMenuItem;
@@ -733,20 +733,20 @@ public class MainWindowController {
 		return useFullScreenMenuItem;
 	}
 
-	public MenuItem getFilterTaxaMenuItem() {
-		return filterTaxaMenuItem;
+	public MenuItem getEditTaxaMenuItem() {
+		return editTaxaMenuItem;
 	}
 
-	public MenuItem getFilterCharactersMenuItem() {
-		return filterCharactersMenuItem;
+	public MenuItem getEditCharactersMenuItem() {
+		return editCharactersMenuItem;
 	}
 
-	public MenuItem getFilterTreesMenuItem() {
-		return filterTreesMenuItem;
+	public MenuItem getEditTreesMenuItem() {
+		return editTreesMenuItem;
 	}
 
-	public MenuItem getFilterSplitsMenuItem() {
-		return filterSplitsMenuItem;
+	public MenuItem getEditSplitsMenuItem() {
+		return editSplitsMenuItem;
 	}
 
 	public MenuItem getTraitsMenuItem() {
@@ -817,24 +817,25 @@ public class MainWindowController {
 		return consensusTreeMenuItem;
 	}
 
-	public MenuItem getRootByOutgroupMenuItem() {
-		return rootByOutgroupMenuItem;
+
+	public MenuItem getRerootTreesMenuItem() {
+		return rerootTreesMenuItem;
 	}
 
-	public MenuItem getRootByMidpointMenuItem() {
-		return rootByMidpointMenuItem;
+	public MenuItem getViewTreePagesMenuItem() {
+		return viewTreePagesMenuItem;
 	}
 
-	public MenuItem getTreeViewMenuItem() {
-		return treeViewMenuItem;
+	public MenuItem getViewSingleTreeMenuItem() {
+		return viewSingleTreeMenuItem;
 	}
 
-	public MenuItem getTreeGridMenuItem() {
-		return treeGridMenuItem;
+	public MenuItem getViewTanglegramMenuItem() {
+		return viewTanglegramMenuItem;
 	}
 
-	public MenuItem getTanglegramMenuItem() {
-		return tanglegramMenuItem;
+	public MenuItem getViewDensiTreeMenuItem() {
+		return viewDensiTreeMenuItem;
 	}
 
 	public MenuItem getNeighborNetMenuItem() {

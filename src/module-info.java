@@ -47,14 +47,18 @@ module splitstreesix {
 	opens splitstree6.io.readers.characters;
 	opens splitstree6.io.readers.distances;
 	opens splitstree6.io.readers.splits;
+	// opens splitstree6.io.readers.taxa;
 	opens splitstree6.io.readers.trees;
 	opens splitstree6.io.readers.network;
+	opens splitstree6.io.readers.view;
 
 	opens splitstree6.io.writers.characters;
 	opens splitstree6.io.writers.distances;
 	opens splitstree6.io.writers.splits;
 	opens splitstree6.io.writers.trees;
+	opens splitstree6.io.writers.taxa;
 	opens splitstree6.io.writers.network;
+	opens splitstree6.io.writers.view;
 
 	opens splitstree6.window;
 
@@ -80,7 +84,9 @@ module splitstreesix {
 	opens splitstree6.algorithms.taxa.taxa2view;
 
 	opens splitstree6.view.trees.treepages;
+
 	opens splitstree6.view.displaytext;
+	opens splitstree6.view.displaydatablock;
 	opens splitstree6.view.inputeditor;
 	opens splitstree6.view;
 

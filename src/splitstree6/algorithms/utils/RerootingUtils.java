@@ -38,8 +38,6 @@ import java.util.TreeSet;
 public class RerootingUtils {
 	/**
 	 * reroot tree by edge
-	 *
-	 * @return true, if rerooted
 	 */
 	public static void rerootByEdge(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Edge e) {
 		if ((e.getSource() == tree.getRoot() || e.getTarget() == tree.getRoot()) && tree.getRoot().getDegree() == 2)

@@ -19,7 +19,9 @@
 
 package splitstree6.tabs.algorithms.taxaedit;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
@@ -33,7 +35,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DefaultStringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.find.TableColumnSearcher;
+import jloda.fx.find.Searcher;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -56,6 +58,8 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 
 	private boolean inSelection = false;
 
+	private final InvalidationListener activeChangedListener;
+
 	/**
 	 * constructor
 	 */
@@ -66,18 +70,9 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		this.controller = tab.getTaxaFilterController();
 
 		var inputTaxonBlock = mainWindow.getWorkflow().getInputTaxonBlock();
-
-		final InvalidationListener activeChangedListener = e ->
-				controller.getInfoLabel().setText(String.format("Checked: %d, active: %d (of %d)",
-						(inputTaxonBlock.getNtax() - taxaEditor.getNumberDisabledTaxa()),
-						mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(), inputTaxonBlock.getNtax()));
-
-		taxaEditor.optionDisabledTaxaProperty().addListener(activeChangedListener);
-		taxaEditorNode.validProperty().addListener(activeChangedListener);
-		activeChangedListener.invalidated(null);
+		var workingTaxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
 
 		var tableView = controller.getTableView();
-
 		tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
 		controller.getIdColumn().setCellValueFactory(new PropertyValueFactory<>("Id"));
@@ -121,8 +116,12 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 					if (e.wasAdded()) {
 						for (var item : controller.getTableView().getItems()) {
 							if (item.getTaxon().getName().equals(e.getElementAdded().getName())) {
-								controller.getTableView().getSelectionModel().select(controller.getTableView().getItems().indexOf(item));
-								break;
+								var index = controller.getTableView().getItems().indexOf(item);
+								if (index >= 0) {
+									controller.getTableView().getSelectionModel().select(index);
+									Platform.runLater(() -> tableView.scrollTo(index));
+									break;
+								}
 							}
 						}
 					}
@@ -141,8 +140,18 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		findToolBar = new FindToolBar(mainWindow.getStage(), new TableColumnSearcher<>(controller.getDisplayLabelColumn(), TaxaEditTableItem::setDisplayLabel));
-		findToolBar.showReplaceToolBarProperty().bindBidirectional(controller.getFindAndReplaceRadioMenuItem().selectedProperty());
+		var searcher = setupSearcher(tableView);
+		findToolBar = new FindToolBar(mainWindow.getStage(), searcher);
+		searcher.foundProperty().addListener((v, o, n) -> tableView.scrollTo(n));
+
+		controller.getFindAndReplaceRadioMenuItem().setOnAction(e -> {
+			if (!findToolBar.isShowReplaceToolBar()) {
+				findToolBar.setShowReplaceToolBar(true);
+			} else {
+				findToolBar.setShowReplaceToolBar(false);
+				findToolBar.setShowFindToolBar(false);
+			}
+		});
 
 		controller.getTopVBox().getChildren().add(0, findToolBar);
 
@@ -171,6 +180,13 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		});
 		controller.getActivateSelectedMenuItem().disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
 
+		controller.getSelectCurrentlyActiveMenuItem().setOnAction(e -> tableView.getItems().stream()
+				.filter(item -> workingTaxonBlock.getTaxa().contains(item.getTaxon()))
+				.forEach(item -> tableView.getSelectionModel().select(item)));
+
+		controller.getSelectActivatedMenuItem().setOnAction(e -> tableView.getItems().stream()
+				.filter(TaxaEditTableItem::isActive).forEach(item -> tableView.getSelectionModel().select(item)));
+
 		controller.getShowHTMLInfoMenuItem().selectedProperty().addListener((v, o, n) -> {
 			controller.getHtmlInfoFlowPane().getChildren().clear();
 			if (n) {
@@ -188,6 +204,31 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		mainWindow.getWorkflow().getInputTaxaNode().validProperty().addListener((v, o, n) -> {
 			updateView();
 		});
+
+		activeChangedListener = e -> {
+			var label = (tableView.getSelectionModel().getSelectedItems().size() > 0 ? String.format("Selected: %d, ", tableView.getSelectionModel().getSelectedItems().size()) : "");
+			label += String.format("Active: %d (%d in use), total: %d", (inputTaxonBlock.getNtax() - taxaEditor.getNumberDisabledTaxa()), workingTaxonBlock.getNtax(), inputTaxonBlock.getNtax());
+			controller.getInfoLabel().setText(label);
+		};
+
+		tableView.getSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(activeChangedListener));
+		taxaEditor.optionDisabledTaxaProperty().addListener(new WeakInvalidationListener(activeChangedListener));
+		taxaEditorNode.validProperty().addListener(new WeakInvalidationListener(activeChangedListener));
+		activeChangedListener.invalidated(null);
+	}
+
+	private Searcher<TaxaEditTableItem> setupSearcher(TableView<TaxaEditTableItem> tableView) {
+		return new Searcher<>(tableView.getItems(),
+				i -> tableView.getSelectionModel().isSelected(i),
+				(i, select) -> {
+					if (select)
+						tableView.getSelectionModel().select(i);
+					else
+						tableView.getSelectionModel().clearSelection(i);
+				},
+				tableView.getSelectionModel().selectionModeProperty(),
+				i -> tableView.getItems().get(i).getName() + "%%%%" + tableView.getItems().get(i).getDisplayLabel(),
+				(i, label) -> tableView.getItems().get(i).setDisplayLabel(label.replaceAll(".*%%%%", "")));
 	}
 
 

@@ -37,5 +37,6 @@ public class NewickWriter extends TreesWriter {
 				w.write(trees.getTrees().get(i).toBracketString() + ";\n");
 			}
 		}
+		w.flush();
 	}
 }

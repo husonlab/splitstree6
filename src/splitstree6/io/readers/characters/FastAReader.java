@@ -45,8 +45,8 @@ public class FastAReader extends CharactersReader {
 	private static final String[] possibleIDs =
 			{"gb", "emb", "ena", "dbj", "pir", "prf", "sp", "pdb", "pat", "bbs", "gnl", "ref", "lcl"};
 
-	private final BooleanProperty optionFullLabels = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionPIRFormat = new SimpleBooleanProperty(false);
+	private final BooleanProperty optionFullLabels = new SimpleBooleanProperty(this, "optionFullLabels", false);
+	private final BooleanProperty optionPIRFormat = new SimpleBooleanProperty(this, "optionPIRFormat", false);
 
 	public FastAReader() {
 		setFileExtensions("fasta", "fas", "fa", "seq", "fsa", "fna", "dna");

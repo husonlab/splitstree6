@@ -1,5 +1,5 @@
 /*
- *  TGFWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  TextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -28,7 +28,11 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class TGFWriter extends NetworkWriter {
+/**
+ * write block in text format
+ * Daniel Huson, 11.2021
+ */
+public class TextWriter extends NetworkWriter {
 	private final BooleanProperty optionShowAllDetails = new SimpleBooleanProperty(false);
 
 	@Override

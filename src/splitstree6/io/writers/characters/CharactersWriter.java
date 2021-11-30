@@ -20,9 +20,9 @@
 package splitstree6.io.writers.characters;
 
 import splitstree6.data.CharactersBlock;
-import splitstree6.io.utils.DataWriterBase;
+import splitstree6.io.utils.DataBlockWriter;
 
-public abstract class CharactersWriter extends DataWriterBase<CharactersBlock> {
+public abstract class CharactersWriter extends DataBlockWriter<CharactersBlock> {
 	public CharactersWriter() {
 		super(CharactersBlock.class);
 	}

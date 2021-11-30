@@ -27,6 +27,7 @@ import jloda.util.PluginClassLoader;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataNode;
+import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
 import splitstree6.workflow.commands.AddAlgorithmCommand;
 import splitstree6.workflow.commands.AddNetworkPipelineCommand;
@@ -105,7 +106,7 @@ public class DataNodeContextMenuPresenter {
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (AddAlgorithmCommand.isApplicable(dataNode, algorithm))
+			if (AddAlgorithmCommand.isApplicable(dataNode, algorithm) && !(algorithm instanceof DataTaxaFilter))
 				list.add(new Pair<>(algorithm.getName(), algorithm));
 		}
 		list.sort(Comparator.comparing(Pair::getKey));

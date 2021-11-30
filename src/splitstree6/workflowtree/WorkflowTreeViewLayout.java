@@ -146,7 +146,7 @@ public class WorkflowTreeViewLayout {
 				if (workflow.isInputDataLoader(algorithmNode) || workflow.isInputTaxaDataFilter(algorithmNode)) {
 					//System.err.println("Skipped: " + algorithmNode);
 					// ignore
-				} else if (workflow.isInputTaxaFilter(algorithmNode)) {
+				} else if (workflow.isInputTaxaEditor(algorithmNode)) {
 					var item = new WorkflowTreeItem(mainWindow, algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					if (inputTaxaItem.getChildren().size() > 1)

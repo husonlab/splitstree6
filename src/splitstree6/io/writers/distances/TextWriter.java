@@ -1,5 +1,5 @@
 /*
- *  TabbedTextWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  TextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -25,8 +25,8 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class TabbedTextWriter extends DistancesWriter {
-	public TabbedTextWriter() {
+public class TextWriter extends DistancesWriter {
+	public TextWriter() {
 		setFileExtensions("tab", "txt");
 	}
 

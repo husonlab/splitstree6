@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  Copyright (C) 2018. Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+<!--
+  ~  DisplayData.fxml Copyright (C) 2021 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<TitledPane fx:id="titledPane" text="Format" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.view.displaydatablock.DisplayDataController">
+   <content>
+      <AnchorPane>
+         <children>
+            <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                        AnchorPane.topAnchor="0.0">
+               <top>
+                  <BorderPane>
+                     <center>
+                        <ChoiceBox fx:id="formatCBox" prefWidth="120.0">
+                           <padding>
+                              <Insets right="5.0"/>
+                           </padding>
+                        </ChoiceBox>
+                     </center>
+                     <left>
+                        <Label text="Format:" BorderPane.alignment="CENTER">
+                           <padding>
+                              <Insets right="5.0"/>
+                           </padding>
+                        </Label>
+                     </left>
+                     <right>
+                        <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
+                                prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                text="Apply" BorderPane.alignment="CENTER">
+                           <graphic>
+                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image smooth="false" url="@/jloda/resources/icons/sun/Play24.gif"/>
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                           <tooltip>
+                              <Tooltip text="Apply format"/>
+                           </tooltip>
+                        </Button>
+                     </right>
+                     <BorderPane.margin>
+                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                     </BorderPane.margin>
+                  </BorderPane>
+               </top>
+               <center>
+                  <VBox fx:id="mainPane" spacing="10.0" BorderPane.alignment="CENTER">
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="10.0"/>
+                     </padding>
+                  </VBox>
+               </center>
+            </BorderPane>
+         </children>
+      </AnchorPane>
+   </content>
+</TitledPane>

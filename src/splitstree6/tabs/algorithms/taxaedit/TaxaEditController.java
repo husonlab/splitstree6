@@ -49,6 +49,12 @@ public class TaxaEditController {
 	private MenuItem activateSelectedMenuItem;
 
 	@FXML
+	private MenuItem selectCurrentlyActiveMenuItem;
+
+	@FXML
+	private MenuItem selectActivatedMenuItem;
+
+	@FXML
 	private TableColumn<TaxaEditTableItem, Integer> idColumn;
 
 	@FXML
@@ -58,7 +64,7 @@ public class TaxaEditController {
 	private TableColumn<TaxaEditTableItem, String> displayLabelColumn;
 
 	@FXML
-	private RadioMenuItem findAndReplaceRadioMenuItem;
+	private MenuItem findAndReplaceRadioMenuItem;
 
 	@FXML
 	private RadioMenuItem showHTMLInfoMenuItem;
@@ -97,6 +103,14 @@ public class TaxaEditController {
 		return activateSelectedMenuItem;
 	}
 
+	public MenuItem getSelectCurrentlyActiveMenuItem() {
+		return selectCurrentlyActiveMenuItem;
+	}
+
+	public MenuItem getSelectActivatedMenuItem() {
+		return selectActivatedMenuItem;
+	}
+
 	public TableColumn<TaxaEditTableItem, Integer> getIdColumn() {
 		return idColumn;
 	}
@@ -109,7 +123,7 @@ public class TaxaEditController {
 		return displayLabelColumn;
 	}
 
-	public RadioMenuItem getFindAndReplaceRadioMenuItem() {
+	public MenuItem getFindAndReplaceRadioMenuItem() {
 		return findAndReplaceRadioMenuItem;
 	}
 

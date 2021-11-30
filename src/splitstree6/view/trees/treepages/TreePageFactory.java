@@ -21,6 +21,7 @@ package splitstree6.view.trees.treepages;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -50,6 +51,8 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 	private final ObjectProperty<GridPane> gridPane = new SimpleObjectProperty<>();
 
+	private final InvalidationListener updater;
+
 	private int page;
 
 	public TreePageFactory(MainWindow mainWindow, TreePagesView treePagesView, ObservableList<PhyloTree> trees, ReadOnlyIntegerProperty rows, ReadOnlyIntegerProperty cols, ReadOnlyObjectProperty<Dimension2D> dimensions) {
@@ -68,14 +71,15 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		});
 		gridPane.set(new GridPane());
 
-		final InvalidationListener updater = e -> RunAfterAWhile.apply(this, this::update);
-		treePagesView.optionDiagramProperty().addListener(updater);
-		treePagesView.optionOrientationProperty().addListener(updater);
-		rows.addListener(updater);
-		cols.addListener(updater);
+		updater = e -> RunAfterAWhile.apply(this, this::update);
 
-		MainWindowManager.useDarkThemeProperty().addListener(updater);
-		dimensions.addListener(updater);
+		trees.addListener(new WeakInvalidationListener(updater));
+		treePagesView.optionDiagramProperty().addListener(new WeakInvalidationListener(updater));
+		treePagesView.optionOrientationProperty().addListener(new WeakInvalidationListener(updater));
+		rows.addListener(new WeakInvalidationListener(updater));
+		cols.addListener(new WeakInvalidationListener(updater));
+		dimensions.addListener(new WeakInvalidationListener(updater));
+		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updater));
 	}
 
 	private void update() {

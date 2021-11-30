@@ -72,4 +72,9 @@ public class DataNode<S extends DataBlock> extends jloda.fx.workflow.DataNode {
 	public void setTitle(String title) {
 		this.title.set(title);
 	}
+
+	@Override
+	public String toString() {
+		return getTitle();
+	}
 }
