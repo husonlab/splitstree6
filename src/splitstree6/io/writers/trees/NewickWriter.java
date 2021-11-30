@@ -19,13 +19,20 @@
 
 package splitstree6.io.writers.trees;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
 import java.io.Writer;
 
-public class NewickWriter extends TreesWriter {
+/**
+ * write trees in Newick format
+ */
+public class NewickWriter extends TreesWriterBase {
+	private final BooleanProperty optionEdgeWeights = new SimpleBooleanProperty(this, "optionEdgeWeights", true);
+
 	public NewickWriter() {
 		setFileExtensions("tree", "tre", "trees", "new", "nwk", "treefile");
 	}
@@ -33,10 +40,18 @@ public class NewickWriter extends TreesWriter {
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, TreesBlock trees) throws IOException {
 		if (trees != null) {
-			for (int i = 0; i < trees.getNTrees(); i++) {
-				w.write(trees.getTrees().get(i).toBracketString() + ";\n");
+			for (var i = 0; i < trees.getNTrees(); i++) {
+				w.write(trees.getTrees().get(i).toBracketString(isOptionEdgeWeights()) + ";\n");
 			}
 		}
 		w.flush();
+	}
+
+	public boolean isOptionEdgeWeights() {
+		return optionEdgeWeights.get();
+	}
+
+	public BooleanProperty optionEdgeWeightsProperty() {
+		return optionEdgeWeights;
 	}
 }

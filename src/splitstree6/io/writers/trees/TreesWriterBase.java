@@ -1,5 +1,5 @@
 /*
- *  NetworkWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  TreesWriterBase.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.network;
+package splitstree6.io.writers.trees;
 
-import splitstree6.data.NetworkBlock;
+import splitstree6.data.TreesBlock;
 import splitstree6.io.utils.DataBlockWriter;
 
-public abstract class NetworkWriter extends DataBlockWriter<NetworkBlock> {
-	public NetworkWriter() {
-		super(NetworkBlock.class);
+
+public abstract class TreesWriterBase extends DataBlockWriter<TreesBlock> {
+	public TreesWriterBase() {
+		super(TreesBlock.class);
 	}
 }

@@ -25,9 +25,13 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class TextWriter extends CharactersWriter {
+/**
+ * writes characters in text format
+ * Daniel Huson, 11.2021
+ */
+public class TextWriter extends CharactersWriterBase {
 	public TextWriter() {
-		setFileExtensions("tab", "txt");
+		setFileExtensions("text", "txt");
 	}
 
 	@Override

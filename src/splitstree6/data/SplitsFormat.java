@@ -25,17 +25,22 @@ package splitstree6.data;
  * Daniel Huson, 12/29/16.
  */
 public class SplitsFormat {
-
 	private boolean optionLabels = false;
 	private boolean optionWeights = true;
 	private boolean optionConfidences = false;
 	private boolean optionShowBothSides = false;
 
-
 	/**
 	 * Constructor
 	 */
 	public SplitsFormat() {
+	}
+
+	public SplitsFormat(SplitsFormat other) {
+		this.optionLabels = other.optionLabels;
+		this.optionWeights = other.optionWeights;
+		this.optionConfidences = other.optionConfidences;
+		this.optionShowBothSides = other.optionShowBothSides;
 	}
 
 	/**

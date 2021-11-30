@@ -20,43 +20,72 @@
 package splitstree6.io.writers.characters;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import jloda.util.Pair;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.CharactersFormat;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.nexus.CharactersNexusOutput;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.List;
 
 /**
  * write block in Nexus format
  * Daniel Huson, 11.2021
  */
-public class NexusWriter extends CharactersWriter {
-	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(false);
+public class NexusWriter extends CharactersWriterBase {
+	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(this, "optionPrependTaxa", false);
 	private String title;
 	private Pair<String, String> link;
 	private boolean asWorkflowOnly;
+
+	private final BooleanProperty optionTranspose = new SimpleBooleanProperty(this, "optionTranspose", false);
+	private final BooleanProperty optionInterleave = new SimpleBooleanProperty(this, "optionInterleave", true);
+	private final BooleanProperty optionLabels = new SimpleBooleanProperty(this, "optionLabels", true);
+	private final BooleanProperty optionTokens = new SimpleBooleanProperty(this, "optionTokens", false);
+	private final BooleanProperty optionUseDotAsMatch = new SimpleBooleanProperty(this, "optionUseDotAsMatch", false);
+	private final IntegerProperty optionColumnsPerBlock = new SimpleIntegerProperty(this, "optionColumnsPerBlock", 80);
+
 
 	public NexusWriter() {
 		setFileExtensions("nexus", "nex", "nxs");
 	}
 
+	public List<String> listOptions() {
+		return List.of(optionLabels.getName(), optionInterleave.getName(), optionColumnsPerBlock.getName(), optionTranspose.getName(),
+				optionUseDotAsMatch.getName(), optionTokens.getName(), optionPrependTaxa.getName());
+	}
+
 	@Override
-	public void write(Writer w, TaxaBlock taxa, CharactersBlock block) throws IOException {
-		if (isOptionPrependTaxa())
-			new splitstree6.io.writers.taxa.NexusWriter().write(w, taxa, taxa);
-		final var output = new CharactersNexusOutput();
-		output.setTitleAndLink(getTitle(), getLink());
-		if (asWorkflowOnly) {
-			var newBlock = new CharactersBlock();
-			newBlock.setDataType(block.getDataType());
-			newBlock.setFormat(block.getFormat());
-			output.write(w, new TaxaBlock(), new CharactersBlock());
-		} else
-			output.write(w, taxa, block);
-		w.flush();
+	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
+		var saveFormat = new CharactersFormat(characters.getFormat());
+		try {
+			characters.getFormat().setOptionLabels(isOptionLabels());
+			characters.getFormat().setOptionMatchCharacter(isOptionUseDotAsMatch() ? '.' : 0);
+			characters.getFormat().setOptionInterleave(isOptionInterleave());
+			characters.getFormat().setOptionTranspose(isOptionTranspose());
+			characters.getFormat().setOptionColumnsPerBlock(getOptionColumnsPerBlock());
+			characters.getFormat().setOptionTokens(isOptionTokens());
+
+			if (isOptionPrependTaxa())
+				new splitstree6.io.writers.taxa.NexusWriter().write(w, taxa, taxa);
+			final var output = new CharactersNexusOutput();
+			output.setTitleAndLink(getTitle(), getLink());
+			if (asWorkflowOnly) {
+				var newBlock = new CharactersBlock();
+				newBlock.setDataType(characters.getDataType());
+				newBlock.setFormat(characters.getFormat());
+				output.write(w, new TaxaBlock(), new CharactersBlock());
+			} else
+				output.write(w, taxa, characters);
+			w.flush();
+		} finally {
+			characters.setFormat(saveFormat);
+		}
 	}
 
 	public boolean isOptionPrependTaxa() {
@@ -67,8 +96,52 @@ public class NexusWriter extends CharactersWriter {
 		return optionPrependTaxa;
 	}
 
-	public void setOptionPrependTaxa(boolean optionPrependTaxa) {
-		this.optionPrependTaxa.set(optionPrependTaxa);
+	public boolean isOptionTranspose() {
+		return optionTranspose.get();
+	}
+
+	public BooleanProperty optionTransposeProperty() {
+		return optionTranspose;
+	}
+
+	public boolean isOptionInterleave() {
+		return optionInterleave.get();
+	}
+
+	public BooleanProperty optionInterleaveProperty() {
+		return optionInterleave;
+	}
+
+	public boolean isOptionLabels() {
+		return optionLabels.get();
+	}
+
+	public BooleanProperty optionLabelsProperty() {
+		return optionLabels;
+	}
+
+	public boolean isOptionTokens() {
+		return optionTokens.get();
+	}
+
+	public BooleanProperty optionTokensProperty() {
+		return optionTokens;
+	}
+
+	public boolean isOptionUseDotAsMatch() {
+		return optionUseDotAsMatch.get();
+	}
+
+	public BooleanProperty optionUseDotAsMatchProperty() {
+		return optionUseDotAsMatch;
+	}
+
+	public int getOptionColumnsPerBlock() {
+		return optionColumnsPerBlock.get();
+	}
+
+	public IntegerProperty optionColumnsPerBlockProperty() {
+		return optionColumnsPerBlock;
 	}
 
 	public String getTitle() {

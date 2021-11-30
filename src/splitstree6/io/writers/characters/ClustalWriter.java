@@ -28,23 +28,26 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class ClustalWriter extends CharactersWriter {
+/**
+ * writes data in clustal format
+ * Daniel Huson, 11.2021
+ */
+public class ClustalWriter extends CharactersWriterBase {
+	private final IntegerProperty optionLineLength = new SimpleIntegerProperty(this, "optionLineLength", 40);
 
 	public ClustalWriter() {
 		setFileExtensions("aln", "clustal");
 	}
 
-	private final IntegerProperty optionLineLength = new SimpleIntegerProperty(40);
-
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
 		w.write("CLUSTAL multiple sequence alignment (Produced by SplitsTree 6)\n\n\n");
 
-		var ntax = taxa.getNtax();
-		var nchar = characters.getNchar();
+		final var ntax = taxa.getNtax();
+		final var nchar = characters.getNchar();
 
-		var lineLength = getOptionLineLength();
-		int iterations;
-		if (nchar % getOptionLineLength() == 0)
+		final var lineLength = optionLineLength.get();
+		final int iterations;
+		if (nchar % lineLength == 0)
 			iterations = nchar / lineLength;
 		else
 			iterations = nchar / lineLength + 1;
@@ -64,15 +67,7 @@ public class ClustalWriter extends CharactersWriter {
 		}
 	}
 
-	public int getOptionLineLength() {
-		return optionLineLength.get();
-	}
-
 	public IntegerProperty optionLineLengthProperty() {
 		return optionLineLength;
-	}
-
-	public void setOptionLineLength(int optionLineLength) {
-		this.optionLineLength.set(optionLineLength);
 	}
 }

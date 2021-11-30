@@ -65,6 +65,7 @@ public class OptionControlCreator {
 		switch (option.getOptionValueType()) {
 			case Integer -> {
 				var control = new TextField();
+				control.setPrefColumnCount(6);
 				control.setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
 				control.setOnAction(e -> {
@@ -72,6 +73,10 @@ public class OptionControlCreator {
 						option.getProperty().setValue(NumberUtils.parseInt(control.getText()));
 					else
 						Platform.runLater(() -> control.setText(String.valueOf(option.getProperty().getValue())));
+				});
+				control.focusedProperty().addListener((v, o, n) -> {
+					if (!n)
+						control.getOnAction().handle(null);
 				});
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "0" : n.toString());
@@ -82,6 +87,7 @@ public class OptionControlCreator {
 			}
 			case Float -> {
 				var control = new TextField();
+				control.setPrefColumnCount(6);
 				control.setTextFormatter(new TextFormatter<>(new FloatStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
 				control.setOnAction(e -> {
@@ -89,6 +95,10 @@ public class OptionControlCreator {
 						option.getProperty().setValue(NumberUtils.parseFloat(control.getText()));
 					else
 						Platform.runLater(() -> control.setText(String.valueOf(option.getProperty().getValue())));
+				});
+				control.focusedProperty().addListener((v, o, n) -> {
+					if (!n)
+						control.getOnAction().handle(null);
 				});
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "0" : n.toString());
@@ -99,6 +109,7 @@ public class OptionControlCreator {
 			}
 			case Double -> {
 				var control = new TextField();
+				control.setPrefColumnCount(6);
 				control.setTextFormatter(new TextFormatter<>(new DoubleStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
 				control.setOnAction(e -> {
@@ -106,6 +117,10 @@ public class OptionControlCreator {
 						option.getProperty().setValue(NumberUtils.parseDouble(control.getText()));
 					else
 						Platform.runLater(() -> control.setText(String.valueOf(option.getProperty().getValue())));
+				});
+				control.focusedProperty().addListener((v, o, n) -> {
+					if (!n)
+						control.getOnAction().handle(null);
 				});
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "0" : n.toString());
@@ -116,12 +131,17 @@ public class OptionControlCreator {
 			}
 			case String -> {
 				var control = new TextField(option.getProperty().getValue().toString());
+				control.setPrefColumnCount(12);
 				control.setOnAction(e -> option.getProperty().setValue(control.getText()));
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "" : n.toString());
 					changeListeners.add(changeListener);
 					option.getProperty().addListener(new WeakChangeListener(changeListener));
 				}
+				control.focusedProperty().addListener((v, o, n) -> {
+					if (!n)
+						control.getOnAction().handle(null);
+				});
 				return control;
 			}
 			case Boolean -> {

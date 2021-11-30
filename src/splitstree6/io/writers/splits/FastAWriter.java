@@ -26,18 +26,20 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class FastAWriter extends SplitsWriter {
+/**
+ * write splits in FastA format
+ */
+public class FastAWriter extends SplitsWriterBase {
 
 	public FastAWriter() {
 		setFileExtensions("fasta", "fa", "binary");
 	}
 
 	public void write(Writer w, TaxaBlock taxa, SplitsBlock splits) throws IOException {
-
-		FastA fasta = new FastA();
-		for (int t = 1; t <= taxa.getNtax(); t++) {
-			char[] seq = new char[splits.getNsplits()];
-			for (int s = 1; s <= splits.getNsplits(); s++) {
+		final var fasta = new FastA();
+		for (var t = 1; t <= taxa.getNtax(); t++) {
+			var seq = new char[splits.getNsplits()];
+			for (var s = 1; s <= splits.getNsplits(); s++) {
 				if (splits.get(s).getA().get(t))
 					seq[s - 1] = '1';
 				else

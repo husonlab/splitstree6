@@ -40,7 +40,7 @@ import java.util.Map;
  * export in NeXML format
  * Daria Evseeva, 2019
  */
-public class NeXMLWriter extends TreesWriter {
+public class NeXMLWriter extends TreesWriterBase {
 	private static XMLOutputFactory xmlOutputFactory;
 
 	public NeXMLWriter() {

@@ -43,6 +43,13 @@ public class DistancesFormat {
 		optionDiagonal = true;
 	}
 
+	public DistancesFormat(DistancesFormat other) {
+		this.optionTriangle = other.optionTriangle;
+		this.optionLabels = other.optionLabels;
+		this.optionDiagonal = other.optionDiagonal;
+		this.optionVariancesIO = isOptionVariancesIO();
+	}
+
 	/**
 	 * Get the value of triangle
 	 *

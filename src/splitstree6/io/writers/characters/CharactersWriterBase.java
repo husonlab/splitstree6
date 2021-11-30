@@ -1,5 +1,5 @@
 /*
- *  TaxaWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  CharactersWriterBase.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.taxa;
+package splitstree6.io.writers.characters;
 
-import splitstree6.data.TaxaBlock;
+import splitstree6.data.CharactersBlock;
 import splitstree6.io.utils.DataBlockWriter;
 
-public abstract class TaxaWriter extends DataBlockWriter<TaxaBlock> {
-	public TaxaWriter() {
-		super(TaxaBlock.class);
+public abstract class CharactersWriterBase extends DataBlockWriter<CharactersBlock> {
+	public CharactersWriterBase() {
+		super(CharactersBlock.class);
 	}
 }

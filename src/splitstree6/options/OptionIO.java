@@ -113,21 +113,23 @@ public class OptionIO {
 	 * write options
 	 */
 	public static void writeOptions(Writer w, IHasOptions optionsCarrier) throws IOException {
-		final var options = new ArrayList<>(Option.getAllOptions(optionsCarrier));
-		if (options.size() > 0) {
-			w.write("OPTIONS\n");
-			boolean first = true;
-			for (var option : options) {
-				final var valueString = OptionValueType.toStringType(option.getOptionValueType(), option.getProperty().getValue());
-				if (valueString.length() > 0) {
-					if (first)
-						first = false;
-					else
-						w.write(",\n");
-					w.write("\t" + option.getName() + " = " + valueString);
+		if (optionsCarrier != null) {
+			final var options = new ArrayList<>(Option.getAllOptions(optionsCarrier));
+			if (options.size() > 0) {
+				w.write("OPTIONS\n");
+				boolean first = true;
+				for (var option : options) {
+					final var valueString = OptionValueType.toStringType(option.getOptionValueType(), option.getProperty().getValue());
+					if (valueString.length() > 0) {
+						if (first)
+							first = false;
+						else
+							w.write(",\n");
+						w.write("\t" + option.getName() + " = " + valueString);
+					}
 				}
+				w.write(";\n");
 			}
-			w.write(";\n");
 		}
 	}
 }

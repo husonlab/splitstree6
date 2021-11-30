@@ -32,7 +32,7 @@ import java.io.Writer;
  * write block in Nexus format
  * Daniel Huson, 11.2021
  */
-public class NexusWriter extends TaxaWriter {
+public class NexusWriter extends TaxaWriterBase {
 	private final BooleanProperty optionPrependNexus = new SimpleBooleanProperty(this, "optionPrependNexus", true);
 	private String title;
 	private Pair<String, String> link;
@@ -44,7 +44,7 @@ public class NexusWriter extends TaxaWriter {
 
 	@Override
 	public void write(Writer w, TaxaBlock ignored, TaxaBlock taxaBlock) throws IOException {
-		if (getOptionPrependNexus())
+		if (isOptionPrependNexus())
 			w.write("#nexus\n");
 		var output = new TaxaNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
@@ -55,16 +55,12 @@ public class NexusWriter extends TaxaWriter {
 		w.flush();
 	}
 
-	public boolean getOptionPrependNexus() {
+	public boolean isOptionPrependNexus() {
 		return optionPrependNexus.get();
 	}
 
 	public BooleanProperty optionPrependNexusProperty() {
 		return optionPrependNexus;
-	}
-
-	public void setOptionPrependNexus(boolean optionPrependNexus) {
-		this.optionPrependNexus.set(optionPrependNexus);
 	}
 
 	public String getTitle() {

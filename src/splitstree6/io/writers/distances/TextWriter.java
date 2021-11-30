@@ -19,39 +19,58 @@
 
 package splitstree6.io.writers.distances;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
 import java.io.Writer;
 
-public class TextWriter extends DistancesWriter {
+/**
+ * writes distances in text format
+ * Daniel Huson, 11.2021
+ */
+public class TextWriter extends DistancesWriterBase {
+	public enum Format {Matrix, Vector}
+
+	private final ObjectProperty<Format> optionFormat = new SimpleObjectProperty<>(this, "optionFormat", Format.Matrix);
+
 	public TextWriter() {
 		setFileExtensions("tab", "txt");
 	}
 
 	@Override
 	public void write(Writer w, TaxaBlock taxa, DistancesBlock distances) throws IOException {
+		final var ntax = distances.getNtax();
+		switch (optionFormat.get()) {
+			case Matrix -> {
+				w.write("# Distance matrix:\n");
+				for (var i = 1; i <= ntax; i++) {
+					for (var j = 1; j <= ntax; j++) {
+						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))) + "\t");
+					}
+					w.write("\n");
+				}
+				w.write("\n");
+			}
+			case Vector -> {
 
-		int ntax = distances.getNtax();
-
-		w.write("Distance matrix\n");
-		for (int i = 1; i <= ntax; i++) {
-			for (int j = 1; j <= ntax; j++)
-				//w.write(dec.format(distances.get(i, j)) + "\t");
-				w.write((float) distances.get(i, j) + "\t");
-			w.write("\n");
+				//Export the distances as a matrix then as a column vector.
+				w.write("Distance matrix as column vector (1,2),(1,3),..,(1,n),(2,3),... :\n");
+				for (var i = 1; i <= ntax; i++) {
+					for (var j = i + 1; j <= ntax; j++) {
+						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))) + "\n");
+					}
+				}
+				w.write("\n");
+				w.flush();
+			}
 		}
-		w.write("\n");
+	}
 
-		//Export the distances as a matrix then as a column vector.
-		w.write("Distance matrix as column vector. (1,2),(1,3),..,(1,n),(2,3),...\n");
-		for (int i = 1; i <= ntax; i++) {
-			for (int j = i + 1; j <= ntax; j++)
-				//w.write(dec.format(distances.get(i, j)) + "\n");
-				w.write((float) distances.get(i, j) + "\n");
-		}
-		w.write("\n");
-		w.flush();
+	public ObjectProperty<Format> optionFormatProperty() {
+		return optionFormat;
 	}
 }

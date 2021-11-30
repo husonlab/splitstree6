@@ -1,5 +1,5 @@
 /*
- *  TreesWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  TaxaWriterBase.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.view;
+package splitstree6.io.writers.taxa;
 
-import splitstree6.data.ViewBlock;
+import splitstree6.data.TaxaBlock;
 import splitstree6.io.utils.DataBlockWriter;
 
-public abstract class ViewWriter extends DataBlockWriter<ViewBlock> {
-	public ViewWriter() {
-		super(ViewBlock.class);
+public abstract class TaxaWriterBase extends DataBlockWriter<TaxaBlock> {
+	public TaxaWriterBase() {
+		super(TaxaBlock.class);
 	}
 }

@@ -33,8 +33,8 @@ import java.io.Writer;
  * write block in Nexus format
  * Daniel Huson, 11.2021
  */
-public class NexusWriter extends NetworkWriter {
-	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(false);
+public class NexusWriter extends NetworkWriterBase {
+	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(this, "optionPrependTaxa", false);
 	private String title;
 	private Pair<String, String> link;
 	private boolean asWorkflowOnly;
@@ -64,10 +64,6 @@ public class NexusWriter extends NetworkWriter {
 
 	public BooleanProperty optionPrependTaxaProperty() {
 		return optionPrependTaxa;
-	}
-
-	public void setOptionPrependTaxa(boolean optionPrependTaxa) {
-		this.optionPrependTaxa.set(optionPrependTaxa);
 	}
 
 	public String getTitle() {

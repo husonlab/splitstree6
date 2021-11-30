@@ -24,9 +24,13 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class TextWriter extends TaxaWriter {
+/**
+ * write as text
+ * Daniel Huson, 11.2021
+ */
+public class TextWriter extends TaxaWriterBase {
 	public TextWriter() {
-		setFileExtensions("tab", "txt");
+		setFileExtensions("txt", "text");
 	}
 
 	@Override

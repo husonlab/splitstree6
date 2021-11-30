@@ -25,18 +25,33 @@ package splitstree6.data;
  * Daniel Huson, 12/22/16.
  */
 public class CharactersFormat {
-	private boolean optionTranspose;
+	private boolean optionTranspose = false;
 	private boolean optionInterleave = true;
 	private boolean optionLabels = true;
-	private boolean optionTokens;
+	private boolean optionTokens = false;
 	private char optionMatchCharacter = 0;
 	private int optionColumnsPerBlock = 80;
 
 	/**
-	 * the Constructor
+	 * constructor
 	 */
 	public CharactersFormat() {
 	}
+
+	/**
+	 * copy constructor
+	 *
+	 * @param that to be copied
+	 */
+	public CharactersFormat(CharactersFormat that) {
+		this.optionTranspose = that.optionTranspose;
+		this.optionInterleave = that.optionInterleave;
+		this.optionLabels = that.optionLabels;
+		this.optionTokens = that.optionTokens;
+		this.optionMatchCharacter = that.optionMatchCharacter;
+		this.optionColumnsPerBlock = that.optionColumnsPerBlock;
+	}
+
 
 	public boolean isOptionTranspose() {
 		return optionTranspose;

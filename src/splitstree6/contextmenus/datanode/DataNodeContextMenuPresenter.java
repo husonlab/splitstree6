@@ -24,6 +24,7 @@ import javafx.scene.control.MenuItem;
 import javafx.util.Pair;
 import jloda.fx.undo.UndoManager;
 import jloda.util.PluginClassLoader;
+import splitstree6.dialog.export.ExportDialog;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataNode;
@@ -49,7 +50,8 @@ public class DataNodeContextMenuPresenter {
 		controller.getEditMenuItem().setOnAction(e -> mainWindow.getTextTabsManager().showTab(dataNode, true));
 
 		controller.getExportMenuItem().setOnAction(e -> {
-			System.err.println("Export: not implemented");
+			var exportDialog = new ExportDialog(mainWindow, dataNode);
+			exportDialog.getStage().show();
 		});
 
 		controller.getAddTreeMenu().getItems().setAll(createAddTreeMenuItems(workflow, undoManager, dataNode));

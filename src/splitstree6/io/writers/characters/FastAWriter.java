@@ -19,6 +19,8 @@
 
 package splitstree6.io.writers.characters;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import jloda.seq.FastA;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
@@ -26,23 +28,37 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class FastAWriter extends CharactersWriter {
+/**
+ * writes data in Fasta format
+ * Daniel Huson, 11.2021
+ */
+public class FastAWriter extends CharactersWriterBase {
+	private final IntegerProperty optionLineLength = new SimpleIntegerProperty(this, "optionLineLength", 80);
+
 	public FastAWriter() {
 		setFileExtensions("fasta", "fas", "fa", "seq", "fsa", "fna", "dna");
 	}
 
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
-		var fasta = new FastA();
-		var ntax = taxa.getNtax();
-		var nchar = characters.getNchar();
+		final var fasta = new FastA();
+		final var ntax = taxa.getNtax();
+		final var nchar = characters.getNchar();
+
+		final var lineLength = Math.max(1, optionLineLength.get());
 
 		for (var i = 1; i <= ntax; i++) {
 			var sequence = new StringBuilder("");
 			for (var j = 1; j <= nchar; j++) {
-				sequence.append(characters.get(i, j));
+				sequence.append((characters.get(i, j)));
+				if ((j % lineLength) == 0 && j < nchar)
+					sequence.append("\n");
 			}
 			fasta.add(taxa.getLabel(i), sequence.toString().toUpperCase());
 		}
 		fasta.write(w);
+	}
+
+	public IntegerProperty optionLineLengthProperty() {
+		return optionLineLength;
 	}
 }

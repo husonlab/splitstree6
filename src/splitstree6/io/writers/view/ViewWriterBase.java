@@ -1,5 +1,5 @@
 /*
- *  DistancesWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  TreesWriterBase.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.distances;
+package splitstree6.io.writers.view;
 
-import splitstree6.data.DistancesBlock;
+import splitstree6.data.ViewBlock;
 import splitstree6.io.utils.DataBlockWriter;
 
-public abstract class DistancesWriter extends DataBlockWriter<DistancesBlock> {
-	public DistancesWriter() {
-		super(DistancesBlock.class);
+public abstract class ViewWriterBase extends DataBlockWriter<ViewBlock> {
+	public ViewWriterBase() {
+		super(ViewBlock.class);
 	}
 }

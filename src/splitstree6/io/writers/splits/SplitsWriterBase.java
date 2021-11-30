@@ -1,5 +1,5 @@
 /*
- *  SplitsWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  SplitsWriterBase.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -22,8 +22,8 @@ package splitstree6.io.writers.splits;
 import splitstree6.data.SplitsBlock;
 import splitstree6.io.utils.DataBlockWriter;
 
-public abstract class SplitsWriter extends DataBlockWriter<SplitsBlock> {
-	public SplitsWriter() {
+public abstract class SplitsWriterBase extends DataBlockWriter<SplitsBlock> {
+	public SplitsWriterBase() {
 		super(SplitsBlock.class);
 	}
 }

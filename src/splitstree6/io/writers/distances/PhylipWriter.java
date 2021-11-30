@@ -27,11 +27,15 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
-public class PhylipWriter extends DistancesWriter {
-	private final BooleanProperty optionTriangular = new SimpleBooleanProperty(false);
+/**
+ * writes distances in Phylip format
+ * Daniel Huson, 11.2021
+ */
+public class PhylipWriter extends DistancesWriterBase {
+	private final BooleanProperty optionTriangular = new SimpleBooleanProperty(this, "optionTriangular", false);
 
 	public PhylipWriter() {
-		setFileExtensions("dist", "dst");
+		setFileExtensions("dist", "dst", "phylip", "phy");
 	}
 
 	@Override

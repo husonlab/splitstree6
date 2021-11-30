@@ -18,7 +18,7 @@
  */
 
 /*
- *  DisplayDataPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  ExportDialogPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -36,18 +36,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.displaydatablock;
+package splitstree6.dialog.export;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import javafx.geometry.Orientation;
 import javafx.scene.control.Label;
-import javafx.scene.control.Separator;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import jloda.util.FileUtils;
+import jloda.util.ProgramProperties;
 import jloda.util.StringUtils;
 import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.writers.ExportManager;
@@ -56,37 +56,19 @@ import splitstree6.options.OptionControlCreator;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataNode;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * display data presenter
+ * export dialog presenter
  * Daniel Huson, 11.2021
  */
-public class DisplayDataPresenter {
+public class ExportDialogPresenter {
 	private final List<ChangeListener> changeListeners = new ArrayList<>();
 
-	private final InvalidationListener dataBlockChangeListener;
-
-	public DisplayDataPresenter(MainWindow mainWindow, DisplayData displayData, DisplayDataController controller, DataNode dataNode) {
-		{
-			// add format titled pane to tool bar:
-			var displayTextController = displayData.getController();
-			displayTextController.getToolBar().getItems().add(new Separator(Orientation.VERTICAL));
-			var titledPane = controller.getTitledPane();
-			AnchorPane.setLeftAnchor(titledPane, 100.0);
-			AnchorPane.setTopAnchor(titledPane, 4.0);
-			displayTextController.getAnchorPane().getChildren().add(titledPane);
-
-			titledPane.setAnimated(true);
-			titledPane.setExpanded(false);
-			titledPane.setText("Format: Nexus");
-		}
-
-		var workflow = mainWindow.getWorkflow();
-		var taxaBlock = workflow.getWorkingTaxaBlock();
+	public ExportDialogPresenter(MainWindow mainWindow, ExportDialogController controller, Stage stage, DataNode dataNode) {
+		MainWindowManager.getInstance().addAuxiliaryWindow(mainWindow, stage);
 
 		var exporter = new SimpleObjectProperty<DataBlockWriter>();
 
@@ -101,37 +83,63 @@ public class DisplayDataPresenter {
 			}
 		});
 
-		dataBlockChangeListener = e -> {
-			controller.getFormatCBox().getItems().setAll(ExportManager.getInstance().getExporterNames(dataNode.getDataBlock()));
-			for (var name : controller.getFormatCBox().getItems()) {
-				if (name.startsWith("Nexus")) {
-					controller.getFormatCBox().setValue(name);
-					return;
-				}
+		controller.getFormatCBox().getItems().setAll(ExportManager.getInstance().getExporterNames(dataNode.getDataBlock()));
+		for (var name : controller.getFormatCBox().getItems()) {
+			if (name.startsWith("Nexus")) {
+				controller.getFormatCBox().setValue(name);
 			}
-			if (controller.getFormatCBox().getItems().size() > 0)
-				controller.getFormatCBox().setValue(controller.getFormatCBox().getItems().get(0));
-		};
-		dataNode.dataBlockProperty().addListener(new WeakInvalidationListener(dataBlockChangeListener));
+		}
+		if (controller.getFormatCBox().getValue() == null && controller.getFormatCBox().getItems().size() > 0)
+			controller.getFormatCBox().setValue(controller.getFormatCBox().getItems().get(0));
 
-		dataBlockChangeListener.invalidated(null);
+		controller.getBrowseButton().setOnAction(e -> {
+			var file = showExportDialog(mainWindow, dataNode, exporter.get());
+			if (file != null)
+				controller.getFileTextField().setText(file.getPath());
+		});
+
+		controller.getCancelButton().setOnAction(e -> {
+			stage.hide();
+			MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
+		});
 
 		controller.getApplyButton().setOnAction(e -> {
-			if (exporter.get() != null) {
-				try (var w = new StringWriter()) {
-					exporter.get().write(w, taxaBlock, dataNode.getDataBlock());
-					displayData.replaceText(w.toString());
-					controller.getTitledPane().setText("Format: " + exporter.get().getName());
-				} catch (IOException ex) {
-					NotificationManager.showError("Export data failed: " + ex);
-					controller.getTitledPane().setText("Format");
-				}
+			try {
+				var fileName = controller.getFileTextField().getText();
+				FileUtils.checkFileWritable(fileName, true);
+				exporter.get().write(fileName, mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock());
+				stage.hide();
+				MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
+			} catch (Exception ex) {
+				NotificationManager.showError("Export failed: " + ex);
 			}
 		});
-		controller.getApplyButton().disableProperty().bind(displayData.emptyProperty().or(exporter.isNull()));
+		controller.getApplyButton().disableProperty().bind(controller.getFileTextField().textProperty().isEmpty());
 	}
 
-	public void setupOptionControls(DisplayDataController controller, DataBlockWriter exporter) {
+	/**
+	 * save dialog
+	 *
+	 * @param mainWindow the main window
+	 * @return true if saved
+	 */
+	public static File showExportDialog(MainWindow mainWindow, DataNode dataNode, DataBlockWriter dataBlockWriter) {
+		final var fileChooser = new FileChooser();
+		fileChooser.setTitle("Export SplitsTree6 data");
+
+		final var previousDir = new File(ProgramProperties.get("ExportDir", ""));
+		if (previousDir.isDirectory()) {
+			fileChooser.setInitialDirectory(previousDir);
+		} else
+			fileChooser.setInitialDirectory((new File(mainWindow.getFileName()).getParentFile()));
+
+		fileChooser.getExtensionFilters().addAll(dataBlockWriter.getExtensionFilter());
+		fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "-" + StringUtils.toLowerCaseWithUnderScores(dataNode.getTitle()) + "." + dataBlockWriter.getFileExtensions().get(0))));
+
+		return fileChooser.showSaveDialog(mainWindow.getStage());
+	}
+
+	public void setupOptionControls(ExportDialogController controller, DataBlockWriter exporter) {
 		controller.getMainPane().getChildren().clear();
 		changeListeners.clear();
 		for (var option : Option.getAllOptions(exporter)) {

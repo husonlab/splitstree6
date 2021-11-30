@@ -62,6 +62,8 @@ module splitstreesix {
 
 	opens splitstree6.window;
 
+	opens splitstree6.dialog.export;
+
 	opens splitstree6.workflowtree;
 
 	opens splitstree6.tabs.inputeditor;

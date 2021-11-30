@@ -36,7 +36,7 @@ import java.util.List;
  * write block in Nexus format
  * Daniel Huson, 11.2021
  */
-public class NexusWriter extends TreesWriter {
+public class NexusWriter extends TreesWriterBase {
 	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(this, "optionPrependTaxa", false);
 	private String title;
 	private Pair<String, String> link;
@@ -84,8 +84,20 @@ public class NexusWriter extends TreesWriter {
 		return optionPrependTaxa;
 	}
 
-	public void setOptionPrependTaxa(boolean optionPrependTaxa) {
-		this.optionPrependTaxa.set(optionPrependTaxa);
+	public boolean isOptionTranslate() {
+		return optionTranslate.get();
+	}
+
+	public BooleanProperty optionTranslateProperty() {
+		return optionTranslate;
+	}
+
+	public boolean isOptionWeights() {
+		return optionWeights.get();
+	}
+
+	public BooleanProperty optionWeightsProperty() {
+		return optionWeights;
 	}
 
 	public String getTitle() {
@@ -112,27 +124,4 @@ public class NexusWriter extends TreesWriter {
 		this.asWorkflowOnly = asWorkflowOnly;
 	}
 
-	public boolean isOptionTranslate() {
-		return optionTranslate.get();
-	}
-
-	public BooleanProperty optionTranslateProperty() {
-		return optionTranslate;
-	}
-
-	public void setOptionTranslate(boolean optionTranslate) {
-		this.optionTranslate.set(optionTranslate);
-	}
-
-	public boolean isOptionWeights() {
-		return optionWeights.get();
-	}
-
-	public BooleanProperty optionWeightsProperty() {
-		return optionWeights;
-	}
-
-	public void setOptionWeights(boolean optionWeights) {
-		this.optionWeights.set(optionWeights);
-	}
 }

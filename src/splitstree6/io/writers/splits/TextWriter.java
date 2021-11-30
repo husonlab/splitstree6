@@ -24,11 +24,14 @@ import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.BitSet;
 
-public class TextWriter extends SplitsWriter {
+/**
+ * write as text
+ * Daniel Huson, 11.2021
+ */
+public class TextWriter extends SplitsWriterBase {
 	public TextWriter() {
-		setFileExtensions("tab", "txt");
+		setFileExtensions("txt", "text");
 	}
 
 	@Override
@@ -36,19 +39,19 @@ public class TextWriter extends SplitsWriter {
 		w.write("Splits\n");
 		w.write("\tWeights");
 
-		for (int i = 1; i <= taxa.getNtax(); i++)
+		for (var i = 1; i <= taxa.getNtax(); i++)
 			w.write("\t" + taxa.getLabel(i));
 		w.write("\n");
 
 		//Now we loop through the splits, one split per row.
-		int nsplits = splits.getNsplits();
-		int ntax = taxa.getNtax();
+		final var ntax = taxa.getNtax();
+		final var nsplits = splits.getNsplits();
 		for (int s = 1; s <= nsplits; s++) {
 
 			//Split number
 			w.write(Integer.toString(s));
 			w.write("\t" + splits.get(s).getWeight());
-			BitSet A = splits.get(s).getA();
+			var A = splits.get(s).getA();
 			for (int j = 1; j <= ntax; j++) {
 				char ch = A.get(j) ? '1' : '0';
 				w.write("\t" + ch);

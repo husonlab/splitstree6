@@ -32,8 +32,8 @@ import java.io.Writer;
  * write block in text format
  * Daniel Huson, 11.2021
  */
-public class TextWriter extends NetworkWriter {
-	private final BooleanProperty optionShowAllDetails = new SimpleBooleanProperty(false);
+public class TextWriter extends NetworkWriterBase {
+	private final BooleanProperty optionShowAllDetails = new SimpleBooleanProperty(this, "optionShowAllDetails", false);
 
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, NetworkBlock dataBlock) throws IOException {
