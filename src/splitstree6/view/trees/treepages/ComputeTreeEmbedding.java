@@ -20,6 +20,8 @@
 package splitstree6.view.trees.treepages;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -71,24 +73,26 @@ public class ComputeTreeEmbedding {
 
 	public static double MAX_FONT_SIZE = 24;
 
-	private static final double LINEAR_LABEL_GAP = 5;
-	private static final double RADIAL_LABEL_GAP = 15;
-
 	/**
 	 * compute a tree embedding
 	 *
-	 * @param taxaBlock    set of working taxa
-	 * @param tree         tree
-	 * @param diagram      diagram type
-	 * @param width        target width
-	 * @param height       target height
-	 * @param nodeCallback callback to set up additional node stuff
-	 * @param edgeCallback callback to set up additional edges stuff
+	 * @param taxaBlock            set of working taxa
+	 * @param tree                 tree
+	 * @param diagram              diagram type
+	 * @param width                target width
+	 * @param height               target height
+	 * @param nodeCallback         callback to set up additional node stuff
+	 * @param edgeCallback         callback to set up additional edges stuff
+	 * @param linkNodesEdgesLabels link coordinates nodes, edges and labels via listeners
+	 * @param alignLabels          align labels in rectangular and circular phylograms
 	 * @return group of all edges, nodes and node-labels
 	 */
 	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, Diagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
-							  BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels) {
+							  BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
 		var parentPlacement = ParentPlacement.ChildrenAverage;
+
+		if (alignLabels && diagram != Diagram.RectangularPhylogram && diagram != Diagram.CircularPhylogram)
+			alignLabels = false; // can't or don't need to, or can't, align labels in all other cases
 
 		parentPlacement = ParentPlacement.LeafAverage;
 
@@ -97,7 +101,6 @@ public class ComputeTreeEmbedding {
 		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
 
 		double fontHeight;
-
 		if (diagram.isRadial())
 			fontHeight = Math.min(MAX_FONT_SIZE, 0.5 * Math.min(width, height) * Math.PI / (numberOfLeaves + 1));
 		else
@@ -113,25 +116,36 @@ public class ComputeTreeEmbedding {
 				label.setTextFill(color);
 				nodeLabelMap.put(v, label);
 
+				// BasicFX.reportChanges(label.getRawText(),label.translateXProperty());
+				// BasicFX.reportChanges(label.getRawText(),label.translateYProperty());
+
 				maxLabelWidth = Math.max(maxLabelWidth, label.getEstimatedWidth());
 			}
 		}
-		if (maxLabelWidth > 0.25 * width) {
-			fontHeight = Math.min(MAX_FONT_SIZE, fontHeight * 0.25 * width / maxLabelWidth);
+
+
+		if (maxLabelWidth + fontHeight > 0.25 * width) {
+			fontHeight = Math.min(MAX_FONT_SIZE, fontHeight * 0.25 * width / (maxLabelWidth + fontHeight));
 			maxLabelWidth = 0;
 			for (var label : nodeLabelMap.values()) {
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
 			}
 		}
+		final var labelGap = fontHeight;
 
 		final double normalizeWidth;
 		final double normalizeHeight;
 
 		if (diagram.isRadial()) {
-			normalizeHeight = normalizeWidth = Math.min(width - 2 * (maxLabelWidth + RADIAL_LABEL_GAP) - 5, height - 2 * (maxLabelWidth + RADIAL_LABEL_GAP) - 5);
+			var tmp = Math.min(width - 2 * (maxLabelWidth + labelGap), height - 2 * (maxLabelWidth + labelGap));
+			if(tmp > 20)
+				tmp -= 10;
+			else if (tmp < 0)
+				tmp = 20;
+			normalizeWidth = normalizeHeight = tmp;
 		} else {
-			normalizeWidth = width - maxLabelWidth - LINEAR_LABEL_GAP;
+			normalizeWidth = width - maxLabelWidth - labelGap;
 			normalizeHeight = height - fontHeight;
 		}
 
@@ -147,6 +161,9 @@ public class ComputeTreeEmbedding {
 		};
 
 		normalize(normalizeWidth, normalizeHeight, nodePointMap);
+
+		assert (Math.abs(nodePointMap.get(tree.getRoot()).getX()) < 0.000001);
+		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
 
 		var nodeGroup = new Group();
 		var nodeLabelGroup = new Group();
@@ -172,7 +189,8 @@ public class ComputeTreeEmbedding {
 		}
 
 		if (diagram == Diagram.CircularCladogram || diagram == Diagram.CircularPhylogram) {
-			var rootPt = nodePointMap.get(tree.getRoot());
+			var origin = new Point2D(0, 0);
+
 			Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
 				for (var e : v.outEdges()) {
 					var w = e.getTarget();
@@ -190,19 +208,16 @@ public class ComputeTreeEmbedding {
 
 					line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));
 
-
-					var vPt0 = vPt.subtract(rootPt);
-					var wPt0 = wPt.subtract(rootPt);
-					if (vPt0.magnitude() > 0 && wPt0.magnitude() > 0) {
-						var corner = rootPt.add(wPt0.multiply(vPt0.magnitude() / wPt0.magnitude()));
+					if (vPt.magnitude() > 0 && wPt.magnitude() > 0) {
+						var corner = wPt.multiply(vPt.magnitude() / wPt.magnitude());
 
 						var arcTo = new ArcTo();
 						arcTo.setX(corner.getX());
 						arcTo.setY(corner.getY());
-						arcTo.setRadiusX(vPt0.magnitude());
-						arcTo.setRadiusY(vPt0.magnitude());
-						arcTo.setLargeArcFlag(GeometryUtilsFX.computeObservedAngle(rootPt, vPt, wPt) > 180);
-						arcTo.setSweepFlag(GeometryUtilsFX.computeObservedAngle(rootPt, vPt, wPt) > 0);
+						arcTo.setRadiusX(vPt.magnitude());
+						arcTo.setRadiusY(vPt.magnitude());
+						arcTo.setLargeArcFlag(GeometryUtilsFX.computeObservedAngle(origin, vPt, wPt) > 180);
+						arcTo.setSweepFlag(GeometryUtilsFX.computeObservedAngle(origin, vPt, wPt) > 0);
 
 						line.getElements().add(arcTo);
 					}
@@ -214,6 +229,11 @@ public class ComputeTreeEmbedding {
 					line.getElements().add(lineTo2);
 					edgeGroup.getChildren().add(line);
 					edgeCallback.accept(e, line);
+
+
+					if (w.isLeaf() && diagram == Diagram.CircularPhylogram) {
+						nodeAngleMap.put(w, GeometryUtilsFX.computeAngle(wPt));
+					}
 				}
 			});
 		} else if (diagram == Diagram.TriangularCladogram || diagram == Diagram.RadialPhylogram || diagram == Diagram.RadialCladogram) {
@@ -294,12 +314,17 @@ public class ComputeTreeEmbedding {
 			}
 		}
 
-		if (diagram.isRadial())
-			layoutNodeLabelsRadial(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, linkNodesEdgesLabels);
-		else
-			layoutNodeLabelsRectangular(tree, nodeShapeMap, nodeLabelMap, linkNodesEdgesLabels);
+		Group labelConnectorGroup = alignLabels ? new Group() : null;
 
-		return new Group(edgeGroup, nodeGroup, nodeLabelGroup);
+		if (diagram.isRadial())
+			layoutNodeLabelsRadial(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
+		else
+			layoutNodeLabelsRectangular(tree, nodeShapeMap, nodeLabelMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
+
+		if (labelConnectorGroup != null)
+			return new Group(labelConnectorGroup, edgeGroup, nodeGroup, nodeLabelGroup);
+		else
+			return new Group(edgeGroup, nodeGroup, nodeLabelGroup);
 	}
 
 	private static NodeArray<Point2D> computeCoordinatesRectangular(PhyloTree tree, boolean toScale, ParentPlacement parentPlacement) {
@@ -405,24 +430,21 @@ public class ComputeTreeEmbedding {
 			nodeAngleMap.put(tree.getRoot(), 0.0);
 			final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
 			Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
-				final double angle;
 				if (v.isLeaf()) {
 					firstLastLeafBelowMap.put(v, new Pair<>(v, v));
-					angle = leafNumber.getAndIncrement() * delta;
+					nodeAngleMap.put(v, leafNumber.getAndIncrement() * delta);
 				} else {
 					var firstLeafBelow = firstLastLeafBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
 					var lastLeafBelow = firstLastLeafBelowMap.get(v.getLastOutEdge().getTarget()).getSecond();
 					firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
-					angle = 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow));
+					nodeAngleMap.put(v, 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow)));
 				}
 				if (toScale && v.getInDegree() > 0) {
 					var e = v.getFirstInEdge();
 					var parentRadius = nodeRadiusMap.get(e.getSource());
 					nodeRadiusMap.put(v, parentRadius + tree.getWeight(e));
 				}
-				nodeAngleMap.put(v, angle);
 			});
-
 			tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
 		}
 		return nodePointMap;
@@ -473,7 +495,15 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static void layoutNodeLabelsRectangular(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, boolean linkNodesEdgesLabels) {
+	private static void layoutNodeLabelsRectangular(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, double labelGap,
+													boolean linkNodesEdgesLabels, Group labelConnectors) {
+		var alignLabels = (labelConnectors != null);
+		double max;
+		if (alignLabels) {
+			max = tree.nodeStream().mapToDouble(v -> nodeShapeMap.get(v).getTranslateX()).max().orElse(0);
+		} else
+			max = Double.MIN_VALUE;
+
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
@@ -481,18 +511,30 @@ public class ComputeTreeEmbedding {
 				InvalidationListener changeListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
 						if (linkNodesEdgesLabels) {
-							if (v.isLeaf())
-								label.translateXProperty().bind(shape.translateXProperty().add(LINEAR_LABEL_GAP));
-							else
+							if (v.isLeaf()) {
+								var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
+								label.translateXProperty().bind(shape.translateXProperty().add(add));
+								if (alignLabels && add > 1.1 * labelGap) {
+									// todo: this is untested
+									labelConnectors.getChildren().add(new LabelConnector(
+											Bindings.createDoubleBinding(() -> shape.getTranslateX() + 0.5 * labelGap, shape.translateXProperty()),
+											Bindings.createDoubleBinding(shape::getTranslateY, shape.translateYProperty()),
+											Bindings.createDoubleBinding(() -> shape.getTranslateX() + add - 0.5 * labelGap, shape.translateXProperty()),
+											Bindings.createDoubleBinding(shape::getTranslateY, shape.translateYProperty())));
+								}
+							} else
 								label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(0.5));
 							label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
 						} else {
-							if (v.isLeaf())
-								label.setTranslateX(shape.getTranslateX() + LINEAR_LABEL_GAP);
-							else
+							if (v.isLeaf()) {
+								var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
+								label.setTranslateX(shape.getTranslateX() + add);
+								if (alignLabels && add > 1.1 * labelGap) {
+									labelConnectors.getChildren().add(new LabelConnector(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY()));
+								}
+							} else
 								label.setTranslateX(shape.getTranslateX() - label.getWidth() - 0.5);
 							label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
-
 						}
 					}
 				};
@@ -502,14 +544,22 @@ public class ComputeTreeEmbedding {
 		}
 	}
 
-	private static void layoutNodeLabelsRadial(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap, boolean linkNodesEdgesLabels) {
+	private static void layoutNodeLabelsRadial(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap, double labelGap,
+											   boolean linkNodesEdgesLabels, Group labelConnectors) {
+		var alignLabels = (labelConnectors != null);
+		final double maxRadius;
+		if (alignLabels) {
+			maxRadius = tree.nodeStream().map(nodeShapeMap::get).mapToDouble(s -> GeometryUtilsFX.magnitude(s.getTranslateX(), s.getTranslateY())).max().orElse(0);
+		} else
+			maxRadius = Double.MIN_VALUE;
+
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
 				InvalidationListener changeListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
-						Double angle = nodeAngleMap.get(v);
+						var angle = nodeAngleMap.get(v);
 						if (angle == null) {
 							if (v.getParent() != null) {
 								var vPoint = new Point2D(shape.getTranslateX(), shape.getTranslateY());
@@ -523,15 +573,34 @@ public class ComputeTreeEmbedding {
 							} else
 								angle = 0.0;
 						}
-						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, RADIAL_LABEL_GAP + 0.5 * label.getWidth());
+						var add = (maxRadius > Double.MIN_VALUE ? maxRadius - GeometryUtilsFX.magnitude(shape.getTranslateX(), shape.getTranslateY()) : 0);
+
+						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, add + labelGap + 0.5 * label.getWidth());
 						if (linkNodesEdgesLabels) {
 							label.translateXProperty().bind(shape.translateXProperty().subtract(0.5 * label.getWidth()).add(offset.getX()));
 							label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()).add(offset.getY()));
+
+
+							if (alignLabels && add > 1.1 * labelGap) {
+								// todo: this is untested
+								var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
+								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
+								labelConnectors.getChildren().add(new LabelConnector(
+										Bindings.createDoubleBinding(() -> shape.getTranslateX() + offset1.getX(), shape.translateXProperty()),
+										Bindings.createDoubleBinding(() -> shape.getTranslateY() + offset1.getY(), shape.translateYProperty()),
+										Bindings.createDoubleBinding(() -> shape.getTranslateX() + offset2.getX(), shape.translateXProperty()),
+										Bindings.createDoubleBinding(() -> shape.getTranslateY() + offset2.getY(), shape.translateYProperty())));
+							}
 						} else {
 							label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
 							label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY());
+
+							if (alignLabels && add > 1.1 * labelGap) {
+								var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
+								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
+								labelConnectors.getChildren().add(new LabelConnector(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX()+offset2.getX(),shape.getTranslateY()+offset2.getY()));
+							}
 						}
-						//label.setRotate(angle > 90 && angle < 270 ? angle + 180 : angle);
 						label.setRotate(angle);
 					}
 				};
@@ -571,6 +640,26 @@ public class ComputeTreeEmbedding {
 				var point = nodePointMap.get(v);
 				nodePointMap.put(v, new Point2D(point.getX() * scaleX, point.getY() * scaleY));
 			}
+		}
+	}
+
+	public static class LabelConnector extends Line {
+		public LabelConnector(double x1, double y1, double x2, double y2) {
+			setStartX(x1);
+			setStartY(y1);
+			setEndX(x2);
+			setEndY(y2);
+			setStroke(Color.DARKGRAY);
+			getStrokeDashArray().addAll(2.0, 5.0);
+		}
+
+		public LabelConnector(DoubleBinding x1, DoubleBinding y1, DoubleBinding x2, DoubleBinding y2) {
+			startXProperty().bind(x1);
+			startYProperty().bind(y1);
+			endXProperty().bind(x2);
+			endYProperty().bind(y2);
+			setStroke(Color.LIGHTGRAY);
+			getStrokeDashArray().addAll(2.0,5.0);
 		}
 	}
 }

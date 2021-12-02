@@ -63,8 +63,11 @@
                                                   text="Activate All"/>
                                         <MenuItem fx:id="activateNoneMenuItem" mnemonicParsing="false"
                                                   text="Activate None"/>
+                                        <SeparatorMenuItem/>
                                         <MenuItem fx:id="activateSelectedMenuItem" mnemonicParsing="false"
                                                   text="Activate Selected"/>
+                                        <MenuItem fx:id="deactivateSelectedMenuItem" mnemonicParsing="false"
+                                                  text="Deactivate Selected"/>
                                         <SeparatorMenuItem/>
                                         <MenuItem fx:id="selectCurrentlyActiveMenuItem" mnemonicParsing="false"
                                                   text="Select Currently Active"/>

@@ -49,6 +49,8 @@ public class TaxaEditController {
 	private MenuItem activateSelectedMenuItem;
 
 	@FXML
+	private MenuItem deactivateSelectedMenuItem;
+	@FXML
 	private MenuItem selectCurrentlyActiveMenuItem;
 
 	@FXML
@@ -101,6 +103,10 @@ public class TaxaEditController {
 
 	public MenuItem getActivateSelectedMenuItem() {
 		return activateSelectedMenuItem;
+	}
+
+	public MenuItem getDeactivateSelectedMenuItem() {
+		return deactivateSelectedMenuItem;
 	}
 
 	public MenuItem getSelectCurrentlyActiveMenuItem() {

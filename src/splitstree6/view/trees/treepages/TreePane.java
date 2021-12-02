@@ -116,7 +116,7 @@ public class TreePane extends StackPane {
 				height = getPrefHeight() - 12;
 			}
 
-			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false);
+			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
 
 			applyLabelScaleFactor(group, labelScaleFactor.get());
 
@@ -147,7 +147,7 @@ public class TreePane extends StackPane {
 				}
 			}
 
-			if (group.getScaleX() != 1) { // if we have flipped the group, we need to flip each label to remain readable
+			if (false && group.getScaleX() != 1) { // if we have flipped the group, we need to flip each label to remain readable
 				var queue = new LinkedList<>(group.getChildren());
 				while (queue.size() > 0) {
 					var node = queue.pop();

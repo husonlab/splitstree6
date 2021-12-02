@@ -29,6 +29,8 @@ import splitstree6.workflow.DataBlock;
 public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 
 	@FXML
+	private Pane topPane;
+	@FXML
 	private Pane mainPane;
 
 	@FXML
@@ -39,7 +41,6 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 
 	@FXML
 	private Button applyButton;
-
 
 	public ChoiceBox<Algorithm<S, T>> getAlgorithmCBox() {
 		return algorithmCBox;
@@ -55,5 +56,9 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 
 	public Pane getMainPane() {
 		return mainPane;
+	}
+
+	public Pane getTopPane() {
+		return topPane;
 	}
 }
