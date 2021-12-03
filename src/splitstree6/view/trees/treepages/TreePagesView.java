@@ -35,7 +35,6 @@ import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
 
-import java.util.Collection;
 import java.util.List;
 
 public class TreePagesView implements IView {
@@ -259,10 +258,6 @@ public class TreePagesView implements IView {
 	@Override
 	public UndoManager getUndoManager() {
 		return undoManager;
-	}
-
-	public void setTrees(Collection<PhyloTree> trees) {
-		this.trees.setAll(trees);
 	}
 
 	@Override

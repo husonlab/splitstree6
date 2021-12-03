@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~  TreePagesView.fxml Copyright (C) 2021 Daniel H. Huson
-  ~  
+  ~  TanglegramView.fxml Copyright (C) 2021 Daniel H. Huson
+  ~
   ~  (Some files contain contributions from other authors, who are then mentioned separately.)
-  ~  
+  ~
   ~  This program is free software: you can redistribute it and/or modify
   ~  it under the terms of the GNU General Public License as published by
   ~  the Free Software Foundation, either version 3 of the License, or
   ~  (at your option) any later version.
-  ~  
+  ~
   ~  This program is distributed in the hope that it will be useful,
   ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
   ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   ~  GNU General Public License for more details.
-  ~  
+  ~
   ~  You should have received a copy of the GNU General Public License
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="splitstree6.view.trees.treepages.TreePagesViewController">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.view.trees.tanglegram.TanglegramViewController">
     <children>
-        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                    AnchorPane.topAnchor="0.0">
+        <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <top>
                 <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                     <children>
@@ -109,23 +109,29 @@
                                     </tooltip>
                                 </Button>
                                 <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="diagramCBox" prefWidth="50.0">
+                                <ComboBox fx:id="tree1CBox" prefWidth="100.0"/>
+                                <ComboBox fx:id="diagram1CBox" prefWidth="50.0">
                                     <tooltip>
                                         <Tooltip text="Choose diagram"/>
                                     </tooltip>
                                 </ComboBox>
-                                <ComboBox fx:id="orientationCBox" prefWidth="50.0">
+                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <ComboBox fx:id="tree2CBox" layoutX="165.0" layoutY="10.0" prefWidth="100.0"/>
+                                <ComboBox fx:id="diagram2CBox" layoutX="165.0" layoutY="10.0" prefWidth="50.0">
+                                    <tooltip>
+                                        <Tooltip text="Choose diagram"/>
+                                    </tooltip>
+                                </ComboBox>
+                                <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
                                     <tooltip>
                                         <Tooltip text="Choose root side"/>
                                     </tooltip>
                                 </ComboBox>
-                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                <Separator layoutX="494.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
-                                    <tooltip>
-                                        <Tooltip text="Set rows x columns"/>
-                                    </tooltip>
-                                </ComboBox>
                                 <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="GRAPHIC_ONLY"
                                               maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                                               minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
@@ -142,20 +148,36 @@
                                         <Tooltip text="Show tree names"/>
                                     </tooltip>
                                 </ToggleButton>
+                                <Separator layoutX="548.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
                             </items>
                         </ToolBar>
                     </children>
                 </VBox>
             </top>
             <center>
-                <Pane fx:id="pane" BorderPane.alignment="CENTER">
-                    <BorderPane.margin>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
-                    </BorderPane.margin>
+                <GridPane fx:id="gridPane" alignment="CENTER" pickOnBounds="false">
+                    <columnConstraints>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0"/>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="-Infinity"
+                                           minWidth="-Infinity"/>
+                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS"/>
+                    </rowConstraints>
                     <children>
-                        <Pagination fx:id="pagination" pageCount="1"/>
+                        <Pane fx:id="middlePane" maxWidth="-Infinity" minWidth="-Infinity" pickOnBounds="false"
+                              prefWidth="250.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1"
+                              GridPane.hgrow="SOMETIMES" GridPane.vgrow="ALWAYS"/>
+                        <StackPane fx:id="leftPane" pickOnBounds="false" style="-fx-background-color: transparent;"
+                                   GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER"
+                                   GridPane.vgrow="ALWAYS"/>
+                        <StackPane fx:id="rightPane" pickOnBounds="false" style="-fx-background-color: transparent;"
+                                   GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS"
+                                   GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS"/>
                     </children>
-                </Pane>
+                </GridPane>
             </center>
         </BorderPane>
     </children>

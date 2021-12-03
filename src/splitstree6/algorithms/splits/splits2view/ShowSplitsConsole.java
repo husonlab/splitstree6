@@ -23,7 +23,7 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.io.writers.splits.TextWriter;
+import splitstree6.io.writers.splits.PlainTextWriter;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -33,7 +33,7 @@ public class ShowSplitsConsole extends Splits2View {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock outputData) throws IOException {
 		try (var w = new StringWriter()) {
 			w.write(inputData.getName() + ":\n");
-			var writer = new TextWriter();
+			var writer = new PlainTextWriter();
 			writer.write(w, taxaBlock, inputData);
 			System.out.println(w);
 		}

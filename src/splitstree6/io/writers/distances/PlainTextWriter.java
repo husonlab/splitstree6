@@ -1,5 +1,5 @@
 /*
- *  TextWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  PlainTextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -32,12 +32,12 @@ import java.io.Writer;
  * writes distances in text format
  * Daniel Huson, 11.2021
  */
-public class TextWriter extends DistancesWriterBase {
+public class PlainTextWriter extends DistancesWriterBase {
 	public enum Format {Matrix, Vector}
 
 	private final ObjectProperty<Format> optionFormat = new SimpleObjectProperty<>(this, "optionFormat", Format.Matrix);
 
-	public TextWriter() {
+	public PlainTextWriter() {
 		setFileExtensions("tab", "txt");
 	}
 

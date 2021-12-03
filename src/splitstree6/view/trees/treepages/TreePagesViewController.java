@@ -52,7 +52,7 @@ public class TreePagesViewController {
 	private ComboBox<ComputeTreeEmbedding.Diagram> diagramCBox;
 
 	@FXML
-	private ComboBox<TreePane.Orientation> rootSideCBox;
+	private ComboBox<TreePane.Orientation> orientationCBox;
 
 	@FXML
 	private ComboBox<String> rowsColsCBox;
@@ -99,8 +99,8 @@ public class TreePagesViewController {
 		return diagramCBox;
 	}
 
-	public ComboBox<TreePane.Orientation> getRootSideCBox() {
-		return rootSideCBox;
+	public ComboBox<TreePane.Orientation> getOrientationCBox() {
+		return orientationCBox;
 	}
 
 	public ComboBox<String> getRowsColsCBox() {

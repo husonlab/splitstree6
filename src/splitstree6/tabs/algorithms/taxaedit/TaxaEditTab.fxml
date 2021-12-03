@@ -104,7 +104,7 @@
                                         <MenuItem fx:id="findAndReplaceRadioMenuItem" mnemonicParsing="false"
                                                   text="Find/Replace..."/>
                                         <RadioMenuItem fx:id="showHTMLInfoMenuItem" mnemonicParsing="false"
-                                                       text="Show HTML Help"/>
+                                                       text="Show Supported HTML Tags"/>
                                     </items>
                                 </ContextMenu>
                             </contextMenu>

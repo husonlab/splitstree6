@@ -191,8 +191,8 @@ public class WorkflowTreeItem extends TreeItem<String> {
 	 * show the view for this node
 	 */
 	public void showView() {
-		if (workflowNode instanceof DataNode)
-			mainWindow.getTextTabsManager().showTab(workflowNode, true);
+		if (workflowNode instanceof DataNode dataNode)
+			mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
 		else if (workflowNode instanceof AlgorithmNode algorithmNode)
 			mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 	}

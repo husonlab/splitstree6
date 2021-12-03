@@ -1,5 +1,5 @@
 /*
- *  TextWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  PlainTextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -32,7 +32,7 @@ import java.io.Writer;
  * write block in text format
  * Daniel Huson, 11.2021
  */
-public class TextWriter extends NetworkWriterBase {
+public class PlainTextWriter extends NetworkWriterBase {
 	private final BooleanProperty optionShowAllDetails = new SimpleBooleanProperty(this, "optionShowAllDetails", false);
 
 	@Override

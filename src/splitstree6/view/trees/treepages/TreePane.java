@@ -204,4 +204,8 @@ public class TreePane extends StackPane {
 			}
 		}
 	}
+
+	public AService<Group> getService() {
+		return service;
+	}
 }

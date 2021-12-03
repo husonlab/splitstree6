@@ -1,5 +1,5 @@
 /*
- *  AlgorithmItemPresenter.java Copyright (C) 2021 Daniel H. Huson
+ *  DataItemPresenter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -46,7 +46,7 @@ public class DataItemPresenter<D extends DataBlock> {
 			selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node));
 		});
 
-		controller.getEditButton().setOnAction(e -> mainWindow.getTextTabsManager().showTab(node, true));
+		controller.getEditButton().setOnAction(e -> mainWindow.getTextTabsManager().showDataNodeTab(node, true));
 		controller.getEditButton().disableProperty().bind((selected.and(node.validProperty()).not()));
 
 		controller.getNameLabel().textProperty().bind(node.titleProperty());

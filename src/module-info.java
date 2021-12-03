@@ -86,6 +86,7 @@ module splitstreesix {
 	opens splitstree6.algorithms.taxa.taxa2view;
 
 	opens splitstree6.view.trees.treepages;
+	opens splitstree6.view.trees.tanglegram;
 
 	opens splitstree6.view.displaytext;
 	opens splitstree6.view.displaydatablock;

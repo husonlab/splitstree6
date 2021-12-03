@@ -1,5 +1,5 @@
 /*
- *  ViewReader.java Copyright (C) 2021 Daniel H. Huson
+ *  PlainTextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.readers.view;
+package splitstree6.io.writers.trees;
 
-import splitstree6.data.ViewBlock;
-import splitstree6.io.utils.DataReaderBase;
-
-public abstract class ViewReader extends DataReaderBase<ViewBlock> {
-	public ViewReader() {
-		super(ViewBlock.class);
-	}
+/**
+ * write trees in plain-text format
+ * Daniel Huson, 12.2021
+ */
+public class PlainTextWriter extends NewickWriter {
 }

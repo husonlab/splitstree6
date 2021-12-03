@@ -22,10 +22,11 @@ package splitstree6.window;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
@@ -53,6 +54,7 @@ public class MainWindow implements IMainWindow {
 	private final TextTabsManager textTabsManager;
 	private final AlgorithmTabsManager algorithmTabsManager;
 
+	private final ObservableList<Taxon> activeTaxa = FXCollections.observableArrayList();
 	private final SelectionModel<Taxon> taxonSelectionModel = new SetSelectionModel<>();
 	private final BooleanProperty dirty = new SimpleBooleanProperty(false);
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
@@ -64,8 +66,6 @@ public class MainWindow implements IMainWindow {
 
 	private final StringProperty fileName = new SimpleStringProperty("");
 	private final BooleanProperty hasSplitsTree6File = new SimpleBooleanProperty(false);
-
-	private final ObjectProperty<Font> displayFont = new SimpleObjectProperty<>(new Font("Arial", 12));
 
 	private Stage stage;
 
@@ -86,6 +86,14 @@ public class MainWindow implements IMainWindow {
 		workflowTab = new WorkflowTab(this);
 		methodsTab = new TextDisplayTab(this, "Methods", false, false);
 		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? ExtractMethodsText.getInstance().apply(workflow) : ""));
+		workflow.validProperty().addListener((v, o, n) -> {
+			if (workflow.getWorkingTaxaBlock() == null) {
+				activeTaxa.clear();
+			} else {
+				if (!Basic.equal(activeTaxa, workflow.getWorkingTaxaBlock().getTaxa()))
+					activeTaxa.setAll(workflow.getWorkingTaxaBlock().getTaxa());
+			}
+		});
 
 		textTabsManager = new TextTabsManager(this);
 		algorithmTabsManager = new AlgorithmTabsManager(this);
@@ -259,15 +267,7 @@ public class MainWindow implements IMainWindow {
 		this.hasSplitsTree6File.set(hasSplitsTree6File);
 	}
 
-	public Font getDisplayFont() {
-		return displayFont.get();
-	}
-
-	public ObjectProperty<Font> displayFontProperty() {
-		return displayFont;
-	}
-
-	public void setDisplayFont(Font displayFont) {
-		this.displayFont.set(displayFont);
+	public ObservableList<Taxon> getActiveTaxa() {
+		return activeTaxa;
 	}
 }

@@ -81,4 +81,11 @@ public class Taxon {
 	public int hashCode() {
 		return name.hashCode();
 	}
+
+	public String getNameAndDisplayLabel(String separator) {
+		if (getDisplayLabel().isBlank() || getDisplayLabel().equals(getName()))
+			return getName();
+		else
+			return getName() + separator + getDisplayLabel();
+	}
 }

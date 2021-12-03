@@ -66,6 +66,13 @@ public class TaxaEditTableItem {
 		this.displayLabel.set(displayLabel);
 	}
 
+	public String getNameAndDisplayLabel(String separator) {
+		if (getDisplayLabel().isBlank() || getDisplayLabel().equals(getName()))
+			return getName();
+		else
+			return getName() + separator + getDisplayLabel();
+	}
+
 	public Taxon getTaxon() {
 		return taxon;
 	}

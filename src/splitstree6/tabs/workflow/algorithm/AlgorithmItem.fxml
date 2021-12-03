@@ -73,7 +73,7 @@
                             <graphic>
                                 <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                     <image>
-                                        <Image smooth="false" url="@/jloda/resources/icons/sun/Play16.gif"/>
+                                        <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
                                     </image>
                                 </ImageView>
                             </graphic>

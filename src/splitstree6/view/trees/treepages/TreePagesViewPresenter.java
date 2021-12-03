@@ -29,12 +29,18 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import javafx.scene.control.SelectionMode;
+import jloda.fx.find.FindToolBar;
+import jloda.fx.find.Searcher;
 import jloda.fx.util.Print;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.Pair;
+import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
+
+import java.util.function.Function;
 
 /**
  * multi tree view presenter
@@ -50,6 +56,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 	private final ObjectProperty<Dimension2D> boxDimensions = new SimpleObjectProperty<>(new Dimension2D(0, 0));
 
+	private final FindToolBar findToolBar;
+
 	/**
 	 * constructor
 	 */
@@ -64,12 +72,12 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().getItems().addAll(ComputeTreeEmbedding.Diagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
 
-		controller.getRootSideCBox().setButtonCell(ComboBoxUtils.createRootSideComboBoxListCell());
-		controller.getRootSideCBox().setCellFactory(ComboBoxUtils.createRootSideComboBoxCallback());
-		controller.getRootSideCBox().getItems().addAll(TreePane.Orientation.values());
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createOrientationComboBoxListCell());
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createOrientationComboBoxCallback());
+		controller.getOrientationCBox().getItems().addAll(TreePane.Orientation.values());
 
-		controller.getRootSideCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
-		//controller.getRootSideCBox().disableProperty().bind(Bindings.createObjectBinding(() -> treePagesView.getOptionDiagram().isRadial(), treePagesView.optionDiagramProperty()));
+		controller.getOrientationCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
+		//controller.getOrientationCBox().disableProperty().bind(Bindings.createObjectBinding(() -> treePagesView.getOptionDiagram().isRadial(), treePagesView.optionDiagramProperty()));
 
 		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowTreeNamesProperty());
 
@@ -141,10 +149,28 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				Platform.runLater(() -> treePagesView.setPageNumber((Math.max(1, numberOfPages.get()))));
 		});
 
-		Platform.runLater(this::setupMenuItems);
+		controller.getOpenButton().setOnAction(mainWindow.getController().getOpenMenuItem().getOnAction());
+		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
+		controller.getSaveButton().disableProperty().bind(mainWindow.getController().getSaveAsMenuItem().disableProperty());
 
 		controller.getPrintButton().setOnAction(e -> Print.print(mainWindow.getStage(), treePagesView.imageNodeProperty().get()));
 		controller.getPrintButton().disableProperty().bind(treePagesView.emptyProperty());
+
+		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
+
+		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(), t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
+				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s), new SimpleObjectProperty<>(SelectionMode.MULTIPLE), t -> t2taxon.apply(t).getNameAndDisplayLabel("===="), null));
+		findToolBar.setShowFindToolBar(false);
+
+		controller.getvBox().getChildren().add(findToolBar);
+		controller.getFindButton().setOnAction(e -> {
+			if (findToolBar.isShowFindToolBar())
+				findToolBar.setShowFindToolBar(false);
+			else
+				findToolBar.setShowFindToolBar(true);
+		});
+
+		Platform.runLater(this::setupMenuItems);
 	}
 
 	private Pair<Integer, Integer> parseRowsColsText(String text) {
@@ -167,6 +193,9 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getZoomOutMenuItem().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
 		mainWindow.getController().getZoomOutMenuItem().disableProperty().bind(treePageView.emptyProperty());
 
+		mainWindow.getController().getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
+		mainWindow.getController().getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+		mainWindow.getController().getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
 		mainWindow.getController().getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
 		mainWindow.getController().getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());

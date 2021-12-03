@@ -1,5 +1,5 @@
 /*
- *  ViewReader.java Copyright (C) 2021 Daniel H. Huson
+ *  PlainTextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,29 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.readers.view;
+package splitstree6.io.writers.taxa;
 
-import splitstree6.data.ViewBlock;
-import splitstree6.io.utils.DataReaderBase;
+import splitstree6.data.TaxaBlock;
 
-public abstract class ViewReader extends DataReaderBase<ViewBlock> {
-	public ViewReader() {
-		super(ViewBlock.class);
+import java.io.IOException;
+import java.io.Writer;
+
+/**
+ * write as text
+ * Daniel Huson, 11.2021
+ */
+public class PlainTextWriter extends TaxaWriterBase {
+	public PlainTextWriter() {
+		setFileExtensions("txt", "text");
+	}
+
+	@Override
+	public void write(Writer w, TaxaBlock ignored, TaxaBlock taxa) throws IOException {
+		w.write("Taxa\n");
+		for (int i = 1; i <= taxa.getNtax(); i++) {
+			w.write(i + "\t" + taxa.getLabel(i) + "\n");
+		}
+		w.write("\n");
+		w.flush();
 	}
 }

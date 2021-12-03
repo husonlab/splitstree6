@@ -197,9 +197,13 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		controller.getShowHTMLInfoMenuItem().selectedProperty().addListener((v, o, n) -> {
 			controller.getHtmlInfoFlowPane().getChildren().clear();
 			if (n) {
-				controller.getHtmlInfoFlowPane().getChildren().add(new Label("Supported HTML tags:"));
+				var firstLabel = new Label("Display label HTML tags:");
+				firstLabel.setStyle("-fx-text-fill: darkgray;");
+				controller.getHtmlInfoFlowPane().getChildren().add(firstLabel);
 				for (var word : RichTextLabel.getSupportedHTMLTags().split("\s+")) {
-					controller.getHtmlInfoFlowPane().getChildren().add(new Label(word));
+					var label = new Label(word);
+					label.setStyle("-fx-text-fill: darkgray;");
+					controller.getHtmlInfoFlowPane().getChildren().add(label);
 				}
 			}
 			controller.getHtmlInfoFlowPane().requestLayout();
@@ -233,9 +237,15 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 				newContextMenu.getItems().add(new SeparatorMenuItem());
 
 			for (var menuItem : contextMenu.getItems()) {
-				if (menuItem instanceof SeparatorMenuItem)
+				if (menuItem instanceof SeparatorMenuItem) {
 					newContextMenu.getItems().add(new SeparatorMenuItem());
-				else {
+				}
+				if (menuItem instanceof RadioMenuItem radioMenuItem) {
+					var newMenuItem = new RadioMenuItem(menuItem.getText());
+					newMenuItem.selectedProperty().bindBidirectional(radioMenuItem.selectedProperty());
+					newMenuItem.disableProperty().bind(menuItem.disableProperty());
+					newContextMenu.getItems().add(newMenuItem);
+				} else {
 					var newMenuItem = new MenuItem(menuItem.getText());
 					newMenuItem.setOnAction(menuItem.getOnAction());
 					newMenuItem.disableProperty().bind(menuItem.disableProperty());
@@ -256,8 +266,8 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 						tableView.getSelectionModel().clearSelection(i);
 				},
 				tableView.getSelectionModel().selectionModeProperty(),
-				i -> tableView.getItems().get(i).getName() + "%%%%" + tableView.getItems().get(i).getDisplayLabel(),
-				(i, label) -> tableView.getItems().get(i).setDisplayLabel(label.replaceAll(".*%%%%", "")));
+				i -> tableView.getItems().get(i).getNameAndDisplayLabel("===="),
+				(i, label) -> tableView.getItems().get(i).setDisplayLabel(label.replaceAll(".*====", "")));
 	}
 
 

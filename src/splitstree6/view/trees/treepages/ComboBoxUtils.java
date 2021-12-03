@@ -61,7 +61,7 @@ public class ComboBoxUtils {
 	/**
 	 * create list cell for root side combo box
 	 */
-	public static ListCell<TreePane.Orientation> createRootSideComboBoxListCell() {
+	public static ListCell<TreePane.Orientation> createOrientationComboBoxListCell() {
 		return new ListCell<>() {
 			{
 				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -85,7 +85,7 @@ public class ComboBoxUtils {
 	/**
 	 * creates the callback method for diagraom combo box
 	 */
-	public static Callback<ListView<TreePane.Orientation>, ListCell<TreePane.Orientation>> createRootSideComboBoxCallback() {
-		return p -> createRootSideComboBoxListCell();
+	public static Callback<ListView<TreePane.Orientation>, ListCell<TreePane.Orientation>> createOrientationComboBoxCallback() {
+		return p -> createOrientationComboBoxListCell();
 	}
 }

@@ -29,7 +29,7 @@
     <contextMenu>
         <ContextMenu fx:id="contextMenu">
             <items>
-                <MenuItem fx:id="editMenuItem" mnemonicParsing="false" text="View">
+                <MenuItem fx:id="showTextMenuItem" mnemonicParsing="false" text="Show Text...">
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">

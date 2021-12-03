@@ -1,5 +1,5 @@
 /*
- *  TextWriter.java Copyright (C) 2021 Daniel H. Huson
+ *  PlainTextWriter.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,8 +17,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.taxa;
+package splitstree6.io.writers.splits;
 
+import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
@@ -28,18 +29,36 @@ import java.io.Writer;
  * write as text
  * Daniel Huson, 11.2021
  */
-public class TextWriter extends TaxaWriterBase {
-	public TextWriter() {
+public class PlainTextWriter extends SplitsWriterBase {
+	public PlainTextWriter() {
 		setFileExtensions("txt", "text");
 	}
 
 	@Override
-	public void write(Writer w, TaxaBlock ignored, TaxaBlock taxa) throws IOException {
-		w.write("Taxa\n");
-		for (int i = 1; i <= taxa.getNtax(); i++) {
-			w.write(i + "\t" + taxa.getLabel(i) + "\n");
+	public void write(Writer w, TaxaBlock taxa, SplitsBlock splits) throws IOException {
+		w.write("Splits\n");
+		w.write("\tWeights");
+
+		for (var i = 1; i <= taxa.getNtax(); i++)
+			w.write("\t" + taxa.getLabel(i));
+		w.write("\n");
+
+		//Now we loop through the splits, one split per row.
+		final var ntax = taxa.getNtax();
+		final var nsplits = splits.getNsplits();
+		for (int s = 1; s <= nsplits; s++) {
+
+			//Split number
+			w.write(Integer.toString(s));
+			w.write("\t" + splits.get(s).getWeight());
+			var A = splits.get(s).getA();
+			for (int j = 1; j <= ntax; j++) {
+				char ch = A.get(j) ? '1' : '0';
+				w.write("\t" + ch);
+			}
+
+			w.write("\n");
 		}
 		w.write("\n");
-		w.flush();
 	}
 }

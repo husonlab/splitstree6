@@ -29,7 +29,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.TreesNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
-import splitstree6.view.trees.next.Next;
+import splitstree6.view.trees.tanglegram.TanglegramView;
 import splitstree6.view.trees.treepages.TreePagesView;
 
 import java.io.IOException;
@@ -67,20 +67,26 @@ public class ShowTrees extends Trees2View {
 						var mainWindow = getNode().getOwner().getMainWindow();
 						var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
 						viewBlock.setView(view);
-						view.getTrees().setAll(inputData.getTrees());
 					});
 				}
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TreePagesView view) {
-						view.setTrees(inputData.getTrees());
+						view.getTrees().setAll(inputData.getTrees());
 					}
 				});
 			}
 			case Tanglegram -> {
+				if (!(viewBlock.getView() instanceof TanglegramView)) {
+					Platform.runLater(() -> {
+						var mainWindow = getNode().getOwner().getMainWindow();
+						var view = new TanglegramView(mainWindow, "Tanglegram", viewBlock.getViewTab());
+						viewBlock.setView(view);
+					});
+				}
 				Platform.runLater(() -> {
-					var mainWindow = getNode().getOwner().getMainWindow();
-					var view = new Next(mainWindow, viewBlock.getViewTab());
-					viewBlock.setView(view);
+					if (viewBlock.getView() instanceof TanglegramView view) {
+						view.getTrees().setAll(inputData.getTrees());
+					}
 				});
 			}
 			case SingleTree, DensiTree -> throw new IOException("Not implemented: " + getOptionView());

@@ -30,7 +30,7 @@ public class DataNodeContextMenuController {
 	private ContextMenu contextMenu;
 
 	@FXML
-	private MenuItem editMenuItem;
+	private MenuItem showTextMenuItem;
 
 	@FXML
 	private MenuItem exportMenuItem;
@@ -48,8 +48,8 @@ public class DataNodeContextMenuController {
 		return contextMenu;
 	}
 
-	public MenuItem getEditMenuItem() {
-		return editMenuItem;
+	public MenuItem getShowTextMenuItem() {
+		return showTextMenuItem;
 	}
 
 	public MenuItem getExportMenuItem() {

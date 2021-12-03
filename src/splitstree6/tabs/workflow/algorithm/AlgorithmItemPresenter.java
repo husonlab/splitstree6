@@ -59,7 +59,7 @@ public class AlgorithmItemPresenter {
 				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Stop this algorithm");
 			} else {
-				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Play16.gif", 16));
+				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("Play.png", 16));
 				controller.getPlayButton().setOnAction(e -> node.restart());
 				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().not().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Run this algorithm");

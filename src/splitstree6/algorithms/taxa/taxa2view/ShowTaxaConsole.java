@@ -22,7 +22,7 @@ package splitstree6.algorithms.taxa.taxa2view;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.io.writers.taxa.TextWriter;
+import splitstree6.io.writers.taxa.PlainTextWriter;
 import splitstree6.methods.IgnoredInMethodsText;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
@@ -39,7 +39,7 @@ public class ShowTaxaConsole extends Algorithm<DataBlock, ViewBlock> implements 
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DataBlock inputData, ViewBlock outputData) throws IOException {
 		try (var w = new StringWriter()) {
 			w.write(taxaBlock.getName() + ":\n");
-			var writer = new TextWriter();
+			var writer = new PlainTextWriter();
 			writer.write(w, taxaBlock, taxaBlock);
 			System.out.println(w);
 		}

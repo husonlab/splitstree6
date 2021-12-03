@@ -185,6 +185,7 @@ public class ComputeTreeEmbedding {
 			if (label != null) {
 				nodeLabelGroup.getChildren().add(label);
 				nodeCallback.accept(v, circle, label);
+				circle.setUserData(taxaBlock.get(tree.getTaxa(v).iterator().next()));
 			}
 		}
 
