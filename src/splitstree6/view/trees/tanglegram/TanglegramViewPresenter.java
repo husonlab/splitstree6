@@ -62,11 +62,14 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		controller = tanglegramView.getController();
 
+		var taxonOrdering1 = new SimpleObjectProperty<int[]>();
+		var taxonOrdering2 = new SimpleObjectProperty<int[]>();
+
 		var tree1 = new SimpleObjectProperty<PhyloTree>();
 		tree1.addListener((v, o, n) -> controller.getTree1CBox().setValue(tree1.get()));
 		tree1.bind(Bindings.createObjectBinding(() -> tanglegramView.getOptionTree1() >= 1 && tanglegramView.getOptionTree1() <= trees.size() ? trees.get(tanglegramView.getOptionTree1() - 1) : null, tanglegramView.optionTree1Property(), trees));
 
-		var tree1Pane = new TanglegramTreePane(tanglegramView, mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, boxDimensions, tanglegramView.optionDiagram1Property(), tanglegramView.optionOrientationProperty());
+		var tree1Pane = new TanglegramTreePane(tanglegramView, mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, taxonOrdering1, boxDimensions, tanglegramView.optionDiagram1Property(), tanglegramView.optionOrientationProperty());
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
 		var tree2 = new SimpleObjectProperty<PhyloTree>();
@@ -76,8 +79,19 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		var orientation2Property = new SimpleObjectProperty<TreePane.Orientation>();
 		orientation2Property.bind(Bindings.createObjectBinding(() -> tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg, tanglegramView.optionOrientationProperty()));
 
-		var tree2Pane = new TanglegramTreePane(tanglegramView, mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, boxDimensions, tanglegramView.optionDiagram2Property(), orientation2Property);
+		var tree2Pane = new TanglegramTreePane(tanglegramView, mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, taxonOrdering2, boxDimensions, tanglegramView.optionDiagram2Property(), orientation2Property);
 		controller.getRightPane().getChildren().add(tree2Pane);
+
+		tree1.addListener(e -> {
+			var pair = TaxonOrdering.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), tree1.get(), tree2.get());
+			taxonOrdering1.set(pair.getFirst());
+			taxonOrdering2.set(pair.getSecond());
+		});
+		tree2.addListener(e -> {
+			var pair = TaxonOrdering.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), tree1.get(), tree2.get());
+			taxonOrdering1.set(pair.getFirst());
+			taxonOrdering2.set(pair.getSecond());
+		});
 
 		{
 			var connectors = new Connectors(mainWindow, controller.getMiddlePane(), controller.getLeftPane(), controller.getRightPane(), new SimpleObjectProperty<>(Color.DARKGRAY), new SimpleDoubleProperty(1.0));

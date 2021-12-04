@@ -23,16 +23,20 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.SetChangeListener;
+import javafx.collections.WeakSetChangeListener;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.SelectionEffectBlue;
 import splitstree6.data.parts.Taxon;
 import splitstree6.window.MainWindow;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * draws connectors between any nodes that have the same user string
@@ -48,6 +52,10 @@ public class Connectors {
 	private double strokeWidth;
 
 	private final Group group = new Group();
+
+	private final Map<Taxon, Shape> taxonShapeMap = new HashMap<>();
+
+	private final SetChangeListener<Taxon> selectionListener;
 
 	public Connectors(MainWindow mainWindow, Pane drawPane, Pane tree1Pane, Pane tree2Pane, ObjectProperty<Color> strokeColor, DoubleProperty strokeWidth) {
 		this.mainWindow = mainWindow;
@@ -70,10 +78,26 @@ public class Connectors {
 
 		drawPane.getChildren().add(group);
 
+		selectionListener = e -> {
+			if (e.wasAdded()) {
+				var shape = taxonShapeMap.get(e.getElementAdded());
+				if (shape != null)
+					shape.setEffect(SelectionEffectBlue.getInstance());
+			}
+			if (e.wasRemoved()) {
+				var shape = taxonShapeMap.get(e.getElementRemoved());
+				if (shape != null)
+					shape.setEffect(null);
+
+			}
+		};
+		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionListener));
+
 		update();
 	}
 
 	public void update() {
+		taxonShapeMap.clear();
 		var map1 = new HashMap<Taxon, Node>();
 		for (var node : BasicFX.getAllRecursively(tree1Pane, Shape.class)) {
 			if (node.getUserData() instanceof Taxon taxon) {
@@ -95,6 +119,7 @@ public class Connectors {
 			if (node1 != null && node2 != null) {
 				var line = new Path();
 				group.getChildren().add(line);
+				taxonShapeMap.put(taxon, line);
 
 				line.setStrokeWidth(strokeWidth);
 				line.setStroke(strokeColor);
@@ -104,18 +129,15 @@ public class Connectors {
 					mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
 				});
 
-
 				InvalidationListener invalidationListener = e -> {
 					line.getElements().clear();
 					var screenStartPoint = node1.getParent().localToScreen(node1.getTranslateX(), node1.getTranslateY());
-					if (screenStartPoint != null) {
+					var screenEndPoint = node2.getParent().localToScreen(node2.getTranslateX(), node2.getTranslateY());
+					if (screenStartPoint != null && screenEndPoint != null) {
 						var localStartPoint = line.screenToLocal(screenStartPoint);
 						line.getElements().add(new MoveTo(0, localStartPoint != null ? localStartPoint.getY() : 0));
 						line.getElements().add(new HLineTo(20));
-					}
 
-					var screenEndPoint = node2.getParent().localToScreen(node2.getTranslateX(), node2.getTranslateY());
-					if (screenEndPoint != null) {
 						var localEndPoint = line.screenToLocal(screenEndPoint);
 						line.getElements().add(new LineTo(drawPane.getWidth() - 20, localEndPoint != null ? localEndPoint.getY() : 0));
 						line.getElements().add(new HLineTo(drawPane.getWidth()));

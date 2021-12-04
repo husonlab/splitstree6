@@ -44,7 +44,8 @@ public class TanglegramTreePane extends StackPane {
 	private final InvalidationListener updater;
 	private Runnable runAfterUpdate;
 
-	public TanglegramTreePane(TanglegramView tanglegramView, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
+	public TanglegramTreePane(TanglegramView tanglegramView, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
+							  ObjectProperty<PhyloTree> tree, ObjectProperty<int[]> taxonOrdering, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<ComputeTreeEmbedding.Diagram> optionDiagram, ObjectProperty<TreePane.Orientation> optionOrientation) {
 		setMinSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
 		setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
@@ -55,15 +56,16 @@ public class TanglegramTreePane extends StackPane {
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonOrdering.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), optionOrientation.get(), tanglegramView.optionZoomFactorProperty(), tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowTreeNamesProperty());
 						treePane.drawTree();
 						getChildren().add(treePane);
 
 						if (getRunAfterUpdate() != null) {
 							treePane.getService().stateProperty().addListener((v, o, n) -> {
-								if (n == Worker.State.SUCCEEDED)
-									getRunAfterUpdate().run();
+								if (n == Worker.State.SUCCEEDED) {
+									Platform.runLater(() -> getRunAfterUpdate().run());
+								}
 							});
 						}
 					}
@@ -74,6 +76,7 @@ public class TanglegramTreePane extends StackPane {
 		optionOrientation.addListener(new WeakInvalidationListener(updater));
 		dimensions.addListener(new WeakInvalidationListener(updater));
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updater));
+		taxonOrdering.addListener(new WeakInvalidationListener(updater));
 
 		//setStyle("-fx-border-color: yellow");
 	}

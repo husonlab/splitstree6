@@ -97,7 +97,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
-				var treePane = new TreePane(taxaBlock, tree, name, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+				var treePane = new TreePane(taxaBlock, tree, name, null, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.getOptionOrientation(), treePagesView.optionZoomFactorProperty(), treePagesView.optionFontScaleFactorProperty(),
 						treePagesView.optionShowTreeNamesProperty());
 				treePane.drawTree();

@@ -78,6 +78,7 @@ public class ComputeTreeEmbedding {
 	 *
 	 * @param taxaBlock            set of working taxa
 	 * @param tree                 tree
+	 * @param taxonOrdering        if non-null, maps the i-th taxon to its position in the leaf ordering
 	 * @param diagram              diagram type
 	 * @param width                target width
 	 * @param height               target height
@@ -87,7 +88,7 @@ public class ComputeTreeEmbedding {
 	 * @param alignLabels          align labels in rectangular and circular phylograms
 	 * @return group of all edges, nodes and node-labels
 	 */
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, Diagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, int[] taxonOrdering, Diagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
 							  BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
 		var parentPlacement = ParentPlacement.ChildrenAverage;
 
@@ -99,6 +100,19 @@ public class ComputeTreeEmbedding {
 		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
 
 		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
+
+		final var taxon2pos = new int[taxaBlock.getNtax() + 1];
+		if (taxonOrdering != null && taxonOrdering.length > 0) {
+			for (int pos = 1; pos < taxonOrdering.length; pos++)
+				taxon2pos[taxonOrdering[pos]] = pos;
+		} else {
+			var pos = new Counter(0);
+			Traversals.preOrderTreeTraversal(tree.getRoot(), v -> {
+				for (var t : tree.getTaxa(v)) {
+					taxon2pos[t] = (int) pos.incrementAndGet();
+				}
+			});
+		}
 
 		double fontHeight;
 		if (diagram.isRadial())
@@ -122,7 +136,6 @@ public class ComputeTreeEmbedding {
 				maxLabelWidth = Math.max(maxLabelWidth, label.getEstimatedWidth());
 			}
 		}
-
 
 		if (maxLabelWidth + fontHeight > 0.25 * width) {
 			fontHeight = Math.min(MAX_FONT_SIZE, fontHeight * 0.25 * width / (maxLabelWidth + fontHeight));
@@ -152,12 +165,12 @@ public class ComputeTreeEmbedding {
 		NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
-			case RectangularPhylogram -> computeCoordinatesRectangular(tree, true, parentPlacement);
-			case RectangularCladogram -> computeCoordinatesRectangular(tree, false, parentPlacement);
-			case TriangularCladogram -> computeCoordinatesTriangularCladogram(tree);
-			case RadialPhylogram -> computeCoordinatesRadialPhylogram(tree, parentPlacement);
-			case RadialCladogram, CircularCladogram -> computeCoordinatesRadialCladogram(tree, nodeAngleMap, false);
-			case CircularPhylogram -> computeCoordinatesRadialCladogram(tree, nodeAngleMap, true);
+			case RectangularPhylogram -> computeCoordinatesRectangular(tree, taxon2pos, true, parentPlacement);
+			case RectangularCladogram -> computeCoordinatesRectangular(tree, taxon2pos, false, parentPlacement);
+			case TriangularCladogram -> computeCoordinatesTriangularCladogram(tree, taxon2pos);
+			case RadialPhylogram -> computeCoordinatesRadialPhylogram(tree, taxon2pos, parentPlacement);
+			case RadialCladogram, CircularCladogram -> computeCoordinatesRadialCladogram(tree, taxon2pos, nodeAngleMap, false);
+			case CircularPhylogram -> computeCoordinatesRadialCladogram(tree,taxon2pos, nodeAngleMap, true);
 		};
 
 		normalize(normalizeWidth, normalizeHeight, nodePointMap);
@@ -328,7 +341,7 @@ public class ComputeTreeEmbedding {
 			return new Group(edgeGroup, nodeGroup, nodeLabelGroup);
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesRectangular(PhyloTree tree, boolean toScale, ParentPlacement parentPlacement) {
+	private static NodeArray<Point2D> computeCoordinatesRectangular(PhyloTree tree, int[] taxon2pos, boolean toScale, ParentPlacement parentPlacement) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		// compute x-coordinates:
@@ -352,11 +365,11 @@ public class ComputeTreeEmbedding {
 		// compute y-coordinates:
 		if (parentPlacement == ParentPlacement.LeafAverage) {
 			final NodeArray<Pair<Integer, Integer>> nodeFirstLastLeafYMap = tree.newNodeArray();
-			var leafNumber = new Counter();
 			Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
 				if (v.isLeaf()) {
-					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), leafNumber.incrementAndGet()));
-					nodeFirstLastLeafYMap.put(v, new Pair<>((int) leafNumber.get(), (int) leafNumber.get()));
+					var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
+					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), pos));
+					nodeFirstLastLeafYMap.put(v, new Pair<>(pos,pos));
 				} else {
 					var min = nodeFirstLastLeafYMap.get(v.getFirstOutEdge().getTarget()).getFirst();
 					var max = nodeFirstLastLeafYMap.get(v.getLastOutEdge().getTarget()).getSecond();
@@ -379,7 +392,8 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesTriangularCladogram(PhyloTree tree) {
+
+	private static NodeArray<Point2D> computeCoordinatesTriangularCladogram(PhyloTree tree, int[] taxon2pos) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 		final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
 
@@ -391,8 +405,8 @@ public class ComputeTreeEmbedding {
 				var leafNumber = new Counter(0);
 				Traversals.postOrderTreeTraversal(root, v -> {
 					if (v.isLeaf()) {
-						var y = (double) leafNumber.incrementAndGet();
-						nodePointMap.put(v, new Point2D(0.0, y));
+						var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
+						nodePointMap.put(v, new Point2D(0.0, pos));
 						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
 					} else {
 						var firstLeafBelow = firstLastLeafBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
@@ -408,12 +422,11 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesRadialCladogram(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean toScale) {
+	private static NodeArray<Point2D> computeCoordinatesRadialCladogram(PhyloTree tree, int[] taxon2pos, NodeDoubleArray nodeAngleMap, boolean toScale) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
 		if (numberOfLeaves > 0) {
-			final var leafNumber = new Counter();
 			final var delta = 360.0 / numberOfLeaves;
 
 			final NodeDoubleArray nodeRadiusMap = tree.newNodeDoubleArray();
@@ -433,7 +446,8 @@ public class ComputeTreeEmbedding {
 			Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
 				if (v.isLeaf()) {
 					firstLastLeafBelowMap.put(v, new Pair<>(v, v));
-					nodeAngleMap.put(v, leafNumber.getAndIncrement() * delta);
+					var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
+					nodeAngleMap.put(v, pos * delta);
 				} else {
 					var firstLeafBelow = firstLastLeafBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
 					var lastLeafBelow = firstLastLeafBelowMap.get(v.getLastOutEdge().getTarget()).getSecond();
@@ -451,12 +465,11 @@ public class ComputeTreeEmbedding {
 		return nodePointMap;
 	}
 
-	private static NodeArray<Point2D> computeCoordinatesRadialPhylogram(PhyloTree tree, ParentPlacement parentPlacement) {
+	private static NodeArray<Point2D> computeCoordinatesRadialPhylogram(PhyloTree tree, int[] taxon2pos, ParentPlacement parentPlacement) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		final var numberOfLeaves = tree.nodeStream().filter(Node::isLeaf).count();
 		if (numberOfLeaves > 0) {
-			final var leafNumber = new Counter();
 			final var delta = 360.0 / numberOfLeaves;
 
 			final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
@@ -466,7 +479,8 @@ public class ComputeTreeEmbedding {
 					final double angle;
 					if (v.isLeaf()) {
 						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
-						angle = leafNumber.getAndIncrement() * delta;
+						var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
+						angle = pos * delta;
 					} else {
 						var firstLeafBelow = firstLastLeafBelowMap.get(v.getFirstOutEdge().getTarget()).getFirst();
 						var lastLeafBelow = firstLastLeafBelowMap.get(v.getLastOutEdge().getTarget()).getSecond();
@@ -478,9 +492,10 @@ public class ComputeTreeEmbedding {
 			} else {
 				Traversals.postOrderTreeTraversal(tree.getRoot(), v -> {
 					final double angle;
-					if (v.isLeaf())
-						angle = leafNumber.getAndIncrement() * delta;
-					else
+					if (v.isLeaf()) {
+						var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
+						angle = pos * delta;
+					} else
 						angle = v.childrenStream().mapToDouble(nodeAngleMap::get).sum() / v.getOutDegree();
 					nodeAngleMap.put(v, angle);
 				});
