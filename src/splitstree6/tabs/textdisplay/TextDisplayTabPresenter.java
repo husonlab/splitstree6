@@ -43,6 +43,7 @@ import java.util.regex.Pattern;
 public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final TextDisplayTab tab;
+	private final TextDisplayController controller;
 
 	private final FindToolBar findToolBar;
 
@@ -55,17 +56,17 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 		this.tab = tab;
 		this.editable = editable;
 
-		var tabController = tab.getController();
+		controller = tab.getController();
 
-		var codeArea = tabController.getCodeArea();
+		var codeArea = controller.getCodeArea();
 
 		codeArea.setEditable(editable);
 
-		tabController.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
+		controller.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
 		codeArea.setWrapText(true);
 
 		findToolBar = new FindToolBar(null, new CodeAreaSearcher("Text", codeArea));
-		tabController.getTopVBox().getChildren().add(findToolBar);
+		controller.getTopVBox().getChildren().add(findToolBar);
 
 		selectionEmpty = new BooleanBinding() {
 			{
@@ -83,18 +84,18 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 			MainWindowManager.getPreviousSelection().add(codeArea.getText(n.getStart(), n.getEnd()));
 		});
 
-		tabController.getFindButton().setOnAction((e) -> findToolBar.setShowFindToolBar(true));
+		controller.getFindButton().setOnAction((e) -> findToolBar.setShowFindToolBar(true));
 
 		if (editable) {
-			tabController.getFindAndReplaceButton().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+			controller.getFindAndReplaceButton().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 		}
 		if (!editable) {
-			var items = tabController.getToolBar().getItems();
-			items.remove(tabController.getFindAndReplaceButton());
+			var items = controller.getToolBar().getItems();
+			items.remove(controller.getFindAndReplaceButton());
 		}
 
-		tabController.getWrapTextToggle().selectedProperty().bindBidirectional(tab.wrapTextProperty());
-		tabController.getLineNumbersToggle().selectedProperty().bindBidirectional(tab.showLineNumbersProperty());
+		controller.getWrapTextToggle().selectedProperty().bindBidirectional(tab.wrapTextProperty());
+		controller.getLineNumbersToggle().selectedProperty().bindBidirectional(tab.showLineNumbersProperty());
 
 
 		// prevent double paste:
@@ -110,55 +111,62 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 			if (n)
 				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
 		});
+
+		controller.getOpenButton().setOnAction(mainWindow.getController().getOpenMenuItem().getOnAction());
+		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
+		controller.getSaveButton().disableProperty().bind(mainWindow.getController().getSaveAsMenuItem().disableProperty());
+
+		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
+		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
 	}
 
 	public void setupMenuItems() {
-		var controller = mainWindow.getController();
-		var tabController = tab.getController();
+		var windowController = mainWindow.getController();
 
-		var codeArea = tabController.getCodeArea();
+		var codeArea = controller.getCodeArea();
 
-		controller.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
-		controller.getPrintMenuItem().disableProperty().bind(tab.emptyProperty());
+		windowController.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
+		windowController.getPrintMenuItem().disableProperty().bind(tab.emptyProperty());
 
 		if (editable) {
-			controller.getCutMenuItem().setOnAction(e -> codeArea.cut());
-			controller.getCutMenuItem().disableProperty().bind(selectionEmpty);
+			windowController.getCutMenuItem().setOnAction(e -> codeArea.cut());
+			windowController.getCutMenuItem().disableProperty().bind(selectionEmpty);
 		}
 
-		controller.getCopyMenuItem().setOnAction(e -> codeArea.copy());
-		controller.getCopyMenuItem().disableProperty().bind(selectionEmpty);
+		windowController.getCopyMenuItem().setOnAction(e -> codeArea.copy());
+		windowController.getCopyMenuItem().disableProperty().bind(selectionEmpty);
 
 		if (editable) {
-			controller.getPasteMenuItem().setOnAction(e -> codeArea.paste());
+			windowController.getPasteMenuItem().setOnAction(e -> codeArea.paste());
 
-			controller.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
-			controller.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());
+			windowController.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
+			windowController.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());
 
-			controller.getUndoMenuItem().setOnAction(e -> codeArea.undo());
+			windowController.getUndoMenuItem().setOnAction(e -> codeArea.undo());
 			{
 				var undoAvailable = new SimpleBooleanProperty();
 				undoAvailable.bind(codeArea.undoAvailableProperty());
-				controller.getUndoMenuItem().disableProperty().bind(undoAvailable.not());
+				windowController.getUndoMenuItem().disableProperty().bind(undoAvailable.not());
 			}
 
-			controller.getRedoMenuItem().setOnAction(e -> codeArea.redo());
+			windowController.getRedoMenuItem().setOnAction(e -> codeArea.redo());
 			{
 				var redoAvailable = new SimpleBooleanProperty();
 				redoAvailable.bind(codeArea.redoAvailableProperty());
-				controller.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
+				windowController.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
 			}
-		}
+		} else
+			windowController.getPasteMenuItem().setDisable(true);
 
-		controller.getFindMenuItem().setOnAction(tabController.getFindButton().getOnAction());
+		windowController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
 		if (editable) {
-			controller.getReplaceMenuItem().setOnAction(tabController.getFindAndReplaceButton().getOnAction());
+			windowController.getReplaceMenuItem().setOnAction(controller.getFindAndReplaceButton().getOnAction());
 		}
 
-		controller.getFindAgainMenuItem().setOnAction((e) -> findToolBar.findAgain());
-		controller.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+		windowController.getFindAgainMenuItem().setOnAction((e) -> findToolBar.findAgain());
+		windowController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
-		controller.getGotoLineMenuItem().setOnAction((e) -> {
+		windowController.getGotoLineMenuItem().setOnAction((e) -> {
 			final TextInputDialog dialog = new TextInputDialog("");
 			dialog.setTitle("Go to Line - " + ProgramProperties.getProgramName());
 			dialog.initStyle(StageStyle.UTILITY);
@@ -174,13 +182,13 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getSelectAllMenuItem().setOnAction(e -> codeArea.selectAll());
-		controller.getSelectAllMenuItem().disableProperty().bind(tab.emptyProperty());
+		windowController.getSelectAllMenuItem().setOnAction(e -> codeArea.selectAll());
+		windowController.getSelectAllMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		controller.getSelectNoneMenuItem().setOnAction(e -> codeArea.selectRange(0, 0));
-		controller.getSelectNoneMenuItem().disableProperty().bind(tab.emptyProperty());
+		windowController.getSelectNoneMenuItem().setOnAction(e -> codeArea.selectRange(0, 0));
+		windowController.getSelectNoneMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		controller.getSelectFromPreviousMenuItem().setOnAction(e -> {
+		windowController.getSelectFromPreviousMenuItem().setOnAction(e -> {
 			for (String word : MainWindowManager.getPreviousSelection()) {
 				final Pattern pattern = Pattern.compile(word);
 				String source = codeArea.getText();
@@ -192,15 +200,15 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 				}
 			}
 		});
-		controller.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
+		windowController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
-		controller.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
-		controller.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
+		windowController.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
+		windowController.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
-		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
+		windowController.getIncreaseFontSizeMenuItem().setOnAction(null);
+		windowController.getDecreaseFontSizeMenuItem().setOnAction(null);
 
-		controller.getZoomInMenuItem().setOnAction(null);
-		controller.getZoomOutMenuItem().setOnAction(null);
+		windowController.getZoomInMenuItem().setOnAction(null);
+		windowController.getZoomOutMenuItem().setOnAction(null);
 	}
 }

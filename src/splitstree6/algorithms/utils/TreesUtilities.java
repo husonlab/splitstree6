@@ -258,6 +258,7 @@ public class TreesUtilities {
 	public static PhyloTree computeInducedTree(int[] oldTaxonId2NewTaxonId, PhyloTree originalTree) {
 		final var inducedTree = new PhyloTree();
 		inducedTree.copy(originalTree);
+		inducedTree.getLSAChildrenMap().clear();
 
 		final var toRemove = new LinkedList<Node>(); // initially, set to all leaves that have lost their taxa
 

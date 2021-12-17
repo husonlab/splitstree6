@@ -1,0 +1,280 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=6 nAlgorithms=4;
+PROGRAM version='SplitsTree6 Community Edition';
+WORKFLOW creationDate='1639579003690'; [Wed Dec 15 15:36:43 CET 2021]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 47 taxa and one tree, network.
+The Show Trees method was used (default options) so as to obtain a Tree Pages visualization (Huson et al 2012).
+
+References:
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+Huson et al 2012: D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=47;
+TAXLABELS
+	[1] 'Flageliaria'
+	[2] 'Joinvillea'
+	[3] 'Baloskion'
+	[4] 'Elegia'
+	[5] 'Anomochloa'
+	[6] 'Lithachne'
+	[7] 'Pseudosasa'
+	[8] 'Guaduellla'
+	[9] 'Puelia'
+	[10] 'Micraira'
+	[11] 'Olyra'
+	[12] 'Stipa'
+	[13] 'Thysanolaena'
+	[14] 'Ehrharta'
+	[15] 'Anisopogon'
+	[16] 'Avena'
+	[17] 'Nardus'
+	[18] 'Lygeum'
+	[19] 'Chasmanthium'
+	[20] 'Arundo'
+	[21] 'Oryza'
+	[22] 'Chusquea'
+	[23] 'Bromus'
+	[24] 'Amphipogon'
+	[25] 'Molinia'
+	[26] 'Phragmites'
+	[27] 'Eriachne'
+	[28] 'Leersia'
+	[29] 'Triticum'
+	[30] 'Gynerium'
+	[31] 'Merxmuelliera m.'
+	[32] 'Merxmuelliera r.'
+	[33] 'Stipagrostis'
+	[34] 'Aristida'
+	[35] 'Merxmuellera m.'
+	[36] 'Zea'
+	[37] 'Miscanthus'
+	[38] 'Pennisetum'
+	[39] 'Danthonia'
+	[40] 'Spartina'
+	[41] 'Pappophorum'
+	[42] 'Centropodia'
+	[43] 'Merxmuellera r.'
+	[44] 'Panicum'
+	[45] 'Karroochloa'
+	[46] 'Austrodanthonia'
+	[47] 'Eragrostis'
+;
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Editor';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Editor';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Editor';
+DIMENSIONS ntax=47;
+TAXLABELS
+	[1] 'Flageliaria'
+	[2] 'Joinvillea'
+	[3] 'Baloskion'
+	[4] 'Elegia'
+	[5] 'Anomochloa'
+	[6] 'Lithachne'
+	[7] 'Pseudosasa'
+	[8] 'Guaduellla'
+	[9] 'Puelia'
+	[10] 'Micraira'
+	[11] 'Olyra'
+	[12] 'Stipa'
+	[13] 'Thysanolaena'
+	[14] 'Ehrharta'
+	[15] 'Anisopogon'
+	[16] 'Avena'
+	[17] 'Nardus'
+	[18] 'Lygeum'
+	[19] 'Chasmanthium'
+	[20] 'Arundo'
+	[21] 'Oryza'
+	[22] 'Chusquea'
+	[23] 'Bromus'
+	[24] 'Amphipogon'
+	[25] 'Molinia'
+	[26] 'Phragmites'
+	[27] 'Eriachne'
+	[28] 'Leersia'
+	[29] 'Triticum'
+	[30] 'Gynerium'
+	[31] 'Merxmuelliera m.'
+	[32] 'Merxmuelliera r.'
+	[33] 'Stipagrostis'
+	[34] 'Aristida'
+	[35] 'Merxmuellera m.'
+	[36] 'Zea'
+	[37] 'Miscanthus'
+	[38] 'Pennisetum'
+	[39] 'Danthonia'
+	[40] 'Spartina'
+	[41] 'Pappophorum'
+	[42] 'Centropodia'
+	[43] 'Merxmuellera r.'
+	[44] 'Panicum'
+	[45] 'Karroochloa'
+	[46] 'Austrodanthonia'
+	[47] 'Eragrostis'
+;
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 1]
+PROPERTIES partialTrees=no rooted=yes network=yes;
+TRANSLATE
+	1 'Flageliaria',
+	2 'Joinvillea',
+	3 'Baloskion',
+	4 'Elegia',
+	5 'Anomochloa',
+	6 'Lithachne',
+	7 'Pseudosasa',
+	8 'Guaduellla',
+	9 'Puelia',
+	10 'Micraira',
+	11 'Olyra',
+	12 'Stipa',
+	13 'Thysanolaena',
+	14 'Ehrharta',
+	15 'Anisopogon',
+	16 'Avena',
+	17 'Nardus',
+	18 'Lygeum',
+	19 'Chasmanthium',
+	20 'Arundo',
+	21 'Oryza',
+	22 'Chusquea',
+	23 'Bromus',
+	24 'Amphipogon',
+	25 'Molinia',
+	26 'Phragmites',
+	27 'Eriachne',
+	28 'Leersia',
+	29 'Triticum',
+	30 'Gynerium',
+	31 'Merxmuelliera m.',
+	32 'Merxmuelliera r.',
+	33 'Stipagrostis',
+	34 'Aristida',
+	35 'Merxmuellera m.',
+	36 'Zea',
+	37 'Miscanthus',
+	38 'Pennisetum',
+	39 'Danthonia',
+	40 'Spartina',
+	41 'Pappophorum',
+	42 'Centropodia',
+	43 'Merxmuellera r.',
+	44 'Panicum',
+	45 'Karroochloa',
+	46 'Austrodanthonia',
+	47 'Eragrostis',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] ((((3:1):1,(4:1):1):1,(1:1):1,(2:1,((5:1):1,(((6:1):1,((((11:1):1,((14:1):1,((21:1,(28:1):1):1,(22:1):1):1):1):1,7:1):1)#H1:0):1,(((((12:1,(15:1):1,(16:1,((29:1):1,23:1):1):1):1,((17:1):1,(18:1):1):1):1,#H1:0):1,(((13:1,(((30:1,((36:1,37:1):1,(38:1,(44:1):1):1):1):1)#H2:0,19:1):1):1,#H2:0):1,(((20:1,(24:1,((35:1):1,((39:1,(45:1,46:1):1):1)#H3:0):1):1):1,((25:1,26:1):1)#H4:0):1,((((31:1):1,#H3:0):1,(27:1):1):1,(((((40:1):1,(41:1,(47:1)#H5:0):1):1,((42:1,#H5:0):1,(43:1):1):1):1,(32:1):1):1,((33:1,34:1):1,#H4:0):1):1):1):1,(10:1):1):1):1,((8:1):1,(9:1):1):1):1):1):1):1):1);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 1]
+PROPERTIES partialTrees=no rooted=yes network=yes;
+TRANSLATE
+	1 'Flageliaria',
+	2 'Joinvillea',
+	3 'Baloskion',
+	4 'Elegia',
+	5 'Anomochloa',
+	6 'Lithachne',
+	7 'Pseudosasa',
+	8 'Guaduellla',
+	9 'Puelia',
+	10 'Micraira',
+	11 'Olyra',
+	12 'Stipa',
+	13 'Thysanolaena',
+	14 'Ehrharta',
+	15 'Anisopogon',
+	16 'Avena',
+	17 'Nardus',
+	18 'Lygeum',
+	19 'Chasmanthium',
+	20 'Arundo',
+	21 'Oryza',
+	22 'Chusquea',
+	23 'Bromus',
+	24 'Amphipogon',
+	25 'Molinia',
+	26 'Phragmites',
+	27 'Eriachne',
+	28 'Leersia',
+	29 'Triticum',
+	30 'Gynerium',
+	31 'Merxmuelliera m.',
+	32 'Merxmuelliera r.',
+	33 'Stipagrostis',
+	34 'Aristida',
+	35 'Merxmuellera m.',
+	36 'Zea',
+	37 'Miscanthus',
+	38 'Pennisetum',
+	39 'Danthonia',
+	40 'Spartina',
+	41 'Pappophorum',
+	42 'Centropodia',
+	43 'Merxmuellera r.',
+	44 'Panicum',
+	45 'Karroochloa',
+	46 'Austrodanthonia',
+	47 'Eragrostis',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] ((((3:1):1,(4:1):1):1,(1:1):1,(2:1,((5:1):1,(((6:1):1,((((11:1):1,((14:1):1,((21:1,(28:1):1):1,(22:1):1):1):1):1,7:1):1)#H1:0):1,(((((12:1,(15:1):1,(16:1,((29:1):1,23:1):1):1):1,((17:1):1,(18:1):1):1):1,#H1:0):1,(((13:1,(((30:1,((36:1,37:1):1,(38:1,(44:1):1):1):1):1)#H2:0,19:1):1):1,#H2:0):1,(((20:1,(24:1,((35:1):1,((39:1,(45:1,46:1):1):1)#H3:0):1):1):1,((25:1,26:1):1)#H4:0):1,((((31:1):1,#H3:0):1,(27:1):1):1,(((((40:1):1,(41:1,(47:1)#H5:0):1):1,((42:1,#H5:0):1,(43:1):1):1):1,(32:1):1):1,((33:1,34:1):1,#H4:0):1):1):1):1,(10:1):1):1):1,((8:1):1,(9:1):1):1):1):1):1):1):1);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreePages';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Tree Pages';
+LINK ALGORITHM = 'Show Trees';
+NAME 'Tree Pages';
+INPUT 'TREES';
+OPTIONS
+	Diagram = 'RectangularPhylogram',
+	Orientation = 'Rotate0Deg',
+	Rows = 1,
+	Cols = 1,
+	ZoomFactor = 1,
+	FontScaleFactor = 1;
+END; [VIEW]

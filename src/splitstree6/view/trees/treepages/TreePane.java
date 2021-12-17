@@ -39,6 +39,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 
 import java.util.LinkedList;
 
@@ -63,6 +64,8 @@ public class TreePane extends StackPane {
 		}
 	}
 
+	private Runnable runAfterUpdate;
+
 	private Pane treePane;
 
 	private final InteractionSetup interactionSetup;
@@ -76,12 +79,12 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, int[] taxonOrdering, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					ComputeTreeEmbedding.Diagram diagram, Orientation orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
+					ComputeTreeLayout.Diagram diagram, Orientation orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
 
 		this.interactionSetup = new InteractionSetup(taxaBlock, phyloTree, taxonSelectionModel, orientation);
 		// setStyle("-fx-border-color: lightgray;");
 
-		getStyleClass().add("background");
+		setStyle("-fx-background-color: transparent");
 
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);
@@ -116,8 +119,8 @@ public class TreePane extends StackPane {
 				height = getPrefHeight() - 12;
 			}
 
-			var group = ComputeTreeEmbedding.apply(taxaBlock, phyloTree, taxonOrdering, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
-
+			var group = ComputeTreeLayout.apply(taxaBlock, phyloTree, taxonOrdering, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
+			group.setId("treeGroup");
 			applyLabelScaleFactor(group, labelScaleFactor.get());
 
 			switch (orientation) {
@@ -146,18 +149,6 @@ public class TreePane extends StackPane {
 					group.setRotate(90);
 				}
 			}
-
-			if (false && group.getScaleX() != 1) { // if we have flipped the group, we need to flip each label to remain readable
-				var queue = new LinkedList<>(group.getChildren());
-				while (queue.size() > 0) {
-					var node = queue.pop();
-					if (node instanceof RichTextLabel) {
-						Platform.runLater(() -> node.setScaleX(group.getScaleX()));
-					} else if (node instanceof Parent parent) {
-						queue.addAll(parent.getChildrenUnmodifiable());
-					}
-				}
-			}
 			return group;
 		});
 
@@ -183,6 +174,9 @@ public class TreePane extends StackPane {
 				}
 				e.consume();
 			});
+			if (getRunAfterUpdate() != null) {
+				Platform.runLater(() -> getRunAfterUpdate().run());
+			}
 		});
 
 		service.setOnFailed(a -> System.err.println("Draw tree failed: " + service.getException()));
@@ -207,5 +201,14 @@ public class TreePane extends StackPane {
 
 	public AService<Group> getService() {
 		return service;
+	}
+
+
+	public Runnable getRunAfterUpdate() {
+		return runAfterUpdate;
+	}
+
+	public void setRunAfterUpdate(Runnable runAfterUpdate) {
+		this.runAfterUpdate = runAfterUpdate;
 	}
 }

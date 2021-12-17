@@ -197,6 +197,12 @@ public class MainWindowController {
 	private MenuItem zoomOutMenuItem;
 
 	@FXML
+	private MenuItem zoomInHorizontalMenuItem;
+
+	@FXML
+	private MenuItem zoomOutHorizontalMenuItem;
+
+	@FXML
 	private MenuItem resetMenuItem;
 
 	@FXML
@@ -691,6 +697,14 @@ public class MainWindowController {
 
 	public MenuItem getZoomOutMenuItem() {
 		return zoomOutMenuItem;
+	}
+
+	public MenuItem getZoomInHorizontalMenuItem() {
+		return zoomInHorizontalMenuItem;
+	}
+
+	public MenuItem getZoomOutHorizontalMenuItem() {
+		return zoomOutHorizontalMenuItem;
 	}
 
 	public MenuItem getResetMenuItem() {

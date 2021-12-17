@@ -1,5 +1,5 @@
 /*
- *  RerootTrees.java Copyright (C) 2021 Daniel H. Huson
+ *  RerootOrLadderizeTrees.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -24,7 +24,13 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import jloda.graph.Edge;
+import jloda.graph.Node;
+import jloda.graph.NodeIntArray;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.util.IteratorUtils;
+import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.algorithms.utils.RerootingUtils;
@@ -34,27 +40,30 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.AlgorithmNode;
 
 import java.io.IOException;
-import java.util.BitSet;
-import java.util.List;
+import java.util.*;
 
 /**
- * report trees by midpoint or outgroup
+ * report trees by midpoint or outgroup, and/or ladderize
  * Daniel Huson, 11.2021
  */
-public class RerootTrees extends Trees2Trees implements IFilter {
+public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 	public enum RootBy {Off, MidPoint, OutGroup}
+
+	public enum Ladderize {Off, Left, Right, Random}
 
 	private final ObjectProperty<RootBy> optionRootBy = new SimpleObjectProperty<>(this, "optionRootBy", RootBy.MidPoint);
 
-	private final ObjectProperty<String[]> optionOutGroupTaxa = new SimpleObjectProperty<>(new String[0]);
+	private final ObjectProperty<String[]> optionOutGroupTaxa = new SimpleObjectProperty<>(this, "optionOutGroupTaxa", new String[0]);
+
+	private final ObjectProperty<Ladderize> optionLadderize = new SimpleObjectProperty<>(this, "optionLadderize", Ladderize.Off);
 
 	private final InvalidationListener selectionInvalidationListener;
 
 	public List<String> listOptions() {
-		return List.of(optionRootBy.getName(), "optionOutGroupTaxa");
+		return List.of(optionRootBy.getName(), optionOutGroupTaxa.getName(), optionLadderize.getName());
 	}
 
-	public RerootTrees() {
+	public RerootOrLadderizeTrees() {
 		this.selectionInvalidationListener = observable -> {
 			if (getNode() != null) {
 				setOptionOutGroupTaxa(getNode().getOwner().getMainWindow().getTaxonSelectionModel().getSelectedItems().stream().map(Taxon::getName).toArray(String[]::new));
@@ -78,17 +87,16 @@ public class RerootTrees extends Trees2Trees implements IFilter {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, TreesBlock outputData) throws IOException {
+		var trees = outputData.getTrees();
+		trees.clear();
+
 		switch (getOptionRootBy()) {
 			case Off -> {
 				optionOutGroupTaxa.set(new String[0]);
-
-				outputData.getTrees().setAll(inputData.getTrees());
+				trees.addAll(inputData.getTrees());
 			}
 			case MidPoint -> {
 				optionOutGroupTaxa.set(new String[0]);
-
-				outputData.getTrees().clear();
-
 				for (PhyloTree orig : inputData.getTrees()) {
 					final PhyloTree tree = new PhyloTree();
 					tree.copy(orig);
@@ -98,26 +106,23 @@ public class RerootTrees extends Trees2Trees implements IFilter {
 					}
 					// todo: ask about internal node labels
 					RerootingUtils.rerootByMidpoint(false, tree);
-					outputData.getTrees().add(tree);
+					trees.add(tree);
 					outputData.setRooted(true);
 				}
 			}
 			case OutGroup -> {
 				selectionInvalidationListener.invalidated(null);
 
-				final BitSet outGroupTaxonSet = new BitSet();
+				final var outGroupTaxonSet = new BitSet();
 				for (var taxon : getOptionOutGroupTaxa()) {
 					int index = taxaBlock.indexOf(taxon);
 					if (index >= 0)
 						outGroupTaxonSet.set(index);
 				}
 
-				outputData.getTrees().clear();
-
-				for (PhyloTree orig : inputData.getTrees()) {
-					if (orig.getNumberOfNodes() > 0) {
-						final PhyloTree tree = new PhyloTree();
-						tree.copy(orig);
+				for (var originalTree : inputData.getTrees()) {
+					if (originalTree.getNumberOfNodes() > 0) {
+						final PhyloTree tree = new PhyloTree(originalTree);
 						if (tree.getRoot() == null) {
 							tree.setRoot(tree.getFirstNode());
 							tree.redirectEdgesAwayFromRoot();
@@ -125,10 +130,34 @@ public class RerootTrees extends Trees2Trees implements IFilter {
 						if (outGroupTaxonSet.cardinality() > 0)
 							// todo: ask about internal node labels
 							RerootingUtils.rerootByOutGroup(false, tree, outGroupTaxonSet);
-						outputData.getTrees().add(tree);
+						trees.add(tree);
 					}
 				}
 				outputData.setRooted(true);
+			}
+		}
+
+		if (getOptionLadderize() == Ladderize.Left || getOptionLadderize() == Ladderize.Right) {
+			for (var tree : trees) {
+				var node2height = tree.newNodeIntArray();
+				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+					if (v.isLeaf()) {
+						node2height.put(v, 1);
+					} else {
+						node2height.put(v, v.childrenStream().mapToInt(node2height::get).max().orElse(0) + 1);
+						v.rearrangeAdjacentEdges(orderEdges(v, node2height, getOptionLadderize() == Ladderize.Left));
+					}
+				});
+			}
+		} else if (getOptionLadderize() == Ladderize.Random) {
+			for (var tree : trees) {
+				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+					var newOrder = new LinkedList<Edge>();
+					for (Iterator<Edge> it = IteratorUtils.randomize(v.adjacentEdges().iterator(), v.getId()); it.hasNext(); ) {
+						newOrder.add(it.next());
+					}
+					v.rearrangeAdjacentEdges(newOrder);
+				});
 			}
 		}
 	}
@@ -155,5 +184,36 @@ public class RerootTrees extends Trees2Trees implements IFilter {
 
 	public void setOptionOutGroupTaxa(String[] optionOutGroupTaxa) {
 		this.optionOutGroupTaxa.set(optionOutGroupTaxa);
+	}
+
+	public Ladderize getOptionLadderize() {
+		return optionLadderize.get();
+	}
+
+	public ObjectProperty<Ladderize> optionLadderizeProperty() {
+		return optionLadderize;
+	}
+
+	public void setOptionLadderize(Ladderize optionLadderize) {
+		this.optionLadderize.set(optionLadderize);
+	}
+
+	/**
+	 * order edges to ladderize
+	 */
+	private List<Edge> orderEdges(Node v, NodeIntArray node2height, boolean left) {
+		var sorted = new ArrayList<Pair<Integer, Edge>>();
+
+		for (var f : v.outEdges()) {
+			var w = f.getTarget();
+			sorted.add(new Pair<>((left ? -1 : 1) * node2height.get(w), f));
+		}
+		sorted.sort(Comparator.comparing(Pair::getFirst));
+
+		var result = new LinkedList<Edge>();
+		for (Pair<Integer, Edge> pair : sorted) {
+			result.add(pair.getSecond());
+		}
+		return result;
 	}
 }

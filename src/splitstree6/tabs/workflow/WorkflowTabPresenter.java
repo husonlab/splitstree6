@@ -41,6 +41,7 @@ import splitstree6.workflow.commands.DuplicateCommand;
 public class WorkflowTabPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final WorkflowTab workflowTab;
+	private final WorkflowTabController controller;
 	private final Group nodeItemsGroup = new Group();
 	private final WorkflowTabLayout workflowTabLayout;
 
@@ -49,25 +50,25 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 	public WorkflowTabPresenter(MainWindow mainWindow, WorkflowTab workflowTab) {
 		this.mainWindow = mainWindow;
 		this.workflowTab = workflowTab;
-		var tabController = workflowTab.getController();
+		this.controller = workflowTab.getController();
 		var workflow = mainWindow.getWorkflow();
 
 		var edgeItemsGroup = new Group();
-		tabController.getMainPane().getChildren().addAll(edgeItemsGroup, nodeItemsGroup);
+		controller.getMainPane().getChildren().addAll(edgeItemsGroup, nodeItemsGroup);
 
 		workflowTabLayout = new WorkflowTabLayout(workflowTab, nodeItemsGroup, edgeItemsGroup);
 
 		{
-			var scrollPane = tabController.getScrollPane();
+			var scrollPane = controller.getScrollPane();
 
-			scrollPane.prefWidthProperty().bind(tabController.getMainPane().widthProperty());
-			scrollPane.prefHeightProperty().bind(tabController.getMainPane().heightProperty());
+			scrollPane.prefWidthProperty().bind(controller.getMainPane().widthProperty());
+			scrollPane.prefHeightProperty().bind(controller.getMainPane().heightProperty());
 
 			scrollPane.setLockAspectRatio(true);
 			scrollPane.setRequireShiftOrControlToZoom(true);
-			tabController.getZoomButton().setOnAction(e -> scrollPane.resetZoom());
-			tabController.getZoomInButton().setOnAction(e -> scrollPane.zoomBy(1.1, 1.1));
-			tabController.getZoomOutButton().setOnAction(e -> scrollPane.zoomBy(1 / 1.1, 1 / 1.1));
+			controller.getZoomButton().setOnAction(e -> scrollPane.resetZoom());
+			controller.getZoomInButton().setOnAction(e -> scrollPane.zoomBy(1.1, 1.1));
+			controller.getZoomOutButton().setOnAction(e -> scrollPane.zoomBy(1 / 1.1, 1 / 1.1));
 		}
 
 		workflow.getSelectionModel().getSelectedItems().addListener((SetChangeListener<WorkflowNode>) e -> {
@@ -87,56 +88,53 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 				nodeToDuplicateOrDelete.set(null);
 		});
 
-		tabController.getMainPane().setOnMouseClicked(e -> workflow.getSelectionModel().clearSelection());
+		controller.getMainPane().setOnMouseClicked(e -> workflow.getSelectionModel().clearSelection());
 
-		tabController.getOpenButton().setOnAction(e -> mainWindow.getController().getOpenMenuItem().getOnAction().handle(e));
-		tabController.getSaveButton().setOnAction(e -> mainWindow.getController().getSaveAsMenuItem().getOnAction().handle(e));
-		tabController.getPrintButton().setOnAction(e -> mainWindow.getController().getPrintMenuItem().getOnAction().handle(e));
+		controller.getProgressIndicator().visibleProperty().bind(mainWindow.getWorkflow().runningProperty());
 
-		tabController.getProgressIndicator().visibleProperty().bind(mainWindow.getWorkflow().runningProperty());
+		controller.getOpenButton().setOnAction(mainWindow.getController().getOpenMenuItem().getOnAction());
+		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
+		controller.getSaveButton().disableProperty().bind(mainWindow.getController().getSaveAsMenuItem().disableProperty());
+
+		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
+		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
 	}
 
 
 	public void setupMenuItems() {
-		var controller = mainWindow.getController();
-		var tabController = workflowTab.getController();
+		var windowController = mainWindow.getController();
 		var workflow = mainWindow.getWorkflow();
 
-		controller.getCutMenuItem().setOnAction(null);
-		controller.getCopyMenuItem().setOnAction(null);
+		windowController.getCutMenuItem().setOnAction(null);
+		windowController.getCopyMenuItem().setOnAction(null);
 
-		controller.getCopyImageMenuItem().setOnAction(null);
+		windowController.getCopyImageMenuItem().setOnAction(null);
 
-		controller.getPasteMenuItem().setOnAction(null);
+		windowController.getPasteMenuItem().setOnAction(null);
 
-		controller.getUndoMenuItem().setOnAction(e -> workflowTab.getUndoManager().undo());
-		controller.getUndoMenuItem().disableProperty().bind(workflowTab.getUndoManager().undoableProperty().not());
-		controller.getRedoMenuItem().setOnAction(e -> workflowTab.getUndoManager().redo());
-		controller.getRedoMenuItem().disableProperty().bind(workflowTab.getUndoManager().redoableProperty().not());
-
-		controller.getDuplicateMenuItem().setOnAction(e -> {
+		windowController.getDuplicateMenuItem().setOnAction(e -> {
 			workflowTab.getUndoManager().doAndAdd(DuplicateCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get()));
 		});
-		controller.getDuplicateMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+		windowController.getDuplicateMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
 
-		controller.getDeleteMenuItem().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DeleteCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
-		controller.getDeleteMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+		windowController.getDeleteMenuItem().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DeleteCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
+		windowController.getDeleteMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
 
-		controller.getFindMenuItem().setOnAction(null);
-		controller.getFindAgainMenuItem().setOnAction(null);
+		windowController.getFindMenuItem().setOnAction(null);
+		windowController.getFindAgainMenuItem().setOnAction(null);
 
 		// controller.getReplaceMenuItem().setOnAction(null);
 
-		controller.getSelectAllMenuItem().setOnAction(e -> workflow.getSelectionModel().selectAll(workflow.nodes()));
-		controller.getSelectNoneMenuItem().setOnAction(e -> workflow.getSelectionModel().clearSelection());
+		windowController.getSelectAllMenuItem().setOnAction(e -> workflow.getSelectionModel().selectAll(workflow.nodes()));
+		windowController.getSelectNoneMenuItem().setOnAction(e -> workflow.getSelectionModel().clearSelection());
 
-		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
-		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
+		windowController.getIncreaseFontSizeMenuItem().setOnAction(null);
+		windowController.getDecreaseFontSizeMenuItem().setOnAction(null);
 
-		controller.getZoomInMenuItem().setOnAction(tabController.getZoomInButton().getOnAction());
-		controller.getZoomOutMenuItem().setOnAction(tabController.getZoomOutButton().getOnAction());
+		windowController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
+		windowController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 
-		controller.getResetMenuItem().setOnAction(tabController.getZoomButton().getOnAction());
+		windowController.getResetMenuItem().setOnAction(controller.getZoomButton().getOnAction());
 	}
 
 	public static DropShadow getDropShadow() {

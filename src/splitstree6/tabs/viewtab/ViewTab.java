@@ -38,7 +38,7 @@ import splitstree6.window.MainWindow;
  * Daniel Huson, 11.2021
  */
 public class ViewTab extends Tab implements IDisplayTab {
-	private final UndoManager undoManager = new UndoManager();
+	private UndoManager undoManager;
 	private final MainWindow mainWindow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
@@ -64,7 +64,14 @@ public class ViewTab extends Tab implements IDisplayTab {
 		});
 
 		viewProperty().addListener((v, o, n) -> {
-			setContent(n.getRoot());
+			if (n != null) {
+				setContent(n.getRoot());
+				undoManager = n.getUndoManager();
+			} else {
+				setContent(null);
+				undoManager = null;
+			}
+			mainWindow.getPresenter().updateUndoRedo();
 		});
 		mainWindow.addTabToMainTabPane(this);
 	}

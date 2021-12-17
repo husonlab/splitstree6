@@ -26,36 +26,40 @@ import javafx.scene.control.Tooltip;
 import javafx.util.Callback;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.util.StringUtils;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 
 
 public class ComboBoxUtils {
 	/**
 	 * create list cell for diagram combo box
 	 */
-	public static ListCell<ComputeTreeEmbedding.Diagram> createDiagramComboBoxListCell() {
+	public static ListCell<ComputeTreeLayout.Diagram> createDiagramComboBoxListCell(boolean horizontalFlip) {
 		return new ListCell<>() {
 			{
 				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
 			}
 
 			@Override
-			protected void updateItem(ComputeTreeEmbedding.Diagram item, boolean empty) {
+			protected void updateItem(ComputeTreeLayout.Diagram item, boolean empty) {
 				super.updateItem(item, empty);
 
 				if (item == null || empty) {
 					setGraphic(null);
 				} else {
-					setGraphic(ResourceManagerFX.getIconAsImageView(item.name() + "16.gif", 16));
+					var imageView = ResourceManagerFX.getIconAsImageView(item.name() + "16.gif", 16);
+					if (horizontalFlip)
+						imageView.setScaleX(-imageView.getScaleX());
+					setGraphic(imageView);
 				}
 			}
 		};
 	}
 
 	/**
-	 * creates the callback method for diagraom combo box
+	 * creates the callback method for diagram combo box
 	 */
-	public static Callback<ListView<ComputeTreeEmbedding.Diagram>, ListCell<ComputeTreeEmbedding.Diagram>> createDiagramComboxBoxCallback() {
-		return p -> createDiagramComboBoxListCell();
+	public static Callback<ListView<ComputeTreeLayout.Diagram>, ListCell<ComputeTreeLayout.Diagram>> createDiagramComboxBoxCallback(boolean horizontalFlip) {
+		return p -> createDiagramComboBoxListCell(horizontalFlip);
 	}
 
 	/**

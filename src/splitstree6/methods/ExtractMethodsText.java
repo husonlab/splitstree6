@@ -24,7 +24,6 @@ import jloda.util.Pair;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.IFilter;
 import splitstree6.main.Version;
-import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
@@ -45,8 +44,8 @@ public class ExtractMethodsText {
 	public static String inputDataTemplate = "The original input consisted of %s and %s.\n";
 	public static String taxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.\n";
 	public static String taxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s.\n";
-	public static String methodWithOutputTemplate = "The %s method%s was used%s so as to obtain %s.\n";
-	public static String methodTemplate = "The %s method%s was used%s.\n";
+	public static String methodWithOutputTemplate = "The %s method%s was used%s so as to obtain %s%s.\n";
+	public static String methodTemplate = "The %s method%s was used%s%s.\n";
 
 	public static String filterTemplate = "A %s%s was applied so as to be %s.\n";
 
@@ -132,7 +131,18 @@ public class ExtractMethodsText {
 											var optionsReport = ExtractOptionsText.apply(algorithm);
 											String line;
 											if (targetNode != null) {
-												line = String.format(methodWithOutputTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "", targetNode.getDataBlock().getShortDescription());
+												var targetBlock = targetNode.getDataBlock();
+												var targetKey = "";
+												{
+													targetKey = getKeysString(targetBlock);
+													var dataKeysAndPapers = ExtractCitations.apply(targetBlock);
+													if (dataKeysAndPapers != null) {
+														allKeysAndPapers.addAll(dataKeysAndPapers);
+													}
+												}
+												line = String.format(methodWithOutputTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "",
+														targetBlock.getShortDescription(), targetKey.isBlank() ? "" : targetKey);
+
 											} else {
 												line = String.format(methodTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "");
 											}
@@ -165,16 +175,15 @@ public class ExtractMethodsText {
 	}
 
 	/**
-	 * gets the citation keys for an algorithm
+	 * gets the citation keys
 	 *
-	 * @param algorithm
-	 * @return citation
+	 * @return citation key
 	 */
-	public static String getKeysString(Algorithm algorithm) {
-		if (algorithm.getCitation() == null || algorithm.getCitation().length() < 2)
+	public static String getKeysString(IHasCitations citationsCarrier) {
+		if (citationsCarrier.getCitation() == null || citationsCarrier.getCitation().length() < 2)
 			return "";
 		else {
-			var tokens = StringUtils.split(algorithm.getCitation(), ';');
+			var tokens = StringUtils.split(citationsCarrier.getCitation(), ';');
 			var buf = new StringBuilder();
 			buf.append(" (");
 			for (int i = 0; i < tokens.length; i += 2) {

@@ -19,10 +19,11 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.tanglegram.TanglegramViewController">
@@ -108,29 +109,42 @@
                                         <Tooltip text="Find in selected tab"/>
                                     </tooltip>
                                 </Button>
-                                <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                                <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
                                 <ComboBox fx:id="tree1CBox" prefWidth="100.0"/>
                                 <ComboBox fx:id="diagram1CBox" prefWidth="50.0">
                                     <tooltip>
-                                        <Tooltip text="Choose diagram"/>
+                                        <Tooltip text="Choose diagram for tree 1"/>
                                     </tooltip>
                                 </ComboBox>
-                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="tree2CBox" layoutX="165.0" layoutY="10.0" prefWidth="100.0"/>
                                 <ComboBox fx:id="diagram2CBox" layoutX="165.0" layoutY="10.0" prefWidth="50.0">
                                     <tooltip>
-                                        <Tooltip text="Choose diagram"/>
+                                        <Tooltip text="Choose diagram for tree 2"/>
                                     </tooltip>
                                 </ComboBox>
+                                <ComboBox fx:id="tree2CBox" layoutX="165.0" layoutY="10.0" prefWidth="100.0"/>
                                 <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
                                 <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
                                     <tooltip>
-                                        <Tooltip text="Choose root side"/>
+                                        <Tooltip text="Choose orientation"/>
                                     </tooltip>
                                 </ComboBox>
                                 <Separator layoutX="494.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <Button fx:id="previousButton" mnemonicParsing="false"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="&lt;">
+                                    <tooltip>
+                                        <Tooltip text="Move to previous pair of trees"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="nextButton" mnemonicParsing="false"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;">
+                                    <tooltip>
+                                        <Tooltip text="Move to next pair of trees"/>
+                                    </tooltip>
+                                </Button>
+                                <Separator layoutX="548.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
                                 <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="GRAPHIC_ONLY"
                                               maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
@@ -148,36 +162,120 @@
                                         <Tooltip text="Show tree names"/>
                                     </tooltip>
                                 </ToggleButton>
-                                <Separator layoutX="548.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                                <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Expand Vertically">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false"
+                                                       url="@/jloda/resources/icons/ExpandVertical16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Expand tree vertically"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="contractVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Contract Vertically">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false"
+                                                       url="@/jloda/resources/icons/ContractVertical16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Contract tree vertically"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="expandHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Expand Horizontally">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false"
+                                                       url="@/jloda/resources/icons/ExpandHorizontal16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Expand tree horizontally"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="contractHorizontallyButton" contentDisplay="GRAPHIC_ONLY"
+                                        maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Contract Horizontally">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false"
+                                                       url="@/jloda/resources/icons/ContractHorizontal16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Contract tree horizontally"/>
+                                    </tooltip>
+                                </Button>
                             </items>
                         </ToolBar>
                     </children>
                 </VBox>
             </top>
             <center>
-                <GridPane fx:id="gridPane" alignment="CENTER" pickOnBounds="false">
-                    <columnConstraints>
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0"/>
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" maxWidth="-Infinity"
-                                           minWidth="-Infinity"/>
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS" minWidth="10.0"/>
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints minHeight="10.0" prefHeight="30.0" valignment="CENTER" vgrow="ALWAYS"/>
-                    </rowConstraints>
+                <AnchorPane>
                     <children>
-                        <Pane fx:id="middlePane" maxWidth="-Infinity" minWidth="-Infinity" pickOnBounds="false"
-                              prefWidth="250.0" style="-fx-background-color: transparent;" GridPane.columnIndex="1"
-                              GridPane.hgrow="SOMETIMES" GridPane.vgrow="ALWAYS"/>
-                        <StackPane fx:id="leftPane" pickOnBounds="false" style="-fx-background-color: transparent;"
-                                   GridPane.halignment="RIGHT" GridPane.hgrow="ALWAYS" GridPane.valignment="CENTER"
-                                   GridPane.vgrow="ALWAYS"/>
-                        <StackPane fx:id="rightPane" pickOnBounds="false" style="-fx-background-color: transparent;"
-                                   GridPane.columnIndex="2" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS"
-                                   GridPane.valignment="CENTER" GridPane.vgrow="ALWAYS"/>
+                        <ScrollPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <content>
+                                <HBox alignment="CENTER">
+                                    <children>
+                                        <StackPane fx:id="leftPane" alignment="TOP_RIGHT" pickOnBounds="false"
+                                                   style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
+                                        <Pane fx:id="middlePane" maxWidth="-Infinity" minWidth="50.0"
+                                              pickOnBounds="false" prefHeight="200.0"
+                                              style="-fx-background-color: transparent;"/>
+                                        <StackPane fx:id="rightPane" alignment="TOP_LEFT" pickOnBounds="false"
+                                                   style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                                    </padding>
+                                </HBox>
+                            </content>
+                        </ScrollPane>
+                        <Label fx:id="tree1Label" text="Tree 1" AnchorPane.leftAnchor="40.0"
+                               AnchorPane.topAnchor="5.0"/>
+                        <Label fx:id="tree2Label" style="-fx-background-color: transparent;" text="Tree 2"
+                               AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0"/>
                     </children>
-                </GridPane>
+                </AnchorPane>
             </center>
         </BorderPane>
     </children>

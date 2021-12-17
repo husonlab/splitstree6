@@ -129,23 +129,30 @@ public class Connectors {
 					mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
 				});
 
-				InvalidationListener invalidationListener = e -> {
-					line.getElements().clear();
-					var screenStartPoint = node1.getParent().localToScreen(node1.getTranslateX(), node1.getTranslateY());
-					var screenEndPoint = node2.getParent().localToScreen(node2.getTranslateX(), node2.getTranslateY());
-					if (screenStartPoint != null && screenEndPoint != null) {
-						var localStartPoint = line.screenToLocal(screenStartPoint);
-						line.getElements().add(new MoveTo(0, localStartPoint != null ? localStartPoint.getY() : 0));
-						line.getElements().add(new HLineTo(20));
+				if (mainWindow.getTaxonSelectionModel().isSelected(taxon))
+					line.setEffect(SelectionEffectBlue.getInstance());
 
-						var localEndPoint = line.screenToLocal(screenEndPoint);
-						line.getElements().add(new LineTo(drawPane.getWidth() - 20, localEndPoint != null ? localEndPoint.getY() : 0));
-						line.getElements().add(new HLineTo(drawPane.getWidth()));
-					}
+				InvalidationListener invalidationListener = e -> {
+					Platform.runLater(() -> {
+						line.getElements().clear();
+						var screenStartPoint = node1.getParent().localToScreen(node1.getTranslateX(), node1.getTranslateY());
+						var screenEndPoint = node2.getParent().localToScreen(node2.getTranslateX(), node2.getTranslateY());
+						if (screenStartPoint != null && screenEndPoint != null) {
+							var localStartPoint = line.screenToLocal(screenStartPoint);
+							var localEndPoint = line.screenToLocal(screenEndPoint);
+							if (localStartPoint != null && localEndPoint != null) {
+								line.getElements().add(new MoveTo(0, localStartPoint.getY()));
+								line.getElements().add(new CubicCurveTo(0.3 * drawPane.getWidth(), localStartPoint.getY(),
+										0.7 * drawPane.getWidth(), localEndPoint.getY(),
+										drawPane.getWidth(), localEndPoint.getY()));
+							}
+						} else
+							group.getChildren().remove(line);
+					});
 				};
 				tree1Pane.boundsInParentProperty().addListener(invalidationListener);
 				tree2Pane.boundsInParentProperty().addListener(invalidationListener);
-				Platform.runLater(() -> invalidationListener.invalidated(null));
+				invalidationListener.invalidated(null);
 			}
 		}
 	}

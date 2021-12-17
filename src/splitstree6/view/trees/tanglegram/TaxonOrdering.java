@@ -40,7 +40,6 @@ package splitstree6.view.trees.tanglegram;
 
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
-import jloda.graph.algorithms.Traversals;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.Counter;
@@ -57,6 +56,7 @@ import java.util.*;
  * computes the taxon ordering to be used in the tanglegram
  * Daniel Huson, 12.2021
  */
+@Deprecated
 public class TaxonOrdering {
 	/**
 	 * apply the computation
@@ -67,12 +67,11 @@ public class TaxonOrdering {
 	 */
 	public static Pair<int[], int[]> apply(TaxaBlock taxaBlock, PhyloTree tree1, PhyloTree tree2) {
 		if (tree1 != null && tree1.getNumberOfNodes() > 0 && tree2 != null && tree2.getNumberOfNodes() > 0) {
-
 			if (tree1 == tree2) { // the same tree object, need to handle this case separately
 				var nTaxa = TreesUtilities.getTaxa(tree1).cardinality();
 				var cycle = new int[nTaxa + 1];
 				var pos = new Counter();
-				Traversals.preOrderTreeTraversal(tree1.getRoot(), v -> {
+				tree1.preorderTraversal(v -> {
 					if (v.isLeaf()) {
 						IteratorUtils.asStream(tree1.getTaxa(v)).forEach(t -> cycle[(int) pos.incrementAndGet()] = t);
 					}
@@ -168,41 +167,42 @@ public class TaxonOrdering {
 					for (var pos = 1; pos < taxCycle.length; pos++)
 						tax2pos[taxCycle[pos]] = pos;
 					// map each node to the taxa positions
-					NodeArray<BitSet> positions1Below = tree1.newNodeArray();
-					Traversals.postOrderTreeTraversal(tree1.getRoot(), v -> {
-						if (v.isLeaf()) {
-							positions1Below.put(v, BitSetUtils.asBitSet(IteratorUtils.asStream(tree1.getTaxa(v)).mapToInt(t -> tax2pos[t]).toArray()));
-						} else {
-							var below = new BitSet();
-							v.childrenStream().map(positions1Below::get).forEach(below::or);
-							positions1Below.put(v, below);
-						}
-					});
+					try (NodeArray<BitSet> positions1Below = tree1.newNodeArray()) {
+						tree1.postorderTraversal(v -> {
+							if (v.isLeaf()) {
+								positions1Below.put(v, BitSetUtils.asBitSet(IteratorUtils.asStream(tree1.getTaxa(v)).mapToInt(t -> tax2pos[t]).toArray()));
+							} else {
+								var below = new BitSet();
+								v.childrenStream().map(positions1Below::get).forEach(below::or);
+								positions1Below.put(v, below);
+							}
+						});
 
-					var cycle1 = new int[taxCycle.length];
-					computeBestOrderingRec(tree1, tree1.getRoot(), positions1Below, new Counter(0), cycle1);
-
-					result.setFirst(cycle1);
+						var cycle1 = new int[taxCycle.length];
+						computeBestOrderingRec(tree1, tree1.getRoot(), positions1Below, new Counter(0), cycle1);
+						result.setFirst(cycle1);
+					}
 				}
 				{
 					var tax2pos = new int[taxCycle.length];
 					for (var pos = 1; pos < taxCycle.length; pos++)
 						tax2pos[taxCycle[pos]] = pos;
 					// map each node to the taxa positions
-					NodeArray<BitSet> positions2Below = tree2.newNodeArray();
-					Traversals.postOrderTreeTraversal(tree2.getRoot(), v -> {
-						if (v.isLeaf()) {
-							positions2Below.put(v, BitSetUtils.asBitSet(IteratorUtils.asStream(tree2.getTaxa(v)).mapToInt(t -> tax2pos[t]).toArray()));
-						} else {
-							var below = new BitSet();
-							v.childrenStream().map(positions2Below::get).forEach(below::or);
-							positions2Below.put(v, below);
-						}
-					});
+					try (NodeArray<BitSet> positions2Below = tree2.newNodeArray()) {
+						tree2.postorderTraversal(v -> {
+							if (v.isLeaf()) {
+								positions2Below.put(v, BitSetUtils.asBitSet(IteratorUtils.asStream(tree2.getTaxa(v)).mapToInt(t -> tax2pos[t]).toArray()));
+							} else {
+								var below = new BitSet();
+								v.childrenStream().map(positions2Below::get).forEach(below::or);
+								positions2Below.put(v, below);
+							}
+						});
 
-					var cycle2 = new int[taxCycle.length];
-					computeBestOrderingRec(tree2, tree2.getRoot(), positions2Below, new Counter(0), cycle2);
-					result.setSecond(cycle2);
+						var cycle2 = new int[taxCycle.length];
+						computeBestOrderingRec(tree2, tree2.getRoot(), positions2Below, new Counter(0), cycle2);
+						result.setSecond(cycle2);
+					}
 
 					return result;
 				}

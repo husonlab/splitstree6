@@ -21,7 +21,9 @@ package splitstree6.io.readers.trees;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.PhyloTreeNetworkUtils;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
@@ -30,9 +32,7 @@ import splitstree6.data.TreesBlock;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 /**
  * reads trees in Newick format,
@@ -46,7 +46,7 @@ public class NewickReader extends TreesReader {
 	}
 
 	@Override
-	public void read(ProgressListener progress, String inputFile, TaxaBlock taxa, TreesBlock trees) throws IOException {
+	public void read(ProgressListener progress, String inputFile, TaxaBlock taxa, TreesBlock treesBlock) throws IOException {
 		var lineno = 0;
 		try (var it = new FileLineIterator(inputFile)) {
 			progress.setMaximum(it.getMaximumProgress());
@@ -56,8 +56,12 @@ public class NewickReader extends TreesReader {
 			final var taxonNamesFound = new HashSet<String>();
 			final ArrayList<String> orderedTaxonNames = new ArrayList<>();
 
-			var partial = false;
 			final var parts = new ArrayList<String>();
+
+			treesBlock.clear();
+			treesBlock.setNetwork(false);
+			treesBlock.setPartial(false);
+			treesBlock.setRooted(true);
 
 			// read in the trees
 			while (it.hasNext()) {
@@ -74,6 +78,7 @@ public class NewickReader extends TreesReader {
 					final var tree = new PhyloTree();
 					try {
 						tree.parseBracketNotation(treeLine, true);
+						//System.err.println(tree.toBracketString(false));
 					} catch (IOException ex) {
 						throw new IOExceptionWithLineNumber(lineno, ex);
 					}
@@ -84,7 +89,7 @@ public class NewickReader extends TreesReader {
 					if (TreesUtilities.hasNumbersOnInternalNodes(tree)) {
 						TreesUtilities.changeNumbersOnInternalNodesToEdgeConfidencies(tree);
 					}
-					final var labelList = tree.listNodeLabels(true);
+					final var labelList = listNodeLabels(tree, true);
 					final var labelSet = new HashSet<>(labelList);
 					final var multiLabeled = (labelSet.size() < labelList.size());
 
@@ -105,9 +110,9 @@ public class NewickReader extends TreesReader {
 							}
 						} else {
 							for (var z : labelSet) {
-								labelSet.remove(z);
+								labelList.remove(z);
 							}
-							throw new IOExceptionWithLineNumber(lineno, "Name appears multiple times in tree:" + labelList.get(0));
+							throw new IOExceptionWithLineNumber(lineno, "Name appears multiple times in tree: " + labelList.get(0));
 						}
 					}
 
@@ -119,7 +124,7 @@ public class NewickReader extends TreesReader {
 						}
 					} else {
 						if (!taxonNamesFound.equals(IteratorUtils.asSet(labelList))) {
-							partial = true;
+							treesBlock.setPartial(true);
 							for (var name : labelList) {
 								if (!taxonNamesFound.contains(name)) {
 									System.err.println("Additional taxon name: " + name);
@@ -139,8 +144,12 @@ public class NewickReader extends TreesReader {
 						}
 					}
 
-					trees.getTrees().add(tree);
-					tree.setName("tree-" + trees.size());
+					if (!treesBlock.isNetwork() && tree.edgeStream().anyMatch(tree::isSpecial)) {
+						treesBlock.setNetwork(true);
+					}
+
+					treesBlock.getTrees().add(tree);
+					tree.setName("tree-" + treesBlock.size());
 
 					progress.setProgress(it.getProgress());
 				} else
@@ -149,9 +158,7 @@ public class NewickReader extends TreesReader {
 			if (parts.size() > 0)
 				System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
 			taxa.addTaxaByNames(orderedTaxonNames);
-			trees.setPartial(partial);
 		}
-		trees.setRooted(true);
 	}
 
 	public boolean isOptionConvertMultiLabeledTree() {
@@ -165,6 +172,33 @@ public class NewickReader extends TreesReader {
 	public void setOptionConvertMultiLabeledTree(boolean optionConvertMultiLabeledTree) {
 		this.optionConvertMultiLabeledTree.set(optionConvertMultiLabeledTree);
 	}
+
+
+	/**
+	 * list node labels in pre-order
+	 *
+	 * @param ignoreInternalNumericalLabels if set, will ignore number labels on internal nodes
+	 * @return list
+	 */
+	public List<String> listNodeLabels(PhyloTree tree, boolean ignoreInternalNumericalLabels) {
+		final var list = new ArrayList<String>();
+		var queue = new LinkedList<Node>();
+		queue.add(tree.getRoot());
+		while (queue.size() > 0) {
+			var w = queue.pop();
+			var label = tree.getLabel(w);
+			if (w.isLeaf()) {
+				if (label != null && (w.isLeaf() || !(ignoreInternalNumericalLabels && NumberUtils.isDouble(label))))
+					list.add(label);
+			}
+			for (var e : w.outEdges()) {
+				if (PhyloTreeNetworkUtils.okToDescendDownThisEdge(tree, e))
+					queue.add(e.getTarget());
+			}
+		}
+		return list;
+	}
+
 
 	@Override
 	public boolean accepts(String file) {

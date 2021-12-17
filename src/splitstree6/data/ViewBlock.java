@@ -148,4 +148,8 @@ public class ViewBlock extends DataBlock {
 	public void setInitializationLines(String initializationLines) {
 		this.initializationLines.set(initializationLines);
 	}
+
+	public String getCitation() {
+		return getView() == null ? null : getView().getCitation();
+	}
 }

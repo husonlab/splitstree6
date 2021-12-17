@@ -20,13 +20,14 @@
 package splitstree6.view.trees.tanglegram;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
-import javafx.scene.layout.*;
+import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
+import jloda.fx.util.DraggableLabel;
 import jloda.phylo.PhyloTree;
-import splitstree6.view.trees.treepages.ComputeTreeEmbedding;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 import splitstree6.view.trees.treepages.TreePane;
 
 /**
@@ -57,18 +58,36 @@ public class TanglegramViewController {
 	private Button findButton;
 
 	@FXML
+	private Button expandVerticallyButton;
+
+	@FXML
+	private Button contractVerticallyButton;
+
+	@FXML
+	private Button expandHorizontallyButton;
+
+	@FXML
+	private Button contractHorizontallyButton;
+
+	@FXML
 	private ComboBox<PhyloTree> tree1CBox;
 
 	@FXML
-	private ComboBox<ComputeTreeEmbedding.Diagram> diagram1CBox;
+	private ComboBox<ComputeTreeLayout.Diagram> diagram1CBox;
 
 	@FXML
 	private ComboBox<PhyloTree> tree2CBox;
 	@FXML
-	private ComboBox<ComputeTreeEmbedding.Diagram> diagram2CBox;
+	private ComboBox<ComputeTreeLayout.Diagram> diagram2CBox;
 
 	@FXML
 	private ComboBox<TreePane.Orientation> orientationCBox;
+
+	@FXML
+	private Button previousButton;
+
+	@FXML
+	private Button nextButton;
 
 	@FXML
 	private ToggleButton showTreeNamesToggleButton;
@@ -86,7 +105,11 @@ public class TanglegramViewController {
 	private Pane middlePane;
 
 	@FXML
-	private GridPane gridPane;
+	private Label tree1Label;
+
+	@FXML
+	private Label tree2Label;
+
 
 	@FXML
 	private void initialize() {
@@ -100,14 +123,10 @@ public class TanglegramViewController {
 		borderPane.setCenter(center);
 		borderPane.setLeft(left);
 		borderPane.setRight(right);
-		borderPane.setBottom(bottom);
 		borderPane.setTop(top);
 
-		gridPane.setMinWidth(Pane.USE_PREF_SIZE);
-		gridPane.setMinHeight(Pane.USE_PREF_SIZE);
-		gridPane.setMaxWidth(Pane.USE_PREF_SIZE);
-		gridPane.setMaxHeight(Pane.USE_PREF_SIZE);
-
+		DraggableLabel.makeDraggable(tree1Label);
+		DraggableLabel.makeDraggable(tree2Label);
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -138,11 +157,27 @@ public class TanglegramViewController {
 		return findButton;
 	}
 
+	public Button getExpandVerticallyButton() {
+		return expandVerticallyButton;
+	}
+
+	public Button getContractVerticallyButton() {
+		return contractVerticallyButton;
+	}
+
+	public Button getExpandHorizontallyButton() {
+		return expandHorizontallyButton;
+	}
+
+	public Button getContractHorizontallyButton() {
+		return contractHorizontallyButton;
+	}
+
 	public ComboBox<PhyloTree> getTree1CBox() {
 		return tree1CBox;
 	}
 
-	public ComboBox<ComputeTreeEmbedding.Diagram> getDiagram1CBox() {
+	public ComboBox<ComputeTreeLayout.Diagram> getDiagram1CBox() {
 		return diagram1CBox;
 	}
 
@@ -150,12 +185,20 @@ public class TanglegramViewController {
 		return tree2CBox;
 	}
 
-	public ComboBox<ComputeTreeEmbedding.Diagram> getDiagram2CBox() {
+	public ComboBox<ComputeTreeLayout.Diagram> getDiagram2CBox() {
 		return diagram2CBox;
 	}
 
 	public ComboBox<TreePane.Orientation> getOrientationCBox() {
 		return orientationCBox;
+	}
+
+	public Button getPreviousButton() {
+		return previousButton;
+	}
+
+	public Button getNextButton() {
+		return nextButton;
 	}
 
 	public ToggleButton getShowTreeNamesToggleButton() {
@@ -174,11 +217,15 @@ public class TanglegramViewController {
 		return middlePane;
 	}
 
-	public GridPane getGridPane() {
-		return gridPane;
-	}
-
 	public BorderPane getBorderPane() {
 		return borderPane;
+	}
+
+	public Label getTree1Label() {
+		return tree1Label;
+	}
+
+	public Label getTree2Label() {
+		return tree2Label;
 	}
 }

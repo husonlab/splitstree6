@@ -205,5 +205,10 @@ public class DisplayTextView implements IView {
 	public void setWrapText(boolean wrapText) {
 		this.wrapText.set(wrapText);
 	}
+
+	@Override
+	public String getCitation() {
+		return null;
+	}
 }
 

@@ -19,6 +19,7 @@
 
 package splitstree6.view.inputeditor;
 
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.input.Clipboard;
@@ -110,6 +111,8 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 			if (n)
 				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
 		});
+
+		Platform.runLater(codeArea::requestFocus);
 	}
 
 	public void setupMenuItems() {

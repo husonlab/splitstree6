@@ -31,7 +31,6 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.util.TriConsumer;
 import jloda.graph.Edge;
-import jloda.graph.algorithms.Traversals;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
@@ -170,6 +169,8 @@ public class InteractionSetup {
 
 	public BiConsumer<Edge, Shape> createEdgeCallback() {
 		return (edge, shape) -> {
+			shape.setPickOnBounds(false);
+
 			var tree = (PhyloTree) edge.getOwner();
 
 			shape.setOnMouseClicked(e -> {
@@ -177,13 +178,13 @@ public class InteractionSetup {
 					if (!e.isShiftDown())
 						taxonSelectionModel.clearSelection();
 					if (!e.isAltDown()) {
-						Traversals.preOrderTreeTraversal(edge.getTarget(), v -> {
+						tree.preorderTraversal(edge.getTarget(), v -> {
 							for (var t : tree.getTaxa(v)) {
 								taxonSelectionModel.select(taxaBlock.get(t));
 							}
 						});
 					} else {
-						Traversals.preOrderTreeTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> {
+						tree.preorderTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> {
 							for (var t : tree.getTaxa(v)) {
 								taxonSelectionModel.select(taxaBlock.get(t));
 							}

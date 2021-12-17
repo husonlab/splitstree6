@@ -83,8 +83,8 @@ public class NeighborNetCycle {
 		try {
 			return compute(new ProgressSilent(), nTax, dist);
 		} catch (CanceledException ignored) {
-			return null; // can't happen
 		}
+		return new int[0]; // can't happen
 	}
 
 	/**

@@ -23,7 +23,6 @@ package splitstree6.algorithms.trees.trees2trees;
 import javafx.beans.property.*;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
-import jloda.phylo.PhyloTreeUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
@@ -67,8 +66,8 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 			child.getTrees().addAll(parent.getTrees());
 			child.setPartial(parent.isPartial());
 		} else {
-			boolean isPartial = false;
-			for (int t = 1; t <= parent.getNTrees(); t++) {
+			var isPartial = false;
+			for (var t = 1; t <= parent.getNTrees(); t++) {
 				PhyloTree tree = parent.getTree(t);
 
 				if (isOptionRequireAllTaxa() && tree.getNumberOfTaxa() < taxaBlock.getNtax())
@@ -76,11 +75,11 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 				if (tree.getNumberOfTaxa() < getOptionMinNumberOfTaxa())
 					continue;
 				if (getOptionMinTotalTreeLength() > 0) {
-					final double treeLength = PhyloTreeUtils.computeTotalWeight(tree);
+					final var treeLength = tree.computeTotalWeight();
 					if (treeLength < getOptionMinTotalTreeLength())
 						continue;
 				}
-				boolean isCopy = false;
+				var isCopy = false;
 				if (getOptionMinEdgeLength() > 0) {
 					tree = new PhyloTree(tree);
 					if (tree.contractShortEdges(getOptionMinEdgeLength()))

@@ -20,12 +20,13 @@
 package splitstree6.workflow;
 
 import jloda.util.Basic;
+import splitstree6.methods.IHasCitations;
 
 /**
  * splitstree data block
  * Daniel Huson, 10.2021
  */
-public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
+public abstract class DataBlock extends jloda.fx.workflow.DataBlock implements IHasCitations {
 
 	private DataNode node;
 
@@ -71,5 +72,9 @@ public abstract class DataBlock extends jloda.fx.workflow.DataBlock {
 
 	public void setNode(DataNode node) {
 		this.node = node;
+	}
+
+	public String getCitation() {
+		return null;
 	}
 }

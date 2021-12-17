@@ -41,16 +41,10 @@ public class NetworkTabPresenter implements IDisplayTabPresenter {
 
 		controller.getPasteMenuItem().setOnAction(null);
 
-		controller.getUndoMenuItem().setOnAction(e -> tab.getUndoManager().undo());
-		controller.getUndoMenuItem().disableProperty().bind(tab.getUndoManager().undoableProperty().not());
-		controller.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
-		controller.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
-
 		controller.getFindMenuItem().setOnAction(null);
 		controller.getFindAgainMenuItem().setOnAction(null);
 
 		controller.getReplaceMenuItem().setOnAction(null);
-
 
 		controller.getSelectAllMenuItem().setOnAction(null);
 		controller.getSelectNoneMenuItem().setOnAction(null);

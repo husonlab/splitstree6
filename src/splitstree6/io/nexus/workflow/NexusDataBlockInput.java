@@ -98,24 +98,24 @@ public class NexusDataBlockInput {
 			} else if (np.peekMatchBeginBlock(TreesBlock.BLOCK_NAME)) {
 				final var input = new TreesNexusInput();
 				final var dataBlock = new TreesBlock();
-				dataBlock.updateShortDescription();
 				input.parse(np, taxa, dataBlock);
+				dataBlock.updateShortDescription();
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
 			} else if (np.peekMatchBeginBlock(NetworkBlock.BLOCK_NAME)) {
 				final var input = new NetworkNexusInput();
 				final var dataBlock = new NetworkBlock();
-				dataBlock.updateShortDescription();
 				input.parse(np, taxa, dataBlock);
+				dataBlock.updateShortDescription();
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
 			} else if (np.peekMatchBeginBlock(ViewBlock.BLOCK_NAME)) {
 				final var input = new ViewNexusInput();
 				final var dataBlock = new ViewBlock();
-				dataBlock.updateShortDescription();
 				input.parse(np, taxa, dataBlock);
+				dataBlock.updateShortDescription();
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;

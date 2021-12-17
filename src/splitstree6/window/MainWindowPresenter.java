@@ -27,11 +27,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import jloda.fx.util.BasicFX;
@@ -46,7 +48,7 @@ import jloda.util.ProgramProperties;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
 import splitstree6.algorithms.trees.trees2trees.ConsensusTree;
-import splitstree6.algorithms.trees.trees2trees.RerootTrees;
+import splitstree6.algorithms.trees.trees2trees.RerootOrLadderizeTrees;
 import splitstree6.algorithms.trees.trees2trees.TreeSelector;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.dialog.SaveBeforeClosingDialog;
@@ -62,15 +64,18 @@ import java.util.Stack;
 
 public class MainWindowPresenter {
 	private final MainWindow mainWindow;
+	private final MainWindowController controller;
 	private final ObjectProperty<IDisplayTab> focusedDisplayTab = new SimpleObjectProperty<>();
 
 	private final ObservableMap<WorkflowNode, Tab> workFlowTabs = FXCollections.observableHashMap();
 
 	private final SplitPanePresenter splitPanePresenter;
 
+	private final EventHandler<KeyEvent> keyEventEventHandler;
+
 	public MainWindowPresenter(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
-		var controller = mainWindow.getController();
+		controller = mainWindow.getController();
 
 		var workflowTreeView = mainWindow.getWorkflowTreeView();
 
@@ -80,10 +85,26 @@ public class MainWindowPresenter {
 		AnchorPane.setTopAnchor(workflowTreeView, 0.0);
 		AnchorPane.setBottomAnchor(workflowTreeView, 0.0);
 
+		keyEventEventHandler = e -> {
+			var ch = e.getCharacter();
+			if ((ch.equals("+") || ch.equals("=") && e.isShiftDown()) && e.isShortcutDown()
+				&& controller.getIncreaseFontSizeMenuItem().getOnAction() != null && !controller.getIncreaseFontSizeMenuItem().isDisable()) {
+				controller.getIncreaseFontSizeMenuItem().getOnAction().handle(null);
+				e.consume();
+			} else if (ch.equals("-") && !e.isShiftDown() && e.isShortcutDown() && controller.getDecreaseFontSizeMenuItem().getOnAction() != null && !controller.getDecreaseFontSizeMenuItem().isDisable()) {
+				controller.getDecreaseFontSizeMenuItem().getOnAction().handle(null);
+				e.consume();
+			}
+		};
+
 		mainWindow.getStage().getScene().focusOwnerProperty().addListener((v, o, n) -> {
 			try {
+				if (o != null)
+					o.removeEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
 				var displayTab = getContainingDisplayTab(n);
 				if (displayTab != null) {
+					n.addEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
+
 					focusedDisplayTab.set(displayTab);
 					disableAllMenuItems(controller);
 					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
@@ -99,13 +120,14 @@ public class MainWindowPresenter {
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
 				disableAllMenuItems(controller);
-				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 				if (n instanceof IDisplayTab displayTab) {
-					if (displayTab.getPresenter() != null)
-						displayTab.getPresenter().setupMenuItems();
 					focusedDisplayTab.set(displayTab);
 				} else
 					focusedDisplayTab.set(null);
+				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
+				if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null) {
+					focusedDisplayTab.get().getPresenter().setupMenuItems();
+				}
 				enableAllMenuItemsWithDefinedAction(controller);
 			} catch (Exception ex) {
 				Basic.caught(ex);
@@ -142,11 +164,11 @@ public class MainWindowPresenter {
 			}
 		});
 
-		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
-
 		RecentFilesManager.getInstance().setFileOpener(fileName -> {
 			FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex));
 		});
+
+		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 	}
@@ -238,6 +260,8 @@ public class MainWindowPresenter {
 					mainWindow.getWorkflow().cancel();
 			}
 		});
+
+		updateUndoRedo();
 
 		controller.getCutMenuItem().setDisable(false);
 		controller.getCopyMenuItem().setDisable(false);
@@ -341,7 +365,7 @@ public class MainWindowPresenter {
 		controller.getSelectTreeMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1)));
 		controller.getConsensusTreeMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTreeSplits.Consensus.Majority)));
 
-		controller.getRerootTreesMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new RerootTrees(), null));
+		controller.getRerootTreesMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new RerootOrLadderizeTrees(), null));
 
 		controller.getViewSingleTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.SingleTree))));
@@ -457,5 +481,24 @@ public class MainWindowPresenter {
 
 	public SplitPanePresenter getSplitPanePresenter() {
 		return splitPanePresenter;
+	}
+
+	public void updateUndoRedo() {
+		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getUndoManager() != null) {
+			var undoManager = focusedDisplayTab.get().getUndoManager();
+			controller.getUndoMenuItem().textProperty().bind(undoManager.undoNameProperty());
+			controller.getUndoMenuItem().setOnAction(e -> undoManager.undo());
+			controller.getUndoMenuItem().disableProperty().bind(undoManager.undoableProperty().not());
+			controller.getRedoMenuItem().textProperty().bind(undoManager.redoNameProperty());
+			controller.getRedoMenuItem().setOnAction(e -> undoManager.redo());
+			controller.getRedoMenuItem().disableProperty().bind(undoManager.redoableProperty().not());
+		} else {
+			controller.getUndoMenuItem().textProperty().unbind();
+			controller.getUndoMenuItem().setText("Undo");
+			controller.getUndoMenuItem().setDisable(true);
+			controller.getRedoMenuItem().textProperty().unbind();
+			controller.getRedoMenuItem().setText("Redo");
+			controller.getRedoMenuItem().setDisable(true);
+		}
 	}
 }

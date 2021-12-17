@@ -37,7 +37,6 @@ public class TextDisplayTab extends Tab implements IDisplayTab {
 	private final TextDisplayController controller;
 	private final TextDisplayTabPresenter presenter;
 
-	private final UndoManager undoManager = new UndoManager();
 	private final MainWindow mainWindow;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
@@ -141,7 +140,7 @@ public class TextDisplayTab extends Tab implements IDisplayTab {
 
 	@Override
 	public UndoManager getUndoManager() {
-		return undoManager;
+		return null;
 	}
 
 	@Override

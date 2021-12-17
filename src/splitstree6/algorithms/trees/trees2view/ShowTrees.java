@@ -71,6 +71,7 @@ public class ShowTrees extends Trees2View {
 				}
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TreePagesView view) {
+						view.getUndoManager().clear();
 						view.getTrees().setAll(inputData.getTrees());
 					}
 				});
@@ -85,6 +86,7 @@ public class ShowTrees extends Trees2View {
 				}
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TanglegramView view) {
+						view.getUndoManager().clear();
 						view.getTrees().setAll(inputData.getTrees());
 					}
 				});
@@ -100,6 +102,7 @@ public class ShowTrees extends Trees2View {
 				}
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof DisplayTextView view) {
+						view.getUndoManager().clear();
 						try (var w = new StringWriter()) {
 							(new TreesNexusOutput()).write(w, taxaBlock, inputData);
 							view.replaceText(w.toString());
@@ -110,7 +113,6 @@ public class ShowTrees extends Trees2View {
 				});
 			}
 		}
-
 		viewBlock.updateShortDescription();
 	}
 

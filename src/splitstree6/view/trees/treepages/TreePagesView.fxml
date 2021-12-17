@@ -126,6 +126,11 @@
                                         <Tooltip text="Set rows x columns"/>
                                     </tooltip>
                                 </ComboBox>
+                                <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <ComboBox fx:id="treeCBox" prefWidth="100.0"/>
+                                <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
                                 <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="GRAPHIC_ONLY"
                                               maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                                               minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"

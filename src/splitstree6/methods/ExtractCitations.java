@@ -21,7 +21,6 @@ package splitstree6.methods;
 
 import jloda.util.Pair;
 import jloda.util.StringUtils;
-import splitstree6.workflow.Algorithm;
 
 import java.util.Collection;
 import java.util.List;
@@ -30,19 +29,18 @@ import java.util.TreeSet;
 
 public class ExtractCitations {
 	/**
-	 * get all the key - paper pairs for an algorithm
+	 * get all the key - paper pairs for an object with citations
 	 *
-	 * @param algorithm
 	 * @return pairs
 	 */
-	public static Collection<Pair<String, String>> apply(Algorithm algorithm) {
-		if (algorithm.getCitation() == null || algorithm.getCitation().length() < 2)
+	public static Collection<Pair<String, String>> apply(IHasCitations citationsCarrier) {
+		if (citationsCarrier.getCitation() == null || citationsCarrier.getCitation().length() < 2)
 			return null;
 		else {
 			Set<Pair<String, String>> set = new TreeSet<>();
-			var tokens = StringUtils.split(algorithm.getCitation(), ';');
+			var tokens = StringUtils.split(citationsCarrier.getCitation(), ';');
 			if (tokens.length % 2 == 1)
-				System.err.println("Internal error: Citation string has odd number of tokens: " + algorithm.getCitation());
+				System.err.println("Internal error: Citation string has odd number of tokens: " + citationsCarrier.getCitation());
 			for (int i = 0; i < tokens.length - 1; i += 2) {
 				set.add(new Pair<>(tokens[i], tokens[i + 1]));
 			}

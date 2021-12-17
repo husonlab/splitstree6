@@ -94,13 +94,6 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomInMenuItem().setOnAction(null);
 		controller.getZoomOutMenuItem().setOnAction(null);
 
-		controller.getUndoMenuItem().setOnAction(e -> workflowTreeView.getUndoManager().undo());
-		controller.getUndoMenuItem().disableProperty().bind(workflowTreeView.getUndoManager().undoableProperty().not());
-
-		controller.getRedoMenuItem().setOnAction(e -> workflowTreeView.getUndoManager().redo());
-		controller.getRedoMenuItem().disableProperty().bind(workflowTreeView.getUndoManager().redoableProperty().not());
-
-
 		var treeView = tabController.getWorkflowTreeView();
 		treeView.getStyleClass().add("background");
 

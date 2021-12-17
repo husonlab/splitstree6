@@ -283,13 +283,13 @@
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
+                                                <KeyCodeCombination alt="UP" code="PLUS" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
+                                                <KeyCodeCombination alt="UP" code="MINUS" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
@@ -303,6 +303,19 @@
                                         <MenuItem fx:id="zoomOutMenuItem" text="Zoom Out">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP"
+                                                                    shift="UP" shortcut="DOWN"/>
+                                            </accelerator>
+                                        </MenuItem>
+                                        <SeparatorMenuItem mnemonicParsing="false"/>
+                                        <MenuItem fx:id="zoomInHorizontalMenuItem" text="Zoom In Horizontal">
+                                            <accelerator>
+                                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
+                                                                    shift="UP" shortcut="DOWN"/>
+                                            </accelerator>
+                                        </MenuItem>
+                                        <MenuItem fx:id="zoomOutHorizontalMenuItem" text="Zoom Out Horizontal">
+                                            <accelerator>
+                                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
@@ -385,7 +398,7 @@
                                         <MenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
                                         <MenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="rerootTreesMenuItem" text="Reroot Trees"/>
+                                        <MenuItem fx:id="rerootTreesMenuItem" text="Reroot Or Ladderize Trees"/>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
                                         <MenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>
@@ -502,8 +515,7 @@
                                                                          BorderPane.alignment="CENTER"/>
                                                             </top>
                                                             <center>
-                                                                <TabPane fx:id="algorithmsTabPane"
-                                                                         tabClosingPolicy="UNAVAILABLE"
+                                                                <TabPane tabClosingPolicy="UNAVAILABLE"
                                                                          BorderPane.alignment="CENTER"/>
                                                             </center>
                                                         </BorderPane>

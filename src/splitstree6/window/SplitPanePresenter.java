@@ -84,6 +84,11 @@ public class SplitPanePresenter {
 
 		openCloseLeft(false);
 		Platform.runLater(() -> leftSplitPane.setDividerPositions(1.0));
+
+		leftSplitPane.getDividers().get(0).positionProperty().addListener((v, o, n) -> {
+			if (n.doubleValue() == 0.0)
+				leftSplitPane.getDividers().get(0).setPosition(1.0);
+		});
 	}
 
 	public void openCloseLeft(boolean animate) {

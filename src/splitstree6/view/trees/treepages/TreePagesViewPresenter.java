@@ -32,12 +32,13 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.control.SelectionMode;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
-import jloda.fx.util.Print;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.Pair;
+import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Function;
@@ -49,10 +50,13 @@ import java.util.function.Function;
 public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	private final static ObservableList<String> gridValues = FXCollections.observableArrayList("1 x 1");
 
+
 	private final MainWindow mainWindow;
 	private final TreePagesView treePageView;
 
 	private final TreePagesViewController controller;
+
+	private final ObjectProperty<RowsCols> rowsAndCols = new SimpleObjectProperty<>(new RowsCols(0, 0));
 
 	private final ObjectProperty<Dimension2D> boxDimensions = new SimpleObjectProperty<>(new Dimension2D(0, 0));
 
@@ -67,9 +71,9 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		controller = treePagesView.getController();
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell());
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback());
-		controller.getDiagramCBox().getItems().addAll(ComputeTreeEmbedding.Diagram.values());
+		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(false));
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(false));
+		controller.getDiagramCBox().getItems().addAll(ComputeTreeLayout.Diagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
 
 		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createOrientationComboBoxListCell());
@@ -81,33 +85,57 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowTreeNamesProperty());
 
-		{
-			controller.getRowsColsCBox().getItems().setAll(gridValues);
-			var text = String.format("%d x %d", treePagesView.getOptionRows(), treePagesView.getOptionCols());
-			if (gridValues.contains(text))
-				gridValues.set(0, text);
-			controller.getRowsColsCBox().setValue(text);
-		}
-
+		controller.getRowsColsCBox().getItems().setAll(gridValues);
 		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
 
 		treePagesView.optionRowsProperty().addListener((v, o, n) -> {
-			var text = String.format("%d x %d", treePagesView.getOptionRows(), treePagesView.getOptionCols());
-			if (!gridValues.contains(text))
-				gridValues.set(0, text);
-			controller.getRowsColsCBox().setValue(text);
+			if (rowsAndCols.get().rows() != n.intValue())
+				rowsAndCols.set(new RowsCols(n.intValue(), rowsAndCols.get().cols()));
+		});
+		treePagesView.optionColsProperty().addListener((v, o, n) -> {
+			if (rowsAndCols.get().cols() != n.intValue())
+				rowsAndCols.set(new RowsCols(rowsAndCols.get().rows(), n.intValue()));
+		});
+
+		rowsAndCols.addListener((v, o, n) -> {
+			if (n != null) {
+				treePagesView.setOptionRows(n.rows());
+				treePagesView.setOptionCols(n.cols());
+				treePagesView.setOptionZoomFactor(1);
+				treePagesView.setOptionFontScaleFactor(1);
+				controller.getRowsColsCBox().setValue(n.toString());
+			}
 		});
 
 		controller.getRowsColsCBox().valueProperty().addListener((v, o, n) -> {
+			var rowsCols = RowsCols.valueOf(n);
+			if (rowsCols != null)
+				rowsAndCols.set(rowsCols);
+		});
+
+		rowsAndCols.set(new RowsCols(treePagesView.getOptionRows(), treePagesView.getOptionCols()));
+
+		controller.getTreeCBox().valueProperty().addListener((v, o, n) -> {
 			if (n != null) {
-				var pair = parseRowsColsText(n);
-				if (pair != null) {
-					treePagesView.setOptionRows(pair.getFirst());
-					treePagesView.setOptionCols(pair.getSecond());
-					Platform.runLater(() -> controller.getRowsColsCBox().setValue(String.format("%d x %d", treePageView.getOptionRows(), treePagesView.getOptionCols())));
-				}
+				var index = phyloTrees.indexOf(n);
+				var page = index / (treePagesView.getOptionRows() * treePagesView.getOptionCols()) + 1;
+				treePagesView.setPageNumber(page);
 			}
 		});
+		controller.getTreeCBox().setItems(phyloTrees);
+
+		InvalidationListener updateTreeInvalidationListener = e -> {
+			var t = (treePagesView.getPageNumber() - 1) * (treePagesView.getOptionRows() * treePagesView.getOptionCols());
+			if (t >= 0 && t < phyloTrees.size())
+				controller.getTreeCBox().setValue(phyloTrees.get(t));
+			else
+				controller.getTreeCBox().setValue(null);
+		};
+
+		treePagesView.pageNumberProperty().addListener(updateTreeInvalidationListener);
+		treePagesView.optionRowsProperty().addListener(updateTreeInvalidationListener);
+		treePagesView.optionColsProperty().addListener(updateTreeInvalidationListener);
+		treePagesView.getTrees().addListener(updateTreeInvalidationListener);
 
 		targetBounds.addListener((v, o, n) -> {
 			var width = n.getWidth();
@@ -117,11 +145,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			boxDimensions.set(new Dimension2D(width / treePagesView.getOptionCols() - 5, height / treePagesView.getOptionRows() - 5));
 		});
 
-		treePagesView.optionRowsProperty().addListener((v, o, n) ->
-				boxDimensions.set(new Dimension2D(boxDimensions.get().getWidth(), boxDimensions.get().getHeight() * o.intValue() / n.intValue())));
-
-		treePagesView.optionColsProperty().addListener((v, o, n) ->
-				boxDimensions.set(new Dimension2D(boxDimensions.get().getWidth() * o.intValue() / n.intValue(), boxDimensions.get().getHeight())));
+		rowsAndCols.addListener((v, o, n) -> boxDimensions.set(new Dimension2D(boxDimensions.get().getWidth() * o.cols() / n.cols(), boxDimensions.get().getHeight() * o.rows() / n.rows())));
 
 		var numberOfPages = new SimpleIntegerProperty(0);
 
@@ -136,8 +160,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		{
 			InvalidationListener invalidationListener = e -> numberOfPages.set(1 + (phyloTrees.size() - 1) / (treePagesView.getOptionRows() * treePagesView.getOptionCols()));
-			treePagesView.optionRowsProperty().addListener(invalidationListener);
-			treePagesView.optionColsProperty().addListener(invalidationListener);
+			rowsAndCols.addListener(invalidationListener);
 			phyloTrees.addListener(invalidationListener);
 			invalidationListener.invalidated(null);
 		}
@@ -153,8 +176,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
 		controller.getSaveButton().disableProperty().bind(mainWindow.getController().getSaveAsMenuItem().disableProperty());
 
-		controller.getPrintButton().setOnAction(e -> Print.print(mainWindow.getStage(), treePagesView.imageNodeProperty().get()));
-		controller.getPrintButton().disableProperty().bind(treePagesView.emptyProperty());
+		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
+		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
 
 		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
@@ -169,6 +192,18 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			else
 				findToolBar.setShowFindToolBar(true);
 		});
+
+
+		var undoManager = treePagesView.getUndoManager();
+		rowsAndCols.addListener((v, o, n) -> undoManager.add("Set Grid", rowsAndCols, o, n));
+		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("Change Page", treePagesView.pageNumberProperty(), o, n));
+		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" Set Diagram", treePagesView.optionDiagramProperty(), o, n));
+		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set Orientation", treePagesView.optionOrientationProperty(), o, n));
+		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree Names", treePagesView.optionShowTreeNamesProperty(), o, n));
+		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set Orientation", treePagesView.optionOrientationProperty(), o, n));
+		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Font Size", treePagesView.optionFontScaleFactorProperty(), o, n));
+		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Zoom", treePagesView.optionZoomFactorProperty(), o, n));
+		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree names", treePagesView.optionShowTreeNamesProperty(), o, n));
 
 		Platform.runLater(this::setupMenuItems);
 	}
@@ -189,7 +224,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
 
 		mainWindow.getController().getZoomInMenuItem().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
-		mainWindow.getController().getZoomInMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(1.0 / 1.1)));
+		mainWindow.getController().getZoomInMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
 		mainWindow.getController().getZoomOutMenuItem().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
 		mainWindow.getController().getZoomOutMenuItem().disableProperty().bind(treePageView.emptyProperty());
 
@@ -197,11 +232,23 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainWindow.getController().getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
-		mainWindow.getController().getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
-		mainWindow.getController().getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
-
 		mainWindow.getController().getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
 		mainWindow.getController().getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
 		mainWindow.getController().getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+	}
+
+	private static record RowsCols(int rows, int cols) {
+		public static RowsCols valueOf(String str) {
+			if (str != null) {
+				var tokens = StringUtils.split(str, 'x');
+				if (tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]))
+					return new RowsCols(NumberUtils.parseInt(tokens[0]), NumberUtils.parseInt(tokens[1]));
+			}
+			return null;
+		}
+
+		public String toString() {
+			return rows + " x " + cols;
+		}
 	}
 }

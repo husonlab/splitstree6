@@ -33,6 +33,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
@@ -55,9 +56,7 @@ public class TreePagesView implements IView {
 	private final IntegerProperty optionRows = new SimpleIntegerProperty(this, "optionRows", ProgramProperties.get("TreePagesRows", 1));
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
-	private final ObjectProperty<Node> imageNode = new SimpleObjectProperty<>(null);
-
-	private final ObjectProperty<ComputeTreeEmbedding.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeEmbedding.Diagram.getDefault());
+	private final ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeLayout.Diagram.getDefault());
 	private final ObjectProperty<TreePane.Orientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", TreePane.Orientation.getDefault());
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
@@ -89,7 +88,7 @@ public class TreePagesView implements IView {
 
 		empty.bind(Bindings.isEmpty(getTrees()));
 
-		optionDiagram.addListener((v, o, n) -> ComputeTreeEmbedding.Diagram.setDefault(n));
+		optionDiagram.addListener((v, o, n) -> ComputeTreeLayout.Diagram.setDefault(n));
 		optionOrientation.addListener((v, o, n) -> TreePane.Orientation.setDefault(n));
 		optionRows.addListener((v, o, n) -> ProgramProperties.put("TreePagesRows", n.intValue()));
 		optionCols.addListener((v, o, n) -> ProgramProperties.put("TreePagesCols", n.intValue()));
@@ -148,15 +147,15 @@ public class TreePagesView implements IView {
 		this.pageNumber.set(pageNumber);
 	}
 
-	public ComputeTreeEmbedding.Diagram getOptionDiagram() {
+	public ComputeTreeLayout.Diagram getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<ComputeTreeEmbedding.Diagram> optionDiagramProperty() {
+	public ObjectProperty<ComputeTreeLayout.Diagram> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(ComputeTreeEmbedding.Diagram optionDiagram) {
+	public void setOptionDiagram(ComputeTreeLayout.Diagram optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 
@@ -170,14 +169,6 @@ public class TreePagesView implements IView {
 
 	public void setOptionOrientation(TreePane.Orientation optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
-	}
-
-	public ObjectProperty<Node> imageNodeProperty() {
-		return imageNode;
-	}
-
-	public void setImageNode(Node imageNode) {
-		this.imageNode.set(imageNode);
 	}
 
 	public Pane getRoot() {
@@ -263,5 +254,10 @@ public class TreePagesView implements IView {
 	@Override
 	public Node getImageNode() {
 		return controller.getPagination();
+	}
+
+	@Override
+	public String getCitation() {
+		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
 	}
 }

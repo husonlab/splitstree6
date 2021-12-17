@@ -24,6 +24,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import jloda.phylo.PhyloTree;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 
 public class TreePagesViewController {
 
@@ -49,7 +51,7 @@ public class TreePagesViewController {
 	private Button findButton;
 
 	@FXML
-	private ComboBox<ComputeTreeEmbedding.Diagram> diagramCBox;
+	private ComboBox<ComputeTreeLayout.Diagram> diagramCBox;
 
 	@FXML
 	private ComboBox<TreePane.Orientation> orientationCBox;
@@ -66,6 +68,8 @@ public class TreePagesViewController {
 	@FXML
 	private ToggleButton showTreeNamesToggleButton;
 
+	@FXML
+	private ComboBox<PhyloTree> treeCBox;
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -95,7 +99,7 @@ public class TreePagesViewController {
 		return findButton;
 	}
 
-	public ComboBox<ComputeTreeEmbedding.Diagram> getDiagramCBox() {
+	public ComboBox<ComputeTreeLayout.Diagram> getDiagramCBox() {
 		return diagramCBox;
 	}
 
@@ -117,5 +121,9 @@ public class TreePagesViewController {
 
 	public ToggleButton getShowTreeNamesToggleButton() {
 		return showTreeNamesToggleButton;
+	}
+
+	public ComboBox<PhyloTree> getTreeCBox() {
+		return treeCBox;
 	}
 }

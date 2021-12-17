@@ -23,16 +23,16 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.concurrent.Worker;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Dimension2D;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.Group;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.trees.treepages.ComputeTreeEmbedding;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 import splitstree6.view.trees.treepages.RunAfterAWhile;
 import splitstree6.view.trees.treepages.TreePane;
 
@@ -40,36 +40,26 @@ import splitstree6.view.trees.treepages.TreePane;
  * a tanglegram tree pane
  * Daniel Huson, 12.2021
  */
-public class TanglegramTreePane extends StackPane {
+public class TanglegramTreePane extends Group {
 	private final InvalidationListener updater;
 	private Runnable runAfterUpdate;
 
 	public TanglegramTreePane(TanglegramView tanglegramView, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<int[]> taxonOrdering, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<ComputeTreeEmbedding.Diagram> optionDiagram, ObjectProperty<TreePane.Orientation> optionOrientation) {
-		setMinSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
-		setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
-
-		dimensions.addListener((v, o, n) -> setPrefSize(n.getWidth(), n.getHeight()));
+							  ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram, ObjectProperty<TreePane.Orientation> optionOrientation) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonOrdering.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), optionOrientation.get(), tanglegramView.optionZoomFactorProperty(), tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowTreeNamesProperty());
+								optionDiagram.get(), optionOrientation.get(), new SimpleDoubleProperty(1.0), tanglegramView.optionFontScaleFactorProperty(), new SimpleBooleanProperty(false));
+						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
 						getChildren().add(treePane);
-
-						if (getRunAfterUpdate() != null) {
-							treePane.getService().stateProperty().addListener((v, o, n) -> {
-								if (n == Worker.State.SUCCEEDED) {
-									Platform.runLater(() -> getRunAfterUpdate().run());
-								}
-							});
-						}
 					}
-				}));
+				})
+		);
 
 		tree.addListener(new WeakInvalidationListener(updater));
 		optionDiagram.addListener(new WeakInvalidationListener(updater));
@@ -77,8 +67,6 @@ public class TanglegramTreePane extends StackPane {
 		dimensions.addListener(new WeakInvalidationListener(updater));
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updater));
 		taxonOrdering.addListener(new WeakInvalidationListener(updater));
-
-		//setStyle("-fx-border-color: yellow");
 	}
 
 	public Runnable getRunAfterUpdate() {

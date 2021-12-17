@@ -161,16 +161,12 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 				item.setActive(true);
 			}
 		});
-		controller.getActivateAllMenuItem().disableProperty().bind(Bindings.createObjectBinding(
-				() -> taxaEditor.getNumberDisabledTaxa() == 0, taxaEditor.optionDisabledTaxaProperty()));
 
 		controller.getActivateNoneMenuItem().setOnAction(e -> {
 			for (var item : tableView.getItems()) {
 				item.setActive(false);
 			}
 		});
-		controller.getActivateNoneMenuItem().disableProperty().bind(Bindings.createObjectBinding(
-				() -> taxaEditor.getNumberDisabledTaxa() == inputTaxonBlock.getNtax(), taxaEditor.optionDisabledTaxaProperty()));
 
 		controller.getActivateSelectedMenuItem().setOnAction(e -> {
 			for (var item : tableView.getSelectionModel().getSelectedItems()) {
@@ -239,8 +235,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 			for (var menuItem : contextMenu.getItems()) {
 				if (menuItem instanceof SeparatorMenuItem) {
 					newContextMenu.getItems().add(new SeparatorMenuItem());
-				}
-				if (menuItem instanceof RadioMenuItem radioMenuItem) {
+				} else if (menuItem instanceof RadioMenuItem radioMenuItem) {
 					var newMenuItem = new RadioMenuItem(menuItem.getText());
 					newMenuItem.selectedProperty().bindBidirectional(radioMenuItem.selectedProperty());
 					newMenuItem.disableProperty().bind(menuItem.disableProperty());

@@ -22,7 +22,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.tabs.textdisplay.TextDisplayController">
     <children>
@@ -33,6 +33,62 @@
                     <children>
                         <ToolBar fx:id="toolBar" prefHeight="32.0">
                             <items>
+                                <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Open">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Open16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Open a file"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Save">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Save16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Save file"/>
+                                    </tooltip>
+                                </Button>
+                                <Button fx:id="printButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                        mnemonicParsing="false" prefHeight="20.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Print">
+                                    <font>
+                                        <Font size="10.0"/>
+                                    </font>
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Print16.gif"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Print the selected tab"/>
+                                    </tooltip>
+                                </Button>
+                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
                                 <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" layoutX="98.0" layoutY="11.0"
                                         maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
                                         mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0" text="Find"
