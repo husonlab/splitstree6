@@ -43,19 +43,18 @@ import jloda.graph.NodeArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
-import jloda.util.Pair;
 
 /**
  * computes the rectangular layout for a rooted tree or network
  * Daniel Huson, 12.2021
  */
 public class LayoutTreeRectangular {
-	public static NodeArray<Point2D> apply(PhyloTree tree, int[] taxon2pos, boolean toScale, ComputeTreeLayout.ParentPlacement parentPlacement) {
+	public static NodeArray<Point2D> apply(PhyloTree tree, int[] taxon2pos, boolean toScale) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		// compute x-coordinates:
 		if (toScale) {
-			var delta = tree.isRootedNetwork() ? 0.1 * computeAverageEdgeWeight(tree) : 0.0;
+			var delta = tree.isReticulated() ? 0.25 * computeAverageEdgeWeight(tree) : 0.0;
 			LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
 				double x;
 				if (v.getInDegree() == 0) {
@@ -69,54 +68,38 @@ public class LayoutTreeRectangular {
 
 			});
 		} else { // not to scale:
-			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (v.isLeaf()) { // leaf, not lsaLeaf
-					nodePointMap.put(v, new Point2D(0.0, 0.0));
-				} else {
-					// use children here, not LSA children
-					var min = IteratorUtils.asStream(tree.lsaChildren(v)).mapToDouble(w -> nodePointMap.get(w).getX()).min().orElse(0);
-					nodePointMap.put(v, new Point2D(min - 1, 0.0));
-				}
-			});
+			try (var visited = tree.newNodeSet()) {
+				tree.postorderTraversal(tree.getRoot(), v -> !visited.contains(v), v -> {
+					visited.add(v);
+					if (v.isLeaf()) { // leaf, not lsaLeaf
+						nodePointMap.put(v, new Point2D(0.0, 0.0));
+					} else {
+						// use children here, not LSA children
+						var min = v.childrenStream().mapToDouble(w -> nodePointMap.get(w).getX()).min().orElse(0);
+						nodePointMap.put(v, new Point2D(min - 1, 0.0));
+					}
+				});
+			}
 		}
 
 		// compute y-coordinates:
-		if (parentPlacement == ComputeTreeLayout.ParentPlacement.LeafAverage) {
-			final NodeArray<Pair<Integer, Integer>> nodeFirstLastLeafYMap = tree.newNodeArray();
-			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (v.isLeaf()) {
-					var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), pos));
-					nodeFirstLastLeafYMap.put(v, new Pair<>(pos, pos));
-				}
-				if (tree.isLsaLeaf(v)) { // todo: need to debug this
-					var min = nodeFirstLastLeafYMap.get(v.getFirstOutEdge().getTarget()).getFirst();
-					var max = nodeFirstLastLeafYMap.get(v.getLastOutEdge().getTarget()).getSecond();
-					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), (0.5 * (min + max))));
-					nodeFirstLastLeafYMap.put(v, new Pair<>(min, max));
-				} else {
-					var min = nodeFirstLastLeafYMap.get(tree.getFirstChildLSA(v)).getFirst();
-					var max = nodeFirstLastLeafYMap.get(tree.getLastChildLSA(v)).getSecond();
-					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), (0.5 * (min + max))));
-					nodeFirstLastLeafYMap.put(v, new Pair<>(min, max));
-				}
-			});
-		} else { // child average
-			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (v.isLeaf()) {
-					var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), pos));
-				} else if (tree.isLsaLeaf(v)) { // todo: need to debug this
-					var min = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
-					var max = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();
-					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), (0.5 * (min + max))));
-				} else {
-					var min = nodePointMap.get(tree.getFirstChildLSA(v)).getY();
-					var max = nodePointMap.get(tree.getLastChildLSA(v)).getY();
-					nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), (0.5 * (min + max))));
-				}
-			});
-		}
+		var lsaLeafHeightMap = splitstree6.view.trees.layout.LSAUtils.computeHeightForLSALeaves(tree, taxon2pos);
+		LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+			if (v.isLeaf()) {
+				var y = taxon2pos[tree.getTaxa(v).iterator().next()];
+				nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), y));
+			} else if (tree.isLsaLeaf(v)) {
+				var y = lsaLeafHeightMap.get(v);
+				nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), y));
+			} else {
+				var yMin = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
+						.mapToDouble(w -> nodePointMap.get(w).getY()).min().orElse(0);
+				var yMax = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
+						.mapToDouble(w -> nodePointMap.get(w).getY()).max().orElse(0);
+				var y = 0.5 * (yMin + yMax);
+				nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), y));
+			}
+		});
 		return nodePointMap;
 	}
 

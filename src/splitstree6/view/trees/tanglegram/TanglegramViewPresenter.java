@@ -224,7 +224,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
 				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s),
 				new SimpleObjectProperty<>(SelectionMode.MULTIPLE),
-				t -> t2taxon.apply(t).getNameAndDisplayLabel("===="), null));
+				t -> t2taxon.apply(t).getNameAndDisplayLabel("===="),
+				label -> label.replaceAll(".*====", ""),
+				null));
 		findToolBar.setShowFindToolBar(false);
 
 		controller.getvBox().getChildren().add(findToolBar);

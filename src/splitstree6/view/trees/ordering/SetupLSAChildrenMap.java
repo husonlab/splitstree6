@@ -41,13 +41,12 @@ package splitstree6.view.trees.ordering;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeIntArray;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.Counter;
 import jloda.util.IteratorUtils;
-import jloda.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 /**
  * sets up the LSA children map if tree contains a rooted network
@@ -67,7 +66,7 @@ public class SetupLSAChildrenMap {
 		//System.err.println("Maintaining current embedding");
 
 		try (NodeArray<Node> reticulationLSAMap = tree.newNodeArray()) {
-			if (isTransferNetwork(tree)) {
+			if (false && isTransferNetwork(tree)) {
 				tree.getLSAChildrenMap().clear();
 				for (Node v : tree.nodes()) {
 					var children = new ArrayList<Node>(v.getOutDegree());
@@ -82,95 +81,13 @@ public class SetupLSAChildrenMap {
 				}
 			} else // must be combining network
 			{
-				if (false) {
-					System.err.println("++++++++ Nodes 0:");
-					tree.preorderTraversal(tree.getRoot(), v -> {
-						if (v.isLeaf())
-							System.err.println(v + " " + tree.getLabel(v));
-						else {
-							System.err.println("Node:" + v.getId());
-							System.err.println("Children:" + StringUtils.toString(v.childrenStream().map(w -> w.getId()).collect(Collectors.toList()), " "));
-							System.err.println("LSA Chld:" + StringUtils.toString(IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> w.getId()).collect(Collectors.toList()), " "));
-						}
-					});
-				}
-
 				tree.getLSAChildrenMap().putAll(LSAUtils.computeLSAChildrenMap(tree, reticulationLSAMap));
-
-				if (false) {
-					System.err.println("++++++++ Nodes 1:");
-					tree.preorderTraversal(tree.getRoot(), v -> {
-						if (v.isLeaf())
-							System.err.println(v.getId() + " " + tree.getLabel(v));
-						else {
-							System.err.println("Node:" + v.getId());
-							System.err.println("Children:" + StringUtils.toString(v.childrenStream().map(w -> w.getId()).collect(Collectors.toList()), " "));
-							System.err.println("LSA Chld:" + StringUtils.toString(IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> w.getId()).collect(Collectors.toList()), " "));
-						}
-					});
-				}
 				// maps reticulate nodes to lsa nodes
 				// compute preorder numbering of all nodes
 				try (var ordering = tree.newNodeIntArray(); var visited = tree.newNodeSet()) {
 					var counter = new Counter(0);
 					tree.preorderTraversal(tree.getRoot(), v -> ordering.put(v, (int) counter.incrementAndGet()));
-
-					if (false) {
-						System.err.println("++++++++ Nodes 2:");
-						jloda.phylo.LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
-							if (v.isLeaf())
-								System.err.println(v.getId() + " " + tree.getLabel(v));
-							else {
-								System.err.println("Node:" + v.getId());
-								System.err.println("Children:" + StringUtils.toString(v.childrenStream().map(w -> w.getId()).collect(Collectors.toList()), " "));
-								System.err.println("LSA Chld:" + StringUtils.toString(IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> w.getId()).collect(Collectors.toList()), " "));
-							}
-						});
-					}
-
-					if (false) {
-						System.err.println("before reorder:");
-						System.err.println("network: " + tree.toBracketString(true));
-						System.err.println("LSAtree: " + jloda.phylo.LSAUtils.getLSATree(tree).toBracketString(true));
-					}
 					reorderLSAChildren(tree, ordering);
-
-					if (false) {
-						System.err.println("++++++++ Nodes 3:");
-						jloda.phylo.LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
-							if (v.isLeaf())
-								System.err.println(v.getId() + " " + tree.getLabel(v));
-							else {
-								System.err.println("Node:" + v.getId());
-								System.err.println("Children:" + StringUtils.toString(v.childrenStream().map(w -> w.getId()).collect(Collectors.toList()), " "));
-								System.err.println("LSA Chld:" + StringUtils.toString(IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> w.getId()).collect(Collectors.toList()), " "));
-							}
-						});
-					}
-
-				}
-				if (false) {
-					var counter = new Counter(0);
-					System.err.println("Leaves:");
-					jloda.phylo.LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
-						if (v.isLeaf())
-							System.err.println(tree.getLabel(v) + ": " + counter.incrementAndGet());
-					});
-				}
-				if (false) {
-					System.err.println("after reorder:");
-					System.err.println("network: " + tree.toBracketString(true));
-					System.err.println("LSAtree: " + jloda.phylo.LSAUtils.getLSATree(tree).toBracketString(true));
-
-					var pos = new Counter(0);
-					System.err.println("Traversal:");
-					jloda.phylo.LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
-						System.err.println("node: " + v.getId() + " (pos: " + pos.incrementAndGet() + ")");
-						System.err.println("Children: " + StringUtils.toString(v.childrenStream().map(w -> w.getId()).collect(Collectors.toList()), " "));
-						System.err.println("LSA Chd: " + StringUtils.toString(IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> w.getId()).collect(Collectors.toList()), " "));
-						if (tree.getLabel(v) != null)
-							System.err.println("taxon: " + tree.getLabel(v));
-					});
 				}
 			}
 		}
@@ -190,12 +107,6 @@ public class SetupLSAChildrenMap {
 			var children = tree.getLSAChildrenMap().get(v);
 			if (children != null) {
 				var list = new ArrayList<>(children);
-				if (false) {
-					System.err.println("LSA children old for v=" + v.getId() + ":");
-					for (Node u : children) {
-						System.err.println(" " + u.getId() + " order: " + ordering.get(u));
-					}
-				}
 				list.sort((v1, v2) -> {
 					if (ordering.getInt(v1) < ordering.getInt(v2))
 						return -1;
@@ -207,12 +118,6 @@ public class SetupLSAChildrenMap {
 					return 0;
 				});
 				tree.getLSAChildrenMap().put(v, list);
-				if (false) {
-					System.err.println("LSA children new for v=" + v.getId() + ":");
-					for (Node u : children) {
-						System.err.println(" " + u.getId() + " order: " + ordering.get(u));
-					}
-				}
 			}
 		}
 	}

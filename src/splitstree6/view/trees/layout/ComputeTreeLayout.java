@@ -117,7 +117,7 @@ public class ComputeTreeLayout {
 		final var numberOfLeaves = tree.nodeStream().filter(tree::isLsaLeaf).count();
 
 		if (taxonOrdering == null || taxonOrdering.length == 0) {
-			taxonOrdering = CircularOrdering.apply(taxaBlock, tree);
+			taxonOrdering = CircularOrdering.computeRealizableCycle(tree, CircularOrdering.apply(taxaBlock, tree));
 		}
 
 		final var taxon2pos = new int[taxaBlock.getNtax() + 1];
@@ -155,12 +155,18 @@ public class ComputeTreeLayout {
 				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
 			}
 		}
-		final var labelGap = fontHeight;
+		var labelGap = fontHeight;
 
 		final double normalizeWidth;
 		final double normalizeHeight;
 
 		if (diagram.isRadial()) {
+			if (maxLabelWidth > 100) {
+				fontHeight *= 100 / maxLabelWidth;
+				labelGap = fontHeight;
+				maxLabelWidth = 100;
+			}
+
 			var tmp = Math.min(width - 2 * (maxLabelWidth + labelGap), height - 2 * (maxLabelWidth + labelGap));
 			if (tmp > 20)
 				tmp -= 10;
@@ -175,8 +181,8 @@ public class ComputeTreeLayout {
 		NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
-			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, taxon2pos, true, parentPlacement);
-			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, taxon2pos, false, parentPlacement);
+			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, taxon2pos, true);
+			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, taxon2pos, false);
 			case TriangularCladogram -> LayoutTreeTriangular.apply(tree, taxon2pos);
 			case RadialPhylogram -> LayoutTreeRadial.applyPhylogram(tree, taxon2pos, parentPlacement);
 			case RadialCladogram, CircularCladogram -> LayoutTreeRadial.applyCladogram(tree, taxon2pos, nodeAngleMap, false);

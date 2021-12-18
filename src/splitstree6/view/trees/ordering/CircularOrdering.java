@@ -45,7 +45,7 @@ public class CircularOrdering {
 	 * @return circular orderings for both trees
 	 */
 	public static int[] apply(TaxaBlock taxaBlock, PhyloTree tree, PhyloTree... trees) {
-		if (!tree.isRootedNetwork() && trees.length == 0) {
+		if (!tree.isReticulated() && trees.length == 0) {
 			var taxCycle = new int[taxaBlock.getNtax() + 1];
 			var counter = new Single<>(0);
 			tree.postorderTraversal(tree.getRoot(), v -> {
@@ -79,7 +79,7 @@ public class CircularOrdering {
 			final var distances = new double[ntax][ntax];
 
 			for (var phyloTree : IteratorUtils.asList(List.of(tree), List.of(trees))) {
-				if (phyloTree.isRootedNetwork() && phyloTree.getLSAChildrenMap().size() == 0)
+				if (phyloTree.isReticulated() && phyloTree.getLSAChildrenMap().size() == 0)
 					SetupLSAChildrenMap.apply(phyloTree);
 
 				var taxa = BitSetUtils.asBitSet(phyloTree.getTaxa());

@@ -262,6 +262,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 				},
 				tableView.getSelectionModel().selectionModeProperty(),
 				i -> tableView.getItems().get(i).getNameAndDisplayLabel("===="),
+				label -> label.replaceAll(".*====", ""),
 				(i, label) -> tableView.getItems().get(i).setDisplayLabel(label.replaceAll(".*====", "")));
 	}
 

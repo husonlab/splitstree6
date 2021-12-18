@@ -296,26 +296,27 @@
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="zoomInMenuItem" text="Zoom In">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="UP"
+                                                <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP"
+                                                                    shift="UP"
                                                                     shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <MenuItem fx:id="zoomOutMenuItem" text="Zoom Out">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP"
+                                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <MenuItem fx:id="zoomInHorizontalMenuItem" text="Zoom In Horizontal">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
+                                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <MenuItem fx:id="zoomOutHorizontalMenuItem" text="Zoom Out Horizontal">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
+                                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
                                                                     shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>

@@ -24,12 +24,12 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16"
-            xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.tanglegram.TanglegramViewController">
     <children>
-        <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <top>
                 <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                     <children>
@@ -249,12 +249,13 @@
                 </VBox>
             </top>
             <center>
-                <AnchorPane>
+                <AnchorPane style="-fx-background-color: transparent;">
                     <children>
-                        <ScrollPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                        <ScrollPane fx:id="scrollPane" style="-fx-background-color: transparent;"
+                                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                     AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <content>
-                                <HBox alignment="CENTER">
+                                <HBox alignment="CENTER" style="-fx-background-color: transparent;">
                                     <children>
                                         <StackPane fx:id="leftPane" alignment="TOP_RIGHT" pickOnBounds="false"
                                                    style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
@@ -270,8 +271,8 @@
                                 </HBox>
                             </content>
                         </ScrollPane>
-                        <Label fx:id="tree1Label" text="Tree 1" AnchorPane.leftAnchor="40.0"
-                               AnchorPane.topAnchor="5.0"/>
+                        <Label fx:id="tree1Label" style="-fx-background-color: transparent;" text="Tree 1"
+                               AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="5.0"/>
                         <Label fx:id="tree2Label" style="-fx-background-color: transparent;" text="Tree 2"
                                AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0"/>
                     </children>

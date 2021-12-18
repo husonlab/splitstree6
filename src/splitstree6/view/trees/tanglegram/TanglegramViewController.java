@@ -40,6 +40,9 @@ public class TanglegramViewController {
 	private AnchorPane anchorPane;
 
 	@FXML
+	ScrollPane scrollPane;
+
+	@FXML
 	private VBox vBox;
 
 	@FXML

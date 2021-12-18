@@ -182,7 +182,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
 		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(), t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
-				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s), new SimpleObjectProperty<>(SelectionMode.MULTIPLE), t -> t2taxon.apply(t).getNameAndDisplayLabel("===="), null));
+				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s), new SimpleObjectProperty<>(SelectionMode.MULTIPLE), t -> t2taxon.apply(t).getNameAndDisplayLabel("===="),
+				label -> label.replaceAll(".*====", ""), null));
 		findToolBar.setShowFindToolBar(false);
 
 		controller.getvBox().getChildren().add(findToolBar);

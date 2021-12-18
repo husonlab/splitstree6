@@ -77,7 +77,7 @@ public class CreateEdgesRectangular {
 			}
 			line.getElements().add(moveTo);
 
-			if (!tree.isSpecial(e)) {
+			if (!tree.isSpecial(e) && !tree.isTransferEdge(e)) {
 				var lineTo1 = new LineTo();
 				line.getElements().add(lineTo1);
 				if (linkNodesEdgesLabels) {
@@ -113,7 +113,7 @@ public class CreateEdgesRectangular {
 					lineTo2.setY(targetShape.getTranslateY());
 				}
 			} else { // special edge
-				line.setStroke(Color.DARKGOLDENROD);
+				line.setStroke(Color.DARKORANGE);
 
 				var quadCurveTo = new QuadCurveTo();
 				line.getElements().add(quadCurveTo);
@@ -134,22 +134,23 @@ public class CreateEdgesRectangular {
 			edgeCallback.accept(e, line);
 		}
 
-		for (var v : tree.nodes()) {
-			for (var w : tree.lsaChildren(v)) {
-				if (w.inEdgesStream(false).anyMatch(tree::isSpecial)) {
-					var sourceShape = nodeShapeMap.get(v);
-					var targetShape = nodeShapeMap.get(w);
+		if (false)
+			for (var v : tree.nodes()) {
+				for (var w : tree.lsaChildren(v)) {
+					if (w.inEdgesStream(false).anyMatch(tree::isSpecial)) {
+						var sourceShape = nodeShapeMap.get(v);
+						var targetShape = nodeShapeMap.get(w);
 
-					var line = new Line();
-					line.setStartX(sourceShape.getTranslateX());
-					line.setStartY(sourceShape.getTranslateY());
-					line.setEndX(targetShape.getTranslateX());
-					line.setEndY(targetShape.getTranslateY());
-					line.setStroke(Color.DEEPPINK);
-					shapes.add(line);
+						var line = new Line();
+						line.setStartX(sourceShape.getTranslateX());
+						line.setStartY(sourceShape.getTranslateY());
+						line.setEndX(targetShape.getTranslateX());
+						line.setEndY(targetShape.getTranslateY());
+						line.setStroke(Color.DEEPPINK.deriveColor(1, 1, 1, 0.5));
+						shapes.add(line);
+					}
 				}
 			}
-		}
 		return shapes;
 	}
 }
