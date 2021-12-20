@@ -107,7 +107,7 @@ public class LayoutTreeRectangular {
 		var weight = 0.0;
 		var count = 0;
 		for (var e : tree.edges()) {
-			if (!tree.isSpecial(e)) {
+			if (!tree.isReticulatedEdge(e)) {
 				weight += Math.max(0, tree.getWeight(e));
 				count++;
 			}

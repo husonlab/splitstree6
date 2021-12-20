@@ -77,7 +77,7 @@ public class CreateEdgesRectangular {
 			}
 			line.getElements().add(moveTo);
 
-			if (!tree.isSpecial(e) && !tree.isTransferEdge(e)) {
+			if (!tree.isReticulatedEdge(e) && !tree.isTransferEdge(e)) {
 				var lineTo1 = new LineTo();
 				line.getElements().add(lineTo1);
 				if (linkNodesEdgesLabels) {
@@ -137,7 +137,7 @@ public class CreateEdgesRectangular {
 		if (false)
 			for (var v : tree.nodes()) {
 				for (var w : tree.lsaChildren(v)) {
-					if (w.inEdgesStream(false).anyMatch(tree::isSpecial)) {
+					if (w.inEdgesStream(false).anyMatch(tree::isReticulatedEdge)) {
 						var sourceShape = nodeShapeMap.get(v);
 						var targetShape = nodeShapeMap.get(w);
 

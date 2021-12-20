@@ -23,7 +23,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.phylo.PhyloTreeNetworkUtils;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
@@ -144,7 +143,7 @@ public class NewickReader extends TreesReader {
 						}
 					}
 
-					if (!treesBlock.isNetwork() && tree.edgeStream().anyMatch(tree::isSpecial)) {
+					if (!treesBlock.isNetwork() && tree.edgeStream().anyMatch(tree::isReticulatedEdge)) {
 						treesBlock.setNetwork(true);
 					}
 
@@ -192,13 +191,12 @@ public class NewickReader extends TreesReader {
 					list.add(label);
 			}
 			for (var e : w.outEdges()) {
-				if (PhyloTreeNetworkUtils.okToDescendDownThisEdge(tree, e))
+				if (tree.okToDescendDownThisEdgeInTraversal(e))
 					queue.add(e.getTarget());
 			}
 		}
 		return list;
 	}
-
 
 	@Override
 	public boolean accepts(String file) {

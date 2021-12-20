@@ -67,7 +67,7 @@ public class HardWired {
 
 	private static BitSet collectAllHardwiredClustersRec(PhyloTree tree, Node v, Map<BitSet, Double> clusterWeightMap) {
 		var taxa = new BitSet();
-		var weight = v.inEdgesStream(false).mapToDouble(e -> tree.getWeight()).average().orElse(0.001);
+		var weight = v.inEdgesStream(false).mapToDouble(tree::getWeight).average().orElse(0.001);
 
 		if (v.isLeaf()) {
 			taxa.or(BitSetUtils.asBitSet(tree.getTaxa(v)));

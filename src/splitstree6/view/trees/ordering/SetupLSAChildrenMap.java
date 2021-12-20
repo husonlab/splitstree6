@@ -58,7 +58,7 @@ public class SetupLSAChildrenMap {
 	 * @param tree phylo tree
 	 */
 	public static void apply(PhyloTree tree) {
-		if (tree.getRoot() == null || tree.getNumberSpecialEdges() == 0) {
+		if (tree.getRoot() == null || tree.getNumberReticulateEdges() == 0) {
 			tree.getLSAChildrenMap().clear();
 			return; // if this is a tree, don't need LSA guide tree
 		}
@@ -71,7 +71,7 @@ public class SetupLSAChildrenMap {
 				for (Node v : tree.nodes()) {
 					var children = new ArrayList<Node>(v.getOutDegree());
 					for (var e : v.outEdges()) {
-						if (!tree.isSpecial(e) || tree.getWeight(e) > 0) {
+						if (!tree.isReticulatedEdge(e) || tree.getWeight(e) > 0) {
 							children.add(e.getTarget());
 							reticulationLSAMap.put(e.getTarget(), e.getSource());
 						}
@@ -129,6 +129,6 @@ public class SetupLSAChildrenMap {
 	 * @return true, if is transfer network
 	 */
 	public static boolean isTransferNetwork(PhyloTree tree) {
-		return IteratorUtils.asStream(tree.specialEdges()).anyMatch(e -> tree.getWeight(e) != 0);
+		return IteratorUtils.asStream(tree.reticulatedEdges()).anyMatch(e -> tree.getWeight(e) != 0);
 	}
 }
