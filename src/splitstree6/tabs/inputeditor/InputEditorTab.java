@@ -43,7 +43,10 @@ public class InputEditorTab extends ViewTab {
 			setText(NAME);
 		} else {
 			this.inputEditorView = new InputEditorView(mainWindow, this);
-			Platform.runLater(() -> setView(inputEditorView));
+			Platform.runLater(() -> {
+				setView(inputEditorView);
+				inputEditorView.getController().getCodeArea().requestFocus();
+			});
 		}
 		//setGraphic(new ImageView(ResourceManagerFX.getIcon("sun/Import16.gif")));
 	}

@@ -20,6 +20,7 @@
 package splitstree6.view.displaytext;
 
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
@@ -62,6 +63,7 @@ public class DisplayTextViewController {
 	@FXML
 	private void initialize() {
 		codeArea = new CodeArea();
+		codeArea.setPadding(new Insets(5, 2, 5, 2));
 		scrollPane = new VirtualizedScrollPane<>(codeArea);
 		borderPane.setCenter(scrollPane);
 	}
@@ -101,7 +103,6 @@ public class DisplayTextViewController {
 	public CodeArea getCodeArea() {
 		return codeArea;
 	}
-
 	public VirtualizedScrollPane<CodeArea> getScrollPane() {
 		return scrollPane;
 	}

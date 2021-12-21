@@ -44,7 +44,7 @@ public class FileLoader {
 
 		if (!(new File(fileName)).canRead())
 			NotificationManager.showError("File not found or unreadable: " + fileName);
-		else if (editorTab != null && !editorTab.getText().isBlank()) {
+		else if (editorTab != null && editorTab.getText().isBlank()) {
 			editorTab.importFromFile(fileName);
 			mainWindow.setFileName(fileName);
 			RecentFilesManager.getInstance().insertRecentFile(fileName);
@@ -58,6 +58,10 @@ public class FileLoader {
 			}
 			 */
 		} else {
+			if (editorTab != null) {
+				NotificationManager.showWarning("Input editor is not empty, will open in new Window");
+			}
+
 			var newWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(mainWindow);
 			if (WorkflowNexusInput.isApplicable(fileName)) {
 				WorkflowNexusInput.open(newWindow, fileName);
