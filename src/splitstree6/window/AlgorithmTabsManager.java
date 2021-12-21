@@ -22,6 +22,7 @@ package splitstree6.window;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.scene.control.Tab;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
@@ -33,7 +34,7 @@ import splitstree6.workflow.Workflow;
 public class AlgorithmTabsManager {
 	private final MainWindow mainWindow;
 	private final SplittableTabPane tabPane;
-	private final ObservableMap<WorkflowNode, AlgorithmTab> nodeTabMap = FXCollections.observableHashMap();
+	private final ObservableMap<WorkflowNode, Tab> nodeTabMap = FXCollections.observableHashMap();
 
 	public AlgorithmTabsManager(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
@@ -52,8 +53,6 @@ public class AlgorithmTabsManager {
 							else
 								tab = new AlgorithmTab(mainWindow, algorithmNode);
 							tab.setOnCloseRequest(t -> showTab(algorithmNode, false));
-							node.validProperty().addListener((v, o, n) -> {
-							});
 							nodeTabMap.put(node, tab);
 						}
 					}
@@ -76,9 +75,17 @@ public class AlgorithmTabsManager {
 			if (show) {
 				mainWindow.getPresenter().getSplitPanePresenter().ensureAlgorithmsTabPaneIsOpen();
 				if (!tabPane.getTabs().contains(tab)) {
-					tabPane.getTabs().add(tab);
+					var newTab = new Tab();
+					newTab.setText(tab.getText());
+					newTab.setGraphic(tab.getGraphic());
+					var content = tab.getContent();
+					tab.setContent(null);
+					newTab.setContent(content);
+					nodeTabMap.put(node, newTab);
+					tabPane.getTabs().add(newTab);
 				}
-				tabPane.getSelectionModel().select(tab);
+				if (true)
+					tabPane.getSelectionModel().select(tab);
 			} else
 				tabPane.getTabs().remove(tab);
 		}

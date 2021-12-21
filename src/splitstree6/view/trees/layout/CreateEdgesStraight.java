@@ -48,6 +48,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
+import static splitstree6.view.trees.layout.CreateEdgesRectangular.addArrowHead;
+
 /**
  * draws edges using straight lines
  * Daniel Huson, 12.2021
@@ -68,21 +70,28 @@ public class CreateEdgesStraight {
 				moveTo.setY(sourceShape.getTranslateY());
 			}
 
-			var lineTo2 = new LineTo();
+			var lineTo = new LineTo();
 			if (linkNodesEdgesLabels) {
-				lineTo2.xProperty().bind(targetShape.translateXProperty());
-				lineTo2.yProperty().bind(targetShape.translateYProperty());
+				lineTo.xProperty().bind(targetShape.translateXProperty());
+				lineTo.yProperty().bind(targetShape.translateYProperty());
 			} else {
-				lineTo2.setX(targetShape.getTranslateX());
-				lineTo2.setY(targetShape.getTranslateY());
+				lineTo.setX(targetShape.getTranslateX());
+				lineTo.setY(targetShape.getTranslateY());
 			}
 
-			var line = new Path(moveTo, lineTo2);
-
+			var line = new Path(moveTo, lineTo);
 			line.setFill(Color.TRANSPARENT);
-			line.setStroke(color);
 			line.setStrokeLineCap(StrokeLineCap.ROUND);
 			line.setStrokeWidth(1);
+
+			if (tree.isReticulatedEdge(e))
+				line.setStroke(Color.DARKORANGE);
+			else
+				line.setStroke(color);
+
+			if (tree.isTransferEdge(e))
+				addArrowHead(line, moveTo, lineTo);
+
 			shapes.add(line);
 			edgeCallback.accept(e, line);
 		}

@@ -24,12 +24,12 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import jloda.fx.util.GrayOutlineEffect;
+import jloda.fx.util.MiddleArrowHead;
 
 /**
  * workflow edge view
@@ -70,98 +70,13 @@ public class WorkflowEdgeItem extends Group {
 		part2.endYProperty().bind(target.translateYProperty().add(target.heightProperty().divide(2)));
 		part2.startYProperty().bind(part2.endYProperty());
 
-		final ArrowHead arrowHead1 = new ArrowHead();
+		var midArrow1 = new MiddleArrowHead(part1);
+		midArrow1.visibleProperty().bind(part1.startYProperty().isNotEqualTo(part1.endYProperty()));
 
-		arrowHead1.update(part1);
+		var midArrow2 = new MiddleArrowHead(part2);
+		midArrow2.visibleProperty().bind(part2.startXProperty().isNotEqualTo(part2.endXProperty()));
 
-		part1.startXProperty().addListener((observable, oldValue, newValue) -> arrowHead1.update(part1));
-		part1.startYProperty().addListener((observable, oldValue, newValue) -> arrowHead1.update(part1));
-		part1.endXProperty().addListener((observable, oldValue, newValue) -> arrowHead1.update(part1));
-		part1.endYProperty().addListener((observable, oldValue, newValue) -> arrowHead1.update(part1));
-		arrowHead1.visibleProperty().bind(part1.startYProperty().isNotEqualTo(part1.endYProperty()));
-
-		final ArrowHead arrowHead2 = new ArrowHead();
-
-		arrowHead2.update(part2);
-
-		part2.startXProperty().addListener((observable, oldValue, newValue) -> arrowHead2.update(part2));
-		part2.startYProperty().addListener((observable, oldValue, newValue) -> arrowHead2.update(part2));
-		part2.endXProperty().addListener((observable, oldValue, newValue) -> arrowHead2.update(part2));
-		part2.endYProperty().addListener((observable, oldValue, newValue) -> arrowHead2.update(part2));
-		arrowHead2.visibleProperty().bind(part2.startXProperty().isNotEqualTo(part2.endXProperty()));
-
-		this.getChildren().addAll(part1, part2, arrowHead1, arrowHead2);
-	}
-
-	/**
-	 * compute angle of vector in radian
-	 *
-	 * @param p point
-	 * @return angle of vector in radian
-	 */
-	public static double computeAngle(Point2D p) {
-		if (p.getX() != 0) {
-			double x = Math.abs(p.getX());
-			double y = Math.abs(p.getY());
-			double a = Math.atan(y / x);
-
-			if (p.getX() > 0) {
-				if (p.getY() > 0)
-					return a;
-				else
-					return 2.0 * Math.PI - a;
-			} else // p.getX()<0
-			{
-				if (p.getY() > 0)
-					return Math.PI - a;
-				else
-					return Math.PI + a;
-			}
-		} else if (p.getY() > 0)
-			return 0.5 * Math.PI;
-		else // p.y<0
-			return -0.5 * Math.PI;
-	}
-
-	private class ArrowHead extends Group {
-		private final Line part1 = new Line();
-		private final Line part2 = new Line();
-
-		public ArrowHead() {
-			part1.strokeProperty().bind(stroke);
-			part1.strokeWidthProperty().bind(strokeWidth);
-			part2.strokeProperty().bind(stroke);
-			part2.strokeWidthProperty().bind(strokeWidth);
-
-			getChildren().add(part1);
-			getChildren().add(part2);
-		}
-
-		public void update(Line line) {
-			Point2D start = new Point2D(line.getStartX(), line.getStartY());
-			Point2D end = new Point2D(line.getEndX(), line.getEndY());
-			double radian = computeAngle(end.subtract(start));
-
-			(new Point2D(line.getStartX(), line.getStartY())).angle(line.getEndX(), line.getEndY());
-
-			double dx = 5 * Math.cos(radian);
-			double dy = 5 * Math.sin(radian);
-
-			Point2D mid = start.midpoint(end);
-			Point2D head = mid.add(dx, dy);
-			Point2D one = mid.add(-dy, dx);
-			Point2D two = mid.add(dy, -dx);
-
-			part1.setStartX(one.getX());
-			part1.setStartY(one.getY());
-			part1.setEndX(head.getX());
-			part1.setEndY(head.getY());
-
-			part2.setStartX(two.getX());
-			part2.setStartY(two.getY());
-			part2.setEndX(head.getX());
-			part2.setEndY(head.getY());
-		}
+		this.getChildren().addAll(part1, part2, midArrow1, midArrow2);
 	}
 
 	public Pane getSource() {

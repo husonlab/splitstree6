@@ -45,6 +45,10 @@ public class CircularOrdering {
 	 * @return circular orderings for both trees
 	 */
 	public static int[] apply(TaxaBlock taxaBlock, PhyloTree tree, PhyloTree... trees) {
+		if (trees.length > 0 && Arrays.asList(trees).contains(null)) {
+			trees = Arrays.stream(trees).filter(Objects::nonNull).toList().toArray(new PhyloTree[0]);
+		}
+
 		if (!tree.isReticulated() && trees.length == 0) {
 			var taxCycle = new int[taxaBlock.getNtax() + 1];
 			var counter = new Single<>(0);

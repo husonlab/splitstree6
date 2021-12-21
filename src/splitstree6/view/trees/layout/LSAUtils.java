@@ -85,6 +85,20 @@ public class LSAUtils {
 		}
 	}
 
+	/**
+	 * computes the angle for any node that is a leaf only in the LSA tree, but not in the network
+	 *
+	 * @param tree
+	 * @param tax2pos
+	 * @return height
+	 */
+	public static Map<Node, Double> computeAngleForLSALeaves(PhyloTree tree, int[] tax2pos, double delta) {
+		var lsaValueMap = computeHeightForLSALeaves(tree, tax2pos);
+		lsaValueMap.replaceAll((v, value) -> delta * value);
+		return lsaValueMap;
+	}
+
+
 	private static void visitRec(PhyloTree tree, Node v, NodeArray<Integer> nodeHighPosMap, ArrayList<Pair<Node, Integer>> leafOrder) {
 		if (v.isLeaf()) {
 			leafOrder.add(new Pair<>(v, nodeHighPosMap.get(v)));

@@ -19,6 +19,7 @@
 
 package splitstree6.view.trees.tanglegram;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -82,6 +83,13 @@ public class TanglegramView implements IView {
 
 	public TanglegramView(MainWindow mainWindow, String name, ViewTab viewTab) {
 		this.name.set(name);
+
+		getTrees().addListener((InvalidationListener) e -> {
+			setOptionTree1(Math.min(getOptionTree1(), getTrees().size()));
+			setOptionTree2(Math.min(getOptionTree2(), getTrees().size()));
+		});
+
+
 		var loader = new ExtendedFXMLLoader<TanglegramViewController>(TanglegramViewController.class);
 		controller = loader.getController();
 

@@ -44,7 +44,6 @@ import jloda.graph.NodeIntArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.Counter;
-import jloda.util.IteratorUtils;
 
 import java.util.ArrayList;
 
@@ -63,10 +62,8 @@ public class SetupLSAChildrenMap {
 			return; // if this is a tree, don't need LSA guide tree
 		}
 
-		//System.err.println("Maintaining current embedding");
-
 		try (NodeArray<Node> reticulationLSAMap = tree.newNodeArray()) {
-			if (false && isTransferNetwork(tree)) {
+			if (isAllReticulationsAreTransfers(tree)) { // transfers only
 				tree.getLSAChildrenMap().clear();
 				for (Node v : tree.nodes()) {
 					var children = new ArrayList<Node>(v.getOutDegree());
@@ -79,7 +76,7 @@ public class SetupLSAChildrenMap {
 					tree.getLSAChildrenMap().put(v, children);
 
 				}
-			} else // must be combining network
+			} else // contains hybridizations and possibly transfers
 			{
 				tree.getLSAChildrenMap().putAll(LSAUtils.computeLSAChildrenMap(tree, reticulationLSAMap));
 				// maps reticulate nodes to lsa nodes
@@ -123,12 +120,28 @@ public class SetupLSAChildrenMap {
 	}
 
 	/**
-	 * does network look like a transfer network?
+	 * does network only contain transfers?
 	 *
 	 * @param tree
-	 * @return true, if is transfer network
+	 * @return true, if is reticulate network that only contains
 	 */
-	public static boolean isTransferNetwork(PhyloTree tree) {
-		return IteratorUtils.asStream(tree.reticulatedEdges()).anyMatch(e -> tree.getWeight(e) != 0);
+	public static boolean isAllReticulationsAreTransfers(PhyloTree tree) {
+		var hasTransferReticulation = false;
+		var hasNonTransferReticulation = false;
+
+		for (var v : tree.nodes()) {
+			if (v.getInDegree() > 1) {
+				var transfer = false;
+				for (var e : v.inEdges()) {
+					if (tree.getWeight(e) != 0)
+						transfer = true;
+				}
+				if (!transfer)
+					hasNonTransferReticulation = true;
+				else
+					hasTransferReticulation = true;
+			}
+		}
+		return hasTransferReticulation && !hasNonTransferReticulation;
 	}
 }

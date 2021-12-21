@@ -495,9 +495,12 @@ public class MainWindowPresenter {
 		} else {
 			controller.getUndoMenuItem().textProperty().unbind();
 			controller.getUndoMenuItem().setText("Undo");
+			controller.getUndoMenuItem().disableProperty().unbind();
 			controller.getUndoMenuItem().setDisable(true);
+
 			controller.getRedoMenuItem().textProperty().unbind();
 			controller.getRedoMenuItem().setText("Redo");
+			controller.getRedoMenuItem().disableProperty().unbind();
 			controller.getRedoMenuItem().setDisable(true);
 		}
 	}

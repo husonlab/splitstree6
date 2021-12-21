@@ -94,14 +94,20 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getRightPane().getChildren().add(tree2Pane);
 
 		tree1.addListener(e -> {
-			var cycle = CircularOrdering.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), tree1.get(), tree2.get());
-			taxonOrdering1.set(CircularOrdering.computeRealizableCycle(tree1.get(), cycle));
-			taxonOrdering2.set(CircularOrdering.computeRealizableCycle(tree2.get(), cycle));
+			if (tree1.get() != null) {
+				var cycle = CircularOrdering.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), tree1.get(), tree2.get());
+				taxonOrdering1.set(CircularOrdering.computeRealizableCycle(tree1.get(), cycle));
+				if (tree2.get() != null)
+					taxonOrdering2.set(CircularOrdering.computeRealizableCycle(tree2.get(), cycle));
+			}
 		});
 		tree2.addListener(e -> {
-			var cycle = CircularOrdering.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), tree1.get(), tree2.get());
-			taxonOrdering1.set(CircularOrdering.computeRealizableCycle(tree1.get(), cycle));
-			taxonOrdering2.set(CircularOrdering.computeRealizableCycle(tree2.get(), cycle));
+			if (tree1.get() != null) {
+				var cycle = CircularOrdering.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), tree1.get(), tree2.get());
+				taxonOrdering1.set(CircularOrdering.computeRealizableCycle(tree1.get(), cycle));
+				if (tree2.get() != null)
+					taxonOrdering2.set(CircularOrdering.computeRealizableCycle(tree2.get(), cycle));
+			}
 		});
 
 		{

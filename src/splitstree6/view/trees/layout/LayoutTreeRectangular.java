@@ -50,60 +50,59 @@ import jloda.util.IteratorUtils;
  */
 public class LayoutTreeRectangular {
 	public static NodeArray<Point2D> apply(PhyloTree tree, int[] taxon2pos, boolean toScale) {
-		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
-
 		// compute x-coordinates:
-		if (toScale) {
-			var delta = tree.isReticulated() ? 0.25 * computeAverageEdgeWeight(tree) : 0.0;
-			LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
-				double x;
-				if (v.getInDegree() == 0) {
-					x = 0.0;
-				} else if (v.getInDegree() == 1) {
-					x = nodePointMap.get(v.getParent()).getX() + tree.getWeight(v.getFirstInEdge());
-				} else {
-					x = v.parentsStream(false).mapToDouble(w -> nodePointMap.get(w).getX()).max().orElse(0.0) + delta;
+		try (var nodeXMap = tree.newNodeDoubleArray(); var nodeYMap = tree.newNodeDoubleArray()) {
+			if (toScale) {
+				var delta = tree.isReticulated() ? 0.25 * computeAverageEdgeWeight(tree) : 0.0;
+				LSAUtils.preorderTraversalLSA(tree, tree.getRoot(),
+						v -> nodeXMap.put(v,
+								switch (v.getInDegree()) {
+									case 0 -> 0.0;
+									case 1 -> nodeXMap.get(v.getParent()) + tree.getWeight(v.getFirstInEdge());
+									default -> v.parentsStream(false).mapToDouble(nodeXMap::get).max().orElse(0.0) + delta;
+								}));
+			} else { // not to scale:
+				try (var visited = tree.newNodeSet()) {
+					tree.postorderTraversal(tree.getRoot(), v -> !visited.contains(v), v -> {
+						visited.add(v);
+						if (v.isLeaf()) { // leaf, not lsaLeaf
+							nodeXMap.put(v, 0.0);
+						} else {
+							// use children here, not LSA children
+							var min = v.outEdgesStream(false).filter(e -> !tree.isTransferEdge(e)).mapToDouble(e -> nodeXMap.get(e.getTarget())).min().orElse(0);
+							nodeXMap.put(v, min - 1.0);
+						}
+					});
 				}
-				nodePointMap.put(v, new Point2D(x, 0.0));
+			}
 
+			// compute y-coordinates:
+			var lsaLeafHeightMap = splitstree6.view.trees.layout.LSAUtils.computeHeightForLSALeaves(tree, taxon2pos);
+			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+				if (tree.isLeaf(v)) {
+					var y = taxon2pos[tree.getTaxa(v).iterator().next()];
+					nodeYMap.put(v, (double) y);
+				} else if (tree.isLsaLeaf(v)) {
+					nodeYMap.put(v, lsaLeafHeightMap.get(v));
+				} else {
+					var yMin = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
+							.mapToDouble(nodeYMap::get).min().orElse(0);
+					var yMax = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
+							.mapToDouble(nodeYMap::get).max().orElse(0);
+					nodeYMap.put(v, 0.5 * (yMin + yMax));
+				}
 			});
-		} else { // not to scale:
-			try (var visited = tree.newNodeSet()) {
-				tree.postorderTraversal(tree.getRoot(), v -> !visited.contains(v), v -> {
-					visited.add(v);
-					if (v.isLeaf()) { // leaf, not lsaLeaf
-						nodePointMap.put(v, new Point2D(0.0, 0.0));
-					} else {
-						// use children here, not LSA children
-						var min = v.childrenStream().mapToDouble(w -> nodePointMap.get(w).getX()).min().orElse(0);
-						nodePointMap.put(v, new Point2D(min - 1, 0.0));
-					}
-				});
-			}
-		}
 
-		// compute y-coordinates:
-		var lsaLeafHeightMap = splitstree6.view.trees.layout.LSAUtils.computeHeightForLSALeaves(tree, taxon2pos);
-		LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-			if (v.isLeaf()) {
-				var y = taxon2pos[tree.getTaxa(v).iterator().next()];
-				nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), y));
-			} else if (tree.isLsaLeaf(v)) {
-				var y = lsaLeafHeightMap.get(v);
-				nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), y));
-			} else {
-				var yMin = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
-						.mapToDouble(w -> nodePointMap.get(w).getY()).min().orElse(0);
-				var yMax = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
-						.mapToDouble(w -> nodePointMap.get(w).getY()).max().orElse(0);
-				var y = 0.5 * (yMin + yMax);
-				nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), y));
+			final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+			for (var v : tree.nodes()) {
+				nodePointMap.put(v, new Point2D(nodeXMap.get(v), nodeYMap.get(v)));
 			}
-		});
-		return nodePointMap;
+
+			return nodePointMap;
+		}
 	}
 
-	private static double computeAverageEdgeWeight(PhyloTree tree) {
+	public static double computeAverageEdgeWeight(PhyloTree tree) {
 		var weight = 0.0;
 		var count = 0;
 		for (var e : tree.edges()) {

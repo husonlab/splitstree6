@@ -43,10 +43,14 @@ public class LayoutTreeTriangular {
 			nodePointMap.put(root, new Point2D(0.0, 0.0));
 			// compute all y-coordinates:
 			{
+				var lsaLeafHeightMap = splitstree6.view.trees.layout.LSAUtils.computeHeightForLSALeaves(tree, taxon2pos);
 				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-					if (tree.isLsaLeaf(v)) {
+					if (tree.isLeaf(v)) {
 						var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
 						nodePointMap.put(v, new Point2D(0.0, pos));
+						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
+					} else if (tree.isLsaLeaf(v)) {
+						nodePointMap.put(v, new Point2D(0.0, lsaLeafHeightMap.get(v)));
 						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
 					} else {
 						var firstLeafBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> firstLastLeafBelowMap.get(w).getFirst()).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))

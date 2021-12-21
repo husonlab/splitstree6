@@ -1,5 +1,5 @@
 /*
- *  LayoutTreeRadial.java Copyright (C) 2021 Daniel H. Huson
+ *  LayoutTreeCircular.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -23,13 +23,16 @@ import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
-import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 import jloda.util.Pair;
+import jloda.util.Single;
 
-import java.util.concurrent.atomic.LongAccumulator;
+import java.util.LinkedList;
+
+import static splitstree6.view.trees.layout.LayoutTreeRectangular.computeAverageEdgeWeight;
+
 
 /**
  * compute a radial layout
@@ -37,98 +40,147 @@ import java.util.concurrent.atomic.LongAccumulator;
  */
 public class LayoutTreeRadial {
 	/**
-	 * compute layout for a radial cladogram
+	 * compute layout for a radial phylogram
 	 */
-	public static NodeArray<Point2D> applyCladogram(PhyloTree tree, int[] taxon2pos, NodeDoubleArray nodeAngleMap, boolean toScale) {
-		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
-
-		final var numberOfLeaves = tree.nodeStream().filter(tree::isLsaLeaf).count();
-		if (numberOfLeaves > 0) {
-			final var delta = 360.0 / numberOfLeaves;
-
-			final NodeDoubleArray nodeRadiusMap = tree.newNodeDoubleArray();
-
-			final var maxDepth = computeMaxDepth(tree);
-			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (tree.isLsaLeaf(v)) {
-					nodeRadiusMap.put(v, (double) maxDepth);
-				} else {
-					nodeRadiusMap.put(v, IteratorUtils.asStream(tree.lsaChildren(v)).mapToDouble(nodeRadiusMap::get).min().orElse(maxDepth) - 1);
-				}
-			});
-			nodeRadiusMap.put(tree.getRoot(), 0.0);
+	public static NodeArray<Point2D> apply(PhyloTree tree, int[] taxon2pos) {
+		// compute angles:
+		try (var nodeAngleMap = tree.newNodeDoubleArray()) {
+			final var alpha = (tree.getNumberOfNodes() > 0 ? 360.0 / tree.nodeStream().filter(Node::isLeaf).count() : 0);
 
 			nodeAngleMap.put(tree.getRoot(), 0.0);
-			final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
+			var lsaLeafAngleMap = splitstree6.view.trees.layout.LSAUtils.computeAngleForLSALeaves(tree, taxon2pos, alpha);
+
 			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (tree.isLsaLeaf(v)) {
-					firstLastLeafBelowMap.put(v, new Pair<>(v, v));
+				if (tree.isLeaf(v)) {
 					var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-					nodeAngleMap.put(v, pos * delta);
+					nodeAngleMap.put(v, pos * alpha);
+				} else if (tree.isLsaLeaf(v)) {
+					nodeAngleMap.put(v, lsaLeafAngleMap.get(v));
 				} else {
-					var firstLeafBelow = firstLastLeafBelowMap.get(tree.getFirstChildLSA(v)).getFirst();
-					var lastLeafBelow = firstLastLeafBelowMap.get(tree.getLastChildLSA(v)).getSecond();
-					firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
-					nodeAngleMap.put(v, 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow)));
-				}
-				if (toScale && v.getInDegree() > 0) {
-					var e = v.getFirstInEdge();
-					var parentRadius = nodeRadiusMap.get(e.getSource());
-					nodeRadiusMap.put(v, parentRadius + tree.getWeight(e));
+					var aMin = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
+							.mapToDouble(nodeAngleMap::get).min().orElse(0);
+					var aMax = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
+							.mapToDouble(nodeAngleMap::get).max().orElse(0);
+					nodeAngleMap.put(v, 0.5 * (aMin + aMax));
 				}
 			});
-			tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
+
+			// assign coordinates:
+			var delta = tree.isReticulated() ? 0.25 * computeAverageEdgeWeight(tree) : 0.0;
+
+			final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+
+			// assign coordinates:
+			{
+				nodePointMap.put(tree.getRoot(), new Point2D(0, 0));
+				final var queue = new LinkedList<Node>();
+				queue.add(tree.getRoot());
+				while (queue.size() > 0) { // breath-first assignment
+					var w = queue.remove(0); // pop
+					var ok = true;
+					if (w.getInDegree() == 1 && w.getParent() == tree.getRoot()) { // can't show single root edge
+						var rootPt = nodePointMap.get(tree.getRoot());
+						nodePointMap.put(w, rootPt);
+					} else if (w.getInDegree() == 1) { // has regular in-edge
+						var e = w.getFirstInEdge();
+						var v = e.getSource();
+						var vPt = nodePointMap.get(v);
+
+						if (vPt == null) { // can't process yet
+							ok = false;
+						} else {
+							var weight = tree.getWeight(e);
+							var angle = nodeAngleMap.get(w);
+							var wPt = GeometryUtilsFX.translateByAngle(vPt, angle, weight);
+							nodePointMap.put(w, wPt);
+						}
+					} else if (w.getInDegree() > 1) { // all in edges are reticulate edges
+						var rootPt = nodePointMap.get(tree.getRoot());
+						var maxDistance = 0.0;
+						var x = 0.0;
+						var y = 0.0;
+						var count = 0;
+						for (var v : w.parents()) {
+							var vPt = nodePointMap.get(v);
+							if (vPt == null) {
+								ok = false;
+							} else {
+								maxDistance = Math.max(maxDistance, rootPt.distance(vPt));
+								x += vPt.getX();
+								y += vPt.getY();
+							}
+							count++;
+						}
+						if (ok) {
+							var wPt = new Point2D(x / count, y / count);
+							var dist = maxDistance - wPt.distance(rootPt) + delta;
+							var angle = w.getOutDegree() > 0 ? nodeAngleMap.get(w.getFirstOutEdge().getTarget()) : 0;
+							wPt = GeometryUtilsFX.translateByAngle(wPt, angle, dist);
+							nodePointMap.put(w, wPt);
+						}
+					}
+
+					if (ok)   // add children to end of queue:
+						queue.addAll(IteratorUtils.asList(w.children()));
+					else  // process this node again later
+						queue.add(w);
+				}
+			}
+			return nodePointMap;
 		}
-		return nodePointMap;
 	}
+
 
 	/**
 	 * compute layout for a radial phylogram
 	 */
-	public static NodeArray<Point2D> applyPhylogram(PhyloTree tree, int[] taxon2pos, ComputeTreeLayout.ParentPlacement parentPlacement) {
-		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+	public static NodeArray<Point2D> applyAlt(PhyloTree tree, int[] taxon2pos) {
 
-		final var numberOfLeaves = tree.nodeStream().filter(tree::isLsaLeaf).count();
-		if (numberOfLeaves > 0) {
-			final var delta = 360.0 / numberOfLeaves;
+		try (var nodeAngleMap = tree.newNodeDoubleArray()) {
+			final var alpha = (tree.getNumberOfNodes() > 0 ? 360.0 / tree.nodeStream().filter(Node::isLeaf).count() : 0.0);
 
-			final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
-			if (parentPlacement == ComputeTreeLayout.ParentPlacement.LeafAverage) {
-				final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
-				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-					final double angle;
-					if (tree.isLsaLeaf(v)) {
-						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
-						var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-						angle = pos * delta;
-					} else {
-						var firstLeafBelow = firstLastLeafBelowMap.get(tree.getFirstChildLSA(v)).getFirst();
-						var lastLeafBelow = firstLastLeafBelowMap.get(tree.getLastChildLSA(v)).getSecond();
-						firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
-						angle = 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow));
-					}
-					nodeAngleMap.put(v, angle);
-				});
+			if (false) {
+				try (NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray()) {
+					LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+						final double angle;
+						if (tree.isLsaLeaf(v)) {
+							firstLastLeafBelowMap.put(v, new Pair<>(v, v));
+							var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
+							angle = pos * alpha;
+						} else {
+							var firstLeafBelow = firstLastLeafBelowMap.get(tree.getFirstChildLSA(v)).getFirst();
+							var lastLeafBelow = firstLastLeafBelowMap.get(tree.getLastChildLSA(v)).getSecond();
+							firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
+							angle = 0.5 * (nodeAngleMap.get(firstLeafBelow) + nodeAngleMap.get(lastLeafBelow));
+						}
+						nodeAngleMap.put(v, angle);
+					});
+				}
 			} else {
 				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
 					final double angle;
 					if (tree.isLsaLeaf(v)) {
 						var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-						angle = pos * delta;
+						angle = pos * alpha;
 					} else
 						angle = IteratorUtils.asStream(tree.lsaChildren(v)).mapToDouble(nodeAngleMap::get).sum() / v.getOutDegree();
 					nodeAngleMap.put(v, angle);
 				});
 			}
+
+			final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 			nodePointMap.put(tree.getRoot(), new Point2D(0, 0));
 			LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
 				var p = nodePointMap.get(v);
+				for (var w : tree.lsaChildren(v)) {
+
+				}
 				for (var e : v.outEdges()) {
 					nodePointMap.put(e.getTarget(), GeometryUtilsFX.translateByAngle(p, nodeAngleMap.get(e.getTarget()), tree.getWeight(e)));
 				}
 			});
+			return nodePointMap;
 		}
-		return nodePointMap;
 	}
 
 	/**
@@ -138,8 +190,8 @@ public class LayoutTreeRadial {
 	 * @return length of longest path
 	 */
 	public static int computeMaxDepth(PhyloTree tree) {
-		var max = new LongAccumulator(Math::max, 0);
-		LSAUtils.breathFirstTraversalLSA(tree, tree.getRoot(), 0, (level, v) -> max.accumulate(level));
-		return max.intValue();
+		var max = new Single<>(0);
+		LSAUtils.breathFirstTraversalLSA(tree, tree.getRoot(), 0, (level, v) -> max.set(Math.max(max.get(), level)));
+		return max.get();
 	}
 }

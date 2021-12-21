@@ -38,8 +38,10 @@
 
 package splitstree6.view.trees.layout;
 
+import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
@@ -77,7 +79,7 @@ public class CreateEdgesRectangular {
 			}
 			line.getElements().add(moveTo);
 
-			if (!tree.isReticulatedEdge(e) && !tree.isTransferEdge(e)) {
+			if (tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
 				var lineTo1 = new LineTo();
 				line.getElements().add(lineTo1);
 				if (linkNodesEdgesLabels) {
@@ -112,7 +114,20 @@ public class CreateEdgesRectangular {
 					lineTo2.setX(targetShape.getTranslateX());
 					lineTo2.setY(targetShape.getTranslateY());
 				}
-			} else { // special edge
+			} else if (tree.isTransferEdge(e)) {
+				line.setStroke(Color.DARKORANGE);
+				var lineTo1 = new LineTo();
+				line.getElements().add(lineTo1);
+
+				if (linkNodesEdgesLabels) {
+					lineTo1.xProperty().bind(targetShape.translateXProperty());
+					lineTo1.yProperty().bind(targetShape.translateYProperty());
+				} else {
+					lineTo1.setX(targetShape.getTranslateX());
+					lineTo1.setY(targetShape.getTranslateY());
+					addArrowHead(line, moveTo, lineTo1);
+				}
+			} else { // tree.isReticulatedEdge(e)
 				line.setStroke(Color.DARKORANGE);
 
 				var quadCurveTo = new QuadCurveTo();
@@ -128,7 +143,6 @@ public class CreateEdgesRectangular {
 					quadCurveTo.setX(targetShape.getTranslateX());
 					quadCurveTo.setY(targetShape.getTranslateY());
 				}
-
 			}
 			shapes.add(line);
 			edgeCallback.accept(e, line);
@@ -152,5 +166,19 @@ public class CreateEdgesRectangular {
 				}
 			}
 		return shapes;
+	}
+
+	public static void addArrowHead(Path path, MoveTo moveto, LineTo lineTo) {
+		var radian = GeometryUtilsFX.deg2rad(GeometryUtilsFX.computeAngle(lineTo.getX() - moveto.getX(), lineTo.getY() - moveto.getY()));
+		var dx = 10 * Math.cos(radian);
+		var dy = 10 * Math.sin(radian);
+
+		var head = new Point2D(lineTo.getX(), lineTo.getY());
+		var one = head.add(-dx - dy, dx - dy);
+		var two = head.add(-dx + dy, -dx - dy);
+
+		path.getElements().add(new LineTo(one.getX(), one.getY()));
+		path.getElements().add(new MoveTo(head.getX(), head.getY()));
+		path.getElements().add(new LineTo(two.getX(), two.getY()));
 	}
 }

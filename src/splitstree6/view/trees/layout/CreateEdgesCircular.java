@@ -52,6 +52,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
+import static splitstree6.view.trees.layout.CreateEdgesRectangular.addArrowHead;
+
 public class CreateEdgesCircular {
 
 	public static Collection<Shape> apply(ComputeTreeLayout.Diagram diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
@@ -64,6 +66,7 @@ public class CreateEdgesCircular {
 			for (var e : v.outEdges()) {
 				var w = e.getTarget();
 
+
 				// todo: need to implemented linked
 
 				var vPt = nodePointMap.get(v);
@@ -71,31 +74,40 @@ public class CreateEdgesCircular {
 
 				var line = new Path();
 				line.setFill(Color.TRANSPARENT);
-				line.setStroke(color);
 				line.setStrokeLineCap(StrokeLineCap.ROUND);
 				line.setStrokeWidth(1);
 
-				line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));
+				if (tree.isTreeEdge(e)) {
+					line.setStroke(color);
 
-				if (vPt.magnitude() > 0 && wPt.magnitude() > 0) {
-					var corner = wPt.multiply(vPt.magnitude() / wPt.magnitude());
+					if (tree.isReticulatedEdge(e))
+						line.setStroke(Color.PINK);
 
-					var arcTo = new ArcTo();
-					arcTo.setX(corner.getX());
-					arcTo.setY(corner.getY());
-					arcTo.setRadiusX(vPt.magnitude());
-					arcTo.setRadiusY(vPt.magnitude());
-					arcTo.setLargeArcFlag(GeometryUtilsFX.computeObservedAngle(origin, vPt, wPt) > 180);
-					arcTo.setSweepFlag(GeometryUtilsFX.computeObservedAngle(origin, vPt, wPt) > 0);
+					line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));
 
-					line.getElements().add(arcTo);
+					if (vPt.magnitude() > 0 && wPt.magnitude() > 0) {
+						var corner = wPt.multiply(vPt.magnitude() / wPt.magnitude());
+
+						var arcTo = new ArcTo();
+						arcTo.setX(corner.getX());
+						arcTo.setY(corner.getY());
+						arcTo.setRadiusX(vPt.magnitude());
+						arcTo.setRadiusY(vPt.magnitude());
+						arcTo.setLargeArcFlag(GeometryUtilsFX.computeObservedAngle(origin, vPt, wPt) > 180);
+						arcTo.setSweepFlag(GeometryUtilsFX.computeObservedAngle(origin, vPt, wPt) > 0);
+
+						line.getElements().add(arcTo);
+					}
+
+					line.getElements().add(new LineTo(wPt.getX(), wPt.getY()));
+				} else {
+					line.setStroke(Color.DARKORANGE);
+					var moveTo = new MoveTo(vPt.getX(), vPt.getY());
+					var lineTo = new LineTo(wPt.getX(), wPt.getY());
+					line.getElements().addAll(moveTo, lineTo);
+					if (tree.isTransferEdge(e))
+						addArrowHead(line, moveTo, lineTo);
 				}
-
-				var lineTo2 = new LineTo();
-				lineTo2.setX(wPt.getX());
-				lineTo2.setY(wPt.getY());
-
-				line.getElements().add(lineTo2);
 				shapes.add(line);
 				edgeCallback.accept(e, line);
 

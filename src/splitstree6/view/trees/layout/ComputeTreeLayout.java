@@ -184,9 +184,9 @@ public class ComputeTreeLayout {
 			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, taxon2pos, true);
 			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, taxon2pos, false);
 			case TriangularCladogram -> LayoutTreeTriangular.apply(tree, taxon2pos);
-			case RadialPhylogram -> LayoutTreeRadial.applyPhylogram(tree, taxon2pos, parentPlacement);
-			case RadialCladogram, CircularCladogram -> LayoutTreeRadial.applyCladogram(tree, taxon2pos, nodeAngleMap, false);
-			case CircularPhylogram -> LayoutTreeRadial.applyCladogram(tree, taxon2pos, nodeAngleMap, true);
+			case RadialPhylogram -> LayoutTreeRadial.apply(tree, taxon2pos);
+			case RadialCladogram, CircularCladogram -> LayoutTreeCircular.apply(tree, taxon2pos, nodeAngleMap, false);
+			case CircularPhylogram -> LayoutTreeCircular.apply(tree, taxon2pos, nodeAngleMap, true);
 		};
 
 		normalize(normalizeWidth, normalizeHeight, nodePointMap);
@@ -202,7 +202,7 @@ public class ComputeTreeLayout {
 
 		for (var v : tree.nodes()) {
 			var point = nodePointMap.get(v);
-			var circle = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
+			var circle = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 2 : 0.5);
 			circle.setFill(color);
 			circle.setStroke(Color.TRANSPARENT);
 			nodeGroup.getChildren().add(circle);
