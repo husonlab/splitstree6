@@ -24,11 +24,9 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.control.IndexRange;
 import jloda.fx.find.ITextSearcher;
 import org.fxmisc.richtext.CodeArea;
 
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -84,33 +82,37 @@ public class CodeAreaSearcher implements ITextSearcher {
 	/**
 	 * Find first instance
 	 */
-	public boolean findFirst(String regularExpression) {
+	public boolean findFirst(String regEx) {
 		//codeArea.positionCaret(0);
 		codeArea.moveTo(0); //todo test
-		return singleSearch(regularExpression, true);
+		return singleSearch(regEx, true);
 	}
 
 	/**
 	 * Find next instance
 	 */
-	public boolean findNext(String regularExpression) {
-		return singleSearch(regularExpression, true);
+	public boolean findNext(String regEx) {
+		return singleSearch(regEx, true);
 	}
 
 	/**
 	 * Find previous instance
 	 */
-	public boolean findPrevious(String regularExpression) {
-		return codeArea != null && singleSearch(regularExpression, false);
+	public boolean findPrevious(String regEx) {
+		return codeArea != null && singleSearch(regEx, false);
 	}
 
 	/**
 	 * Replace selection with current. Does nothing if selection invalid.
 	 */
-	public boolean replaceNext(String regularExpression, String replaceText) {
+	public boolean replaceNext(String regEx, String replaceText) {
 		if (codeArea == null) return false;
-		if (findNext(regularExpression)) {
-			codeArea.replaceSelection(replaceText);
+		if (findNext(regEx)) {
+			var selection = codeArea.getSelection();
+			var inputText = codeArea.getSelectedText();
+			var newText = inputText.replaceAll(regEx, replaceText);
+			codeArea.replaceSelection(newText);
+			codeArea.selectRange(selection.getStart(), selection.getStart() + newText.length());
 			return true;
 		}
 		return false;
@@ -124,34 +126,10 @@ public class CodeAreaSearcher implements ITextSearcher {
 	public int replaceAll(String regularExpression, String replaceText, boolean selectionOnly) {
 		if (codeArea == null) return 0;
 
-		final ArrayList<IndexRange> occurrences = new ArrayList<>();
-		{
-			final IndexRange indexRange;
-			if (selectionOnly)
-				indexRange = codeArea.getSelection();
-			else
-				indexRange = null;
-
-			final Pattern pattern = Pattern.compile(regularExpression);
-			final Matcher matcher = pattern.matcher(codeArea.getText());
-			int pos = 0;
-
-			int offset = 0; // need to take into account that text length may change during replacement
-
-			while (matcher.find(pos)) {
-				if (indexRange == null || matcher.start() >= indexRange.getStart() && matcher.end() <= indexRange.getEnd()) {
-					occurrences.add(new IndexRange(matcher.start() + offset, matcher.end() + offset));
-					offset += replaceText.length() - (matcher.end() - matcher.start());
-				}
-				pos = matcher.end();
-			}
-		}
-
-		for (IndexRange range : occurrences) {
-			codeArea.replaceText(range, replaceText);
-
-		}
-		return occurrences.size();
+		var matcher = Pattern.compile(regularExpression).matcher(codeArea.getText());
+		var count = (int) matcher.results().count();
+		codeArea.replaceText(matcher.replaceAll(replaceText));
+		return count;
 	}
 
 	/**
@@ -217,7 +195,6 @@ public class CodeAreaSearcher implements ITextSearcher {
 		return Math.max(codeArea.getAnchor(), codeArea.getCaretPosition());
 	}
 
-
 	private void selectMatched(Matcher matcher) {
 		codeArea.selectRange(matcher.start(), matcher.end());
 	}
@@ -232,13 +209,12 @@ public class CodeAreaSearcher implements ITextSearcher {
 		//Search begins at the end of the currently selected portion of text.
 		int currentPoint = getSearchStart();
 
-
 		boolean found = false;
 
-		Pattern pattern = Pattern.compile(regularExpression);
+		var pattern = Pattern.compile(regularExpression);
 
-		String source = codeArea.getText();
-		Matcher matcher = pattern.matcher(source);
+		var source = codeArea.getText();
+		var matcher = pattern.matcher(source);
 
 		if (forward)
 			found = matcher.find(currentPoint);
@@ -257,9 +233,6 @@ public class CodeAreaSearcher implements ITextSearcher {
 				found = true;
 				//System.err.println("\tfound at [" + pos + "," + matcher.end() + "]" + " but still looking");
 			}
-			if (found)
-				matcher.find(pos);
-			//System.err.println("\tfound at [" + pos + "," + matcher.end() + "]");
 		}
 
 		if (!found && currentPoint != 0) {
