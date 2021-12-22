@@ -94,7 +94,7 @@ public class LayoutAlgorithm {
 				} else {
 					var maxDepth = computeMaxDepth(tree);
 					try (var nodeRadiusMap = tree.newNodeDoubleArray()) {
-						tree.postorderTraversal(tree.getRoot(), v -> {
+						tree.postorderTraversal(v -> {
 							if (tree.isLeaf(v)) {
 								nodeRadiusMap.put(v, (double) maxDepth);
 							} else {
