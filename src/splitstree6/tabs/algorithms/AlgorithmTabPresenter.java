@@ -23,7 +23,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
-import jloda.util.Basic;
 import jloda.util.StringUtils;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
@@ -43,15 +42,6 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 
 		controller.getApplyButton().setOnAction(e -> algorithmTab.getAlgorithmNode().restart());
 		controller.getApplyButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()));
-
-		controller.getReset().setOnAction(e -> {
-			try {
-				algorithmNode.setAlgorithm(algorithmNode.getAlgorithm().getClass().getConstructor().newInstance());
-			} catch (Exception ex) {
-				Basic.caught(ex);
-			}
-		});
-		controller.getReset().disableProperty().bind(Bindings.isEmpty(controller.getMainPane().getChildren()));
 
 		var label = new Label();
 		label.textProperty().bind(algorithmTab.getAlgorithmNode().titleProperty());

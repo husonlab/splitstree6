@@ -22,14 +22,19 @@ package splitstree6.tabs.algorithms;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.MenuButton;
 import javafx.scene.layout.Pane;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 
+/**
+ * algorithm tab controller
+ * Daniel Huson, 12.2021
+ *
+ * @param <S>
+ * @param <T>
+ */
 public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
-
-	@FXML
-	private Pane topPane;
 	@FXML
 	private Pane mainPane;
 
@@ -37,17 +42,18 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 	private ChoiceBox<Algorithm<S, T>> algorithmCBox;
 
 	@FXML
-	private Button Reset;
+	private Button applyButton;
 
 	@FXML
-	private Button applyButton;
+	private MenuButton menuButton;
+
+	@FXML
+	private void initialize() {
+		menuButton.setVisible(false);
+	}
 
 	public ChoiceBox<Algorithm<S, T>> getAlgorithmCBox() {
 		return algorithmCBox;
-	}
-
-	public Button getReset() {
-		return Reset;
 	}
 
 	public Button getApplyButton() {
@@ -58,7 +64,7 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 		return mainPane;
 	}
 
-	public Pane getTopPane() {
-		return topPane;
+	public MenuButton getMenuButton() {
+		return menuButton;
 	}
 }

@@ -20,7 +20,10 @@
   -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
@@ -40,58 +43,46 @@
                 <GridPane BorderPane.alignment="CENTER">
                     <columnConstraints>
                         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
+                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
                         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
+                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="30.0" minWidth="10.0"
+                                           prefWidth="30.0"/>
                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES"/>
                     </columnConstraints>
                     <rowConstraints>
                         <RowConstraints minHeight="32.0" prefHeight="34.0" vgrow="SOMETIMES"/>
                     </rowConstraints>
                     <children>
-                        <ChoiceBox fx:id="algorithmCBox">
+                        <ChoiceBox fx:id="algorithmCBox" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                             <GridPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="10.0"/>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </GridPane.margin>
                         </ChoiceBox>
-                        <HBox spacing="10.0" GridPane.columnIndex="2">
-                            <children>
-                                <Button fx:id="Reset" contentDisplay="GRAPHIC_ONLY" layoutX="98.0" layoutY="11.0"
-                                        maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Reset">
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Undo24.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Reset to default settings"/>
-                                    </tooltip>
-                                </Button>
-                                <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" layoutX="98.0" layoutY="11.0"
-                                        maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                                        mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Apply">
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Run algorithm"/>
-                                    </tooltip>
-                                </Button>
-                            </children>
-                            <padding>
-                                <Insets bottom="5.0" left="5.0" right="10.0" top="5.0"/>
-                            </padding>
-                        </HBox>
-                        <Pane fx:id="topPane" GridPane.columnIndex="1"/>
+                        <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
+                                prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                text="Apply" GridPane.columnIndex="3" GridPane.halignment="CENTER"
+                                GridPane.valignment="CENTER">
+                            <graphic>
+                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                    <image>
+                                        <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
+                                    </image>
+                                </ImageView>
+                            </graphic>
+                            <tooltip>
+                                <Tooltip text="Run algorithm"/>
+                            </tooltip>
+                            <GridPane.margin>
+                                <Insets/>
+                            </GridPane.margin>
+                        </Button>
+                        <MenuButton fx:id="menuButton" mnemonicParsing="false" text="Edit" GridPane.columnIndex="1"
+                                    GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                            <GridPane.margin>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                            </GridPane.margin>
+                        </MenuButton>
                     </children>
                 </GridPane>
             </top>

@@ -41,7 +41,10 @@ public class Utilities {
 		for (var t = 1; t <= ntax; t++)
 			taxa.set(t);
 		var distances = new double[ntax][ntax];
-		for (var tree : treesBlock.getTrees()) {
+		var step = Math.max(1, treesBlock.getNTrees() / 1000);
+		var trees = treesBlock.getTrees();
+		for (int i = 0; i < trees.size(); i += step) {
+			var tree = trees.get(i);
 			var splits = new ArrayList<ASplit>();
 			TreesUtilities.computeSplits(taxa, tree, splits);
 			SplitsUtilities.splitsToDistances(ntax, splits, distances);

@@ -29,7 +29,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.Pane;
 import javafx.util.converter.DefaultStringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
@@ -223,32 +222,32 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		taxaEditorNode.validProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 		activeChangedListener.invalidated(null);
 
-		setContextMenuOnTab(tab.getController().getTopPane(), controller);
+		setupEditMenuButton(tab.getController().getMenuButton(), controller);
+
 	}
 
-	private void setContextMenuOnTab(Pane pane, TaxaEditController controller) {
-		var newContextMenu = new ContextMenu();
+	private void setupEditMenuButton(MenuButton menuButton, TaxaEditController controller) {
 		for (var contextMenu : List.of(controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu())) {
-			if (newContextMenu.getItems().size() > 0)
-				newContextMenu.getItems().add(new SeparatorMenuItem());
+			if (menuButton.getItems().size() > 0)
+				menuButton.getItems().add(new SeparatorMenuItem());
 
 			for (var menuItem : contextMenu.getItems()) {
 				if (menuItem instanceof SeparatorMenuItem) {
-					newContextMenu.getItems().add(new SeparatorMenuItem());
+					menuButton.getItems().add(new SeparatorMenuItem());
 				} else if (menuItem instanceof RadioMenuItem radioMenuItem) {
 					var newMenuItem = new RadioMenuItem(menuItem.getText());
 					newMenuItem.selectedProperty().bindBidirectional(radioMenuItem.selectedProperty());
 					newMenuItem.disableProperty().bind(menuItem.disableProperty());
-					newContextMenu.getItems().add(newMenuItem);
+					menuButton.getItems().add(newMenuItem);
 				} else {
 					var newMenuItem = new MenuItem(menuItem.getText());
 					newMenuItem.setOnAction(menuItem.getOnAction());
 					newMenuItem.disableProperty().bind(menuItem.disableProperty());
-					newContextMenu.getItems().add(newMenuItem);
+					menuButton.getItems().add(newMenuItem);
 				}
 			}
 		}
-		pane.setOnContextMenuRequested(e -> newContextMenu.show(pane, e.getScreenX(), e.getScreenY()));
+		menuButton.setVisible(true);
 	}
 
 	private Searcher<TaxaEditTableItem> setupSearcher(TableView<TaxaEditTableItem> tableView) {
