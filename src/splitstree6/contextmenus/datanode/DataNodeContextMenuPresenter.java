@@ -117,6 +117,7 @@ public class DataNodeContextMenuPresenter {
 		for (var pair : list) {
 			var menuItem = new MenuItem(pair.getKey());
 			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(workflow, dataNode, pair.getValue())));
+			menuItem.setDisable(!pair.getValue().isApplicable(workflow.getWorkingTaxaBlock(), dataNode.getDataBlock()));
 			result.add(menuItem);
 		}
 		return result;

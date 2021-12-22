@@ -66,7 +66,7 @@ import java.util.function.BiConsumer;
  */
 public class ComputeTreeLayout {
 	public enum Diagram {
-		RectangularCladogram, RectangularPhylogram, TriangularCladogram, RadialCladogram, RadialPhylogram, CircularCladogram, CircularPhylogram;
+		RectangularCladogram, RectangularPhylogram, CircularCladogram, CircularPhylogram, TriangularCladogram, RadialCladogram, RadialPhylogram;
 
 		public static Diagram getDefault() {
 			return Diagram.valueOf(ProgramProperties.get("DefaultTreeDiagram", RectangularPhylogram.name()));

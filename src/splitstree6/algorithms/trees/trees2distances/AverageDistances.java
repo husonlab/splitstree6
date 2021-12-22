@@ -148,4 +148,9 @@ public class AverageDistances extends Trees2Distances {
 			}
 		}
 	}
+
+	@Override
+	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
+		return !parent.isPartial() && !parent.isReticulated();
+	}
 }

@@ -176,6 +176,11 @@ public class FilteredSuperNetwork extends SuperNetwork {
 		this.optionMaxDistortionScore.set(optionMaxDistortionScore);
 	}
 
+	@Override
+	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
+		return !parent.isReticulated();
+	}
+
 	public boolean isOptionAllTrivial() {
 		return optionAllTrivial.get();
 	}

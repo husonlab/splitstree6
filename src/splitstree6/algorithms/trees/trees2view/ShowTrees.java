@@ -73,6 +73,7 @@ public class ShowTrees extends Trees2View {
 					if (viewBlock.getView() instanceof TreePagesView view) {
 						view.getUndoManager().clear();
 						view.getTrees().setAll(inputData.getTrees());
+						view.setReticulated(inputData.isReticulated());
 					}
 				});
 			}
@@ -88,6 +89,7 @@ public class ShowTrees extends Trees2View {
 					if (viewBlock.getView() instanceof TanglegramView view) {
 						view.getUndoManager().clear();
 						view.getTrees().setAll(inputData.getTrees());
+						view.setReticulated(inputData.isReticulated());
 					}
 				});
 			}

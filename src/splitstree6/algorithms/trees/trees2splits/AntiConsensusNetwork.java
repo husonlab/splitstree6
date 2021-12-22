@@ -619,7 +619,7 @@ public class AntiConsensusNetwork extends Trees2Splits {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return true;
+		return !parent.isReticulated();
 	}
 
 	/**

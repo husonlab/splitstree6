@@ -229,9 +229,8 @@ public class ConsensusNetwork extends Trees2Splits {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return parent.size() > 0 && !parent.isPartial();
+		return !parent.isPartial() && !parent.isReticulated();
 	}
-
 
 	public EdgeWeights getOptionEdgeWeights() {
 		return optionEdgeWeights.get();

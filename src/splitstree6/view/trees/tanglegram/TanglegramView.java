@@ -26,7 +26,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.control.TabPane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
@@ -49,14 +48,13 @@ public class TanglegramView implements IView {
 	private final TanglegramViewController controller;
 	private final TanglegramViewPresenter presenter;
 
-	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>();
+	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
-	private final StringProperty name = new SimpleStringProperty();
-
-	private final ObjectProperty<TabPane> tabPane = new SimpleObjectProperty<>(null);
+	private final StringProperty name = new SimpleStringProperty(this, "name");
 
 	private final ObservableList<PhyloTree> trees = FXCollections.observableArrayList();
-	private final BooleanProperty empty = new SimpleBooleanProperty(true);
+	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
+	private final BooleanProperty reticulated = new SimpleBooleanProperty(this, "reticulated", false);
 
 	private final IntegerProperty optionTree1 = new SimpleIntegerProperty(this, "optionTree1", 1); // 1-based
 	private final ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram1 = new SimpleObjectProperty<>(this, "optionDiagram1", ComputeTreeLayout.Diagram.RectangularPhylogram);
@@ -141,16 +139,21 @@ public class TanglegramView implements IView {
 		return name;
 	}
 
-	public TabPane getTabPane() {
-		return tabPane.get();
-	}
-
-	public ObjectProperty<TabPane> tabPaneProperty() {
-		return tabPane;
-	}
 
 	public ObservableList<PhyloTree> getTrees() {
 		return trees;
+	}
+
+	public boolean isReticulated() {
+		return reticulated.get();
+	}
+
+	public BooleanProperty reticulatedProperty() {
+		return reticulated;
+	}
+
+	public void setReticulated(boolean reticulated) {
+		this.reticulated.set(reticulated);
 	}
 
 	public boolean isEmpty() {

@@ -198,6 +198,11 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 		this.optionLadderize.set(optionLadderize);
 	}
 
+	@Override
+	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
+		return !parent.isPartial() && !parent.isReticulated();
+	}
+
 	/**
 	 * order edges to ladderize
 	 */

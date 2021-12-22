@@ -326,7 +326,7 @@ public class LooseAndLacy extends Trees2Trees {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return taxaBlock.getTraitsBlock() != null && taxaBlock.getTraitsBlock().getNTraits() > 0 && parent.getNTrees() > 0;
+		return taxaBlock.getTraitsBlock() != null && taxaBlock.getTraitsBlock().getNTraits() > 0 && parent.getNTrees() > 0 && !parent.isPartial() && !parent.isReticulated();
 	}
 
 	public SpeciesDefinition getOptionSpeciesDefinition() {

@@ -53,6 +53,6 @@ public class AverageConsensus extends Trees2Splits {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isPartial();
+		return !parent.isPartial() && !parent.isReticulated();
 	}
 }

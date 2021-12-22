@@ -26,7 +26,9 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.scene.control.SelectionMode;
@@ -36,6 +38,7 @@ import jloda.fx.find.Searcher;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.view.trees.layout.ComputeTreeLayout;
 import splitstree6.view.trees.ordering.CircularOrdering;
 import splitstree6.view.trees.treepages.ComboBoxUtils;
 import splitstree6.view.trees.treepages.TreePane;
@@ -117,19 +120,37 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			tanglegramView.optionFontScaleFactorProperty().addListener(e -> connectors.update());
 		}
 
-		controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(false));
-		controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(false));
-		controller.getDiagram1CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
-		controller.getDiagram1CBox().setValue(tanglegramView.getOptionDiagram1());
-		tanglegramView.optionDiagram1Property().addListener((v, o, n) -> controller.getDiagram1CBox().setValue(n));
-		controller.getDiagram1CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram1Property().set(n));
+		{
+			final ObservableSet<ComputeTreeLayout.Diagram> disabledDiagrams1 = FXCollections.observableSet();
+			tree1.addListener((v, o, n) -> {
+				disabledDiagrams1.clear();
+				if (tree1.get() != null && tree1.get().isReticulated()) {
+					disabledDiagrams1.add(ComputeTreeLayout.Diagram.TriangularCladogram);
+				}
+			});
 
-		controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(true));
-		controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(true));
-		controller.getDiagram2CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
-		controller.getDiagram2CBox().setValue(tanglegramView.getOptionDiagram2());
-		tanglegramView.optionDiagram2Property().addListener((v, o, n) -> controller.getDiagram2CBox().setValue(n));
-		controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram2Property().set(n));
+			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(false, disabledDiagrams1));
+			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(false, disabledDiagrams1));
+			controller.getDiagram1CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
+			controller.getDiagram1CBox().setValue(tanglegramView.getOptionDiagram1());
+			tanglegramView.optionDiagram1Property().addListener((v, o, n) -> controller.getDiagram1CBox().setValue(n));
+			controller.getDiagram1CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram1Property().set(n));
+		}
+		{
+			final ObservableSet<ComputeTreeLayout.Diagram> disabledDiagrams2 = FXCollections.observableSet();
+			tree2.addListener((v, o, n) -> {
+				disabledDiagrams2.clear();
+				if (tree2.get() != null && tree2.get().isReticulated()) {
+					disabledDiagrams2.add(ComputeTreeLayout.Diagram.TriangularCladogram);
+				}
+			});
+			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(true, disabledDiagrams2));
+			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(true, disabledDiagrams2));
+			controller.getDiagram2CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
+			controller.getDiagram2CBox().setValue(tanglegramView.getOptionDiagram2());
+			tanglegramView.optionDiagram2Property().addListener((v, o, n) -> controller.getDiagram2CBox().setValue(n));
+			controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram2Property().set(n));
+		}
 
 		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createOrientationComboBoxListCell());
 		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createOrientationComboBoxCallback());

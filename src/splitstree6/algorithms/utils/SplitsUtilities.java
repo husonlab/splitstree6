@@ -32,7 +32,6 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
-import java.io.PrintStream;
 import java.util.*;
 
 /**
@@ -83,8 +82,8 @@ public class SplitsUtilities {
 	 */
 	static public int[] computeCycle(int ntax, List<ASplit> splits) {
 		try {
-			final PrintStream pso = Basic.hideSystemOut();
-			final PrintStream pse = Basic.hideSystemErr();
+			final var pso = Basic.hideSystemOut();
+			final var pse = Basic.hideSystemErr();
 			try {
 				return NeighborNetCycle.computeNeighborNetCycle(ntax, splitsToDistances(ntax, splits));
 			} finally {
@@ -93,8 +92,8 @@ public class SplitsUtilities {
 			}
 		} catch (Exception ex) {
 			Basic.caught(ex);
-			final int[] order = new int[ntax + 1];
-			for (int t = 1; t <= ntax; t++) {
+			final var order = new int[ntax + 1];
+			for (var t = 1; t <= ntax; t++) {
 				order[t] = t;
 			}
 			return order;
@@ -123,12 +122,12 @@ public class SplitsUtilities {
 	public static double[][] splitsToDistances(int ntax, List<ASplit> splits, double[][] dist) {
 		if (dist == null)
 			dist = new double[ntax][ntax];
-		for (int i = 1; i <= ntax; i++) {
-			for (int j = i + 1; j <= ntax; j++) {
-				for (ASplit split : splits) {
-					BitSet A = split.getA();
-
-					if (A.get(i) != A.get(j)) {
+		for (var i = 1; i <= ntax; i++) {
+			for (var j = i + 1; j <= ntax; j++) {
+				for (var split : splits) {
+					var A = split.getA();
+					var B = split.getB();
+					if (A.get(i) != A.get(j) && B.get(i) != B.get(j)) {
 						dist[i - 1][j - 1]++;
 						dist[j - 1][i - 1]++;
 					}
@@ -146,20 +145,20 @@ public class SplitsUtilities {
 	 * @return normalized cycle
 	 */
 	public static int[] normalizeCycle(int[] cycle) {
-		int posOf1 = -1;
-		for (int i = 1; i < cycle.length; i++) {
+		var posOf1 = -1;
+		for (var i = 1; i < cycle.length; i++) {
 			if (cycle[i] == 1) {
 				posOf1 = i;
 				break;
 			}
 		}
-		final int posPrev = (posOf1 == 1 ? cycle.length - 1 : posOf1 - 1);
-		final int posNext = (posOf1 == cycle.length - 1 ? 1 : posOf1 + 1);
+		final var posPrev = (posOf1 == 1 ? cycle.length - 1 : posOf1 - 1);
+		final var posNext = (posOf1 == cycle.length - 1 ? 1 : posOf1 + 1);
 		if (cycle[posPrev] > cycle[posNext]) { // has correct orientation, ensure that taxon 1 is at first position
 			if (posOf1 != 1) {
-				int[] tmp = new int[cycle.length];
-				int i = posOf1;
-				for (int j = 1; j < tmp.length; j++) {
+				var tmp = new int[cycle.length];
+				var i = posOf1;
+				for (var j = 1; j < tmp.length; j++) {
 					tmp[j] = cycle[i];
 					if (++i == cycle.length)
 						i = 1;
@@ -169,9 +168,9 @@ public class SplitsUtilities {
 				return cycle;
 		} else // change orientation, as well
 		{
-			int[] tmp = new int[cycle.length];
-			int i = posOf1;
-			for (int j = 1; j < tmp.length; j++) {
+			var tmp = new int[cycle.length];
+			var i = posOf1;
+			for (var j = 1; j < tmp.length; j++) {
 				tmp[j] = cycle[i];
 				if (--i == 0)
 					i = cycle.length - 1;
@@ -186,7 +185,7 @@ public class SplitsUtilities {
 	 * @param splits
 	 */
 	public static ArrayList<ASplit> sortByDecreasingWeight(List<ASplit> splits) {
-		final ASplit[] array = splits.toArray(new ASplit[splits.size()]);
+		final var array = splits.toArray(new ASplit[splits.size()]);
 		Arrays.sort(array, (a, b) -> {
 			if (a.getWeight() > b.getWeight())
 				return -1;
@@ -206,9 +205,9 @@ public class SplitsUtilities {
 	 * @return true if circular
 	 */
 	public static boolean isCircular(TaxaBlock taxa, int[] cycle, ASplit split) {
-		final BitSet part = (!split.getA().get(cycle[1]) ? split.getA() : split.getB()); // choose part that doesn't go around the horn
-		int prev = 0;
-		for (int t = 1; t <= taxa.getNtax(); t++) {
+		final var part = (!split.getA().get(cycle[1]) ? split.getA() : split.getB()); // choose part that doesn't go around the horn
+		var prev = 0;
+		for (var t = 1; t <= taxa.getNtax(); t++) {
 			if (part.get(cycle[t])) {
 				if (prev != 0 && t != prev + 1)
 					return false;
@@ -226,10 +225,10 @@ public class SplitsUtilities {
 	 * @throws SplitsException
 	 */
 	public static void verifySplits(Collection<ASplit> splits, TaxaBlock taxa) throws SplitsException {
-		final Set<BitSet> seen = new HashSet<>();
+		final var seen = new HashSet<BitSet>();
 
-		for (ASplit split : splits) {
-			final BitSet aSet = split.getA();
+		for (var split : splits) {
+			final var aSet = split.getA();
 			if (seen.contains(aSet))
 				throw new SplitsException("Split " + aSet + " occurs multiple times");
 			if (aSet.cardinality() == 0)
@@ -256,8 +255,7 @@ public class SplitsUtilities {
 		if (splits == null || dist == null)
 			return;
 
-		final int ntax = dist.getNtax();
-
+		final var ntax = dist.getNtax();
 
 		if (!forceRecalculation && splits.getFit() >= 0)
 			return; //No need to recalculate.
@@ -267,14 +265,14 @@ public class SplitsUtilities {
 
 		pl.setSubtask("Recomputing fit");
 
-		double[][] sdist = new double[ntax + 1][ntax + 1];
+		var sdist = new double[ntax + 1][ntax + 1];
 
-		for (int i = 1; i <= ntax; i++) {
+		for (var i = 1; i <= ntax; i++) {
 			sdist[i][i] = 0;
-			for (int j = i + 1; j <= ntax; j++) {
+			for (var j = i + 1; j <= ntax; j++) {
 				float dij = 0;
-				for (int s = 1; s <= splits.getNsplits(); s++) {
-					BitSet split = splits.getSplits().get(s - 1).getA();
+				for (var s = 1; s <= splits.getNsplits(); s++) {
+					var split = splits.getSplits().get(s - 1).getA();
 					if (split.get(i) != split.get(j))
 						dij += splits.getSplits().get(s - 1).getWeight();
 				}
@@ -288,8 +286,8 @@ public class SplitsUtilities {
 		float diffSumSquare = 0;
 		float netsumSquare = 0;
 
-		for (int i = 1; i <= ntax; i++) {
-			for (int j = i + 1; j <= ntax; j++) {
+		for (var i = 1; i <= ntax; i++) {
+			for (var j = i + 1; j <= ntax; j++) {
 				double sij = sdist[i][j];
 				double dij = dist.get(i, j);
 				ssum += Math.abs(sij - dij);
@@ -312,10 +310,10 @@ public class SplitsUtilities {
 	}
 
 	public static void rotateCycle(int[] cycle, int first) {
-		final int[] tmp = new int[2 * cycle.length - 1];
+		final var tmp = new int[2 * cycle.length - 1];
 		System.arraycopy(cycle, 0, tmp, 0, cycle.length);
 		System.arraycopy(cycle, 1, tmp, cycle.length, cycle.length - 1);
-		for (int i = 1; i < tmp.length; i++) {
+		for (var i = 1; i < tmp.length; i++) {
 			if (tmp[i] == first) {
 				for (int j = 1; j < cycle.length; j++) {
 					cycle[j] = tmp[i++];
@@ -326,10 +324,10 @@ public class SplitsUtilities {
 	}
 
 	public static int getTighestSplit(BitSet taxa, SplitsBlock splitsBlock) {
-		int best = 0;
-		int bestSideCardinality = Integer.MAX_VALUE;
-		for (int s = 1; s <= splitsBlock.getNsplits(); s++) {
-			final ASplit split = splitsBlock.get(s);
+		var best = 0;
+		var bestSideCardinality = Integer.MAX_VALUE;
+		for (var s = 1; s <= splitsBlock.getNsplits(); s++) {
+			final var split = splitsBlock.get(s);
 			if (BitSetUtils.contains(split.getA(), taxa) && split.getA().cardinality() < bestSideCardinality) {
 				best = s;
 				bestSideCardinality = split.getA().cardinality();

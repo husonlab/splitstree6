@@ -83,7 +83,9 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 		} else if (this instanceof DataLoader<S, T> source) {
 			var targetTaxaBlock = outputData.stream().filter(d -> d instanceof TaxaBlock).map(d -> (TaxaBlock) d).findFirst().orElse(null);
 			source.load(progress, inputBlock, targetTaxaBlock, outputBlock);
-		} else {
+		} else if (taxaBlock != null && inputBlock != null && outputBlock != null) {
+			if (!isApplicable(taxaBlock, inputBlock))
+				throw new IOException("Algorithm is not applicable to given input data");
 			compute(progress, taxaBlock, inputBlock, outputBlock);
 		}
 	}

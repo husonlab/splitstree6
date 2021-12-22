@@ -30,7 +30,7 @@ public class TreesBlock extends DataBlock {
 	private final ObservableList<PhyloTree> trees;
 	private boolean partial = false; // are partial trees present?
 	private boolean rooted = false; // are the trees explicitly rooted?
-	private boolean network = false;
+	private boolean reticulated = false;
 
 	private TreesFormat format = new TreesFormat();
 
@@ -48,7 +48,7 @@ public class TreesBlock extends DataBlock {
 		trees.addAll(that.getTrees());
 		partial = that.isPartial();
 		rooted = that.isRooted();
-		network = that.isNetwork();
+		reticulated = that.isReticulated();
 		format = new TreesFormat();
 	}
 
@@ -81,12 +81,12 @@ public class TreesBlock extends DataBlock {
 		this.rooted = rooted;
 	}
 
-	public boolean isNetwork() {
-		return network;
+	public boolean isReticulated() {
+		return reticulated;
 	}
 
-	public void setNetwork(boolean network) {
-		this.network = network;
+	public void setReticulated(boolean reticulated) {
+		this.reticulated = reticulated;
 	}
 
 	/**
@@ -110,7 +110,7 @@ public class TreesBlock extends DataBlock {
 		trees.clear();
 		partial = false;
 		rooted = false;
-		network=false;
+		reticulated =false;
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class TreesBlock extends DataBlock {
 
 	@Override
 	public void updateShortDescription() {
-		setShortDescription((getNTrees() == 1 ? "one tree" : String.format("%,d trees", getNTrees())) + (isPartial() ? ", partial" : "") + (isNetwork() ? ", network" : ""));
+		setShortDescription((getNTrees() == 1 ? "one tree" : String.format("%,d trees", getNTrees())) + (isPartial() ? ", partial" : "") + (isReticulated() ? ", network" : ""));
 	}
 
 	@Override

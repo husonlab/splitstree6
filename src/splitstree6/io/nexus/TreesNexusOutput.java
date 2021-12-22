@@ -50,8 +50,8 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 			w.write("PROPERTIES");
 			w.write(" partialTrees=" + (treesBlock.isPartial() ? "yes" : "no"));
 			w.write(" rooted=" + (treesBlock.isRooted() ? "yes" : "no"));
-			if (treesBlock.isNetwork())
-				w.write(" network=yes");
+			if (treesBlock.isReticulated())
+				w.write(" reticulated=yes");
 			w.write(";\n");
 		}
 

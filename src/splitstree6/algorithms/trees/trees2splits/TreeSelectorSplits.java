@@ -91,7 +91,7 @@ public class TreeSelectorSplits extends Trees2Splits {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return 1 <= getOptionWhich() && getOptionWhich() <= parent.getTrees().size() && !parent.isPartial();
+		return 1 <= getOptionWhich() && getOptionWhich() <= parent.getTrees().size() && !parent.isPartial() && !parent.isReticulated();
 	}
 
 	public int getOptionWhich() {

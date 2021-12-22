@@ -58,7 +58,7 @@ public class NewickReader extends TreesReader {
 			final var parts = new ArrayList<String>();
 
 			treesBlock.clear();
-			treesBlock.setNetwork(false);
+			treesBlock.setReticulated(false);
 			treesBlock.setPartial(false);
 			treesBlock.setRooted(true);
 
@@ -143,8 +143,8 @@ public class NewickReader extends TreesReader {
 						}
 					}
 
-					if (!treesBlock.isNetwork() && tree.edgeStream().anyMatch(tree::isReticulatedEdge)) {
-						treesBlock.setNetwork(true);
+					if (!treesBlock.isReticulated() && tree.edgeStream().anyMatch(tree::isReticulatedEdge)) {
+						treesBlock.setReticulated(true);
 					}
 
 					treesBlock.getTrees().add(tree);

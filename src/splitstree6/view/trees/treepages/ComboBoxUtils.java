@@ -19,6 +19,9 @@
 
 package splitstree6.view.trees.treepages;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.When;
+import javafx.collections.ObservableSet;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
@@ -33,7 +36,7 @@ public class ComboBoxUtils {
 	/**
 	 * create list cell for diagram combo box
 	 */
-	public static ListCell<ComputeTreeLayout.Diagram> createDiagramComboBoxListCell(boolean horizontalFlip) {
+	public static ListCell<ComputeTreeLayout.Diagram> createDiagramComboBoxListCell(boolean horizontalFlip, ObservableSet<ComputeTreeLayout.Diagram> disabledItems) {
 		return new ListCell<>() {
 			{
 				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -50,6 +53,9 @@ public class ComboBoxUtils {
 					if (horizontalFlip)
 						imageView.setScaleX(-imageView.getScaleX());
 					setGraphic(imageView);
+					imageView.disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
+					disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
+					imageView.opacityProperty().bind(new When(imageView.disableProperty()).then(0.4).otherwise(1.0));
 				}
 			}
 		};
@@ -58,8 +64,8 @@ public class ComboBoxUtils {
 	/**
 	 * creates the callback method for diagram combo box
 	 */
-	public static Callback<ListView<ComputeTreeLayout.Diagram>, ListCell<ComputeTreeLayout.Diagram>> createDiagramComboxBoxCallback(boolean horizontalFlip) {
-		return p -> createDiagramComboBoxListCell(horizontalFlip);
+	public static Callback<ListView<ComputeTreeLayout.Diagram>, ListCell<ComputeTreeLayout.Diagram>> createDiagramComboxBoxCallback(boolean horizontalFlip, ObservableSet<ComputeTreeLayout.Diagram> disabled) {
+		return p -> createDiagramComboBoxListCell(horizontalFlip, disabled);
 	}
 
 	/**

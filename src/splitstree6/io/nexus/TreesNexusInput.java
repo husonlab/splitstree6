@@ -39,7 +39,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			BEGIN TREES;
 			    [TITLE {title};]
 			    [LINK {type} = {title};]
-			[PROPERTIES [PARTIALTREES={YES|NO}] [ROOTED={YES|NO}] [NETWORK={YES|NO}];]
+			[PROPERTIES [PARTIALTREES={YES|NO}] [ROOTED={YES|NO}] [RETICULATED={YES|NO}];]
 			[TRANSLATE
 			    nodeLabel1 taxon1,
 			    nodeLabel2 taxon2,
@@ -99,8 +99,8 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 				rootedExplicitySet = true;
 			}
 
-			treesBlock.setNetwork(np.findIgnoreCase(tokens, "network=no", false, treesBlock.isNetwork()));
-			treesBlock.setNetwork(np.findIgnoreCase(tokens, "network=yes", true, treesBlock.isNetwork()));
+			treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=no", false, treesBlock.isReticulated()));
+			treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=yes", true, treesBlock.isReticulated()));
 
 			if (tokens.size() != 0)
 				throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in PROPERTIES");

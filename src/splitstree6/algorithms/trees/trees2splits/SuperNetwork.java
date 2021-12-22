@@ -712,4 +712,9 @@ public class SuperNetwork extends Trees2Splits {
 	public void setOptionEdgeWeights(EdgeWeights optionEdgeWeights) {
 		this.optionEdgeWeights.set(optionEdgeWeights);
 	}
+
+	@Override
+	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
+		return !parent.isReticulated();
+	}
 }

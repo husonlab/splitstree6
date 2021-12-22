@@ -27,6 +27,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.scene.control.SelectionMode;
@@ -71,8 +72,18 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		controller = treePagesView.getController();
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(false));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(false));
+		final ObservableSet<ComputeTreeLayout.Diagram> disabledDiagrams = FXCollections.observableSet();
+		treePagesView.reticulatedProperty().addListener((v, o, n) -> {
+			disabledDiagrams.clear();
+			if (n) {
+				disabledDiagrams.add(ComputeTreeLayout.Diagram.TriangularCladogram);
+				disabledDiagrams.add(ComputeTreeLayout.Diagram.RadialCladogram);
+				disabledDiagrams.add(ComputeTreeLayout.Diagram.RadialPhylogram);
+			}
+		});
+
+		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(false, disabledDiagrams));
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(false, disabledDiagrams));
 		controller.getDiagramCBox().getItems().addAll(ComputeTreeLayout.Diagram.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
 

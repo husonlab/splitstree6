@@ -73,7 +73,7 @@ public class ConsensusTree extends Trees2Trees {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isPartial();
+		return !parent.isPartial() && !parent.isReticulated();
 	}
 
 	public ConsensusTreeSplits.Consensus getOptionConsensus() {

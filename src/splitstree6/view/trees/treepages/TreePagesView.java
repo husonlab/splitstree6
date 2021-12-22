@@ -44,14 +44,15 @@ public class TreePagesView implements IView {
 	private final TreePagesViewController controller;
 	private final TreePagesViewPresenter presenter;
 
-	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>();
+	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
-	private final StringProperty nameProperty = new SimpleStringProperty();
+	private final StringProperty name = new SimpleStringProperty(this, "name");
 
-	private final ObjectProperty<TabPane> tabPane = new SimpleObjectProperty<>(null);
+	private final ObjectProperty<TabPane> tabPane = new SimpleObjectProperty<>(this, "tabPane", null);
 
 	private final ObservableList<PhyloTree> trees = FXCollections.observableArrayList();
-	private final BooleanProperty empty = new SimpleBooleanProperty(true);
+	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
+	private final BooleanProperty reticulated = new SimpleBooleanProperty(this, "reticulated", false);
 
 	private final IntegerProperty optionRows = new SimpleIntegerProperty(this, "optionRows", ProgramProperties.get("TreePagesRows", 1));
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
@@ -70,8 +71,15 @@ public class TreePagesView implements IView {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(), pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName());
 	}
 
+	/**
+	 * constructor
+	 *
+	 * @param mainWindow
+	 * @param name
+	 * @param viewTab
+	 */
 	public TreePagesView(MainWindow mainWindow, String name, ViewTab viewTab) {
-		nameProperty.set(name);
+		this.name.set(name);
 		var loader = new ExtendedFXMLLoader<TreePagesViewController>(TreePagesViewController.class);
 		controller = loader.getController();
 
@@ -109,6 +117,18 @@ public class TreePagesView implements IView {
 
 	public ObservableList<PhyloTree> getTrees() {
 		return trees;
+	}
+
+	public boolean isReticulated() {
+		return reticulated.get();
+	}
+
+	public BooleanProperty reticulatedProperty() {
+		return reticulated;
+	}
+
+	public void setReticulated(boolean reticulated) {
+		this.reticulated.set(reticulated);
 	}
 
 	public int getOptionRows() {
@@ -177,7 +197,7 @@ public class TreePagesView implements IView {
 
 	@Override
 	public String getName() {
-		return nameProperty.get();
+		return name.get();
 	}
 
 	@Override
