@@ -27,8 +27,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.util.DraggableLabel;
 import jloda.phylo.PhyloTree;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
-import splitstree6.view.trees.treepages.TreePane;
+import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.treepages.LayoutOrientation;
 
 /**
  * tanglegram view controller
@@ -76,15 +76,15 @@ public class TanglegramViewController {
 	private ComboBox<PhyloTree> tree1CBox;
 
 	@FXML
-	private ComboBox<ComputeTreeLayout.Diagram> diagram1CBox;
+	private ComboBox<TreeDiagramType> diagram1CBox;
 
 	@FXML
 	private ComboBox<PhyloTree> tree2CBox;
 	@FXML
-	private ComboBox<ComputeTreeLayout.Diagram> diagram2CBox;
+	private ComboBox<TreeDiagramType> diagram2CBox;
 
 	@FXML
-	private ComboBox<TreePane.Orientation> orientationCBox;
+	private ComboBox<LayoutOrientation> orientationCBox;
 
 	@FXML
 	private Button previousButton;
@@ -180,7 +180,7 @@ public class TanglegramViewController {
 		return tree1CBox;
 	}
 
-	public ComboBox<ComputeTreeLayout.Diagram> getDiagram1CBox() {
+	public ComboBox<TreeDiagramType> getDiagram1CBox() {
 		return diagram1CBox;
 	}
 
@@ -188,11 +188,11 @@ public class TanglegramViewController {
 		return tree2CBox;
 	}
 
-	public ComboBox<ComputeTreeLayout.Diagram> getDiagram2CBox() {
+	public ComboBox<TreeDiagramType> getDiagram2CBox() {
 		return diagram2CBox;
 	}
 
-	public ComboBox<TreePane.Orientation> getOrientationCBox() {
+	public ComboBox<LayoutOrientation> getOrientationCBox() {
 		return orientationCBox;
 	}
 

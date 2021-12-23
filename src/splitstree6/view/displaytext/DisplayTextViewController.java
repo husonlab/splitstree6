@@ -103,6 +103,7 @@ public class DisplayTextViewController {
 	public CodeArea getCodeArea() {
 		return codeArea;
 	}
+
 	public VirtualizedScrollPane<CodeArea> getScrollPane() {
 		return scrollPane;
 	}

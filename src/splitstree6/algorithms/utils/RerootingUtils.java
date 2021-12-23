@@ -309,6 +309,7 @@ public class RerootingUtils {
 
 	/**
 	 * compute the midpoint score for all edges
+	 *
 	 * @return midpoint scores
 	 */
 	public static EdgeFloatArray getMidpointScores(PhyloTree tree) {
@@ -328,6 +329,7 @@ public class RerootingUtils {
 
 	/**
 	 * compute the midpoint score a given root node
+	 *
 	 * @return midpoint score
 	 */
 	public static float getMidpointScore(PhyloTree tree, Node root) {
@@ -344,6 +346,7 @@ public class RerootingUtils {
 
 	/**
 	 * compute the maximum distance from v to a leaf in a tree, avoiding edge f
+	 *
 	 * @return max distance
 	 */
 	private static float computeMaxDistanceRec(PhyloTree tree, Node v, Edge f) {
@@ -358,6 +361,7 @@ public class RerootingUtils {
 
 	/**
 	 * bottom up calculation of max down distance
+	 *
 	 * @return distance down (including length of e)
 	 */
 	private static float computeMaxBottomUpDistance(PhyloTree tree, Edge e, EdgeFloatArray maxDownDistance) {

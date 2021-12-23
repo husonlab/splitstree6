@@ -25,7 +25,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.control.TabPane;
 import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
@@ -33,7 +32,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
+import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
@@ -48,8 +47,6 @@ public class TreePagesView implements IView {
 
 	private final StringProperty name = new SimpleStringProperty(this, "name");
 
-	private final ObjectProperty<TabPane> tabPane = new SimpleObjectProperty<>(this, "tabPane", null);
-
 	private final ObservableList<PhyloTree> trees = FXCollections.observableArrayList();
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 	private final BooleanProperty reticulated = new SimpleBooleanProperty(this, "reticulated", false);
@@ -57,18 +54,28 @@ public class TreePagesView implements IView {
 	private final IntegerProperty optionRows = new SimpleIntegerProperty(this, "optionRows", ProgramProperties.get("TreePagesRows", 1));
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
-	private final ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", ComputeTreeLayout.Diagram.getDefault());
-	private final ObjectProperty<TreePane.Orientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", TreePane.Orientation.getDefault());
+	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
-	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames", ProgramProperties.get("TreePagesShowTreeNames", true));
+	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames");
 
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
+	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
+
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(), pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName());
+	}
+
+	{
+		ProgramProperties.track(optionRows, 1);
+		ProgramProperties.track(optionCols, 1);
+		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
+		ProgramProperties.track(optionShowTreeNames, true);
 	}
 
 	/**
@@ -84,7 +91,6 @@ public class TreePagesView implements IView {
 		controller = loader.getController();
 
 		// this is the target area for the tree page:
-		final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>();
 		presenter = new TreePagesViewPresenter(mainWindow, this, targetBounds, getTrees());
 
 		this.viewTab.addListener((v, o, n) -> {
@@ -92,12 +98,11 @@ public class TreePagesView implements IView {
 			if (n != null)
 				targetBounds.bind(n.layoutBoundsProperty());
 		});
+
 		setViewTab(viewTab);
 
 		empty.bind(Bindings.isEmpty(getTrees()));
 
-		optionDiagram.addListener((v, o, n) -> ComputeTreeLayout.Diagram.setDefault(n));
-		optionOrientation.addListener((v, o, n) -> TreePane.Orientation.setDefault(n));
 		optionRows.addListener((v, o, n) -> ProgramProperties.put("TreePagesRows", n.intValue()));
 		optionCols.addListener((v, o, n) -> ProgramProperties.put("TreePagesCols", n.intValue()));
 		optionShowTreeNames.addListener((v, o, n) -> ProgramProperties.put("TreePagesShowTreeNames", n));
@@ -167,27 +172,27 @@ public class TreePagesView implements IView {
 		this.pageNumber.set(pageNumber);
 	}
 
-	public ComputeTreeLayout.Diagram getOptionDiagram() {
+	public TreeDiagramType getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<ComputeTreeLayout.Diagram> optionDiagramProperty() {
+	public ObjectProperty<TreeDiagramType> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(ComputeTreeLayout.Diagram optionDiagram) {
+	public void setOptionDiagram(TreeDiagramType optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public TreePane.Orientation getOptionOrientation() {
+	public LayoutOrientation getOptionOrientation() {
 		return optionOrientation.get();
 	}
 
-	public ObjectProperty<TreePane.Orientation> optionOrientationProperty() {
+	public ObjectProperty<LayoutOrientation> optionOrientationProperty() {
 		return optionOrientation;
 	}
 
-	public void setOptionOrientation(TreePane.Orientation optionOrientation) {
+	public void setOptionOrientation(LayoutOrientation optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
 	}
 
@@ -216,18 +221,6 @@ public class TreePagesView implements IView {
 
 	public BooleanProperty emptyProperty() {
 		return empty;
-	}
-
-	public TabPane getTabPane() {
-		return tabPane.get();
-	}
-
-	public ObjectProperty<TabPane> tabPaneProperty() {
-		return tabPane;
-	}
-
-	public void setTabPane(TabPane tabPane) {
-		this.tabPane.set(tabPane);
 	}
 
 	public double getOptionZoomFactor() {

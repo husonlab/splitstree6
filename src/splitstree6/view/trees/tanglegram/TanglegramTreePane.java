@@ -32,7 +32,8 @@ import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
+import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.view.trees.treepages.RunAfterAWhile;
 import splitstree6.view.trees.treepages.TreePane;
 
@@ -46,7 +47,7 @@ public class TanglegramTreePane extends Group {
 
 	public TanglegramTreePane(TanglegramView tanglegramView, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<int[]> taxonOrdering, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram, ObjectProperty<TreePane.Orientation> optionOrientation) {
+							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LayoutOrientation> optionOrientation) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {

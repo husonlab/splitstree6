@@ -53,7 +53,6 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
-import jloda.util.ProgramProperties;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.view.trees.ordering.CircularOrdering;
@@ -65,21 +64,6 @@ import java.util.function.BiConsumer;
  * Daniel Huson, 10.2021
  */
 public class ComputeTreeLayout {
-	public enum Diagram {
-		RectangularCladogram, RectangularPhylogram, CircularCladogram, CircularPhylogram, TriangularCladogram, RadialCladogram, RadialPhylogram;
-
-		public static Diagram getDefault() {
-			return Diagram.valueOf(ProgramProperties.get("DefaultTreeDiagram", RectangularPhylogram.name()));
-		}
-
-		public static void setDefault(Diagram diagram) {
-			ProgramProperties.put("DefaultTreeDiagram", diagram.name());
-		}
-
-		public boolean isRadial() {
-			return this == RadialPhylogram || this == RadialCladogram || this == CircularPhylogram || this == CircularCladogram;
-		}
-	}
 
 	public enum ParentPlacement {LeafAverage, ChildrenAverage}
 
@@ -100,14 +84,14 @@ public class ComputeTreeLayout {
 	 * @param alignLabels          align labels in rectangular and circular phylograms
 	 * @return group of all edges, nodes and node-labels
 	 */
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, int[] taxonOrdering, Diagram diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, int[] taxonOrdering, TreeDiagramType diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
 							  BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Group();
 
 		var parentPlacement = ParentPlacement.ChildrenAverage;
 
-		if (alignLabels && diagram != Diagram.RectangularPhylogram && diagram != Diagram.CircularPhylogram)
+		if (alignLabels && diagram != TreeDiagramType.RectangularPhylogram && diagram != TreeDiagramType.CircularPhylogram)
 			alignLabels = false; // can't or don't need to, or can't, align labels in all other cases
 
 		//parentPlacement = ParentPlacement.LeafAverage;
@@ -218,11 +202,11 @@ public class ComputeTreeLayout {
 			}
 		}
 
-		if (diagram == Diagram.CircularCladogram || diagram == Diagram.CircularPhylogram) {
+		if (diagram == TreeDiagramType.CircularCladogram || diagram == TreeDiagramType.CircularPhylogram) {
 			edgeGroup.getChildren().addAll(CreateEdgesCircular.apply(diagram, tree, nodePointMap, nodeAngleMap, color, linkNodesEdgesLabels, edgeCallback));
-		} else if (diagram == Diagram.TriangularCladogram || diagram == Diagram.RadialPhylogram || diagram == Diagram.RadialCladogram) {
+		} else if (diagram == TreeDiagramType.TriangularCladogram || diagram == TreeDiagramType.RadialPhylogram || diagram == TreeDiagramType.RadialCladogram) {
 			edgeGroup.getChildren().addAll(CreateEdgesStraight.apply(diagram, tree, nodeShapeMap, color, linkNodesEdgesLabels, edgeCallback));
-		} else { // if (diagram == TreePane.Diagram.Rectangular) {
+		} else { // if (diagram == TreePane.TreeDiagramType.Rectangular) {
 			edgeGroup.getChildren().addAll(CreateEdgesRectangular.apply(diagram, tree, nodeShapeMap, color, linkNodesEdgesLabels, edgeCallback));
 		}
 

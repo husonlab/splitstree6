@@ -49,7 +49,7 @@ public class InteractionSetup {
 	private final TaxaBlock taxaBlock;
 	private final SelectionModel<Taxon> taxonSelectionModel;
 
-	private final TreePane.Orientation orientation;
+	private final LayoutOrientation orientation;
 
 	private final Map<Taxon, Pair<Shape, RichTextLabel>> taxonShapeLabelMap;
 	private final EventHandler<MouseEvent> mousePressedHandler;
@@ -60,7 +60,7 @@ public class InteractionSetup {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, TreePane.Orientation orientation) {
+	public InteractionSetup(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, LayoutOrientation orientation) {
 		this.phyloTree = phyloTree;
 		this.taxaBlock = taxaBlock;
 		this.taxonSelectionModel = taxonSelectionModel;

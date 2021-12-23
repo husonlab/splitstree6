@@ -32,8 +32,8 @@ import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
-import splitstree6.view.trees.treepages.TreePane;
+import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
@@ -57,12 +57,12 @@ public class TanglegramView implements IView {
 	private final BooleanProperty reticulated = new SimpleBooleanProperty(this, "reticulated", false);
 
 	private final IntegerProperty optionTree1 = new SimpleIntegerProperty(this, "optionTree1", 1); // 1-based
-	private final ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram1 = new SimpleObjectProperty<>(this, "optionDiagram1", ComputeTreeLayout.Diagram.RectangularPhylogram);
+	private final ObjectProperty<TreeDiagramType> optionDiagram1 = new SimpleObjectProperty<>(this, "optionDiagram1", TreeDiagramType.RectangularPhylogram);
 
 	private final IntegerProperty optionTree2 = new SimpleIntegerProperty(this, "optionTree2", 2); // 1-based
-	private final ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", ComputeTreeLayout.Diagram.RectangularPhylogram);
+	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", TreeDiagramType.RectangularPhylogram);
 
-	private final ObjectProperty<TreePane.Orientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation1", TreePane.Orientation.Rotate0Deg);
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation1", LayoutOrientation.Rotate0Deg);
 
 	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames", ProgramProperties.get("TanglegramShowTreeNames", true));
 
@@ -70,8 +70,14 @@ public class TanglegramView implements IView {
 
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0);
 
-
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
+
+	{
+		ProgramProperties.track(optionDiagram1, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionDiagram2, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
+		ProgramProperties.track(optionShowTreeNames, true);
+	}
 
 	public List<String> listOptions() {
 		return List.of(optionTree1.getName(), optionDiagram1.getName(),
@@ -103,8 +109,6 @@ public class TanglegramView implements IView {
 		setViewTab(viewTab);
 
 		empty.bind(Bindings.isEmpty(getTrees()));
-
-		optionShowTreeNames.addListener((v, o, n) -> ProgramProperties.put("TanglegramShowTreeNames", n));
 	}
 
 	public void setViewTab(ViewTab viewTab) {
@@ -168,27 +172,27 @@ public class TanglegramView implements IView {
 		return controller.getAnchorPane();
 	}
 
-	public ComputeTreeLayout.Diagram getOptionDiagram1() {
+	public TreeDiagramType getOptionDiagram1() {
 		return optionDiagram1.get();
 	}
 
-	public ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram1Property() {
+	public ObjectProperty<TreeDiagramType> optionDiagram1Property() {
 		return optionDiagram1;
 	}
 
-	public TreePane.Orientation getOptionOrientation() {
+	public LayoutOrientation getOptionOrientation() {
 		return optionOrientation.get();
 	}
 
-	public ObjectProperty<TreePane.Orientation> optionOrientationProperty() {
+	public ObjectProperty<LayoutOrientation> optionOrientationProperty() {
 		return optionOrientation;
 	}
 
-	public ComputeTreeLayout.Diagram getOptionDiagram2() {
+	public TreeDiagramType getOptionDiagram2() {
 		return optionDiagram2.get();
 	}
 
-	public ObjectProperty<ComputeTreeLayout.Diagram> optionDiagram2Property() {
+	public ObjectProperty<TreeDiagramType> optionDiagram2Property() {
 		return optionDiagram2;
 	}
 

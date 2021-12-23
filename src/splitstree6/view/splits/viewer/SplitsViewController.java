@@ -1,5 +1,5 @@
 /*
- *  TreePagesViewController.java Copyright (C) 2021 Daniel H. Huson
+ *  SplitsViewController.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,20 +17,25 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.treepages;
+package splitstree6.view.splits.viewer;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
-import jloda.phylo.PhyloTree;
-import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.treepages.LayoutOrientation;
 
-public class TreePagesViewController {
+public class SplitsViewController {
 
 	@FXML
 	private AnchorPane anchorPane;
+
+	@FXML
+	private BorderPane borderPane;
 
 	@FXML
 	private VBox vBox;
@@ -51,25 +56,13 @@ public class TreePagesViewController {
 	private Button findButton;
 
 	@FXML
-	private ComboBox<TreeDiagramType> diagramCBox;
+	private ComboBox<SplitsDiagramType> diagramCBox;
+
+	@FXML
+	private ComboBox<SplitsRooting> rootingCBox;
 
 	@FXML
 	private ComboBox<LayoutOrientation> orientationCBox;
-
-	@FXML
-	private ComboBox<String> rowsColsCBox;
-
-	@FXML
-	private Pane pane;
-
-	@FXML
-	private Pagination pagination;
-
-	@FXML
-	private ToggleButton showTreeNamesToggleButton;
-
-	@FXML
-	private ComboBox<PhyloTree> treeCBox;
 
 	@FXML
 	private Button zoomInButton;
@@ -77,8 +70,15 @@ public class TreePagesViewController {
 	@FXML
 	private Button zoomOutButton;
 
+	@FXML
+	private ScrollPane scrollPane;
+
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
+	}
+
+	public BorderPane getBorderPane() {
+		return borderPane;
 	}
 
 	public VBox getvBox() {
@@ -105,32 +105,16 @@ public class TreePagesViewController {
 		return findButton;
 	}
 
-	public ComboBox<TreeDiagramType> getDiagramCBox() {
+	public ComboBox<SplitsDiagramType> getDiagramCBox() {
 		return diagramCBox;
+	}
+
+	public ComboBox<SplitsRooting> getRootingCBox() {
+		return rootingCBox;
 	}
 
 	public ComboBox<LayoutOrientation> getOrientationCBox() {
 		return orientationCBox;
-	}
-
-	public ComboBox<String> getRowsColsCBox() {
-		return rowsColsCBox;
-	}
-
-	public Pane getPane() {
-		return pane;
-	}
-
-	public Pagination getPagination() {
-		return pagination;
-	}
-
-	public ToggleButton getShowTreeNamesToggleButton() {
-		return showTreeNamesToggleButton;
-	}
-
-	public ComboBox<PhyloTree> getTreeCBox() {
-		return treeCBox;
 	}
 
 	public Button getZoomInButton() {
@@ -139,5 +123,9 @@ public class TreePagesViewController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
+	}
+
+	public ScrollPane getScrollPane() {
+		return scrollPane;
 	}
 }

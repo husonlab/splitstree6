@@ -26,58 +26,61 @@
 <?import javafx.scene.layout.*?>
 <TitledPane fx:id="titledPane" text="Format" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.displaydatablock.DisplayDataController">
-   <content>
-      <AnchorPane>
-         <children>
-            <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                        AnchorPane.topAnchor="0.0">
-               <top>
-                  <BorderPane>
-                     <center>
-                        <ChoiceBox fx:id="formatCBox" prefWidth="120.0">
-                           <padding>
-                              <Insets right="5.0"/>
-                           </padding>
-                        </ChoiceBox>
-                     </center>
-                     <left>
-                        <Label text="Format:" BorderPane.alignment="CENTER">
-                           <padding>
-                              <Insets right="5.0"/>
-                           </padding>
-                        </Label>
-                     </left>
-                     <right>
-                        <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
-                                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
-                                prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                                text="Apply" BorderPane.alignment="CENTER">
-                           <graphic>
-                              <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                 <image>
-                                    <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
-                                 </image>
-                              </ImageView>
-                           </graphic>
-                           <tooltip>
-                              <Tooltip text="Apply format"/>
-                           </tooltip>
-                        </Button>
-                     </right>
-                     <BorderPane.margin>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
-                     </BorderPane.margin>
-                  </BorderPane>
-               </top>
-               <center>
-                  <VBox fx:id="mainPane" spacing="10.0" BorderPane.alignment="CENTER">
-                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="10.0"/>
-                     </padding>
-                  </VBox>
-               </center>
-            </BorderPane>
-         </children>
-      </AnchorPane>
-   </content>
+    <content>
+        <AnchorPane>
+            <children>
+                <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                            AnchorPane.topAnchor="0.0">
+                    <top>
+                        <BorderPane>
+                            <center>
+                                <ChoiceBox fx:id="formatCBox" prefWidth="120.0">
+                                    <padding>
+                                        <Insets right="5.0"/>
+                                    </padding>
+                                </ChoiceBox>
+                            </center>
+                            <left>
+                                <Label text="Format:" BorderPane.alignment="CENTER">
+                                    <padding>
+                                        <Insets right="5.0"/>
+                                    </padding>
+                                </Label>
+                            </left>
+                            <right>
+                                <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0"
+                                        maxWidth="18.0"
+                                        minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
+                                        prefWidth="18.0"
+                                        style="-fx-border-style: none; -fx-background-color: transparent;"
+                                        text="Apply" BorderPane.alignment="CENTER">
+                                    <graphic>
+                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                   preserveRatio="true">
+                                            <image>
+                                                <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
+                                            </image>
+                                        </ImageView>
+                                    </graphic>
+                                    <tooltip>
+                                        <Tooltip text="Apply format"/>
+                                    </tooltip>
+                                </Button>
+                            </right>
+                            <BorderPane.margin>
+                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                            </BorderPane.margin>
+                        </BorderPane>
+                    </top>
+                    <center>
+                        <VBox fx:id="mainPane" spacing="10.0" BorderPane.alignment="CENTER">
+                            <padding>
+                                <Insets bottom="5.0" left="5.0" right="5.0" top="10.0"/>
+                            </padding>
+                        </VBox>
+                    </center>
+                </BorderPane>
+            </children>
+        </AnchorPane>
+    </content>
 </TitledPane>

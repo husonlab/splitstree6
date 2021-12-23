@@ -38,16 +38,16 @@ import jloda.fx.find.Searcher;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
+import splitstree6.view.splits.viewer.ComboBoxUtils;
+import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.ordering.CircularOrdering;
-import splitstree6.view.trees.treepages.ComboBoxUtils;
-import splitstree6.view.trees.treepages.TreePane;
+import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Function;
 
-import static splitstree6.view.trees.layout.ComputeTreeLayout.Diagram.*;
-import static splitstree6.view.trees.treepages.TreePane.Orientation.*;
+import static splitstree6.view.trees.layout.TreeDiagramType.*;
+import static splitstree6.view.trees.treepages.LayoutOrientation.*;
 
 /**
  * tanglegram view presenter
@@ -90,7 +90,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		tree2.bind(Bindings.createObjectBinding(() -> tanglegramView.getOptionTree2() >= 1 && tanglegramView.getOptionTree2() <= trees.size() ? trees.get(tanglegramView.getOptionTree2() - 1) : null, tanglegramView.optionTree2Property(), trees));
 		controller.getTree2Label().visibleProperty().bind(tanglegramView.optionShowTreeNamesProperty());
 
-		var orientation2Property = new SimpleObjectProperty<TreePane.Orientation>();
+		var orientation2Property = new SimpleObjectProperty<LayoutOrientation>();
 		orientation2Property.bind(Bindings.createObjectBinding(() -> tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg, tanglegramView.optionOrientationProperty()));
 
 		var tree2Pane = new TanglegramTreePane(tanglegramView, mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, taxonOrdering2, treePaneDimensions, tanglegramView.optionDiagram2Property(), orientation2Property);
@@ -121,39 +121,40 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		}
 
 		{
-			final ObservableSet<ComputeTreeLayout.Diagram> disabledDiagrams1 = FXCollections.observableSet();
+			final ObservableSet<TreeDiagramType> disabledDiagrams1 = FXCollections.observableSet();
 			tree1.addListener((v, o, n) -> {
 				disabledDiagrams1.clear();
 				if (tree1.get() != null && tree1.get().isReticulated()) {
-					disabledDiagrams1.add(ComputeTreeLayout.Diagram.TriangularCladogram);
+					disabledDiagrams1.add(TreeDiagramType.TriangularCladogram);
 				}
 			});
 
-			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(false, disabledDiagrams1));
-			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(false, disabledDiagrams1));
+			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams1, it -> it.toString() + "16.gif", false));
+			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams1, it -> it.toString() + "16.gif", false));
 			controller.getDiagram1CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram1CBox().setValue(tanglegramView.getOptionDiagram1());
 			tanglegramView.optionDiagram1Property().addListener((v, o, n) -> controller.getDiagram1CBox().setValue(n));
 			controller.getDiagram1CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram1Property().set(n));
 		}
 		{
-			final ObservableSet<ComputeTreeLayout.Diagram> disabledDiagrams2 = FXCollections.observableSet();
+			final ObservableSet<TreeDiagramType> disabledDiagrams2 = FXCollections.observableSet();
 			tree2.addListener((v, o, n) -> {
 				disabledDiagrams2.clear();
 				if (tree2.get() != null && tree2.get().isReticulated()) {
-					disabledDiagrams2.add(ComputeTreeLayout.Diagram.TriangularCladogram);
+					disabledDiagrams2.add(TreeDiagramType.TriangularCladogram);
 				}
 			});
-			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(true, disabledDiagrams2));
-			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(true, disabledDiagrams2));
+
+			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams2, it -> it.toString() + "16.gif", true));
+			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams2, it -> it.toString() + "16.gif", true));
 			controller.getDiagram2CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram2CBox().setValue(tanglegramView.getOptionDiagram2());
 			tanglegramView.optionDiagram2Property().addListener((v, o, n) -> controller.getDiagram2CBox().setValue(n));
 			controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram2Property().set(n));
 		}
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createOrientationComboBoxListCell());
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createOrientationComboBoxCallback());
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, it -> it.toString() + ".png"));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, it -> it.toString() + ".png"));
 		controller.getOrientationCBox().getItems().addAll(Rotate0Deg, FlipRotate180Deg);
 		controller.getOrientationCBox().setValue(tanglegramView.getOptionOrientation());
 		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionOrientationProperty().set(n));
@@ -262,9 +263,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		var undoManager = tanglegramView.getUndoManager();
 		tanglegramView.optionTree1Property().addListener((v, o, n) -> undoManager.add("Set Tree 1", tanglegramView.optionTree1Property(), o, n));
 		tanglegramView.optionTree2Property().addListener((v, o, n) -> undoManager.add("Set Tree 2", tanglegramView.optionTree2Property(), o, n));
-		tanglegramView.optionDiagram1Property().addListener((v, o, n) -> undoManager.add("Set Diagram 1", tanglegramView.optionDiagram1Property(), o, n));
-		tanglegramView.optionDiagram2Property().addListener((v, o, n) -> undoManager.add("Set Diagram 2", tanglegramView.optionDiagram2Property(), o, n));
-		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("Set Orientation", tanglegramView.optionOrientationProperty(), o, n));
+		tanglegramView.optionDiagram1Property().addListener((v, o, n) -> undoManager.add("Set TreeDiagramType 1", tanglegramView.optionDiagram1Property(), o, n));
+		tanglegramView.optionDiagram2Property().addListener((v, o, n) -> undoManager.add("Set TreeDiagramType 2", tanglegramView.optionDiagram2Property(), o, n));
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("Set LayoutOrientation", tanglegramView.optionOrientationProperty(), o, n));
 		tanglegramView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Font Size", tanglegramView.optionFontScaleFactorProperty(), o, n));
 		tanglegramView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Horizontal Zoom", tanglegramView.optionHorizontalZoomFactorProperty(), o, n));
 		tanglegramView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Vertical Zoom", tanglegramView.optionVerticalZoomFactorProperty(), o, n));

@@ -36,10 +36,10 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
-import jloda.util.ProgramProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.view.trees.layout.ComputeTreeLayout;
+import splitstree6.view.trees.layout.TreeDiagramType;
 
 import java.util.LinkedList;
 
@@ -48,21 +48,6 @@ import java.util.LinkedList;
  * Daniel Huson, 11.2021
  */
 public class TreePane extends StackPane {
-	public enum Orientation {
-		Rotate0Deg, Rotate90Deg, Rotate180Deg, Rotate270Deg, FlipRotate0Deg, FlipRotate90Deg, FlipRotate180Deg, FlipRotate270Deg;
-
-		public boolean isWidthHeightSwitched() {
-			return this == Rotate90Deg || this == FlipRotate90Deg || this == Rotate270Deg || this == FlipRotate270Deg;
-		}
-
-		public static Orientation getDefault() {
-			return valueOf(ProgramProperties.get("DefaultTreeRootSide", Rotate0Deg.name()));
-		}
-
-		public static void setDefault(Orientation orientation) {
-			ProgramProperties.put("DefaultTreeRootSide", orientation.name());
-		}
-	}
 
 	private Runnable runAfterUpdate;
 
@@ -79,7 +64,7 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, int[] taxonOrdering, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					ComputeTreeLayout.Diagram diagram, Orientation orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
+					TreeDiagramType diagram, LayoutOrientation orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
 
 		this.interactionSetup = new InteractionSetup(taxaBlock, phyloTree, taxonSelectionModel, orientation);
 		// setStyle("-fx-border-color: lightgray;");

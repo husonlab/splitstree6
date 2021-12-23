@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~  TreePagesView.fxml Copyright (C) 2021 Daniel H. Huson
-  ~  
+  ~  SplitsView.fxml Copyright (C) 2021 Daniel H. Huson
+  ~
   ~  (Some files contain contributions from other authors, who are then mentioned separately.)
-  ~  
+  ~
   ~  This program is free software: you can redistribute it and/or modify
   ~  it under the terms of the GNU General Public License as published by
   ~  the Free Software Foundation, either version 3 of the License, or
   ~  (at your option) any later version.
-  ~  
+  ~
   ~  This program is distributed in the hope that it will be useful,
   ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
   ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   ~  GNU General Public License for more details.
-  ~  
+  ~
   ~  You should have received a copy of the GNU General Public License
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="splitstree6.view.trees.treepages.TreePagesViewController">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.view.splits.viewer.SplitsViewController">
     <children>
-        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                    AnchorPane.topAnchor="0.0">
+        <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
+                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <top>
                 <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                     <children>
@@ -108,45 +108,25 @@
                                         <Tooltip text="Find in selected tab"/>
                                     </tooltip>
                                 </Button>
-                                <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="diagramCBox" prefWidth="50.0">
-                                    <tooltip>
-                                        <Tooltip text="Choose diagram"/>
-                                    </tooltip>
-                                </ComboBox>
-                                <ComboBox fx:id="orientationCBox" prefWidth="50.0">
-                                    <tooltip>
-                                        <Tooltip text="Choose root side"/>
-                                    </tooltip>
-                                </ComboBox>
-                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
-                                    <tooltip>
-                                        <Tooltip text="Set rows x columns"/>
-                                    </tooltip>
-                                </ComboBox>
                                 <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="treeCBox" prefWidth="100.0"/>
-                                <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
-                                <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="GRAPHIC_ONLY"
-                                              maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                                              minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
-                                              prefWidth="24.0" text="Show Tree Names">
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image url="@/splitstree6/resources/icons/Text16.png"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
+                                <ComboBox fx:id="diagramCBox">
                                     <tooltip>
-                                        <Tooltip text="Show tree names"/>
+                                        <Tooltip text="Choose diagram type"/>
                                     </tooltip>
-                                </ToggleButton>
+                                </ComboBox>
+                                <ComboBox fx:id="rootingCBox">
+                                    <tooltip>
+                                        <Tooltip text="Choose rooting method"/>
+                                    </tooltip>
+                                </ComboBox>
+                                <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                           orientation="VERTICAL" prefHeight="20.0"/>
+                                <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
+                                    <tooltip>
+                                        <Tooltip text="Choose orientation"/>
+                                    </tooltip>
+                                </ComboBox>
                                 <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                                 <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                                         minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
@@ -164,7 +144,7 @@
                                         </ImageView>
                                     </graphic>
                                     <tooltip>
-                                        <Tooltip text="Zoom in"/>
+                                        <Tooltip text="Zoom out"/>
                                     </tooltip>
                                 </Button>
                                 <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
@@ -183,24 +163,22 @@
                                         </ImageView>
                                     </graphic>
                                     <tooltip>
-                                        <Tooltip text="Zoom out"/>
+                                        <Tooltip text="Zoom in"/>
                                     </tooltip>
                                 </Button>
-
                             </items>
                         </ToolBar>
                     </children>
                 </VBox>
             </top>
             <center>
-                <Pane fx:id="pane" BorderPane.alignment="CENTER">
-                    <BorderPane.margin>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
-                    </BorderPane.margin>
+                <AnchorPane style="-fx-background-color: transparent;">
                     <children>
-                        <Pagination fx:id="pagination" pageCount="1"/>
+                        <ScrollPane fx:id="scrollPane" style="-fx-background-color: transparent;"
+                                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     </children>
-                </Pane>
+                </AnchorPane>
             </center>
         </BorderPane>
     </children>

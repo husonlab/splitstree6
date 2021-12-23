@@ -110,7 +110,7 @@ public class TreesBlock extends DataBlock {
 		trees.clear();
 		partial = false;
 		rooted = false;
-		reticulated =false;
+		reticulated = false;
 	}
 
 	@Override

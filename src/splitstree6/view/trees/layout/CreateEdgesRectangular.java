@@ -56,7 +56,7 @@ import java.util.function.BiConsumer;
  */
 public class CreateEdgesRectangular {
 
-	public static Collection<Shape> apply(ComputeTreeLayout.Diagram diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
 		for (var e : tree.edges()) {

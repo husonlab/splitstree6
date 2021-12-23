@@ -39,7 +39,8 @@ import jloda.util.Pair;
 import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
+import splitstree6.view.splits.viewer.ComboBoxUtils;
+import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Function;
@@ -72,27 +73,25 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		controller = treePagesView.getController();
 
-		final ObservableSet<ComputeTreeLayout.Diagram> disabledDiagrams = FXCollections.observableSet();
+		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();
 		treePagesView.reticulatedProperty().addListener((v, o, n) -> {
 			disabledDiagrams.clear();
 			if (n) {
-				disabledDiagrams.add(ComputeTreeLayout.Diagram.TriangularCladogram);
-				disabledDiagrams.add(ComputeTreeLayout.Diagram.RadialCladogram);
-				disabledDiagrams.add(ComputeTreeLayout.Diagram.RadialPhylogram);
+				disabledDiagrams.add(TreeDiagramType.TriangularCladogram);
+				disabledDiagrams.add(TreeDiagramType.RadialCladogram);
+				disabledDiagrams.add(TreeDiagramType.RadialPhylogram);
 			}
 		});
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createDiagramComboBoxListCell(false, disabledDiagrams));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createDiagramComboxBoxCallback(false, disabledDiagrams));
-		controller.getDiagramCBox().getItems().addAll(ComputeTreeLayout.Diagram.values());
+		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, it -> it.toString() + "16.gif"));
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, it -> it.toString() + "16.gif"));
+		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createOrientationComboBoxListCell());
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createOrientationComboBoxCallback());
-		controller.getOrientationCBox().getItems().addAll(TreePane.Orientation.values());
-
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, it -> it.toString() + ".png"));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, it -> it.toString() + ".png"));
+		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
-		//controller.getOrientationCBox().disableProperty().bind(Bindings.createObjectBinding(() -> treePagesView.getOptionDiagram().isRadial(), treePagesView.optionDiagramProperty()));
 
 		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowTreeNamesProperty());
 
@@ -206,13 +205,19 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		});
 
 
+		controller.getZoomInButton().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
+		controller.getZoomInButton().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
+		controller.getZoomOutButton().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
+		controller.getZoomOutButton().disableProperty().bind(treePageView.emptyProperty());
+
+
 		var undoManager = treePagesView.getUndoManager();
 		rowsAndCols.addListener((v, o, n) -> undoManager.add("Set Grid", rowsAndCols, o, n));
 		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("Change Page", treePagesView.pageNumberProperty(), o, n));
-		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" Set Diagram", treePagesView.optionDiagramProperty(), o, n));
-		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set Orientation", treePagesView.optionOrientationProperty(), o, n));
+		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" Set TreeDiagramType", treePagesView.optionDiagramProperty(), o, n));
+		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set LayoutOrientation", treePagesView.optionOrientationProperty(), o, n));
 		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree Names", treePagesView.optionShowTreeNamesProperty(), o, n));
-		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set Orientation", treePagesView.optionOrientationProperty(), o, n));
+		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set LayoutOrientation", treePagesView.optionOrientationProperty(), o, n));
 		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Font Size", treePagesView.optionFontScaleFactorProperty(), o, n));
 		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Zoom", treePagesView.optionZoomFactorProperty(), o, n));
 		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree names", treePagesView.optionShowTreeNamesProperty(), o, n));
@@ -235,10 +240,10 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
 		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
 
-		mainWindow.getController().getZoomInMenuItem().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
-		mainWindow.getController().getZoomInMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
-		mainWindow.getController().getZoomOutMenuItem().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
-		mainWindow.getController().getZoomOutMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainWindow.getController().getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
+		mainWindow.getController().getZoomInMenuItem().disableProperty().bind(controller.getZoomInButton().disableProperty());
+		mainWindow.getController().getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
+		mainWindow.getController().getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
 		mainWindow.getController().getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
 		mainWindow.getController().getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());

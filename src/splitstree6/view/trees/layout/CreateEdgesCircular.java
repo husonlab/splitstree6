@@ -56,7 +56,7 @@ import static splitstree6.view.trees.layout.CreateEdgesRectangular.addArrowHead;
 
 public class CreateEdgesCircular {
 
-	public static Collection<Shape> apply(ComputeTreeLayout.Diagram diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
 
@@ -111,7 +111,7 @@ public class CreateEdgesCircular {
 				shapes.add(line);
 				edgeCallback.accept(e, line);
 
-				if (tree.isLsaLeaf(w) && diagram == ComputeTreeLayout.Diagram.CircularPhylogram) {
+				if (tree.isLsaLeaf(w) && diagram == TreeDiagramType.CircularPhylogram) {
 					nodeAngleMap.put(w, GeometryUtilsFX.computeAngle(wPt));
 				}
 			}
