@@ -20,13 +20,13 @@
 package splitstree6.view.splits.viewer;
 
 import javafx.beans.property.*;
-import javafx.beans.value.ObservableValue;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
+import splitstree6.data.parts.Compatibility;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
@@ -54,6 +54,8 @@ public class SplitsView implements IView {
 
 	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting");
 
+	private final BooleanProperty optionUseWeights = new SimpleBooleanProperty(this, "optionUseWeights");
+
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
@@ -64,10 +66,11 @@ public class SplitsView implements IView {
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Outline);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionRooting, SplitsRooting::valueOf, SplitsRooting.None);
+		ProgramProperties.track(optionUseWeights, true);
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName());
+		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionUseWeights.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -88,6 +91,8 @@ public class SplitsView implements IView {
 
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);
+			if (n != null && getOptionDiagram() == SplitsDiagramType.Outline && n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic)
+				setOptionDiagram(SplitsDiagramType.Splits);
 		});
 	}
 
@@ -123,7 +128,7 @@ public class SplitsView implements IView {
 	}
 
 	@Override
-	public ObservableValue<Boolean> emptyProperty() {
+	public ReadOnlyBooleanProperty emptyProperty() {
 		return empty;
 	}
 
@@ -208,6 +213,18 @@ public class SplitsView implements IView {
 
 	public void setOptionFontScaleFactor(double optionFontScaleFactor) {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
+	}
+
+	public boolean isOptionUseWeights() {
+		return optionUseWeights.get();
+	}
+
+	public BooleanProperty optionUseWeightsProperty() {
+		return optionUseWeights;
+	}
+
+	public void setOptionUseWeights(boolean optionUseWeights) {
+		this.optionUseWeights.set(optionUseWeights);
 	}
 
 	public Bounds getTargetBounds() {

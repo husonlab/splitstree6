@@ -24,5 +24,5 @@ package splitstree6.view.splits.viewer;
  * Daniel Huson, 122.2021
  */
 public enum SplitsRooting {
-	None, MidPoint, MidPointAlt, OutGroup, OutGroupAlt;
+	None, MidPoint, MidPointAlt, OutGroup, OutGroupAlt
 }

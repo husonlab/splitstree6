@@ -23,25 +23,44 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
+import javafx.geometry.Dimension2D;
+import javafx.scene.control.SelectionMode;
+import jloda.fx.find.FindToolBar;
+import jloda.fx.find.Searcher;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * splits network presenter
  */
 public class SplitsViewPresenter implements IDisplayTabPresenter {
+	private final MainWindow mainWindow;
+	private final SplitsView splitsView;
+	private final SplitsViewController controller;
+
+	private final FindToolBar findToolBar;
+
 	private final InvalidationListener selectionListener;
 
+	private final ObjectProperty<SplitNetworkPane> splitNetworkPane = new SimpleObjectProperty<>();
+	private final InvalidationListener updateListener;
+
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock) {
-		var controller = splitsView.getController();
+		this.mainWindow = mainWindow;
+		this.splitsView = splitsView;
+		this.controller = splitsView.getController();
 
 		final ObservableSet<SplitsDiagramType> disabledDiagramTypes = FXCollections.observableSet();
 
@@ -86,14 +105,80 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, it -> it.toString() + ".png"));
 		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, it -> it.toString() + ".png"));
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
-		controller.getOrientationCBox().valueProperty().bind(splitsView.optionOrientationProperty());
-
-		controller.getDiagramCBox().valueProperty().addListener((v, o, n) -> System.err.println(n));
-		controller.getRootingCBox().valueProperty().addListener((v, o, n) -> System.err.println(n));
+		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 
 		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> System.err.println(n));
+
+		controller.getUseWeightsToggleButton().selectedProperty().bindBidirectional(splitsView.optionUseWeightsProperty());
+
+		var boxDimension = new SimpleObjectProperty<Dimension2D>();
+		targetBounds.addListener((v, o, n) -> {
+			boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40));
+		});
+
+		splitNetworkPane.addListener((v, o, n) -> {
+			controller.getScrollPane().setContent(n);
+		});
+
+		updateListener = e -> {
+			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
+					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
+					splitsView.getOptionRooting(), splitsView.isOptionUseWeights(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty());
+			splitNetworkPane.set(pane);
+			pane.drawNetwork();
+		};
+
+		splitsBlock.addListener(updateListener);
+		splitsView.optionDiagramProperty().addListener(updateListener);
+		splitsView.optionOrientationProperty().addListener(updateListener);
+		splitsView.optionRootingProperty().addListener(updateListener);
+		splitsView.optionUseWeightsProperty().addListener(updateListener);
+
+		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
+		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
+
+		controller.getZoomInButton().setOnAction(e -> splitsView.setOptionZoomFactor(1.1 * splitsView.getOptionZoomFactor()));
+		controller.getZoomInButton().disableProperty().bind(splitsView.emptyProperty().or(splitsView.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
+		controller.getZoomOutButton().setOnAction(e -> splitsView.setOptionZoomFactor((1.0 / 1.1) * splitsView.getOptionZoomFactor()));
+		controller.getZoomOutButton().disableProperty().bind(splitsView.emptyProperty());
+
+		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
+
+		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(),
+				t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
+				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s),
+				new SimpleObjectProperty<>(SelectionMode.MULTIPLE),
+				t -> t2taxon.apply(t).getNameAndDisplayLabel("===="),
+				label -> label.replaceAll(".*====", ""),
+				null));
+		findToolBar.setShowFindToolBar(false);
+		controller.getvBox().getChildren().add(findToolBar);
+		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
 	}
 
 	public void setupMenuItems() {
+		var mainController = mainWindow.getController();
+
+		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+
+		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor(1.2 * splitsView.getOptionFontScaleFactor()));
+		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor((1.0 / 1.2) * splitsView.getOptionFontScaleFactor()));
+		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
+
+		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
+		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
+
+		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
+		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
+
+		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
+		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+
+		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
+		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
+		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 	}
 }

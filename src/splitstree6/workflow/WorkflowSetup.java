@@ -28,7 +28,7 @@ import splitstree6.algorithms.source.source2distances.DistancesLoader;
 import splitstree6.algorithms.source.source2network.NetworkLoader;
 import splitstree6.algorithms.source.source2splits.SplitsLoader;
 import splitstree6.algorithms.source.source2trees.TreesLoader;
-import splitstree6.algorithms.splits.splits2view.ShowSplitsConsole;
+import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
@@ -64,25 +64,23 @@ public class WorkflowSetup {
 			workflow.newAlgorithmNode(new HammingDistances(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
-			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new ViewBlock()));
-			// todo: replace by calculation of network
+			var viewerNode = workflow.newDataNode(new ViewBlock());
+			workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), splitsNode, viewerNode);
 		} else if (clazz.equals(DistancesBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new DistancesLoader(), new TaxaBlock(), new DistancesBlock());
 			var distancesNode = workflow.getInputDataNode();
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
-			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new ViewBlock()));
-			// todo: replace by calculation of network
+			var viewerNode = workflow.newDataNode(new ViewBlock());
+			workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), splitsNode, viewerNode);
 		} else if (clazz.equals(SplitsBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new SplitsLoader(), new TaxaBlock(), new SplitsBlock());
-			var splitsNode = workflow.getInputDataNode();
-			workflow.newAlgorithmNode(new ShowSplitsConsole(), workflow.getWorkingTaxaNode(), splitsNode, workflow.newDataNode(new ViewBlock()));
-			// todo: replace by calculation of network
+			var viewerNode = workflow.newDataNode(new ViewBlock());
+			workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), viewerNode);
 		} else if (clazz.equals(TreesBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new TreesLoader(), new TaxaBlock(), new TreesBlock());
 			var viewerNode = workflow.newDataNode(new ViewBlock());
 			workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), viewerNode);
-			// todo: add calculation of network?
 		} else if (clazz.equals(NetworkBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new NetworkLoader(), new TaxaBlock(), new NetworkBlock());
 			var dataNode = workflow.getWorkingDataNode();

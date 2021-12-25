@@ -72,6 +72,7 @@ public class ShowSplitsNetwork extends Splits2View {
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof SplitsView view) {
 						view.getUndoManager().clear();
+						view.setSplitsBlock(null); // this is neccessary to trigger update
 						view.setSplitsBlock(inputData);
 					}
 				});

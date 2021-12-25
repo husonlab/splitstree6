@@ -19,7 +19,7 @@
 
 package splitstree6.view;
 
-import javafx.beans.value.ObservableValue;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import splitstree6.options.IHasOptions;
@@ -39,7 +39,7 @@ public interface IView extends IHasOptions {
 
 	UndoManager getUndoManager();
 
-	ObservableValue<Boolean> emptyProperty();
+	ReadOnlyBooleanProperty emptyProperty();
 
 	Node getImageNode();
 

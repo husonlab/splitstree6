@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.view.splits.layout;
+package splitstree6.view.splits.layout.algorithms;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
@@ -41,26 +41,25 @@ import java.util.TreeSet;
  * Daniel Huson, 11.2017
  */
 public class EqualAngle {
-    /**
-     * apply the algorithm to build a new graph
-     *
-     * @param progress
-     * @param useWeights
-     * @param taxaBlock
-     * @param splits
-     * @param graph
-     * @param nodePointMap
-     */
-    public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits, PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet forbiddenSplits, BitSet usedSplits) throws CanceledException {
-        //System.err.println("Running equals angle algorithm");
-        graph.clear();
-        usedSplits.clear();
+	/**
+	 * apply the algorithm to build a new graph
+	 *
+	 * @param progress
+	 * @param useWeights
+	 * @param taxaBlock
+	 * @param splits
+	 * @param graph
+	 */
+	public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits, PhyloSplitsGraph graph, BitSet forbiddenSplits, BitSet usedSplits) throws CanceledException {
+		//System.err.println("Running equals angle algorithm");
+		graph.clear();
+		usedSplits.clear();
 
-        progress.setTasks("Equal Angle", null);
-        progress.setMaximum(100);    //initialize maximum progress
-        progress.setProgress(-1);    //set progress to 0
+		progress.setTasks("Equal Angle", null);
+		progress.setMaximum(100);    //initialize maximum progress
+		progress.setProgress(-1);    //set progress to 0
 
-        final int[] cycle = normalizeCycle(splits.getCycle());
+		final int[] cycle = normalizeCycle(splits.getCycle());
 
         progress.setProgress(2);
 
@@ -97,8 +96,6 @@ public class EqualAngle {
                 graph.setAngle(e, GeometryUtilsFX.modulo360(graph.getAngle(e) - angle));
             }
         }
-        if (nodePointMap != null)
-            assignCoordinatesToNodes(useWeights, graph, nodePointMap, 1); // need coordinates
 
         PhyloGraphUtils.addLabels(taxaBlock, graph);
         progress.setProgress(100);   //set progress to 100%

@@ -349,14 +349,11 @@ public class SplitsUtilities {
 	 * @param cycle
 	 * @param splitsBlock
 	 * @param useWeights  use split weights or otherwise give all splits weight 1
-	 * @param progress
 	 * @return rooting split and both distances
 	 * @throws CanceledException
 	 */
 	public static Triplet<Integer, Double, Double> computeRootLocation(boolean alt, int nTax, Set<Integer> outGroup,
-																	   int[] cycle, SplitsBlock splitsBlock, boolean useWeights, ProgressListener progress) {
-		progress.setSubtask("Computing root location");
-
+																	   int[] cycle, SplitsBlock splitsBlock, boolean useWeights) {
 		if (outGroup.size() > 0) {
 			final BitSet outGroupSplits = new BitSet();
 			final BitSet outGroupBits = BitSetUtils.asBitSet(outGroup);

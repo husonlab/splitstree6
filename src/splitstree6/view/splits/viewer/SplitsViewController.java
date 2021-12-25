@@ -20,10 +20,7 @@
 package splitstree6.view.splits.viewer;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
@@ -72,6 +69,9 @@ public class SplitsViewController {
 
 	@FXML
 	private ScrollPane scrollPane;
+
+	@FXML
+	private ToggleButton useWeightsToggleButton;
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -127,5 +127,9 @@ public class SplitsViewController {
 
 	public ScrollPane getScrollPane() {
 		return scrollPane;
+	}
+
+	public ToggleButton getUseWeightsToggleButton() {
+		return useWeightsToggleButton;
 	}
 }

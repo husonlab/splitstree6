@@ -54,7 +54,7 @@ public class TanglegramTreePane extends Group {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonOrdering.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), optionOrientation.get(), new SimpleDoubleProperty(1.0), tanglegramView.optionFontScaleFactorProperty(), new SimpleBooleanProperty(false));
+								optionDiagram.get(), optionOrientation, new SimpleDoubleProperty(1.0), tanglegramView.optionFontScaleFactorProperty(), new SimpleBooleanProperty(false));
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
 						getChildren().add(treePane);

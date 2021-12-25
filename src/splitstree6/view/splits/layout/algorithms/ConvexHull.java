@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.view.splits.layout;
+package splitstree6.view.splits.layout.algorithms;
 
 import jloda.graph.Edge;
 import jloda.graph.EdgeSet;

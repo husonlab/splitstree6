@@ -49,15 +49,16 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.TriConsumer;
 import jloda.fx.window.MainWindowManager;
 import jloda.graph.Edge;
-import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
-import jloda.util.StringUtils;
+import jloda.util.IteratorUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.view.trees.ordering.CircularOrdering;
 
 import java.util.function.BiConsumer;
+
+import static splitstree6.view.trees.layout.LayoutUtils.getLabelText;
 
 /**
  * computes an embedding of a tree
@@ -66,8 +67,6 @@ import java.util.function.BiConsumer;
 public class ComputeTreeLayout {
 
 	public enum ParentPlacement {LeafAverage, ChildrenAverage}
-
-	public static double MAX_FONT_SIZE = 24;
 
 	/**
 	 * compute a tree embedding
@@ -89,16 +88,12 @@ public class ComputeTreeLayout {
 		if (tree.getNumberOfNodes() == 0)
 			return new Group();
 
-		var parentPlacement = ParentPlacement.ChildrenAverage;
-
 		if (alignLabels && diagram != TreeDiagramType.RectangularPhylogram && diagram != TreeDiagramType.CircularPhylogram)
 			alignLabels = false; // can't or don't need to, or can't, align labels in all other cases
 
 		//parentPlacement = ParentPlacement.LeafAverage;
 
 		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
-
-		final var numberOfLeaves = tree.nodeStream().filter(tree::isLsaLeaf).count();
 
 		if (taxonOrdering == null || taxonOrdering.length == 0) {
 			taxonOrdering = CircularOrdering.computeRealizableCycle(tree, CircularOrdering.apply(taxaBlock, tree));
@@ -108,14 +103,12 @@ public class ComputeTreeLayout {
 		for (int pos = 1; pos < taxonOrdering.length; pos++)
 			taxon2pos[taxonOrdering[pos]] = pos;
 
-		double fontHeight;
-		if (diagram.isRadial())
-			fontHeight = Math.min(MAX_FONT_SIZE, 0.5 * Math.min(width, height) * Math.PI / (numberOfLeaves + 1));
-		else
-			fontHeight = Math.min(MAX_FONT_SIZE, height / (numberOfLeaves + 1));
+		var triplet = LayoutUtils.computeFontHeightGraphWidthHeight(taxaBlock, tree, diagram.isRadial(), width, height);
+		var fontHeight = triplet.getFirst();
+		width = triplet.getSecond();
+		height = triplet.getThird();
 
-		var maxLabelWidth = 0.0;
-		NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
+		final NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
 		for (var v : tree.nodes()) {
 			var text = getLabelText(taxaBlock, tree, v);
 			if (text != null) {
@@ -123,46 +116,12 @@ public class ComputeTreeLayout {
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTextFill(color);
 				nodeLabelMap.put(v, label);
-
-				// BasicFX.reportChanges(label.getRawText(),label.translateXProperty());
-				// BasicFX.reportChanges(label.getRawText(),label.translateYProperty());
-
-				maxLabelWidth = Math.max(maxLabelWidth, label.getEstimatedWidth());
 			}
 		}
 
-		if (maxLabelWidth + fontHeight > 0.25 * width) {
-			fontHeight = Math.min(MAX_FONT_SIZE, fontHeight * 0.25 * width / (maxLabelWidth + fontHeight));
-			maxLabelWidth = 0;
-			for (var label : nodeLabelMap.values()) {
-				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
-			}
-		}
-		var labelGap = fontHeight;
+		var labelGap = fontHeight + 1;
 
-		final double normalizeWidth;
-		final double normalizeHeight;
-
-		if (diagram.isRadial()) {
-			if (maxLabelWidth > 100) {
-				fontHeight *= 100 / maxLabelWidth;
-				labelGap = fontHeight;
-				maxLabelWidth = 100;
-			}
-
-			var tmp = Math.min(width - 2 * (maxLabelWidth + labelGap), height - 2 * (maxLabelWidth + labelGap));
-			if (tmp > 20)
-				tmp -= 10;
-			else if (tmp < 0)
-				tmp = 20;
-			normalizeWidth = normalizeHeight = tmp;
-		} else {
-			normalizeWidth = width - maxLabelWidth - labelGap;
-			normalizeHeight = height - fontHeight;
-		}
-
-		NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
+		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
 			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, taxon2pos, true);
@@ -173,7 +132,7 @@ public class ComputeTreeLayout {
 			case CircularPhylogram -> LayoutTreeCircular.apply(tree, taxon2pos, nodeAngleMap, true);
 		};
 
-		normalize(normalizeWidth, normalizeHeight, nodePointMap);
+		LayoutUtils.normalize(width, height, nodePointMap);
 
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getX()) < 0.000001);
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
@@ -198,7 +157,9 @@ public class ComputeTreeLayout {
 			if (label != null) {
 				nodeLabelGroup.getChildren().add(label);
 				nodeCallback.accept(v, circle, label);
-				circle.setUserData(taxaBlock.get(tree.getTaxa(v).iterator().next()));
+				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
+				if (taxonId != null)
+					circle.setUserData(taxaBlock.get(taxonId));
 			}
 		}
 
@@ -223,39 +184,6 @@ public class ComputeTreeLayout {
 			return new Group(edgeGroup, nodeGroup, nodeLabelGroup);
 	}
 
-
-	private static String getLabelText(TaxaBlock taxaBlock, PhyloTree tree, Node v) {
-		final int taxonId;
-		{
-			final var it = tree.getTaxa(v).iterator();
-			taxonId = (it.hasNext() ? it.next() : 0);
-		}
-		if (v.getLabel() != null && tree.getLabel(v).length() > 0) {
-			if (TaxaBlock.hasDisplayLabels(taxaBlock) && taxonId > 0)
-				return taxaBlock.get(taxonId).getDisplayLabelOrName();
-			else
-				return tree.getLabel(v);
-		} else if (tree.getNumberOfTaxa(v) > 0)
-			return StringUtils.toString(taxaBlock.getLabels(tree.getTaxa(v)), ",");
-		else
-			return null;
-	}
-
-	private static void normalize(double width, double height, NodeArray<Point2D> nodePointMap) {
-		var minX = nodePointMap.values().parallelStream().mapToDouble(Point2D::getX).min().orElse(0);
-		var maxX = nodePointMap.values().parallelStream().mapToDouble(Point2D::getX).max().orElse(0);
-		var minY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).min().orElse(0);
-		var maxY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).max().orElse(0);
-
-		var scaleX = (maxX > minX ? width / (maxX - minX) : 1);
-		var scaleY = (maxY > minY ? height / (maxY - minY) : 1);
-		if (minX != 0 || scaleX != 1 || minY != 0 || scaleY != 1) {
-			for (var v : nodePointMap.keySet()) {
-				var point = nodePointMap.get(v);
-				nodePointMap.put(v, new Point2D(point.getX() * scaleX, point.getY() * scaleY));
-			}
-		}
-	}
 
 	public static class LabelConnector extends Line {
 		public LabelConnector(double x1, double y1, double x2, double y2) {

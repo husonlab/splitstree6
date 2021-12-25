@@ -18,7 +18,7 @@
  *
  */
 
-package splitstree6.view.splits.layout;
+package splitstree6.view.splits.layout.algorithms;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
@@ -45,7 +45,7 @@ import java.util.function.Function;
  * runs the outline algorithm due to Bryant and Huson, 2021
  * Daniel Huson, 1.2020
  */
-public class NetworkOutlineAlgorithm {
+public class Outline {
     /**
      * apply the algorithm to build a new graph
      *
@@ -57,7 +57,7 @@ public class NetworkOutlineAlgorithm {
      * @param nodePointMap
      */
     public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits,
-                             PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet forbiddenSplits, BitSet usedSplits,
+                             PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet usedSplits,
                              ArrayList<ArrayList<Node>> loops, boolean rooted) throws CanceledException {
         progress.setTasks("Outline", null);
 

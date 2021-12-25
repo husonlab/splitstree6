@@ -22,6 +22,7 @@ package splitstree6.view.trees.treepages;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.ObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -31,6 +32,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.util.TriConsumer;
 import jloda.graph.Edge;
+import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
@@ -45,11 +47,8 @@ import java.util.function.BiConsumer;
  * Daniel Huson, 2021
  */
 public class InteractionSetup {
-	private final PhyloTree phyloTree;
 	private final TaxaBlock taxaBlock;
 	private final SelectionModel<Taxon> taxonSelectionModel;
-
-	private final LayoutOrientation orientation;
 
 	private final Map<Taxon, Pair<Shape, RichTextLabel>> taxonShapeLabelMap;
 	private final EventHandler<MouseEvent> mousePressedHandler;
@@ -60,11 +59,9 @@ public class InteractionSetup {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, LayoutOrientation orientation) {
-		this.phyloTree = phyloTree;
+	public InteractionSetup(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, ObjectProperty<LayoutOrientation> orientation) {
 		this.taxaBlock = taxaBlock;
 		this.taxonSelectionModel = taxonSelectionModel;
-		this.orientation = orientation;
 		taxonShapeLabelMap = new HashMap<>();
 
 		mousePressedHandler = e -> {
@@ -85,7 +82,7 @@ public class InteractionSetup {
 						var dx = e.getScreenX() - mouseDownX;
 						var dy = e.getScreenY() - mouseDownY;
 
-						switch (orientation) {
+						switch (orientation.get()) {
 							case Rotate90Deg -> {
 								var tmp = dx;
 								dx = -dy;
@@ -140,26 +137,28 @@ public class InteractionSetup {
 	public TriConsumer<jloda.graph.Node, Shape, RichTextLabel> createNodeCallback() {
 		return (v, shape, label) -> {
 			Platform.runLater(() -> {
-				for (var t : phyloTree.getTaxa(v)) {
-					if (t <= taxaBlock.getNtax()) {
-						var taxon = taxaBlock.get(t);
-						taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
-						label.setOnMousePressed(mousePressedHandler);
-						label.setOnMouseDragged(mouseDraggedHandler);
-						final EventHandler<MouseEvent> mouseClickedHandler = e -> {
-							if (e.isStillSincePress()) {
-								if (!e.isShiftDown())
-									taxonSelectionModel.clearSelection();
-								taxonSelectionModel.toggleSelection(taxon);
-								e.consume();
-							}
-						};
-						shape.setOnMouseClicked(mouseClickedHandler);
-						label.setOnMouseClicked(mouseClickedHandler);
+				if (v.getOwner() instanceof PhyloGraph phyloGraph) {
+					for (var t : phyloGraph.getTaxa(v)) {
+						if (t <= taxaBlock.getNtax()) {
+							var taxon = taxaBlock.get(t);
+							taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
+							label.setOnMousePressed(mousePressedHandler);
+							label.setOnMouseDragged(mouseDraggedHandler);
+							final EventHandler<MouseEvent> mouseClickedHandler = e -> {
+								if (e.isStillSincePress()) {
+									if (!e.isShiftDown())
+										taxonSelectionModel.clearSelection();
+									taxonSelectionModel.toggleSelection(taxon);
+									e.consume();
+								}
+							};
+							shape.setOnMouseClicked(mouseClickedHandler);
+							label.setOnMouseClicked(mouseClickedHandler);
 
-						if (taxonSelectionModel.isSelected(taxon)) {
-							shape.setEffect(SelectionEffectBlue.getInstance());
-							label.setEffect(SelectionEffectBlue.getInstance());
+							if (taxonSelectionModel.isSelected(taxon)) {
+								shape.setEffect(SelectionEffectBlue.getInstance());
+								label.setEffect(SelectionEffectBlue.getInstance());
+							}
 						}
 					}
 				}
@@ -171,28 +170,28 @@ public class InteractionSetup {
 		return (edge, shape) -> {
 			shape.setPickOnBounds(false);
 
-			var tree = (PhyloTree) edge.getOwner();
-
-			shape.setOnMouseClicked(e -> {
-				if (e.getClickCount() >= 1) {
-					if (!e.isShiftDown())
-						taxonSelectionModel.clearSelection();
-					if (!e.isAltDown()) {
-						tree.preorderTraversal(edge.getTarget(), v -> {
-							for (var t : tree.getTaxa(v)) {
-								taxonSelectionModel.select(taxaBlock.get(t));
-							}
-						});
-					} else {
-						tree.preorderTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> {
-							for (var t : tree.getTaxa(v)) {
-								taxonSelectionModel.select(taxaBlock.get(t));
-							}
-						});
+			if (edge.getOwner() instanceof PhyloTree tree) {
+				shape.setOnMouseClicked(e -> {
+					if (e.getClickCount() >= 1) {
+						if (!e.isShiftDown())
+							taxonSelectionModel.clearSelection();
+						if (!e.isAltDown()) {
+							tree.preorderTraversal(edge.getTarget(), v -> {
+								for (var t : tree.getTaxa(v)) {
+									taxonSelectionModel.select(taxaBlock.get(t));
+								}
+							});
+						} else {
+							tree.preorderTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> {
+								for (var t : tree.getTaxa(v)) {
+									taxonSelectionModel.select(taxaBlock.get(t));
+								}
+							});
+						}
+						e.consume();
 					}
-					e.consume();
-				}
-			});
+				});
+			}
 		};
 	}
 }
