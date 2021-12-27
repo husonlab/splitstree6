@@ -58,7 +58,7 @@ public class Outline {
      */
     public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits,
                              PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet usedSplits,
-                             ArrayList<ArrayList<Node>> loops, boolean rooted) throws CanceledException {
+                             ArrayList<ArrayList<Node>> loops, int rootSplit) throws CanceledException {
         progress.setTasks("Outline", null);
 
         if (nodePointMap == null)
@@ -74,7 +74,7 @@ public class Outline {
         try {
             final var cycle = splits.getCycle();
             //final int[] cycle=SplitsUtilities.normalizeCycle(splits.getCycle());
-            final var split2angle = EqualAngle.assignAnglesToSplits(taxaBlock.getNtax(), splits, splits.getCycle(), rooted ? 160 : 360);
+            final var split2angle = EqualAngle.assignAnglesToSplits(taxaBlock.getNtax(), splits, splits.getCycle(), rootSplit == 0 ? 360 : 160);
 
             final ArrayList<Event> events;
             {
@@ -115,10 +115,12 @@ public class Outline {
 
                 if (event.isStart()) {
                     currentSplits.set(event.getS(), true);
-                    location = GeometryUtilsFX.translateByAngle(location, split2angle[event.getS()], useWeights ? event.getWeight() : 1);
+                    var weight = useWeights ? event.getWeight() : (event.getS() == rootSplit ? 0.1 : 1);
+                    location = GeometryUtilsFX.translateByAngle(location, split2angle[event.getS()], weight);
                 } else {
                     currentSplits.set(event.getS(), false);
-                    location = GeometryUtilsFX.translateByAngle(location, split2angle[event.getS()] + 180, useWeights ? event.getWeight() : 1);
+                    var weight = useWeights ? event.getWeight() : (event.getS() == rootSplit ? 0.1 : 1);
+                    location = GeometryUtilsFX.translateByAngle(location, split2angle[event.getS()] + 180, weight);
                 }
 
                 final var mustCreateNode = (splits2node.get(currentSplits) == null);

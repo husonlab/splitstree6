@@ -62,6 +62,31 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.splitsView = splitsView;
 		this.controller = splitsView.getController();
 
+		splitNetworkPane.addListener((v, o, n) -> {
+			controller.getScrollPane().setContent(n);
+		});
+
+		controller.getScrollPane().setLockAspectRatio(true);
+		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
+		controller.getScrollPane().setUpdateScaleMethod(() -> splitsView.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * splitsView.getOptionZoomFactor()));
+
+		if (false) {
+			controller.getScrollPane().viewportBoundsProperty().addListener(e -> {
+				var scrollPane = controller.getScrollPane();
+				var pane = splitNetworkPane.get();
+				if (pane != null) {
+					var newWidth = scrollPane.getViewportBounds().getWidth();
+					var oldWidth = pane.getMinWidth();
+					if (Math.abs(oldWidth - newWidth) > 20)
+						pane.setMinWidth(newWidth);
+					var newHeight = scrollPane.getViewportBounds().getHeight();
+					var oldHeight = pane.getMinHeight();
+					if (Math.abs(oldHeight - newHeight) > 20)
+						pane.setMinHeight(newHeight);
+				}
+			});
+		}
+
 		final ObservableSet<SplitsDiagramType> disabledDiagramTypes = FXCollections.observableSet();
 
 		disabledDiagramTypes.add(SplitsDiagramType.Outline);
@@ -102,28 +127,26 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getRootingCBox().getItems().addAll(SplitsRooting.values());
 		controller.getRootingCBox().valueProperty().bindBidirectional(splitsView.optionRootingProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, it -> it.toString() + ".png"));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, it -> it.toString() + ".png"));
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createNode));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createNode));
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 
-		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> System.err.println(n));
-
 		controller.getUseWeightsToggleButton().selectedProperty().bindBidirectional(splitsView.optionUseWeightsProperty());
+		controller.getScaleBar().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty());
+		controller.getScaleBar().factorXProperty().bind(splitsView.optionZoomFactorProperty());
 
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
 		targetBounds.addListener((v, o, n) -> {
 			boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40));
 		});
 
-		splitNetworkPane.addListener((v, o, n) -> {
-			controller.getScrollPane().setContent(n);
-		});
-
 		updateListener = e -> {
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
+					splitsView.getSplitSelectionModel(),
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
-					splitsView.getOptionRooting(), splitsView.isOptionUseWeights(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty());
+					splitsView.getOptionRooting(), splitsView.isOptionUseWeights(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
+					controller.getScaleBar().unitLengthXProperty());
 			splitNetworkPane.set(pane);
 			pane.drawNetwork();
 		};

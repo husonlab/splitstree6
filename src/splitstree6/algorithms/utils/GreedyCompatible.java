@@ -40,6 +40,7 @@
 package splitstree6.algorithms.utils;
 
 import jloda.util.CanceledException;
+import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
@@ -65,19 +66,18 @@ public class GreedyCompatible {
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
 
-		final ArrayList<ASplit> sorted = SplitsUtilities.sortByDecreasingWeight(splits);
 		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
-		for (ASplit aSplit : sorted) {
+		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(a.getWeight(), b.getWeight()))) {
 			boolean ok = true;
 			for (ASplit bSplit : result) {
-				if (!Compatibility.areCompatible(aSplit, bSplit)) {
+				if (!Compatibility.areCompatible(split, bSplit)) {
 					ok = false;
 					break;
 				}
 				progress.incrementProgress();
 			}
 			if (ok) {
-				result.add(aSplit);
+				result.add(split);
 			}
 		}
 		return result;

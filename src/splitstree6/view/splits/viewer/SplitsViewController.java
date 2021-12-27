@@ -20,10 +20,16 @@
 package splitstree6.view.splits.viewer;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.util.ScaleBar;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 
 public class SplitsViewController {
@@ -53,6 +59,9 @@ public class SplitsViewController {
 	private Button findButton;
 
 	@FXML
+	private StackPane centerPane;
+
+	@FXML
 	private ComboBox<SplitsDiagramType> diagramCBox;
 
 	@FXML
@@ -68,10 +77,22 @@ public class SplitsViewController {
 	private Button zoomOutButton;
 
 	@FXML
-	private ScrollPane scrollPane;
+	private ToggleButton useWeightsToggleButton;
 
 	@FXML
-	private ToggleButton useWeightsToggleButton;
+	private AnchorPane innerAnchorPane;
+
+	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
+
+	private final ScaleBar scaleBar = new ScaleBar();
+
+	@FXML
+	private void initialize() {
+		centerPane.getChildren().add(zoomableScrollPane);
+		innerAnchorPane.getChildren().add(scaleBar);
+		AnchorPane.setTopAnchor(scaleBar, 10.0);
+		AnchorPane.setLeftAnchor(scaleBar, 10.0);
+	}
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -125,11 +146,19 @@ public class SplitsViewController {
 		return zoomOutButton;
 	}
 
-	public ScrollPane getScrollPane() {
-		return scrollPane;
+	public ZoomableScrollPane getScrollPane() {
+		return zoomableScrollPane;
 	}
 
 	public ToggleButton getUseWeightsToggleButton() {
 		return useWeightsToggleButton;
+	}
+
+	public ScaleBar getScaleBar() {
+		return scaleBar;
+	}
+
+	public AnchorPane getInnerAnchorPane() {
+		return innerAnchorPane;
 	}
 }

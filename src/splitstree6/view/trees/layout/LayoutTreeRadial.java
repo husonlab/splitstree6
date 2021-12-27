@@ -78,10 +78,7 @@ public class LayoutTreeRadial {
 				while (queue.size() > 0) { // breath-first assignment
 					var w = queue.remove(0); // pop
 					var ok = true;
-					if (w.getInDegree() == 1 && w.getParent() == tree.getRoot()) { // can't show single root edge
-						var rootPt = nodePointMap.get(tree.getRoot());
-						nodePointMap.put(w, rootPt);
-					} else if (w.getInDegree() == 1) { // has regular in-edge
+					if (w.getInDegree() == 1) { // has regular in-edge
 						var e = w.getFirstInEdge();
 						var v = e.getSource();
 						var vPt = nodePointMap.get(v);

@@ -129,8 +129,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 			});
 
-			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams1, it -> it.toString() + "16.gif", false));
-			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams1, it -> it.toString() + "16.gif", false));
+			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams1, TreeDiagramType::createNode, false));
+			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams1, TreeDiagramType::createNode, false));
 			controller.getDiagram1CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram1CBox().setValue(tanglegramView.getOptionDiagram1());
 			tanglegramView.optionDiagram1Property().addListener((v, o, n) -> controller.getDiagram1CBox().setValue(n));
@@ -145,16 +145,16 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 			});
 
-			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams2, it -> it.toString() + "16.gif", true));
-			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams2, it -> it.toString() + "16.gif", true));
+			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams2, TreeDiagramType::createNode, true));
+			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams2, TreeDiagramType::createNode, true));
 			controller.getDiagram2CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram2CBox().setValue(tanglegramView.getOptionDiagram2());
 			tanglegramView.optionDiagram2Property().addListener((v, o, n) -> controller.getDiagram2CBox().setValue(n));
 			controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram2Property().set(n));
 		}
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, it -> it.toString() + ".png"));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, it -> it.toString() + ".png"));
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createNode));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createNode));
 		controller.getOrientationCBox().getItems().addAll(Rotate0Deg, FlipRotate180Deg);
 		controller.getOrientationCBox().setValue(tanglegramView.getOptionOrientation());
 		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionOrientationProperty().set(n));

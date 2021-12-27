@@ -20,6 +20,7 @@
 package splitstree6.view.splits.viewer;
 
 import javafx.application.Platform;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -36,7 +37,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.view.splits.layout.ComputeSplitNetworkLayout;
 import splitstree6.view.trees.layout.LayoutUtils;
-import splitstree6.view.trees.treepages.InteractionSetup;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
@@ -54,10 +54,12 @@ public class SplitNetworkPane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public SplitNetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-							SplitsDiagramType diagram, ObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting, boolean useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor) {
-
-		var interactionSetup = new InteractionSetup(taxaBlock, taxonSelectionModel, orientation);
+	public SplitNetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel,
+							SelectionModel<Integer> splitSelectionModel,
+							double boxWidth, double boxHeight,
+							SplitsDiagramType diagram, ObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting,
+							boolean useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+							DoubleProperty unitLength) {
 
 		getStyleClass().add("background");
 		getChildren().setAll(group);
@@ -83,6 +85,9 @@ public class SplitNetworkPane extends StackPane {
 		service.setExecutor(ProgramExecutorService.getInstance());
 
 		service.setCallable(() -> {
+			if (taxaBlock == null || splitsBlock == null)
+				return new Group();
+
 			double width;
 			double height;
 			if (orientation.get().isWidthHeightSwitched()) {
@@ -93,13 +98,16 @@ public class SplitNetworkPane extends StackPane {
 				height = getPrefHeight() - 12;
 			}
 
-			var result = ComputeSplitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting, useWeights, taxonSelectionModel, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback());
+			var result = ComputeSplitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting, useWeights,
+					taxonSelectionModel, unitLength, width - 4, height - 4, splitSelectionModel, orientation);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());
 			LayoutUtils.applOrientation(result, orientation.get());
 			return result;
 		});
+
+		service.setOnScheduled(a -> unitLength.set(0));
 
 		service.setOnSucceeded(a -> {
 			if (zoomFactor.get() != 1) {

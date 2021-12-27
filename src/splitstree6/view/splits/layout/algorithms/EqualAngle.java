@@ -408,45 +408,46 @@ public class EqualAngle {
 
 
     /**
-     * assigns coordinates to nodes
-     *
-     * @param useWeights
-     * @param graph
-     */
-    public static void assignCoordinatesToNodes(boolean useWeights, PhyloSplitsGraph graph, NodeArray<Point2D> node2point, int startTaxonId) {
-        if (graph.getNumberOfNodes() == 0)
-            return;
-        final var v = graph.getTaxon2Node(startTaxonId);
-        node2point.put(v, new Point2D(0, 0));
+	 * assigns coordinates to nodes
+	 *
+	 * @param useWeights
+	 * @param graph
+	 */
+	public static void assignCoordinatesToNodes(boolean useWeights, PhyloSplitsGraph graph, NodeArray<Point2D> node2point, int startTaxonId, int rootSplit) {
+		if (graph.getNumberOfNodes() == 0)
+			return;
+		final var v = graph.getTaxon2Node(startTaxonId);
+		node2point.put(v, new Point2D(0, 0));
 
-        final var splitsInPath = new BitSet();
-        NodeSet nodesVisited = new NodeSet(graph);
+		final var splitsInPath = new BitSet();
+		NodeSet nodesVisited = new NodeSet(graph);
 
-        assignCoordinatesToNodesRec(useWeights, v, splitsInPath, nodesVisited, graph, node2point);
-    }
+		assignCoordinatesToNodesRec(useWeights, v, splitsInPath, nodesVisited, graph, node2point, rootSplit);
+	}
 
-    /**
-     * recursively assigns coordinates to all nodes
-     *
-     * @param useWeights
-     * @param v
-     * @param splitsInPath
-     * @param nodesVisited
-     * @param graph
-     */
-    private static void assignCoordinatesToNodesRec(boolean useWeights, Node v, BitSet splitsInPath, NodeSet nodesVisited, PhyloSplitsGraph graph, NodeArray<Point2D> node2point) {
-        if (!nodesVisited.contains(v)) {
-            nodesVisited.add(v);
-            for (var e : v.adjacentEdges()) {
-                var s = graph.getSplit(e);
-                if (!splitsInPath.get(s)) {
-                    var w = graph.getOpposite(v, e);
-                    var p = GeometryUtilsFX.translateByAngle(node2point.get(v), graph.getAngle(e), useWeights ? graph.getWeight(e) : 1);
-                    node2point.put(w, p);
-                    splitsInPath.set(s, true);
-                    assignCoordinatesToNodesRec(useWeights, w, splitsInPath, nodesVisited, graph, node2point);
-                    splitsInPath.set(s, false);
-                }
+	/**
+	 * recursively assigns coordinates to all nodes
+	 *
+	 * @param useWeights
+	 * @param v
+	 * @param splitsInPath
+	 * @param nodesVisited
+	 * @param graph
+	 */
+	private static void assignCoordinatesToNodesRec(boolean useWeights, Node v, BitSet splitsInPath, NodeSet nodesVisited, PhyloSplitsGraph graph, NodeArray<Point2D> node2point, int rootSplit) {
+		if (!nodesVisited.contains(v)) {
+			nodesVisited.add(v);
+			for (var e : v.adjacentEdges()) {
+				var s = graph.getSplit(e);
+				if (!splitsInPath.get(s)) {
+					var w = graph.getOpposite(v, e);
+					var weight = (useWeights ? graph.getWeight(e) : graph.getSplit(e) == rootSplit ? 0.1 : 1);
+					var p = GeometryUtilsFX.translateByAngle(node2point.get(v), graph.getAngle(e), weight);
+					node2point.put(w, p);
+					splitsInPath.set(s, true);
+					assignCoordinatesToNodesRec(useWeights, w, splitsInPath, nodesVisited, graph, node2point, rootSplit);
+					splitsInPath.set(s, false);
+				}
             }
         }
     }

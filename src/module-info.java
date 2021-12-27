@@ -95,6 +95,7 @@ module splitstreesix {
 	opens splitstree6.view.inputeditor;
 	opens splitstree6.view;
 	opens splitstree6.view.trees.layout;
+	opens splitstree6.view.splits.layout;
 
 
 }

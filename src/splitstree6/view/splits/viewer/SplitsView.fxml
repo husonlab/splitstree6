@@ -178,11 +178,10 @@
                 </VBox>
             </top>
             <center>
-                <AnchorPane style="-fx-background-color: transparent;">
+                <AnchorPane fx:id="innerAnchorPane" style="-fx-background-color: transparent;">
                     <children>
-                        <ScrollPane fx:id="scrollPane" style="-fx-background-color: transparent;"
-                                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     </children>
                 </AnchorPane>
             </center>

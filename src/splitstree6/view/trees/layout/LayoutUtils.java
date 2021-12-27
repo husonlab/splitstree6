@@ -98,7 +98,7 @@ public class LayoutUtils {
 		return new Triplet<>(fontHeight, normalizeWidth, normalizeHeight);
 	}
 
-	public static void normalize(double width, double height, NodeArray<Point2D> nodePointMap) {
+	public static double normalize(double width, double height, NodeArray<Point2D> nodePointMap, boolean maintainAspectRatio) {
 		var minX = nodePointMap.values().parallelStream().mapToDouble(Point2D::getX).min().orElse(0);
 		var maxX = nodePointMap.values().parallelStream().mapToDouble(Point2D::getX).max().orElse(0);
 		var minY = nodePointMap.values().parallelStream().mapToDouble(Point2D::getY).min().orElse(0);
@@ -106,12 +106,16 @@ public class LayoutUtils {
 
 		var scaleX = (maxX > minX ? width / (maxX - minX) : 1);
 		var scaleY = (maxY > minY ? height / (maxY - minY) : 1);
+		if (maintainAspectRatio) {
+			scaleX = scaleY = Math.min(scaleX, scaleY);
+		}
 		if (minX != 0 || scaleX != 1 || minY != 0 || scaleY != 1) {
 			for (var v : nodePointMap.keySet()) {
 				var point = nodePointMap.get(v);
 				nodePointMap.put(v, new Point2D(point.getX() * scaleX, point.getY() * scaleY));
 			}
 		}
+		return scaleX;
 	}
 
 	public static String getLabelText(TaxaBlock taxaBlock, PhyloGraph graph, Node v) {

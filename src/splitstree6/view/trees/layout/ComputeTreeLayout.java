@@ -132,7 +132,7 @@ public class ComputeTreeLayout {
 			case CircularPhylogram -> LayoutTreeCircular.apply(tree, taxon2pos, nodeAngleMap, true);
 		};
 
-		LayoutUtils.normalize(width, height, nodePointMap);
+		LayoutUtils.normalize(width, height, nodePointMap, diagram.isRadial());
 
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getX()) < 0.000001);
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
@@ -145,7 +145,7 @@ public class ComputeTreeLayout {
 
 		for (var v : tree.nodes()) {
 			var point = nodePointMap.get(v);
-			var circle = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 2 : 0.5);
+			var circle = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
 			circle.setFill(color);
 			circle.setStroke(Color.TRANSPARENT);
 			nodeGroup.getChildren().add(circle);

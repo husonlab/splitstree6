@@ -22,6 +22,8 @@ package splitstree6.view.splits.viewer;
 import javafx.beans.property.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.ProgramProperties;
@@ -38,6 +40,8 @@ import java.util.List;
 public class SplitsView implements IView {
 
 	private final UndoManager undoManager = new UndoManager();
+
+	private final SelectionModel<Integer> splitSelectionModel = new SetSelectionModel<>();
 
 	private final SplitsViewController controller;
 	private final SplitsViewPresenter presenter;
@@ -93,6 +97,7 @@ public class SplitsView implements IView {
 			empty.set(n == null || n.size() == 0);
 			if (n != null && getOptionDiagram() == SplitsDiagramType.Outline && n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic)
 				setOptionDiagram(SplitsDiagramType.Splits);
+			splitSelectionModel.clearSelection();
 		});
 	}
 
@@ -134,7 +139,7 @@ public class SplitsView implements IView {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getScrollPane().getContent();
+		return controller.getInnerAnchorPane();
 	}
 
 	@Override
@@ -249,5 +254,9 @@ public class SplitsView implements IView {
 
 	public void setSplitsBlock(SplitsBlock splitsBlock) {
 		this.splitsBlock.set(splitsBlock);
+	}
+
+	public SelectionModel<Integer> getSplitSelectionModel() {
+		return splitSelectionModel;
 	}
 }

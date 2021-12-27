@@ -47,7 +47,7 @@ public class Utilities {
 			var tree = trees.get(i);
 			var splits = new ArrayList<ASplit>();
 			TreesUtilities.computeSplits(taxa, tree, splits);
-			SplitsUtilities.splitsToDistances(ntax, splits, distances);
+			SplitsUtilities.splitsToDistances(ntax, splits, distances, false);
 		}
 		return NeighborNetCycle.computeNeighborNetCycle(ntax, distances);
 	}

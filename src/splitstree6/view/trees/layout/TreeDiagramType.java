@@ -19,6 +19,9 @@
 
 package splitstree6.view.trees.layout;
 
+import javafx.scene.Node;
+import jloda.fx.util.ResourceManagerFX;
+
 /**
  * the tree diagram type
  * Daniel Huson, 12.2021
@@ -28,5 +31,9 @@ public enum TreeDiagramType {
 
 	public boolean isRadial() {
 		return this == RadialPhylogram || this == RadialCladogram || this == CircularPhylogram || this == CircularCladogram;
+	}
+
+	public Node createNode() {
+		return ResourceManagerFX.getIconAsImageView(name() + "16.gif", 16);
 	}
 }

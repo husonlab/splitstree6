@@ -71,7 +71,7 @@ public class FileLoader {
 				if (importManager.getReaders(fileName).size() == 1) { // unique input format
 					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler);
-					mainWindow.setFileName(fileName);
+					newWindow.setFileName(fileName);
 					RecentFilesManager.getInstance().insertRecentFile(fileName);
 					newWindow.setDirty(true);
 				} else {

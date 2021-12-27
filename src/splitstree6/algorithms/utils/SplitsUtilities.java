@@ -20,7 +20,9 @@
 
 package splitstree6.algorithms.utils;
 
-import jloda.util.*;
+import jloda.util.Basic;
+import jloda.util.BitSetUtils;
+import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
@@ -32,12 +34,14 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * utilities for splits
- * Daniel Huson, 2005, 2016
- * Daria Evseeva,23.01.2017.
+ * Daniel Huson, 12.2021
  */
 public class SplitsUtilities {
 	/**
@@ -85,7 +89,7 @@ public class SplitsUtilities {
 			final var pso = Basic.hideSystemOut();
 			final var pse = Basic.hideSystemErr();
 			try {
-				return NeighborNetCycle.computeNeighborNetCycle(ntax, splitsToDistances(ntax, splits));
+				return NeighborNetCycle.computeNeighborNetCycle(ntax, splitsToDistances(ntax, splits, false));
 			} finally {
 				Basic.restoreSystemErr(pse);
 				Basic.restoreSystemOut(pso);
@@ -107,8 +111,8 @@ public class SplitsUtilities {
 	 * @param splits with 1-based taxa
 	 * @return distance matrix, 0-based
 	 */
-	public static double[][] splitsToDistances(int ntax, List<ASplit> splits) {
-		return splitsToDistances(ntax, splits, null);
+	public static double[][] splitsToDistances(int ntax, List<ASplit> splits, boolean useWeights) {
+		return splitsToDistances(ntax, splits, null, useWeights);
 	}
 
 	/**
@@ -119,7 +123,7 @@ public class SplitsUtilities {
 	 * @param dist   matrix, 0-based
 	 * @return distance matrix, 0-based
 	 */
-	public static double[][] splitsToDistances(int ntax, List<ASplit> splits, double[][] dist) {
+	public static double[][] splitsToDistances(int ntax, List<ASplit> splits, double[][] dist, boolean useWeights) {
 		if (dist == null)
 			dist = new double[ntax][ntax];
 		for (var i = 1; i <= ntax; i++) {
@@ -128,8 +132,8 @@ public class SplitsUtilities {
 					var A = split.getA();
 					var B = split.getB();
 					if (A.get(i) != A.get(j) && B.get(i) != B.get(j)) {
-						dist[i - 1][j - 1]++;
-						dist[j - 1][i - 1]++;
+						dist[i - 1][j - 1] += (useWeights ? split.getWeight() : 1.0);
+						dist[j - 1][i - 1] += (useWeights ? split.getWeight():1.0);
 					}
 				}
 			}
@@ -177,23 +181,6 @@ public class SplitsUtilities {
 			}
 			return tmp;
 		}
-	}
-
-	/**
-	 * sort splits by decreasing weight
-	 *
-	 * @param splits
-	 */
-	public static ArrayList<ASplit> sortByDecreasingWeight(List<ASplit> splits) {
-		final var array = splits.toArray(new ASplit[splits.size()]);
-		Arrays.sort(array, (a, b) -> {
-			if (a.getWeight() > b.getWeight())
-				return -1;
-			else if (a.getWeight() < b.getWeight())
-				return 1;
-			return 0;
-		});
-		return new ArrayList<>(Arrays.asList(array)); // this construction ensures that the resulting list can grow
 	}
 
 	/**
@@ -323,166 +310,28 @@ public class SplitsUtilities {
 		}
 	}
 
-	public static int getTighestSplit(BitSet taxa, SplitsBlock splitsBlock) {
+	/**
+	 * computes a tightest split around a subset of taxa
+	 *
+	 * @param splitsBlock
+	 * @param subset
+	 * @return a tightest split
+	 */
+	public static int getTighestSplit(SplitsBlock splitsBlock, BitSet subset) {
 		var best = 0;
 		var bestSideCardinality = Integer.MAX_VALUE;
 		for (var s = 1; s <= splitsBlock.getNsplits(); s++) {
 			final var split = splitsBlock.get(s);
-			if (BitSetUtils.contains(split.getA(), taxa) && split.getA().cardinality() < bestSideCardinality) {
+			if (BitSetUtils.contains(split.getA(), subset) && split.getA().cardinality() < bestSideCardinality) {
 				best = s;
 				bestSideCardinality = split.getA().cardinality();
 			}
-			if (BitSetUtils.contains(split.getB(), taxa) && (split.getB().cardinality() < bestSideCardinality)) {
+			if (BitSetUtils.contains(split.getB(), subset) && (split.getB().cardinality() < bestSideCardinality)) {
 				best = s;
 				bestSideCardinality = split.getB().cardinality();
 			}
 		}
 		return best;
-	}
-
-	/**
-	 * computes the midpoint root location
-	 *
-	 * @param alt         use alternative side
-	 * @param nTax        number of taxa
-	 * @param outGroup    out group taxa or empty, if performing simple midpoint rooting
-	 * @param cycle
-	 * @param splitsBlock
-	 * @param useWeights  use split weights or otherwise give all splits weight 1
-	 * @return rooting split and both distances
-	 * @throws CanceledException
-	 */
-	public static Triplet<Integer, Double, Double> computeRootLocation(boolean alt, int nTax, Set<Integer> outGroup,
-																	   int[] cycle, SplitsBlock splitsBlock, boolean useWeights) {
-		if (outGroup.size() > 0) {
-			final BitSet outGroupSplits = new BitSet();
-			final BitSet outGroupBits = BitSetUtils.asBitSet(outGroup);
-			final int outGroupTaxon = outGroup.iterator().next();
-
-
-			for (int p = 1; p <= splitsBlock.getNsplits(); p++) {
-				final BitSet pa = splitsBlock.get(p).getPartContaining(outGroupTaxon);
-				if (BitSetUtils.contains(pa, outGroupBits)) {
-					boolean ok = true;
-					for (int q : BitSetUtils.members(outGroupSplits)) {
-						final BitSet qa = splitsBlock.get(q).getPartContaining(outGroupTaxon);
-						if (BitSetUtils.contains(pa, qa)) {
-							ok = false;
-							break;
-						} else if (BitSetUtils.contains(qa, pa)) {
-							outGroupSplits.clear(q);
-						}
-					}
-					if (ok)
-						outGroupSplits.set(p);
-				}
-			}
-			if (outGroupSplits.cardinality() > 0) {
-				final int s = outGroupSplits.nextSetBit(0);
-				return new Triplet<>(s, 0.9 * splitsBlock.get(s).getWeight(), 0.1 * splitsBlock.get(s).getWeight());
-			}
-		} else {
-			final double[][] splitDistances = new double[nTax + 1][nTax + 1];
-			for (ASplit split : splitsBlock.getSplits()) {
-				for (int a : BitSetUtils.members(split.getA())) {
-					for (int b : BitSetUtils.members(split.getB())) {
-						double diff = useWeights ? split.getWeight() : 1;
-						splitDistances[a][b] += diff;
-						splitDistances[b][a] += diff;
-					}
-				}
-			}
-			double maxDistance = 0;
-			final Pair<Integer, Integer> furthestPair = new Pair<>(0, 0);
-
-			for (int a = 1; a <= nTax; a++) {
-				for (int b = a + 1; b <= nTax; b++) {
-					if (splitDistances[a][b] > maxDistance) {
-						maxDistance = splitDistances[a][b];
-						furthestPair.set(a, b);
-					}
-				}
-			}
-
-			final Map<ASplit, Integer> split2id = new HashMap<>();
-
-			final ArrayList<ASplit> splits = new ArrayList<>();
-			for (int s = 1; s <= splitsBlock.getNsplits(); s++) {
-				final ASplit split = splitsBlock.get(s);
-				if (split.separates(furthestPair.getFirst(), furthestPair.getSecond())) {
-					splits.add(split);
-					split2id.put(split, s);
-				}
-			}
-
-			final BitSet interval = computeInterval(furthestPair.getFirst(), furthestPair.getSecond(), cycle, alt);
-
-			splits.sort((s1, s2) -> {
-				final BitSet a1 = s1.getPartContaining(furthestPair.getFirst());
-				final BitSet a2 = s2.getPartContaining(furthestPair.getFirst());
-				final int size1 = BitSetUtils.intersection(a1, interval).cardinality();
-				final int size2 = BitSetUtils.intersection(a2, interval).cardinality();
-
-				if (size1 < size2)
-					return -1;
-				else if (size1 > size2)
-					return 1;
-				else
-					return Integer.compare(a1.cardinality(), a2.cardinality());
-			});
-
-			double total = 0;
-			for (ASplit split : splits) {
-				final double weight = (useWeights ? split.getWeight() : 1);
-				final double delta = total + weight - 0.5 * maxDistance;
-				if (delta > 0) {
-					return new Triplet<>(split2id.get(split), delta, weight - delta);
-				}
-				total += weight;
-			}
-		}
-		return new Triplet<>(1, 0.0, useWeights ? splitsBlock.get(1).getWeight() : 1);
-	}
-
-	private static BitSet computeInterval(int a, int b, int[] cycle, boolean alt) {
-		final BitSet set = new BitSet();
-
-		if (cycle.length > 0) {
-			if (alt) {
-				boolean in = false;
-				int i = cycle.length - 1;
-				while (true) {
-					if (cycle[i] == a) {
-						set.set(a);
-						in = true;
-					}
-					if (in && cycle[i] == b) {
-						break;
-					}
-					if (i == 1)
-						i = cycle.length - 1;
-					else
-						i--;
-				}
-			} else {
-				boolean in = false;
-				int i = 1;
-				while (true) {
-					if (cycle[i] == a) {
-						set.set(a);
-						in = true;
-					}
-					if (in && cycle[i] == b) {
-						break;
-					}
-					if (i >= cycle.length - 1)
-						i = 1;
-					else
-						i++;
-				}
-			}
-		}
-		return set;
 	}
 
 	public static boolean computeSplitsForLessThan4Taxa(TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws CanceledException {
@@ -497,5 +346,30 @@ public class SplitsUtilities {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * returns comparison of maximum distance between any two taxon on side A and on side B of the given split
+	 *
+	 * @param ntax        number of taxa
+	 * @param splitsBlock splits
+	 * @param split       split to investigate
+	 * @param useWeights  use weighted splits
+	 * @return comparison value
+	 */
+	public static int compareMaxDistanceInSplitParts(int ntax, SplitsBlock splitsBlock, int split, boolean useWeights) {
+		var distances = splitsToDistances(ntax, splitsBlock.getSplits(), useWeights);
+
+		var maxA = 0.0;
+		for (var a : BitSetUtils.members(splitsBlock.get(split).getA())) {
+			for (var b : BitSetUtils.members(splitsBlock.get(split).getA(), a + 1))
+				maxA = Math.max(maxA, distances[a - 1][b - 1]);
+		}
+		var maxB = 0.0;
+		for (var a : BitSetUtils.members(splitsBlock.get(split).getB())) {
+			for (var b : BitSetUtils.members(splitsBlock.get(split).getB(), a + 1))
+				maxB = Math.max(maxB, distances[a - 1][b - 1]);
+		}
+		return Double.compare(maxA,maxB);
 	}
 }

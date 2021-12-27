@@ -38,6 +38,8 @@
 
 package splitstree6.view.trees.treepages;
 
+import javafx.scene.control.Label;
+
 /**
  * tree or network layout orientation
  * Daniel Huson,12.2021
@@ -47,5 +49,28 @@ public enum LayoutOrientation {
 
 	public boolean isWidthHeightSwitched() {
 		return this == Rotate90Deg || this == FlipRotate90Deg || this == Rotate270Deg || this == FlipRotate270Deg;
+	}
+
+	public Label createNode() {
+		var label = new Label("R");
+		switch (this) {
+			case Rotate90Deg -> label.setRotate(-90);
+			case Rotate180Deg -> label.setRotate(180);
+			case Rotate270Deg -> label.setRotate(-270);
+			case FlipRotate0Deg -> label.setScaleX(-label.getScaleX());
+			case FlipRotate90Deg -> {
+				label.setScaleX(-label.getScaleX());
+				label.setRotate(-90);
+			}
+			case FlipRotate180Deg -> {
+				label.setScaleX(-label.getScaleX());
+				label.setRotate(180);
+			}
+			case FlipRotate270Deg -> {
+				label.setScaleX(-label.getScaleX());
+				label.setRotate(-270);
+			}
+		}
+		return label;
 	}
 }

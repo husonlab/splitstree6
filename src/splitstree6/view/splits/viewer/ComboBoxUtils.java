@@ -22,12 +22,12 @@ package splitstree6.view.splits.viewer;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.When;
 import javafx.collections.ObservableSet;
+import javafx.scene.Node;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.util.Callback;
-import jloda.fx.util.ResourceManagerFX;
 
 import java.util.function.Function;
 
@@ -36,14 +36,14 @@ import java.util.function.Function;
  * Daniel Huson, 12.2021
  */
 public class ComboBoxUtils {
-	public static <T> ListCell<T> createButtonCell(ObservableSet<T> disabledItems, Function<T, String> itemImageMap) {
-		return createButtonCell(disabledItems, itemImageMap, false);
+	public static <T> ListCell<T> createButtonCell(ObservableSet<T> disabledItems, Function<T, Node> itemNodeFunction) {
+		return createButtonCell(disabledItems, itemNodeFunction, false);
 	}
 
 	/**
 	 * create list cell for diagram combo box
 	 */
-	public static <T> ListCell<T> createButtonCell(ObservableSet<T> disabledItems, Function<T, String> itemImageMap, boolean flip) {
+	public static <T> ListCell<T> createButtonCell(ObservableSet<T> disabledItems, Function<T, Node> itemNodeFunction, boolean flip) {
 		return new ListCell<>() {
 			{
 				setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
@@ -56,15 +56,15 @@ public class ComboBoxUtils {
 				if (item == null || empty) {
 					setGraphic(null);
 				} else {
-					if (itemImageMap != null && itemImageMap.apply(item) != null) {
-						var imageView = ResourceManagerFX.getIconAsImageView(itemImageMap.apply(item), 16);
+					if (itemNodeFunction != null && itemNodeFunction.apply(item) != null) {
+						var node = itemNodeFunction.apply(item);
 						if (flip)
-							imageView.setScaleX(-imageView.getScaleX());
-						setGraphic(imageView);
+							node.setScaleX(-node.getScaleX());
+						setGraphic(node);
 						if (disabledItems != null) {
-							imageView.disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
+							node.disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
 							disableProperty().bind(Bindings.createBooleanBinding(() -> disabledItems.contains(item), disabledItems));
-							imageView.opacityProperty().bind(new When(imageView.disableProperty()).then(0.4).otherwise(1.0));
+							node.opacityProperty().bind(new When(node.disableProperty()).then(0.4).otherwise(1.0));
 						}
 					} else {
 						var label = new Label(item.toString());
@@ -79,14 +79,14 @@ public class ComboBoxUtils {
 		};
 	}
 
-	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, String> itemImageMap) {
-		return p -> createButtonCell(disabled, itemImageMap, false);
+	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeMap) {
+		return p -> createButtonCell(disabled, itemNodeMap, false);
 	}
 
 	/**
 	 * creates the callback method for diagram combo box
 	 */
-	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, String> itemImageMap, boolean flip) {
-		return p -> createButtonCell(disabled, itemImageMap, flip);
+	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeMap, boolean flip) {
+		return p -> createButtonCell(disabled, itemNodeMap, flip);
 	}
 }
