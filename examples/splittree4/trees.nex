@@ -1,0 +1,48 @@
+#nexus
+
+BEGIN Taxa;
+DIMENSIONS ntax=4;
+TAXLABELS
+[1] 'a'
+[2] 'b'
+[3] 'c'
+[4] 'd'
+;
+END; [Taxa]
+
+BEGIN Network;
+DIMENSIONS ntax=4 nvertices=6 nedges=5;
+DRAW to_scale;
+TRANSLATE
+2 'a',
+3 'c',
+4 'd',
+5 'b',
+;
+VERTICES
+1 -0.4025 0.0 s=n,
+2 0.0 0.0 s=n,
+3 -0.41133884 0.051338837 s=n,
+4 -0.56883883 0.008838835 s=n,
+5 -0.4025 -0.1875 s=n,
+6 -0.41133884 0.008838835 s=n,
+;
+VLABELS
+2 'taxon1' x=12 y=6 f='Dialog-PLAIN-10',
+3 'taxon3' x=-17 y=23,
+4 'taxon4' x=-46 y=6,
+5 'taxon2' x=-17 y=-16,
+;
+EDGES
+1 1 2 s=5 w=0.4025,
+2 1 5 s=1 w=0.1875,
+3 6 1 s=4 w=0.0125,
+4 6 3 s=2 w=0.0425,
+5 6 4 s=3 w=0.1575,
+;
+END; [Network]
+
+BEGIN st_Assumptions;
+	uptodate;
+	autolayoutnodelabels;
+END; [st_Assumptions]

@@ -1,0 +1,48 @@
+#NEXUS
+
+[!Example of distance data.
+In this case, 11 towns on the North Island and one town on the South Island
+of New Zealand]
+
+
+BEGIN taxa;
+    DIMENSIONS ntax=12;
+TAXLABELS
+[1]    Auckland
+[2]    Gisborne
+[3]    Hamilton
+[4]    Kaikoura
+[5]    Masterton
+[6]    Napier
+[7]    New_Plymouth
+[8]    Palmerston_North
+[9]    Rotorua
+[10]    Taupo
+[11]    Wellington
+[12]    Whangarei
+;
+END;
+
+BEGIN distances;
+    DIMENSIONS ntax=12;
+    FORMAT
+        triangle=LOWER
+        diagonal
+        labels
+        missing=?
+    ;
+    MATRIX
+    Auckland          0
+    Gisborne          520 0
+    Hamilton          131 433 0
+    Kaikoura          970 831 829 0
+    Masterton         599 438 522 393 0
+    Napier            421 213 355 618 252 0
+    New_Plymouth      373 624 242 630 332 396 0
+    Palmerston_North  571 383 440 437 109 170 241 0
+    Rotorua           239 290 108 687 453 228 318 277 0
+    Taupo             296 363 165 609 373 150 199 333 78 0
+    Wellington        967 528 536 303 100 325 337 144 394 316 0
+    Whangarei         173 693 307 1134 772 594 546 744 412 469 840 0
+    ;
+END;

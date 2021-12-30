@@ -1,0 +1,124 @@
+#nexus
+
+BEGIN Taxa;
+DIMENSIONS ntax=40;
+TAXLABELS
+[1] 'Alternaria_smyrnii'
+[2] 'Ulocladium_chartarum'
+[3] 'Alternaria_alternata'
+[4] 'Alternaria_infectoria'
+[5] 'Ulocladium_atrum'
+[6] 'Lewia_infectoria'
+[7] 'Stemphylium_callistephi'
+[8] 'Nimbya_scirpicola'
+[9] 'Alternaria_ethzedia'
+[10] 'Alternaria_brassicicola'
+[11] 'Embellisia_novae-zelandiae'
+[12] 'Stemphylium_vesicarium'
+[13] 'Ulocladium_alternariae'
+[14] 'Pleospora_herbarum'
+[15] 'Alternaria_cheiranthi'
+[16] 'Alternaria_triticina'
+[17] 'Alternaria_japonica'
+[18] 'Alternaria_selini'
+[19] 'Nimbya_caricis'
+[20] 'Alternaria_arborescens'
+[21] 'Stemphylium_botryosum'
+[22] 'Alternaria_radicina'
+[23] 'Alternaria_destruens'
+[24] 'Alternaria_petroselini'
+[25] 'Alternaria_crassa'
+[26] 'Alternaria_tenuissima'
+[27] 'Embellisia_indefessa'
+[28] 'Alternaria_dauci'
+[29] 'Embellisia_leptinellae'
+[30] 'Alternaria_porri'
+[31] 'Alternaria_macrospora'
+[32] 'Ulocladium_botrytis'
+[33] 'Embellisia_hyacinthi'
+[34] 'Alternaria_carotiincultae'
+[35] 'Alternaria_longipes'
+[36] 'Ulocladium_consortiale'
+[37] 'Exserohilum_pedicillatum'
+[38] 'Embellisia_allii'
+[39] 'Alternaria_solani'
+[40] 'Embellisia_proteae'
+;
+END; [Taxa]
+
+BEGIN Reticulate;
+DIMENSIONS ntax=40 nRootComponents=1 nNettedComponents=7 nTreeComponents=31;
+FORMAT
+	ACTIVEROOT=1;
+	ACTIVENETTEDCOMPONENTS=	1	1	1	1	1	1	1;
+	SHOWLABELS=	INTERNAL;
+TreeComponents
+	sub_1=Ulocladium_chartarum:1.0;
+	sub_2=(Ulocladium_consortiale:1.0,Ulocladium_atrum:1.0,Ulocladium_botrytis:1.0):1.0;
+	sub_3=Alternaria_cheiranthi:1.0;
+	sub_4=Embellisia_indefessa:1.0;
+	sub_5=nettedComp_3:1.0;
+	sub_6=(Alternaria_solani:1.0,Alternaria_porri:1.0):1.0;
+	sub_7=Alternaria_crassa:1.0;
+	sub_8=Alternaria_dauci:1.0;
+	sub_9=Alternaria_macrospora:1.0;
+	sub_10=nettedComp_4:1.0;
+	sub_11=((Alternaria_tenuissima:1.0,Alternaria_destruens:1.0,Alternaria_arborescens:1.0,Alternaria_alternata:1.0):1.0,Alternaria_longipes:1.0):1.0;
+	sub_12=Alternaria_brassicicola:1.0;
+	sub_13=Alternaria_japonica:1.0;
+	sub_14=Ulocladium_alternariae:1.0;
+	sub_15=Alternaria_smyrnii:1.0;
+	sub_16=(Alternaria_carotiincultae:1.0,Alternaria_radicina:1.0):1.0;
+	sub_17=Alternaria_petroselini:1.0;
+	sub_18=Alternaria_selini:1.0;
+	sub_19=nettedComp_5:1.0;
+	sub_20=nettedComp_2:1.0;
+	sub_21=Embellisia_leptinellae:1.0;
+	sub_22=Embellisia_proteae:1.0;
+	sub_23=Embellisia_novae-zelandiae:1.0;
+	sub_24=Embellisia_hyacinthi:1.0;
+	sub_25=Nimbya_caricis:1.0;
+	sub_26=Nimbya_scirpicola:1.0;
+	sub_27=Embellisia_allii:1.0;
+	sub_28=Stemphylium_vesicarium:1.0;
+	sub_29=Pleospora_herbarum:1.0;
+	sub_30=Stemphylium_callistephi:1.0;
+	sub_31=Stemphylium_botryosum:1.0;
+NETTEDCOMPONENTS
+	nettedComp_1=
+		nettedBack_1=((sub_23,sub_24,sub_22)sub_21)sub_20,sub_23,sub_24,sub_22;
+		nettedBack_2=((sub_20,sub_22)sub_21,(sub_24,sub_22)sub_23),sub_20,sub_24;
+		nettedBack_3=((sub_20,sub_23,sub_22)sub_21,(sub_23,sub_22)sub_24),sub_20;
+		nettedBack_4=((sub_20)sub_21,(sub_23,sub_24)sub_22),sub_20,sub_23,sub_24;
+	;
+	nettedComp_2=
+		nettedBack_1=(((sub_19,sub_10)sub_11)sub_5,((sub_14)sub_13,sub_19)sub_12),sub_14,sub_10;
+	;
+	nettedComp_3=
+		nettedBack_1=(((sub_16)sub_17)sub_18)sub_15,sub_16;
+	;
+	nettedComp_4=
+		nettedBack_1=(((sub_31)sub_30)sub_29)sub_28,sub_31;
+	;
+	nettedComp_5=
+		nettedBack_1=((sub_3,sub_4)sub_2)sub_1,sub_3,sub_4;
+		nettedBack_2=((sub_2,sub_4)sub_3,(sub_2)sub_1),sub_4;
+		nettedBack_3=(sub_2,sub_3)sub_4,(sub_2,sub_3)sub_1;
+		nettedBack_4=((sub_1)sub_2,(sub_4)sub_3),sub_1,sub_4;
+		nettedBack_5=((sub_1,sub_3)sub_2,(sub_3)sub_4),sub_1;
+		nettedBack_6=((sub_1,sub_2)sub_3)sub_4,sub_1,sub_2;
+	;
+	nettedComp_6=
+		nettedBack_1=((sub_27)sub_26)sub_25,sub_27;
+		nettedBack_2=((sub_25)sub_26)sub_27,sub_25;
+		nettedBack_3=(sub_26)sub_25,(sub_26)sub_27;
+	;
+	nettedComp_7=
+		nettedBack_1=((sub_8)sub_9)sub_7,(sub_8)sub_6;
+	;
+ROOTCOMPONENTS
+	backbone=((((nettedComp_1:1.0,nettedComp_6:1.0):1.0,((Lewia_infectoria:1.0,Alternaria_infectoria:1.0):1.0,(Alternaria_ethzedia:1.0,Alternaria_triticina:1.0):1.0):1.0):1.0,Exserohilum_pedicillatum:1.0,nettedComp_7:1.0):0.10000000149011612);
+END; [Reticulate]
+BEGIN st_Assumptions;
+	autolayoutnodelabels;
+END; [st_Assumptions]

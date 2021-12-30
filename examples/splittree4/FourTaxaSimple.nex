@@ -1,0 +1,30 @@
+#nexus
+
+BEGIN Taxa;
+DIMENSIONS ntax=4;
+TAXLABELS
+[1] 'A'
+[2] 'B'
+[3] 'C'
+[4] 'D'
+;
+END; [Taxa]
+
+BEGIN Distances;
+DIMENSIONS ntax=4;
+FORMAT labels=no no diagonal triangle=lower;
+MATRIX
+
+ 3.0
+ 3.0 4.0
+ 4.0 3.0 3.0
+;
+END; [Distances]
+
+BEGIN st_Assumptions;
+disttransform=NeighborNetReboot;
+splitstransform=.EqualAngle ;
+SplitsPostProcess filter=dimension value=4;
+ exclude  no missing;
+autolayoutnodelabels;
+END; [st_Assumptions]

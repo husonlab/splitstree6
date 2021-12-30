@@ -1,0 +1,31 @@
+#nexus
+
+[! Example of some quartets on new zealand towns.]
+
+BEGIN taxa;
+    DIMENSIONS ntax=12;
+TAXLABELS
+[1]    Auckland
+[2]    Gisborne
+[3]    Hamilton
+[4]    Kaikoura
+[5]    Masterton
+[6]    Napier
+[7]    New_Plymouth
+[8]    Palmerston_North
+[9]    Rotorua
+[10]    Taupo
+[11]    Wellington
+[12]    Whangarei
+;
+END;
+
+BEGIN ST_QUARTETS;
+DIMENSIONS NQUARTETS=3;
+FORMAT NO LABELS NO WEIGHTS;
+MATRIX
+1 2: 3 4,
+1 2: 3 5,
+5 6: 7 8,
+;
+END;
