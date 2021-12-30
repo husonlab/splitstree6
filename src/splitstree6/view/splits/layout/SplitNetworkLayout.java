@@ -18,7 +18,7 @@
  */
 
 /*
- *  ComputeSplitNetworkLayout.java Copyright (C) 2021 Daniel H. Huson
+ *  SplitNetworkLayout.java Copyright (C) 2021 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -38,8 +38,10 @@
 
 package splitstree6.view.splits.layout;
 
+import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -47,6 +49,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
@@ -82,7 +85,13 @@ import static splitstree6.view.trees.layout.LayoutUtils.normalize;
  * computes the splits network layout
  * Daniel Huson, 12.2021
  */
-public class ComputeSplitNetworkLayout {
+public class SplitNetworkLayout {
+	private final RadialLabelLayout labelLayout;
+
+	public SplitNetworkLayout() {
+		labelLayout = new RadialLabelLayout();
+	}
+
 	/**
 	 * compute an outline or network
 	 *
@@ -101,9 +110,11 @@ public class ComputeSplitNetworkLayout {
 	 * @return group of groups, namly loops, nodes, edges and node labels
 	 * @throws IOException
 	 */
-	public static Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
-							  SplitsRooting rooting, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, DoubleProperty unitLength,
-							  double width, double height, SelectionModel<Integer> splitSelectionModel, ObjectProperty<LayoutOrientation> orientation) throws IOException {
+	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
+					   SplitsRooting rooting, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, DoubleProperty unitLength,
+					   double width, double height, SelectionModel<Integer> splitSelectionModel, ObjectProperty<LayoutOrientation> orientation) throws IOException {
+
+		labelLayout.clear();
 
 		if (splitsBlock0.getNsplits() == 0)
 			return new Group();
@@ -177,7 +188,7 @@ public class ComputeSplitNetworkLayout {
 					ConvexHull.apply(progress, taxaBlock, splitsBlock, graph, usedSplits);
 				}
 				EqualAngle.assignAnglesToEdges(taxaBlock.getNtax(), splitsBlock, splitsBlock.getCycle(), graph, new BitSet(), rootSplit == 0 ? 360 : 160);
-				EqualAngle.assignCoordinatesToNodes(useWeights, graph, nodePointMap, splitsBlock.getCycle()[1],rootSplit);
+				EqualAngle.assignCoordinatesToNodes(useWeights, graph, nodePointMap, splitsBlock.getCycle()[1], rootSplit);
 
 			} catch (CanceledException e) {
 				NotificationManager.showWarning("User CANCELED 'splits network' computation");
@@ -189,7 +200,7 @@ public class ComputeSplitNetworkLayout {
 		width = triplet.getSecond();
 		height = triplet.getThird();
 
-		unitLength.set(normalize(width, height, nodePointMap,true));
+		unitLength.set(normalize(width, height, nodePointMap, true));
 
 		// compute the shapes:
 		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
@@ -226,6 +237,14 @@ public class ComputeSplitNetworkLayout {
 				var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
 				if (taxonId != null)
 					shape.setUserData(taxaBlock.get(taxonId));
+
+				double angle = v.adjacentEdgesStream(false).mapToDouble(graph::getAngle).average().orElse(0);
+				if (rootSplit == 0 && v == graph.getTaxon2Node(1)) {
+					angle += 180;
+				}
+				labelLayout.getItems().add(new RadialLabelLayout.LayoutItem(shape.getTranslateX(), shape.getTranslateY(), angle, label.getRawText(), label.widthProperty(), label.heightProperty(),
+						xOffset -> label.translateXProperty().bind(shape.translateXProperty().add(xOffset)), yOffset -> label.translateYProperty().bind(shape.translateYProperty().add(yOffset))));
+				labelLayout.getAvoidList().add(new BoundingBox(shape.getTranslateX(), shape.getTranslateY(),2*shape.getRadius(),2*shape.getRadius()));
 			}
 		}
 
@@ -249,7 +268,12 @@ public class ComputeSplitNetworkLayout {
 			loopsGroup.getChildren().add((new LoopView(loop, nodeXMap, nodeYMap).getShape()));
 		}
 
+		ProgramExecutorService.submit(100, () -> Platform.runLater(labelLayout::layoutLabels));
+
 		return new Group(loopsGroup, edgesGroup, nodesGroup, nodeLabelsGroup);
 	}
 
+	public RadialLabelLayout getLabelLayout() {
+		return labelLayout;
+	}
 }

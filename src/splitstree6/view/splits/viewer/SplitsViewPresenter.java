@@ -32,6 +32,7 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.control.SelectionMode;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
+import jloda.fx.util.ProgramExecutorService;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
@@ -150,6 +151,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			splitNetworkPane.set(pane);
 			pane.drawNetwork();
 		};
+
+		splitsView.optionFontScaleFactorProperty().addListener(e -> {
+			if (splitNetworkPane.get() != null)
+				ProgramExecutorService.submit(100, () -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels()));
+		});
 
 		splitsBlock.addListener(updateListener);
 		splitsView.optionDiagramProperty().addListener(updateListener);

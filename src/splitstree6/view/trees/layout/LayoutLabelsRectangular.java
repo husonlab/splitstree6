@@ -32,6 +32,7 @@ import jloda.phylo.PhyloTree;
  * Daniel Huson, 12.2021
  */
 public class LayoutLabelsRectangular {
+
 	public static void apply(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, double labelGap,
 							 boolean linkNodesEdgesLabels, Group labelConnectors) {
 		var alignLabels = (labelConnectors != null);
@@ -45,19 +46,22 @@ public class LayoutLabelsRectangular {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
-				InvalidationListener changeListener = a -> {
+				InvalidationListener invalidationListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
 						if (linkNodesEdgesLabels) {
 							if (tree.isLsaLeaf(v)) {
 								var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
 								label.translateXProperty().bind(shape.translateXProperty().add(add));
 								if (alignLabels && add > 1.1 * labelGap) {
-									// todo: this is untested
-									labelConnectors.getChildren().add(new ComputeTreeLayout.LabelConnector(
+									if (label.getUserData() instanceof LabelConnector labelConnector)
+										labelConnectors.getChildren().remove(labelConnector);
+									var labelConnector = new LabelConnector(
 											Bindings.createDoubleBinding(() -> shape.getTranslateX() + 0.5 * labelGap, shape.translateXProperty()),
 											Bindings.createDoubleBinding(shape::getTranslateY, shape.translateYProperty()),
 											Bindings.createDoubleBinding(() -> shape.getTranslateX() + add - 0.5 * labelGap, shape.translateXProperty()),
-											Bindings.createDoubleBinding(shape::getTranslateY, shape.translateYProperty())));
+											Bindings.createDoubleBinding(shape::getTranslateY, shape.translateYProperty()));
+									label.setUserData(labelConnector);
+									labelConnectors.getChildren().add(labelConnector);
 								}
 							} else
 								label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(0.5));
@@ -67,7 +71,11 @@ public class LayoutLabelsRectangular {
 								var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
 								label.setTranslateX(shape.getTranslateX() + add);
 								if (alignLabels && add > 1.1 * labelGap) {
-									labelConnectors.getChildren().add(new ComputeTreeLayout.LabelConnector(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY()));
+									if (label.getUserData() instanceof LabelConnector labelConnector)
+										labelConnectors.getChildren().remove(labelConnector);
+									var labelConnector = new LabelConnector(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY());
+									labelConnectors.getChildren().add(labelConnector);
+									label.setUserData(labelConnector);
 								}
 							} else
 								label.setTranslateX(shape.getTranslateX() - label.getWidth() - 0.5);
@@ -75,10 +83,9 @@ public class LayoutLabelsRectangular {
 						}
 					}
 				};
-				label.widthProperty().addListener(changeListener);
-				label.heightProperty().addListener(changeListener);
+				label.widthProperty().addListener(invalidationListener);
+				label.heightProperty().addListener(invalidationListener);
 			}
 		}
 	}
-
 }

@@ -35,7 +35,7 @@ import jloda.fx.util.ProgramExecutorService;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.splits.layout.ComputeSplitNetworkLayout;
+import splitstree6.view.splits.layout.SplitNetworkLayout;
 import splitstree6.view.trees.layout.LayoutUtils;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
@@ -50,6 +50,8 @@ public class SplitNetworkPane extends StackPane {
 	private final ChangeListener<Number> fontScaleChangeListener;
 
 	private final AService<Group> service;
+
+	private SplitNetworkLayout splitNetworkLayout = new SplitNetworkLayout();
 
 	/**
 	 * single tree pane
@@ -98,7 +100,7 @@ public class SplitNetworkPane extends StackPane {
 				height = getPrefHeight() - 12;
 			}
 
-			var result = ComputeSplitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting, useWeights,
+			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting, useWeights,
 					taxonSelectionModel, unitLength, width - 4, height - 4, splitSelectionModel, orientation);
 
 			result.setId("networkGroup");
@@ -149,6 +151,10 @@ public class SplitNetworkPane extends StackPane {
 
 	public void setRunAfterUpdate(Runnable runAfterUpdate) {
 		this.runAfterUpdate = runAfterUpdate;
+	}
+
+	public void layoutLabels() {
+		splitNetworkLayout.getLabelLayout().layoutLabels();
 	}
 
 

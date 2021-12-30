@@ -38,12 +38,10 @@
 
 package splitstree6.view.trees.layout;
 
-import javafx.beans.binding.DoubleBinding;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.TriConsumer;
@@ -184,25 +182,5 @@ public class ComputeTreeLayout {
 			return new Group(edgeGroup, nodeGroup, nodeLabelGroup);
 	}
 
-
-	public static class LabelConnector extends Line {
-		public LabelConnector(double x1, double y1, double x2, double y2) {
-			setStartX(x1);
-			setStartY(y1);
-			setEndX(x2);
-			setEndY(y2);
-			setStroke(Color.DARKGRAY);
-			getStrokeDashArray().addAll(2.0, 5.0);
-		}
-
-		public LabelConnector(DoubleBinding x1, DoubleBinding y1, DoubleBinding x2, DoubleBinding y2) {
-			startXProperty().bind(x1);
-			startYProperty().bind(y1);
-			endXProperty().bind(x2);
-			endYProperty().bind(y2);
-			setStroke(Color.LIGHTGRAY);
-			getStrokeDashArray().addAll(2.0, 5.0);
-		}
-	}
 }
 

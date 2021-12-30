@@ -95,7 +95,7 @@ public class LayoutLabelsRadial {
 								// todo: this is untested
 								var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
 								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
-								labelConnectors.getChildren().add(new ComputeTreeLayout.LabelConnector(
+								labelConnectors.getChildren().add(new LabelConnector(
 										Bindings.createDoubleBinding(() -> shape.getTranslateX() + offset1.getX(), shape.translateXProperty()),
 										Bindings.createDoubleBinding(() -> shape.getTranslateY() + offset1.getY(), shape.translateYProperty()),
 										Bindings.createDoubleBinding(() -> shape.getTranslateX() + offset2.getX(), shape.translateXProperty()),
@@ -108,7 +108,7 @@ public class LayoutLabelsRadial {
 							if (alignLabels && add > 1.1 * labelGap) {
 								var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
 								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
-								labelConnectors.getChildren().add(new ComputeTreeLayout.LabelConnector(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY()));
+								labelConnectors.getChildren().add(new LabelConnector(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY()));
 							}
 						}
 						label.setRotate(angle);

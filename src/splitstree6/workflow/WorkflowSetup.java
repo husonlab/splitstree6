@@ -72,7 +72,7 @@ public class WorkflowSetup {
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
 			var viewerNode = workflow.newDataNode(new ViewBlock());
-			workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), splitsNode, viewerNode);
+			workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), splitsNode, viewerNode);
 		} else if (clazz.equals(SplitsBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new SplitsLoader(), new TaxaBlock(), new SplitsBlock());
 			var viewerNode = workflow.newDataNode(new ViewBlock());
