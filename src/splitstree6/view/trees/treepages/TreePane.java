@@ -108,7 +108,7 @@ public class TreePane extends StackPane {
 			group.setId("treeGroup");
 			applyLabelScaleFactor(group, labelScaleFactor.get());
 
-			LayoutUtils.applOrientation(group, orientation.get());
+			LayoutUtils.applyOrientation(group, orientation.get());
 			return group;
 		});
 

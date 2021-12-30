@@ -41,7 +41,6 @@ package splitstree6.view.splits.layout;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.ObjectProperty;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -59,7 +58,6 @@ import jloda.util.Pair;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -90,7 +88,7 @@ public class InteractionSetup {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel, ObjectProperty<LayoutOrientation> orientation) {
+	public InteractionSetup(TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel) {
 		this.taxaBlock = taxaBlock;
 		this.splitsBlock = splitsBlock;
 		this.taxonSelectionModel = taxonSelectionModel;
@@ -113,40 +111,6 @@ public class InteractionSetup {
 
 						var dx = e.getScreenX() - mouseDownX;
 						var dy = e.getScreenY() - mouseDownY;
-
-						switch (orientation.get()) {
-							case Rotate90Deg -> {
-								var tmp = dx;
-								dx = -dy;
-								dy = tmp;
-							}
-							case Rotate180Deg -> {
-								dx = -dx;
-								dy = -dy;
-							}
-							case Rotate270Deg -> {
-								var tmp = dx;
-								dx = dy;
-								dy = -tmp;
-							}
-							case FlipRotate0Deg -> {
-								dx = -dx;
-							}
-							case FlipRotate90Deg -> {
-								var tmp = dx;
-								dx = dy;
-								dy = tmp;
-							}
-							case FlipRotate180Deg -> {
-								dy = -dy;
-							}
-							case FlipRotate270Deg -> {
-								var tmp = dx;
-								dx = -dy;
-								dy = -tmp;
-							}
-						}
-
 						label.setLayoutX(label.getLayoutX() + dx);
 						label.setLayoutY(label.getLayoutY() + dy);
 					}

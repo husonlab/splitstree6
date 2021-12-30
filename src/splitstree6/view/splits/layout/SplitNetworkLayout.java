@@ -49,6 +49,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
@@ -162,7 +163,7 @@ public class SplitNetworkLayout {
 		}
 
 		// interaction support:
-		var interactionSetup = new InteractionSetup(taxaBlock, splitsBlock, taxonSelectionModel, splitSelectionModel, orientation);
+		var interactionSetup = new InteractionSetup(taxaBlock, splitsBlock, taxonSelectionModel, splitSelectionModel);
 		var nodeCallback = interactionSetup.createNodeCallback();
 		var edgeCallback = interactionSetup.createEdgeCallback();
 
@@ -199,6 +200,8 @@ public class SplitNetworkLayout {
 		var fontHeight = triplet.getFirst();
 		width = triplet.getSecond();
 		height = triplet.getThird();
+
+		applyOrientation(orientation.get(), rootSplit > 0 ? 90 : 0, graph, nodePointMap);
 
 		unitLength.set(normalize(width, height, nodePointMap, true));
 
@@ -271,6 +274,19 @@ public class SplitNetworkLayout {
 		ProgramExecutorService.submit(100, () -> Platform.runLater(labelLayout::layoutLabels));
 
 		return new Group(loopsGroup, edgesGroup, nodesGroup, nodeLabelsGroup);
+	}
+
+	private void applyOrientation(LayoutOrientation orientation, double addAngle, PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap) {
+		if (orientation != LayoutOrientation.Rotate0Deg || addAngle != 0) {
+			for (var v : nodePointMap.keySet()) {
+				if (addAngle > 0)
+					nodePointMap.put(v, GeometryUtilsFX.rotate(nodePointMap.get(v), addAngle));
+				nodePointMap.put(v, orientation.apply(nodePointMap.get(v)));
+			}
+			for (var e : graph.edges()) {
+				graph.setAngle(e, orientation.apply(graph.getAngle(e) + addAngle));
+			}
+		}
 	}
 
 	public RadialLabelLayout getLabelLayout() {

@@ -38,7 +38,9 @@
 
 package splitstree6.view.trees.treepages;
 
+import javafx.geometry.Point2D;
 import javafx.scene.control.Label;
+import jloda.fx.util.GeometryUtilsFX;
 
 /**
  * tree or network layout orientation
@@ -72,5 +74,31 @@ public enum LayoutOrientation {
 			}
 		}
 		return label;
+	}
+
+	public Point2D apply(Point2D point2D) {
+		return switch (this) {
+			case Rotate0Deg -> point2D;
+			case Rotate90Deg -> GeometryUtilsFX.rotate(point2D, -90);
+			case Rotate180Deg -> GeometryUtilsFX.rotate(point2D, 180);
+			case Rotate270Deg -> GeometryUtilsFX.rotate(point2D, -270);
+			case FlipRotate0Deg -> new Point2D(-point2D.getX(), point2D.getY());
+			case FlipRotate90Deg -> GeometryUtilsFX.rotate(-point2D.getX(), point2D.getY(), -90);
+			case FlipRotate180Deg -> GeometryUtilsFX.rotate(-point2D.getX(), point2D.getY(), 180);
+			case FlipRotate270Deg -> GeometryUtilsFX.rotate(-point2D.getX(), point2D.getY(), -270);
+		};
+	}
+
+	public double apply(double angle) {
+		return switch (this) {
+			case Rotate0Deg -> angle;
+			case Rotate90Deg -> GeometryUtilsFX.modulo360(angle - 90);
+			case Rotate180Deg -> GeometryUtilsFX.modulo360(angle + 180);
+			case Rotate270Deg -> GeometryUtilsFX.modulo360(angle - 270);
+			case FlipRotate0Deg -> GeometryUtilsFX.modulo360(180 - angle);
+			case FlipRotate90Deg -> GeometryUtilsFX.modulo360(180 - angle - 90);
+			case FlipRotate180Deg -> GeometryUtilsFX.modulo360(180 - angle + 180);
+			case FlipRotate270Deg -> GeometryUtilsFX.modulo360(180 - angle - 270);
+		};
 	}
 }

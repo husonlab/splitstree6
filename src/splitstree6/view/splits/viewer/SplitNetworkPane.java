@@ -90,22 +90,11 @@ public class SplitNetworkPane extends StackPane {
 			if (taxaBlock == null || splitsBlock == null)
 				return new Group();
 
-			double width;
-			double height;
-			if (orientation.get().isWidthHeightSwitched()) {
-				height = getPrefWidth();
-				width = getPrefHeight() - 12;
-			} else {
-				width = getPrefWidth();
-				height = getPrefHeight() - 12;
-			}
-
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting, useWeights,
-					taxonSelectionModel, unitLength, width - 4, height - 4, splitSelectionModel, orientation);
+					taxonSelectionModel, unitLength, getPrefWidth() - 4, getPrefHeight() - 16, splitSelectionModel, orientation);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());
-			LayoutUtils.applOrientation(result, orientation.get());
 			return result;
 		});
 

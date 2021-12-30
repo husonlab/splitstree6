@@ -146,7 +146,7 @@ public class LayoutUtils {
 		}
 	}
 
-	public static void applOrientation(Group group, LayoutOrientation orientation) {
+	public static void applyOrientation(Group group, LayoutOrientation orientation) {
 		switch (orientation) {
 			case Rotate0Deg -> {
 				group.setScaleX(1);
