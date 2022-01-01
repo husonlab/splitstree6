@@ -78,7 +78,6 @@ public class InteractionSetup {
 					var shapeLabel = taxonShapeLabelMap.get(taxon);
 					if (shapeLabel != null) {
 						var label = shapeLabel.getSecond();
-
 						var dx = e.getScreenX() - mouseDownX;
 						var dy = e.getScreenY() - mouseDownY;
 

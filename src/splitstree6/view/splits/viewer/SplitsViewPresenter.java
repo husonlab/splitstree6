@@ -128,8 +128,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getRootingCBox().getItems().addAll(SplitsRooting.values());
 		controller.getRootingCBox().valueProperty().bindBidirectional(splitsView.optionRootingProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createNode));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createNode));
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createIconLabel));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createIconLabel));
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 

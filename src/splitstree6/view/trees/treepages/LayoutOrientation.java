@@ -53,7 +53,33 @@ public enum LayoutOrientation {
 		return this == Rotate90Deg || this == FlipRotate90Deg || this == Rotate270Deg || this == FlipRotate270Deg;
 	}
 
-	public Label createNode() {
+	public double angle() {
+		return switch (this) {
+			case Rotate0Deg -> 0;
+			case Rotate90Deg -> 90;
+			case Rotate180Deg -> 180;
+			case Rotate270Deg -> 270;
+			case FlipRotate0Deg -> 0;
+			case FlipRotate90Deg -> 90;
+			case FlipRotate180Deg -> 180;
+			case FlipRotate270Deg -> 270;
+		};
+	}
+
+	public boolean flip() {
+		return switch (this) {
+			case Rotate0Deg -> false;
+			case Rotate90Deg -> false;
+			case Rotate180Deg -> false;
+			case Rotate270Deg -> false;
+			case FlipRotate0Deg -> true;
+			case FlipRotate90Deg -> true;
+			case FlipRotate180Deg -> true;
+			case FlipRotate270Deg -> true;
+		};
+	}
+
+	public Label createIconLabel() {
 		var label = new Label("R");
 		switch (this) {
 			case Rotate90Deg -> label.setRotate(-90);

@@ -19,10 +19,14 @@
 
 package splitstree6.view.trees.layout;
 
+import javafx.animation.ParallelTransition;
+import javafx.animation.RotateTransition;
+import javafx.animation.ScaleTransition;
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
 import javafx.scene.Parent;
+import javafx.util.Duration;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.BasicFX;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloGraph;
@@ -134,7 +138,7 @@ public class LayoutUtils {
 	}
 
 	public static void applyLabelScaleFactor(Parent root, double factor) {
-		if (factor > 0 && factor != 1) {
+		if (factor != 0 && factor != 1) {
 			var queue = new LinkedList<>(root.getChildrenUnmodifiable());
 			while (queue.size() > 0) {
 				var node = queue.pop();
@@ -146,39 +150,61 @@ public class LayoutUtils {
 		}
 	}
 
-	public static void applyOrientation(Group group, LayoutOrientation orientation) {
-		switch (orientation) {
-			case Rotate0Deg -> {
-				group.setScaleX(1);
-				group.setRotate(0);
+	/**
+	 * apply a change of orientation to a node
+	 */
+	public static void applyOrientation(LayoutOrientation oldOrientation, LayoutOrientation newOrientation, boolean animate, javafx.scene.Node node) {
+		if (node != null) {
+			System.err.println(node + " " + oldOrientation + " -> " + newOrientation);
+
+			final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
+			var flip = (oldOrientation == null && newOrientation.flip() || oldOrientation != null && newOrientation.flip() != oldOrientation.flip());
+
+			if (animate && Math.abs(angle0) == 180 && flip) {
+				var scaleTransition = new ScaleTransition(Duration.seconds(1));
+				scaleTransition.setNode(node);
+				var oldScaleY = node.getScaleY();
+				scaleTransition.setToY(-oldScaleY);
+				scaleTransition.setOnFinished(e -> {
+					node.setScaleY(oldScaleY);
+					node.setScaleX(-node.getScaleX());
+					node.setRotate(node.getRotate() + angle0);
+					ensureRichTextLabelsUpright(node);
+				});
+				scaleTransition.play();
+			} else if (animate) {
+				double angle;
+				if (angle0 == 270)
+					angle = -90;
+				else if (angle0 == -270)
+					angle = 90;
+				else
+					angle = angle0;
+
+
+				var rotateTransition = new RotateTransition(Duration.seconds(1));
+				rotateTransition.setNode(node);
+				rotateTransition.setByAngle(angle);
+
+				var scaleTransition = new ScaleTransition(Duration.seconds(1));
+				scaleTransition.setNode(node);
+				scaleTransition.setToX((flip ? -1 : 1) * node.getScaleX());
+
+				var parallelTransition = new ParallelTransition(rotateTransition, scaleTransition);
+				parallelTransition.play();
+				parallelTransition.setOnFinished(e -> {
+					ensureRichTextLabelsUpright(node);
+				});
+			} else {
+				node.setRotate(angle0);
+				node.setScaleX((flip ? -1 : 1) * node.getScaleX());
 			}
-			case Rotate90Deg -> {
-				group.setScaleX(1);
-				group.setRotate(-90);
-			}
-			case Rotate180Deg -> {
-				group.setScaleX(1);
-				group.setRotate(180);
-			}
-			case Rotate270Deg -> {
-				group.setScaleX(1);
-				group.setRotate(90);
-			}
-			case FlipRotate0Deg -> {
-				group.setScaleX(-1);
-			}
-			case FlipRotate90Deg -> {
-				group.setScaleX(-1);
-				group.setRotate(-90);
-			}
-			case FlipRotate180Deg -> {
-				group.setScaleX(-1);
-				group.setRotate(180);
-			}
-			case FlipRotate270Deg -> {
-				group.setScaleX(-1);
-				group.setRotate(90);
-			}
+		}
+	}
+
+	public static void ensureRichTextLabelsUpright(javafx.scene.Node node) {
+		for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
+			label.ensureUpright();
 		}
 	}
 }

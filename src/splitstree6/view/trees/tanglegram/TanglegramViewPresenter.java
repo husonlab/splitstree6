@@ -35,10 +35,12 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
+import jloda.fx.util.BasicFX;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
+import splitstree6.view.trees.layout.LayoutUtils;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.ordering.CircularOrdering;
 import splitstree6.view.trees.treepages.LayoutOrientation;
@@ -79,7 +81,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		tree1.bind(Bindings.createObjectBinding(() -> tanglegramView.getOptionTree1() >= 1 && tanglegramView.getOptionTree1() <= trees.size() ? trees.get(tanglegramView.getOptionTree1() - 1) : null, tanglegramView.optionTree1Property(), trees));
 		controller.getTree1Label().visibleProperty().bind(tanglegramView.optionShowTreeNamesProperty());
 
-		var tree1Pane = new TanglegramTreePane(tanglegramView, mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, taxonOrdering1, treePaneDimensions, tanglegramView.optionDiagram1Property(), tanglegramView.optionOrientationProperty());
+		var tree1Pane = new TanglegramTreePane(mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, taxonOrdering1, treePaneDimensions,
+				tanglegramView.optionDiagram1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty());
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
 		var tree2 = new SimpleObjectProperty<PhyloTree>(this, "tree2");
@@ -91,9 +94,17 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getTree2Label().visibleProperty().bind(tanglegramView.optionShowTreeNamesProperty());
 
 		var orientation2Property = new SimpleObjectProperty<LayoutOrientation>();
-		orientation2Property.bind(Bindings.createObjectBinding(() -> tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg, tanglegramView.optionOrientationProperty()));
+		BasicFX.reportChanges("orientation2", orientation2Property);
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> {
+			if (n == Rotate0Deg)
+				orientation2Property.set(FlipRotate0Deg);
+			else
+				orientation2Property.set(Rotate180Deg);
+		});
+		orientation2Property.set(tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg);
 
-		var tree2Pane = new TanglegramTreePane(tanglegramView, mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, taxonOrdering2, treePaneDimensions, tanglegramView.optionDiagram2Property(), orientation2Property);
+		var tree2Pane = new TanglegramTreePane(mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, taxonOrdering2, treePaneDimensions,
+				tanglegramView.optionDiagram2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty());
 		controller.getRightPane().getChildren().add(tree2Pane);
 
 		tree1.addListener(e -> {
@@ -153,12 +164,16 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			controller.getDiagram2CBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionDiagram2Property().set(n));
 		}
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createNode));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createNode));
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createIconLabel));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createIconLabel));
 		controller.getOrientationCBox().getItems().addAll(Rotate0Deg, FlipRotate180Deg);
 		controller.getOrientationCBox().setValue(tanglegramView.getOptionOrientation());
 		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionOrientationProperty().set(n));
 		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> controller.getOrientationCBox().setValue(n));
+
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> {
+			LayoutUtils.applyOrientation(o, n, true, controller.getMiddlePane().getChildren().get(0));
+		});
 
 		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(tanglegramView.optionShowTreeNamesProperty());
 
@@ -288,6 +303,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		Platform.runLater(this::setupMenuItems);
 	}
+
 
 	@Override
 	public void setupMenuItems() {

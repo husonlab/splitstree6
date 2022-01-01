@@ -26,13 +26,11 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.ProgramExecutorService;
@@ -42,8 +40,6 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.view.trees.layout.ComputeTreeLayout;
 import splitstree6.view.trees.layout.LayoutUtils;
 import splitstree6.view.trees.layout.TreeDiagramType;
-
-import java.util.LinkedList;
 
 /**
  * display an individual phylogenetic tree
@@ -66,6 +62,8 @@ public class TreePane extends StackPane {
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, int[] taxonOrdering, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
 
+		System.err.println("setup: " + name + ": " + orientation.get());
+
 		var interactionSetup = new InteractionSetup(taxaBlock, taxonSelectionModel, orientation);
 		// setStyle("-fx-border-color: lightgray;");
 
@@ -78,7 +76,7 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		fontScaleChangeListener = (v, o, n) -> applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
+		fontScaleChangeListener = (v, o, n) -> LayoutUtils.applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
 		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 
 		zoomChangedListener = (v, o, n) -> {
@@ -89,9 +87,15 @@ public class TreePane extends StackPane {
 		};
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
+
 		// compute the tree in a separate thread:
 		service = new AService<>();
 		service.setExecutor(ProgramExecutorService.getInstance());
+
+		orientation.addListener((v, o, n) -> {
+			System.err.println(" listen: " + o + " -> " + n);
+			LayoutUtils.applyOrientation(o, n, true, pane);
+		});
 
 		service.setCallable(() -> {
 			double width;
@@ -106,17 +110,16 @@ public class TreePane extends StackPane {
 
 			var group = ComputeTreeLayout.apply(taxaBlock, phyloTree, taxonOrdering, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
 			group.setId("treeGroup");
-			applyLabelScaleFactor(group, labelScaleFactor.get());
-
-			LayoutUtils.applyOrientation(group, orientation.get());
 			return group;
 		});
 
 		service.setOnSucceeded(a -> {
-			pane = new StackPane();
+			var group = service.getValue();
+
+			pane = new StackPane(group);
 			pane.setStyle("-fx-background-color: transparent");
 			pane.setId("treeView");
-			if (zoomFactor.get() != 1) {
+			if (zoomFactor.get() > 0 && zoomFactor.get() != 1) {
 				pane.setScaleX(zoomFactor.get());
 				pane.setScaleY(zoomFactor.get());
 			}
@@ -124,7 +127,9 @@ public class TreePane extends StackPane {
 			pane.setMinHeight(getPrefHeight() - 12);
 			pane.setMinWidth(getPrefWidth());
 
-			pane.getChildren().setAll(service.getValue());
+			LayoutUtils.applyLabelScaleFactor(group, labelScaleFactor.get());
+			Platform.runLater(() -> LayoutUtils.applyOrientation(null, orientation.get(), false, pane)); // run to ensure labels are upright
+
 			var label = new Label(name);
 			label.visibleProperty().bind(showTreeName);
 			getChildren().setAll(new VBox(label, pane));
@@ -147,23 +152,10 @@ public class TreePane extends StackPane {
 		service.restart();
 	}
 
-	private static void applyLabelScaleFactor(Parent root, double factor) {
-		if (factor > 0 && factor != 1) {
-			var queue = new LinkedList<>(root.getChildrenUnmodifiable());
-			while (queue.size() > 0) {
-				var node = queue.pop();
-				if (node instanceof RichTextLabel richTextLabel) {
-					richTextLabel.setScale(factor * richTextLabel.getScale());
-				} else if (node instanceof Parent parent)
-					queue.addAll(parent.getChildrenUnmodifiable());
-			}
-		}
-	}
 
 	public AService<Group> getService() {
 		return service;
 	}
-
 
 	public Runnable getRunAfterUpdate() {
 		return runAfterUpdate;

@@ -88,8 +88,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createNode));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createNode));
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createIconLabel));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createIconLabel));
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
 
@@ -217,7 +217,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" Set TreeDiagramType", treePagesView.optionDiagramProperty(), o, n));
 		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set LayoutOrientation", treePagesView.optionOrientationProperty(), o, n));
 		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree Names", treePagesView.optionShowTreeNamesProperty(), o, n));
-		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set LayoutOrientation", treePagesView.optionOrientationProperty(), o, n));
 		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Font Size", treePagesView.optionFontScaleFactorProperty(), o, n));
 		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Zoom", treePagesView.optionZoomFactorProperty(), o, n));
 		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree names", treePagesView.optionShowTreeNamesProperty(), o, n));
