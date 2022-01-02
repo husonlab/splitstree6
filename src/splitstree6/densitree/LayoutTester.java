@@ -63,7 +63,8 @@ public class LayoutTester extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		// var file = "examples/trees/trees-10000x100.tre";
 		//var file = "examples/trees/bees.tre";
-		var file = "examples/beast2/flu.new";
+		//var file = "examples/beast2/flu.new";
+		var file = "examples/beast2/primates-mtDNA.new";
 		//var file="examples/trees49.tre";
 		//var file="examples/trees/full-1001.tree";
 
