@@ -41,6 +41,7 @@ package splitstree6.densitree;
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Orientation;
 import javafx.geometry.Point2D;
 import javafx.scene.Scene;
@@ -60,8 +61,9 @@ import splitstree6.io.readers.trees.NewickReader;
 public class LayoutTester extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		var file = "examples/trees/trees-10000x100.tre";
+		// var file = "examples/trees/trees-10000x100.tre";
 		//var file = "examples/trees/bees.tre";
+		var file = "examples/beast2/flu.new";
 		//var file="examples/trees49.tre";
 		//var file="examples/trees/full-1001.tree";
 
@@ -118,11 +120,18 @@ public class LayoutTester extends Application {
 					pane.getChildren().add(line);
 					if (e.getTarget().isLeaf()) {
 						var label = new RichTextLabel(tree.getLabel(w));
-						var angle = nodeAngleMap.get(w);
-						var labelPos = GeometryUtilsFX.translateByAngle(wPt, angle, 20);
-						label.setLayoutX(labelPos.getX() - 8);
-						label.setLayoutY(labelPos.getY() - 8);
-						label.setRotate(angle);
+						ChangeListener<Number> listener = (observableValue, oldValue, newValue) -> { // use a listener because we have to wait until both width and height have been set
+							if (oldValue.doubleValue() == 0 && newValue.doubleValue() > 0 && label.getWidth() > 0 && label.getHeight() > 0) {
+								var angle = nodeAngleMap.get(w);
+								var delta = GeometryUtilsFX.translateByAngle(-0.5 * label.getWidth(), -0.5 * label.getHeight(), angle, 0.5 * label.getWidth() + 5);
+								label.setLayoutX(wPt.getX() + delta.getX());
+								label.setLayoutY(wPt.getY() + delta.getY());
+								label.setRotate(angle);
+								label.ensureUpright();
+							}
+						};
+						label.widthProperty().addListener(listener);
+						label.heightProperty().addListener(listener);
 						pane.getChildren().add(label);
 					}
 					if (v == tree.getRoot()) {
