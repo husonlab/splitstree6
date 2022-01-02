@@ -92,10 +92,7 @@ public class TreePane extends StackPane {
 		service = new AService<>();
 		service.setExecutor(ProgramExecutorService.getInstance());
 
-		orientation.addListener((v, o, n) -> {
-			System.err.println(" listen: " + o + " -> " + n);
-			LayoutUtils.applyOrientation(o, n, true, pane);
-		});
+		orientation.addListener((v, o, n) -> LayoutUtils.applyOrientation(o, n, pane));
 
 		service.setCallable(() -> {
 			double width;
@@ -128,7 +125,7 @@ public class TreePane extends StackPane {
 			pane.setMinWidth(getPrefWidth());
 
 			LayoutUtils.applyLabelScaleFactor(group, labelScaleFactor.get());
-			Platform.runLater(() -> LayoutUtils.applyOrientation(null, orientation.get(), false, pane)); // run to ensure labels are upright
+			Platform.runLater(() -> LayoutUtils.applyOrientation(orientation.get(), pane));
 
 			var label = new Label(name);
 			label.visibleProperty().bind(showTreeName);

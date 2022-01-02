@@ -171,9 +171,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionOrientationProperty().set(n));
 		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> controller.getOrientationCBox().setValue(n));
 
-		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> {
-			LayoutUtils.applyOrientation(o, n, true, controller.getMiddlePane().getChildren().get(0));
-		});
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> LayoutUtils.applyOrientation(o, n, controller.getMiddlePane().getChildren().get(0)));
 
 		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(tanglegramView.optionShowTreeNamesProperty());
 

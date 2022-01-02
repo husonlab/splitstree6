@@ -153,36 +153,43 @@ public class LayoutUtils {
 	/**
 	 * apply a change of orientation to a node
 	 */
-	public static void applyOrientation(LayoutOrientation oldOrientation, LayoutOrientation newOrientation, boolean animate, javafx.scene.Node node) {
-		if (node != null) {
-			System.err.println(node + " " + oldOrientation + " -> " + newOrientation);
+	public static void applyOrientation(LayoutOrientation newOrientation, javafx.scene.Node node) {
+		node.setRotate(-newOrientation.angle());
+		if (newOrientation.flip())
+			node.setScaleX(-node.getScaleX());
+		ensureRichTextLabelsUpright(node);
+	}
 
-			final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
-			var flip = (oldOrientation == null && newOrientation.flip() || oldOrientation != null && newOrientation.flip() != oldOrientation.flip());
+	/**
+	 * apply a change of orientation to a node
+	 */
+	public static void applyOrientation(LayoutOrientation oldOrientation, LayoutOrientation newOrientation, javafx.scene.Node node) {
+		final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
+		var flip = (oldOrientation == null && newOrientation.flip() || oldOrientation != null && newOrientation.flip() != oldOrientation.flip());
 
-			if (animate && Math.abs(angle0) == 180 && flip) {
-				var scaleTransition = new ScaleTransition(Duration.seconds(1));
-				scaleTransition.setNode(node);
-				var oldScaleY = node.getScaleY();
-				scaleTransition.setToY(-oldScaleY);
-				scaleTransition.setOnFinished(e -> {
-					node.setScaleY(oldScaleY);
-					node.setScaleX(-node.getScaleX());
-					node.setRotate(node.getRotate() + angle0);
-					ensureRichTextLabelsUpright(node);
-				});
-				scaleTransition.play();
-			} else if (animate) {
-				double angle;
-				if (angle0 == 270)
-					angle = -90;
-				else if (angle0 == -270)
-					angle = 90;
-				else
-					angle = angle0;
+		if (Math.abs(angle0) == 180 && flip) {
+			var scaleTransition = new ScaleTransition(Duration.seconds(1));
+			scaleTransition.setNode(node);
+			var oldScaleY = node.getScaleY();
+			scaleTransition.setToY(-oldScaleY);
+			scaleTransition.setOnFinished(e -> {
+				node.setScaleY(oldScaleY);
+				node.setScaleX(-node.getScaleX());
+				node.setRotate(node.getRotate() + angle0);
+				ensureRichTextLabelsUpright(node);
+			});
+			scaleTransition.play();
+		} else {
+			double angle;
+			if (angle0 == 270)
+				angle = -90;
+			else if (angle0 == -270)
+				angle = 90;
+			else
+				angle = angle0;
 
 
-				var rotateTransition = new RotateTransition(Duration.seconds(1));
+			var rotateTransition = new RotateTransition(Duration.seconds(1));
 				rotateTransition.setNode(node);
 				rotateTransition.setByAngle(angle);
 
@@ -195,11 +202,7 @@ public class LayoutUtils {
 				parallelTransition.setOnFinished(e -> {
 					ensureRichTextLabelsUpright(node);
 				});
-			} else {
-				node.setRotate(angle0);
-				node.setScaleX((flip ? -1 : 1) * node.getScaleX());
 			}
-		}
 	}
 
 	public static void ensureRichTextLabelsUpright(javafx.scene.Node node) {
