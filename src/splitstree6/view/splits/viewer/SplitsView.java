@@ -57,6 +57,7 @@ public class SplitsView implements IView {
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
 
 	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting");
+	private final DoubleProperty optionRootAngle = new SimpleDoubleProperty(this, "optionRootAngle");
 
 	private final BooleanProperty optionUseWeights = new SimpleBooleanProperty(this, "optionUseWeights");
 
@@ -71,10 +72,12 @@ public class SplitsView implements IView {
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionRooting, SplitsRooting::valueOf, SplitsRooting.None);
 		ProgramProperties.track(optionUseWeights, true);
+		ProgramProperties.track(optionRootAngle, 160.0);
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionUseWeights.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName());
+		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionUseWeights.getName(), optionZoomFactor.getName(),
+				optionFontScaleFactor.getName(), optionRootAngle.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -194,6 +197,18 @@ public class SplitsView implements IView {
 
 	public void setOptionRooting(SplitsRooting optionRooting) {
 		this.optionRooting.set(optionRooting);
+	}
+
+	public double getOptionRootAngle() {
+		return optionRootAngle.get();
+	}
+
+	public DoubleProperty optionRootAngleProperty() {
+		return optionRootAngle;
+	}
+
+	public void setOptionRootAngle(double optionRootAngle) {
+		this.optionRootAngle.set(optionRootAngle);
 	}
 
 	public double getOptionZoomFactor() {

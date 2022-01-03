@@ -23,7 +23,6 @@ package splitstree6.algorithms.utils;
 import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
-import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
@@ -34,10 +33,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * utilities for splits
@@ -75,6 +71,37 @@ public class SplitsUtilities {
 		}
 
 		return (float) (sumDSquared > 0 ? (100.0 * (1.0 - sumDiffSquared / sumDSquared)) : 0);
+	}
+
+	/**
+	 * Determines the decomposition-fit of a splits system
+	 */
+	static public float computeSplitDecompositionFit(DistancesBlock dist, List<ASplit> splits) {
+		if (splits == null || dist == null)
+			return 0f;
+
+		final var ntax = dist.getNtax();
+
+		var sdist = new double[ntax + 1][ntax + 1];
+
+		for (var a : BitSetUtils.range(1, ntax + 1)) {
+			for (var b : BitSetUtils.range(a + 1, ntax + 1)) {
+				sdist[a][b] = sdist[b][a] = (float) splits.stream().filter(s -> s.separates(a, b)).mapToDouble(ASplit::getWeight).sum();
+			}
+		}
+
+		float dsum = 0;
+		float ssum = 0;
+
+		for (var i = 1; i <= ntax; i++) {
+			for (var j = i + 1; j <= ntax; j++) {
+				double sij = sdist[i][j];
+				double dij = dist.get(i, j);
+				ssum += Math.abs(sij - dij);
+				dsum += dij;
+			}
+		}
+		return (float) Math.max(0, 100.0 * (1.0 - ssum / dsum));
 	}
 
 
@@ -228,73 +255,6 @@ public class SplitsUtilities {
 		}
 	}
 
-	/**
-	 * Determines the fit of a splits system, ie how well it
-	 * represents a given distance matrix, in percent. Computes two different values.
-	 * //ToDo: Fix variances.
-	 * // todo no lsfit?
-	 *
-	 * @param forceRecalculation always recompute the fit, even if there is a valid value stored.
-	 * @param splits             the splits
-	 * @param dist               the distances
-	 */
-	static public void computeFits(boolean forceRecalculation, SplitsBlock splits, DistancesBlock dist, ProgressListener pl) {
-		if (splits == null || dist == null)
-			return;
-
-		final var ntax = dist.getNtax();
-
-		if (!forceRecalculation && splits.getFit() >= 0)
-			return; //No need to recalculate.
-
-		splits.setFit(-1);
-		//splits.getProperties().setLSFit(-1); //A fit of -1 means that we don't have a valid value.
-
-		pl.setSubtask("Recomputing fit");
-
-		var sdist = new double[ntax + 1][ntax + 1];
-
-		for (var i = 1; i <= ntax; i++) {
-			sdist[i][i] = 0;
-			for (var j = i + 1; j <= ntax; j++) {
-				float dij = 0;
-				for (var s = 1; s <= splits.getNsplits(); s++) {
-					var split = splits.getSplits().get(s - 1).getA();
-					if (split.get(i) != split.get(j))
-						dij += splits.getSplits().get(s - 1).getWeight();
-				}
-				sdist[i][j] = sdist[j][i] = dij;
-			}
-		}
-
-		float dsum = 0;
-		float ssum = 0;
-		float dsumSquare = 0;
-		float diffSumSquare = 0;
-		float netsumSquare = 0;
-
-		for (var i = 1; i <= ntax; i++) {
-			for (var j = i + 1; j <= ntax; j++) {
-				double sij = sdist[i][j];
-				double dij = dist.get(i, j);
-				ssum += Math.abs(sij - dij);
-				diffSumSquare += (sij - dij) * (sij - dij);
-				dsum += dij;
-				dsumSquare += dij * dij;
-				netsumSquare += sij * sij;
-			}
-		}
-		final double fit = Math.max(0, 100.0 * (1.0 - ssum / dsum));
-		splits.setFit((float) fit);
-
-		final double lsFit = Math.max(0.0, 100.0 * (1.0 - diffSumSquare / dsumSquare));
-
-		splits.setFit((float) lsFit);
-
-		double stress = Math.sqrt(diffSumSquare / netsumSquare);
-
-		System.err.println("\nRecomputed fit:\n\tfit = " + fit + "\n\tLS fit =" + lsFit + "\n\tstress =" + stress + "\n");
-	}
 
 	public static void rotateCycle(int[] cycle, int first) {
 		final var tmp = new int[2 * cycle.length - 1];
@@ -370,6 +330,25 @@ public class SplitsUtilities {
 			for (var b : BitSetUtils.members(splitsBlock.get(split).getB(), a + 1))
 				maxB = Math.max(maxB, distances[a - 1][b - 1]);
 		}
-		return Double.compare(maxA,maxB);
+		return Double.compare(maxA, maxB);
+	}
+
+	public static List<ASplit> createAllMissingTrivial(Collection<ASplit> splits, int ntax) {
+		var present = new BitSet();
+		for (var split : splits) {
+			if (split.getA().cardinality() == 1) {
+				present.or(split.getA());
+			}
+			if (split.getB().cardinality() == 1) {
+				present.or(split.getB());
+			}
+		}
+		var result = new ArrayList<ASplit>(ntax - present.cardinality());
+		for (var t = present.nextClearBit(1); t <= ntax && t != -1; t = present.nextClearBit(t + 1)) {
+			var split = new ASplit(BitSetUtils.asBitSet(t), ntax);
+			split.setWeight(0);
+			result.add(split);
+		}
+		return result;
 	}
 }

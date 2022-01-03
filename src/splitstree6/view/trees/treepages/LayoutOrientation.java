@@ -39,6 +39,7 @@
 package splitstree6.view.trees.treepages;
 
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import jloda.fx.util.GeometryUtilsFX;
 
@@ -81,37 +82,20 @@ public enum LayoutOrientation {
 
 	public Label createIconLabel() {
 		var label = new Label("R");
-		switch (this) {
-			case Rotate90Deg -> label.setRotate(-90);
-			case Rotate180Deg -> label.setRotate(180);
-			case Rotate270Deg -> label.setRotate(-270);
-			case FlipRotate0Deg -> label.setScaleX(-label.getScaleX());
-			case FlipRotate90Deg -> {
-				label.setScaleX(-label.getScaleX());
-				label.setRotate(-90);
-			}
-			case FlipRotate180Deg -> {
-				label.setScaleX(-label.getScaleX());
-				label.setRotate(180);
-			}
-			case FlipRotate270Deg -> {
-				label.setScaleX(-label.getScaleX());
-				label.setRotate(-270);
-			}
-		}
+		apply(label);
 		return label;
 	}
 
-	public Point2D apply(Point2D point2D) {
+	public Point2D apply(Point2D point) {
 		return switch (this) {
-			case Rotate0Deg -> point2D;
-			case Rotate90Deg -> GeometryUtilsFX.rotate(point2D, -90);
-			case Rotate180Deg -> GeometryUtilsFX.rotate(point2D, 180);
-			case Rotate270Deg -> GeometryUtilsFX.rotate(point2D, -270);
-			case FlipRotate0Deg -> new Point2D(-point2D.getX(), point2D.getY());
-			case FlipRotate90Deg -> GeometryUtilsFX.rotate(-point2D.getX(), point2D.getY(), -90);
-			case FlipRotate180Deg -> GeometryUtilsFX.rotate(-point2D.getX(), point2D.getY(), 180);
-			case FlipRotate270Deg -> GeometryUtilsFX.rotate(-point2D.getX(), point2D.getY(), -270);
+			case Rotate0Deg -> point;
+			case Rotate90Deg -> GeometryUtilsFX.rotate(point, -90);
+			case Rotate180Deg -> GeometryUtilsFX.rotate(point, -180);
+			case Rotate270Deg -> GeometryUtilsFX.rotate(point, -270);
+			case FlipRotate0Deg -> new Point2D(-point.getX(), point.getY());
+			case FlipRotate90Deg -> GeometryUtilsFX.rotate(-point.getX(), point.getY(), -90);
+			case FlipRotate180Deg -> GeometryUtilsFX.rotate(-point.getX(), point.getY(), -180);
+			case FlipRotate270Deg -> GeometryUtilsFX.rotate(-point.getX(), point.getY(), -270);
 		};
 	}
 
@@ -122,9 +106,30 @@ public enum LayoutOrientation {
 			case Rotate180Deg -> GeometryUtilsFX.modulo360(angle + 180);
 			case Rotate270Deg -> GeometryUtilsFX.modulo360(angle - 270);
 			case FlipRotate0Deg -> GeometryUtilsFX.modulo360(180 - angle);
-			case FlipRotate90Deg -> GeometryUtilsFX.modulo360(180 - angle - 90);
-			case FlipRotate180Deg -> GeometryUtilsFX.modulo360(180 - angle + 180);
-			case FlipRotate270Deg -> GeometryUtilsFX.modulo360(180 - angle - 270);
+			case FlipRotate90Deg -> GeometryUtilsFX.modulo360(90 - angle);
+			case FlipRotate180Deg -> GeometryUtilsFX.modulo360(360 - angle);
+			case FlipRotate270Deg -> GeometryUtilsFX.modulo360(-90 - angle);
 		};
+	}
+
+	public void apply(Node node) {
+		switch (this) {
+			case Rotate90Deg -> node.setRotate(-90);
+			case Rotate180Deg -> node.setRotate(-180);
+			case Rotate270Deg -> node.setRotate(-270);
+			case FlipRotate0Deg -> node.setScaleX(-node.getScaleX());
+			case FlipRotate90Deg -> {
+				node.setScaleX(-node.getScaleX());
+				node.setRotate(-90);
+			}
+			case FlipRotate180Deg -> {
+				node.setScaleX(-node.getScaleX());
+				node.setRotate(-180);
+			}
+			case FlipRotate270Deg -> {
+				node.setScaleX(-node.getScaleX());
+				node.setRotate(-270);
+			}
+		}
 	}
 }

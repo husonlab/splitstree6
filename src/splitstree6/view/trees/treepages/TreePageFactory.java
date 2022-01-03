@@ -75,7 +75,6 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 		trees.addListener(new WeakInvalidationListener(updater));
 		treePagesView.optionDiagramProperty().addListener(new WeakInvalidationListener(updater));
-		// treePagesView.optionOrientationProperty().addListener(new WeakInvalidationListener(updater)); // orientation is handled in TreePane
 		rows.addListener(new WeakInvalidationListener(updater));
 		cols.addListener(new WeakInvalidationListener(updater));
 		dimensions.addListener(new WeakInvalidationListener(updater));

@@ -20,8 +20,6 @@
 
 package splitstree6.view.splits.viewer;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
@@ -38,31 +36,20 @@ public class LoopView {
     private final Polygon polygon = new Polygon();
     private final ArrayList<Node> nodes;
 
-    private final NodeArray<DoubleProperty> nodeXMap;
-    private final NodeArray<DoubleProperty> nodeYMap;
-
-    private final InvalidationListener invalidationListener;
-
     public LoopView(ArrayList<Node> nodes, NodeArray<DoubleProperty> nodeXMap, NodeArray<DoubleProperty> nodeYMap) {
         this.nodes = nodes;
-        this.nodeXMap = nodeXMap;
-        this.nodeYMap = nodeYMap;
         polygon.setFill(Color.WHITESMOKE);
         polygon.setStroke(Color.TRANSPARENT);
-        update();
 
-        invalidationListener = e -> update();
-
-        for (var v : nodes) {
-            nodeXMap.get(v).addListener(new WeakInvalidationListener(invalidationListener));
-            nodeYMap.get(v).addListener(new WeakInvalidationListener(invalidationListener));
-        }
-    }
-
-    public void update() {
-        polygon.getPoints().clear();
-        for (Node v : nodes) {
-            polygon.getPoints().addAll(nodeXMap.get(v).get(), nodeYMap.get(v).get());
+        for (var i = 0; i < nodes.size(); i++) {
+            var v = nodes.get(i);
+            var x = nodeXMap.get(v);
+            var y = nodeYMap.get(v);
+            polygon.getPoints().addAll(x.get(), y.get());
+            var ix = 2 * i;
+            x.addListener(e -> polygon.getPoints().set(ix, x.get()));
+            var iy = 2 * i + 1;
+            x.addListener(e -> polygon.getPoints().set(iy, y.get()));
         }
     }
 

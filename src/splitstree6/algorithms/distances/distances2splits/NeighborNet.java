@@ -67,14 +67,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	 */
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws CanceledException {
-
-		// todo: this is for testing the WorkflowTab
-		if (false)
-			try {
-				Thread.sleep(4000);
-			} catch (InterruptedException ignored) {
-			}
-
 		if (SplitsUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;
 

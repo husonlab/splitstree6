@@ -38,10 +38,7 @@
 
 package splitstree6.view.splits.layout;
 
-import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.geometry.BoundingBox;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -50,7 +47,6 @@ import javafx.scene.shape.Line;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
@@ -71,7 +67,6 @@ import splitstree6.view.splits.viewer.LoopView;
 import splitstree6.view.splits.viewer.SplitsDiagramType;
 import splitstree6.view.splits.viewer.SplitsRooting;
 import splitstree6.view.trees.layout.LayoutUtils;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -88,6 +83,12 @@ import static splitstree6.view.trees.layout.LayoutUtils.normalize;
  */
 public class SplitNetworkLayout {
 	private final RadialLabelLayout labelLayout;
+
+	private final PhyloSplitsGraph graph = new PhyloSplitsGraph();
+	private final NodeArray<Point2D> nodePointMap = graph.newNodeArray();
+	private final ArrayList<ArrayList<Node>> loops = new ArrayList<>();
+	private final NodeArray<DoubleProperty> nodeXMap = graph.newNodeArray();
+	private final NodeArray<DoubleProperty> nodeYMap = graph.newNodeArray();
 
 	public SplitNetworkLayout() {
 		labelLayout = new RadialLabelLayout();
@@ -107,13 +108,12 @@ public class SplitNetworkLayout {
 	 * @param width
 	 * @param height
 	 * @param splitSelectionModel
-	 * @param orientation
-	 * @return group of groups, namly loops, nodes, edges and node labels
+	 * @return group of groups, namely loops, nodes, edges and node labels
 	 * @throws IOException
 	 */
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
-					   SplitsRooting rooting, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, DoubleProperty unitLength,
-					   double width, double height, SelectionModel<Integer> splitSelectionModel, ObjectProperty<LayoutOrientation> orientation) throws IOException {
+					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, DoubleProperty unitLength,
+					   double width, double height, SelectionModel<Integer> splitSelectionModel) throws IOException {
 
 		labelLayout.clear();
 
@@ -168,14 +168,13 @@ public class SplitNetworkLayout {
 		var edgeCallback = interactionSetup.createEdgeCallback();
 
 		// compute the network and assign coordinates to nodes, and compute loops for outline:
-		final var graph = new PhyloSplitsGraph();
-		final NodeArray<Point2D> nodePointMap = graph.newNodeArray();
-		final var loops = new ArrayList<ArrayList<Node>>();
+
+		graph.clear();
 
 		if (diagram == SplitsDiagramType.Outline) {
 			try {
 				var usedSplits = new BitSet();
-				Outline.apply(progress, useWeights, taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit);
+				Outline.apply(progress, useWeights, taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
 				if (usedSplits.cardinality() < splitsBlock.getNsplits())
 					NotificationManager.showWarning(String.format("Outline algorithm: Showing only %d of %d splits", usedSplits.cardinality(), splitsBlock.getNsplits()));
 			} catch (CanceledException e) {
@@ -188,7 +187,7 @@ public class SplitNetworkLayout {
 				if (usedSplits.cardinality() < splitsBlock.getNsplits()) {
 					ConvexHull.apply(progress, taxaBlock, splitsBlock, graph, usedSplits);
 				}
-				EqualAngle.assignAnglesToEdges(taxaBlock.getNtax(), splitsBlock, splitsBlock.getCycle(), graph, new BitSet(), rootSplit == 0 ? 360 : 160);
+				EqualAngle.assignAnglesToEdges(taxaBlock.getNtax(), splitsBlock, splitsBlock.getCycle(), graph, new BitSet(), rootSplit == 0 ? 360 : rootAngle);
 				EqualAngle.assignCoordinatesToNodes(useWeights, graph, nodePointMap, splitsBlock.getCycle()[1], rootSplit);
 
 			} catch (CanceledException e) {
@@ -196,20 +195,21 @@ public class SplitNetworkLayout {
 			}
 		}
 
+		if (rootSplit > 0) // want the root to be placed on the left by default
+			rotate90(graph, nodePointMap);
+
 		var triplet = computeFontHeightGraphWidthHeight(taxaBlock, graph, true, width, height);
 		var fontHeight = triplet.getFirst();
 		width = triplet.getSecond();
 		height = triplet.getThird();
-
-		applyOrientation(orientation.get(), rootSplit > 0 ? 90 : 0, graph, nodePointMap);
 
 		unitLength.set(normalize(width, height, nodePointMap, true));
 
 		// compute the shapes:
 		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
 
-		final NodeArray<DoubleProperty> nodeXMap = graph.newNodeArray();
-		final NodeArray<DoubleProperty> nodeYMap = graph.newNodeArray();
+		nodeXMap.clear();
+		nodeYMap.clear();
 
 		// nodes:
 		var nodesGroup = new Group();
@@ -233,8 +233,8 @@ public class SplitNetworkLayout {
 				var label = new RichTextLabel(text);
 				label.setTextFill(color);
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-				label.translateXProperty().bind(nodeXMap.get(v).add(10));
-				label.translateYProperty().bind(nodeYMap.get(v).add(10));
+				label.setTranslateX(nodeXMap.get(v).doubleValue() + 10);
+				label.setTranslateY(nodeYMap.get(v).doubleValue() + 10);
 				nodeLabelsGroup.getChildren().add(label);
 				nodeCallback.accept(v, shape, label);
 				var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
@@ -245,9 +245,11 @@ public class SplitNetworkLayout {
 				if (rootSplit == 0 && v == graph.getTaxon2Node(1)) {
 					angle += 180;
 				}
-				labelLayout.getItems().add(new RadialLabelLayout.LayoutItem(shape.getTranslateX(), shape.getTranslateY(), angle, label.getRawText(), label.widthProperty(), label.heightProperty(),
-						xOffset -> label.translateXProperty().bind(shape.translateXProperty().add(xOffset)), yOffset -> label.translateYProperty().bind(shape.translateYProperty().add(yOffset))));
-				labelLayout.getAvoidList().add(new BoundingBox(shape.getTranslateX(), shape.getTranslateY(),2*shape.getRadius(),2*shape.getRadius()));
+				var translateXProperty = shape.translateXProperty();
+				var translateYProperty = shape.translateYProperty();
+				labelLayout.getItems().add(new RadialLabelLayout.LayoutItem(translateXProperty, translateYProperty, angle, label.getRawText(), label.widthProperty(), label.heightProperty(),
+						xOffset -> label.translateXProperty().bind(translateXProperty.add(xOffset)), yOffset -> label.translateYProperty().bind(translateYProperty.add(yOffset))));
+				labelLayout.getAvoidList().add(new RadialLabelLayout.Box(translateXProperty, translateYProperty,2*shape.getRadius(),2*shape.getRadius()));
 			}
 		}
 
@@ -268,24 +270,18 @@ public class SplitNetworkLayout {
 
 		var loopsGroup = new Group();
 		for (var loop : loops) {
-			loopsGroup.getChildren().add((new LoopView(loop, nodeXMap, nodeYMap).getShape()));
+			loopsGroup.getChildren().add(new LoopView(loop, nodeXMap, nodeYMap).getShape());
 		}
-
-		ProgramExecutorService.submit(100, () -> Platform.runLater(labelLayout::layoutLabels));
 
 		return new Group(loopsGroup, edgesGroup, nodesGroup, nodeLabelsGroup);
 	}
 
-	private void applyOrientation(LayoutOrientation orientation, double addAngle, PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap) {
-		if (orientation != LayoutOrientation.Rotate0Deg || addAngle != 0) {
-			for (var v : nodePointMap.keySet()) {
-				if (addAngle > 0)
-					nodePointMap.put(v, GeometryUtilsFX.rotate(nodePointMap.get(v), addAngle));
-				nodePointMap.put(v, orientation.apply(nodePointMap.get(v)));
-			}
-			for (var e : graph.edges()) {
-				graph.setAngle(e, orientation.apply(graph.getAngle(e) + addAngle));
-			}
+	private void rotate90(PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap) {
+		for (var v : graph.nodes()) {
+			nodePointMap.put(v, GeometryUtilsFX.rotate(nodePointMap.get(v), 90));
+		}
+		for (var e : graph.edges()) {
+			graph.setAngle(e, graph.getAngle(e) + 90);
 		}
 	}
 

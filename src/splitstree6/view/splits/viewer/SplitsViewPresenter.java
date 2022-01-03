@@ -33,6 +33,7 @@ import javafx.scene.control.SelectionMode;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
 import jloda.fx.util.ProgramExecutorService;
+import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
@@ -94,12 +95,20 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		splitsBlock.addListener((v, o, n) -> {
 			disabledDiagramTypes.clear();
-			if (n == null)
+			if (n == null) {
 				disabledDiagramTypes.addAll(List.of(SplitsDiagramType.values()));
-			else if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic) {
-				disabledDiagramTypes.add(SplitsDiagramType.Outline);
-				if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline)
-					Platform.runLater(() -> splitsView.setOptionDiagram(SplitsDiagramType.Splits));
+				controller.getFitLabel().setVisible(false);
+			} else {
+				if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic) {
+					disabledDiagramTypes.add(SplitsDiagramType.Outline);
+					if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline)
+						Platform.runLater(() -> splitsView.setOptionDiagram(SplitsDiagramType.Splits));
+				}
+				if (n.getFit() > 0) {
+					controller.getFitLabel().setText(StringUtils.removeTrailingZerosAfterDot(String.format("Fit: %.2f", n.getFit())));
+					controller.getFitLabel().setVisible(true);
+				} else
+					controller.getFitLabel().setVisible(false);
 			}
 		});
 
@@ -134,7 +143,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 
 		controller.getUseWeightsToggleButton().selectedProperty().bindBidirectional(splitsView.optionUseWeightsProperty());
-		controller.getScaleBar().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty());
+		controller.getScaleBar().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()));
 		controller.getScaleBar().factorXProperty().bind(splitsView.optionZoomFactorProperty());
 
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
@@ -146,7 +155,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
 					splitsView.getSplitSelectionModel(),
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
-					splitsView.getOptionRooting(), splitsView.isOptionUseWeights(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
+					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.isOptionUseWeights(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					controller.getScaleBar().unitLengthXProperty());
 			splitNetworkPane.set(pane);
 			pane.drawNetwork();
@@ -154,12 +163,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		splitsView.optionFontScaleFactorProperty().addListener(e -> {
 			if (splitNetworkPane.get() != null)
-				ProgramExecutorService.submit(100, () -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels()));
+				ProgramExecutorService.submit(100, () -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation())));
 		});
 
 		splitsBlock.addListener(updateListener);
 		splitsView.optionDiagramProperty().addListener(updateListener);
-		splitsView.optionOrientationProperty().addListener(updateListener);
 		splitsView.optionRootingProperty().addListener(updateListener);
 		splitsView.optionUseWeightsProperty().addListener(updateListener);
 
@@ -171,7 +179,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomOutButton().setOnAction(e -> splitsView.setOptionZoomFactor((1.0 / 1.1) * splitsView.getOptionZoomFactor()));
 		controller.getZoomOutButton().disableProperty().bind(splitsView.emptyProperty());
 
-		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
+		final Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
 		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(),
 				t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),

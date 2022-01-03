@@ -58,7 +58,7 @@ public class Outline {
      */
     public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits,
                              PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet usedSplits,
-                             ArrayList<ArrayList<Node>> loops, int rootSplit) throws CanceledException {
+                             ArrayList<ArrayList<Node>> loops, int rootSplit, double rootAngle) throws CanceledException {
         progress.setTasks("Outline", null);
 
         if (nodePointMap == null)
@@ -74,7 +74,7 @@ public class Outline {
         try {
             final var cycle = splits.getCycle();
             //final int[] cycle=SplitsUtilities.normalizeCycle(splits.getCycle());
-            final var split2angle = EqualAngle.assignAnglesToSplits(taxaBlock.getNtax(), splits, splits.getCycle(), rootSplit == 0 ? 360 : 160);
+            final var split2angle = EqualAngle.assignAnglesToSplits(taxaBlock.getNtax(), splits, splits.getCycle(), rootSplit == 0 ? 360 : rootAngle);
 
             final ArrayList<Event> events;
             {

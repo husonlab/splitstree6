@@ -153,17 +153,22 @@ public class LayoutUtils {
 	/**
 	 * apply a change of orientation to a node
 	 */
-	public static void applyOrientation(LayoutOrientation newOrientation, javafx.scene.Node node) {
-		node.setRotate(-newOrientation.angle());
+	public static void applyOrientation(LayoutOrientation newOrientation, javafx.scene.Node node, boolean keepLabelsUnrotated) {
 		if (newOrientation.flip())
 			node.setScaleX(-node.getScaleX());
+		var angle = -newOrientation.angle();
+		if (angle != 0.0) {
+			node.setRotate(angle);
+			if (keepLabelsUnrotated)
+				rotateLabels(node, -angle);
+		}
 		ensureRichTextLabelsUpright(node);
 	}
 
 	/**
 	 * apply a change of orientation to a node
 	 */
-	public static void applyOrientation(LayoutOrientation oldOrientation, LayoutOrientation newOrientation, javafx.scene.Node node) {
+	public static void applyOrientation(LayoutOrientation oldOrientation, LayoutOrientation newOrientation, javafx.scene.Node node, boolean keepLabelsUnrotated) {
 		final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
 		var flip = (oldOrientation == null && newOrientation.flip() || oldOrientation != null && newOrientation.flip() != oldOrientation.flip());
 
@@ -176,6 +181,8 @@ public class LayoutUtils {
 				node.setScaleY(oldScaleY);
 				node.setScaleX(-node.getScaleX());
 				node.setRotate(node.getRotate() + angle0);
+				if (keepLabelsUnrotated)
+					rotateLabels(node, -angle0);
 				ensureRichTextLabelsUpright(node);
 			});
 			scaleTransition.play();
@@ -188,7 +195,6 @@ public class LayoutUtils {
 			else
 				angle = angle0;
 
-
 			var rotateTransition = new RotateTransition(Duration.seconds(1));
 				rotateTransition.setNode(node);
 				rotateTransition.setByAngle(angle);
@@ -200,14 +206,22 @@ public class LayoutUtils {
 				var parallelTransition = new ParallelTransition(rotateTransition, scaleTransition);
 				parallelTransition.play();
 				parallelTransition.setOnFinished(e -> {
+					if (keepLabelsUnrotated)
+						rotateLabels(node, -angle);
 					ensureRichTextLabelsUpright(node);
 				});
-			}
+		}
 	}
 
 	public static void ensureRichTextLabelsUpright(javafx.scene.Node node) {
 		for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
 			label.ensureUpright();
+		}
+	}
+
+	public static void rotateLabels(javafx.scene.Node node, double angle) {
+		for (var label : BasicFX.getAllRecursively(node, RichTextLabel.class)) {
+			label.setRotate(label.getRotate() + angle);
 		}
 	}
 }

@@ -28,7 +28,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 
@@ -86,12 +88,20 @@ public class SplitsViewController {
 
 	private final ScaleBar scaleBar = new ScaleBar();
 
+	private final CopyableLabel fitLabel = new CopyableLabel();
+
 	@FXML
 	private void initialize() {
 		centerPane.getChildren().add(zoomableScrollPane);
 		innerAnchorPane.getChildren().add(scaleBar);
-		AnchorPane.setTopAnchor(scaleBar, 10.0);
-		AnchorPane.setLeftAnchor(scaleBar, 10.0);
+		AnchorPane.setTopAnchor(scaleBar, 2.0);
+		AnchorPane.setLeftAnchor(scaleBar, 5.0);
+
+		AnchorPane.setTopAnchor(fitLabel, 25.0);
+		AnchorPane.setLeftAnchor(fitLabel, 2.0);
+		innerAnchorPane.getChildren().add(fitLabel);
+
+		DraggableLabel.makeDraggable(fitLabel);
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -156,6 +166,10 @@ public class SplitsViewController {
 
 	public ScaleBar getScaleBar() {
 		return scaleBar;
+	}
+
+	public CopyableLabel getFitLabel() {
+		return fitLabel;
 	}
 
 	public AnchorPane getInnerAnchorPane() {

@@ -21,12 +21,12 @@ package splitstree6.view.splits.layout;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.geometry.Bounds;
 import jloda.fx.util.AService;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.util.IteratorUtils;
+import splitstree6.view.trees.treepages.LayoutOrientation;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,21 +44,29 @@ public class RadialLabelLayout {
 
 	private final ArrayList<LayoutItem> items = new ArrayList<>();
 
-	private final ArrayList<Bounds> avoidList = new ArrayList<>();
+	private final ArrayList<Box> avoidList = new ArrayList<>();
 
 	private double gap = 4;
+
+	private LayoutOrientation orientation;
 
 	public RadialLabelLayout() {
 		setupLayoutService();
 	}
 
-	public void layoutLabels() {
+	private int deferredCounter = 0;
+
+	public void layoutLabels(LayoutOrientation orientation) {
 		if (items.size() > 0) {
-			if (items.get(0).width() == 0) {
-				System.err.println("not ready");
-				Platform.runLater(this::layoutLabels);
-			} else
+			if (deferredCounter < items.size() && items.stream().anyMatch(item -> item.width() == 0 || item.height() == 0)) {
+				//System.err.println("not ready");
+				deferredCounter++;
+				Platform.runLater(() -> layoutLabels(orientation));
+			} else {
+				deferredCounter = 0;
+				this.orientation = orientation;
 				layoutService.restart();
+			}
 		}
 	}
 
@@ -71,7 +79,7 @@ public class RadialLabelLayout {
 		return items;
 	}
 
-	public ArrayList<Bounds> getAvoidList() {
+	public ArrayList<Box> getAvoidList() {
 		return avoidList;
 	}
 
@@ -82,6 +90,7 @@ public class RadialLabelLayout {
 	public void setGap(double gap) {
 		this.gap = gap;
 	}
+
 
 	/**
 	 * setup the layout service
@@ -99,7 +108,7 @@ public class RadialLabelLayout {
 							itemBestChoiceMap.putIfAbsent(item, choice);
 							var ok = true;
 							for (var avoid : avoidList) {
-								if (choice.intersects(avoid)) {
+								if (avoid.intersects(choice)) {
 									ok = false;
 									break;
 								}
@@ -168,8 +177,8 @@ public class RadialLabelLayout {
 						var choice = itemBestChoiceMap.get(item);
 
 						var ok = false;
-						var deltaX = 5 * Math.cos(GeometryUtilsFX.deg2rad(item.angle()));
-						var deltaY = 5 * Math.sin(GeometryUtilsFX.deg2rad(item.angle()));
+						var deltaX = 5 * Math.cos(GeometryUtilsFX.deg2rad(orientation.apply(item.angle())));
+						var deltaY = 5 * Math.sin(GeometryUtilsFX.deg2rad(orientation.apply(item.angle())));
 
 						var x = choice.x();
 						var y = choice.y();
@@ -177,7 +186,7 @@ public class RadialLabelLayout {
 						while (!ok && i++ < 1000) {
 							ok = true;
 							for (var avoid : getAvoidList()) {
-								if (choice.intersects(avoid)) {
+								if (avoid.intersects(choice)) {
 									ok = false;
 									break;
 								}
@@ -209,8 +218,8 @@ public class RadialLabelLayout {
 	}
 
 	private Choice[] computeChoices(LayoutItem item) {
-		var angle = GeometryUtilsFX.modulo360(item.angle());
-		var angleRadian = GeometryUtilsFX.deg2rad(angle);
+		var angle = GeometryUtilsFX.modulo360(orientation.apply(item.angle()));
+		var angleRadian = GeometryUtilsFX.deg2rad(orientation.apply(angle));
 		var choices = new Choice[3];
 
 		if (angle >= 45 && angle <= 135) { // up
@@ -249,15 +258,16 @@ public class RadialLabelLayout {
 	/**
 	 * item for radial layout
 	 *
-	 * @param anchorX        x coordinate of anchor
-	 * @param anchorY        y coordiante of anchor
-	 * @param angle          ideal angle to move label, in degrees
-	 * @param widthProperty  label width
-	 * @param heightProperty label height
-	 * @param xSetter        method to set computed x-coordinate of label
-	 * @param ySetter        method to set computed y-coordinate of label
+	 * @param anchorXProperty x coordinate of anchor
+	 * @param anchorYProperty y coordinate of anchor
+	 * @param angle           ideal angle to move label, in degrees
+	 * @param widthProperty   label width
+	 * @param heightProperty  label height
+	 * @param xSetter         method to set computed x-coordinate of label
+	 * @param ySetter         method to set computed y-coordinate of label
 	 */
-	public static record LayoutItem(double anchorX, double anchorY, double angle, String label,
+	public static record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
+									double angle, String label,
 									ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
 									Consumer<Double> xSetter, Consumer<Double> ySetter) {
 		public double width() {
@@ -267,19 +277,19 @@ public class RadialLabelLayout {
 		public double height() {
 			return heightProperty.get();
 		}
+
+		public double anchorX() {
+			return anchorXProperty.get();
+		}
+
+		public double anchorY() {
+			return anchorYProperty.get();
+		}
 	}
 
 	private static record Choice(double x, double y, double width, double height, int priority, LayoutItem item) {
 		private boolean intersects(Choice other) {
 			return (x + width >= other.x && x <= other.x + other.width) && (y + height >= other.y && y <= other.y + other.height);
-		}
-
-		private boolean intersects(Choice other, double otherX, double otherY) {
-			return (x + width >= otherX && x <= otherX + other.width) && (y + height >= otherY && y <= otherY + other.height);
-		}
-
-		private boolean intersects(Bounds bounds) {
-			return (x + width >= bounds.getMinX() && x <= bounds.getMinX() + bounds.getWidth()) && (y + height >= bounds.getMinY() && y <= bounds.getMinY() + bounds.getHeight());
 		}
 
 		public Choice copyWithUpdatedXY(double x, double y) {
@@ -294,5 +304,13 @@ public class RadialLabelLayout {
 			return 1;
 		else
 			return Integer.compare(((Choice) v.getData()).priority(), ((Choice) w.getData()).priority());
+	}
+
+	public static record Box(ReadOnlyDoubleProperty x, ReadOnlyDoubleProperty y, double width, double height) {
+		private boolean intersects(Choice other) {
+			return (x.get() + width >= other.x() && x.get() <= other.x() + other.width()) && (y.get() + height >= other.y() && y.get() <= other.y() + other.height());
+		}
+
+
 	}
 }

@@ -111,11 +111,15 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 			progress.incrementProgress();
 		}
 
+		// add all missing trivial
+		previousSplits.addAll(SplitsUtilities.createAllMissingTrivial(previousSplits, ntax));
+
 		// copy splits to splits
-		//splitsBlock.setFit(computeFit(distancesBlock, previousSplits));
 		splitsBlock.getSplits().addAll(previousSplits);
+
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), previousSplits));
+		splitsBlock.setFit(SplitsUtilities.computeSplitDecompositionFit(distancesBlock, splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 	}
 
 
