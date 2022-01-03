@@ -23,6 +23,8 @@ import javafx.animation.ParallelTransition;
 import javafx.animation.Transition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
@@ -40,6 +42,7 @@ import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.ProgramExecutorService;
+import jloda.fx.window.MainWindowManager;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -56,6 +59,8 @@ public class SplitNetworkPane extends StackPane {
 	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 	private final ChangeListener<LayoutOrientation> orientChangeListener;
+	private final InvalidationListener redrawListener;
+
 	private final AService<Group> service;
 	private final SplitNetworkLayout splitNetworkLayout = new SplitNetworkLayout();
 	private Runnable runAfterUpdate;
@@ -91,6 +96,10 @@ public class SplitNetworkPane extends StackPane {
 
 		orientChangeListener = (v, o, n) -> applyOrientation(o, n);
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
+
+		redrawListener = e -> drawNetwork();
+		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(redrawListener));
+
 
 		// compute the tree in a separate thread:
 		service = new AService<>(mainWindow.getController().getBottomFlowPane());

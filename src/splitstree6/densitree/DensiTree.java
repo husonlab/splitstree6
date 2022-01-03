@@ -20,6 +20,7 @@
 package splitstree6.densitree;
 
 import javafx.scene.canvas.Canvas;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import jloda.util.StringUtils;
 
@@ -44,6 +45,7 @@ public class DensiTree {
 
 			for (int value : model.getCircularOrdering()) {
 				if (value > 0) {
+					gc.setStroke(Color.BLUE);
 					gc.strokeText(String.valueOf(value), cx, cy);
 					cx += 20;
 					if (cx > canvas.getWidth())

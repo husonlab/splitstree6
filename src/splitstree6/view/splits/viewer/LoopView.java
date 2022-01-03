@@ -23,6 +23,7 @@ package splitstree6.view.splits.viewer;
 import javafx.beans.property.DoubleProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
+import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 
@@ -38,7 +39,7 @@ public class LoopView {
 
     public LoopView(ArrayList<Node> nodes, NodeArray<DoubleProperty> nodeXMap, NodeArray<DoubleProperty> nodeYMap) {
         this.nodes = nodes;
-        polygon.setFill(Color.WHITESMOKE);
+        polygon.setFill(MainWindowManager.isUseDarkTheme() ? Color.GREY : Color.WHITESMOKE);
         polygon.setStroke(Color.TRANSPARENT);
 
         for (var i = 0; i < nodes.size(); i++) {
