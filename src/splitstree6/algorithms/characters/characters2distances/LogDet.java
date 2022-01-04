@@ -33,7 +33,6 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -90,9 +89,9 @@ import java.util.List;
  */
 
 public class LogDet extends Characters2Distances {
-	private final BooleanProperty optionFudgeFactor = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionFillZeros = new SimpleBooleanProperty(false);
-	private final DoubleProperty optionPropInvariableSites = new SimpleDoubleProperty(0.0);
+	private final BooleanProperty optionFudgeFactor = new SimpleBooleanProperty(this, "optionFudgeFactor", false);
+	private final BooleanProperty optionFillZeros = new SimpleBooleanProperty(this, "optionFillZeros", false);
+	private final DoubleProperty optionPropInvariableSites = new SimpleDoubleProperty(this, "optionPropInvariableSites", 0.0);
 
 	@Override
 	public String getCitation() {
@@ -100,20 +99,19 @@ public class LogDet extends Characters2Distances {
 	}
 
 	public List<String> listOptions() {
-		return Arrays.asList("PropInvariableSites", "FudgeFactor", "FillZeros");
+		return List.of(optionPropInvariableSites.getName(), optionFudgeFactor.getName(), optionFillZeros.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		switch (optionName) {
-			case "PropInvariableSites":
-				return "Proportion of invariable sites";
-			case "FudgeFactor":
-				return "Input missing matrix entries using LDDist method";
-			case "FillZeros":
-				return "Replace zeros with small numbers in rows/columns with values";
-		}
-		return optionName;
+		if (optionName.equals(optionPropInvariableSites.getName())) {
+			return "Proportion of invariable sites";
+		} else if (optionName.equals(optionFudgeFactor.getName())) {
+			return "Input missing matrix entries using LDDist method";
+		} else if (optionName.equals(optionFillZeros.getName())) {
+			return "Replace zeros with small numbers in rows/columns with values";
+		} else
+			return super.getToolTip(optionName);
 	}
 
 	@Override

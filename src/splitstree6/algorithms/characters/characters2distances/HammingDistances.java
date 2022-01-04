@@ -33,7 +33,6 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -44,10 +43,10 @@ import java.util.concurrent.TimeUnit;
  * @author Daniel Huson, 2003, 2017
  */
 public class HammingDistances extends Characters2Distances {
-	private final BooleanProperty optionNormalize = new SimpleBooleanProperty(true);
+	private final BooleanProperty optionNormalize = new SimpleBooleanProperty(this, "optionNormalize", true);
 
 	public List<String> listOptions() {
-		return Collections.singletonList("Normalize");
+		return List.of(optionNormalize.getName());
 	}
 
 	@Override
@@ -57,10 +56,10 @@ public class HammingDistances extends Characters2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
-		if (optionName.equals("Normalize"))
+		if (optionName.equals(optionNormalize.getName()))
 			return "Normalize distances";
 		else
-			return optionName;
+			return super.getToolTip(optionName);
 	}
 
 	@Override

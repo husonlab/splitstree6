@@ -39,26 +39,29 @@ import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * heuristic dimension filter
  * Daniel Huson, 5.2004
  */
 public class DimensionFilter extends Splits2Splits implements IFilter {
-	private final IntegerProperty optionMaxDimension = new SimpleIntegerProperty(4);
+	private final IntegerProperty optionMaxDimension = new SimpleIntegerProperty(this, "optionMaxDimension", 4);
 	private boolean active;
 
 	private final static int COMPUTE_DSUBGRAPH_MAXDIMENSION = 5;
 
 	@Override
 	public List<String> listOptions() {
-		return Collections.singletonList("MaxDimension");
+		return List.of(optionMaxDimension.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		if ("MaxDimension".equals(optionName)) {
+		if (optionName.equals(optionMaxDimension.getName())) {
 			return "Heuristically remove splits that create configurations of a higher dimension than this threshold";
 		}
 		return optionName;

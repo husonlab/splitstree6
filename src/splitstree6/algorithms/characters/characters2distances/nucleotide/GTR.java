@@ -44,7 +44,7 @@ public class GTR extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("PropInvariableSites", "SetSiteVarParams", "RateMatrix", "UseML_Distances");
+		return Arrays.asList("optionPropInvariableSites", "optionSetSiteVarParams", "optionRateMatrix", "optionUseML_Distances");
 	}
 
 	@Override

@@ -30,7 +30,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -43,7 +42,7 @@ import java.util.List;
 
 public class BalancedConfidenceNetwork extends Trees2Splits {
 
-	private final DoubleProperty optionLevel = new SimpleDoubleProperty(this, "Level", .95);
+	private final DoubleProperty optionLevel = new SimpleDoubleProperty(this, "optionLevel", .95);
 
 	@Override
 	public String getCitation() {
@@ -54,7 +53,7 @@ public class BalancedConfidenceNetwork extends Trees2Splits {
 
 	@Override
 	public List<String> listOptions() {
-		return Collections.singletonList("Level");
+		return List.of(optionLevel.getName());
 	}
 
 	@Override

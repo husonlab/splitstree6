@@ -28,6 +28,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
+import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
 import splitstree6.algorithms.splits.splits2splits.LeastSquaresWeights;
 import splitstree6.algorithms.trees.trees2distances.AverageDistances;
 import splitstree6.algorithms.utils.PartialSplit;
@@ -48,20 +49,20 @@ import java.util.*;
  * <p>
  * Created on 22.06.2017
  *
- * @author Daniel Huson and Daria Evseeva
+ * @author Daniel Huson
  */
 
 public class SuperNetwork extends Trees2Splits {
 	public enum EdgeWeights {AverageRelative, Mean, TreeSizeWeightedMean, Sum, Min, None}
 
-	private final BooleanProperty optionZRule = new SimpleBooleanProperty(true);
-	private final BooleanProperty noOptionLeastSquare = new SimpleBooleanProperty(false); // todo this needs work
-	private final BooleanProperty optionSuperTree = new SimpleBooleanProperty(false);
-	private final IntegerProperty optionNumberOfRuns = new SimpleIntegerProperty(1);
-	private final BooleanProperty optionApplyRefineHeuristic = new SimpleBooleanProperty(false);
-	private final IntegerProperty optionSeed = new SimpleIntegerProperty(0);
-
+	private final BooleanProperty optionZRule = new SimpleBooleanProperty(this, "optionZRule", true);
+	private final BooleanProperty noOptionLeastSquare = new SimpleBooleanProperty(this, "noOptionLeastSquare", false); // todo this needs work
+	private final BooleanProperty optionSuperTree = new SimpleBooleanProperty(this, "optionSuperTree", false);
+	private final IntegerProperty optionNumberOfRuns = new SimpleIntegerProperty(this, "optionNumberOfRuns", 1);
+	private final BooleanProperty optionApplyRefineHeuristic = new SimpleBooleanProperty(this, "optionApplyRefineHeuristic", false);
+	private final IntegerProperty optionSeed = new SimpleIntegerProperty(this, "optionSeed", 0);
 	private final SimpleObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(EdgeWeights.TreeSizeWeightedMean);
+	private final BooleanProperty optionUseHighDimensionFilter = new SimpleBooleanProperty(this, "optionUseHighDimensionFilter", true);
 
 	@Override
 	public String getCitation() {
@@ -71,21 +72,30 @@ public class SuperNetwork extends Trees2Splits {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("EdgeWeights", "ZRule", "SuperTree", "NumberOfRuns", "ApplyRefineHeuristic", "LeastSquare", "Seed");
+		return Arrays.asList(optionEdgeWeights.getName(), optionZRule.getName(), optionSuperTree.getName(), optionNumberOfRuns.getName(),
+				optionApplyRefineHeuristic.getName(), optionSeed.getName(), optionUseHighDimensionFilter.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		return switch (optionName) {
-			case "EdgeWeights" -> "Determine how to calculate edge weights in resulting network";
-			case "LeastSquare" -> "Use least squares";
-			case "ZRule" -> "Apply the Z-closure rule";
-			case "SuperTree" -> "Enforce the strong induction property, which results in a super tree";
-			case "NumberOfRuns" -> "Number of runs using random permutations of the input splits";
-			case "ApplyRefineHeuristic" -> "Apply a simple refinement heuristic";
-			case "Seed" -> "Set seed used for random permutations";
-			default -> optionName;
-		};
+		if (optionEdgeWeights.getName().equals(optionName)) {
+			return "Determine how to calculate edge weights in resulting network";
+		} else if (noOptionLeastSquare.getName().equals(optionName)) {
+			return "Use least squares";
+		} else if (optionZRule.getName().equals(optionName)) {
+			return "Apply the Z-closure rule";
+		} else if (optionSuperTree.getName().equals(optionName)) {
+			return "Enforce the strong induction property, which results in a super tree";
+		} else if (optionNumberOfRuns.getName().equals(optionName)) {
+			return "Number of runs using random permutations of the input splits";
+		} else if (optionApplyRefineHeuristic.getName().equals(optionName)) {
+			return "Apply a simple refinement heuristic";
+		} else if (optionSeed.getName().equals(optionName)) {
+			return "Set seed used for random permutations";
+		} else if (optionUseHighDimensionFilter.getName().equals(optionName)) {
+			return "Heuristically remove splits causing high-dimensional network";
+		} else
+			return super.getToolTip(optionName);
 	}
 
 	@Override
@@ -164,28 +174,27 @@ public class SuperNetwork extends Trees2Splits {
 
 		progress.setTasks("Z-closure", "init");
 
-		Map[] pSplitsOfTrees = new Map[treesBlock.getNTrees() + 1];
+		var pSplitsOfTrees = (Map<PartialSplit, PartialSplit>[]) new Map[treesBlock.getNTrees() + 1];
 		// for each tree, identity map on set of splits
-		BitSet[] supportSet = new BitSet[treesBlock.getNTrees() + 1];
+		var supportSet = new BitSet[treesBlock.getNTrees() + 1];
 		Set<PartialSplit> allPSplits = new HashSet<>();
 
 		progress.setSubtask("extracting partial splits from trees");
 		progress.setMaximum(treesBlock.getNTrees());
 
-		for (int which = 1; which <= treesBlock.getNTrees(); which++) {
+		for (var which = 1; which <= treesBlock.getNTrees(); which++) {
 			progress.incrementProgress();
-			pSplitsOfTrees[which] = new HashMap();
+			pSplitsOfTrees[which] = new HashMap<>();
 			supportSet[which] = new BitSet();
 			computePartialSplits(taxaBlock, treesBlock, which, pSplitsOfTrees[which], supportSet[which]);
-			for (Object o : pSplitsOfTrees[which].keySet()) {
-				PartialSplit ps = (PartialSplit) o;
+			for (var ps : pSplitsOfTrees[which].keySet()) {
 				if (ps.isNonTrivial()) {
 					allPSplits.add((PartialSplit) ps.clone());
 					progress.incrementProgress();
 				}
 			}
 		}
-		SplitsBlock splits = new SplitsBlock();
+		var computedSplits = new SplitsBlock();
 
 		if (isOptionZRule()) {
 			computeClosureOuterLoop(progress, allPSplits);
@@ -199,46 +208,34 @@ public class SuperNetwork extends Trees2Splits {
 		////doc.notifySubtask("collecting full splits");
 		////doc.notifySetMaximumProgress(allPSplits.size());
 		for (PartialSplit ps : allPSplits) {
-			int size = ps.getXsize();
+			var size = ps.getXsize();
 
 			// for now, keep all splits of correct size
 			if (size == taxaBlock.getNtax()) {
-				boolean ok = true;
+				var ok = true;
 				if (isOptionSuperTree()) {
-					for (int t = 1; ok && t <= treesBlock.getNTrees(); t++) {
-						Map pSplits = (pSplitsOfTrees[t]);
-						BitSet support = supportSet[t];
-						PartialSplit induced = ps.getInduced(support);
+					for (var t = 1; ok && t <= treesBlock.getNTrees(); t++) {
+						var pSplits = (pSplitsOfTrees[t]);
+						var support = supportSet[t];
+						var induced = ps.getInduced(support);
 						if (induced != null && !pSplits.containsKey(induced))
 							ok = false;     // found a tree that doesn't contain the induced split
 					}
 				}
 				if (ok) {
-					ASplit split = new ASplit(ps.getA(), taxaBlock.getNtax());
-					splits.getSplits().add(split);
+					var split = new ASplit(ps.getA(), taxaBlock.getNtax());
+					computedSplits.getSplits().add(split);
 				}
 			}
 		}
 
 		// add all missing trivial splits
-		for (int t = 1; t <= taxaBlock.getNtax(); t++) {
-			BitSet ts = new BitSet();
-			ts.set(t);
-			PartialSplit ps = new PartialSplit(ts);
-			BitSet ts1 = new BitSet();
-			ts1.set(1, taxaBlock.getNtax() + 1);
-			ps.setComplement(ts1);
-			if (!allPSplits.contains(ps)) {
-				ASplit split = new ASplit(ps.getA(), taxaBlock.getNtax());
-				splits.getSplits().add(split);
-			}
-
-		}
+		SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax());
 
 		if (getOptionEdgeWeights().equals(EdgeWeights.AverageRelative)) {
-			setWeightAverageReleativeLength(pSplitsOfTrees, supportSet, splits);
+			setWeightAverageReleativeLength(pSplitsOfTrees, supportSet, computedSplits);
 		} else if (!getOptionEdgeWeights().equals(EdgeWeights.None)) {
-			setWeightsConfidences(pSplitsOfTrees, supportSet, splits);
+			setWeightsConfidences(pSplitsOfTrees, supportSet, computedSplits);
 		}
 
 		// todo how do we get here ?
@@ -254,11 +251,17 @@ public class SuperNetwork extends Trees2Splits {
 				LeastSquaresWeights leastSquares = new LeastSquaresWeights();
 				leastSquares.setDistancesBlock(distances);
 
-				leastSquares.compute(new ProgressPercentage(), taxaBlock, splits, splitsBlock);
+				leastSquares.compute(new ProgressPercentage(), taxaBlock, computedSplits, splitsBlock);
 			}
 		}
 
-		splitsBlock.copy(splits);
+		if (isOptionUseHighDimensionFilter()) {
+			var dimensionsFilter = new DimensionFilter();
+			dimensionsFilter.compute(progress, taxaBlock, computedSplits, splitsBlock);
+		} else
+			splitsBlock.copy(computedSplits);
+
+
 		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		progress.close();
 	}
@@ -300,21 +303,13 @@ public class SuperNetwork extends Trees2Splits {
 				}
 			}
 
-			float value = 1;
-			switch (getOptionEdgeWeights()) {
-				case Min:
-					value = min;
-					break;
-				case Mean:
-					value = (total > 0 ? weighted / total : 0);
-					break;
-				case TreeSizeWeightedMean:
-					value = (total > 0 ? sum / total : 0);
-					break;
-				case Sum:
-					value = sum;
-					break;
-			}
+			float value = switch (getOptionEdgeWeights()) {
+				case Min -> min;
+				case Mean -> (total > 0 ? weighted / total : 0);
+				case TreeSizeWeightedMean -> (total > 0 ? sum / total : 0);
+				case Sum -> sum;
+				default -> 1;
+			};
 			splits.getSplits().get(s - 1).setWeight(value);
 			splits.getSplits().get(s - 1).setConfidence(total);
 		}
@@ -382,12 +377,11 @@ public class SuperNetwork extends Trees2Splits {
 	 * @param support       supporting taxa are returned here
 	 */
 	private void computePartialSplits(TaxaBlock taxa, TreesBlock trees, int which, Map<PartialSplit, PartialSplit> pSplitsOfTree, BitSet support) {
-		final ArrayList<PartialSplit> list = new ArrayList<>(); // list of (onesided) partial splits
-		Node v = trees.getTrees().get(which - 1).getFirstNode();
+		final var list = new ArrayList<PartialSplit>(); // list of (onesided) partial splits
+		var v = trees.getTrees().get(which - 1).getFirstNode();
 		computePSplitsFromTreeRecursively(v, null, trees, taxa, list, which, support);
 
-		for (Object aList : list) {
-			PartialSplit ps = (PartialSplit) aList;
+		for (var ps : list) {
 			ps.setComplement(support);
 			pSplitsOfTree.put(ps, ps);
 		}
@@ -689,6 +683,7 @@ public class SuperNetwork extends Trees2Splits {
 		this.optionApplyRefineHeuristic.set(optionApplyRefineHeuristic);
 	}
 
+
 	public int getOptionSeed() {
 		return optionSeed.get();
 	}
@@ -711,6 +706,18 @@ public class SuperNetwork extends Trees2Splits {
 
 	public void setOptionEdgeWeights(EdgeWeights optionEdgeWeights) {
 		this.optionEdgeWeights.set(optionEdgeWeights);
+	}
+
+	public boolean isOptionUseHighDimensionFilter() {
+		return optionUseHighDimensionFilter.get();
+	}
+
+	public BooleanProperty optionUseHighDimensionFilterProperty() {
+		return optionUseHighDimensionFilter;
+	}
+
+	public void setOptionUseHighDimensionFilter(boolean optionUseHighDimensionFilter) {
+		this.optionUseHighDimensionFilter.set(optionUseHighDimensionFilter);
 	}
 
 	@Override

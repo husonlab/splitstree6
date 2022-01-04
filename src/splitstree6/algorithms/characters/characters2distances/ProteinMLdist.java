@@ -20,7 +20,10 @@
 
 package splitstree6.algorithms.characters.characters2distances;
 
-import javafx.beans.property.*;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.Property;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
@@ -32,7 +35,6 @@ import splitstree6.data.parts.CharactersType;
 import splitstree6.models.proteinModels.*;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -46,16 +48,9 @@ import java.util.List;
 public class ProteinMLdist extends Characters2Distances {
 	public enum Model {cpREV45, Dayhoff, JTT, mtMAM, mtREV24, pmb, Rhodopsin, WAG}
 
-	private final Property<Model> optionModel = new SimpleObjectProperty<>(Model.JTT);
-	private final DoubleProperty optionPropInvariableSites = new SimpleDoubleProperty(0.0);
-	private final DoubleProperty optionGamma = new SimpleDoubleProperty(0.0);
-
-	//todo these are not used? delete?
-	private final BooleanProperty optionUsePropInvariableSites = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionUseGamma = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionEstimateVariance = new SimpleBooleanProperty(true);
-
-	public final static String DESCRIPTION = "Calculates maximum likelihood protein distance estimates";
+	private final Property<Model> optionModel = new SimpleObjectProperty<>(this, "optionModel", Model.JTT);
+	private final DoubleProperty optionPropInvariableSites = new SimpleDoubleProperty(this, "optionPropInvariableSites", 0.0);
+	private final DoubleProperty optionGamma = new SimpleDoubleProperty(this, "optionGamma", 0.0);
 
 	@Override
 	public String getCitation() {
@@ -66,21 +61,19 @@ public class ProteinMLdist extends Characters2Distances {
 	}
 
 	public List<String> listOptions() {
-		return Arrays.asList("Model", "PropInvariableSites", "Gamma",
-				"UsePropInvariableSites", "UseGamma", "EstimateVariance");
+		return List.of(optionModel.getName(), optionPropInvariableSites.getName(), optionGamma.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		return switch (optionName) {
-			case "PropInvariableSites" -> "Proportion of invariable sites";
-			case "Gamma" -> "Alpha parameter for gamma distribution. Negative gamma = Equal rates";
-			case "Model" -> "Choose an amino acid substitution model";
-			case "UsePropInvariableSites" -> "UsePropInvariableSites";
-			case "UseGamma" -> "UseGamma";
-			case "EstimateVariance" -> "EstimateVariance";
-			default -> null;
-		};
+		if (optionName.equals(optionPropInvariableSites.getName())) {
+			return "Proportion of invariable sites";
+		} else if (optionName.equals(optionGamma.getName())) {
+			return "Alpha parameter for gamma distribution. Negative gamma = Equal rates";
+		} else if (optionName.equals(optionModel.getName())) {
+			return "Choose an amino acid substitution model";
+		} else
+			return super.getToolTip(optionName);
 	}
 
 	@Override
@@ -205,18 +198,6 @@ public class ProteinMLdist extends Characters2Distances {
 	}
 
 
-	public boolean getOptionUsePropInvariableSites() {
-		return this.optionUsePropInvariableSites.getValue();
-	}
-
-	public BooleanProperty optionUsePropInvariableSitesProperty() {
-		return this.optionUsePropInvariableSites;
-	}
-
-	public void setOptionUsePropInvariableSites(boolean val) {
-		this.optionUsePropInvariableSites.setValue(val);
-	}
-
 
 	public double getOptionGamma() {
 		return this.optionGamma.getValue();
@@ -228,30 +209,5 @@ public class ProteinMLdist extends Characters2Distances {
 
 	public void setOptionGamma(double gamma) {
 		this.optionGamma.setValue(gamma);
-	}
-
-
-	public boolean getOptionUseGamma() {
-		return this.optionUseGamma.getValue();
-	}
-
-	public BooleanProperty optionUseGammaProperty() {
-		return this.optionUseGamma;
-	}
-
-	public void setOptionUseGamma(boolean var) {
-		this.optionUseGamma.setValue(var);
-	}
-
-	public boolean getOptionEstimateVariance() {
-		return this.optionEstimateVariance.getValue();
-	}
-
-	public BooleanProperty optionEstimateVarianceProperty() {
-		return this.optionEstimateVariance;
-	}
-
-	public void setOptionEstimateVariance(boolean val) {
-		this.optionEstimateVariance.setValue(val);
 	}
 }

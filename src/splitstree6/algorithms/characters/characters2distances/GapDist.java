@@ -36,7 +36,6 @@ import java.io.IOException;
  */
 public class GapDist extends Characters2Distances {
 	// todo: citation?
-	public final static String DESCRIPTION = "Calculates the gap distance from a set of sequences";
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {

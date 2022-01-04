@@ -43,9 +43,9 @@ import static java.lang.String.format;
 public class LooseAndLacy extends Trees2Trees {
 	public enum SpeciesDefinition {Loose, Lacy, Both}
 
-	private final ObjectProperty<SpeciesDefinition> optionSpeciesDefinition = new SimpleObjectProperty<>(SpeciesDefinition.Both);
-	private final IntegerProperty optionTraitNumber = new SimpleIntegerProperty(1);
-	private final BooleanProperty optionUseAllTraits = new SimpleBooleanProperty();
+	private final ObjectProperty<SpeciesDefinition> optionSpeciesDefinition = new SimpleObjectProperty<>(this, "optionSpeciesDefinition", SpeciesDefinition.Both);
+	private final IntegerProperty optionTraitNumber = new SimpleIntegerProperty(this, "optionTraitNumber", 1);
+	private final BooleanProperty optionUseAllTraits = new SimpleBooleanProperty(this, "optionUseAllTraits", false);
 
 	@Override
 	public String getCitation() {
@@ -54,17 +54,19 @@ public class LooseAndLacy extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("SpeciesDefinition", "TraitNumber", "UseAllTraits");
+		return List.of(optionSpeciesDefinition.getName(), optionTraitNumber.getName(), optionUseAllTraits.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		return switch (optionName) {
-			case "SpeciesDefinition" -> "Species definition to use";
-			case "TraitNumber" -> "Number of specific trait to use";
-			case "UseAllTraits" -> "Use all traits";
-			default -> optionName;
-		};
+		if (optionName.equals(optionSpeciesDefinition.getName())) {
+			return "Species definition to use";
+		} else if (optionName.equals(optionTraitNumber.getName())) {
+			return "Number of specific trait to use";
+		} else if (optionName.equals(optionUseAllTraits.getName())) {
+			return "Use all traits";
+		} else
+			return optionName;
 	}
 
 

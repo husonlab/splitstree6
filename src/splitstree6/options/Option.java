@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 public class Option<T> {
 	private final Property<T> property;
 	private final String name;
-	private String toolTipText;
+	private final String toolTipText;
 	private final ArrayList<String> legalValues;
 
 	/**
@@ -96,7 +96,7 @@ public class Option<T> {
 				final String optionName = methodName.replaceAll("^option", "").replaceAll("Property$", "");
 
 				try {
-					final Object toolTip = (tooltipMethod != null ? tooltipMethod.invoke(optionable, optionName) : null);
+					final Object toolTip = (tooltipMethod != null ? tooltipMethod.invoke(optionable, "option" + optionName) : null);
 					final String toolTipText = (toolTip != null ? toolTip.toString() : null);
 					final Option option = new Option((Property) method.invoke(optionable), optionName, toolTipText);
 					options.add(option);
@@ -132,7 +132,7 @@ public class Option<T> {
 				set.add(optionName);
 			}
 
-			// add other parameters not mentioned in the order
+			// add other options not mentioned in the order
 			if (false)
 				for (String name : name2AnOption.keySet()) {
 					if (!set.contains(name))
@@ -188,10 +188,6 @@ public class Option<T> {
 
 	public String getToolTipText() {
 		return toolTipText;
-	}
-
-	public void setToolTipText(String toolTipText) {
-		this.toolTipText = toolTipText;
 	}
 
 	public ArrayList<String> getLegalValues() {

@@ -42,7 +42,7 @@ import java.util.List;
 public class LeastSquaresWeights extends Splits2Splits {
 	final DistancesBlock distancesBlock = new DistancesBlock();
 
-	private final BooleanProperty optionConstrain = new SimpleBooleanProperty(this, "Constrain", false);
+	private final BooleanProperty optionConstrain = new SimpleBooleanProperty(this, "optionConstrain", false);
 
 	@Override
 	public List<String> listOptions() {
@@ -53,7 +53,7 @@ public class LeastSquaresWeights extends Splits2Splits {
 
 	@Override
 	public String getToolTip(String optionName) {
-		if ("Constrain".equals(optionName)) {
+		if ("optionConstrain".equals(optionName)) {
 			return "Use constrained least squares";
 		}
 		return optionName;

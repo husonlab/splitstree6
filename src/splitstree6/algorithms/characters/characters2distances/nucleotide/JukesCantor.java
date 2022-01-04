@@ -42,7 +42,7 @@ public class JukesCantor extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("PropInvariableSites", "SetSiteVarParams", "UseML_Distances");
+		return Arrays.asList("optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}
 
 	@Override

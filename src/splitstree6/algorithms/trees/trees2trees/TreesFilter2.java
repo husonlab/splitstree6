@@ -29,7 +29,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -37,25 +36,25 @@ import java.util.List;
  * Daniel Huson, 1/2019
  */
 public class TreesFilter2 extends Trees2Trees implements IFilter {
-	private final BooleanProperty optionRequireAllTaxa = new SimpleBooleanProperty(false);
-	private final IntegerProperty optionMinNumberOfTaxa = new SimpleIntegerProperty(1);
-	private final DoubleProperty optionMinTotalTreeLength = new SimpleDoubleProperty(0);
-	private final DoubleProperty optionMinEdgeLength = new SimpleDoubleProperty(0);
-	private final BooleanProperty optionUniformEdgeLengths = new SimpleBooleanProperty(false);
+	private final BooleanProperty optionRequireAllTaxa = new SimpleBooleanProperty(this, "optionRequireAllTaxa", false);
+	private final IntegerProperty optionMinNumberOfTaxa = new SimpleIntegerProperty(this, "optionMinNumberOfTaxa", 1);
+	private final DoubleProperty optionMinTotalTreeLength = new SimpleDoubleProperty(this, "optionMinNumberOfTaxa", 0);
+	private final DoubleProperty optionMinEdgeLength = new SimpleDoubleProperty(this, "optionMinEdgeLength", 0);
+	private final BooleanProperty optionUniformEdgeLengths = new SimpleBooleanProperty(this, "optionUniformEdgeLengths", false);
 
 
 	public List<String> listOptions() {
-		return Arrays.asList("RequireAllTaxa", "MinNumberOfTaxa", "MinTotalTreeLength", "MinEdgeLength", "UniformEdgeLengths");
+		return List.of(optionRequireAllTaxa.getName(), optionMinNumberOfTaxa.getName(), optionMinTotalTreeLength.getName(), optionMinEdgeLength.getName(), optionUniformEdgeLengths.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
 		return switch (optionName) {
-			case "RequireAllTaxa" -> "Keep only trees that have the full set of taxa";
-			case "MinNumberOfTaxa" -> "Keep only trees that have at least this number of taxa";
-			case "MinTotalTreeLength" -> "Keep only trees that have at least this total length";
-			case "MinEdgeLength" -> "Keep only edges that have this minimum length";
-			case "UniformEdgeLengths" -> "Change all edge weights to 1";
+			case "optionRequireAllTaxa" -> "Keep only trees that have the full set of taxa";
+			case "optionMinNumberOfTaxa" -> "Keep only trees that have at least this number of taxa";
+			case "optionMinTotalTreeLength" -> "Keep only trees that have at least this total length";
+			case "optionMinEdgeLength" -> "Keep only edges that have this minimum length";
+			case "optionUniformEdgeLengths" -> "Change all edge weights to 1";
 			default -> optionName;
 		};
 	}

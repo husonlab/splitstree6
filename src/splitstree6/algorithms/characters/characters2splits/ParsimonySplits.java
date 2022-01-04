@@ -40,8 +40,7 @@ import java.util.BitSet;
  * Daniel Huson, 2003
  */
 public class ParsimonySplits extends Characters2Splits {
-
-	private final BooleanProperty optionGapsAsMissing = new SimpleBooleanProperty(false);
+	private final BooleanProperty optionGapsAsMissing = new SimpleBooleanProperty(this, "optionGapsAsMissing", false);
 
 	@Override
 	public String getCitation() {
@@ -51,10 +50,10 @@ public class ParsimonySplits extends Characters2Splits {
 
 	@Override
 	public String getToolTip(String optionName) {
-		if (optionName.equals("GapsAsMissing"))
+		if (optionName.equals(optionGapsAsMissing.getName()))
 			return "Treat gaps as missing characters";
 		else
-			return optionName;
+			return super.getToolTip(optionName);
 	}
 
 	@Override

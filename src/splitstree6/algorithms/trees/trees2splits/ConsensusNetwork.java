@@ -20,15 +20,14 @@
 
 package splitstree6.algorithms.trees.trees2splits;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
 import splitstree6.algorithms.utils.SplitsException;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
@@ -51,8 +50,9 @@ import java.util.concurrent.ExecutorService;
 public class ConsensusNetwork extends Trees2Splits {
 	public enum EdgeWeights {Mean, TreeSizeWeightedMean, Median, Count, Sum, None}
 
-	private final SimpleObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "EdgeWeights", EdgeWeights.TreeSizeWeightedMean);
-	private final DoubleProperty optionThresholdPercent = new SimpleDoubleProperty(this, "ThresholdPercent", 30.0);
+	private final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.TreeSizeWeightedMean);
+	private final DoubleProperty optionThresholdPercent = new SimpleDoubleProperty(this, "optionThresholdPercent", 30.0);
+	private final BooleanProperty optionUseHighDimensionFilter = new SimpleBooleanProperty(this, "optionUseHighDimensionFilter", true);
 
 	private final Object sync = new Object();
 
@@ -63,7 +63,7 @@ public class ConsensusNetwork extends Trees2Splits {
 	}
 
 	public List<String> listOptions() {
-		return Arrays.asList("EdgeWeights", "ThresholdPercent");
+		return List.of(optionThresholdPercent.getName(), optionEdgeWeights.getName(), optionUseHighDimensionFilter.getName());
 	}
 
 	@Override
@@ -72,8 +72,10 @@ public class ConsensusNetwork extends Trees2Splits {
 			return "Determine how to calculate edge weights in resulting network";
 		else if (optionName.equals(optionThresholdPercent.getName()))
 			return "Determine threshold for percent of input trees that split has to occur in for it to appear in the output";
+		else if (optionName.equals(optionUseHighDimensionFilter.getName()))
+			return "Heuristically remove splits causing high-dimensional network";
 		else
-			return optionName;
+			return super.getToolTip(optionName);
 	}
 
 	/**
@@ -162,6 +164,7 @@ public class ConsensusNetwork extends Trees2Splits {
 			}
 		}
 
+		var computedSplits = new SplitsBlock();
 		{
 			final int numberOfThreads = Math.min(splitsAndWeights.size(), 8);
 			final CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
@@ -191,7 +194,7 @@ public class ConsensusNetwork extends Trees2Splits {
 								};
 								final float confidence = (float) weightStats.getCount() / (float) trees.size();
 								synchronized (sync) {
-									splitsBlock.getSplits().add(new ASplit(side, taxaBlock.getNtax(), wgt, confidence));
+									computedSplits.getSplits().add(new ASplit(side, taxaBlock.getNtax(), wgt, confidence));
 								}
 							}
 							if (threadNumber == 0) {
@@ -220,6 +223,12 @@ public class ConsensusNetwork extends Trees2Splits {
 			}
 		}
 
+		if (isOptionUseHighDimensionFilter()) {
+			var dimensionsFilter = new DimensionFilter();
+			dimensionsFilter.compute(progress, taxaBlock, computedSplits, splitsBlock);
+		} else
+			splitsBlock.copy(computedSplits);
+
 		SplitsUtilities.verifySplits(splitsBlock.getSplits(), taxaBlock);
 
 		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
@@ -236,7 +245,7 @@ public class ConsensusNetwork extends Trees2Splits {
 		return optionEdgeWeights.get();
 	}
 
-	public SimpleObjectProperty<EdgeWeights> optionEdgeWeightsProperty() {
+	public ObjectProperty<EdgeWeights> optionEdgeWeightsProperty() {
 		return optionEdgeWeights;
 	}
 
@@ -254,6 +263,18 @@ public class ConsensusNetwork extends Trees2Splits {
 
 	public void setOptionThresholdPercent(double optionThresholdPercent) {
 		this.optionThresholdPercent.set(optionThresholdPercent);
+	}
+
+	public boolean isOptionUseHighDimensionFilter() {
+		return optionUseHighDimensionFilter.get();
+	}
+
+	public BooleanProperty optionUseHighDimensionFilterProperty() {
+		return optionUseHighDimensionFilter;
+	}
+
+	public void setOptionUseHighDimensionFilter(boolean optionUseHighDimensionFilter) {
+		this.optionUseHighDimensionFilter.set(optionUseHighDimensionFilter);
 	}
 
 	/**
@@ -312,7 +333,6 @@ public class ConsensusNetwork extends Trees2Splits {
 			Object[] array = weights.toArray();
 			Arrays.sort(array);
 			return (Float) array[array.length / 2];
-
 		}
 
 		/**

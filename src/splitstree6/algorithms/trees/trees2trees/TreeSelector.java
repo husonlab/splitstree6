@@ -28,7 +28,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -36,16 +35,16 @@ import java.util.List;
  * Daniel Huson, 1/2018
  */
 public class TreeSelector extends Trees2Trees implements IFilter {
-	private final IntegerProperty optionWhich = new SimpleIntegerProperty(1); // 1-based
+	private final IntegerProperty optionWhich = new SimpleIntegerProperty(this, "optionWhich", 1); // 1-based
 
 	@Override
 	public List<String> listOptions() {
-		return Collections.singletonList("Which");
+		return List.of(optionWhich.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		if ("Which".equals(optionName)) {
+		if (optionName.equals(optionWhich.getName())) {
 			return "Which tree to use";
 		}
 		return optionName;

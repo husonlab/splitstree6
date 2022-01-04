@@ -46,7 +46,7 @@ public class K2P extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("TsTvRatio", "Gamma", "PropInvariableSites", "SetSiteVarParams", "UseML_Distances");
+		return Arrays.asList("optionTsTvRatio", "optionGamma", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}
 
 	@Override

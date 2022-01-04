@@ -33,7 +33,6 @@ import splitstree6.data.parts.Compatibility;
 
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -44,11 +43,11 @@ import java.util.List;
  * @author Daniel Huson
  */
 public class TreeSelectorSplits extends Trees2Splits {
-	private final IntegerProperty optionWhich = new SimpleIntegerProperty(this, "Which", 1); // which tree is selected?
+	private final IntegerProperty optionWhich = new SimpleIntegerProperty(this, "optionWhich", 1); // which tree is selected?
 
 	@Override
 	public List<String> listOptions() {
-		return Collections.singletonList("Which");
+		return List.of(optionWhich.getName());
 	}
 
 	@Override

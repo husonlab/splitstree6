@@ -33,29 +33,27 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.AmbiguityCodes;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 public class HammingDistancesAmbigStates extends Characters2Distances {
 
 	public enum AmbiguousOptions {Ignore, AverageStates, MatchStates}
 
-	private BooleanProperty optionNormalize = new SimpleBooleanProperty(true);
-	private Property<AmbiguousOptions> optionHandleAmbiguousStates = new SimpleObjectProperty<>(AmbiguousOptions.Ignore);
+	private final BooleanProperty optionNormalize = new SimpleBooleanProperty(this, "optionNormalize", true);
+	private final Property<AmbiguousOptions> optionHandleAmbiguousStates = new SimpleObjectProperty<>(this, "optionHandleAmbiguousStates", AmbiguousOptions.Ignore);
 
 	public List<String> listOptions() {
-		return Arrays.asList("Normalize", "HandleAmbiguousStates");
+		return List.of(optionNormalize.getName(), optionHandleAmbiguousStates.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		switch (optionName) {
-			case "Normalize":
-				return "Normalize distances";
-			case "HandleAmbiguousStates":
-				return "Choose way to handle ambiguous nucleotides";
-		}
-		return optionName;
+		if (optionName.equals(optionNormalize.getName())) {
+			return "Normalize distances";
+		} else if (optionName.equals(optionHandleAmbiguousStates.getName())) {
+			return "Choose way to handle ambiguous nucleotides";
+		} else
+			return super.getToolTip(optionName);
 	}
 
 	@Override

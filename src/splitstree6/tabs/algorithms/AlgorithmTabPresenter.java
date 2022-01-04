@@ -22,6 +22,7 @@ package splitstree6.tabs.algorithms;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import jloda.util.StringUtils;
 import splitstree6.options.Option;
@@ -70,6 +71,9 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				var hbox = new HBox(label, control);
 				hbox.setPrefWidth(HBox.USE_COMPUTED_SIZE);
 				controller.getMainPane().getChildren().add(hbox);
+				var toolTip = new Tooltip(option.getToolTipText());
+				label.setTooltip(toolTip);
+				control.setTooltip(toolTip);
 			}
 		}
 	}

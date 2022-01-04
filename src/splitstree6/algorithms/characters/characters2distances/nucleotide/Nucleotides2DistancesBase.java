@@ -74,15 +74,15 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 
 	public String getToolTip(String optionName) {
 		return switch (optionName) {
-			case "PropInvariableSites" -> "Proportion of invariable sites";
-			case "Gamma" -> "Alpha value for the Gamma distribution";
-			case "UseML_Distances" -> "Use maximum likelihood estimation of distances (rather than exact distances)";
-			case "TsTvRatio" -> "Ratio of transitions vs transversions";
-			case "BaseFrequencies" -> "Base frequencies (in order ACGT/U)";
-			case "RateMatrix" -> "Rate matrix for GTR (in order ACGT/U)";
-			case "SetBaseFrequencies" -> "Set base frequencies to default values, or to estimations from characters (using Capture-recapture for invariable sites)";
-			case "SetSiteVarParams" -> "Set site variation parameters to default values, or to estimations from characters";
-			default -> optionName;
+			case "optionPropInvariableSites" -> "Proportion of invariable sites";
+			case "optionGamma" -> "Alpha value for the Gamma distribution";
+			case "optionUseML_Distances" -> "Use maximum likelihood estimation of distances (rather than exact distances)";
+			case "optionTsTvRatio" -> "Ratio of transitions vs transversions";
+			case "optionBaseFrequencies" -> "Base frequencies (in order ACGT/U)";
+			case "optionRateMatrix" -> "Rate matrix for GTR (in order ACGT/U)";
+			case "optionSetBaseFrequencies" -> "Set base frequencies to default values, or to estimations from characters (using Capture-recapture for invariable sites)";
+			case "optionSetSiteVarParams" -> "Set site variation parameters to default values, or to estimations from characters";
+			default -> super.getToolTip(optionName);
 		};
 	}
 

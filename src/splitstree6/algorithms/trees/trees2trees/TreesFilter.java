@@ -42,14 +42,11 @@ public class TreesFilter extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getToolTip(String optionName) {
-		switch (optionName) {
-			case "EnabledTrees":
-				return "List of trees currently enabled";
-			case "DisabledTrees":
-				return "List of trees currently disabled";
-			default:
-				return optionName;
-		}
+		return switch (optionName) {
+			case "optionEnabledTrees" -> "List of trees currently enabled";
+			case "optionDisabledTrees" -> "List of trees currently disabled";
+			default -> optionName;
+		};
 	}
 
 	@Override

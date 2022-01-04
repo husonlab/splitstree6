@@ -34,7 +34,7 @@ import java.io.IOException;
  * Daniel Huson, 2.2018
  */
 public class MedianJoining extends Characters2Network {
-	private final IntegerProperty optionEpsilon = new SimpleIntegerProperty(0);
+	private final IntegerProperty optionEpsilon = new SimpleIntegerProperty(this, "optionEpsilon", 0);
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock inputData, NetworkBlock outputData) throws IOException {

@@ -23,7 +23,7 @@ import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.network.network2view.ShowNetworkConsole;
-import splitstree6.algorithms.splits.splits2network.SplitsNetworkAlgorithm;
+import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
 import splitstree6.data.*;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
@@ -37,17 +37,32 @@ import java.util.*;
  * Daniel Huson, 10.2021
  */
 public class AddNetworkPipelineCommand {
-
-	public static UndoableRedoableCommand create(Workflow workflow, DataNode node, Algorithm algorithm) {
+	/**
+	 * creates a command for adding a pipeline to view a split network or other network
+	 *
+	 * @param workflow  the workflow
+	 * @param dataNode  an existing data node
+	 * @param algorithm the algorithm to be attached to the data node
+	 * @return newly created nodes
+	 */
+	public static UndoableRedoableCommand create(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
 		final Collection<WorkflowNode> addedNodes = new ArrayList<>();
 		return UndoableRedoableCommand.create("Add " + algorithm.getName(),
 				() -> workflow.deleteNodes(addedNodes),
 				() -> {
 					addedNodes.clear();
-					addedNodes.addAll(addPipeline(workflow, node, algorithm));
+					addedNodes.addAll(addPipeline(workflow, dataNode, algorithm));
 				});
 	}
 
+	/**
+	 * create a node for the given algorithm and then add additional nodes to get to a split network or network visualization and then runs the pipeline
+	 *
+	 * @param workflow  the workflow
+	 * @param dataNode  an existing data node
+	 * @param algorithm the algorithm to be attached to the data node
+	 * @return newly created nodes
+	 */
 	public static List<WorkflowNode> addPipeline(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
 		try {
 			if (workflow.isRunning())
@@ -67,14 +82,11 @@ public class AddNetworkPipelineCommand {
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
 				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2);
 			} else if (algorithm.getToClass() == SplitsBlock.class) {
-				// todo: replace sink block by  view block
-				var targetDataNode2 = workflow.newDataNode(new NetworkBlock());
-				var algorithmNode2 = workflow.newAlgorithmNode(new SplitsNetworkAlgorithm(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
-				var targetDataNode3 = workflow.newDataNode(new ViewBlock());
-				var algorithmNode3 = workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), targetDataNode2, targetDataNode3);
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+				var algorithmNode2 = workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				algorithmNode.restart();
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
-				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2, algorithmNode3, targetDataNode3);
+				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2);
 			} else {
 				throw new RuntimeException("Internal error 2");
 			}

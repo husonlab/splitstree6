@@ -38,7 +38,7 @@ import java.util.List;
  * Date: 17-Feb-2004
  */
 public class LeastSquaresDistances extends Splits2Distances {
-	private final BooleanProperty optionConstrain = new SimpleBooleanProperty(this, "Constrain", false);
+	private final BooleanProperty optionConstrain = new SimpleBooleanProperty(this, "optionConstrain", false);
 
 	@Override
 	public List<String> listOptions() {
@@ -49,7 +49,7 @@ public class LeastSquaresDistances extends Splits2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
-		if ("Constrain".equals(optionName)) {
+		if (optionName.equals(optionConstrain.getName())) {
 			return "Use constrained least squares";
 		}
 		return optionName;

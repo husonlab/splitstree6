@@ -51,7 +51,7 @@ public class K3ST extends Nucleotides2DistancesBase {
 	}
 
 	public List<String> listOptions() {
-		return Arrays.asList("TsTvRatio", "ACvATRatio", "Gamma", "PropInvariableSites", "SetSiteVarParams", "UseML_Distances");
+		return Arrays.asList("optionTsTvRatio", "optionACvATRatio", "optionGamma", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}
 
 	@Override

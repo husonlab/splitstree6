@@ -42,7 +42,7 @@ public class Codominant extends Characters2Distances {
 	 * over the loci.
 	 */
 	//protected boolean useSquareRoot;
-	private final BooleanProperty optionUseSquareRoot = new SimpleBooleanProperty(true);
+	private final BooleanProperty optionUseSquareRoot = new SimpleBooleanProperty(this, "optionUseSquareRoot", true);
 
 	@Override
 	public String getCitation() {
@@ -51,10 +51,10 @@ public class Codominant extends Characters2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
-		if (optionName.equals("UseSquareRoot"))
+		if (optionName.equals(optionUseSquareRoot.getName()))
 			return "Use the final distance as square root of the loci contribution. Otherwise: loci averages";
 		else
-			return optionName;
+			return super.getToolTip(optionName);
 	}
 
 	@Override

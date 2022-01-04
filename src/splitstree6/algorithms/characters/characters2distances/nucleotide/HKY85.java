@@ -48,7 +48,7 @@ public class HKY85 extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("TsTvRatio", "optionBaseFrequencies", "SetBaseFrequencies", "PropInvariableSites", "SetSiteVarParams");
+		return Arrays.asList("optionTsTvRatio", "optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams");
 	}
 
 	public HKY85() {

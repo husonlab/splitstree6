@@ -56,17 +56,17 @@ public class AntiConsensusNetwork extends Trees2Splits {
 
 	private final ObjectProperty<Reference> optionReferenceTree = new SimpleObjectProperty<>(Reference.MajorityConsensus);
 
-	private final IntegerProperty optionSinRank = new SimpleIntegerProperty(this, "SinRank", 1);
-	private final BooleanProperty optionAllSinsUpToRank = new SimpleBooleanProperty(this, "AllSinsUpToRank", false);
-	private final DoubleProperty optionMinSpanPercent = new SimpleDoubleProperty(this, "MinSpanPercent", 1);
+	private final IntegerProperty optionSinRank = new SimpleIntegerProperty(this, "optionSinRank", 1);
+	private final BooleanProperty optionAllSinsUpToRank = new SimpleBooleanProperty(this, "optionAllSinsUpToRank", false);
+	private final DoubleProperty optionMinSpanPercent = new SimpleDoubleProperty(this, "optionMinSpanPercent", 1);
 
-	private final IntegerProperty optionMaxDistortion = new SimpleIntegerProperty(this, "MaxDistortion", 1);
+	private final IntegerProperty optionMaxDistortion = new SimpleIntegerProperty(this, "optionMaxDistortion", 1);
 
-	private final BooleanProperty optionRequireSingleSPR = new SimpleBooleanProperty(this, "RequireSingleSPR", false);
+	private final BooleanProperty optionRequireSingleSPR = new SimpleBooleanProperty(this, "optionRequireSingleSPR", false);
 
-	private final DoubleProperty optionMinWeight = new SimpleDoubleProperty(this, "MinWeight", 0.00001);
+	private final DoubleProperty optionMinWeight = new SimpleDoubleProperty(this, "optionMinWeight", 0.00001);
 
-	private final BooleanProperty optionOnePerTree = new SimpleBooleanProperty(this, "OnePerTree", false);
+	private final BooleanProperty optionOnePerTree = new SimpleBooleanProperty(this, "optionOnePerTree", false);
 
 	@Override
 	public String getCitation() {
@@ -75,20 +75,20 @@ public class AntiConsensusNetwork extends Trees2Splits {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("SinRank", "AllSinsUpToRank", "MaxDistortion", "RequireSingleSPR", "MinSpanPercent", "MinWeight", "ReferenceTree", "MultipleSINsPerTree");
+		return Arrays.asList(optionSinRank.getName(), optionAllSinsUpToRank.getName(), optionMaxDistortion.getName(), optionRequireSingleSPR.getName(), optionMinSpanPercent.getName(), optionMinWeight.getName(), optionReferenceTree.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
 		return switch (optionName) {
-			case "SinSplitsRank" -> "The rank of the set of strongly incompatible splits to be shown";
-			case "SinsUpToRank" -> "Show all SINs up to selected rank";
-			case "MinSpanPercent" -> "Set the minimum amount of the consensus tree that an incompatible split must span";
-			case "MaxDistortion" -> "Set the max-distortion. Uses the single-event heuristic, when set to 1, else the multi-event heuristic\n(see the paper for details)";
-			case "MinWeight" -> "Set the minimum weight for a SIN to be reported";
-			case "ReferenceTree" -> "By default, uses the majority consensus as the reference 'species' tree. Alternatively, the first or last input tree can be used";
-			case "RequireSingleSPR" -> "For distortion=1, require that all members of the SIN are reconciled using the same SPR";
-			default -> optionName;
+			case "optionSinSplitsRank" -> "The rank of the set of strongly incompatible splits to be shown";
+			case "optionSinsUpToRank" -> "Show all SINs up to selected rank";
+			case "optionMinSpanPercent" -> "Set the minimum amount of the consensus tree that an incompatible split must span";
+			case "optionMaxDistortion" -> "Set the max-distortion. Uses the single-event heuristic, when set to 1, else the multi-event heuristic\n(see the paper for details)";
+			case "optionMinWeight" -> "Set the minimum weight for a SIN to be reported";
+			case "optionReferenceTree" -> "By default, uses the majority consensus as the reference 'species' tree. Alternatively, the first or last input tree can be used";
+			case "optionRequireSingleSPR" -> "For distortion=1, require that all members of the SIN are reconciled using the same SPR";
+			default -> super.getToolTip(optionName);
 		};
 	}
 

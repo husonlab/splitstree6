@@ -32,7 +32,6 @@ import splitstree6.data.parts.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -43,24 +42,22 @@ import java.util.List;
 public class ConsensusTreeSplits extends Trees2Splits {
 	public enum Consensus {Strict, Majority, Greedy} // todo: add loose?
 
-	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "Consensus", Consensus.Majority);
-	private final SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "EdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
+	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
+	private final SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("Consensus", "EdgeWeights");
+		return List.of(optionConsensus.getName(), optionEdgeWeights.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		switch (optionName) {
-			case "Consensus":
-				return "Select consensus method";
-			case "EdgeWeights":
-				return "Determine how to calculate edge weights in resulting network";
-			default:
-				return optionName;
-		}
+		if (optionName.equals(optionConsensus.getName()))
+			return "Select consensus method";
+		else if (optionName.equals(optionEdgeWeights.getName()))
+			return "Determine how to calculate edge weights in resulting network";
+		else
+			return super.getToolTip(optionName);
 	}
 
 	/**

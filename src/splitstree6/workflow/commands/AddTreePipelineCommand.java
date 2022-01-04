@@ -37,9 +37,16 @@ import java.util.*;
  * Daniel Huson, 10.2021
  */
 public class AddTreePipelineCommand {
-
-	public static UndoableRedoableCommand create(Workflow workflow, DataNode node, Algorithm algorithm) {
-		if (node.getDataBlock().getClass() != CharactersBlock.class && node.getDataBlock().getClass() != DistancesBlock.class)
+	/**
+	 * creates a command for adding a pipeline to view trees
+	 *
+	 * @param workflow  the workflow
+	 * @param dataNode  an existing data node
+	 * @param algorithm the algorithm to be attached to the data node
+	 * @return newly created nodes
+	 */
+	public static UndoableRedoableCommand create(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
+		if (dataNode.getDataBlock().getClass() != CharactersBlock.class && dataNode.getDataBlock().getClass() != DistancesBlock.class)
 			throw new RuntimeException("Bad node class");
 
 		final Collection<WorkflowNode> addedNodes = new ArrayList<>();
@@ -47,10 +54,18 @@ public class AddTreePipelineCommand {
 				() -> workflow.deleteNodes(addedNodes),
 				() -> {
 					addedNodes.clear();
-					addedNodes.addAll(addPipeline(workflow, node, algorithm));
+					addedNodes.addAll(addPipeline(workflow, dataNode, algorithm));
 				});
 	}
 
+	/**
+	 * create a node for the given algorithm and then add additional nodes to get to a tree visualization and then runs the pipeline
+	 *
+	 * @param workflow  the workflow
+	 * @param dataNode  an existing data node
+	 * @param algorithm the algorithm to be attached to the data node
+	 * @return newly created nodes
+	 */
 	public static List<WorkflowNode> addPipeline(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
 		try {
 			if (workflow.isRunning())
@@ -63,14 +78,12 @@ public class AddTreePipelineCommand {
 			var algorithmNode = workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), dataNode, targetDataNode);
 
 			if (algorithm.getToClass() == TreesBlock.class) {
-				// replace sink block by tree view block
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
 				var algorithmNode2 = workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				algorithmNode.restart();
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
 				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2);
 			} else if (algorithm.getToClass() == SplitsBlock.class) {
-				// replace sink block by tree view block
 				var targetDataNode2 = workflow.newDataNode(new TreesBlock());
 				var algorithmNode2 = workflow.newAlgorithmNode(new GreedyTree(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				var targetDataNode3 = workflow.newDataNode(new ViewBlock());

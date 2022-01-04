@@ -44,10 +44,10 @@ import java.util.List;
  * Daniel Huson, 2006, 3.2018
  */
 public class FilteredSuperNetwork extends SuperNetwork {
-	private final IntegerProperty optionMinNumberTrees = new SimpleIntegerProperty(this, "MinNumberTrees", 1);
-	private final IntegerProperty optionMaxDistortionScore = new SimpleIntegerProperty(this, "MaxDistortionScore", 0);
-	private final BooleanProperty optionAllTrivial = new SimpleBooleanProperty(this, "AllTrivial", true);
-	private final BooleanProperty optionUseTotalScore = new SimpleBooleanProperty(this, "UseTotalScore", false);
+	private final IntegerProperty optionMinNumberTrees = new SimpleIntegerProperty(this, "optionMinNumberTrees", 1);
+	private final IntegerProperty optionMaxDistortionScore = new SimpleIntegerProperty(this, "optionMaxDistortionScore", 0);
+	private final BooleanProperty optionAllTrivial = new SimpleBooleanProperty(this, "optionAllTrivial", true);
+	private final BooleanProperty optionUseTotalScore = new SimpleBooleanProperty(this, "optionUseTotalScore", false);
 
 
 	@Override
@@ -58,7 +58,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 	}
 
 	public List<String> listOptions() {
-		return Arrays.asList("MinNumberTrees", "MaxDistortionScore", "AllTrivial", "UseTotalScore");
+		return Arrays.asList(optionMinNumberTrees.getName(), optionMaxDistortionScore.getName(), optionAllTrivial.getName(), optionUseTotalScore.getName());
 	}
 
 	@Override

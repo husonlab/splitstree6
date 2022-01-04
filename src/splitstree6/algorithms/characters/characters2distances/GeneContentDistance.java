@@ -30,7 +30,6 @@ import splitstree6.data.parts.CharactersType;
 
 import java.io.IOException;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -41,7 +40,7 @@ import java.util.List;
 public class GeneContentDistance extends Characters2Distances {
 	public final static String DESCRIPTION = "Compute distances based on shared genes (Snel Bork et al 1999, Huson and Steel 2003)";
 
-	private final BooleanProperty optionUseMLDistancesDistance = new SimpleBooleanProperty(false);
+	private final BooleanProperty optionUseMLDistancesDistance = new SimpleBooleanProperty(this, "optionUseMLDistancesDistance", false);
 
 	@Override
 	public String getCitation() {
@@ -49,7 +48,7 @@ public class GeneContentDistance extends Characters2Distances {
 	}
 
 	public List<String> listOptions() {
-		return Collections.singletonList("UseMLDistance");
+		return List.of(optionUseMLDistancesDistance.getName());
 	}
 
 	@Override

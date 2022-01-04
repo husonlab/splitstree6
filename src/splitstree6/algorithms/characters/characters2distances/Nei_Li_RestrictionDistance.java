@@ -40,7 +40,7 @@ import java.io.IOException;
 
 public class Nei_Li_RestrictionDistance extends Characters2Distances {
 
-	private final DoubleProperty optionRestrictionSiteLength = new SimpleDoubleProperty(6.0);
+	private final DoubleProperty optionRestrictionSiteLength = new SimpleDoubleProperty(this, "optionRestrictionSiteLength", 6.0);
 
 	@Override
 	public String getCitation() {
@@ -49,7 +49,7 @@ public class Nei_Li_RestrictionDistance extends Characters2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
-		if (optionName.equals("RestrictionSiteLength"))
+		if (optionName.equals(optionRestrictionSiteLength.getName()))
 			return "Expected length of restriction site (4-8 bp)";
 		else
 			return optionName;
