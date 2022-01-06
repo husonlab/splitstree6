@@ -45,8 +45,26 @@ import jloda.fx.window.WindowGeometry;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
+import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
+import splitstree6.algorithms.characters.characters2distances.LogDet;
+import splitstree6.algorithms.characters.characters2distances.ProteinMLdist;
+import splitstree6.algorithms.characters.characters2distances.Uncorrected_P;
+import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
+import splitstree6.algorithms.characters.characters2network.MedianJoining;
+import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
+import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
+import splitstree6.algorithms.distances.distances2splits.BunemanTree;
+import splitstree6.algorithms.distances.distances2splits.NeighborNet;
+import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
+import splitstree6.algorithms.distances.distances2trees.BioNJ;
+import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
+import splitstree6.algorithms.distances.distances2trees.UPGMA;
+import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
+import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
+import splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork;
+import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
 import splitstree6.algorithms.trees.trees2trees.ConsensusTree;
 import splitstree6.algorithms.trees.trees2trees.RerootOrLadderizeTrees;
 import splitstree6.algorithms.trees.trees2trees.TreeSelector;
@@ -276,6 +294,8 @@ public class MainWindowPresenter {
 			controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 		}
 
+		controller.getCopyNewickMenuItem().setDisable(false);
+
 		controller.getPasteMenuItem().setDisable(false);
 
 		// controller.getDuplicateMenuItem().setOnAction(null);
@@ -345,58 +365,101 @@ public class MainWindowPresenter {
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
-		controller.getUncorrectedPMenuItem().setOnAction(null);
+		controller.getUncorrectedPMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new Uncorrected_P()));
+		controller.getUncorrectedPMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new Uncorrected_P()));
 
-		controller.getLogDetMenuItem().setOnAction(null);
+		controller.getLogDetMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new LogDet()));
+		controller.getLogDetMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new LogDet()));
 
-		controller.getHky85MenuItem().setOnAction(null);
-		controller.getJukesCantorMenuItem().setOnAction(null);
-		controller.getK2pMenuItem().setOnAction(null);
-		controller.getK3stMenuItem().setOnAction(null);
-		controller.getF81MenuItem().setOnAction(null);
-		controller.getF84MenuItem().setOnAction(null);
-		controller.getProteinMLDistanceMenuItem().setOnAction(null);
-		controller.getGeneContentDistanceMenuItem().setOnAction(null);
-		controller.getNjMenuItem().setOnAction(null);
-		controller.getBioNJMenuItem().setOnAction(null);
-		controller.getUpgmaMenuItem().setOnAction(null);
-		controller.getBunemanTreeMenuItem().setOnAction(null);
+		controller.getHky85MenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new HKY85()));
+		controller.getHky85MenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new HKY85()));
 
-		controller.getSelectTreeMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1)));
-		controller.getConsensusTreeMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTreeSplits.Consensus.Majority)));
+		controller.getJukesCantorMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new JukesCantor()));
+		controller.getJukesCantorMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new JukesCantor()));
 
-		controller.getRerootTreesMenuItem().setOnAction(e -> InsertAlgorithm.apply(mainWindow, new RerootOrLadderizeTrees(), null));
+		controller.getK2pMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new K2P()));
+		controller.getK2pMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new K2P()));
+
+		controller.getK3stMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new K3ST()));
+		controller.getK3stMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new K3ST()));
+
+		controller.getF81MenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new F81()));
+		controller.getF81MenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new F81()));
+
+		controller.getF84MenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new F84()));
+		controller.getF84MenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new F84()));
+
+		controller.getProteinMLDistanceMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ProteinMLdist()));
+		controller.getProteinMLDistanceMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ProteinMLdist()));
+
+		controller.getGeneContentDistanceMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new GeneContentDistance()));
+		controller.getGeneContentDistanceMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new GeneContentDistance()));
+
+		controller.getNjMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new NeighborJoining()));
+		controller.getNjMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new NeighborJoining()));
+
+		controller.getBioNJMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BioNJ()));
+		controller.getBioNJMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BioNJ()));
+
+		controller.getUpgmaMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new UPGMA()));
+		controller.getUpgmaMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new UPGMA()));
+
+		controller.getBunemanTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BunemanTree()));
+		controller.getBunemanTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BunemanTree()));
+
+		controller.getSelectTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1)));
+		controller.getSelectTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TreeSelector()));
+
+		controller.getConsensusTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTreeSplits.Consensus.Majority)));
+		controller.getConsensusTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusTree()));
+
+		controller.getRerootTreesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RerootOrLadderizeTrees()));
+		controller.getRerootTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RerootOrLadderizeTrees()));
 
 		controller.getViewSingleTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.SingleTree))));
-		controller.getViewSingleTreeMenuItem().disableProperty().bind(workflow.runningProperty());
+		controller.getViewSingleTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
 
 		controller.getViewTreePagesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.TreePages))));
-		controller.getViewTreePagesMenuItem().disableProperty().bind(workflow.runningProperty());
+		controller.getViewTreePagesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
 
 		controller.getViewTanglegramMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.Tanglegram))));
-		controller.getViewTanglegramMenuItem().disableProperty().bind(workflow.runningProperty());
+		controller.getViewTanglegramMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
 
 		controller.getViewDensiTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.DensiTree))));
-		controller.getViewDensiTreeMenuItem().disableProperty().bind(workflow.runningProperty());
+		controller.getViewDensiTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
 
-		controller.getNeighborNetMenuItem().setOnAction(null);
-		controller.getSplitDecompositionMenuItem().setOnAction(null);
-		controller.getParsimonySplitsMenuItem().setOnAction(null);
-		controller.getConsensusNetworkMenuItem().setOnAction(null);
-		controller.getFilteredSuperNetworkMenuItem().setOnAction(null);
-		controller.getMedianNetworkMenuItem().setOnAction(null);
-		controller.getMedianJoiningMenuItem().setOnAction(null);
-		controller.getMinSpanningNetworkMenuItem().setOnAction(null);
-		controller.getConsensusClusterNetworkMenuItem().setOnAction(null);
-		controller.getHybridizationNetworkMenuItem().setOnAction(null);
-		controller.getSplitsNetworkViewMenuItem().setOnAction(null);
+		controller.getNeighborNetMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new NeighborNet()));
+		controller.getNeighborNetMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new NeighborNet()));
+
+		controller.getSplitDecompositionMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new SplitDecomposition()));
+		controller.getSplitDecompositionMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new SplitDecomposition()));
+
+		controller.getParsimonySplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ParsimonySplits()));
+		controller.getParsimonySplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ParsimonySplits()));
+
+		controller.getConsensusNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusNetwork()));
+		controller.getConsensusNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusNetwork()));
+
+		controller.getFilteredSuperNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new FilteredSuperNetwork()));
+		controller.getFilteredSuperNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new FilteredSuperNetwork()));
+
+		controller.getMedianJoiningMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MedianJoining()));
+		controller.getMedianJoiningMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MedianJoining()));
+
+		controller.getMinSpanningNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningNetwork()));
+		controller.getMinSpanningNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MinSpanningNetwork()));
+
+		controller.getHybridizationNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new AutumnAlgorithm()));
+		controller.getHybridizationNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new AutumnAlgorithm()));
+
+		controller.getSplitsNetworkViewMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowSplitsNetwork(), a -> ((ShowSplitsNetwork) a).setOptionView(ShowSplitsNetwork.ViewType.SplitsView)));
+		controller.getSplitsNetworkViewMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowSplitsNetwork()));
+
 		controller.getHaplotypeNetworkViewMenuItem().setOnAction(null);
-		controller.getShow3DViewerMenuItem().setOnAction(null);
-		controller.getRelaxMenuItem().setOnAction(null);
 
 		controller.getPcoaMenuItem().setOnAction(null);
 		controller.getBrayCurtisMenuItem().setOnAction(null);

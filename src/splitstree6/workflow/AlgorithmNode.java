@@ -39,7 +39,8 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 		super(owner);
 		title.set(getName());
 		try {
-			owner.getServiceConfigurator().accept(getService());
+			if (owner.getServiceConfigurator() != null)
+				owner.getServiceConfigurator().accept(getService());
 		} catch (Exception ignored) {
 		}
 	}

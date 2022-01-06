@@ -80,27 +80,27 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			treesBlock.setPartial(np.findIgnoreCase(tokens, "no partialTrees", false, treesBlock.isPartial()));
 			treesBlock.setPartial(np.findIgnoreCase(tokens, "partialTrees", true, treesBlock.isPartial()));
 
-			if (np.findIgnoreCase(tokens, "rooted=no", false, treesBlock.isRooted())) {
+			if (np.findIgnoreCase(tokens, "rooted=no", true, false)) {
 				treesBlock.setRooted(false);
 				rootedExplicitySet = true;
 			}
-			if (np.findIgnoreCase(tokens, "rooted=yes", true, treesBlock.isRooted())) {
-				treesBlock.setRooted(true);
-				rootedExplicitySet = true;
-			}
-
-			// legacy:
-			if (np.findIgnoreCase(tokens, "no rooted", false, treesBlock.isRooted())) {
-				treesBlock.setRooted(false);
-				rootedExplicitySet = true;
-			}
-			if (np.findIgnoreCase(tokens, "rooted", true, treesBlock.isRooted())) {
+			if (np.findIgnoreCase(tokens, "rooted=yes", true, false)) {
 				treesBlock.setRooted(true);
 				rootedExplicitySet = true;
 			}
 
 			treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=no", false, treesBlock.isReticulated()));
 			treesBlock.setReticulated(np.findIgnoreCase(tokens, "reticulated=yes", true, treesBlock.isReticulated()));
+
+			// legacy:
+			if (np.findIgnoreCase(tokens, "no rooted", true, false)) {
+				treesBlock.setRooted(false);
+				rootedExplicitySet = true;
+			}
+			if (np.findIgnoreCase(tokens, "rooted", true, false)) {
+				treesBlock.setRooted(true);
+				rootedExplicitySet = true;
+			}
 
 			if (tokens.size() != 0)
 				throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in PROPERTIES");

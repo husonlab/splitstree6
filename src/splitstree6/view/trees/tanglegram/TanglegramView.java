@@ -64,7 +64,8 @@ public class TanglegramView implements IView {
 
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation1", LayoutOrientation.Rotate0Deg);
 
-	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames", ProgramProperties.get("TanglegramShowTreeNames", true));
+	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames", true);
+	private final BooleanProperty optionShowTreeInfo = new SimpleBooleanProperty(this, "optionShowTreeInfo", true);
 
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0);
 
@@ -77,12 +78,14 @@ public class TanglegramView implements IView {
 		ProgramProperties.track(optionDiagram2, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionShowTreeNames, true);
+		ProgramProperties.track(optionShowTreeInfo, true);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionTree1.getName(), optionDiagram1.getName(),
 				optionTree2.getName(), optionDiagram2.getName(), optionOrientation.getName(),
-				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName());
+				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
+				optionShowTreeNames.getName(), optionShowTreeInfo.getName());
 	}
 
 	public TanglegramView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -169,7 +172,7 @@ public class TanglegramView implements IView {
 	}
 
 	public Node getImageNode() {
-		return controller.getAnchorPane();
+		return controller.getInnerAnchorPane();
 	}
 
 	public TreeDiagramType getOptionDiagram1() {
@@ -222,6 +225,26 @@ public class TanglegramView implements IView {
 
 	public BooleanProperty optionShowTreeNamesProperty() {
 		return optionShowTreeNames;
+	}
+
+	public boolean isOptionShowTreeNames() {
+		return optionShowTreeNames.get();
+	}
+
+	public void setOptionShowTreeNames(boolean optionShowTreeNames) {
+		this.optionShowTreeNames.set(optionShowTreeNames);
+	}
+
+	public boolean isOptionShowTreeInfo() {
+		return optionShowTreeInfo.get();
+	}
+
+	public BooleanProperty optionShowTreeInfoProperty() {
+		return optionShowTreeInfo;
+	}
+
+	public void setOptionShowTreeInfo(boolean optionShowTreeInfo) {
+		this.optionShowTreeInfo.set(optionShowTreeInfo);
 	}
 
 	public double getOptionHorizontalZoomFactor() {

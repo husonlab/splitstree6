@@ -128,24 +128,19 @@
                                 </ComboBox>
                                 <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="treeCBox" prefWidth="100.0"/>
+                                <ComboBox fx:id="treeCBox" minWidth="100.0"/>
                                 <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
-                                <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="GRAPHIC_ONLY"
+                                <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
                                               maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                                               minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
-                                              prefWidth="24.0" text="Show Tree Names">
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image url="@/splitstree6/resources/icons/Text16.png"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
+                                              prefWidth="24.0" text="T" textOverrun="CLIP">
                                     <tooltip>
-                                        <Tooltip text="Show tree names"/>
+                                        <Tooltip text="Show tree names and info"/>
                                     </tooltip>
+                                    <font>
+                                        <Font size="12.0"/>
+                                    </font>
                                 </ToggleButton>
                                 <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                                 <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
@@ -153,7 +148,7 @@
                                         style="-fx-border-style: none; -fx-background-color: transparent;"
                                         text="Zoom In">
                                     <font>
-                                        <Font size="10.0"/>
+                                        <Font size="12.0"/>
                                     </font>
                                     <graphic>
                                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"

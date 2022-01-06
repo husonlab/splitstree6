@@ -22,13 +22,21 @@ package splitstree6.workflow.commands;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
+import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
+import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.DistancesBlock;
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.TreesBlock;
+import splitstree6.data.ViewBlock;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * add an algorithm to the given datanode
@@ -56,9 +64,26 @@ public class AddAlgorithmCommand {
 
 			var targetDataNode = workflow.newDataNode((DataBlock) algorithm.getToClass().getConstructor().newInstance());
 			var algorithmNode = workflow.newAlgorithmNode(algorithm, workflow.getWorkingTaxaNode(), dataNode, targetDataNode);
+
+			var list = new ArrayList<WorkflowNode>();
+			list.add(targetDataNode);
+			list.add(algorithmNode);
+
+			if (algorithm.getToClass() == SplitsBlock.class) {
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+				var algorithmNode2 = workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				list.add(targetDataNode2);
+				list.add(algorithmNode2);
+
+			} else if (algorithm.getToClass() == TreesBlock.class) {
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+				var algorithmNode2 = workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				list.add(targetDataNode2);
+				list.add(algorithmNode2);
+			}
 			algorithmNode.restart();
 			NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
-			return Arrays.asList(targetDataNode, algorithmNode);
+			return list;
 		} catch (Exception ex) {
 			NotificationManager.showError("Attach algorithm failed: " + ex);
 			return Collections.emptyList();

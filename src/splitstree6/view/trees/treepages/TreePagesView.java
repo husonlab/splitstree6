@@ -35,9 +35,35 @@ import splitstree6.view.IView;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.window.MainWindow;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class TreePagesView implements IView {
+	public enum TreeLabels {
+		None, Name, Info;
+
+		public String label() {
+			return switch (this) {
+				case None -> "-";
+				case Name -> "n";
+				case Info -> "i";
+			};
+		}
+
+		public static String[] labels() {
+			return Arrays.stream(values()).map(TreeLabels::label).toArray(String[]::new);
+		}
+
+		public static TreeLabels valueOfLabel(String label) {
+			return switch (label) {
+				case "-" -> None;
+				case "n" -> Name;
+				case "i" -> Info;
+				default -> None;
+			};
+		}
+	}
+
 	private final UndoManager undoManager = new UndoManager();
 
 	private final TreePagesViewController controller;
@@ -59,23 +85,26 @@ public class TreePagesView implements IView {
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
-	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames");
+	private final ObjectProperty<TreeLabels> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
+
 
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
-	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(), pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName());
-	}
-
 	{
 		ProgramProperties.track(optionRows, 1);
 		ProgramProperties.track(optionCols, 1);
 		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
-		ProgramProperties.track(optionShowTreeNames, true);
+		ProgramProperties.track(optionTreeLabels, TreeLabels::valueOf, TreeLabels.Name);
+	}
+
+	public List<String> listOptions() {
+		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(),
+				pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName(),
+				optionTreeLabels.getName());
 	}
 
 	/**
@@ -102,10 +131,6 @@ public class TreePagesView implements IView {
 		setViewTab(viewTab);
 
 		empty.bind(Bindings.isEmpty(getTrees()));
-
-		optionRows.addListener((v, o, n) -> ProgramProperties.put("TreePagesRows", n.intValue()));
-		optionCols.addListener((v, o, n) -> ProgramProperties.put("TreePagesCols", n.intValue()));
-		optionShowTreeNames.addListener((v, o, n) -> ProgramProperties.put("TreePagesShowTreeNames", n));
 	}
 
 	public void setViewTab(ViewTab viewTab) {
@@ -247,16 +272,16 @@ public class TreePagesView implements IView {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
 	}
 
-	public boolean isOptionShowTreeNames() {
-		return optionShowTreeNames.get();
+	public TreeLabels getOptionTreeLabels() {
+		return optionTreeLabels.get();
 	}
 
-	public BooleanProperty optionShowTreeNamesProperty() {
-		return optionShowTreeNames;
+	public ObjectProperty<TreeLabels> optionTreeLabelsProperty() {
+		return optionTreeLabels;
 	}
 
-	public void setOptionShowTreeNames(boolean optionShowTreeNames) {
-		this.optionShowTreeNames.set(optionShowTreeNames);
+	public void setOptionTreeLabels(TreeLabels optionTreeLabels) {
+		this.optionTreeLabels.set(optionTreeLabels);
 	}
 
 	@Override

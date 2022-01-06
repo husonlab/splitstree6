@@ -24,8 +24,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
-import jloda.phylo.Distortion;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.algorithms.Distortion;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
@@ -46,7 +46,6 @@ import java.util.List;
 public class FilteredSuperNetwork extends SuperNetwork {
 	private final IntegerProperty optionMinNumberTrees = new SimpleIntegerProperty(this, "optionMinNumberTrees", 1);
 	private final IntegerProperty optionMaxDistortionScore = new SimpleIntegerProperty(this, "optionMaxDistortionScore", 0);
-	private final BooleanProperty optionAllTrivial = new SimpleBooleanProperty(this, "optionAllTrivial", true);
 	private final BooleanProperty optionUseTotalScore = new SimpleBooleanProperty(this, "optionUseTotalScore", false);
 
 
@@ -58,7 +57,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 	}
 
 	public List<String> listOptions() {
-		return Arrays.asList(optionMinNumberTrees.getName(), optionMaxDistortionScore.getName(), optionAllTrivial.getName(), optionUseTotalScore.getName());
+		return Arrays.asList(optionMinNumberTrees.getName(), optionMaxDistortionScore.getName(), optionUseTotalScore.getName());
 	}
 
 	@Override
@@ -142,8 +141,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 					progress.incrementProgress();
 				}
 				//System.err.println(" sum=" + count);
-				if ((isOptionAllTrivial() && (A.cardinality() == 1 || B.cardinality() == 1))
-					|| count >= getOptionMinNumberTrees()) {
+				if (A.cardinality() == 1 || B.cardinality() == 1 || count >= getOptionMinNumberTrees()) {
 					final ASplit aSplit = splits.get(s);
 					child.getSplits().add(new ASplit(aSplit.getA(), aSplit.getB(), aSplit.getWeight(), (float) count / (float) trees.getNTrees()));
 				}
@@ -179,18 +177,6 @@ public class FilteredSuperNetwork extends SuperNetwork {
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
 		return !parent.isReticulated();
-	}
-
-	public boolean isOptionAllTrivial() {
-		return optionAllTrivial.get();
-	}
-
-	public BooleanProperty optionAllTrivialProperty() {
-		return optionAllTrivial;
-	}
-
-	public void setOptionAllTrivial(boolean optionAllTrivial) {
-		this.optionAllTrivial.set(optionAllTrivial);
 	}
 
 	public boolean isOptionUseTotalScore() {

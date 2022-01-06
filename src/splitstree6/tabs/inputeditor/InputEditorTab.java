@@ -49,6 +49,7 @@ public class InputEditorTab extends ViewTab {
 			});
 		}
 		//setGraphic(new ImageView(ResourceManagerFX.getIcon("sun/Import16.gif")));
+		inputEditorView.getController().getCodeArea().textProperty().addListener(e -> setEmpty(inputEditorView.getController().getCodeArea().getText().isEmpty()));
 	}
 
 	public void importFromFile(String fileName) {

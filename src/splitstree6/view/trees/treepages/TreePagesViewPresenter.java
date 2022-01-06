@@ -24,6 +24,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -33,6 +34,7 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.control.SelectionMode;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
+import jloda.fx.util.BasicFX;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.Pair;
@@ -52,15 +54,16 @@ import java.util.function.Function;
 public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	private final static ObservableList<String> gridValues = FXCollections.observableArrayList("1 x 1");
 
-
 	private final MainWindow mainWindow;
 	private final TreePagesView treePageView;
 
 	private final TreePagesViewController controller;
 
-	private final ObjectProperty<RowsCols> rowsAndCols = new SimpleObjectProperty<>(new RowsCols(0, 0));
+	private final ObjectProperty<RowsCols> rowsAndCols = new SimpleObjectProperty<>(this, "rowsAndCols", new RowsCols(0, 0));
 
-	private final ObjectProperty<Dimension2D> boxDimensions = new SimpleObjectProperty<>(new Dimension2D(0, 0));
+	private final ObjectProperty<Dimension2D> boxDimensions = new SimpleObjectProperty<>(this, "boxDimensions", new Dimension2D(0, 0));
+
+	private final ObjectProperty<TreePageFactory> treePageFactory = new SimpleObjectProperty<>(this, "treePageFactory", null);
 
 	private final FindToolBar findToolBar;
 
@@ -93,7 +96,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
 
-		controller.getShowTreeNamesToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowTreeNamesProperty());
 
 		controller.getRowsColsCBox().getItems().setAll(gridValues);
 		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
@@ -162,7 +164,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		treePagesView.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
 		controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> treePagesView.setPageNumber(n.intValue() + 1));
 
-		ObjectProperty<TreePageFactory> treePageFactory = new SimpleObjectProperty<>(null);
 		treePageFactory.set(new TreePageFactory(mainWindow, treePagesView, phyloTrees, treePagesView.optionRowsProperty(), treePagesView.optionColsProperty(), boxDimensions));
 
 		controller.getPagination().pageFactoryProperty().bind(treePageFactory);
@@ -181,6 +182,12 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			else if (n.intValue() >= numberOfPages.get())
 				Platform.runLater(() -> treePagesView.setPageNumber((Math.max(1, numberOfPages.get()))));
 		});
+
+		{
+			var labelProperty = new SimpleStringProperty();
+			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), treePagesView.getOptionTreeLabels().label(), labelProperty, TreePagesView.TreeLabels.labels());
+			labelProperty.addListener((v, o, n) -> treePagesView.setOptionTreeLabels(TreePagesView.TreeLabels.valueOfLabel(n)));
+		}
 
 		controller.getOpenButton().setOnAction(mainWindow.getController().getOpenMenuItem().getOnAction());
 		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
@@ -216,10 +223,9 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("Change Page", treePagesView.pageNumberProperty(), o, n));
 		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" Set TreeDiagramType", treePagesView.optionDiagramProperty(), o, n));
 		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set LayoutOrientation", treePagesView.optionOrientationProperty(), o, n));
-		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree Names", treePagesView.optionShowTreeNamesProperty(), o, n));
+		treePagesView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("Set Tree Labels", treePagesView.optionTreeLabelsProperty(), o, n));
 		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Font Size", treePagesView.optionFontScaleFactorProperty(), o, n));
 		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Zoom", treePagesView.optionZoomFactorProperty(), o, n));
-		treePagesView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree names", treePagesView.optionShowTreeNamesProperty(), o, n));
 
 		Platform.runLater(this::setupMenuItems);
 	}
@@ -234,6 +240,19 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 	@Override
 	public void setupMenuItems() {
+		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
+			var page = treePageView.getPageNumber();
+			var count = treePageView.getOptionCols() * treePageView.getOptionRows();
+			var bot = (page - 1) * count;
+			var top = Math.min(treePageView.getTrees().size(), page * count);
+			var buf = new StringBuilder();
+			for (var t = bot; t < top; t++) {
+				buf.append(treePageView.getTrees().get(t).toBracketString(true)).append(";\n");
+			}
+			BasicFX.putTextOnClipBoard(buf.toString());
+		});
+		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(treePageView.emptyProperty());
+
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor(1.2 * treePageView.getOptionFontScaleFactor()));
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
 		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));

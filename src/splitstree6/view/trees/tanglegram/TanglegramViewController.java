@@ -108,11 +108,13 @@ public class TanglegramViewController {
 	private Pane middlePane;
 
 	@FXML
-	private Label tree1Label;
+	private Label tree1NameLabel;
 
 	@FXML
-	private Label tree2Label;
+	private Label tree2NameLabel;
 
+	@FXML
+	private AnchorPane innerAnchorPane;
 
 	@FXML
 	private void initialize() {
@@ -128,8 +130,8 @@ public class TanglegramViewController {
 		borderPane.setRight(right);
 		borderPane.setTop(top);
 
-		DraggableLabel.makeDraggable(tree1Label);
-		DraggableLabel.makeDraggable(tree2Label);
+		DraggableLabel.makeDraggable(tree1NameLabel);
+		DraggableLabel.makeDraggable(tree2NameLabel);
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -224,11 +226,15 @@ public class TanglegramViewController {
 		return borderPane;
 	}
 
-	public Label getTree1Label() {
-		return tree1Label;
+	public Label getTree1NameLabel() {
+		return tree1NameLabel;
 	}
 
-	public Label getTree2Label() {
-		return tree2Label;
+	public Label getTree2NameLabel() {
+		return tree2NameLabel;
+	}
+
+	public AnchorPane getInnerAnchorPane() {
+		return innerAnchorPane;
 	}
 }

@@ -37,6 +37,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
+import jloda.util.Single;
 import splitstree6.data.parts.Taxon;
 import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
@@ -64,7 +65,7 @@ public class MainWindow implements IMainWindow {
 	private final TextDisplayTab methodsTab;
 	private final WorkflowTreeView workflowTreeView;
 
-	private final StringProperty fileName = new SimpleStringProperty("");
+	private final StringProperty fileName = new SimpleStringProperty("Untitled");
 	private final BooleanProperty hasSplitsTree6File = new SimpleBooleanProperty(false);
 
 	private Stage stage;
@@ -92,6 +93,17 @@ public class MainWindow implements IMainWindow {
 			} else {
 				if (!Basic.equal(activeTaxa, workflow.getWorkingTaxaBlock().getTaxa()))
 					activeTaxa.setAll(workflow.getWorkingTaxaBlock().getTaxa());
+			}
+		});
+
+		//BasicFX.reportChanges("running",workflow.runningProperty());
+		var first = new Single<>(true);
+		workflow.runningProperty().addListener((v, o, n) -> {
+			if (n) {
+				if (first.get())
+					first.set(false);
+				else
+					setDirty(true); // after initial run of the workflow, any further run makes document "dirty"
 			}
 		});
 

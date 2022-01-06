@@ -20,9 +20,8 @@
 package splitstree6.view.trees.treepages;
 
 import javafx.application.Platform;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.InvalidationListener;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.scene.Group;
@@ -35,6 +34,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.view.trees.layout.ComputeTreeLayout;
@@ -54,15 +54,16 @@ public class TreePane extends StackPane {
 	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 
+	private final StringProperty infoString = new SimpleStringProperty("");
+
 	private final AService<Group> service;
 
 	/**
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, int[] taxonOrdering, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor, ReadOnlyBooleanProperty showTreeName) {
-
-		System.err.println("setup: " + name + ": " + orientation.get());
+					TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels) {
 
 		var interactionSetup = new InteractionSetup(taxaBlock, taxonSelectionModel, orientation);
 		// setStyle("-fx-border-color: lightgray;");
@@ -94,6 +95,7 @@ public class TreePane extends StackPane {
 
 		orientation.addListener((v, o, n) -> LayoutUtils.applyOrientation(o, n, pane, false));
 
+
 		service.setCallable(() -> {
 			double width;
 			double height;
@@ -104,6 +106,10 @@ public class TreePane extends StackPane {
 				width = getPrefWidth();
 				height = getPrefHeight() - 12;
 			}
+
+			var info = RootedNetworkProperties.computeInfoString(phyloTree);
+
+			Platform.runLater(() -> infoString.set(info));
 
 			var group = ComputeTreeLayout.apply(taxaBlock, phyloTree, taxonOrdering, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
 			group.setId("treeGroup");
@@ -127,9 +133,28 @@ public class TreePane extends StackPane {
 			LayoutUtils.applyLabelScaleFactor(group, labelScaleFactor.get());
 			Platform.runLater(() -> LayoutUtils.applyOrientation(orientation.get(), pane, false));
 
-			var label = new Label(name);
-			label.visibleProperty().bind(showTreeName);
-			getChildren().setAll(new VBox(label, pane));
+			{
+				final var treeLabel = new Label(name);
+				final InvalidationListener listener = e -> {
+					switch (showTreeLabels.get()) {
+						case None -> {
+							treeLabel.setText("");
+							treeLabel.setVisible(false);
+						}
+						case Name -> {
+							treeLabel.setText(phyloTree.getName());
+							treeLabel.setVisible(true);
+						}
+						case Info -> {
+							treeLabel.setText(phyloTree.getName() + " : " + getInfoString());
+							treeLabel.setVisible(true);
+						}
+					}
+				};
+				showTreeLabels.addListener(listener);
+				listener.invalidated(null);
+				getChildren().setAll(new VBox(treeLabel, pane));
+			}
 
 			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				if (e.isStillSincePress() && !e.isShiftDown()) {
@@ -160,5 +185,13 @@ public class TreePane extends StackPane {
 
 	public void setRunAfterUpdate(Runnable runAfterUpdate) {
 		this.runAfterUpdate = runAfterUpdate;
+	}
+
+	public String getInfoString() {
+		return infoString.get();
+	}
+
+	public StringProperty infoStringProperty() {
+		return infoString;
 	}
 }

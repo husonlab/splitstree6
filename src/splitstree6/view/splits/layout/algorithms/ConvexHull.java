@@ -69,8 +69,8 @@ public class ConvexHull {
             return; // all nodes have been processed
         //System.err.println("Running convex hull algorithm");
 
-        progress.setTasks("Convex Hull", null);
-        progress.setMaximum(splits.getNsplits());    //initialize maximum progress
+        progress.setTasks("Computing Splits Network", "Convex Hull algorithm");
+		progress.setMaximum(splits.getNsplits());    //initialize maximum progress
         progress.setProgress(-1);        //set progress to 0
 
         try {

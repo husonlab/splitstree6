@@ -49,14 +49,21 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		algorithmTab.setGraphic(label);
 
 		controller.getAlgorithmCBox().valueProperty().addListener((v, o, n) -> {
-			algorithmTab.getAlgorithmNode().setAlgorithm((Algorithm) n);
+			var algorithm = (Algorithm) n;
+			algorithmTab.getAlgorithmNode().setAlgorithm(algorithm);
+			var tooltip = (algorithm == null ? null
+					: new Tooltip(algorithm.getName() + (algorithm.getCitation() == null ? "" : "\n" + StringUtils.fold(algorithm.getCitation().replaceAll(".*;", ""), 80))));
+			controller.getAlgorithmCBox().setTooltip(tooltip);
 		});
 		controller.getAlgorithmCBox().disableProperty().bind(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1));
 
 		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null)
 			setupOptionControls(controller, algorithmTab.getAlgorithmNode().getAlgorithm());
 
-		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((v, o, n) -> setupOptionControls(controller, (Algorithm) n));
+		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((v, o, n) -> {
+			controller.getAlgorithmCBox().setValue(n);
+			setupOptionControls(controller, (Algorithm) n);
+		});
 	}
 
 	public void setupOptionControls(AlgorithmTabController controller, Algorithm algorithm) {
@@ -67,9 +74,9 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 			var control = OptionControlCreator.apply(option, changeListeners);
 			if (control != null) {
 				var label = new Label(StringUtils.fromCamelCase(option.getName()));
-				label.setPrefWidth(120);
+				label.setMinWidth(120);
 				var hbox = new HBox(label, control);
-				hbox.setPrefWidth(HBox.USE_COMPUTED_SIZE);
+				hbox.prefWidthProperty().bind(controller.getMainPane().widthProperty());
 				controller.getMainPane().getChildren().add(hbox);
 				var toolTip = new Tooltip(option.getToolTipText());
 				label.setTooltip(toolTip);

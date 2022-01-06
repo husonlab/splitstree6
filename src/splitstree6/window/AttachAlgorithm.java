@@ -19,11 +19,19 @@
 
 package splitstree6.window;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.window.NotificationManager;
 import jloda.util.IteratorUtils;
+import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
+import splitstree6.algorithms.trees.trees2view.ShowTrees;
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.TreesBlock;
+import splitstree6.data.ViewBlock;
 import splitstree6.workflow.*;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -36,19 +44,50 @@ public class AttachAlgorithm {
 	/**
 	 * attaches an algorithm, first find, select or choose the node and the call the callback
 	 *
+	 * @param mainWindow main window
+	 * @param algorithm  object to show which type of algorithm is desired, this object is not used if algorithm found in workflow
+	 */
+	public static void apply(MainWindow mainWindow, Algorithm algorithm) {
+		apply(mainWindow, algorithm, null);
+	}
+
+	/**
+	 * attaches an algorithm, first find, select or choose the node and then call the callback
+	 *
 	 * @param mainWindow             main window
 	 * @param algorithm              object to show which type of algorithm is desired, this object is not used if algorithm found in workflow
 	 * @param algorithmSetupCallback - select options if algorithm found
 	 */
 	public static void apply(MainWindow mainWindow, Algorithm algorithm, Consumer<Algorithm> algorithmSetupCallback) {
+		var workflow = mainWindow.getWorkflow();
 		var algorithmNode = AttachAlgorithm.findSelectOrCreateAlgorithmNode(mainWindow.getWorkflow(), algorithm);
 		if (algorithmNode != null) {
 			algorithm = algorithmNode.getAlgorithm();
 			mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 			if (algorithmSetupCallback != null)
 				algorithmSetupCallback.accept(algorithm);
-			algorithmNode.restart();
+
+
+			if (algorithm.getToClass() == SplitsBlock.class) {
+				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+				workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+			} else if (algorithm.getToClass() == TreesBlock.class) {
+				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+				workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+			}
+
+			if (algorithm.isApplicable(workflow.getWorkingTaxaBlock(), algorithmNode.getPreferredParent().getDataBlock()))
+				algorithmNode.restart();
 		}
+	}
+
+	public static BooleanProperty createDisableProperty(MainWindow mainWindow, Algorithm algorithm) {
+		var workflow = mainWindow.getWorkflow();
+		var disable = new SimpleBooleanProperty(false);
+		workflow.validProperty().addListener((v, o, n) -> disable.setValue(workflow.isRunning() || !n || workflow.dataNodesStream().noneMatch(d -> algorithm.getFromClass() == d.getDataBlock().getClass())));
+		return disable;
 	}
 
 	/**
@@ -57,13 +96,23 @@ public class AttachAlgorithm {
 	 * @return node or null
 	 */
 	public static AlgorithmNode findSelectOrCreateAlgorithmNode(Workflow workflow, Algorithm algorithm) {
-		var algorithmNodes = workflow.getNodes(algorithm.getClass()).stream()
-				.filter(workflow::isDerivedNode).collect(Collectors.toList());
+		var algorithmNodes = (ArrayList<AlgorithmNode>) workflow.algorithmNodesStream()
+				.filter(n -> n.getAlgorithm().getFromClass() == algorithm.getFromClass() && n.getAlgorithm().getToClass() == algorithm.getToClass()).collect(Collectors.toCollection(ArrayList::new));
 
-		if (algorithmNodes.size() == 1)
-			return algorithmNodes.iterator().next();
-		else if (algorithmNodes.size() > 1) {
-			return SetParameterDialog.apply(null, "There are multiple instances of this algorithm:", algorithmNodes, algorithmNodes.iterator().next());
+		if (algorithmNodes.size() == 1) {
+			var algorithmNode = algorithmNodes.get(0);
+			if (algorithmNode.getAlgorithm().getClass() != algorithm.getClass()) {
+				algorithmNode.setAlgorithm(algorithm);
+				algorithmNode.restart();
+			}
+			return algorithmNode;
+		} else if (algorithmNodes.size() > 1) {
+			var algorithmNode = SetParameterDialog.apply(null, "There are multiple possible choices for this algorithm:", algorithmNodes, algorithmNodes.get(0));
+			if (algorithmNode != null && algorithmNode.getAlgorithm().getClass() != algorithm.getClass()) {
+				algorithmNode.setAlgorithm(algorithm);
+				algorithmNode.restart();
+			}
+			return algorithmNode;
 		} else {
 			var dataNodes = (List<DataNode>) IteratorUtils.asStream(workflow.dataNodes()).filter(d -> workflow.isDerivedNode(d) || workflow.isWorkingDataNode(d))
 					.filter(d -> d.getDataBlock().getClass() == algorithm.getFromClass()).collect(Collectors.toList());

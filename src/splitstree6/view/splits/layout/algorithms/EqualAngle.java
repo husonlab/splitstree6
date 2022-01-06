@@ -55,7 +55,7 @@ public class EqualAngle {
 		graph.clear();
 		usedSplits.clear();
 
-		progress.setTasks("Equal Angle", null);
+        progress.setTasks("Computing Splits Network", "Equal Angle algorithm");
 		progress.setMaximum(100);    //initialize maximum progress
 		progress.setProgress(-1);    //set progress to 0
 
@@ -67,7 +67,6 @@ public class EqualAngle {
 
         final var interiorSplits = getNonTrivialSplitsOrdered(splits);
 
-        progress.setSubtask("process internal splits");
         progress.setMaximum(interiorSplits.size());    //initialize maximum progress
 
         {

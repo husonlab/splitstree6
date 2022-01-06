@@ -119,6 +119,9 @@ public class MainWindowController {
 	private MenuItem copyImageMenuItem;
 
 	@FXML
+	private MenuItem copyNewickMenuItem;
+
+	@FXML
 	private MenuItem pasteMenuItem;
 
 	@FXML
@@ -325,16 +328,10 @@ public class MainWindowController {
 	private MenuItem filteredSuperNetworkMenuItem;
 
 	@FXML
-	private MenuItem medianNetworkMenuItem;
-
-	@FXML
 	private MenuItem medianJoiningMenuItem;
 
 	@FXML
 	private MenuItem minSpanningNetworkMenuItem;
-
-	@FXML
-	private MenuItem consensusClusterNetworkMenuItem;
 
 	@FXML
 	private MenuItem hybridizationNetworkMenuItem;
@@ -342,14 +339,9 @@ public class MainWindowController {
 	@FXML
 	private MenuItem splitsNetworkViewMenuItem;
 
+
 	@FXML
 	private MenuItem haplotypeNetworkViewMenuItem;
-
-	@FXML
-	private MenuItem show3DViewerMenuItem;
-
-	@FXML
-	private MenuItem relaxMenuItem;
 
 	@FXML
 	private MenuItem pcoaMenuItem;
@@ -593,6 +585,10 @@ public class MainWindowController {
 
 	public MenuItem getCopyImageMenuItem() {
 		return copyImageMenuItem;
+	}
+
+	public MenuItem getCopyNewickMenuItem() {
+		return copyNewickMenuItem;
 	}
 
 	public MenuItem getPasteMenuItem() {
@@ -872,9 +868,6 @@ public class MainWindowController {
 		return filteredSuperNetworkMenuItem;
 	}
 
-	public MenuItem getMedianNetworkMenuItem() {
-		return medianNetworkMenuItem;
-	}
 
 	public MenuItem getMedianJoiningMenuItem() {
 		return medianJoiningMenuItem;
@@ -884,9 +877,6 @@ public class MainWindowController {
 		return minSpanningNetworkMenuItem;
 	}
 
-	public MenuItem getConsensusClusterNetworkMenuItem() {
-		return consensusClusterNetworkMenuItem;
-	}
 
 	public MenuItem getHybridizationNetworkMenuItem() {
 		return hybridizationNetworkMenuItem;
@@ -898,14 +888,6 @@ public class MainWindowController {
 
 	public MenuItem getHaplotypeNetworkViewMenuItem() {
 		return haplotypeNetworkViewMenuItem;
-	}
-
-	public MenuItem getShow3DViewerMenuItem() {
-		return show3DViewerMenuItem;
-	}
-
-	public MenuItem getRelaxMenuItem() {
-		return relaxMenuItem;
 	}
 
 	public MenuItem getPcoaMenuItem() {

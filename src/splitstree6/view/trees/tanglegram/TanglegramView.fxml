@@ -146,21 +146,16 @@
                                 </Button>
                                 <Separator layoutX="548.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
-                                <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="GRAPHIC_ONLY"
+                                <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
                                               maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
                                               minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
-                                              prefWidth="24.0" text="Show Tree Names">
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image url="@/splitstree6/resources/icons/Text16.png"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
+                                              prefWidth="24.0" text="T">
                                     <tooltip>
-                                        <Tooltip text="Show tree names"/>
+                                        <Tooltip text="Show tree names or info"/>
                                     </tooltip>
+                                    <font>
+                                        <Font size="12.0"/>
+                                    </font>
                                 </ToggleButton>
                                 <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                                 <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
@@ -249,7 +244,7 @@
                 </VBox>
             </top>
             <center>
-                <AnchorPane style="-fx-background-color: transparent;">
+                <AnchorPane fx:id="innerAnchorPane" style="-fx-background-color: transparent;">
                     <children>
                         <ScrollPane fx:id="scrollPane" style="-fx-background-color: transparent;"
                                     AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
@@ -271,10 +266,12 @@
                                 </HBox>
                             </content>
                         </ScrollPane>
-                        <Label fx:id="tree1Label" style="-fx-background-color: transparent;" text="Tree 1"
-                               AnchorPane.leftAnchor="40.0" AnchorPane.topAnchor="5.0"/>
-                        <Label fx:id="tree2Label" style="-fx-background-color: transparent;" text="Tree 2"
-                               AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="5.0"/>
+                        <Label fx:id="tree1NameLabel" layoutX="40.0" layoutY="5.0"
+                               style="-fx-background-color: transparent;" text="Tree 1" AnchorPane.leftAnchor="5.0"
+                               AnchorPane.topAnchor="5.0"/>
+                        <Label fx:id="tree2NameLabel" layoutX="725.0" layoutY="5.0"
+                               style="-fx-background-color: transparent;" text="Tree 2" AnchorPane.rightAnchor="5.0"
+                               AnchorPane.topAnchor="5.0"/>
                     </children>
                 </AnchorPane>
             </center>

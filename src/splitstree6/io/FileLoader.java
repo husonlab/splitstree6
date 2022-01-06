@@ -44,7 +44,7 @@ public class FileLoader {
 
 		if (!(new File(fileName)).canRead())
 			NotificationManager.showError("File not found or unreadable: " + fileName);
-		else if (editorTab != null && editorTab.getText().isBlank()) {
+		else if (editorTab != null && editorTab.isEmpty()) {
 			editorTab.importFromFile(fileName);
 			mainWindow.setFileName(fileName);
 			RecentFilesManager.getInstance().insertRecentFile(fileName);
