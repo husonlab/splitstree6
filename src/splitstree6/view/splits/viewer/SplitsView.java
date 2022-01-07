@@ -105,6 +105,11 @@ public class SplitsView implements IView {
 	}
 
 	@Override
+	public void clear() {
+		getSplitsBlock().clear();
+	}
+
+	@Override
 	public String getName() {
 		return name.get();
 	}

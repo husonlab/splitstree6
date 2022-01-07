@@ -186,4 +186,18 @@ public class CircularOrdering {
 			}
 		}
 	}
+
+	public static int[] computeCircularOrderingUsingLSA(PhyloTree phyloTree) {
+		var list = new ArrayList<Integer>();
+		list.add(0);
+		LSAUtils.postorderTraversalLSA(phyloTree, phyloTree.getRoot(), v -> {
+			for (var t : phyloTree.getTaxa(v))
+				list.add(t);
+		});
+		var cycle = new int[list.size()];
+		for (var i = 0; i < list.size(); i++) {
+			cycle[i] = list.get(i);
+		}
+		return cycle;
+	}
 }

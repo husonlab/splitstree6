@@ -77,8 +77,8 @@
                                 <Insets/>
                             </GridPane.margin>
                         </Button>
-                        <MenuButton fx:id="menuButton" mnemonicParsing="false" text="Edit" GridPane.columnIndex="1"
-                                    GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                        <MenuButton fx:id="menuButton" minWidth="-Infinity" mnemonicParsing="false" text="Edit"
+                                    GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                             <GridPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                             </GridPane.margin>

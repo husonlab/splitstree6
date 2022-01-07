@@ -32,6 +32,7 @@ import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.IView;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.DataNode;
 
 /**
  * tab to be shown in main tab-pane
@@ -46,14 +47,18 @@ public class ViewTab extends Tab implements IDisplayTab {
 
 	private final ObjectProperty<IView> view = new SimpleObjectProperty<>();
 
+	private final AlgorithmBreadCrumbsToolBar algorithmBreadCrumbsToolBar;
+
 	/**
 	 * constructor
 	 */
-	public ViewTab(MainWindow mainWindow, boolean closable) {
+	public ViewTab(MainWindow mainWindow, DataNode dataNode, boolean closable) {
 		this.mainWindow = mainWindow;
 		setText("ViewTab");
 		setClosable(closable);
 		setOnCloseRequest(v -> mainWindow.removeTabFromMainTabPane(this));
+
+		algorithmBreadCrumbsToolBar = dataNode == null ? null : new AlgorithmBreadCrumbsToolBar(mainWindow, dataNode);
 
 		tabPaneProperty().addListener((v, o, n) -> {
 			if (n == null)
@@ -118,7 +123,6 @@ public class ViewTab extends Tab implements IDisplayTab {
 			view.setViewTab(this);
 			this.setText(view.getName());
 		}
-
 	}
 
 	@Override
@@ -130,5 +134,11 @@ public class ViewTab extends Tab implements IDisplayTab {
 	public IDisplayTabPresenter getPresenter() {
 		return getView() == null ? null : getView().getPresenter();
 	}
+
+	public AlgorithmBreadCrumbsToolBar getAlgorithmBreadCrumbsToolBar() {
+		return algorithmBreadCrumbsToolBar;
+	}
+
+	public void clear() {}
 }
 

@@ -95,7 +95,6 @@ public class TreePane extends StackPane {
 
 		orientation.addListener((v, o, n) -> LayoutUtils.applyOrientation(o, n, pane, false));
 
-
 		service.setCallable(() -> {
 			double width;
 			double height;

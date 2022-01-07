@@ -106,7 +106,7 @@ public class TextTabsManager {
 		if (nodeTabMap.containsKey(node))
 			tab = nodeTabMap.get(node);
 		else {
-			tab = new ViewTab(mainWindow, true);
+			tab = new ViewTab(mainWindow, node, true);
 			var view = new DisplayData(mainWindow, node, node.getTitle() + " text", false);
 			tab.setView(view);
 			tab.setOnCloseRequest(t -> nodeTabMap.remove(node));

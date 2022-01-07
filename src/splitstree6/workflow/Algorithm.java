@@ -53,6 +53,7 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	protected Algorithm(Class<S> fromClass, Class<T> toClass) {
 		this.fromClass = fromClass;
 		this.toClass = toClass;
+		setShortDescription("The " + getName() + " algorithm");
 	}
 
 	public List<String> listOptions() {

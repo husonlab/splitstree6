@@ -63,6 +63,8 @@ public class ShowTrees extends Trees2View {
 		switch (getOptionView()) {
 			case TreePages -> {
 				if (!(viewBlock.getView() instanceof TreePagesView)) {
+					if (viewBlock.getView() != null)
+						viewBlock.getView().clear();
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
 						var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
@@ -79,6 +81,8 @@ public class ShowTrees extends Trees2View {
 			}
 			case Tanglegram -> {
 				if (!(viewBlock.getView() instanceof TanglegramView)) {
+					if (viewBlock.getView() != null)
+						viewBlock.getView().clear();
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
 						var view = new TanglegramView(mainWindow, "Tanglegram", viewBlock.getViewTab());
@@ -96,6 +100,8 @@ public class ShowTrees extends Trees2View {
 			case SingleTree, DensiTree -> throw new IOException("Not implemented: " + getOptionView());
 			case Text -> {
 				if (!(viewBlock.getView() instanceof DisplayTextView)) {
+					if (viewBlock.getView() != null)
+						viewBlock.getView().clear();
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
 						var view = new DisplayTextView(mainWindow, inputData.getName() + " text", false);

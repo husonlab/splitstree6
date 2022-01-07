@@ -92,8 +92,16 @@ public class TanglegramView implements IView {
 		this.name.set(name);
 
 		getTrees().addListener((InvalidationListener) e -> {
-			setOptionTree1(Math.min(getOptionTree1(), getTrees().size()));
-			setOptionTree2(Math.min(getOptionTree2(), getTrees().size()));
+			var t1 = Math.min(getOptionTree1(), getTrees().size());
+			var t2 = Math.min(getOptionTree2(), getTrees().size());
+			if (t1 == t2) {
+				if (t2 < getTrees().size())
+					t2++;
+				else if (t1 > 1)
+					t1--;
+			}
+			setOptionTree1(t1);
+			setOptionTree2(t2);
 		});
 
 
@@ -282,6 +290,11 @@ public class TanglegramView implements IView {
 
 	public void setOptionFontScaleFactor(double optionFontScaleFactor) {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
+	}
+
+	@Override
+	public void clear() {
+		getTrees().clear();
 	}
 
 	@Override

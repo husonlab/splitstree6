@@ -19,6 +19,8 @@
 
 package splitstree6.workflow;
 
+import javafx.beans.value.WeakChangeListener;
+import javafx.concurrent.Worker;
 import jloda.fx.window.NotificationManager;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
@@ -45,10 +47,10 @@ public class WorkflowSetup {
 	public static Workflow apply(String fileName, MainWindow mainWindow) {
 		var workflow = new Workflow(mainWindow);
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(mainWindow.getController().getBottomFlowPane()));
-		return apply(fileName, workflow, null);
+		return apply(fileName, workflow, null, null);
 	}
 
-	public static Workflow apply(String fileName, Workflow workflow, Consumer<Throwable> exceptionHandler) {
+	public static Workflow apply(String fileName, Workflow workflow, Consumer<Throwable> exceptionHandler, Runnable runOnSuccess) {
 		workflow.clear();
 
 		var sourceBlock = new SourceBlock();
@@ -97,8 +99,13 @@ public class WorkflowSetup {
 		 */
 		System.err.println("Workflow: " + workflow.size());
 		if (workflow.size() > 0) {
-			if (exceptionHandler != null)
-				workflow.getLoaderNode().getService().setOnFailed(e -> exceptionHandler.accept(e.getSource().getException()));
+			if (exceptionHandler != null || runOnSuccess != null)
+				workflow.getLoaderNode().getService().stateProperty().addListener(new WeakChangeListener<>((v, o, n) -> {
+					if (n == Worker.State.FAILED && exceptionHandler != null)
+						exceptionHandler.accept(workflow.getLoaderNode().getService().getException());
+					if (n == Worker.State.SUCCEEDED && runOnSuccess != null)
+						runOnSuccess.run();
+				}));
 			workflow.getSourceNode().setValid(true);
 			workflow.getInputDataLoaderNode().restart();
 		}

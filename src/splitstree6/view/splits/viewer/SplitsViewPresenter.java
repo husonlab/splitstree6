@@ -46,6 +46,7 @@ import java.util.function.Function;
 
 /**
  * splits network presenter
+ * Daniel Huson 1.2022
  */
 public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
@@ -191,6 +192,15 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
 		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
+
+		splitsView.viewTabProperty().addListener((v, o, n) -> {
+			if (n != null) {
+				controller.getvBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
+			}
+		});
+		splitsView.emptyProperty().addListener(e -> splitsView.getRoot().setDisable(splitsView.emptyProperty().get()));
+
+		Platform.runLater(this::setupMenuItems);
 	}
 
 	public void setupMenuItems() {

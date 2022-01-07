@@ -43,6 +43,8 @@ public interface IView extends IHasOptions {
 
 	Node getImageNode();
 
+	void clear();
+
 	IDisplayTabPresenter getPresenter();
 
 	String getCitation();

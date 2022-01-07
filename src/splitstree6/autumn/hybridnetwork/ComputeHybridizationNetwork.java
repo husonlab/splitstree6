@@ -68,7 +68,9 @@ public class ComputeHybridizationNetwork {
             label2taxonId.put(taxaBlock.getLabel(t), t);
         }
 
+        var n = 0;
         for (var tree : networks) {
+			tree.setName("H" + (++n));
             for (var v : tree.nodes()) {
                 var label = tree.getLabel(v);
                 if (label != null) {

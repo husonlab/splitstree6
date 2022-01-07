@@ -21,6 +21,7 @@ package splitstree6.data;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -41,6 +42,8 @@ public class ViewBlock extends DataBlock {
 	private final StringProperty inputBlockName = new SimpleStringProperty();
 	private final StringProperty initializationLines = new SimpleStringProperty("");
 
+	private InvalidationListener invalidationListener;
+
 	private ViewTab viewTab;
 
 	@Override
@@ -49,9 +52,9 @@ public class ViewBlock extends DataBlock {
 		if (node.getOwner() != null) {
 			var mainWindow = ((Workflow) node.getOwner()).getMainWindow();
 			if (viewTab == null)
-				Platform.runLater(() -> viewTab = new ViewTab(mainWindow, false));
+				Platform.runLater(() -> viewTab = new ViewTab(mainWindow, node, false));
 
-			node.getParents().addListener((InvalidationListener) e -> {
+			invalidationListener = e -> {
 				if (node.getParents().size() == 0) { // have removed the node from the workflow
 					if (viewTab != null)
 						mainWindow.removeTabFromMainTabPane(viewTab);
@@ -60,12 +63,13 @@ public class ViewBlock extends DataBlock {
 					if (view != null) {
 						if (viewTab != null)
 							mainWindow.removeTabFromMainTabPane(viewTab);
-						viewTab = new ViewTab(mainWindow, false);
+						viewTab = new ViewTab(mainWindow, node, false);
 						mainWindow.addTabToMainTabPane(viewTab);
 						viewTab.setView(view);
 					}
 				}
-			});
+			};
+			node.getParents().addListener(new WeakInvalidationListener(invalidationListener));
 		}
 	}
 
@@ -118,6 +122,12 @@ public class ViewBlock extends DataBlock {
 
 	public ReadOnlyObjectProperty<IView> viewProperty() {
 		return viewTab.viewProperty();
+	}
+
+	@Override
+	public void clear() {
+		if (getView() != null)
+			getView().clear();
 	}
 
 	public void setView(IView view) {

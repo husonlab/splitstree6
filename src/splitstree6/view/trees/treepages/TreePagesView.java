@@ -181,6 +181,7 @@ public class TreePagesView implements IView {
 		return optionCols;
 	}
 
+
 	public void setOptionCols(int optionCols) {
 		this.optionCols.set(Math.max(1, optionCols));
 	}
@@ -223,6 +224,11 @@ public class TreePagesView implements IView {
 
 	public Pane getRoot() {
 		return controller.getAnchorPane();
+	}
+
+	@Override
+	public void clear() {
+		getTrees().clear();
 	}
 
 	@Override
@@ -282,6 +288,14 @@ public class TreePagesView implements IView {
 
 	public void setOptionTreeLabels(TreeLabels optionTreeLabels) {
 		this.optionTreeLabels.set(optionTreeLabels);
+	}
+
+	public ViewTab getViewTab() {
+		return viewTab.get();
+	}
+
+	public ObjectProperty<ViewTab> viewTabProperty() {
+		return viewTab;
 	}
 
 	@Override

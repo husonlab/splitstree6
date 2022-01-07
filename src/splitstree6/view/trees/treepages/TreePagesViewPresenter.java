@@ -37,7 +37,6 @@ import jloda.fx.find.Searcher;
 import jloda.fx.util.BasicFX;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
-import jloda.util.Pair;
 import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -227,15 +226,14 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Font Size", treePagesView.optionFontScaleFactorProperty(), o, n));
 		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Zoom", treePagesView.optionZoomFactorProperty(), o, n));
 
-		Platform.runLater(this::setupMenuItems);
-	}
+		treePagesView.viewTabProperty().addListener((v, o, n) -> {
+			if (n != null) {
+				Platform.runLater(() -> controller.getvBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar()));
+			}
+		});
+		treePagesView.emptyProperty().addListener(e -> treePagesView.getRoot().setDisable(treePagesView.emptyProperty().get()));
 
-	private Pair<Integer, Integer> parseRowsColsText(String text) {
-		var tokens = text.split("x");
-		if (tokens.length == 2 && NumberUtils.isInteger(tokens[0].trim()) && NumberUtils.isInteger(tokens[1].trim()))
-			return new Pair<>(Math.max(1, Integer.parseInt(tokens[0].trim())), Math.max(1, Integer.parseInt(tokens[1].trim())));
-		else
-			return null;
+		Platform.runLater(this::setupMenuItems);
 	}
 
 	@Override

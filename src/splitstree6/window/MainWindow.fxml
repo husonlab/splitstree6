@@ -300,14 +300,13 @@
                                         <MenuItem fx:id="zoomInMenuItem" text="Zoom In">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP"
-                                                                    shift="UP"
-                                                                    shortcut="DOWN"/>
+                                                                    shift="UP" shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <MenuItem fx:id="zoomOutMenuItem" text="Zoom Out">
                                             <accelerator>
-                                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
+                                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="UP"
+                                                                    shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
                                         <SeparatorMenuItem mnemonicParsing="false"/>
@@ -566,25 +565,29 @@
                 </AnchorPane>
             </center>
             <bottom>
-                <HBox spacing="5.0" style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
-                      BorderPane.alignment="TOP_LEFT">
+                <HBox minHeight="-Infinity" spacing="5.0"
+                      style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
+                      BorderPane.alignment="BOTTOM_CENTER">
                     <children>
                         <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="30.0" vgap="5.0" HBox.hgrow="ALWAYS">
                             <padding>
                                 <Insets bottom="2.0" right="50.0" top="2.0"/>
                             </padding>
                         </FlowPane>
-                        <VBox alignment="BOTTOM_RIGHT" HBox.hgrow="NEVER">
+                        <VBox alignment="BOTTOM_CENTER" HBox.hgrow="SOMETIMES">
+                            <HBox.margin>
+                                <Insets/>
+                            </HBox.margin>
                             <children>
-                                <Label fx:id="memoryLabel" text="Memory" textFill="DARKGRAY">
+                                <Label fx:id="memoryLabel" alignment="CENTER_RIGHT" text="Memory" textFill="DARKGRAY">
                                     <font>
                                         <Font size="12.0"/>
                                     </font>
+                                    <VBox.margin>
+                                        <Insets bottom="5.0" right="16.0"/>
+                                    </VBox.margin>
                                 </Label>
                             </children>
-                            <HBox.margin>
-                                <Insets bottom="6.0" right="20.0"/>
-                            </HBox.margin>
                         </VBox>
                     </children>
                 </HBox>

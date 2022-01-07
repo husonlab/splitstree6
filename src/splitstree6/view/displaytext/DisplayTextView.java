@@ -137,6 +137,10 @@ public class DisplayTextView implements IView {
 		}
 	}
 
+	@Override
+	public void clear() {
+		controller.getCodeArea().replaceText("");
+	}
 
 	@Override
 	public UndoManager getUndoManager() {

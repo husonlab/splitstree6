@@ -37,7 +37,7 @@ public class InputEditorTab extends ViewTab {
 	 * constructor
 	 */
 	public InputEditorTab(MainWindow mainWindow) {
-		super(mainWindow, false);
+		super(mainWindow, null, false);
 		if (false) {
 			inputEditorView = null;
 			setText(NAME);

@@ -127,6 +127,8 @@ public class InputEditorView extends DisplayTextView implements IView {
 
 	public void parseAndLoad() {
 		try {
+			var name = mainWindow.getFileName();
+
 			if (tmpFile == null) {
 				tmpFile = FileUtils.getUniqueFileName(System.getProperty("user.dir"), "Untitled", "tmp");
 				tmpFile.deleteOnExit();
@@ -135,17 +137,24 @@ public class InputEditorView extends DisplayTextView implements IView {
 				w.write(getController().getCodeArea().getText());
 			}
 
-			Consumer<Throwable> failedHandler = ex -> {
+			final Consumer<Throwable> failedHandler = ex -> {
+				mainWindow.getWorkflow().clear();
 				if (ex instanceof IOExceptionWithLineNumber exceptionWithLineNumber) {
 					viewTab.getTabPane().getSelectionModel().select(viewTab);
 					getController().getCodeArea().requestFocus();
 					gotoLine(exceptionWithLineNumber.getLineNumber(), 0);
 				}
 				NotificationManager.showError("Parse failed: " + ex.getMessage());
+				mainWindow.setFileName(name);
+
 			};
-			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler);
-			mainWindow.setDirty(true);
-			mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
+			final Runnable runOnSuccess = () -> {
+				mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
+				mainWindow.setFileName(name);
+				mainWindow.setDirty(true);
+			};
+			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler, runOnSuccess);
+
 		} catch (Exception ex) {
 			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
 		}

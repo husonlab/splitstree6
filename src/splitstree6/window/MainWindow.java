@@ -20,6 +20,7 @@
 package splitstree6.window;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
@@ -57,16 +58,16 @@ public class MainWindow implements IMainWindow {
 
 	private final ObservableList<Taxon> activeTaxa = FXCollections.observableArrayList();
 	private final SelectionModel<Taxon> taxonSelectionModel = new SetSelectionModel<>();
-	private final BooleanProperty dirty = new SimpleBooleanProperty(false);
-	private final BooleanProperty empty = new SimpleBooleanProperty(true);
-	private final StringProperty name = new SimpleStringProperty("");
+	private final BooleanProperty dirty = new SimpleBooleanProperty(this, "dirty", false);
+	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
+	private final StringProperty name = new SimpleStringProperty(this, "name", "");
 
 	private final WorkflowTab workflowTab;
 	private final TextDisplayTab methodsTab;
 	private final WorkflowTreeView workflowTreeView;
 
-	private final StringProperty fileName = new SimpleStringProperty("Untitled");
-	private final BooleanProperty hasSplitsTree6File = new SimpleBooleanProperty(false);
+	private final StringProperty fileName = new SimpleStringProperty(this, "fileName", "Untitled");
+	private final BooleanProperty hasSplitsTree6File = new SimpleBooleanProperty(this, "hasSplitsTree6File", false);
 
 	private Stage stage;
 
@@ -110,9 +111,10 @@ public class MainWindow implements IMainWindow {
 		textTabsManager = new TextTabsManager(this);
 		algorithmTabsManager = new AlgorithmTabsManager(this);
 
-		fileName.addListener((v, o, n) -> name.set(n == null || n.isBlank() ? "Empty" : FileUtils.replaceFileSuffix(FileUtils.getFileNameWithoutPath(n), "")));
-
 		workflowTreeView = new WorkflowTreeView(this);
+
+		fileName.addListener((v, o, n) -> name.set(n == null || n.isBlank() ? "Untitled" : FileUtils.replaceFileSuffix(FileUtils.getFileNameWithoutPath(n), "")));
+		name.set("Untitled");
 	}
 
 	@Override
@@ -141,7 +143,7 @@ public class MainWindow implements IMainWindow {
 
 		scene.getStylesheets().add("jloda/resources/css/white_pane.css");
 
-		stage.titleProperty().addListener((e) -> MainWindowManager.getInstance().fireChanged());
+		stage.titleProperty().addListener(e -> MainWindowManager.getInstance().fireChanged());
 
 		presenter = new MainWindowPresenter(this);
 
@@ -149,10 +151,14 @@ public class MainWindow implements IMainWindow {
 
 		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
 
-		name.addListener(c -> stage.setTitle(FileUtils.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
-
-		dirtyProperty().addListener(c -> stage.setTitle(FileUtils.getFileNameWithoutPath(getName()) + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName()));
+		InvalidationListener invalidationListener = e -> {
+			stage.setTitle(getName() + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName());
+		};
+		name.addListener(invalidationListener);
+		dirty.addListener(invalidationListener);
+		invalidationListener.invalidated(null);
 		stage.show();
+		Platform.runLater(() -> stage.setWidth(stage.getWidth() - 1));// this hack ensures that bottom flowpane is shown
 	}
 
 	@Override
