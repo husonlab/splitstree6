@@ -62,7 +62,6 @@ public class ShowTrees extends Trees2View {
 
 		switch (getOptionView()) {
 			case TreePages -> {
-				if (!(viewBlock.getView() instanceof TreePagesView)) {
 					if (viewBlock.getView() != null)
 						viewBlock.getView().clear();
 					Platform.runLater(() -> {
@@ -70,7 +69,7 @@ public class ShowTrees extends Trees2View {
 						var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
-				}
+
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TreePagesView view) {
 						view.getUndoManager().clear();
@@ -80,7 +79,6 @@ public class ShowTrees extends Trees2View {
 				});
 			}
 			case Tanglegram -> {
-				if (!(viewBlock.getView() instanceof TanglegramView)) {
 					if (viewBlock.getView() != null)
 						viewBlock.getView().clear();
 					Platform.runLater(() -> {
@@ -88,7 +86,7 @@ public class ShowTrees extends Trees2View {
 						var view = new TanglegramView(mainWindow, "Tanglegram", viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
-				}
+
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TanglegramView view) {
 						view.getUndoManager().clear();
@@ -99,7 +97,6 @@ public class ShowTrees extends Trees2View {
 			}
 			case SingleTree, DensiTree -> throw new IOException("Not implemented: " + getOptionView());
 			case Text -> {
-				if (!(viewBlock.getView() instanceof DisplayTextView)) {
 					if (viewBlock.getView() != null)
 						viewBlock.getView().clear();
 					Platform.runLater(() -> {
@@ -107,7 +104,7 @@ public class ShowTrees extends Trees2View {
 						var view = new DisplayTextView(mainWindow, inputData.getName() + " text", false);
 						viewBlock.setView(view);
 					});
-				}
+
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof DisplayTextView view) {
 						view.getUndoManager().clear();

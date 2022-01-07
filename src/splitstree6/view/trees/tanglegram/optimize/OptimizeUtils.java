@@ -44,7 +44,6 @@ import jloda.graph.NodeIntArray;
 import jloda.graph.NodeSet;
 import jloda.graph.algorithms.Dijkstra;
 import jloda.phylo.PhyloTree;
-import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 
 import java.util.*;
@@ -314,15 +313,18 @@ public class OptimizeUtils {
      * @param tree
      * @return
      */
-    public static TaxaBlock getTaxaForTanglegram(PhyloTree tree) {
-        var taxa = new TaxaBlock();
+    public static Taxa getTaxaForTanglegram(PhyloTree tree) {
+        var labels = new TreeSet<String>();
         for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
             if (v.getOutDegree() == 0 && tree.getLabel(v) != null) {
-                taxa.addTaxonByName(tree.getLabel(v));
+                labels.add(tree.getLabel(v));
             } else if (v.getOutDegree() == 0 && tree.getLabel(v) == null) {
                 tree.setLabel(v, "null" + tree.getId(v) + tree.getId(v.getFirstInEdge()));
             }
         }
+        var taxa = new Taxa();
+        for (var label : labels)
+            taxa.add(label);
         return taxa;
     }
 

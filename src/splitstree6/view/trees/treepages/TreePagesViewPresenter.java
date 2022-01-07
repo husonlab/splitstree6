@@ -150,7 +150,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		targetBounds.addListener((v, o, n) -> {
 			var width = n.getWidth();
-			var height = n.getHeight() - 120;
+			var height = Math.max(150, n.getHeight() - 150);
 			controller.getPagination().setPrefWidth(width);
 			controller.getPagination().setPrefHeight(height);
 			boxDimensions.set(new Dimension2D(width / treePagesView.getOptionCols() - 5, height / treePagesView.getOptionRows() - 5));

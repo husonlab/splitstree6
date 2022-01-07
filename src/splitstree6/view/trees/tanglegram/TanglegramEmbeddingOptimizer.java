@@ -70,7 +70,6 @@ public class TanglegramEmbeddingOptimizer {
 
 		service.setCallable(() -> {
 			embeddingOptimizer.apply(new PhyloTree[]{tree1.get(), tree2.get()}, service.getProgressListener(), isUseShortestPaths(), isUseFastAlignmentHeuristic());
-
 			var cycle1_0 = embeddingOptimizer.getFirstOrder().stream().mapToInt(label -> mainWindow.getWorkflow().getWorkingTaxaBlock().indexOf(label)).filter(t -> t != -1).toArray();
 			var cycle1 = new int[cycle1_0.length + 1];
 			System.arraycopy(cycle1_0, 0, cycle1, 1, cycle1_0.length);
