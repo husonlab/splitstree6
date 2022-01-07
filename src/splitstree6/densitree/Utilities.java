@@ -40,7 +40,8 @@ public class Utilities {
 		var taxa = new BitSet();
 		for (var t = 1; t <= ntax; t++)
 			taxa.set(t);
-		var distances = new double[ntax][ntax];
+		int max_num_nodes = 3 * ntax - 5;
+		var distances = new double[max_num_nodes][max_num_nodes];
 		var step = Math.max(1, treesBlock.getNTrees() / 1000);
 		var trees = treesBlock.getTrees();
 		for (int i = 0; i < trees.size(); i += step) {
@@ -49,7 +50,7 @@ public class Utilities {
 			TreesUtilities.computeSplits(taxa, tree, splits);
 			SplitsUtilities.splitsToDistances(ntax, splits, distances, false);
 		}
-		return NeighborNetCycle.computeNeighborNetCycle(ntax, distances);
+		return NeighborNetCycle.compute(ntax, distances);
 	}
 
 }

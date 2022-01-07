@@ -80,7 +80,8 @@ public class CircularOrdering {
 			index2tax.put(ntax, formalOutgroupTaxon);
 			ntax++;
 
-			final var distances = new double[ntax][ntax];
+			int max_num_nodes = 3 * ntax - 5;
+			final var distances = new double[max_num_nodes][max_num_nodes];
 
 			for (var phyloTree : IteratorUtils.asList(List.of(tree), List.of(trees))) {
 				if (phyloTree.isReticulated() && phyloTree.getLSAChildrenMap().size() == 0)
@@ -100,7 +101,7 @@ public class CircularOrdering {
 				}
 			}
 
-			final var indexCycle = NeighborNetCycle.computeNeighborNetCycle(ntax, distances);
+			final var indexCycle = NeighborNetCycle.compute(ntax, distances);
 			var taxCycle = new int[indexCycle.length];
 			for (var i = 1; i < indexCycle.length; i++) {
 				taxCycle[i] = index2tax.get(indexCycle[i] - 1);

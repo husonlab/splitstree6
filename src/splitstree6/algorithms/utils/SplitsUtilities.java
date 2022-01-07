@@ -116,7 +116,7 @@ public class SplitsUtilities {
 			final var pso = Basic.hideSystemOut();
 			final var pse = Basic.hideSystemErr();
 			try {
-				return NeighborNetCycle.computeNeighborNetCycle(ntax, splitsToDistances(ntax, splits, false));
+				return NeighborNetCycle.compute(ntax, splitsToDistances(ntax, splits, false));
 			} finally {
 				Basic.restoreSystemErr(pse);
 				Basic.restoreSystemOut(pso);

@@ -228,6 +228,8 @@ public class TreePagesView implements IView {
 
 	@Override
 	public void clear() {
+		controller.getPagination().pageCountProperty().unbind();
+		controller.getPagination().setPageCount(0);
 		getTrees().clear();
 	}
 

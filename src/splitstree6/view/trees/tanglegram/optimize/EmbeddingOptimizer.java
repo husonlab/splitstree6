@@ -712,7 +712,7 @@ public class EmbeddingOptimizer {
 			// get the order using NN
 
 			var ntax = taxon2ID.size();
-			var ordering = NeighborNetCycle.computeNeighborNetCycle(ntax, distMat);
+			var ordering = NeighborNetCycle.compute(ntax, distMat);
 			if (trees.length == 2) {
 				// we restrict the ordering to the common taxa. If solution zero exist, we will find it
 
@@ -802,7 +802,7 @@ public class EmbeddingOptimizer {
 			// get the order using NN
 
 			var ntax = taxon2ID.size();
-			return NeighborNetCycle.computeNeighborNetCycle(ntax, distMat);
+			return NeighborNetCycle.compute(ntax, distMat);
 		} else {
 			var ordering = new int[taxon2ID.size()];
 			var i = 0;
