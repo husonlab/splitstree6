@@ -73,7 +73,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		var taxonOrdering1 = new SimpleObjectProperty<int[]>(null);
 		var taxonOrdering2 = new SimpleObjectProperty<int[]>(null);
 
-
 		tree1.addListener((v, o, n) -> {
 					controller.getTree1CBox().setValue(n);
 					setLabel(n, tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
@@ -104,38 +103,77 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		controller.getRightPane().getChildren().add(tree2Pane);
 
-		final var optimizeEmbeddings = new TanglegramEmbeddingOptimizer(mainWindow);
-		InvalidationListener treeChangedListener = e -> {
-			var t1 = tanglegramView.getOptionTree1();
-			var t2 = tanglegramView.getOptionTree2();
+		{
+			controller.getTree1CBox().setItems(trees);
+			controller.getTree1CBox().disableProperty().bind(Bindings.isEmpty(trees));
+			if (tanglegramView.getOptionTree1() <= trees.size())
+				controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree1() - 1));
+			controller.getTree1CBox().valueProperty().addListener((v, o, n) -> {
+				if (n != null)
+					tanglegramView.optionTree1Property().set(trees.indexOf(n) + 1);
+			});
 
-			if (t1 >= 1 && t1 <= trees.size())
-				tree1.set(trees.get(t1 - 1));
-			if (t2 >= 1 && t2 <= trees.size())
-				tree2.set(trees.get(t2 - 1));
+			controller.getTree2CBox().setItems(trees);
+			controller.getTree2CBox().disableProperty().bind(Bindings.isEmpty(trees));
+			if (tanglegramView.getOptionTree2() <= trees.size())
+				controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree2() - 1));
+			controller.getTree2CBox().valueProperty().addListener((v, o, n) -> {
+				if (n != null)
+					tanglegramView.optionTree2Property().set(trees.indexOf(n) + 1);
+			});
 
-			if (t1 >= 1 && t1 <= trees.size() && t2 >= 1 && t2 <= trees.size()) {
-				controller.getBorderPane().disableProperty().bind(optimizeEmbeddings.runningProperty());
-				optimizeEmbeddings.apply(tree1.get(), tree2.get(), (out1, out2) -> {
-					taxonOrdering1.set(out1);
-					taxonOrdering2.set(out2);
-				});
-			}
-		};
-		tanglegramView.optionTree1Property().addListener(treeChangedListener);
-		tanglegramView.optionTree2Property().addListener(treeChangedListener);
-		tanglegramView.getTrees().addListener(treeChangedListener);
-		treeChangedListener.invalidated(null);
+			trees.addListener((InvalidationListener) e -> {
+				if (controller.getTree1CBox().getValue() == null) {
+					if (tanglegramView.getOptionTree1() >= 1 && tanglegramView.getOptionTree1() <= trees.size())
+						controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree1() - 1));
+					else if (trees.size() >= 1)
+						controller.getTree1CBox().setValue(trees.get(0));
+				}
+				if (controller.getTree2CBox().getValue() == null) {
+					if (tanglegramView.getOptionTree2() >= 1 && tanglegramView.getOptionTree2() <= trees.size())
+						controller.getTree2CBox().setValue(trees.get(tanglegramView.getOptionTree2() - 1));
+					else if (trees.size() >= 2)
+						controller.getTree2CBox().setValue(trees.get(1));
+				}
+			});
+		}
+
+		{
+			final var optimizeEmbeddings = new TanglegramEmbeddingOptimizer(mainWindow);
+			InvalidationListener treeChangedListener = e -> {
+				var t1 = tanglegramView.getOptionTree1();
+				var t2 = tanglegramView.getOptionTree2();
+
+				if (t1 >= 1 && t1 <= trees.size())
+					tree1.set(trees.get(t1 - 1));
+				if (t2 >= 1 && t2 <= trees.size())
+					tree2.set(trees.get(t2 - 1));
+
+				if (t1 >= 1 && t1 <= trees.size() && t2 >= 1 && t2 <= trees.size()) {
+					controller.getBorderPane().disableProperty().bind(optimizeEmbeddings.runningProperty());
+					optimizeEmbeddings.apply(tree1.get(), tree2.get(), result -> {
+						tree1.get().copy(result.tree1());
+						taxonOrdering1.set(result.cycle1());
+						tree2.get().copy(result.tree2());
+						taxonOrdering2.set(result.cycle2());
+					});
+				}
+			};
+			tanglegramView.optionTree1Property().addListener(treeChangedListener);
+			tanglegramView.optionTree2Property().addListener(treeChangedListener);
+			tanglegramView.getTrees().addListener(treeChangedListener);
+			treeChangedListener.invalidated(null);
 
 
-		tanglegramView.optionShowTreeNamesProperty().addListener(e -> {
-			setLabel(tree1.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
-			setLabel(tree2.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
-		});
-		tanglegramView.optionShowTreeInfoProperty().addListener(e -> {
-			setLabel(tree1.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
-			setLabel(tree2.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
-		});
+			tanglegramView.optionShowTreeNamesProperty().addListener(e -> {
+				setLabel(tree1.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
+				setLabel(tree2.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
+			});
+			tanglegramView.optionShowTreeInfoProperty().addListener(e -> {
+				setLabel(tree1.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
+				setLabel(tree2.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
+			});
+		}
 
 		{
 			var connectors = new Connectors(mainWindow, controller.getMiddlePane(), controller.getLeftPane(), controller.getRightPane(), new SimpleObjectProperty<>(Color.DARKGRAY), new SimpleDoubleProperty(1.0));
@@ -195,39 +233,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				tanglegramView.setOptionShowTreeInfo("i".equals(n));
 			});
 		}
-
-		controller.getTree1CBox().setItems(trees);
-		controller.getTree1CBox().disableProperty().bind(Bindings.isEmpty(trees));
-		if (tanglegramView.getOptionTree1() <= trees.size())
-			controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree1() - 1));
-		controller.getTree1CBox().valueProperty().addListener((v, o, n) -> {
-			if (n != null)
-				tanglegramView.optionTree1Property().set(trees.indexOf(n) + 1);
-		});
-
-		controller.getTree2CBox().setItems(trees);
-		controller.getTree2CBox().disableProperty().bind(Bindings.isEmpty(trees));
-		if (tanglegramView.getOptionTree2() <= trees.size())
-			controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree2() - 1));
-		controller.getTree2CBox().valueProperty().addListener((v, o, n) -> {
-			if (n != null)
-				tanglegramView.optionTree2Property().set(trees.indexOf(n) + 1);
-		});
-
-		trees.addListener((InvalidationListener) e -> {
-			if (controller.getTree1CBox().getValue() == null) {
-				if (tanglegramView.getOptionTree1() >= 1 && tanglegramView.getOptionTree1() <= trees.size())
-					controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree1() - 1));
-				else if (trees.size() >= 1)
-					controller.getTree1CBox().setValue(trees.get(0));
-			}
-			if (controller.getTree2CBox().getValue() == null) {
-				if (tanglegramView.getOptionTree2() >= 1 && tanglegramView.getOptionTree2() <= trees.size())
-					controller.getTree2CBox().setValue(trees.get(tanglegramView.getOptionTree2() - 1));
-				else if (trees.size() >= 2)
-					controller.getTree2CBox().setValue(trees.get(1));
-			}
-		});
 
 		controller.getPreviousButton().setOnAction(e -> {
 			tanglegramView.getUndoManager().setRecordChanges(false);
@@ -327,6 +332,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		tanglegramView.emptyProperty().addListener(e -> tanglegramView.getRoot().setDisable(tanglegramView.emptyProperty().get()));
+
 
 		Platform.runLater(this::setupMenuItems);
 	}

@@ -134,9 +134,11 @@ public class EmbeddingOptimizer {
 				}
 			}
 		}
-		System.err.println("taxon2Id:");
-		for (var taxon : taxon2Id.keySet()) {
-			System.err.println(taxon + " " + taxon2Id.get(taxon));
+		if (false) {
+			System.err.println("taxon2Id:");
+			for (var taxon : taxon2Id.keySet()) {
+				System.err.println(taxon + " " + taxon2Id.get(taxon));
+			}
 		}
 
 		final int[] circularOrdering;
@@ -147,8 +149,8 @@ public class EmbeddingOptimizer {
 		else
 			circularOrdering = computerCircularOrderingHardwiredMatrix(trees, taxon2Id, id2Taxon);
 
-
-		System.err.println("circularOrdering: " + StringUtils.toString(circularOrdering, " "));
+		if (false)
+			System.err.println("circularOrdering: " + StringUtils.toString(circularOrdering, " "));
 
 
 		if (DEBUG_time) {
@@ -424,14 +426,18 @@ public class EmbeddingOptimizer {
 			newOrder[0].remove(0);
 			newOrder[1].remove(0);
 
-			System.err.println("first: " + StringUtils.toString(newOrder[0], " "));
-			System.err.println("second: " + StringUtils.toString(newOrder[1], " "));
+
+			if (false) {
+				System.err.println("first: " + StringUtils.toString(newOrder[0], " "));
+				System.err.println("second: " + StringUtils.toString(newOrder[1], " "));
+			}
 
 			firstOrder = new LinkedList<>(newOrder[0]);
 			secondOrder = new LinkedList<>(newOrder[1]);
 
-			System.err.println("The minimal crossing number found is " + finalScore);
-			if (true) {
+			if (false)
+				System.err.println("Smallest crossing number found: " + finalScore);
+			if (false) {
 				System.err.println("Order of the taxa in the trees: ");
 				System.err.println(firstOrder);
 				System.err.println(secondOrder);
