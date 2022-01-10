@@ -27,6 +27,7 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 
 public class DensiTreeMainController {
 
@@ -34,7 +35,13 @@ public class DensiTreeMainController {
 	private Pane mainPane;
 
 	@FXML
+	private StackPane stackPane;
+
+	@FXML
 	private Canvas canvas;
+
+	@FXML
+	private Pane pane;
 
 	@FXML
 	private MenuItem openMenuItem;
@@ -52,6 +59,9 @@ public class DensiTreeMainController {
 	private Button drawButton;
 
 	@FXML
+	private Button clearButton;
+
+	@FXML
 	private FlowPane bottomFlowPane;
 
 	@FXML
@@ -61,8 +71,16 @@ public class DensiTreeMainController {
 		return mainPane;
 	}
 
+	public StackPane getStackPane(){
+		return stackPane;
+	}
+
 	public Canvas getCanvas() {
 		return canvas;
+	}
+
+	public Pane getPane(){
+		return pane;
 	}
 
 	public MenuItem getOpenMenuItem() {
@@ -83,6 +101,10 @@ public class DensiTreeMainController {
 
 	public Button getDrawButton() {
 		return drawButton;
+	}
+
+	public Button getClearButton() {
+		return clearButton;
 	}
 
 	public FlowPane getBottomFlowPane() {
