@@ -41,6 +41,7 @@ package splitstree6.view.trees.tanglegram;
 import javafx.beans.property.*;
 import jloda.fx.util.AService;
 import jloda.phylo.PhyloTree;
+import jloda.util.Pair;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.window.MainWindow;
 
@@ -51,7 +52,7 @@ import java.util.function.Consumer;
  * Daniel Huson, 1.2022
  */
 public class TanglegramEmbeddingOptimizer {
-	private final AService<Result> service;
+	private final AService<Pair<PhyloTree, PhyloTree>> service;
 	private final ObjectProperty<PhyloTree> tree1 = new SimpleObjectProperty<>();
 	private final ObjectProperty<PhyloTree> tree2 = new SimpleObjectProperty<>();
 	private final EmbeddingOptimizer embeddingOptimizer = new EmbeddingOptimizer();
@@ -69,19 +70,15 @@ public class TanglegramEmbeddingOptimizer {
 
 		service.setCallable(() -> {
 			embeddingOptimizer.apply(new PhyloTree[]{tree1.get(), tree2.get()}, service.getProgressListener(), isUseShortestPaths(), isUseFastAlignmentHeuristic());
-			var cycle1_0 = embeddingOptimizer.getFirstOrder().stream().mapToInt(label -> mainWindow.getWorkflow().getWorkingTaxaBlock().indexOf(label)).filter(t -> t != -1).toArray();
-			var cycle1 = new int[cycle1_0.length + 1];
-			System.arraycopy(cycle1_0, 0, cycle1, 1, cycle1_0.length);
-			var cycle2_0 = embeddingOptimizer.getSecondOrder().stream().mapToInt(label -> mainWindow.getWorkflow().getWorkingTaxaBlock().indexOf(label)).filter(t -> t != -1).toArray();
-			var cycle2 = new int[cycle2_0.length + 1];
-			System.arraycopy(cycle2_0, 0, cycle2, 1, cycle2_0.length);
-			return new Result(tree1.get(), cycle1, tree2.get(), cycle2);
+			return new Pair<>(tree1.get(), tree2.get());
 		});
 	}
 
-	public void apply(PhyloTree tree1, PhyloTree tree2, Consumer<Result> resultConsumer) {
+	public void apply(PhyloTree tree1, PhyloTree tree2, Consumer<Pair<PhyloTree, PhyloTree>> resultConsumer) {
 		this.tree1.set(new PhyloTree(tree1));
+		// LSATree.computeNodeLSAChildrenMap(this.tree1.get());
 		this.tree2.set(new PhyloTree(tree2));
+		// LSATree.computeNodeLSAChildrenMap(this.tree2.get());
 		service.setOnSucceeded(e -> resultConsumer.accept(service.getValue()));
 		service.restart();
 	}
@@ -112,8 +109,5 @@ public class TanglegramEmbeddingOptimizer {
 
 	public ReadOnlyBooleanProperty runningProperty() {
 		return service.runningProperty();
-	}
-
-	public static record Result(PhyloTree tree1, int[] cycle1, PhyloTree tree2, int[] cycle2) {
 	}
 }

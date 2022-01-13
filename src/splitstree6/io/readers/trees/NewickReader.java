@@ -126,7 +126,8 @@ public class NewickReader extends TreesReader {
 							treesBlock.setPartial(true);
 							for (var name : labelList) {
 								if (!taxonNamesFound.contains(name)) {
-									System.err.println("Additional taxon name: " + name);
+									if (false)
+										System.err.println("Additional taxon name: " + name);
 									taxonNamesFound.add(name);
 									orderedTaxonNames.add(name);
 									taxName2Id.put(name, orderedTaxonNames.size());

@@ -48,14 +48,14 @@ public class TanglegramTreePane extends Group {
 	private Runnable runAfterUpdate;
 
 	public TanglegramTreePane(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
-							  ObjectProperty<PhyloTree> tree, ObjectProperty<int[]> taxonOrdering, ObjectProperty<Dimension2D> dimensions,
+							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LayoutOrientation> optionOrientation, ReadOnlyDoubleProperty fontScaleFactorProperty) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonOrdering.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), optionOrientation, new SimpleDoubleProperty(1.0), fontScaleFactorProperty, new SimpleObjectProperty<>(TreePagesView.TreeLabels.None));
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
@@ -69,7 +69,6 @@ public class TanglegramTreePane extends Group {
 		// optionOrientation.addListener(new WeakInvalidationListener(updater)); // treepane listens for chanages of orientation
 		dimensions.addListener(new WeakInvalidationListener(updater));
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updater));
-		taxonOrdering.addListener(new WeakInvalidationListener(updater));
 	}
 
 	public Runnable getRunAfterUpdate() {

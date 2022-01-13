@@ -44,6 +44,7 @@ import jloda.graph.NodeIntArray;
 import jloda.graph.NodeSet;
 import jloda.graph.algorithms.Dijkstra;
 import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
 import splitstree6.data.parts.ASplit;
 
 import java.util.*;
@@ -215,33 +216,30 @@ public class OptimizeUtils {
      * @return split system for this tanglegram
      */
     public static ArrayList<ASplit> getSplitSystem(Set<Set<String>> clusters, Map<String, Integer> taxon2ID) {
-        var splits = new ArrayList<ASplit>();
-        final BitSet activeTaxa = new BitSet();
-        for (String s : taxon2ID.keySet()) {
-            activeTaxa.set(taxon2ID.get(s));
-        }
-        for (Set<String> currCluster : clusters) {
-            //System.err.println("currCluster " + currCluster);
+		var splits = new ArrayList<ASplit>();
+		final var activeTaxa = BitSetUtils.asBitSet(taxon2ID.values());
+		for (var currCluster : clusters) {
+			//System.err.println("currCluster " + currCluster);
 
-            final BitSet sideA = new BitSet();
+			final var sideA = new BitSet();
 
-            for (String aCurrCluster : currCluster) {
-                if (taxon2ID.get(aCurrCluster) != null)
-                    sideA.set(taxon2ID.get(aCurrCluster));
-            }
+			for (var taxonLabel : currCluster) {
+				sideA.set(taxon2ID.get(taxonLabel));
+			}
 
-            final BitSet complement = (BitSet) activeTaxa.clone();
-            complement.andNot(sideA);
-            if (complement.cardinality() > 0 && sideA.cardinality() > 0) {
-                final var split = new ASplit(sideA, complement);
+			if (sideA.cardinality() > 0) {
+				final var sideB = BitSetUtils.minus(activeTaxa, sideA);
+				if (sideB.cardinality() > 0) {
+					final var split = new ASplit(sideA, sideB);
 
-                //System.err.println("split " + split);
+					//System.err.println("split " + split);
 
-                if (!splits.contains(split)) {
-                    splits.add(split);
-                }
-            }
-        }
+					if (!splits.contains(split)) {
+						splits.add(split);
+					}
+				}
+			}
+		}
         return splits;
     }
 

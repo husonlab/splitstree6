@@ -52,7 +52,6 @@ import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 import splitstree6.data.TaxaBlock;
-import splitstree6.view.trees.ordering.CircularOrdering;
 
 import java.util.function.BiConsumer;
 
@@ -71,7 +70,6 @@ public class ComputeTreeLayout {
 	 *
 	 * @param taxaBlock            set of working taxa
 	 * @param tree                 tree
-	 * @param taxonOrdering        if non-null, maps the i-th taxon to its position in the leaf ordering
 	 * @param diagram              diagram type
 	 * @param width                target width
 	 * @param height               target height
@@ -81,7 +79,7 @@ public class ComputeTreeLayout {
 	 * @param alignLabels          align labels in rectangular and circular phylograms
 	 * @return group of all edges, nodes and node-labels
 	 */
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, int[] taxonOrdering, TreeDiagramType diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
+	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagramType diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
 							  BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Group();
@@ -92,14 +90,6 @@ public class ComputeTreeLayout {
 		//parentPlacement = ParentPlacement.LeafAverage;
 
 		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
-
-		if (taxonOrdering == null || taxonOrdering.length == 0) {
-			taxonOrdering = CircularOrdering.computeRealizableCycle(tree, CircularOrdering.apply(taxaBlock, tree));
-		}
-
-		final var taxon2pos = new int[taxaBlock.getNtax() + 1];
-		for (int pos = 1; pos < taxonOrdering.length; pos++)
-			taxon2pos[taxonOrdering[pos]] = pos;
 
 		var triplet = LayoutUtils.computeFontHeightGraphWidthHeight(taxaBlock, tree, diagram.isRadial(), width, height);
 		var fontHeight = triplet.getFirst();
@@ -122,12 +112,12 @@ public class ComputeTreeLayout {
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
-			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, taxon2pos, true);
-			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, taxon2pos, false);
-			case TriangularCladogram -> LayoutTreeTriangular.apply(tree, taxon2pos);
-			case RadialPhylogram -> LayoutTreeRadial.apply(tree, taxon2pos);
-			case RadialCladogram, CircularCladogram -> LayoutTreeCircular.apply(tree, taxon2pos, nodeAngleMap, false);
-			case CircularPhylogram -> LayoutTreeCircular.apply(tree, taxon2pos, nodeAngleMap, true);
+			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, true);
+			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, false);
+			case TriangularCladogram -> LayoutTreeTriangular.apply(tree);
+			case RadialPhylogram -> LayoutTreeRadial.apply(tree);
+			case RadialCladogram, CircularCladogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, false);
+			case CircularPhylogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, true);
 		};
 
 		LayoutUtils.normalize(width, height, nodePointMap, diagram.isRadial());

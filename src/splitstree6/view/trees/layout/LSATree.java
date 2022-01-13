@@ -1,23 +1,4 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
- *
- *  (Some files contain contributions from other authors, who are then mentioned separately.)
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
-/*
  *  LSATree.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
@@ -35,7 +16,8 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package splitstree6.view.trees.tanglegram.optimize;
+
+package splitstree6.view.trees.layout;
 
 
 import jloda.graph.*;
@@ -88,46 +70,6 @@ public class LSATree {
 				Node lsa = reticulation2LSA.get(v);
 				if (lsa != null)
 					tree.getLSAChildrenMap().get(lsa).add(v);
-			}
-		}
-	}
-
-
-	/**
-	 * recursively determine the number of edges between a reticulation and its lsa
-	 *
-	 * @param tree
-	 * @param reticulation2LSA
-	 * @return number of edges between a reticulation and its lsa
-	 */
-	private static NodeIntArray computeReticulationSize(PhyloTree tree, NodeArray<Node> reticulation2LSA) {
-		NodeIntArray rSize = new NodeIntArray(tree);
-
-		for (Node r = tree.getFirstNode(); r != null; r = r.getNext()) {
-			Node lsa = reticulation2LSA.get(r);
-			if (lsa != null) {
-				System.err.println("lsa: " + lsa + " r: " + r);
-				EdgeSet visited = new EdgeSet(tree);
-				computeReticulationSizeRec(r, lsa, visited);
-				rSize.set(r, visited.size());
-			}
-		}
-
-		return rSize;
-	}
-
-	/**
-	 * recursively count edges from r upto lsa
-	 *
-	 * @param r
-	 * @param lsa
-	 * @param visited
-	 */
-	private static void computeReticulationSizeRec(Node r, Node lsa, EdgeSet visited) {
-		for (Edge e = r.getFirstInEdge(); e != null; e = r.getNextInEdge(e)) {
-			if (!visited.contains(e) && e.getSource() != lsa) {
-				visited.add(e);
-				computeReticulationSizeRec(e.getSource(), lsa, visited);
 			}
 		}
 	}

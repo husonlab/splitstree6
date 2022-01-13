@@ -26,7 +26,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.util.DraggableLabel;
-import jloda.phylo.PhyloTree;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 
@@ -73,13 +72,13 @@ public class TanglegramViewController {
 	private Button contractHorizontallyButton;
 
 	@FXML
-	private ComboBox<PhyloTree> tree1CBox;
+	private ComboBox<String> tree1CBox;
 
 	@FXML
 	private ComboBox<TreeDiagramType> diagram1CBox;
 
 	@FXML
-	private ComboBox<PhyloTree> tree2CBox;
+	private ComboBox<String> tree2CBox;
 	@FXML
 	private ComboBox<TreeDiagramType> diagram2CBox;
 
@@ -178,7 +177,7 @@ public class TanglegramViewController {
 		return contractHorizontallyButton;
 	}
 
-	public ComboBox<PhyloTree> getTree1CBox() {
+	public ComboBox<String> getTree1CBox() {
 		return tree1CBox;
 	}
 
@@ -186,7 +185,7 @@ public class TanglegramViewController {
 		return diagram1CBox;
 	}
 
-	public ComboBox<PhyloTree> getTree2CBox() {
+	public ComboBox<String> getTree2CBox() {
 		return tree2CBox;
 	}
 

@@ -25,6 +25,7 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.util.Counter;
 import jloda.util.IteratorUtils;
 import jloda.util.Pair;
 import jloda.util.Single;
@@ -42,20 +43,15 @@ public class LayoutTreeRadial {
 	/**
 	 * compute layout for a radial phylogram
 	 */
-	public static NodeArray<Point2D> apply(PhyloTree tree, int[] taxon2pos) {
+	public static NodeArray<Point2D> apply(PhyloTree tree) {
 		// compute angles:
 		try (var nodeAngleMap = tree.newNodeDoubleArray()) {
-			final var alpha = (tree.getNumberOfNodes() > 0 ? 360.0 / tree.nodeStream().filter(Node::isLeaf).count() : 0);
-
+			final var alpha = (tree.getNumberOfNodes() > 0 ? 360.0 / tree.nodeStream().filter(tree::isLsaLeaf).count() : 0);
 			nodeAngleMap.put(tree.getRoot(), 0.0);
-			var lsaLeafAngleMap = splitstree6.view.trees.layout.LSAUtils.computeAngleForLSALeaves(tree, taxon2pos, alpha);
-
+			var counter = new Counter(0);
 			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (tree.isLeaf(v)) {
-					var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-					nodeAngleMap.put(v, pos * alpha);
-				} else if (tree.isLsaLeaf(v)) {
-					nodeAngleMap.put(v, lsaLeafAngleMap.get(v));
+				if (tree.isLeaf(v) || tree.isLsaLeaf(v)) {
+					nodeAngleMap.put(v, (double) counter.incrementAndGet() * alpha);
 				} else {
 					var aMin = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
 							.mapToDouble(nodeAngleMap::get).min().orElse(0);

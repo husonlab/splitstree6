@@ -21,7 +21,6 @@ package splitstree6.view.trees.layout;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
@@ -38,7 +37,7 @@ public class LayoutTreeCircular {
 	/**
 	 * compute layout for a circular cladogram
 	 */
-	public static NodeArray<Point2D> apply(PhyloTree tree, int[] taxon2pos, NodeDoubleArray nodeAngleMap, boolean toScale) {
+	public static NodeArray<Point2D> apply(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean toScale) {
 
 		// compute radius:
 		try (var nodeRadiusMap = tree.newNodeDoubleArray()) {
@@ -55,24 +54,9 @@ public class LayoutTreeCircular {
 			nodeRadiusMap.put(tree.getRoot(), 0.0);
 
 			// compute angle
-			nodeAngleMap.put(tree.getRoot(), 0.0);
-			final var alpha = (tree.getNumberOfNodes() > 0 ? 360.0 / tree.nodeStream().filter(Node::isLeaf).count() : 0.0);
-
-			var lsaLeafAngleMap = splitstree6.view.trees.layout.LSAUtils.computeAngleForLSALeaves(tree, taxon2pos, alpha);
+			ComputeYCoordinates.computeAngles(tree, nodeAngleMap);
 
 			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (tree.isLeaf(v)) {
-					var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-					nodeAngleMap.put(v, pos * alpha);
-				} else if (tree.isLsaLeaf(v)) {
-					nodeAngleMap.put(v, lsaLeafAngleMap.get(v));
-				} else {
-					var aMin = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
-							.mapToDouble(nodeAngleMap::get).min().orElse(0);
-					var aMax = IteratorUtils.asStream(tree.lsaChildren(v)).filter(w -> v.getEdgeTo(w) != null)
-							.mapToDouble(nodeAngleMap::get).max().orElse(0);
-					nodeAngleMap.put(v, 0.5 * (aMin + aMax));
-				}
 				if (toScale && v.getInDegree() > 0) {
 					var e = v.getFirstInEdge();
 					var parentRadius = nodeRadiusMap.get(e.getSource());

@@ -41,12 +41,14 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
+import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 
+import java.io.IOException;
 import java.util.*;
 
 /**
@@ -54,12 +56,8 @@ import java.util.*;
  * Daniel Huson, Celine Scornavacca 7.2010
  */
 public class EmbeddingOptimizer {
-	public final boolean DEBUG = false;
-	public final boolean DEBUG_time = false;
-	public final boolean printILP = false;
-
-	private List<String> firstOrder = null;
-	private List<String> secondOrder = null;
+	public static final boolean DEBUG = false;
+	public static final boolean printILP = false;
 
 	/**
 	 * apply the embedding algorithm to a single tree
@@ -67,7 +65,7 @@ public class EmbeddingOptimizer {
 	 * @param tree
 	 * @param progressListener
 	 */
-	public void apply(PhyloTree tree, ProgressListener progressListener) throws CanceledException {
+	public static void apply(PhyloTree tree, ProgressListener progressListener) throws CanceledException {
 		if (printILP) {
 			int tempIndex = 1;
 			for (var v : tree.nodes()) {
@@ -93,7 +91,7 @@ public class EmbeddingOptimizer {
 	 * @param progressListener
 	 * @param useFastAlignmentHeuristic
 	 */
-	public int apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
+	public static int apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
 		if (progressListener != null) {
 			progressListener.setTasks("Optimizing embedding", "Using Scornavacca, Zickmann & Huson, 2011");
 			//progressListener.setCancelable(false);
@@ -103,10 +101,6 @@ public class EmbeddingOptimizer {
 		//System.err.println("Computing optimal embedding using circular-ordering algorithm");
 		final var taxon2Id = new TreeMap<String, Integer>();
 		final var id2Taxon = new HashMap<Integer, String>();
-
-		var timeBef = System.currentTimeMillis();
-		var timeStart = System.currentTimeMillis();
-		var timeNeeded = 0L;
 
 		var dummyLeaves = new Vector<Node>();
 		var count = 1;
@@ -152,13 +146,6 @@ public class EmbeddingOptimizer {
 		if (false)
 			System.err.println("circularOrdering: " + StringUtils.toString(circularOrdering, " "));
 
-
-		if (DEBUG_time) {
-			timeNeeded = System.currentTimeMillis() - timeBef;
-			timeBef = System.currentTimeMillis();
-			System.err.println(" breakpoint 1:" + timeNeeded);
-		}
-
 		if (!useFastAlignmentHeuristic && trees.length == 2) {
 			final var bestOrdering = getLinearOrderingId(circularOrdering, idRho);
 
@@ -193,12 +180,6 @@ public class EmbeddingOptimizer {
 			var newOrder = (LinkedList<String>[]) new LinkedList[2];
 			newOrder[0] = new LinkedList<>();
 			newOrder[1] = new LinkedList<>();
-
-			if (DEBUG_time) {
-				timeNeeded = System.currentTimeMillis() - timeBef;
-				timeBef = System.currentTimeMillis();
-				System.err.println(" breakpoint 2:" + timeNeeded);
-			}
 
 			var currOrderingListNew = new LinkedList<String>();
 			for (var i = 1; i < bestOrdering.length; i++) {
@@ -432,16 +413,26 @@ public class EmbeddingOptimizer {
 				System.err.println("second: " + StringUtils.toString(newOrder[1], " "));
 			}
 
-			firstOrder = new LinkedList<>(newOrder[0]);
-			secondOrder = new LinkedList<>(newOrder[1]);
-
-			if (false)
+			if (true)
 				System.err.println("Smallest crossing number found: " + finalScore);
 			if (false) {
-				System.err.println("Order of the taxa in the trees: ");
-				System.err.println(firstOrder);
-				System.err.println(secondOrder);
+
+				for (var i = 0; i < trees.length; i++) {
+					System.err.println("Order of the taxa in tree " + (i + 1) + ":");
+					System.err.println(newOrder[i]);
+				}
 			}
+			// reorder adjacencies to reflect the ordering:
+			try {
+				for (int i = 0; i < trees.length; i++) {
+					var node2pos = EmbedderForOrderPrescribedNetwork.setupOrderingFromNames(trees[i], newOrder[i]);
+					EmbedderForOrderPrescribedNetwork.apply(trees[i], node2pos);
+				}
+			} catch (IOException ex) {
+				Basic.caught(ex);
+			}
+
+
 			return finalScore; //in case we actually compute the layout, we return -1
 		} else {  // use fast alignment heuristic if number of trees !=2
 			useFastAlignmentHeuristic(trees, circularOrdering, idRho, taxon2Id, dummyLeaves);
@@ -458,17 +449,9 @@ public class EmbeddingOptimizer {
 	 * @param taxon2Id
 	 * @param dummyLeaves
 	 */
-	private void useFastAlignmentHeuristic(PhyloTree[] trees, int[] circularOrdering, int idRho, Map<String, Integer> taxon2Id, Vector<Node> dummyLeaves) {
-
+	private static void useFastAlignmentHeuristic(PhyloTree[] trees, int[] circularOrdering, int idRho, Map<String, Integer> taxon2Id, Vector<Node> dummyLeaves) {
 		var bestOrdering = getLinearOrderingId(circularOrdering, idRho);
 		var s = 0;
-		var timeBef = System.currentTimeMillis();
-
-		if (DEBUG_time) {
-			long timeNeeded = timeBef = System.currentTimeMillis() - timeBef;
-			timeBef = System.currentTimeMillis();
-			System.err.println(" breakpoint fastHeuristic:" + timeNeeded);
-		}
 
 		for (var tree : trees) {
 			var rho = dummyLeaves.get(s);
@@ -503,7 +486,6 @@ public class EmbeddingOptimizer {
 			computeTaxaBelowRec(tree.getRoot(), taxaBelow);
 			rotateTreeByTaxaBelow(tree, taxaBelow);
 			(new LayoutUnoptimized()).apply(tree, null);
-			System.err.print("");
 		}
 	}
 
@@ -515,7 +497,7 @@ public class EmbeddingOptimizer {
 	 * @param idRho
 	 * @return linear ordering
 	 */
-	private int[] getLinearOrderingId(int[] circularOrdering, int idRho) {
+	private static int[] getLinearOrderingId(int[] circularOrdering, int idRho) {
 		var start = 0;
 		for (var src = 1; src < circularOrdering.length; src++) {
 			if (circularOrdering[src] == idRho)
@@ -626,7 +608,7 @@ public class EmbeddingOptimizer {
 	 * @return
 	 */
 	//working
-	public int[] computerCircularOrderingHardwiredMatrix(PhyloTree[] trees, Map<String, Integer> taxon2ID, Map<Integer, String> id2Taxon) {
+	public static int[] computerCircularOrderingHardwiredMatrix(PhyloTree[] trees, Map<String, Integer> taxon2ID, Map<Integer, String> id2Taxon) {
 		if (taxon2ID.size() > 2) {
 
 			double[][] distMat = null;
@@ -666,7 +648,7 @@ public class EmbeddingOptimizer {
 						String taxon = it.next();
 						Node toDelete = null;
 						for (Node node : newTrees[s].nodes()) {
-							if (node.getOutDegree() == 0 && newTrees[s].getLabel(node).equals(taxon)) {
+							if (node.getOutDegree() == 0 && newTrees[s].getLabel(node)!=null &&  newTrees[s].getLabel(node)==taxon) {
 								toDelete = node;
 								break;
 							}
@@ -728,7 +710,7 @@ public class EmbeddingOptimizer {
 
 					int index = 0;
 					for (int i : ordering) {
-						if (!taxaNotInTrees[0].contains(id2Taxon.get(i)) && !taxaNotInTrees[1].contains(id2Taxon.get(i))) {
+						if (i > 0 && !taxaNotInTrees[0].contains(id2Taxon.get(i)) && !taxaNotInTrees[1].contains(id2Taxon.get(i))) {
 							newOrdering[index] = i;
 							index++;
 						}
@@ -754,7 +736,7 @@ public class EmbeddingOptimizer {
 	 * @param id2Taxon
 	 * @return
 	 */
-	public int[] computerCircularOrderingShortestPathMatrix(PhyloTree[] trees, Map<String, Integer> taxon2ID, Map<Integer, String> id2Taxon) {
+	public static int[] computerCircularOrderingShortestPathMatrix(PhyloTree[] trees, Map<String, Integer> taxon2ID, Map<Integer, String> id2Taxon) {
 
 		if (taxon2ID.size() > 2) {
 			int count = 1;
@@ -817,24 +799,6 @@ public class EmbeddingOptimizer {
 			}
 			return ordering;
 		}
-	}
-
-	/**
-	 * gets the list of taxa for the first network, if computed
-	 *
-	 * @return list of taxa or null
-	 */
-	public List<String> getFirstOrder() {
-		return firstOrder;
-	}
-
-	/**
-	 * gets the list of taxa for the second network, if computed
-	 *
-	 * @return list of taxa or null
-	 */
-	public List<String> getSecondOrder() {
-		return secondOrder;
 	}
 
 	private static PhyloTree copySubtreeWithoutReticulations(PhyloTree src, Node v) {

@@ -34,6 +34,9 @@ import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
+import jloda.util.CanceledException;
+import jloda.util.progress.ProgressSilent;
+import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.window.MainWindow;
 
 /**
@@ -92,11 +95,18 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		var c = 0;
 		for (int which = start; which < top; which++) {
 			var tree = trees.get(which);
+			if (tree.isReticulated()) {
+				tree = new PhyloTree(tree);
+				try {
+					EmbeddingOptimizer.apply(tree, new ProgressSilent());
+				} catch (CanceledException ignored) {
+				}
+			}
 			var name = (tree.getName() != null ? tree.getName() : "tree-" + (which + 1));
 
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
-				var treePane = new TreePane(taxaBlock, tree, name, null, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+				var treePane = new TreePane(taxaBlock, tree, name, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.optionOrientationProperty(), treePagesView.optionZoomFactorProperty(), treePagesView.optionFontScaleFactorProperty(),
 						treePagesView.optionTreeLabelsProperty());
 				treePane.drawTree();

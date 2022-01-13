@@ -34,6 +34,7 @@ import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
 import jloda.fx.util.BasicFX;
+import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.parts.Taxon;
@@ -45,6 +46,7 @@ import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static splitstree6.view.trees.layout.TreeDiagramType.*;
 import static splitstree6.view.trees.treepages.LayoutOrientation.*;
@@ -70,22 +72,19 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		this.tanglegramView = tanglegramView;
 		controller = tanglegramView.getController();
 
-		var taxonOrdering1 = new SimpleObjectProperty<int[]>(null);
-		var taxonOrdering2 = new SimpleObjectProperty<int[]>(null);
-
 		tree1.addListener((v, o, n) -> {
-					controller.getTree1CBox().setValue(n);
+					controller.getTree1CBox().setValue(n == null ? null : n.getName());
 					setLabel(n, tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
 				}
 		);
 
-		var tree1Pane = new TanglegramTreePane(mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, taxonOrdering1, treePaneDimensions,
+		var tree1Pane = new TanglegramTreePane(mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
 				tanglegramView.optionDiagram1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty());
 
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
 		tree2.addListener((v, o, n) -> {
-			controller.getTree2CBox().setValue(n);
+			controller.getTree2CBox().setValue(n == null ? null : n.getName());
 			setLabel(n, tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
 		});
 
@@ -98,42 +97,46 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		orientation2Property.set(tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg);
 
-		var tree2Pane = new TanglegramTreePane(mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, taxonOrdering2, treePaneDimensions,
+		var tree2Pane = new TanglegramTreePane(mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
 				tanglegramView.optionDiagram2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty());
 
 		controller.getRightPane().getChildren().add(tree2Pane);
 
+		final ObservableList<String> treeNames = FXCollections.observableArrayList();
+		trees.addListener((InvalidationListener) e -> treeNames.setAll(trees.stream().map(Graph::getName).collect(Collectors.toList())));
+
+
 		{
-			controller.getTree1CBox().setItems(trees);
+			controller.getTree1CBox().setItems(treeNames);
 			controller.getTree1CBox().disableProperty().bind(Bindings.isEmpty(trees));
 			if (tanglegramView.getOptionTree1() <= trees.size())
-				controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree1() - 1));
+				controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree1() - 1).getName());
 			controller.getTree1CBox().valueProperty().addListener((v, o, n) -> {
 				if (n != null)
-					tanglegramView.optionTree1Property().set(trees.indexOf(n) + 1);
+					tanglegramView.optionTree1Property().set(controller.getTree1CBox().getItems().indexOf(n) + 1);
 			});
 
-			controller.getTree2CBox().setItems(trees);
+			controller.getTree2CBox().setItems(treeNames);
 			controller.getTree2CBox().disableProperty().bind(Bindings.isEmpty(trees));
 			if (tanglegramView.getOptionTree2() <= trees.size())
-				controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree2() - 1));
+				controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree2() - 1).getName());
 			controller.getTree2CBox().valueProperty().addListener((v, o, n) -> {
 				if (n != null)
-					tanglegramView.optionTree2Property().set(trees.indexOf(n) + 1);
+					tanglegramView.optionTree2Property().set(controller.getTree2CBox().getItems().indexOf(n) + 1);
 			});
 
 			trees.addListener((InvalidationListener) e -> {
 				if (controller.getTree1CBox().getValue() == null) {
 					if (tanglegramView.getOptionTree1() >= 1 && tanglegramView.getOptionTree1() <= trees.size())
-						controller.getTree1CBox().setValue(trees.get(tanglegramView.getOptionTree1() - 1));
+						controller.getTree1CBox().setValue(treeNames.get(tanglegramView.getOptionTree1() - 1));
 					else if (trees.size() >= 1)
-						controller.getTree1CBox().setValue(trees.get(0));
+						controller.getTree1CBox().setValue(treeNames.get(0));
 				}
 				if (controller.getTree2CBox().getValue() == null) {
 					if (tanglegramView.getOptionTree2() >= 1 && tanglegramView.getOptionTree2() <= trees.size())
-						controller.getTree2CBox().setValue(trees.get(tanglegramView.getOptionTree2() - 1));
+						controller.getTree2CBox().setValue(treeNames.get(tanglegramView.getOptionTree2() - 1));
 					else if (trees.size() >= 2)
-						controller.getTree2CBox().setValue(trees.get(1));
+						controller.getTree2CBox().setValue(treeNames.get(1));
 				}
 			});
 		}
@@ -144,18 +147,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				var t1 = tanglegramView.getOptionTree1();
 				var t2 = tanglegramView.getOptionTree2();
 
-				if (t1 >= 1 && t1 <= trees.size())
-					tree1.set(trees.get(t1 - 1));
-				if (t2 >= 1 && t2 <= trees.size())
-					tree2.set(trees.get(t2 - 1));
-
 				if (t1 >= 1 && t1 <= trees.size() && t2 >= 1 && t2 <= trees.size()) {
 					controller.getBorderPane().disableProperty().bind(optimizeEmbeddings.runningProperty());
-					optimizeEmbeddings.apply(tree1.get(), tree2.get(), result -> {
-						tree1.get().copy(result.tree1());
-						taxonOrdering1.set(result.cycle1());
-						tree2.get().copy(result.tree2());
-						taxonOrdering2.set(result.cycle2());
+					optimizeEmbeddings.apply(trees.get(t1 - 1), trees.get(t2 - 1), result -> {
+						tree1.set(result.getFirst());
+						tree2.set(result.getSecond());
 					});
 				}
 			};
@@ -389,5 +385,4 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 	}
-
 }

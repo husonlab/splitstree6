@@ -61,7 +61,7 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, int[] taxonOrdering, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
+	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels) {
 
@@ -110,7 +110,7 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			var group = ComputeTreeLayout.apply(taxaBlock, phyloTree, taxonOrdering, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
+			var group = ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
 			group.setId("treeGroup");
 			return group;
 		});

@@ -24,6 +24,7 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.util.Counter;
 import jloda.util.IteratorUtils;
 import jloda.util.Pair;
 
@@ -34,7 +35,7 @@ import java.util.Comparator;
  * Daniel Huson, 12.2021
  */
 public class LayoutTreeTriangular {
-	public static NodeArray<Point2D> apply(PhyloTree tree, int[] taxon2pos) {
+	public static NodeArray<Point2D> apply(PhyloTree tree) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 		final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
 
@@ -43,14 +44,10 @@ public class LayoutTreeTriangular {
 			nodePointMap.put(root, new Point2D(0.0, 0.0));
 			// compute all y-coordinates:
 			{
-				var lsaLeafHeightMap = splitstree6.view.trees.layout.LSAUtils.computeHeightForLSALeaves(tree, taxon2pos);
+				var counter = new Counter(0);
 				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-					if (tree.isLeaf(v)) {
-						var pos = taxon2pos[tree.getTaxa(v).iterator().next()];
-						nodePointMap.put(v, new Point2D(0.0, pos));
-						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
-					} else if (tree.isLsaLeaf(v)) {
-						nodePointMap.put(v, new Point2D(0.0, lsaLeafHeightMap.get(v)));
+					if (tree.isLeaf(v) || tree.isLsaLeaf(v)) {
+						nodePointMap.put(v, new Point2D(0.0, (double) counter.incrementAndGet()));
 						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
 					} else {
 						var firstLeafBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> firstLastLeafBelowMap.get(w).getFirst()).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))
