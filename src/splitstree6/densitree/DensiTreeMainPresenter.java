@@ -21,12 +21,16 @@ package splitstree6.densitree;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.util.AService;
+import jloda.fx.util.FXSwingUtilities;
 import jloda.util.ProgramProperties;
 import splitstree6.io.readers.trees.NewickReader;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 import java.io.File;
 import java.io.IOException;
@@ -77,19 +81,22 @@ public class DensiTreeMainPresenter {
 			}
 		});
 
-		InvalidationListener listener = observable -> DensiTree.draw(new DensiTree.Parameters(true), model, controller.getCanvas(), controller.getPane());
+
+		InvalidationListener listener = observable -> DensiTree.draw(new DensiTree.Parameters(controller.getCheckBox().isSelected()), model, controller.getCanvas(), controller.getPane());
 
 		controller.getDrawButton().setOnAction(e -> {
-			var parameters = new DensiTree.Parameters(true);
+			var parameters = new DensiTree.Parameters(controller.getCheckBox().isSelected());
 			DensiTree.draw(parameters, model, controller.getCanvas(), controller.getPane());
 			controller.getMainPane().widthProperty().addListener(listener);
 			controller.getMainPane().heightProperty().addListener(listener);
+			controller.getCheckBox().selectedProperty().addListener(listener);
 		});
 		controller.getDrawButton().disableProperty().bind(Bindings.isEmpty(model.getTreesBlock().getTrees()));
 		controller.getClearButton().setOnAction(e -> {
-			DensiTree.clear(controller.getCanvas());
+			DensiTree.clear(controller.getCanvas(), controller.getPane());
 			controller.getMainPane().widthProperty().removeListener(listener);
 			controller.getMainPane().heightProperty().removeListener(listener);
+			controller.getCheckBox().selectedProperty().removeListener(listener);
 		});
 	}
 }

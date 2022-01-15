@@ -21,10 +21,7 @@ package splitstree6.densitree;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -60,6 +57,9 @@ public class DensiTreeMainController {
 
 	@FXML
 	private Button clearButton;
+
+	@FXML
+	private CheckBox checkBox;
 
 	@FXML
 	private FlowPane bottomFlowPane;
@@ -105,6 +105,10 @@ public class DensiTreeMainController {
 
 	public Button getClearButton() {
 		return clearButton;
+	}
+
+	public CheckBox getCheckBox() {
+		return checkBox;
 	}
 
 	public FlowPane getBottomFlowPane() {

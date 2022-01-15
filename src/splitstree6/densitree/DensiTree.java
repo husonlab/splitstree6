@@ -19,14 +19,18 @@
 
 package splitstree6.densitree;
 
+import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.util.Pair;
+import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
@@ -40,10 +44,11 @@ import java.util.Objects;
  */
 public class DensiTree {
 
-    public static void clear(Canvas canvas) {
+    public static void clear(Canvas canvas, Pane pane) {
         var gc = canvas.getGraphicsContext2D();
         gc.restore();
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        pane.getChildren().clear();
     }
 
     public static void draw(Parameters parameters, Model model, Canvas canvas, Pane pane) {
@@ -57,8 +62,6 @@ public class DensiTree {
 
         pane.getChildren().clear();
 
-        var line = new Line(0,0, pane.getWidth(), pane.getHeight());
-        pane.getChildren().add(line);
 
         System.out.println("Pane:");
         System.out.println("Width: " + pane.getWidth());
@@ -97,6 +100,8 @@ public class DensiTree {
         int ymin = (int) 100;
         int xmax = (int) (canvas.getWidth() -100);
         int ymax = (int) (canvas.getHeight() -100);
+
+        boolean toScale = parameters.toScale;
         //int rmax = Math.min(x0, y0) - 100;
 
         int[] circle = model.getCircularOrdering();
@@ -112,7 +117,15 @@ public class DensiTree {
         for (int i = 1; i <= model.getTreesBlock().size(); i++) {
             var tree = model.getTreesBlock().getTree(i);
             //drawEdges(angles, rmax, x0, y0, tree, tree.getRoot(), gc, calculateWeightSum(tree, tree.getRoot()));
-            drawEdges1(tree, circle, gc, xmin, ymin, xmax, ymax);
+            if(i == model.getTreesBlock().size()){
+                drawLabels1(tree, circle, pane, xmin, ymin, xmax, ymax, toScale);
+                gc.setLineWidth(1);
+                gc.setStroke(Color.GREENYELLOW);
+                drawEdges1(tree, circle, gc, xmin, ymin, xmax, ymax, toScale);
+                gc.setLineWidth(0.01);
+                gc.setStroke(Color.BLACK);
+            }
+            drawEdges1(tree, circle, gc, xmin, ymin, xmax, ymax, toScale);
         }
         gc.setLineWidth(1.0);
     }
@@ -227,10 +240,41 @@ public class DensiTree {
 
     }
 
-    public static void drawEdges1(PhyloTree tree, int[] circle, GraphicsContext gc, int xmin, int ymin, int xmax, int ymax) {
+    public static void drawLabels1(PhyloTree tree, int[] circle, Pane pane, int xmin, int ymin, int xmax, int ymax, boolean toScale){
         NodeArray<Point2D> nodePointMap = tree.newNodeArray();
         var nodeAngleMap = tree.newNodeDoubleArray();
-        LayoutAlgorithm.apply(tree, false, circle, nodePointMap, nodeAngleMap);
+        LayoutAlgorithm.apply(tree, toScale, circle, nodePointMap, nodeAngleMap);
+        adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+
+        for (var e : tree.edges()) {
+            var v = e.getSource();
+            var w = e.getTarget();
+            var vPt = nodePointMap.get(v);
+            var wPt = nodePointMap.get(w);
+            if (e.getTarget().isLeaf()) {
+                var label = new RichTextLabel(tree.getLabel(w));
+                ChangeListener<Number> listener = (observableValue, oldValue, newValue) -> { // use a listener because we have to wait until both width and height have been set
+                    if (oldValue.doubleValue() == 0 && newValue.doubleValue() > 0 && label.getWidth() > 0 && label.getHeight() > 0) {
+                        var angle = nodeAngleMap.get(w);
+                        var delta = GeometryUtilsFX.translateByAngle(-0.5 * label.getWidth(), -0.5 * label.getHeight(), angle, 0.5 * label.getWidth() + 5);
+                        label.setLayoutX(wPt.getX() + delta.getX());
+                        label.setLayoutY(wPt.getY() + delta.getY());
+                        label.setRotate(angle);
+                        label.ensureUpright();
+                        label.setTextFill(Color.RED);
+                    }
+                };
+                label.widthProperty().addListener(listener);
+                label.heightProperty().addListener(listener);
+                pane.getChildren().add(label);
+            }
+        }
+    }
+
+    public static void drawEdges1(PhyloTree tree, int[] circle, GraphicsContext gc, int xmin, int ymin, int xmax, int ymax, boolean toScale) {
+        NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+        var nodeAngleMap = tree.newNodeDoubleArray();
+        LayoutAlgorithm.apply(tree, toScale, circle, nodePointMap, nodeAngleMap);
         adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
         for (var e : tree.edges()) {
