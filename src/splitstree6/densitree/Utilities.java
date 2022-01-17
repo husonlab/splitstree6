@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.data.DistancesBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.io.readers.trees.NewickReader;
@@ -36,21 +37,18 @@ public class Utilities {
 		return (new NewickReader()).getExtensionFilter();
 	}
 
-	public static int[] computeCycle(int ntax, TreesBlock treesBlock) {
-		var taxa = new BitSet();
-		for (var t = 1; t <= ntax; t++)
-			taxa.set(t);
-		int max_num_nodes = 3 * ntax - 5;
-		var distances = new double[max_num_nodes][max_num_nodes];
+	public static int[] computeCycle(BitSet taxa, TreesBlock treesBlock) {
+		var distances = new DistancesBlock();
+		distances.setNtax(taxa.cardinality());
 		var step = Math.max(1, treesBlock.getNTrees() / 1000);
 		var trees = treesBlock.getTrees();
 		for (int i = 0; i < trees.size(); i += step) {
 			var tree = trees.get(i);
 			var splits = new ArrayList<ASplit>();
 			TreesUtilities.computeSplits(taxa, tree, splits);
-			SplitsUtilities.splitsToDistances(ntax, splits, distances, false);
+			SplitsUtilities.splitsToDistances(splits, true, distances);
 		}
-		return NeighborNetCycle.compute(ntax, distances);
+		return NeighborNetCycle.compute(taxa.cardinality(), distances);
 	}
 
 }

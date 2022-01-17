@@ -21,20 +21,14 @@ package splitstree6.densitree;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.scene.image.WritableImage;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.util.AService;
-import jloda.fx.util.FXSwingUtilities;
 import jloda.util.ProgramProperties;
 import splitstree6.io.readers.trees.NewickReader;
 
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
 import java.io.File;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * the presenter
@@ -64,14 +58,16 @@ public class DensiTreeMainPresenter {
 				if (selectedFile.getParentFile().isDirectory())
 					ProgramProperties.put("InputDir", selectedFile.getParent());
 				var service = new AService<Integer>(controller.getBottomFlowPane());
-				service.setCallable(() ->
-				{
+				service.setCallable(() -> {
 					var newickReader = new NewickReader();
 					newickReader.read(service.getProgressListener(), selectedFile.getPath(), model.getTaxaBlock(), model.getTreesBlock());
 					if (model.getTreesBlock().isPartial())
 						throw new IOException("Partial trees not acceptable");
-					model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getNtax(), model.getTreesBlock()));
+					model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getTaxaSet(), model.getTreesBlock()));
 					return model.getTreesBlock().getNTrees();
+				});
+				service.setOnScheduled(a -> {
+					model.clear();
 				});
 				service.setOnSucceeded(a -> {
 					controller.getMessageLabel().setText(String.format("Trees: %,d", service.getValue()));

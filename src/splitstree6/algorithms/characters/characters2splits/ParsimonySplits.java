@@ -58,17 +58,17 @@ public class ParsimonySplits extends Characters2Splits {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock chars, SplitsBlock splitsBlock) throws IOException {
-		ArrayList<ASplit> previousSplits = new ArrayList<>(); // list of previously computed splits
-		ArrayList<ASplit> currentSplits = new ArrayList<>(); // current list of splits
-		final BitSet taxaPrevious = new BitSet(); // taxa already processed
+		splitsBlock.clear();
+
+		var previousSplits = new ArrayList<ASplit>(); // list of previously computed splits
+		var currentSplits = new ArrayList<ASplit>(); // current list of splits
 
 		progress.setMaximum(taxaBlock.getNtax());
 		progress.setProgress(0);
 
-		for (int t = 1; t <= taxaBlock.getNtax(); t++) {
+		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
 			// initally, just add 1 to set of previous taxa
 			if (t == 1) {
-				taxaPrevious.set(t);
 				continue;
 			}
 
@@ -78,7 +78,7 @@ public class ParsimonySplits extends Characters2Splits {
 
 			//System.err.println("wgt1 stuff: t=" + t + " AT=" + At);
 			{
-				final int wgt = pIndex(optionGapsAsMissing.getValue(), t, At, chars);
+				final var wgt = pIndex(optionGapsAsMissing.getValue(), t, At, chars);
 				//System.err.println("wgt1: " + wgt);
 				if (wgt > 0) {
 					currentSplits.add(new ASplit(At, t, wgt));
@@ -86,9 +86,9 @@ public class ParsimonySplits extends Characters2Splits {
 			}
 
 			// consider all previously computed splits:
-			for (ASplit prevSplit : previousSplits) {
-				final BitSet A = prevSplit.getA();
-				final BitSet B = prevSplit.getB();
+			for (var prevSplit : previousSplits) {
+				final var A = prevSplit.getA();
+				final var B = prevSplit.getB();
 				// is Au{t} vs B a split?
 				A.set(t);
 				{
@@ -103,7 +103,7 @@ public class ParsimonySplits extends Characters2Splits {
 				// is A vs Bu{t} a split?
 				B.set(t);
 				{
-					final int wgt = Math.min((int) prevSplit.getWeight(), pIndex(optionGapsAsMissing.getValue(), t, B, chars));
+					final var wgt = Math.min((int) prevSplit.getWeight(), pIndex(optionGapsAsMissing.getValue(), t, B, chars));
 					//System.err.println("wgt3: "+wgt);
 					if (wgt > 0)
 						currentSplits.add(new ASplit(B, t, wgt));
@@ -118,14 +118,12 @@ public class ParsimonySplits extends Characters2Splits {
 				currentSplits = tmp;
 				currentSplits.clear();
 			}
-
-			taxaPrevious.set(t);
 			progress.incrementProgress();
 		}
 
 		splitsBlock.getSplits().addAll(previousSplits);
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), previousSplits));
+		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 	}
 
 
@@ -139,18 +137,18 @@ public class ParsimonySplits extends Characters2Splits {
 	 * @return
 	 */
 	private int pIndex(boolean gapsAsMissing, int t, BitSet A, CharactersBlock characters) {
-		int value = Integer.MAX_VALUE;
+		var value = Integer.MAX_VALUE;
 
 		if (!A.get(t)) // a1==t
 			System.err.println("pIndex(): a1=" + t + " not in A");
 
-		for (int a2 = 1; a2 <= t; a2++) {
+		for (var a2 = 1; a2 <= t; a2++) {
 			if (A.get(a2))
-				for (int b1 = 1; b1 <= t; b1++) {
+				for (var b1 = 1; b1 <= t; b1++) {
 					if (!A.get(b1))
-						for (int b2 = b1; b2 <= t; b2++) {
+						for (var b2 = b1; b2 <= t; b2++) {
 							if (!A.get(b2)) {
-								int val_a1a2b1b2 = pScore(gapsAsMissing, t, a2, b1, b2, characters);
+								var val_a1a2b1b2 = pScore(gapsAsMissing, t, a2, b1, b2, characters);
 								//System.err.println(" a1, a2, b1, b2 = "+ a1+"; "+ a2+"; " +b1+"; "+ b2);
 								if (val_a1a2b1b2 != 0)
 									value = Math.min(value, val_a1a2b1b2);

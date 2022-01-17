@@ -112,60 +112,56 @@ public class SplitsUtilities {
 	 * @param splits the splits
 	 */
 	static public int[] computeCycle(int ntax, List<ASplit> splits) {
-		try {
-			final var pso = Basic.hideSystemOut();
-			final var pse = Basic.hideSystemErr();
+		if (ntax > 3) {
 			try {
-				return NeighborNetCycle.compute(ntax, splitsToDistances(ntax, splits, false));
-			} finally {
-				Basic.restoreSystemErr(pse);
-				Basic.restoreSystemOut(pso);
-			}
-		} catch (Exception ex) {
-			Basic.caught(ex);
-			final var order = new int[ntax + 1];
-			for (var t = 1; t <= ntax; t++) {
-				order[t] = t;
-			}
-			return order;
-		}
-	}
-
-	/**
-	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
-	 *
-	 * @param ntax   number of taxa
-	 * @param splits with 1-based taxa
-	 * @return distance matrix, 0-based
-	 */
-	public static double[][] splitsToDistances(int ntax, List<ASplit> splits, boolean useWeights) {
-		return splitsToDistances(ntax, splits, null, useWeights);
-	}
-
-	/**
-	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
-	 *
-	 * @param ntax   number of taxa
-	 * @param splits with 1-based taxa
-	 * @param dist   matrix, 0-based
-	 * @return distance matrix, 0-based
-	 */
-	public static double[][] splitsToDistances(int ntax, List<ASplit> splits, double[][] dist, boolean useWeights) {
-		if (dist == null)
-			dist = new double[ntax][ntax];
-		for (var i = 1; i <= ntax; i++) {
-			for (var j = i + 1; j <= ntax; j++) {
-				for (var split : splits) {
-					var A = split.getA();
-					var B = split.getB();
-					if (A.get(i) != A.get(j) && B.get(i) != B.get(j)) {
-						dist[i - 1][j - 1] += (useWeights ? split.getWeight() : 1.0);
-						dist[j - 1][i - 1] += (useWeights ? split.getWeight():1.0);
-					}
+				final var pso = Basic.hideSystemOut();
+				final var pse = Basic.hideSystemErr();
+				try {
+					return NeighborNetCycle.compute(ntax, splitsToDistances(ntax, splits, true));
+				} finally {
+					Basic.restoreSystemErr(pse);
+					Basic.restoreSystemOut(pso);
 				}
+			} catch (Exception ex) {
+				Basic.caught(ex);
 			}
 		}
-		return dist;
+		final var order = new int[ntax + 1];
+		for (var t = 1; t <= ntax; t++) {
+			order[t] = t;
+		}
+		return order;
+	}
+
+
+	/**
+	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
+	 *
+	 * @param ntax   number of taxa
+	 * @param splits with 1-based taxa
+	 * @return distance matrix, 0-based
+	 */
+	public static DistancesBlock splitsToDistances(int ntax, List<ASplit> splits, boolean useWeights) {
+		var distancesBlock = new DistancesBlock();
+		distancesBlock.setNtax(ntax);
+		splitsToDistances(splits, useWeights, distancesBlock);
+		return distancesBlock;
+	}
+
+	/**
+	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
+	 *
+	 * @param splits with 1-based taxa
+	 * @return distance matrix, 0-based
+	 */
+	public static void splitsToDistances(List<ASplit> splits, boolean useWeights, DistancesBlock distancesBlock) {
+		for (var split : splits) {
+			for (var i : BitSetUtils.members(split.getA()))
+				for (var j : BitSetUtils.members(split.getB(), i + 1)) {
+					distancesBlock.set(i, j, distancesBlock.get(i, j) + (useWeights ? split.getWeight() : 1.0));
+					distancesBlock.set(j, i, distancesBlock.get(i, j));
+				}
+		}
 	}
 
 
@@ -323,12 +319,12 @@ public class SplitsUtilities {
 		var maxA = 0.0;
 		for (var a : BitSetUtils.members(splitsBlock.get(split).getA())) {
 			for (var b : BitSetUtils.members(splitsBlock.get(split).getA(), a + 1))
-				maxA = Math.max(maxA, distances[a - 1][b - 1]);
+				maxA = Math.max(maxA, distances.get(a,b));
 		}
 		var maxB = 0.0;
 		for (var a : BitSetUtils.members(splitsBlock.get(split).getB())) {
 			for (var b : BitSetUtils.members(splitsBlock.get(split).getB(), a + 1))
-				maxB = Math.max(maxB, distances[a - 1][b - 1]);
+				maxB = Math.max(maxB,distances.get(a,b));
 		}
 		return Double.compare(maxA, maxB);
 	}

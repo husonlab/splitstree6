@@ -44,8 +44,7 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		controller.getApplyButton().setOnAction(e -> algorithmTab.getAlgorithmNode().restart());
 		controller.getApplyButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()));
 
-		var label = new Label();
-		label.textProperty().bind(algorithmTab.getAlgorithmNode().titleProperty());
+		var label = new Label(algorithmTab.getAlgorithmNode().getAlgorithm().getName());
 		algorithmTab.setGraphic(label);
 
 		controller.getAlgorithmCBox().valueProperty().addListener((v, o, n) -> {
@@ -63,6 +62,8 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((v, o, n) -> {
 			controller.getAlgorithmCBox().setValue(n);
 			setupOptionControls(controller, (Algorithm) n);
+			label.setText(n.getName());
+
 		});
 	}
 

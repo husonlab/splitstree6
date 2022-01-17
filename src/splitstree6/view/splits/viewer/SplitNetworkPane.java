@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ChangeListener;
@@ -53,6 +54,7 @@ public class SplitNetworkPane extends StackPane {
 	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 	private final ChangeListener<LayoutOrientation> orientChangeListener;
+	private final InvalidationListener layoutLabelsListener;
 	private final InvalidationListener redrawListener;
 
 	private final AService<Group> service;
@@ -67,7 +69,7 @@ public class SplitNetworkPane extends StackPane {
 							double boxWidth, double boxHeight,
 							SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting,
 							double rootAngle,
-							boolean useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+							ReadOnlyBooleanProperty useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 							DoubleProperty unitLength) {
 		getStyleClass().add("background");
 		getChildren().setAll(group);
@@ -91,6 +93,9 @@ public class SplitNetworkPane extends StackPane {
 		orientChangeListener = (v, o, n) -> splitstree6.view.splits.layout.LayoutUtils.applyOrientation(this, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or));
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
+		layoutLabelsListener = e -> layoutLabels(orientation.get());
+		useWeights.addListener(new WeakInvalidationListener(layoutLabelsListener));
+
 		redrawListener = e -> drawNetwork();
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(redrawListener));
 
@@ -104,7 +109,7 @@ public class SplitNetworkPane extends StackPane {
 				return new Group();
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
-					rootAngle, useWeights, taxonSelectionModel, unitLength, getPrefWidth() - 4, getPrefHeight() - 16, splitSelectionModel);
+					rootAngle, useWeights.get(), taxonSelectionModel, unitLength, getPrefWidth() - 4, getPrefHeight() - 16, splitSelectionModel);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());

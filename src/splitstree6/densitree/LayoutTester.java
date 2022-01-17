@@ -74,7 +74,7 @@ public class LayoutTester extends Application {
 		var newickReader = new NewickReader();
 		newickReader.read(new ProgressSilent(), file, model.getTaxaBlock(), model.getTreesBlock());
 
-		model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getNtax(), model.getTreesBlock()));
+		model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getTaxaSet(), model.getTreesBlock()));
 
 		var pane = new Pane();
 		pane.setPrefWidth(800);
@@ -104,7 +104,7 @@ public class LayoutTester extends Application {
 			if (useOwnCycle.isSelected()) {
 				var treesBlock = new TreesBlock();
 				treesBlock.getTrees().add(tree);
-				cycle = Utilities.computeCycle(model.getTaxaBlock().getNtax(), treesBlock);
+				cycle = Utilities.computeCycle(model.getTaxaBlock().getTaxaSet(), treesBlock);
 			}
 
 			try (NodeArray<Point2D> nodePointMap = tree.newNodeArray(); var nodeAngleMap = tree.newNodeDoubleArray()) {

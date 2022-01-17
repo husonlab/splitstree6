@@ -156,7 +156,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
 					splitsView.getSplitSelectionModel(),
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
-					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.isOptionUseWeights(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
+					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionUseWeightsProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					controller.getScaleBar().unitLengthXProperty());
 			splitNetworkPane.set(pane);
 			pane.drawNetwork();

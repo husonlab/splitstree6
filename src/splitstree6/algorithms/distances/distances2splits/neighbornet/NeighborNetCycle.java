@@ -64,6 +64,18 @@ public class NeighborNetCycle {
     /**
      * Run the neighbor net algorithm to compute the circular ordering of the taxa
      */
+    public static int[] compute(int nTax, DistancesBlock distancesBlock) {
+        try {
+            return compute(new ProgressSilent(), nTax, distancesBlock);
+        } catch (CanceledException ignored) {
+            return null; // can't happen
+        }
+    }
+
+
+    /**
+     * Run the neighbor net algorithm to compute the circular ordering of the taxa
+     */
     public static int[] compute(ProgressListener progress, int nTax, DistancesBlock distancesBlock) throws CanceledException {
         //Special cases. When nTax<=3, the default circular ordering will work.
         if (nTax <= 3) {
@@ -121,13 +133,13 @@ public class NeighborNetCycle {
             netNodes.next = taxNode;
         }
 
-        for (NetNode taxNode = netNodes; taxNode.next != null; taxNode = taxNode.next)
+        for (var taxNode = netNodes; taxNode.next != null; taxNode = taxNode.next)
             /* Set up links in other direction */
             taxNode.next.prev = taxNode;
 
         /* Perform the agglomeration step */
-        Stack<NetNode> amalgs = new Stack<>();
-        int num_nodes = ntax;
+        var amalgs = new Stack<NetNode>();
+        var num_nodes = ntax;
         if (progressListener != null)
             progressListener.setSubtask("agglomeration");
         num_nodes = agglomNodes(progressListener, amalgs, D, netNodes, num_nodes);

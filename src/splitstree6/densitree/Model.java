@@ -39,6 +39,12 @@ public class Model {
 		return circularOrdering;
 	}
 
+	public void clear() {
+		taxaBlock.clear();
+		treesBlock.clear();
+		circularOrdering = new int[0];
+	}
+
 	public void setCircularOrdering(int[] circularOrdering) {
 		this.circularOrdering = circularOrdering;
 	}
