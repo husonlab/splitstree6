@@ -23,7 +23,6 @@ import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
-import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 import jloda.util.Single;
@@ -37,32 +36,49 @@ public class LayoutTreeCircular {
 	/**
 	 * compute layout for a circular cladogram
 	 */
-	public static NodeArray<Point2D> apply(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean toScale) {
+	public static NodeArray<Point2D> apply(PhyloTree tree, NodeDoubleArray nodeAngleMap, boolean toScale, ComputeHeightAndAngles.Averaging averaging) {
 
 		// compute radius:
 		try (var nodeRadiusMap = tree.newNodeDoubleArray()) {
-			final var maxDepth = computeMaxDepth(tree);
-			try (var visited = tree.newNodeSet()) {
-				tree.postorderTraversal(tree.getRoot(), v -> !visited.contains(v), v -> {
-					if (tree.isLeaf(v)) {
-						nodeRadiusMap.put(v, (double) maxDepth);
-					} else {
-						nodeRadiusMap.put(v, IteratorUtils.asStream(tree.lsaChildren(v)).mapToDouble(nodeRadiusMap::get).min().orElse(maxDepth) - 1);
+			if (!toScale) {
+				final var maxDepth = computeMaxDepth(tree);
+				try (var visited = tree.newNodeSet()) {
+					tree.postorderTraversal(tree.getRoot(), v -> !visited.contains(v), v -> {
+						if (tree.isLeaf(v)) {
+							nodeRadiusMap.put(v, (double) maxDepth);
+						} else {
+							nodeRadiusMap.put(v, IteratorUtils.asStream(tree.lsaChildren(v)).mapToDouble(nodeRadiusMap::get).min().orElse(maxDepth) - 1);
+						}
+					});
+				}
+			} else {
+				var percentOffset = 50.0;
+
+				var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);
+				var smallOffsetForRecticulateEdge = (percentOffset / 100.0) * averageWeight;
+
+				nodeRadiusMap.put(tree.getRoot(), 0.0);
+				tree.preorderTraversal(v -> {
+					var max = 0.0;
+					for (var e : v.inEdges()) {
+						var w = e.getSource();
+						var wRadius = nodeRadiusMap.get(w);
+						if (wRadius != null) {
+							if (tree.isReticulatedEdge(e)) {
+								max = Math.max(max, wRadius + smallOffsetForRecticulateEdge);
+							} else
+								max = Math.max(max, wRadius + tree.getWeight(e));
+						}
+						var vRadius = nodeRadiusMap.get(v);
+						if (vRadius == null || max > vRadius)
+							nodeRadiusMap.put(v, max);
 					}
 				});
 			}
-			nodeRadiusMap.put(tree.getRoot(), 0.0);
 
 			// compute angle
-			ComputeYCoordinates.computeAngles(tree, nodeAngleMap);
+			ComputeHeightAndAngles.computeAngles(tree, nodeAngleMap, averaging);
 
-			LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-				if (toScale && v.getInDegree() > 0) {
-					var e = v.getFirstInEdge();
-					var parentRadius = nodeRadiusMap.get(e.getSource());
-					nodeRadiusMap.put(v, parentRadius + tree.getWeight(e));
-				}
-			});
 			final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 			tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
 			return nodePointMap;
@@ -77,7 +93,7 @@ public class LayoutTreeCircular {
 	 */
 	public static int computeMaxDepth(PhyloTree tree) {
 		var max = new Single<>(0);
-		LSAUtils.breathFirstTraversalLSA(tree, tree.getRoot(), 0, (level, v) -> max.set(Math.max(max.get(), level)));
+		tree.breathFirstTraversal(tree.getRoot(), 0, (level, v) -> max.set(Math.max(max.get(), level)));
 		return max.get();
 	}
 }

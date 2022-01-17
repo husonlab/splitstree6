@@ -41,6 +41,7 @@ import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
+import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.window.MainWindow;
 
@@ -90,11 +91,23 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createIconLabel));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createIconLabel));
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createLabel));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
 
+		final ObservableSet<ComputeHeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		treePagesView.optionDiagramProperty().addListener((v, o, n) -> {
+			disabledAveraging.clear();
+			if (n == TreeDiagramType.RadialPhylogram) {
+				disabledAveraging.add(ComputeHeightAndAngles.Averaging.ChildAverage);
+			}
+		});
+
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(ComputeHeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().valueProperty().bindBidirectional(treePagesView.optionAveragingProperty());
 
 		controller.getRowsColsCBox().getItems().setAll(gridValues);
 		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
@@ -169,7 +182,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getPagination().pageCountProperty().bind(numberOfPages);
 
 		{
-			InvalidationListener invalidationListener = e -> numberOfPages.set(1 + (phyloTrees.size() - 1) / (treePagesView.getOptionRows() * treePagesView.getOptionCols()));
+			InvalidationListener invalidationListener = e -> numberOfPages.set(1 + (phyloTrees.size() - 1) / (rowsAndCols.get().rows() * rowsAndCols.get().cols()));
 			rowsAndCols.addListener(invalidationListener);
 			phyloTrees.addListener(invalidationListener);
 			invalidationListener.invalidated(null);

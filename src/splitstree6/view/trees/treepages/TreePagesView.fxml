@@ -119,6 +119,11 @@
                                         <Tooltip text="Choose root side"/>
                                     </tooltip>
                                 </ComboBox>
+                                <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                                    <tooltip>
+                                        <Tooltip text="use child-average or leaf-average to place internal nodes"/>
+                                    </tooltip>
+                                </ComboBox>
                                 <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
                                            orientation="VERTICAL" prefHeight="20.0"/>
                                 <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">

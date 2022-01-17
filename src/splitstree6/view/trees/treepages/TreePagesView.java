@@ -32,6 +32,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
+import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.window.MainWindow;
 
@@ -81,12 +82,12 @@ public class TreePagesView implements IView {
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
 	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
+	private final ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
 	private final ObjectProperty<TreeLabels> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
-
 
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
@@ -97,6 +98,7 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionRows, 1);
 		ProgramProperties.track(optionCols, 1);
 		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionAveraging, ComputeHeightAndAngles.Averaging::valueOf, ComputeHeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionTreeLabels, TreeLabels::valueOf, TreeLabels.Name);
 	}
@@ -208,6 +210,18 @@ public class TreePagesView implements IView {
 
 	public void setOptionDiagram(TreeDiagramType optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
+	}
+
+	public ComputeHeightAndAngles.Averaging getOptionAveraging() {
+		return optionAveraging.get();
+	}
+
+	public ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveragingProperty() {
+		return optionAveraging;
+	}
+
+	public void setOptionAveraging(ComputeHeightAndAngles.Averaging optionAveraging) {
+		this.optionAveraging.set(optionAveraging);
 	}
 
 	public LayoutOrientation getOptionOrientation() {

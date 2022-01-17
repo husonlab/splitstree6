@@ -35,11 +35,15 @@ import jloda.fx.util.AService;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
+import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.ComputeTreeLayout;
 import splitstree6.view.trees.layout.LayoutUtils;
 import splitstree6.view.trees.layout.TreeDiagramType;
+
+import java.util.function.Consumer;
 
 /**
  * display an individual phylogenetic tree
@@ -53,16 +57,17 @@ public class TreePane extends StackPane {
 
 	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
+	private Consumer<LayoutOrientation> orientationConsumer;
 
 	private final StringProperty infoString = new SimpleStringProperty("");
 
-	private final AService<Group> service;
+	private final AService<Pair<Group, Consumer<LayoutOrientation>>> service;
 
 	/**
 	 * single tree pane
 	 */
 	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels) {
 
 		var interactionSetup = new InteractionSetup(taxaBlock, taxonSelectionModel, orientation);
@@ -93,7 +98,12 @@ public class TreePane extends StackPane {
 		service = new AService<>();
 		service.setExecutor(ProgramExecutorService.getInstance());
 
-		orientation.addListener((v, o, n) -> LayoutUtils.applyOrientation(o, n, pane, false));
+		orientation.addListener((v, o, n) -> {
+			if (diagram == TreeDiagramType.RadialPhylogram)
+				splitstree6.view.splits.layout.LayoutUtils.applyOrientation(pane, o, n, orientationConsumer);
+			else
+				LayoutUtils.applyOrientation(pane, n, o, false);
+		});
 
 		service.setCallable(() -> {
 			double width;
@@ -110,13 +120,15 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			var group = ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
-			group.setId("treeGroup");
-			return group;
+			var pair = ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, averaging, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
+			pair.getFirst().setId("treeGroup");
+			return pair;
 		});
 
 		service.setOnSucceeded(a -> {
-			var group = service.getValue();
+			var pair = service.getValue();
+			var group = pair.getFirst();
+			orientationConsumer = pair.getSecond();
 
 			pane = new StackPane(group);
 			pane.setStyle("-fx-background-color: transparent");
@@ -130,7 +142,11 @@ public class TreePane extends StackPane {
 			pane.setMinWidth(getPrefWidth());
 
 			LayoutUtils.applyLabelScaleFactor(group, labelScaleFactor.get());
-			Platform.runLater(() -> LayoutUtils.applyOrientation(orientation.get(), pane, false));
+			Platform.runLater(() -> {
+				LayoutUtils.applyOrientation(orientation.get(), pane, false);
+				if (orientationConsumer != null)
+					orientationConsumer.accept(orientation.get());
+			});
 
 			{
 				final var treeLabel = new Label(name);
@@ -174,7 +190,7 @@ public class TreePane extends StackPane {
 	}
 
 
-	public AService<Group> getService() {
+	public AService<Pair<Group, Consumer<LayoutOrientation>>> getService() {
 		return service;
 	}
 

@@ -168,7 +168,7 @@ public class LayoutUtils {
 	/**
 	 * apply a change of orientation to a node
 	 */
-	public static void applyOrientation(LayoutOrientation oldOrientation, LayoutOrientation newOrientation, javafx.scene.Node node, boolean keepLabelsUnrotated) {
+	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, boolean keepLabelsUnrotated) {
 		final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
 		var flip = (oldOrientation == null && newOrientation.flip() || oldOrientation != null && newOrientation.flip() != oldOrientation.flip());
 

@@ -78,6 +78,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 		trees.addListener(new WeakInvalidationListener(updater));
 		treePagesView.optionDiagramProperty().addListener(new WeakInvalidationListener(updater));
+		treePagesView.optionAveragingProperty().addListener(new WeakInvalidationListener(updater));
 		rows.addListener(new WeakInvalidationListener(updater));
 		cols.addListener(new WeakInvalidationListener(updater));
 		dimensions.addListener(new WeakInvalidationListener(updater));
@@ -107,7 +108,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(taxaBlock, tree, name, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-						treePagesView.getOptionDiagram(), treePagesView.optionOrientationProperty(), treePagesView.optionZoomFactorProperty(), treePagesView.optionFontScaleFactorProperty(),
+						treePagesView.getOptionDiagram(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(), treePagesView.optionZoomFactorProperty(), treePagesView.optionFontScaleFactorProperty(),
 						treePagesView.optionTreeLabelsProperty());
 				treePane.drawTree();
 				pane = treePane;

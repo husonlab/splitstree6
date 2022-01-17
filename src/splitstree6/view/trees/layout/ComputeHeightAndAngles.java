@@ -1,5 +1,5 @@
 /*
- *  ComputeYCoordinates.java Copyright (C) 2022 Daniel H. Huson
+ *  ComputeHeightAndAngles.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,9 +19,13 @@
 
 package splitstree6.view.trees.layout;
 
+import javafx.scene.control.Label;
 import jloda.graph.Node;
+import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.util.Pair;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -30,7 +34,14 @@ import java.util.List;
 /**
  * computes the y-coordinates for the rectangular layout
  */
-public class ComputeYCoordinates {
+public class ComputeHeightAndAngles {
+	public enum Averaging {
+		ChildAverage, LeafAverage;
+
+		public static Label createLabel(Averaging t) {
+			return new Label(t == ChildAverage ? "CA" : "LA");
+		}
+	}
 
 	/**
 	 * compute the y-coordinates for the parallel view
@@ -38,23 +49,39 @@ public class ComputeYCoordinates {
 	 * @param tree
 	 * @return y-coordinates
 	 */
-	public static void apply(PhyloTree tree, NodeDoubleArray nodeYCoordinateMap) {
-		apply(tree, tree.getRoot(), nodeYCoordinateMap);
+	public static void apply(PhyloTree tree, NodeDoubleArray nodeHeightMap, Averaging averaging) {
+		apply(tree, tree.getRoot(), nodeHeightMap, averaging);
 	}
 
 	/**
 	 * compute the y-coordinates for the parallel view
 	 */
-	public static void apply(PhyloTree tree, Node root, NodeDoubleArray nodeYCoordinateMap) {
+	public static void apply(PhyloTree tree, Node root, NodeDoubleArray nodeHeightMap, Averaging averaging) {
 		var leafOrder = new LinkedList<Node>();
-		computeYCoordinateOfLeavesRec(tree, root, 0, nodeYCoordinateMap, leafOrder);
+		computeYCoordinateOfLeavesRec(tree, root, 0, nodeHeightMap, leafOrder);
 		if (tree.getNumberReticulateEdges() > 0)
-			fixSpacing(leafOrder, nodeYCoordinateMap);
-		computeYCoordinateOfInternalRec(tree, root, nodeYCoordinateMap);
+			fixSpacing(leafOrder, nodeHeightMap);
+		if (averaging == Averaging.ChildAverage)
+			computeHeightInternalNodesAsChildAverageRec(tree, root, nodeHeightMap);
+		else {
+
+			try (NodeArray<Pair<Double, Double>> minMaxBelowMap = tree.newNodeArray()) {
+				tree.nodeStream().filter(tree::isLsaLeaf).forEach(v -> minMaxBelowMap.put(v, new Pair<>(nodeHeightMap.get(v), nodeHeightMap.get(v))));
+
+				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+					if (!tree.isLsaLeaf(v)) {
+						var min = minMaxBelowMap.get(tree.getFirstChildLSA(v)).getFirst();
+						var max = minMaxBelowMap.get(tree.getLastChildLSA(v)).getSecond();
+						nodeHeightMap.put(v, 0.5 * (min + max));
+						minMaxBelowMap.put(v, new Pair<>(min, max));
+					}
+				});
+			}
+		}
 	}
 
-	public static void computeAngles(PhyloTree tree, NodeDoubleArray nodeAngleMap) {
-		ComputeYCoordinates.apply(tree, nodeAngleMap);
+	public static void computeAngles(PhyloTree tree, NodeDoubleArray nodeAngleMap, Averaging averaging) {
+		ComputeHeightAndAngles.apply(tree, nodeAngleMap, averaging);
 		var max = tree.nodeStream().filter(tree::isLsaLeaf).mapToDouble(nodeAngleMap::get).max().orElse(0);
 		var factor = 360.0 / max;
 		for (var v : nodeAngleMap.keySet()) {
@@ -86,24 +113,24 @@ public class ComputeYCoordinates {
 	 * recursively compute the y coordinate for the internal nodes of a parallel diagram
 	 *
 	 * @param v
-	 * @param yCoord
+	 * @param nodeHeightMap
 	 */
-	private static void computeYCoordinateOfInternalRec(PhyloTree tree, Node v, NodeDoubleArray yCoord) {
+	private static void computeHeightInternalNodesAsChildAverageRec(PhyloTree tree, Node v, NodeDoubleArray nodeHeightMap) {
 		if (v.getOutDegree() > 0) {
 			double first = Double.NEGATIVE_INFINITY;
 			double last = Double.NEGATIVE_INFINITY;
 
 			for (Node w : tree.lsaChildren(v)) {
-				Double y = yCoord.get(w);
-				if (y == null) {
-					computeYCoordinateOfInternalRec(tree, w, yCoord);
-					y = yCoord.get(w);
+				var height = nodeHeightMap.get(w);
+				if (height == null) {
+					computeHeightInternalNodesAsChildAverageRec(tree, w, nodeHeightMap);
+					height = nodeHeightMap.get(w);
 				}
-				last = y;
+				last = height;
 				if (first == Double.NEGATIVE_INFINITY)
 					first = last;
 			}
-			yCoord.put(v, 0.5 * (last + first));
+			nodeHeightMap.put(v, 0.5 * (last + first));
 		}
 	}
 

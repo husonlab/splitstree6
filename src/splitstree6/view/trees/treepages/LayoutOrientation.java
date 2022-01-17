@@ -80,7 +80,7 @@ public enum LayoutOrientation {
 		};
 	}
 
-	public Label createIconLabel() {
+	public Label createLabel() {
 		var label = new Label("R");
 		apply(label);
 		return label;

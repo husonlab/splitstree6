@@ -68,6 +68,7 @@ public class NormalizeNetworks extends Trees2Trees {
 					for (var e : v.inEdges()) {
 						outputTree.setWeight(e, 0.0);
 						outputTree.setReticulated(e, true);
+						outputData.setReticulated(true);
 					}
 				}
 			}

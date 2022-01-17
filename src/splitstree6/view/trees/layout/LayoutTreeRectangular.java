@@ -39,13 +39,14 @@
 package splitstree6.view.trees.layout;
 
 import javafx.geometry.Point2D;
-import jloda.graph.*;
+import jloda.graph.Node;
+import jloda.graph.NodeArray;
+import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.util.IteratorUtils;
 
-import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Set;
 
 /**
  * computes the rectangular layout for a rooted tree or network
@@ -59,15 +60,29 @@ public class LayoutTreeRectangular {
 	 * @param toScale
 	 * @return node to point map
 	 */
-	public static NodeArray<Point2D> apply(PhyloTree tree, boolean toScale) {
+	public static NodeArray<Point2D> apply(PhyloTree tree, boolean toScale, ComputeHeightAndAngles.Averaging averaging) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 		nodePointMap.put(tree.getRoot(), new Point2D(0, 0));
 		try (var yCoord = tree.newNodeDoubleArray()) {
-			ComputeYCoordinates.apply(tree, yCoord);
+			ComputeHeightAndAngles.apply(tree, yCoord, averaging);
 			if (toScale) {
 				setCoordinatesPhylogram(tree, yCoord, nodePointMap);
 			} else {
-				try (var levels = computeLevels(tree)) {
+				try (var levels = tree.newNodeIntArray()) {
+					// compute levels: max length of path from node to a leaf
+					tree.postorderTraversal(v -> {
+						if (v.isLeaf())
+							levels.put(v, 0);
+						else {
+							var level = 0;
+							for (var w : v.children()) {
+								level = Math.max(level, levels.get(w));
+							}
+							var prev = (levels.get(v) != null ? levels.get(v) : 0);
+							if (level + 1 > prev)
+								levels.set(v, level + 1);
+						}
+					});
 					LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
 						nodePointMap.put(v, new Point2D(-levels.get(v), yCoord.get(v)));
 					});
@@ -90,123 +105,72 @@ public class LayoutTreeRectangular {
 	}
 
 	/**
-	 * assign rectangular phylogram coordinates. First must use cladogram code to set y coordinates!
 	 * This code assumes that all edges are directed away from the root.
 	 *
 	 * @param tree
 	 */
 	public static void setCoordinatesPhylogram(PhyloTree tree, NodeDoubleArray yCoord, NodeArray<Point2D> nodePointMap) {
-		// todo: these things need to be made user options
-		var useWeights = true;
-		var percentOffset = 0;
+		// todo: this could be a user option:
+		var percentOffset = 50.0;
 
-		var smallDistance = 5.0 / 100.0;
-		if (useWeights) {
-			var largestDistance = 0.0;
-			for (Edge e = tree.getFirstEdge(); e != null; e = e.getNext())
-				if (!tree.isReticulatedEdge(e))
-					largestDistance = Math.max(largestDistance, tree.getWeight(e));
-			smallDistance = (percentOffset / 100.0) * largestDistance;
-		}
+		var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);
+		var smallOffsetForRecticulateEdge = (percentOffset / 100.0) * averageWeight;
 
-		double rootHeight = yCoord.get(tree.getRoot());
+		var rootHeight = yCoord.get(tree.getRoot());
 
-		NodeSet assigned = new NodeSet(tree);
+		try (var assigned = tree.newNodeSet()) {
 
-		// assign coordinates:
-		var queue = new LinkedList<Node>();
-		queue.add(tree.getRoot());
-		while (queue.size() > 0) // breath-first assignment
-		{
-			Node w = queue.remove(0); // pop
-
-			boolean ok = true;
-			if (w.getInDegree() == 1) // has regular in edge
+			// assign coordinates:
+			var queue = new LinkedList<Node>();
+			queue.add(tree.getRoot());
+			while (queue.size() > 0) // breath-first assignment
 			{
-				Edge e = w.getFirstInEdge();
-				Node v = e.getSource();
-				var location = nodePointMap.get(v);
-
-				if (!assigned.contains(v)) // can't process yet
+				var w = queue.remove(0); // pop
+				var ok = true;
+				if (w.getInDegree() == 1) // has regular in edge
 				{
-					ok = false;
-				} else {
-					double weight = (useWeights ? tree.getWeight(e) : 1);
-					double height = yCoord.get(e.getTarget());
-					Node u = e.getTarget();
-					nodePointMap.put(u, new Point2D(location.getX() + weight, height));
-					assigned.add(u);
-				}
-			} else if (w.getInDegree() > 1) // all in edges are 'blue' edges
-			{
-				double x = Double.NEGATIVE_INFINITY;
-				for (Edge f = w.getFirstInEdge(); f != null; f = w.getNextInEdge(f)) {
-					Node u = f.getSource();
-					var location = nodePointMap.get(u);
-					if (location == null) {
+					var e = w.getFirstInEdge();
+					var v = e.getSource();
+					var location = nodePointMap.get(v);
+
+					if (!assigned.contains(v)) // can't process yet
+					{
 						ok = false;
 					} else {
-						x = Math.max(x, location.getX());
+						var height = yCoord.get(e.getTarget());
+						var u = e.getTarget();
+						nodePointMap.put(u, new Point2D(location.getX() + tree.getWeight(e), height));
+						assigned.add(u);
 					}
-				}
-				if (ok && x > Double.NEGATIVE_INFINITY) {
-					x += smallDistance;
-					nodePointMap.put(w, new Point2D(x, yCoord.get(w)));
+				} else if (w.getInDegree() > 1) // all in edges are 'blue' edges
+				{
+					double x = Double.NEGATIVE_INFINITY;
+					for (var f : w.inEdges()) {
+						var u = f.getSource();
+						var location = nodePointMap.get(u);
+						if (location == null) {
+							ok = false;
+						} else {
+							x = Math.max(x, location.getX());
+						}
+					}
+					if (ok && x > Double.NEGATIVE_INFINITY) {
+						x += smallOffsetForRecticulateEdge;
+						nodePointMap.put(w, new Point2D(x, yCoord.get(w)));
+						assigned.add(w);
+					}
+				} else  // is root node
+				{
+					nodePointMap.put(w, new Point2D(0, rootHeight));
 					assigned.add(w);
 				}
-			} else  // is root node
-			{
-				nodePointMap.put(w, new Point2D(0, rootHeight));
-				assigned.add(w);
-			}
 
-			if (ok)  // add children to end of queue:
-			{
-				for (Edge f = w.getFirstOutEdge(); f != null; f = w.getNextOutEdge(f)) {
-					queue.add(f.getTarget());
-				}
-			} else  // process this node again later
-				queue.add(w);
-		}
-	}
-
-	/**
-	 * compute the levels in the tree or network (max number of edges from node to a leaf)
-	 */
-	public static NodeIntArray computeLevels(PhyloTree tree) {
-		var levels = tree.newNodeIntArray();
-		computeLevelsRec(tree, tree.getRoot(), levels, new HashSet<>());
-		return levels;
-	}
-
-	/**
-	 * compute node levels
-	 *
-	 * @param v
-	 * @param levels
-	 */
-	public static void computeLevelsRec(PhyloTree tree, Node v, NodeIntArray levels, Set<Node> path) {
-		path.add(v);
-		var level = 0;
-		var below = new HashSet<>();
-		for (var f : v.outEdges()) {
-			var w = f.getTarget();
-			below.add(w);
-			if (levels.get(w) == null)
-				computeLevelsRec(tree, w, levels, path);
-			level = Math.max(level, levels.get(w) + (tree.isTransferEdge(f) ? 0 : 1));
-		}
-		var lsaChildren = tree.getLSAChildrenMap().get(v);
-		if (lsaChildren != null) {
-			for (var w : lsaChildren) {
-				if (!below.contains(w) && !path.contains(w)) {
-					if (levels.get(w) == null)
-						computeLevelsRec(tree, w, levels, path);
-					level = Math.max(level, levels.get(w) + 1);
+				if (ok)  // add children to end of queue:
+					queue.addAll(IteratorUtils.asList(w.children()));
+				else  // process this node again later
+					queue.add(w);
 				}
 			}
-		}
-		levels.put(v, level);
-		path.remove(v);
 	}
 }
+

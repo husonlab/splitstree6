@@ -45,6 +45,7 @@ import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
+import jloda.util.ProgramProperties;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -88,7 +89,7 @@ public class CreateEdgesRectangular {
 				} else {
 					var dx = targetShape.getTranslateX() - sourceShape.getTranslateX();
 					var dy = targetShape.getTranslateY() - sourceShape.getTranslateY();
-					if (Math.abs(dx) <= 8 || Math.abs(dy) <= 8) {
+					if (Math.abs(dx) <= 5 || Math.abs(dy) <= 5) {
 						lineTo1.setX(sourceShape.getTranslateX());
 						lineTo1.setY(targetShape.getTranslateY());
 					} else {
@@ -148,7 +149,8 @@ public class CreateEdgesRectangular {
 			edgeCallback.accept(e, line);
 		}
 
-		if (false)
+		// draw LSA edges
+		if (ProgramProperties.get("showlsa", false))
 			for (var v : tree.nodes()) {
 				for (var w : tree.lsaChildren(v)) {
 					if (w.inEdgesStream(false).anyMatch(tree::isReticulatedEdge)) {

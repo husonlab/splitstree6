@@ -36,6 +36,7 @@ import java.util.function.Consumer;
 
 /**
  * do radial layout of labels
+ * Label items are added to the item list and then the layout labels method is called
  * Daniel Huson, 12.2021
  */
 public class RadialLabelLayout {
@@ -54,8 +55,20 @@ public class RadialLabelLayout {
 		setupLayoutService();
 	}
 
+	/**
+	 * layout the labels
+	 */
+	public void layoutLabels() {
+		layoutLabels(LayoutOrientation.Rotate0Deg);
+	}
+
 	private int deferredCounter = 0;
 
+	/**
+	 * layout the labels after graph has been transformed to a specific orientation
+	 *
+	 * @param orientation layout orientation
+	 */
 	public void layoutLabels(LayoutOrientation orientation) {
 		if (items.size() > 0) {
 			if (deferredCounter < items.size() && items.stream().anyMatch(item -> item.width() == 0 || item.height() == 0)) {
@@ -73,6 +86,36 @@ public class RadialLabelLayout {
 	public void clear() {
 		items.clear();
 		avoidList.clear();
+	}
+
+	/**
+	 * add an item for layout
+	 *
+	 * @param anchorXProperty x coordinate of anchor
+	 * @param anchorYProperty y coordinate of anchor
+	 * @param angle           ideal angle of direction to move label, in degrees
+	 * @param widthProperty   label width
+	 * @param heightProperty  label height
+	 * @param xSetter         method to set computed x-coordinate of label
+	 * @param ySetter         method to set computed y-coordinate of label
+	 */
+	public void addItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
+						double angle,
+						ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
+						Consumer<Double> xSetter, Consumer<Double> ySetter) {
+		getItems().add(new RadialLabelLayout.LayoutItem(anchorXProperty, anchorYProperty, angle, widthProperty, heightProperty, xSetter, ySetter));
+	}
+
+	/**
+	 * add an item that we want to avoid placing a label over
+	 *
+	 * @param x      x-coordinate
+	 * @param y      y-coordinate
+	 * @param width  width
+	 * @param height height
+	 */
+	public void addAvoidable(ReadOnlyDoubleProperty x, ReadOnlyDoubleProperty y, double width, double height) {
+		getAvoidList().add(new Box(x, y, width, height));
 	}
 
 	public ArrayList<LayoutItem> getItems() {
@@ -260,14 +303,14 @@ public class RadialLabelLayout {
 	 *
 	 * @param anchorXProperty x coordinate of anchor
 	 * @param anchorYProperty y coordinate of anchor
-	 * @param angle           ideal angle to move label, in degrees
+	 * @param angle           ideal angle of direction to move label, in degrees
 	 * @param widthProperty   label width
 	 * @param heightProperty  label height
 	 * @param xSetter         method to set computed x-coordinate of label
 	 * @param ySetter         method to set computed y-coordinate of label
 	 */
 	public static record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
-									double angle, String label,
+									double angle,
 									ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
 									Consumer<Double> xSetter, Consumer<Double> ySetter) {
 		public double width() {
@@ -310,7 +353,5 @@ public class RadialLabelLayout {
 		private boolean intersects(Choice other) {
 			return (x.get() + width >= other.x() && x.get() <= other.x() + other.width()) && (y.get() + height >= other.y() && y.get() <= other.y() + other.height());
 		}
-
-
 	}
 }

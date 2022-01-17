@@ -33,6 +33,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.view.trees.treepages.RunAfterAWhile;
@@ -49,14 +50,14 @@ public class TanglegramTreePane extends Group {
 
 	public TanglegramTreePane(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<LayoutOrientation> optionOrientation, ReadOnlyDoubleProperty fontScaleFactorProperty) {
+							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation, ReadOnlyDoubleProperty fontScaleFactorProperty) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), optionOrientation, new SimpleDoubleProperty(1.0), fontScaleFactorProperty, new SimpleObjectProperty<>(TreePagesView.TreeLabels.None));
+								optionDiagram.get(), optionAveraging.get(), optionOrientation, new SimpleDoubleProperty(1.0), fontScaleFactorProperty, new SimpleObjectProperty<>(TreePagesView.TreeLabels.None));
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
 						getChildren().add(treePane);
@@ -66,8 +67,9 @@ public class TanglegramTreePane extends Group {
 
 		tree.addListener(new WeakInvalidationListener(updater));
 		optionDiagram.addListener(new WeakInvalidationListener(updater));
-		// optionOrientation.addListener(new WeakInvalidationListener(updater)); // treepane listens for chanages of orientation
+		// optionOrientation.addListener(new WeakInvalidationListener(updater)); // treepane listens for changes of orientation
 		dimensions.addListener(new WeakInvalidationListener(updater));
+		optionAveraging.addListener(new WeakInvalidationListener(updater));
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updater));
 	}
 

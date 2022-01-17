@@ -19,9 +19,6 @@
 
 package splitstree6.view.splits.viewer;
 
-import javafx.animation.ParallelTransition;
-import javafx.animation.Transition;
-import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
@@ -36,7 +33,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;
-import javafx.util.Duration;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
@@ -50,8 +46,6 @@ import splitstree6.view.splits.layout.SplitNetworkLayout;
 import splitstree6.view.trees.layout.LayoutUtils;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
-
-import java.util.ArrayList;
 
 public class SplitNetworkPane extends StackPane {
 
@@ -94,7 +88,7 @@ public class SplitNetworkPane extends StackPane {
 		};
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
-		orientChangeListener = (v, o, n) -> applyOrientation(o, n);
+		orientChangeListener = (v, o, n) -> splitstree6.view.splits.layout.LayoutUtils.applyOrientation(this, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or));
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
 		redrawListener = e -> drawNetwork();
@@ -182,33 +176,4 @@ public class SplitNetworkPane extends StackPane {
 		Platform.runLater(() -> splitNetworkLayout.getLabelLayout().layoutLabels(orientation));
 	}
 
-	public void applyOrientation(LayoutOrientation oldOrientation, LayoutOrientation newOrientation) {
-		var transitions = new ArrayList<Transition>();
-
-		BasicFX.preorderTraversal(getChildren().get(0), n -> {
-			if (n instanceof Shape shape) {
-				var translate = new TranslateTransition(Duration.seconds(1));
-				translate.setNode(shape);
-				var point = new Point2D(shape.getTranslateX(), shape.getTranslateY());
-
-				if (oldOrientation.angle() != 0)
-					point = GeometryUtilsFX.rotate(point, oldOrientation.angle());
-				if (oldOrientation.flip())
-					point = new Point2D(-point.getX(), point.getY());
-
-				if (newOrientation.flip())
-					point = new Point2D(-point.getX(), point.getY());
-				if (newOrientation.angle() != 0)
-					point = GeometryUtilsFX.rotate(point, -newOrientation.angle());
-				translate.setToX(point.getX());
-				translate.setToY(point.getY());
-				transitions.add(translate);
-			}
-		});
-		var parallel = new ParallelTransition(transitions.toArray(new Transition[0]));
-		parallel.setOnFinished(e -> {
-			Platform.runLater(() -> splitNetworkLayout.getLabelLayout().layoutLabels(newOrientation));
-		});
-		parallel.play();
-	}
 }

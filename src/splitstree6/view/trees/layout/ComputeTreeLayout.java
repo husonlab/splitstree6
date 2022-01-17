@@ -51,9 +51,12 @@ import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
+import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
+import splitstree6.view.trees.treepages.LayoutOrientation;
 
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static splitstree6.view.trees.layout.LayoutUtils.getLabelText;
 
@@ -62,9 +65,6 @@ import static splitstree6.view.trees.layout.LayoutUtils.getLabelText;
  * Daniel Huson, 10.2021
  */
 public class ComputeTreeLayout {
-
-	public enum ParentPlacement {LeafAverage, ChildrenAverage}
-
 	/**
 	 * compute a tree embedding
 	 *
@@ -79,10 +79,10 @@ public class ComputeTreeLayout {
 	 * @param alignLabels          align labels in rectangular and circular phylograms
 	 * @return group of all edges, nodes and node-labels
 	 */
-	public static Group apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagramType diagram, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
-							  BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
+	public static Pair<Group, Consumer<LayoutOrientation>> apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
+																 BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
 		if (tree.getNumberOfNodes() == 0)
-			return new Group();
+			return new Pair<>(new Group(), null);
 
 		if (alignLabels && diagram != TreeDiagramType.RectangularPhylogram && diagram != TreeDiagramType.CircularPhylogram)
 			alignLabels = false; // can't or don't need to, or can't, align labels in all other cases
@@ -91,7 +91,7 @@ public class ComputeTreeLayout {
 
 		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
 
-		var triplet = LayoutUtils.computeFontHeightGraphWidthHeight(taxaBlock, tree, diagram.isRadial(), width, height);
+		var triplet = LayoutUtils.computeFontHeightGraphWidthHeight(taxaBlock, tree, diagram.isRadialOrCircular(), width, height);
 		var fontHeight = triplet.getFirst();
 		width = triplet.getSecond();
 		height = triplet.getThird();
@@ -111,16 +111,17 @@ public class ComputeTreeLayout {
 
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 
+
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
-			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, true);
-			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, false);
+			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, true, averaging);
+			case RectangularCladogram -> LayoutTreeRectangular.apply(tree, false, averaging);
 			case TriangularCladogram -> LayoutTreeTriangular.apply(tree);
 			case RadialPhylogram -> LayoutTreeRadial.apply(tree);
-			case RadialCladogram, CircularCladogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, false);
-			case CircularPhylogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, true);
+			case RadialCladogram, CircularCladogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, false, averaging);
+			case CircularPhylogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, true, averaging);
 		};
 
-		LayoutUtils.normalize(width, height, nodePointMap, diagram.isRadial());
+		LayoutUtils.normalize(width, height, nodePointMap, diagram.isRadialOrCircular());
 
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getX()) < 0.000001);
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
@@ -154,22 +155,28 @@ public class ComputeTreeLayout {
 		if (diagram == TreeDiagramType.CircularCladogram || diagram == TreeDiagramType.CircularPhylogram) {
 			edgeGroup.getChildren().addAll(CreateEdgesCircular.apply(diagram, tree, nodePointMap, nodeAngleMap, color, linkNodesEdgesLabels, edgeCallback));
 		} else if (diagram == TreeDiagramType.TriangularCladogram || diagram == TreeDiagramType.RadialPhylogram || diagram == TreeDiagramType.RadialCladogram) {
-			edgeGroup.getChildren().addAll(CreateEdgesStraight.apply(diagram, tree, nodeShapeMap, color, linkNodesEdgesLabels, edgeCallback));
+			edgeGroup.getChildren().addAll(CreateEdgesStraight.apply(diagram, tree, nodeShapeMap, color, linkNodesEdgesLabels || diagram == TreeDiagramType.RadialPhylogram, edgeCallback));
 		} else { // if (diagram == TreePane.TreeDiagramType.Rectangular) {
 			edgeGroup.getChildren().addAll(CreateEdgesRectangular.apply(diagram, tree, nodeShapeMap, color, linkNodesEdgesLabels, edgeCallback));
 		}
 
 		Group labelConnectorGroup = alignLabels ? new Group() : null;
 
-		if (diagram.isRadial())
-			LayoutLabelsRadial.apply(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
-		else
-			LayoutLabelsRectangular.apply(tree, nodeShapeMap, nodeLabelMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
+		LayoutLabelsRadialPhylogram layoutLabelsRadialPhylogram = null;
+
+		switch (diagram) {
+			case CircularPhylogram, CircularCladogram, RadialCladogram -> LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
+			case RadialPhylogram -> {
+				layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap);
+			}
+			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, nodeLabelMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
+
+		}
 
 		if (labelConnectorGroup != null)
-			return new Group(labelConnectorGroup, edgeGroup, nodeGroup, nodeLabelGroup);
+			return new Pair<>(new Group(labelConnectorGroup, edgeGroup, nodeGroup, nodeLabelGroup), layoutLabelsRadialPhylogram);
 		else
-			return new Group(edgeGroup, nodeGroup, nodeLabelGroup);
+			return new Pair<>(new Group(edgeGroup, nodeGroup, nodeLabelGroup), layoutLabelsRadialPhylogram);
 	}
 
 }

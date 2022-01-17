@@ -125,8 +125,9 @@ public class Normalize {
 		var sourceReticulations = inputGraph.nodeStream().filter(v -> v.getInDegree() > 1).count();
 		var targetReticulations = outputGraph.nodeStream().filter(v -> v.getInDegree() > 1).count();
 
-		System.err.printf("Network with %,d nodes, %,d edges and %,d reticulations -> normalization with %,d nodes, %,d edges and %,d reticulations%n",
-				inputGraph.getNumberOfNodes(), inputGraph.getNumberOfEdges(), sourceReticulations, outputGraph.getNumberOfNodes(), outputGraph.getNumberOfEdges(), targetReticulations);
+		if (false)
+			System.err.printf("Network with %,d nodes, %,d edges and %,d reticulations -> normalization with %,d nodes, %,d edges and %,d reticulations%n",
+					inputGraph.getNumberOfNodes(), inputGraph.getNumberOfEdges(), sourceReticulations, outputGraph.getNumberOfNodes(), outputGraph.getNumberOfEdges(), targetReticulations);
 	}
 
 	/**

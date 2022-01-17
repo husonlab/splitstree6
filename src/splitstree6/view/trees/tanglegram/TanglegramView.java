@@ -32,6 +32,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
+import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
@@ -57,15 +58,17 @@ public class TanglegramView implements IView {
 	private final BooleanProperty reticulated = new SimpleBooleanProperty(this, "reticulated", false);
 
 	private final IntegerProperty optionTree1 = new SimpleIntegerProperty(this, "optionTree1", 1); // 1-based
-	private final ObjectProperty<TreeDiagramType> optionDiagram1 = new SimpleObjectProperty<>(this, "optionDiagram1", TreeDiagramType.RectangularPhylogram);
+	private final ObjectProperty<TreeDiagramType> optionDiagram1 = new SimpleObjectProperty<>(this, "optionDiagram1");
+	private final ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging1 = new SimpleObjectProperty<>(this, "optionAveraging1");
 
 	private final IntegerProperty optionTree2 = new SimpleIntegerProperty(this, "optionTree2", 2); // 1-based
-	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", TreeDiagramType.RectangularPhylogram);
+	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2");
+	private final ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging2 = new SimpleObjectProperty<>(this, "optionAveraging2");
 
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation1", LayoutOrientation.Rotate0Deg);
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation1");
 
-	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames", true);
-	private final BooleanProperty optionShowTreeInfo = new SimpleBooleanProperty(this, "optionShowTreeInfo", true);
+	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames");
+	private final BooleanProperty optionShowTreeInfo = new SimpleBooleanProperty(this, "optionShowTreeInfo");
 
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0);
 
@@ -75,15 +78,17 @@ public class TanglegramView implements IView {
 
 	{
 		ProgramProperties.track(optionDiagram1, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionAveraging1, ComputeHeightAndAngles.Averaging::valueOf, ComputeHeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionDiagram2, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
+		ProgramProperties.track(optionAveraging2, ComputeHeightAndAngles.Averaging::valueOf, ComputeHeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionShowTreeNames, true);
 		ProgramProperties.track(optionShowTreeInfo, true);
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionTree1.getName(), optionDiagram1.getName(),
-				optionTree2.getName(), optionDiagram2.getName(), optionOrientation.getName(),
+		return List.of(optionTree1.getName(), optionDiagram1.getName(), optionAveraging1.getName(),
+				optionTree2.getName(), optionDiagram2.getName(), optionAveraging2.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
 				optionShowTreeNames.getName(), optionShowTreeInfo.getName());
 	}
@@ -103,7 +108,6 @@ public class TanglegramView implements IView {
 			setOptionTree1(t1);
 			setOptionTree2(t2);
 		});
-
 
 		var loader = new ExtendedFXMLLoader<TanglegramViewController>(TanglegramViewController.class);
 		controller = loader.getController();
@@ -191,6 +195,18 @@ public class TanglegramView implements IView {
 		return optionDiagram1;
 	}
 
+	public ComputeHeightAndAngles.Averaging getOptionAveraging1() {
+		return optionAveraging1.get();
+	}
+
+	public ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging1Property() {
+		return optionAveraging1;
+	}
+
+	public void setOptionAveraging1(ComputeHeightAndAngles.Averaging optionAveraging1) {
+		this.optionAveraging1.set(optionAveraging1);
+	}
+
 	public LayoutOrientation getOptionOrientation() {
 		return optionOrientation.get();
 	}
@@ -205,6 +221,18 @@ public class TanglegramView implements IView {
 
 	public ObjectProperty<TreeDiagramType> optionDiagram2Property() {
 		return optionDiagram2;
+	}
+
+	public ComputeHeightAndAngles.Averaging getOptionAveraging2() {
+		return optionAveraging2.get();
+	}
+
+	public ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging2Property() {
+		return optionAveraging2;
+	}
+
+	public void setOptionAveraging2(ComputeHeightAndAngles.Averaging optionAveraging2) {
+		this.optionAveraging2.set(optionAveraging2);
 	}
 
 	public int getOptionTree1() {

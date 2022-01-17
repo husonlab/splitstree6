@@ -23,8 +23,10 @@ import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 
@@ -34,7 +36,29 @@ public class TryRichText extends Application {
 
 		var richText = new RichTextLabel();
 		var textField = new TextField();
-		textField.setOnAction(e -> richText.setText(textField.getText()));
+
+		var bold = new ToggleButton("Bold");
+		bold.selectedProperty().addListener((v, o, n) -> richText.setBold(n));
+		var italic = new ToggleButton("Italic");
+		italic.selectedProperty().addListener((v, o, n) -> richText.setItalic(n));
+
+		var fontFamily = new TextField();
+		fontFamily.setOnAction(e -> richText.setFontFamily(fontFamily.getText()));
+
+		textField.setOnAction(e -> {
+			richText.setText(textField.getText());
+			richText.setBold(bold.isSelected());
+			richText.setItalic(italic.isSelected());
+			richText.setFontFamily(fontFamily.getText());
+
+			for (var type : RichTextLabel.Event.listTypes()) {
+				var event = richText.getPrefixElement(type);
+				if (event != null) {
+					System.err.println(richText.getText().substring(event.pos(), event.segmentStart()));
+				}
+			}
+		});
+
 
 		var rotate = new Button("Rotate");
 		rotate.setOnAction(e -> richText.setRotate(richText.getRotate() + 20));
@@ -45,6 +69,8 @@ public class TryRichText extends Application {
 		root.setTop(textField);
 		root.setCenter(richText);
 		root.setBottom(new HBox(rotate, unRotate));
+
+		root.setRight(new VBox(bold, italic, fontFamily));
 
 
 		var scene = new Scene(root, 300, 300);

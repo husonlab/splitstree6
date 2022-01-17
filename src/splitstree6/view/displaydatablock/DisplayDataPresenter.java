@@ -97,12 +97,16 @@ public class DisplayDataPresenter {
 
 		dataBlockChangeListener.invalidated(null);
 
+		controller.getTitledPane().setAnimated(true);
+		//controller.getTitledPane().setExpanded(true);
+
 		controller.getApplyButton().setOnAction(e -> {
 			if (exporter.get() != null) {
 				try (var w = new StringWriter()) {
 					exporter.get().write(w, taxaBlock, dataNode.getDataBlock());
 					displayData.replaceText(w.toString());
 					controller.getTitledPane().setText("Format: " + exporter.get().getName());
+					controller.getTitledPane().setExpanded(false);
 				} catch (IOException ex) {
 					NotificationManager.showError("Export data failed: " + ex);
 					controller.getTitledPane().setText("Format");
