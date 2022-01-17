@@ -247,9 +247,9 @@ public class SplitNetworkLayout {
 				}
 				var translateXProperty = shape.translateXProperty();
 				var translateYProperty = shape.translateYProperty();
-				labelLayout.getItems().add(new RadialLabelLayout.LayoutItem(translateXProperty, translateYProperty, angle, label.getRawText(), label.widthProperty(), label.heightProperty(),
-						xOffset -> label.translateXProperty().bind(translateXProperty.add(xOffset)), yOffset -> label.translateYProperty().bind(translateYProperty.add(yOffset))));
-				labelLayout.getAvoidList().add(new RadialLabelLayout.Box(translateXProperty, translateYProperty,2*shape.getRadius(),2*shape.getRadius()));
+				labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
+						xOffset -> label.translateXProperty().bind(translateXProperty.add(xOffset)), yOffset -> label.translateYProperty().bind(translateYProperty.add(yOffset)));
+				labelLayout.addAvoidable(translateXProperty, translateYProperty, 2 * shape.getRadius(), 2 * shape.getRadius());
 			}
 		}
 
