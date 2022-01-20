@@ -91,15 +91,7 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		controller.getMainPane().setOnMouseClicked(e -> workflow.getSelectionModel().clearSelection());
 
 		controller.getProgressIndicator().visibleProperty().bind(mainWindow.getWorkflow().runningProperty());
-
-		controller.getOpenButton().setOnAction(mainWindow.getController().getOpenMenuItem().getOnAction());
-		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
-		controller.getSaveButton().disableProperty().bind(mainWindow.getController().getSaveAsMenuItem().disableProperty());
-
-		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
-		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
 	}
-
 
 	public void setupMenuItems() {
 		var windowController = mainWindow.getController();

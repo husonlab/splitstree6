@@ -20,8 +20,14 @@
 package splitstree6.view.splits.viewer;
 
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
+import javafx.scene.control.Separator;
+import javafx.scene.shape.Shape;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -29,12 +35,16 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
+import splitstree6.view.format.branches.BranchFormatter;
+import splitstree6.view.format.taxlabels.TaxLabelFormatter;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SplitsView implements IView {
@@ -85,8 +95,11 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
+		final ObservableMap<Taxon, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
+		final ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
+
 		// this is the target area for the tree page:
-		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock);
+		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, taxonLabelMap, splitShapeMap);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -95,6 +108,12 @@ public class SplitsView implements IView {
 		});
 
 		setViewTab(viewTab);
+
+		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, taxonLabelMap);
+
+		var branchFormatter = new BranchFormatter(mainWindow, splitSelectionModel, splitShapeMap);
+
+		controller.getFormatVbox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), branchFormatter);
 
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);

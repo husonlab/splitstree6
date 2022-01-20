@@ -19,10 +19,11 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
             xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.splits.viewer.SplitsViewController">
@@ -30,66 +31,10 @@
         <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <top>
-                <VBox fx:id="vBox" BorderPane.alignment="CENTER">
+                <VBox fx:id="vBox">
                     <children>
-                        <ToolBar fx:id="toolBar" prefHeight="32.0">
+                        <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
                             <items>
-                                <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Open">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Open a file"/>
-                                    </tooltip>
-                                </Button>
-                                <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Save">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Save16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Save file"/>
-                                    </tooltip>
-                                </Button>
-                                <Button fx:id="printButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Print">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Print16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Print the selected tab"/>
-                                    </tooltip>
-                                </Button>
-                                <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
                                 <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                                         minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
                                         style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
@@ -173,6 +118,9 @@
                                     </tooltip>
                                 </Button>
                             </items>
+                            <padding>
+                                <Insets left="110.0"/>
+                            </padding>
                         </ToolBar>
                     </children>
                 </VBox>
@@ -182,9 +130,18 @@
                     <children>
                         <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                        <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
+                              AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     </children>
                 </AnchorPane>
             </center>
         </BorderPane>
+        <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER" expanded="false"
+                    maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0" text="Format"
+                    AnchorPane.leftAnchor="2.0" AnchorPane.topAnchor="3.0">
+            <content>
+                <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
+            </content>
+        </TitledPane>
     </children>
 </AnchorPane>

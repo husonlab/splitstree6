@@ -201,13 +201,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			labelProperty.addListener((v, o, n) -> treePagesView.setOptionTreeLabels(TreePagesView.TreeLabels.valueOfLabel(n)));
 		}
 
-		controller.getOpenButton().setOnAction(mainWindow.getController().getOpenMenuItem().getOnAction());
-		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
-		controller.getSaveButton().disableProperty().bind(mainWindow.getController().getSaveAsMenuItem().disableProperty());
-
-		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
-		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
-
 		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
 		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(), t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),

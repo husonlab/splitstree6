@@ -196,7 +196,7 @@ public class MainWindowPresenter {
 
 		controller.getNewMenuItem().setOnAction(e -> MainWindowManager.getInstance().createAndShowWindow(false));
 
-		controller.getOpenMenuItem().setOnAction(e -> {
+		controller.getOpenButton().setOnAction(e -> {
 			final File previousDir = new File(ProgramProperties.get("InputDir", ""));
 			final FileChooser fileChooser = new FileChooser();
 			if (previousDir.isDirectory())
@@ -208,6 +208,7 @@ public class MainWindowPresenter {
 				FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
 			}
 		});
+		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
 
 		controller.getImportMenuItem().setOnAction(e -> {
 			System.err.println("Not implemented");
@@ -222,11 +223,12 @@ public class MainWindowPresenter {
 		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> {
 		});
 
-		controller.getSaveMenuItem().setOnAction(e -> {
+		controller.getSaveButton().setOnAction(e -> {
 			SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName()));
 		});
-		controller.getSaveMenuItem().disableProperty().bind((mainWindow.dirtyProperty().and(mainWindow.fileNameProperty().isNotEmpty()).and(mainWindow.hasSplitsTree6FileProperty())).not());
-
+		controller.getSaveButton().disableProperty().bind((mainWindow.dirtyProperty().and(mainWindow.fileNameProperty().isNotEmpty()).and(mainWindow.hasSplitsTree6FileProperty())).not());
+		controller.getSaveMenuItem().setOnAction(controller.getSaveButton().getOnAction());
+		controller.getSaveMenuItem().disableProperty().bind(controller.getSaveButton().disableProperty());
 
 		controller.getSaveAsMenuItem().setOnAction(e -> {
 			SaveDialog.showSaveDialog(mainWindow, false);
@@ -247,9 +249,11 @@ public class MainWindowPresenter {
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
 
 		if (focusedDisplayTab.get() != null) {
-			controller.getPrintMenuItem().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().getImageNode()));
-			controller.getPrintMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
+			controller.getPrintButton().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().getImageNode()));
+			controller.getPrintButton().disableProperty().bind(focusedDisplayTab.isNull());
 		}
+		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
+		controller.getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
 
 		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> {
 			System.err.println("Not implemented");

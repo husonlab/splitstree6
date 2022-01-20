@@ -111,13 +111,6 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 			if (n)
 				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
 		});
-
-		controller.getOpenButton().setOnAction(mainWindow.getController().getOpenMenuItem().getOnAction());
-		controller.getSaveButton().setOnAction(mainWindow.getController().getSaveAsMenuItem().getOnAction());
-		controller.getSaveButton().disableProperty().bind(mainWindow.getController().getSaveAsMenuItem().disableProperty());
-
-		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
-		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
 	}
 
 	public void setupMenuItems() {

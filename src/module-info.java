@@ -94,7 +94,9 @@ module splitstreesix {
 	opens splitstree6.view.displaytext;
 	opens splitstree6.view.displaydatablock;
 	opens splitstree6.view.inputeditor;
-	opens splitstree6.view;
+	opens splitstree6.view.format.taxlabels;
+	opens splitstree6.view.format.branches;
+
 	opens splitstree6.view.trees.layout;
 	opens splitstree6.view.splits.layout;
 

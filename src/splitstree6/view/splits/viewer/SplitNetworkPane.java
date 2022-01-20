@@ -28,12 +28,14 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
@@ -47,6 +49,8 @@ import splitstree6.view.splits.layout.SplitNetworkLayout;
 import splitstree6.view.trees.layout.LayoutUtils;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
+
+import java.util.ArrayList;
 
 public class SplitNetworkPane extends StackPane {
 
@@ -65,8 +69,8 @@ public class SplitNetworkPane extends StackPane {
 	 * single tree pane
 	 */
 	public SplitNetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel,
-							SelectionModel<Integer> splitSelectionModel,
-							double boxWidth, double boxHeight,
+							SelectionModel<Integer> splitSelectionModel, ObservableMap<Taxon, RichTextLabel> taxonLabelMap,
+							ObservableMap<Integer, ArrayList<Shape>> splitShapeMap, double boxWidth, double boxHeight,
 							SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting,
 							double rootAngle,
 							ReadOnlyBooleanProperty useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
@@ -99,7 +103,6 @@ public class SplitNetworkPane extends StackPane {
 		redrawListener = e -> drawNetwork();
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(redrawListener));
 
-
 		// compute the tree in a separate thread:
 		service = new AService<>(mainWindow.getController().getBottomFlowPane());
 		service.setExecutor(ProgramExecutorService.getInstance());
@@ -109,7 +112,7 @@ public class SplitNetworkPane extends StackPane {
 				return new Group();
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
-					rootAngle, useWeights.get(), taxonSelectionModel, unitLength, getPrefWidth() - 4, getPrefHeight() - 16, splitSelectionModel);
+					rootAngle, useWeights.get(), taxonSelectionModel, splitSelectionModel, taxonLabelMap, splitShapeMap, unitLength, getPrefWidth() - 4, getPrefHeight() - 16);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());
@@ -132,7 +135,10 @@ public class SplitNetworkPane extends StackPane {
 
 			addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(taxonSelectionModel::clearSelection);
+					Platform.runLater(() -> {
+						taxonSelectionModel.clearSelection();
+						splitSelectionModel.clearSelection();
+					});
 				}
 				e.consume();
 			});

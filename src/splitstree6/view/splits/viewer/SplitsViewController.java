@@ -20,10 +20,7 @@
 package splitstree6.view.splits.viewer;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -47,15 +44,6 @@ public class SplitsViewController {
 
 	@FXML
 	private ToolBar toolBar;
-
-	@FXML
-	private Button openButton;
-
-	@FXML
-	private Button saveButton;
-
-	@FXML
-	private Button printButton;
 
 	@FXML
 	private Button findButton;
@@ -84,6 +72,13 @@ public class SplitsViewController {
 	@FXML
 	private AnchorPane innerAnchorPane;
 
+	@FXML
+	private TitledPane formatTitledPane;
+
+	@FXML
+	private VBox formatVBox;
+
+
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();
@@ -100,6 +95,27 @@ public class SplitsViewController {
 		AnchorPane.setTopAnchor(fitLabel, 25.0);
 		AnchorPane.setLeftAnchor(fitLabel, 2.0);
 		innerAnchorPane.getChildren().add(fitLabel);
+
+		formatVBox.setMinHeight(0);
+		formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+
+		if (!formatTitledPane.isExpanded()) {
+			formatVBox.setVisible(false);
+			formatVBox.setMaxHeight(0);
+		} else {
+			formatVBox.setVisible(true);
+			formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+		}
+
+		formatTitledPane.expandedProperty().addListener((v, o, n) -> {
+			formatVBox.setVisible(n);
+			formatVBox.setMaxHeight(n ? formatVBox.getPrefHeight() : 0);
+		});
+
+		AnchorPane.setTopAnchor(formatTitledPane, AnchorPane.getTopAnchor(formatTitledPane) + 30);
+
+		innerAnchorPane.getChildren().remove(formatVBox);
+		innerAnchorPane.getChildren().add(formatVBox);
 
 		DraggableLabel.makeDraggable(fitLabel);
 	}
@@ -118,18 +134,6 @@ public class SplitsViewController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
-	}
-
-	public Button getOpenButton() {
-		return openButton;
-	}
-
-	public Button getSaveButton() {
-		return saveButton;
-	}
-
-	public Button getPrintButton() {
-		return printButton;
 	}
 
 	public Button getFindButton() {
@@ -174,5 +178,9 @@ public class SplitsViewController {
 
 	public AnchorPane getInnerAnchorPane() {
 		return innerAnchorPane;
+	}
+
+	public VBox getFormatVbox() {
+		return formatVBox;
 	}
 }

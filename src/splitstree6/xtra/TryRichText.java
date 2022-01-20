@@ -52,7 +52,7 @@ public class TryRichText extends Application {
 			richText.setFontFamily(fontFamily.getText());
 
 			for (var type : RichTextLabel.Event.listTypes()) {
-				var event = richText.getPrefixElement(type);
+				var event = RichTextLabel.getPrefixElement(richText.getText(), type);
 				if (event != null) {
 					System.err.println(richText.getText().substring(event.pos(), event.segmentStart()));
 				}

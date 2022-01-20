@@ -52,11 +52,11 @@ public class Outline {
      * @param progress
      * @param useWeights
      * @param taxaBlock
-     * @param splits
+     * @param splits0
      * @param graph
      * @param nodePointMap
      */
-    public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits,
+    public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits0,
                              PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet usedSplits,
                              ArrayList<ArrayList<Node>> loops, int rootSplit, double rootAngle) throws CanceledException {
         progress.setTasks("Outline", null);
@@ -68,8 +68,10 @@ public class Outline {
 
         final var splits2node = new HashMap<BitSet, Node>();
 
-        final var origNSplits = splits.getNsplits();
-        addAllTrivial(taxaBlock.getNtax(), splits); // these will be removed again
+        final var origNSplits = splits0.getNsplits();
+        var splits = new SplitsBlock(splits0);
+        addAllTrivial(taxaBlock.getNtax(), splits);
+        // these will be removed again
 
         try {
             final var cycle = splits.getCycle();
@@ -115,7 +117,7 @@ public class Outline {
 
                 if (event.isStart()) {
                     currentSplits.set(event.getS(), true);
-                    var weight = useWeights ? event.getWeight() : (event.getS() == rootSplit ? 0.1 : 1);
+                    var weight = useWeights ? event.getWeight() : (event.getS() == rootSplit ? 0.1 : event.getS() <= origNSplits ? 1 : 0);
                     location = GeometryUtilsFX.translateByAngle(location, split2angle[event.getS()], weight);
                 } else {
                     currentSplits.set(event.getS(), false);
@@ -167,7 +169,7 @@ public class Outline {
                     graph.addTaxon(start, t);
             }
 
-            {
+            if (false) {
                 final var edgesToRemove = new ArrayList<Edge>();
                 final var splitsToRemove = new BitSet();
                 for (var e : graph.edges()) {
@@ -242,7 +244,7 @@ public class Outline {
                     taxaWithTrivialSplit.set(split.getSmallerPart().nextSetBit(0));
             }
             for (var t = taxaWithTrivialSplit.nextClearBit(1); t != -1 && t <= ntaxa; t = taxaWithTrivialSplit.nextClearBit(t + 1)) {
-                splits.getSplits().add(new ASplit(BitSetUtils.asBitSet(t), ntaxa, 0.0001));
+                splits.getSplits().add(new ASplit(BitSetUtils.asBitSet(t), ntaxa, 0.00001));
             }
         }
     }

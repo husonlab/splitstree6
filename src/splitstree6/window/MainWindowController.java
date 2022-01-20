@@ -426,6 +426,16 @@ public class MainWindowController {
 	@FXML
 	private Label memoryLabel;
 
+	@FXML
+	private Button openButton;
+
+	@FXML
+	private Button saveButton;
+
+	@FXML
+	private Button printButton;
+
+
 	//@FXML
 	//private TabPane algorithmTabPane;
 
@@ -1008,5 +1018,17 @@ public class MainWindowController {
 
 	public SplittableTabPane getMainTabPane() {
 		return mainTabPane;
+	}
+
+	public Button getOpenButton() {
+		return openButton;
+	}
+
+	public Button getSaveButton() {
+		return saveButton;
+	}
+
+	public Button getPrintButton() {
+		return printButton;
 	}
 }

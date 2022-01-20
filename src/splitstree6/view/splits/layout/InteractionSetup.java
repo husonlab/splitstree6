@@ -207,13 +207,15 @@ public class InteractionSetup {
 				shape.setOnMouseEntered(e -> {
 					if (!e.isStillSincePress() && !edgeShapeEntered) {
 						edgeShapeEntered = true;
-						shape.setStrokeWidth(4 * shape.getStrokeWidth());
+						shape.setUserData(shape.getStrokeWidth());
+						shape.setStrokeWidth(shape.getStrokeWidth() + 4);
 						e.consume();
 					}
 				});
 				shape.setOnMouseExited(e -> {
 					if (edgeShapeEntered) {
-						shape.setStrokeWidth(0.25 * shape.getStrokeWidth());
+						shape.setStrokeWidth(shape.getStrokeWidth() - 4);
+						shape.setUserData(null);
 						edgeShapeEntered = false;
 						e.consume();
 					}

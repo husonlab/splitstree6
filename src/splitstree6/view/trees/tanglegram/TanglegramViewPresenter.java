@@ -307,9 +307,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		tanglegramView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree Names", tanglegramView.optionShowTreeNamesProperty(), o, n));
 		tanglegramView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add((n ? "Show" : "Hide") + " Tree Info", tanglegramView.optionShowTreeInfoProperty(), o, n));
 
-		controller.getPrintButton().setOnAction(mainWindow.getController().getPrintMenuItem().getOnAction());
-		controller.getPrintButton().disableProperty().bind(mainWindow.getController().getPrintMenuItem().disableProperty());
-
 		controller.getContractHorizontallyButton().setOnAction(e -> tanglegramView.setOptionHorizontalZoomFactor((1.0 / 1.1) * tanglegramView.getOptionHorizontalZoomFactor()));
 		controller.getContractHorizontallyButton().disableProperty().bind(tanglegramView.emptyProperty().or(tanglegramView.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
 

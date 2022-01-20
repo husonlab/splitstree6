@@ -39,11 +39,13 @@
 package splitstree6.view.splits.layout;
 
 import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.GeometryUtilsFX;
@@ -104,16 +106,17 @@ public class SplitNetworkLayout {
 	 * @param rooting
 	 * @param useWeights
 	 * @param taxonSelectionModel
+	 * @param splitSelectionModel
 	 * @param unitLength
 	 * @param width
 	 * @param height
-	 * @param splitSelectionModel
 	 * @return group of groups, namely loops, nodes, edges and node labels
 	 * @throws IOException
 	 */
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
-					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, DoubleProperty unitLength,
-					   double width, double height, SelectionModel<Integer> splitSelectionModel) throws IOException {
+					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
+					   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap, DoubleProperty unitLength,
+					   double width, double height) throws IOException {
 
 		labelLayout.clear();
 
@@ -215,6 +218,8 @@ public class SplitNetworkLayout {
 		var nodesGroup = new Group();
 		var nodeLabelsGroup = new Group();
 
+		taxonLabelMap.clear();
+
 		for (var v : graph.nodes()) {
 			var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
 			var point = nodePointMap.get(v);
@@ -231,6 +236,9 @@ public class SplitNetworkLayout {
 			var text = LayoutUtils.getLabelText(taxaBlock, graph, v);
 			if (text != null && !isRootNode) {
 				var label = new RichTextLabel(text);
+				// todo: need to change stuff so that each node has at most one taxon
+				taxonLabelMap.put(taxaBlock.get(graph.getTaxa(v).iterator().next()), label);
+
 				label.setTextFill(color);
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTranslateX(nodeXMap.get(v).doubleValue() + 10);
@@ -266,6 +274,9 @@ public class SplitNetworkLayout {
 				line.setStroke(color);
 			edgeCallback.accept(e, line);
 			edgesGroup.getChildren().add(line);
+
+			var split = graph.getSplit(e);
+			splitShapeMap.computeIfAbsent(split,s->new ArrayList<>()).add(line);
 		}
 
 		var loopsGroup = new Group();

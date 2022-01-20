@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  SplitEdgePresenter.fxml Copyright (C) 2022 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<VBox prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="splitstree6.view.format.branches.BranchFormatterController">
+    <children>
+        <HBox alignment="CENTER">
+            <children>
+                <Label text="Splits">
+                    <tooltip>
+                        <Tooltip text="Branch formatting"/>
+                    </tooltip>
+                </Label>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="6.0">
+            <children>
+                <Label text=" Width"/>
+                <ComboBox fx:id="widthCBox" editable="true" prefWidth="100.0" visibleRowCount="14">
+                    <tooltip>
+                        <Tooltip text="Line width"/>
+                    </tooltip>
+                </ComboBox>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0" spacing="4.0">
+            <children>
+                <Label text="Color">
+                    <font>
+                        <Font size="12.0"/>
+                    </font>
+                    <HBox.margin>
+                        <Insets right="8.0"/>
+                    </HBox.margin>
+                </Label>
+                <ColorPicker fx:id="colorPicker">
+                    <tooltip>
+                        <Tooltip text="Text color"/>
+                    </tooltip>
+                </ColorPicker>
+            </children>
+        </HBox>
+    </children>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+</VBox>

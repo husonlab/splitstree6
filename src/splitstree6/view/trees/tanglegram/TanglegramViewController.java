@@ -48,15 +48,6 @@ public class TanglegramViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private Button openButton;
-
-	@FXML
-	private Button saveButton;
-
-	@FXML
-	private Button printButton;
-
-	@FXML
 	private Button findButton;
 
 	@FXML
@@ -143,18 +134,6 @@ public class TanglegramViewController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
-	}
-
-	public Button getOpenButton() {
-		return openButton;
-	}
-
-	public Button getSaveButton() {
-		return saveButton;
-	}
-
-	public Button getPrintButton() {
-		return printButton;
 	}
 
 	public Button getFindButton() {
