@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
+ *  LayoutUtils.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *

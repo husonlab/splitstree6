@@ -1,5 +1,5 @@
 /*
- *  DensiTreeMain.java Copyright (C) 2021 Daniel H. Huson
+ *  DensiTreeMain.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -48,7 +48,7 @@ public class DensiTreeMain extends Application {
 		ProgramProperties.setProgramVersion(Version.SHORT_DESCRIPTION);
 
 		ProgramProperties.setProgramLicence("""
-				Copyright (C) 2021 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.
+				Copyright (C) 2022. This program comes with ABSOLUTELY NO WARRANTY.
 				This is free software, licensed under the terms of the GNU General Public License, Version 3.
 				Sources available at: https://github.com/husonlab/splitstree6
 				""");
