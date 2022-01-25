@@ -1,5 +1,5 @@
 /*
- * BranchFormatter.java Copyright (C) 2022 Daniel H. Huson
+ * SplitsFormatter.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,26 +17,33 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.format.branches;
+package splitstree6.view.format.splits;
 
+import javafx.collections.ObservableList;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
-import splitstree6.window.MainWindow;
+import jloda.graph.Node;
+import splitstree6.view.splits.viewer.LoopView;
 
 import java.util.ArrayList;
 import java.util.Map;
 
-public class BranchFormatter extends Pane {
-	private final BranchFormatterController controller;
-	private final BranchFormatterPresenter presenter;
+/**
+ * splits formatter pane
+ * Daniel Huson, 1.2022
+ */
+public class SplitsFormatter extends Pane {
+	private final SplitsFormatterController controller;
+	private final SplitsFormatterPresenter presenter;
 
-	public BranchFormatter(MainWindow mainWindow, SelectionModel<Integer> splitSelectionModel, Map<Integer, ArrayList<Shape>> splitShapeMap) {
-		var loader = new ExtendedFXMLLoader<BranchFormatterController>(BranchFormatterController.class);
+	public SplitsFormatter(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, Shape> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObservableList<LoopView> loopViews) {
+		var loader = new ExtendedFXMLLoader<SplitsFormatterController>(SplitsFormatterController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new BranchFormatterPresenter(mainWindow, controller, splitSelectionModel, splitShapeMap);
+		presenter = new SplitsFormatterPresenter(undoManager, controller, splitSelectionModel, nodeShapeMap, splitShapeMap, loopViews);
 	}
 }

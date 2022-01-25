@@ -47,7 +47,7 @@ public class AddNetworkPipelineCommand {
 	 */
 	public static UndoableRedoableCommand create(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
 		final Collection<WorkflowNode> addedNodes = new ArrayList<>();
-		return UndoableRedoableCommand.create("Add " + algorithm.getName(),
+		return UndoableRedoableCommand.create("add " + algorithm.getName(),
 				() -> workflow.deleteNodes(addedNodes),
 				() -> {
 					addedNodes.clear();

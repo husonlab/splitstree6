@@ -19,7 +19,9 @@
 
 package splitstree6.view.splits.layout;
 
+import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -42,6 +44,7 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
 import splitstree6.view.splits.layout.algorithms.ConvexHull;
 import splitstree6.view.splits.layout.algorithms.EqualAngle;
@@ -70,8 +73,6 @@ public class SplitNetworkLayout {
 	private final PhyloSplitsGraph graph = new PhyloSplitsGraph();
 	private final NodeArray<Point2D> nodePointMap = graph.newNodeArray();
 	private final ArrayList<ArrayList<Node>> loops = new ArrayList<>();
-	private final NodeArray<DoubleProperty> nodeXMap = graph.newNodeArray();
-	private final NodeArray<DoubleProperty> nodeYMap = graph.newNodeArray();
 
 	public SplitNetworkLayout() {
 		labelLayout = new RadialLabelLayout();
@@ -96,7 +97,8 @@ public class SplitNetworkLayout {
 	 */
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
 					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
-					   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap, DoubleProperty unitLength,
+					   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+					   ObservableList<LoopView> loopViews, DoubleProperty unitLength,
 					   double width, double height) throws IOException {
 
 		labelLayout.clear();
@@ -147,19 +149,21 @@ public class SplitNetworkLayout {
 		}
 
 		// interaction support:
-		var interactionSetup = new InteractionSetup(taxaBlock, splitsBlock, taxonSelectionModel, splitSelectionModel);
+		var interactionSetup = new InteractionSetup(taxaBlock, splitsBlock, taxonSelectionModel, splitSelectionModel, taxonLabelMap, nodeShapeMap, splitShapeMap);
 		var nodeCallback = interactionSetup.createNodeCallback();
 		var edgeCallback = interactionSetup.createEdgeCallback();
 
 		// compute the network and assign coordinates to nodes, and compute loops for outline:
 
 		graph.clear();
+		nodeShapeMap.clear();
+		loopViews.clear();
 
 		if (diagram == SplitsDiagramType.Outline) {
 			try {
 				var usedSplits = new BitSet();
 				Outline.apply(progress, useWeights, taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
-				if (usedSplits.cardinality() < splitsBlock.getNsplits())
+				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.cyclic && usedSplits.cardinality() < splitsBlock.getNsplits())
 					NotificationManager.showWarning(String.format("Outline algorithm: Showing only %d of %d splits", usedSplits.cardinality(), splitsBlock.getNsplits()));
 			} catch (CanceledException e) {
 				NotificationManager.showWarning("User CANCELED 'outline' computation");
@@ -192,9 +196,6 @@ public class SplitNetworkLayout {
 		// compute the shapes:
 		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
 
-		nodeXMap.clear();
-		nodeYMap.clear();
-
 		// nodes:
 		var nodesGroup = new Group();
 		var nodeLabelsGroup = new Group();
@@ -206,12 +207,12 @@ public class SplitNetworkLayout {
 			var point = nodePointMap.get(v);
 			var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 2 : 0.5);
 			shape.setTranslateX(point.getX());
+			shape.setTranslateY(point.getY());
+
 			shape.setStroke(Color.TRANSPARENT);
 			shape.setFill(color);
+			nodeShapeMap.put(v, shape);
 
-			nodeXMap.put(v, shape.translateXProperty());
-			shape.setTranslateY(point.getY());
-			nodeYMap.put(v, shape.translateYProperty());
 			nodesGroup.getChildren().add(shape);
 
 			var text = LayoutUtils.getLabelText(taxaBlock, graph, v);
@@ -222,10 +223,13 @@ public class SplitNetworkLayout {
 
 				label.setTextFill(color);
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-				label.setTranslateX(nodeXMap.get(v).doubleValue() + 10);
-				label.setTranslateY(nodeYMap.get(v).doubleValue() + 10);
+				label.setTranslateX(nodeShapeMap.get(v).getTranslateX() + 10);
+				label.setTranslateY(nodeShapeMap.get(v).getTranslateY() + 10);
 				nodeLabelsGroup.getChildren().add(label);
 				nodeCallback.accept(v, shape, label);
+
+				label.applyCss();
+
 				var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
 				if (taxonId != null)
 					shape.setUserData(taxaBlock.get(taxonId));
@@ -245,10 +249,10 @@ public class SplitNetworkLayout {
 		var edgesGroup = new Group();
 		for (var e : graph.edges()) {
 			var line = new Line();
-			line.startXProperty().bind(nodeXMap.get(e.getSource()));
-			line.startYProperty().bind(nodeYMap.get(e.getSource()));
-			line.endXProperty().bind(nodeXMap.get(e.getTarget()));
-			line.endYProperty().bind(nodeYMap.get(e.getTarget()));
+			line.startXProperty().bind(nodeShapeMap.get(e.getSource()).translateXProperty());
+			line.startYProperty().bind(nodeShapeMap.get(e.getSource()).translateYProperty());
+			line.endXProperty().bind(nodeShapeMap.get(e.getTarget()).translateXProperty());
+			line.endYProperty().bind(nodeShapeMap.get(e.getTarget()).translateYProperty());
 			if (graph.getSplit(e) == rootSplit) // is added  split
 				line.setStroke(Color.GRAY);
 			else
@@ -257,12 +261,14 @@ public class SplitNetworkLayout {
 			edgesGroup.getChildren().add(line);
 
 			var split = graph.getSplit(e);
-			splitShapeMap.computeIfAbsent(split,s->new ArrayList<>()).add(line);
+			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
 		}
 
 		var loopsGroup = new Group();
 		for (var loop : loops) {
-			loopsGroup.getChildren().add(new LoopView(loop, nodeXMap, nodeYMap).getShape());
+			var loopView = new LoopView(loop, v -> nodeShapeMap.get(v).translateXProperty(), v -> nodeShapeMap.get(v).translateYProperty());
+			loopsGroup.getChildren().add(loopView);
+			Platform.runLater(() -> loopViews.add(loopView));
 		}
 
 		return new Group(loopsGroup, edgesGroup, nodesGroup, nodeLabelsGroup);

@@ -26,6 +26,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
@@ -36,6 +37,7 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
 import jloda.fx.util.ProgramExecutorService;
+import jloda.graph.Node;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
@@ -67,7 +69,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private final InvalidationListener updateListener;
 
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
-							   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
+							   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+							   ObservableList<LoopView> loopViews) {
 		this.mainWindow = mainWindow;
 		this.splitsView = splitsView;
 		this.controller = splitsView.getController();
@@ -105,7 +108,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			disabledDiagramTypes.clear();
 			if (n == null) {
 				disabledDiagramTypes.addAll(List.of(SplitsDiagramType.values()));
-				controller.getFitLabel().setVisible(false);
 			} else {
 				if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic) {
 					disabledDiagramTypes.add(SplitsDiagramType.Outline);
@@ -163,7 +165,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		updateListener = e -> {
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
-					splitsView.getSplitSelectionModel(), taxonLabelMap, splitShapeMap,
+					splitsView.getSplitSelectionModel(), taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews,
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
 					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionUseWeightsProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					controller.getScaleBar().unitLengthXProperty());
@@ -205,6 +207,17 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		splitsView.emptyProperty().addListener(e -> splitsView.getRoot().setDisable(splitsView.emptyProperty().get()));
+
+		var undoManager = splitsView.getUndoManager();
+
+		splitsView.optionRootAngleProperty().addListener((c, o, n) -> undoManager.add("set root angle", splitsView.optionRootAngleProperty(), o, n));
+		splitsView.optionUseWeightsProperty().addListener((v, o, n) -> undoManager.add("set use weights", splitsView.optionUseWeightsProperty(), o, n));
+		splitsView.optionRootingProperty().addListener((c, o, n) -> undoManager.add("set rooting", splitsView.optionRootingProperty(), o, n));
+		splitsView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" set diagram", splitsView.optionDiagramProperty(), o, n));
+		splitsView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" set layout orientatio", splitsView.optionOrientationProperty(), o, n));
+		splitsView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", splitsView.optionFontScaleFactorProperty(), o, n));
+		splitsView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("set zoom factor", splitsView.optionZoomFactorProperty(), o, n));
+
 
 		Platform.runLater(this::setupMenuItems);
 	}

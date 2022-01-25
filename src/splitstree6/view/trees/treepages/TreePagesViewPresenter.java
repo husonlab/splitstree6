@@ -222,15 +222,14 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomOutButton().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
 		controller.getZoomOutButton().disableProperty().bind(treePageView.emptyProperty());
 
-
 		var undoManager = treePagesView.getUndoManager();
-		rowsAndCols.addListener((v, o, n) -> undoManager.add("Set Grid", rowsAndCols, o, n));
-		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("Change Page", treePagesView.pageNumberProperty(), o, n));
-		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" Set TreeDiagramType", treePagesView.optionDiagramProperty(), o, n));
-		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" Set LayoutOrientation", treePagesView.optionOrientationProperty(), o, n));
-		treePagesView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("Set Tree Labels", treePagesView.optionTreeLabelsProperty(), o, n));
-		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Font Size", treePagesView.optionFontScaleFactorProperty(), o, n));
-		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add((n.doubleValue() > 1 ? "Increase" : "Decrease ") + " Zoom", treePagesView.optionZoomFactorProperty(), o, n));
+		rowsAndCols.addListener((v, o, n) -> undoManager.add("set grid dimensions", rowsAndCols, o, n));
+		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("set page", treePagesView.pageNumberProperty(), o, n));
+		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("set diagram type", treePagesView.optionDiagramProperty(), o, n));
+		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("set layout orientation", treePagesView.optionOrientationProperty(), o, n));
+		treePagesView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("set show tree names", treePagesView.optionTreeLabelsProperty(), o, n));
+		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", treePagesView.optionFontScaleFactorProperty(), o, n));
+		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("set zoom", treePagesView.optionZoomFactorProperty(), o, n));
 
 		treePagesView.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {

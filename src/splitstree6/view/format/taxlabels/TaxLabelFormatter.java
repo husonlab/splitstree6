@@ -19,12 +19,14 @@
 
 package splitstree6.view.format.taxlabels;
 
-import javafx.collections.ObservableMap;
 import javafx.scene.layout.Pane;
-import jloda.fx.control.RichTextLabel;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.data.parts.Taxon;
 import splitstree6.window.MainWindow;
+
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 
 /**
  * provides taxon label formatter
@@ -34,12 +36,13 @@ public class TaxLabelFormatter extends Pane {
 	private final TaxLabelFormatterController controller;
 	private final TaxLabelFormatterPresenter presenter;
 
-	public TaxLabelFormatter(MainWindow mainWindow, ObservableMap<Taxon, RichTextLabel> taxonLabelMap) {
+	public TaxLabelFormatter(MainWindow mainWindow, UndoManager undoManager,
+							 Function<Taxon, String> taxonLabelGetter, BiConsumer<Taxon, String> taxonLabelSetter) {
 
 		var loader = new ExtendedFXMLLoader<TaxLabelFormatterController>(TaxLabelFormatterController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new TaxLabelFormatterPresenter(mainWindow, controller, taxonLabelMap);
+		presenter = new TaxLabelFormatterPresenter(mainWindow, controller, undoManager, taxonLabelGetter, taxonLabelSetter);
 	}
 }

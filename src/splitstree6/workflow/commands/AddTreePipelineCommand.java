@@ -50,7 +50,7 @@ public class AddTreePipelineCommand {
 			throw new RuntimeException("Bad node class");
 
 		final Collection<WorkflowNode> addedNodes = new ArrayList<>();
-		return UndoableRedoableCommand.create("Add " + algorithm.getName(),
+		return UndoableRedoableCommand.create("add " + algorithm.getName(),
 				() -> workflow.deleteNodes(addedNodes),
 				() -> {
 					addedNodes.clear();

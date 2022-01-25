@@ -28,6 +28,7 @@ import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
@@ -42,6 +43,7 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.MainWindowManager;
+import jloda.graph.Node;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -70,7 +72,8 @@ public class SplitNetworkPane extends StackPane {
 	 */
 	public SplitNetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel,
 							SelectionModel<Integer> splitSelectionModel, ObservableMap<Taxon, RichTextLabel> taxonLabelMap,
-							ObservableMap<Integer, ArrayList<Shape>> splitShapeMap, double boxWidth, double boxHeight,
+							ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+							ObservableList<LoopView> loopViews, double boxWidth, double boxHeight,
 							SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting,
 							double rootAngle,
 							ReadOnlyBooleanProperty useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
@@ -112,7 +115,9 @@ public class SplitNetworkPane extends StackPane {
 				return new Group();
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
-					rootAngle, useWeights.get(), taxonSelectionModel, splitSelectionModel, taxonLabelMap, splitShapeMap, unitLength, getPrefWidth() - 4, getPrefHeight() - 16);
+					rootAngle, useWeights.get(), taxonSelectionModel, splitSelectionModel, taxonLabelMap, nodeShapeMap, splitShapeMap,
+					loopViews,
+					unitLength, getPrefWidth() - 4, getPrefHeight() - 16);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());

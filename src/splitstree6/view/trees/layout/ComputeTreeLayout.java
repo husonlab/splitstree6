@@ -84,6 +84,7 @@ public class ComputeTreeLayout {
 				var label = new RichTextLabel(text);
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTextFill(color);
+				label.applyCss();
 				nodeLabelMap.put(v, label);
 			}
 		}

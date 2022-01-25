@@ -21,6 +21,7 @@ package splitstree6.view.splits.viewer;
 
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
@@ -39,7 +40,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
-import splitstree6.view.format.branches.BranchFormatter;
+import splitstree6.view.format.splits.SplitsFormatter;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
@@ -95,11 +96,14 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
+
 		final ObservableMap<Taxon, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
+		final ObservableMap<jloda.graph.Node, Shape> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
+		final ObservableList<LoopView> loopViews = FXCollections.observableArrayList();
 
 		// this is the target area for the tree page:
-		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, taxonLabelMap, splitShapeMap);
+		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -109,9 +113,9 @@ public class SplitsView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, taxonLabelMap);
+		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager, t -> taxonLabelMap.get(t) == null ? null : taxonLabelMap.get(t).getText(), (t, text) -> taxonLabelMap.get(t).setText(text));
 
-		var branchFormatter = new BranchFormatter(mainWindow, splitSelectionModel, splitShapeMap);
+		var branchFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, loopViews);
 
 		controller.getFormatVbox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), branchFormatter);
 

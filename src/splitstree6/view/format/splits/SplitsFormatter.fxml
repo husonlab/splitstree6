@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ BranchFormatter.fxml Copyright (C) 2022 Daniel H. Huson
+  ~ SplitsFormatter.fxml Copyright (C) 2022 Daniel H. Huson
   ~
   ~ (Some files contain contributions from other authors, who are then mentioned separately.)
   ~
@@ -22,9 +22,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 <VBox prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="splitstree6.view.format.branches.BranchFormatterController">
+      fx:controller="splitstree6.view.format.splits.SplitsFormatterController">
     <children>
         <HBox alignment="CENTER">
             <children>
@@ -55,11 +56,55 @@
                         <Insets right="8.0"/>
                     </HBox.margin>
                 </Label>
-                <ColorPicker fx:id="colorPicker">
+                <ColorPicker fx:id="colorPicker" editable="true">
                     <tooltip>
                         <Tooltip text="Text color"/>
                     </tooltip>
                 </ColorPicker>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER" layoutX="15.0" layoutY="15.0">
+            <children>
+                <Label text="Outline">
+                    <tooltip>
+                        <Tooltip text="Branch formatting"/>
+                    </tooltip>
+                </Label>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0" spacing="4.0">
+            <children>
+                <Label text="Fill">
+                    <font>
+                        <Font size="12.0"/>
+                    </font>
+                    <HBox.margin>
+                        <Insets right="20.0"/>
+                    </HBox.margin>
+                </Label>
+                <ColorPicker fx:id="outlineColorPicker">
+                    <tooltip>
+                        <Tooltip text="Text color"/>
+                    </tooltip>
+                    <value>
+                        <Color red="0.7529411911964417" green="0.7529411911964417" blue="0.7529411911964417"/>
+                    </value>
+                </ColorPicker>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER" layoutX="15.0" layoutY="99.0">
+            <children>
+                <Label text="Rotate">
+                    <tooltip>
+                        <Tooltip text="Branch formatting"/>
+                    </tooltip>
+                </Label>
+            </children>
+        </HBox>
+        <HBox alignment="CENTER" spacing="4.0">
+            <children>
+                <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="&lt;"/>
+                <Button fx:id="rotateRightButton" mnemonicParsing="false" text="&gt;"/>
             </children>
         </HBox>
     </children>

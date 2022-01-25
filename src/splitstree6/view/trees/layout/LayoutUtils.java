@@ -59,6 +59,7 @@ public class LayoutUtils {
 			if (text != null) {
 				var label = new RichTextLabel(text);
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
+				label.applyCss();
 				nodeLabelMap.put(v, label);
 
 				// BasicFX.reportChanges(label.getRawText(),label.translateXProperty());

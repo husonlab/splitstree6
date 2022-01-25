@@ -1,5 +1,5 @@
 /*
- * BranchFormatterController.java Copyright (C) 2022 Daniel H. Huson
+ * SplitsFormatterController.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,33 +17,56 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.format.branches;
+package splitstree6.view.format.splits;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.util.converter.FormatStringConverter;
 
 import java.text.NumberFormat;
 
-public class BranchFormatterController {
+public class SplitsFormatterController {
 
 	@FXML
-	private ComboBox<Double> widthCBox;
+	private ComboBox<Number> widthCBox;
 
 	@FXML
 	private ColorPicker colorPicker;
 
 	@FXML
+	private Button rotateLeftButton;
+
+	@FXML
+	private Button rotateRightButton;
+
+	@FXML
+	private ColorPicker outlineColorPicker;
+
+
+	@FXML
 	private void initialize() {
-		widthCBox.setConverter(new FormatStringConverter<Double>(NumberFormat.getInstance()));
+		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
 	}
 
-	public ComboBox<Double> getWidthCBox() {
+	public ComboBox<Number> getWidthCBox() {
 		return widthCBox;
 	}
 
 	public ColorPicker getColorPicker() {
 		return colorPicker;
+	}
+
+	public Button getRotateLeftButton() {
+		return rotateLeftButton;
+	}
+
+	public Button getRotateRightButton() {
+		return rotateRightButton;
+	}
+
+	public ColorPicker getOutlineColorPicker() {
+		return outlineColorPicker;
 	}
 }

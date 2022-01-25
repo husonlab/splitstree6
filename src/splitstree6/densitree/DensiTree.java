@@ -252,6 +252,7 @@ public class DensiTree {
             var wPt = nodePointMap.get(w);
             if (e.getTarget().isLeaf()) {
                 var label = new RichTextLabel(tree.getLabel(w));
+                label.applyCss();
                 ChangeListener<Number> listener = (observableValue, oldValue, newValue) -> { // use a listener because we have to wait until both width and height have been set
                     if (oldValue.doubleValue() == 0 && newValue.doubleValue() > 0 && label.getWidth() > 0 && label.getHeight() > 0) {
                         var angle = nodeAngleMap.get(w);

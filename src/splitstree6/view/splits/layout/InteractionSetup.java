@@ -22,11 +22,13 @@ package splitstree6.view.splits.layout;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.graph.GraphTraversals;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.util.TriConsumer;
@@ -60,7 +62,7 @@ public class InteractionSetup {
 	private final EventHandler<MouseEvent> mousePressedHandler;
 	private final EventHandler<MouseEvent> mouseDraggedHandler;
 
-	private final Map<Integer, ArrayList<Shape>> splitShapesMap = new HashMap<>();
+	private final Map<Integer, ArrayList<Shape>> splitShapeMap;
 
 	private final InvalidationListener taxonSelectionInvalidationListener;
 	private final InvalidationListener splitSelectionInvalidationListener;
@@ -69,11 +71,14 @@ public class InteractionSetup {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel) {
+	public InteractionSetup(TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
+							ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
 		this.taxaBlock = taxaBlock;
 		this.splitsBlock = splitsBlock;
 		this.taxonSelectionModel = taxonSelectionModel;
 		this.splitSelectionModel = splitSelectionModel;
+
+		this.splitShapeMap = splitShapeMap;
 
 		mousePressedHandler = e -> {
 			if (e.getSource() instanceof Pane pane && pane.getEffect() != null) { // need a better way to determine whether this label is selected
@@ -112,9 +117,9 @@ public class InteractionSetup {
 		taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionInvalidationListener));
 
 		splitSelectionInvalidationListener = e -> {
-			for (var s : splitShapesMap.keySet()) {
+			for (var s : this.splitShapeMap.keySet()) {
 				var selected = splitSelectionModel.isSelected(s);
-				for (var shape : splitShapesMap.get(s)) {
+				for (var shape : this.splitShapeMap.get(s)) {
 					shape.setEffect(selected ? SelectionEffectBlue.getInstance() : null);
 				}
 			}
@@ -204,16 +209,15 @@ public class InteractionSetup {
 
 				if (edge.getOwner() instanceof PhyloSplitsGraph graph) {
 					var split = graph.getSplit(edge);
-					splitShapesMap.computeIfAbsent(split, k -> new ArrayList<>()).add(shape);
 
 					shape.setPickOnBounds(false);
 
 					shape.setOnMouseClicked(e -> {
-						if (e.getClickCount() >= 1) {
-							if (!e.isShiftDown()) {
-								taxonSelectionModel.clearSelection();
-								splitSelectionModel.clearSelection();
-							}
+						if (!e.isShiftDown()) {
+							taxonSelectionModel.clearSelection();
+							splitSelectionModel.clearSelection();
+						}
+						if (e.getClickCount() == 1) {
 							if (split >= 1 && split <= splitsBlock.getNsplits()) {
 								splitSelectionModel.select(split);
 								var partA = splitsBlock.get(split).getA();
@@ -222,8 +226,20 @@ public class InteractionSetup {
 								var taxa = BitSetUtils.asStream(whichPart).map(taxaBlock::get).collect(Collectors.toList());
 								taxonSelectionModel.selectAll(taxa);
 							}
-							e.consume();
+						} else if (e.getClickCount() == 2) {
+							var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxaBlock::indexOf).collect(Collectors.toList()));
+							var start = graph.nodeStream().filter(v -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(v))).cardinality() > 0).findAny().orElse(null);
+							if (start != null) {
+								try (var visited = graph.newNodeSet()) {
+									GraphTraversals.traverseReachable(start, f -> graph.getSplit(f) != split, visited::add);
+									for (var f : graph.edges()) {
+										if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
+											splitSelectionModel.select(graph.getSplit(f));
+									}
+								}
+							}
 						}
+						e.consume();
 					});
 				}
 			});
