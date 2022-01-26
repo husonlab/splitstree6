@@ -194,7 +194,7 @@ public class TaxLabelFormatterPresenter {
 				var strikeStates = new HashSet<Boolean>();
 				var colors = new HashSet<Paint>();
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var text = taxon.getDisplayLabelOrName();
+					var text = taxonLabelGetter.apply(taxon);
 					fontFamilies.add(RichTextLabel.getFontFamily(text));
 					fontSizes.add(RichTextLabel.getFontSize(text));
 					boldStates.add(RichTextLabel.isBold(text));
