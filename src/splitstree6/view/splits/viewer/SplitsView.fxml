@@ -19,7 +19,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
@@ -118,9 +117,6 @@
                                     </tooltip>
                                 </Button>
                             </items>
-                            <padding>
-                                <Insets left="110.0"/>
-                            </padding>
                         </ToolBar>
                     </children>
                 </VBox>
@@ -131,14 +127,14 @@
                         <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                         <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
-                              AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                              AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="0.0"/>
                     </children>
                 </AnchorPane>
             </center>
         </BorderPane>
         <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER" expanded="false"
                     maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0" text="Format"
-                    AnchorPane.leftAnchor="2.0" AnchorPane.topAnchor="3.0">
+                    AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="3.0">
             <content>
                 <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
             </content>

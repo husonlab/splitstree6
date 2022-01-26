@@ -63,6 +63,7 @@
                 </ColorPicker>
             </children>
         </HBox>
+        <Separator prefWidth="200.0"/>
         <HBox alignment="CENTER" layoutX="15.0" layoutY="15.0">
             <children>
                 <Label text="Outline">
@@ -92,6 +93,7 @@
                 </ColorPicker>
             </children>
         </HBox>
+        <Separator prefWidth="200.0"/>
         <HBox alignment="CENTER" layoutX="15.0" layoutY="99.0">
             <children>
                 <Label text="Rotate">

@@ -156,6 +156,7 @@ public class SplitNetworkPane extends StackPane {
 	}
 
 	public void drawNetwork() {
+		//System.err.println("redraw");
 		service.restart();
 	}
 

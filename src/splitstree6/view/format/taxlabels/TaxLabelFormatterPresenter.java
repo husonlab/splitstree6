@@ -24,16 +24,13 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.event.EventHandler;
-import javafx.scene.control.ComboBox;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.text.Font;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
+import jloda.fx.util.AutoCompleteComboBox;
 import jloda.util.NumberUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.window.MainWindow;
@@ -54,7 +51,7 @@ public class TaxLabelFormatterPresenter {
 		var selectionModel = mainWindow.getTaxonSelectionModel();
 
 		controller.getFontFamilyCbox().setItems(fontFamilies);
-		new AutoCompleteComboBoxListener<>(controller.getFontFamilyCbox());
+		AutoCompleteComboBox.install(controller.getFontFamilyCbox());
 
 		controller.getFontFamilyCbox().setValue((new RichTextLabel()).getFontFamily());
 		controller.getFontFamilyCbox().valueProperty().addListener((v, o, n) -> {
@@ -223,85 +220,4 @@ public class TaxLabelFormatterPresenter {
 		selectionListener.invalidated(null);
 	}
 
-	public static class AutoCompleteComboBoxListener<T> implements EventHandler<KeyEvent> {
-
-		private final ComboBox<T> comboBox;
-		private final ObservableList<T> data;
-		private boolean moveCaretToPos = false;
-		private int caretPos;
-
-		public AutoCompleteComboBoxListener(final ComboBox<T> comboBox) {
-			this.comboBox = comboBox;
-			StringBuilder sb = new StringBuilder();
-			data = comboBox.getItems();
-
-			this.comboBox.setEditable(true);
-			this.comboBox.setOnKeyPressed(new EventHandler<KeyEvent>() {
-
-				@Override
-				public void handle(KeyEvent t) {
-					comboBox.hide();
-				}
-			});
-			this.comboBox.setOnKeyReleased(AutoCompleteComboBoxListener.this);
-		}
-
-		@Override
-		public void handle(KeyEvent event) {
-			if (event.getCode() == KeyCode.UP) {
-				caretPos = -1;
-				moveCaret(comboBox.getEditor().getText().length());
-				return;
-			} else if (event.getCode() == KeyCode.DOWN) {
-				if (!comboBox.isShowing()) {
-					comboBox.show();
-				}
-				caretPos = -1;
-				moveCaret(comboBox.getEditor().getText().length());
-				return;
-			} else if (event.getCode() == KeyCode.BACK_SPACE) {
-				moveCaretToPos = true;
-				caretPos = comboBox.getEditor().getCaretPosition();
-			} else if (event.getCode() == KeyCode.DELETE) {
-				moveCaretToPos = true;
-				caretPos = comboBox.getEditor().getCaretPosition();
-			}
-
-			if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.LEFT
-				|| event.isControlDown() || event.getCode() == KeyCode.HOME
-				|| event.getCode() == KeyCode.END || event.getCode() == KeyCode.TAB) {
-				return;
-			}
-
-			ObservableList<T> list = FXCollections.observableArrayList();
-			for (T datum : data) {
-				if (datum.toString().toLowerCase().startsWith(
-						AutoCompleteComboBoxListener.this.comboBox
-								.getEditor().getText().toLowerCase())) {
-					list.add(datum);
-				}
-			}
-			String t = comboBox.getEditor().getText();
-
-			comboBox.setItems(list);
-			comboBox.getEditor().setText(t);
-			if (!moveCaretToPos) {
-				caretPos = -1;
-			}
-			moveCaret(t.length());
-			if (!list.isEmpty()) {
-				comboBox.show();
-			}
-		}
-
-		private void moveCaret(int textLength) {
-			if (caretPos == -1) {
-				comboBox.getEditor().positionCaret(textLength);
-			} else {
-				comboBox.getEditor().positionCaret(caretPos);
-			}
-			moveCaretToPos = false;
-		}
-
-	}
 }
