@@ -103,7 +103,7 @@ public class RadialLabelLayout {
 						double angle,
 						ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
 						Consumer<Double> xSetter, Consumer<Double> ySetter) {
-		getItems().add(new RadialLabelLayout.LayoutItem(anchorXProperty, anchorYProperty, angle, widthProperty, heightProperty, xSetter, ySetter));
+		items.add(new RadialLabelLayout.LayoutItem(anchorXProperty, anchorYProperty, angle, widthProperty, heightProperty, xSetter, ySetter));
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class RadialLabelLayout {
 	 * @param height height
 	 */
 	public void addAvoidable(ReadOnlyDoubleProperty x, ReadOnlyDoubleProperty y, double width, double height) {
-		getAvoidList().add(new Box(x, y, width, height));
+		avoidList.add(new Box(x, y, width, height));
 	}
 
 	public ArrayList<LayoutItem> getItems() {
@@ -228,7 +228,7 @@ public class RadialLabelLayout {
 						var i = 0;
 						while (!ok && i++ < 1000) {
 							ok = true;
-							for (var avoid : getAvoidList()) {
+							for (var avoid : avoidList) {
 								if (avoid.intersects(choice)) {
 									ok = false;
 									break;
@@ -262,7 +262,7 @@ public class RadialLabelLayout {
 
 	private Choice[] computeChoices(LayoutItem item) {
 		var angle = GeometryUtilsFX.modulo360(orientation.apply(item.angle()));
-		var angleRadian = GeometryUtilsFX.deg2rad(orientation.apply(angle));
+		var angleRadian = GeometryUtilsFX.deg2rad(angle);
 		var choices = new Choice[3];
 
 		if (angle >= 45 && angle <= 135) { // up
@@ -309,10 +309,10 @@ public class RadialLabelLayout {
 	 * @param xSetter         method to set computed x-coordinate of label
 	 * @param ySetter         method to set computed y-coordinate of label
 	 */
-	public static record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
-									double angle,
-									ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
-									Consumer<Double> xSetter, Consumer<Double> ySetter) {
+	private static record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
+									 double angle,
+									 ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
+									 Consumer<Double> xSetter, Consumer<Double> ySetter) {
 		public double width() {
 			return widthProperty.get();
 		}

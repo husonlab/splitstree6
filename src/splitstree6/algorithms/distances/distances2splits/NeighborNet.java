@@ -72,13 +72,13 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		progress.setMaximum(-1);
 
-		final int[] cycle = NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock);
+		final var cycle = NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock.getDistances());
 
 		progress.setTasks("NNet", "edge weights");
 
 		final ArrayList<ASplit> splits;
 
-		final long start = System.currentTimeMillis();
+		final var start = System.currentTimeMillis();
 
 
 		//  if (getOptionWeights().equals(WeightsAlgorithm.LP))

@@ -36,7 +36,6 @@ public class TanglegramEmbeddingOptimizer {
 	private final AService<Pair<PhyloTree, PhyloTree>> service;
 	private final ObjectProperty<PhyloTree> tree1 = new SimpleObjectProperty<>();
 	private final ObjectProperty<PhyloTree> tree2 = new SimpleObjectProperty<>();
-	private final EmbeddingOptimizer embeddingOptimizer = new EmbeddingOptimizer();
 
 	private final BooleanProperty useShortestPaths = new SimpleBooleanProperty(this, "useShortestPaths", false);
 	private final BooleanProperty useFastAlignmentHeuristic = new SimpleBooleanProperty(this, "useFastAlignmentHeuristic", false);
@@ -50,7 +49,7 @@ public class TanglegramEmbeddingOptimizer {
 		service = new AService<>(mainWindow.getController().getBottomFlowPane());
 
 		service.setCallable(() -> {
-			embeddingOptimizer.apply(new PhyloTree[]{tree1.get(), tree2.get()}, service.getProgressListener(), isUseShortestPaths(), isUseFastAlignmentHeuristic());
+			EmbeddingOptimizer.apply(new PhyloTree[]{tree1.get(), tree2.get()}, service.getProgressListener(), isUseShortestPaths(), isUseFastAlignmentHeuristic());
 			return new Pair<>(tree1.get(), tree2.get());
 		});
 	}

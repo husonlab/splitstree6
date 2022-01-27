@@ -21,6 +21,7 @@ package splitstree6.tabs.algorithms;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
+import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
@@ -41,11 +42,16 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		var controller = algorithmTab.getController();
 		var algorithmNode = algorithmTab.getAlgorithmNode();
 
-		controller.getApplyButton().setOnAction(e -> algorithmTab.getAlgorithmNode().restart());
+		controller.getApplyButton().setOnAction(e -> {
+			algorithmNode.restart();
+			algorithmNode.setTitle(algorithmNode.getAlgorithm().getName());
+		});
 		controller.getApplyButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()));
 
 		var label = new Label(algorithmTab.getAlgorithmNode().getAlgorithm().getName());
 		algorithmTab.setGraphic(label);
+
+		//AutoCompleteComboBox.install(controller.getAlgorithmCBox());
 
 		controller.getAlgorithmCBox().valueProperty().addListener((v, o, n) -> {
 			var algorithm = (Algorithm) n;
@@ -77,6 +83,8 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				var label = new Label(StringUtils.fromCamelCase(option.getName()));
 				label.setMinWidth(120);
 				var hbox = new HBox(label, control);
+				hbox.setAlignment(Pos.CENTER_LEFT);
+				hbox.setSpacing(3);
 				hbox.prefWidthProperty().bind(controller.getMainPane().widthProperty());
 				controller.getMainPane().getChildren().add(hbox);
 				var toolTip = new Tooltip(option.getToolTipText());

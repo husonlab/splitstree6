@@ -359,8 +359,7 @@
                                                                     shortcut="DOWN"/>
                                             </accelerator>
                                         </MenuItem>
-                                        <CheckMenuItem fx:id="sparseLabelsCheckMenuItem" text="Sparse Labels"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
+                                         <SeparatorMenuItem mnemonicParsing="false"/>
                                         <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
                                     </items>
                                 </Menu>

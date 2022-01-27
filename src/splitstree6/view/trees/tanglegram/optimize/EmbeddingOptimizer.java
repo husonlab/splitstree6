@@ -611,10 +611,9 @@ public class EmbeddingOptimizer {
 					newTrees[s] = (PhyloTree) trees[s].clone();
 					taxaNotInTrees[Math.abs(s - 1)] = new Taxa();
 
-
-					for (Iterator<String> it = taxaTrees[s].iterator(); it.hasNext(); ) {
-						String taxon = it.next();
-						boolean contains = (taxaTrees[java.lang.Math.abs(s - 1)]).contains(taxon);
+					for (var it = taxaTrees[s].iterator(); it.hasNext(); ) {
+						var taxon = it.next();
+						var contains = (taxaTrees[java.lang.Math.abs(s - 1)]).contains(taxon);
 						if (!contains) {
 							taxaNotInTrees[Math.abs(s - 1)].add(taxon);
 						}

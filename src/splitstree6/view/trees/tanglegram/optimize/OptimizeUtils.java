@@ -235,13 +235,12 @@ public class OptimizeUtils {
      */
     public static double[][] setMatForDiffSys(double[][] D, int ntax, ArrayList<ASplit> splits, boolean firstTree) {
         if (D == null) {
-            int max_num_nodes = 3 * ntax - 5;
-            D = new double[max_num_nodes][max_num_nodes];
-            for (int i = 1; i <= ntax; i++)
-                for (int j = i + 1; j <= ntax; j++) {
+            D = new double[ntax][ntax];
+            for (int i = 0; i < ntax; i++)
+                for (int j = i + 1; j < ntax; j++) {
                     double weight = 0;
                     for (ASplit split : splits) {
-                        if (split.separates(i, j))
+                        if (split.separates(i + 1, j + 1))
                             weight++;
                     }
                     if (firstTree) {
@@ -251,11 +250,11 @@ public class OptimizeUtils {
                     }
                 }
         } else {
-            for (int i = 1; i <= ntax; i++)
-                for (int j = i + 1; j <= ntax; j++) {
+            for (int i = 0; i < ntax; i++)
+                for (int j = i + 1; j < ntax; j++) {
                     double weight = 0;
                     for (ASplit split : splits) {
-                        if (split.separates(i, j))
+                        if (split.separates(i + 1, j + 1))
                             weight++;
                     }
                     D[i][j] = D[j][i] = D[i][j] + weight;

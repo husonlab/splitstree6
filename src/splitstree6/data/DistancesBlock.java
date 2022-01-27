@@ -164,6 +164,11 @@ public class DistancesBlock extends DataBlock {
 		}
 	}
 
+	/**
+	 * gets distances, 0-based
+	 *
+	 * @return distances matrix, 0-based
+	 */
 	public double[][] getDistances() {
 		return distances;
 	}

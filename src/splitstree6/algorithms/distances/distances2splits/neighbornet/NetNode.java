@@ -21,8 +21,12 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import java.util.Objects;
 
-public class NetNode {
-	int id = 0;
+/**
+ * node used in the neighbor net algorithm
+ * David Bryant and Daniel Huson, 2005
+ */
+class NetNode {
+	final int id;
 	NetNode nbr = null; // adjacent node
 	NetNode ch1 = null; // first child
 	NetNode ch2 = null; // second child
@@ -31,19 +35,22 @@ public class NetNode {
 	double Rx = 0;
 	double Sx = 0;
 
-	public String toString() {
-		String str = "[id=" + id;
-		str += " nbr=" + (nbr == null ? "null" : ("" + nbr.id));
-		str += " ch1=" + (ch1 == null ? "null" : ("" + ch1.id));
-		str += " ch2=" + (ch2 == null ? "null" : ("" + ch2.id));
-		str += " prev=" + (prev == null ? "null" : ("" + prev.id));
-		str += " next=" + (next == null ? "null" : ("" + next.id));
-		str += " Rx=" + Rx;
-		str += " Sx=" + Sx;
-		str += "]";
-		return str;
+	NetNode(int id) {
+		this.id = id;
 	}
 
+	@Override
+	public String toString() {
+		return "[id=" + id
+			   + " nbr=" + (nbr == null ? "null" : ("" + nbr.id))
+			   + " ch1=" + (ch1 == null ? "null" : ("" + ch1.id))
+			   + " ch2=" + (ch2 == null ? "null" : ("" + ch2.id))
+			   + " prev=" + (prev == null ? "null" : ("" + prev.id))
+			   + " next=" + (next == null ? "null" : ("" + next.id))
+			   + " Rx=" + Rx
+			   + " Sx=" + Sx
+			   + "]";
+	}
 
 	@Override
 	public boolean equals(Object o) {

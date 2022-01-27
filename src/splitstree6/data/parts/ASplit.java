@@ -262,8 +262,7 @@ public final class ASplit implements Comparable<ASplit> {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof ASplit) {
-			final ASplit that = (ASplit) obj;
+		if (obj instanceof final ASplit that) {
 			return this.A.equals(that.A) && this.B.equals(that.B);
 		} else
 			return false;

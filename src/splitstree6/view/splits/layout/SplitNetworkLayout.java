@@ -241,7 +241,14 @@ public class SplitNetworkLayout {
 				var translateXProperty = shape.translateXProperty();
 				var translateYProperty = shape.translateYProperty();
 				labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
-						xOffset -> label.translateXProperty().bind(translateXProperty.add(xOffset)), yOffset -> label.translateYProperty().bind(translateYProperty.add(yOffset)));
+						xOffset -> {
+							label.setLayoutX(0);
+							label.translateXProperty().bind(translateXProperty.add(xOffset));
+						},
+						yOffset -> {
+							label.setLayoutY(0);
+							label.translateYProperty().bind(translateYProperty.add(yOffset));
+						});
 				labelLayout.addAvoidable(translateXProperty, translateYProperty, 2 * shape.getRadius(), 2 * shape.getRadius());
 			}
 		}

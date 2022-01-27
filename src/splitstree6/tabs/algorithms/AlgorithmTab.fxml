@@ -43,9 +43,9 @@
                 <GridPane BorderPane.alignment="CENTER">
                     <columnConstraints>
                         <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
-                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES" minWidth="100.0"/>
+                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
                         <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
-                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="30.0" minWidth="10.0"
+                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="30.0" minWidth="30.0"
                                            prefWidth="30.0"/>
                         <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES"/>
                     </columnConstraints>
@@ -77,7 +77,7 @@
                                 <Insets/>
                             </GridPane.margin>
                         </Button>
-                        <MenuButton fx:id="menuButton" minWidth="-Infinity" mnemonicParsing="false" text="Edit"
+                        <MenuButton fx:id="menuButton" minWidth="0.0" mnemonicParsing="false" text="Edit"
                                     GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                             <GridPane.margin>
                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>

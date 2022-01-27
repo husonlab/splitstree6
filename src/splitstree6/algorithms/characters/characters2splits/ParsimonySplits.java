@@ -112,7 +112,7 @@ public class ParsimonySplits extends Characters2Splits {
 
 			// swap lists:
 			{
-				final ArrayList<ASplit> tmp = previousSplits;
+				final var tmp = previousSplits;
 				previousSplits = currentSplits;
 				currentSplits = tmp;
 				currentSplits.clear();
@@ -121,8 +121,9 @@ public class ParsimonySplits extends Characters2Splits {
 		}
 
 		splitsBlock.getSplits().addAll(previousSplits);
-		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+
+		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), previousSplits));
+		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 	}
 
 

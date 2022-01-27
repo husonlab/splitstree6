@@ -63,7 +63,7 @@ public class SplitsNexusOutput extends NexusIOBase implements INexusOutput<Split
 		w.write(";\n");
 		if (splitsBlock.getThreshold() != 0)
 			w.write("THRESHOLD=" + splitsBlock.getThreshold() + "; \n");
-		w.write(String.format("PROPERTIES fit=%.2f", splitsBlock.getFit()));
+		w.write(String.format("PROPERTIES fit=%s", StringUtils.removeTrailingZerosAfterDot("%.1f", splitsBlock.getFit())));
 		switch (splitsBlock.getCompatibility()) {
 			case compatible:
 				w.write(" compatible");
@@ -110,10 +110,10 @@ public class SplitsNexusOutput extends NexusIOBase implements INexusOutput<Split
 				w.write(" '" + lab + "'" + " \t");
 			}
 			if (format.isOptionWeights()) {
-				w.write(" " + split.getWeight() + " \t");
+				w.write(" " + StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight()) + " \t");
 			}
 			if (format.isOptionConfidences()) {
-				w.write(" " + split.getConfidence() + " \t");
+				w.write(" " + StringUtils.removeTrailingZerosAfterDot("%.8f", split.getConfidence()) + " \t");
 			}
 			w.write(" " + StringUtils.toString(split.getA(), " "));
 			if (format.isOptionShowBothSides())

@@ -168,20 +168,20 @@ public enum Compatibility {
 		if (cycle == null)
 			cycle = SplitsUtilities.computeCycle(ntax, splits);
 
-		int[] inverse = new int[ntax + 1];
-		for (int t = 1; t <= ntax; t++)
+		var inverse = new int[ntax + 1];
+		for (var t = 1; t <= ntax; t++)
 			inverse[cycle[t]] = t;
-		for (ASplit split : splits) {
+		for (var split : splits) {
 			final BitSet A;
 			if (split.isContainedInA(cycle[1]))     // avoid wraparound
 				A = split.getB();
 			else
 				A = split.getA();
 
-			int minA = ntax;
-			int maxA = 1;
-			for (int t = 1; t <= ntax; t++) {
-				if (split.isContainedInA(t)) {
+			var minA = ntax;
+			var maxA = 1;
+			for (var t = 1; t <= ntax; t++) {
+				if (A.get(t)) {
 					if (inverse[t] < minA)
 						minA = inverse[t];
 					if (inverse[t] > maxA)

@@ -224,9 +224,6 @@ public class MainWindowController {
 	private MenuItem layoutLabelsMenuItem;
 
 	@FXML
-	private CheckMenuItem sparseLabelsCheckMenuItem;
-
-	@FXML
 	private CheckMenuItem showScaleBarMenuItem;
 
 	@FXML
@@ -735,10 +732,6 @@ public class MainWindowController {
 
 	public MenuItem getLayoutLabelsMenuItem() {
 		return layoutLabelsMenuItem;
-	}
-
-	public CheckMenuItem getSparseLabelsCheckMenuItem() {
-		return sparseLabelsCheckMenuItem;
 	}
 
 	public CheckMenuItem getShowScaleBarMenuItem() {

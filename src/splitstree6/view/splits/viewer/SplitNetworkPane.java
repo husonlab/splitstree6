@@ -190,7 +190,7 @@ public class SplitNetworkPane extends StackPane {
 				shape.setTranslateY(point.getY());
 			}
 		});
-		Platform.runLater(() -> splitNetworkLayout.getLabelLayout().layoutLabels(orientation));
+		ProgramExecutorService.submit(100, () -> Platform.runLater(() -> layoutLabels(orientation)));
 	}
 
 }

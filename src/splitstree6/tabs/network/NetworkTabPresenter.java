@@ -75,7 +75,6 @@ public class NetworkTabPresenter implements IDisplayTabPresenter {
 		controller.getFlipMenuItem().setOnAction(null);
 		controller.getFormatNodesMenuItem().setOnAction(null);
 		controller.getLayoutLabelsMenuItem().setOnAction(null);
-		controller.getSparseLabelsCheckMenuItem().setOnAction(null);
 		controller.getShowScaleBarMenuItem().setOnAction(null);
 	}
 }

@@ -22,6 +22,7 @@ package splitstree6.view.splits.viewer;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -67,6 +68,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final ObjectProperty<SplitNetworkPane> splitNetworkPane = new SimpleObjectProperty<>();
 	private final InvalidationListener updateListener;
+
+	private BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
 							   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
@@ -152,10 +155,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 
 		controller.getUseWeightsToggleButton().selectedProperty().bindBidirectional(splitsView.optionUseWeightsProperty());
-		controller.getScaleBar().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()));
+		controller.getScaleBar().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()).and(showScaleBar));
 		controller.getScaleBar().factorXProperty().bind(splitsView.optionZoomFactorProperty());
 
-		controller.getFitLabel().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()));
+		controller.getFitLabel().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()).and(showScaleBar));
 
 
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
@@ -253,5 +256,13 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			splitsView.getSplitSelectionModel().clearSelection();
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> {
+			Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation()));
+		});
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
+
+		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
+		mainController.getShowScaleBarMenuItem().disableProperty().bind(splitsView.optionUseWeightsProperty().not());
 	}
 }

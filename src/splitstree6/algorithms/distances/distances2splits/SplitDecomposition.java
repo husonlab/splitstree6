@@ -20,7 +20,6 @@
 package splitstree6.algorithms.distances.distances2splits;
 
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
@@ -113,11 +112,10 @@ public class SplitDecomposition extends Distances2Splits {
 		splitsBlock.getSplits().addAll(previousSplits);
 
 		splitsBlock.setFit(SplitsUtilities.computeSplitDecompositionFit(distancesBlock, splitsBlock.getSplits()));
-		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 
-		splitsBlock.setCycle(NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock));
-
-		progress.setProgress(ntax);   //set progress to 100%
+		progress.setProgress(taxaBlock.getNtax());   //set progress to 100%
 		progress.close();
 	}
 

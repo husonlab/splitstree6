@@ -55,7 +55,7 @@ public class TaxLabelFormatterPresenter {
 
 		controller.getFontFamilyCbox().setValue((new RichTextLabel()).getFontFamily());
 		controller.getFontFamilyCbox().valueProperty().addListener((v, o, n) -> {
-			if (!inUpdatingDefaults && n != null && !n.isBlank()) {
+			if (!inUpdatingDefaults && n != null && !n.isBlank() && controller.getFontFamilyCbox().getItems().contains(n)) {
 				var undoList = new UndoableRedoableCommandList("set font");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxonLabelGetter.apply(taxon);
@@ -195,13 +195,15 @@ public class TaxLabelFormatterPresenter {
 				var colors = new HashSet<Paint>();
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var text = taxonLabelGetter.apply(taxon);
-					fontFamilies.add(RichTextLabel.getFontFamily(text));
-					fontSizes.add(RichTextLabel.getFontSize(text));
-					boldStates.add(RichTextLabel.isBold(text));
-					italicStates.add(RichTextLabel.isItalic(text));
-					underlineStates.add(RichTextLabel.isUnderline(text));
-					strikeStates.add(RichTextLabel.isStrike(text));
-					colors.add(RichTextLabel.getTextFill(text));
+					if (text != null) {
+						fontFamilies.add(RichTextLabel.getFontFamily(text));
+						fontSizes.add(RichTextLabel.getFontSize(text));
+						boldStates.add(RichTextLabel.isBold(text));
+						italicStates.add(RichTextLabel.isItalic(text));
+						underlineStates.add(RichTextLabel.isUnderline(text));
+						strikeStates.add(RichTextLabel.isStrike(text));
+						colors.add(RichTextLabel.getTextFill(text));
+					}
 				}
 				controller.getFontFamilyCbox().setValue(fontFamilies.size() == 1 ? fontFamilies.iterator().next() : null);
 				controller.getFontSizeTextArea().setText(fontSizes.size() == 1 ? String.valueOf(fontSizes.iterator().next()) : "");

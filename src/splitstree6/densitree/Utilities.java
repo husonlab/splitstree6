@@ -48,7 +48,7 @@ public class Utilities {
 			TreesUtilities.computeSplits(taxa, tree, splits);
 			SplitsUtilities.splitsToDistances(splits, true, distances);
 		}
-		return NeighborNetCycle.compute(taxa.cardinality(), distances);
+		return NeighborNetCycle.compute(taxa.cardinality(), distances.getDistances());
 	}
 
 }
