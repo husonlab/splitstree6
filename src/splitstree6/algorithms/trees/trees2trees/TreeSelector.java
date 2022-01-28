@@ -26,7 +26,6 @@ import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -50,7 +49,7 @@ public class TreeSelector extends Trees2Trees implements IFilter {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock ignored, TreesBlock parent, TreesBlock child) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock ignored, TreesBlock parent, TreesBlock child) {
 		setOptionWhich(Math.max(1, Math.min(parent.size(), optionWhich.get())));
 		child.getTrees().add(parent.getTree(getOptionWhich()));
 		child.setRooted(parent.isRooted());

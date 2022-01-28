@@ -151,9 +151,7 @@ public class MainWindow implements IMainWindow {
 
 		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
 
-		InvalidationListener invalidationListener = e -> {
-			stage.setTitle(getName() + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName());
-		};
+		InvalidationListener invalidationListener = e -> stage.setTitle(getName() + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName());
 		name.addListener(invalidationListener);
 		dirty.addListener(invalidationListener);
 		invalidationListener.invalidated(null);

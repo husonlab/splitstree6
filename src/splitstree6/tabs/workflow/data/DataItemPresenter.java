@@ -42,9 +42,7 @@ public class DataItemPresenter<D extends DataBlock> {
 		dataItem.setEffect(WorkflowTabPresenter.getDropShadow());
 
 		var selected = new SimpleBooleanProperty(false);
-		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> {
-			selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node));
-		});
+		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node)));
 
 		controller.getEditButton().setOnAction(e -> mainWindow.getTextTabsManager().showDataNodeTab(node, true));
 		controller.getEditButton().disableProperty().bind((selected.and(node.validProperty()).not()));

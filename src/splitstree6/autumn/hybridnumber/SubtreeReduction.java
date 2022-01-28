@@ -40,7 +40,7 @@ import java.util.*;
 public class SubtreeReduction {
     public static final boolean checking = false;
 
-    public static enum ReturnValue {
+    public enum ReturnValue {
         ISOMORPHIC, REDUCED, IRREDUCIBLE
     }
 
@@ -63,7 +63,7 @@ public class SubtreeReduction {
         // root1.reorderSubTree();
         // root2.reorderSubTree();
 
-        List<Root> subTrees = new LinkedList<Root>();
+        List<Root> subTrees = new LinkedList<>();
 
         // run the algorithm
         ReturnValue value = apply(root1, root2, subTrees);
@@ -80,14 +80,14 @@ public class SubtreeReduction {
             System.err.println("Trees are not subtree reducible");
         }
 
-        List<Root> results = new LinkedList<Root>();
+        List<Root> results = new LinkedList<>();
         results.add(root1);
         results.add(root2);
         results.addAll(subTrees);
 
         // convert data-structures to final trees
-        List<PhyloTree> result = PostProcess.apply(results.toArray(new Root[results.size()]), allTaxa, false);
-        return result.toArray(new PhyloTree[result.size()]);
+        List<PhyloTree> result = PostProcess.apply(results.toArray(new Root[0]), allTaxa, false);
+        return result.toArray(new PhyloTree[0]);
     }
 
     /**
@@ -112,8 +112,8 @@ public class SubtreeReduction {
             string2 = v2.toStringFullTreeX();
         }
 
-        Single<Boolean> changed = new Single<Boolean>(false);
-        applyRec(v1, isomorphic1, v2, isomorphic2, subTrees, new HashSet<Pair<Node, Node>>(), changed);
+        Single<Boolean> changed = new Single<>(false);
+        applyRec(v1, isomorphic1, v2, isomorphic2, subTrees, new HashSet<>(), changed);
 
         if (!v1.getTaxa().equals(v2.getTaxa()))
             throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(v1.getTaxa()) + " vs " + StringUtils.toString(v2.getTaxa()));
@@ -157,7 +157,7 @@ public class SubtreeReduction {
      * @param changed
      */
     private static void applyRec(Root v1, NodeSet isomorphic1, Root v2, NodeSet isomorphic2, List<Root> subTrees, Set<Pair<Node, Node>> compared, Single<Boolean> changed) {
-        Pair<Node, Node> key = new Pair<Node, Node>(v1, v2);
+        Pair<Node, Node> key = new Pair<>(v1, v2);
         if (compared.contains(key))
             return;
         else
@@ -182,7 +182,7 @@ public class SubtreeReduction {
         // now process v1 and v2:
 
         // 2. determine isomorphic pairs of children below v1 and v2:
-        Set<Pair<Root, Root>> isomorphicPairs = new HashSet<Pair<Root, Root>>();
+        Set<Pair<Root, Root>> isomorphicPairs = new HashSet<>();
         BitSet taxa = new BitSet();
 
         for (Edge e1 = v1.getFirstOutEdge(); e1 != null; e1 = v1.getNextOutEdge(e1)) {
@@ -193,7 +193,7 @@ public class SubtreeReduction {
                     if (isomorphic2.contains(u2)) {
                         if (u1.getTaxa().equals(u2.getTaxa())) {
                             // System.err.println("Isomorphic: " + u1 + " and " + u2);
-                            isomorphicPairs.add(new Pair<Root, Root>(u1, u2));
+                            isomorphicPairs.add(new Pair<>(u1, u2));
                             taxa.or(u1.getTaxa());
                         }
                     }
@@ -206,7 +206,7 @@ public class SubtreeReduction {
             if (checking && !v1.getTaxa().equals(v2.getTaxa())) {
                 System.err.println("v1: " + v1.toStringFullTreeX());
                 System.err.println("v2: " + v2.toStringFullTreeX());
-                throw new RuntimeException("Trees deemed isomorphic have different taxon sets: " + v1.toString() + " vs " + v2.toString());
+                throw new RuntimeException("Trees deemed isomorphic have different taxon sets: " + v1 + " vs " + v2);
             }
             isomorphic1.add(v1);
             isomorphic2.add(v2);

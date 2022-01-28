@@ -227,8 +227,7 @@ public class CodeAreaSearcher implements ITextSearcher {
 			int searchFrom = 0;
 			//System.err.println("Searching backwards before " + currentPoint);
 			while (matcher.find(searchFrom) && matcher.end() < currentPoint) {
-				pos = matcher.start();
-				searchFrom = matcher.end();
+                searchFrom = matcher.end();
 				found = true;
 				//System.err.println("\tfound at [" + pos + "," + matcher.end() + "]" + " but still looking");
 			}

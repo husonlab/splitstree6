@@ -26,70 +26,57 @@
 <?import javafx.scene.text.Font?>
 <VBox xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="splitstree6.view.inputeditor.InputEditorViewController">
-    <children>
-        <ToolBar fx:id="firstToolBar">
-            <items>
-                <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
-                        minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                        text="Open" style="-fx-border-style: none; -fx-background-color: transparent;">
-                    <font>
-                        <Font size="10.0"/>
-                    </font>
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Open16.gif"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Open a file"/>
-                    </tooltip>
-                </Button>
-                <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" layoutX="10.0" layoutY="11.0" maxHeight="18.0"
-                        maxWidth="18.0" minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
-                        prefWidth="18.0" text="Save" style="-fx-border-style: none; -fx-background-color: transparent;">
-                    <font>
-                        <Font size="10.0"/>
-                    </font>
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/SaveAs16.gif"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Save input to text file"/>
-                    </tooltip>
-                </Button>
-                <Separator layoutX="71.0" layoutY="18.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                           prefHeight="20.0"/>
-            </items>
-        </ToolBar>
-        <ToolBar fx:id="lastToolBar" prefHeight="40.0" prefWidth="200.0">
-            <items>
+    <ToolBar fx:id="firstToolBar">
+        <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                text="Open" style="-fx-border-style: none; -fx-background-color: transparent;">
+            <font>
+                <Font size="10.0"/>
+            </font>
+            <graphic>
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image smooth="false" url="@/jloda/resources/icons/sun/Open16.gif"/>
+                </ImageView>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Open a file"/>
+            </tooltip>
+        </Button>
+        <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" layoutX="10.0" layoutY="11.0" maxHeight="18.0"
+                maxWidth="18.0" minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
+                prefWidth="18.0" text="Save" style="-fx-border-style: none; -fx-background-color: transparent;">
+            <font>
+                <Font size="10.0"/>
+            </font>
+            <graphic>
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image smooth="false" url="@/jloda/resources/icons/sun/SaveAs16.gif"/>
+                </ImageView>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Save input to text file"/>
+            </tooltip>
+        </Button>
+        <Separator layoutX="71.0" layoutY="18.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                   prefHeight="20.0"/>
+    </ToolBar>
+    <ToolBar fx:id="lastToolBar" prefHeight="40.0" prefWidth="200.0">
+        <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
 
-                <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-
-                <Button fx:id="parseAndLoadButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
-                        minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                        text="Parse and Load" style="-fx-border-style: none; -fx-background-color: transparent;">
-                    <font>
-                        <Font size="10.0"/>
-                    </font>
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
-                            </image>
-                        </ImageView>
-                    </graphic>
-                    <tooltip>
-                        <Tooltip text="Parse text and load data"/>
-                    </tooltip>
-                </Button>
-            </items>
-        </ToolBar>
-    </children>
+        <Button fx:id="parseAndLoadButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+                text="Parse and Load" style="-fx-border-style: none; -fx-background-color: transparent;">
+            <font>
+                <Font size="10.0"/>
+            </font>
+            <graphic>
+                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                    <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
+                </ImageView>
+            </graphic>
+            <tooltip>
+                <Tooltip text="Parse text and load data"/>
+            </tooltip>
+        </Button>
+    </ToolBar>
 </VBox>

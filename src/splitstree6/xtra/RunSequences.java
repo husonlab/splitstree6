@@ -28,16 +28,16 @@ import splitstree6.workflow.WorkflowSetup;
 public class RunSequences extends Application {
 
 	@Override
-	public void start(Stage stage) throws Exception {
-		var file = "/Users/huson/IdeaProjects/community/splitstree6/examples/bees.fasta";
-		var workflow = WorkflowSetup.apply(file, null);
+    public void start(Stage stage) {
+        var file = "/Users/huson/IdeaProjects/community/splitstree6/examples/bees.fasta";
+        var workflow = WorkflowSetup.apply(file, null);
 
-		workflow.validProperty().addListener((v, o, n) -> {
-			if (!n) {
-				System.err.println(workflow.toReportString());
-				System.err.println(ExtractMethodsText.getInstance().apply(workflow));
-			}
-		});
+        workflow.validProperty().addListener((v, o, n) -> {
+            if (!n) {
+                System.err.println(workflow.toReportString());
+                System.err.println(ExtractMethodsText.getInstance().apply(workflow));
+            }
+        });
 
 		workflow.getLoaderNode().restart();
 

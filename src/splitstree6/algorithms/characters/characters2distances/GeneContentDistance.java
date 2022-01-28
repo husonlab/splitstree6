@@ -27,7 +27,6 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
 
-import java.io.IOException;
 import java.util.BitSet;
 import java.util.List;
 
@@ -59,7 +58,7 @@ public class GeneContentDistance extends Characters2Distances {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) {
 
 		System.err.println("Not tested under construction");
         /*@todo: test this class

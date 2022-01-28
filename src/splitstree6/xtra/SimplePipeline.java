@@ -91,17 +91,17 @@ public class SimplePipeline extends Application {
 	}
 
 	@Override
-	public void start(Stage stage) throws Exception {
-		var workflow = setupWorkflow();
+    public void start(Stage stage) {
+        var workflow = setupWorkflow();
 
-		System.err.println(workflow.toReportString());
+        System.err.println(workflow.toReportString());
 
-		workflow.getSourceNode().setValid(true);
+        workflow.getSourceNode().setValid(true);
 
-		workflow.validProperty().addListener((v, o, n) -> {
-			if (!n) {
-				System.err.println(workflow.toReportString());
-				System.err.println(ExtractMethodsText.getInstance().apply(workflow));
+        workflow.validProperty().addListener((v, o, n) -> {
+            if (!n) {
+                System.err.println(workflow.toReportString());
+                System.err.println(ExtractMethodsText.getInstance().apply(workflow));
 			}
 		});
 

@@ -36,14 +36,12 @@ public class DeleteCommand {
 		Collection<Pair<WorkflowNode, WorkflowNode>> parentChildPairs = getParentChildPairs(nodes);
 
 		return UndoableRedoableCommand.create("delete nodes",
-				() -> {
-					workflow.addNodes(nodes, parentChildPairs);
-				},
-				() -> {
-					var reverse = new ArrayList<>(nodes);
-					Collections.reverse(reverse);
-					workflow.deleteNodes(reverse);
-				});
+                () -> workflow.addNodes(nodes, parentChildPairs),
+                () -> {
+                    var reverse = new ArrayList<>(nodes);
+                    Collections.reverse(reverse);
+                    workflow.deleteNodes(reverse);
+                });
 	}
 
 	public static Set<Pair<WorkflowNode, WorkflowNode>> getParentChildPairs(Collection<WorkflowNode> nodes) {

@@ -110,18 +110,17 @@ public class WorkflowNexusOutput {
 		final var queue = new LinkedList<WorkflowNode>();
 		queue.add(workflow.getWorkingDataNode());
 		while (queue.size() > 0) {
-			final WorkflowNode node = queue.poll();
-			if (node instanceof DataNode) {
-				final var dataNode = (DataNode) node;
-				setupExporter(dataNode, nexusExporter);
-				nexusExporter.export(w, workflow.getWorkingTaxaBlock(), dataNode.getDataBlock());
-			} else {
-				final var algorithm = (AlgorithmNode) node;
-				setupExporter(algorithm, nexusExporter);
-				nexusExporter.export(w, algorithm.getAlgorithm());
-			}
-			queue.addAll(node.getChildren());
-		}
+            final WorkflowNode node = queue.poll();
+            if (node instanceof final DataNode dataNode) {
+                setupExporter(dataNode, nexusExporter);
+                nexusExporter.export(w, workflow.getWorkingTaxaBlock(), dataNode.getDataBlock());
+            } else {
+                final var algorithm = (AlgorithmNode) node;
+                setupExporter(algorithm, nexusExporter);
+                nexusExporter.export(w, algorithm.getAlgorithm());
+            }
+            queue.addAll(node.getChildren());
+        }
 
 		return splitsTree6Block.size();
 	}

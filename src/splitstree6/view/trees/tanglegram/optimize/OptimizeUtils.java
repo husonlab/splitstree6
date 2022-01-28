@@ -279,9 +279,7 @@ public class OptimizeUtils {
             Node w = f.getTarget();
             nodes.add(w);
             NodeSet tmpSet = getDescendingNodesRec(tree, w, nodes);
-            for (Node aTmpSet : tmpSet) {
-                nodes.add(aTmpSet);
-            }
+            nodes.addAll(tmpSet);
         }
         return nodes;
     }
@@ -481,7 +479,7 @@ public class OptimizeUtils {
         }
         //recursion
         else {
-            TreeSet<String> set = new TreeSet<String>();
+            TreeSet<String> set = new TreeSet<>();
             for (Edge f : v.outEdges()) {
                 var w = f.getTarget();
                 set.addAll(collectAllHardwiredClustersRec(tree, w, clusters));

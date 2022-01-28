@@ -55,17 +55,17 @@ public class ShowSplitsNetwork extends Splits2View {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock viewBlock) throws IOException {
-		viewBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
+    public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock viewBlock) {
+        viewBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
 
-		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
+        // if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 
-		switch (getOptionView()) {
-			case SplitsView -> {
-				if (!(viewBlock.getView() instanceof SplitsView)) {
-					Platform.runLater(() -> {
-						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new SplitsView(mainWindow, "Splits Viewer", viewBlock.getViewTab());
+        switch (getOptionView()) {
+            case SplitsView -> {
+                if (!(viewBlock.getView() instanceof SplitsView)) {
+                    Platform.runLater(() -> {
+                        var mainWindow = getNode().getOwner().getMainWindow();
+                        var view = new SplitsView(mainWindow, "Splits Viewer", viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
 				}

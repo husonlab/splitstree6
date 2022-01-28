@@ -108,7 +108,6 @@ public class HammingDistances extends Characters2Distances {
 			}
 		} finally {
 			service.shutdown();
-			//noinspection ResultOfMethodCallIgnored
 			try {
 				service.awaitTermination(1000, TimeUnit.DAYS);
 			} catch (InterruptedException ignored) {

@@ -64,9 +64,7 @@ public class LayoutUtils {
 		});
 		var parallel = new ParallelTransition(transitions.toArray(new Transition[0]));
 		if (orientationConsumer != null)
-			parallel.setOnFinished(e -> {
-				Platform.runLater(() -> orientationConsumer.accept(newOrientation));
-			});
+			parallel.setOnFinished(e -> Platform.runLater(() -> orientationConsumer.accept(newOrientation)));
 		parallel.play();
 	}
 }

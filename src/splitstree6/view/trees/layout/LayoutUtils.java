@@ -43,7 +43,7 @@ import java.util.LinkedList;
  * Daniel Huson, 12.2021
  */
 public class LayoutUtils {
-	public static double MAX_FONT_SIZE = 24;
+	public static final double MAX_FONT_SIZE = 24;
 
 	public static Triplet<Double, Double, Double> computeFontHeightGraphWidthHeight(TaxaBlock taxaBlock, PhyloGraph graph, boolean radial, double width, double height) {
 		double fontHeight;

@@ -81,8 +81,8 @@ public class FilteredSuperNetwork extends SuperNetwork {
 		}
 
 		progress.setSubtask("Processing splits");
-		progress.setMaximum(splits.getNsplits() * trees.getNTrees());
-		progress.setProgress(0);
+        progress.setMaximum((long) splits.getNsplits() * trees.getNTrees());
+        progress.setProgress(0);
 
 		System.err.println("Filtering splits:");
 		if (isOptionUseTotalScore()) {

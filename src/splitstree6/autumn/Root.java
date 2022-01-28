@@ -81,7 +81,7 @@ public class Root extends Node {
 	 * @return all nodes below
 	 */
 	public Set<Node> getAllNodesBelow() {
-		Set<Node> nodes = new HashSet<Node>();
+		Set<Node> nodes = new HashSet<>();
 		getAllNodesBelowRec(this, nodes);
 		return nodes;
 	}
@@ -227,7 +227,7 @@ public class Root extends Node {
 	 * @return all leaves
 	 */
 	public List<Root> getAllLeaves() {
-		List<Root> result = new LinkedList<Root>();
+        List<Root> result = new LinkedList<>();
 		getAllLeavesRec(this, result);
 		return result;
 	}
@@ -254,7 +254,7 @@ public class Root extends Node {
 	 * @return string
 	 */
 	public String toString() {
-		StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 		buf.append("node indeg=").append(getInDegree()).append(" outdeg=").append(getOutDegree()).append(" taxa=").append(getTaxaString());
 		return buf.toString();
 	}
@@ -279,7 +279,7 @@ public class Root extends Node {
 		StringBuffer buf = new StringBuffer();
 		toStringTreeRec(buf, true, false, true);
 		checkTreeRec(this, buf.toString());
-		return buf.toString() + ";";
+        return buf + ";";
 	}
 
 	/**
@@ -291,7 +291,7 @@ public class Root extends Node {
 		StringBuffer buf = new StringBuffer();
 		toStringTreeRec(buf, false, false, false);
 		checkTreeRec(this, buf.toString());
-		return buf.toString() + ";";
+        return buf + ";";
 	}
 
 	/**
@@ -347,8 +347,8 @@ public class Root extends Node {
 			if (!root.getTaxa().equals(taxa))
 				throw new RuntimeException("Taxa discrepancy: " + string + ";");
 			if (!root.getRemovedTaxa().equals(removed))
-				throw new RuntimeException("Removed-taxa discrepancy at " + root.toString() + ": " + string + ";"
-										   + "\nExpected(root): " + StringUtils.toString(root.getRemovedTaxa()) + ", got(below): " + StringUtils.toString(removed));
+                throw new RuntimeException("Removed-taxa discrepancy at " + root + ": " + string + ";"
+                        + "\nExpected(root): " + StringUtils.toString(root.getRemovedTaxa()) + ", got(below): " + StringUtils.toString(removed));
 			if (root.getOutDegree() == 0 && root.getTaxa().cardinality() == 0 && root.getInDegree() == 1 && root.getFirstInEdge().getInfo() == null)
 				throw new RuntimeException("In-edge without tree id:: " + string + ";");
 		}
@@ -364,9 +364,9 @@ public class Root extends Node {
 		if (getOutDegree() == 0) {
 			buf.append("(").append(getTaxaString()).append(")");
 		} else {
-			toStringNetworkRec(buf, true, false, new HashMap<Node, Integer>(), new Single<Integer>(0));
+            toStringNetworkRec(buf, true, false, new HashMap<>(), new Single<>(0));
 		}
-		return buf.toString() + ";";
+        return buf + ";";
 	}
 
 	/**
@@ -379,9 +379,9 @@ public class Root extends Node {
 		if (getOutDegree() == 0)
 			buf.append("(").append(getTaxaString()).append(")");
 		else {
-			toStringNetworkRec(buf, false, true, new HashMap<Node, Integer>(), new Single<Integer>(0));
+            toStringNetworkRec(buf, false, true, new HashMap<>(), new Single<>(0));
 		}
-		return buf.toString() + ";";
+        return buf + ";";
 	}
 
 	/**
@@ -430,8 +430,8 @@ public class Root extends Node {
 	 * @return get taxa
 	 */
 	public String getTaxaString() {
-		StringBuffer buf = new StringBuffer();
-		BitSet both = new BitSet();
+        StringBuilder buf = new StringBuilder();
+        BitSet both = new BitSet();
 		both.or(getTaxa());
 		both.or(getRemovedTaxa());
 		for (int t = both.nextSetBit(0); t != -1; t = both.nextSetBit(t + 1)) {
@@ -462,7 +462,7 @@ public class Root extends Node {
 	 * recursively does the work
 	 */
 	private void reorderChildrenRec(Root v, boolean recurse) {
-		List<Edge> children = new LinkedList<Edge>();
+        List<Edge> children = new LinkedList<>();
 
 		for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
 			Root w = (Root) e.getTarget();
@@ -472,32 +472,29 @@ public class Root extends Node {
 		}
 
 		// if(!v.hasLexicographicChildren())
-		{
-			Edge[] array = children.toArray(new Edge[children.size()]);
-			Arrays.sort(array, new Comparator<Edge>() {
-				public int compare(Edge e1, Edge e2) {
-					Root v1 = (Root) e1.getTarget();
-					Root v2 = (Root) e2.getTarget();
+        {
+            Edge[] array = children.toArray(new Edge[0]);
+            Arrays.sort(array, (e1, e2) -> {
+                Root v1 = (Root) e1.getTarget();
+                Root v2 = (Root) e2.getTarget();
 
-					int t1 = v1.getTaxa().nextSetBit(0);
-					int t2 = v2.getTaxa().nextSetBit(0);
-					while (t1 != -1 && t2 != -1) {
-						if (t1 < t2)
-							return -1;
-						else if (t1 > t2)
-							return 1;
-						t1 = v1.getTaxa().nextSetBit(t1 + 1);
-						t2 = v2.getTaxa().nextSetBit(t2 + 1);
-					}
-					if (t1 == -1 && t2 != -1)
-						return -1;
-					if (t1 != -1 && t2 == -1)
-						return 1;
-					return 0;
-				}
-			});
-			List<Edge> list = new LinkedList<Edge>();
-			list.addAll(Arrays.asList(array));
+                int t1 = v1.getTaxa().nextSetBit(0);
+                int t2 = v2.getTaxa().nextSetBit(0);
+                while (t1 != -1 && t2 != -1) {
+                    if (t1 < t2)
+                        return -1;
+                    else if (t1 > t2)
+                        return 1;
+                    t1 = v1.getTaxa().nextSetBit(t1 + 1);
+                    t2 = v2.getTaxa().nextSetBit(t2 + 1);
+                }
+                if (t1 == -1 && t2 != -1)
+                    return -1;
+                if (t1 != -1 && t2 == -1)
+                    return 1;
+                return 0;
+            });
+            List<Edge> list = new LinkedList<>(Arrays.asList(array));
 			if (v.getInDegree() > 0)
 				list.add(v.getFirstInEdge());
 			v.rearrangeAdjacentEdges(list);
@@ -508,12 +505,12 @@ public class Root extends Node {
 	 * reorder the network below this node so that all children are in lexicographic order
 	 */
 	public void reorderNetwork() {
-		Map<Node, Integer> order = new HashMap<Node, Integer>();
-		Single<Integer> postOrderNumber = new Single<Integer>(1);
-		order.put(this, postOrderNumber.get());
-		computePostOrderNumberingRec(this, order, postOrderNumber);
-		reorderNetworkChildrenRec(this, order);
-	}
+        Map<Node, Integer> order = new HashMap<>();
+        Single<Integer> postOrderNumber = new Single<>(1);
+        order.put(this, postOrderNumber.get());
+        computePostOrderNumberingRec(this, order, postOrderNumber);
+        reorderNetworkChildrenRec(this, order);
+    }
 
 	/**
 	 * computes a post-order numbering of all nodes, avoiding edges that are only contained in tree2
@@ -529,26 +526,24 @@ public class Root extends Node {
 		if (v.getOutDegree() == 0) {
 			taxaBelow.or(v.getTaxa());
 		} else {
-			SortedSet<Pair<BitSet, Root>> child2TaxaBelow = new TreeSet<Pair<BitSet, Root>>(new Comparator<Pair<BitSet, Root>>() {
-				public int compare(Pair<BitSet, Root> pair1, Pair<BitSet, Root> pair2) {
-					int t1 = pair1.getFirst().nextSetBit(0);
-					int t2 = pair2.getFirst().nextSetBit(0);
-					if (t1 < t2)
-						return -1;
-					else if (t1 > t2)
-						return 1;
+            SortedSet<Pair<BitSet, Root>> child2TaxaBelow = new TreeSet<>((pair1, pair2) -> {
+                int t1 = pair1.getFirst().nextSetBit(0);
+                int t2 = pair2.getFirst().nextSetBit(0);
+                if (t1 < t2)
+                    return -1;
+                else if (t1 > t2)
+                    return 1;
 
-					int id1 = pair1.getSecond().getId();
-					int id2 = pair2.getSecond().getId();
+                int id1 = pair1.getSecond().getId();
+                int id2 = pair2.getSecond().getId();
 
-					if (id1 < id2)
-						return -1;
-					else if (id1 > id2)
-						return 1;
-					else
-						return 0;
-				}
-			});
+                if (id1 < id2)
+                    return -1;
+                else if (id1 > id2)
+                    return 1;
+                else
+                    return 0;
+            });
 
 			// first visit the children:
 			for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
@@ -562,7 +557,7 @@ public class Root extends Node {
 							throw new RuntimeException("Node has two in-edges, but chosen one is not labeled 1");
 
 						BitSet childTaxa = computePostOrderNumberingRec(w, order, postOrderNumber);
-						child2TaxaBelow.add(new Pair<BitSet, Root>(childTaxa, w));
+                        child2TaxaBelow.add(new Pair<>(childTaxa, w));
 
 					} else {
 						if (w.getInDegree() < 2)
@@ -589,41 +584,38 @@ public class Root extends Node {
 			throw new RuntimeException("reorderNetworkChildrenRec: Unlabeled node encountered: " + v);
 		}
 		if (v.getTaxa().cardinality() > 0) {
-			List<Edge> children = new LinkedList<Edge>();
+            List<Edge> children = new LinkedList<>();
 
-			for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-				Root w = (Root) e.getTarget();
-				Integer treeId = (Integer) e.getInfo();
-				if (w.getInDegree() == 1 || treeId == null || treeId != 2)
-					reorderNetworkChildrenRec(w, order);
-				children.add(e);
-			}
+            for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
+                Root w = (Root) e.getTarget();
+                Integer treeId = (Integer) e.getInfo();
+                if (w.getInDegree() == 1 || treeId == null || treeId != 2)
+                    reorderNetworkChildrenRec(w, order);
+                children.add(e);
+            }
 
-			Edge[] array = children.toArray(new Edge[children.size()]);
-			Arrays.sort(array, new Comparator<Edge>() {
-				public int compare(Edge e1, Edge e2) {
-					Integer rank1 = order.get(e1.getTarget());
-					Integer rank2 = order.get(e2.getTarget());
+            Edge[] array = children.toArray(new Edge[0]);
+            Arrays.sort(array, (e1, e2) -> {
+                Integer rank1 = order.get(e1.getTarget());
+                Integer rank2 = order.get(e2.getTarget());
 
-					if (rank1 == null)  // dead node
-						rank1 = Integer.MAX_VALUE;
-					if (rank2 == null)  // dead node
-						rank2 = Integer.MAX_VALUE;
+                if (rank1 == null)  // dead node
+                    rank1 = Integer.MAX_VALUE;
+                if (rank2 == null)  // dead node
+                    rank2 = Integer.MAX_VALUE;
 
-					if (rank1 < rank2)
-						return -1;
-					else if (rank1 > rank2)
-						return 1;
-					else if (e1.getId() < e2.getId())
-						return -1;
-					else if (e1.getId() > e2.getId())
-						return 1;
-					else
-						return 0;
-				}
-			});
-			List<Edge> list = new LinkedList<Edge>();
-			list.addAll(Arrays.asList(array));
+                if (rank1 < rank2)
+                    return -1;
+                else if (rank1 > rank2)
+                    return 1;
+                else if (e1.getId() < e2.getId())
+                    return -1;
+                else if (e1.getId() > e2.getId())
+                    return 1;
+                else
+                    return 0;
+            });
+            List<Edge> list = new LinkedList<>(Arrays.asList(array));
 			if (v.getInDegree() > 0)
 				list.add(v.getFirstInEdge());
 			v.rearrangeAdjacentEdges(list);
@@ -699,7 +691,7 @@ public class Root extends Node {
 		Root root2 = new Root(new Graph());
 		root2.setTaxa(getTaxa());
 		root2.setRemovedTaxa(getRemovedTaxa());
-		Map<Root, Root> old2new = new HashMap<Root, Root>();
+        Map<Root, Root> old2new = new HashMap<>();
 		old2new.put(this, root2);
 
 		copySubNetworkRec(this, root2, old2new);
@@ -738,7 +730,7 @@ public class Root extends Node {
 	public Root addNetwork(Root root1) {
 		Root root2 = newNode();
 		root2.setTaxa(root1.getTaxa());
-		Map<Root, Root> old2new = new HashMap<Root, Root>();
+        Map<Root, Root> old2new = new HashMap<>();
 		old2new.put(root1, root2);
 		copySubNetworkRec(root1, root2, old2new);
 		return root2;

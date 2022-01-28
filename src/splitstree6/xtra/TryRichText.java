@@ -32,17 +32,17 @@ import jloda.fx.control.RichTextLabel;
 
 public class TryRichText extends Application {
 	@Override
-	public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
-		var richText = new RichTextLabel();
-		var textField = new TextField();
+        var richText = new RichTextLabel();
+        var textField = new TextField();
 
-		var bold = new ToggleButton("Bold");
-		bold.selectedProperty().addListener((v, o, n) -> richText.setBold(n));
-		var italic = new ToggleButton("Italic");
-		italic.selectedProperty().addListener((v, o, n) -> richText.setItalic(n));
+        var bold = new ToggleButton("Bold");
+        bold.selectedProperty().addListener((v, o, n) -> richText.setBold(n));
+        var italic = new ToggleButton("Italic");
+        italic.selectedProperty().addListener((v, o, n) -> richText.setItalic(n));
 
-		var fontFamily = new TextField();
+        var fontFamily = new TextField();
 		fontFamily.setOnAction(e -> richText.setFontFamily(fontFamily.getText()));
 
 		textField.setOnAction(e -> {

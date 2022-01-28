@@ -67,7 +67,7 @@ public class ClusterReduction {
 		}
 
 		// run the algorithm
-		Pair<Root, Root> pair = apply(root1, root2, new Single<Integer>());
+		Pair<Root, Root> pair = apply(root1, root2, new Single<>());
 
 		if (pair != null) {
 			var results = new LinkedList<Root>();
@@ -102,7 +102,7 @@ public class ClusterReduction {
 	 * @return two reduced clusters or null
 	 */
 	public static Pair<Root, Root> apply(Root v1, Root v2, Single<Integer> placeHolder) {
-		var pair = applyRec(v1.getTaxa(), v1, v2, new HashSet<Pair<Node, Node>>(), placeHolder);
+        var pair = applyRec(v1.getTaxa(), v1, v2, new HashSet<>(), placeHolder);
 		if (!v1.getTaxa().equals(v2.getTaxa()))
 			throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(v1.getTaxa()) + " vs " + StringUtils.toString(v2.getTaxa()));
 
@@ -278,7 +278,7 @@ public class ClusterReduction {
 			if (!taxa1.equals(taxa2))
 				throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(X) + " vs " + StringUtils.toString(Y));
 
-			return new Pair<Root, Root>(subTreeRoot1, subTreeRoot2);
+            return new Pair<>(subTreeRoot1, subTreeRoot2);
 		} else if (X.equals(Y)) // no pair of connected components, but perhaps both nodes give us a component
 		{
 			if (root1.getInDegree() == 0 || root2.getInDegree() == 0)

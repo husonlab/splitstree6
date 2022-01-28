@@ -238,7 +238,7 @@ public class ComputeHybridizationNetwork {
 
                 return cachedResults.getFirst();
             } else {
-                var newResults = new TreeSet<Root>(new NetworkComparator());
+                var newResults = new TreeSet<>(new NetworkComparator());
                 var h = computeRec(root1, root2, isReduced, candidateHybrids, k, newResults, depth);
 
                 if (h > 0)
@@ -260,7 +260,7 @@ public class ComputeHybridizationNetwork {
      * @param k
      * @param totalResults
      */
-    private int computeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybridsOriginal, int k, Collection<Root> totalResults, String depth) throws IOException, CanceledException {
+    private int computeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybridsOriginal, int k, Collection<Root> totalResults, String depth) throws IOException {
         if (verbose) {
             System.err.println(depth + "---------- ComputeRec:");
             System.err.println(depth + "Tree1: " + root1.toStringFullTreeX());
@@ -320,7 +320,7 @@ public class ComputeHybridizationNetwork {
                             candidateHybrids.set(placeHolderTaxon.get(), true);
                         }
 
-                        var currentResults = new TreeSet<Root>(new NetworkComparator());
+                        var currentResults = new TreeSet<>(new NetworkComparator());
 
                         var h = cacheComputeRec(root1, root2, false, candidateHybrids, k, currentResults, depth + " >");
                         var merged = MergeNetworks.apply(currentResults, subTrees);
@@ -344,7 +344,7 @@ public class ComputeHybridizationNetwork {
                 var clusterTrees = ClusterReduction.apply(root1, root2, placeHolderTaxon);
 
                 if (clusterTrees != null) {
-                    var resultBottomPair = new TreeSet<Root>(new NetworkComparator());
+                    var resultBottomPair = new TreeSet<>(new NetworkComparator());
                     var h = cacheComputeRec(clusterTrees.getFirst(), clusterTrees.getSecond(), true, candidateHybridsOriginal, k, resultBottomPair, depth + " >");
 
                     // for the top pair, we should reconsider the place holder in the top pair as a possible place holder
@@ -352,13 +352,13 @@ public class ComputeHybridizationNetwork {
 
                     candidateHybrids.set(placeHolderTaxon.get(), true);
 
-                    var resultTopPair = new TreeSet<Root>(new NetworkComparator());
+                    var resultTopPair = new TreeSet<>(new NetworkComparator());
                     h += cacheComputeRec(root1, root2, false, candidateHybrids, k - h, resultTopPair, depth + " >");
 
-                    var currentResults = new TreeSet<Root>(new NetworkComparator());
+                    var currentResults = new TreeSet<>(new NetworkComparator());
 
                     for (var r : resultBottomPair) {
-                        currentResults.addAll(MergeNetworks.apply(resultTopPair, Arrays.asList(r)));
+                        currentResults.addAll(MergeNetworks.apply(resultTopPair, List.of(r)));
                     }
                     if (verbose) {
                         System.err.println(depth + "Cluster reduction applied::");
@@ -534,7 +534,7 @@ public class ComputeHybridizationNetwork {
     }
 
     private static Collection<Root> copyAll(Collection<Root> list) {
-        var copy = new TreeSet<Root>(new NetworkComparator());
+        var copy = new TreeSet<>(new NetworkComparator());
         for (var r : list) {
             copy.add(r.copySubNetwork());
         }

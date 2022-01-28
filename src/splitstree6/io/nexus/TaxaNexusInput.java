@@ -54,21 +54,19 @@ public class TaxaNexusInput extends NexusIOBase {
 	}
 
 	/**
-	 * parse a taxa block
-	 *
-	 * @return list of taxon names found
-	 */
-	public ArrayList<String> parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
-		final var taxonNamesFound = new ArrayList<String>();
+     * parse a taxa block
+     */
+    public void parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
+        final var taxonNamesFound = new ArrayList<String>();
 
-		taxaBlock.getTaxa().clear();
+        taxaBlock.getTaxa().clear();
 
-		np.setCollectAllComments(true);
+        np.setCollectAllComments(true);
 
-		if (np.peekMatchIgnoreCase("#nexus"))
-			np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
+        if (np.peekMatchIgnoreCase("#nexus"))
+            np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
 
-		var comment = np.getComment();
+        var comment = np.getComment();
 		if (comment != null && comment.startsWith("!")) {
 			NotificationManager.showInformation(comment);
 		}
@@ -142,7 +140,6 @@ public class TaxaNexusInput extends NexusIOBase {
 		}
 
 		np.matchEndBlock();
-		return taxonNamesFound;
-	}
+    }
 
 }

@@ -26,7 +26,6 @@ import splitstree6.algorithms.IFilter;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -62,7 +61,7 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock parent, CharactersBlock child) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock parent, CharactersBlock child) {
 		child.clear();
 
 		int totalColumns = parent.getNchar();

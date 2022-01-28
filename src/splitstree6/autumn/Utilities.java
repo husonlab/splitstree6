@@ -71,7 +71,7 @@ public class Utilities {
      * @return set of clusters, each cluster a BitSet
      */
     static public Set<Cluster> extractClusters(TaxaBlock allTaxa, PhyloTree tree1, PhyloTree tree2) {
-        Set<Cluster> result = new HashSet<Cluster>();
+        Set<Cluster> result = new HashSet<>();
 
         BitSet taxa = extractClustersRec(tree1, tree1.getRoot(), allTaxa, result);
         taxa.or(extractClustersRec(tree2, tree2.getRoot(), allTaxa, result));

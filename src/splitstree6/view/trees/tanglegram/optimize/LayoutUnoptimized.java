@@ -26,7 +26,10 @@ import jloda.graph.NodeSet;
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressListener;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 
 /**
@@ -51,7 +54,7 @@ public class LayoutUnoptimized {
         if (isAllReticulationsAreTransfers(tree)) {
             tree.getLSAChildrenMap().clear();
             for (Node v = tree.getFirstNode(); v != null; v = tree.getNextNode(v)) {
-                List<Node> children = new LinkedList<Node>();
+                List<Node> children = new LinkedList<>();
                 for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
                     if (!tree.isReticulatedEdge(e) || tree.getWeight(e) > 0) {
                         children.add(e.getTarget());
@@ -118,22 +121,18 @@ public class LayoutUnoptimized {
                         System.err.println(" " + u.getId() + " order: " + ordering.get(u));
                     }
                 }
-                SortedSet<Node> sorted = new TreeSet<Node>(new Comparator<Node>() {
-
-                    public int compare(Node v1, Node v2) {
-                        if (ordering.getInt(v1) < ordering.getInt(v2))
-                            return -1;
-                        else if (ordering.getInt(v1) > ordering.getInt(v2))
-                            return 1;
-                        if (v1.getId() != v2.getId())
-                            System.err.println("ERROR in sort");
-                        // different nodes must have different ordering values!
-                        return 0;
-                    }
+                SortedSet<Node> sorted = new TreeSet<>((v1, v2) -> {
+                    if (ordering.getInt(v1) < ordering.getInt(v2))
+                        return -1;
+                    else if (ordering.getInt(v1) > ordering.getInt(v2))
+                        return 1;
+                    if (v1.getId() != v2.getId())
+                        System.err.println("ERROR in sort");
+                    // different nodes must have different ordering values!
+                    return 0;
                 });
                 sorted.addAll(children);
-                List<Node> list = new LinkedList<Node>();
-                list.addAll(sorted);
+                List<Node> list = new LinkedList<>(sorted);
                 tree.getLSAChildrenMap().put(v, list);
                 if (false) {
                     System.err.println("LSA children new for v=" + v.getId() + ":");

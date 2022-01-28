@@ -38,15 +38,15 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Neig
 
 
 public class NeighborNetBlockPivot {
-	private static boolean verbose = true;
+	private static final boolean verbose = true;
 
 	public static class BlockPivotParams {
-		public int maxBlockPivotIterations = 1000; //Maximum number of iterations for the block pivot algorithm
+		public final int maxBlockPivotIterations = 1000; //Maximum number of iterations for the block pivot algorithm
 		public int maxPCGIterations = 1000; //Maximum number of iterations for the conjugate gradient algorithm
-		public double pcgTol = 1e-12; //Tolerance for pcg: will stop when residual has norm less than this.
-		public double blockPivotCutoff = 1e-8; //Cutoff - values in block pivot with value smaller than this are set to zero.
-		public boolean usePreconditioner = true; //True if the conjugate gradient makes use of preconditioner.
-		public int preconditionerBands = 10; //Number of bands used when computing Y,Z submatrices in the preconditioner.
+		public final double pcgTol = 1e-12; //Tolerance for pcg: will stop when residual has norm less than this.
+		public final double blockPivotCutoff = 1e-8; //Cutoff - values in block pivot with value smaller than this are set to zero.
+		public final boolean usePreconditioner = true; //True if the conjugate gradient makes use of preconditioner.
+		public final int preconditionerBands = 10; //Number of bands used when computing Y,Z submatrices in the preconditioner.
 		// Note that alot of the calculations for preconditioning are done even if this is false, so use this flag only to assess #iterations.
 		public boolean useOldCG = true; //Use the old CG code for least squares
 	}
@@ -190,21 +190,18 @@ public class NeighborNetBlockPivot {
 			double[] W = new double[npairs];
 			Arrays.fill(W, 1.0);
 			double[] oldd = new double[npairs];
-			for (int i = 0; i < npairs; i++)
-				oldd[i] = d[i + 1];   //Need to translate the distance vector into the old form
+			//Need to translate the distance vector into the old form
+			if (npairs >= 0) System.arraycopy(d, 1, oldd, 0, npairs);
 			double[] Atd = new double[npairs + 1];
 			circularAtx(n, d, Atd);
 			double[] b = new double[npairs];
-			for (int i = 0; i < npairs; i++)
-				b[i] = Atd[i + 1];
+			if (npairs >= 0) System.arraycopy(Atd, 1, b, 0, npairs);
 			double[] xOld = new double[npairs];
 			boolean[] activeOld = new boolean[npairs];
-			for (int i = 0; i < npairs; i++)
-				activeOld[i] = G[i + 1];
+			if (npairs >= 0) System.arraycopy(G, 1, activeOld, 0, npairs);
 			NeighborNetSplits.circularConjugateGrads(n, npairs, r, u, p, y, W, b, activeOld, xOld);
 			double[] x = new double[npairs + 1];
-			for (int i = 1; i <= npairs; i++)
-				x[i] = xOld[i - 1];
+			if (npairs >= 0) System.arraycopy(xOld, 0, x, 1, npairs);
 
 			//System.err.println("Norm after circular ls is " + pgnorm(n,G,d,x));
 
@@ -484,8 +481,8 @@ public class NeighborNetBlockPivot {
 
 	static private int randomElement(boolean[] S, Random rand) {
 		int n = 0;
-		for (int i = 0; i < S.length; i++) {
-			if (S[i])
+		for (boolean b : S) {
+			if (b)
 				n++;
 		}
 		int k = rand.nextInt(n);
@@ -511,7 +508,7 @@ public class NeighborNetBlockPivot {
 	 * @param G
 	 * @return
 	 */
-	private static double projectedGradientNorm(int n, double d[], double[] z, boolean[] G) {
+	private static double projectedGradientNorm(int n, double[] d, double[] z, boolean[] G) {
 		int npairs = n * (n - 1) / 2;
 		double[] x = z.clone();
 		for (int i = 1; i <= npairs; i++) {

@@ -32,7 +32,7 @@ import java.util.Random;
  * Daniel Huson, 2005
  */
 public class CaptureRecapture {
-	public static String DESCRIPTION = "Estimation of invariant sites using capture-recapture method (Lockhart, Huson, Steel, 2000)";
+	public static final String DESCRIPTION = "Estimation of invariant sites using capture-recapture method (Lockhart, Huson, Steel, 2000)";
 	int optionTaxaCutoff = 20; // Cut off before we switch to sampling
 
 	/**
@@ -170,7 +170,7 @@ public class CaptureRecapture {
 			progress.setProgress(0);
 
 			final Random random = new Random();
-			int[] q = new int[4];
+			int[] q;
 			double sum2 = 0.0;
 			boolean done = false;
 			int iter = 0;

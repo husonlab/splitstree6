@@ -25,19 +25,21 @@ import Jama.Matrix;
  * Implements a data structure for matrices where the number of nonzero entries in each row is bounded by a constant.
  */
 public class SparseRowMatrix {
-	public int m, n, N;
-	public int[][] ind; //Indices of nonzero entries in each row
-	public double[][] val; //Corresponding values
+    public final int m;
+    public final int n;
+    public final int N;
+    public final int[][] ind; //Indices of nonzero entries in each row
+    public final double[][] val; //Corresponding values
 
-	/**
-	 * Construct an all-zero matrix
-	 *
-	 * @param m number of rows
-	 * @param n number of columns
-	 * @param N max number of non-zero entries in a row
-	 */
-	public SparseRowMatrix(int m, int n, int N) {
-		this.m = m;
+    /**
+     * Construct an all-zero matrix
+     *
+     * @param m number of rows
+     * @param n number of columns
+     * @param N max number of non-zero entries in a row
+     */
+    public SparseRowMatrix(int m, int n, int N) {
+        this.m = m;
 		this.n = n;
 		this.N = N;
 		ind = new int[m + 1][N + 1];

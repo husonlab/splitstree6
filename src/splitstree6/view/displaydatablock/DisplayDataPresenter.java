@@ -71,9 +71,7 @@ public class DisplayDataPresenter {
 
 		var exporter = new SimpleObjectProperty<DataBlockWriter>();
 
-		exporter.addListener((v, o, n) -> {
-			setupOptionControls(controller, n);
-		});
+		exporter.addListener((v, o, n) -> setupOptionControls(controller, n));
 
 		controller.getFormatCBox().valueProperty().addListener((v, o, n) -> {
 			controller.getMainPane().getChildren().clear();

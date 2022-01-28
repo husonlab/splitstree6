@@ -52,17 +52,15 @@ public class TaxaBlock extends DataBlock {
 		name2taxon = FXCollections.observableHashMap();
 
 		taxa.addListener((ListChangeListener<Taxon>) c -> {
-			taxon2index.clear();
-			name2taxon.clear();
-			for (int t = 1; t <= getNtax(); t++) {
-				final Taxon taxon = taxa.get(t - 1);
-				taxon2index.put(taxon, t - 1);
-				name2taxon.put(taxon.getName(), taxon);
-			}
-		});
-		taxa.addListener((InvalidationListener) observable -> {
-			ntax = size();
-		});
+            taxon2index.clear();
+            name2taxon.clear();
+            for (int t = 1; t <= getNtax(); t++) {
+                final Taxon taxon = taxa.get(t - 1);
+                taxon2index.put(taxon, t - 1);
+                name2taxon.put(taxon.getName(), taxon);
+            }
+        });
+        taxa.addListener((InvalidationListener) observable -> ntax = size());
 	}
 
 	public TaxaBlock(TaxaBlock that) {
@@ -195,21 +193,19 @@ public class TaxaBlock extends DataBlock {
 		}
 	}
 
-	/**
-	 * adds a name to the taxa, making it unique, if necessary
-	 *
-	 * @param name0 original name
-	 * @return unique name
-	 */
-	public String addTaxonByName(String name0) {
-		int count = 1;
-		String name = name0;
-		while (name2taxon.containsKey(name)) {
-			name = name0 + "-" + (count++);
-		}
-		getTaxa().add(new Taxon(name));
-		return name;
-	}
+    /**
+     * adds a name to the taxa, making it unique, if necessary
+     *
+     * @param name0 original name
+     */
+    public void addTaxonByName(String name0) {
+        int count = 1;
+        String name = name0;
+        while (name2taxon.containsKey(name)) {
+            name = name0 + "-" + (count++);
+        }
+        getTaxa().add(new Taxon(name));
+    }
 
 	/**
 	 * computes index map for modified block

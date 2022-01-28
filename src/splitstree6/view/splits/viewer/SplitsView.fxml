@@ -26,118 +26,102 @@
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
             xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.splits.viewer.SplitsViewController">
-    <children>
-        <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
-                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <top>
-                <VBox fx:id="vBox">
-                    <children>
-                        <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
-                            <items>
-                                <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Find in selected tab"/>
-                                    </tooltip>
-                                </Button>
-                                <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="diagramCBox">
-                                    <tooltip>
-                                        <Tooltip text="Choose diagram type"/>
-                                    </tooltip>
-                                </ComboBox>
-                                <ComboBox fx:id="rootingCBox">
-                                    <tooltip>
-                                        <Tooltip text="Choose rooting method"/>
-                                    </tooltip>
-                                </ComboBox>
-                                <ToggleButton fx:id="useWeightsToggleButton" mnemonicParsing="false" selected="true"
-                                              text="W">
-                                    <tooltip>
-                                        <Tooltip text="Use split weights"/>
-                                    </tooltip>
-                                </ToggleButton>
-                                <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                                           orientation="VERTICAL" prefHeight="20.0"/>
-                                <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
-                                    <tooltip>
-                                        <Tooltip text="Choose orientation"/>
-                                    </tooltip>
-                                </ComboBox>
-                                <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                                <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;"
-                                        text="Zoom In">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Zoom out"/>
-                                    </tooltip>
-                                </Button>
-                                <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                        minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                        style="-fx-border-style: none; -fx-background-color: transparent;"
-                                        text="Zoom Out">
-                                    <font>
-                                        <Font size="10.0"/>
-                                    </font>
-                                    <graphic>
-                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                   preserveRatio="true">
-                                            <image>
-                                                <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
-                                            </image>
-                                        </ImageView>
-                                    </graphic>
-                                    <tooltip>
-                                        <Tooltip text="Zoom in"/>
-                                    </tooltip>
-                                </Button>
-                            </items>
-                        </ToolBar>
-                    </children>
-                </VBox>
-            </top>
-            <center>
-                <AnchorPane fx:id="innerAnchorPane" style="-fx-background-color: transparent;">
-                    <children>
-                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                        <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
-                              AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="0.0"/>
-                    </children>
-                </AnchorPane>
-            </center>
-        </BorderPane>
-        <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER" expanded="false"
-                    maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0" text="Format"
-                    AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="3.0">
-            <content>
-                <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
-            </content>
-        </TitledPane>
-    </children>
+    <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <top>
+            <VBox fx:id="vBox">
+                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
+                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Find in selected tab"/>
+                        </tooltip>
+                    </Button>
+                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                               orientation="VERTICAL" prefHeight="20.0"/>
+                    <ComboBox fx:id="diagramCBox">
+                        <tooltip>
+                            <Tooltip text="Choose diagram type"/>
+                        </tooltip>
+                    </ComboBox>
+                    <ComboBox fx:id="rootingCBox">
+                        <tooltip>
+                            <Tooltip text="Choose rooting method"/>
+                        </tooltip>
+                    </ComboBox>
+                    <ToggleButton fx:id="useWeightsToggleButton" mnemonicParsing="false" selected="true"
+                                  text="W">
+                        <tooltip>
+                            <Tooltip text="Use split weights"/>
+                        </tooltip>
+                    </ToggleButton>
+                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                               orientation="VERTICAL" prefHeight="20.0"/>
+                    <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
+                        <tooltip>
+                            <Tooltip text="Choose orientation"/>
+                        </tooltip>
+                    </ComboBox>
+                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                    <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Zoom In">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Zoom out"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Zoom Out">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                       preserveRatio="true">
+                                <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Zoom in"/>
+                        </tooltip>
+                    </Button>
+                </ToolBar>
+            </VBox>
+        </top>
+        <center>
+            <AnchorPane fx:id="innerAnchorPane" style="-fx-background-color: transparent;">
+                <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
+                      AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="0.0"/>
+            </AnchorPane>
+        </center>
+    </BorderPane>
+    <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER" expanded="false"
+                maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" prefWidth="100.0" text="Format"
+                AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="3.0">
+        <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
+    </TitledPane>
 </AnchorPane>

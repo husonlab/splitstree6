@@ -30,10 +30,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import splitstree6.data.TreesBlock;
 
-import java.io.IOException;
 import java.util.*;
-
-import static java.lang.String.format;
 
 /**
  * computes the loose and lacy species for a given tree and taxon trait
@@ -70,7 +67,7 @@ public class LooseAndLacy extends Trees2Trees {
 
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) {
 		final TraitsBlock traitsBlock = taxaBlock.getTraitsBlock();
 
 		final int[] upper;
@@ -108,7 +105,7 @@ public class LooseAndLacy extends Trees2Trees {
 			{
 				int count = 0;
 				for (BitSet set : looseSpecies) {
-					System.err.println(format("[%d] %s", ++count, StringUtils.toString(set, " ")));
+					System.err.printf("[%d] %s%n", ++count, StringUtils.toString(set, " "));
 				}
 			}
 

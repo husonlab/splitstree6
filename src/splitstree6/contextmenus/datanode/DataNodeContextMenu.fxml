@@ -33,9 +33,7 @@
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Edit16.gif"/>
-                            </image>
+                            <Image smooth="false" url="@/jloda/resources/icons/sun/Edit16.gif"/>
                         </ImageView>
                     </graphic>
                 </MenuItem>
@@ -43,9 +41,7 @@
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Export16.gif"/>
-                            </image>
+                            <Image smooth="false" url="@/jloda/resources/icons/sun/Export16.gif"/>
                         </ImageView>
                     </graphic>
                 </MenuItem>
@@ -54,9 +50,7 @@
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
-                            </image>
+                            <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
                         </ImageView>
                     </graphic>
                 </Menu>
@@ -64,9 +58,7 @@
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
-                            </image>
+                            <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
                         </ImageView>
                     </graphic>
                 </Menu>
@@ -75,9 +67,7 @@
                     <graphic>
                         <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
                                    preserveRatio="true">
-                            <image>
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
-                            </image>
+                            <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
                         </ImageView>
                     </graphic>
                 </Menu>

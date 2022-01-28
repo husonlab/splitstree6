@@ -140,7 +140,7 @@ public class SplitsTree6 extends Application {
 	}
 
 	@Override
-	public void stop() throws Exception {
+	public void stop() {
 		ProgramProperties.store();
 		System.exit(0);
 	}

@@ -285,13 +285,8 @@ public class RerootingUtils {
 			if (compare < 0)
 				return -1;
 			else if (compare > 0)
-				return 1;
-			else if (a.getFirst().getId() < b.getFirst().getId())
-				return -1;
-			else if (a.getFirst().getId() > b.getFirst().getId())
-				return 1;
-			else
-				return 0;
+                return 1;
+            else return Integer.compare(a.getFirst().getId(), b.getFirst().getId());
 		});
 		for (var e : tree.edges()) {
 			Triplet<Edge, Float, Float> triplet = new Triplet<>(e, maxTopDownDistance.getFloat(e), maxBottomUpDistance.getFloat(e));

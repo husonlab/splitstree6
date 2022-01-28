@@ -57,7 +57,7 @@ public class ClusterReduction {
 		var v2 = roots.getSecond();
 
 		// run the algorithm
-		var pair = apply(v1, v2, new Single<Integer>());
+		var pair = apply(v1, v2, new Single<>());
 
 		if (pair != null) {
 			var results = new LinkedList<Root>();
@@ -91,7 +91,7 @@ public class ClusterReduction {
 			string2 = v2.toStringFullTreeX();
 		}
 
-		var pair = applyRec(v1, v2, new HashSet<Pair<Node, Node>>(), placeHolderTaxa);
+        var pair = applyRec(v1, v2, new HashSet<>(), placeHolderTaxa);
 		if (!v1.getTaxa().equals(v2.getTaxa()))
 			throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(v1.getTaxa()) + " vs " + StringUtils.toString(v2.getTaxa()));
 

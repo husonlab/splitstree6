@@ -22,7 +22,7 @@ package splitstree6.data.parts;
 import splitstree6.data.CharactersBlock;
 
 public class AmbiguityCodes {
-	public static String CODES = "wrkysmbhdvn";
+	public static final String CODES = "wrkysmbhdvn";
 
 	/**
 	 * gets all nucleotides associated with a given code
@@ -31,44 +31,21 @@ public class AmbiguityCodes {
 	 * @return all (lowercase) letters associated with the given code, or the nucleotide it self, if not a code
 	 */
 	public static String getNucleotides(char code) {
-		switch (Character.toLowerCase(code)) {
-			case 'w':
-				return "at";
-
-			case 'r':
-				return "ag";
-
-			case 'k':
-				return "gt";
-
-			case 'y':
-				return "ct";
-
-			case 's':
-				return "cg";
-
-			case 'm':
-				return "ac";
-
-			case 'b':
-				return "cgt";
-
-			case 'h':
-				return "act";
-
-			case 'd':
-				return "agt";
-
-			case 'v':
-				return "acg";
-
-			case 'n':
-				return "acgt";
-
-			default:
-				return "" + Character.toLowerCase(code); // this is not a code, but a nucleotide
-		}
-	}
+        return switch (Character.toLowerCase(code)) {
+            case 'w' -> "at";
+            case 'r' -> "ag";
+            case 'k' -> "gt";
+            case 'y' -> "ct";
+            case 's' -> "cg";
+            case 'm' -> "ac";
+            case 'b' -> "cgt";
+            case 'h' -> "act";
+            case 'd' -> "agt";
+            case 'v' -> "acg";
+            case 'n' -> "acgt";
+            default -> "" + Character.toLowerCase(code); // this is not a code, but a nucleotide
+        };
+    }
 
 	/**
 	 * is the given letter an ambiguity code?

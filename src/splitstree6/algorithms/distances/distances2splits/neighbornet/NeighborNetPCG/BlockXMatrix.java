@@ -28,22 +28,22 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Neig
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.add;
 
 public class BlockXMatrix {
-	public int n;  //Number of taxa = one more than the number of blocks
-	public int[] m; //Array of block sizes.
-	public TridiagonalMatrix[] A; //Diagonal blocks: tridiagonal
-	public SparseRowMatrix[] B; //Off-diagonal blocks: sparse
-	public SparseRowMatrix[] C; //Blocks in the last row/column.
-	public boolean hasCorners; //Flag indicating wether the top right and bottom left entries of A[n-1] are present.
+    public final int n;  //Number of taxa = one more than the number of blocks
+    public final int[] m; //Array of block sizes.
+    public final TridiagonalMatrix[] A; //Diagonal blocks: tridiagonal
+    public final SparseRowMatrix[] B; //Off-diagonal blocks: sparse
+    public final SparseRowMatrix[] C; //Blocks in the last row/column.
+    public final boolean hasCorners; //Flag indicating wether the top right and bottom left entries of A[n-1] are present.
 
-	/**
-	 * BlockXMatrix
-	 * <p>
-	 * Construct a full X matrix, with all rows and columns. This is a block matrix, specified in the pdf.
-	 *
-	 * @param n number of taxa.
-	 */
-	public BlockXMatrix(int n) {
-		this.n = n;
+    /**
+     * BlockXMatrix
+     * <p>
+     * Construct a full X matrix, with all rows and columns. This is a block matrix, specified in the pdf.
+     *
+     * @param n number of taxa.
+     */
+    public BlockXMatrix(int n) {
+        this.n = n;
 
 		//Construct array of block sizes
 		m = new int[n];

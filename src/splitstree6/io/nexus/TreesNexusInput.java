@@ -141,7 +141,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			}
 		}
 
-		final var knownTaxonNames = new HashSet<String>(taxonNamesFound);
+		final var knownTaxonNames = new HashSet<>(taxonNamesFound);
 
 		int treeNumber = 1;
 		while (np.peekMatchIgnoreCase("tree")) {
@@ -170,11 +170,9 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			}
 
 			final boolean isRooted; // In SplitsTree6 we ignore this because trees are now always rooted
-			if (rootedExplicitySet)
-				isRooted = treesBlock.isRooted();
-			else {
+			if (rootedExplicitySet) {
+			} else {
 				String comment = np.getComment();
-				isRooted = (comment != null && comment.equalsIgnoreCase("&R"));
 			}
 
 			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);

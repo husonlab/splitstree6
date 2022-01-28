@@ -29,63 +29,57 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.tabs.algorithms.AlgorithmTabController">
-    <children>
-        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                    AnchorPane.topAnchor="0.0">
-            <center>
-                <VBox fx:id="mainPane" alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
-                    <BorderPane.margin>
-                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
-                    </BorderPane.margin>
-                </VBox>
-            </center>
-            <top>
-                <GridPane BorderPane.alignment="CENTER">
-                    <columnConstraints>
-                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
-                        <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
-                        <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
-                        <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="30.0" minWidth="30.0"
-                                           prefWidth="30.0"/>
-                        <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES"/>
-                    </columnConstraints>
-                    <rowConstraints>
-                        <RowConstraints minHeight="32.0" prefHeight="34.0" vgrow="SOMETIMES"/>
-                    </rowConstraints>
-                    <children>
-                        <ChoiceBox fx:id="algorithmCBox" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-                            <GridPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                            </GridPane.margin>
-                        </ChoiceBox>
-                        <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
-                                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
-                                prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                                text="Apply" GridPane.columnIndex="3" GridPane.halignment="CENTER"
-                                GridPane.valignment="CENTER">
-                            <graphic>
-                                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                    <image>
-                                        <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
-                                    </image>
-                                </ImageView>
-                            </graphic>
-                            <tooltip>
-                                <Tooltip text="Run algorithm"/>
-                            </tooltip>
-                            <GridPane.margin>
-                                <Insets/>
-                            </GridPane.margin>
-                        </Button>
-                        <MenuButton fx:id="menuButton" minWidth="0.0" mnemonicParsing="false" text="Edit"
-                                    GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
-                            <GridPane.margin>
-                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-                            </GridPane.margin>
-                        </MenuButton>
-                    </children>
-                </GridPane>
-            </top>
-        </BorderPane>
-    </children>
+    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0">
+        <center>
+            <VBox fx:id="mainPane" alignment="CENTER" spacing="10.0" BorderPane.alignment="CENTER">
+                <BorderPane.margin>
+                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                </BorderPane.margin>
+            </VBox>
+        </center>
+        <top>
+            <GridPane BorderPane.alignment="CENTER">
+                <columnConstraints>
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
+                    <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
+                    <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
+                    <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="30.0" minWidth="30.0"
+                                       prefWidth="30.0"/>
+                    <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="32.0" prefHeight="34.0" vgrow="SOMETIMES"/>
+                </rowConstraints>
+                <ChoiceBox fx:id="algorithmCBox" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                    <GridPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </GridPane.margin>
+                </ChoiceBox>
+                <Button fx:id="applyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
+                        minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
+                        prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                        text="Apply" GridPane.columnIndex="3" GridPane.halignment="CENTER"
+                        GridPane.valignment="CENTER">
+                    <graphic>
+                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                            <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
+                        </ImageView>
+                    </graphic>
+                    <tooltip>
+                        <Tooltip text="Run algorithm"/>
+                    </tooltip>
+                    <GridPane.margin>
+                        <Insets/>
+                    </GridPane.margin>
+                </Button>
+                <MenuButton fx:id="menuButton" minWidth="0.0" mnemonicParsing="false" text="Edit"
+                            GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                    <GridPane.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </GridPane.margin>
+                </MenuButton>
+            </GridPane>
+        </top>
+    </BorderPane>
 </AnchorPane>

@@ -53,17 +53,17 @@ public class RunMedianJoining extends Application {
 	}
 
 	@Override
-	public void start(Stage stage) throws Exception {
-		var workflow = setupWorkflow();
+    public void start(Stage stage) {
+        var workflow = setupWorkflow();
 
-		workflow.validProperty().addListener((v, o, n) -> {
-			if (!n) {
-				System.err.println(workflow.toReportString());
-				System.err.println(ExtractMethodsText.getInstance().apply(workflow));
-			}
-		});
+        workflow.validProperty().addListener((v, o, n) -> {
+            if (!n) {
+                System.err.println(workflow.toReportString());
+                System.err.println(ExtractMethodsText.getInstance().apply(workflow));
+            }
+        });
 
-		var source = workflow.getSourceBlock();
+        var source = workflow.getSourceBlock();
 		workflow.getSourceBlock().getSources().add("/Users/huson/IdeaProjects/community/splitstree6/examples/bees.fasta");
 
 		System.err.println("Input type: " + ImportManager.getInstance().determineInputType(source.getSources().get(0)).getSimpleName());

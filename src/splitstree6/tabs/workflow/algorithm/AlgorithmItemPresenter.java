@@ -41,9 +41,7 @@ public class AlgorithmItemPresenter {
 		controller.getNameLabel().textProperty().bind(node.titleProperty());
 
 		var selected = new SimpleBooleanProperty(false);
-		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> {
-			selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node));
-		});
+		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node)));
 
 
 		controller.getEditButton().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(node, true));

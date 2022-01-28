@@ -23,7 +23,6 @@ import jloda.graph.Graph;
 import jloda.util.Pair;
 import splitstree6.autumn.Root;
 
-import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -41,7 +40,7 @@ public class MergeIsomorphicInducedTrees {
      * @param root2
      * @return resulting tree
      */
-    public static Root apply(Root root1, Root root2) throws IOException {
+    public static Root apply(Root root1, Root root2) {
         if (verbose) {
             System.err.println("Merge isomorphic trees:");
             System.err.println("tree1: " + root1.toStringFullTreeX());
@@ -321,11 +320,11 @@ public class MergeIsomorphicInducedTrees {
         var order = new LinkedList<Pair<Edge, Integer>>();
         for (var e1 : path1) {
             if (e1.getSource() != v1)
-                order.add(new Pair<Edge, Integer>(e1, 1));
+                order.add(new Pair<>(e1, 1));
         }
         for (var e2 : path2) {
             if (e2.getSource() != v2)
-                order.add(new Pair<Edge, Integer>(e2, 2));
+                order.add(new Pair<>(e2, 2));
         }
 
         // add all the disabled subtrees

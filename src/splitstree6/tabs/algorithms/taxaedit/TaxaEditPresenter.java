@@ -207,9 +207,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 
 		updateView();
 
-		mainWindow.getWorkflow().getInputTaxaNode().validProperty().addListener((v, o, n) -> {
-			updateView();
-		});
+		mainWindow.getWorkflow().getInputTaxaNode().validProperty().addListener((v, o, n) -> updateView());
 
 		activeChangedListener = e -> {
 			var label = (tableView.getSelectionModel().getSelectedItems().size() > 0 ? String.format("Selected: %d, ", tableView.getSelectionModel().getSelectedItems().size()) : "");

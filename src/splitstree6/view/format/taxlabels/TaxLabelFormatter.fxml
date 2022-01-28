@@ -25,88 +25,78 @@
 <?import javafx.scene.text.*?>
 <VBox fx:id="vBox" prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/16"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.taxlabels.TaxLabelFormatterController">
-   <children>
-      <HBox alignment="CENTER">
-         <children>
-            <Label text="Labels">
-               <tooltip>
-                  <Tooltip text="Formatting of whole taxon labels. Edit indvidual labels to add specific formatting."/>
-               </tooltip>
-            </Label>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" spacing="4.0">
-         <children>
-            <Label text="Font:"/>
-            <ComboBox fx:id="fontFamilyCbox" prefWidth="150.0">
-               <tooltip>
-                  <Tooltip text="Font family"/>
-               </tooltip>
-            </ComboBox>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
-         <children>
-            <Label text="Size:">
-               <HBox.margin>
-                  <Insets right="2.0"/>
-               </HBox.margin>
-            </Label>
-            <TextField fx:id="fontSizeTextArea" prefColumnCount="4" prefWidth="50.0">
-               <tooltip>
-                  <Tooltip text="Font size"/>
-               </tooltip>
-            </TextField>
-            <ToggleButton fx:id="boldToggleButton" mnemonicParsing="false" text="b">
-               <font>
-                  <Font name="System Bold" size="12.0"/>
-               </font>
-               <tooltip>
-                  <Tooltip text="Bold"/>
-               </tooltip>
-            </ToggleButton>
-            <ToggleButton fx:id="italicToggleButton" mnemonicParsing="false" text="i">
-               <font>
-                  <Font name="System Italic" size="12.0"/>
-               </font>
-               <tooltip>
-                  <Tooltip text="Italics"/>
-               </tooltip>
-            </ToggleButton>
-            <ToggleButton fx:id="underlineToggleButton" mnemonicParsing="false" text="u">
-               <font>
-                  <Font size="12.0"/>
-               </font>
-               <tooltip>
-                  <Tooltip text="Underlined"/>
-               </tooltip>
-            </ToggleButton>
-            <ToggleButton fx:id="strikeToggleButton" layoutX="152.0" layoutY="12.0" mnemonicParsing="false" text="s">
-               <font>
-                  <Font size="12.0"/>
-               </font>
-               <tooltip>
-                  <Tooltip text="Strike"/>
-               </tooltip>
-            </ToggleButton>
-         </children>
-      </HBox>
-      <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0" spacing="4.0">
-         <children>
-            <Label text="Color:">
-               <font>
-                  <Font size="12.0"/>
-               </font>
-            </Label>
-            <ColorPicker fx:id="textFillColorChooser">
-               <tooltip>
-                  <Tooltip text="Text color"/>
-               </tooltip>
-            </ColorPicker>
-         </children>
-      </HBox>
-   </children>
-   <padding>
-      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-   </padding>
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+    <HBox alignment="CENTER">
+        <Label text="Labels">
+            <tooltip>
+                <Tooltip text="Formatting of whole taxon labels. Edit indvidual labels to add specific formatting."/>
+            </tooltip>
+        </Label>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="4.0">
+        <Label text="Font:"/>
+        <ComboBox fx:id="fontFamilyCbox" prefWidth="150.0">
+            <tooltip>
+                <Tooltip text="Font family"/>
+            </tooltip>
+        </ComboBox>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
+        <Label text="Size:">
+            <HBox.margin>
+                <Insets right="2.0"/>
+            </HBox.margin>
+        </Label>
+        <TextField fx:id="fontSizeTextArea" prefColumnCount="4" prefWidth="50.0">
+            <tooltip>
+                <Tooltip text="Font size"/>
+            </tooltip>
+        </TextField>
+        <ToggleButton fx:id="boldToggleButton" mnemonicParsing="false" text="b">
+            <font>
+                <Font name="System Bold" size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Bold"/>
+            </tooltip>
+        </ToggleButton>
+        <ToggleButton fx:id="italicToggleButton" mnemonicParsing="false" text="i">
+            <font>
+                <Font name="System Italic" size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Italics"/>
+            </tooltip>
+        </ToggleButton>
+        <ToggleButton fx:id="underlineToggleButton" mnemonicParsing="false" text="u">
+            <font>
+                <Font size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Underlined"/>
+            </tooltip>
+        </ToggleButton>
+        <ToggleButton fx:id="strikeToggleButton" layoutX="152.0" layoutY="12.0" mnemonicParsing="false" text="s">
+            <font>
+                <Font size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Strike"/>
+            </tooltip>
+        </ToggleButton>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0" spacing="4.0">
+        <Label text="Color:">
+            <font>
+                <Font size="12.0"/>
+            </font>
+        </Label>
+        <ColorPicker fx:id="textFillColorChooser">
+            <tooltip>
+                <Tooltip text="Text color"/>
+            </tooltip>
+        </ColorPicker>
+    </HBox>
 </VBox>

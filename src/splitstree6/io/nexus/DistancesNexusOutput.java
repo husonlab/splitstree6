@@ -87,7 +87,7 @@ public class DistancesNexusOutput extends NexusIOBase implements INexusOutput<Di
 					}
 					buf.append(StringUtils.removeTrailingZerosAfterDot(String.format(" %.6f", distancesBlock.get(s, t))));
 				}
-				w.write(buf.toString() + "\n");
+				w.write(buf + "\n");
 			}
 			w.write(";\n");
 		}

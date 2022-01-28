@@ -55,7 +55,7 @@ public class Refine {
 
 		// convert data-structures to final trees
 		List<PhyloTree> result = PostProcess.apply(new Root[]{v1, v2}, allTaxa, false);
-		return result.toArray(new PhyloTree[result.size()]);
+		return result.toArray(new PhyloTree[0]);
 
 	}
 
@@ -66,7 +66,7 @@ public class Refine {
 	 * @param root2
 	 */
 	public static void apply(Root root1, Root root2) {
-		applyRec(root1, root2, new HashSet<Pair<Root, Root>>());
+        applyRec(root1, root2, new HashSet<>());
 		if (!root1.getTaxa().equals(root2.getTaxa()))
 			throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(root1.getTaxa()) + " vs " + StringUtils.toString(root2.getTaxa()));
 	}
@@ -78,7 +78,7 @@ public class Refine {
 	 * @param v2
 	 */
 	private static void applyRec(Root v1, Root v2, Set<Pair<Root, Root>> compared) {
-		Pair<Root, Root> pair = new Pair<Root, Root>(v1, v2);
+        Pair<Root, Root> pair = new Pair<>(v1, v2);
 
 		if (compared.contains(pair))
 			return;
@@ -98,9 +98,9 @@ public class Refine {
 			// System.err.println("X contains Y");
 
 			BitSet taxa1 = new BitSet();
-			BitSet removedTaxa1 = new BitSet();
-			LinkedList<Root> toPushDown = new LinkedList<Root>();
-			int count = 0;
+            BitSet removedTaxa1 = new BitSet();
+            LinkedList<Root> toPushDown = new LinkedList<>();
+            int count = 0;
 			for (Edge e1 = v1.getFirstOutEdge(); e1 != null; e1 = v1.getNextOutEdge(e1)) {
 				Root w1 = (Root) e1.getTarget();
 				if (Y.intersects(w1.getTaxa())) {
@@ -111,7 +111,7 @@ public class Refine {
 				}
 			}
 			if (count > 1 && taxa1.equals(Y)) {
-				Set<Root> needsReordering1 = new HashSet<Root>();
+                Set<Root> needsReordering1 = new HashSet<>();
 				// push down nodes
 				Root u = v1.newNode();
 				u.setTaxa(taxa1);
@@ -138,9 +138,9 @@ public class Refine {
 			//   System.err.println("Y contains X");
 
 			BitSet taxa2 = new BitSet();
-			BitSet removedTaxa2 = new BitSet();
-			LinkedList<Node> toPushDown = new LinkedList<Node>();
-			int count = 0;
+            BitSet removedTaxa2 = new BitSet();
+            LinkedList<Node> toPushDown = new LinkedList<>();
+            int count = 0;
 			for (Edge e2 = v2.getFirstOutEdge(); e2 != null; e2 = v2.getNextOutEdge(e2)) {
 				Root w2 = (Root) e2.getTarget();
 				if (X.intersects(w2.getTaxa())) {
@@ -151,7 +151,7 @@ public class Refine {
 				}
 			}
 			if (count > 1 && taxa2.equals(X)) {
-				Set<Root> needsReordering2 = new HashSet<Root>();
+                Set<Root> needsReordering2 = new HashSet<>();
 				// push down nodes
 				Root u = v2.newNode();
 				u.setTaxa(taxa2);

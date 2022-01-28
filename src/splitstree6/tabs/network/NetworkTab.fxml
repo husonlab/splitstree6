@@ -23,19 +23,15 @@
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.tabs.network.NetworkTabController">
-    <children>
-        <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <center>
-                <StackPane BorderPane.alignment="CENTER">
-                    <children>
-                        <Pane fx:id="mainPane"/>
-                    </children>
-                </StackPane>
-            </center>
-            <top>
-                <VBox fx:id="topVBox" BorderPane.alignment="CENTER"/>
-            </top>
-        </BorderPane>
-    </children>
+    <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <center>
+            <StackPane BorderPane.alignment="CENTER">
+                <Pane fx:id="mainPane"/>
+            </StackPane>
+        </center>
+        <top>
+            <VBox fx:id="topVBox" BorderPane.alignment="CENTER"/>
+        </top>
+    </BorderPane>
 </AnchorPane>

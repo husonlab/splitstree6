@@ -70,15 +70,12 @@ public class TraitsNexusFormat implements INexusFormat {
 	}
 
 	public String getSeparatorString() {
-		switch (optionSeparator) {
-			case Comma:
-				return ",";
-			case SemiColon:
-				return ";";
-			default:
-				return " ";
-		}
-	}
+        return switch (optionSeparator) {
+            case Comma -> ",";
+            case SemiColon -> ";";
+            default -> " ";
+        };
+    }
 
 	public char getOptionMissingCharacter() {
 		return optionMissingCharacter;

@@ -215,29 +215,29 @@ public class MaxWeightClique {
 			c = c - 1;
 
 			//Add to not
-			ne = ne + 1;
-			if (nod > 1) {
-				for (s = ne + 1; AdjMatrix[fixp][old[s]]; s++) {
-				}
-			}
+            ne = ne + 1;
+            if (nod > 1) {
+                for (s = ne + 1; AdjMatrix[fixp][old[s]]; s++) {
+                }
+            }
 
 
-		}
-	}
+        }
+    }
 
-	class Pair implements Comparable {
-		public int id;
-		public double x;
+    static class Pair implements Comparable {
+        public final int id;
+        public final double x;
 
-		public Pair(int id, double x) {
-			this.id = id;
-			this.x = x;
-		}
+        public Pair(int id, double x) {
+            this.id = id;
+            this.x = x;
+        }
 
-		public int compareTo(Object o) {
-			Pair p = (Pair) o;
+        public int compareTo(Object o) {
+            Pair p = (Pair) o;
 
-			//Note - we want to sort in decreasing size!!
+            //Note - we want to sort in decreasing size!!
 			if (this.x < p.x)
 				return 1;
 			else

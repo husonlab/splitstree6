@@ -96,63 +96,62 @@ public class AntiConsensusNetwork extends Trees2Splits {
 	 */
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
-		boolean showTrees = false;
+        boolean showTrees = false;
 
-		System.err.println("Computing anti-consensus network...");
+        System.err.println("Computing anti-consensus network...");
 
-		// 1. compute the references splits and tree
-		final SplitsBlock referenceSplits = new SplitsBlock();
+        // 1. compute the references splits and tree
+        final SplitsBlock referenceSplits = new SplitsBlock();
 
-		final int firstTreeToUse;
-		final int lastTreeToUse;
+        final int firstTreeToUse;
+        final int lastTreeToUse;
 
-		switch (getOptionReferenceTree()) {
-			default:
-			case MajorityConsensus: {
-				if (treesBlock.isPartial()) {
-					throw new IOException("Can't use majority consensus as reference tree because some input trees have incomplete taxa");
-				} else {
-					progress.setTasks("Anti-consensus", "Determining majority consensus splits");
-					final ConsensusTreeSplits consensusTreeSplits = new ConsensusTreeSplits();
-					consensusTreeSplits.setOptionConsensus(ConsensusTreeSplits.Consensus.Majority); // todo: implement and use loose consensus
-					consensusTreeSplits.setOptionEdgeWeights(ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
-					consensusTreeSplits.compute(progress, taxaBlock, treesBlock, referenceSplits);
-					firstTreeToUse = 1;
-					lastTreeToUse = treesBlock.getNTrees();
-					break;
-				}
-			}
-			case FirstInputTree: {
-				progress.setTasks("Anti-consensus", "Extracting splits from first tree");
-				final TreeSelectorSplits treeSelector = new TreeSelectorSplits();
-				treeSelector.setOptionWhich(1);
-				treeSelector.compute(progress, taxaBlock, treesBlock, referenceSplits);
+        switch (getOptionReferenceTree()) {
+            case MajorityConsensus -> {
+                if (treesBlock.isPartial()) {
+                    throw new IOException("Can't use majority consensus as reference tree because some input trees have incomplete taxa");
+                } else {
+                    progress.setTasks("Anti-consensus", "Determining majority consensus splits");
+                    final ConsensusTreeSplits consensusTreeSplits = new ConsensusTreeSplits();
+                    consensusTreeSplits.setOptionConsensus(ConsensusTreeSplits.Consensus.Majority); // todo: implement and use loose consensus
+                    consensusTreeSplits.setOptionEdgeWeights(ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
+                    consensusTreeSplits.compute(progress, taxaBlock, treesBlock, referenceSplits);
+                    firstTreeToUse = 1;
+                    lastTreeToUse = treesBlock.getNTrees();
+                    break;
+                }
+            }
+            case FirstInputTree -> {
+                progress.setTasks("Anti-consensus", "Extracting splits from first tree");
+                final TreeSelectorSplits treeSelector = new TreeSelectorSplits();
+                treeSelector.setOptionWhich(1);
+                treeSelector.compute(progress, taxaBlock, treesBlock, referenceSplits);
 
-				if (referenceSplits.isPartial()) {
-					throw new IOException("Can't use first tree as reference tree because it doesn't contain all taxa");
-				} else {
-					firstTreeToUse = 2;
-					lastTreeToUse = treesBlock.getNTrees();
-					setOptionReferenceTree(Reference.FirstInputTree);
-					break;
-				}
-			}
-			case LastInputTree: {
-				progress.setTasks("Anti-consensus", "Extracting splits from last tree");
-				final TreeSelectorSplits treeSelector = new TreeSelectorSplits();
-				treeSelector.setOptionWhich(treesBlock.getNTrees());
-				treeSelector.compute(progress, taxaBlock, treesBlock, referenceSplits);
+                if (referenceSplits.isPartial()) {
+                    throw new IOException("Can't use first tree as reference tree because it doesn't contain all taxa");
+                } else {
+                    firstTreeToUse = 2;
+                    lastTreeToUse = treesBlock.getNTrees();
+                    setOptionReferenceTree(Reference.FirstInputTree);
+                    break;
+                }
+            }
+            case LastInputTree -> {
+                progress.setTasks("Anti-consensus", "Extracting splits from last tree");
+                final TreeSelectorSplits treeSelector = new TreeSelectorSplits();
+                treeSelector.setOptionWhich(treesBlock.getNTrees());
+                treeSelector.compute(progress, taxaBlock, treesBlock, referenceSplits);
 
-				if (referenceSplits.isPartial()) {
-					throw new IOException("Can't use last tree as reference tree because it doesn't contain all taxa");
-				} else {
-					firstTreeToUse = 1;
-					lastTreeToUse = treesBlock.getNTrees() - 1;
-					setOptionReferenceTree(Reference.LastInputTree);
-				}
-				break;
-			}
-		}
+                if (referenceSplits.isPartial()) {
+                    throw new IOException("Can't use last tree as reference tree because it doesn't contain all taxa");
+                } else {
+                    firstTreeToUse = 1;
+                    lastTreeToUse = treesBlock.getNTrees() - 1;
+                    setOptionReferenceTree(Reference.LastInputTree);
+                }
+                break;
+            }
+        }
 
 		if (referenceSplits.getNsplits() == 0)
 			throw new IOException("Reference tree has no splits");
@@ -682,20 +681,20 @@ public class AntiConsensusNetwork extends Trees2Splits {
 		};
 	}
 
-	/**
-	 * set of strongly incompatible (SIN) splits
-	 */
-	public class SIN {
-		private final int treeId;
-		private final String treeName;
-		private final double spanPercent;
-		private final int distortion;
+    /**
+     * set of strongly incompatible (SIN) splits
+     */
+    public static class SIN {
+        private final int treeId;
+        private final String treeName;
+        private final double spanPercent;
+        private final int distortion;
 
-		private final ArrayList<ASplit> splits = new ArrayList<>();
-		private double totalWeight = 0;
-		private int rank;
+        private final ArrayList<ASplit> splits = new ArrayList<>();
+        private double totalWeight = 0;
+        private int rank;
 
-		public SIN(int treeId, String treeName, double spanPercent, int distortion) {
+        public SIN(int treeId, String treeName, double spanPercent, int distortion) {
 			this.treeId = treeId;
 			this.treeName = treeName;
 			this.spanPercent = spanPercent;

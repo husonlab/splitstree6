@@ -47,7 +47,7 @@ import java.util.BitSet;
  * David Bryant and Daniel Huson, 2005
  */
 public class NeighborNetSplits {
-	private static boolean verbose = false;
+	private static final boolean verbose = false;
 
 	public enum LeastSquares {ols, fm1, fm2, estimated}
 
@@ -185,20 +185,11 @@ public class NeighborNetSplits {
 			for (int j = i + 1; j <= nTax; j++) {
 				double dij = distances[cycle[i] - 1][cycle[j] - 1];
 				switch (leastSquares) {
-					default:
-					case ols:
-						v[index] = 1.0;
-						break;
-					case fm1:
-						v[index] = dij;
-						break;
-					case fm2:
-						v[index] = dij * dij;
-						break;
-					case estimated:
-						v[index] = (variances != null ? variances[cycle[i] - 1][cycle[j] - 1] : 1.0);
-						break;
-				}
+                    case ols -> v[index] = 1.0;
+                    case fm1 -> v[index] = dij;
+                    case fm2 -> v[index] = dij * dij;
+                    case estimated -> v[index] = (variances != null ? variances[cycle[i] - 1][cycle[j] - 1] : 1.0);
+                }
 				index++;
 			}
 		return v;
@@ -823,20 +814,11 @@ public class NeighborNetSplits {
 			for (int j = i + 1; j <= nTax; j++) {
 				double dij = distances[cycle[i] - 1][cycle[j] - 1];
 				switch (leastSquares) {
-					default:
-					case ols:
-						v[index] = 1.0;
-						break;
-					case fm1:
-						v[index] = dij;
-						break;
-					case fm2:
-						v[index] = dij * dij;
-						break;
-					case estimated:
-						v[index] = (variances != null ? variances[cycle[i] - 1][cycle[j] - 1] : 1.0);
-						break;
-				}
+                    case ols -> v[index] = 1.0;
+                    case fm1 -> v[index] = dij;
+                    case fm2 -> v[index] = dij * dij;
+                    case estimated -> v[index] = (variances != null ? variances[cycle[i] - 1][cycle[j] - 1] : 1.0);
+                }
 				index++;
 			}
 		return v;

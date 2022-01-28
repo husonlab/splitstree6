@@ -95,16 +95,13 @@ public class Task implements Runnable {
 	}
 
 	/**
-	 * try to set the status to done
-	 *
-	 * @return true, if status was running
-	 */
-	private boolean setStatusDone() {
-		synchronized (this) {
-			if (status != Status.RUNNING)
-				return false;
-			status = Status.DONE;
-			return true;
-		}
-	}
+     * try to set the status to done
+     */
+    private void setStatusDone() {
+        synchronized (this) {
+            if (status != Status.RUNNING)
+                return;
+            status = Status.DONE;
+        }
+    }
 }

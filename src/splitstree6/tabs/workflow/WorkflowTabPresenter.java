@@ -104,10 +104,8 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		windowController.getPasteMenuItem().setOnAction(null);
 
-		windowController.getDuplicateMenuItem().setOnAction(e -> {
-			workflowTab.getUndoManager().doAndAdd(DuplicateCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get()));
-		});
-		windowController.getDuplicateMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+		windowController.getDuplicateMenuItem().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DuplicateCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
+        windowController.getDuplicateMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
 
 		windowController.getDeleteMenuItem().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DeleteCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
 		windowController.getDeleteMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());

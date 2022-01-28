@@ -44,27 +44,27 @@ public class EmbedderForOrderPrescribedNetwork {
 	 */
 	public static void apply(PhyloTree tree, Map<Node, Float> node2pos) throws IOException {
 		if (tree.getRoot() != null) {
-			if (verbose)
-				System.err.println("Original network: " + tree.toBracketString(true) + ";");
-			// recompute the lsa layout
-			(new LayoutUnoptimized()).apply(tree, new ProgressSilent());
+            if (verbose)
+                System.err.println("Original network: " + tree.toBracketString(true) + ";");
+            // recompute the lsa layout
+            (new LayoutUnoptimized()).apply(tree, new ProgressSilent());
 
-			// get ordering of labeled leaves
-			Node[] orderedLabeledLeaves = computeOrderedLabeledLeaves(node2pos);
+            // get ordering of labeled leaves
+            Node[] orderedLabeledLeaves = computeOrderedLabeledLeaves(node2pos);
 
-			// assign numbers to all subtrees obtained by disregarding all reticulate edges:
-			NodeArray<Integer> node2SubTreeId = new NodeArray<Integer>(tree);
-			Map<Integer, Node> subTreeId2Root = new HashMap<Integer, Node>();
+            // assign numbers to all subtrees obtained by disregarding all reticulate edges:
+            NodeArray<Integer> node2SubTreeId = new NodeArray<>(tree);
+            Map<Integer, Node> subTreeId2Root = new HashMap<>();
 
-			int numberOfSubTrees = 0;
-			for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
-				if (node2SubTreeId.get(v) == null && v.getInDegree() != 1) {
-					computeNode2SubTreeIdRec(v, ++numberOfSubTrees, node2SubTreeId);
-					subTreeId2Root.put(numberOfSubTrees, v);
-				}
-			}
-			if (verbose) {
-				System.err.println("Leaf to subtree:");
+            int numberOfSubTrees = 0;
+            for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
+                if (node2SubTreeId.get(v) == null && v.getInDegree() != 1) {
+                    computeNode2SubTreeIdRec(v, ++numberOfSubTrees, node2SubTreeId);
+                    subTreeId2Root.put(numberOfSubTrees, v);
+                }
+            }
+            if (verbose) {
+                System.err.println("Leaf to subtree:");
 				for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
 					if (v.getOutDegree() == 0) {
 						System.err.println("Leaf " + tree.getLabel(v) + " contained in subtree: " + node2SubTreeId.get(v));
@@ -79,7 +79,7 @@ public class EmbedderForOrderPrescribedNetwork {
 			}
 
 			// map each reticulate node to its lsa parent
-			Map<Node, Node> node2lsaParent = new HashMap<Node, Node>();
+            Map<Node, Node> node2lsaParent = new HashMap<>();
 			for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
 				if (tree.getLSAChildrenMap().get(v) != null) {
 					for (Node w : tree.getLSAChildrenMap().get(v)) {
@@ -222,7 +222,7 @@ public class EmbedderForOrderPrescribedNetwork {
 		PhyloTree tree = (PhyloTree) lsaParent.getOwner();
 
 		if (true) {
-			Queue<Node> queue = new LinkedList<Node>();
+            Queue<Node> queue = new LinkedList<>();
 			queue.add(v);
 			String label = null;
 			while (label == null && queue.size() > 0) {
@@ -262,7 +262,7 @@ public class EmbedderForOrderPrescribedNetwork {
 		PhyloTree tree = (PhyloTree) lsaParent.getOwner();
 
 		if (true) {
-			Queue<Node> queue = new LinkedList<Node>();
+            Queue<Node> queue = new LinkedList<>();
 			queue.add(v);
 			String label = null;
 			while (label == null && queue.size() > 0) {
@@ -298,7 +298,7 @@ public class EmbedderForOrderPrescribedNetwork {
 	 * @return lca(a, b)
 	 */
 	private static Node getLCA(Node a, Node b) throws IOException {
-		Set<Node> aboveA = new HashSet<Node>();
+        Set<Node> aboveA = new HashSet<>();
 		while (true) {
 			aboveA.add(a);
 			if (a.getInDegree() != 1)
@@ -348,7 +348,7 @@ public class EmbedderForOrderPrescribedNetwork {
 		List<Node> targetNodes = null;
 		if (tree.getLSAChildrenMap().get(v) != null)
 			targetNodes = tree.getLSAChildrenMap().get(v);
-		List<Node> list = new LinkedList<Node>();
+        List<Node> list = new LinkedList<>();
 
 		if (targetNodes == null) {
 			for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
@@ -368,7 +368,7 @@ public class EmbedderForOrderPrescribedNetwork {
 	 * @return
 	 */
 	private static Node[] computeOrderedLabeledLeaves(Map<Node, Float> node2pos) {
-		SortedMap<Float, Node> pos2node = new TreeMap<Float, Node>();
+        SortedMap<Float, Node> pos2node = new TreeMap<>();
 		for (Node v : node2pos.keySet()) {
 			pos2node.put(node2pos.get(v), v);
 		}
@@ -411,46 +411,42 @@ public class EmbedderForOrderPrescribedNetwork {
 	private static void reorderChildren(Node v, final Map<Node, Float> node2pos) {
 		List<Node> lsaChildren = ((PhyloTree) v.getOwner()).getLSAChildrenMap().get(v);
 		if (lsaChildren != null) {
-			SortedSet<Node> nodes = new TreeSet<Node>(new Comparator<Node>() {
-				public int compare(Node w1, Node w2) {
-					float pos1 = node2pos.get(w1);
-					float pos2 = node2pos.get(w2);
-					if (pos1 < pos2)
-						return -1;
-					else if (pos1 > pos2)
-						return 1;
-					else if (w1.getId() < w2.getId())
-						return -1;
-					else if (w1.getId() > w2.getId())
-						return 1;
-					else
-						return 0;
-				}
-			});
-			nodes.addAll(lsaChildren);
-			lsaChildren.clear();
-			lsaChildren.addAll(nodes);
-		}
+            SortedSet<Node> nodes = new TreeSet<>((w1, w2) -> {
+                float pos1 = node2pos.get(w1);
+                float pos2 = node2pos.get(w2);
+                if (pos1 < pos2)
+                    return -1;
+                else if (pos1 > pos2)
+                    return 1;
+                else if (w1.getId() < w2.getId())
+                    return -1;
+                else if (w1.getId() > w2.getId())
+                    return 1;
+                else
+                    return 0;
+            });
+            nodes.addAll(lsaChildren);
+            lsaChildren.clear();
+            lsaChildren.addAll(nodes);
+        }
 
-		SortedSet<Edge> edges = new TreeSet<Edge>(new Comparator<Edge>() {
-			public int compare(Edge e1, Edge e2) {
-				Node w1 = e1.getTarget();
-				Node w2 = e2.getTarget();
+        SortedSet<Edge> edges = new TreeSet<>((e1, e2) -> {
+            Node w1 = e1.getTarget();
+            Node w2 = e2.getTarget();
 
-				float pos1 = node2pos.get(w1);
-				float pos2 = node2pos.get(w2);
-				if (pos1 < pos2)
-					return -1;
-				else if (pos1 > pos2)
-					return 1;
-				else if (w1.getId() < w2.getId())
-					return -1;
-				else if (w1.getId() > w2.getId())
-					return 1;
-				else
-					return 0;
-			}
-		});
+            float pos1 = node2pos.get(w1);
+            float pos2 = node2pos.get(w2);
+            if (pos1 < pos2)
+                return -1;
+            else if (pos1 > pos2)
+                return 1;
+            else if (w1.getId() < w2.getId())
+                return -1;
+            else if (w1.getId() > w2.getId())
+                return 1;
+            else
+                return 0;
+        });
 		for (Edge e : v.adjacentEdges()) {
 			edges.add(e);
 		}
@@ -466,9 +462,9 @@ public class EmbedderForOrderPrescribedNetwork {
 	 * @return ordering of labeled leaves
 	 */
 	public static Map<Node, Float> setupOrderingFromNames(PhyloTree tree, List<String> names) throws IOException {
-		Node[] nodes = new Node[names.size()];
-		Map<String, Integer> name2pos = new HashMap<String, Integer>();
-		int pos = 0;
+        Node[] nodes = new Node[names.size()];
+        Map<String, Integer> name2pos = new HashMap<>();
+        int pos = 0;
 		for (String name : names) {
 			name2pos.put(name, pos++);
 		}
@@ -483,7 +479,7 @@ public class EmbedderForOrderPrescribedNetwork {
 				nodes[thePos] = v;
 			}
 		}
-		Map<Node, Float> node2pos = new HashMap<Node, Float>();
+        Map<Node, Float> node2pos = new HashMap<>();
 		for (int i = 0; i < nodes.length; i++)
 			node2pos.put(nodes[i], (float) i + 1);
 		return node2pos;

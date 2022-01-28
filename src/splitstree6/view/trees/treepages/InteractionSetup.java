@@ -92,26 +92,22 @@ public class InteractionSetup {
 								dy = -dy;
 							}
 							case Rotate270Deg -> {
-								var tmp = dx;
-								dx = dy;
-								dy = -tmp;
-							}
-							case FlipRotate0Deg -> {
-								dx = -dx;
-							}
-							case FlipRotate90Deg -> {
-								var tmp = dx;
-								dx = dy;
-								dy = tmp;
-							}
-							case FlipRotate180Deg -> {
-								dy = -dy;
-							}
-							case FlipRotate270Deg -> {
-								var tmp = dx;
-								dx = -dy;
-								dy = -tmp;
-							}
+                                var tmp = dx;
+                                dx = dy;
+                                dy = -tmp;
+                            }
+                            case FlipRotate0Deg -> dx = -dx;
+                            case FlipRotate90Deg -> {
+                                var tmp = dx;
+                                dx = dy;
+                                dy = tmp;
+                            }
+                            case FlipRotate180Deg -> dy = -dy;
+                            case FlipRotate270Deg -> {
+                                var tmp = dx;
+                                dx = -dy;
+                                dy = -tmp;
+                            }
 						}
 
 						label.setLayoutX(label.getLayoutX() + dx);
@@ -134,36 +130,34 @@ public class InteractionSetup {
 	}
 
 	public TriConsumer<jloda.graph.Node, Shape, RichTextLabel> createNodeCallback() {
-		return (v, shape, label) -> {
-			Platform.runLater(() -> {
-				if (v.getOwner() instanceof PhyloGraph phyloGraph) {
-					for (var t : phyloGraph.getTaxa(v)) {
-						if (t <= taxaBlock.getNtax()) {
-							var taxon = taxaBlock.get(t);
-							taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
-							label.setOnMousePressed(mousePressedHandler);
-							label.setOnMouseDragged(mouseDraggedHandler);
-							final EventHandler<MouseEvent> mouseClickedHandler = e -> {
-								if (e.isStillSincePress()) {
-									if (!e.isShiftDown())
-										taxonSelectionModel.clearSelection();
-									taxonSelectionModel.toggleSelection(taxon);
-									e.consume();
-								}
-							};
-							shape.setOnMouseClicked(mouseClickedHandler);
-							label.setOnMouseClicked(mouseClickedHandler);
+        return (v, shape, label) -> Platform.runLater(() -> {
+            if (v.getOwner() instanceof PhyloGraph phyloGraph) {
+                for (var t : phyloGraph.getTaxa(v)) {
+                    if (t <= taxaBlock.getNtax()) {
+                        var taxon = taxaBlock.get(t);
+                        taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
+                        label.setOnMousePressed(mousePressedHandler);
+                        label.setOnMouseDragged(mouseDraggedHandler);
+                        final EventHandler<MouseEvent> mouseClickedHandler = e -> {
+                            if (e.isStillSincePress()) {
+                                if (!e.isShiftDown())
+                                    taxonSelectionModel.clearSelection();
+                                taxonSelectionModel.toggleSelection(taxon);
+                                e.consume();
+                            }
+                        };
+                        shape.setOnMouseClicked(mouseClickedHandler);
+                        label.setOnMouseClicked(mouseClickedHandler);
 
-							if (taxonSelectionModel.isSelected(taxon)) {
-								shape.setEffect(SelectionEffectBlue.getInstance());
-								label.setEffect(SelectionEffectBlue.getInstance());
-							}
-						}
-					}
-				}
-			});
-		};
-	}
+                        if (taxonSelectionModel.isSelected(taxon)) {
+                            shape.setEffect(SelectionEffectBlue.getInstance());
+                            label.setEffect(SelectionEffectBlue.getInstance());
+                        }
+                    }
+                }
+            }
+        });
+    }
 
 	public BiConsumer<Edge, Shape> createEdgeCallback() {
 		return (edge, shape) -> {

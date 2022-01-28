@@ -299,30 +299,30 @@ public class RadialLabelLayout {
 	}
 
 	/**
-	 * item for radial layout
-	 *
-	 * @param anchorXProperty x coordinate of anchor
-	 * @param anchorYProperty y coordinate of anchor
-	 * @param angle           ideal angle of direction to move label, in degrees
-	 * @param widthProperty   label width
-	 * @param heightProperty  label height
-	 * @param xSetter         method to set computed x-coordinate of label
-	 * @param ySetter         method to set computed y-coordinate of label
-	 */
-	private static record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
-									 double angle,
-									 ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
-									 Consumer<Double> xSetter, Consumer<Double> ySetter) {
-		public double width() {
-			return widthProperty.get();
-		}
+     * item for radial layout
+     *
+     * @param anchorXProperty x coordinate of anchor
+     * @param anchorYProperty y coordinate of anchor
+     * @param angle           ideal angle of direction to move label, in degrees
+     * @param widthProperty   label width
+     * @param heightProperty  label height
+     * @param xSetter         method to set computed x-coordinate of label
+     * @param ySetter         method to set computed y-coordinate of label
+     */
+    private record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
+                              double angle,
+                              ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
+                              Consumer<Double> xSetter, Consumer<Double> ySetter) {
+        public double width() {
+            return widthProperty.get();
+        }
 
-		public double height() {
-			return heightProperty.get();
-		}
+        public double height() {
+            return heightProperty.get();
+        }
 
-		public double anchorX() {
-			return anchorXProperty.get();
+        public double anchorX() {
+            return anchorXProperty.get();
 		}
 
 		public double anchorY() {
@@ -330,15 +330,15 @@ public class RadialLabelLayout {
 		}
 	}
 
-	private static record Choice(double x, double y, double width, double height, int priority, LayoutItem item) {
-		private boolean intersects(Choice other) {
-			return (x + width >= other.x && x <= other.x + other.width) && (y + height >= other.y && y <= other.y + other.height);
-		}
+    private record Choice(double x, double y, double width, double height, int priority, LayoutItem item) {
+        private boolean intersects(Choice other) {
+            return (x + width >= other.x && x <= other.x + other.width) && (y + height >= other.y && y <= other.y + other.height);
+        }
 
-		public Choice copyWithUpdatedXY(double x, double y) {
-			return new Choice(x, y, width(), height(), priority(), item());
-		}
-	}
+        public Choice copyWithUpdatedXY(double x, double y) {
+            return new Choice(x, y, width(), height(), priority(), item());
+        }
+    }
 
 	private static int compare(Node v, Node w) {
 		if (v.getDegree() < w.getDegree())
@@ -349,9 +349,9 @@ public class RadialLabelLayout {
 			return Integer.compare(((Choice) v.getData()).priority(), ((Choice) w.getData()).priority());
 	}
 
-	public static record Box(ReadOnlyDoubleProperty x, ReadOnlyDoubleProperty y, double width, double height) {
-		private boolean intersects(Choice other) {
-			return (x.get() + width >= other.x() && x.get() <= other.x() + other.width()) && (y.get() + height >= other.y() && y.get() <= other.y() + other.height());
-		}
-	}
+    public record Box(ReadOnlyDoubleProperty x, ReadOnlyDoubleProperty y, double width, double height) {
+        private boolean intersects(Choice other) {
+            return (x.get() + width >= other.x() && x.get() <= other.x() + other.width()) && (y.get() + height >= other.y() && y.get() <= other.y() + other.height());
+        }
+    }
 }

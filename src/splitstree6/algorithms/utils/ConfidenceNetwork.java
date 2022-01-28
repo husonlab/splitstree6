@@ -52,7 +52,7 @@ public class ConfidenceNetwork {
 		}
 
 		public double Rij;
-		public int j;
+        public final int j;
 	}
 
 	/**
@@ -61,17 +61,15 @@ public class ConfidenceNetwork {
 	 * @param row
 	 */
 	private static void sortAscending(DoubleInt[] row) {
-		Arrays.sort(row, 1, row.length, new Comparator() {
-			public int compare(Object x, Object y) {
-				if (((DoubleInt) x).Rij < ((DoubleInt) y).Rij)
-					return -1;
-				else if (((DoubleInt) y).Rij < ((DoubleInt) x).Rij)
-					return 1;
-				else
-					return 0;
-			}
-		});
-	}
+        Arrays.sort(row, 1, row.length, (Comparator) (x, y) -> {
+            if (((DoubleInt) x).Rij < ((DoubleInt) y).Rij)
+                return -1;
+            else if (((DoubleInt) y).Rij < ((DoubleInt) x).Rij)
+                return 1;
+            else
+                return 0;
+        });
+    }
 
 	/**
 	 * Returns a set of splits corresponding to a confidence network, from the specified split matrix.

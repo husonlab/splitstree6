@@ -29,27 +29,27 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class AuxiliaryThreadScheduler {
 	final private ScheduledThreadPoolExecutor executor;
-	final static private boolean verbose = true;
+    final static private boolean verbose = true;
 
-	final public static byte PENDING = 0;
-	final public static byte RUNNING = 1;
-	final public static byte DONE = 2;
-	final public static byte DE_SCHEDULED = 2;
+    final public static byte PENDING = 0;
+    final public static byte RUNNING = 1;
+    final public static byte DONE = 2;
+    final public static byte DE_SCHEDULED = 2;
 
-	final private SortedMap<Long, Runnable> scheduledTasks = new TreeMap<>();
-	final private Map<Long, Future> id2future = new HashMap<>();
+    final private SortedMap<Long, Runnable> scheduledTasks = new TreeMap<>();
+    final private Map<Long, Future> id2future = new HashMap<>();
 
-	final private Set<Long> pending = new HashSet<Long>();
-	final private Set<Long> running = new HashSet<Long>();
+    final private Set<Long> pending = new HashSet<>();
+    final private Set<Long> running = new HashSet<>();
 
-	/**
-	 * setup a scheduler
-	 *
-	 * @param maxNumberOfThreads
-	 */
-	public AuxiliaryThreadScheduler(int maxNumberOfThreads) {
-		executor = new ScheduledThreadPoolExecutor(maxNumberOfThreads);
-	}
+    /**
+     * setup a scheduler
+     *
+     * @param maxNumberOfThreads
+     */
+    public AuxiliaryThreadScheduler(int maxNumberOfThreads) {
+        executor = new ScheduledThreadPoolExecutor(maxNumberOfThreads);
+    }
 
 	/**
 	 * schedule a task to be run on the next available thread

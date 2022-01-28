@@ -102,25 +102,24 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
 
         final ChangeListener<Worker.State> stateChangeListener = (c, o, n) -> {
             switch (n) {
-                case RUNNING:
+                case RUNNING -> {
                     button.setTextFill(Color.BLACK);
                     button.setStyle(shape + computingColor);
-                    break;
-                case FAILED:
+                }
+                case FAILED -> {
                     button.setTextFill(Color.DARKRED);
                     button.setStyle(shape);
-                    break;
-                default:
+                }
+                default -> {
                     button.setTextFill(Color.BLACK);
                     button.setStyle(shape);
+                }
             }
         };
         algorithmNode.getService().stateProperty().addListener(new WeakChangeListener<>(stateChangeListener));
         stateChangeListeners.add(stateChangeListener);
 
-        button.setOnAction((e) -> {
-            mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
-        });
+        button.setOnAction((e) -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true));
         return button;
     }
 

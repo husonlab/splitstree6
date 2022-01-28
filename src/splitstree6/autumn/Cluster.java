@@ -124,31 +124,29 @@ public class Cluster extends BitSet {
 	 * compare clusters first by size and then lexicographically
 	 */
 	static public Comparator<Cluster> getComparator() {
-		return new Comparator<Cluster>() {
-			public int compare(Cluster cluster1, Cluster cluster2) {
-				if (cluster1.cardinality() > cluster2.cardinality())
-					return -1;
-				else if (cluster1.cardinality() < cluster2.cardinality())
-					return 1;
+        return (cluster1, cluster2) -> {
+            if (cluster1.cardinality() > cluster2.cardinality())
+                return -1;
+            else if (cluster1.cardinality() < cluster2.cardinality())
+                return 1;
 
-				int t1 = cluster1.nextSetBit(0);
-				int t2 = cluster2.nextSetBit(0);
-				while (true) {
-					if (t1 < t2)
-						return -1;
-					else if (t1 > t2)
-						return 1;
-					t1 = cluster1.nextSetBit(t1 + 1);
-					t2 = cluster2.nextSetBit(t2 + 1);
-					if (t1 == -1 && t2 > -1)
-						return -1;
-					else if (t1 > -1 && t2 == -1)
-						return 1;
-					else if (t1 == -1 && t2 == -1)
-						return 0;
-				}
-			}
-		};
+            int t1 = cluster1.nextSetBit(0);
+            int t2 = cluster2.nextSetBit(0);
+            while (true) {
+                if (t1 < t2)
+                    return -1;
+                else if (t1 > t2)
+                    return 1;
+                t1 = cluster1.nextSetBit(t1 + 1);
+                t2 = cluster2.nextSetBit(t2 + 1);
+                if (t1 == -1 && t2 > -1)
+                    return -1;
+                else if (t1 > -1 && t2 == -1)
+                    return 1;
+                else if (t1 == -1 && t2 == -1)
+                    return 0;
+            }
+        };
 	}
 
 	/**
@@ -274,11 +272,7 @@ public class Cluster extends BitSet {
 			a = A.nextSetBit(a + 1);
 			b = B.nextSetBit(b + 1);
 		}
-		if (a < b)
-			return -1;
-		else if (a > b)
-			return 1;
-		else return 0;
+        return Integer.compare(a, b);
 	}
 
 	/**
@@ -302,7 +296,7 @@ public class Cluster extends BitSet {
 	public static Cluster[] getClustersSortedByDecreasingCardinality(Cluster[] clusters) {
 		Set<Cluster> sorted = new TreeSet<>(Cluster.getComparator());
 		Collections.addAll(sorted, clusters);
-		return sorted.toArray(new Cluster[sorted.size()]);
+        return sorted.toArray(new Cluster[0]);
 	}
 
 	/**

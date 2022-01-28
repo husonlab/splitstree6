@@ -27,7 +27,6 @@ import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 
-import java.io.IOException;
 import java.util.*;
 
 public class TaxaEditor extends Taxa2Taxa implements IFilter {
@@ -38,7 +37,7 @@ public class TaxaEditor extends Taxa2Taxa implements IFilter {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputData, TaxaBlock outputData) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputData, TaxaBlock outputData) {
 		final Map<String, String> name2displayLabel = new HashMap<>();
 		for (int t = 1; t <= inputData.getNtax(); t++) {
 			final Taxon taxon = inputData.get(t);

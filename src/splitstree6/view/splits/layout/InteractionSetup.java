@@ -130,119 +130,115 @@ public class InteractionSetup {
 	private boolean nodeShapeOrLabelEntered = false;  // this prevents flickering
 
 	public TriConsumer<Node, Shape, RichTextLabel> createNodeCallback() {
-		return (v, shape, label) -> {
-			Platform.runLater(() -> {
-				shape.setOnMouseEntered(e -> {
-					if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
-						nodeShapeOrLabelEntered = true;
-						shape.setScaleX(1.5 * shape.getScaleX());
-						shape.setScaleY(1.5 * shape.getScaleY());
-						label.setScaleX(1.1 * label.getScaleX());
-						label.setScaleY(1.1 * label.getScaleY());
-						e.consume();
-					}
-				});
-				shape.setOnMouseExited(e -> {
-					if (nodeShapeOrLabelEntered) {
-						shape.setScaleX(shape.getScaleX() / 1.5);
-						shape.setScaleY(shape.getScaleY() / 1.5);
-						label.setScaleX(label.getScaleX() / 1.1);
-						label.setScaleY(label.getScaleY() / 1.1);
-						nodeShapeOrLabelEntered = false;
-						e.consume();
-					}
-				});
-				label.setOnMouseEntered(shape.getOnMouseEntered());
-				label.setOnMouseExited(shape.getOnMouseExited());
+        return (v, shape, label) -> Platform.runLater(() -> {
+            shape.setOnMouseEntered(e -> {
+                if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
+                    nodeShapeOrLabelEntered = true;
+                    shape.setScaleX(1.5 * shape.getScaleX());
+                    shape.setScaleY(1.5 * shape.getScaleY());
+                    label.setScaleX(1.1 * label.getScaleX());
+                    label.setScaleY(1.1 * label.getScaleY());
+                    e.consume();
+                }
+            });
+            shape.setOnMouseExited(e -> {
+                if (nodeShapeOrLabelEntered) {
+                    shape.setScaleX(shape.getScaleX() / 1.5);
+                    shape.setScaleY(shape.getScaleY() / 1.5);
+                    label.setScaleX(label.getScaleX() / 1.1);
+                    label.setScaleY(label.getScaleY() / 1.1);
+                    nodeShapeOrLabelEntered = false;
+                    e.consume();
+                }
+            });
+            label.setOnMouseEntered(shape.getOnMouseEntered());
+            label.setOnMouseExited(shape.getOnMouseExited());
 
-				if (v.getOwner() instanceof PhyloGraph phyloGraph) {
-					for (var t : phyloGraph.getTaxa(v)) {
-						if (t <= taxaBlock.getNtax()) {
-							var taxon = taxaBlock.get(t);
-							taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
-							label.setOnMousePressed(mousePressedHandler);
-							label.setOnMouseDragged(mouseDraggedHandler);
-							final EventHandler<MouseEvent> mouseClickedHandler = e -> {
-								if (e.isStillSincePress()) {
-									if (!e.isShiftDown())
-										taxonSelectionModel.clearSelection();
-									taxonSelectionModel.toggleSelection(taxon);
-									e.consume();
-								}
-							};
-							shape.setOnMouseClicked(mouseClickedHandler);
-							label.setOnMouseClicked(mouseClickedHandler);
+            if (v.getOwner() instanceof PhyloGraph phyloGraph) {
+                for (var t : phyloGraph.getTaxa(v)) {
+                    if (t <= taxaBlock.getNtax()) {
+                        var taxon = taxaBlock.get(t);
+                        taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
+                        label.setOnMousePressed(mousePressedHandler);
+                        label.setOnMouseDragged(mouseDraggedHandler);
+                        final EventHandler<MouseEvent> mouseClickedHandler = e -> {
+                            if (e.isStillSincePress()) {
+                                if (!e.isShiftDown())
+                                    taxonSelectionModel.clearSelection();
+                                taxonSelectionModel.toggleSelection(taxon);
+                                e.consume();
+                            }
+                        };
+                        shape.setOnMouseClicked(mouseClickedHandler);
+                        label.setOnMouseClicked(mouseClickedHandler);
 
-							if (taxonSelectionModel.isSelected(taxon)) {
-								shape.setEffect(SelectionEffectBlue.getInstance());
-								label.setEffect(SelectionEffectBlue.getInstance());
-							}
-						}
-					}
-				}
+                        if (taxonSelectionModel.isSelected(taxon)) {
+                            shape.setEffect(SelectionEffectBlue.getInstance());
+                            label.setEffect(SelectionEffectBlue.getInstance());
+                        }
+                    }
+                }
+            }
 
-			});
-		};
+        });
 	}
 
 	private boolean edgeShapeEntered = false;
 
 	public BiConsumer<Edge, Shape> createEdgeCallback() {
-		return (edge, shape) -> {
-			Platform.runLater(() -> {
-				shape.setOnMouseEntered(e -> {
-					if (!e.isStillSincePress() && !edgeShapeEntered) {
-						edgeShapeEntered = true;
-						shape.setUserData(shape.getStrokeWidth());
-						shape.setStrokeWidth(shape.getStrokeWidth() + 4);
-						e.consume();
-					}
-				});
-				shape.setOnMouseExited(e -> {
-					if (edgeShapeEntered) {
-						shape.setStrokeWidth(shape.getStrokeWidth() - 4);
-						shape.setUserData(null);
-						edgeShapeEntered = false;
-						e.consume();
-					}
-				});
+        return (edge, shape) -> Platform.runLater(() -> {
+            shape.setOnMouseEntered(e -> {
+                if (!e.isStillSincePress() && !edgeShapeEntered) {
+                    edgeShapeEntered = true;
+                    shape.setUserData(shape.getStrokeWidth());
+                    shape.setStrokeWidth(shape.getStrokeWidth() + 4);
+                    e.consume();
+                }
+            });
+            shape.setOnMouseExited(e -> {
+                if (edgeShapeEntered) {
+                    shape.setStrokeWidth(shape.getStrokeWidth() - 4);
+                    shape.setUserData(null);
+                    edgeShapeEntered = false;
+                    e.consume();
+                }
+            });
 
-				if (edge.getOwner() instanceof PhyloSplitsGraph graph) {
-					var split = graph.getSplit(edge);
+            if (edge.getOwner() instanceof PhyloSplitsGraph graph) {
+                var split = graph.getSplit(edge);
 
-					shape.setPickOnBounds(false);
+                shape.setPickOnBounds(false);
 
-					shape.setOnMouseClicked(e -> {
-						if (!e.isShiftDown()) {
-							taxonSelectionModel.clearSelection();
-							splitSelectionModel.clearSelection();
-						}
-						if (e.getClickCount() == 1) {
-							if (split >= 1 && split <= splitsBlock.getNsplits()) {
-								splitSelectionModel.select(split);
-								var partA = splitsBlock.get(split).getA();
-								var partB = splitsBlock.get(split).getB();
-								var whichPart = ((partA.cardinality() < partB.cardinality()) == !e.isAltDown() ? partA : partB);
-								var taxa = BitSetUtils.asStream(whichPart).map(taxaBlock::get).collect(Collectors.toList());
-								taxonSelectionModel.selectAll(taxa);
-							}
-						} else if (e.getClickCount() == 2) {
-							var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxaBlock::indexOf).collect(Collectors.toList()));
-							var start = graph.nodeStream().filter(v -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(v))).cardinality() > 0).findAny().orElse(null);
-							if (start != null) {
-								try (var visited = graph.newNodeSet()) {
-									GraphTraversals.traverseReachable(start, f -> graph.getSplit(f) != split, visited::add);
-									for (var f : graph.edges()) {
-										if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
-											splitSelectionModel.select(graph.getSplit(f));
-									}
-								}
-							}
-						}
-						e.consume();
-					});
-				}
-			});
-		};
+                shape.setOnMouseClicked(e -> {
+                    if (!e.isShiftDown()) {
+                        taxonSelectionModel.clearSelection();
+                        splitSelectionModel.clearSelection();
+                    }
+                    if (e.getClickCount() == 1) {
+                        if (split >= 1 && split <= splitsBlock.getNsplits()) {
+                            splitSelectionModel.select(split);
+                            var partA = splitsBlock.get(split).getA();
+                            var partB = splitsBlock.get(split).getB();
+                            var whichPart = ((partA.cardinality() < partB.cardinality()) == !e.isAltDown() ? partA : partB);
+                            var taxa = BitSetUtils.asStream(whichPart).map(taxaBlock::get).collect(Collectors.toList());
+                            taxonSelectionModel.selectAll(taxa);
+                        }
+                    } else if (e.getClickCount() == 2) {
+                        var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxaBlock::indexOf).collect(Collectors.toList()));
+                        var start = graph.nodeStream().filter(v -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(v))).cardinality() > 0).findAny().orElse(null);
+                        if (start != null) {
+                            try (var visited = graph.newNodeSet()) {
+                                GraphTraversals.traverseReachable(start, f -> graph.getSplit(f) != split, visited::add);
+                                for (var f : graph.edges()) {
+                                    if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
+                                        splitSelectionModel.select(graph.getSplit(f));
+                                }
+                            }
+                        }
+                    }
+                    e.consume();
+                });
+            }
+        });
 	}
 }

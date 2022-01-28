@@ -30,7 +30,7 @@ import java.util.*;
  */
 public class RunAfterAWhile {
 	private static final RunAfterAWhile instance;
-	public static long DELAY = 500L;
+    public static final long DELAY = 500L;
 
 	static {
 		instance = new RunAfterAWhile();
@@ -46,8 +46,8 @@ public class RunAfterAWhile {
 			@Override
 			public void run() {
 				synchronized (keyTimeRunnableMap) {
-					var time = System.currentTimeMillis();
-					var toDelete = new ArrayList<Object>();
+                    var time = System.currentTimeMillis();
+                    var toDelete = new ArrayList<>();
 					for (var entry : keyTimeRunnableMap.entrySet()) {
 						if (time > entry.getValue().getFirst() + DELAY) {
 							toDelete.add(entry.getKey());

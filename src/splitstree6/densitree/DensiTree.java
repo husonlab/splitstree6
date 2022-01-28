@@ -110,9 +110,9 @@ public class DensiTree {
 
         var tree1 = model.getTreesBlock().getTree(1);
         int counter = 0;
-        for(int i = 0; i < circle.length; i++){
-            if(circle[i] > 0){
-                labels[counter] = tree1.getTaxon2Node(circle[i]).getLabel();
+        for (int j : circle) {
+            if (j > 0) {
+                labels[counter] = tree1.getTaxon2Node(j).getLabel();
                 counter++;
             }
         }

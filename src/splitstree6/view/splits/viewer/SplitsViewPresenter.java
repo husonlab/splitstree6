@@ -69,7 +69,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private final ObjectProperty<SplitNetworkPane> splitNetworkPane = new SimpleObjectProperty<>();
 	private final InvalidationListener updateListener;
 
-	private BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
+	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
 							   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
@@ -78,9 +78,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.splitsView = splitsView;
 		this.controller = splitsView.getController();
 
-		splitNetworkPane.addListener((v, o, n) -> {
-			controller.getScrollPane().setContent(n);
-		});
+        splitNetworkPane.addListener((v, o, n) -> controller.getScrollPane().setContent(n));
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
@@ -162,9 +160,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
-		targetBounds.addListener((v, o, n) -> {
-			boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40));
-		});
+        targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40)));
 
 		updateListener = e -> {
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
@@ -257,10 +253,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
-		mainController.getLayoutLabelsMenuItem().setOnAction(e -> {
-			Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation()));
-		});
-		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
+        mainController.getLayoutLabelsMenuItem().setOnAction(e -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation())));
+        mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(splitsView.optionUseWeightsProperty().not());

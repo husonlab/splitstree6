@@ -103,21 +103,21 @@ public class SplitsBlock extends DataBlock {
 	}
 
 	public Iterable<ASplit> splits() {
-		return () -> new Iterator<ASplit>() {
-			int i = 0; // 0-based because we do not use get(i) but rather splits.get(i)
+        return () -> new Iterator<>() {
+            int i = 0; // 0-based because we do not use get(i) but rather splits.get(i)
 
-			@Override
-			public boolean hasNext() {
-				return i < splits.size();
-			}
+            @Override
+            public boolean hasNext() {
+                return i < splits.size();
+            }
 
-			@Override
-			public ASplit next() {
-				if (i >= splits.size())
-					throw new NoSuchElementException();
-				return splits.get(i++);
-			}
-		};
+            @Override
+            public ASplit next() {
+                if (i >= splits.size())
+                    throw new NoSuchElementException();
+                return splits.get(i++);
+            }
+        };
 	}
 
 	public Compatibility getCompatibility() {

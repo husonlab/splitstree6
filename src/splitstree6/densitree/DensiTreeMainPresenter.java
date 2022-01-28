@@ -56,25 +56,21 @@ public class DensiTreeMainPresenter {
 			if (selectedFile != null) {
 				stage.setTitle(selectedFile.getName());
 				if (selectedFile.getParentFile().isDirectory())
-					ProgramProperties.put("InputDir", selectedFile.getParent());
-				var service = new AService<Integer>(controller.getBottomFlowPane());
-				service.setCallable(() -> {
-					var newickReader = new NewickReader();
-					newickReader.read(service.getProgressListener(), selectedFile.getPath(), model.getTaxaBlock(), model.getTreesBlock());
-					if (model.getTreesBlock().isPartial())
-						throw new IOException("Partial trees not acceptable");
-					model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getTaxaSet(), model.getTreesBlock()));
-					return model.getTreesBlock().getNTrees();
-				});
-				service.setOnScheduled(a -> {
-					model.clear();
-				});
-				service.setOnSucceeded(a -> {
-					controller.getMessageLabel().setText(String.format("Trees: %,d", service.getValue()));
-				});
-				service.setOnFailed(a -> controller.getMessageLabel().setText("Failed: " + service.getException()));
-				service.start();
-			}
+                    ProgramProperties.put("InputDir", selectedFile.getParent());
+                var service = new AService<Integer>(controller.getBottomFlowPane());
+                service.setCallable(() -> {
+                    var newickReader = new NewickReader();
+                    newickReader.read(service.getProgressListener(), selectedFile.getPath(), model.getTaxaBlock(), model.getTreesBlock());
+                    if (model.getTreesBlock().isPartial())
+                        throw new IOException("Partial trees not acceptable");
+                    model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getTaxaSet(), model.getTreesBlock()));
+                    return model.getTreesBlock().getNTrees();
+                });
+                service.setOnScheduled(a -> model.clear());
+                service.setOnSucceeded(a -> controller.getMessageLabel().setText(String.format("Trees: %,d", service.getValue())));
+                service.setOnFailed(a -> controller.getMessageLabel().setText("Failed: " + service.getException()));
+                service.start();
+            }
 		});
 
 

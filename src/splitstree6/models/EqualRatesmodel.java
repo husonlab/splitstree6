@@ -45,18 +45,18 @@ import java.util.Random;
  */
 public class EqualRatesmodel implements SubstitutionModel {
 
-	private double[] pi;
-	private double mu;
-	private int nstates;
+    private double[] pi;
+    private final double mu;
+    private final int nstates;
 
-	private double tCurrent; //Current value of t.
+    private double tCurrent; //Current value of t.
 
-	public EqualRatesmodel(int n) {
-		nstates = n;
-		for (int i = 0; i < n; i++)
-			pi[i] = 1.0 / n;
-		mu = (double) n / (n - 1);
-	}
+    public EqualRatesmodel(int n) {
+        nstates = n;
+        for (int i = 0; i < n; i++)
+            pi[i] = 1.0 / n;
+        mu = (double) n / (n - 1);
+    }
 
 	public EqualRatesmodel(double[] pi) {
 		nstates = pi.length;

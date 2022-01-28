@@ -101,15 +101,15 @@ public class DensiTreeMain extends Application {
 	}
 
 	@Override
-	public void start(Stage stage) throws Exception {
-		var model = new Model();
+    public void start(Stage stage) {
+        var model = new Model();
 
-		var loader = new ExtendedFXMLLoader<DensiTreeMainController>(DensiTreeMainController.class);
-		var controller = loader.getController();
-		new DensiTreeMainPresenter(stage, controller, model);
-		stage.setScene(new Scene(loader.getRoot()));
-		stage.sizeToScene();
+        var loader = new ExtendedFXMLLoader<DensiTreeMainController>(DensiTreeMainController.class);
+        var controller = loader.getController();
+        new DensiTreeMainPresenter(stage, controller, model);
+        stage.setScene(new Scene(loader.getRoot()));
+        stage.sizeToScene();
 
-		stage.show();
-	}
+        stage.show();
+    }
 }

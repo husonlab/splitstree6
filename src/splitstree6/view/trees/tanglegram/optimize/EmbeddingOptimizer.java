@@ -67,22 +67,22 @@ public class EmbeddingOptimizer {
 	}
 
 	/**
-	 * apply the embedding algorithm to a whole set of trees
-	 *
-	 * @param trees
-	 * @param progressListener
-	 * @param useFastAlignmentHeuristic
-	 */
-	public static int apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
-		if (progressListener != null) {
-			progressListener.setTasks("Optimizing embedding", "Using Scornavacca, Zickmann & Huson, 2011");
-			//progressListener.setCancelable(false);
-			progressListener.setMaximum(-1);
-			progressListener.setProgress(-1);
-		}
-		//System.err.println("Computing optimal embedding using circular-ordering algorithm");
-		final var taxon2Id = new TreeMap<String, Integer>();
-		final var id2Taxon = new HashMap<Integer, String>();
+     * apply the embedding algorithm to a whole set of trees
+     *
+     * @param trees
+     * @param progressListener
+     * @param useFastAlignmentHeuristic
+     */
+    public static void apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
+        if (progressListener != null) {
+            progressListener.setTasks("Optimizing embedding", "Using Scornavacca, Zickmann & Huson, 2011");
+            //progressListener.setCancelable(false);
+            progressListener.setMaximum(-1);
+            progressListener.setProgress(-1);
+        }
+        //System.err.println("Computing optimal embedding using circular-ordering algorithm");
+        final var taxon2Id = new TreeMap<String, Integer>();
+        final var id2Taxon = new HashMap<Integer, String>();
 
 		var dummyLeaves = new Vector<Node>();
 		var count = 1;
@@ -351,7 +351,7 @@ public class EmbeddingOptimizer {
 							System.err.println("\n\nERROR newOrder Partial\n\n");
 							System.err.println(" bestEnd  " + newOrder[s].toString());
 
-							System.err.println(currOrderingListNew.size() + " currOrderingListNew  " + currOrderingListNew.toString());
+                            System.err.println(currOrderingListNew.size() + " currOrderingListNew  " + currOrderingListNew);
 							for (var str : currOrderingListNew) {
 								if (!newOrder[s].contains(str)) {
 									System.err.println(" missing  " + str);
@@ -415,10 +415,8 @@ public class EmbeddingOptimizer {
 			}
 
 
-			return finalScore; //in case we actually compute the layout, we return -1
 		} else {  // use fast alignment heuristic if number of trees !=2
 			useFastAlignmentHeuristic(trees, circularOrdering, idRho, taxon2Id, dummyLeaves);
-			return -1; //in case we actually compute the layout, we return -1
 		}
 	}
 
@@ -569,12 +567,7 @@ public class EmbeddingOptimizer {
 					else if (e.getSource() == sourceNode && f.getTarget() == sourceNode)
 						return 1;
 					// no else here!
-					if (e.getId() < f.getId())
-						return -1;
-					else if (e.getId() > f.getId())
-						return 1;
-					else
-						return 0;
+                    return Integer.compare(e.getId(), f.getId());
 				});
 				v0.rearrangeAdjacentEdges(adjacentEdges);
 			}

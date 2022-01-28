@@ -63,24 +63,20 @@ public class OptionIO {
 									}
 								}
 								case doubleSquareMatrix -> {
-									final double[][] matrix = (double[][]) option.getProperty().getValue();
-									for (int i = 0; i < matrix.length; i++) {
-										for (int j = 0; j < matrix.length; j++)
-											matrix[i][j] = np.getDouble();
-									}
-								}
-								case Enum -> {
-									option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
-								}
-								case stringArray -> {
-									final ArrayList<String> list = new ArrayList<>();
-									while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
-										list.add(np.getWordRespectCase());
-									option.getProperty().setValue(list.toArray(new String[0]));
-								}
-								default -> {
-									option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
-								}
+                                    final double[][] matrix = (double[][]) option.getProperty().getValue();
+                                    for (int i = 0; i < matrix.length; i++) {
+                                        for (int j = 0; j < matrix.length; j++)
+                                            matrix[i][j] = np.getDouble();
+                                    }
+                                }
+                                case Enum -> option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
+                                case stringArray -> {
+                                    final ArrayList<String> list = new ArrayList<>();
+                                    while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
+                                        list.add(np.getWordRespectCase());
+                                    option.getProperty().setValue(list.toArray(new String[0]));
+                                }
+                                default -> option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
 							}
 
 						} else {

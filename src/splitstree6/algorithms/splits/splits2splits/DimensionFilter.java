@@ -37,7 +37,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
-import java.io.IOException;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
@@ -69,7 +68,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	/**
 	 * heuristically remove high-dimension configurations in split graph
 	 */
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock parent, SplitsBlock child) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock parent, SplitsBlock child) {
 		active = false;
 
 		if (parent.getCompatibility() != Compatibility.compatible && parent.getCompatibility() != Compatibility.cyclic && parent.getCompatibility() != Compatibility.weaklyCompatible) {

@@ -36,7 +36,7 @@ import java.util.*;
  * Daniel Huson, 5.2011
  */
 public class SubtreeReduction {
-    public static enum ReturnValue {
+    public enum ReturnValue {
         ISOMORPHIC, REDUCED, IRREDUCIBLE
     }
 
@@ -73,7 +73,7 @@ public class SubtreeReduction {
         var subTrees = new LinkedList<Pair<Root, Root>>();
 
         // run the algorithm
-        var value = apply(root1, root2, subTrees, new Single<Integer>());
+        var value = apply(root1, root2, subTrees, new Single<>());
         if (value == ReturnValue.ISOMORPHIC) {
             System.err.println("Trees are isomorphic");
             var taxa = root1.getTaxa();
@@ -103,8 +103,8 @@ public class SubtreeReduction {
                 mergedSubtrees.add(MergeIsomorphicInducedTrees.apply(pair.getFirst(), pair.getSecond()));
             }
             results.addAll(mergedSubtrees);
-            var merged1 = MergeNetworks.apply(Arrays.asList(newRoot1), mergedSubtrees);
-            var merged2 = MergeNetworks.apply(Arrays.asList(newRoot2), mergedSubtrees);
+            var merged1 = MergeNetworks.apply(List.of(newRoot1), mergedSubtrees);
+            var merged2 = MergeNetworks.apply(List.of(newRoot2), mergedSubtrees);
             results.addAll(merged1);
             results.addAll(merged2);
         }
@@ -122,10 +122,10 @@ public class SubtreeReduction {
      * @param root2
      * @return true iff isomorphic
      */
-    public static ReturnValue apply(Root root1, Root root2, List<Pair<Root, Root>> subTrees, Single<Integer> placeHolderTaxon) throws IOException {
+    public static ReturnValue apply(Root root1, Root root2, List<Pair<Root, Root>> subTrees, Single<Integer> placeHolderTaxon) {
         var isomorphic = new HashSet<Pair<Root, Root>>();
-        applyRec(nextBranchingNode(root1), nextBranchingNode(root2), subTrees, isomorphic, new HashSet<Pair<Root, Root>>(), new HashSet<Root>(), new HashSet<Root>(), placeHolderTaxon);
-        if (isomorphic.contains(new Pair<Root, Root>(nextBranchingNode(root1), nextBranchingNode(root2))))
+        applyRec(nextBranchingNode(root1), nextBranchingNode(root2), subTrees, isomorphic, new HashSet<>(), new HashSet<>(), new HashSet<>(), placeHolderTaxon);
+        if (isomorphic.contains(new Pair<>(nextBranchingNode(root1), nextBranchingNode(root2))))
             return ReturnValue.ISOMORPHIC;
         else if (subTrees.size() == 0)
             return ReturnValue.IRREDUCIBLE;
@@ -157,7 +157,7 @@ public class SubtreeReduction {
      */
     private static void applyRec(Root root1, Root root2, List<Pair<Root, Root>> subTrees, Set<Pair<Root, Root>> isomorphic, Set<Pair<Root, Root>> visited, Set<Root> subTreeBelow1, Set<Root> subTreeBelow2, Single<Integer> placeHolderTaxon) {
         // check whether already visited:
-        var pairOfRoots = new Pair<Root, Root>(root1, root2);
+        var pairOfRoots = new Pair<>(root1, root2);
         if (visited.contains(pairOfRoots))
             return;
         else
@@ -209,13 +209,13 @@ public class SubtreeReduction {
                     var u2 = (Root) e2.getTarget();
                     if (u2.getTaxa().cardinality() > 0 && !subTreeBelow2.contains(u2)) {
                         u2 = nextBranchingNode(u2);
-                        var pairOfChildren = new Pair<Root, Root>(u1, u2);
+                        var pairOfChildren = new Pair<>(u1, u2);
                         if (isomorphic.contains(pairOfChildren)) {
                             // System.err.println("Isomorphic: " + u1 + " and " + u2);
                             taxa.or(u1.getTaxa());
 
                             // must use the nodes directly below root1 and root2 rather than the next branching nodes:
-                            isomorphicChildren.add(new Pair<Root, Root>((Root) e1.getTarget(), (Root) e2.getTarget()));
+                            isomorphicChildren.add(new Pair<>((Root) e1.getTarget(), (Root) e2.getTarget()));
                             break;
                         }
                     }
@@ -317,7 +317,7 @@ public class SubtreeReduction {
                 subRoot2.newEdge(subRoot2, w);
             }
 
-            subTrees.add(new Pair<Root, Root>(subRoot1, subRoot2));
+            subTrees.add(new Pair<>(subRoot1, subRoot2));
 
             // remove all but the first taxon from rest of tree:
             var up1 = root1;

@@ -182,9 +182,7 @@ public class MainWindowPresenter {
 			}
 		});
 
-		RecentFilesManager.getInstance().setFileOpener(fileName -> {
-			FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex));
-		});
+		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 
@@ -210,40 +208,28 @@ public class MainWindowPresenter {
 		});
 		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
 
-		controller.getImportMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
-		});
+        controller.getImportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
 
-		controller.getReplaceDataMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
-		});
+        controller.getReplaceDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
 
 		controller.getInputEditorMenuItem().setOnAction(e -> showInputEditor());
 
 		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> {
 		});
 
-		controller.getSaveButton().setOnAction(e -> {
-			SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName()));
-		});
-		controller.getSaveButton().disableProperty().bind((mainWindow.dirtyProperty().and(mainWindow.fileNameProperty().isNotEmpty()).and(mainWindow.hasSplitsTree6FileProperty())).not());
+        controller.getSaveButton().setOnAction(e -> SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName())));
+        controller.getSaveButton().disableProperty().bind((mainWindow.dirtyProperty().and(mainWindow.fileNameProperty().isNotEmpty()).and(mainWindow.hasSplitsTree6FileProperty())).not());
 		controller.getSaveMenuItem().setOnAction(controller.getSaveButton().getOnAction());
 		controller.getSaveMenuItem().disableProperty().bind(controller.getSaveButton().disableProperty());
 
-		controller.getSaveAsMenuItem().setOnAction(e -> {
-			SaveDialog.showSaveDialog(mainWindow, false);
-		});
-		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+        controller.getSaveAsMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, false));
+        controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
 
-		controller.getExportMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
-		});
-		controller.getExportMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+        controller.getExportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+        controller.getExportMenuItem().disableProperty().bind(mainWindow.emptyProperty());
 
-		controller.getExportWorkflowMenuItem().setOnAction(e -> {
-			SaveDialog.showSaveDialog(mainWindow, true);
-		});
-		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+        controller.getExportWorkflowMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, true));
+        controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
 
 
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
@@ -255,10 +241,8 @@ public class MainWindowPresenter {
 		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
 		controller.getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
 
-		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> {
-			System.err.println("Not implemented");
-		});
-		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not());
+        controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+        controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not());
 
 		controller.getGroupIdenticalHaplotypesFilesMenuItem().setOnAction(null);
 

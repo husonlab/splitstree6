@@ -210,10 +210,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		controller.getvBox().getChildren().add(findToolBar);
 		controller.getFindButton().setOnAction(e -> {
-			if (findToolBar.isShowFindToolBar())
-				findToolBar.setShowFindToolBar(false);
-			else
-				findToolBar.setShowFindToolBar(true);
+			findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar());
 		});
 
 
@@ -275,17 +272,17 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 	}
 
-	private static record RowsCols(int rows, int cols) {
-		public static RowsCols valueOf(String str) {
-			if (str != null) {
-				var tokens = StringUtils.split(str, 'x');
-				if (tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]))
-					return new RowsCols(NumberUtils.parseInt(tokens[0]), NumberUtils.parseInt(tokens[1]));
-			}
-			return null;
-		}
+    private record RowsCols(int rows, int cols) {
+        public static RowsCols valueOf(String str) {
+            if (str != null) {
+                var tokens = StringUtils.split(str, 'x');
+                if (tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]))
+                    return new RowsCols(NumberUtils.parseInt(tokens[0]), NumberUtils.parseInt(tokens[1]));
+            }
+            return null;
+        }
 
-		public String toString() {
+        public String toString() {
 			return rows + " x " + cols;
 		}
 	}

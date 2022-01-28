@@ -123,7 +123,7 @@ public abstract class QuasiMedianBase {
 					if (count == 1)
 						graph.setLabel(v, taxa.get(graph.getTaxa(v).iterator().next()).getDisplayLabelOrName());
 					else if (count > 1)
-						graph.setLabel(v, "{" + buf.toString() + "}");
+						graph.setLabel(v, "{" + buf + "}");
 				}
 			}
 			String full = expandCondensed(condensed, orig2CondensedPos, translator);
@@ -443,28 +443,28 @@ public abstract class QuasiMedianBase {
 		// condensed taxa start at 0
 		for (int t = 1; t <= ntax; t++) {
 			origTaxa2CondensedTaxa[t]--;
-		}
+        }
 
-		String[] result = new String[list.size()];
-		int which = 0;
-		for (Object aList : list) {
-			result[which++] = (String) aList;
-		}
-		return result;
-	}
+        String[] result = new String[list.size()];
+        int which = 0;
+        for (Object aList : list) {
+            result[which++] = (String) aList;
+        }
+        return result;
+    }
 
-	class Translator {
-		Map mapOrigPosCondensedPosCondensedCharToOrigChar = new HashMap();
-		int maxOrigPos = 0;
-		int maxOrigChar = 0;
-		int maxCondensedPos = 0;
+    static class Translator {
+        final Map mapOrigPosCondensedPosCondensedCharToOrigChar = new HashMap();
+        int maxOrigPos = 0;
+        int maxOrigChar = 0;
+        int maxCondensedPos = 0;
 
-		public void put(int origPos, char origChar, int condensedPos, char condensedChar) {
-			maxOrigPos = Math.max(maxOrigPos, origPos);
-			maxOrigChar = Math.max(maxOrigChar, origChar);
-			maxCondensedPos = Math.max(maxCondensedPos, condensedPos);
-			Triple triple = new Triple(origPos, condensedPos, condensedChar);
-			Character ch = origChar;
+        public void put(int origPos, char origChar, int condensedPos, char condensedChar) {
+            maxOrigPos = Math.max(maxOrigPos, origPos);
+            maxOrigChar = Math.max(maxOrigChar, origChar);
+            maxCondensedPos = Math.max(maxCondensedPos, condensedPos);
+            Triple triple = new Triple(origPos, condensedPos, condensedChar);
+            Character ch = origChar;
 			mapOrigPosCondensedPosCondensedCharToOrigChar.put(triple, ch);
 		}
 
@@ -494,27 +494,26 @@ public abstract class QuasiMedianBase {
 			return buf.toString();
 		}
 
-		class Triple {
-			int first;
-			int second;
-			char third;
+        class Triple {
+            final int first;
+            final int second;
+            final char third;
 
-			Triple(int first, int second, char third) {
-				this.first = first;
-				this.second = second;
-				this.third = third;
-			}
+            Triple(int first, int second, char third) {
+                this.first = first;
+                this.second = second;
+                this.third = third;
+            }
 
-			public int hashCode() {
-				return first + 17 * second + 37 * third;
-			}
+            public int hashCode() {
+                return first + 17 * second + 37 * third;
+            }
 
 			public boolean equals(Object other) {
-				if (other instanceof Triple) {
-					Triple t = (Triple) other;
-					return first == t.first && second == t.second && third == t.third;
-				} else
-					return false;
+                if (other instanceof Triple t) {
+                    return first == t.first && second == t.second && third == t.third;
+                } else
+                    return false;
 			}
 		}
 	}

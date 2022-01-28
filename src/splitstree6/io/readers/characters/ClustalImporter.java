@@ -79,7 +79,7 @@ public class ClustalImporter extends CharactersReader {
 						lastSeqIndex--;
 					tmpLine = tmpLine.substring(0, lastSeqIndex);
 
-					String label = "";
+					String label;
 					int labelIndex = tmpLine.indexOf(' ');
 					if (labelIndex == -1 || labelIndex == 0)
 						throw new IOExceptionWithLineNumber("No taxa label given", counter);

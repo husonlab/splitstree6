@@ -26,7 +26,6 @@ import splitstree6.data.ViewBlock;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * view nexus input
@@ -52,19 +51,19 @@ public class ViewNexusInput extends NexusIOBase {
 	}
 
 	/**
-	 * parse a view block
-	 */
-	public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, ViewBlock viewBlock) throws IOException {
-		final var taxonNamesFound = new ArrayList<String>();
+     * parse a view block
+     */
+    public void parse(NexusStreamParser np, TaxaBlock taxaBlock, ViewBlock viewBlock) throws IOException {
+        final var taxonNamesFound = new ArrayList<String>();
 
-		np.matchBeginBlock("VIEW");
-		parseTitleAndLink(np);
+        np.matchBeginBlock("VIEW");
+        parseTitleAndLink(np);
 
-		np.matchIgnoreCase("NAME");
-		viewBlock.setName(np.getLabelRespectCase());
-		np.matchIgnoreCase(";");
-		np.matchIgnoreCase("INPUT");
-		viewBlock.setInputBlockName(np.getWordMatchesIgnoringCase("TAXA TRAITS CHARACTERS DISTANCES SPLITS TREES NETWORK"));
+        np.matchIgnoreCase("NAME");
+        viewBlock.setName(np.getLabelRespectCase());
+        np.matchIgnoreCase(";");
+        np.matchIgnoreCase("INPUT");
+        viewBlock.setInputBlockName(np.getWordMatchesIgnoringCase("TAXA TRAITS CHARACTERS DISTANCES SPLITS TREES NETWORK"));
 		np.matchIgnoreCase(";");
 
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
@@ -72,6 +71,5 @@ public class ViewNexusInput extends NexusIOBase {
 		}
 		np.matchEndBlock();
 
-		return taxonNamesFound;
-	}
+    }
 }

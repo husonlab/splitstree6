@@ -25,7 +25,6 @@ import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
@@ -38,7 +37,7 @@ public class NetworkTaxaFilter extends DataTaxaFilter<NetworkBlock, NetworkBlock
 	}
 
 	@Override
-	public void filter(ProgressListener progress, TaxaBlock originalTaxaBlock, TaxaBlock modifiedTaxaBlock, NetworkBlock inputData, NetworkBlock outputData) throws IOException {
+	public void filter(ProgressListener progress, TaxaBlock originalTaxaBlock, TaxaBlock modifiedTaxaBlock, NetworkBlock inputData, NetworkBlock outputData) {
 		var labels = new HashSet<>(modifiedTaxaBlock.getLabels());
 
 		outputData.copy(inputData);

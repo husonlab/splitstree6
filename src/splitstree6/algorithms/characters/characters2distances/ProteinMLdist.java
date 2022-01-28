@@ -132,42 +132,24 @@ public class ProteinMLdist extends Characters2Distances {
 	}
 
 	public ProteinModel selectModel(Model model) {
-		ProteinModel themodel;
+        ProteinModel themodel;
 
-		System.err.println("Model name = " + model.toString());
-		//TODO: Add all models
-		switch (model) {
-			case cpREV45:
-				themodel = new cpREV45Model();
-				break;
-			case Dayhoff:
-				themodel = new DayhoffModel();
-				break;
-			case JTT:
-				themodel = new JTTmodel();
-				break;
-			case mtMAM:
-				themodel = new mtMAMModel();
-				break;
-			case mtREV24:
-				themodel = new mtREV24Model();
-				break;
-			case pmb:
-				themodel = new pmbModel();
-				break;
-			case Rhodopsin:
-				themodel = new RhodopsinModel();
-				break;
-			case WAG:
-				themodel = new WagModel();
-				break;
-			default:
-				themodel = null;
-				break;
-		}
+        System.err.println("Model name = " + model.toString());
+        //TODO: Add all models
+        themodel = switch (model) {
+            case cpREV45 -> new cpREV45Model();
+            case Dayhoff -> new DayhoffModel();
+            case JTT -> new JTTmodel();
+            case mtMAM -> new mtMAMModel();
+            case mtREV24 -> new mtREV24Model();
+            case pmb -> new pmbModel();
+            case Rhodopsin -> new RhodopsinModel();
+            case WAG -> new WagModel();
+            default -> null;
+        };
 
-		return themodel;
-	}
+        return themodel;
+    }
 
 	// GETTER AND SETTER
 

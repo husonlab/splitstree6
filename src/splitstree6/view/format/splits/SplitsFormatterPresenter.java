@@ -152,9 +152,7 @@ public class SplitsFormatterPresenter {
 			ProgramProperties.put("OutlineFillColor", n);
 		});
 		controller.getOutlineColorPicker().disableProperty().bind(Bindings.isEmpty(loopViews));
-		loopViews.addListener((InvalidationListener) e -> {
-			controller.getOutlineColorPicker().setValue(ProgramProperties.get("OutlineFillColor", Color.SILVER));
-		});
+        loopViews.addListener((InvalidationListener) e -> controller.getOutlineColorPicker().setValue(ProgramProperties.get("OutlineFillColor", Color.SILVER)));
 
 		//selectionModel.getSelectedItems().addListener(selectionListener);
 		splitSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));

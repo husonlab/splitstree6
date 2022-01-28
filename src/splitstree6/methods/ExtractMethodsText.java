@@ -37,24 +37,24 @@ import java.util.TreeSet;
  * Daniel Huson, June 2017
  */
 public class ExtractMethodsText {
-	private static ExtractMethodsText instance;
+    private static ExtractMethodsText instance;
 
-	public static String preambleTemplate = "Analysis was performed using SplitsTree6 %s%s.\n";
-	public static String inputDataTemplate = "The original input consisted of %s and %s.\n";
-	public static String taxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.\n";
-	public static String taxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s.\n";
-	public static String methodWithOutputTemplate = "The %s method%s was used%s so as to obtain %s%s.\n";
-	public static String methodTemplate = "The %s method%s was used%s%s.\n";
+    public static final String preambleTemplate = "Analysis was performed using SplitsTree6 %s%s.\n";
+    public static final String inputDataTemplate = "The original input consisted of %s and %s.\n";
+    public static final String taxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.\n";
+    public static final String taxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s.\n";
+    public static final String methodWithOutputTemplate = "The %s method%s was used%s so as to obtain %s%s.\n";
+    public static final String methodTemplate = "The %s method%s was used%s%s.\n";
 
-	public static String filterTemplate = "A %s%s was applied so as to be %s.\n";
+    public static final String filterTemplate = "A %s%s was applied so as to be %s.\n";
 
-	/**
-	 * constructor
-	 */
-	private ExtractMethodsText() {
-	}
+    /**
+     * constructor
+     */
+    private ExtractMethodsText() {
+    }
 
-	/**
+    /**
 	 * gets the single instance
 	 *
 	 * @return instance

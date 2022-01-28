@@ -106,17 +106,17 @@ public class StockholmImporter extends CharactersReader {
 		}
 	}
 
-	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) throws IOException {
-		StringBuilder foundSymbols = new StringBuilder("");
-		for (int i = 1; i <= characters.getNtax(); i++) {
-			for (int j = 1; j <= characters.getNchar(); j++) {
-				char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
-				if (foundSymbols.toString().indexOf(symbol) == -1) {
-					foundSymbols.append(symbol);
-				}
-				characters.set(i, j, matrix.get(i - 1).charAt(j - 1));
-			}
-		}
+	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) {
+        StringBuilder foundSymbols = new StringBuilder("");
+        for (int i = 1; i <= characters.getNtax(); i++) {
+            for (int j = 1; j <= characters.getNchar(); j++) {
+                char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
+                if (foundSymbols.toString().indexOf(symbol) == -1) {
+                    foundSymbols.append(symbol);
+                }
+                characters.set(i, j, matrix.get(i - 1).charAt(j - 1));
+            }
+        }
 		characters.setDataType(CharactersType.guessType(CharactersType.union(foundSymbols.toString())));
 	}
 }

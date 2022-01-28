@@ -62,8 +62,7 @@ public class VectorUtilities {
 
 	static public double norm(double[] x) {
 		double ss = 0.0;
-		for (int i = 0; i < x.length; i++)
-			ss += x[i] * x[i];
+        for (double v : x) ss += v * v;
 		return Math.sqrt(ss);
 	}
 

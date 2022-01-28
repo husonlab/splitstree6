@@ -27,645 +27,591 @@
 <?import javafx.scene.text.*?>
 <AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.window.MainWindowController">
-    <children>
-        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                    AnchorPane.topAnchor="0.0">
-            <top>
-                <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
-                    <children>
-                        <MenuBar fx:id="menuBar">
-                            <menus>
-                                <Menu fx:id="fileMenu" text="File">
-                                    <items>
-                                        <MenuItem fx:id="newMenuItem" text="New...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <Menu fx:id="openRecentMenu" text="Open Recent"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="importMenuItem" text="Import...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="replaceDataMenuItem" text="Replace Data...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="inputEditorMenuItem" text="Input Editor...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="U" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="analyzeGenomesMenuItem" text="Analyze Genomes..."/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="saveMenuItem" text="Save">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="saveAsMenuItem" text="Save As...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="exportMenuItem" text="Export...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="pageSetupMenuItem" text="Page Setup..."/>
-                                        <MenuItem fx:id="printMenuItem" text="Print...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <Menu fx:id="toolsMenu" text="Tools">
-                                            <items>
-                                                <MenuItem fx:id="importMultipleTreeFilesMenuItem"
-                                                          text="Import Trees from Multiple Files..."/>
-                                                <MenuItem fx:id="GroupIdenticalHaplotypesFilesMenuItem"
-                                                          text="Group Identical Haplotypes...">
-                                                </MenuItem>
-                                            </items>
-                                        </Menu>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="closeMenuItem" text="Close">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="quitMenuItem" text="Quit">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                    </items>
-                                </Menu>
-                                <Menu fx:id="editMenu" text="Edit">
-                                    <items>
-                                        <MenuItem fx:id="undoMenuItem" text="Undo">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="redoMenuItem" text="Redo">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="cutMenuItem" text="Cut">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="X" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="copyMenuItem" text="Copy">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="copyNewickMenuItem" text="Copy Newick">
-                                        </MenuItem>
+    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0">
+        <top>
+            <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
+                <MenuBar fx:id="menuBar">
+                    <Menu fx:id="fileMenu" text="File">
+                        <MenuItem fx:id="newMenuItem" text="New...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <Menu fx:id="openRecentMenu" text="Open Recent"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="importMenuItem" text="Import...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="replaceDataMenuItem" text="Replace Data...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="inputEditorMenuItem" text="Input Editor...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="U" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="analyzeGenomesMenuItem" text="Analyze Genomes..."/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="saveMenuItem" text="Save">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="saveAsMenuItem" text="Save As...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="exportMenuItem" text="Export...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="pageSetupMenuItem" text="Page Setup..."/>
+                        <MenuItem fx:id="printMenuItem" text="Print...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <Menu fx:id="toolsMenu" text="Tools">
+                            <MenuItem fx:id="importMultipleTreeFilesMenuItem"
+                                      text="Import Trees from Multiple Files..."/>
+                            <MenuItem fx:id="GroupIdenticalHaplotypesFilesMenuItem"
+                                      text="Group Identical Haplotypes...">
+                            </MenuItem>
+                        </Menu>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="closeMenuItem" text="Close">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="quitMenuItem" text="Quit">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                    </Menu>
+                    <Menu fx:id="editMenu" text="Edit">
+                        <MenuItem fx:id="undoMenuItem" text="Undo">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="redoMenuItem" text="Redo">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="cutMenuItem" text="Cut">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="X" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="copyMenuItem" text="Copy">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="copyNewickMenuItem" text="Copy Newick">
+                        </MenuItem>
 
-                                        <MenuItem fx:id="copyImageMenuItem" text="Copy Image">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="pasteMenuItem" text="Paste">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="duplicateMenuItem" text="Duplicate">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="D" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="deleteMenuItem" text="Delete">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="BACK_SPACE" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="findMenuItem" text="Find...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="F" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="findAgainMenuItem" text="Find Again">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="replaceMenuItem" text="Replace...">
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="gotoLineMenuItem" text="Goto Line...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="preferencesMenuItem" text="Preferences...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                    </items>
-                                </Menu>
-                                <Menu text="Select">
-                                    <items>
-                                        <MenuItem fx:id="selectAllMenuItem" text="Select All">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="selectNoneMenuItem" text="Select None">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="selectAllNodesMenuItem" text="All Nodes"/>
-                                        <MenuItem fx:id="selectAllLabeledNodesMenuItem" text="All Labeled Nodes">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="L" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="selectAllBelowMenuItem" text="All Nodes Below">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="selectBracketsMenuItem" text="Brackets">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="invertNodeSelectionMenuItem" mnemonicParsing="false"
-                                                  text="Invert Node Selection"/>
-                                        <MenuItem fx:id="deselectAllNodesMenuItem" mnemonicParsing="false"
-                                                  text="Deselect Nodes"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="selectAllEdgesMenuItem" text="All Edges"/>
-                                        <MenuItem fx:id="selectAllLabeledEdgesMenuItem" mnemonicParsing="false"
-                                                  text="All Labeled Edges"/>
-                                        <MenuItem fx:id="selectAllEdgesBelowMenuItem" mnemonicParsing="false"
-                                                  text="All Edges Below"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="invertEdgeSelectionMenuItem" mnemonicParsing="false"
-                                                  text="Invert Edge Selection"/>
-                                        <MenuItem fx:id="deselectEdgesMenuItem" mnemonicParsing="false"
-                                                  text="Deselect Edges"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="selectFromPreviousMenuItem" text="From Previous">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                    </items>
-                                </Menu>
-                                <Menu text="View">
-                                    <items>
-                                        <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false"
-                                                       text="Use Dark Theme"/>
-                                        <MenuItem fx:id="useFullScreenMenuItem" mnemonicParsing="false"
-                                                  text="Enter Full Screen">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="F" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="PLUS" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="MINUS" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="zoomInMenuItem" text="Zoom In">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="zoomOutMenuItem" text="Zoom Out">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="zoomInHorizontalMenuItem" text="Zoom In Horizontal">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="zoomOutHorizontalMenuItem" text="Zoom Out Horizontal">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="resetMenuItem" mnemonicParsing="false" text="Reset">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="DIGIT0" control="UP" meta="UP"
-                                                                    shift="UP" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="rotateLeftMenuItem" text="Rotate Left">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="rotateRightMenuItem" text="Rotate Right">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <MenuItem fx:id="flipMenuItem" text="Flip">
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="formatNodesMenuItem" text="Format...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="J" control="UP" meta="UP"
-                                                                    shift="DOWN" shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="L" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                         <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
-                                    </items>
-                                </Menu>
-                                <Menu text="Data">
-                                    <items>
-                                        <MenuItem fx:id="editTaxaMenuItem" text="Edit Taxa..."/>
-                                        <MenuItem fx:id="editCharactersMenuItem" text="Edit Characters..."/>
-                                        <MenuItem fx:id="editTreesMenuItem" text="Edit Trees..."/>
-                                        <MenuItem fx:id="editSplitsMenuItem" text="Edit Splits..."/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="traitsMenuItem" text="Traits"/>
-                                    </items>
-                                </Menu>
-                                <Menu text="Distances">
-                                    <items>
-                                        <MenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"/>
-                                        <MenuItem fx:id="logDetMenuItem" text="Log Det"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="hky85MenuItem" text="HKY 85"/>
-                                        <MenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"/>
-                                        <MenuItem fx:id="k2pMenuItem" text="K2P"/>
-                                        <MenuItem fx:id="k3stMenuItem" text="K3ST"/>
-                                        <MenuItem fx:id="f81MenuItem" text="F81"/>
-                                        <MenuItem fx:id="f84MenuItem" text="F84"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="geneContentDistanceMenuItem" text="Gene Content Distance"/>
-                                    </items>
-                                </Menu>
-                                <Menu text="Tree">
-                                    <items>
-                                        <MenuItem fx:id="njMenuItem" text="NJ"/>
-                                        <MenuItem fx:id="bioNJMenuItem" text="BioNJ"/>
-                                        <MenuItem fx:id="upgmaMenuItem" text="UPGMA"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="bunemanTreeMenuItem" text="Buneman Tree"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
-                                        <MenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="rerootTreesMenuItem" text="Reroot Or Ladderize Trees"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
-                                        <MenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="viewTanglegramMenuItem" text="Show Tanglegram"/>
-                                        <MenuItem fx:id="viewDensiTreeMenuItem" text="Show DensiTree"/>
-                                    </items>
-                                </Menu>
-                                <Menu text="Network">
-                                    <items>
-                                        <MenuItem fx:id="neighborNetMenuItem" text="Neighbor Net"/>
-                                        <MenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"/>
-                                        <MenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
-                                        <MenuItem fx:id="filteredSuperNetworkMenuItem" text="Filtered Super Network"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>
-                                        <MenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="splitsNetworkViewMenuItem" text="Splits Network View"/>
-                                        <MenuItem fx:id="haplotypeNetworkViewMenuItem" text="Haplotype Network View"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                    </items>
-                                </Menu>
-                                <Menu text="PCoA">
-                                    <items>
-                                        <MenuItem fx:id="pcoaMenuItem" text="PCoA"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="brayCurtisMenuItem" text="Bray Curtis"/>
-                                        <MenuItem fx:id="jsdMenuItem" text="JSD"/>
-                                        <MenuItem fx:id="bootstrappingMenuItem" text="Euclidean"/>
-                                    </items>
-                                </Menu>
-                                <Menu text="Analysis">
-                                    <items>
-                                        <MenuItem fx:id="showBootStrapTreeMenuItem" text="Show Bootstrap Tree..."/>
-                                        <MenuItem fx:id="showBootStrapNetworkMenuItem"
-                                                  text="Show Bootstrap Network..."/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="estimateInvariableSitesMenuItem"
-                                                  text="Esimate Invariable Sites..."/>
-                                        <MenuItem fx:id="computePhylogeneticDiversityMenuItem"
-                                                  text="Compute Phylogenetic Diversity"/>
-                                        <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="showWorkflowMenuItem" text="Show Workflow"/>
-                                    </items>
-                                </Menu>
-                                <Menu fx:id="windowMenu" text="Window">
-                                    <items>
-                                        <MenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                    </items>
-                                </Menu>
-                                <Menu fx:id="helpMenu" text="Help">
-                                    <items>
-                                        <MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."/>
-                                        <SeparatorMenuItem mnemonicParsing="false"/>
-                                        <MenuItem fx:id="aboutMenuItem" text="About...">
-                                            <accelerator>
-                                                <KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP"
-                                                                    shortcut="DOWN"/>
-                                            </accelerator>
-                                        </MenuItem>
-                                    </items>
-                                </Menu>
-                            </menus>
-                        </MenuBar>
-                    </children>
-                </VBox>
-            </top>
-            <center>
-                <AnchorPane BorderPane.alignment="CENTER">
-                    <BorderPane.margin>
-                        <Insets right="2.0" top="2.0"/>
-                    </BorderPane.margin>
-                    <children>
-                        <SplitPane fx:id="mainSplitPane" dividerPositions="0.29797979797979796"
-                                   AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                            <items>
-                                <AnchorPane fx:id="leftAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0"
-                                            prefWidth="100.0">
-                                    <children>
-                                        <BorderPane layoutX="6.0" AnchorPane.bottomAnchor="0.0"
-                                                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                        <MenuItem fx:id="copyImageMenuItem" text="Copy Image">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="pasteMenuItem" text="Paste">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="duplicateMenuItem" text="Duplicate">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="D" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="deleteMenuItem" text="Delete">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="BACK_SPACE" control="UP" meta="UP"
+                                                    shift="UP" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="findMenuItem" text="Find...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="F" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="findAgainMenuItem" text="Find Again">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="replaceMenuItem" text="Replace...">
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="gotoLineMenuItem" text="Goto Line...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="preferencesMenuItem" text="Preferences...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                    </Menu>
+                    <Menu text="Select">
+                        <MenuItem fx:id="selectAllMenuItem" text="Select All">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="selectNoneMenuItem" text="Select None">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="selectAllNodesMenuItem" text="All Nodes"/>
+                        <MenuItem fx:id="selectAllLabeledNodesMenuItem" text="All Labeled Nodes">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="L" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="selectAllBelowMenuItem" text="All Nodes Below">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="selectBracketsMenuItem" text="Brackets">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="invertNodeSelectionMenuItem" mnemonicParsing="false"
+                                  text="Invert Node Selection"/>
+                        <MenuItem fx:id="deselectAllNodesMenuItem" mnemonicParsing="false"
+                                  text="Deselect Nodes"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="selectAllEdgesMenuItem" text="All Edges"/>
+                        <MenuItem fx:id="selectAllLabeledEdgesMenuItem" mnemonicParsing="false"
+                                  text="All Labeled Edges"/>
+                        <MenuItem fx:id="selectAllEdgesBelowMenuItem" mnemonicParsing="false"
+                                  text="All Edges Below"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="invertEdgeSelectionMenuItem" mnemonicParsing="false"
+                                  text="Invert Edge Selection"/>
+                        <MenuItem fx:id="deselectEdgesMenuItem" mnemonicParsing="false"
+                                  text="Deselect Edges"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="selectFromPreviousMenuItem" text="From Previous">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                    </Menu>
+                    <Menu text="View">
+                        <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false"
+                                       text="Use Dark Theme"/>
+                        <MenuItem fx:id="useFullScreenMenuItem" mnemonicParsing="false"
+                                  text="Enter Full Screen">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="F" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="PLUS" control="UP" meta="UP"
+                                                    shift="UP" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="MINUS" control="UP" meta="UP"
+                                                    shift="UP" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="zoomInMenuItem" text="Zoom In">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP"
+                                                    shift="UP" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="zoomOutMenuItem" text="Zoom Out">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="zoomInHorizontalMenuItem" text="Zoom In Horizontal">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
+                                                    shift="UP" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="zoomOutHorizontalMenuItem" text="Zoom Out Horizontal">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
+                                                    shift="UP" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="resetMenuItem" mnemonicParsing="false" text="Reset">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="DIGIT0" control="UP" meta="UP"
+                                                    shift="UP" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="rotateLeftMenuItem" text="Rotate Left">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="rotateRightMenuItem" text="Rotate Right">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <MenuItem fx:id="flipMenuItem" text="Flip">
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="formatNodesMenuItem" text="Format...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="J" control="UP" meta="UP"
+                                                    shift="DOWN" shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="L" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
+                    </Menu>
+                    <Menu text="Data">
+                        <MenuItem fx:id="editTaxaMenuItem" text="Edit Taxa..."/>
+                        <MenuItem fx:id="editCharactersMenuItem" text="Edit Characters..."/>
+                        <MenuItem fx:id="editTreesMenuItem" text="Edit Trees..."/>
+                        <MenuItem fx:id="editSplitsMenuItem" text="Edit Splits..."/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="traitsMenuItem" text="Traits"/>
+                    </Menu>
+                    <Menu text="Distances">
+                        <MenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"/>
+                        <MenuItem fx:id="logDetMenuItem" text="Log Det"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="hky85MenuItem" text="HKY 85"/>
+                        <MenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"/>
+                        <MenuItem fx:id="k2pMenuItem" text="K2P"/>
+                        <MenuItem fx:id="k3stMenuItem" text="K3ST"/>
+                        <MenuItem fx:id="f81MenuItem" text="F81"/>
+                        <MenuItem fx:id="f84MenuItem" text="F84"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="geneContentDistanceMenuItem" text="Gene Content Distance"/>
+                    </Menu>
+                    <Menu text="Tree">
+                        <MenuItem fx:id="njMenuItem" text="NJ"/>
+                        <MenuItem fx:id="bioNJMenuItem" text="BioNJ"/>
+                        <MenuItem fx:id="upgmaMenuItem" text="UPGMA"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="bunemanTreeMenuItem" text="Buneman Tree"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
+                        <MenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="rerootTreesMenuItem" text="Reroot Or Ladderize Trees"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
+                        <MenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="viewTanglegramMenuItem" text="Show Tanglegram"/>
+                        <MenuItem fx:id="viewDensiTreeMenuItem" text="Show DensiTree"/>
+                    </Menu>
+                    <Menu text="Network">
+                        <MenuItem fx:id="neighborNetMenuItem" text="Neighbor Net"/>
+                        <MenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"/>
+                        <MenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
+                        <MenuItem fx:id="filteredSuperNetworkMenuItem" text="Filtered Super Network"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>
+                        <MenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="splitsNetworkViewMenuItem" text="Splits Network View"/>
+                        <MenuItem fx:id="haplotypeNetworkViewMenuItem" text="Haplotype Network View"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                    </Menu>
+                    <Menu text="PCoA">
+                        <MenuItem fx:id="pcoaMenuItem" text="PCoA"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="brayCurtisMenuItem" text="Bray Curtis"/>
+                        <MenuItem fx:id="jsdMenuItem" text="JSD"/>
+                        <MenuItem fx:id="bootstrappingMenuItem" text="Euclidean"/>
+                    </Menu>
+                    <Menu text="Analysis">
+                        <MenuItem fx:id="showBootStrapTreeMenuItem" text="Show Bootstrap Tree..."/>
+                        <MenuItem fx:id="showBootStrapNetworkMenuItem"
+                                  text="Show Bootstrap Network..."/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="estimateInvariableSitesMenuItem"
+                                  text="Esimate Invariable Sites..."/>
+                        <MenuItem fx:id="computePhylogeneticDiversityMenuItem"
+                                  text="Compute Phylogenetic Diversity"/>
+                        <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="showWorkflowMenuItem" text="Show Workflow"/>
+                    </Menu>
+                    <Menu fx:id="windowMenu" text="Window">
+                        <MenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                    </Menu>
+                    <Menu fx:id="helpMenu" text="Help">
+                        <MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="aboutMenuItem" text="About...">
+                            <accelerator>
+                                <KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP"
+                                                    shortcut="DOWN"/>
+                            </accelerator>
+                        </MenuItem>
+                    </Menu>
+                </MenuBar>
+            </VBox>
+        </top>
+        <center>
+            <AnchorPane BorderPane.alignment="CENTER">
+                <BorderPane.margin>
+                    <Insets right="2.0" top="2.0"/>
+                </BorderPane.margin>
+                <SplitPane fx:id="mainSplitPane" dividerPositions="0.29797979797979796"
+                           AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <AnchorPane fx:id="leftAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0"
+                                prefWidth="100.0">
+                        <padding>
+                            <Insets left="6.0"/>
+                        </padding>
+                        <BorderPane layoutX="6.0" AnchorPane.bottomAnchor="0.0"
+                                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                    AnchorPane.topAnchor="0.0">
+                            <center>
+                                <SplitPane fx:id="leftSplitPane" dividerPositions="1.0"
+                                           orientation="VERTICAL">
+                                    <AnchorPane fx:id="treeViewAnchorPane" minHeight="0.0"
+                                                minWidth="0.0" prefHeight="100.0"
+                                                prefWidth="160.0"/>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0"
+                                                prefWidth="160.0">
+                                        <BorderPane fx:id="algorithmsBorderPane"
+                                                    AnchorPane.bottomAnchor="0.0"
+                                                    AnchorPane.leftAnchor="0.0"
+                                                    AnchorPane.rightAnchor="0.0"
                                                     AnchorPane.topAnchor="0.0">
-                                            <center>
-                                                <SplitPane fx:id="leftSplitPane" dividerPositions="1.0"
-                                                           orientation="VERTICAL">
-                                                    <items>
-                                                        <AnchorPane fx:id="treeViewAnchorPane" minHeight="0.0"
-                                                                    minWidth="0.0" prefHeight="100.0"
-                                                                    prefWidth="160.0"/>
-                                                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0"
-                                                                    prefWidth="160.0">
-                                                            <children>
-                                                                <BorderPane fx:id="algorithmsBorderPane"
-                                                                            AnchorPane.bottomAnchor="0.0"
-                                                                            AnchorPane.leftAnchor="0.0"
-                                                                            AnchorPane.rightAnchor="0.0"
-                                                                            AnchorPane.topAnchor="0.0">
-                                                                    <top>
-                                                                        <ToolBar fx:id="algorithmsTabToolBar"
-                                                                                 prefHeight="28.0"
-                                                                                 BorderPane.alignment="CENTER"/>
-                                                                    </top>
-                                                                    <center>
-                                                                        <TabPane tabClosingPolicy="UNAVAILABLE"
-                                                                                 BorderPane.alignment="CENTER"/>
-                                                                    </center>
-                                                                </BorderPane>
-                                                            </children>
-                                                        </AnchorPane>
-                                                    </items>
-                                                </SplitPane>
-                                            </center>
                                             <top>
-                                                <ToolBar BorderPane.alignment="CENTER">
-                                                    <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY"
-                                                            maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
-                                                            prefHeight="20.0"
-                                                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                                                            text="Open">
-                                                        <font>
-                                                            <Font size="10.0"/>
-                                                        </font>
-                                                        <graphic>
-                                                            <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                       pickOnBounds="true" preserveRatio="true">
-                                                                <image>
-                                                                    <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
-                                                                </image>
-                                                            </ImageView>
-                                                        </graphic>
-                                                        <tooltip>
-                                                            <Tooltip text="Open a file"/>
-                                                        </tooltip>
-                                                    </Button>
-                                                    <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY"
-                                                            maxHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                                                            text="Save">
-                                                        <font>
-                                                            <Font size="10.0"/>
-                                                        </font>
-                                                        <graphic>
-                                                            <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                       pickOnBounds="true" preserveRatio="true">
-                                                                <image>
-                                                                    <Image smooth="false"
-                                                                           url="@/jloda/resources/icons/sun/Save16.gif"/>
-                                                                </image>
-                                                            </ImageView>
-                                                        </graphic>
-                                                        <tooltip>
-                                                            <Tooltip text="Save file"/>
-                                                        </tooltip>
-                                                    </Button>
-                                                    <Button fx:id="printButton" contentDisplay="GRAPHIC_ONLY"
-                                                            maxHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                                                            text="Print">
-                                                        <font>
-                                                            <Font size="10.0"/>
-                                                        </font>
-                                                        <graphic>
-                                                            <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                       pickOnBounds="true" preserveRatio="true">
-                                                                <image>
-                                                                    <Image smooth="false"
-                                                                           url="@/jloda/resources/icons/sun/Print16.gif"/>
-                                                                </image>
-                                                            </ImageView>
-                                                        </graphic>
-                                                        <tooltip>
-                                                            <Tooltip text="Print the selected tab"/>
-                                                        </tooltip>
-                                                    </Button>
-                                                    <BorderPane.margin>
-                                                        <Insets/>
-                                                    </BorderPane.margin>
-                                                </ToolBar>
+                                                <ToolBar fx:id="algorithmsTabToolBar"
+                                                         prefHeight="28.0"
+                                                         BorderPane.alignment="CENTER"/>
                                             </top>
-                                        </BorderPane>
-                                    </children>
-                                    <padding>
-                                        <Insets left="6.0"/>
-                                    </padding>
-                                </AnchorPane>
-                                <AnchorPane fx:id="rightAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0"
-                                            prefWidth="100.0">
-                                    <children>
-                                        <BorderPane fx:id="mainBorderPane" AnchorPane.bottomAnchor="0.0"
-                                                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                                    AnchorPane.topAnchor="0.0">
-                                            <padding>
-                                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
-                                            </padding>
                                             <center>
-                                                <TabPane prefHeight="200.0" prefWidth="200.0"
-                                                         tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER"/>
+                                                <TabPane tabClosingPolicy="UNAVAILABLE"
+                                                         BorderPane.alignment="CENTER"/>
                                             </center>
                                         </BorderPane>
-                                    </children>
-                                </AnchorPane>
-                            </items>
-                        </SplitPane>
-                        <Button fx:id="openCloseLeftButton" contentDisplay="CENTER" maxHeight="10.0" maxWidth="10.0"
-                                mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0"
-                                style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;"
-                                AnchorPane.leftAnchor="-6.0" AnchorPane.topAnchor="10.0">
-                            <font>
-                                <Font size="10.0"/>
-                            </font>
-                            <tooltip>
-                                <Tooltip text="Open or close the side bar"/>
-                            </tooltip>
-                        </Button>
-                        <Button fx:id="openCloseRightButton" contentDisplay="CENTER" maxHeight="10.0" maxWidth="10.0"
-                                mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0" rotate="-90.0"
-                                style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;"
-                                AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="-6.0">
-                            <font>
-                                <Font size="10.0"/>
-                            </font>
-                            <tooltip>
-                                <Tooltip text="Open or close the algorithm tabs"/>
-                            </tooltip>
-                        </Button>
-                    </children>
-                </AnchorPane>
-            </center>
-            <bottom>
-                <HBox minHeight="-Infinity" spacing="5.0"
-                      style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
-                      BorderPane.alignment="BOTTOM_CENTER">
-                    <children>
-                        <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="30.0" vgap="5.0" HBox.hgrow="ALWAYS">
+                                    </AnchorPane>
+                                </SplitPane>
+                            </center>
+                            <top>
+                                <ToolBar BorderPane.alignment="CENTER">
+                                    <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY"
+                                            maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                                            prefHeight="20.0"
+                                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                                            text="Open">
+                                        <font>
+                                            <Font size="10.0"/>
+                                        </font>
+                                        <graphic>
+                                            <ImageView fitHeight="16.0" fitWidth="16.0"
+                                                       pickOnBounds="true" preserveRatio="true">
+                                                <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
+                                            </ImageView>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Open a file"/>
+                                        </tooltip>
+                                    </Button>
+                                    <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY"
+                                            maxHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                                            text="Save">
+                                        <font>
+                                            <Font size="10.0"/>
+                                        </font>
+                                        <graphic>
+                                            <ImageView fitHeight="16.0" fitWidth="16.0"
+                                                       pickOnBounds="true" preserveRatio="true">
+                                                <Image smooth="false"
+                                                       url="@/jloda/resources/icons/sun/Save16.gif"/>
+                                            </ImageView>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Save file"/>
+                                        </tooltip>
+                                    </Button>
+                                    <Button fx:id="printButton" contentDisplay="GRAPHIC_ONLY"
+                                            maxHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                                            text="Print">
+                                        <font>
+                                            <Font size="10.0"/>
+                                        </font>
+                                        <graphic>
+                                            <ImageView fitHeight="16.0" fitWidth="16.0"
+                                                       pickOnBounds="true" preserveRatio="true">
+                                                <Image smooth="false"
+                                                       url="@/jloda/resources/icons/sun/Print16.gif"/>
+                                            </ImageView>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Print the selected tab"/>
+                                        </tooltip>
+                                    </Button>
+                                    <BorderPane.margin>
+                                        <Insets/>
+                                    </BorderPane.margin>
+                                </ToolBar>
+                            </top>
+                        </BorderPane>
+                    </AnchorPane>
+                    <AnchorPane fx:id="rightAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0"
+                                prefWidth="100.0">
+                        <BorderPane fx:id="mainBorderPane" AnchorPane.bottomAnchor="0.0"
+                                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                    AnchorPane.topAnchor="0.0">
                             <padding>
-                                <Insets bottom="2.0" right="50.0" top="2.0"/>
+                                <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                             </padding>
-                        </FlowPane>
-                        <VBox alignment="BOTTOM_CENTER" HBox.hgrow="SOMETIMES">
-                            <HBox.margin>
-                                <Insets/>
-                            </HBox.margin>
-                            <children>
-                                <Label fx:id="memoryLabel" alignment="CENTER_RIGHT" text="Memory" textFill="DARKGRAY">
-                                    <font>
-                                        <Font size="12.0"/>
-                                    </font>
-                                    <VBox.margin>
-                                        <Insets bottom="5.0" right="16.0"/>
-                                    </VBox.margin>
-                                </Label>
-                            </children>
-                        </VBox>
-                    </children>
-                </HBox>
-            </bottom>
-        </BorderPane>
-    </children>
+                            <center>
+                                <TabPane prefHeight="200.0" prefWidth="200.0"
+                                         tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER"/>
+                            </center>
+                        </BorderPane>
+                    </AnchorPane>
+                </SplitPane>
+                <Button fx:id="openCloseLeftButton" contentDisplay="CENTER" maxHeight="10.0" maxWidth="10.0"
+                        mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0"
+                        style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;"
+                        AnchorPane.leftAnchor="-6.0" AnchorPane.topAnchor="10.0">
+                    <font>
+                        <Font size="10.0"/>
+                    </font>
+                    <tooltip>
+                        <Tooltip text="Open or close the side bar"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="openCloseRightButton" contentDisplay="CENTER" maxHeight="10.0" maxWidth="10.0"
+                        mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0" rotate="-90.0"
+                        style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;"
+                        AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="-6.0">
+                    <font>
+                        <Font size="10.0"/>
+                    </font>
+                    <tooltip>
+                        <Tooltip text="Open or close the algorithm tabs"/>
+                    </tooltip>
+                </Button>
+            </AnchorPane>
+        </center>
+        <bottom>
+            <HBox minHeight="-Infinity" spacing="5.0"
+                  style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
+                  BorderPane.alignment="BOTTOM_CENTER">
+                <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="30.0" vgap="5.0" HBox.hgrow="ALWAYS">
+                    <padding>
+                        <Insets bottom="2.0" right="50.0" top="2.0"/>
+                    </padding>
+                </FlowPane>
+                <VBox alignment="BOTTOM_CENTER" HBox.hgrow="SOMETIMES">
+                    <HBox.margin>
+                        <Insets/>
+                    </HBox.margin>
+                    <Label fx:id="memoryLabel" alignment="CENTER_RIGHT" text="Memory" textFill="DARKGRAY">
+                        <font>
+                            <Font size="12.0"/>
+                        </font>
+                        <VBox.margin>
+                            <Insets bottom="5.0" right="16.0"/>
+                        </VBox.margin>
+                    </Label>
+                </VBox>
+            </HBox>
+        </bottom>
+    </BorderPane>
 </AnchorPane>

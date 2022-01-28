@@ -76,7 +76,7 @@ public class ComputeHybridNumber {
      * @param progressListener
      * @return hybrid number
      */
-    public static int apply(PhyloTree tree1, PhyloTree tree2, ProgressListener progressListener) throws IOException, CanceledException {
+    public static int apply(PhyloTree tree1, PhyloTree tree2, ProgressListener progressListener) throws IOException {
         progressListener.setTasks("Computing hybrid number", "(Unknown how long this will really take)");
         ComputeHybridNumber computeHybridNumber = new ComputeHybridNumber(progressListener);
         computeHybridNumber.run(tree1, tree2, new TaxaBlock());
@@ -92,7 +92,7 @@ public class ComputeHybridNumber {
      * @param bestScore
      * @return hybrid number
      */
-    public static int apply(PhyloTree tree1, PhyloTree tree2, ProgressListener progressListener, int bestScore) throws IOException, CanceledException {
+    public static int apply(PhyloTree tree1, PhyloTree tree2, ProgressListener progressListener, int bestScore) throws IOException {
         ComputeHybridNumber computeHybridNumber = new ComputeHybridNumber(progressListener);
         computeHybridNumber.bestScore.set(bestScore);
         computeHybridNumber.run(tree1, tree2, new TaxaBlock());
@@ -106,7 +106,7 @@ public class ComputeHybridNumber {
      * @param tree2
      * @return reduced trees
      */
-    int run(PhyloTree tree1, PhyloTree tree2, TaxaBlock allTaxa) throws IOException, CanceledException {
+    int run(PhyloTree tree1, PhyloTree tree2, TaxaBlock allTaxa) throws IOException {
         if (!initialized) {
             initialized = true;
             progressListener.setMaximum(20);
@@ -218,7 +218,7 @@ public class ComputeHybridNumber {
      * @param scoreAbove
      * @param additionalAbove
      */
-    private int computeHybridNumberRec(final Root root1, final Root root2, boolean isReduced, Integer previousHybrid, BitSet retry, final boolean topLevel, final int scoreAbove, final ValuesList additionalAbove) throws IOException, CanceledException {
+    private int computeHybridNumberRec(final Root root1, final Root root2, boolean isReduced, Integer previousHybrid, BitSet retry, final boolean topLevel, final int scoreAbove, final ValuesList additionalAbove) throws IOException {
         if (System.currentTimeMillis() > nextTime) {
             synchronized (progressListener) {
                 nextTime += waitTime;
@@ -267,7 +267,7 @@ public class ComputeHybridNumber {
                     break;
             }
 
-            Single<Integer> placeHolderTaxa = new Single<Integer>();
+            Single<Integer> placeHolderTaxa = new Single<>();
             final Pair<Root, Root> clusterTrees = ClusterReduction.apply(root1, root2, placeHolderTaxa);
             final boolean retryTop = false && (previousHybrid != null && placeHolderTaxa.get() < previousHybrid);
             // if the taxa involved in the cluster reduction come before the previously removed hybrid, do full retry

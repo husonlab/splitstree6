@@ -84,9 +84,7 @@ public class ComputeHeightAndAngles {
 		ComputeHeightAndAngles.apply(tree, nodeAngleMap, averaging);
 		var max = tree.nodeStream().filter(tree::isLsaLeaf).mapToDouble(nodeAngleMap::get).max().orElse(0);
 		var factor = 360.0 / max;
-		for (var v : nodeAngleMap.keySet()) {
-			nodeAngleMap.put(v, nodeAngleMap.get(v) * factor);
-		}
+        nodeAngleMap.replaceAll((v, value) -> value * factor);
 	}
 
 	/**

@@ -93,57 +93,57 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 			optionSetSiteVarParamsProperty().removeListener(listenerSetSiteVarParams);
 		// setup set Parameters control:
 		listenerSetSiteVarParams = (c, o, n) -> {
-			switch (n) {
-				case defaultValues: {
-					setOptionPropInvariableSites(DEFAULT_PROP_INVARIABLE_SITES);
-					setOptionGamma(DEFAULT_GAMMA);
-					break;
-				}
-				case fromChars: {
-					final AService<Double> service = new AService<>(() -> {
-						// todo: want this to run in foot pane
-						try (ProgressPercentage progress = new ProgressPercentage(CaptureRecapture.DESCRIPTION)) {
-							final CaptureRecapture captureRecapture = new CaptureRecapture();
-							return captureRecapture.estimatePropInvariableSites(progress, parent);
-						}
-					});
-					service.setOnSucceeded((e) -> setOptionPropInvariableSites(service.getValue()));
-					service.setOnFailed((e) -> {
-						NotificationManager.showError("Calculation of proportion of invariable sites failed: " + service.getException().getMessage());
-					});
-					service.start();
-					break;
-				}
-			}
-		};
+            switch (n) {
+                case defaultValues -> {
+                    setOptionPropInvariableSites(DEFAULT_PROP_INVARIABLE_SITES);
+                    setOptionGamma(DEFAULT_GAMMA);
+                    break;
+                }
+                case fromChars -> {
+                    final AService<Double> service = new AService<>(() -> {
+                        // todo: want this to run in foot pane
+                        try (ProgressPercentage progress = new ProgressPercentage(CaptureRecapture.DESCRIPTION)) {
+                            final CaptureRecapture captureRecapture = new CaptureRecapture();
+                            return captureRecapture.estimatePropInvariableSites(progress, parent);
+                        }
+                    });
+                    service.setOnSucceeded((e) -> setOptionPropInvariableSites(service.getValue()));
+                    service.setOnFailed((e) -> {
+                        NotificationManager.showError("Calculation of proportion of invariable sites failed: " + service.getException().getMessage());
+                    });
+                    service.start();
+                    break;
+                }
+            }
+        };
 		optionSetSiteVarParamsProperty().addListener(listenerSetSiteVarParams);
 
 		if (listenerSetBaseFrequencies != null)
 			optionSetBaseFrequenciesProperty().removeListener(listenerSetBaseFrequencies);
 		// setup set Parameters control:
 		listenerSetBaseFrequencies = (c, o, n) -> {
-			switch (n) {
-				case defaultValues: {
-					setOptionBaseFrequencies(DEFAULT_BASE_FREQ);
-					setOptionRateMatrix(DEFAULT_RATE_MATRIX);
-					setOptionTsTvRatio(DEFAULT_TSTV_RATIO);
-					setOptionACvATRatio(DEFAULT_AC_VS_AT);
-					break;
-				}
-				case fromChars: {
-					final AService<double[]> service = new AService<>(() -> NucleotideModel.computeFreqs(parent, false));
-					service.setOnSucceeded((e) -> setOptionBaseFrequencies(service.getValue()));
-					service.setOnFailed((e) -> {
-						NotificationManager.showError("Calculation of base frequencies failed: " + service.getException().getMessage());
-					});
-					service.start();
+            switch (n) {
+                case defaultValues -> {
+                    setOptionBaseFrequencies(DEFAULT_BASE_FREQ);
+                    setOptionRateMatrix(DEFAULT_RATE_MATRIX);
+                    setOptionTsTvRatio(DEFAULT_TSTV_RATIO);
+                    setOptionACvATRatio(DEFAULT_AC_VS_AT);
+                    break;
+                }
+                case fromChars -> {
+                    final AService<double[]> service = new AService<>(() -> NucleotideModel.computeFreqs(parent, false));
+                    service.setOnSucceeded((e) -> setOptionBaseFrequencies(service.getValue()));
+                    service.setOnFailed((e) -> {
+                        NotificationManager.showError("Calculation of base frequencies failed: " + service.getException().getMessage());
+                    });
+                    service.start();
 
-					// todo: don't know how to estimate QMatrix from data, ask Dave!
-					setOptionRateMatrix(DEFAULT_RATE_MATRIX);
-					break;
-				}
-			}
-		};
+                    // todo: don't know how to estimate QMatrix from data, ask Dave!
+                    setOptionRateMatrix(DEFAULT_RATE_MATRIX);
+                    break;
+                }
+            }
+        };
 		optionSetBaseFrequenciesProperty().addListener(listenerSetBaseFrequencies);
 	}
 

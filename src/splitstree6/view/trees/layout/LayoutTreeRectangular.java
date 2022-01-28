@@ -54,19 +54,17 @@ public class LayoutTreeRectangular {
 					tree.postorderTraversal(v -> {
 						if (v.isLeaf())
 							levels.put(v, 0);
-						else {
-							var level = 0;
-							for (var w : v.children()) {
-								level = Math.max(level, levels.get(w));
-							}
-							var prev = (levels.get(v) != null ? levels.get(v) : 0);
-							if (level + 1 > prev)
-								levels.set(v, level + 1);
-						}
-					});
-					LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
-						nodePointMap.put(v, new Point2D(-levels.get(v), yCoord.get(v)));
-					});
+                        else {
+                            var level = 0;
+                            for (var w : v.children()) {
+                                level = Math.max(level, levels.get(w));
+                            }
+                            var prev = (levels.get(v) != null ? levels.get(v) : 0);
+                            if (level + 1 > prev)
+                                levels.set(v, level + 1);
+                        }
+                    });
+                    LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> nodePointMap.put(v, new Point2D(-levels.get(v), yCoord.get(v))));
 				}
 			}
 		}

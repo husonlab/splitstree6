@@ -1,21 +1,21 @@
 module splitstreesix {
-	requires transitive jloda;
-	requires transitive javafx.controls;
-	requires transitive javafx.graphics;
-	requires transitive javafx.fxml;
-	requires transitive javafx.web;
-	requires transitive java.sql;
-	requires transitive java.desktop;
+    requires transitive jloda;
+    requires transitive javafx.controls;
+    requires transitive javafx.graphics;
+    requires transitive javafx.fxml;
+    requires javafx.base;
+    requires java.xml;
+    requires transitive java.desktop;
 
-	requires Jama;
-	requires richtextfx.fat;
-	requires org.apache.commons.collections4;
+    requires Jama;
+    requires richtextfx.fat;
+    requires org.apache.commons.collections4;
 
-	opens splitstree6.resources.css;
-	opens splitstree6.resources.icons;
-	opens splitstree6.resources.images;
+    opens splitstree6.resources.css;
+    opens splitstree6.resources.icons;
+    opens splitstree6.resources.images;
 
-	opens splitstree6.algorithms.characters.characters2characters;
+    opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
 	opens splitstree6.algorithms.characters.characters2network;
 	opens splitstree6.algorithms.characters.characters2view;

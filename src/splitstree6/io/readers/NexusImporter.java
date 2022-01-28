@@ -41,7 +41,7 @@ public class NexusImporter {
 		try (var np = new NexusStreamParser(FileUtils.getReaderPossiblyZIPorGZIP(fileName))) {
 			np.matchIgnoreCase("#nexus");
 
-			List<String> taxLabels = null;
+			List<String> taxLabels;
 
 			if (np.isAtBeginOfBlock("SplitsTree6") || np.isAtBeginOfBlock("SplitsTree5")) {
 				np.skipBlock();

@@ -39,7 +39,6 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.AlgorithmNode;
 
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -86,7 +85,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, TreesBlock outputData) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, TreesBlock outputData) {
 		var trees = outputData.getTrees();
 		trees.clear();
 
