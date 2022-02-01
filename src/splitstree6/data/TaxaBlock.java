@@ -23,14 +23,11 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
-import java.io.IOException;
 import java.util.*;
 
 public class TaxaBlock extends DataBlock {
@@ -38,8 +35,9 @@ public class TaxaBlock extends DataBlock {
 
 	private int ntax;
 	private final ObservableList<Taxon> taxa;
-	private final ObservableMap<Taxon, Integer> taxon2index;
-	private final ObservableMap<String, Taxon> name2taxon;
+	private final ObservableList<Taxon> unmodifiableTaxa;
+	private final Map<Taxon, Integer> taxon2index;
+	private final Map<String, Taxon> name2taxon;
 
 	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
 
@@ -48,19 +46,10 @@ public class TaxaBlock extends DataBlock {
 	 */
 	public TaxaBlock() {
 		taxa = FXCollections.observableArrayList();
-		taxon2index = FXCollections.observableHashMap();
-		name2taxon = FXCollections.observableHashMap();
-
-		taxa.addListener((ListChangeListener<Taxon>) c -> {
-            taxon2index.clear();
-            name2taxon.clear();
-            for (int t = 1; t <= getNtax(); t++) {
-                final Taxon taxon = taxa.get(t - 1);
-                taxon2index.put(taxon, t - 1);
-                name2taxon.put(taxon.getName(), taxon);
-            }
-        });
-        taxa.addListener((InvalidationListener) observable -> ntax = size());
+		unmodifiableTaxa = FXCollections.unmodifiableObservableList(taxa);
+		taxon2index = new HashMap<>();
+		name2taxon = new HashMap<>();
+		unmodifiableTaxa.addListener((InvalidationListener) observable -> ntax = size());
 	}
 
 	public TaxaBlock(TaxaBlock that) {
@@ -74,11 +63,12 @@ public class TaxaBlock extends DataBlock {
 	 * @param src copy from here
 	 */
 	public void copy(TaxaBlock src) {
-		final ArrayList<Taxon> newTaxa = new ArrayList<>();
-		for (Taxon srcTaxon : src.taxa) {
-			newTaxa.add((new Taxon(srcTaxon)));
-		}
-		taxa.setAll(newTaxa);
+		clear();
+		taxa.setAll(src.taxa);
+		taxon2index.clear();
+		taxon2index.putAll(src.taxon2index);
+		name2taxon.clear();
+		name2taxon.putAll(src.name2taxon);
 		traitsBlock.set(src.traitsBlock.get());
 	}
 
@@ -182,14 +172,18 @@ public class TaxaBlock extends DataBlock {
 	 *
 	 * @return taxa
 	 */
-	public List<Taxon> getTaxa() {
-		return taxa;
+	public ObservableList<Taxon> getTaxa() {
+		return unmodifiableTaxa;
 	}
 
 	public void addTaxaByNames(Collection<String> taxonNames) {
 		for (String name : taxonNames) {
-			if (!name2taxon.containsKey(name))
-				getTaxa().add(new Taxon(name));
+			if (!name2taxon.containsKey(name)) {
+				var taxon = new Taxon(name);
+				name2taxon.put(name, taxon);
+				taxon2index.put(taxon, taxa.size());
+				taxa.add(taxon);
+			}
 		}
 	}
 
@@ -203,8 +197,8 @@ public class TaxaBlock extends DataBlock {
         String name = name0;
         while (name2taxon.containsKey(name)) {
             name = name0 + "-" + (count++);
-        }
-        getTaxa().add(new Taxon(name));
+		}
+		addTaxaByNames(List.of(name));
     }
 
 	/**
@@ -225,15 +219,33 @@ public class TaxaBlock extends DataBlock {
 	}
 
 	/**
-	 * adds a taxon. Throws an exception if name already present
+	 * Adds taxa. Throws an exception if name already present
 	 *
-	 * @param taxon
-	 * @throws IOException taxon name already present
+	 * @param add
+	 * @throws RuntimeException taxon name already present
 	 */
-	public void add(Taxon taxon) throws IOException {
+	public void add(Collection<Taxon> add) {
+		for (var taxon : add) {
+			if (taxa.contains(taxon))
+				throw new RuntimeException("Duplicate taxon name: " + taxon.getName());
+			name2taxon.put(taxon.getName(), taxon);
+			taxon2index.put(taxon, taxa.size());
+			taxa.add(taxon);
+		}
+	}
+
+	/**
+	 * Adds a taxon
+	 *
+	 * @throws RuntimeException taxon name already present
+	 */
+	public void add(Taxon taxon) {
 		if (taxa.contains(taxon))
-			throw new IOException("Duplicate taxon name: " + taxon.getName());
+			throw new RuntimeException("Duplicate taxon name: " + taxon.getName());
+		name2taxon.put(taxon.getName(), taxon);
+		taxon2index.put(taxon, taxa.size());
 		taxa.add(taxon);
+
 	}
 
 	/**
@@ -272,10 +284,10 @@ public class TaxaBlock extends DataBlock {
 	}
 
 	/**
-	 * get the current set of taxa as a bit set
+	 * get the current set of taxa as a bit set, 1-based
 	 */
 	public BitSet getTaxaSet() {
-		final BitSet taxa = new BitSet();
+		final var taxa = new BitSet();
 		taxa.set(1, getNtax() + 1);
 		return taxa;
 	}
@@ -300,7 +312,7 @@ public class TaxaBlock extends DataBlock {
 	 * @return true, if some taxon has info
 	 */
 	public static boolean hasDisplayLabels(TaxaBlock taxaBlock) {
-		for (int t = 1; t <= taxaBlock.getNtax(); t++)
+		for (var t = 1; t <= taxaBlock.getNtax(); t++)
 			if (taxaBlock.get(t).getDisplayLabel() != null)
 				return true;
 		return false;
@@ -312,7 +324,7 @@ public class TaxaBlock extends DataBlock {
 	 * @return true, if some taxon has info
 	 */
 	public static boolean hasInfos(TaxaBlock taxaBlock) {
-		for (int t = 1; t <= taxaBlock.getNtax(); t++)
+		for (var t = 1; t <= taxaBlock.getNtax(); t++)
 			if (taxaBlock.get(t).getInfo() != null && taxaBlock.get(t).getInfo().length() > 0)
 				return true;
 		return false;

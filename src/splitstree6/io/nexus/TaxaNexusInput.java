@@ -59,7 +59,7 @@ public class TaxaNexusInput extends NexusIOBase {
     public void parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
         final var taxonNamesFound = new ArrayList<String>();
 
-        taxaBlock.getTaxa().clear();
+        taxaBlock.clear();
 
         np.setCollectAllComments(true);
 

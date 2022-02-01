@@ -39,17 +39,18 @@ public class TaxaEditor extends Taxa2Taxa implements IFilter {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputData, TaxaBlock outputData) {
 		final Map<String, String> name2displayLabel = new HashMap<>();
-		for (int t = 1; t <= inputData.getNtax(); t++) {
+		for (var t = 1; t <= inputData.getNtax(); t++) {
 			final Taxon taxon = inputData.get(t);
 			name2displayLabel.put(taxon.getName(), taxon.getDisplayLabel());
 		}
-		outputData.getTaxa().clear();
 
 		if (getNumberDisabledTaxa() == 0) {
-			outputData.getTaxa().addAll(inputData.getTaxa());
+			outputData.copy(inputData);
 			setShortDescription(StringUtils.fromCamelCase(getClass().getSimpleName()));
 		} else {
-			for (String name : inputData.getLabels()) {
+			outputData.clear();
+
+			for (var name : inputData.getLabels()) {
 				if (!isDisabled(name)) {
 					outputData.addTaxaByNames(Collections.singleton(name));
 					if (inputData.get(name).getDisplayLabel() != null)
