@@ -209,4 +209,9 @@ public class TreePane extends StackPane {
 	public StringProperty infoStringProperty() {
 		return infoString;
 	}
+
+	public void updateLabelLayout(LayoutOrientation orientation) {
+		if (orientationConsumer != null)
+			orientationConsumer.accept(orientation);
+	}
 }

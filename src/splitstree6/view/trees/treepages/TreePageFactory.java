@@ -32,6 +32,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Callback;
+import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
@@ -137,5 +138,11 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			update();
 		}
 		return gridPane.get();
+	}
+
+	public void updateLabelLayout(LayoutOrientation orientation) {
+		for (var treePane : BasicFX.getAllRecursively(gridPane.get(), TreePane.class)) {
+			treePane.updateLabelLayout(orientation);
+		}
 	}
 }

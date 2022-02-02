@@ -227,10 +227,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
-		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor(1.2 * splitsView.getOptionFontScaleFactor()));
-		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
-		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor((1.0 / 1.2) * splitsView.getOptionFontScaleFactor()));
-		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor(1.2 * splitsView.getOptionFontScaleFactor()));
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor((1.0 / 1.2) * splitsView.getOptionFontScaleFactor()));
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
@@ -253,10 +253,19 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
-        mainController.getLayoutLabelsMenuItem().setOnAction(e -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation())));
-        mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> {
+			Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation()));
+		});
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(splitsView.optionUseWeightsProperty().not());
+
+		mainController.getRotateLeftMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateLeft()));
+		mainController.getRotateLeftMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainController.getRotateRightMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateRight()));
+		mainController.getRotateRightMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainController.getFlipMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getFlip()));
+		mainController.getFlipMenuItem().disableProperty().bind(splitsView.emptyProperty());
 	}
 }

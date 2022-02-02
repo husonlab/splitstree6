@@ -27,6 +27,7 @@ import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
 
 public class AlgorithmItemPresenter {
@@ -45,7 +46,10 @@ public class AlgorithmItemPresenter {
 
 
 		controller.getEditButton().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(node, true));
-		controller.getEditButton().disableProperty().bind(selected.not());
+		if (algorithmItem.getWorkflowNode().getAlgorithm() instanceof DataTaxaFilter)
+			controller.getEditButton().setDisable(true);
+		else
+			controller.getEditButton().disableProperty().bind(selected.not());
 
 		controller.getPlayButton().setOnAction(e -> node.restart());
 		controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().not().and(node.allParentsValidProperty()).and(selected)).not());

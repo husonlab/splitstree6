@@ -215,6 +215,10 @@ public class TanglegramView implements IView {
 		return optionOrientation;
 	}
 
+	public void setOptionOrientation(LayoutOrientation optionOrientation) {
+		this.optionOrientation.set(optionOrientation);
+	}
+
 	public TreeDiagramType getOptionDiagram2() {
 		return optionDiagram2.get();
 	}

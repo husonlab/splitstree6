@@ -63,16 +63,12 @@ public final class ASplit implements Comparable<ASplit> {
 	 * @param weight
 	 */
 	public ASplit(BitSet A, int ntax, double weight, double confidence) {
-		this.A = new BitSet();
-		this.B = new BitSet();
+		this.A = BitSetUtils.copy(A);
+		this.B = BitSetUtils.copy(A);
 		if (A.get(1)) {
-			this.A.or(A);
-			this.B.or(A);
 			this.B.flip(1, ntax + 1);
 		} else {
-			this.A.or(A);
 			this.A.flip(1, ntax + 1);
-			this.B.or(A);
 		}
 		this.weight = weight;
 		this.confidence = confidence;
@@ -123,7 +119,7 @@ public final class ASplit implements Comparable<ASplit> {
 	}
 
 	public static int compare(ASplit a, ASplit b) {
-		int com = BitSetUtils.compare(a.getA(), b.getA());
+		var com = BitSetUtils.compare(a.getA(), b.getA());
 		if (com == 0)
 			com = BitSetUtils.compare(a.getB(), b.getB());
 		return com;
@@ -242,9 +238,9 @@ public final class ASplit implements Comparable<ASplit> {
 	}
 
 	public String toString() {
-		final StringBuilder buf = new StringBuilder();
-		boolean first = true;
-		for (int t = A.nextSetBit(0); t != -1; t = A.nextSetBit(t + 1)) {
+		final var buf = new StringBuilder();
+		var first = true;
+		for (var t : BitSetUtils.members(A)) {
 			if (first)
 				first = false;
 			else
@@ -269,7 +265,7 @@ public final class ASplit implements Comparable<ASplit> {
 	}
 
 	public ASplit clone() {
-		ASplit result = new ASplit(this.getA(), this.ntax());
+		var result = new ASplit(this.getA(), this.ntax());
 		result.setWeight(this.getWeight());
 		result.setConfidence(this.getConfidence());
 		result.setLabel(this.label);
@@ -277,7 +273,7 @@ public final class ASplit implements Comparable<ASplit> {
 	}
 
 	public int compareTo(ASplit other) {
-		int result = BitSetUtils.compare(getPartContaining(1), other.getPartContaining(1));
+		var result = BitSetUtils.compare(getPartContaining(1), other.getPartContaining(1));
 		if (result == 0)
 			result = BitSetUtils.compare(getPartNotContaining(1), other.getPartNotContaining(1));
 		return result;

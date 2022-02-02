@@ -113,4 +113,43 @@ public enum LayoutOrientation {
 			}
 		}
 	}
+
+	public LayoutOrientation getRotateLeft() {
+		return switch (this) {
+			case Rotate0Deg -> Rotate90Deg;
+			case Rotate90Deg -> Rotate180Deg;
+			case Rotate180Deg -> Rotate270Deg;
+			case Rotate270Deg -> Rotate0Deg;
+			case FlipRotate0Deg -> FlipRotate90Deg;
+			case FlipRotate90Deg -> FlipRotate180Deg;
+			case FlipRotate180Deg -> FlipRotate270Deg;
+			case FlipRotate270Deg -> FlipRotate0Deg;
+		};
+	}
+
+	public LayoutOrientation getRotateRight() {
+		return switch (this) {
+			case Rotate0Deg -> Rotate270Deg;
+			case Rotate90Deg -> Rotate0Deg;
+			case Rotate180Deg -> Rotate90Deg;
+			case Rotate270Deg -> Rotate180Deg;
+			case FlipRotate0Deg -> FlipRotate270Deg;
+			case FlipRotate90Deg -> FlipRotate0Deg;
+			case FlipRotate180Deg -> FlipRotate90Deg;
+			case FlipRotate270Deg -> FlipRotate180Deg;
+		};
+	}
+
+	public LayoutOrientation getFlip() {
+		return switch (this) {
+			case Rotate0Deg -> FlipRotate0Deg;
+			case Rotate90Deg -> FlipRotate90Deg;
+			case Rotate180Deg -> FlipRotate180Deg;
+			case Rotate270Deg -> FlipRotate270Deg;
+			case FlipRotate0Deg -> Rotate0Deg;
+			case FlipRotate90Deg -> Rotate90Deg;
+			case FlipRotate180Deg -> Rotate180Deg;
+			case FlipRotate270Deg -> Rotate270Deg;
+		};
+	}
 }

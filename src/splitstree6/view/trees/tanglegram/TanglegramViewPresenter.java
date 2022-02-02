@@ -381,5 +381,14 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
 		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+
+		mainController.getFlipMenuItem().setOnAction(e -> {
+			if (tanglegramView.getOptionOrientation() == Rotate0Deg)
+				tanglegramView.setOptionOrientation(FlipRotate180Deg);
+			else
+				tanglegramView.setOptionOrientation(Rotate0Deg);
+		});
+		mainController.getFlipMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
+
 	}
 }

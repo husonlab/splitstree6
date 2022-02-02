@@ -209,9 +209,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		findToolBar.setShowFindToolBar(false);
 
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindButton().setOnAction(e -> {
-			findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar());
-		});
+		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
 
 
 		controller.getZoomInButton().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
@@ -240,7 +238,9 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 	@Override
 	public void setupMenuItems() {
-		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
+		var mainController = mainWindow.getController();
+
+		mainController.getCopyNewickMenuItem().setOnAction(e -> {
 			var page = treePageView.getPageNumber();
 			var count = treePageView.getOptionCols() * treePageView.getOptionRows();
 			var bot = (page - 1) * count;
@@ -251,7 +251,21 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			}
 			BasicFX.putTextOnClipBoard(buf.toString());
 		});
-		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getCopyNewickMenuItem().disableProperty().bind(treePageView.emptyProperty());
+
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor(1.2 * treePageView.getOptionFontScaleFactor()));
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
+
+		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
+		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomInButton().disableProperty());
+		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
+		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
+
+		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
+		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor(1.2 * treePageView.getOptionFontScaleFactor()));
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());

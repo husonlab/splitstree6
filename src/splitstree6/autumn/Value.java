@@ -53,15 +53,16 @@ public class Value extends Single<Integer> {
 	}
 
 	/**
-     * synchronized set
-     *
-     * @param value
-     */
-    public void set(Integer value) {
-        synchronized (this) {
-            super.set(value);
-        }
-    }
+	 * synchronized set
+	 *
+	 * @param value
+	 */
+	public Integer set(Integer value) {
+		synchronized (this) {
+			super.set(value);
+		}
+		return value;
+	}
 
 	/**
 	 * set to lower value. If value is not lower, does nothing
