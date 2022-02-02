@@ -51,9 +51,6 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
 	/**
 	 * computes a post-order numbering of all nodes, avoiding edges that are only contained in tree2
 	 *
-	 * @param v
-	 * @param order
-	 * @param postOrderNumber
 	 * @return taxa below
 	 */
 	private static BitSet computePostOrderNumberingRec(PhyloTree tree, Node v, TaxaBlock allTaxa, final Map<Node, Integer> order, Single<Integer> postOrderNumber) throws IOException {
@@ -73,12 +70,7 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
                 int id1 = pair1.getSecond().getId();
                 int id2 = pair2.getSecond().getId();
 
-                if (id1 < id2)
-                    return -1;
-                else if (id1 > id2)
-                    return 1;
-                else
-                    return 0;
+				return Integer.compare(id1, id2);
             });
 
 			// first visit the children:
@@ -137,13 +129,8 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
             if (rank1 < rank2)
                 return -1;
             else if (rank1 > rank2)
-                return 1;
-            else if (e1.getId() < e2.getId())
-                return -1;
-            else if (e1.getId() > e2.getId())
-                return 1;
-            else
-                return 0;
+				return 1;
+			else return Integer.compare(e1.getId(), e2.getId());
         });
 		var list = new LinkedList<>(Arrays.asList(array));
 		if (v.getInDegree() > 0)

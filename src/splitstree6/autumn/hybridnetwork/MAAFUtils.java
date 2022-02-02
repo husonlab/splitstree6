@@ -32,8 +32,6 @@ public class MAAFUtils {
     /**
      * if there is more than one network for the same MAAF, removes all but one of them
      *
-     * @param networks
-     * @param verbose
      * @return number of networks removed
      */
     public static int removeDuplicateMAAFs(Set<Root> networks, boolean verbose) {
@@ -70,7 +68,6 @@ public class MAAFUtils {
     /**
      * computes all maafs as trees
      *
-     * @param networks
      * @return MAAFs  (each as a tree in which an auxiliary root is connected to all subtrees)
      */
     public static Collection<Root> computeAllMAAFs(Set<Root> networks) {
@@ -89,7 +86,6 @@ public class MAAFUtils {
     /**
      * computes the MAAF for the given network. Note that all components of the MAAF are attached below an auxiliary root node
      *
-     * @param network
      * @param extendedMAAF if true, compute extended MAAF in which all unlabeled nodes of outdegree 0 are kept
      * @return MAAF
      */

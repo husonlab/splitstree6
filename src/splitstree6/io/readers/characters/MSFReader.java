@@ -74,7 +74,7 @@ public class MSFReader extends CharactersReader {
 					tokens.nextToken();
 					String taxon = tokens.nextToken();
 
-					if (taxa2seq.keySet().contains(taxon))
+					if (taxa2seq.containsKey(taxon))
 						throw new IOExceptionWithLineNumber("Repeated taxon name", linesCounter);
 
 					taxaBlock.add(new Taxon(taxon));

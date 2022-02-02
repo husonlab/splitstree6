@@ -153,8 +153,6 @@ public abstract class ProteinModel implements SubstitutionModel {
 	/**
 	 * Get an entry in the Q matrix (can involve computation)
 	 *
-	 * @param i
-	 * @param j
 	 * @return Q[i][j]
 	 */
 	public double getQ(int i, int j) {

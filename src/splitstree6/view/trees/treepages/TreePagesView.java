@@ -112,9 +112,6 @@ public class TreePagesView implements IView {
 	/**
 	 * constructor
 	 *
-	 * @param mainWindow
-	 * @param name
-	 * @param viewTab
 	 */
 	public TreePagesView(MainWindow mainWindow, String name, ViewTab viewTab) {
 		this.name.set(name);

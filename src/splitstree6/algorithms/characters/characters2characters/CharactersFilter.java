@@ -94,7 +94,7 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 				}
 				if (isOptionExcludeConstantSites() && ch2count.size() == 1) {
 					columnMask.set(col);
-				} else if (isOptionExcludeParsimonyUninformativeSites() && ch2count.size() == 2 && ch2count.values().contains(1)) {
+				} else if (isOptionExcludeParsimonyUninformativeSites() && ch2count.size() == 2 && ch2count.containsValue(1)) {
 					columnMask.set(col);
 				}
 			}

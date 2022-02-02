@@ -35,7 +35,6 @@ public class Value extends Single<Integer> {
 	/**
 	 * constructor
 	 *
-	 * @param value
 	 */
 	public Value(Integer value) {
 		super(value);
@@ -55,7 +54,6 @@ public class Value extends Single<Integer> {
 	/**
 	 * synchronized set
 	 *
-	 * @param value
 	 */
 	public Integer set(Integer value) {
 		synchronized (this) {
@@ -67,7 +65,6 @@ public class Value extends Single<Integer> {
 	/**
 	 * set to lower value. If value is not lower, does nothing
 	 *
-	 * @param value
 	 */
 	public void lowerTo(int value) {
 		synchronized (this) {

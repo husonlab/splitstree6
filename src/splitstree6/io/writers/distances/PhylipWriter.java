@@ -53,7 +53,7 @@ public class PhylipWriter extends DistancesWriterBase {
 		if (!isOptionTriangular()) {
 			System.err.println("standard");
 			for (int i = 1; i <= distances.getDistances().length; i++) {
-				StringBuilder sequence = new StringBuilder("");
+				StringBuilder sequence = new StringBuilder();
 				for (int j = 1; j <= distances.getDistances()[i - 1].length; j++) {
 					sequence.append(String.format("%.5f ", distances.get(i, j)));
 				}
@@ -71,7 +71,7 @@ public class PhylipWriter extends DistancesWriterBase {
 			System.err.println("triangular");
 			w.write(taxa.getLabel(1) + "\n");
 			for (int i = 2; i <= distances.getDistances().length; i++) {
-				StringBuilder sequence = new StringBuilder("");
+				StringBuilder sequence = new StringBuilder();
 				for (int j = 1; j <= i - 1; j++) {
 					sequence.append(String.format("%.5f ", distances.get(i, j)));
 				}

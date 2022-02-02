@@ -130,11 +130,6 @@ public class ParsimonySplits extends Characters2Splits {
 	/**
 	 * Computes the p-index of a split:
 	 *
-	 * @param gapsAsMissing
-	 * @param t
-	 * @param A
-	 * @param characters
-	 * @return
 	 */
 	private int pIndex(boolean gapsAsMissing, int t, BitSet A, CharactersBlock characters) {
 		var value = Integer.MAX_VALUE;
@@ -164,13 +159,6 @@ public class ParsimonySplits extends Characters2Splits {
 	/**
 	 * Computes the parsimony-score for the four given taxa:
 	 *
-	 * @param gapMissingMode
-	 * @param a1
-	 * @param a2
-	 * @param b1
-	 * @param b2
-	 * @param characters
-	 * @return
 	 */
 	private int pScore(boolean gapMissingMode, int a1, int a2, int b1, int b2, CharactersBlock characters) {
 		final char missingChar = characters.getMissingCharacter();

@@ -145,7 +145,6 @@ public class ProteinMLdist extends Characters2Distances {
             case pmb -> new pmbModel();
             case Rhodopsin -> new RhodopsinModel();
             case WAG -> new WagModel();
-            default -> null;
         };
 
         return themodel;

@@ -151,7 +151,6 @@ public class SplitsUtilities {
 	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
 	 *
 	 * @param splits with 1-based taxa
-	 * @return distance matrix, 0-based
 	 */
 	public static void splitsToDistances(List<ASplit> splits, boolean useWeights, DistancesBlock distancesBlock) {
 		for (var split : splits) {
@@ -167,7 +166,6 @@ public class SplitsUtilities {
 	/**
 	 * normalize cycle so that it is lexicographically smallest
 	 *
-	 * @param cycle
 	 * @return normalized cycle
 	 */
 	public static int[] normalizeCycle(int[] cycle) {
@@ -208,9 +206,7 @@ public class SplitsUtilities {
 	/**
 	 * is split circular with respect to the given cycle?
 	 *
-	 * @param taxa
 	 * @param cycle uses indices 1 to number-of-taxa
-	 * @param split
 	 * @return true if circular
 	 */
 	public static boolean isCircular(TaxaBlock taxa, int[] cycle, ASplit split) {
@@ -229,9 +225,6 @@ public class SplitsUtilities {
 	/**
 	 * verify that all splits are proper and are contained in the taxon set
 	 *
-	 * @param splits
-	 * @param taxa
-	 * @throws SplitsException
 	 */
 	public static void verifySplits(Collection<ASplit> splits, TaxaBlock taxa) throws SplitsException {
 		final var seen = new HashSet<BitSet>();
@@ -268,8 +261,6 @@ public class SplitsUtilities {
 	/**
 	 * computes a tightest split around a subset of taxa
 	 *
-	 * @param splitsBlock
-	 * @param subset
 	 * @return a tightest split
 	 */
 	public static int getTighestSplit(SplitsBlock splitsBlock, BitSet subset) {

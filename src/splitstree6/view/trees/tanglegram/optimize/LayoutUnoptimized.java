@@ -40,9 +40,7 @@ public class LayoutUnoptimized {
     /**
      * compute standard embedding
      *
-     * @param tree
-     * @param progressListener
-     */
+	 */
     public void apply(PhyloTree tree, ProgressListener progressListener) {
         if (tree.getRoot() == null || tree.getNumberReticulateEdges() == 0) {
             tree.getLSAChildrenMap().clear();
@@ -77,10 +75,6 @@ public class LayoutUnoptimized {
     /**
      * recursively compute the pre-ordering numbering of all nodes below v
      *
-     * @param v
-     * @param visited
-     * @param ordering
-     * @param number
      * @return last number assigned
      */
     private int computePreOrderNumberingRec(PhyloTree tree, Node v, NodeSet visited, NodeIntArray ordering, int number) {
@@ -107,9 +101,7 @@ public class LayoutUnoptimized {
     /**
      * reorder LSA children of each node to reflect the topological embedding of the network
      *
-     * @param tree
-     * @param ordering
-     */
+	 */
     private void reorderLSAChildren(PhyloTree tree, final NodeIntArray ordering) {
         // System.err.println("------ v="+v);
         for (Node v = tree.getFirstNode(); v != null; v = tree.getNextNode(v)) {
@@ -147,7 +139,6 @@ public class LayoutUnoptimized {
     /**
      * does network only contain transfers?
      *
-     * @param tree
      * @return true, if is reticulate network that only contains
      */
     public static boolean isAllReticulationsAreTransfers(PhyloTree tree) {

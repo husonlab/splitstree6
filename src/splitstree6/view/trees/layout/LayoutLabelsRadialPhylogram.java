@@ -42,11 +42,6 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 	/**
 	 * setup labels for tree
 	 *
-	 * @param tree
-	 * @param nodeShapeMap
-	 * @param nodeLabelMap
-	 * @param nodeAngleMap
-	 * @param labelGap
 	 */
 	public LayoutLabelsRadialPhylogram(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap, double labelGap) {
 

@@ -26,7 +26,6 @@ import jloda.swing.util.ArgsOptions;
 import jloda.util.*;
 import jloda.util.progress.ProgressPercentage;
 
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.stream.Collectors;
 
@@ -34,9 +33,6 @@ public class Mash {
 	/**
 	 * runs the mash algorithm
 	 *
-	 * @param args
-	 * @throws UsageException
-	 * @throws IOException
 	 */
 	public static void main(String[] args) {
 		try {
@@ -57,10 +53,6 @@ public class Mash {
 	/**
 	 * run
 	 *
-	 * @param args
-	 * @throws UsageException
-	 * @throws IOException
-	 * @throws ClassNotFoundException
 	 */
 	private void run(String[] args) throws Exception {
 		final ArgsOptions options = new ArgsOptions(args, this, "Computes Mash sketches, Jaccard index and distances");

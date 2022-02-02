@@ -46,8 +46,6 @@ public class ComputeHeightAndAngles {
 	/**
 	 * compute the y-coordinates for the parallel view
 	 *
-	 * @param tree
-	 * @return y-coordinates
 	 */
 	public static void apply(PhyloTree tree, NodeDoubleArray nodeHeightMap, Averaging averaging) {
 		apply(tree, tree.getRoot(), nodeHeightMap, averaging);
@@ -90,7 +88,6 @@ public class ComputeHeightAndAngles {
 	/**
 	 * recursively compute the y coordinate for a parallel or triangular diagram
 	 *
-	 * @param v
 	 * @return index of last leaf
 	 */
 	private static int computeYCoordinateOfLeavesRec(PhyloTree tree, Node v, int leafNumber, NodeDoubleArray yCoord, List<Node> nodeOrder) {
@@ -110,8 +107,6 @@ public class ComputeHeightAndAngles {
 	/**
 	 * recursively compute the y coordinate for the internal nodes of a parallel diagram
 	 *
-	 * @param v
-	 * @param nodeHeightMap
 	 */
 	private static void computeHeightInternalNodesAsChildAverageRec(PhyloTree tree, Node v, NodeDoubleArray nodeHeightMap) {
 		if (v.getOutDegree() > 0) {
@@ -135,7 +130,6 @@ public class ComputeHeightAndAngles {
 	/**
 	 * fix spacing so that space between any two true leaves is 1
 	 *
-	 * @param leafOrder
 	 */
 	private static void fixSpacing(Collection<Node> leafOrder, NodeDoubleArray yCoord) {
 		var nodes = leafOrder.toArray(new Node[0]);

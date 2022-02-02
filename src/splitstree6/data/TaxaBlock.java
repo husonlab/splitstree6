@@ -204,7 +204,6 @@ public class TaxaBlock extends DataBlock {
 	/**
 	 * computes index map for modified block
 	 *
-	 * @param modifiedTaxaBlockBlock
 	 * @return modified map
 	 */
 	public Map<Integer, Integer> computeIndexMap(TaxaBlock modifiedTaxaBlockBlock) {
@@ -221,7 +220,6 @@ public class TaxaBlock extends DataBlock {
 	/**
 	 * Adds taxa. Throws an exception if name already present
 	 *
-	 * @param add
 	 * @throws RuntimeException taxon name already present
 	 */
 	public void add(Collection<Taxon> add) {

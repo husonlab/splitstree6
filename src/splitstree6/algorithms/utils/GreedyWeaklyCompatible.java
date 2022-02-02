@@ -37,10 +37,7 @@ public class GreedyWeaklyCompatible {
 	/**
 	 * computes greedily compatible splits
 	 *
-	 * @param progress
-	 * @param splits
 	 * @return compatible splits
-	 * @throws CanceledException
 	 */
 	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits) throws CanceledException {
 		progress.setSubtask("Greedy weakly compatible");

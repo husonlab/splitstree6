@@ -33,7 +33,6 @@ public class CircularSplitAlgorithms {
 	 *
 	 * @param n Number of taxa.
 	 * @param x vector with dimension n(n-1)/2
-	 * @return vector d is overwritten by vector A*x with dimension n(n-1)/2.
 	 */
 	static public void circularAx(int n, double[] x, double[] d) {
 		int npairs = n * (n - 1) / 2;
@@ -138,7 +137,6 @@ public class CircularSplitAlgorithms {
 	 *
 	 * @param n Number of taxa.
 	 * @param y vector with dimension n(n-1)/2
-	 * @return overwrite vector x=A\y which solves Ax = y. x has dimension n(n-1)/2
 	 */
 	static public void circularSolve(int n, double[] y, double[] x) {
 		int npairs = n * (n - 1) / 2;
@@ -176,7 +174,6 @@ public class CircularSplitAlgorithms {
 	 *
 	 * @param n Number of taxa.
 	 * @param x vector with dimension n(n-1)/2
-	 * @return overwrites vector y =  inv(A)'*x which has dimension n(n-1)/2
 	 */
 	static public void circularAinvT(int n, double[] x, double[] y) {
 		int npairs = n * (n - 1) / 2;

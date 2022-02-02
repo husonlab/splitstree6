@@ -177,9 +177,6 @@ public class NexusExporter {
 	/**
 	 * save an algorithms block
 	 *
-	 * @param w
-	 * @param algorithm
-	 * @throws IOException
 	 */
 	public void export(Writer w, Algorithm algorithm) throws IOException {
 		final AlgorithmNexusOutput output = new AlgorithmNexusOutput();

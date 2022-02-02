@@ -35,8 +35,6 @@ public class K3STmodel extends NucleotideModel {
 	 * Constructor taking ratio of transitions to transversions, as well
 	 * as the ratio of A<->T mutations to A<->C mutations.
 	 *
-	 * @param TsTv
-	 * @param ATvsAC
 	 */
 	public K3STmodel(double TsTv, double ATvsAC) {
 		super();
@@ -53,9 +51,6 @@ public class K3STmodel extends NucleotideModel {
 	 * just like the parameter kappa in Swofford et al, pg 434.
 	 * We fill in Q according to the standard model.
 	 *
-	 * @param AG_CT
-	 * @param AT_CG
-	 * @param AC_GT
 	 */
 	public K3STmodel(double AG_CT, double AT_CG, double AC_GT) {
 		InitK3ST(AG_CT, AT_CG, AC_GT);
@@ -85,9 +80,7 @@ public class K3STmodel extends NucleotideModel {
 	/**
 	 * compute exact value
 	 *
-	 * @param F
 	 * @return exact value
-	 * @throws SaturatedDistancesException
 	 */
 	@Override
 	public double exactDistance(double[][] F) throws SaturatedDistancesException {

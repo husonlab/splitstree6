@@ -142,7 +142,6 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	/**
 	 * build the incompatibility graph
 	 *
-	 * @param splits
 	 * @return incompatibility graph
 	 */
 	private Graph buildIncompatibilityGraph(List<ASplit> splits) {
@@ -167,7 +166,6 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	/**
 	 * computes the subgraph in which every node is contained in a d-clique
 	 *
-	 * @param graph
 	 * @param d     clique size
 	 */
 	private void computeDSubgraph(ProgressListener progress, Graph graph, int d) throws CanceledException {

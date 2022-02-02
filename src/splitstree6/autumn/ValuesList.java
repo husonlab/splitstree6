@@ -29,7 +29,6 @@ public class ValuesList extends LinkedList<Value> {
 	/**
 	 * make a copy that also contains the given value
 	 *
-	 * @param value
 	 * @return copy with value added
 	 */
 	public ValuesList copyWithAdditionalElement(Value value) {

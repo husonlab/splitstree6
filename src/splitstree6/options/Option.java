@@ -41,9 +41,6 @@ public class Option<T> {
 	/**
 	 * constructs an option
 	 *
-	 * @param property
-	 * @param name
-	 * @param toolTipText
 	 */
 	Option(Property<T> property, String name, String toolTipText) {
 		this.property = property;
@@ -74,7 +71,6 @@ public class Option<T> {
 	 * gets all options associated with an optionable.
 	 * An option is given by a getOption/setOptionValue pair of methods
 	 *
-	 * @param optionable
 	 * @return options
 	 */
 	public static ArrayList<Option> getAllOptions(Object optionable) {
@@ -152,7 +148,6 @@ public class Option<T> {
 	/**
 	 * gets a mapping of names to options
 	 *
-	 * @param optionable
 	 * @return map
 	 */
 	public static Map<String, Option> getName2Options(Object optionable) {

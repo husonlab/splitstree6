@@ -80,7 +80,6 @@ public class SimpleNewickParser {
 	 * @param pos   current position in string
 	 * @param str   string
 	 * @return new current position
-	 * @throws IOException
 	 */
 	private int parseBracketNotationRecursively(int depth, Node v, int pos, String str) throws IOException {
 		try {

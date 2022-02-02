@@ -43,9 +43,7 @@ public class WorkflowNexusOutput {
 	/**
 	 * save the workflow in nexus format
 	 *
-	 * @param workflow
 	 * @param file     file or stdout
-	 * @throws IOException
 	 */
 	public void save(Workflow workflow, final File file, boolean asWorkflowOnly) throws IOException {
 		if (file.getParentFile() != null && file.getParentFile().isDirectory())
@@ -60,7 +58,6 @@ public class WorkflowNexusOutput {
 	/**
 	 * write a workflow
 	 *
-	 * @throws IOException
 	 */
 	public int save(Workflow workflow, Writer w, boolean asWorkflowOnly) throws IOException {
 		SplitsTree6Block splitsTree6Block = new SplitsTree6Block();
@@ -128,8 +125,6 @@ public class WorkflowNexusOutput {
 	/**
 	 * sets up the exporter so that it reports title and links
 	 *
-	 * @param dataNode
-	 * @param nexusExporter
 	 */
 	private void setupExporter(DataNode dataNode, NexusExporter nexusExporter) {
 		nexusExporter.setTitle(dataNode.getTitle());
@@ -140,8 +135,6 @@ public class WorkflowNexusOutput {
 	/**
 	 * sets up the exporter so that it reports title and links
 	 *
-	 * @param algorithmNode
-	 * @param nexusExporter
 	 */
 	private void setupExporter(AlgorithmNode algorithmNode, NexusExporter nexusExporter) {
 		nexusExporter.setTitle(algorithmNode.getTitle());

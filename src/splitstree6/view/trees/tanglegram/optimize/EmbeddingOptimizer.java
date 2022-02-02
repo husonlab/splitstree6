@@ -44,8 +44,6 @@ public class EmbeddingOptimizer {
 	/**
 	 * apply the embedding algorithm to a single tree
 	 *
-	 * @param tree
-	 * @param progressListener
 	 */
 	public static void apply(PhyloTree tree, ProgressListener progressListener) throws CanceledException {
 		if (printILP) {
@@ -69,10 +67,7 @@ public class EmbeddingOptimizer {
 	/**
      * apply the embedding algorithm to a whole set of trees
      *
-     * @param trees
-     * @param progressListener
-     * @param useFastAlignmentHeuristic
-     */
+	 */
     public static void apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
         if (progressListener != null) {
             progressListener.setTasks("Optimizing embedding", "Using Scornavacca, Zickmann & Huson, 2011");
@@ -423,11 +418,6 @@ public class EmbeddingOptimizer {
 	/**
 	 * fast heuristic that tries to rotate trees so that they match the given ordering
 	 *
-	 * @param trees
-	 * @param circularOrdering
-	 * @param idRho
-	 * @param taxon2Id
-	 * @param dummyLeaves
 	 */
 	private static void useFastAlignmentHeuristic(PhyloTree[] trees, int[] circularOrdering, int idRho, Map<String, Integer> taxon2Id, Vector<Node> dummyLeaves) {
 		var bestOrdering = getLinearOrderingId(circularOrdering, idRho);
@@ -473,8 +463,6 @@ public class EmbeddingOptimizer {
 	/**
 	 * gets the linear ordering starting at id idRho and excluding idRho
 	 *
-	 * @param circularOrdering
-	 * @param idRho
 	 * @return linear ordering
 	 */
 	private static int[] getLinearOrderingId(int[] circularOrdering, int idRho) {
@@ -499,8 +487,6 @@ public class EmbeddingOptimizer {
 	/**
 	 * recursively extends the taxa below map from leaves to all nodes
 	 *
-	 * @param v
-	 * @param taxaBelow
 	 */
 	public static void computeTaxaBelowRec(Node v, NodeArray<BitSet> taxaBelow) {
 		if (v.getOutDegree() > 0 && taxaBelow.get(v) == null) {
@@ -518,8 +504,6 @@ public class EmbeddingOptimizer {
 	/**
 	 * rotates all out edges so as to sort by the taxa-below sets
 	 *
-	 * @param tree
-	 * @param taxaBelow
 	 */
 	public static void rotateTreeByTaxaBelow(PhyloTree tree, final NodeArray<BitSet> taxaBelow) {
 		for (var v0 : tree.nodes()) {
@@ -577,10 +561,6 @@ public class EmbeddingOptimizer {
 	/**
 	 * compute a circular ordering using neighbor net
 	 *
-	 * @param trees
-	 * @param taxon2ID
-	 * @param id2Taxon
-	 * @return
 	 */
 	//working
 	public static int[] computerCircularOrderingHardwiredMatrix(PhyloTree[] trees, Map<String, Integer> taxon2ID, Map<Integer, String> id2Taxon) {
@@ -622,7 +602,7 @@ public class EmbeddingOptimizer {
 						String taxon = it.next();
 						Node toDelete = null;
 						for (Node node : newTrees[s].nodes()) {
-							if (node.getOutDegree() == 0 && newTrees[s].getLabel(node)!=null &&  newTrees[s].getLabel(node)==taxon) {
+							if (node.getOutDegree() == 0 && newTrees[s].getLabel(node) != null && Objects.equals(newTrees[s].getLabel(node), taxon)) {
 								toDelete = node;
 								break;
 							}
@@ -705,10 +685,6 @@ public class EmbeddingOptimizer {
 	/**
 	 * compute a circular ordering using neighbor net
 	 *
-	 * @param trees
-	 * @param taxon2ID
-	 * @param id2Taxon
-	 * @return
 	 */
 	public static int[] computerCircularOrderingShortestPathMatrix(PhyloTree[] trees, Map<String, Integer> taxon2ID, Map<Integer, String> id2Taxon) {
 

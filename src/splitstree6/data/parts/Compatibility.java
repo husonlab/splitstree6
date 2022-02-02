@@ -34,8 +34,6 @@ public enum Compatibility {
 	/**
 	 * computes the compatiblity of a set of splits
 	 *
-	 * @param ntax
-	 * @param splits
 	 * @return compatibility
 	 */
 	public static Compatibility compute(int ntax, List<ASplit> splits) {
@@ -45,9 +43,6 @@ public enum Compatibility {
 	/**
 	 * computes the compatiblity of a set of splits
 	 *
-	 * @param ntax
-	 * @param splits
-	 * @param cycle
 	 * @return compatibility
 	 */
 	public static Compatibility compute(int ntax, List<ASplit> splits, int[] cycle) {
@@ -91,8 +86,6 @@ public enum Compatibility {
 	/**
 	 * determines whether two splits on the same taxa set are compatible
 	 *
-	 * @param split1
-	 * @param split2
 	 * @return true, if split1 and split2 are compatible
 	 */
 	public static boolean areCompatible(ASplit split1, ASplit split2) {
@@ -125,8 +118,6 @@ public enum Compatibility {
 	/**
 	 * determines whether three splits on the same taxa set are weakly compatible
 	 *
-	 * @param split1
-	 * @param split2
 	 * @return true, if all three are weakly compatible
 	 */
 	public static boolean areWeaklyCompatible(ASplit split1, ASplit split2, ASplit split3) {
@@ -144,9 +135,6 @@ public enum Compatibility {
 	/**
 	 * do the three  bitsets intersect?
 	 *
-	 * @param a
-	 * @param b
-	 * @param c
 	 * @return true, if non-empty   intersection
 	 */
 	private static boolean intersects(BitSet a, BitSet b, BitSet c) {
@@ -160,7 +148,6 @@ public enum Compatibility {
 	/**
 	 * Determines whether a given splits system is cyclic
 	 *
-	 * @param ntax
 	 * @param splits the splits object
 	 * @return true, if the given splits are cyclic
 	 */
@@ -198,7 +185,6 @@ public enum Compatibility {
 	/**
 	 * gets the compatiblity matrix
 	 *
-	 * @param splits
 	 * @return compatibility matrix
 	 */
 	public static boolean[][] getCompatibilityMatrix(final List<ASplit> splits) {

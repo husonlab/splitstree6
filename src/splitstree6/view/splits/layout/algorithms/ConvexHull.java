@@ -43,11 +43,7 @@ public class ConvexHull {
     /**
      * apply the algorithm to build a new graph
      *
-     * @param progress
-     * @param taxa
-     * @param splits
-     * @param splitsGraph
-     */
+	 */
     public static void apply(ProgressListener progress, TaxaBlock taxa, SplitsBlock splits, PhyloSplitsGraph splitsGraph) throws CanceledException {
         splitsGraph.clear();
         apply(progress, taxa, splits, splitsGraph, new BitSet());
@@ -56,12 +52,7 @@ public class ConvexHull {
     /**
      * assume that some splits have already been processed and applies convex hull algorithm to remaining splits
      *
-     * @param progress
-     * @param taxaBlock
-     * @param splits
-     * @param graph
-     * @param usedSplits
-     */
+	 */
     public static void apply(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splits, PhyloSplitsGraph graph, BitSet usedSplits) throws CanceledException {
 
         if (usedSplits.cardinality() == splits.getNsplits())
@@ -302,8 +293,6 @@ public class ConvexHull {
      * computes a good order in which to process the splits.
      * Currently orders splits by increasing size
      *
-     * @param splits
-     * @param usedSplits
      * @return order
      */
     private static int[] getOrderToProcessSplitsIn(SplitsBlock splits, BitSet usedSplits) {

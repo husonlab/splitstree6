@@ -40,12 +40,7 @@ public class RerootByHybridNumber {
 	/**
 	 * reroot both trees so as to minimize the hybrid number
 	 *
-	 * @param origTree1
-	 * @param origTree2
-	 * @param progressListener
 	 * @return hybrid number
-	 * @throws IOException
-	 * @throws CanceledException
 	 */
 	// todo: can delete this, too slow
 	public static int apply(PhyloTree origTree1, PhyloTree origTree2, ProgressListener progressListener) throws IOException, CanceledException {
@@ -99,13 +94,8 @@ public class RerootByHybridNumber {
                             else if (a.getFirst().getFirst() < b.getFirst().getFirst())
                                 return -1;
                             else if (a.getFirst().getFirst() > b.getFirst().getFirst())
-                                return 1;
-                            else if (a.getSecond().getFirst() < b.getSecond().getFirst())
-                                return -1;
-                            else if (a.getSecond().getFirst() > b.getSecond().getFirst())
-                                return 1;
-                            else
-                                return 0;
+								return 1;
+							else return a.getSecond().getFirst().compareTo(b.getSecond().getFirst());
                         });
 
 		// setup all pairs of rootings
@@ -178,7 +168,7 @@ public class RerootByHybridNumber {
 				float halfOfTotal1 = (pair.getFirst().getSecond() + pair.getFirst().getThird() + weight1) / 2;
 				float sourceLength1 = halfOfTotal1 - pair.getFirst().getSecond();
 				float targetLength1 = pair.getFirst().getSecond() + weight1 - halfOfTotal1;
-				tree1.setRoot((Node) null);
+				tree1.setRoot(null);
 				tree1.setRoot(e1, sourceLength1, targetLength1, null);
 				tree1.redirectEdgesAwayFromRoot();
 
@@ -190,7 +180,7 @@ public class RerootByHybridNumber {
 				float halfOfTotal2 = (pair.getSecond().getSecond() + pair.getSecond().getThird() + weight2) / 2;
 				float sourceLength2 = halfOfTotal2 - pair.getSecond().getSecond();
 				float targetLength2 = pair.getSecond().getSecond() + weight2 - halfOfTotal2;
-				tree2.setRoot((Node) null);
+				tree2.setRoot(null);
 				tree2.setRoot(e2, sourceLength2, targetLength2, null);
 				tree2.redirectEdgesAwayFromRoot();
 

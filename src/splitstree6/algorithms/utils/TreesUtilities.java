@@ -42,7 +42,6 @@ public class TreesUtilities {
 	/**
 	 * gets all taxa in tree, if node to taxa mapping has been set
 	 *
-	 * @param tree
 	 * @return all taxa in tree
 	 */
 	public static BitSet getTaxa(PhyloTree tree) {
@@ -58,8 +57,6 @@ public class TreesUtilities {
 	/**
 	 * determines whether every pair of taxa occur together in some tree
 	 *
-	 * @param taxa
-	 * @param trees
 	 * @return returns true, if every pair of taxa occur together in some  tree
 	 */
 	static public boolean hasAllPairs(TaxaBlock taxa, TreesBlock trees) {

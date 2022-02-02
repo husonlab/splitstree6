@@ -36,8 +36,6 @@ public class MergeIsomorphicInducedTrees {
     /**
      * perform the merge
      *
-     * @param root1
-     * @param root2
      * @return resulting tree
      */
     public static Root apply(Root root1, Root root2) {
@@ -309,12 +307,7 @@ public class MergeIsomorphicInducedTrees {
     /**
      * create a new edge below v that contains all disabled subtrees along the induced edge (v1,w1) and (v2,w2)
      *
-     * @param path1
-     * @param w1
-     * @param path2
-     * @param w2
-     * @param vTar
-     */
+	 */
     private static Root mergeAlongInducedEdge(Root v1, List<Edge> path1, Root w1, Root v2, List<Edge> path2, Root w2, Root vTar) {
         // order the subtrees nodes along the induced edge:
         var order = new LinkedList<Pair<Edge, Integer>>();
@@ -371,8 +364,6 @@ public class MergeIsomorphicInducedTrees {
     /**
      * the subtree below vSrc copied below vTar
      *
-     * @param vTar
-     * @param vSrc
      * @param taboo don't use this edge (leads down along induced edge...)
      */
     private static void addSubTree(Root vTar, Root vSrc, Edge taboo, int treeId) {
@@ -393,9 +384,7 @@ public class MergeIsomorphicInducedTrees {
     /**
      * the subtree below vSrc copied below vTar
      *
-     * @param vTar
-     * @param eSrc
-     */
+	 */
     private static void addSubTree(Root vTar, Edge eSrc, int treeId) {
         var wSrc = (Root) eSrc.getTarget();
         var wTar = vTar.newNode();

@@ -39,10 +39,7 @@ public class LayoutAlgorithm {
 	/**
 	 * compute coordinates for all nodes
 	 *
-	 * @param tree
 	 * @param toScale use weights or scale all edges so that leaves are equi-distance from root?
-	 * @param cycle
-	 * @return coordinates
 	 */
 	public static void apply(PhyloTree tree, boolean toScale, int[] cycle, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
 		nodePointMap.clear();

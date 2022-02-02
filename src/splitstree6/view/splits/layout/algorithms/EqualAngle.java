@@ -43,11 +43,6 @@ public class EqualAngle {
 	/**
 	 * apply the algorithm to build a new graph
 	 *
-	 * @param progress
-	 * @param useWeights
-	 * @param taxaBlock
-	 * @param splits
-	 * @param graph
 	 */
 	public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits, PhyloSplitsGraph graph, BitSet forbiddenSplits, BitSet usedSplits) throws CanceledException {
 		//System.err.println("Running equals angle algorithm");
@@ -117,11 +112,7 @@ public class EqualAngle {
     /**
      * initializes the graph
      *
-     * @param taxa
-     * @param splits
-     * @param posOfTaxonInCycle
-     * @param graph
-     */
+	 */
     private static void initGraph(TaxaBlock taxa, SplitsBlock splits, int[] posOfTaxonInCycle, PhyloSplitsGraph graph) {
         graph.clear();
 
@@ -158,7 +149,6 @@ public class EqualAngle {
      * returns the list of all non-trivial splits, ordered by by increasing size
      * of the split part containing taxon 1
      *
-     * @param splits
      * @return non-trivial splits
      */
     private static ArrayList<Integer> getNonTrivialSplitsOrdered(SplitsBlock splits) {
@@ -180,7 +170,6 @@ public class EqualAngle {
     /**
      * normalizes cycle so that cycle[1]=1
      *
-     * @param cycle
      * @return normalized cycle
      */
     private static int[] normalizeCycle(int[] cycle) {
@@ -207,12 +196,7 @@ public class EqualAngle {
     /**
      * adds an interior split using the wrapping algorithm
      *
-     * @param taxa
-     * @param splits
-     * @param s
-     * @param cycle
-     * @param graph
-     */
+	 */
     private static void wrapSplit(TaxaBlock taxa, SplitsBlock splits, int s, int[] cycle, PhyloSplitsGraph graph) throws IllegalStateException {
         final var part = splits.get(s).getPartNotContaining(1);
 
@@ -300,7 +284,6 @@ public class EqualAngle {
     /**
      * does this edge lead to a leaf?
      *
-     * @param f
      * @return is leaf edge
      */
     private static boolean isLeafEdge(Edge f) {
@@ -310,8 +293,7 @@ public class EqualAngle {
     /**
      * this removes all temporary trivial edges added to the graph
      *
-     * @param graph
-     */
+	 */
     private static void removeTemporaryTrivialEdges(PhyloSplitsGraph graph) {
         final var tempEdges = new EdgeSet(graph);
         for (var e : graph.edges()) {
@@ -339,9 +321,6 @@ public class EqualAngle {
     /**
      * assigns angles to all edges in the graph
      *
-     * @param splits
-     * @param cycle
-     * @param graph
      * @param forbiddenSplits : set of all the splits such as their edges won't have their angles changed
      */
     public static void assignAnglesToEdges(int ntaxa, SplitsBlock splits, int[] cycle, PhyloSplitsGraph graph, BitSet forbiddenSplits, double totalAngle) {
@@ -358,9 +337,7 @@ public class EqualAngle {
     /**
      * assigns angles to all edges in the graph
      *
-     * @param splits
-     * @param cycle
-     */
+	 */
     public static double[] assignAnglesToSplits(int ntaxa, SplitsBlock splits, int[] cycle, double totalAngle) {
         //We create the list of angles representing the positions on a circle.
         var angles = new double[ntaxa + 1];
@@ -379,8 +356,6 @@ public class EqualAngle {
      * assigns angles to the splits in the graph, considering that they are located exactly "in the middle" of two taxa
      * so we fill split2angle using TaxaAngles.
      *
-     * @param splits
-     * @param cycle
      * @param angles      for each taxa, its angle
      * @param split2angle for each split, its angle
      */
@@ -408,8 +383,6 @@ public class EqualAngle {
     /**
 	 * assigns coordinates to nodes
 	 *
-	 * @param useWeights
-	 * @param graph
 	 */
 	public static void assignCoordinatesToNodes(boolean useWeights, PhyloSplitsGraph graph, NodeArray<Point2D> node2point, int startTaxonId, int rootSplit) {
 		if (graph.getNumberOfNodes() == 0)
@@ -426,11 +399,6 @@ public class EqualAngle {
 	/**
 	 * recursively assigns coordinates to all nodes
 	 *
-	 * @param useWeights
-	 * @param v
-	 * @param splitsInPath
-	 * @param nodesVisited
-	 * @param graph
 	 */
 	private static void assignCoordinatesToNodesRec(boolean useWeights, Node v, BitSet splitsInPath, NodeSet nodesVisited, PhyloSplitsGraph graph, NodeArray<Point2D> node2point, int rootSplit) {
 		if (!nodesVisited.contains(v)) {

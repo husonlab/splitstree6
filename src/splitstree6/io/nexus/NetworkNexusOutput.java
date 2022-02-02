@@ -36,10 +36,6 @@ public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<Netw
 	/**
 	 * write the block in nexus format
 	 *
-	 * @param w
-	 * @param taxaBlock
-	 * @param networkBlock
-	 * @throws IOException
 	 */
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, NetworkBlock networkBlock) throws IOException {

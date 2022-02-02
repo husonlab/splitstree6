@@ -35,11 +35,6 @@ public class PreProcess {
 	/**
 	 * apply preprocessing to two trees
 	 *
-	 * @param tree1
-	 * @param tree2
-	 * @param allTaxa
-	 * @return
-	 * @throws IOException
 	 */
 	static public Pair<Root, Root> apply(PhyloTree tree1, PhyloTree tree2, TaxaBlock allTaxa) throws IOException {
 
@@ -61,11 +56,6 @@ public class PreProcess {
 	/**
 	 * apply preprocessing to one tree
 	 *
-	 * @param tree1
-	 * @param allTaxa
-	 * @param mustHaveSameTaxa
-	 * @return
-	 * @throws IOException
 	 */
 	static public Root apply(PhyloTree tree1, TaxaBlock allTaxa, boolean mustHaveSameTaxa) throws IOException {
 

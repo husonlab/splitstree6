@@ -50,8 +50,6 @@ public class SplitMatrix {
 	/**
 	 * Constructs a SplitMatrix from a set of trees
 	 *
-	 * @param trees
-	 * @param taxa
 	 */
 	public SplitMatrix(TreesBlock trees, TaxaBlock taxa) throws SplitsException {
 		ntax = taxa.getNtax();

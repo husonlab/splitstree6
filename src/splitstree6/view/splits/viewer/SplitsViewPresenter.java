@@ -253,9 +253,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
-		mainController.getLayoutLabelsMenuItem().setOnAction(e -> {
-			Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation()));
-		});
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation())));
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);

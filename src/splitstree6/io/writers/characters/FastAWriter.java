@@ -47,7 +47,7 @@ public class FastAWriter extends CharactersWriterBase {
 		final var lineLength = Math.max(1, optionLineLength.get());
 
 		for (var i = 1; i <= ntax; i++) {
-			var sequence = new StringBuilder("");
+			var sequence = new StringBuilder();
 			for (var j = 1; j <= nchar; j++) {
 				sequence.append((characters.get(i, j)));
 				if ((j % lineLength) == 0 && j < nchar)

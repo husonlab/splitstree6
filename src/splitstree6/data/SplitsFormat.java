@@ -90,7 +90,6 @@ public class SplitsFormat {
 	/**
 	 * show confidences?
 	 *
-	 * @param optionConfidences
 	 */
 	public void setOptionConfidences(boolean optionConfidences) {
 		this.optionConfidences = optionConfidences;

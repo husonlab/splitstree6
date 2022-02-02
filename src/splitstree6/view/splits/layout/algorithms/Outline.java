@@ -48,13 +48,7 @@ public class Outline {
     /**
      * apply the algorithm to build a new graph
      *
-     * @param progress
-     * @param useWeights
-     * @param taxaBlock
-     * @param splits0
-     * @param graph
-     * @param nodePointMap
-     */
+	 */
     public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits0,
                              PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet usedSplits,
                              ArrayList<ArrayList<Node>> loops, int rootSplit, double rootAngle) throws CanceledException {
@@ -216,10 +210,7 @@ public class Outline {
     /**
      * determines loop that is closed by reentering v
      *
-     * @param v
-     * @param inEdge
-     * @return
-     */
+	 */
     private static ArrayList<Node> createLoop(Node v, Edge inEdge) {
         final var loop = new ArrayList<Node>();
         var w = v;

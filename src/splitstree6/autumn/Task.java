@@ -50,7 +50,6 @@ public class Task implements Runnable {
 	/**
 	 * set the runnable
 	 *
-	 * @param runnable
 	 */
 	public void setRunnable(Runnable runnable) {
 		this.runnable = runnable;

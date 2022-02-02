@@ -152,8 +152,6 @@ public class Cluster extends BitSet {
 	/**
 	 * determines whether set A contains set B
 	 *
-	 * @param A
-	 * @param B
 	 * @return true, if A contains B
 	 */
 	public static boolean contains(BitSet A, BitSet B) {
@@ -166,8 +164,6 @@ public class Cluster extends BitSet {
 	/**
 	 * computes the union of A and B
 	 *
-	 * @param A
-	 * @param B
 	 * @return union
 	 */
 	public static BitSet union(BitSet A, BitSet B) {
@@ -179,8 +175,6 @@ public class Cluster extends BitSet {
 	/**
 	 * computes the intersection of A and B
 	 *
-	 * @param A
-	 * @param B
 	 * @return intersection
 	 */
 	public static BitSet intersection(BitSet A, BitSet B) {
@@ -194,8 +188,6 @@ public class Cluster extends BitSet {
 	/**
 	 * subtracts A from B
 	 *
-	 * @param A
-	 * @param B
 	 * @return A \ B
 	 */
 	public static BitSet setminus(BitSet A, BitSet B) {
@@ -207,9 +199,6 @@ public class Cluster extends BitSet {
 	/**
 	 * are two given clusters incompatible?
 	 *
-	 * @param A
-	 * @param B
-	 * @return
 	 */
 	public static boolean incompatible(BitSet A, BitSet B) {
 		return setminus(A, B).cardinality() > 0 && setminus(B, A).cardinality() > 0
@@ -219,8 +208,6 @@ public class Cluster extends BitSet {
 	/**
 	 * are two clusters equal?
 	 *
-	 * @param A
-	 * @param B
 	 * @return true, if equal
 	 */
 	public static boolean equals(BitSet A, BitSet B) {
@@ -230,9 +217,6 @@ public class Cluster extends BitSet {
 	/**
 	 * are two clusters equal or all taxa upto max taxon id?
 	 *
-	 * @param A
-	 * @param B
-	 * @param maxTaxonId
 	 * @return true, if equal upto maxTaxonId
 	 */
 	public static boolean equals(BitSet A, BitSet B, int maxTaxonId) {
@@ -245,7 +229,6 @@ public class Cluster extends BitSet {
 	/**
 	 * print an array of clusters
 	 *
-	 * @param clusters
 	 */
 	public static void print(Cluster[] clusters) {
 		for (Cluster cluster : clusters) {
@@ -257,9 +240,6 @@ public class Cluster extends BitSet {
 	/**
 	 * compare two bit sets
 	 *
-	 * @param A
-	 * @param B
-	 * @return
 	 */
 	public static int compare(BitSet A, BitSet B) {
 		int a = A.nextSetBit(0);
@@ -278,7 +258,6 @@ public class Cluster extends BitSet {
 	/**
 	 * extract the set of taxa present in an array of clusters
 	 *
-	 * @param clusters
 	 * @return taxa
 	 */
 	public static BitSet extractTaxa(Cluster[] clusters) {
@@ -290,7 +269,6 @@ public class Cluster extends BitSet {
 	/**
 	 * get clusters sorted by decreasing cardinality
 	 *
-	 * @param clusters
 	 * @return sorted clusters
 	 */
 	public static Cluster[] getClustersSortedByDecreasingCardinality(Cluster[] clusters) {
@@ -302,7 +280,6 @@ public class Cluster extends BitSet {
 	/**
 	 * gets the maximum element in a set, or -1, if the set is empty
 	 *
-	 * @param cluster
 	 * @return max element or -1
 	 */
 	public static int getMaxElement(BitSet cluster) {
@@ -328,8 +305,6 @@ public class Cluster extends BitSet {
 	/**
 	 * does the given set intersect all of the given clusters?
 	 *
-	 * @param set
-	 * @param clusters
 	 * @return true, if set intersects one of the clusters
 	 */
 	public static boolean intersectsAll(BitSet set, Cluster[] clusters) {
@@ -342,8 +317,6 @@ public class Cluster extends BitSet {
 	/**
 	 * does the set contain at least one of the given clusters
 	 *
-	 * @param set
-	 * @param clusters
 	 * @return true, if set contains at least one of the given clusters
 	 */
 	public static boolean containsAtLeastOne(BitSet set, Cluster[] clusters) {
@@ -356,8 +329,6 @@ public class Cluster extends BitSet {
 	/**
 	 * computes the number of taxa that are each not contained in all clusters
 	 *
-	 * @param taxa
-	 * @param clusters
 	 * @return number of taxa that are each not contained in all clusters
 	 */
 	public static int numberOfTaxaNotContainedInAllClusters(BitSet taxa, Cluster[] clusters) {
@@ -374,8 +345,6 @@ public class Cluster extends BitSet {
 	/**
 	 * add a cluster to an array of clusters
 	 *
-	 * @param clusters
-	 * @param additional
 	 * @return new array of clusters
 	 */
 	public static Cluster[] addCluster(Cluster[] clusters, Cluster additional) {

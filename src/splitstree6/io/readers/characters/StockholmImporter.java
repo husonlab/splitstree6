@@ -107,7 +107,7 @@ public class StockholmImporter extends CharactersReader {
 	}
 
 	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) {
-        StringBuilder foundSymbols = new StringBuilder("");
+        StringBuilder foundSymbols = new StringBuilder();
         for (int i = 1; i <= characters.getNtax(); i++) {
             for (int j = 1; j <= characters.getNchar(); j++) {
                 char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));

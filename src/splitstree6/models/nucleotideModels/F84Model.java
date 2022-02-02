@@ -39,8 +39,6 @@ public class F84Model extends NucleotideModel {
 	 * than the parameter K in Swofford et al, pg 436.)
 	 * We first compute the corresponding K, fill in Q according to the standard model/.
 	 *
-	 * @param baseFreqs
-	 * @param TsTv
 	 */
 	public F84Model(double[] baseFreqs, double TsTv) {
 		super();

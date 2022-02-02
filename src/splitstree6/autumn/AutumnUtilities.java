@@ -30,9 +30,6 @@ public class AutumnUtilities {
 	/**
 	 * extract all taxa from the given tree and add all new ones to the set of all taxa
 	 *
-	 * @param i
-	 * @param tree
-	 * @param allTaxa
 	 * @return the bits of all taxa found in the tree
 	 */
 	public static BitSet extractTaxa(int i, PhyloTree tree, TaxaBlock allTaxa) throws IOException {

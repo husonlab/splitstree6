@@ -44,8 +44,6 @@ public class ClusterReduction {
 	/**
 	 * cluster reduce two trees, if possible
 	 *
-	 * @param tree1
-	 * @param tree2
 	 * @return subtree-reduced trees followed by all reduced subtrees
 	 */
 	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2) throws IOException {
@@ -77,9 +75,6 @@ public class ClusterReduction {
 	/**
 	 * finds a pair nodes for minimal cluster reduction, if one exists
 	 *
-	 * @param v1
-	 * @param v2
-	 * @param placeHolderTaxa
 	 * @return two reduced clusters or null
 	 */
 	public static Pair<Root, Root> apply(Root v1, Root v2, Single<Integer> placeHolderTaxa) {
@@ -159,10 +154,6 @@ public class ClusterReduction {
 	/**
 	 * recursively does the work
 	 *
-	 * @param v1
-	 * @param v2
-	 * @param compared
-	 * @param placeHolderTaxa
 	 * @return two reduced clusters or null
 	 */
 	private static Pair<Root, Root> applyRec(Root v1, Root v2, Set<Pair<Node, Node>> compared, Single<Integer> placeHolderTaxa) {
@@ -262,9 +253,6 @@ public class ClusterReduction {
 	/**
 	 * find a pair of separatable bunches of subtrees in both trees.
 	 *
-	 * @param v1
-	 * @param v2
-	 * @return
 	 */
 	private static Pair<Set<Node>, Set<Node>> getPairOfSeparatableConnectedComponents(Node v1, Node v2) {
 
@@ -319,10 +307,6 @@ public class ClusterReduction {
 	/**
 	 * get all tree nodes in a connected component of the  intersection graph
 	 *
-	 * @param a
-	 * @param sets1
-	 * @param sets2
-	 * @return
 	 */
 	private static Pair<Set<Node>, Set<Node>> getNodesInComponent(Node a, Node[] sets1, Node[] sets2) {
 		var seen = new HashSet<Node>();

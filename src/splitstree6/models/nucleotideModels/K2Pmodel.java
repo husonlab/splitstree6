@@ -39,7 +39,6 @@ public class K2Pmodel extends NucleotideModel {
 	 * than the parameter kappa in Swofford et al, pg 435.)
 	 * We first compute the corresponding kappa, fill in Q according to the standard model.
 	 *
-	 * @param TsTv
 	 */
 	public K2Pmodel(double TsTv) {
 		final double[] basefreqs = {0.25, 0.25, 0.25, 0.25};

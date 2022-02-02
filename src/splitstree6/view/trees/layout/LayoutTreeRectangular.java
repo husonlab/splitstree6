@@ -38,7 +38,6 @@ public class LayoutTreeRectangular {
 	 * compute rectangular tree or network layout
 	 *
 	 * @param tree    tree
-	 * @param toScale
 	 * @return node to point map
 	 */
 	public static NodeArray<Point2D> apply(PhyloTree tree, boolean toScale, ComputeHeightAndAngles.Averaging averaging) {
@@ -86,7 +85,6 @@ public class LayoutTreeRectangular {
 	/**
 	 * This code assumes that all edges are directed away from the root.
 	 *
-	 * @param tree
 	 */
 	public static void setCoordinatesPhylogram(PhyloTree tree, NodeDoubleArray yCoord, NodeArray<Point2D> nodePointMap) {
 		// todo: this could be a user option:

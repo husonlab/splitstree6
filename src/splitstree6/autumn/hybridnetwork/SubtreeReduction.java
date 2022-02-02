@@ -43,8 +43,6 @@ public class SubtreeReduction {
     /**
      * sub-tree reduce two trees
      *
-     * @param tree1
-     * @param tree2
      * @param merge merge merged-subtrees back into trees, for debugging purposes
      * @return subtree-reduced trees followed by all reduced subtrees
      */
@@ -118,8 +116,6 @@ public class SubtreeReduction {
     /**
      * check whether two induced trees are isomorphic or not
      *
-     * @param root1
-     * @param root2
      * @return true iff isomorphic
      */
     public static ReturnValue apply(Root root1, Root root2, List<Pair<Root, Root>> subTrees, Single<Integer> placeHolderTaxon) {
@@ -149,12 +145,7 @@ public class SubtreeReduction {
     /**
      * recursively do the work
      *
-     * @param root1
-     * @param root2
-     * @param subTrees
-     * @param isomorphic
-     * @param placeHolderTaxon
-     */
+	 */
     private static void applyRec(Root root1, Root root2, List<Pair<Root, Root>> subTrees, Set<Pair<Root, Root>> isomorphic, Set<Pair<Root, Root>> visited, Set<Root> subTreeBelow1, Set<Root> subTreeBelow2, Single<Integer> placeHolderTaxon) {
         // check whether already visited:
         var pairOfRoots = new Pair<>(root1, root2);
@@ -350,7 +341,6 @@ public class SubtreeReduction {
     /**
      * moves down to next branching node
      *
-     * @param root
      * @return root or next branching node
      */
     private static Root nextBranchingNode(Root root) {

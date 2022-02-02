@@ -20,7 +20,6 @@
 package splitstree6.view.splits.layout;
 
 import jloda.util.BitSetUtils;
-import jloda.util.CanceledException;
 import jloda.util.Pair;
 import jloda.util.Triplet;
 import splitstree6.algorithms.utils.SplitsUtilities;
@@ -46,11 +45,8 @@ public class RootingUtils {
 	 * @param alt         use alternative side
 	 * @param nTax        number of taxa
 	 * @param outGroup    out group taxa or empty, if performing simple midpoint rooting
-	 * @param cycle
-	 * @param splitsBlock
 	 * @param useWeights  use split weights or otherwise give all splits weight 1
 	 * @return rooting split and both distances
-	 * @throws CanceledException
 	 */
 	public static Triplet<Integer, Double, Double> computeRootLocation(boolean alt, int nTax, Set<Integer> outGroup,
 																	   int[] cycle, SplitsBlock splitsBlock, boolean useWeights) {
@@ -183,14 +179,7 @@ public class RootingUtils {
 	/**
 	 * setup target taxa block and splits block for computing rooted network
 	 *
-	 * @param altLayout
-	 * @param triplet
-	 * @param taxaBlockSrc
-	 * @param splitsBlockSrc
-	 * @param taxaBlockTarget
-	 * @param splitsBlockTarget
 	 * @return root split
-	 * @throws IOException
 	 */
 	public static int setupForRootedNetwork(boolean altLayout, Triplet<Integer, Double, Double> triplet, TaxaBlock taxaBlockSrc, SplitsBlock splitsBlockSrc, TaxaBlock taxaBlockTarget, SplitsBlock splitsBlockTarget) throws IOException {
 		//final Triplet<Integer,Double,Double> triplet= SplitsUtilities.getMidpointSplit(taxaBlockSrc.getNtax(), splitsBlockSrc);

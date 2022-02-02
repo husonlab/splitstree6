@@ -174,7 +174,6 @@ public class CodeAreaSearcher implements ITextSearcher {
 	/**
 	 * Selects all occurrences of text in document, subject to options and constraints of document type
 	 *
-	 * @param pattern
 	 */
 	public int findAll(String pattern) {
 		//Not implemented for text editors.... as we cannot select multiple chunks of text.

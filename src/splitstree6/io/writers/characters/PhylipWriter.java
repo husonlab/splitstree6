@@ -65,7 +65,7 @@ public class PhylipWriter extends CharactersWriterBase {
 			for (var i = 1; i <= iterations; i++) {
 				final var startIndex = lineLength * (i - 1) + 1;
 				for (var t = 1; t <= ntax; t++) {
-					StringBuilder sequence = new StringBuilder("");
+					StringBuilder sequence = new StringBuilder();
 
 					// set space after every 10 chars, but not in the beginning of line
 					for (int j = startIndex; j <= lineLength * i && j <= nchar; j++) {
@@ -83,7 +83,7 @@ public class PhylipWriter extends CharactersWriterBase {
 			}
 		} else {
 			for (var t = 1; t <= ntax; t++) {
-				var sequence = new StringBuilder("");
+				var sequence = new StringBuilder();
 				for (var j = 1; j <= nchar; j++) {
 					if ((j - 1) % 10 == 0 && (j - 1) != 0) sequence.append(" "); // set space after every 10 chars
 					sequence.append(characters.get(t, j));

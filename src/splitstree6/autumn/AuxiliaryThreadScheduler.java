@@ -45,8 +45,7 @@ public class AuxiliaryThreadScheduler {
     /**
      * setup a scheduler
      *
-     * @param maxNumberOfThreads
-     */
+	 */
     public AuxiliaryThreadScheduler(int maxNumberOfThreads) {
         executor = new ScheduledThreadPoolExecutor(maxNumberOfThreads);
     }
@@ -54,7 +53,6 @@ public class AuxiliaryThreadScheduler {
 	/**
 	 * schedule a task to be run on the next available thread
 	 *
-	 * @param runnable
 	 * @return task id
 	 */
 	public long schedule(Runnable runnable) {
@@ -88,7 +86,6 @@ public class AuxiliaryThreadScheduler {
 	/**
 	 * de-schedule a task. Use this if we want to run the task ourselves.
 	 *
-	 * @param taskId
 	 * @return status of task, de-scheduling only successful if DE_SCHEDULED returned
 	 */
 	public byte deSchedule(long taskId) {
@@ -106,7 +103,6 @@ public class AuxiliaryThreadScheduler {
 	/**
 	 * wait for the task to complete.
 	 *
-	 * @param taskId
 	 */
 	public void waitFor(long taskId) {
 		var future = id2future.get(taskId);
@@ -120,7 +116,6 @@ public class AuxiliaryThreadScheduler {
 	/**
 	 * wait for a set of tasks to complete
 	 *
-	 * @param taskIds
 	 */
 	public void waitFor(HashSet<Long> taskIds) {
 		for (var taskId : taskIds) {
@@ -131,7 +126,6 @@ public class AuxiliaryThreadScheduler {
 	/**
 	 * attempt to launch a task in one of the worker threads
 	 *
-	 * @param taskId
 	 * @return true, if launched, false if not
 	 */
 	private boolean launch(final long taskId) {

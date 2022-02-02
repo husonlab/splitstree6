@@ -272,7 +272,6 @@ public class LogDet extends Characters2Distances {
 	/**
 	 * Sets flag of whether missing entries in the F matrix are imputed, using the method that LDDist uses.
 	 *
-	 * @param val
 	 */
 	public void setOptionFudgeFactor(boolean val) {
 		this.optionFudgeFactor.setValue(val);
@@ -294,7 +293,6 @@ public class LogDet extends Characters2Distances {
 	/**
 	 * Set proportion of invariable sites to use for log det.
 	 *
-	 * @param pInvar
 	 */
 	public void setOptionPropInvariableSites(double pInvar) {
 		this.optionPropInvariableSites.setValue(pInvar);

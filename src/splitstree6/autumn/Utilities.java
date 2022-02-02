@@ -22,7 +22,6 @@ package splitstree6.autumn;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 
@@ -40,12 +39,8 @@ public class Utilities {
     /**
      * get the number of reticulations in a cluster network
      *
-     * @param tree1
-     * @param tree2
-     * @param progress
      * @return number of reticulate nodes
-     * @throws CanceledException
-     */
+	 */
     public static int getNumberOfReticulationsInClusterNetwork(PhyloTree tree1, PhyloTree tree2, ProgressListener progress) throws IOException {
 
         var allTaxa = new TaxaBlock();
@@ -66,8 +61,6 @@ public class Utilities {
     /**
      * extract the set of clusters from the two given trees
      *
-     * @param allTaxa
-     * @param tree1
      * @return set of clusters, each cluster a BitSet
      */
     static public Set<Cluster> extractClusters(TaxaBlock allTaxa, PhyloTree tree1, PhyloTree tree2) {
@@ -83,10 +76,6 @@ public class Utilities {
     /**
      * recursively find all clusters in a tree
      *
-     * @param tree
-     * @param v
-     * @param taxa
-     * @param clusters
      * @return all taxa on or below v
      */
     private static Cluster extractClustersRec(PhyloTree tree, Node v, TaxaBlock taxa, Set<Cluster> clusters) {

@@ -58,27 +58,16 @@ public class ConfidenceNetwork {
 	/**
 	 * Sort a row (1..nblocks) of DoubleInts according to the Rij value.
 	 *
-	 * @param row
 	 */
 	private static void sortAscending(DoubleInt[] row) {
         Arrays.sort(row, 1, row.length, (Comparator) (x, y) -> {
-            if (((DoubleInt) x).Rij < ((DoubleInt) y).Rij)
-                return -1;
-            else if (((DoubleInt) y).Rij < ((DoubleInt) x).Rij)
-                return 1;
-            else
-                return 0;
+			return Double.compare(((DoubleInt) x).Rij, ((DoubleInt) y).Rij);
         });
     }
 
 	/**
 	 * Returns a set of splits corresponding to a confidence network, from the specified split matrix.
 	 *
-	 * @param M
-	 * @param level
-	 * @param pl
-	 * @return
-	 * @throws CanceledException
 	 */
 	static public SplitsBlock getConfidenceNetwork(SplitMatrix M, double level, int ntax, ProgressListener pl) throws CanceledException {
 

@@ -64,7 +64,6 @@ public class NeighborNetBlockPivot {
 	 * @param progress Progress indicator
 	 * @param params   Search parameters
 	 * @return array of split weights in indices 1,...,n(n-1)/2
-	 * @throws CanceledException
 	 */
 	static public double[] circularBlockPivot(int n, double[] d, ProgressListener progress, BlockPivotParams params) throws CanceledException {
 
@@ -502,11 +501,6 @@ public class NeighborNetBlockPivot {
 	/**
 	 * Compute the projected gradient at x=z (with z(G)=0) for 0.5 * \|Ax - d\|^2 with x>=0.
 	 *
-	 * @param n
-	 * @param d
-	 * @param z
-	 * @param G
-	 * @return
 	 */
 	private static double projectedGradientNorm(int n, double[] d, double[] z, boolean[] G) {
 		int npairs = n * (n - 1) / 2;
@@ -535,11 +529,6 @@ public class NeighborNetBlockPivot {
 	/**
 	 * Compute the projected gradient at x=z (with z(G)=0) for 0.5 * \|Ax - d\|^2 with x>=0.
 	 *
-	 * @param n
-	 * @param d
-	 * @param z
-	 * @param G
-	 * @return
 	 */
 	private static double functionVal(int n, double[] d, double[] z, boolean[] G) {
 		int npairs = n * (n - 1) / 2;

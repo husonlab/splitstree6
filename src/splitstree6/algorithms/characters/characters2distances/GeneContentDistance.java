@@ -75,9 +75,6 @@ public class GeneContentDistance extends Characters2Distances {
 	/**
 	 * computes the SnelBork et al distance
 	 *
-	 * @param ntax
-	 * @param genes
-	 * @return the distance Object
 	 */
 	private static void computeSnelBorkDistance(DistancesBlock dist, int ntax, BitSet[] genes) {
 

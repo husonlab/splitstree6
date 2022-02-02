@@ -74,11 +74,7 @@ public class OptimizeUtils {
     /**
      * compute the crossings in case of many-to-many connections and/or different taxon sets
      *
-     * @param v1
-     * @param v2
-     * @param taxCon
-     * @return
-     */
+	 */
 
     public static int compCrossingsMany2Many(List<String> v1, List<String> v2, Map<String, List<String>> taxCon) {
         int crossingNum = 0;
@@ -120,11 +116,7 @@ public class OptimizeUtils {
     /**
      * get the order of taxa concerning the lsa tree
      *
-     * @param tree
-     * @param v
-     * @param leavesList
-     * @return
-     */
+	 */
 
     public static void getLsaOrderRec(PhyloTree tree, Node v, List<String> leavesList) {
         if (tree.computeSetOfLeaves().contains(v)) {
@@ -228,9 +220,6 @@ public class OptimizeUtils {
     /**
      * initialize new matrix in first call, after that only add distances when called with new split system
      *
-     * @param D
-     * @param ntax
-     * @param splits
      * @return new distance matrix
      */
     public static double[][] setMatForDiffSys(double[][] D, int ntax, ArrayList<ASplit> splits, boolean firstTree) {
@@ -287,9 +276,7 @@ public class OptimizeUtils {
     /**
      * get the taxon set of a tree/network plus fake taxa for DC
      *
-     * @param tree
-     * @return
-     */
+	 */
     public static Taxa getTaxaForTanglegram(PhyloTree tree) {
         var labels = new TreeSet<String>();
         for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
@@ -308,12 +295,7 @@ public class OptimizeUtils {
     /**
      * optimizes layout along the LSA tree
      *
-     * @param tree
-     * @param otherOrder
-     * @param treeNum
-     * @param taxConMap1
-     * @param taxConMap2
-     */
+	 */
     public static void lsaOptimization(PhyloTree tree, List<String> otherOrder, int treeNum, Map<String, List<String>> taxConMap1, Map<String, List<String>> taxConMap2) {
         final Map<Node, List<String>> node2LsaLeavesBelow = new HashMap<>();
         final List<String> lsaOrderInLastOpti = new LinkedList<>();
@@ -323,13 +305,8 @@ public class OptimizeUtils {
     /**
      * does swaps along the lsa tree (but only adapts order when doing a swap to reduce time consumption)
      *
-     * @param tree
-     * @param v
-     * @param otherOrder
-     * @param treeNum
      * @param taxConMap1 can be simply assigned null, only important for host parasite
-     * @param taxConMap2
-     */
+	 */
 
 
     private static void lsaOptimizationRec(PhyloTree tree, Node v, List<String> otherOrder, int treeNum, Map<String, List<String>> taxConMap1,
@@ -492,9 +469,7 @@ public class OptimizeUtils {
     /**
      * compute the number of nodes present in the shortest path for each pair of leaves, considering the graph undirected
      *
-     * @param graph
-     * @return dist of shortest paths for each pairs of leaves
-     */
+	 */
     public static void computeNumberNodesInTheShortestPath(final PhyloTree graph, Map<String, Integer> taxon2ID, double[][] distMatrix) {
         var leaves = graph.computeSetOfLeaves();
         var distMatrixTemp = new int[graph.getNumberOfNodes()][graph.getNumberOfNodes()];   // temp matrix

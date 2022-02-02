@@ -40,10 +40,6 @@ public class StandardStateLabeler extends StateLabeler {
 	/**
 	 * constructor
 	 *
-	 * @param nchar
-	 * @param missingChar
-	 * @param matchChar
-	 * @param gapChar
 	 */
 	public StandardStateLabeler(int nchar, char missingChar, char matchChar, char gapChar) {
 		maxState = -1;

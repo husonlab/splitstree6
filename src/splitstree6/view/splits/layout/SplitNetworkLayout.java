@@ -81,19 +81,7 @@ public class SplitNetworkLayout {
 	/**
 	 * compute an outline or network
 	 *
-	 * @param progress
-	 * @param taxaBlock0
-	 * @param splitsBlock0
-	 * @param diagram
-	 * @param rooting
-	 * @param useWeights
-	 * @param taxonSelectionModel
-	 * @param splitSelectionModel
-	 * @param unitLength
-	 * @param width
-	 * @param height
 	 * @return group of groups, namely loops, nodes, edges and node labels
-	 * @throws IOException
 	 */
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
 					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,

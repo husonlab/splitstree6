@@ -34,7 +34,6 @@ public class CopyWithTaxaRemoved {
     /**
      * creates a copy of the subtree below this node, with all given taxa removed
      *
-     * @param taxa2remove
      * @return copy with named taxa
      */
     public static Root apply(Root v, BitSet taxa2remove) {
@@ -61,10 +60,7 @@ public class CopyWithTaxaRemoved {
     /**
      * recursively makes a copy
      *
-     * @param v1
-     * @param v2
-     * @param taxa2remove
-     */
+	 */
     private static void applyRec(Root v1, Root v2, BitSet taxa2remove) {
         BitSet taxa = new BitSet();
         taxa.or(v1.getTaxa());

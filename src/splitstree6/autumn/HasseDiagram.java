@@ -34,7 +34,6 @@ public class HasseDiagram {
 	/**
 	 * construct the Hasse diagram for a set of clusters
 	 *
-	 * @param clusters
 	 */
 	public static PhyloTree constructHasse(Cluster[] clusters) {
 		// make clusters unique:

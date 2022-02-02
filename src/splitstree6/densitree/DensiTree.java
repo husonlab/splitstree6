@@ -95,18 +95,18 @@ public class DensiTree {
 //        }
 
 
-        int xmin = (int) 100;
-        int ymin = (int) 100;
-        int xmax = (int) (canvas.getWidth() -100);
-        int ymax = (int) (canvas.getHeight() -100);
+		int xmin = 100;
+		int ymin = 100;
+		int xmax = (int) (canvas.getWidth() - 100);
+		int ymax = (int) (canvas.getHeight() - 100);
 
-        boolean toScale = parameters.toScale;
-        int nTrees = model.getTreesBlock().size();
-        int nTaxa = model.getTaxaBlock().getNtax();
+		boolean toScale = parameters.toScale;
+		int nTrees = model.getTreesBlock().size();
+		int nTaxa = model.getTaxaBlock().getNtax();
 
-        int[] circle = model.getCircularOrdering();
-        String[] labels = new String[nTaxa];
-        double[][] coords = new double[nTaxa][3];
+		int[] circle = model.getCircularOrdering();
+		String[] labels = new String[nTaxa];
+		double[][] coords = new double[nTaxa][3];
 
         var tree1 = model.getTreesBlock().getTree(1);
         int counter = 0;

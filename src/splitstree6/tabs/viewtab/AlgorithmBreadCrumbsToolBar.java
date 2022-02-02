@@ -54,9 +54,7 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
     /**
      * constructor
      *
-     * @param mainWindow
-     * @param node
-     */
+	 */
     public AlgorithmBreadCrumbsToolBar(MainWindow mainWindow, WorkflowNode node) {
         invalidationListener = e -> {
             final Workflow workflow = mainWindow.getWorkflow();

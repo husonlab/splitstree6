@@ -37,8 +37,6 @@ public class Refine {
 	/**
 	 * refine two trees
 	 *
-	 * @param tree1
-	 * @param tree2
 	 * @return refined trees
 	 */
 	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2) throws IOException {
@@ -62,8 +60,6 @@ public class Refine {
 	/**
 	 * recursively does the work
 	 *
-	 * @param root1
-	 * @param root2
 	 */
 	public static void apply(Root root1, Root root2) {
         applyRec(root1, root2, new HashSet<>());
@@ -74,8 +70,6 @@ public class Refine {
 	/**
 	 * refines two rooted trees with respect to each other
 	 *
-	 * @param v1
-	 * @param v2
 	 */
 	private static void applyRec(Root v1, Root v2, Set<Pair<Root, Root>> compared) {
         Pair<Root, Root> pair = new Pair<>(v1, v2);

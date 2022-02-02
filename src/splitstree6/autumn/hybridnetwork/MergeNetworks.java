@@ -39,8 +39,6 @@ public class MergeNetworks {
     /**
      * cluster reduce two trees, if possible
      *
-     * @param tree1
-     * @param tree2
      * @return subtree-reduced trees followed by all reduced subtrees
      */
     public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2, PhyloTree[] subTrees) throws IOException {
@@ -74,8 +72,6 @@ public class MergeNetworks {
     /**
      * merge all networks in first list by attaching all networks in second list in all possible ways
      *
-     * @param list1
-     * @param list2
      * @return list of merged networks
      */
     static public List<Root> apply(Collection<Root> list1, Collection<Root> list2) throws IOException {
@@ -96,8 +92,6 @@ public class MergeNetworks {
     /**
      * merge two networks by adding the second to the leaves of the first where ever taxa match
      *
-     * @param root1
-     * @param root2
      * @return merged tree
      */
     static public Root merge(Root root1, Root root2) throws IOException {
@@ -168,10 +162,7 @@ public class MergeNetworks {
     /**
      * recursively does the work
      *
-     * @param v1
-     * @param v2
-     * @param old2new
-     */
+	 */
     private static void copySubNetworkRec(Root v1, Root v2, Map<Root, Root> old2new) {
         for (var e1 : v1.outEdges()) {
             var w1 = (Root) e1.getTarget();

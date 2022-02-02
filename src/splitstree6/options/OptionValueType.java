@@ -36,7 +36,6 @@ public enum OptionValueType {
 	/**
 	 * get the type of a value
 	 *
-	 * @param value
 	 * @return type
 	 */
 	public static OptionValueType getValueType(Object value) {
@@ -65,8 +64,6 @@ public enum OptionValueType {
 	/**
 	 * determines whether the given text represents an object of the given type
 	 *
-	 * @param type
-	 * @param text
 	 * @return true, if text is of given type
 	 */
 	public static boolean isType(OptionValueType type, String text) {
@@ -84,8 +81,6 @@ public enum OptionValueType {
 	/**
 	 * parses the text and returns an object of the given type
 	 *
-	 * @param type
-	 * @param text
 	 * @return object
 	 */
 	public static Object parseType(OptionValueType type, String text) {
@@ -135,18 +130,16 @@ public enum OptionValueType {
 	/**
 	 * converts an object of the specified type to a string
 	 *
-	 * @param type
-	 * @param object
 	 * @return string
 	 */
 	public static String toStringType(OptionValueType type, Object object) {
 		switch (type) {
 			case Integer:
-				return java.lang.String.format("%d", (Integer) object);
+				return java.lang.String.format("%d", object);
 			case Float:
-				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.6f", (Float) object));
+				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.6f", object));
 			case Double:
-				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.8f", (Double) object));
+				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.8f", object));
 			case doubleArray: {
 				StringBuilder buf = new StringBuilder();
 				final double[] array = (double[]) object;

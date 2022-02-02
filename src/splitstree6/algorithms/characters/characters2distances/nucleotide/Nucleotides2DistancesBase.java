@@ -97,8 +97,7 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
                 case defaultValues -> {
                     setOptionPropInvariableSites(DEFAULT_PROP_INVARIABLE_SITES);
                     setOptionGamma(DEFAULT_GAMMA);
-                    break;
-                }
+				}
                 case fromChars -> {
                     final AService<Double> service = new AService<>(() -> {
                         // todo: want this to run in foot pane
@@ -107,13 +106,10 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
                             return captureRecapture.estimatePropInvariableSites(progress, parent);
                         }
                     });
-                    service.setOnSucceeded((e) -> setOptionPropInvariableSites(service.getValue()));
-                    service.setOnFailed((e) -> {
-                        NotificationManager.showError("Calculation of proportion of invariable sites failed: " + service.getException().getMessage());
-                    });
-                    service.start();
-                    break;
-                }
+					service.setOnSucceeded((e) -> setOptionPropInvariableSites(service.getValue()));
+					service.setOnFailed((e) -> NotificationManager.showError("Calculation of proportion of invariable sites failed: " + service.getException().getMessage()));
+					service.start();
+				}
             }
         };
 		optionSetSiteVarParamsProperty().addListener(listenerSetSiteVarParams);
@@ -128,20 +124,16 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
                     setOptionRateMatrix(DEFAULT_RATE_MATRIX);
                     setOptionTsTvRatio(DEFAULT_TSTV_RATIO);
                     setOptionACvATRatio(DEFAULT_AC_VS_AT);
-                    break;
-                }
+				}
                 case fromChars -> {
                     final AService<double[]> service = new AService<>(() -> NucleotideModel.computeFreqs(parent, false));
-                    service.setOnSucceeded((e) -> setOptionBaseFrequencies(service.getValue()));
-                    service.setOnFailed((e) -> {
-                        NotificationManager.showError("Calculation of base frequencies failed: " + service.getException().getMessage());
-                    });
-                    service.start();
+					service.setOnSucceeded((e) -> setOptionBaseFrequencies(service.getValue()));
+					service.setOnFailed((e) -> NotificationManager.showError("Calculation of base frequencies failed: " + service.getException().getMessage()));
+					service.start();
 
                     // todo: don't know how to estimate QMatrix from data, ask Dave!
                     setOptionRateMatrix(DEFAULT_RATE_MATRIX);
-                    break;
-                }
+				}
             }
         };
 		optionSetBaseFrequenciesProperty().addListener(listenerSetBaseFrequencies);

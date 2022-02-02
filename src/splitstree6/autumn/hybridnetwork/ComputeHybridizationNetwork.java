@@ -51,9 +51,6 @@ public class ComputeHybridizationNetwork {
     /**
      * computes the hybrid number for two multifurcating trees
      *
-     * @param tree1
-     * @param tree2
-     * @param hybridizationNumber
      * @return reduced trees
      */
     public static PhyloTree[] apply(TaxaBlock taxaBlock, PhyloTree tree1, PhyloTree tree2, ProgressListener progress, Single<Integer> hybridizationNumber) throws IOException {
@@ -88,9 +85,6 @@ public class ComputeHybridizationNetwork {
     /**
      * run the algorithm
      *
-     * @param tree1
-     * @param tree2
-     * @param hybridizationNumber
      * @return reduced trees
      */
     private PhyloTree[] run(PhyloTree tree1, PhyloTree tree2, int upperBound, Single<Integer> hybridizationNumber) throws IOException {
@@ -211,17 +205,8 @@ public class ComputeHybridizationNetwork {
     /**
      * this is called between recursive calls of the algorithm to cache networks already computed
      *
-     * @param root1
-     * @param root2
-     * @param isReduced
-     * @param candidateHybrids
-     * @param k
-     * @param totalResults
-     * @param depth
      * @return cached networks or newly computed networks
-     * @throws IOException
-     * @throws CanceledException
-     */
+	 */
     private int cacheComputeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybrids, int k, Collection<Root> totalResults, String depth) throws IOException, CanceledException {
         if (true) // use caching
         {
@@ -254,12 +239,8 @@ public class ComputeHybridizationNetwork {
     /**
      * recursively compute the hybrid number
      *
-     * @param root1
-     * @param root2
      * @param isReduced    @return hybrid number
-     * @param k
-     * @param totalResults
-     */
+	 */
     private int computeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybridsOriginal, int k, Collection<Root> totalResults, String depth) throws IOException {
         if (verbose) {
             System.err.println(depth + "---------- ComputeRec:");
@@ -474,7 +455,6 @@ public class ComputeHybridizationNetwork {
     /**
      * get all alive leaves below the given root
      *
-     * @param root
      * @return leaves
      */
     private List<Root> getAllAliveLeaves(Root root) {
@@ -505,11 +485,8 @@ public class ComputeHybridizationNetwork {
     /**
      * gets all alive taxa. Checks that both trees have the same set of alive taxa
      *
-     * @param root1
-     * @param root2
      * @return all alive taxa
-     * @throws IOException
-     */
+	 */
     public BitSet getAllAliveTaxa(Root root1, Root root2) throws IOException {
         if (!root1.getTaxa().equals(root2.getTaxa()))
             throw new IOException("Trees have different sets of alive taxa: " + StringUtils.toString(root1.getTaxa()) + " vs "
@@ -520,8 +497,7 @@ public class ComputeHybridizationNetwork {
     /**
      * reorder the children in all networks
      *
-     * @param networks
-     */
+	 */
     private Collection<Root> fixOrdering(Collection<Root> networks) {
         for (var root : networks) {
             // if (verbose)

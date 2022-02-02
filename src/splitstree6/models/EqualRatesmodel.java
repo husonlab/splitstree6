@@ -79,9 +79,6 @@ public class EqualRatesmodel implements SubstitutionModel {
 	/**
 	 * Returns P_{ij}(t), probability of change to j at time t given i at time 0
 	 *
-	 * @param i
-	 * @param j
-	 * @param t
 	 * @return P_{ij}(t), probability of change to j at time t given i at time 0
 	 */
 	public double getP(int i, int j, double t) {
@@ -97,8 +94,6 @@ public class EqualRatesmodel implements SubstitutionModel {
 	/**
 	 * Get an entry in the Q matrix
 	 *
-	 * @param i
-	 * @param j
 	 * @return Q[i][j]
 	 */
 	public double getQ(int i, int j) {

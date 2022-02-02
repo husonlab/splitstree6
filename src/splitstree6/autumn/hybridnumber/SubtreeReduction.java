@@ -47,8 +47,6 @@ public class SubtreeReduction {
     /**
      * refine two trees
      *
-     * @param tree1
-     * @param tree2
      * @return subtree-reduced trees followed by all reduced subtrees
      */
     public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2) throws IOException {
@@ -153,9 +151,7 @@ public class SubtreeReduction {
      * @param v2          root of second tree
      * @param isomorphic2 set of isomorphic subtrees of v2, initially containing all leaves
      * @param subTrees    all reduced subtrees are returned here
-     * @param compared
-     * @param changed
-     */
+	 */
     private static void applyRec(Root v1, NodeSet isomorphic1, Root v2, NodeSet isomorphic2, List<Root> subTrees, Set<Pair<Node, Node>> compared, Single<Boolean> changed) {
         Pair<Node, Node> key = new Pair<>(v1, v2);
         if (compared.contains(key))

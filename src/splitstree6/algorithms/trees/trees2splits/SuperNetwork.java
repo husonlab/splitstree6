@@ -270,9 +270,6 @@ public class SuperNetwork extends Trees2Splits {
 	 * set the weight to the mean weight of all projections of this split and confidence to
 	 * the count of trees containing a projection of the split
 	 *
-	 * @param pSplits
-	 * @param supportSet
-	 * @param splits
 	 */
 	private void setWeightsConfidences(Map[] pSplits, BitSet[] supportSet, SplitsBlock splits) {
 		for (int s = 1; s <= splits.getNsplits(); s++) {
@@ -318,10 +315,6 @@ public class SuperNetwork extends Trees2Splits {
 	 * sets the weight of a split in the network as the average relative length of the edge
 	 * in the input trees
 	 *
-	 * @param pSplits
-	 * @param supportSet
-	 * @param splits
-	 * @throws CanceledException
 	 */
 	private void setWeightAverageReleativeLength(Map[] pSplits, BitSet[] supportSet, SplitsBlock splits) {
 		// compute average of weights and num of edges for each input tree
@@ -370,8 +363,6 @@ public class SuperNetwork extends Trees2Splits {
 	/**
 	 * returns the set of all partial splits in the given tree
 	 *
-	 * @param trees
-	 * @param which
 	 * @param pSplitsOfTree partial splits are returned here
 	 * @param support       supporting taxa are returned here
 	 */
@@ -416,8 +407,6 @@ public class SuperNetwork extends Trees2Splits {
 	/**
 	 * runs the closure method. Does this multiple times, if desired
 	 *
-	 * @param partialSplits
-	 * @throws CanceledException
 	 */
 	private void computeClosureOuterLoop(ProgressListener progress, Set<PartialSplit> partialSplits) throws CanceledException {
 		this.rand = new Random(getOptionSeed());
@@ -447,8 +436,6 @@ public class SuperNetwork extends Trees2Splits {
 	/**
 	 * gets the number of full splits
 	 *
-	 * @param numAllTaxa
-	 * @param partialSplits
 	 * @return number of full splits
 	 */
 	public int getNumberOfFullSplits(int numAllTaxa, Set partialSplits) {
@@ -464,7 +451,6 @@ public class SuperNetwork extends Trees2Splits {
 	/**
 	 * computes the split closure obtained using the zig-zap rule
 	 *
-	 * @param partialSplits
 	 */
 	private void computeClosure(ProgressListener progress, Set<PartialSplit> partialSplits) throws CanceledException {
 
@@ -515,8 +501,8 @@ public class SuperNetwork extends Trees2Splits {
 				while (it1.hasNext()) {
 					Integer pos1 = ((Integer) it1.next());
 
-					for (Object activeSplit : activeSplits) {
-						Integer pos2 = ((Integer) activeSplit);
+					for (Integer activeSplit : activeSplits) {
+						Integer pos2 = activeSplit;
 						PartialSplit ps1 = splits[pos1];
 						PartialSplit ps2 = splits[pos2];
 						PartialSplit qs1 = new PartialSplit();
@@ -534,8 +520,8 @@ public class SuperNetwork extends Trees2Splits {
 				while (it1.hasNext()) {
 					Integer pos1 = ((Integer) it1.next());
 
-					for (Object activeSplit : activeSplits) {
-						Integer pos2 = ((Integer) activeSplit);
+					for (Integer activeSplit : activeSplits) {
+						Integer pos2 = activeSplit;
 						PartialSplit ps1 = splits[pos1];
 						PartialSplit ps2 = splits[pos2];
 						PartialSplit qs1 = new PartialSplit();
@@ -570,7 +556,6 @@ public class SuperNetwork extends Trees2Splits {
 	/**
 	 * applies a simple refinement heuristic
 	 *
-	 * @param partialSplits
 	 */
 	private void applyRefineHeuristic(Set partialSplits) {
 
