@@ -71,9 +71,8 @@ public class TreePane extends StackPane {
 					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels) {
 
 		var interactionSetup = new InteractionSetup(taxaBlock, taxonSelectionModel, orientation);
-		// setStyle("-fx-border-color: lightgray;");
 
-		setStyle("-fx-background-color: transparent");
+		//setStyle("-fx-background-color: transparent");
 
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);

@@ -32,26 +32,23 @@
         <top>
             <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                 <ToolBar fx:id="toolBar" prefHeight="32.0">
-                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="Find">
+                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                            mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
                         <font>
                             <Font size="10.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false"
-                                       url="@/jloda/resources/icons/sun/Find16.gif"/>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
                             </ImageView>
                         </graphic>
                         <tooltip>
                             <Tooltip text="Find in selected tab"/>
                         </tooltip>
                     </Button>
-                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                               orientation="VERTICAL" prefHeight="20.0"/>
+                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
                     <ComboBox fx:id="tree1CBox" prefWidth="100.0"/>
                     <ComboBox fx:id="diagram1CBox" prefWidth="50.0">
                         <tooltip>
@@ -64,15 +61,15 @@
                         </tooltip>
                     </ComboBox>
                     <ComboBox fx:id="tree2CBox" layoutX="165.0" layoutY="10.0" prefWidth="100.0"/>
-                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                               orientation="VERTICAL" prefHeight="20.0"/>
+                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
                     <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
                         <tooltip>
                             <Tooltip text="Choose orientation"/>
                         </tooltip>
                     </ComboBox>
-                    <Separator layoutX="494.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                               orientation="VERTICAL" prefHeight="20.0"/>
+                    <Separator layoutX="494.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
                     <Button fx:id="previousButton" mnemonicParsing="false"
                             style="-fx-border-style: none; -fx-background-color: transparent;" text="&lt;">
                         <tooltip>
@@ -85,12 +82,11 @@
                             <Tooltip text="Move to next pair of trees"/>
                         </tooltip>
                     </Button>
-                    <Separator layoutX="548.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                               orientation="VERTICAL" prefHeight="20.0"/>
-                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
-                                  maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                                  minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
-                                  prefWidth="24.0" text="T">
+                    <Separator layoutX="548.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" maxHeight="-Infinity"
+                                  maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" text="T">
                         <tooltip>
                             <Tooltip text="Show tree names or info"/>
                         </tooltip>
@@ -101,16 +97,13 @@
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                     <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                             minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="Expand Vertically">
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Expand Vertically">
                         <font>
                             <Font size="10.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false"
-                                       url="@/jloda/resources/icons/ExpandVertical16.gif"/>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandVertical16.gif"/>
                             </ImageView>
                         </graphic>
                         <tooltip>
@@ -125,10 +118,8 @@
                             <Font size="10.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false"
-                                       url="@/jloda/resources/icons/ContractVertical16.gif"/>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractVertical16.gif"/>
                             </ImageView>
                         </graphic>
                         <tooltip>
@@ -143,28 +134,24 @@
                             <Font size="10.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false"
-                                       url="@/jloda/resources/icons/ExpandHorizontal16.gif"/>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandHorizontal16.gif"/>
                             </ImageView>
                         </graphic>
                         <tooltip>
                             <Tooltip text="Expand tree horizontally"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="contractHorizontallyButton" contentDisplay="GRAPHIC_ONLY"
-                            maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                    <Button fx:id="contractHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
                             style="-fx-border-style: none; -fx-background-color: transparent;"
                             text="Contract Horizontally">
                         <font>
                             <Font size="10.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false"
-                                       url="@/jloda/resources/icons/ContractHorizontal16.gif"/>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractHorizontal16.gif"/>
                             </ImageView>
                         </graphic>
                         <tooltip>
@@ -175,29 +162,25 @@
             </VBox>
         </top>
         <center>
-            <AnchorPane fx:id="innerAnchorPane" style="-fx-background-color: transparent;">
-                <ScrollPane fx:id="scrollPane" style="-fx-background-color: transparent;"
-                            AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+            <AnchorPane fx:id="innerAnchorPane">
+                <ScrollPane fx:id="scrollPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                             AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                    <HBox alignment="CENTER" style="-fx-background-color: transparent;">
+                    <HBox alignment="CENTER" styleClass="background">
                         <padding>
                             <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
                         </padding>
                         <StackPane fx:id="leftPane" alignment="TOP_RIGHT" pickOnBounds="false"
                                    style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
-                        <Pane fx:id="middlePane" maxWidth="-Infinity" minWidth="50.0"
-                              pickOnBounds="false" prefHeight="200.0"
-                              style="-fx-background-color: transparent;"/>
+                        <Pane fx:id="middlePane" maxWidth="-Infinity" minWidth="50.0" pickOnBounds="false"
+                              prefHeight="200.0"/>
                         <StackPane fx:id="rightPane" alignment="TOP_LEFT" pickOnBounds="false"
                                    style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
                     </HBox>
                 </ScrollPane>
-                <Label fx:id="tree1NameLabel" layoutX="40.0" layoutY="5.0"
-                       style="-fx-background-color: transparent;" text="Tree 1" AnchorPane.leftAnchor="5.0"
-                       AnchorPane.topAnchor="5.0"/>
-                <Label fx:id="tree2NameLabel" layoutX="725.0" layoutY="5.0"
-                       style="-fx-background-color: transparent;" text="Tree 2" AnchorPane.rightAnchor="5.0"
-                       AnchorPane.topAnchor="5.0"/>
+                <Label fx:id="tree1NameLabel" layoutX="40.0" layoutY="5.0" style="-fx-background-color: transparent;"
+                       text="Tree 1" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0"/>
+                <Label fx:id="tree2NameLabel" layoutX="725.0" layoutY="5.0" style="-fx-background-color: transparent;"
+                       text="Tree 2" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0"/>
             </AnchorPane>
         </center>
     </BorderPane>

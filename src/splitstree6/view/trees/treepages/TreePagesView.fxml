@@ -31,15 +31,14 @@
         <top>
             <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                 <ToolBar fx:id="toolBar" prefHeight="32.0">
-                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                            mnemonicParsing="false" prefHeight="20.0"
                             style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
                         <font>
                             <Font size="10.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                 <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
                             </ImageView>
                         </graphic>
@@ -63,22 +62,22 @@
                             <Tooltip text="use child-average or leaf-average to place internal nodes"/>
                         </tooltip>
                     </ComboBox>
-                    <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
-                               orientation="VERTICAL" prefHeight="20.0"/>
+                    <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
                     <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
                         <tooltip>
                             <Tooltip text="Set rows x columns"/>
                         </tooltip>
                     </ComboBox>
-                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                               orientation="VERTICAL" prefHeight="20.0"/>
+                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
                     <ComboBox fx:id="treeCBox" minWidth="100.0"/>
-                    <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
-                               orientation="VERTICAL" prefHeight="20.0"/>
-                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
-                                  maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
-                                  minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
-                                  prefWidth="24.0" text="T" textOverrun="CLIP">
+                    <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" maxHeight="-Infinity"
+                                  maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" text="T"
+                                  textOverrun="CLIP">
                         <tooltip>
                             <Tooltip text="Show tree names and info"/>
                         </tooltip>
@@ -87,16 +86,14 @@
                         </font>
                     </ToggleButton>
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="Zoom In">
+                    <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                            mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom In">
                         <font>
                             <Font size="12.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                 <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
                             </ImageView>
                         </graphic>
@@ -104,16 +101,14 @@
                             <Tooltip text="Zoom in"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="Zoom Out">
+                    <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                            mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom Out">
                         <font>
                             <Font size="10.0"/>
                         </font>
                         <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
                                 <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
                             </ImageView>
                         </graphic>
@@ -130,7 +125,7 @@
                 <BorderPane.margin>
                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                 </BorderPane.margin>
-                <Pagination fx:id="pagination" pageCount="1"/>
+                <Pagination fx:id="pagination" pageCount="1" styleClass="background"/>
             </Pane>
         </center>
     </BorderPane>

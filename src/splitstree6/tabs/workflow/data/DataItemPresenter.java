@@ -69,7 +69,6 @@ public class DataItemPresenter<D extends DataBlock> {
 			controller.getNameLabel().setGraphic(new ImageView(icon));
 		}
 
-		controller.getAnchorPane().getStyleClass().add("background");
 		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");
 			controller.getInfoLabel().setStyle("-fx-text-fill: darkgray");

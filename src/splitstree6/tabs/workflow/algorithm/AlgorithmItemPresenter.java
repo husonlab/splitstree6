@@ -70,7 +70,6 @@ public class AlgorithmItemPresenter {
 
 		controller.getNameLabel().setGraphic(ResourceManagerFX.getIconAsImageView(node.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16));
 
-		controller.getAnchorPane().getStyleClass().add("background");
 		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");
 			if (controller.getNameLabel().getGraphic() != null)
