@@ -95,7 +95,7 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomOutMenuItem().setOnAction(null);
 
 		var treeView = tabController.getWorkflowTreeView();
-		treeView.getStyleClass().add("background");
+		treeView.getStyleClass().add("viewer-background");
 
 		tabController.getCollapseAllButton().setOnAction((e) -> treeView.getRoot().setExpanded(false));
 

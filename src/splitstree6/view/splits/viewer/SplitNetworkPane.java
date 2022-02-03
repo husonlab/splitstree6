@@ -78,7 +78,7 @@ public class SplitNetworkPane extends StackPane {
 							double rootAngle,
 							ReadOnlyBooleanProperty useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 							DoubleProperty unitLength) {
-		getStyleClass().add("background");
+		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
 
 		setPrefWidth(boxWidth);

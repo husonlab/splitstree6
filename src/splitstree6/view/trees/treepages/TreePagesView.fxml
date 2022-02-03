@@ -125,7 +125,7 @@
                 <BorderPane.margin>
                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                 </BorderPane.margin>
-                <Pagination fx:id="pagination" pageCount="1" styleClass="background"/>
+                <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
             </Pane>
         </center>
     </BorderPane>
