@@ -267,23 +267,12 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
-		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor(1.2 * treePageView.getOptionFontScaleFactor()));
-		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
-		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
-		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
+		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
+		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
-		mainWindow.getController().getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
-		mainWindow.getController().getZoomInMenuItem().disableProperty().bind(controller.getZoomInButton().disableProperty());
-		mainWindow.getController().getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
-		mainWindow.getController().getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
-
-		mainWindow.getController().getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
-		mainWindow.getController().getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainWindow.getController().getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-
-		mainWindow.getController().getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
-		mainWindow.getController().getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
-		mainWindow.getController().getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(treePageView.getOptionOrientation()));
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePageView.emptyProperty());
 	}
 
     private record RowsCols(int rows, int cols) {

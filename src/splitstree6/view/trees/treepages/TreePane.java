@@ -81,7 +81,10 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		fontScaleChangeListener = (v, o, n) -> LayoutUtils.applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
+		fontScaleChangeListener = (v, o, n) -> {
+			LayoutUtils.applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
+			updateLabelLayout(orientation.get());
+		};
 		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 
 		zoomChangedListener = (v, o, n) -> {
@@ -130,7 +133,6 @@ public class TreePane extends StackPane {
 			orientationConsumer = pair.getSecond();
 
 			pane = new StackPane(group);
-			pane.setStyle("-fx-background-color: transparent");
 			pane.setId("treeView");
 			if (zoomFactor.get() > 0 && zoomFactor.get() != 1) {
 				pane.setScaleX(zoomFactor.get());

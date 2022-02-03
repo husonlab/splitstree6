@@ -80,9 +80,11 @@ public class ComputeHeightAndAngles {
 
 	public static void computeAngles(PhyloTree tree, NodeDoubleArray nodeAngleMap, Averaging averaging) {
 		ComputeHeightAndAngles.apply(tree, nodeAngleMap, averaging);
-		var max = tree.nodeStream().filter(tree::isLsaLeaf).mapToDouble(nodeAngleMap::get).max().orElse(0);
+		var max = nodeAngleMap.values().stream().mapToDouble(a -> a).max().orElse(0);
 		var factor = 360.0 / max;
-        nodeAngleMap.replaceAll((v, value) -> value * factor);
+		for (var v : nodeAngleMap.keySet()) {
+			nodeAngleMap.put(v, nodeAngleMap.get(v) * factor);
+		}
 	}
 
 	/**
