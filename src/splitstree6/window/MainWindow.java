@@ -72,7 +72,7 @@ public class MainWindow implements IMainWindow {
 	private Stage stage;
 
 	public MainWindow() {
-		Platform.setImplicitExit(false);
+			Platform.setImplicitExit(false);
 
 		final ExtendedFXMLLoader<MainWindowController> loader = new ExtendedFXMLLoader<>(this.getClass());
 		root = loader.getRoot();
