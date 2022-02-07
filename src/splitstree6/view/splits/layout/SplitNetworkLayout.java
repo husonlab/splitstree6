@@ -32,7 +32,6 @@ import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -182,7 +181,6 @@ public class SplitNetworkLayout {
 		unitLength.set(normalize(width, height, nodePointMap, true));
 
 		// compute the shapes:
-		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
 
 		// nodes:
 		var nodesGroup = new Group();
@@ -194,11 +192,11 @@ public class SplitNetworkLayout {
 			var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
 			var point = nodePointMap.get(v);
 			var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 2 : 0.5);
+			shape.getStyleClass().add("graph-node");
+
 			shape.setTranslateX(point.getX());
 			shape.setTranslateY(point.getY());
 
-			shape.setStroke(Color.TRANSPARENT);
-			shape.setFill(color);
 			nodeShapeMap.put(v, shape);
 
 			nodesGroup.getChildren().add(shape);
@@ -206,10 +204,10 @@ public class SplitNetworkLayout {
 			var text = LayoutUtils.getLabelText(taxaBlock, graph, v);
 			if (text != null && !isRootNode) {
 				var label = new RichTextLabel(text);
+				label.getStyleClass().add("graph-label");
 				// todo: need to change stuff so that each node has at most one taxon
 				taxonLabelMap.put(taxaBlock.get(graph.getTaxa(v).iterator().next()), label);
 
-				label.setTextFill(color);
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTranslateX(nodeShapeMap.get(v).getTranslateX() + 10);
 				label.setTranslateY(nodeShapeMap.get(v).getTranslateY() + 10);
@@ -244,14 +242,14 @@ public class SplitNetworkLayout {
 		var edgesGroup = new Group();
 		for (var e : graph.edges()) {
 			var line = new Line();
+			line.getStyleClass().add("graph-edge");
+
 			line.startXProperty().bind(nodeShapeMap.get(e.getSource()).translateXProperty());
 			line.startYProperty().bind(nodeShapeMap.get(e.getSource()).translateYProperty());
 			line.endXProperty().bind(nodeShapeMap.get(e.getTarget()).translateXProperty());
 			line.endYProperty().bind(nodeShapeMap.get(e.getTarget()).translateYProperty());
 			if (graph.getSplit(e) == rootSplit) // is added  split
 				line.setStroke(Color.GRAY);
-			else
-				line.setStroke(color);
 			edgeCallback.accept(e, line);
 			edgesGroup.getChildren().add(line);
 

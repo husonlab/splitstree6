@@ -72,14 +72,13 @@ public class SplitsFormatterPresenter {
 								for (var shape : splitShapeMap.get(split)) {
 									var oldValue = shape.getStrokeWidth();
 									if (n.doubleValue() != oldValue) {
-										shape.setStrokeWidth(n.doubleValue());
 										undoList.add(shape.strokeWidthProperty(), oldValue, n);
 									}
 								}
 							}
 						}
 						if (undoList.size() > 0)
-							undoManager.add(undoList);
+							undoManager.doAndAdd(undoList);
 
 						Platform.runLater(() -> controller.getWidthCBox().setValue(n));
 					}
@@ -96,14 +95,23 @@ public class SplitsFormatterPresenter {
 						for (var shape : splitShapeMap.get(split)) {
 							var oldColor = shape.getStroke();
 							if (!color.equals(oldColor)) {
-								shape.setStroke(color);
-								undoList.add(shape.strokeProperty(), oldColor, color);
+								var hasGraphEdgeStyleClass = shape.getStyleClass().contains("graph-edge");
+								undoList.add(() -> {
+									if (hasGraphEdgeStyleClass)
+										shape.getStyleClass().add("graph-edge");
+									shape.setStroke(oldColor);
+
+								}, () -> {
+									if (hasGraphEdgeStyleClass)
+										shape.getStyleClass().remove("graph-edge");
+									shape.setStroke(color);
+								});
 							}
 						}
 					}
 				}
 				if (undoList.size() > 0)
-					undoManager.add(undoList);
+					undoManager.doAndAdd(undoList);
 			}
 		});
 
@@ -118,7 +126,7 @@ public class SplitsFormatterPresenter {
 				for (var split : splitSelectionModel.getSelectedItems()) {
 					if (splitShapeMap.containsKey(split)) {
 						for (var shape : splitShapeMap.get(split)) {
-							if (shape.getUserData() instanceof Double width) // temporarily store with in user data when user is hovering over edge
+							if (shape.getUserData() instanceof Double width) // temporarily store width in user data when user is hovering over edge
 								widths.add(width);
 							else
 								widths.add(shape.getStrokeWidth());

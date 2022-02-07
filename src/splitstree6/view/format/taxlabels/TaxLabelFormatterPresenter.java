@@ -157,7 +157,7 @@ public class TaxLabelFormatterPresenter {
 				var undoList = new UndoableRedoableCommandList("set label color");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxonLabelGetter.apply(taxon);
-					if (oldLabel != null && !RichTextLabel.getTextFill(oldLabel).equals(color)) {
+					if (oldLabel != null && (RichTextLabel.getTextFill(oldLabel) == null || !RichTextLabel.getTextFill(oldLabel).equals(color))) {
 						var newLabel = RichTextLabel.setTextFill(oldLabel, color);
 						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
 						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));

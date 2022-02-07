@@ -38,17 +38,13 @@ import java.util.function.BiConsumer;
  */
 public class CreateEdgesRectangular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
 		for (var e : tree.edges()) {
 			var sourceShape = nodeShapeMap.get(e.getSource());
 			var targetShape = nodeShapeMap.get(e.getTarget());
 			var line = new Path();
-			line.setFill(Color.TRANSPARENT);
-			line.setStroke(color);
-			line.setStrokeLineCap(StrokeLineCap.ROUND);
-			line.setStrokeWidth(1);
 			line.setPickOnBounds(false);
 
 			var moveTo = new MoveTo();
@@ -62,6 +58,8 @@ public class CreateEdgesRectangular {
 			line.getElements().add(moveTo);
 
 			if (tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
+				line.getStyleClass().add("graph-edge");
+
 				var lineTo1 = new LineTo();
 				line.getElements().add(lineTo1);
 				if (linkNodesEdgesLabels) {
@@ -97,7 +95,7 @@ public class CreateEdgesRectangular {
 					lineTo2.setY(targetShape.getTranslateY());
 				}
 			} else if (tree.isTransferEdge(e)) {
-				line.setStroke(Color.DARKORANGE);
+				line.getStyleClass().add("graph-special-edge");
 				var lineTo1 = new LineTo();
 				line.getElements().add(lineTo1);
 
@@ -110,7 +108,7 @@ public class CreateEdgesRectangular {
 					addArrowHead(line, moveTo, lineTo1);
 				}
 			} else { // tree.isReticulatedEdge(e)
-				line.setStroke(Color.DARKORANGE);
+				line.getStyleClass().add("graph-special-edge");
 
 				var quadCurveTo = new QuadCurveTo();
 				line.getElements().add(quadCurveTo);

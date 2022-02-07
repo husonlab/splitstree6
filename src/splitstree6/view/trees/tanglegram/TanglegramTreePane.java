@@ -29,7 +29,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import jloda.fx.selection.SelectionModel;
-import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -70,7 +69,6 @@ public class TanglegramTreePane extends Group {
 		// optionOrientation.addListener(new WeakInvalidationListener(updater)); // treepane listens for changes of orientation
 		dimensions.addListener(new WeakInvalidationListener(updater));
 		optionAveraging.addListener(new WeakInvalidationListener(updater));
-		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updater));
 	}
 
 	public Runnable getRunAfterUpdate() {

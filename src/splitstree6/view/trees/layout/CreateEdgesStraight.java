@@ -37,7 +37,7 @@ import static splitstree6.view.trees.layout.CreateEdgesRectangular.addArrowHead;
  */
 public class CreateEdgesStraight {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 		for (var e : tree.edges()) {
 			var sourceShape = nodeShapeMap.get(e.getSource());
@@ -65,10 +65,10 @@ public class CreateEdgesStraight {
 			line.setStrokeLineCap(StrokeLineCap.ROUND);
 			line.setStrokeWidth(1);
 
-			if (tree.isReticulatedEdge(e))
-				line.setStroke(Color.DARKORANGE);
+			if (tree.isTreeEdge(e))
+				line.getStyleClass().add("graph-edge");
 			else
-				line.setStroke(color);
+				line.getStyleClass().add("graph-special-edge");
 
 			if (tree.isTransferEdge(e))
 				addArrowHead(line, moveTo, lineTo);

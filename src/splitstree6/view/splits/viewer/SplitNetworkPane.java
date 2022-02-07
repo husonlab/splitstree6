@@ -42,7 +42,6 @@ import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.ProgramExecutorService;
-import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -104,7 +103,6 @@ public class SplitNetworkPane extends StackPane {
 		useWeights.addListener(new WeakInvalidationListener(layoutLabelsListener));
 
 		redrawListener = e -> drawNetwork();
-		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(redrawListener));
 
 		// compute the tree in a separate thread:
 		service = new AService<>(mainWindow.getController().getBottomFlowPane());

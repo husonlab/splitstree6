@@ -44,6 +44,7 @@ abstract public class WorkflowNodeItem extends Pane {
 		this.workflowTab = workflowTab;
 		setupMouseInteraction(workflow.getSelectionModel());
 		this.node = node;
+		setStyle("-fx-background-color: -fx-base;");
 	}
 
 	public void move(double dx, double dy) {

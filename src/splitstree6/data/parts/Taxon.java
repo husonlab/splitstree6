@@ -19,50 +19,79 @@
 
 package splitstree6.data.parts;
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+/**
+ * a taxon
+ * Daniel Huson, 2021
+ */
 public class Taxon {
 	private String name;
-	private String info;
-	private String displayLabel;
+	private String _info;
+	private StringProperty info;
+	private String _displayLabel;
+	private StringProperty displayLabel;
 
 	public Taxon() {
 	}
 
 	public Taxon(String name) {
-		setName(name);
+		this.name = name;
 	}
 
 	public Taxon(Taxon src) {
-		name = src.name;
-		displayLabel = src.displayLabel;
-		info = src.info;
+		this(src.getName());
+		setInfo(src.getInfo());
+		setDisplayLabel(src.getDisplayLabel());
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getDisplayLabel() {
+		if (displayLabel != null)
+			return displayLabel.get();
+		else
+			return _displayLabel;
 	}
 
-	public String getDisplayLabel() {
+	public StringProperty displayLabelProperty() {
+		if (displayLabel == null)
+			displayLabel = new SimpleStringProperty(_displayLabel);
 		return displayLabel;
 	}
 
 	public String getDisplayLabelOrName() {
-		return displayLabel != null ? displayLabel : name;
+		return getDisplayLabel() != null ? getDisplayLabel() : getName();
 	}
 
 	public void setDisplayLabel(String displayLabel) {
-		this.displayLabel = displayLabel;
+		if (this.displayLabel != null)
+			this.displayLabel.set(displayLabel);
+		else
+			_displayLabel = displayLabel;
 	}
 
 	public String getInfo() {
+		if (info != null)
+			return info.get();
+		else
+			return _info;
+	}
+
+	public StringProperty infoProperty() {
+		if (info == null)
+			info = new SimpleStringProperty(_info);
 		return info;
 	}
 
 	public void setInfo(String info) {
-		this.info = info;
+		if (this.info != null)
+			this.info.set(info);
+		else
+			_info = info;
 	}
 
 	public String toString() {
@@ -84,8 +113,8 @@ public class Taxon {
 
 	public String getNameAndDisplayLabel(String separator) {
 		if (getDisplayLabel() == null || getDisplayLabel().isBlank() || getDisplayLabel().equals(getName()))
-			return getName();
+			return name;
 		else
-			return getName() + separator + getDisplayLabel();
+			return name + separator + getDisplayLabel();
 	}
 }

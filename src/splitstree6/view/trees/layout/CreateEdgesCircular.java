@@ -20,7 +20,6 @@
 package splitstree6.view.trees.layout;
 
 import javafx.geometry.Point2D;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
@@ -37,7 +36,7 @@ import static splitstree6.view.trees.layout.CreateEdgesRectangular.addArrowHead;
 
 public class CreateEdgesCircular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, Color color, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
 
@@ -47,22 +46,15 @@ public class CreateEdgesCircular {
 			for (var e : v.outEdges()) {
 				var w = e.getTarget();
 
-
 				// todo: need to implemented linked
 
 				var vPt = nodePointMap.get(v);
 				var wPt = nodePointMap.get(w);
 
 				var line = new Path();
-				line.setFill(Color.TRANSPARENT);
-				line.setStrokeLineCap(StrokeLineCap.ROUND);
-				line.setStrokeWidth(1);
 
 				if (tree.isTreeEdge(e)) {
-					line.setStroke(color);
-
-					if (tree.isReticulatedEdge(e))
-						line.setStroke(Color.PINK);
+					line.getStyleClass().add("graph-edge");
 
 					line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));
 
@@ -82,7 +74,8 @@ public class CreateEdgesCircular {
 
 					line.getElements().add(new LineTo(wPt.getX(), wPt.getY()));
 				} else {
-					line.setStroke(Color.DARKORANGE);
+					line.getStyleClass().add("graph-special-edge");
+
 					var moveTo = new MoveTo(vPt.getX(), vPt.getY());
 					var lineTo = new LineTo(wPt.getX(), wPt.getY());
 					line.getElements().addAll(moveTo, lineTo);
@@ -99,5 +92,4 @@ public class CreateEdgesCircular {
 		});
 		return shapes;
 	}
-
 }

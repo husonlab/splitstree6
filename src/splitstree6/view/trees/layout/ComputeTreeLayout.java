@@ -21,12 +21,10 @@ package splitstree6.view.trees.layout;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.TriConsumer;
-import jloda.fx.window.MainWindowManager;
 import jloda.graph.Edge;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
@@ -70,8 +68,6 @@ public class ComputeTreeLayout {
 
 		//parentPlacement = ParentPlacement.LeafAverage;
 
-		final var color = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
-
 		var triplet = LayoutUtils.computeFontHeightGraphWidthHeight(taxaBlock, tree, diagram.isRadialOrCircular(), width, height);
 		var fontHeight = triplet.getFirst();
 		width = triplet.getSecond();
@@ -83,7 +79,6 @@ public class ComputeTreeLayout {
 			if (text != null) {
 				var label = new RichTextLabel(text);
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-				label.setTextFill(color);
 				label.applyCss();
 				nodeLabelMap.put(v, label);
 			}
@@ -116,30 +111,29 @@ public class ComputeTreeLayout {
 
 		for (var v : tree.nodes()) {
 			var point = nodePointMap.get(v);
-			var circle = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
-			circle.setFill(color);
-			circle.setStroke(Color.TRANSPARENT);
-			nodeGroup.getChildren().add(circle);
-			circle.setTranslateX(point.getX());
-			circle.setTranslateY(point.getY());
-			nodeShapeMap.put(v, circle);
+			var shape = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
+			shape.getStyleClass().add("graph-node");
+			nodeGroup.getChildren().add(shape);
+			shape.setTranslateX(point.getX());
+			shape.setTranslateY(point.getY());
+			nodeShapeMap.put(v, shape);
 
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
 				nodeLabelGroup.getChildren().add(label);
-				nodeCallback.accept(v, circle, label);
+				nodeCallback.accept(v, shape, label);
 				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
 				if (taxonId != null)
-					circle.setUserData(taxaBlock.get(taxonId));
+					shape.setUserData(taxaBlock.get(taxonId));
 			}
 		}
 
 		if (diagram == TreeDiagramType.CircularCladogram || diagram == TreeDiagramType.CircularPhylogram) {
-			edgeGroup.getChildren().addAll(CreateEdgesCircular.apply(diagram, tree, nodePointMap, nodeAngleMap, color, linkNodesEdgesLabels, edgeCallback));
+			edgeGroup.getChildren().addAll(CreateEdgesCircular.apply(diagram, tree, nodePointMap, nodeAngleMap, linkNodesEdgesLabels, edgeCallback));
 		} else if (diagram == TreeDiagramType.TriangularCladogram || diagram == TreeDiagramType.RadialPhylogram || diagram == TreeDiagramType.RadialCladogram) {
-			edgeGroup.getChildren().addAll(CreateEdgesStraight.apply(diagram, tree, nodeShapeMap, color, linkNodesEdgesLabels || diagram == TreeDiagramType.RadialPhylogram, edgeCallback));
+			edgeGroup.getChildren().addAll(CreateEdgesStraight.apply(diagram, tree, nodeShapeMap, linkNodesEdgesLabels || diagram == TreeDiagramType.RadialPhylogram, edgeCallback));
 		} else { // if (diagram == TreePane.TreeDiagramType.Rectangular) {
-			edgeGroup.getChildren().addAll(CreateEdgesRectangular.apply(diagram, tree, nodeShapeMap, color, linkNodesEdgesLabels, edgeCallback));
+			edgeGroup.getChildren().addAll(CreateEdgesRectangular.apply(diagram, tree, nodeShapeMap, linkNodesEdgesLabels, edgeCallback));
 		}
 
 		Group labelConnectorGroup = alignLabels ? new Group() : null;

@@ -27,7 +27,7 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="anchorPane" prefHeight="50.0" prefWidth="160.0" style="-fx-border-color: lightgray;"
+<AnchorPane fx:id="anchorPane" prefHeight="50.0" prefWidth="160.0" style="-fx-border-color: darkgray;"
             xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.tabs.workflow.data.DataItemController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
@@ -56,8 +56,8 @@
             </Label>
         </center>
         <left>
-            <Button fx:id="editButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
-                    minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
+            <Button fx:id="editButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0" minHeight="18.0"
+                    minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
                     style="-fx-border-style: none; -fx-background-color: transparent;" text="Edit"
                     BorderPane.alignment="CENTER">
                 <font>

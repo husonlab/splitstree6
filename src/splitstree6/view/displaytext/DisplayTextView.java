@@ -60,7 +60,6 @@ public class DisplayTextView implements IView {
 
 		controller.getCodeArea().getStyleClass().add("viewer-background");
 
-		// todo: use darker line numbers in dark theme
 		showLineNumbers.addListener((v, o, n) -> controller.getCodeArea().setParagraphGraphicFactory(n ? LineNumberFactory.get(controller.getCodeArea()) : null));
 		wrapText.bindBidirectional(controller.getCodeArea().wrapTextProperty());
 	}

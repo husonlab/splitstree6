@@ -40,8 +40,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 
-import java.util.List;
-
 /**
  * taxa edit presenter
  * Daniel Huson, 11.2021
@@ -220,12 +218,12 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		taxaEditorNode.validProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 		activeChangedListener.invalidated(null);
 
-		setupEditMenuButton(tab.getController().getMenuButton(), controller);
+		setupEditMenuButton(tab.getController().getMenuButton(), controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu());
 
 	}
 
-	private void setupEditMenuButton(MenuButton menuButton, TaxaEditController controller) {
-		for (var contextMenu : List.of(controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu())) {
+	public static void setupEditMenuButton(MenuButton menuButton, ContextMenu... sourceMenus) {
+		for (var contextMenu : sourceMenus) {
 			if (menuButton.getItems().size() > 0)
 				menuButton.getItems().add(new SeparatorMenuItem());
 
@@ -308,7 +306,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		mainWindowController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));
 	}
 
-	private static void updateColumnWidths(TableView<TaxaEditTableItem> tableView, TableColumn<TaxaEditTableItem, String> displayCol) {
+	public static <T, S> void updateColumnWidths(TableView<T> tableView, TableColumn<T, S> displayCol) {
 		double newLayoutTableColumnWidth = tableView.getWidth() - 20;
 		for (var col : tableView.getColumns()) {
 			if (col != displayCol && col.isVisible())
