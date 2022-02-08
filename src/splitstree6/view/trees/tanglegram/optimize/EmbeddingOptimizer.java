@@ -409,7 +409,6 @@ public class EmbeddingOptimizer {
 				Basic.caught(ex);
 			}
 
-
 		} else {  // use fast alignment heuristic if number of trees !=2
 			useFastAlignmentHeuristic(trees, circularOrdering, idRho, taxon2Id, dummyLeaves);
 		}
