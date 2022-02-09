@@ -153,15 +153,18 @@ public class SplitsUtilities {
 	 * @param splits with 1-based taxa
 	 */
 	public static void splitsToDistances(List<ASplit> splits, boolean useWeights, DistancesBlock distancesBlock) {
-		for (var split : splits) {
-			for (var i : BitSetUtils.members(split.getA()))
-				for (var j : BitSetUtils.members(split.getB(), i + 1)) {
-					distancesBlock.set(i, j, distancesBlock.get(i, j) + (useWeights ? split.getWeight() : 1.0));
-					distancesBlock.set(j, i, distancesBlock.get(i, j));
+		for (var i = 1; i <= distancesBlock.getNtax(); i++) {
+			for (var j = i + 1; j < distancesBlock.getNtax(); j++) {
+				for (var s : splits) {
+					if (s.separates(i, j)) {
+						var dist = distancesBlock.get(i, j) + (useWeights ? s.getWeight() : 1);
+						distancesBlock.set(i, j, dist);
+						distancesBlock.set(j, i, dist);
+					}
 				}
+			}
 		}
 	}
-
 
 	/**
 	 * normalize cycle so that it is lexicographically smallest
