@@ -106,6 +106,13 @@ public class TanglegramViewController {
 	@FXML
 	private AnchorPane innerAnchorPane;
 
+
+	@FXML
+	private VBox formatVBox;
+
+	@FXML
+	private TitledPane formatTitledPane;
+
 	@FXML
 	private void initialize() {
 		// draw center first:
@@ -122,6 +129,26 @@ public class TanglegramViewController {
 
 		DraggableLabel.makeDraggable(tree1NameLabel);
 		DraggableLabel.makeDraggable(tree2NameLabel);
+
+		formatVBox.setMinHeight(0);
+		formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+
+		if (!formatTitledPane.isExpanded()) {
+			formatVBox.setVisible(false);
+			formatVBox.setMaxHeight(0);
+		} else {
+			formatVBox.setVisible(true);
+			formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+		}
+
+		formatTitledPane.expandedProperty().addListener((v, o, n) -> {
+			formatVBox.setVisible(n);
+			formatVBox.setMaxHeight(n ? formatVBox.getPrefHeight() : 0);
+		});
+
+		innerAnchorPane.getChildren().remove(formatVBox);
+		innerAnchorPane.getChildren().add(formatVBox);
+
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -214,5 +241,9 @@ public class TanglegramViewController {
 
 	public AnchorPane getInnerAnchorPane() {
 		return innerAnchorPane;
+	}
+
+	public VBox getFormatVBox() {
+		return formatVBox;
 	}
 }

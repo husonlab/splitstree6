@@ -37,8 +37,6 @@ import splitstree6.view.trees.treepages.LayoutOrientation;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static splitstree6.view.trees.layout.LayoutUtils.getLabelText;
-
 /**
  * computes an embedding of a tree
  * Daniel Huson, 10.2021
@@ -75,9 +73,8 @@ public class ComputeTreeLayout {
 
 		final NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
 		for (var v : tree.nodes()) {
-			var text = getLabelText(taxaBlock, tree, v);
-			if (text != null) {
-				var label = new RichTextLabel(text);
+			var label = LayoutUtils.getLabel(taxaBlock, tree, v);
+			if (label != null) {
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.applyCss();
 				nodeLabelMap.put(v, label);
@@ -87,7 +84,6 @@ public class ComputeTreeLayout {
 		var labelGap = fontHeight + 1;
 
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
-
 
 		final NodeArray<Point2D> nodePointMap = switch (diagram) {
 			case RectangularPhylogram -> LayoutTreeRectangular.apply(tree, true, averaging);

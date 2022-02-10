@@ -59,7 +59,7 @@ public class Taxon {
 
 	public StringProperty displayLabelProperty() {
 		if (displayLabel == null)
-			displayLabel = new SimpleStringProperty(_displayLabel);
+			displayLabel = new SimpleStringProperty(getDisplayLabelOrName());
 		return displayLabel;
 	}
 

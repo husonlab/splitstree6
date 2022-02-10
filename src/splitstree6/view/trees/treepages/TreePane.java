@@ -30,6 +30,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.ProgramExecutorService;
@@ -66,11 +67,11 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
+	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels) {
 
-		var interactionSetup = new InteractionSetup(taxaBlock, taxonSelectionModel, orientation);
+		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, orientation);
 
 		//setStyle("-fx-background-color: transparent");
 

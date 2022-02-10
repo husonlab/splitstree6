@@ -28,7 +28,6 @@ import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.shape.Shape;
-import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -36,7 +35,6 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
@@ -96,14 +94,12 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
-
-		final ObservableMap<Taxon, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
 		final ObservableMap<jloda.graph.Node, Shape> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
 		final ObservableList<LoopView> loopViews = FXCollections.observableArrayList();
 
 		// this is the target area for the tree page:
-		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
+		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, nodeShapeMap, splitShapeMap, loopViews);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -113,7 +109,7 @@ public class SplitsView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager, t -> taxonLabelMap.get(t) == null ? null : taxonLabelMap.get(t).getText(), (t, text) -> taxonLabelMap.get(t).setText(text));
+		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
 
 		var branchFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, loopViews);
 

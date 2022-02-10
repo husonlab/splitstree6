@@ -55,9 +55,8 @@ public class LayoutUtils {
 		var maxLabelWidth = 0.0;
 		NodeArray<RichTextLabel> nodeLabelMap = graph.newNodeArray();
 		for (var v : graph.nodes()) {
-			var text = getLabelText(taxaBlock, graph, v);
-			if (text != null) {
-				var label = new RichTextLabel(text);
+			var label = getLabel(taxaBlock, graph, v);
+			if (label != null) {
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.applyCss();
 				nodeLabelMap.put(v, label);
@@ -134,6 +133,24 @@ public class LayoutUtils {
 			return StringUtils.toString(taxaBlock.getLabels(graph.getTaxa(v)), ",");
 		} else if (v.getLabel() != null && !graph.getLabel(v).isBlank()) {
 			return graph.getLabel(v);
+		} else
+			return null;
+	}
+
+	public static RichTextLabel getLabel(TaxaBlock taxaBlock, PhyloGraph graph, Node v) {
+		if (graph.getNumberOfTaxa(v) == 1) {
+			var label = new RichTextLabel();
+			var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
+			if (taxonId != null) {
+				var taxon = taxaBlock.get(taxonId);
+				label.textProperty().bindBidirectional(taxon.displayLabelProperty());
+			} else
+				label.setText(graph.getLabel(v));
+			return label;
+		} else if (graph.getNumberOfTaxa(v) >= 2) {
+			return new RichTextLabel(StringUtils.toString(taxaBlock.getLabels(graph.getTaxa(v)), ","));
+		} else if (v.getLabel() != null && !graph.getLabel(v).isBlank()) {
+			return new RichTextLabel(graph.getLabel(v));
 		} else
 			return null;
 	}
@@ -225,4 +242,5 @@ public class LayoutUtils {
 			label.setRotate(label.getRotate() + angle);
 		}
 	}
+
 }

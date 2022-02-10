@@ -34,8 +34,7 @@ public class TaxaEditTableItem {
 	public TaxaEditTableItem(int id, Taxon taxon) {
 		this.id = id;
 		this.taxon = taxon;
-		setDisplayLabel(taxon.getDisplayLabelOrName());
-		displayLabel.addListener((v, o, n) -> taxon.setDisplayLabel(n));
+		displayLabel.bindBidirectional(taxon.displayLabelProperty());
 	}
 
 	public boolean isActive() {

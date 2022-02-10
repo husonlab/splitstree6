@@ -32,12 +32,9 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.fx.util.AutoCompleteComboBox;
 import jloda.util.NumberUtils;
-import splitstree6.data.parts.Taxon;
 import splitstree6.window.MainWindow;
 
 import java.util.HashSet;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
 
 public class TaxLabelFormatterPresenter {
 	private final InvalidationListener selectionListener;
@@ -46,8 +43,7 @@ public class TaxLabelFormatterPresenter {
 
 	private boolean inUpdatingDefaults = false;
 
-	public TaxLabelFormatterPresenter(MainWindow mainWindow, TaxLabelFormatterController controller, UndoManager undoManager,
-									  Function<Taxon, String> taxonLabelGetter, BiConsumer<Taxon, String> taxonLabelSetter) {
+	public TaxLabelFormatterPresenter(MainWindow mainWindow, TaxLabelFormatterController controller, UndoManager undoManager) {
 		var selectionModel = mainWindow.getTaxonSelectionModel();
 
 		controller.getFontFamilyCbox().setItems(fontFamilies);
@@ -58,11 +54,11 @@ public class TaxLabelFormatterPresenter {
 			if (!inUpdatingDefaults && n != null && !n.isBlank() && controller.getFontFamilyCbox().getItems().contains(n)) {
 				var undoList = new UndoableRedoableCommandList("set font");
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var oldLabel = taxonLabelGetter.apply(taxon);
+					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && !RichTextLabel.getFontFamily(oldLabel).equals(n)) {
 						var newLabel = RichTextLabel.setFontFamily(oldLabel, n);
-						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
-						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));
+						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
 				if (undoList.size() > 0)
@@ -75,11 +71,11 @@ public class TaxLabelFormatterPresenter {
 				var undoList = new UndoableRedoableCommandList("set font size");
 				var size = Math.max(0.1, NumberUtils.parseDouble(controller.getFontSizeTextArea().getText()));
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var oldLabel = taxonLabelGetter.apply(taxon);
+					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.getFontSize(oldLabel) != size) {
 						var newLabel = RichTextLabel.setFontSize(oldLabel, size);
-						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
-						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));
+						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
 				if (undoList.size() > 0)
@@ -91,11 +87,11 @@ public class TaxLabelFormatterPresenter {
 			if (!inUpdatingDefaults) {
 				var undoList = new UndoableRedoableCommandList("set bold");
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var oldLabel = taxonLabelGetter.apply(taxon);
+					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isBold(oldLabel) != controller.getBoldToggleButton().isSelected()) {
 						var newLabel = RichTextLabel.setBold(oldLabel, controller.getBoldToggleButton().isSelected());
-						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
-						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));
+						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
 				if (undoList.size() > 0)
@@ -107,11 +103,11 @@ public class TaxLabelFormatterPresenter {
 			if (!inUpdatingDefaults) {
 				var undoList = new UndoableRedoableCommandList("set italic");
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var oldLabel = taxonLabelGetter.apply(taxon);
+					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isItalic(oldLabel) != controller.getItalicToggleButton().isSelected()) {
 						var newLabel = RichTextLabel.setItalic(oldLabel, controller.getItalicToggleButton().isSelected());
-						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
-						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));
+						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
 				if (undoList.size() > 0)
@@ -123,11 +119,11 @@ public class TaxLabelFormatterPresenter {
 			if (!inUpdatingDefaults) {
 				var undoList = new UndoableRedoableCommandList("set underline");
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var oldLabel = taxonLabelGetter.apply(taxon);
+					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isUnderline(oldLabel) != controller.getUnderlineToggleButton().isSelected()) {
 						var newLabel = RichTextLabel.setUnderline(oldLabel, controller.getUnderlineToggleButton().isSelected());
-						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
-						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));
+						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
 				if (undoList.size() > 0)
@@ -139,11 +135,11 @@ public class TaxLabelFormatterPresenter {
 			if (!inUpdatingDefaults) {
 				var undoList = new UndoableRedoableCommandList("set strike");
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var oldLabel = taxonLabelGetter.apply(taxon);
+					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isStrike(oldLabel) != controller.getStrikeToggleButton().isSelected()) {
 						var newLabel = RichTextLabel.setStrike(oldLabel, controller.getStrikeToggleButton().isSelected());
-						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
-						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));
+						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
 				if (undoList.size() > 0)
@@ -156,11 +152,11 @@ public class TaxLabelFormatterPresenter {
 				var color = controller.getTextFillColorChooser().getValue();
 				var undoList = new UndoableRedoableCommandList("set label color");
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var oldLabel = taxonLabelGetter.apply(taxon);
+					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && (RichTextLabel.getTextFill(oldLabel) == null || !RichTextLabel.getTextFill(oldLabel).equals(color))) {
 						var newLabel = RichTextLabel.setTextFill(oldLabel, color);
-						Platform.runLater(() -> taxonLabelSetter.accept(taxon, newLabel));
-						undoList.add(() -> taxonLabelSetter.accept(taxon, oldLabel), () -> taxonLabelSetter.accept(taxon, newLabel));
+						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
 				if (undoList.size() > 0)
@@ -194,7 +190,7 @@ public class TaxLabelFormatterPresenter {
 				var strikeStates = new HashSet<Boolean>();
 				var colors = new HashSet<Paint>();
 				for (var taxon : selectionModel.getSelectedItems()) {
-					var text = taxonLabelGetter.apply(taxon);
+					var text = taxon.getDisplayLabelOrName();
 					if (text != null) {
 						fontFamilies.add(RichTextLabel.getFontFamily(text));
 						fontSizes.add(RichTextLabel.getFontSize(text));

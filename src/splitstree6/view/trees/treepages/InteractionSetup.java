@@ -24,10 +24,15 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.event.EventHandler;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
+import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.util.TriConsumer;
@@ -47,6 +52,7 @@ import java.util.function.BiConsumer;
  * Daniel Huson, 2021
  */
 public class InteractionSetup {
+	private final Stage stage;
 	private final TaxaBlock taxaBlock;
 	private final SelectionModel<Taxon> taxonSelectionModel;
 
@@ -59,7 +65,8 @@ public class InteractionSetup {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, ObjectProperty<LayoutOrientation> orientation) {
+	public InteractionSetup(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, ObjectProperty<LayoutOrientation> orientation) {
+		this.stage = stage;
 		this.taxaBlock = taxaBlock;
 		this.taxonSelectionModel = taxonSelectionModel;
 		taxonShapeLabelMap = new HashMap<>();
@@ -146,18 +153,33 @@ public class InteractionSetup {
                                 e.consume();
                             }
                         };
-                        shape.setOnMouseClicked(mouseClickedHandler);
+						label.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
+						shape.setOnMouseClicked(mouseClickedHandler);
                         label.setOnMouseClicked(mouseClickedHandler);
 
-                        if (taxonSelectionModel.isSelected(taxon)) {
-                            shape.setEffect(SelectionEffectBlue.getInstance());
-                            label.setEffect(SelectionEffectBlue.getInstance());
-                        }
-                    }
-                }
-            }
-        });
-    }
+						if (taxonSelectionModel.isSelected(taxon)) {
+							shape.setEffect(SelectionEffectBlue.getInstance());
+							label.setEffect(SelectionEffectBlue.getInstance());
+						}
+					}
+				}
+			}
+		});
+	}
+
+	private static void showContextMenu(Stage stage, ContextMenuEvent event, Taxon taxon, RichTextLabel label) {
+		var editLabelMenuItem = new MenuItem("Edit Label...");
+		editLabelMenuItem.setOnAction(e -> {
+			var editLabelDialog = new EditLabelDialog(stage, label);
+			var result = editLabelDialog.showAndWait();
+			if (result.isPresent()) {
+				label.setText(result.get());
+			}
+		});
+		var menu = new ContextMenu();
+		menu.getItems().add(editLabelMenuItem);
+		menu.show(label, event.getScreenX(), event.getScreenY());
+	}
 
 	public BiConsumer<Edge, Shape> createEdgeCallback() {
 		return (edge, shape) -> {

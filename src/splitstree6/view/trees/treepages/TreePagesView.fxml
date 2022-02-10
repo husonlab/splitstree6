@@ -24,109 +24,133 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="anchorPane" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane fx:id="anchorPane" prefWidth="700.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.treepages.TreePagesViewController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                 AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="vBox" BorderPane.alignment="CENTER">
-                <ToolBar fx:id="toolBar" prefHeight="32.0">
-                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
-                            </ImageView>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="Find in selected tab"/>
-                        </tooltip>
-                    </Button>
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <ComboBox fx:id="diagramCBox" prefWidth="50.0">
-                        <tooltip>
-                            <Tooltip text="Choose diagram"/>
-                        </tooltip>
-                    </ComboBox>
-                    <ComboBox fx:id="orientationCBox" prefWidth="50.0">
-                        <tooltip>
-                            <Tooltip text="Choose root side"/>
-                        </tooltip>
-                    </ComboBox>
-                    <ComboBox fx:id="averagingCBox" minWidth="50.0">
-                        <tooltip>
-                            <Tooltip text="use child-average or leaf-average to place internal nodes"/>
-                        </tooltip>
-                    </ComboBox>
-                    <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
-                    <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
-                        <tooltip>
-                            <Tooltip text="Set rows x columns"/>
-                        </tooltip>
-                    </ComboBox>
-                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
-                    <ComboBox fx:id="treeCBox" minWidth="100.0"/>
-                    <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
-                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" maxHeight="-Infinity"
-                                  maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" text="T"
-                                  textOverrun="CLIP">
-                        <tooltip>
-                            <Tooltip text="Show tree names and info"/>
-                        </tooltip>
-                        <font>
-                            <Font size="12.0"/>
-                        </font>
-                    </ToggleButton>
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom In">
-                        <font>
-                            <Font size="12.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
-                            </ImageView>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="Zoom in"/>
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom Out">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
-                            </ImageView>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="Zoom out"/>
-                        </tooltip>
-                    </Button>
+                <AnchorPane>
+                    <children>
+                        <ToolBar fx:id="toolBar" minHeight="-Infinity" prefHeight="32.0" AnchorPane.bottomAnchor="0.0"
+                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                                    mnemonicParsing="false" prefHeight="20.0"
+                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
+                                <font>
+                                    <Font size="10.0"/>
+                                </font>
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
+                                    </ImageView>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Find in selected tab"/>
+                                </tooltip>
+                            </Button>
+                            <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                            <ComboBox fx:id="diagramCBox" prefWidth="50.0">
+                                <tooltip>
+                                    <Tooltip text="Choose diagram"/>
+                                </tooltip>
+                            </ComboBox>
+                            <ComboBox fx:id="orientationCBox" prefWidth="50.0">
+                                <tooltip>
+                                    <Tooltip text="Choose root side"/>
+                                </tooltip>
+                            </ComboBox>
+                            <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                                <tooltip>
+                                    <Tooltip text="use child-average or leaf-average to place internal nodes"/>
+                                </tooltip>
+                            </ComboBox>
+                            <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                       orientation="VERTICAL" prefHeight="20.0"/>
+                            <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
+                                <tooltip>
+                                    <Tooltip text="Set rows x columns"/>
+                                </tooltip>
+                            </ComboBox>
+                            <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                       orientation="VERTICAL" prefHeight="20.0"/>
+                            <ComboBox fx:id="treeCBox" minWidth="100.0"/>
+                            <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                       orientation="VERTICAL" prefHeight="20.0"/>
+                            <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
+                                          maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                                          minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
+                                          prefWidth="24.0" text="T" textOverrun="CLIP">
+                                <tooltip>
+                                    <Tooltip text="Show tree names and info"/>
+                                </tooltip>
+                                <font>
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                            <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                                    mnemonicParsing="false" prefHeight="20.0"
+                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom In">
+                                <font>
+                                    <Font size="12.0"/>
+                                </font>
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
+                                    </ImageView>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Zoom in"/>
+                                </tooltip>
+                            </Button>
+                            <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom Out">
+                                <font>
+                                    <Font size="10.0"/>
+                                </font>
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
+                                    </ImageView>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Zoom out"/>
+                                </tooltip>
+                            </Button>
+                            <StackPane alignment="TOP_LEFT"/>
 
-                </ToolBar>
+                        </ToolBar>
+                        <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER"
+                                    expanded="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0"
+                                    prefWidth="100.0" text="Format" AnchorPane.rightAnchor="16.0"
+                                    AnchorPane.topAnchor="3.0">
+                            <content>
+                                <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
+                            </content>
+                        </TitledPane>
+                    </children>
+                </AnchorPane>
             </VBox>
         </top>
         <center>
-            <Pane fx:id="pane" BorderPane.alignment="CENTER">
+            <AnchorPane fx:id="innerAnchorPane" BorderPane.alignment="CENTER">
                 <BorderPane.margin>
                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                 </BorderPane.margin>
-                <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
-            </Pane>
+                <children>
+                    <Pane fx:id="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
+                    </Pane>
+                    <VBox fx:id="formatVBox" prefHeight="150.0" prefWidth="200.0" styleClass="context-menu"
+                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="2.0"/>
+                </children>
+            </AnchorPane>
         </center>
     </BorderPane>
 </AnchorPane>

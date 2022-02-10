@@ -28,6 +28,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
+import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
@@ -47,7 +48,7 @@ public class TanglegramTreePane extends Group {
 	private final InvalidationListener updater;
 	private Runnable runAfterUpdate;
 
-	public TanglegramTreePane(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
+	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation, ReadOnlyDoubleProperty fontScaleFactorProperty) {
 
@@ -55,7 +56,7 @@ public class TanglegramTreePane extends Group {
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						var treePane = new TreePane(taxaBlock, tree.get(), tree.get().getName(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+						var treePane = new TreePane(stage, taxaBlock, tree.get(), tree.get().getName(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), optionAveraging.get(), optionOrientation, new SimpleDoubleProperty(1.0), fontScaleFactorProperty, new SimpleObjectProperty<>(TreePagesView.TreeLabels.None));
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();

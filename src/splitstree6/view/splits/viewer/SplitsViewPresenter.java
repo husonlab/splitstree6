@@ -26,7 +26,10 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.scene.control.ContextMenu;
@@ -34,10 +37,12 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.shape.Shape;
+import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
 import jloda.fx.label.EditLabelDialog;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.graph.Node;
 import jloda.util.BitSetUtils;
@@ -73,7 +78,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
-							   ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+							   ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 							   ObservableList<LoopView> loopViews) {
 		this.mainWindow = mainWindow;
 		this.splitsView = splitsView;
@@ -159,24 +164,21 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		controller.getFitLabel().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()).and(showScaleBar));
 
-		taxonLabelMap.addListener((MapChangeListener<? super Taxon, ? super RichTextLabel>) e -> {
-			if (e.wasAdded()) {
-				e.getValueAdded().setOnContextMenuRequested(m -> showContextMenu(m, e.getKey(), e.getValueAdded()));
-			} else {
-				e.getValueRemoved().setOnContextMenuRequested(null);
-			}
-		});
-
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
 		targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40)));
 
 		updateListener = e -> {
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
-					splitsView.getSplitSelectionModel(), taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews,
+					splitsView.getSplitSelectionModel(), nodeShapeMap, splitShapeMap, loopViews,
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
 					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionUseWeightsProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					controller.getScaleBar().unitLengthXProperty());
 			splitNetworkPane.set(pane);
+			pane.setRunAfterUpdate(() -> {
+				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
+					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), label));
+				}
+			});
 			pane.drawNetwork();
 		};
 
@@ -275,10 +277,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().disableProperty().bind(splitsView.emptyProperty());
 	}
 
-	private void showContextMenu(ContextMenuEvent event, Taxon taxon, RichTextLabel label) {
+	private static void showContextMenu(ContextMenuEvent event, Stage stage, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
-			var editLabelDialog = new EditLabelDialog(mainWindow.getStage(), label);
+			var editLabelDialog = new EditLabelDialog(stage, label);
 			var result = editLabelDialog.showAndWait();
 			if (result.isPresent()) {
 				label.setText(result.get());

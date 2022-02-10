@@ -32,6 +32,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
+import splitstree6.view.format.taxlabels.TaxLabelFormatter;
 import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.treepages.LayoutOrientation;
@@ -124,6 +125,10 @@ public class TanglegramView implements IView {
 		setViewTab(viewTab);
 
 		empty.bind(Bindings.isEmpty(getTrees()));
+
+		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
+
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter);
 	}
 
 	public void setViewTab(ViewTab viewTab) {

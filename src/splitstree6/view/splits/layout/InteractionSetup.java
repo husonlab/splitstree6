@@ -72,7 +72,7 @@ public class InteractionSetup {
 	private static double mouseDownY;
 
 	public InteractionSetup(TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
-							ObservableMap<Taxon, RichTextLabel> taxonLabelMap, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
+							ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
 		this.taxaBlock = taxaBlock;
 		this.splitsBlock = splitsBlock;
 		this.taxonSelectionModel = taxonSelectionModel;

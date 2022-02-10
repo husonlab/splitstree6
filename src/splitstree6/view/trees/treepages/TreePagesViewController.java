@@ -72,6 +72,37 @@ public class TreePagesViewController {
 	@FXML
 	private Button zoomOutButton;
 
+	@FXML
+	private VBox formatVBox;
+
+	@FXML
+	private TitledPane formatTitledPane;
+
+	@FXML
+	private AnchorPane innerAnchorPane;
+
+	@FXML
+	private void initialize() {
+		formatVBox.setMinHeight(0);
+		formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+
+		if (!formatTitledPane.isExpanded()) {
+			formatVBox.setVisible(false);
+			formatVBox.setMaxHeight(0);
+		} else {
+			formatVBox.setVisible(true);
+			formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+		}
+
+		formatTitledPane.expandedProperty().addListener((v, o, n) -> {
+			formatVBox.setVisible(n);
+			formatVBox.setMaxHeight(n ? formatVBox.getPrefHeight() : 0);
+		});
+
+		innerAnchorPane.getChildren().remove(formatVBox);
+		innerAnchorPane.getChildren().add(formatVBox);
+	}
+
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
 	}
@@ -126,5 +157,13 @@ public class TreePagesViewController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
+	}
+
+	public VBox getFormatVBox() {
+		return formatVBox;
+	}
+
+	public TitledPane getFormatTitledPane() {
+		return formatTitledPane;
 	}
 }
