@@ -19,6 +19,8 @@
 
 package splitstree6.algorithms.utils;
 
+import jloda.util.CanceledException;
+import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -49,18 +51,22 @@ public class SplitMatrix {
 
 	/**
 	 * Constructs a SplitMatrix from a set of trees
-	 *
 	 */
-	public SplitMatrix(TreesBlock trees, TaxaBlock taxa) throws SplitsException {
+	public SplitMatrix(ProgressListener progress, TaxaBlock taxa, TreesBlock trees) throws CanceledException, SplitsException {
 		ntax = taxa.getNtax();
 		matrix = new SparseTable<>();
 		splitIndices = new HashMap<>();
 		allSplits = new SplitsBlock();
 
+		progress.setMaximum(trees.getNTrees());
+		progress.setProgress(0);
+
 		for (int i = 0; i < trees.getNTrees(); i++) {
 			SplitsBlock splitsBlock = new SplitsBlock();
 			TreesUtilities.computeSplits(null, trees.getTrees().get(i), splitsBlock.getSplits());
 			SplitsUtilities.verifySplits(splitsBlock.getSplits(), taxa);
+			add(splitsBlock);
+			progress.incrementProgress();
 		}
 	}
 
@@ -137,7 +143,8 @@ public class SplitMatrix {
 	 * @return weight
 	 */
 	public double get(int split, int blockNum) {
-		return matrix.get(split, blockNum);
+		var value = matrix.get(split, blockNum);
+		return value == null ? 0.0 : value;
 	}
 
 
@@ -206,12 +213,12 @@ public class SplitMatrix {
 
 
 	public void print() {
-		System.out.println("printText Split matrix:");
+		System.err.println("Split matrix:");
 		for (int i = 0; i <= allSplits.getNsplits(); i++) {
 			for (int j = 0; j <= nblocks; j++) {
-				System.out.print(matrix.get(i, j) + " ");
+				System.err.print(matrix.get(i, j) + " ");
 			}
-			System.out.println();
+			System.err.println();
 		}
 	}
 }
