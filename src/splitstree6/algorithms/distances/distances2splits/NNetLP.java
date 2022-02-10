@@ -72,6 +72,5 @@ public class NNetLP extends Distances2Splits implements IToCircularSplits {
 		outputSplitsBlock.getSplits().add(new ASplit(A, B, weight));
 
 		throw new IOException("Not implemented");
-
 	}
 }

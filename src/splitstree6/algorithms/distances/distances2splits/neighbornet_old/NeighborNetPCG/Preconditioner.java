@@ -1,20 +1,37 @@
-package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG;
+/*
+ * Preconditioner.java Copyright (C) 2022 Daniel H. Huson
+ *
+ * (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetPCG;
 
 import Jama.Matrix;
 
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.blocks2vector;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.vector2blocks;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.TridiagonalMatrix.multiplyLU;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.minus;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetPCG.TridiagonalMatrix.multiplyLU;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetPCG.VectorUtilities.minus;
 
 public class Preconditioner {
 
-	public BlockXMatrix X;
+	public final BlockXMatrix X;
 
-	public TridiagonalMatrix[] L;
-	public TridiagonalMatrix[] U;
-	public SparseRowMatrix[] Y;
-	public SparseRowMatrix[] Z;
+	public final TridiagonalMatrix[] L;
+	public final TridiagonalMatrix[] U;
+	public final SparseRowMatrix[] Y;
+	public final SparseRowMatrix[] Z;
 
 	/**
 	 * Constructs the block conditioner, in O(n^2) time [linear in the number of variables].
@@ -209,15 +226,6 @@ public class Preconditioner {
 		}
 		return nu;
 	}
-
-	public double[] solve(double[] yvec, boolean[] G) {
-		int n = X.n;
-		double[][] y, x;
-		y = vector2blocks(n, yvec, G);
-		x = solve(y);
-		return blocks2vector(n, x, G);
-	}
-
 
 	public Matrix[] toMatrix() {
 		int[] m = X.m;

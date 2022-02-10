@@ -1,20 +1,20 @@
 /*
- * NeighborNetCycle.java Copyright (C) 2022 Daniel H. Huson
+ *  NeighborNetCycle.java Copyright (C) 2021 Daniel H. Huson
  *
- * (Some files contain contributions from other authors, who are then mentioned separately.)
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
@@ -31,12 +31,14 @@ import java.util.Stack;
  * David Bryant and Daniel Huson, 2005
  */
 public class NeighborNetCycle {
+    /**
+     * Run the neighbor net algorithm to compute the circular ordering of the taxa
+     */
     public static int[] compute(int nTax, double[][] dist) {
         try {
             return compute(new ProgressSilent(), nTax, dist);
         } catch (CanceledException ignored) {
-            // can't happen
-            return new int[0];
+            return new int[0]; // can't happen
         }
     }
 
@@ -46,30 +48,30 @@ public class NeighborNetCycle {
     public static int[] compute(ProgressListener progress, int nTax, double[][] dist) throws CanceledException {
         //Special cases. When nTax<=3, the default circular ordering will work.
         if (nTax <= 3) {
-            var cycle = new int[nTax + 1];
+            int[] cycle = new int[nTax + 1];
             for (int i = 1; i <= nTax; i++)
                 cycle[i] = i;
             return cycle;
         }
 
-        final var mat = setupMatrix(nTax, dist);
+        final double[][] mat = setupMatrix(nTax, dist);
 
-        final var nodesHeader = new NetNode(0);
+        final NetNode nodesHeader = new NetNode(0);
 
         /* Nodes are stored in a doubly linked list that we set up here */
-        for (var i = nTax; i >= 1; i--) /* Initially, all singleton nodes are active */ {
-            var node = new NetNode(i);
+        for (int i = nTax; i >= 1; i--) /* Initially, all singleton nodes are active */ {
+            final NetNode node = new NetNode(i);
             node.next = nodesHeader.next;
             nodesHeader.next = node;
         }
 
         /* Set up links in other direction */
-        for (var taxNode = nodesHeader; taxNode.next != null; taxNode = taxNode.next)
+        for (NetNode taxNode = nodesHeader; taxNode.next != null; taxNode = taxNode.next)
             taxNode.next.prev = taxNode;
 
         /* Perform the agglomeration step */
         progress.setTasks("NNet", "agglomeration");
-        final var joins = joinNodes(progress, mat, nodesHeader, nTax);
+        final Stack<NetNode> joins = joinNodes(progress, mat, nodesHeader, nTax);
         progress.setTasks("NNet", "expansion");
         // System.err.println("Ordering: "+ Basic.toString(ordering));
 
@@ -95,14 +97,14 @@ public class NeighborNetCycle {
      * @return a working matrix of appropriate cardinality 1-based
      */
     private static double[][] setupMatrix(int nTax, double[][] dist) {
-        var max_num_nodes = 3 * nTax - 5;
-        var mat = new double[max_num_nodes][max_num_nodes];
+        int max_num_nodes = 3 * nTax - 5;
+        double[][] mat = new double[max_num_nodes][max_num_nodes];
         /* Copy the distance matrix into a larger, scratch distance matrix */
-        for (var i = 1; i <= nTax; i++) {
+        for (int i = 1; i <= nTax; i++) {
             System.arraycopy(dist[i - 1], 0, mat[i], 1, nTax);
             Arrays.fill(mat[i], nTax + 1, max_num_nodes, 0.0);
         }
-        for (var i = nTax + 1; i < max_num_nodes; i++)
+        for (int i = nTax + 1; i < max_num_nodes; i++)
             Arrays.fill(mat[i], 0, max_num_nodes, 0.0);
         return mat;
     }
@@ -123,10 +125,11 @@ public class NeighborNetCycle {
         double Dpq;
 
         while (num_active > 3) {
+
             /* Special case
             If we let this one go then we get a divide by zero when computing Qpq */
             if (num_active == 4 && num_clusters == 2) {
-                var p = nodesHead.next;
+                NetNode p = nodesHead.next;
                 NetNode q;
                 if (p.next != p.nbr)
                     q = p.next;
@@ -144,11 +147,11 @@ public class NeighborNetCycle {
 
             todo: 2x speedup by using symmetry */
 
-            for (var p = nodesHead.next; p != null; p = p.next)
+            for (NetNode p = nodesHead.next; p != null; p = p.next)
                 p.Sx = 0.0;
-            for (var p = nodesHead.next; p != null; p = p.next) {
+            for (NetNode p = nodesHead.next; p != null; p = p.next) {
                 if (p.nbr == null || p.nbr.id > p.id) {
-                    for (var q = p.next; q != null; q = q.next) {
+                    for (NetNode q = p.next; q != null; q = q.next) {
                         if (q.nbr == null || (q.nbr.id > q.id) && (q.nbr != p)) {
                             if ((p.nbr == null) && (q.nbr == null))
                                 Dpq = D[p.id][q.id];
@@ -176,10 +179,10 @@ public class NeighborNetCycle {
 
             /* Now minimize (m-2) D[C_i,C_k] - Sx - Sy */
             best = 0;
-            for (var p = nodesHead.next; p != null; p = p.next) {
+            for (NetNode p = nodesHead.next; p != null; p = p.next) {
                 if ((p.nbr != null) && (p.nbr.id < p.id)) /* We only evaluate one node per cluster */
                     continue;
-                for (var q = nodesHead.next; q != p; q = q.next) {
+                for (NetNode q = nodesHead.next; q != p; q = q.next) {
                     if ((q.nbr != null) && (q.nbr.id < q.id)) /* We only evaluate one node per cluster */
                         continue;
                     if (q.nbr == p) /* We only evaluate nodes in different clusters */
@@ -194,6 +197,8 @@ public class NeighborNetCycle {
                         Dpq = (D[p.id][q.id] + D[p.id][q.nbr.id] + D[p.nbr.id][q.id] + D[p.nbr.id][q.nbr.id]) / 4.0;
                     Qpq = ((double) num_clusters - 2.0) * Dpq - p.Sx - q.Sx;
 
+                    //System.out.println("\t"+"["+p.id+","+q.id+"] \t = \t "+Qpq);
+
                     /* Check if this is the best so far */
                     if ((Cx == null || (Qpq < best)) && (p.nbr != q)) {
                         Cx = p;
@@ -206,8 +211,8 @@ public class NeighborNetCycle {
                 throw new RuntimeException("Internal error");
 
             /* Find the node in each cluster */
-            var x = Cx;
-            var y = Cy;
+            NetNode x = Cx;
+            NetNode y = Cy;
 
             if (Cx.nbr != null || Cy.nbr != null) {
                 Cx.Rx = ComputeRx(Cx, Cx, Cy, D, nodesHead);
@@ -285,6 +290,7 @@ public class NeighborNetCycle {
     static private void join2way(NetNode x, NetNode y) {
         x.nbr = y;
         y.nbr = x;
+        //System.err.println("2way:\t"+x.id+"\t"+y.id); //**
     }
 
     /**
@@ -305,11 +311,11 @@ public class NeighborNetCycle {
     Returns a pointer to the node u */
 //printf("Three way: %d, %d, and %d\n",x.id,y.id,z.id);
 
-        var u = new NetNode(num_nodes + 1);
+        NetNode u = new NetNode(num_nodes + 1);
         u.ch1 = x;
         u.ch2 = y;
 
-        var v = new NetNode(num_nodes + 2);
+        NetNode v = new NetNode(num_nodes + 2);
         v.ch1 = y;
         v.ch2 = z;
 
@@ -341,11 +347,12 @@ public class NeighborNetCycle {
 
         /* Update distance matrix */
 
-        for (var p = nodesHead.next; p != null; p = p.next) {
+        for (NetNode p = nodesHead.next; p != null; p = p.next) {
             mat[u.id][p.id] = mat[p.id][u.id] = (2.0 / 3.0) * mat[x.id][p.id] + mat[y.id][p.id] / 3.0;
             mat[v.id][p.id] = mat[p.id][v.id] = (2.0 / 3.0) * mat[z.id][p.id] + mat[y.id][p.id] / 3.0;
         }
         mat[u.id][u.id] = mat[v.id][v.id] = 0.0;
+        //System.err.println("Agg 3way\t("+x.id+", "+y.id+", "+z.id+")->("+u.id+", "+v.id+")");
 
         joins.push(u);
 
@@ -366,7 +373,7 @@ public class NeighborNetCycle {
        3 way amalgamations */
 
         //noinspection SuspiciousNameCombination
-        final var u = join3way(x2, x, y, joins, mat, nodesHead, num_nodes); /* Replace x2,x,y by two nodes, equals to x2_prev.next and y_prev.next. */
+        final NetNode u = join3way(x2, x, y, joins, mat, nodesHead, num_nodes); /* Replace x2,x,y by two nodes, equals to x2_prev.next and y_prev.next. */
         num_nodes += 2;
         join3way(u, u.nbr, y2, joins, mat, nodesHead, num_nodes); /* z = y_prev . next */
         num_nodes += 2;
@@ -384,9 +391,9 @@ public class NeighborNetCycle {
      * @return the Rx value
      */
     static private double ComputeRx(NetNode z, NetNode Cx, NetNode Cy, double[][] mat, NetNode nodesHead) {
-        var Rx = 0.0;
+        double Rx = 0.0;
 
-        for (var p = nodesHead.next; p != null; p = p.next) {
+        for (NetNode p = nodesHead.next; p != null; p = p.next) {
             if (p == Cx || p == Cx.nbr || p == Cy || p == Cy.nbr || p.nbr == null)
                 Rx += mat[z.id][p.id];
             else /* p.nbr != null */
@@ -406,9 +413,9 @@ public class NeighborNetCycle {
         //System.err.println("expandNodes");
 
         /* Set up the circular order for the first three nodes */
-        var x = nodesHead.next;
-        var y = x.next;
-        var z = y.next;
+        NetNode x = nodesHead.next;
+        NetNode y = x.next;
+        NetNode z = y.next;
 
         z.next = x;
         x.prev = z;
@@ -417,14 +424,14 @@ public class NeighborNetCycle {
         while (!joins.empty()) {
             /* Find the three elements replacing u and v. Swap u and v around if v comes before u in the
             circular ordering being built up */
-            var u = joins.pop();
+            NetNode u = joins.pop();
             // System.err.println("POP: u="+u);
-            var v = u.nbr;
+            NetNode v = u.nbr;
             x = u.ch1;
             y = u.ch2;
             z = v.ch2;
             if (v != u.next) {
-                var tmp = u;
+                NetNode tmp = u;
                 u = v;
                 v = tmp;
                 tmp = x;
@@ -451,10 +458,10 @@ public class NeighborNetCycle {
         }
 
         /* extract the ordering */
-        final var cycle = new int[nTax + 1];
+        final int[] cycle = new int[nTax + 1];
         {
-            var a = x;
-            var t = 0;
+            NetNode a = x;
+            int t = 0;
             do {
                 cycle[++t] = a.id;
                 a = a.next;
@@ -463,4 +470,3 @@ public class NeighborNetCycle {
         return cycle;
     }
 }
-

@@ -17,19 +17,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG;
+package splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetPCG;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
+import splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetSplits;
 
 import java.util.Arrays;
 import java.util.Random;
 
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms.*;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.norm;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits.Regularization.nnls;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetPCG.CircularSplitAlgorithms.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetPCG.VectorUtilities.norm;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetSplits.Regularization.nnls;
 
 //Things to do next
 //(1) Implement warm starts

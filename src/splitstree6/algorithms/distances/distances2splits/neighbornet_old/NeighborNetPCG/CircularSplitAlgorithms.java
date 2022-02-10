@@ -1,8 +1,26 @@
-package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG;
+/*
+ * CircularSplitAlgorithms.java Copyright (C) 2022 Daniel H. Huson
+ *
+ * (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package splitstree6.algorithms.distances.distances2splits.neighbornet_old.NeighborNetPCG;
 
 import Jama.Matrix;
 
-import java.util.Arrays;
 import java.util.Random;
 
 public class CircularSplitAlgorithms {
@@ -15,11 +33,11 @@ public class CircularSplitAlgorithms {
 	 *
 	 * @param n Number of taxa.
 	 * @param x vector with dimension n(n-1)/2
-	 *          vector d is overwritten by vector A*x with dimension n(n-1)/2.
 	 */
 	static public void circularAx(int n, double[] x, double[] d) {
+		int npairs = n * (n - 1) / 2;
+		//double[] d = new double[npairs+1];
 
-		Arrays.fill(d, 0.0);
 		//First compute d[i][i+1] for all i.
 		int dindex = 1; //index of (i,i+1)
 		for (int i = 1; i <= n - 1; i++) {
@@ -71,8 +89,8 @@ public class CircularSplitAlgorithms {
 	 * @param p, vector assumed to be of size n(n-1)/2. Overwritten by A'x.
 	 */
 	static public void circularAtx(int n, double[] x, double[] p) {
-
-		Arrays.fill(p, 0.0);
+		int npairs = n * (n - 1) / 2;
+		//double[] p = new double[npairs+1];
 
 		//First compute trivial splits
 		int sIndex = 1;
@@ -119,11 +137,9 @@ public class CircularSplitAlgorithms {
 	 *
 	 * @param n Number of taxa.
 	 * @param y vector with dimension n(n-1)/2
-	 *          overwrite vector x=A\y which solves Ax = y. x has dimension n(n-1)/2
 	 */
 	static public void circularSolve(int n, double[] y, double[] x) {
-
-		Arrays.fill(x, 0.0);
+		int npairs = n * (n - 1) / 2;
 
 		int index = 1;
 		//x[1,2]= (y[1,2]+y[1,n] - y[2,n])/2
@@ -158,11 +174,9 @@ public class CircularSplitAlgorithms {
 	 *
 	 * @param n Number of taxa.
 	 * @param x vector with dimension n(n-1)/2
-	 *          overwrites vector y =  inv(A)'*x which has dimension n(n-1)/2
 	 */
 	static public void circularAinvT(int n, double[] x, double[] y) {
 		int npairs = n * (n - 1) / 2;
-		Arrays.fill(y, 0.0);
 
 		//Suppose B = inv(A). Evaluates B*x column by column:
 		// B*x = \sum_{ij} B(:,ij) * x(ij)
@@ -206,7 +220,6 @@ public class CircularSplitAlgorithms {
 
 	/**
 	 * Constructs 0-1 design matrix for a full collection of circular splits. Note: JAMA matrix index from 0,1,2,...
-	 * (FOR DEBUGGING)
 	 *
 	 * @param n int, ntaxa.
 	 * @return Matrix
@@ -235,110 +248,13 @@ public class CircularSplitAlgorithms {
 		return A;
 	}
 
-	/**
-	 * Compute the sum of squares of the gradient for non-active indices after calling equality constrained least squares.
-	 * Gradient g = A'(d-Ax). Returns \sum_{i:!G[i]} g[i]
-	 *
-	 * @param n ntaxa
-	 * @param d vector of distances
-	 * @param G vector indicating active indices: G[i] true <-> i is active
-	 * @param z x[!G] = z[!G]
-	 * @return \sum_{i:!G[i]} g[i]^2
-	 */
-	static public double checkCircularLeastsquares(int n, double[] d, boolean[] G, double[] z) {
-		int npairs = n * (n - 1) / 2;
-		double[] x = new double[npairs + 1];
-		double[] g = new double[npairs + 1];
-		double[] Ax = new double[npairs + 1];
-		for (int i = 1; i <= npairs; i++)
-			if (!G[i])
-				x[i] = z[i];
-		CircularSplitAlgorithms.circularAx(n, x, Ax);
-		for (int i = 1; i <= npairs; i++)
-			Ax[i] -= d[i];
-		CircularSplitAlgorithms.circularAtx(n, Ax, g);
-
-		//DEBUG: Check that Ax, Atx are calculated right
-//        double[] x1 = new double[npairs+1];
-//        Random random = new Random();
-//        for(int i=1;i<=npairs;i++) {
-//            x1[i] = random.nextDouble();
-//        }
-//        double[] x2 = new double[npairs+1];
-//        double[] x3 = new double[npairs+1];
-//        CircularSplitAlgorithms.circularAx(n,x1,x2);
-//        CircularSplitAlgorithms.circularSolve(n,x2,x3);
-//        double diff = 0.0;
-//        for(int i=1;i<=npairs;i++)
-//            diff+=(x3[i]-x1[i])*(x3[i]-x1[i]);
-//        System.err.println("Check Ax and solve. Error = "+diff);
-//DEBUG TO HERE
-
-
-		double norm2 = 0.0;
-		for (int i = 1; i <= npairs; i++) {
-			if (!G[i])
-				norm2 += g[i] * g[i];
-		}
-		return norm2;
-	}
-
-	/**
-	 * Compute the sum of squares of the gradient for non-active indices after calling equality constrained least squares.
-	 * Gradient g = A'(d-Ax). Returns \sum_{i:x[i]>0} g[i]^2 + \sum_{i:x[i]=0} min(0,g[i])^2
-	 *
-	 * @param n ntaxa
-	 * @param d vector of distances
-	 * @param x vector of split weights --- assumed to be non-negative.
-	 * @return norm of projected gradient.
-	 */
-	static public double checkNnegLeastsquares(int n, double[] d, double[] x) {
-		int npairs = n * (n - 1) / 2;
-		double[] g = new double[npairs + 1];
-		double[] Ax = new double[npairs + 1];
-		CircularSplitAlgorithms.circularAx(n, x, Ax);
-		for (int i = 1; i <= npairs; i++)
-			Ax[i] -= d[i];
-		CircularSplitAlgorithms.circularAtx(n, Ax, g);
-
-		double dsum = 0.0;
-		double xsum = 0.0;
-		for (int i = 1; i <= npairs; i++) {
-			dsum += d[i];
-			xsum += x[i];
-		}
-		System.err.println("dsum = " + dsum + "\txsum = " + xsum);
-
-
-		double norm1 = 0.0, norm2 = 0.0;
-		for (int i = 1; i <= npairs; i++) {
-			if (x[i] > 0)
-				norm1 += g[i] * g[i];
-			else
-				norm2 += Math.min(g[i], 0.0) * Math.min(g[i], 0.0);
-		}
-		return norm1 + norm2;
-	}
-
-
-	static public void main(String[] args) {
+	static public void test(int n) {
 		//Test Ax.
-
-		int n = 5;
-		if (args.length > 0)
-			n = Integer.parseInt(args[0]);
-
-
-		System.err.println("Testing Circular Algorithms for n = " + n);
 		int npairs = n * (n - 1) / 2;
 		double[] x = new double[npairs + 1];
 		Random rand = new Random();
 		for (int i = 1; i <= npairs; i++)
 			x[i] = rand.nextDouble();
-
-		Arrays.fill(x, 1, npairs + 1, 1.0);
-
-
 		double[] y = new double[npairs + 1];
 		circularAx(n, x, y);
 
@@ -352,50 +268,29 @@ public class CircularSplitAlgorithms {
 		for (int i = 1; i <= npairs; i++)
 			y2[i] = yJ.get(i - 1, 0);
 
-		double err = VectorUtilities.dist(y, y2);
+		double err = VectorUtilities.diff(y, y2);
 		System.err.println("Compare CircularAx, err = " + err);
+
+		circularAinvT(n, x, y);
+		yJ = (A.transpose()).inverse().times(xJ);
+		for (int i = 1; i <= npairs; i++)
+			y2[i] = yJ.get(i - 1, 0);
+		err = VectorUtilities.diff(y, y2);
+		System.err.println("Compare CircularAinvTx, err = " + err);
+
 
 		circularAtx(n, x, y);
 		yJ = (A.transpose()).times(xJ);
 		for (int i = 1; i <= npairs; i++)
 			y2[i] = yJ.get(i - 1, 0);
-		err = VectorUtilities.dist(y, y2);
-
-//        System.err.print("x = ["+x[1]);
-//        for(int i=2;i<=npairs;i++)
-//            System.err.print(","+x[i]);
-//        System.err.println("]");
-//
-//        System.err.print("y = ["+y[1]);
-//        for(int i=2;i<=npairs;i++)
-//            System.err.print(","+y[i]);
-//        System.err.println("]");
-
-
-//        PrintWriter output = new PrintWriter(System.err);
-//        A.print(output,3,0);
-//        output.flush();
-
-		circularAinvT(n, y, y2);
-		err = VectorUtilities.dist(y2, x);
-		System.err.println("Compare CircularAinvTx, err = " + err);
-
-//
-//        System.err.println("Compare CircularATx, err = "+ err);
-//        circularAinvT(n,x,y);
-//        yJ = (A.transpose()).inverse().times(xJ);
-//        for(int i=1;i<=npairs;i++)
-//            y2[i] = yJ.get(i-1,0);
-//         err = VectorUtilities.dist(y,y2);
-//        System.err.println("Compare CircularAinvTx, err = "+ err);
-//
-
+		err = VectorUtilities.diff(y, y2);
+		System.err.println("Compare CircularATx, err = " + err);
 
 		circularSolve(n, x, y);
 		yJ = (A.inverse()).times(xJ);
 		for (int i = 1; i <= npairs; i++)
 			y2[i] = yJ.get(i - 1, 0);
-		err = VectorUtilities.dist(y, y2);
+		err = VectorUtilities.diff(y, y2);
 		System.err.println("Compare CircularSolve, err = " + err);
 
 

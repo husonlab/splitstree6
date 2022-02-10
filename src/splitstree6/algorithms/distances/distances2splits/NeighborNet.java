@@ -36,14 +36,13 @@ import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	// public enum WeightsAlgorithm {NNet2004, NNet2021, LP}
-	public enum WeightsAlgorithm {NNet2004, NNet2021}
+	//public enum WeightsAlgorithm {NNet2004, NNet2021}
 
-	private final ObjectProperty<WeightsAlgorithm> optionWeights = new SimpleObjectProperty<>(this, "optionWeights", WeightsAlgorithm.NNet2004);
+	//private final ObjectProperty<WeightsAlgorithm> optionWeights = new SimpleObjectProperty<>(this,"optionWeights",WeightsAlgorithm.NNet2004);
 
 	public enum InferenceAlgorithm {ActiveSet, BlockPivot}
 
@@ -52,7 +51,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", true);
 
 	public List<String> listOptions() {
-		return Arrays.asList(optionInferenceAlgorithm.getName(), optionUsePreconditioner.getName(), optionWeights.getName());
+		return List.of(optionInferenceAlgorithm.getName(), optionUsePreconditioner.getName());
 	}
 
 	@Override
@@ -62,11 +61,14 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			   "Molecular Biology and Evolution, 21(2):255– 265, 2004.";
 	}
 
+
 	/**
 	 * run the neighbor net algorithm
 	 */
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws CanceledException {
+		double optionThreshold = 1e-6; //TODO This should be a parameter, or maybe just set to zero and use the splits filter.
+
 		if (SplitsUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;
 
@@ -80,13 +82,10 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		final var start = System.currentTimeMillis();
 
+		var useBlockPivot = (getOptionInferenceAlgorithm() == InferenceAlgorithm.BlockPivot);
+		var useDualDCG = isOptionUsePreconditioner();
+		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDualDCG, progress);
 
-		//  if (getOptionWeights().equals(WeightsAlgorithm.LP))
-		//      splits = NeighborNetSplitsLP.compute(taxaBlock.getNtax(), cycle, distancesBlock.getDistances(), 0.000001, progress);
-		//  else
-		splits = NeighborNetSplits.compute(getOptionWeights().equals(WeightsAlgorithm.NNet2021),
-				taxaBlock.getNtax(), cycle, distancesBlock.getDistances(), distancesBlock.getVariances(), 0.000001, NeighborNetSplits.LeastSquares.ols, NeighborNetSplits.Regularization.nnls, 1,
-				progress);
 
 		if (Compatibility.isCompatible(splits))
 			splitsBlock.setCompatibility(Compatibility.compatible);
@@ -105,17 +104,18 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		return parent.getNtax() > 0;
 	}
 
-	public WeightsAlgorithm getOptionWeights() {
-		return optionWeights.get();
-	}
+    /* public WeightsAlgorithm getOptionWeights() {
+        return optionWeights.get();
+    }
 
-	public ObjectProperty<WeightsAlgorithm> optionWeightsProperty() {
-		return optionWeights;
-	}
+    public ObjectProperty<WeightsAlgorithm> optionWeightsProperty() {
+        return optionWeights;
+    }
 
-	public void setOptionWeights(WeightsAlgorithm optionWeights) {
-		this.optionWeights.set(optionWeights);
-	}
+    public void setOptionWeights(WeightsAlgorithm optionWeights) {
+        this.optionWeights.set(optionWeights);
+    }
+    */
 
 	public InferenceAlgorithm getOptionInferenceAlgorithm() {
 		return optionInferenceAlgorithm.get();
