@@ -48,3 +48,5 @@ antbuild/
 *.out
 *.toc
 
+#output files
+out/
