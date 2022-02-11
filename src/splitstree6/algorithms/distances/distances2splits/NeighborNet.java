@@ -76,7 +76,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		final var cycle = NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock.getDistances());
 
-		progress.setTasks("NNet", "edge weights");
+		progress.setTasks("NNet", "edge weight optimization");
 
 		final ArrayList<ASplit> splits;
 
@@ -96,7 +96,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		splitsBlock.getSplits().addAll(splits);
 
-		System.err.println("Time: " + Math.round((System.currentTimeMillis() - start)) + "ms");
+		System.err.printf("Time: %,.1fs%n", (System.currentTimeMillis() - start) / 1000f);
 	}
 
 	@Override
