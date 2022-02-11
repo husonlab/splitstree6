@@ -185,6 +185,16 @@ public class InteractionSetup {
 		return (edge, shape) -> {
 			shape.setPickOnBounds(false);
 
+			shape.setOnMouseEntered(e ->
+			{
+				shape.setUserData(shape.getStrokeWidth());
+				shape.setStrokeWidth(shape.getStrokeWidth() + 4);
+			});
+			shape.setOnMouseExited(e -> {
+				shape.setStrokeWidth(shape.getStrokeWidth() - 4);
+				shape.setUserData(null);
+			});
+
 			if (edge.getOwner() instanceof PhyloTree tree) {
 				shape.setOnMouseClicked(e -> {
 					if (e.getClickCount() >= 1) {

@@ -23,6 +23,7 @@ package splitstree6.dialog;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
+import jloda.fx.window.MainWindowManager;
 import splitstree6.window.MainWindow;
 
 /**
@@ -43,6 +44,10 @@ public class SaveBeforeClosingDialog {
 		} else {
 			mainWindow.getStage().toFront();
 			var alert = new Alert(Alert.AlertType.CONFIRMATION);
+			if (MainWindowManager.isUseDarkTheme()) {
+				alert.getDialogPane().getScene().getWindow().getScene().getStylesheets().add("jloda/resources/css/dark.css");
+			}
+
 			alert.initOwner(mainWindow.getStage());
 			alert.setTitle("Save File Dialog");
 			alert.setHeaderText("This document has unsaved changes");

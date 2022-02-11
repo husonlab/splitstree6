@@ -80,17 +80,14 @@ public class PhylipReader extends CharactersReader {
 		}
 
 		if (!interleaved) {
-			try (FileLineIterator it = new FileLineIterator(fileName)) {
-				progress.setMaximum(it.getMaximumProgress());
-				progress.setProgress(0);
-
+			try (var it = new FileLineIterator(fileName, progress)) {
 				var first = true;
 
 				var taxaSet = new HashSet<String>();
 				var taxonNames = new ArrayList<String>();
 				var sequences = new ArrayList<String>();
 				String taxonName = null;
-				var sequence = new StringBuilder();
+				var sequenceBuffer = new StringBuilder();
 
 				for (var line : it.lines()) {
 					if (!line.isBlank()) {
@@ -109,24 +106,26 @@ public class PhylipReader extends CharactersReader {
 								taxonName = line.substring(0, 10).trim();
 								taxonName = StringUtils.getUniqueName(taxonName, taxaSet);
 								taxaSet.add(taxonName);
-								sequence.setLength(0);
-								sequence.append(line.substring(10).replaceAll("\\s+", ""));
+								sequenceBuffer.setLength(0);
+								sequenceBuffer.append(line.substring(10).replaceAll("\\s+", ""));
 							} else
-								sequence.append(line.replaceAll("\\s+", ""));
-							if (sequence.length() == nChar) {
-								sequences.add(sequence.toString());
-								sequence.setLength(0);
+								sequenceBuffer.append(line.replaceAll("\\s+", ""));
+							if (sequenceBuffer.length() == nChar) {
+								sequences.add(sequenceBuffer.toString());
+								sequenceBuffer.setLength(0);
 								taxonNames.add(taxonName);
 								taxonName = null;
 							}
 						}
 					}
-					progress.setProgress(it.getProgress());
 				}
-				if (sequence.length() > 0) {
+				if (sequenceBuffer.length() > 0) {
 					taxonNames.add(taxonName);
-					sequences.add(sequence.toString());
-					sequence.setLength(0);
+					var sequence = sequenceBuffer.toString();
+					if (getMissing() == 0 && sequence.contains("?"))
+						setMissing('?');
+					sequences.add(sequence);
+					sequenceBuffer.setLength(0);
 				}
 				if (taxonNames.size() != nTax) {
 					throw new IOException(String.format("Expected %d taxa, found: %d", nTax, taxonNames.size()));
@@ -152,10 +151,7 @@ public class PhylipReader extends CharactersReader {
 			}
 		} else // interleaved
 		{
-			try (FileLineIterator it = new FileLineIterator(fileName)) {
-				progress.setMaximum(it.getMaximumProgress());
-				progress.setProgress(0);
-
+			try (var it = new FileLineIterator(fileName, progress)) {
 				var taxaSet = new HashSet<String>();
 				var taxonNames = new ArrayList<String>();
 				var sequenceBuffers = new ArrayList<StringBuilder>();
@@ -190,22 +186,23 @@ public class PhylipReader extends CharactersReader {
 						if (++which == nTax)
 							which = 0;
 					}
-
-					progress.setProgress(it.getProgress());
 				}
 				taxaBlock.addTaxaByNames(taxonNames);
 				var sequences = new ArrayList<String>();
 				for (var buf : sequenceBuffers) {
-					sequences.add(buf.toString());
+					var sequence = buf.toString();
+					if (getMissing() == 0 && sequence.contains("?"))
+						setMissing('?');
+					sequences.add(sequence);
 				}
 				characters.setDimension(nTax, nChar);
 				characters.setDataType(CharactersType.guessType(CharactersType.union(sequences.toArray(new String[0]))));
 				characters.setGapCharacter(getGap());
 				characters.setMissingCharacter(getMissing());
 
-				for (int i = 0; i < sequences.size(); i++) {
+				for (var i = 0; i < sequences.size(); i++) {
 					var seq = sequences.get(i);
-					for (int j = 0; j < seq.length(); j++)
+					for (var j = 0; j < seq.length(); j++)
 						characters.set(i + 1, j + 1, seq.charAt(j));
 				}
 			}

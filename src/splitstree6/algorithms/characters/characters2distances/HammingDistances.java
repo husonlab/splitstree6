@@ -82,14 +82,14 @@ public class HammingDistances extends Characters2Distances {
 						if (exception.isNull()) {
 							try {
 								final PairwiseCompare seqPair = new PairwiseCompare(characters, s, t);
-								double p = 1.0;
+								var p = 1.0;
 
-								final double[][] F = seqPair.getF();
+								final var F = seqPair.getF();
 
 								if (F == null) {
 									numMissing.increment();
 								} else {
-									for (int x = 0; x < seqPair.getNumStates(); x++) {
+									for (var x = 0; x < seqPair.getNumStates(); x++) {
 										p = p - F[x][x];
 									}
 

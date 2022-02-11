@@ -48,7 +48,7 @@ import java.util.*;
 public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 	public enum RootBy {Off, MidPoint, OutGroup}
 
-	public enum Ladderize {Off, Left, Right, Random}
+	public enum Ladderize {Off, Up, Down, Random}
 
 	private final ObjectProperty<RootBy> optionRootBy = new SimpleObjectProperty<>(this, "optionRootBy", RootBy.MidPoint);
 
@@ -136,7 +136,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 			}
 		}
 
-		if (getOptionLadderize() == Ladderize.Left || getOptionLadderize() == Ladderize.Right) {
+		if (getOptionLadderize() == Ladderize.Up || getOptionLadderize() == Ladderize.Down) {
 			for (var tree : trees) {
 				var node2height = tree.newNodeIntArray();
 				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
@@ -144,7 +144,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 						node2height.put(v, 1);
 					} else {
 						node2height.put(v, v.childrenStream().mapToInt(node2height::get).max().orElse(0) + 1);
-						v.rearrangeAdjacentEdges(orderEdges(v, node2height, getOptionLadderize() == Ladderize.Left));
+						v.rearrangeAdjacentEdges(orderEdges(v, node2height, getOptionLadderize() == Ladderize.Up));
 					}
 				});
 			}

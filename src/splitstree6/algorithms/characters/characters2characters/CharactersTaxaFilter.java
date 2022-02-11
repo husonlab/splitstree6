@@ -61,10 +61,12 @@ public class CharactersTaxaFilter extends DataTaxaFilter<CharactersBlock, Charac
 			outputData.copyRow(inputData, originalI, modifiedI);
 			progress.incrementProgress();
 		}
+
+		outputData.setDataType(inputData.getDataType());
+
 		outputData.setMissingCharacter(inputData.getMissingCharacter());
 		outputData.setGapCharacter(inputData.getGapCharacter());
 		outputData.setHasAmbiguityCodes(inputData.isHasAmbiguityCodes());
-		outputData.setDataType(inputData.getDataType());
 		outputData.setSymbols(inputData.getSymbols());
 		outputData.setCharacterWeights(inputData.getCharacterWeights());
 		outputData.setStateLabeler(inputData.getStateLabeler());

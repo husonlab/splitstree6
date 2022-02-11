@@ -19,7 +19,6 @@
 
 package splitstree6.algorithms.utils;
 
-import jloda.fx.window.NotificationManager;
 import jloda.graph.*;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
@@ -106,6 +105,11 @@ public class RerootingUtils {
 		if (tree.getRoot() == null)
 			return;
 
+		if (tree.isReticulated()) {
+			System.err.println(tree.getName() + ": reticulated, re-root not implemented");
+			return;
+		}
+
 		var totalOutgroupTaxa = 0;
 		var totalIngroupNodes = 0;
 		var totalNodes = tree.getNumberOfNodes();
@@ -129,7 +133,7 @@ public class RerootingUtils {
 		}
 
 		if (totalOutgroupTaxa == 0 || totalIngroupNodes == 0) {
-			NotificationManager.showError("Internal error: no taxa found in rerootByOutGroup()");
+			System.err.println(tree.getName() + ": no outgroup or ingroup");
 			return;
 		}
 

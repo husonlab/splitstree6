@@ -327,10 +327,13 @@ public class CharactersBlock extends DataBlock {
 	}
 
 	/**
-	 * make a shallow copy of a row
+	 * make a copy of a row
 	 */
 	public void copyRow(CharactersBlock parent, int parentIndex, int targetIndex) {
-		matrix[targetIndex - 1] = parent.matrix[parentIndex - 1];
+		var src = parent.matrix[parentIndex - 1];
+		var tar = new char[src.length];
+		System.arraycopy(src, 0, tar, 0, src.length);
+		matrix[targetIndex - 1] = tar;
 	}
 
 	/**

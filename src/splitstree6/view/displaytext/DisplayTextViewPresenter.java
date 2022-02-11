@@ -160,6 +160,9 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 		controller.getGotoLineMenuItem().setOnAction((e) -> {
 			final TextInputDialog dialog = new TextInputDialog("");
+			if (MainWindowManager.isUseDarkTheme()) {
+				dialog.getDialogPane().getScene().getWindow().getScene().getStylesheets().add("jloda/resources/css/dark.css");
+			}
 			dialog.setTitle("Go to Line - " + ProgramProperties.getProgramName());
 			dialog.initStyle(StageStyle.UTILITY);
 			dialog.setX(mainWindow.getStage().getX() + 0.5 * mainWindow.getStage().getWidth());

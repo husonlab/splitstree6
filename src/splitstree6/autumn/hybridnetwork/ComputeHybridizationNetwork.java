@@ -19,6 +19,7 @@
 package splitstree6.autumn.hybridnetwork;
 
 
+import jloda.fx.window.NotificationManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
@@ -68,9 +69,14 @@ public class ComputeHybridizationNetwork {
         var n = 0;
         for (var tree : networks) {
 			tree.setName("H" + (++n));
+            var seen = new HashSet<String>();
             for (var v : tree.nodes()) {
                 var label = tree.getLabel(v);
                 if (label != null) {
+                    if (seen.contains(label))
+                        NotificationManager.showWarning("Tree " + tree.getName() + ": Multiple occurrence of leaf label: " + label);
+                    else
+                        seen.add(label);
                     var id = label2taxonId.get(label);
                     if (id == -1)
                         System.err.println("Label not found: " + label);
