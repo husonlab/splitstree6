@@ -1,0 +1,536 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=8 nAlgorithms=5;
+PROGRAM version='SplitsTree6 Community Edition';
+WORKFLOW creationDate='1644751608524'; [Sun Feb 13 12:26:48 CET 2022]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 12 taxa and 12 DNA sequences of length 898.
+The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 12 x 12 distance matrix.
+The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 32 splits, cyclic.
+
+References:
+Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255– 265, 2004.
+Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+DIMENSIONS ntax=12;
+TAXLABELS
+	[1] 'Lemur_catta'
+	[2] 'Homo_sapiens'
+	[3] 'Pan'
+	[4] 'Gorilla'
+	[5] 'Pongo'
+	[6] 'Hylobates'
+	[7] 'Macaca_fuscata'
+	[8] 'M._mulatta'
+	[9] 'M._fascicularis'
+	[10] 'M._sylvanus'
+	[11] 'Saimiri_sciureus'
+	[12] 'Tarsius_syrichta'
+;
+DISPLAYLABELS
+	[1] ' Lemur catta<br><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Darica_Lemur_07209.jpg" height=64>'
+	[2] 'Homo sapiens<br><img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Max_und_Moritz.JPG" height=64>'
+	[3] '  Pan<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Common_chimpanzee_%28Pan_troglodytes_schweinfurthii%29_feeding.jpg/1280px-Common_chimpanzee_%28Pan_troglodytes_schweinfurthii%29_feeding.jpg" height=64>'
+	[4] 'Gorilla<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Gorille_des_plaines_de_l%27ouest_à_l%27Espace_Zoologique.jpg/1024px-Gorille_des_plaines_de_l%27ouest_à_l%27Espace_Zoologique.jpg" height=64>'
+	[5] 'Pongo<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG/1024px-Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG" height=64>'
+	[6] 'Hylobates<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg/1024px-Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg" height=64>'
+	[7] 'M. fuscata<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/JapaneseMacaqueM2297.jpg" height=64>'
+	[8] '   M. mulatta<br><img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Rhesus_macaque_%28Macaca_mulatta_mulatta%29%2C_male%2C_Gokarna.jpg" height=64>'
+	[9] 'M. fascicularis<br><img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Em_-_Macaca_fascicularis_-_1.jpg" height=64>'
+	[10] ' M. sylvanus<br><img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Macaca_sylvanus.Mother_and_baby.jpg" height=64>'
+	[11] 'Saimiri sciureus<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Saimiri_sciureus_%286337874822%29.jpg" height=64>'
+	[12] 'Tarsius syrichta<br><img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Tarsius_syrichta.jpg" height=64>'
+;
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Editor';
+NAME 'Taxa Editor';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Editor';
+DIMENSIONS ntax=12;
+TAXLABELS
+	[1] 'Lemur_catta'
+	[2] 'Homo_sapiens'
+	[3] 'Pan'
+	[4] 'Gorilla'
+	[5] 'Pongo'
+	[6] 'Hylobates'
+	[7] 'Macaca_fuscata'
+	[8] 'M._mulatta'
+	[9] 'M._fascicularis'
+	[10] 'M._sylvanus'
+	[11] 'Saimiri_sciureus'
+	[12] 'Tarsius_syrichta'
+;
+DISPLAYLABELS
+	[1] '<font "KG Second Chances Sketch"><c "0x0000ffff"> Lemur catta<br><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Darica_Lemur_07209.jpg" height=64>'
+	[2] '<font "KG Second Chances Sketch"><c "0x0000ffff">Homo sapiens<br><img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Max_und_Moritz.JPG" height=64>'
+	[3] '<font "KG Second Chances Sketch"><c "0x0000ffff">  Pan<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Common_chimpanzee_%28Pan_troglodytes_schweinfurthii%29_feeding.jpg/1280px-Common_chimpanzee_%28Pan_troglodytes_schweinfurthii%29_feeding.jpg" height=64>'
+	[4] '<font "KG Second Chances Sketch"><c "0x0000ffff">Gorilla<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Gorille_des_plaines_de_l%27ouest_à_l%27Espace_Zoologique.jpg/1024px-Gorille_des_plaines_de_l%27ouest_à_l%27Espace_Zoologique.jpg" height=64>'
+	[5] '<font "KG Second Chances Sketch"><c "0x0000ffff">Pongo<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG/1024px-Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG" height=64>'
+	[6] '<font "KG Second Chances Sketch"><c "0x0000ffff">Hylobates<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg/1024px-Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg" height=64>'
+	[7] '<font "KG Second Chances Sketch"><c "0x0000ffff">M. fuscata<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/JapaneseMacaqueM2297.jpg" height=64>'
+	[8] '<font "KG Second Chances Sketch"><c "0x0000ffff">   M. mulatta<br><img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Rhesus_macaque_%28Macaca_mulatta_mulatta%29%2C_male%2C_Gokarna.jpg" height=64>'
+	[9] '<font "KG Second Chances Sketch"><c "0x0000ffff">M. fascicularis<br><img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Em_-_Macaca_fascicularis_-_1.jpg" height=64>'
+	[10] '<font "KG Second Chances Sketch"><c "0x0000ffff"> M. sylvanus<br><img src="https://upload.wikimedia.org/wikipedia/commons/6/62/Macaca_sylvanus.Mother_and_baby.jpg" height=64>'
+	[11] '<font "KG Second Chances Sketch"><c "0x0000ffff">Saimiri sciureus<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/5/5c/Saimiri_sciureus_%286337874822%29.jpg" height=64>'
+	[12] '<font "KG Second Chances Sketch"><c "0x0000ffff">Tarsius syrichta<br><img src="https://upload.wikimedia.org/wikipedia/commons/9/9f/Tarsius_syrichta.jpg" height=64>'
+;
+END; [TAXA]
+
+BEGIN CHARACTERS;
+TITLE 'Input Characters';
+LINK ALGORITHM = 'Taxa Editor';
+DIMENSIONS ntax=12 nchar=898;
+FORMAT
+	datatype='DNA' missing=? matchChar=. gap=- symbols="acgt" labels=left transpose=no interleave=yes;
+MATRIX
+Lemur_catta       aagcttcataggagcaaccattctaataatcgcacatggccttacatcatccatattattctgtctagccaactctaact
+Homo_sapiens      ........cc..c...gt......c........c..c..g........c..at..c.......c.....a.....a....
+Pan               ........cc..c....tt..c..c........c..c..a........c..at..........c.....a.....a..t.
+Gorilla           ........cc..c...gttg....t.....t..c..c..a...........at..........c.....a.....a....
+Pongo             ........cc..c.......cc..c..g..t..c.....a..c.....c...c..c.g.....c.....a.....a....
+Hylobates         ......t.c...t......g.c..c........c..c..a..a..c..t...c.gc.......c..t..a.....a....
+Macaca_fuscata    ......ttcc..c........c..t..g.....t..c..a..c..c..t.......at.....c........t..a....
+'M._mulatta'      ......ttct..c........c..c..g..t..t..c..a..c..c..t.......at.....c........t..a....
+'M._fascicularis' .......tcc..c.......cc..t........c..c..g..c..c..t.....g.at.....ct.g.....t..a....
+'M._sylvanus'     .......tcc..t.....t..c..t...g.t..c.....a..c..c..t.......ac.....ct.g........a....
+Saimiri_sciureus  ........cc..c....tg..c...........t..c..gt....t..g..t..gc.......c.....a.....a..t.
+Tarsius_syrichta  ...t.....t.....c....c...t.....t..c........c..c..c...c.......t..c.....a..ta.a....
+
+Lemur_catta       acgaacgaatccatagccgtacaatactactagcacgagggatccaaaccattctccctcttatagccacctgatgacta
+Homo_sapiens      .......c.ct..c..t..c.tc...a.c..ct.t.a...ac.t.....tc.a.....a..a.....tttt........t
+Pan               .t.....c.c...c..t..c.tc...a.t..ct.c.a...ac.t.....tc.a.....a..a......ttt........c
+Gorilla           .........c...c.....c.tc...a.t..ct.t.a...ac........c.a.....a..a......ctt........t
+Pongo             .........c...c.....c.tc...a.c..ct.t.a...cc.t.....tc.a.....c..a......ct.........t
+Hylobates         .........ct..c.....c.tc...a.c...t.t......c.....g..t.a.....a..g......tt.........c
+Macaca_fuscata    .t.....c.ct..c.a......c........gt.c.....ac.t....t.c.a..t..a..a.c....ttt......t..
+'M._mulatta'      .t.....c.ct..c.a......c........gt.c..g..ac.t....t.c.a..t..a..a.c...ttt.......t..
+'M._fascicularis' .t..g..c.ct....a......c.........t.c.....ac.t....ttc.a..t..at.g.c....tt.........c
+'M._sylvanus'     .......c.c...c.....c.tc.........t.c.....ac......t.c.a.....a..a.c....tt.......t.c
+Saimiri_sciureus  ..........t..c.....a......ac.t.ta.t......c.......ac.at....g.......g.ct.........c
+Tarsius_syrichta  ........g....c..t..a......gc......c..t..cc.t......c.at.a......gc...a..a........c
+
+Lemur_catta       ctcgccagcctaactaacctagccctacccacctctatcaatttaattggcgaactattcgtcactatagcatccttctc
+Homo_sapiens      ..a..a.....cg.......c...t.....c..a....t..cc..c.g..a.....c.ct..gctag..a.ca.g.....
+Pan               ..a..a.....cg.......c.........c.ta.c..t...c.cc.a..g.....c.c...gctag..a.c..a.....
+Gorilla           ..g..a.....cg.c.....c...t.....c..a.c..t..cc..c.a..a..g..c.c...actag..a.ca.a.....
+Pongo             ..a..a.....c........t........ac..a.c.....cc.tc.a..a.....c.c...acta.....cata.....
+Hylobates         gca..a.....cg.......c.........c..a....t..cc.cc.a..t.....c.....acta..g..c........
+Macaca_fuscata    aca..a.....t........t.........c..a........c..c.a..t.....c..t..a.tcgc.a.c..a.....
+'M._mulatta'      aca..a.....t........t.........c..a.......cc..c.a..t.....c..t..a.tcgcga.c..a.....
+'M._fascicularis' aca..a.....t........t.........c..a....t...c..c.a........c..t..a.tc.c.a.t..a..t..
+'M._sylvanus'     aca..a.....t.....t..t..t......t..a....t...c..c.g........c.....a.tcgc.a.c..a..t..
+Saimiri_sciureus  ..a..a.at..cg.......c...........ag....t...c..g.a..a...t..c..aca.tcg..t.t........
+Tarsius_syrichta  .........t....c.....g.....t...c.aa.a..t........c..t.....g.c...a.ta......g.a..t..
+
+Lemur_catta       atgatcaaacattacaattatcttaataggcttaaatatgctcatcaccgctctctattccctctatatattaactacta
+Homo_sapiens      c........t..c..tc.cc.ac.t.c...ac.c..c..a..ag....a..c..a..c........c.....t..c..a.
+Pan               c........t.cc..tc.cc.ac.c.c...a..c..c..a..a.....a..c..g..c........c..g..t..c..a.
+Gorilla           c..........cc..cc..t.ac.t.c...a.ct..c..a..a..t..a..c..g..c.....t........t..c..a.
+Pongo             t.....t.....c..c..cc.ac...c...ac.c..c..a..a.....aa.c..a..c..t...........c..c..a.
+Hylobates         c..gg......c...t....cac.c.cc..gc.c..cg.a..a.....g..c..a..c.....t..c.....t.tc.ta.
+Macaca_fuscata    c.....cc.t..c..c.....gc...c...ac.t..c..at.a..t..g..c.....c..t...c.c.....c.....a.
+'M._mulatta'      c..g..cc.t..c..c.....a....c...a..t..c..a..a..t..g..c.....c......c.c.....c..c..a.
+'M._fascicularis' c.....cc.t..c..c...g.g....cg...c.t.....a..a.....a..c.....c..t...c.c..g..c.t...ag
+'M._sylvanus'     c.....cc....c..c..c..ac...c...ac.g..c..a..a..t..a..c.....c..t..tc.c.....c..c..a.
+Saimiri_sciureus  t.....c...t....t.....a..c.c...ac.t.....a..a..t..a..a.....c..a..tc....g.atg.ct...
+Tarsius_syrichta  ...g...c..c.a..t.........g.....c.t..c.cc..t........c..a........a......c...tc.ta.
+
+Lemur_catta       cacaacgaggaaaactcacatatcattcgcacaacctaaacccatcctttacacgagaaaacacccttatatccatacac
+Homo_sapiens      .....t.g..ctc......cc.c..catta.....a....a..c..a..c.................c..g.t.......
+Pan               .....t....ctc......cc.c..catta.t...a....g..c..a..c...........t..t..c....ttt.....
+Gorilla           .....t....ccc.......c.c..catcac....a....a..c..a................t...c....t...g...
+Pongo             ..........t.c..c....c.c..catca.....a....a..t..t..c.....c.....t.....c..gct.......
+Hylobates         ..........c.c...t...c.c..catta.a...a....a..c..ac.c.............tat.a...ctt..g...
+Macaca_fuscata    ............c.......c....cataat....a....g..cc....c..............at.a....t.......
+'M._mulatta'      ...........gc.......c....cataat....a....a..cc....c.............tat.a....t.......
+'M._fascicularis' t...........c.......c.c..cataat...ta....a..cc....c.............tat.a....t.......
+'M._sylvanus'     ...........gcg......c.c..cataatt...a....a...c.t..c.............tat.a...ct.......
+Saimiri_sciureus  ....g.....tcc...t.....cagca.cag...ta....a...ata..............t..g..a....tt.....t
+Tarsius_syrichta  .t............ta..........atca....ta.c.tg..cc.t..c..c........t..at.a...at.......
+
+Lemur_catta       atactcccccttctcctatttaccttaaaccccaaaattattctaggacccacgtactgtaaatatagtttaaa-aaaac
+Homo_sapiens      c..tc....a.......cc.at..c.c......g.c..c...acc..gtttt.c.ct................cc.....
+Pan               c..tc....a.c.....tc.at..c.c..t..tg.t..c..cact...tt...c.c.................cc.....
+Gorilla           c..tc....a.c.....cc.at..c.c......g.t.....cacc..gtt...c.c.................cc.....
+Pongo             c..tc....a.c.....c..at..c.c.......gc..c..cgct..gtt.g.c...................cc.....
+Hylobates         c.ct.......c.....cc.a...c.c.....t..c..c...act..cttt..tcc.......c.........tc.....
+Macaca_fuscata    c.cgct..aa..a....tc.at..c.c........c..c..c..g..gttt..c.c.....g...........ct.....
+'M._mulatta'      c.cgct..aa.ca....cc.at.tc.c........c..c..c..g..gttt..t.c.....g...........ct.....
+'M._fascicularis' c.cgct..aa..a....tc.at.tc.c........c..c..c..g..gttt..c.c.................ct.....
+'M._sylvanus'     c.cgct..aa..a.t..tc.at.tc.t........c..c.........ttt..t.c.................tt.....
+Saimiri_sciureus  ...aca..aa.c.....cc.......g.g......gg.a...a........t.acct.....t.........gct.....
+Tarsius_syrichta  c..t.t...t.aa.....c.at.tacc.........g.a...a.....a...t.....................c.....
+
+Lemur_catta       actagattgtgaatccagaaatagaagctcaaac-cttcttatttaccgagaaagtaatgtatgaactgctaactctgca
+Homo_sapiens      .tc............tgac..c...g...t.-cga.cc.................ct-cac.a.............atgc
+Pan               .tc............tgac..c...g.....-cga.cc.................ct-.a..a..........t..atat
+Gorilla           .tc............tgat..c...g.....-caa.cc.................ct-c...a..g..........atac
+Pongo             .t.............t.at.....ggc.c..-caa.cc.................ct-cac.a..............cac
+Hylobates         .t.............t.ac......g....g-.aa.c....gc............cc-cac.a.............act.
+Macaca_fuscata    ...............t.acc.....ga....-c.a.c.................act-c.c.a.g.........c.atgt
+'M._mulatta'      .t.............t.acc.....ga..t.-c.a.c.................act-c.cga.g.........c.atgt
+'M._fascicularis' .t.............t.act.....g..ct.-c.a...................act-c.c.a.g........tc.atgc
+'M._sylvanus'     .t....c........t.act.........t.-c.a...................act-..c.a.g..c.....tc.acac
+Saimiri_sciureus  .t.............t.at........aat.-taa.......a.............g-c.c.a..........t..atgc
+Tarsius_syrichta  .t..........g..t.at.........c....gat............a........-..c.a.............atgc
+
+Lemur_catta       ctccgtatataaaaatacggctatctcaacttttaaaggatagaagtaatccattggccttaggagccaaaaa-attggt
+Homo_sapiens      .c..a.g.c...c..c.t....t...................ac..ct.........t......cc.......tt.....
+Pan               .c..a.gcc.g.c..c.t....t...................ac..cc....g....t......cc.......tt.....
+Gorilla           .c....gct.g.c..c.t....t...................ac..ct.........t.......c.......tt.....
+Pongo             t-..a.g.g.g.c..c.t....t.....g.............ac..ct....c....t.......t.......tt.....
+Hylobates         tc..a.g...g.c..c.t....t...................ac..ct.........t.......c.......tt.....
+Macaca_fuscata    ac.....cc.....t.....t.t...................ac..ct........a.........t......c......
+'M._mulatta'      a......cc.....t.....t.t...................ac..ct........a.........t......t......
+'M._fascicularis' .......ct.....c.....t.tc..................ac..ct........a.........t......c......
+'M._sylvanus'     .......ct.....c.....t.t...................ac..ct..................t......t......
+Saimiri_sciureus  tc..aagac...c..ctt....tc...................t...t.........t...............c......
+Tarsius_syrichta  ....a.......c...gt....t...t-..........................c..t.......a..g...........
+
+Lemur_catta       gcaactccaaataaaagtaataaatctattatcctctttcacccttgtcacactgattatcctaactttacctatcatta
+Homo_sapiens      .......................cca.gcaca.ta..a.a...accc.a..c....c.tc.....t.ccc..c...c...
+Pan               .......................cca.g.ata.ta.ca.a...acct.a..c..a.c.cc.t...t.c.c..c...c.c.
+Gorilla           .......................c.a.g.acg.ta.ca.a...acct.ag.c..a.c.tc.t...t.ccc......c...
+Pongo             ....................c.gcca.g..ta..a.ca.a..tgccc....ct.a.c.tc.....tcccc..c..t.ccg
+Hylobates         ......................gcaa.g.aca..a.ca.ag..a..c.a..g..a.cctc.....t.ccc..c..t.cag
+Macaca_fuscata    .......................tca.gcaca..c.ca...tta.aaca..c..t..ctc.......c.c..a..tt..g
+'M._mulatta'      .......................tca.gcaca..c..a...taa.aaca..c..t..ctc.......c.c..a..tt..g
+'M._fascicularis' .......................tca.gcaca..c.ca...taa.aaca..c..c..ctc...g..cc.t..a..tt..g
+'M._sylvanus'     .......................tca.g.ata..c.ca...taa.aaca..t..c..ctc.......c.t..a..tt.cg
+Saimiri_sciureus  ......................---a..cac.t...ca....t..aa.a.....a....g....ctagcg..a...c.ag
+Tarsius_syrichta  .........................t....t..a..c.c..ttt.ac.at....t.cac..t...t.acc..at.t....
+
+Lemur_catta       taaacgttacaaacatatacaaaaactacccctatgcaccatacgtaaaatcttctattgcatgtgccttcatcactagc
+Homo_sapiens      cc.c.c.cgtt...ccta.......aa..t.a..cc.c.at..t........cat.g.c....cca....t..t.tc..t
+Pan               cc.c.c.c.tt...ccta.......aa..t.a...c.c.at..t..g.....cat...c..g.cca....t....t....
+Gorilla           cc.c.t.c.tc..tccta.......aag.t.a..cc.c.at............atcg.c....cca....t....tc...
+Pongo             ct.c.c.c.tt...ccca.......aa....a..cc.c.ac..t......a.gg.c..c....cc.....t.ct.tc...
+Hylobates         cc.c.c...tt...ccca.t.....ga..tta..cc.g.ac.........atga.c.....c.c.a....t..a.tc...
+Macaca_fuscata    cc.c.c.c.tc...cct........acgt..a..cc..gat.........a.aa.cg.aat..a...t.......tc...
+'M._mulatta'      cc.c.c.c.tc...cct........acgt..a..cc..gat.........a.aa.cg.aat..a...t.......tc...
+'M._fascicularis' cc.c.c.c..c...ccc..t.....acgtt.a..cc..gac.........a.aa.cg.aat..a...t..t..t..c..t
+'M._sylvanus'     ct.c.c...tc...ccca.......ac...ta...c..aac.........a.ag.cg.aat..a...t.....t..c...
+Saimiri_sciureus  ct.c.c.c.tt...ccta......g.aca.ta..cc.gtac.........ctag.c..catc.ac...c....t..c..t
+Tarsius_syrichta  .t.caaca..t..a.a...tg...cac.tg.a..cc.ttac.........aac.....c..c..c..a..t..a..a...
+
+Lemur_catta       ctcatcccaactatattatttatctcctcaggacaagaaacaatcatttccaactgacattgaataacaatccaaaccct
+Homo_sapiens      ...t....c..a.c.a....c..g.g.ct..ac......gtt..t..c..g........c...gcc....c......aac
+Pan               ..tt....c..a.c.a....c..a.g.ct..ac......g.t..t..c..a.....g..c...gc.....c......aac
+Gorilla           ...t....c..a.c.a.....c.a.g.ct..ac......g.t..t..c..a.g......c...gc.....c......aa.
+Pongo             ..t........a.c.a.........g.ct............c...g.ca.a......tgc....c...c.c...g..a..
+Hylobates         ..at.t..c..a...a....c..g.g.a...ac........c..t.....a........c....ctg...c......g..
+Macaca_fuscata    ...cc.t....a.ct.....c....t....aac..........c.....gg.g..............tg.c......a..
+'M._mulatta'      ...cc.t....a.ct.....c....t....aac..........c.....ga.g..............t..c......a..
+'M._fascicularis' ...cc.t....a.ccc....c...ct....aac..........c.....gg.gt................c......at.
+'M._sylvanus'     ...tctt....a.ct....a...a.t..t.aac..............c.ga.g...g..c.......t..c......a..
+Saimiri_sciureus  ac.t.at.t.ta.....c......ctta....c......t....a.....a........c........t.........a.
+Tarsius_syrichta  ..ag......tgc.ca.....c.a.a.a..aat.......t...........................g..t..t..ta.
+
+Lemur_catta       aaaactatctattagctt
+Homo_sapiens      cc.g..c..cc.a.....
+Pan               cc.g..c..cc.a.....
+Gorilla           tc....c..cc.a.....
+Pongo             .c....c..ac.a.....
+Hylobates         .g....c..cc.a.....
+Macaca_fuscata    .g.c...a.gc.a.....
+'M._mulatta'      .g.c...a.ac.a.....
+'M._fascicularis' .g.c...a.ac.a.....
+'M._sylvanus'     ..gc...a.at.a.....
+Saimiri_sciureus  c........cc.a.....
+Tarsius_syrichta  c...t...gcc.a.....
+
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK CHARACTERS = 'Input Characters';
+NAME 'Characters Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN CHARACTERS;
+TITLE 'Working Characters';
+LINK ALGORITHM = 'Input Data Filter';
+DIMENSIONS ntax=12 nchar=898;
+FORMAT
+	datatype='DNA' missing=? gap=- symbols="acgt" labels=left transpose=no interleave=yes;
+MATRIX
+Lemur_catta       aagcttcataggagcaaccattctaataatcgcacatggccttacatcatccatattattctgtctagccaactctaact
+Homo_sapiens      aagcttcaccggcgcagtcattctcataatcgcccacgggcttacatcctcattactattctgcctagcaaactcaaact
+Pan               aagcttcaccggcgcaattatcctcataatcgcccacggacttacatcctcattattattctgcctagcaaactcaaatt
+Gorilla           aagcttcaccggcgcagttgttcttataattgcccacggacttacatcatcattattattctgcctagcaaactcaaact
+Pongo             aagcttcaccggcgcaaccaccctcatgattgcccatggactcacatcctccctactgttctgcctagcaaactcaaact
+Hylobates         aagctttacaggtgcaaccgtcctcataatcgcccacggactaacctcttccctgctattctgccttgcaaactcaaact
+Macaca_fuscata    aagcttttccggcgcaaccatccttatgatcgctcacggactcacctcttccatatatttctgcctagccaattcaaact
+'M._mulatta'      aagcttttctggcgcaaccatcctcatgattgctcacggactcacctcttccatatatttctgcctagccaattcaaact
+'M._fascicularis' aagcttctccggcgcaaccacccttataatcgcccacgggctcacctcttccatgtatttctgcttggccaattcaaact
+'M._sylvanus'     aagcttctccggtgcaactatccttatagttgcccatggactcacctcttccatatacttctgcttggccaactcaaact
+Saimiri_sciureus  aagcttcaccggcgcaatgatcctaataatcgctcacgggtttacttcgtctatgctattctgcctagcaaactcaaatt
+Tarsius_syrichta  aagtttcattggagccaccactcttataattgcccatggcctcacctcctccctattattttgcctagcaaatacaaact
+
+Lemur_catta       acgaacgaatccatagccgtacaatactactagcacgagggatccaaaccattctccctcttatagccacctgatgacta
+Homo_sapiens      acgaacgcactcacagtcgcatcataatcctctctcaaggacttcaaactctactcccactaatagctttttgatgactt
+Pan               atgaacgcacccacagtcgcatcataattctctcccaaggacttcaaactctactcccactaatagccttttgatgactc
+Gorilla           acgaacgaacccacagccgcatcataattctctctcaaggactccaaaccctactcccactaatagccctttgatgactt
+Pongo             acgaacgaacccacagccgcatcataatcctctctcaaggccttcaaactctactccccctaatagccctctgatgactt
+Hylobates         acgaacgaactcacagccgcatcataatcctatctcgagggctccaagccttactcccactgatagccttctgatgactc
+Macaca_fuscata    atgaacgcactcacaaccgtaccatactactgtcccgaggacttcaaatcctacttccactaacagccttttgatgatta
+'M._mulatta'      atgaacgcactcacaaccgtaccatactactgtcccggggacttcaaatcctacttccactaacagctttctgatgatta
+'M._fascicularis' atgagcgcactcataaccgtaccatactactatcccgaggacttcaaattctacttccattgacagccttctgatgactc
+'M._sylvanus'     acgaacgcacccacagccgcatcatactactatcccgaggactccaaatcctactcccactaacagccttctgatgattc
+Saimiri_sciureus  acgaacgaattcacagccgaacaataacatttactcgagggctccaaacactattcccgcttataggcctctgatgactc
+Tarsius_syrichta  acgaacgagtccacagtcgaacaatagcactagcccgtggccttcaaaccctattacctcttgcagcaacatgatgactc
+
+Lemur_catta       ctcgccagcctaactaacctagccctacccacctctatcaatttaattggcgaactattcgtcactatagcatccttctc
+Homo_sapiens      ctagcaagcctcgctaacctcgccttaccccccactattaacctactgggagaactctctgtgctagtaaccacgttctc
+Pan               ctagcaagcctcgctaacctcgccctaccccctaccattaatctcctaggggaactctccgtgctagtaacctcattctc
+Gorilla           ctggcaagcctcgccaacctcgccttaccccccaccattaacctactaggagagctctccgtactagtaaccacattctc
+Pongo             ctagcaagcctcactaaccttgccctaccacccaccatcaaccttctaggagaactctccgtactaatagccatattctc
+Hylobates         gcagcaagcctcgctaacctcgccctaccccccactattaacctcctaggtgaactcttcgtactaatggcctccttctc
+Macaca_fuscata    acagcaagccttactaaccttgccctaccccccactatcaatctactaggtgaactctttgtaatcgcaacctcattctc
+'M._mulatta'      acagcaagccttactaaccttgccctaccccccactatcaacctactaggtgaactctttgtaatcgcgacctcattctc
+'M._fascicularis' acagcaagccttactaaccttgccctaccccccactattaatctactaggcgaactctttgtaatcacaacttcattttc
+'M._sylvanus'     acagcaagccttactaatcttgctctaccctccactattaatctactgggcgaactcttcgtaatcgcaacctcattttc
+Saimiri_sciureus  ctagcaaatctcgctaacctcgccctacccacagctattaatctagtaggagaattactcacaatcgtatcttccttctc
+Tarsius_syrichta  ctcgccagcttaaccaacctggcccttcccccaacaattaatttaatcggtgaactgtccgtaataatagcagcattttc
+
+Lemur_catta       atgatcaaacattacaattatcttaataggcttaaatatgctcatcaccgctctctattccctctatatattaactacta
+Homo_sapiens      ctgatcaaatatcactctcctacttacaggactcaacatactagtcacagccctatactccctctacatatttaccacaa
+Pan               ctgatcaaataccactctcctactcacaggattcaacatactaatcacagccctgtactccctctacatgtttaccacaa
+Gorilla           ctgatcaaacaccacccttttacttacaggatctaacatactaattacagccctgtactccctttatatatttaccacaa
+Pongo             ttgatctaacatcaccatcctactaacaggactcaacatactaatcacaaccctatactctctctatatattcaccacaa
+Hylobates         ctgggcaaacactactattacactcaccgggctcaacgtactaatcacggccctatactccctttacatatttatcataa
+Macaca_fuscata    ctgatcccatatcaccattatgctaacaggacttaacatattaattacggccctctactctctccacatattcactacaa
+'M._mulatta'      ctggtcccatatcaccattatattaacaggatttaacatactaattacggccctctactccctccacatattcaccacaa
+'M._fascicularis' ctgatcccatatcaccattgtgttaacgggccttaatatactaatcacagccctctactctctccacatgttcattacag
+'M._sylvanus'     ctgatcccacatcaccatcatactaacaggactgaacatactaattacagccctctactctcttcacatattcaccacaa
+Saimiri_sciureus  ttgatccaactttactattatattcacaggacttaatatactaattacagcactctactcacttcatatgtatgcctcta
+Tarsius_syrichta  atggtcacacctaactattatcttagtaggccttaacacccttatcaccgccctatattccctatatatactaatcataa
+
+Lemur_catta       cacaacgaggaaaactcacatatcattcgcacaacctaaacccatcctttacacgagaaaacacccttatatccatacac
+Homo_sapiens      cacaatggggctcactcacccaccacattaacaacataaaaccctcattcacacgagaaaacaccctcatgttcatacac
+Pan               cacaatgaggctcactcacccaccacattaataacataaagccctcattcacacgagaaaatactctcatatttttacac
+Gorilla           cacaatgaggcccactcacacaccacatcaccaacataaaaccctcatttacacgagaaaacatcctcatattcatgcac
+Pongo             cacaacgaggtacacccacacaccacatcaacaacataaaaccttctttcacacgcgaaaataccctcatgctcatacac
+Hylobates         cacaacgaggcacacttacacaccacattaaaaacataaaaccctcactcacacgagaaaacatattaatacttatgcac
+Macaca_fuscata    cacaacgaggaacactcacacatcacataatcaacataaagccccccttcacacgagaaaacacattaatattcatacac
+'M._mulatta'      cacaacgaggagcactcacacatcacataatcaacataaaaccccccttcacacgagaaaacatattaatattcatacac
+'M._fascicularis' tacaacgaggaacactcacacaccacataatcaatataaaaccccccttcacacgagaaaacatattaatattcatacac
+'M._sylvanus'     cacaacgaggagcgctcacacaccacataattaacataaaaccacctttcacacgagaaaacatattaatactcatacac
+Saimiri_sciureus  cacagcgaggtccacttacatacagcaccagcaatataaaaccaatatttacacgagaaaatacgctaatatttatacat
+Tarsius_syrichta  ctcaacgaggaaaatacacatatcatatcaacaatatcatgccccctttcacccgagaaaatacattaataatcatacac
+
+Lemur_catta       atactcccccttctcctatttaccttaaaccccaaaattattctaggacccacgtactgtaaatatagtttaaa-aaaac
+Homo_sapiens      ctatcccccattctcctcctatccctcaaccccgacatcattaccgggttttcctcttgtaaatatagtttaaccaaaac
+Pan               ctatcccccatcctccttctatccctcaatcctgatatcatcactggattcacctcctgtaaatatagtttaaccaaaac
+Gorilla           ctatcccccatcctcctcctatccctcaaccccgatattatcaccgggttcacctcctgtaaatatagtttaaccaaaac
+Pongo             ctatcccccatcctcctcttatccctcaaccccagcatcatcgctgggttcgcctactgtaaatatagtttaaccaaaac
+Hylobates         ctcttccccctcctcctcctaaccctcaaccctaacatcattactggctttactccctgtaaacatagtttaatcaaaac
+Macaca_fuscata    ctcgctccaattatccttctatccctcaaccccaacatcatcctggggtttacctcctgtagatatagtttaactaaaac
+'M._mulatta'      ctcgctccaatcatcctcctatctctcaaccccaacatcatcctggggtttacttcctgtagatatagtttaactaaaac
+'M._fascicularis' ctcgctccaattatccttctatctctcaaccccaacatcatcctggggtttacctcctgtaaatatagtttaactaaaac
+'M._sylvanus'     ctcgctccaattattcttctatctcttaaccccaacatcattctaggatttacttcctgtaaatatagtttaattaaaac
+Saimiri_sciureus  ataacaccaatcctcctccttaccttgagccccaaggtaattataggaccctcaccttgtaattatagtttagctaaaac
+Tarsius_syrichta  ctatttcccttaatcctactatctaccaaccccaaagtaattataggaaccatgtactgtaaatatagtttaaacaaaac
+
+Lemur_catta       actagattgtgaatccagaaatagaagctcaaac-cttcttatttaccgagaaagtaatgtatgaactgctaactctgca
+Homo_sapiens      atcagattgtgaatctgacaacagaggctta-cgaccccttatttaccgagaaagct-cacaagaactgctaactcatgc
+Pan               atcagattgtgaatctgacaacagaggctca-cgaccccttatttaccgagaaagct-tataagaactgctaattcatat
+Gorilla           atcagattgtgaatctgataacagaggctca-caaccccttatttaccgagaaagct-cgtaagagctgctaactcatac
+Pongo             attagattgtgaatctaataatagggcccca-caaccccttatttaccgagaaagct-cacaagaactgctaactctcac
+Hylobates         attagattgtgaatctaacaatagaggctcg-aaacctcttgcttaccgagaaagcc-cacaagaactgctaactcacta
+Macaca_fuscata    actagattgtgaatctaaccatagagactca-ccacctcttatttaccgagaaaact-cgcaaggactgctaacccatgt
+'M._mulatta'      attagattgtgaatctaaccatagagactta-ccacctcttatttaccgagaaaact-cgcgaggactgctaacccatgt
+'M._fascicularis' attagattgtgaatctaactatagaggccta-ccacttcttatttaccgagaaaact-cgcaaggactgctaatccatgc
+'M._sylvanus'     attagactgtgaatctaactatagaagctta-ccacttcttatttaccgagaaaact-tgcaaggaccgctaatccacac
+Saimiri_sciureus  attagattgtgaatctaataatagaagaata-taacttcttaattaccgagaaagtg-cgcaagaactgctaattcatgc
+Tarsius_syrichta  attagattgtgagtctaataatagaagcccaaagatttcttatttaccaagaaagta-tgcaagaactgctaactcatgc
+
+Lemur_catta       ctccgtatataaaaatacggctatctcaacttttaaaggatagaagtaatccattggccttaggagccaaaaa-attggt
+Homo_sapiens      ccccatgtctaacaacatggctttctcaacttttaaaggataacagctatccattggtcttaggccccaaaaattttggt
+Pan               ccccatgcctgacaacatggctttctcaacttttaaaggataacagccatccgttggtcttaggccccaaaaattttggt
+Gorilla           ccccgtgcttgacaacatggctttctcaacttttaaaggataacagctatccattggtcttaggacccaaaaattttggt
+Pongo             t-ccatgtgtgacaacatggctttctcagcttttaaaggataacagctatcccttggtcttaggatccaaaaattttggt
+Hylobates         tcccatgtatgacaacatggctttctcaacttttaaaggataacagctatccattggtcttaggacccaaaaattttggt
+Macaca_fuscata    acccgtacctaaaattacggttttctcaacttttaaaggataacagctatccattgaccttaggagtcaaaaacattggt
+'M._mulatta'      atccgtacctaaaattacggttttctcaacttttaaaggataacagctatccattgaccttaggagtcaaaaatattggt
+'M._fascicularis' ctccgtacttaaaactacggtttcctcaacttttaaaggataacagctatccattgaccttaggagtcaaaaacattggt
+'M._sylvanus'     ctccgtacttaaaactacggttttctcaacttttaaaggataacagctatccattggccttaggagtcaaaaatattggt
+Saimiri_sciureus  tcccaagactaacaacttggcttcctcaacttttaaaggatagtagttatccattggtcttaggagccaaaaacattggt
+Tarsius_syrichta  ctccatatataacaatgtggctttctt-acttttaaaggatagaagtaatccatcggtcttaggaaccgaaaa-attggt
+
+Lemur_catta       gcaactccaaataaaagtaataaatctattatcctctttcacccttgtcacactgattatcctaactttacctatcatta
+Homo_sapiens      gcaactccaaataaaagtaataaccatgcacactactataaccaccctaaccctgacttccctaattccccccatcctta
+Pan               gcaactccaaataaaagtaataaccatgtatactaccataaccaccttaaccctaactcccttaattctccccatcctca
+Gorilla           gcaactccaaataaaagtaataactatgtacgctaccataaccaccttagccctaacttccttaattccccctatcctta
+Pongo             gcaactccaaataaaagtaacagccatgtttaccaccataactgccctcaccttaacttccctaatcccccccattaccg
+Hylobates         gcaactccaaataaaagtaatagcaatgtacaccaccatagccattctaacgctaacctccctaattccccccattacag
+Macaca_fuscata    gcaactccaaataaaagtaataatcatgcacacccccatcattataacaacccttatctccctaactctcccaatttttg
+'M._mulatta'      gcaactccaaataaaagtaataatcatgcacacccctatcataataacaacccttatctccctaactctcccaatttttg
+'M._fascicularis' gcaactccaaataaaagtaataatcatgcacacccccatcataataacaaccctcatctccctgacccttccaatttttg
+'M._sylvanus'     gcaactccaaataaaagtaataatcatgtatacccccatcataataacaactctcatctccctaactcttccaattttcg
+Saimiri_sciureus  gcaactccaaataaaagtaata---atacacttctccatcactctaataacactaattagcctactagcgccaatcctag
+Tarsius_syrichta  gcaactccaaataaaagtaataaatttattttcatcctccattttactatcacttacactcttaattaccccatttatta
+
+Lemur_catta       taaacgttacaaacatatacaaaaactacccctatgcaccatacgtaaaatcttctattgcatgtgccttcatcactagc
+Homo_sapiens      ccaccctcgttaaccctaacaaaaaaaactcatacccccattatgtaaaatccattgtcgcatccacctttattatcagt
+Pan               ccaccctcattaaccctaacaaaaaaaactcatatccccattatgtgaaatccattatcgcgtccacctttatcattagc
+Gorilla           ccaccttcatcaatcctaacaaaaaaagctcatacccccattacgtaaaatctatcgtcgcatccacctttatcatcagc
+Pongo             ctaccctcattaaccccaacaaaaaaaacccatacccccactatgtaaaaacggccatcgcatccgcctttactatcagc
+Hylobates         ccacccttattaaccccaataaaaagaacttatacccgcactacgtaaaaatgaccattgcctctacctttataatcagc
+Macaca_fuscata    ccaccctcatcaacccttacaaaaaacgtccatacccagattacgtaaaaacaaccgtaatatatgctttcatcatcagc
+'M._mulatta'      ccaccctcatcaacccttacaaaaaacgtccatacccagattacgtaaaaacaaccgtaatatatgctttcatcatcagc
+'M._fascicularis' ccaccctcaccaacccctataaaaaacgttcatacccagactacgtaaaaacaaccgtaatatatgcttttattaccagt
+'M._sylvanus'     ctacccttatcaaccccaacaaaaaacacctatatccaaactacgtaaaaacagccgtaatatatgctttcattaccagc
+Saimiri_sciureus  ctaccctcattaaccctaacaaaagcacactatacccgtactacgtaaaactagccatcatctacgccctcattaccagt
+Tarsius_syrichta  ttacaacaactaaaaaatatgaaacacatgcatacccttactacgtaaaaaactctatcgcctgcgcatttataacaagc
+
+Lemur_catta       ctcatcccaactatattatttatctcctcaggacaagaaacaatcatttccaactgacattgaataacaatccaaaccct
+Homo_sapiens      ctcttccccacaacaatattcatgtgcctagaccaagaagttattatctcgaactgacactgagccacaacccaaacaac
+Pan               cttttccccacaacaatattcatatgcctagaccaagaagctattatctcaaactggcactgagcaacaacccaaacaac
+Gorilla           ctcttccccacaacaatatttctatgcctagaccaagaagctattatctcaagctgacactgagcaacaacccaaacaat
+Pongo             cttatcccaacaacaatatttatctgcctaggacaagaaaccatcgtcacaaactgatgctgaacaaccacccagacact
+Hylobates         ctatttcccacaataatattcatgtgcacagaccaagaaaccattatttcaaactgacactgaactgcaacccaaacgct
+Macaca_fuscata    ctcccctcaacaactttattcatcttctcaaaccaagaaacaaccatttggagctgacattgaataatgacccaaacact
+'M._mulatta'      ctcccctcaacaactttattcatcttctcaaaccaagaaacaaccatttgaagctgacattgaataataacccaaacact
+'M._fascicularis' ctcccctcaacaaccctattcatcctctcaaaccaagaaacaaccatttggagttgacattgaataacaacccaaacatt
+'M._sylvanus'     ctctcttcaacaactttatatatattcttaaaccaagaaacaatcatctgaagctggcactgaataataacccaaacact
+Saimiri_sciureus  accttatctataatattctttatccttacaggccaagaatcaataatttcaaactgacactgaataactatccaaaccat
+Tarsius_syrichta  ctagtcccaatgctcatatttctatacacaaatcaagaaataatcatttccaactgacattgaataacgattcatactat
+
+Lemur_catta       aaaactatctattagctt
+Homo_sapiens      ccagctctccctaagctt
+Pan               ccagctctccctaagctt
+Gorilla           tcaactctccctaagctt
+Pongo             acaactctcactaagctt
+Hylobates         agaactctccctaagctt
+Macaca_fuscata    agacctaacgctaagctt
+'M._mulatta'      agacctaacactaagctt
+'M._fascicularis' agacctaacactaagctt
+'M._sylvanus'     aagcctaacattaagctt
+Saimiri_sciureus  caaactatccctaagctt
+Tarsius_syrichta  caaattatgcctaagctt
+
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Hamming Distances';
+LINK CHARACTERS = 'Working Characters';
+NAME 'Hamming Distances';
+OPTIONS
+	Normalize = 'true';
+END; [ALGORITHM]
+
+BEGIN DISTANCES;
+TITLE 'Distances';
+LINK ALGORITHM = 'Hamming Distances';
+DIMENSIONS ntax=12;
+FORMAT labels=left diagonal triangle=Both;
+MATRIX
+[1] 'Lemur_catta'        0 0.307951 0.309071 0.293393 0.292601 0.295633 0.282195 0.288914 0.297872 0.286674 0.285393 0.25196
+[2] 'Homo_sapiens'       0.307951 0 0.089286 0.103795 0.160894 0.18192 0.232143 0.233259 0.248884 0.25558 0.273236 0.322148
+[3] 'Pan'                0.309071 0.089286 0 0.106027 0.17095 0.188616 0.243304 0.251116 0.267857 0.248884 0.284434 0.321029
+[4] 'Gorilla'            0.293393 0.103795 0.106027 0 0.16648 0.188616 0.236607 0.235491 0.262277 0.24442 0.270997 0.314318
+[5] 'Pongo'              0.292601 0.160894 0.17095 0.16648 0 0.187709 0.244693 0.246927 0.261453 0.241341 0.283632 0.303471
+[6] 'Hylobates'          0.295633 0.18192 0.188616 0.188616 0.187709 0 0.246652 0.238839 0.256696 0.242187 0.268757 0.308725
+[7] 'Macaca_fuscata'     0.282195 0.232143 0.243304 0.236607 0.244693 0.246652 0 0.035714 0.083705 0.123884 0.288914 0.314318
+[8] 'M._mulatta'         0.288914 0.233259 0.251116 0.235491 0.246927 0.238839 0.035714 0 0.092634 0.11942 0.293393 0.316555
+[9] 'M._fascicularis'    0.297872 0.248884 0.267857 0.262277 0.261453 0.256696 0.083705 0.092634 0 0.122768 0.286674 0.310962
+[10] 'M._sylvanus'        0.286674 0.25558 0.248884 0.24442 0.241341 0.242187 0.123884 0.11942 0.122768 0 0.286674 0.318792
+[11] 'Saimiri_sciureus'   0.285393 0.273236 0.284434 0.270997 0.283632 0.268757 0.288914 0.293393 0.286674 0.286674 0 0.319865
+[12] 'Tarsius_syrichta'   0.25196 0.322148 0.321029 0.314318 0.303471 0.308725 0.314318 0.316555 0.310962 0.318792 0.319865 0
+;
+END; [DISTANCES]
+
+BEGIN ALGORITHM;
+TITLE 'Neighbor Net';
+LINK DISTANCES = 'Distances';
+NAME 'Neighbor Net';
+OPTIONS
+	InferenceAlgorithm = 'BlockPivot',
+	UsePreconditioner = 'true';
+END; [ALGORITHM]
+
+BEGIN SPLITS;
+TITLE 'Splits';
+LINK ALGORITHM = 'Neighbor Net';
+DIMENSIONS ntax=12 nsplits=32;
+FORMAT labels=no weights=yes confidences=no;
+PROPERTIES fit=100 cyclic;
+CYCLE 1 11 6 5 2 3 4 8 7 9 10 12;
+MATRIX
+[1, size=1] 	 0.108744 	 1,
+[2, size=2] 	 0.00744883 	 1 11,
+[3, size=1] 	 0.13571195 	 1 2 3 4 5 6 7 8 9 10 11,
+[4, size=1] 	 0.13083014 	 1 2 3 4 5 6 7 8 9 10 12,
+[5, size=2] 	 0.00183147 	 1 2 3 4 5 7 8 9 10 12,
+[6, size=6] 	 0.00836648 	 1 7 8 9 10 12,
+[7, size=2] 	 0.03563879 	 1 12,
+[8, size=1] 	 0.08800288 	 1 2 3 4 5 7 8 9 10 11 12,
+[9, size=4] 	 0.00283004 	 1 4 7 8 9 10 11 12,
+[10, size=5] 	 0.02014921 	 1 7 8 9 10 11 12,
+[11, size=6] 	 0.00085207 	 1 7 9 10 11 12,
+[12, size=5] 	 0.00267464 	 1 9 10 11 12,
+[13, size=3] 	 0.01599967 	 1 11 12,
+[14, size=1] 	 0.07937706 	 1 2 3 4 6 7 8 9 10 11 12,
+[15, size=2] 	 0.0011196 	 1 3 4 6 7 8 9 10 11 12,
+[16, size=4] 	 0.01194455 	 1 6 7 8 9 10 11 12,
+[17, size=1] 	 0.03981126 	 1 3 4 5 6 7 8 9 10 11 12,
+[18, size=2] 	 0.00909698 	 1 4 5 6 7 8 9 10 11 12,
+[19, size=3] 	 0.02714143 	 1 5 6 7 8 9 10 11 12,
+[20, size=5] 	 0.00488951 	 1 5 6 9 10 11 12,
+[21, size=5] 	 0.00060685 	 1 5 6 11 12,
+[22, size=1] 	 0.045759 	 1 2 4 5 6 7 8 9 10 11 12,
+[23, size=2] 	 0.00262339 	 1 2 5 6 7 8 9 10 11 12,
+[24, size=1] 	 0.04834775 	 1 2 3 5 6 7 8 9 10 11 12,
+[25, size=1] 	 0.01808219 	 1 2 3 4 5 6 7 9 10 11 12,
+[26, size=2] 	 0.01827208 	 1 2 3 4 5 6 9 10 11 12,
+[27, size=3] 	 0.01872863 	 1 2 3 4 5 6 10 11 12,
+[28, size=4] 	 0.06144777 	 1 2 3 4 5 6 11 12,
+[29, size=1] 	 0.0133925 	 1 2 3 4 5 6 8 9 10 11 12,
+[30, size=2] 	 0.00333899 	 1 2 3 4 5 6 8 10 11 12,
+[31, size=1] 	 0.04442944 	 1 2 3 4 5 6 7 8 10 11 12,
+[32, size=1] 	 0.05820427 	 1 2 3 4 5 6 7 8 9 11 12,
+;
+END; [SPLITS]
+
+BEGIN ALGORITHM;
+TITLE 'Show Splits';
+LINK SPLITS = 'Splits';
+NAME 'Show Splits';
+OPTIONS
+	View = 'SplitsNetwork';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Splits Network';
+LINK ALGORITHM = 'Show Splits';
+NAME 'Splits Network';
+INPUT 'TREES';
+OPTIONS
+	Diagram = 'Outline',
+	Orientation = 'Rotate0Deg',
+	Rooting = 'None',
+	UseWeights = 'true',
+	ZoomFactor = 1,
+	FontScaleFactor = 1,
+	RootAngle = 160;
+END; [VIEW]
