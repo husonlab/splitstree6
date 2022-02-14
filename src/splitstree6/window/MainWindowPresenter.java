@@ -59,7 +59,7 @@ import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
-import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
+import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
@@ -78,6 +78,7 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 
 import java.io.File;
+import java.util.List;
 import java.util.Stack;
 
 public class MainWindowPresenter {
@@ -187,6 +188,10 @@ public class MainWindowPresenter {
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
+
+		BasicFX.applyToAllMenus(controller.getMenuBar(),
+				m -> !List.of("File", "Window", "Open Recent", "Help").contains(m.getText()),
+				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
@@ -206,43 +211,51 @@ public class MainWindowPresenter {
 				FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
 			}
 		});
+		controller.getOpenButton().disableProperty().bind(workflow.runningProperty());
+
 		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
+		controller.getOpenMenuItem().disableProperty().bind(workflow.runningProperty());
 
-        controller.getImportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+		controller.getImportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+		controller.getImportMenuItem().disableProperty().bind(workflow.runningProperty());
 
-        controller.getReplaceDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+		controller.getReplaceDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+		controller.getReplaceDataMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
 		controller.getInputEditorMenuItem().setOnAction(e -> showInputEditor());
+		controller.getInputEditorMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> {
 		});
+		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-        controller.getSaveButton().setOnAction(e -> SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName())));
-        controller.getSaveButton().disableProperty().bind((mainWindow.dirtyProperty().and(mainWindow.fileNameProperty().isNotEmpty()).and(mainWindow.hasSplitsTree6FileProperty())).not());
+		controller.getSaveButton().setOnAction(e -> SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName())));
+		controller.getSaveButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(mainWindow.dirtyProperty().not()).or(mainWindow.hasSplitsTree6FileProperty().not()));
 		controller.getSaveMenuItem().setOnAction(controller.getSaveButton().getOnAction());
 		controller.getSaveMenuItem().disableProperty().bind(controller.getSaveButton().disableProperty());
 
-        controller.getSaveAsMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, false));
-        controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+		controller.getSaveAsMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, false));
+		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-        controller.getExportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
-        controller.getExportMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+		controller.getExportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+		controller.getExportMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-        controller.getExportWorkflowMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, true));
-        controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+		controller.getExportWorkflowMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, true));
+		controller.getExportWorkflowMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
 
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
+		controller.getPageSetupMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		if (focusedDisplayTab.get() != null) {
 			controller.getPrintButton().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().getImageNode()));
-			controller.getPrintButton().disableProperty().bind(focusedDisplayTab.isNull());
+			controller.getPrintButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(focusedDisplayTab.isNull()));
 		}
 		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
 		controller.getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
 
-        controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> System.err.println("Not implemented"));
-        controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not());
+		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty().not()));
 
 		controller.getGroupIdenticalHaplotypesFilesMenuItem().setOnAction(null);
 
@@ -282,9 +295,9 @@ public class MainWindowPresenter {
 			controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 		}
 
-		controller.getCopyNewickMenuItem().setDisable(false);
+		controller.getCopyNewickMenuItem().setDisable(true);
 
-		controller.getPasteMenuItem().setDisable(false);
+		controller.getPasteMenuItem().setDisable(true);
 
 		// controller.getDuplicateMenuItem().setOnAction(null);
 		// controller.getDeleteMenuItem().setOnAction(null);
@@ -444,8 +457,8 @@ public class MainWindowPresenter {
 		controller.getHybridizationNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new AutumnAlgorithm()));
 		controller.getHybridizationNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new AutumnAlgorithm()));
 
-		controller.getSplitsNetworkViewMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowSplitsNetwork(), a -> ((ShowSplitsNetwork) a).setOptionView(ShowSplitsNetwork.ViewType.SplitsView)));
-		controller.getSplitsNetworkViewMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowSplitsNetwork()));
+		controller.getSplitsNetworkViewMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowSplits(), a -> ((ShowSplits) a).setOptionView(ShowSplits.ViewType.SplitsNetwork)));
+		controller.getSplitsNetworkViewMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowSplits()));
 
 		controller.getHaplotypeNetworkViewMenuItem().setOnAction(null);
 

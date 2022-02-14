@@ -247,7 +247,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 	}
 
 	private Searcher<TaxaEditTableItem> setupSearcher(TableView<TaxaEditTableItem> tableView) {
-		return new Searcher<>(tableView.getItems(),
+		var searcher = new Searcher<>(tableView.getItems(),
 				i -> tableView.getSelectionModel().isSelected(i),
 				(i, select) -> {
 					if (select)
@@ -259,6 +259,8 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 				i -> tableView.getItems().get(i).getNameAndDisplayLabel("===="),
 				label -> label.replaceAll(".*====", ""),
 				(i, label) -> tableView.getItems().get(i).setDisplayLabel(label.replaceAll(".*====", "")));
+		searcher.setSelectionFindable(true);
+		return searcher;
 	}
 
 

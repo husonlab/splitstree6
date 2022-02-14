@@ -111,7 +111,7 @@ public class SplitNetworkPane extends StackPane {
 			if (taxaBlock == null || splitsBlock == null)
 				return new Group();
 
-			var result = splitNetworkLayout.apply(mainWindow.getStage(), service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
+			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
 					rootAngle, useWeights.get(), taxonSelectionModel, splitSelectionModel, nodeShapeMap, splitShapeMap,
 					loopViews,
 					unitLength, getPrefWidth() - 4, getPrefHeight() - 16);

@@ -1,5 +1,5 @@
 /*
- * ShowSplitsNetwork.java Copyright (C) 2022 Daniel H. Huson
+ * ShowSplits.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -37,20 +37,20 @@ import java.io.StringWriter;
 import java.util.List;
 
 /**
- * trees viewer selection
+ * splits viewer selection
  * Daniel Huson, 11.2021
  */
-public class ShowSplitsNetwork extends Splits2View {
-	public enum ViewType {SplitsView, Text}
+public class ShowSplits extends Splits2View {
+	public enum ViewType {SplitsNetwork, SplitsText}
 
-	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.SplitsView);
+	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.SplitsNetwork);
 
 	@Override
 	public List<String> listOptions() {
 		return List.of(optionView.getName());
 	}
 
-	public ShowSplitsNetwork() {
+	public ShowSplits() {
 		super();
 	}
 
@@ -61,11 +61,11 @@ public class ShowSplitsNetwork extends Splits2View {
         // if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 
         switch (getOptionView()) {
-            case SplitsView -> {
-                if (!(viewBlock.getView() instanceof SplitsView)) {
-                    Platform.runLater(() -> {
-                        var mainWindow = getNode().getOwner().getMainWindow();
-                        var view = new SplitsView(mainWindow, "Splits Viewer", viewBlock.getViewTab());
+			case SplitsNetwork -> {
+				if (!(viewBlock.getView() instanceof SplitsView)) {
+					Platform.runLater(() -> {
+						var mainWindow = getNode().getOwner().getMainWindow();
+						var view = new SplitsView(mainWindow, "Splits Network", viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
 				}
@@ -77,11 +77,12 @@ public class ShowSplitsNetwork extends Splits2View {
 					}
 				});
 			}
-			case Text -> {
+			case SplitsText -> {
 				if (!(viewBlock.getView() instanceof DisplayTextView)) {
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new DisplayTextView(mainWindow, inputData.getName() + " text", false);
+						viewBlock.setName("Splits Text");
+						var view = new DisplayTextView(mainWindow, inputData.getName() + " Text", false);
 						viewBlock.setView(view);
 					});
 				}

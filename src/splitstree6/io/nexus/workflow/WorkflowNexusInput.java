@@ -70,7 +70,6 @@ public class WorkflowNexusInput {
 			} catch (Exception exception) {
 				NotificationManager.showError("Open file failed: " + exception);
 			}
-
 		} else {
 			var service = new AService<Workflow>(mainWindow.getController().getBottomFlowPane());
 			service.setCallable(() -> {
@@ -96,6 +95,8 @@ public class WorkflowNexusInput {
 			service.setOnCancelled(e -> NotificationManager.showError("Open file : canceled"));
 			service.start();
 		}
+		if (fileName.endsWith(".stree6"))
+			mainWindow.setHasSplitsTree6File(true);
 		mainWindow.setFileName(fileName);
 	}
 

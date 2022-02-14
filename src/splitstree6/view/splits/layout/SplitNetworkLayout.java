@@ -29,7 +29,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
-import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.GeometryUtilsFX;
@@ -83,7 +82,7 @@ public class SplitNetworkLayout {
 	 *
 	 * @return group of groups, namely loops, nodes, edges and node labels
 	 */
-	public Group apply(Stage stage, ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
+	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
 					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
 					   ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 					   ObservableList<LoopView> loopViews, DoubleProperty unitLength,
@@ -159,8 +158,7 @@ public class SplitNetworkLayout {
 		} else { // splits
 			var usedSplits = new BitSet();
 			try {
-				EqualAngle.apply(progress, useWeights, taxaBlock, splitsBlock, graph, new BitSet(), usedSplits);
-				if (usedSplits.cardinality() < splitsBlock.getNsplits()) {
+				if (!EqualAngle.apply(progress, useWeights, taxaBlock, splitsBlock, graph, new BitSet(), usedSplits)) {
 					ConvexHull.apply(progress, taxaBlock, splitsBlock, graph, usedSplits);
 				}
 				EqualAngle.assignAnglesToEdges(taxaBlock.getNtax(), splitsBlock, splitsBlock.getCycle(), graph, new BitSet(), rootSplit == 0 ? 360 : rootAngle);
@@ -170,6 +168,10 @@ public class SplitNetworkLayout {
 				NotificationManager.showWarning("User CANCELED 'splits network' computation");
 			}
 		}
+
+		progress.setTasks("Drawing", "network");
+		progress.setMaximum(graph.getNumberOfNodes() + graph.getNumberOfEdges());
+		progress.setProgress(0);
 
 		if (rootSplit > 0) // want the root to be placed on the left by default
 			rotate90(graph, nodePointMap);
@@ -183,6 +185,7 @@ public class SplitNetworkLayout {
 
 		// compute the shapes:
 
+
 		// nodes:
 		var nodesGroup = new Group();
 		var nodeLabelsGroup = new Group();
@@ -190,7 +193,7 @@ public class SplitNetworkLayout {
 		for (var v : graph.nodes()) {
 			var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
 			var point = nodePointMap.get(v);
-			var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 2 : 0.5);
+			var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5);
 			shape.getStyleClass().add("graph-node");
 
 			shape.setTranslateX(point.getX());
@@ -199,7 +202,6 @@ public class SplitNetworkLayout {
 			nodeShapeMap.put(v, shape);
 
 			nodesGroup.getChildren().add(shape);
-
 
 			var label = LayoutUtils.getLabel(taxaBlock, graph, v);
 
@@ -234,6 +236,7 @@ public class SplitNetworkLayout {
 						});
 				labelLayout.addAvoidable(translateXProperty, translateYProperty, 2 * shape.getRadius(), 2 * shape.getRadius());
 			}
+			progress.incrementProgress();
 		}
 
 		var edgesGroup = new Group();
@@ -252,6 +255,7 @@ public class SplitNetworkLayout {
 
 			var split = graph.getSplit(e);
 			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
+			progress.incrementProgress();
 		}
 
 		var loopsGroup = new Group();
@@ -260,6 +264,7 @@ public class SplitNetworkLayout {
 			loopsGroup.getChildren().add(loopView);
 			Platform.runLater(() -> loopViews.add(loopView));
 		}
+		progress.reportTaskCompleted();
 
 		return new Group(loopsGroup, edgesGroup, nodesGroup, nodeLabelsGroup);
 	}

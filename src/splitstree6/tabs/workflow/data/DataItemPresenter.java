@@ -63,8 +63,8 @@ public class DataItemPresenter<D extends DataBlock> {
 			}
 		});
 
-		var icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").
-													 replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
+		var icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").replaceAll("\\s+", "")
+													 .replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
 		if (icon != null) {
 			controller.getNameLabel().setGraphic(new ImageView(icon));
 		}

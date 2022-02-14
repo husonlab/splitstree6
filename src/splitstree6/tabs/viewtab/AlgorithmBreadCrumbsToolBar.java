@@ -29,6 +29,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.Tooltip;
 import javafx.scene.paint.Color;
+import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.window.MainWindow;
@@ -92,11 +93,14 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
     private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {
         final var button = new Button();
         button.setStyle(shape);
-        button.textProperty().bind(algorithmNode.nameProperty());
+        button.textProperty().bind(algorithmNode.titleProperty());
         button.disableProperty().bind(algorithmNode.validProperty().not());
         final var tooltip = new Tooltip();
         tooltip.textProperty().bind(algorithmNode.shortDescriptionProperty());
         button.setTooltip(tooltip);
+
+        final var imageView = ResourceManagerFX.getIconAsImageView(algorithmNode.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16);
+        button.setGraphic(imageView);
 
         final ChangeListener<Worker.State> stateChangeListener = (c, o, n) -> {
             switch (n) {
@@ -134,5 +138,4 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
         });
         return button;
     }
-
 }

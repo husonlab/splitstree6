@@ -56,8 +56,7 @@
                         <contextMenu>
                             <ContextMenu>
                                 <items>
-                                    <MenuItem fx:id="activateAllMenuItem" mnemonicParsing="false"
-                                              text="Activate All"/>
+                                    <MenuItem fx:id="activateAllMenuItem" mnemonicParsing="false" text="Activate All"/>
                                     <MenuItem fx:id="activateNoneMenuItem" mnemonicParsing="false"
                                               text="Activate None"/>
                                     <SeparatorMenuItem/>
@@ -75,8 +74,7 @@
                             </ContextMenu>
                         </contextMenu>
                     </TableColumn>
-                    <TableColumn fx:id="nameColumn" editable="false" maxWidth="-Infinity" minWidth="75.0"
-                                 prefWidth="-1.0">
+                    <TableColumn fx:id="nameColumn" editable="false" maxWidth="-1.0" minWidth="100.0" prefWidth="-1.0">
                         <graphic>
                             <Label text="Name">
                                 <tooltip>

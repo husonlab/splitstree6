@@ -109,6 +109,7 @@ public class TextTabsManager {
 			tab = new ViewTab(mainWindow, node, true);
 			var view = new DisplayData(mainWindow, node, node.getTitle() + " text", false);
 			tab.setView(view);
+			tab.textProperty().bind(node.titleProperty());
 			tab.setOnCloseRequest(t -> nodeTabMap.remove(node));
 			nodeTabMap.put(node, tab);
 		}

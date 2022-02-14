@@ -23,7 +23,7 @@ import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.algorithms.network.network2view.ShowNetworkConsole;
-import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
+import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.data.*;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
@@ -83,7 +83,7 @@ public class AddNetworkPipelineCommand {
 				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2);
 			} else if (algorithm.getToClass() == SplitsBlock.class) {
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				var algorithmNode2 = workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				var algorithmNode2 = workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				algorithmNode.restart();
 				NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
 				return Arrays.asList(targetDataNode, algorithmNode, targetDataNode2, algorithmNode2);

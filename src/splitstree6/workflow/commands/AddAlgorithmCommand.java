@@ -22,7 +22,7 @@ package splitstree6.workflow.commands;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
-import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
+import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
@@ -71,7 +71,7 @@ public class AddAlgorithmCommand {
 
 			if (algorithm.getToClass() == SplitsBlock.class) {
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				var algorithmNode2 = workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				var algorithmNode2 = workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				list.add(targetDataNode2);
 				list.add(algorithmNode2);
 

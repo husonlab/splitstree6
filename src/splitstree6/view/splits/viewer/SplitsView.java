@@ -121,6 +121,12 @@ public class SplitsView implements IView {
 				setOptionDiagram(SplitsDiagramType.Splits);
 			splitSelectionModel.clearSelection();
 		});
+
+		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
+		optionRootingProperty().addListener(e -> mainWindow.setDirty(true));
+		optionRootAngleProperty().addListener(e -> mainWindow.setDirty(true));
+		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
+		optionUseWeightsProperty().addListener(e -> mainWindow.setDirty(true));
 	}
 
 	@Override

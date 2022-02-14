@@ -101,7 +101,7 @@ public class ShowTrees extends Trees2View {
 						viewBlock.getView().clear();
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new DisplayTextView(mainWindow, inputData.getName() + " text", false);
+						var view = new DisplayTextView(mainWindow, "Trees Text", false);
 						viewBlock.setView(view);
 					});
 

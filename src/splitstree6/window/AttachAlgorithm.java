@@ -24,7 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.window.NotificationManager;
 import jloda.util.IteratorUtils;
-import splitstree6.algorithms.splits.splits2view.ShowSplitsNetwork;
+import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
@@ -71,7 +71,7 @@ public class AttachAlgorithm {
 			if (algorithm.getToClass() == SplitsBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				workflow.newAlgorithmNode(new ShowSplitsNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 			} else if (algorithm.getToClass() == TreesBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());

@@ -41,19 +41,18 @@ import java.util.TreeSet;
  */
 public class EqualAngle {
 	/**
-	 * apply the algorithm to build a new graph
-	 *
-	 */
-	public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits, PhyloSplitsGraph graph, BitSet forbiddenSplits, BitSet usedSplits) throws CanceledException {
-		//System.err.println("Running equals angle algorithm");
-		graph.clear();
-		usedSplits.clear();
+     * apply the algorithm to build a new graph
+     */
+    public static boolean apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits, PhyloSplitsGraph graph, BitSet forbiddenSplits, BitSet usedSplits) throws CanceledException {
+        //System.err.println("Running equals angle algorithm");
+        graph.clear();
+        usedSplits.clear();
 
         progress.setTasks("Computing Splits Network", "Equal Angle algorithm");
-		progress.setMaximum(100);    //initialize maximum progress
-		progress.setProgress(-1);    //set progress to 0
+        progress.setMaximum(100);    //initialize maximum progress
+        progress.setProgress(-1);    //set progress to 0
 
-		final int[] cycle = normalizeCycle(splits.getCycle());
+        final int[] cycle = normalizeCycle(splits.getCycle());
 
         progress.setProgress(2);
 
@@ -63,6 +62,7 @@ public class EqualAngle {
 
         progress.setMaximum(interiorSplits.size());    //initialize maximum progress
 
+        var allUsed = true;
         {
             var count = 0;
             for (var s : interiorSplits) {
@@ -70,7 +70,8 @@ public class EqualAngle {
                     wrapSplit(taxaBlock, splits, s, cycle, graph);
                     usedSplits.set(s, true);
                     progress.setProgress(++count);
-                }
+                } else
+                    allUsed = false;
             }
         }
 
@@ -102,10 +103,9 @@ public class EqualAngle {
                 System.err.println("Edge " + e.getSource().getId() + " - " + e.getTarget().getId() + " split: " + graph.getSplit(e));
             }
         }
+        progress.reportTaskCompleted();
 
-        progress.setSubtask("");
-        progress.setMaximum(-1);
-        progress.setProgress(-1);
+        return allUsed;
     }
 
 

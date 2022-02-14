@@ -115,7 +115,7 @@
     </BorderPane>
     <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER" expanded="false"
                 maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" prefWidth="100.0" text="Format"
-                AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="3.0">
+                AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="5.0">
         <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
     </TitledPane>
 </AnchorPane>

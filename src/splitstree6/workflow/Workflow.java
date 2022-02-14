@@ -128,7 +128,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	}
 
 	public <D extends DataBlock> DataNode<D> newDataNode(D dataBlock) {
-		return newDataNode(dataBlock, dataBlock.getName());
+		return newDataNode(dataBlock, null);
 	}
 
 	public <D extends DataBlock> DataNode<D> newDataNode(D dataBlock, String title) {
@@ -140,14 +140,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 			node.setTitle(title);
 			dataBlockNameTitleMap.computeIfAbsent(dataBlock.getName(), n -> new ArrayList<>()).add(title);
 		} else {
-			title = dataBlock.getName();
-			var t = 1;
-			var list = dataBlockNameTitleMap.computeIfAbsent(dataBlock.getName(), n -> new ArrayList<>());
-			while (list.contains(title)) {
-				title = dataBlock.getName() + "-" + (++t);
-			}
-			list.add(title);
-			node.setTitle(title);
+			updateTitle(node);
 		}
 
 		addNode(node);
@@ -165,14 +158,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 			node.setTitle(title);
 			algorithmNameTitleMap.computeIfAbsent(algorithm.getName(), n -> new ArrayList<>()).add(title);
 		} else {
-			title = algorithm.getName();
-			var t = 1;
-			var list = algorithmNameTitleMap.computeIfAbsent(algorithm.getName(), n -> new ArrayList<>());
-			while (list.contains(title)) {
-				title = algorithm.getName() + "-" + (++t);
-			}
-			list.add(title);
-			node.setTitle(title);
+			updateTitle(node);
 		}
 		addNode(node);
 		return (AlgorithmNode<S, T>) node;
@@ -196,6 +182,29 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		if (outputData != null)
 			v.addChild(outputData);
 		return v;
+	}
+
+	public void updateTitle(WorkflowNode node) {
+		if (node instanceof AlgorithmNode algorithmNode) {
+			var algorithm = algorithmNode.getAlgorithm();
+			var title = algorithm.getName();
+			var t = 1;
+			var list = algorithmNameTitleMap.computeIfAbsent(algorithm.getName(), n -> new ArrayList<>());
+			while (list.contains(title)) {
+				title = algorithm.getName() + "-" + (++t);
+			}
+			list.add(title);
+			algorithmNode.setTitle(title);
+		} else if (node instanceof DataNode dataName) {
+			var title = dataName.getName();
+			var t = 1;
+			var list = algorithmNameTitleMap.computeIfAbsent(dataName.getName(), n -> new ArrayList<>());
+			while (list.contains(title)) {
+				title = dataName.getName() + "-" + (++t);
+			}
+			list.add(title);
+			dataName.setTitle(title);
+		}
 	}
 
 	public <S extends DataBlock, T extends DataBlock> Collection<AlgorithmNode<S, T>> getNodes(Class<? extends Algorithm> clazz) {

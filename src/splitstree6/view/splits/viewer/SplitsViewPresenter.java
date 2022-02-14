@@ -35,13 +35,17 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
 import jloda.fx.label.EditLabelDialog;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.graph.Node;
@@ -176,7 +180,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			splitNetworkPane.set(pane);
 			pane.setRunAfterUpdate(() -> {
 				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
-					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), label));
+					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
 				}
 			});
 			pane.drawNetwork();
@@ -234,7 +238,23 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
 
+		mainController.getCopyMenuItem().setOnAction(e -> {
+			var list = new ArrayList<String>();
+			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
+				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
+			}
+			if (list.size() > 0) {
+				var content = new ClipboardContent();
+				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
+				Clipboard.getSystemClipboard().setContent(content);
+			}
+		});
+		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+
+
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+		mainController.getCopyNewickMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
 		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor(1.2 * splitsView.getOptionFontScaleFactor()));
@@ -277,13 +297,14 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().disableProperty().bind(splitsView.emptyProperty());
 	}
 
-	private static void showContextMenu(ContextMenuEvent event, Stage stage, RichTextLabel label) {
+	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
+			var oldText = label.getText();
 			var editLabelDialog = new EditLabelDialog(stage, label);
 			var result = editLabelDialog.showAndWait();
-			if (result.isPresent()) {
-				label.setText(result.get());
+			if (result.isPresent() && !result.get().equals(oldText)) {
+				undoManager.doAndAdd("Edit Label", () -> label.setText(oldText), () -> label.setText(result.get()));
 			}
 		});
 		var menu = new ContextMenu();
