@@ -3,7 +3,7 @@
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=8 nAlgorithms=5;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1644925795933'; [Tue Feb 15 12:49:55 CET 2022]
+WORKFLOW creationDate='1644925912299'; [Tue Feb 15 12:51:52 CET 2022]
 END; [SPLITSTREE6]
 
 [
@@ -79,11 +79,11 @@ TAXLABELS
 ;
 DISPLAYLABELS
 	[1] '<font "KG Second Chances Sketch"><c "0x0000ffff"> Lemur catta<br><img src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Darica_Lemur_07209.jpg" height=64>'
-	[2] '<font "KG Second Chances Sketch"><c "0x0000ffff">Homo sapiens<br><img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Max_und_Moritz.JPG" height=64>'
+	[2] '              <font "KG Second Chances Sketch"><c "0x0000ffff">Homo sapiens<br><img src="https://upload.wikimedia.org/wikipedia/commons/2/22/Max_und_Moritz.JPG" height=128>'
 	[3] '<font "KG Second Chances Sketch"><c "0x0000ffff">  Pan<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Common_chimpanzee_%28Pan_troglodytes_schweinfurthii%29_feeding.jpg/1280px-Common_chimpanzee_%28Pan_troglodytes_schweinfurthii%29_feeding.jpg" height=64>'
 	[4] '<font "KG Second Chances Sketch"><c "0x0000ffff">Gorilla<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/bb/Gorille_des_plaines_de_l%27ouest_à_l%27Espace_Zoologique.jpg/1024px-Gorille_des_plaines_de_l%27ouest_à_l%27Espace_Zoologique.jpg" height=64>'
 	[5] '<font "KG Second Chances Sketch"><c "0x0000ffff">Pongo<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG/1024px-Orang_Utan%2C_Semenggok_Forest_Reserve%2C_Sarawak%2C_Borneo%2C_Malaysia.JPG" height=64>'
-	[6] '<font "KG Second Chances Sketch"><c "0x0000ffff">Hylobates<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg/1024px-Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg" height=64>'
+	[6] '   <font "KG Second Chances Sketch"><c "0x0000ffff">Hylobates<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg/1024px-Pileated_Gibbon_%28Hylobates_pileatus%29_-_Female.jpg" height=128>'
 	[7] '<font "KG Second Chances Sketch"><c "0x0000ffff">M. fuscata<br>  <img src="https://upload.wikimedia.org/wikipedia/commons/0/0d/JapaneseMacaqueM2297.jpg" height=64>'
 	[8] '<font "KG Second Chances Sketch"><c "0x0000ffff">   M. mulatta<br><img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Rhesus_macaque_%28Macaca_mulatta_mulatta%29%2C_male%2C_Gokarna.jpg" height=64>'
 	[9] '<font "KG Second Chances Sketch"><c "0x0000ffff">M. fascicularis<br><img src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Em_-_Macaca_fascicularis_-_1.jpg" height=64>'
@@ -530,7 +530,7 @@ OPTIONS
 	Orientation = 'Rotate0Deg',
 	Rooting = 'None',
 	UseWeights = 'true',
-	ZoomFactor = 1,
+	ZoomFactor = 0.90909091,
 	FontScaleFactor = 1,
 	RootAngle = 160,
 	OutlineFill = 0xcce6ffff,
