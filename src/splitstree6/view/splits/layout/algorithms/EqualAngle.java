@@ -407,14 +407,21 @@ public class EqualAngle {
 				var s = graph.getSplit(e);
 				if (!splitsInPath.get(s)) {
 					var w = graph.getOpposite(v, e);
-					var weight = (useWeights ? graph.getWeight(e) : graph.getSplit(e) == rootSplit ? 0.1 : 1);
-					var p = GeometryUtilsFX.translateByAngle(node2point.get(v), graph.getAngle(e), weight);
-					node2point.put(w, p);
-					splitsInPath.set(s, true);
-					assignCoordinatesToNodesRec(useWeights, w, splitsInPath, nodesVisited, graph, node2point, rootSplit);
-					splitsInPath.set(s, false);
-				}
+                    var weight = (useWeights ? graph.getWeight(e) : graph.getSplit(e) == rootSplit ? 0.1 : 1);
+                    var p = GeometryUtilsFX.translateByAngle(node2point.get(v), graph.getAngle(e), weight);
+                    node2point.put(w, p);
+                    splitsInPath.set(s, true);
+                    assignCoordinatesToNodesRec(useWeights, w, splitsInPath, nodesVisited, graph, node2point, rootSplit);
+                    splitsInPath.set(s, false);
+                }
             }
         }
     }
+
+    public static String getCitation() {
+        return "Dress & Huson 2004; " +
+               "A.W.M. Dress and D.H. Huson, Constructing splits graphs, " +
+               "IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.";
+    }
+
 }

@@ -41,6 +41,7 @@ import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.view.format.splits.SplitsFormatter;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
+import splitstree6.view.splits.layout.algorithms.EqualAngle;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
@@ -188,7 +189,7 @@ public class SplitsView implements IView {
 
 	@Override
 	public String getCitation() {
-		return null;
+		return EqualAngle.getCitation();
 	}
 
 	public ViewTab getViewTab() {

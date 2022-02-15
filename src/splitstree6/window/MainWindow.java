@@ -33,6 +33,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.MemoryUsage;
+import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
@@ -86,7 +87,9 @@ public class MainWindow implements IMainWindow {
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
 		workflowTab = new WorkflowTab(this);
+		workflowTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Preferences24.gif", 16));
 		methodsTab = new TextDisplayTab(this, "Methods", false, false);
+		methodsTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/History24.gif", 16));
 		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? ExtractMethodsText.getInstance().apply(workflow) : ""));
 		workflow.validProperty().addListener((v, o, n) -> {
 			if (workflow.getWorkingTaxaBlock() == null) {

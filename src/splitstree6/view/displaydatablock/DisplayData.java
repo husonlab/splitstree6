@@ -29,13 +29,18 @@ import splitstree6.workflow.DataNode;
  * Daniel Huson, 11.21
  */
 public class DisplayData extends DisplayTextView {
+	private final DisplayDataController controller;
 
 	public DisplayData(MainWindow mainWindow, DataNode dataNode, String name, boolean editable) {
 		super(mainWindow, name, editable);
 
 		var loader = new ExtendedFXMLLoader<DisplayDataController>(DisplayDataController.class);
-		DisplayDataController controller = loader.getController();
+		controller = loader.getController();
 
 		new DisplayDataPresenter(mainWindow, this, controller, dataNode);
+	}
+
+	public DisplayDataController getDisplayDataController() {
+		return controller;
 	}
 }

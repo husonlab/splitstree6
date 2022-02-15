@@ -22,6 +22,7 @@ package splitstree6.algorithms.splits.splits2view;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
@@ -55,7 +56,8 @@ public class ShowSplits extends Splits2View {
 
 	@Override
     public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock viewBlock) {
-        viewBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
+		viewBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
+		viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("SplitsNetworkViewer16.gif", 16));
 
         // if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 

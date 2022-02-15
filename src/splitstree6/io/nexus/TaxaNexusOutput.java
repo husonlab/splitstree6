@@ -46,13 +46,17 @@ public class TaxaNexusOutput extends NexusIOBase {
 			for (var i = 1; i <= taxaBlock.getNtax(); i++)
 				w.write("\t[" + i + "] '" + StringUtils.protectBackSlashes(taxaBlock.get(i).getDisplayLabelOrName()) + "'\n");
 			w.write(";\n");
-		}
+		} else
+			w.write("[DISPLAYLABELS;]\n");
+
 		if (TaxaBlock.hasInfos(taxaBlock)) {
 			w.write("TAXINFO\n");
 			for (var i = 1; i <= taxaBlock.getNtax(); i++)
 				w.write("\t[" + i + "] '" + taxaBlock.get(i).getInfo() + "'\n");
 			w.write(";\n");
-		}
+		} else
+			w.write("[TAXINFO;]\n");
+
 		w.write("END; [TAXA]\n");
 	}
 }

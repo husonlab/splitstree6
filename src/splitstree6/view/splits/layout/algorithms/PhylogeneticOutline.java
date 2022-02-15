@@ -1,5 +1,5 @@
 /*
- * Outline.java Copyright (C) 2022 Daniel H. Huson
+ * PhylogeneticOutline.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -44,15 +44,14 @@ import java.util.function.Function;
  * runs the outline algorithm due to Bryant and Huson, 2021
  * Daniel Huson, 1.2020
  */
-public class Outline {
+public class PhylogeneticOutline {
     /**
      * apply the algorithm to build a new graph
-     *
-	 */
+     */
     public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits0,
                              PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet usedSplits,
                              ArrayList<ArrayList<Node>> loops, int rootSplit, double rootAngle) throws CanceledException {
-        progress.setTasks("Outline", null);
+        progress.setTasks("PhylogeneticOutline", null);
 
         if (nodePointMap == null)
             nodePointMap = graph.newNodeArray();
@@ -237,6 +236,10 @@ public class Outline {
                 splits.getSplits().add(new ASplit(BitSetUtils.asBitSet(t), ntaxa, 0.00001));
             }
         }
+    }
+
+    public static String getCitation() {
+        return "Bagci et al, 2021;Bagci C, Bryant D, Cetinkaya B, Huson DH. Microbial Phylogenetic Context Using Phylogenetic Outlines. Genome Biol Evol. 13(9) 2021";
     }
 
     static class Event {

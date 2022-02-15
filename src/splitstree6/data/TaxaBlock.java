@@ -311,7 +311,7 @@ public class TaxaBlock extends DataBlock {
 	 */
 	public static boolean hasDisplayLabels(TaxaBlock taxaBlock) {
 		for (var t = 1; t <= taxaBlock.getNtax(); t++)
-			if (taxaBlock.get(t).getDisplayLabel() != null)
+			if (taxaBlock.get(t).getDisplayLabel() != null && !taxaBlock.get(t).getDisplayLabel().equals(taxaBlock.get(t).getName()))
 				return true;
 		return false;
 	}

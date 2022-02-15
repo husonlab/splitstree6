@@ -24,24 +24,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
 import jloda.fx.control.SplittableTabPane;
+import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.workflow.WorkflowNode;
-import splitstree6.data.TaxaBlock;
-import splitstree6.io.nexus.NexusExporter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.displaydatablock.DisplayData;
-import splitstree6.view.displaytext.DisplayTextView;
-import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
-
-import java.io.IOException;
-import java.io.StringWriter;
 
 public class TextTabsManager {
 	private final MainWindow mainWindow;
 	private final SplittableTabPane tabPane;
 	private final Workflow workflow;
-	private final NexusExporter nexusExporter = new NexusExporter();
 
 	private final ObservableMap<WorkflowNode, ViewTab> nodeTabMap = FXCollections.observableHashMap();
 
@@ -66,48 +59,14 @@ public class TextTabsManager {
 		});
 	}
 
-	private String createText(WorkflowNode node) {
-		if (node instanceof DataNode dataNode) {
-			var dataBlock = dataNode.getDataBlock();
-			if (dataBlock instanceof TaxaBlock taxaBlock) {
-				try (var w = new StringWriter()) {
-					nexusExporter.export(w, taxaBlock);
-					return w.toString();
-				} catch (IOException ignored) {
-				}
-			} else {
-				TaxaBlock taxaBlock;
-				if (workflow.getInputDataNode() != null && workflow.getInputDataNode().getDataBlock() == dataBlock) {
-					taxaBlock = workflow.getInputTaxonBlock();
-				} else {
-					taxaBlock = workflow.getWorkingTaxaBlock();
-				}
-				try (var w = new StringWriter()) {
-					nexusExporter.setPrependTaxa(false);
-					nexusExporter.export(w, taxaBlock, dataBlock);
-					return w.toString();
-				} catch (IOException ignored) {
-				}
-			}
-		} else if (node instanceof AlgorithmNode algorithmNode) {
-			var algorithm = algorithmNode.getAlgorithm();
-			try (var w = new StringWriter()) {
-				nexusExporter.export(w, algorithm);
-				return w.toString();
-			} catch (IOException ignored) {
-			}
-
-		}
-		return node.getName();
-	}
-
 	public void showDataNodeTab(DataNode node, boolean show) {
 		final ViewTab tab;
 		if (nodeTabMap.containsKey(node))
 			tab = nodeTabMap.get(node);
 		else {
 			tab = new ViewTab(mainWindow, node, true);
-			var view = new DisplayData(mainWindow, node, node.getTitle() + " Text", false);
+			tab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16));
+			var view = new DisplayData(mainWindow, node, node.getTitle(), false);
 			tab.setView(view);
 			tab.setText(view.getName());
 			tab.setOnCloseRequest(t -> nodeTabMap.remove(node));
@@ -118,15 +77,16 @@ public class TextTabsManager {
 				tabPane.getTabs().add(tab);
 			}
 			tabPane.getSelectionModel().select(tab);
-			Platform.runLater(() -> ((DisplayTextView) tab.getView()).replaceText(createText(node)));
+			Platform.runLater(() -> ((DisplayData) tab.getView()).getDisplayDataController().getApplyButton().getOnAction().handle(null));
 		} else
 			tabPane.getTabs().remove(tab);
 
 		node.validProperty().addListener((v, o, n) -> {
 			if (!n)
-				((DisplayTextView) tab.getView()).replaceText("");
-			else
-				((DisplayTextView) tab.getView()).replaceText(createText(node));
+				((DisplayData) tab.getView()).replaceText("");
+			else {
+				((DisplayData) tab.getView()).getDisplayDataController().getApplyButton().getOnAction().handle(null);
+			}
 		});
 	}
 }

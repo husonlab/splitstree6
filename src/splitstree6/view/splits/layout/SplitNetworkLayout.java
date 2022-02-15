@@ -47,7 +47,7 @@ import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
 import splitstree6.view.splits.layout.algorithms.ConvexHull;
 import splitstree6.view.splits.layout.algorithms.EqualAngle;
-import splitstree6.view.splits.layout.algorithms.Outline;
+import splitstree6.view.splits.layout.algorithms.PhylogeneticOutline;
 import splitstree6.view.splits.viewer.LoopView;
 import splitstree6.view.splits.viewer.SplitsDiagramType;
 import splitstree6.view.splits.viewer.SplitsRooting;
@@ -149,7 +149,7 @@ public class SplitNetworkLayout {
 		if (diagram == SplitsDiagramType.Outline) {
 			try {
 				var usedSplits = new BitSet();
-				Outline.apply(progress, useWeights, taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
+				PhylogeneticOutline.apply(progress, useWeights, taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
 				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.cyclic && usedSplits.cardinality() < splitsBlock.getNsplits())
 					NotificationManager.showWarning(String.format("Outline algorithm: Showing only %d of %d splits", usedSplits.cardinality(), splitsBlock.getNsplits()));
 			} catch (CanceledException e) {

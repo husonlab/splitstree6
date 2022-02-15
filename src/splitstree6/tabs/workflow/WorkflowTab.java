@@ -54,6 +54,7 @@ public class WorkflowTab extends Tab implements IDisplayTab {
 	 */
 	public WorkflowTab(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
+
 		Workflow workflow = mainWindow.getWorkflow();
 		var loader = new ExtendedFXMLLoader<WorkflowTabController>(this.getClass());
 		controller = loader.getController();

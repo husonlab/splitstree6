@@ -21,10 +21,9 @@ package splitstree6.algorithms.splits.splits2view;
 
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.methods.IgnoredInMethodsText;
 import splitstree6.workflow.Algorithm;
 
-public abstract class Splits2View extends Algorithm<SplitsBlock, ViewBlock> implements IgnoredInMethodsText {
+public abstract class Splits2View extends Algorithm<SplitsBlock, ViewBlock> {
 	public Splits2View() {
 		super(SplitsBlock.class, ViewBlock.class);
 	}
