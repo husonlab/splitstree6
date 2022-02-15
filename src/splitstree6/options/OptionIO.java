@@ -38,21 +38,22 @@ public class OptionIO {
 	/**
 	 * parse options
 	 */
-	public static void parseOptions(NexusStreamParser np, IHasOptions optionsCarrier) throws IOExceptionWithLineNumber {
+	public static void parseOptions(NexusStreamParser np, IOptionsCarrier optionsCarrier) throws IOExceptionWithLineNumber {
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
 			np.matchIgnoreCase("OPTIONS");
 
 			if (!np.peekMatchIgnoreCase(";")) {
-				final var optionsNext = new ArrayList<>(Option.getAllOptions(optionsCarrier));
-				if (optionsNext.size() > 0) {
-					final var legalOptions = new HashMap<String, Option>();
-					for (var option : optionsNext) {
-						legalOptions.put(option.getName(), option);
+				final var allOptionsCarried = new ArrayList<>(Option.getAllOptions(optionsCarrier));
+				if (allOptionsCarried.size() > 0) {
+					final var nameOptionMap = new HashMap<String, Option>();
+					for (var option : allOptionsCarried) {
+						nameOptionMap.put(option.getName(), option);
 					}
+
 					while (true) {
 						final var name = np.getWordRespectCase();
 						np.matchIgnoreCase("=");
-						final var option = legalOptions.get(name);
+						final var option = nameOptionMap.get(name);
 						if (option != null) {
 							final OptionValueType type = option.getOptionValueType();
 							switch (type) {
@@ -97,7 +98,7 @@ public class OptionIO {
 		np.matchIgnoreCase(";");
 	}
 
-	public static void parseOptions(StringProperty initialization, IHasOptions optionsCarrier) throws IOException {
+	public static void parseOptions(StringProperty initialization, IOptionsCarrier optionsCarrier) throws IOException {
 		if (!initialization.get().isBlank()) {
 			try (var np = new NexusStreamParser(new StringReader("OPTIONS " + initialization.get() + ";"))) {
 				parseOptions(np, optionsCarrier);
@@ -108,7 +109,7 @@ public class OptionIO {
 	/**
 	 * write options
 	 */
-	public static void writeOptions(Writer w, IHasOptions optionsCarrier) throws IOException {
+	public static void writeOptions(Writer w, IOptionsCarrier optionsCarrier) throws IOException {
 		if (optionsCarrier != null) {
 			final var options = new ArrayList<>(Option.getAllOptions(optionsCarrier));
 			if (options.size() > 0) {

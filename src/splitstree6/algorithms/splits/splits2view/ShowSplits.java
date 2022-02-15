@@ -26,7 +26,6 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.SplitsNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
@@ -56,7 +55,7 @@ public class ShowSplits extends Splits2View {
 
 	@Override
     public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock viewBlock) {
-        viewBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
+        viewBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
 
         // if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 

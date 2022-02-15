@@ -3,7 +3,7 @@
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=8 nAlgorithms=5;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1644753189112'; [Sun Feb 13 12:53:09 CET 2022]
+WORKFLOW creationDate='1644922490454'; [Tue Feb 15 11:54:50 CET 2022]
 END; [SPLITSTREE6]
 
 [
@@ -61,11 +61,11 @@ TAXLABELS
 ;
 DISPLAYLABELS
 	[1] 'A.ANDRENOF'
-	[2] 'A.MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
-	[3] 'A.DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
-	[4] 'A.CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
-	[5] 'A.FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
-	[6] 'A.KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
+	[2] '   A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
+	[3] 'A. DORSATA<br><img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
+	[4] '   A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
+	[5] '  A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
+	[6] ' A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
 END; [TAXA]
 
@@ -261,17 +261,17 @@ FORMAT labels=no weights=yes confidences=no;
 PROPERTIES fit=100 cyclic;
 CYCLE 1 5 4 2 3 6;
 MATRIX
-[1, size=1] 	 0.00073855 	 1,
-[2, size=1] 	 0.00369276 	 1 2 3 4 6,
-[3, size=1] 	 0.03766618 	 1 2 3 4 5,
-[4, size=2] 	 0.00332349 	 1 2 4 5,
-[5, size=2] 	 0.03360414 	 1 5,
-[6, size=1] 	 0.04923683 	 1 2 4 5 6,
-[7, size=2] 	 0.01009355 	 1 4 5 6,
-[8, size=3] 	 0.00640079 	 1 5 6,
-[9, size=1] 	 0.03323486 	 1 3 4 5 6,
-[10, size=2] 	 0.00726243 	 1 3 5 6,
-[11, size=1] 	 0.04677499 	 1 2 3 5 6,
+[1, size=1] 	 0.000738 	 1,
+[2, size=1] 	 0.00369275 	 1 2 3 4 6,
+[3, size=1] 	 0.037666 	 1 2 3 4 5,
+[4, size=2] 	 0.0033235 	 1 2 4 5,
+[5, size=2] 	 0.0336045 	 1 5,
+[6, size=1] 	 0.04923692 	 1 2 4 5 6,
+[7, size=2] 	 0.01009317 	 1 4 5 6,
+[8, size=3] 	 0.00640092 	 1 5 6,
+[9, size=1] 	 0.033235 	 1 3 4 5 6,
+[10, size=2] 	 0.00726233 	 1 3 5 6,
+[11, size=1] 	 0.04677483 	 1 2 3 5 6,
 ;
 END; [SPLITS]
 
@@ -287,7 +287,7 @@ BEGIN VIEW;
 TITLE 'Splits Network';
 LINK ALGORITHM = 'Show Splits';
 NAME 'Splits Network';
-INPUT 'TREES';
+INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',
 	Orientation = 'Rotate0Deg',
@@ -295,5 +295,7 @@ OPTIONS
 	UseWeights = 'true',
 	ZoomFactor = 1,
 	FontScaleFactor = 1,
-	RootAngle = 160;
+	RootAngle = 160,
+	OutlineFill = 0x800080ff,
+	Edits = 'c:6:0x808000ff' 'w:6:10';
 END; [VIEW]

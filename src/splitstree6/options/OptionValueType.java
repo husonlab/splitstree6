@@ -19,6 +19,7 @@
 
 package splitstree6.options;
 
+import jloda.fx.util.BasicFX;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -31,7 +32,7 @@ import java.io.StringReader;
  * Daniel Huson, 2.2019
  */
 public enum OptionValueType {
-	Integer, Float, Double, String, Boolean, stringArray, doubleArray, doubleSquareMatrix, Enum;
+	Integer, Float, Double, String, Boolean, stringArray, doubleArray, doubleSquareMatrix, Enum, Color;
 
 	/**
 	 * get the type of a value
@@ -57,6 +58,8 @@ public enum OptionValueType {
 			return doubleSquareMatrix;
 		else if (value instanceof Enum)
 			return Enum;
+		else if (value instanceof javafx.scene.paint.Color)
+			return Color;
 		else
 			return null;
 	}
@@ -73,8 +76,9 @@ public enum OptionValueType {
             case Double, doubleArray, doubleSquareMatrix -> NumberUtils.isDouble(text);
             case Boolean -> NumberUtils.isBoolean(text);
             case String -> text.length() > 0;
-            case stringArray -> text.length() > 0;
-            default -> false;
+			case stringArray -> text.length() > 0;
+			case Color -> BasicFX.isColor(text);
+			default -> false;
         };
     }
 
@@ -123,6 +127,8 @@ public enum OptionValueType {
 					return new String[0];
 				}
 			}
+			case Color:
+				return javafx.scene.paint.Color.web(text);
 		}
 		return false;
 	}
@@ -170,6 +176,8 @@ public enum OptionValueType {
 				else
 					return "'" + StringUtils.toString(array, "' '") + "'";
 			}
+			case Color:
+				return object.toString();
 			default:
 				return "'" + object.toString() + "'";
 		}

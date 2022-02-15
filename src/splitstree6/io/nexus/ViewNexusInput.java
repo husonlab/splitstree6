@@ -67,7 +67,7 @@ public class ViewNexusInput extends NexusIOBase {
 		np.matchIgnoreCase(";");
 
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
-			viewBlock.setInitializationLines(StringUtils.toString(np.getTokensRespectCase("OPTIONS", ";"), " "));
+			viewBlock.setInitializationLines(StringUtils.toString(np.getTokensRespectCase("OPTIONS", ";", true), " "));
 		}
 		np.matchEndBlock();
 

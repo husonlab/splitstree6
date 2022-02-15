@@ -21,6 +21,7 @@ package splitstree6.io.utils;
 
 import jloda.util.FileUtils;
 import splitstree6.data.TaxaBlock;
+import splitstree6.options.IOptionsCarrier;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.interfaces.HasFromClass;
 
@@ -28,7 +29,7 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
-public abstract class DataBlockWriter<T extends DataBlock> extends ReaderWriterBase implements HasFromClass<T> {
+public abstract class DataBlockWriter<T extends DataBlock> extends ReaderWriterBase implements IOptionsCarrier, HasFromClass<T> {
 	private final Class<T> fromClass;
 
 	public DataBlockWriter(Class<T> fromClass) {

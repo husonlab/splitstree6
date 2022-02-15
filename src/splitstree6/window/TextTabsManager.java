@@ -107,9 +107,9 @@ public class TextTabsManager {
 			tab = nodeTabMap.get(node);
 		else {
 			tab = new ViewTab(mainWindow, node, true);
-			var view = new DisplayData(mainWindow, node, node.getTitle() + " text", false);
+			var view = new DisplayData(mainWindow, node, node.getTitle() + " Text", false);
 			tab.setView(view);
-			tab.textProperty().bind(node.titleProperty());
+			tab.setText(view.getName());
 			tab.setOnCloseRequest(t -> nodeTabMap.remove(node));
 			nodeTabMap.put(node, tab);
 		}
@@ -121,5 +121,12 @@ public class TextTabsManager {
 			Platform.runLater(() -> ((DisplayTextView) tab.getView()).replaceText(createText(node)));
 		} else
 			tabPane.getTabs().remove(tab);
+
+		node.validProperty().addListener((v, o, n) -> {
+			if (!n)
+				((DisplayTextView) tab.getView()).replaceText("");
+			else
+				((DisplayTextView) tab.getView()).replaceText(createText(node));
+		});
 	}
 }

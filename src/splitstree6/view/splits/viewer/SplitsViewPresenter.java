@@ -51,6 +51,7 @@ import jloda.fx.util.ProgramExecutorService;
 import jloda.graph.Node;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
+import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
@@ -171,7 +172,14 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
 		targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40)));
 
+		var first = new Single<>(true);
+
 		updateListener = e -> {
+			if (first.get())
+				first.set(false);
+			else
+				SplitNetworkEdits.clearEdits(splitsView.optionEditsProperty());
+
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
 					splitsView.getSplitSelectionModel(), nodeShapeMap, splitShapeMap, loopViews,
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
@@ -182,9 +190,25 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
 					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
 				}
+				if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline) {
+					for (var loop : loopViews) {
+						loop.setFill(splitsView.getOptionOutlineFill());
+					}
+				}
+				if (splitsView.getOptionEdits().length > 0) {
+					SplitNetworkEdits.applyEdits(splitsView.getOptionEdits(), nodeShapeMap, splitShapeMap);
+				}
 			});
 			pane.drawNetwork();
 		};
+
+		splitsView.optionOutlineFillProperty().addListener((v, o, n) -> {
+			if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline) {
+				for (var loop : loopViews) {
+					loop.setFill(splitsView.getOptionOutlineFill());
+				}
+			}
+		});
 
 		splitsView.optionFontScaleFactorProperty().addListener(e -> {
 			if (splitNetworkPane.get() != null)

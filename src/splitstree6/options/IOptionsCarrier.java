@@ -1,5 +1,5 @@
 /*
- * IHasOptions.java Copyright (C) 2022 Daniel H. Huson
+ * IOptionsCarrier.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -23,5 +23,5 @@ package splitstree6.options;
  * marker interface for classes that have options
  * Daniel Huson, 11.2021
  */
-public interface IHasOptions {
+public interface IOptionsCarrier {
 }

@@ -52,7 +52,7 @@ public class Option<T> {
 
 		if (property.getValue() != null && property.getValue().getClass().isEnum()) {
 			legalValues = new ArrayList<>();
-			for (Object value : ((Enum) property.getValue()).getClass().getEnumConstants()) {
+			for (Object value : ((Enum<?>) property.getValue()).getClass().getEnumConstants()) {
 				legalValues.add(value.toString());
 			}
 		} else
@@ -60,102 +60,11 @@ public class Option<T> {
 	}
 
 	public Object getEnumValueForName(String name) {
-		for (Object value : ((Enum) property.getValue()).getClass().getEnumConstants()) {
+		for (var value : ((Enum<?>) property.getValue()).getClass().getEnumConstants()) {
 			if (value.toString().equalsIgnoreCase(name))
 				return value;
 		}
 		return null;
-	}
-
-	/**
-	 * gets all options associated with an optionable.
-	 * An option is given by a getOption/setOptionValue pair of methods
-	 *
-	 * @return options
-	 */
-	public static ArrayList<Option> getAllOptions(Object optionable) {
-		final Map<String, Option> name2AnOption = new HashMap<>();
-
-		Method listOptionsMethod = null;
-
-		final ArrayList<Option> options = new ArrayList<>();
-		Method tooltipMethod = null;
-		try {
-			tooltipMethod = optionable.getClass().getMethod("getToolTip", String.class);
-		} catch (Exception ignored) {
-		}
-
-		for (Method method : optionable.getClass().getMethods()) {
-			final String methodName = method.getName();
-			if (methodName.startsWith("option") && methodName.endsWith("Property") && method.getParameterCount() == 0) {
-				final String optionName = methodName.replaceAll("^option", "").replaceAll("Property$", "");
-
-				try {
-					final Object toolTip = (tooltipMethod != null ? tooltipMethod.invoke(optionable, "option" + optionName) : null);
-					final String toolTipText = (toolTip != null ? toolTip.toString() : null);
-					final Option option = new Option((Property) method.invoke(optionable), optionName, toolTipText);
-					options.add(option);
-					name2AnOption.put(optionName, option);
-				} catch (IllegalAccessException | InvocationTargetException e) {
-					Basic.caught(e);
-				}
-			} else if (methodName.equals("listOptions") && method.getParameterCount() == 0)
-				listOptionsMethod = method;
-		}
-
-		// determine the order in which to return options
-		final Collection<String> order = new ArrayList<>(name2AnOption.size());
-
-		List<String> list = null;
-		if (listOptionsMethod != null) {
-			try {
-				var obj = listOptionsMethod.invoke(optionable);
-				if (obj instanceof List<?> objectList) {
-					list = objectList.stream().map(Object::toString).collect(Collectors.toList());
-				}
-			} catch (Exception ignored) {
-			}
-		}
-
-		if (list != null) {
-			final Set<String> set = new HashSet<>();
-			for (Object a : list) {
-				String optionName = a.toString();
-				if (optionName.startsWith("option"))
-					optionName = optionName.replaceAll("^option", "").replaceAll("Property$", "");
-				order.add(optionName);
-				set.add(optionName);
-			}
-
-			// add other options not mentioned in the order
-			if (false)
-				for (String name : name2AnOption.keySet()) {
-					if (!set.contains(name))
-						order.add(name);
-				}
-		} else {
-			order.addAll(name2AnOption.keySet());
-		}
-		options.clear();
-		for (String name : order) {
-			Option option = name2AnOption.get(name);
-			if (option != null)
-				options.add(option);
-		}
-		return options;
-	}
-
-	/**
-	 * gets a mapping of names to options
-	 *
-	 * @return map
-	 */
-	public static Map<String, Option> getName2Options(Object optionable) {
-		final Map<String, Option> name2options = new TreeMap<>();
-		for (Option option : getAllOptions(optionable)) {
-			name2options.put(option.getName(), option);
-		}
-		return name2options;
 	}
 
 	/**
@@ -186,5 +95,71 @@ public class Option<T> {
 
 	public ArrayList<String> getLegalValues() {
 		return legalValues;
+	}
+
+	/**
+	 * gets all options associated with an optionable class
+	 * An option is given by a getOption/setOptionValue pair of methods
+	 *
+	 * @return options
+	 */
+	public static ArrayList<Option> getAllOptions(IOptionsCarrier optionsCarrier) {
+		final var name2AnOption = new HashMap<String, Option<?>>();
+
+		Method listOptionsMethod = null;
+
+		Method tooltipMethod = null;
+		try {
+			tooltipMethod = optionsCarrier.getClass().getMethod("getToolTip", String.class);
+		} catch (Exception ignored) {
+		}
+
+		for (var method : optionsCarrier.getClass().getMethods()) {
+			final var methodName = method.getName();
+			if (methodName.startsWith("option") && methodName.endsWith("Property") && method.getParameterCount() == 0) {
+				final var optionName = methodName.replaceAll("^option", "").replaceAll("Property$", "");
+
+				try {
+					final var toolTip = (tooltipMethod != null ? tooltipMethod.invoke(optionsCarrier, "option" + optionName) : null);
+					final var toolTipText = (toolTip != null ? toolTip.toString() : null);
+					final var option = new Option<>((Property<?>) method.invoke(optionsCarrier), optionName, toolTipText);
+					name2AnOption.put(optionName, option);
+				} catch (IllegalAccessException | InvocationTargetException e) {
+					Basic.caught(e);
+				}
+			} else if (methodName.equals("listOptions") && method.getParameterCount() == 0)
+				listOptionsMethod = method;
+		}
+
+		// collect the listed options:
+
+		final var listedOptions = new ArrayList<String>();
+		if (listOptionsMethod != null) {
+			try {
+				var result = listOptionsMethod.invoke(optionsCarrier);
+				if (result instanceof List<?> namesList) {
+					listedOptions.addAll(namesList.stream().map(Object::toString)
+							.map(name -> name.replaceAll("^option", "").replaceAll("Property$", ""))
+							.collect(Collectors.toList()));
+				}
+			} catch (Exception ignored) {
+			}
+		} else // list not provided, list all found:
+			listedOptions.addAll(name2AnOption.keySet());
+
+		return listedOptions.stream().map(name2AnOption::get).filter(Objects::nonNull).collect(Collectors.toCollection(ArrayList::new));
+	}
+
+	/**
+	 * gets a mapping of names to options
+	 *
+	 * @return map
+	 */
+	public static Map<String, Option<?>> getName2Options(IOptionsCarrier optionsCarrier) {
+		final var name2options = new TreeMap<String, Option<?>>();
+		for (var option : getAllOptions(optionsCarrier)) {
+			name2options.put(option.getName(), option);
+		}
+		return name2options;
 	}
 }

@@ -27,6 +27,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
@@ -73,6 +74,10 @@ public class SplitsView implements IView {
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
+	private final ObjectProperty<Color> optionOutlineFill = new SimpleObjectProperty<>(this, "optionOutlineFill");
+
+	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
+
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	// setup properties:
@@ -82,11 +87,12 @@ public class SplitsView implements IView {
 		ProgramProperties.track(optionRooting, SplitsRooting::valueOf, SplitsRooting.None);
 		ProgramProperties.track(optionUseWeights, true);
 		ProgramProperties.track(optionRootAngle, 160.0);
+		ProgramProperties.track(optionOutlineFill, Color.SILVER);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionUseWeights.getName(), optionZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionRootAngle.getName());
+				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -111,9 +117,9 @@ public class SplitsView implements IView {
 
 		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
 
-		var branchFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, loopViews);
+		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
-		controller.getFormatVbox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), branchFormatter);
+		controller.getFormatVbox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), splitsFormatter);
 
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);
@@ -127,6 +133,7 @@ public class SplitsView implements IView {
 		optionRootAngleProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
 		optionUseWeightsProperty().addListener(e -> mainWindow.setDirty(true));
+		optionOutlineFillProperty().addListener(e -> mainWindow.setDirty(true));
 	}
 
 	@Override
@@ -216,6 +223,19 @@ public class SplitsView implements IView {
 		this.optionOrientation.set(optionOrientation);
 	}
 
+
+	public String[] getOptionEdits() {
+		return optionEdits.get();
+	}
+
+	public ObjectProperty<String[]> optionEditsProperty() {
+		return optionEdits;
+	}
+
+	public void setOptionEdits(String[] optionEdits) {
+		this.optionEdits.set(optionEdits);
+	}
+
 	public SplitsRooting getOptionRooting() {
 		return optionRooting.get();
 	}
@@ -224,20 +244,12 @@ public class SplitsView implements IView {
 		return optionRooting;
 	}
 
-	public void setOptionRooting(SplitsRooting optionRooting) {
-		this.optionRooting.set(optionRooting);
-	}
-
 	public double getOptionRootAngle() {
 		return optionRootAngle.get();
 	}
 
 	public DoubleProperty optionRootAngleProperty() {
 		return optionRootAngle;
-	}
-
-	public void setOptionRootAngle(double optionRootAngle) {
-		this.optionRootAngle.set(optionRootAngle);
 	}
 
 	public double getOptionZoomFactor() {
@@ -272,8 +284,12 @@ public class SplitsView implements IView {
 		return optionUseWeights;
 	}
 
-	public void setOptionUseWeights(boolean optionUseWeights) {
-		this.optionUseWeights.set(optionUseWeights);
+	public Color getOptionOutlineFill() {
+		return optionOutlineFill.get();
+	}
+
+	public ObjectProperty<Color> optionOutlineFillProperty() {
+		return optionOutlineFill;
 	}
 
 	public Bounds getTargetBounds() {

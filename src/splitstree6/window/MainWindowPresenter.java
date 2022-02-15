@@ -36,6 +36,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
@@ -476,7 +477,8 @@ public class MainWindowPresenter {
 
 		controller.getShowWorkflowMenuItem().setOnAction(e -> controller.getMainTabPane().getSelectionModel().select(mainWindow.getTabByClass(WorkflowTab.class)));
 
-		controller.getShowMessageWindowMenuItem().setOnAction(null);
+		controller.getShowMessageWindowMenuItem().setOnAction(e -> MessageWindow.getInstance().setVisible(true));
+
 		controller.getCheckForUpdatesMenuItem().setOnAction(null);
 		controller.getAboutMenuItem().setOnAction(null);
 	}

@@ -22,9 +22,8 @@ package splitstree6.view.format.splits;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.binding.Bindings;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
@@ -32,9 +31,9 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Node;
-import jloda.util.ProgramProperties;
 import splitstree6.view.splits.layout.RotateSplit;
-import splitstree6.view.splits.viewer.LoopView;
+import splitstree6.view.splits.viewer.SplitNetworkEdits;
+import splitstree6.view.splits.viewer.SplitsDiagramType;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -50,7 +49,8 @@ public class SplitsFormatterPresenter {
 	private boolean inUpdatingDefaults = false;
 
 	public SplitsFormatterPresenter(UndoManager undoManager, SplitsFormatterController controller, SelectionModel<Integer> splitSelectionModel,
-									Map<Node, Shape> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObservableList<LoopView> loopViews) {
+									Map<Node, Shape> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
+									ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty) {
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
@@ -66,19 +66,27 @@ public class SplitsFormatterPresenter {
 						strokeWidth.set(0);
 					else {
 						var undoList = new UndoableRedoableCommandList("set line width");
+						var width = n.doubleValue();
+						var edits = new ArrayList<SplitNetworkEdits.Edit>();
 
 						for (var split : splitSelectionModel.getSelectedItems()) {
+							edits.add(new SplitNetworkEdits.Edit('w', split, width));
 							if (splitShapeMap.containsKey(split)) {
 								for (var shape : splitShapeMap.get(split)) {
-									var oldValue = shape.getStrokeWidth();
-									if (n.doubleValue() != oldValue) {
-										undoList.add(shape.strokeWidthProperty(), oldValue, n);
+									var oldWidth = shape.getStrokeWidth();
+									if (n.doubleValue() != oldWidth) {
+										undoList.add(shape.strokeWidthProperty(), oldWidth, width);
 									}
 								}
 							}
 						}
-						if (undoList.size() > 0)
+
+						if (undoList.size() > 0) {
+							var oldEdits = editsProperty.get();
+							var newEdits = SplitNetworkEdits.addEdits(editsProperty.get(), edits);
+							undoList.add(editsProperty, oldEdits, newEdits);
 							undoManager.doAndAdd(undoList);
+						}
 
 						Platform.runLater(() -> controller.getWidthCBox().setValue(n));
 					}
@@ -90,7 +98,11 @@ public class SplitsFormatterPresenter {
 			if (!inUpdatingDefaults) {
 				var undoList = new UndoableRedoableCommandList("set line color");
 				var color = controller.getColorPicker().getValue();
+				var edits = new ArrayList<SplitNetworkEdits.Edit>();
+
 				for (var split : splitSelectionModel.getSelectedItems()) {
+					edits.add(new SplitNetworkEdits.Edit('c', split, color));
+
 					if (splitShapeMap.containsKey(split)) {
 						for (var shape : splitShapeMap.get(split)) {
 							var oldColor = shape.getStroke();
@@ -110,8 +122,13 @@ public class SplitsFormatterPresenter {
 						}
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
+					var oldEdits = editsProperty.get();
+					var newEdits = SplitNetworkEdits.addEdits(editsProperty.get(), edits);
+					undoList.add(editsProperty, oldEdits, newEdits);
+
 					undoManager.doAndAdd(undoList);
+				}
 			}
 		});
 
@@ -145,22 +162,34 @@ public class SplitsFormatterPresenter {
 
 		controller.getRotateLeftButton().setOnAction(e -> {
 			var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
-			undoManager.doAndAdd("rotate splits", () -> RotateSplit.apply(splits, -5, nodeShapeMap), () -> RotateSplit.apply(splits, 5, nodeShapeMap));
+			var oldEdits = editsProperty.get();
+
+			undoManager.doAndAdd("rotate splits", () -> {
+						RotateSplit.apply(splits, -5, nodeShapeMap);
+						editsProperty.set(oldEdits);
+					}
+					, () -> {
+						RotateSplit.apply(splits, 5, nodeShapeMap);
+						editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, 5));
+					});
 		});
 		controller.getRotateLeftButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
 		controller.getRotateRightButton().setOnAction(e -> {
 			var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
-			undoManager.doAndAdd("rotate splits", () -> RotateSplit.apply(splits, 5, nodeShapeMap), () -> RotateSplit.apply(splits, -5, nodeShapeMap));
+			var oldEdits = editsProperty.get();
+			undoManager.doAndAdd("rotate splits", () -> {
+				RotateSplit.apply(splits, 5, nodeShapeMap);
+				editsProperty.set(oldEdits);
+			}, () -> {
+				RotateSplit.apply(splits, -5, nodeShapeMap);
+				editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, -5));
+			});
 		});
 		controller.getRotateRightButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
-		controller.getOutlineColorPicker().valueProperty().addListener((c, o, n) -> {
-			undoManager.doAndAdd("set outline fill color", () -> loopViews.forEach(lv -> lv.setFill(o)), () -> loopViews.forEach(lv -> lv.setFill(n)));
-			ProgramProperties.put("OutlineFillColor", n);
-		});
-		controller.getOutlineColorPicker().disableProperty().bind(Bindings.isEmpty(loopViews));
-        loopViews.addListener((InvalidationListener) e -> controller.getOutlineColorPicker().setValue(ProgramProperties.get("OutlineFillColor", Color.SILVER)));
+		controller.getOutlineColorPicker().valueProperty().bind(outlineFill);
+		controller.getOutlineColorPicker().disableProperty().bind(optionDiagram.isNotEqualTo(SplitsDiagramType.Outline));
 
 		//selectionModel.getSelectedItems().addListener(selectionListener);
 		splitSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));

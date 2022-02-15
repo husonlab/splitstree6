@@ -22,11 +22,11 @@ package splitstree6.view;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
-import splitstree6.options.IHasOptions;
+import splitstree6.options.IOptionsCarrier;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 
-public interface IView extends IHasOptions {
+public interface IView extends IOptionsCarrier {
 	String getName();
 
 	Node getRoot();

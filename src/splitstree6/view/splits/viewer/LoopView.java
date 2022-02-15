@@ -23,7 +23,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Polygon;
 import jloda.graph.Node;
-import jloda.util.ProgramProperties;
 
 import java.util.ArrayList;
 import java.util.function.Function;
@@ -37,7 +36,7 @@ public class LoopView extends Polygon {
 
     public LoopView(ArrayList<Node> nodes, Function<Node, DoubleProperty> nodeXMap, Function<Node, DoubleProperty> nodeYMap) {
         this.nodes = nodes;
-        setFill(ProgramProperties.get("OutlineFillColor", Color.SILVER));
+        setFill(Color.SILVER);
         setStroke(Color.TRANSPARENT);
 
         for (var i = 0; i < nodes.size(); i++) {
