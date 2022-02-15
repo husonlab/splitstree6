@@ -3,7 +3,7 @@
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=8 nAlgorithms=5;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1644751608524'; [Sun Feb 13 12:26:48 CET 2022]
+WORKFLOW creationDate='1644925795933'; [Tue Feb 15 12:49:55 CET 2022]
 END; [SPLITSTREE6]
 
 [
@@ -524,7 +524,7 @@ BEGIN VIEW;
 TITLE 'Splits Network';
 LINK ALGORITHM = 'Show Splits';
 NAME 'Splits Network';
-INPUT 'TREES';
+INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',
 	Orientation = 'Rotate0Deg',
@@ -532,5 +532,7 @@ OPTIONS
 	UseWeights = 'true',
 	ZoomFactor = 1,
 	FontScaleFactor = 1,
-	RootAngle = 160;
+	RootAngle = 160,
+	OutlineFill = 0xcce6ffff,
+	Edits = 'c:1:0x0000ffff' 'c:2:0x0000ffff' 'c:3:0x0000ffff' 'c:4:0x0000ffff' 'c:5:0x0000ffff' 'c:6:0x0000ffff' 'c:7:0x0000ffff' 'c:8:0x0000ffff' 'c:9:0x0000ffff' 'c:10:0x0000ffff' 'c:11:0x0000ffff' 'c:12:0x0000ffff' 'c:13:0x0000ffff' 'c:14:0x0000ffff' 'c:15:0x0000ffff' 'c:16:0x0000ffff' 'c:17:0x0000ffff' 'c:18:0x0000ffff' 'c:19:0x0000ffff' 'c:20:0x0000ffff' 'c:21:0x0000ffff' 'c:22:0x0000ffff' 'c:23:0x0000ffff' 'c:24:0x0000ffff' 'c:25:0x0000ffff' 'c:26:0x0000ffff' 'c:27:0x0000ffff' 'c:28:0x0000ffff' 'c:29:0x0000ffff' 'c:30:0x0000ffff' 'c:31:0x0000ffff' 'c:32:0x0000ffff';
 END; [VIEW]

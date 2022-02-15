@@ -299,7 +299,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getSelectAllMenuItem().setOnAction(e ->
 		{
 			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
-			splitsView.getSplitSelectionModel().selectAll(IteratorUtils.asList(BitSetUtils.range(1, splitsView.getSplitsBlock().getNsplits())));
+			splitsView.getSplitSelectionModel().selectAll(IteratorUtils.asList(BitSetUtils.range(1, splitsView.getSplitsBlock().getNsplits() + 1)));
 		});
 		mainController.getSelectNoneMenuItem().setOnAction(e -> {
 			mainWindow.getTaxonSelectionModel().clearSelection();

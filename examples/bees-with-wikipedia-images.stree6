@@ -3,7 +3,7 @@
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=8 nAlgorithms=5;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1644922490454'; [Tue Feb 15 11:54:50 CET 2022]
+WORKFLOW creationDate='1644924518918'; [Tue Feb 15 12:28:38 CET 2022]
 END; [SPLITSTREE6]
 
 [
@@ -297,5 +297,5 @@ OPTIONS
 	FontScaleFactor = 1,
 	RootAngle = 160,
 	OutlineFill = 0x800080ff,
-	Edits = 'c:6:0x808000ff' 'w:6:10';
+	Edits = 'c:6:0x808000ff' 'w:6:10' 'a:6:-30';
 END; [VIEW]

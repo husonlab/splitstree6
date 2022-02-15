@@ -188,7 +188,7 @@ public class SplitsFormatterPresenter {
 		});
 		controller.getRotateRightButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
-		controller.getOutlineColorPicker().valueProperty().bind(outlineFill);
+		controller.getOutlineColorPicker().valueProperty().bindBidirectional(outlineFill);
 		controller.getOutlineColorPicker().disableProperty().bind(optionDiagram.isNotEqualTo(SplitsDiagramType.Outline));
 
 		//selectionModel.getSelectedItems().addListener(selectionListener);
