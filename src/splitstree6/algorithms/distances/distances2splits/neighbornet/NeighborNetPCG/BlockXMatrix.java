@@ -167,7 +167,7 @@ public class BlockXMatrix {
      * vectors for each block.
      *
      * @param n number of taxa
-     * @param v double vector, size n(n-1)/2
+     * @param v double vector, size |G|
      * @param G boolean vector, size n(n-1)/2, indicating blocks
      * @return array of double arrays, one for each block.
      */
@@ -179,7 +179,8 @@ public class BlockXMatrix {
         int countlast = 0; //Number of elements in block n-1
         double[] vlast = new double[n]; //Elements in block n-1
 
-        int index = 1;
+        int index = 1; //Index for G, 1...npairs
+        int indexv = 0; //Index for v, 1..|G|
         double[] vi = new double[n];
         for (int i = 1; i <= n - 1; i++) {
             Arrays.fill(vi, 0.0);
@@ -188,7 +189,8 @@ public class BlockXMatrix {
             for (int j = i + 1; j <= n - 1; j++) {
                 if (G[index]) {
                     counti++;
-                    vi[counti] = v[index];
+                    indexv++;
+                    vi[counti] = v[indexv];
                 }
                 index++;
             }
@@ -197,7 +199,8 @@ public class BlockXMatrix {
 
             if (G[index]) {
                 countlast++;
-                vlast[countlast] = v[index];
+                indexv++;
+                vlast[countlast] = v[indexv];
             }
             index++;
         }
@@ -268,12 +271,13 @@ public class BlockXMatrix {
      * @param n     number of taxa
      * @param vcell vector of blocks
      * @param G     boolean vector indicating which rows are kept
-     * @return vector
+     * @return vector indexed 1...|G|
      */
     public static double[] blocks2vector(int n, double[][] vcell, boolean[] G) {
         double[] v = new double[n * (n - 1) / 2 + 1];
         int countlast = 0;
         int index = 1;
+        int indexv = 0;
         int counti;
 
         for (int i = 1; i <= n - 1; i++) {
@@ -281,13 +285,15 @@ public class BlockXMatrix {
             for (int j = (i + 1); j <= n - 1; j++) {
                 if (G[index]) {
                     counti++;
-                    v[index] = vcell[i][counti];
+                    indexv++;
+                    v[indexv] = vcell[i][counti];
                 }
                 index++;
             }
             if (G[index]) {
                 countlast++;
-                v[index] = vcell[n - 1][countlast];
+                indexv++;
+                v[indexv] = vcell[n - 1][countlast];
             }
             index++;
         }

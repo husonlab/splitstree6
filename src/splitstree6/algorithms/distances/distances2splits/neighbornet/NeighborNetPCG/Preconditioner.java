@@ -210,6 +210,14 @@ public class Preconditioner {
 		return nu;
 	}
 
+	/**
+	 * Solves Mx = y.
+	 * M is the preconditioning matrix, with rows/cols corresponding to elements of G.
+	 *
+	 * @param yvec vector y, given only as a vector with entries corresponding to entries of G
+	 * @param G   set, boolean vector 1..npairs.
+	 * @return vector x, given only as a vector with entries corresponding to entries of G
+	 */
 	public double[] solve(double[] yvec, boolean[] G) {
 		int n = X.n;
 		double[][] y, x;
