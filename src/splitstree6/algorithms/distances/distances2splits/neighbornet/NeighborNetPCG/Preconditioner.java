@@ -5,6 +5,7 @@ import Jama.Matrix;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.blocks2vector;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.vector2blocks;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.TridiagonalMatrix.multiplyLU;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.add;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.minus;
 
 public class Preconditioner {
@@ -226,7 +227,61 @@ public class Preconditioner {
 		return blocks2vector(n, x, G);
 	}
 
-
+	/**
+	 * Computes y=Mx
+	 * @param x
+	 * @return Mx
+	 */
+	public double[][] multiply(double[][] x) {
+		//v = Ux.
+		int n=X.n;
+		double[][] v = new double[n][];
+		double[][] y = new double[n][];
+		for (int i=1;i<n-1;i++) {
+			if (X.m[i]>0) {
+				v[i]=U[i].multiply(x[i]);
+				if (X.m[i+1]>0&&i<n-2) {
+					v[i] = add(v[i],L[i].multiply(X.B[i].multiplyTranspose(x[i+1])));
+				}
+				if (X.m[n-1]>0) {
+					v[i] = add(v[i],L[i].multiply(Z[i].multiplyTranspose(x[n-1])));
+				}
+			}
+		}
+		//y = Lv
+		for (int i=1;i<n-1;i++) {
+			if (X.m[i]>0) {
+				y[i]=L[i].multiply(v[i]);
+				if (i>1 && X.m[i-1]>0) {
+					y[i] = add(y[i],X.B[i-1].multiply(U[i-1].multiply(v[i-1])));
+				}
+			}
+		}
+		if (X.m[n-1]>0) {
+			y[n-1] = L[n-1].multiply(v[n-1]);
+			for (int j=1;j<n-1;j++) {
+				if (X.m[j]>0)
+					y[n-1] = add(y[n-1],Y[j].multiply(U[j].solveU(v[j])));
+			}
+		}
+		return y;
+	}
+	/**
+	 * Computes y = Mx.
+	 * M is the preconditioning matrix, with rows/cols corresponding to elements of G.
+	 *
+	 *
+	 * @param xvec vector x, indexed 1..|G|
+	 * @param G set, boolean vector 1..npairs.
+	 * @return vector indexed 1..|G|
+	 */
+	public double[] multiply(double[] xvec, boolean[] G) {
+		int n = X.n;
+		double[][] y, x;
+		x = vector2blocks(n, xvec, G);
+		y = multiply(x);
+		return blocks2vector(n, y, G);
+	}
 	public Matrix[] toMatrix() {
 		int[] m = X.m;
 		int n = X.n;
