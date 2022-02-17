@@ -2,6 +2,8 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNe
 
 import Jama.Matrix;
 
+import java.util.Random;
+
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.blocks2vector;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.vector2blocks;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.TridiagonalMatrix.multiplyLU;
@@ -168,14 +170,17 @@ public class Preconditioner {
 		double[][] nu = new double[n][];
 		int[] m = X.m;
 
+		//eta = L^{-1} y
 		if (m[1] > 0) {
 			eta[1] = L[1].solveL(y[1]);
 		}
 		for (int i = 2; i <= n - 2; i++) {
 			if (m[i] > 0) {
 				if (m[i - 1] > 0)
+					//eta[i] = L[i]^{-1} (y[i] - B[i-1] U[i-1]^{-1} eta[i-1]
 					eta[i] = L[i].solveL(minus(y[i], X.B[i - 1].multiply(U[i - 1].solveU(eta[i - 1]))));
 				else
+					//eta[i] = L[i]^{-1} y[i]
 					eta[i] = L[i].solveL(y[i]);
 			}
 		}
@@ -189,6 +194,7 @@ public class Preconditioner {
 			eta[n - 1] = L[n - 1].solveL(v);
 		}
 
+		//nu = U^{-1} eta.
 		if (m[n - 1] > 0) {
 			nu[n - 1] = U[n - 1].solveU(eta[n - 1]);
 		}
@@ -240,20 +246,23 @@ public class Preconditioner {
 		for (int i=1;i<n-1;i++) {
 			if (X.m[i]>0) {
 				v[i]=U[i].multiply(x[i]);
-				if (X.m[i+1]>0&&i<n-2) {
+				if (i<n-2 && X.m[i+1]>0) {
 					v[i] = add(v[i],L[i].multiply(X.B[i].multiplyTranspose(x[i+1])));
 				}
 				if (X.m[n-1]>0) {
-					v[i] = add(v[i],L[i].multiply(Z[i].multiplyTranspose(x[n-1])));
+					v[i] = add(v[i],L[i].solveL(Z[i].multiplyTranspose(x[n-1])));
 				}
 			}
+		}
+		if (X.m[n-1]>0) {
+			v[n-1] = U[n-1].multiply(x[n-1]);
 		}
 		//y = Lv
 		for (int i=1;i<n-1;i++) {
 			if (X.m[i]>0) {
 				y[i]=L[i].multiply(v[i]);
 				if (i>1 && X.m[i-1]>0) {
-					y[i] = add(y[i],X.B[i-1].multiply(U[i-1].multiply(v[i-1])));
+					y[i] = add(y[i],X.B[i-1].multiply(U[i-1].solveU(v[i-1])));
 				}
 			}
 		}
@@ -319,4 +328,40 @@ public class Preconditioner {
 		return new Matrix[]{LL, UU};
 	}
 
+	public static void main(String[] args) {
+		int n=4;
+		int npairs = n * (n - 1) / 2;
+		Random rand = new Random();
+		rand.setSeed(100);
+
+		boolean[] G = new boolean[npairs + 1];
+		int nG = 0;
+		for (int i = 1; i <= npairs; i++) {
+			//G[i] = rand.nextBoolean();
+			G[i] = true;
+			if (G[i])
+				nG++;
+		}
+		//Arrays.fill(G, true);
+
+		boolean[][] gcell = DualPCG.mask2blockmask(n, G);
+		BlockXMatrix X = new BlockXMatrix(n, gcell);
+		Preconditioner M = new Preconditioner(X,3);
+
+		double[] v = new double[nG+1];
+		//for(int i=1;i<=nG;i++)
+		//	v[i] = rand.nextDouble();
+		v[4] = 1;
+
+		double[] u = M.multiply(v,G);
+		double[] v2 = M.solve(u,G);
+		double diff = 0.0;
+		for(int i=1;i<=nG;i++) {
+			diff += (v2[i] - v[i]) * (v2[i] - v[i]);
+			System.err.println(i+"\t"+v[i]+"\t"+v2[i]);
+		}
+		System.err.println("Testing preconditioner multiply and solve. Should be zero: "+diff);
+		System.err.println();
+
+	}
 }
