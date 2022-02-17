@@ -225,6 +225,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomOutButton().setOnAction(e -> splitsView.setOptionZoomFactor((1.0 / 1.1) * splitsView.getOptionZoomFactor()));
 		controller.getZoomOutButton().disableProperty().bind(splitsView.emptyProperty());
 
+		controller.getIncreaseFontButton().setOnAction(e -> splitsView.setOptionFontScaleFactor(1.2 * splitsView.getOptionFontScaleFactor()));
+		controller.getIncreaseFontButton().disableProperty().bind(splitsView.emptyProperty());
+		controller.getDecreaseFontButton().setOnAction(e -> splitsView.setOptionFontScaleFactor((1.0 / 1.2) * splitsView.getOptionFontScaleFactor()));
+		controller.getDecreaseFontButton().disableProperty().bind(splitsView.emptyProperty());
+
 		final Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
 		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(),
@@ -281,10 +286,12 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
-		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor(1.2 * splitsView.getOptionFontScaleFactor()));
-		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
-		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> splitsView.setOptionFontScaleFactor((1.0 / 1.2) * splitsView.getOptionFontScaleFactor()));
-		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(splitsView.emptyProperty());
+
+		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
+		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
+
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());

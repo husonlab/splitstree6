@@ -319,6 +319,12 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getContractVerticallyButton().setOnAction(e -> tanglegramView.setOptionVerticalZoomFactor((1.0 / 1.1) * tanglegramView.getOptionVerticalZoomFactor()));
 		controller.getContractVerticallyButton().disableProperty().bind(tanglegramView.emptyProperty());
 
+		controller.getIncreaseFontButton().setOnAction(e -> tanglegramView.setOptionFontScaleFactor(1.2 * tanglegramView.getOptionFontScaleFactor()));
+		controller.getIncreaseFontButton().disableProperty().bind(tanglegramView.emptyProperty());
+		controller.getDecreaseFontButton().setOnAction(e -> tanglegramView.setOptionFontScaleFactor((1.0 / 1.2) * tanglegramView.getOptionFontScaleFactor()));
+		controller.getDecreaseFontButton().disableProperty().bind(tanglegramView.emptyProperty());
+
+
 		tanglegramView.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
 				controller.getvBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
@@ -357,10 +363,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
 
-		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> tanglegramView.setOptionFontScaleFactor(1.2 * tanglegramView.getOptionFontScaleFactor()));
-		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
-		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> tanglegramView.setOptionFontScaleFactor((1.0 / 1.2) * tanglegramView.getOptionFontScaleFactor()));
-		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
+		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
+		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getExpandVerticallyButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getExpandVerticallyButton().disableProperty());

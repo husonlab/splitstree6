@@ -146,8 +146,7 @@ public class TreePane extends StackPane {
 			LayoutUtils.applyLabelScaleFactor(group, labelScaleFactor.get());
 			Platform.runLater(() -> {
 				LayoutUtils.applyOrientation(orientation.get(), pane, false);
-				if (orientationConsumer != null)
-					orientationConsumer.accept(orientation.get());
+				updateLabelLayout(orientation.get());
 			});
 
 			{
@@ -214,6 +213,6 @@ public class TreePane extends StackPane {
 
 	public void updateLabelLayout(LayoutOrientation orientation) {
 		if (orientationConsumer != null)
-			orientationConsumer.accept(orientation);
+			ProgramExecutorService.submit(100, () -> Platform.runLater(() -> orientationConsumer.accept(orientation)));
 	}
 }

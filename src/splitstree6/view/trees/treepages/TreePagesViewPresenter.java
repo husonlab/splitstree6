@@ -219,6 +219,12 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomOutButton().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
 		controller.getZoomOutButton().disableProperty().bind(treePageView.emptyProperty());
 
+		controller.getIncreaseFontButton().setOnAction(e -> treePageView.setOptionFontScaleFactor(1.2 * treePageView.getOptionFontScaleFactor()));
+		controller.getIncreaseFontButton().disableProperty().bind(treePageView.emptyProperty());
+		controller.getDecreaseFontButton().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
+		controller.getDecreaseFontButton().disableProperty().bind(treePageView.emptyProperty());
+
+
 		var undoManager = treePagesView.getUndoManager();
 		rowsAndCols.addListener((v, o, n) -> undoManager.add("set grid dimensions", rowsAndCols, o, n));
 		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("set page", treePagesView.pageNumberProperty(), o, n));
@@ -255,10 +261,10 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		});
 		mainController.getCopyNewickMenuItem().disableProperty().bind(treePageView.emptyProperty());
 
-		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor(1.2 * treePageView.getOptionFontScaleFactor()));
-		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
-		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
-		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomInButton().disableProperty());

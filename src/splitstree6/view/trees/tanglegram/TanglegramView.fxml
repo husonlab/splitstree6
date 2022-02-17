@@ -168,6 +168,27 @@
                                     <Tooltip text="Contract tree horizontally"/>
                                 </tooltip>
                             </Button>
+                            <Button fx:id="increaseFontButton" maxHeight="20.0"
+                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="A+">
+                                <font>
+                                    <Font size="11.0"/>
+                                </font>
+                                <tooltip>
+                                    <Tooltip text="Increase font size"/>
+                                </tooltip>
+                            </Button>
+                            <Button fx:id="decreaseFontButton" maxHeight="20.0"
+                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="A-">
+                                <font>
+                                    <Font size="11.0"/>
+                                </font>
+                                <tooltip>
+                                    <Tooltip text="Decrease font size"/>
+                                </tooltip>
+                            </Button>
+
                         </ToolBar>
                         <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER"
                                     expanded="false" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="20.0"

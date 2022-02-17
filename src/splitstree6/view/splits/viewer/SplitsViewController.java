@@ -67,6 +67,12 @@ public class SplitsViewController {
 	private Button zoomOutButton;
 
 	@FXML
+	private Button increaseFontButton;
+
+	@FXML
+	private Button decreaseFontButton;
+
+	@FXML
 	private ToggleButton useWeightsToggleButton;
 
 	@FXML
@@ -158,6 +164,14 @@ public class SplitsViewController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
+	}
+
+	public Button getIncreaseFontButton() {
+		return increaseFontButton;
+	}
+
+	public Button getDecreaseFontButton() {
+		return decreaseFontButton;
 	}
 
 	public ZoomableScrollPane getScrollPane() {

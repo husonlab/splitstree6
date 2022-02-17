@@ -63,6 +63,12 @@ public class TanglegramViewController {
 	private Button contractHorizontallyButton;
 
 	@FXML
+	private Button increaseFontButton;
+
+	@FXML
+	private Button decreaseFontButton;
+
+	@FXML
 	private ComboBox<String> tree1CBox;
 
 	@FXML
@@ -112,6 +118,7 @@ public class TanglegramViewController {
 
 	@FXML
 	private TitledPane formatTitledPane;
+
 
 	@FXML
 	private void initialize() {
@@ -181,6 +188,14 @@ public class TanglegramViewController {
 
 	public Button getContractHorizontallyButton() {
 		return contractHorizontallyButton;
+	}
+
+	public Button getIncreaseFontButton() {
+		return increaseFontButton;
+	}
+
+	public Button getDecreaseFontButton() {
+		return decreaseFontButton;
 	}
 
 	public ComboBox<String> getTree1CBox() {

@@ -73,6 +73,12 @@ public class TreePagesViewController {
 	private Button zoomOutButton;
 
 	@FXML
+	private Button increaseFontButton;
+
+	@FXML
+	private Button decreaseFontButton;
+
+	@FXML
 	private VBox formatVBox;
 
 	@FXML
@@ -157,6 +163,14 @@ public class TreePagesViewController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
+	}
+
+	public Button getIncreaseFontButton() {
+		return increaseFontButton;
+	}
+
+	public Button getDecreaseFontButton() {
+		return decreaseFontButton;
 	}
 
 	public VBox getFormatVBox() {

@@ -57,7 +57,7 @@ public class ShowSplits extends Splits2View {
 	@Override
     public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock viewBlock) {
 		viewBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
-		viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("SplitsNetworkViewer16.gif", 16));
+		Platform.runLater(() -> viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("SplitsNetworkViewer16.gif", 16)));
 
         // if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 
