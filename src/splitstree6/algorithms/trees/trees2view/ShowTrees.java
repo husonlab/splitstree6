@@ -58,7 +58,7 @@ public class ShowTrees extends Trees2View {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, ViewBlock viewBlock) throws IOException {
 		viewBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
-		viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("TreesViewer16.gif", 16));
+		Platform.runLater(() -> viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("TreeViewer16.gif", 16)));
 
 		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 

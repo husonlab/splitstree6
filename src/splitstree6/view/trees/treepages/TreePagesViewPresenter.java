@@ -167,6 +167,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			controller.getPagination().setPrefWidth(width);
 			controller.getPagination().setPrefHeight(height);
 			boxDimensions.set(new Dimension2D(width / treePagesView.getOptionCols() - 5, height / treePagesView.getOptionRows() - 5));
+			if (false)
+				Platform.runLater(() -> mainWindow.getController().getLayoutLabelsMenuItem().getOnAction().handle(null));
 		});
 
 		rowsAndCols.addListener((v, o, n) -> boxDimensions.set(new Dimension2D(boxDimensions.get().getWidth() * o.cols() / n.cols(), boxDimensions.get().getHeight() * o.rows() / n.rows())));
