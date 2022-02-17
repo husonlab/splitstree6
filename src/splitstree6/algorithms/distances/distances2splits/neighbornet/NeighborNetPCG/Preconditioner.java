@@ -2,9 +2,12 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNe
 
 import Jama.Matrix;
 
+import java.util.Random;
+
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.blocks2vector;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.vector2blocks;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.TridiagonalMatrix.multiplyLU;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.add;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.minus;
 
 public class Preconditioner {
@@ -167,14 +170,17 @@ public class Preconditioner {
 		double[][] nu = new double[n][];
 		int[] m = X.m;
 
+		//eta = L^{-1} y
 		if (m[1] > 0) {
 			eta[1] = L[1].solveL(y[1]);
 		}
 		for (int i = 2; i <= n - 2; i++) {
 			if (m[i] > 0) {
 				if (m[i - 1] > 0)
+					//eta[i] = L[i]^{-1} (y[i] - B[i-1] U[i-1]^{-1} eta[i-1]
 					eta[i] = L[i].solveL(minus(y[i], X.B[i - 1].multiply(U[i - 1].solveU(eta[i - 1]))));
 				else
+					//eta[i] = L[i]^{-1} y[i]
 					eta[i] = L[i].solveL(y[i]);
 			}
 		}
@@ -188,6 +194,7 @@ public class Preconditioner {
 			eta[n - 1] = L[n - 1].solveL(v);
 		}
 
+		//nu = U^{-1} eta.
 		if (m[n - 1] > 0) {
 			nu[n - 1] = U[n - 1].solveU(eta[n - 1]);
 		}
@@ -210,6 +217,14 @@ public class Preconditioner {
 		return nu;
 	}
 
+	/**
+	 * Solves Mx = y.
+	 * M is the preconditioning matrix, with rows/cols corresponding to elements of G.
+	 *
+	 * @param yvec vector y, given only as a vector with entries corresponding to entries of G
+	 * @param G   set, boolean vector 1..npairs.
+	 * @return vector x, given only as a vector with entries corresponding to entries of G
+	 */
 	public double[] solve(double[] yvec, boolean[] G) {
 		int n = X.n;
 		double[][] y, x;
@@ -218,7 +233,64 @@ public class Preconditioner {
 		return blocks2vector(n, x, G);
 	}
 
-
+	/**
+	 * Computes y=Mx
+	 * @param x
+	 * @return Mx
+	 */
+	public double[][] multiply(double[][] x) {
+		//v = Ux.
+		int n=X.n;
+		double[][] v = new double[n][];
+		double[][] y = new double[n][];
+		for (int i=1;i<n-1;i++) {
+			if (X.m[i]>0) {
+				v[i]=U[i].multiply(x[i]);
+				if (i<n-2 && X.m[i+1]>0) {
+					v[i] = add(v[i],L[i].multiply(X.B[i].multiplyTranspose(x[i+1])));
+				}
+				if (X.m[n-1]>0) {
+					v[i] = add(v[i],L[i].solveL(Z[i].multiplyTranspose(x[n-1])));
+				}
+			}
+		}
+		if (X.m[n-1]>0) {
+			v[n-1] = U[n-1].multiply(x[n-1]);
+		}
+		//y = Lv
+		for (int i=1;i<n-1;i++) {
+			if (X.m[i]>0) {
+				y[i]=L[i].multiply(v[i]);
+				if (i>1 && X.m[i-1]>0) {
+					y[i] = add(y[i],X.B[i-1].multiply(U[i-1].solveU(v[i-1])));
+				}
+			}
+		}
+		if (X.m[n-1]>0) {
+			y[n-1] = L[n-1].multiply(v[n-1]);
+			for (int j=1;j<n-1;j++) {
+				if (X.m[j]>0)
+					y[n-1] = add(y[n-1],Y[j].multiply(U[j].solveU(v[j])));
+			}
+		}
+		return y;
+	}
+	/**
+	 * Computes y = Mx.
+	 * M is the preconditioning matrix, with rows/cols corresponding to elements of G.
+	 *
+	 *
+	 * @param xvec vector x, indexed 1..|G|
+	 * @param G set, boolean vector 1..npairs.
+	 * @return vector indexed 1..|G|
+	 */
+	public double[] multiply(double[] xvec, boolean[] G) {
+		int n = X.n;
+		double[][] y, x;
+		x = vector2blocks(n, xvec, G);
+		y = multiply(x);
+		return blocks2vector(n, y, G);
+	}
 	public Matrix[] toMatrix() {
 		int[] m = X.m;
 		int n = X.n;
@@ -256,4 +328,40 @@ public class Preconditioner {
 		return new Matrix[]{LL, UU};
 	}
 
+	public static void main(String[] args) {
+		int n=4;
+		int npairs = n * (n - 1) / 2;
+		Random rand = new Random();
+		rand.setSeed(100);
+
+		boolean[] G = new boolean[npairs + 1];
+		int nG = 0;
+		for (int i = 1; i <= npairs; i++) {
+			//G[i] = rand.nextBoolean();
+			G[i] = true;
+			if (G[i])
+				nG++;
+		}
+		//Arrays.fill(G, true);
+
+		boolean[][] gcell = DualPCG.mask2blockmask(n, G);
+		BlockXMatrix X = new BlockXMatrix(n, gcell);
+		Preconditioner M = new Preconditioner(X,3);
+
+		double[] v = new double[nG+1];
+		//for(int i=1;i<=nG;i++)
+		//	v[i] = rand.nextDouble();
+		v[4] = 1;
+
+		double[] u = M.multiply(v,G);
+		double[] v2 = M.solve(u,G);
+		double diff = 0.0;
+		for(int i=1;i<=nG;i++) {
+			diff += (v2[i] - v[i]) * (v2[i] - v[i]);
+			System.err.println(i+"\t"+v[i]+"\t"+v2[i]);
+		}
+		System.err.println("Testing preconditioner multiply and solve. Should be zero: "+diff);
+		System.err.println();
+
+	}
 }
