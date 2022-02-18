@@ -165,56 +165,7 @@ public class Preconditioner {
 	}
 
 	public double[][] solve(double[][] y) {
-		int n = X.n;
-		double[][] eta = new double[n][];
-		double[][] nu = new double[n][];
-		int[] m = X.m;
-
-		//eta = L^{-1} y
-		if (m[1] > 0) {
-			eta[1] = L[1].solveL(y[1]);
-		}
-		for (int i = 2; i <= n - 2; i++) {
-			if (m[i] > 0) {
-				if (m[i - 1] > 0)
-					//eta[i] = L[i]^{-1} (y[i] - B[i-1] U[i-1]^{-1} eta[i-1]
-					eta[i] = L[i].solveL(minus(y[i], X.B[i - 1].multiply(U[i - 1].solveU(eta[i - 1]))));
-				else
-					//eta[i] = L[i]^{-1} y[i]
-					eta[i] = L[i].solveL(y[i]);
-			}
-		}
-		if (m[n - 1] > 0) {
-			double[] v = y[n - 1].clone();
-			for (int i = 1; i <= n - 2; i++) {
-				if (m[i] > 0) {
-					v = minus(v, Y[i].multiply(U[i].solveU(eta[i])));
-				}
-			}
-			eta[n - 1] = L[n - 1].solveL(v);
-		}
-
-		//nu = U^{-1} eta.
-		if (m[n - 1] > 0) {
-			nu[n - 1] = U[n - 1].solveU(eta[n - 1]);
-		}
-		if (m[n - 2] > 0) {
-			if (m[n - 1] > 0)
-				nu[n - 2] = U[n - 2].solveU(minus(eta[n - 2], L[n - 2].solveL(Z[n - 2].multiplyTranspose(nu[n - 1]))));
-			else
-				nu[n - 2] = U[n - 2].solveU(eta[n - 2]);
-		}
-		for (int i = n - 3; i >= 1; i--) {
-			if (m[i] > 0) {
-				double[] v = eta[i].clone();
-				if (m[i + 1] > 0)
-					v = minus(v, L[i].solveL(X.B[i].multiplyTranspose(nu[i + 1])));
-				if (m[n - 1] > 0)
-					v = minus(v, L[i].solveL(Z[i].multiplyTranspose(nu[n - 1])));
-				nu[i] = U[i].solveU(v);
-			}
-		}
-		return nu;
+		return solveU(solveL(y));
 	}
 
 	/**
@@ -239,25 +190,31 @@ public class Preconditioner {
 	 * @return Mx
 	 */
 	public double[][] multiply(double[][] x) {
-		//v = Ux.
-		int n=X.n;
-		double[][] v = new double[n][];
-		double[][] y = new double[n][];
-		for (int i=1;i<n-1;i++) {
-			if (X.m[i]>0) {
-				v[i]=U[i].multiply(x[i]);
-				if (i<n-2 && X.m[i+1]>0) {
-					v[i] = add(v[i],L[i].multiply(X.B[i].multiplyTranspose(x[i+1])));
-				}
-				if (X.m[n-1]>0) {
-					v[i] = add(v[i],L[i].solveL(Z[i].multiplyTranspose(x[n-1])));
-				}
-			}
-		}
-		if (X.m[n-1]>0) {
-			v[n-1] = U[n-1].multiply(x[n-1]);
-		}
+		return multiplyL(multiplyU(x));
+	}
+
+	/**
+	 * Computes y = Mx.
+	 * M is the preconditioning matrix, with rows/cols corresponding to elements of G.
+	 *
+	 *
+	 * @param xvec vector x, indexed 1..|G|
+	 * @param G set, boolean vector 1..npairs.
+	 * @return vector indexed 1..|G|
+	 */
+	public double[] multiply(double[] xvec, boolean[] G) {
+		int n = X.n;
+		double[][] y, x;
+		x = vector2blocks(n, xvec, G);
+		y = multiply(x);
+		return blocks2vector(n, y, G);
+	}
+
+	public double[][] multiplyL(double[][] v) {
 		//y = Lv
+		int n=X.n;
+		double[][] y = new double[n][];
+
 		for (int i=1;i<n-1;i++) {
 			if (X.m[i]>0) {
 				y[i]=L[i].multiply(v[i]);
@@ -275,61 +232,81 @@ public class Preconditioner {
 		}
 		return y;
 	}
-	/**
-	 * Computes y = Mx.
-	 * M is the preconditioning matrix, with rows/cols corresponding to elements of G.
-	 *
-	 *
-	 * @param xvec vector x, indexed 1..|G|
-	 * @param G set, boolean vector 1..npairs.
-	 * @return vector indexed 1..|G|
-	 */
-	public double[] multiply(double[] xvec, boolean[] G) {
-		int n = X.n;
-		double[][] y, x;
-		x = vector2blocks(n, xvec, G);
-		y = multiply(x);
-		return blocks2vector(n, y, G);
-	}
-	public Matrix[] toMatrix() {
-		int[] m = X.m;
-		int n = X.n;
-		int msum = 0;
-		for (int i = 1; i <= n - 1; i++)
-			msum += m[i];
 
-		int[][] blocks = new int[n][];
-		int index = 1;
-		for (int i = 1; i <= n - 1; i++) {
-			if (m[i] > 0) {
-				blocks[i] = new int[m[i]];
-				for (int j = 0; j < m[i]; j++) {
-					blocks[i][j] = index + j - 1;
+	public double[][] multiplyU(double[][] x){
+		//v = Ux.
+		int n=X.n;
+		double[][] v = new double[n][];
+		for (int i=1;i<n-1;i++) {
+			if (X.m[i]>0) {
+				v[i]=U[i].multiply(x[i]);
+				if (i<n-2 && X.m[i+1]>0) {
+					v[i] = add(v[i],L[i].solveL(X.B[i].multiplyTranspose(x[i+1])));
 				}
-				index += m[i];
+				if (X.m[n-1]>0) {
+					v[i] = add(v[i],L[i].solveL(Z[i].multiplyTranspose(x[n-1])));
+				}
 			}
 		}
-
-		Matrix LL = new Matrix(msum, msum);
-		Matrix UU = new Matrix(msum, msum);
-		for (int i = 1; i <= n - 1; i++) {
-			LL.setMatrix(blocks[i], blocks[i], L[i].toMatrix());
-			UU.setMatrix(blocks[i], blocks[i], U[i].toMatrix());
-			if (i < n - 1 && i > 1 && m[i - 1] > 0) {
-				LL.setMatrix(blocks[i], blocks[i - 1], X.B[i - 1].toMatrix().times(U[i - 1].toMatrix().inverse()));
-				UU.setMatrix(blocks[i - 1], blocks[i], L[i - 1].toMatrix().inverse().times(X.B[i - 1].toMatrix().transpose()));
-			}
-			if (i < n - 1 && m[n - 1] > 0) {
-				LL.setMatrix(blocks[n - 1], blocks[i], Y[i].toMatrix().times(U[i].toMatrix().inverse()));
-				UU.setMatrix(blocks[i], blocks[n - 1], L[i].toMatrix().inverse().times(Z[i].toMatrix().transpose()));
-			}
-
+		if (X.m[n-1]>0) {
+			v[n-1] = U[n-1].multiply(x[n-1]);
 		}
-		return new Matrix[]{LL, UU};
+		return v;
 	}
+
+	public double[][] solveL(double[][] y) {
+		int n=X.n;
+		double[][] eta = new double[n][];
+
+		if (X.m[1] > 0) {
+			eta[1] = L[1].solveL(y[1]);
+		}
+		for (int i = 2; i <= n - 2; i++) {
+			if (X.m[i] > 0) {
+				if (X.m[i - 1] > 0)
+					//eta[i] = L[i]^{-1} (y[i] - B[i-1] U[i-1]^{-1} eta[i-1]
+					eta[i] = L[i].solveL(minus(y[i], X.B[i - 1].multiply(U[i - 1].solveU(eta[i - 1]))));
+				else
+					//eta[i] = L[i]^{-1} y[i]
+					eta[i] = L[i].solveL(y[i]);
+			}
+		}
+		if (X.m[n - 1] > 0) {
+			double[] v = y[n - 1].clone();
+			for (int i = 1; i <= n - 2; i++) {
+				if (X.m[i] > 0) {
+					v = minus(v, Y[i].multiply(U[i].solveU(eta[i])));
+				}
+			}
+			eta[n - 1] = L[n - 1].solveL(v);
+		}
+		return eta;
+	}
+
+	public double[][] solveU(double[][] eta) {
+		int n=X.n;
+		double[][] nu = new double[n][];
+
+		if (X.m[n - 1] > 0) {
+			nu[n - 1] = U[n - 1].solveU(eta[n - 1]);
+		}
+		for(int i=n-2;i>=1;i--) {
+			if (X.m[i] > 0) {
+				double[] v = eta[i].clone();
+				if (i < n - 2 && X.m[i + 1] > 0)
+					v = minus(v, L[i].solveL(X.B[i].multiplyTranspose(nu[i + 1])));
+				if (X.m[n - 1] > 0)
+					v = minus(v, L[i].solveL(Z[i].multiplyTranspose(nu[n - 1])));
+				nu[i] = U[i].solveU(v);
+			}
+		}
+		//TODO Some efficiency gains possible here - apply L[i].solveL once instead of twice
+		return nu;
+	}
+
 
 	public static void main(String[] args) {
-		int n=4;
+		int n=20;
 		int npairs = n * (n - 1) / 2;
 		Random rand = new Random();
 		rand.setSeed(100);
@@ -337,8 +314,8 @@ public class Preconditioner {
 		boolean[] G = new boolean[npairs + 1];
 		int nG = 0;
 		for (int i = 1; i <= npairs; i++) {
-			//G[i] = rand.nextBoolean();
-			G[i] = true;
+			G[i] = rand.nextBoolean();
+			//G[i] = true;
 			if (G[i])
 				nG++;
 		}
@@ -349,19 +326,28 @@ public class Preconditioner {
 		Preconditioner M = new Preconditioner(X,3);
 
 		double[] v = new double[nG+1];
-		//for(int i=1;i<=nG;i++)
-		//	v[i] = rand.nextDouble();
-		v[4] = 1;
+		for(int i=1;i<=nG;i++)
+			v[i] = rand.nextDouble();
 
-		double[] u = M.multiply(v,G);
-		double[] v2 = M.solve(u,G);
-		double diff = 0.0;
+		double[][] vcell;
+		vcell = vector2blocks(n, v, G);
+		double[][] ucell = M.multiplyL(vcell);
+		double[][] vcell2 = M.solveL(ucell);
+		double[] v2 = blocks2vector(n,vcell2,G);
+
+		double[][] ucell2 = M.multiplyU(vcell);
+		double[][] vcell3 = M.solveU(ucell2);
+		double[] v3 = blocks2vector(n,vcell3,G);
+
+		double diff1 = 0.0, diff2=0.0;
 		for(int i=1;i<=nG;i++) {
-			diff += (v2[i] - v[i]) * (v2[i] - v[i]);
-			System.err.println(i+"\t"+v[i]+"\t"+v2[i]);
+			diff1 += (v2[i] - v[i]) * (v2[i] - v[i]);
+			diff2 += (v3[i] - v[i]) * (v3[i] - v[i]);
+			System.err.println(i+"\t"+v[i]+"\t"+v2[i]+"\t"+v3[i]);
 		}
-		System.err.println("Testing preconditioner multiply and solve. Should be zero: "+diff);
+		System.err.println("Testing preconditioner multiply and solve. Should be zero: "+diff1+"\t"+diff2);
 		System.err.println();
+
 
 	}
 }
