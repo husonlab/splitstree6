@@ -19,6 +19,7 @@
 
 package splitstree6.window;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.dialog.SetParameterDialog;
@@ -86,7 +87,7 @@ public class AttachAlgorithm {
 	public static BooleanProperty createDisableProperty(MainWindow mainWindow, Algorithm algorithm) {
 		var workflow = mainWindow.getWorkflow();
 		var disable = new SimpleBooleanProperty(false);
-		workflow.validProperty().addListener((v, o, n) -> disable.setValue(workflow.isRunning() || !n || workflow.dataNodesStream().noneMatch(d -> algorithm.getFromClass() == d.getDataBlock().getClass())));
+		disable.bind(Bindings.createBooleanBinding(() -> workflow.isRunning() || workflow.dataNodesStream().noneMatch(d -> algorithm.getFromClass() == d.getDataBlock().getClass()), workflow.validProperty()));
 		return disable;
 	}
 

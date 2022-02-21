@@ -59,6 +59,7 @@ public class UPGMA extends Distances2Trees implements IToSingleTree {
 	 */
 	public static PhyloTree computeUPGMATree(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances) throws CanceledException {
 		final var tree = new PhyloTree();
+		tree.setName("UPGMA");
 		final var ntax = distances.getNtax();
 
 		final var subtrees = new Node[ntax + 1];

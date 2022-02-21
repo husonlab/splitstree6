@@ -85,7 +85,6 @@ public class BootstrapTree extends Trees2Trees implements IFilter {
 		outputTreesBlock.getTree(1).setName(inputTrees.getTree(1).getName() + "-bootstrapped");
 	}
 
-
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
 		var dataNode = datablock.getNode();

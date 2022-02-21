@@ -62,6 +62,7 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 	 */
 	public static PhyloTree computeBioNJTree(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances) throws CanceledException {
 		final var tree = new PhyloTree();
+		tree.setName("BioNJ");
 		final var taxaHashMap = new HashMap<String, Node>();
 		final var nTax = distances.getNtax();
 		final var tax = new StringBuffer[nTax + 1];
