@@ -63,7 +63,7 @@
                             <Tooltip text="Use split weights"/>
                         </tooltip>
                     </ToggleButton>
-                    <ToggleButton fx:id="showBootstrapValuesToggleButton" mnemonicParsing="false" selected="true"
+                    <ToggleButton fx:id="showConfidenceToggleButton" mnemonicParsing="false" selected="true"
                                   text="B">
                         <tooltip>
                             <Tooltip text="Show bootstrap values or confidence values"/>

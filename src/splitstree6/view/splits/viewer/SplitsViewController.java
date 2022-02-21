@@ -76,7 +76,7 @@ public class SplitsViewController {
 	private ToggleButton useWeightsToggleButton;
 
 	@FXML
-	private ToggleButton showBootstrapValuesToggleButton;
+	private ToggleButton showConfidenceToggleButton;
 	@FXML
 	private AnchorPane innerAnchorPane;
 
@@ -185,7 +185,7 @@ public class SplitsViewController {
 	}
 
 	public ToggleButton showConfidenceToggleButton() {
-		return showBootstrapValuesToggleButton;
+		return showConfidenceToggleButton;
 	}
 
 	public ScaleBar getScaleBar() {
