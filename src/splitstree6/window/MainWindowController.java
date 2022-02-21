@@ -350,13 +350,16 @@ public class MainWindowController {
 	private MenuItem jsdMenuItem;
 
 	@FXML
-	private MenuItem bootstrappingMenuItem;
+	private MenuItem euclideanMenuItem;
 
 	@FXML
-	private MenuItem showBootStrapTreeMenuItem;
+	private MenuItem bootStrapTreeMenuItem;
 
 	@FXML
-	private MenuItem showBootStrapNetworkMenuItem;
+	private MenuItem bootstrapTreeAsNetworkMenuItem;
+
+	@FXML
+	private MenuItem bootStrapNetworkMenuItem;
 
 	@FXML
 	private MenuItem estimateInvariableSitesMenuItem;
@@ -905,16 +908,20 @@ public class MainWindowController {
 		return jsdMenuItem;
 	}
 
-	public MenuItem getBootstrappingMenuItem() {
-		return bootstrappingMenuItem;
+	public MenuItem getEuclideanMenuItem() {
+		return euclideanMenuItem;
 	}
 
-	public MenuItem getShowBootStrapTreeMenuItem() {
-		return showBootStrapTreeMenuItem;
+	public MenuItem getBootStrapTreeMenuItem() {
+		return bootStrapTreeMenuItem;
 	}
 
-	public MenuItem getShowBootStrapNetworkMenuItem() {
-		return showBootStrapNetworkMenuItem;
+	public MenuItem getBootstrapTreeAsNetworkMenuItem() {
+		return bootstrapTreeAsNetworkMenuItem;
+	}
+
+	public MenuItem getBootStrapNetworkMenuItem() {
+		return bootStrapNetworkMenuItem;
 	}
 
 	public MenuItem getEstimateInvariableSitesMenuItem() {

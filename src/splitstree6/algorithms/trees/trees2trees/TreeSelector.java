@@ -73,7 +73,6 @@ public class TreeSelector extends Trees2Trees implements IFilter {
 		this.optionWhich.set(optionWhich);
 	}
 
-
 	@Override
 	public boolean isActive() {
 		return optionWhich.get() > 0;

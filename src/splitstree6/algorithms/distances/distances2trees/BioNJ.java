@@ -23,6 +23,7 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.trees.IToSingleTree;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -40,7 +41,7 @@ import java.util.HashMap;
  * @author David Bryant and Daniel Huson
  */
 
-public class BioNJ extends Distances2Trees {
+public class BioNJ extends Distances2Trees implements IToSingleTree {
 
 	@Override
 	public String getCitation() {

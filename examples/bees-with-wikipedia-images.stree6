@@ -1,9 +1,9 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=8 nAlgorithms=5;
+DIMENSIONS nDataNodes=10 nAlgorithms=7;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1644924518918'; [Tue Feb 15 12:28:38 CET 2022]
+WORKFLOW creationDate='1645447349298'; [Mon Feb 21 13:42:29 CET 2022]
 END; [SPLITSTREE6]
 
 [
@@ -12,9 +12,12 @@ Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 6 taxa and 6 DNA sequences of length 677.
 The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 6 x 6 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 11 splits, cyclic.
+The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
+The Bootstrap Splits method was used (default options) so as to obtain 11 splits, cyclic.
 
 References:
 Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255– 265, 2004.
+Dress & Huson 2004: A.W.M. Dress and D.H. Huson, Constructing splits graphs, IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.
 Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
 Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
 ]
@@ -38,6 +41,7 @@ DISPLAYLABELS
 	[5] 'A.FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
 	[6] 'A.KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
+[TAXINFO;]
 END; [TAXA]
 
 BEGIN ALGORITHM;
@@ -67,6 +71,7 @@ DISPLAYLABELS
 	[5] '  A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
 	[6] ' A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
+[TAXINFO;]
 END; [TAXA]
 
 BEGIN CHARACTERS;
@@ -283,6 +288,17 @@ OPTIONS
 	View = 'SplitsNetwork';
 END; [ALGORITHM]
 
+BEGIN ALGORITHM;
+TITLE 'Bootstrap Splits';
+LINK SPLITS = 'Splits';
+NAME 'Bootstrap Splits';
+OPTIONS
+	Replicates = 100,
+	MinPercent = 10,
+	ShowAllSplits = 'false',
+	RandomSeed = 42;
+END; [ALGORITHM]
+
 BEGIN VIEW;
 TITLE 'Splits Network';
 LINK ALGORITHM = 'Show Splits';
@@ -297,5 +313,52 @@ OPTIONS
 	FontScaleFactor = 1,
 	RootAngle = 160,
 	OutlineFill = 0x800080ff,
-	Edits = 'c:6:0x808000ff' 'w:6:10' 'a:6:-30';
+	ShowConfidence = 'false';
+END; [VIEW]
+
+BEGIN SPLITS;
+TITLE 'Splits';
+LINK ALGORITHM = 'Bootstrap Splits';
+DIMENSIONS ntax=6 nsplits=11;
+FORMAT labels=no weights=yes confidences=yes;
+PROPERTIES fit=-1 cyclic;
+CYCLE 1 5 4 2 3 6;
+MATRIX
+[1, size=1] 	 0.0012717 	 56 	 1,
+[2, size=2] 	 0.03321419 	 98 	 1 5,
+[3, size=2] 	 0.01020673 	 98 	 1 4 5 6,
+[4, size=3] 	 0.00874623 	 91 	 1 5 6,
+[5, size=2] 	 0.0063885 	 55 	 1 2 4 5,
+[6, size=1] 	 0.04706935 	 100 	 1 2 4 5 6,
+[7, size=1] 	 0.03328578 	 99 	 1 3 4 5 6,
+[8, size=2] 	 0.00884173 	 86 	 1 3 5 6,
+[9, size=1] 	 0.00405412 	 94 	 1 2 3 4 6,
+[10, size=1] 	 0.03635105 	 99 	 1 2 3 4 5,
+[11, size=1] 	 0.04517012 	 100 	 1 2 3 5 6,
+;
+END; [SPLITS]
+
+BEGIN ALGORITHM;
+TITLE 'Show Splits-2';
+LINK SPLITS = 'Splits';
+NAME 'Show Splits';
+OPTIONS
+	View = 'SplitsNetwork';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Splits Network';
+LINK ALGORITHM = 'Show Splits-2';
+NAME 'Splits Network';
+INPUT 'SPLITS';
+OPTIONS
+	Diagram = 'Outline',
+	Orientation = 'Rotate0Deg',
+	Rooting = 'None',
+	UseWeights = 'true',
+	ZoomFactor = 1,
+	FontScaleFactor = 1,
+	RootAngle = 160,
+	OutlineFill = 0x800080ff,
+	ShowConfidence = 'true';
 END; [VIEW]

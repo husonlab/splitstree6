@@ -130,7 +130,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 					controller.getFitLabel().setText(StringUtils.removeTrailingZerosAfterDot(String.format("Fit: %.2f", n.getFit())));
 				} else
 					controller.getFitLabel().setText("");
+				if (controller.showConfidenceToggleButton().isSelected() && !n.hasConfidenceValues())
+					controller.showConfidenceToggleButton().setSelected(false);
 			}
+			controller.showConfidenceToggleButton().setDisable(splitsBlock.get() == null || !splitsBlock.get().hasConfidenceValues());
 		});
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagramTypes, null));
@@ -164,6 +167,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 
 		controller.getUseWeightsToggleButton().selectedProperty().bindBidirectional(splitsView.optionUseWeightsProperty());
+
+		controller.showConfidenceToggleButton().selectedProperty().bindBidirectional(splitsView.optionShowConfidenceProperty());
+
+
 		controller.getScaleBar().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()).and(showScaleBar));
 		controller.getScaleBar().factorXProperty().bind(splitsView.optionZoomFactorProperty());
 
@@ -184,7 +191,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 					splitsView.getSplitSelectionModel(), nodeShapeMap, splitShapeMap, loopViews,
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
 					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionUseWeightsProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
-					controller.getScaleBar().unitLengthXProperty());
+					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty());
 			splitNetworkPane.set(pane);
 			pane.setRunAfterUpdate(() -> {
 				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {

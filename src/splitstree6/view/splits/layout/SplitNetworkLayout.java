@@ -20,11 +20,14 @@
 package splitstree6.view.splits.layout;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -38,6 +41,7 @@ import jloda.graph.NodeArray;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
+import jloda.util.StringUtils;
 import jloda.util.Triplet;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
@@ -85,7 +89,7 @@ public class SplitNetworkLayout {
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
 					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
 					   ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
-					   ObservableList<LoopView> loopViews, DoubleProperty unitLength,
+					   ObservableList<LoopView> loopViews, ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
 					   double width, double height) throws IOException {
 
 		labelLayout.clear();
@@ -240,6 +244,11 @@ public class SplitNetworkLayout {
 		}
 
 		var edgesGroup = new Group();
+
+
+		var confidenceLabels = new Group();
+		var splitsWithConfidenceLabels = new BitSet();
+
 		for (var e : graph.edges()) {
 			var line = new Line();
 			line.getStyleClass().add("graph-edge");
@@ -253,9 +262,21 @@ public class SplitNetworkLayout {
 			edgeCallback.accept(e, line);
 			edgesGroup.getChildren().add(line);
 
+
 			var split = graph.getSplit(e);
 			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
 			progress.incrementProgress();
+
+			if (split <= splitsBlock.getNsplits() && splitsBlock.get(split).getConfidence() != -1 && !splitsWithConfidenceLabels.get(split)) {
+				splitsWithConfidenceLabels.set(split);
+				var label = new Label(StringUtils.removeTrailingZerosAfterDot("%.1f", splitsBlock.get(split).getConfidence()));
+				if (false)
+					label.setStyle("-fx-background-color: rgba(128,128,128,0.2)");
+				placeLabel(line, label);
+				label.effectProperty().bind(line.effectProperty());
+				installTranslateUsingLayout(label, () -> splitSelectionModel.select(split));
+				confidenceLabels.getChildren().add(label);
+			}
 		}
 
 		var loopsGroup = new Group();
@@ -266,7 +287,40 @@ public class SplitNetworkLayout {
 		}
 		progress.reportTaskCompleted();
 
-		return new Group(loopsGroup, edgesGroup, nodesGroup, nodeLabelsGroup);
+		confidenceLabels.visibleProperty().bind(showConfidence);
+
+		return new Group(loopsGroup, edgesGroup, confidenceLabels, nodesGroup, nodeLabelsGroup);
+	}
+
+	private void placeLabel(Line line, Label label) {
+		InvalidationListener listener = e -> {
+			var dir = new Point2D(line.getEndX() - line.getStartX(), line.getEndY() - line.getStartY()).normalize().multiply(12);
+			label.setTranslateX(0.5 * (line.getStartX() + line.getEndX()) - dir.getY() - 12);
+			label.setTranslateY(0.5 * (line.getStartY() + line.getEndY()) + dir.getX() - 12);
+		};
+		line.startXProperty().addListener(listener);
+		line.startYProperty().addListener(listener);
+		line.endXProperty().addListener(listener);
+		line.endYProperty().addListener(listener);
+		listener.invalidated(null);
+	}
+
+	private double mouseX;
+	private double mouseY;
+
+	private void installTranslateUsingLayout(javafx.scene.Node node, Runnable select) {
+		node.setOnMousePressed(e -> {
+			mouseX = e.getSceneX();
+			mouseY = e.getSceneY();
+			select.run();
+		});
+
+		node.setOnMouseDragged(e -> {
+			node.setLayoutX(node.getLayoutX() + (e.getSceneX() - mouseX));
+			node.setLayoutY(node.getLayoutY() + (e.getSceneY() - mouseY));
+			mouseX = e.getSceneX();
+			mouseY = e.getSceneY();
+		});
 	}
 
 	private void rotate90(PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap) {

@@ -72,6 +72,9 @@ public class SplitsView implements IView {
 
 	private final BooleanProperty optionUseWeights = new SimpleBooleanProperty(this, "optionUseWeights");
 
+	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence", true);
+
+
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
@@ -93,7 +96,7 @@ public class SplitsView implements IView {
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionUseWeights.getName(), optionZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName());
+				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(), optionShowConfidence.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -291,6 +294,18 @@ public class SplitsView implements IView {
 
 	public ObjectProperty<Color> optionOutlineFillProperty() {
 		return optionOutlineFill;
+	}
+
+	public boolean isOptionShowConfidence() {
+		return optionShowConfidence.get();
+	}
+
+	public BooleanProperty optionShowConfidenceProperty() {
+		return optionShowConfidence;
+	}
+
+	public void setOptionShowConfidence(boolean optionShowConfidence) {
+		this.optionShowConfidence.set(optionShowConfidence);
 	}
 
 	public Bounds getTargetBounds() {

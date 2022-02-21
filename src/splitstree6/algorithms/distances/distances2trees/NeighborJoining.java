@@ -24,6 +24,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.trees.IToSingleTree;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -35,7 +36,7 @@ import java.util.BitSet;
  *
  * @author Daniel Huson, 12.2020
  */
-public class NeighborJoining extends Distances2Trees {
+public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 	@Override
 	public String getCitation() {
 		return "Saitou and Nei 1987; " +
@@ -49,7 +50,9 @@ public class NeighborJoining extends Distances2Trees {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances, TreesBlock trees) throws CanceledException {
 		trees.setPartial(false);
 		trees.setRooted(true);
-		trees.getTrees().setAll(computeNJTree(progress, taxaBlock, distances));
+		var tree = computeNJTree(progress, taxaBlock, distances);
+		tree.setName("NJ");
+		trees.getTrees().setAll(tree);
 	}
 
 	private PhyloTree computeNJTree(ProgressListener progressListener, TaxaBlock taxaBlock, DistancesBlock distances) throws CanceledException {

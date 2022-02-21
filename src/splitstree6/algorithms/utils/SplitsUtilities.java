@@ -340,4 +340,19 @@ public class SplitsUtilities {
 		}
 		return result;
 	}
+
+	public static void addAllTrivial(int ntaxa, SplitsBlock splits) {
+		if (ntaxa > 2) {
+			final var taxaWithTrivialSplit = new BitSet();
+
+			for (var s = 1; s <= splits.getNsplits(); s++) {
+				final var split = splits.get(s);
+				if (split.isTrivial())
+					taxaWithTrivialSplit.set(split.getSmallerPart().nextSetBit(0));
+			}
+			for (var t = taxaWithTrivialSplit.nextClearBit(1); t != -1 && t <= ntaxa; t = taxaWithTrivialSplit.nextClearBit(t + 1)) {
+				splits.getSplits().add(new ASplit(BitSetUtils.asBitSet(t), ntaxa, 0.00001));
+			}
+		}
+	}
 }

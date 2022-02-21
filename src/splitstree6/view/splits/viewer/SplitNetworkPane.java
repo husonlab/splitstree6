@@ -75,7 +75,7 @@ public class SplitNetworkPane extends StackPane {
 							SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting,
 							double rootAngle,
 							ReadOnlyBooleanProperty useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
-							DoubleProperty unitLength) {
+							ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength) {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
 
@@ -113,8 +113,7 @@ public class SplitNetworkPane extends StackPane {
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
 					rootAngle, useWeights.get(), taxonSelectionModel, splitSelectionModel, nodeShapeMap, splitShapeMap,
-					loopViews,
-					unitLength, getPrefWidth() - 4, getPrefHeight() - 16);
+					loopViews, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());

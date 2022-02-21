@@ -36,18 +36,21 @@ public final class ASplit implements Comparable<ASplit> {
 
 	/**
 	 * constructor
-	 *
 	 */
 	public ASplit(BitSet A, int ntax) {
-		this(A, ntax, 1, 1);
+		this(A, ntax, 1, -1);
+	}
+
+	public ASplit(ASplit src) {
+		this(src.getA(), src.getB(), src.getWeight(), src.getConfidence());
+		setLabel(src.getLabel());
 	}
 
 	/**
 	 * constructor
-	 *
 	 */
 	public ASplit(BitSet A, int ntax, double weight) {
-		this(A, ntax, weight, 1);
+		this(A, ntax, weight, -1);
 	}
 
 	/**
@@ -71,7 +74,7 @@ public final class ASplit implements Comparable<ASplit> {
 	 *
 	 */
 	public ASplit(BitSet A, BitSet B) {
-		this(A, B, 1, 1);
+		this(A, B, 1, -1);
 	}
 
 	/**
@@ -79,7 +82,7 @@ public final class ASplit implements Comparable<ASplit> {
 	 *
 	 */
 	public ASplit(BitSet A, BitSet B, double weight) {
-		this(A, B, weight, 1);
+		this(A, B, weight, -1);
 	}
 
 	/**
@@ -240,7 +243,7 @@ public final class ASplit implements Comparable<ASplit> {
 	@Override
 	public boolean equals(Object obj) {
 		if (obj instanceof final ASplit that) {
-			return this.A.equals(that.A) && this.B.equals(that.B);
+			return getPartContaining(1).equals(that.getPartContaining(1)) && getPartNotContaining(1).equals(that.getPartNotContaining(1));
 		} else
 			return false;
 	}
@@ -267,5 +270,10 @@ public final class ASplit implements Comparable<ASplit> {
 
 	public boolean separates(int a, int b) {
 		return getPartContaining(a) != getPartContaining(b);
+	}
+
+	@Override
+	public int hashCode() {
+		return getPartContaining(1).hashCode();
 	}
 }
