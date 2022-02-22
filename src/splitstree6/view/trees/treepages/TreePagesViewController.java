@@ -64,6 +64,9 @@ public class TreePagesViewController {
 	private ToggleButton showTreeNamesToggleButton;
 
 	@FXML
+	private ToggleButton showInternalLabelsToggleButton;
+
+	@FXML
 	private ComboBox<PhyloTree> treeCBox;
 
 	@FXML
@@ -151,6 +154,10 @@ public class TreePagesViewController {
 
 	public ToggleButton getShowTreeNamesToggleButton() {
 		return showTreeNamesToggleButton;
+	}
+
+	public ToggleButton getShowInternalLabelsToggleButton() {
+		return showInternalLabelsToggleButton;
 	}
 
 	public ComboBox<PhyloTree> getTreeCBox() {

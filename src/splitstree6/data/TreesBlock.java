@@ -26,6 +26,10 @@ import splitstree6.algorithms.trees.trees2trees.TreesTaxaFilter;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
+/**
+ * trees data block
+ * Daniel Huson, 2004, 2.2022
+ */
 public class TreesBlock extends DataBlock {
 	private final ObservableList<PhyloTree> trees;
 	private boolean partial = false; // are partial trees present?
@@ -88,6 +92,7 @@ public class TreesBlock extends DataBlock {
 	public void setReticulated(boolean reticulated) {
 		this.reticulated = reticulated;
 	}
+
 
 	/**
 	 * get t-th tree

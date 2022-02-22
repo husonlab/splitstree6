@@ -92,6 +92,9 @@ public class TanglegramViewController {
 	private ToggleButton showTreeNamesToggleButton;
 
 	@FXML
+	private ToggleButton showInternalLabelsToggleButton;
+
+	@FXML
 	private BorderPane borderPane;
 
 	@FXML
@@ -228,6 +231,10 @@ public class TanglegramViewController {
 
 	public ToggleButton getShowTreeNamesToggleButton() {
 		return showTreeNamesToggleButton;
+	}
+
+	public ToggleButton getShowInternalLabelsToggleButton() {
+		return showInternalLabelsToggleButton;
 	}
 
 	public Pane getLeftPane() {

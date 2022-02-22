@@ -23,5 +23,9 @@ package splitstree6.view.splits.viewer;
  * Daniel Huson, 12.2021
  */
 public enum SplitsDiagramType {
-    Outline, Splits
+    Outline, Splits, OutlineTopology, SplitsTopology;
+
+    public boolean useWeights() {
+        return this == Outline || this == Splits;
+    }
 }

@@ -138,6 +138,7 @@ public class InteractionSetup {
 
 	public TriConsumer<jloda.graph.Node, Shape, RichTextLabel> createNodeCallback() {
         return (v, shape, label) -> Platform.runLater(() -> {
+
             if (v.getOwner() instanceof PhyloGraph phyloGraph) {
                 for (var t : phyloGraph.getTaxa(v)) {
                     if (t <= taxaBlock.getNtax()) {
@@ -155,7 +156,7 @@ public class InteractionSetup {
                         };
 						label.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
 						shape.setOnMouseClicked(mouseClickedHandler);
-                        label.setOnMouseClicked(mouseClickedHandler);
+						label.setOnMouseClicked(mouseClickedHandler);
 
 						if (taxonSelectionModel.isSelected(taxon)) {
 							shape.setEffect(SelectionEffectBlue.getInstance());

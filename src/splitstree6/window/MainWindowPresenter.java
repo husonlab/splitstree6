@@ -69,6 +69,7 @@ import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork;
 import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
+import splitstree6.data.CharactersBlock;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
 import splitstree6.io.FileLoader;
@@ -467,13 +468,13 @@ public class MainWindowPresenter {
 		controller.getJsdMenuItem().setOnAction(null);
 
 		controller.getBootStrapTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTree()));
-		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree()));
+		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
 
 		controller.getBootstrapTreeAsNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BoostrapTreeSplits()));
-		controller.getBootstrapTreeAsNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BoostrapTreeSplits()));
+		controller.getBootstrapTreeAsNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BoostrapTreeSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
 
 		controller.getBootStrapNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapSplits()));
-		controller.getBootStrapNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapSplits()));
+		controller.getBootStrapNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
 
 		controller.getEstimateInvariableSitesMenuItem().setOnAction(null);
 		controller.getComputePhylogeneticDiversityMenuItem().setOnAction(null);

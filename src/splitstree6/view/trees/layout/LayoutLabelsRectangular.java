@@ -63,9 +63,11 @@ public class LayoutLabelsRectangular {
 									label.setUserData(labelConnector);
 									labelConnectors.getChildren().add(labelConnector);
 								}
-							} else
+								label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+							} else {
 								label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty()).subtract(0.5));
-							label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+								label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty()));
+							}
 						} else {
 							if (tree.isLsaLeaf(v)) {
 								var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
@@ -77,9 +79,11 @@ public class LayoutLabelsRectangular {
 									labelConnectors.getChildren().add(labelConnector);
 									label.setUserData(labelConnector);
 								}
-							} else
+								label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
+							} else {
 								label.setTranslateX(shape.getTranslateX() - label.getWidth() - 0.5);
-							label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
+								label.setTranslateY(shape.getTranslateY() - label.getHeight());
+							}
 						}
 					}
 				};

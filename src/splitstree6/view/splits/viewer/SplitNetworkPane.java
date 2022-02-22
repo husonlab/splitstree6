@@ -21,7 +21,6 @@ package splitstree6.view.splits.viewer;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -74,7 +73,7 @@ public class SplitNetworkPane extends StackPane {
 							ObservableList<LoopView> loopViews, double boxWidth, double boxHeight,
 							SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting,
 							double rootAngle,
-							ReadOnlyBooleanProperty useWeights, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+							ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 							ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength) {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
@@ -99,7 +98,6 @@ public class SplitNetworkPane extends StackPane {
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
 		layoutLabelsListener = e -> layoutLabels(orientation.get());
-		useWeights.addListener(new WeakInvalidationListener(layoutLabelsListener));
 
 		redrawListener = e -> drawNetwork();
 
@@ -112,7 +110,7 @@ public class SplitNetworkPane extends StackPane {
 				return new Group();
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
-					rootAngle, useWeights.get(), taxonSelectionModel, splitSelectionModel, nodeShapeMap, splitShapeMap,
+					rootAngle, taxonSelectionModel, splitSelectionModel, nodeShapeMap, splitShapeMap,
 					loopViews, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16);
 
 			result.setId("networkGroup");

@@ -26,7 +26,7 @@ import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * greedily compute compatible splits
@@ -38,7 +38,7 @@ public class GreedyCompatible {
 	 *
 	 * @return compatible splits
 	 */
-	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits) throws CanceledException {
+	public static ArrayList<ASplit> apply(ProgressListener progress, final Collection<ASplit> splits) throws CanceledException {
 		progress.setSubtask("Greedy compatible");
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);

@@ -90,6 +90,8 @@ public class TreePagesView implements IView {
 
 	private final ObjectProperty<TreeLabels> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
+	private final BooleanProperty optionShowInternalLabels = new SimpleBooleanProperty(this, "optionShowInternalLabels");
+
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
@@ -102,12 +104,13 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionAveraging, ComputeHeightAndAngles.Averaging::valueOf, ComputeHeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionTreeLabels, TreeLabels::valueOf, TreeLabels.Name);
+		ProgramProperties.track(optionShowInternalLabels, true);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(),
 				pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName(),
-				optionTreeLabels.getName());
+				optionTreeLabels.getName(), optionShowInternalLabels.getName());
 	}
 
 	/**
@@ -118,7 +121,6 @@ public class TreePagesView implements IView {
 		this.name.set(name);
 		var loader = new ExtendedFXMLLoader<TreePagesViewController>(TreePagesViewController.class);
 		controller = loader.getController();
-
 
 		// this is the target area for the tree page:
 		presenter = new TreePagesViewPresenter(mainWindow, this, targetBounds, getTrees());
@@ -237,6 +239,18 @@ public class TreePagesView implements IView {
 
 	public void setOptionOrientation(LayoutOrientation optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
+	}
+
+	public boolean isOptionShowInternalLabels() {
+		return optionShowInternalLabels.get();
+	}
+
+	public BooleanProperty optionShowInternalLabelsProperty() {
+		return optionShowInternalLabels;
+	}
+
+	public void setOptionShowInternalLabels(boolean optionShowInternalLabels) {
+		this.optionShowInternalLabels.set(optionShowInternalLabels);
 	}
 
 	public Pane getRoot() {

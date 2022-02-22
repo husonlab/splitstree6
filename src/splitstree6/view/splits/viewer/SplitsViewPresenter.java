@@ -123,17 +123,20 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			} else {
 				if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic) {
 					disabledDiagramTypes.add(SplitsDiagramType.Outline);
+					disabledDiagramTypes.add(SplitsDiagramType.OutlineTopology);
 					if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline)
 						Platform.runLater(() -> splitsView.setOptionDiagram(SplitsDiagramType.Splits));
+					if (splitsView.getOptionDiagram() == SplitsDiagramType.OutlineTopology)
+						Platform.runLater(() -> splitsView.setOptionDiagram(SplitsDiagramType.SplitsTopology));
 				}
 				if (n.getFit() > 0) {
 					controller.getFitLabel().setText(StringUtils.removeTrailingZerosAfterDot(String.format("Fit: %.2f", n.getFit())));
 				} else
 					controller.getFitLabel().setText("");
-				if (controller.showConfidenceToggleButton().isSelected() && !n.hasConfidenceValues())
-					controller.showConfidenceToggleButton().setSelected(false);
+				if (controller.showInternalLabelsToggleButton().isSelected() && !n.hasConfidenceValues())
+					controller.showInternalLabelsToggleButton().setSelected(false);
 			}
-			controller.showConfidenceToggleButton().setDisable(splitsBlock.get() == null || !splitsBlock.get().hasConfidenceValues());
+			controller.showInternalLabelsToggleButton().setDisable(splitsBlock.get() == null || !splitsBlock.get().hasConfidenceValues());
 		});
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagramTypes, null));
@@ -166,15 +169,14 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 
-		controller.getUseWeightsToggleButton().selectedProperty().bindBidirectional(splitsView.optionUseWeightsProperty());
 
-		controller.showConfidenceToggleButton().selectedProperty().bindBidirectional(splitsView.optionShowConfidenceProperty());
+		controller.showInternalLabelsToggleButton().selectedProperty().bindBidirectional(splitsView.optionShowConfidenceProperty());
 
-
-		controller.getScaleBar().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()).and(showScaleBar));
+		controller.getScaleBar().visibleProperty().bind((splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.Outline).or(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.Splits)))
+				.and(splitsView.emptyProperty().not()).and(showScaleBar));
 		controller.getScaleBar().factorXProperty().bind(splitsView.optionZoomFactorProperty());
 
-		controller.getFitLabel().visibleProperty().bind(controller.getUseWeightsToggleButton().selectedProperty().and(splitsView.emptyProperty().not()).and(showScaleBar));
+		controller.getFitLabel().visibleProperty().bind(controller.getScaleBar().visibleProperty());
 
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
 		targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40)));
@@ -190,7 +192,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
 					splitsView.getSplitSelectionModel(), nodeShapeMap, splitShapeMap, loopViews,
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
-					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionUseWeightsProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
+					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty());
 			splitNetworkPane.set(pane);
 			pane.setRunAfterUpdate(() -> {
@@ -225,7 +227,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		splitsBlock.addListener(updateListener);
 		splitsView.optionDiagramProperty().addListener(updateListener);
 		splitsView.optionRootingProperty().addListener(updateListener);
-		splitsView.optionUseWeightsProperty().addListener(updateListener);
 
 		controller.getZoomInButton().setOnAction(e -> splitsView.setOptionZoomFactor(1.1 * splitsView.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(splitsView.emptyProperty().or(splitsView.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
@@ -260,7 +261,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		var undoManager = splitsView.getUndoManager();
 
 		splitsView.optionRootAngleProperty().addListener((c, o, n) -> undoManager.add("set root angle", splitsView.optionRootAngleProperty(), o, n));
-		splitsView.optionUseWeightsProperty().addListener((v, o, n) -> undoManager.add("set use weights", splitsView.optionUseWeightsProperty(), o, n));
 		splitsView.optionRootingProperty().addListener((c, o, n) -> undoManager.add("set rooting", splitsView.optionRootingProperty(), o, n));
 		splitsView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" set diagram", splitsView.optionDiagramProperty(), o, n));
 		splitsView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" set layout orientatio", splitsView.optionOrientationProperty(), o, n));
@@ -325,7 +325,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
-		mainController.getShowScaleBarMenuItem().disableProperty().bind(splitsView.optionUseWeightsProperty().not());
+		mainController.getShowScaleBarMenuItem().disableProperty().bind(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.SplitsTopology).or(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.OutlineTopology)));
 
 		mainController.getRotateLeftMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateLeft()));
 		mainController.getRotateLeftMenuItem().disableProperty().bind(splitsView.emptyProperty());

@@ -23,8 +23,11 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import jloda.graph.Node;
+import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.IFilter;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
 import splitstree6.algorithms.trees.IToSingleTree;
@@ -37,13 +40,15 @@ import splitstree6.data.parts.Compatibility;
 import splitstree6.workflow.Workflow;
 
 import java.io.IOException;
+import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
 
 /**
  * Bootstrapping tree
  * Daniel Huson, 2.2022
  */
-public class BootstrapTree extends Trees2Trees implements IFilter {
+public class BootstrapTree extends Trees2Trees {
 	private final IntegerProperty optionReplicates = new SimpleIntegerProperty(this, "optionReplicates", 100);
 	private final DoubleProperty optionMinPercent = new SimpleDoubleProperty(this, "optionMinPercent", 10.0);
 	private final IntegerProperty optionRandomSeed = new SimpleIntegerProperty(this, "optionRandomSeed", 42);
@@ -61,6 +66,8 @@ public class BootstrapTree extends Trees2Trees implements IFilter {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputTrees, TreesBlock outputTreesBlock) throws IOException {
 		setOptionReplicates(Math.max(1, optionReplicates.get()));
+
+		setShortDescription(String.format("bootstrapping using %d replicates", getOptionReplicates()));
 
 		var tree = inputTrees.getTree(1);
 		var inputSplits = new SplitsBlock();
@@ -82,7 +89,34 @@ public class BootstrapTree extends Trees2Trees implements IFilter {
 		bootstrapSplits.compute(progress, taxaBlock, inputSplits, inputTrees.getNode(), outputSplits);
 		var greedyTree = new GreedyTree();
 		greedyTree.compute(progress, taxaBlock, outputSplits, outputTreesBlock);
+		applyBootstrapValues(outputSplits, outputTreesBlock.getTree(1));
 		outputTreesBlock.getTree(1).setName(inputTrees.getTree(1).getName() + "-bootstrapped");
+	}
+
+	private void applyBootstrapValues(SplitsBlock splitsBlock, PhyloTree tree) {
+		var nodeClusterMap = new HashMap<Node, BitSet>();
+		tree.postorderTraversal(v -> {
+			var bits = BitSetUtils.asBitSet(tree.getTaxa(v));
+			for (var w : v.children()) {
+				bits.or(nodeClusterMap.get(w));
+			}
+			nodeClusterMap.put(v, bits);
+		});
+
+		var clusterNodeMap = new HashMap<BitSet, Node>();
+		for (var entry : nodeClusterMap.entrySet()) {
+			if (!entry.getKey().isLeaf())
+				clusterNodeMap.put(entry.getValue(), entry.getKey());
+		}
+
+		for (var split : splitsBlock.getSplits()) {
+			var a = clusterNodeMap.get(split.getA());
+			if (a != null)
+				tree.setLabel(a, StringUtils.removeTrailingZerosAfterDot("%.1f", split.getConfidence()));
+			var b = clusterNodeMap.get(split.getB());
+			if (b != null)
+				tree.setLabel(b, StringUtils.removeTrailingZerosAfterDot("%.1f", split.getConfidence()));
+		}
 	}
 
 	@Override
@@ -128,10 +162,5 @@ public class BootstrapTree extends Trees2Trees implements IFilter {
 
 	public void setOptionRandomSeed(int optionRandomSeed) {
 		this.optionRandomSeed.set(optionRandomSeed);
-	}
-
-	@Override
-	public boolean isActive() {
-		return optionReplicates.get() > 0;
 	}
 }

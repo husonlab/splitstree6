@@ -22,10 +22,7 @@ package splitstree6.view.trees.tanglegram;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import javafx.stage.Stage;
@@ -50,14 +47,16 @@ public class TanglegramTreePane extends Group {
 
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation, ReadOnlyDoubleProperty fontScaleFactorProperty) {
+							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
+							  ReadOnlyDoubleProperty fontScaleFactor,
+							  ReadOnlyBooleanProperty showInternalLabels) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						var treePane = new TreePane(stage, taxaBlock, tree.get(), tree.get().getName(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), optionAveraging.get(), optionOrientation, new SimpleDoubleProperty(1.0), fontScaleFactorProperty, new SimpleObjectProperty<>(TreePagesView.TreeLabels.None));
+								optionDiagram.get(), optionAveraging.get(), optionOrientation, new SimpleDoubleProperty(1.0), fontScaleFactor, new SimpleObjectProperty<>(TreePagesView.TreeLabels.None), showInternalLabels);
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
 						getChildren().add(treePane);

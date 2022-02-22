@@ -85,9 +85,7 @@ public class NewickReader extends TreesReader {
 					if (TreesUtilities.hasNumbersOnLeafNodes(tree)) {
 						throw new IOExceptionWithLineNumber(lineno, "Leaf labels must not be numbers");
 					}
-					if (TreesUtilities.hasNumbersOnInternalNodes(tree)) {
-						TreesUtilities.changeNumbersOnInternalNodesToEdgeConfidencies(tree);
-					}
+
 					final var labelList = listNodeLabels(tree, true);
 					final var labelSet = new HashSet<>(labelList);
 					final var multiLabeled = (labelSet.size() < labelList.size());

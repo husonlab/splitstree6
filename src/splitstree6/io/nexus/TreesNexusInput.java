@@ -21,7 +21,6 @@ package splitstree6.io.nexus;
 
 import jloda.phylo.PhyloTree;
 import jloda.util.IOExceptionWithLineNumber;
-import jloda.util.NumberUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -149,7 +148,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			if (np.peekMatchRespectCase("*"))
 				np.matchRespectCase("*"); // don't know why PAUP puts this star in the file....
 
-			String name = np.getWordRespectCase();
+			var name = np.getWordRespectCase();
 			name = name.replaceAll("\\s+", "_");
 			name = name.replaceAll("[:;,]+", ".");
 			name = name.replaceAll("\\[", "(");
@@ -182,9 +181,6 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			if (translator != null)
 				tree.changeLabels(translator);
 
-			if (hasNumbersOnInternalNodes(tree))
-				changeNumbersOnInternalNodesToEdgeConfidencies(tree); // todo needs debugging
-
 			for (var v : tree.nodes()) {
 				final var label = tree.getLabel(v);
 				if (label != null && label.length() > 0) {
@@ -208,45 +204,6 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 		}
 
 		np.matchEndBlock();
-
 		return taxonNamesFound;
-	}
-
-	/**
-	 * are there any labeled internal nodes and are all such labels numbers?
-	 *
-	 * @return true, if some internal nodes labeled by numbers
-	 */
-	public boolean hasNumbersOnInternalNodes(PhyloTree tree) {
-		boolean hasNumbersOnInternalNodes = false;
-		for (var v = tree.getFirstNode(); v != null; v = v.getNext()) {
-			if (v.getOutDegree() != 0 && v.getInDegree() != 0) {
-				var label = tree.getLabel(v);
-				if (label != null) {
-					if (NumberUtils.isDouble(label))
-						hasNumbersOnInternalNodes = true;
-					else
-						return false;
-				}
-			}
-		}
-		return hasNumbersOnInternalNodes;
-	}
-
-	/**
-	 * reinterpret an numerical label of an internal node as the confidence associated with the incoming edge
-	 */
-	public void changeNumbersOnInternalNodesToEdgeConfidencies(PhyloTree tree) {
-		for (var v = tree.getFirstNode(); v != null; v = v.getNext()) {
-			if (v.getOutDegree() != 0 && v.getInDegree() == 1) {
-				var label = tree.getLabel(v);
-				if (label != null) {
-					if (NumberUtils.isDouble(label)) {
-						tree.setConfidence(v.getFirstInEdge(), NumberUtils.parseDouble(label));
-						tree.setLabel(v, null);
-					}
-				}
-			}
-		}
 	}
 }

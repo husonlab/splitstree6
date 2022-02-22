@@ -71,6 +71,8 @@ public class TanglegramView implements IView {
 	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames");
 	private final BooleanProperty optionShowTreeInfo = new SimpleBooleanProperty(this, "optionShowTreeInfo");
 
+	private final BooleanProperty optionShowInternalLabels = new SimpleBooleanProperty(this, "optionShowInternalLabels");
+
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0);
 
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0);
@@ -85,13 +87,14 @@ public class TanglegramView implements IView {
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionShowTreeNames, true);
 		ProgramProperties.track(optionShowTreeInfo, true);
+		ProgramProperties.track(optionShowInternalLabels, true);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionTree1.getName(), optionDiagram1.getName(), optionAveraging1.getName(),
 				optionTree2.getName(), optionDiagram2.getName(), optionAveraging2.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(), optionFontScaleFactor.getName(),
-				optionShowTreeNames.getName(), optionShowTreeInfo.getName());
+				optionShowTreeNames.getName(), optionShowTreeInfo.getName(), optionShowInternalLabels.getName());
 	}
 
 	public TanglegramView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -327,6 +330,18 @@ public class TanglegramView implements IView {
 
 	public void setOptionFontScaleFactor(double optionFontScaleFactor) {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
+	}
+
+	public boolean isOptionShowInternalLabels() {
+		return optionShowInternalLabels.get();
+	}
+
+	public BooleanProperty optionShowInternalLabelsProperty() {
+		return optionShowInternalLabels;
+	}
+
+	public void setOptionShowInternalLabels(boolean optionShowInternalLabels) {
+		this.optionShowInternalLabels.set(optionShowInternalLabels);
 	}
 
 	@Override

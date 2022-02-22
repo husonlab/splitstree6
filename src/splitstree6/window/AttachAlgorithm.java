@@ -34,7 +34,9 @@ import splitstree6.workflow.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 /**
@@ -84,11 +86,21 @@ public class AttachAlgorithm {
 		}
 	}
 
-	public static BooleanProperty createDisableProperty(MainWindow mainWindow, Algorithm algorithm) {
+	@SafeVarargs
+	public static BooleanProperty createDisableProperty(MainWindow mainWindow, Algorithm algorithm, Supplier<Boolean>... disableConditions) {
 		var workflow = mainWindow.getWorkflow();
-		var disable = new SimpleBooleanProperty(false);
-		disable.bind(Bindings.createBooleanBinding(() -> workflow.isRunning() || workflow.dataNodesStream().noneMatch(d -> algorithm.getFromClass() == d.getDataBlock().getClass()), workflow.validProperty()));
-		return disable;
+		var disableProperty = new SimpleBooleanProperty(false);
+		Callable<Boolean> disableSuppler = () -> {
+			if (workflow.isRunning() || workflow.dataNodesStream().noneMatch(d -> algorithm.getFromClass() == d.getDataBlock().getClass()))
+				return true;
+			for (var condition : disableConditions) {
+				if (!condition.get())
+					return true;
+			}
+			return false;
+		};
+		disableProperty.bind(Bindings.createBooleanBinding(disableSuppler, workflow.validProperty()));
+		return disableProperty;
 	}
 
 	/**

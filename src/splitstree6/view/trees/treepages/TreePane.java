@@ -24,7 +24,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
-import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -36,7 +35,6 @@ import jloda.fx.util.AService;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
-import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.view.trees.layout.ComputeHeightAndAngles;
@@ -58,20 +56,25 @@ public class TreePane extends StackPane {
 
 	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
+
+	private final BooleanProperty showInternalLabels = new SimpleBooleanProperty();
+	private final ChangeListener<Boolean> internalLabelsListener;
+
 	private Consumer<LayoutOrientation> orientationConsumer;
 
 	private final StringProperty infoString = new SimpleStringProperty("");
 
-	private final AService<Pair<Group, Consumer<LayoutOrientation>>> service;
+	private final AService<ComputeTreeLayout.Result> service;
 
 	/**
 	 * single tree pane
 	 */
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
-					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels) {
+					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels) {
 
 		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, orientation);
+
 
 		//setStyle("-fx-background-color: transparent");
 
@@ -96,6 +99,11 @@ public class TreePane extends StackPane {
 		};
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
+		this.showInternalLabels.set(showInternalLabels.get());
+		internalLabelsListener = (v, o, n) -> {
+			this.showInternalLabels.set(n);
+		};
+		showInternalLabels.addListener(new WeakChangeListener<>(internalLabelsListener));
 
 		// compute the tree in a separate thread:
 		service = new AService<>();
@@ -123,15 +131,19 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			var pair = ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, averaging, width - 4, height - 4, interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
-			pair.getFirst().setId("treeGroup");
-			return pair;
+			var result = ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, averaging, width - 4, height - 4,
+					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
+			return result;
 		});
 
 		service.setOnSucceeded(a -> {
-			var pair = service.getValue();
-			var group = pair.getFirst();
-			orientationConsumer = pair.getSecond();
+			var result = service.getValue();
+			var group = result.getAllAsGroup();
+
+			if (result.internalLabels() != null)
+				result.internalLabels().visibleProperty().bind(this.showInternalLabels);
+
+			orientationConsumer = result.layoutOrientationConsumer();
 
 			pane = new StackPane(group);
 			pane.setId("treeView");
@@ -191,7 +203,7 @@ public class TreePane extends StackPane {
 	}
 
 
-	public AService<Pair<Group, Consumer<LayoutOrientation>>> getService() {
+	public AService<ComputeTreeLayout.Result> getService() {
 		return service;
 	}
 

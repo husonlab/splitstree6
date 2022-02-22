@@ -149,8 +149,12 @@ public class LayoutUtils {
 			return label;
 		} else if (graph.getNumberOfTaxa(v) >= 2) {
 			return new RichTextLabel(StringUtils.toString(taxaBlock.getLabels(graph.getTaxa(v)), ","));
-		} else if (v.getLabel() != null && !graph.getLabel(v).isBlank()) {
-			return new RichTextLabel(graph.getLabel(v));
+		} else if (v.getLabel() != null && !v.getLabel().isBlank()) {
+			return new RichTextLabel(v.getLabel());
+		} else if (graph.getLabel(v) != null && !graph.getLabel(v).isBlank()) {
+			var label = new RichTextLabel(graph.getLabel(v));
+
+			return label;
 		} else
 			return null;
 	}
