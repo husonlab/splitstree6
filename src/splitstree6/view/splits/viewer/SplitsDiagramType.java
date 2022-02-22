@@ -25,7 +25,11 @@ package splitstree6.view.splits.viewer;
 public enum SplitsDiagramType {
     Outline, Splits, OutlineTopology, SplitsTopology;
 
-    public boolean useWeights() {
+    public boolean isUsingWeights() {
         return this == Outline || this == Splits;
+    }
+
+    public boolean isOutline() {
+        return this == Outline || this == OutlineTopology;
     }
 }

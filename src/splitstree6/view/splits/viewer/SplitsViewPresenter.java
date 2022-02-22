@@ -199,7 +199,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
 					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
 				}
-				if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline) {
+				if (splitsView.getOptionDiagram().isOutline()) {
 					for (var loop : loopViews) {
 						loop.setFill(splitsView.getOptionOutlineFill());
 					}
@@ -212,7 +212,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		};
 
 		splitsView.optionOutlineFillProperty().addListener((v, o, n) -> {
-			if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline) {
+			if (splitsView.getOptionDiagram().isOutline()) {
 				for (var loop : loopViews) {
 					loop.setFill(splitsView.getOptionOutlineFill());
 				}

@@ -116,26 +116,26 @@ public class SplitNetworkLayout {
 				var selectedTaxa = taxonSelectionModel.getSelectedItems().stream().map(taxaBlock0::indexOf).collect(Collectors.toSet());
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, diagram.useWeights());
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(false, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 			case OutGroupAlt -> {
 				var selectedTaxa = taxonSelectionModel.getSelectedItems().stream().map(taxaBlock0::indexOf).collect(Collectors.toSet());
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, diagram.useWeights());
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(true, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 			case MidPoint -> {
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, diagram.useWeights());
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(false, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 			case MidPointAlt -> {
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, diagram.useWeights());
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(true, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 		}
@@ -151,10 +151,10 @@ public class SplitNetworkLayout {
 		nodeShapeMap.clear();
 		loopViews.clear();
 
-		if (diagram == SplitsDiagramType.Outline || diagram == SplitsDiagramType.OutlineTopology) {
+		if (diagram.isOutline()) {
 			try {
 				var usedSplits = new BitSet();
-				PhylogeneticOutline.apply(progress, diagram.useWeights(), taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
+				PhylogeneticOutline.apply(progress, diagram.isUsingWeights(), taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
 				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.cyclic && usedSplits.cardinality() < splitsBlock.getNsplits())
 					NotificationManager.showWarning(String.format("Outline algorithm: Showing only %d of %d splits", usedSplits.cardinality(), splitsBlock.getNsplits()));
 			} catch (CanceledException e) {
@@ -163,11 +163,11 @@ public class SplitNetworkLayout {
 		} else { // splits
 			var usedSplits = new BitSet();
 			try {
-				if (!EqualAngle.apply(progress, diagram.useWeights(), taxaBlock, splitsBlock, graph, new BitSet(), usedSplits)) {
+				if (!EqualAngle.apply(progress, diagram.isUsingWeights(), taxaBlock, splitsBlock, graph, new BitSet(), usedSplits)) {
 					ConvexHull.apply(progress, taxaBlock, splitsBlock, graph, usedSplits);
 				}
 				EqualAngle.assignAnglesToEdges(taxaBlock.getNtax(), splitsBlock, splitsBlock.getCycle(), graph, new BitSet(), rootSplit == 0 ? 360 : rootAngle);
-				EqualAngle.assignCoordinatesToNodes(diagram.useWeights(), graph, nodePointMap, splitsBlock.getCycle()[1], rootSplit);
+				EqualAngle.assignCoordinatesToNodes(diagram.isUsingWeights(), graph, nodePointMap, splitsBlock.getCycle()[1], rootSplit);
 
 			} catch (CanceledException e) {
 				NotificationManager.showWarning("User CANCELED 'splits network' computation");
