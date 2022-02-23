@@ -50,8 +50,12 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 
 		for (var v : tree.nodes()) {
 			var label = nodeLabelMap.get(v);
+
 			if (label != null) {
 				var shape = nodeShapeMap.get(v);
+				var translateXProperty = shape.translateXProperty();
+				var translateYProperty = shape.translateYProperty();
+
 				var angle = nodeAngleMap.get(v);
 				if (angle == null) {
 					if (v.getParent() != null) {
@@ -67,17 +71,26 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 						angle = 0.0;
 				}
 
-				var translateXProperty = shape.translateXProperty();
-				var translateYProperty = shape.translateYProperty();
-				labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
-						xOffset -> {
-							label.setLayoutX(0);
-							label.translateXProperty().bind(translateXProperty.add(xOffset));
-						},
-						yOffset -> {
-							label.setLayoutY(0);
-							label.translateYProperty().bind(translateYProperty.add(yOffset));
-						});
+				if (v.isLeaf()) {
+
+					labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
+							xOffset -> {
+								label.setLayoutX(0);
+								label.translateXProperty().bind(translateXProperty.add(xOffset));
+							},
+							yOffset -> {
+								label.setLayoutY(0);
+								label.translateYProperty().bind(translateYProperty.add(yOffset));
+							});
+				} else {
+					label.setLayoutX(0);
+					label.setLayoutY(0);
+					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
+					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+					labelLayout.addAvoidable(label.translateXProperty(), label.translateYProperty(), label.getLayoutBounds().getWidth(), label.getLayoutBounds().getHeight());
+
+				}
+
 				labelLayout.addAvoidable(translateXProperty, translateYProperty, shape.getLayoutBounds().getWidth(), shape.getLayoutBounds().getHeight());
 			}
 		}

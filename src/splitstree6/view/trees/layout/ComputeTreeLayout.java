@@ -102,7 +102,6 @@ public class ComputeTreeLayout {
 
 		var nodeGroup = new Group();
 		var internalLabelsGroup = new Group();
-		internalLabelsGroup.setUserData("internalLabelsGroup");
 		var taxonLabelsGroup = new Group();
 		var edgeGroup = new Group();
 

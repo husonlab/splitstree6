@@ -183,7 +183,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		var first = new Single<>(true);
 
-		updateListener = e -> {
+		updateListener = ignored -> {
 			if (first.get())
 				first.set(false);
 			else
@@ -266,7 +266,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		splitsView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" set layout orientatio", splitsView.optionOrientationProperty(), o, n));
 		splitsView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", splitsView.optionFontScaleFactorProperty(), o, n));
 		splitsView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("set zoom factor", splitsView.optionZoomFactorProperty(), o, n));
-
 
 		Platform.runLater(this::setupMenuItems);
 	}

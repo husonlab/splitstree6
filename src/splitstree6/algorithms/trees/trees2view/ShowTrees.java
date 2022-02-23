@@ -22,6 +22,7 @@ package splitstree6.algorithms.trees.trees2view;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
@@ -32,6 +33,8 @@ import splitstree6.io.nexus.TreesNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.trees.tanglegram.TanglegramView;
 import splitstree6.view.trees.treepages.TreePagesView;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataNode;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -45,6 +48,7 @@ public class ShowTrees extends Trees2View {
 	public enum ViewType {SingleTree, TreePages, DensiTree, Tanglegram, Text}
 
 	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.TreePages);
+	private final ChangeListener<Boolean> validListener;
 
 	@Override
 	public List<String> listOptions() {
@@ -53,6 +57,22 @@ public class ShowTrees extends Trees2View {
 
 	public ShowTrees() {
 		super();
+		validListener = (v, o, n) -> {
+			if (getNode() != null && getNode().getPreferredChild() != null && ((DataNode) getNode().getPreferredChild()).getDataBlock() instanceof ViewBlock viewBlock) {
+				if (viewBlock.getView() != null)
+					viewBlock.getView().getRoot().setDisable(!n);
+			}
+		};
+	}
+
+	@Override
+	public void setNode(AlgorithmNode node) {
+		if (getNode() != null)
+			getNode().validProperty().removeListener(validListener);
+		super.setNode(node);
+		if (getNode() != null) {
+			getNode().validProperty().addListener(validListener);
+		}
 	}
 
 	@Override

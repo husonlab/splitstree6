@@ -66,11 +66,13 @@ public class TreePane extends StackPane {
 
 	private final AService<ComputeTreeLayout.Result> service;
 
+	private ComputeTreeLayout.Result result;
+
 	/**
 	 * single tree pane
 	 */
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels) {
 
 		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, orientation);
@@ -86,10 +88,12 @@ public class TreePane extends StackPane {
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
 		fontScaleChangeListener = (v, o, n) -> {
-			LayoutUtils.applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
-			updateLabelLayout(orientation.get());
+			if (result != null) {
+				LayoutUtils.applyLabelScaleFactor(result.taxonLabels(), n.doubleValue() / o.doubleValue());
+				updateLabelLayout(orientation.get());
+			}
 		};
-		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
+		fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 
 		zoomChangedListener = (v, o, n) -> {
 			if (pane != null) {
@@ -131,13 +135,12 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			var result = ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, averaging, width - 4, height - 4,
+			return ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, averaging, width - 4, height - 4,
 					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
-			return result;
 		});
 
 		service.setOnSucceeded(a -> {
-			var result = service.getValue();
+			result = service.getValue();
 			var group = result.getAllAsGroup();
 
 			if (result.internalLabels() != null)
@@ -155,7 +158,7 @@ public class TreePane extends StackPane {
 			pane.setMinHeight(getPrefHeight() - 12);
 			pane.setMinWidth(getPrefWidth());
 
-			LayoutUtils.applyLabelScaleFactor(group, labelScaleFactor.get());
+			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
 			Platform.runLater(() -> {
 				LayoutUtils.applyOrientation(orientation.get(), pane, false);
 				updateLabelLayout(orientation.get());
