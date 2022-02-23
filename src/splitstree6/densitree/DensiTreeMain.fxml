@@ -21,18 +21,29 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.*?>
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="splitstree6.densitree.DensiTreeMainController">
-    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                AnchorPane.topAnchor="0.0">
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.densitree.DensiTreeMainController">
+    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <center>
             <Pane fx:id="mainPane" BorderPane.alignment="CENTER">
                 <StackPane fx:id="stackPane" prefHeight="150.0" prefWidth="200.0">
-                    <Canvas fx:id="canvas" height="200.0" width="200.0"/>
-                    <Pane fx:id="pane" prefHeight="162.0" prefWidth="161.0"/>
+                    <Canvas fx:id="canvas" height="200.0" width="200.0" />
+                    <Pane fx:id="pane" prefHeight="162.0" prefWidth="161.0" />
                 </StackPane>
             </Pane>
         </center>
@@ -42,41 +53,42 @@
                     <Menu mnemonicParsing="false" text="File">
                         <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open...">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                             </accelerator>
                         </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="quitMenuItem" mnemonicParsing="false" text="Quit">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                             </accelerator>
                         </MenuItem>
                     </Menu>
                     <Menu mnemonicParsing="false" text="Edit">
                         <MenuItem fx:id="copyMenuItem" mnemonicParsing="false" text="Copy">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                             </accelerator>
                         </MenuItem>
                     </Menu>
+               <Menu mnemonicParsing="false" text="Highlighting">
+                 <items>
+                     <MenuItem fx:id="specificTreesMenuItem" mnemonicParsing="false" text="Specific Trees" />
+                 </items>
+               </Menu>
                 </MenuBar>
                 <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">
-                    <Button fx:id="drawButton" mnemonicParsing="false" text="Draw"/>
-                    <Button fx:id="clearButton" mnemonicParsing="false" text="Clear"/>
-                    <CheckBox fx:id="checkBox" mnemonicParsing="false" text="To Scale"/>
+                    <Button fx:id="drawButton" mnemonicParsing="false" text="Draw" />
+                    <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" />
+                    <CheckBox fx:id="checkBox" mnemonicParsing="false" text="To Scale" />
                 </ToolBar>
             </VBox>
         </top>
         <bottom>
-            <FlowPane fx:id="bottomFlowPane" alignment="CENTER_LEFT" hgap="5.0" minHeight="32.0"
-                      style="-fx-border-color: lightgray;" vgap="5.0" BorderPane.alignment="CENTER">
+            <FlowPane fx:id="bottomFlowPane" alignment="CENTER_LEFT" hgap="5.0" minHeight="32.0" style="-fx-border-color: lightgray;" vgap="5.0" BorderPane.alignment="CENTER">
                 <padding>
-                    <Insets bottom="5.0" left="5.0" right="30.0" top="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="30.0" top="5.0" />
                 </padding>
-                <Label fx:id="messageLabel" text="Label"/>
+                <Label fx:id="messageLabel" text="Label" />
             </FlowPane>
         </bottom>
     </BorderPane>
