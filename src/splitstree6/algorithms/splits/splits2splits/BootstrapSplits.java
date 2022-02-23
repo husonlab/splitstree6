@@ -178,10 +178,7 @@ public class BootstrapSplits extends Splits2Splits {
 
 		SplitsUtilities.verifySplits(splitsBlock.getSplits(), taxaBlock);
 
-		if (inputSplits.getCycle().length > 0)
-			splitsBlock.setCycle(inputSplits.getCycle());
-		else
-			splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		splitsBlock.setFit(-1);
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 
