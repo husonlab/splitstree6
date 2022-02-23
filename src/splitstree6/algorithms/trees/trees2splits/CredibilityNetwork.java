@@ -49,7 +49,7 @@ import java.util.List;
 public class CredibilityNetwork extends Trees2Splits {
 
 	private final DoubleProperty optionLevel = new SimpleDoubleProperty(this, "optionLevel", .95);
-	private final BooleanProperty optionUseHighDimensionFilter = new SimpleBooleanProperty(this, "optionUseHighDimensionFilter", true);
+	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	@Override
 	public String getCitation() {
@@ -60,7 +60,7 @@ public class CredibilityNetwork extends Trees2Splits {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionLevel.getName(), optionUseHighDimensionFilter.getName());
+		return List.of(optionLevel.getName(), optionHighDimensionFilter.getName());
 	}
 
 	@Override
@@ -155,7 +155,7 @@ public class CredibilityNetwork extends Trees2Splits {
 		}
 
 		splitsBlock.clear();
-		if (isOptionUseHighDimensionFilter()) {
+		if (isOptionHighDimensionFilter()) {
 			var dimensionsFilter = new DimensionFilter();
 			dimensionsFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
 		} else
@@ -185,16 +185,16 @@ public class CredibilityNetwork extends Trees2Splits {
 		this.optionLevel.set(optionLevel);
 	}
 
-	public boolean isOptionUseHighDimensionFilter() {
-		return optionUseHighDimensionFilter.get();
+	public boolean isOptionHighDimensionFilter() {
+		return optionHighDimensionFilter.get();
 	}
 
-	public BooleanProperty optionUseHighDimensionFilterProperty() {
-		return optionUseHighDimensionFilter;
+	public BooleanProperty optionHighDimensionFilterProperty() {
+		return optionHighDimensionFilter;
 	}
 
-	public void setOptionUseHighDimensionFilter(boolean optionUseHighDimensionFilter) {
-		this.optionUseHighDimensionFilter.set(optionUseHighDimensionFilter);
+	public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
+		this.optionHighDimensionFilter.set(optionHighDimensionFilter);
 	}
 
 	static private record DoubleInt(double Rij, int j) {

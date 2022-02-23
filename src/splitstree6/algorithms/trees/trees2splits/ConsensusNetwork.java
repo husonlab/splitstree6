@@ -51,7 +51,7 @@ public class ConsensusNetwork extends Trees2Splits {
 
 	private final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.TreeSizeWeightedMean);
 	private final DoubleProperty optionThresholdPercent = new SimpleDoubleProperty(this, "optionThresholdPercent", 30.0);
-	private final BooleanProperty optionUseHighDimensionFilter = new SimpleBooleanProperty(this, "optionUseHighDimensionFilter", true);
+	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	private final Object sync = new Object();
 
@@ -62,7 +62,7 @@ public class ConsensusNetwork extends Trees2Splits {
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionThresholdPercent.getName(), optionEdgeWeights.getName(), optionUseHighDimensionFilter.getName());
+		return List.of(optionThresholdPercent.getName(), optionEdgeWeights.getName(), optionHighDimensionFilter.getName());
 	}
 
 	@Override
@@ -71,7 +71,7 @@ public class ConsensusNetwork extends Trees2Splits {
 			return "Determine how to calculate edge weights in resulting network";
 		else if (optionName.equals(optionThresholdPercent.getName()))
 			return "Determine threshold for percent of input trees that split has to occur in for it to appear in the output";
-		else if (optionName.equals(optionUseHighDimensionFilter.getName()))
+		else if (optionName.equals(optionHighDimensionFilter.getName()))
 			return "Heuristically remove splits causing high-dimensional network";
 		else
 			return super.getToolTip(optionName);
@@ -222,7 +222,7 @@ public class ConsensusNetwork extends Trees2Splits {
 			}
 		}
 
-		if (isOptionUseHighDimensionFilter()) {
+		if (getOptionHighDimensionFilter()) {
 			var dimensionsFilter = new DimensionFilter();
 			dimensionsFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
 		} else
@@ -264,16 +264,16 @@ public class ConsensusNetwork extends Trees2Splits {
 		this.optionThresholdPercent.set(optionThresholdPercent);
 	}
 
-	public boolean isOptionUseHighDimensionFilter() {
-		return optionUseHighDimensionFilter.get();
+	public boolean getOptionHighDimensionFilter() {
+		return optionHighDimensionFilter.get();
 	}
 
-	public BooleanProperty optionUseHighDimensionFilterProperty() {
-		return optionUseHighDimensionFilter;
+	public BooleanProperty optionHighDimensionFilterProperty() {
+		return optionHighDimensionFilter;
 	}
 
-	public void setOptionUseHighDimensionFilter(boolean optionUseHighDimensionFilter) {
-		this.optionUseHighDimensionFilter.set(optionUseHighDimensionFilter);
+	public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
+		this.optionHighDimensionFilter.set(optionHighDimensionFilter);
 	}
 
 	/**

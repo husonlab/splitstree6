@@ -57,23 +57,26 @@ public class BootstrapSplits extends Splits2Splits {
 	private final DoubleProperty optionMinPercent = new SimpleDoubleProperty(this, "optionMinPercent", 10.0);
 	private final BooleanProperty optionShowAllSplits = new SimpleBooleanProperty(this, "optionShowAllSplits", false);
 	private final IntegerProperty optionRandomSeed = new SimpleIntegerProperty(this, "optionRandomSeed", 42);
+	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionReplicates.getName(), optionMinPercent.getName(), optionShowAllSplits.getName(), optionRandomSeed.getName());
+		return List.of(optionReplicates.getName(), optionMinPercent.getName(), optionShowAllSplits.getName(), optionRandomSeed.getName(), optionHighDimensionFilter.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		if (optionName.equals(optionReplicates.getName())) {
+		if (optionName.equals(optionReplicates.getName()))
 			return "Number of bootstrap replicates";
-		} else if (optionName.equals(optionShowAllSplits.getName())) {
+		else if (optionName.equals(optionShowAllSplits.getName()))
 			return "Show all bootstrap splits, not just the original splits";
-		} else if (optionName.equals(optionMinPercent.getName())) {
+		else if (optionName.equals(optionMinPercent.getName()))
 			return "Minimum percentage support for a split to be included";
-		} else if (optionName.equals(optionRandomSeed.getName())) {
+		else if (optionName.equals(optionRandomSeed.getName()))
 			return "If non-zero, is used as seed for random number generator";
-		}
+		else if (optionName.equals(optionHighDimensionFilter.getName()))
+			return "Heuristically remove splits causing high-dimensional network";
+
 		return optionName;
 	}
 
@@ -111,52 +114,58 @@ public class BootstrapSplits extends Splits2Splits {
 
 			var numberOfThreads = Math.max(1, Math.min(getOptionReplicates(), ProgramExecutorService.getNumberOfCoresToUse()));
 			var service = Executors.newFixedThreadPool(numberOfThreads);
-			var exception = new Single<IOException>();
-
-			progress.setMaximum(getOptionReplicates() / numberOfThreads);
-			progress.setProgress(0);
-
-			for (var t = 0; t < numberOfThreads; t++) {
-				var thread = t;
-
-				service.execute(() -> {
-					try {
-						var path = extractPath(workflow.getWorkingDataNode(), targetNode);
-						if (thread == 0)
-							System.err.println("Bootstrap workflow: " + toString(charactersBlock, path));
-
-						if (targetNode.getDataBlock() instanceof TreesBlock) {
-							path.add(new Pair<>(new TreeSelectorSplits(), new SplitsBlock()));
-						} else
-							path.get(path.size() - 1).setSecond(new SplitsBlock());
-
-						for (var r = thread; r < getOptionReplicates(); r += numberOfThreads) {
-							SplitsBlock replicateSplits = (SplitsBlock) run(new ProgressSilent(), workflow.getWorkingTaxaBlock(), createReplicate(charactersBlock, new Random(seeds[r])), path);
-							for (var split : replicateSplits.getSplits()) {
-								if (isOptionShowAllSplits() || splitCountMap.containsKey(split)) {
-									splitCountMap.put(split, splitCountMap.getOrDefault(split, 0) + 1);
-									splitWeightMap.put(split, splitWeightMap.getOrDefault(split, 0.0) + split.getWeight());
-								}
-							}
-							if (thread == 0)
-								progress.incrementProgress();
-							if (exception.isNotNull())
-								return;
-						}
-					} catch (IOException ex) {
-						exception.setIfCurrentValueIsNull(ex);
-					}
-				});
-			}
-			progress.reportTaskCompleted();
-
-			service.shutdown();
 			try {
-				service.awaitTermination(1000, TimeUnit.DAYS);
-			} catch (InterruptedException ignored) {
+				var exception = new Single<IOException>();
+
+				progress.setMaximum(getOptionReplicates() / numberOfThreads);
+				progress.setProgress(0);
+
+				for (var t = 0; t < numberOfThreads; t++) {
+					var thread = t;
+
+					service.execute(() -> {
+						try {
+							var path = extractPath(workflow.getWorkingDataNode(), targetNode);
+							if (thread == 0)
+								System.err.println("Bootstrap workflow: " + toString(charactersBlock, path));
+
+							if (targetNode.getDataBlock() instanceof TreesBlock) {
+								path.add(new Pair<>(new TreeSelectorSplits(), new SplitsBlock()));
+							} else
+								path.get(path.size() - 1).setSecond(new SplitsBlock());
+
+							for (var r = thread; r < getOptionReplicates(); r += numberOfThreads) {
+								SplitsBlock replicateSplits = (SplitsBlock) run(new ProgressSilent(), workflow.getWorkingTaxaBlock(), createReplicate(charactersBlock, new Random(seeds[r])), path);
+								for (var split : replicateSplits.getSplits()) {
+									if (isOptionShowAllSplits() || splitCountMap.containsKey(split)) {
+										splitCountMap.put(split, splitCountMap.getOrDefault(split, 0) + 1);
+										splitWeightMap.put(split, splitWeightMap.getOrDefault(split, 0.0) + split.getWeight());
+									}
+								}
+								if (thread == 0)
+									progress.incrementProgress();
+								if (exception.isNotNull())
+									return;
+							}
+						} catch (IOException ex) {
+							exception.setIfCurrentValueIsNull(ex);
+						}
+					});
+				}
+				progress.reportTaskCompleted();
+
+				service.shutdown();
+				try {
+					service.awaitTermination(1000, TimeUnit.DAYS);
+				} catch (InterruptedException ignored) {
+				}
+				if (exception.isNotNull())
+					throw exception.get();
+			} finally {
+				service.shutdownNow();
 			}
-			if (exception.isNotNull())
-				throw exception.get();
+
+			var computedSplits = new ArrayList<ASplit>();
 
 			for (var split : splitCountMap.keySet()) {
 				var count = splitCountMap.getOrDefault(split, 0);
@@ -167,11 +176,17 @@ public class BootstrapSplits extends Splits2Splits {
 						if (totalWeight > 0) {
 							split.setWeight(totalWeight / count);
 							split.setConfidence(percent);
-							splitsBlock.getSplits().add(split);
+							computedSplits.add(split);
 						}
 					}
 				}
 			}
+
+			if (getOptionHighDimensionFilter()) {
+				var dimensionsFilter = new DimensionFilter();
+				dimensionsFilter.apply(progress, 4, computedSplits, splitsBlock.getSplits());
+			} else
+				splitsBlock.getSplits().addAll(computedSplits);
 		}
 
 		SplitsUtilities.addAllTrivial(taxaBlock.getNtax(), splitsBlock);
@@ -259,6 +274,18 @@ public class BootstrapSplits extends Splits2Splits {
 
 	public void setOptionRandomSeed(int optionRandomSeed) {
 		this.optionRandomSeed.set(optionRandomSeed);
+	}
+
+	public boolean getOptionHighDimensionFilter() {
+		return optionHighDimensionFilter.get();
+	}
+
+	public BooleanProperty optionHighDimensionFilterProperty() {
+		return optionHighDimensionFilter;
+	}
+
+	public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
+		this.optionHighDimensionFilter.set(optionHighDimensionFilter);
 	}
 
 	/**

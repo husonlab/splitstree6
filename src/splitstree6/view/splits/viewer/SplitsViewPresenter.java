@@ -121,7 +121,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			if (n == null) {
 				disabledDiagramTypes.addAll(List.of(SplitsDiagramType.values()));
 			} else {
-				if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic) {
+				if (n.getCompatibility() == Compatibility.compatible || n.getCompatibility() == Compatibility.cyclic) {
+					if (splitsView.getOptionDiagram() == SplitsDiagramType.Splits)
+						splitsView.setOptionDiagram(SplitsDiagramType.Outline);
+				} else {
 					disabledDiagramTypes.add(SplitsDiagramType.Outline);
 					disabledDiagramTypes.add(SplitsDiagramType.OutlineTopology);
 					if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline)
@@ -291,7 +294,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getCopyNewickMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
-
 
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());

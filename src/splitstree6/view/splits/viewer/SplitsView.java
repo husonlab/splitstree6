@@ -137,7 +137,6 @@ public class SplitsView implements IView {
 
 	@Override
 	public void clear() {
-		System.err.println("clear(): not implemented");
 	}
 
 	@Override

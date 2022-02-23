@@ -44,10 +44,11 @@ public class BoostrapTreeSplits extends Trees2Splits {
 	private final DoubleProperty optionMinPercent = new SimpleDoubleProperty(this, "optionMinPercent", 10.0);
 	private final BooleanProperty optionShowAllSplits = new SimpleBooleanProperty(this, "optionShowAllSplits", false);
 	private final IntegerProperty optionRandomSeed = new SimpleIntegerProperty(this, "optionRandomSeed", 42);
+	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionReplicates.getName(), optionMinPercent.getName(), optionShowAllSplits.getName(), optionRandomSeed.getName());
+		return List.of(optionReplicates.getName(), optionMinPercent.getName(), optionShowAllSplits.getName(), optionRandomSeed.getName(), optionHighDimensionFilter.getName());
 	}
 
 	@Override
@@ -77,6 +78,7 @@ public class BoostrapTreeSplits extends Trees2Splits {
 		bootstrapSplits.setOptionMinPercent(getOptionMinPercent());
 		bootstrapSplits.setOptionRandomSeed(getOptionRandomSeed());
 		bootstrapSplits.setOptionReplicates(getOptionReplicates());
+		bootstrapSplits.setOptionHighDimensionFilter(isOptionHighDimensionFilter());
 		bootstrapSplits.compute(progress, taxaBlock, inputSplits, inputTrees.getNode(), splitsBlock);
 	}
 
@@ -135,5 +137,17 @@ public class BoostrapTreeSplits extends Trees2Splits {
 
 	public void setOptionRandomSeed(int optionRandomSeed) {
 		this.optionRandomSeed.set(optionRandomSeed);
+	}
+
+	public boolean isOptionHighDimensionFilter() {
+		return optionHighDimensionFilter.get();
+	}
+
+	public BooleanProperty optionHighDimensionFilterProperty() {
+		return optionHighDimensionFilter;
+	}
+
+	public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
+		this.optionHighDimensionFilter.set(optionHighDimensionFilter);
 	}
 }
