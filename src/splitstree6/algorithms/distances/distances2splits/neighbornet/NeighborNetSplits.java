@@ -62,7 +62,7 @@ public class NeighborNetSplits {
      * @return weighted splits
      * @throws CanceledException
      */
-    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDualPCG, ProgressListener progress) throws CanceledException {
+    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDualPCG, boolean usePreconditioner, ProgressListener progress) throws CanceledException {
 
         int nTax = cycle.length - 1;
 

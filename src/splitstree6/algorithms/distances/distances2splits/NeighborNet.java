@@ -50,6 +50,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", true);
 
+	private final BooleanProperty optionUseDual = new SimpleBooleanProperty(this, "optionUseDual", true);
+
 	public List<String> listOptions() {
 		return List.of(optionInferenceAlgorithm.getName(), optionUsePreconditioner.getName());
 	}
@@ -83,7 +85,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		final var start = System.currentTimeMillis();
 
 		var useBlockPivot = (getOptionInferenceAlgorithm() == InferenceAlgorithm.BlockPivot);
-		var useDualDCG = isOptionUsePreconditioner();
+		var useDual = isOptionUseDual();
+		var usePreconditioner = isOptionUsePreconditioner();
 		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDualDCG, progress);
 
 
@@ -140,4 +143,19 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public void setOptionUsePreconditioner(boolean optionUsePreconditioner) {
 		this.optionUsePreconditioner.set(optionUsePreconditioner);
 	}
+
+	public boolean isOptionUseDual() {
+		return optionUseDual.get();
+	}
+
+	public BooleanProperty optionUseDualProperty() {
+		return optionUseDual;
+	}
+
+	public void setOptionUseDual(boolean optionUseDual) {
+		this.optionUseDual.set(optionUseDual);
+	}
+
+
+
 }
