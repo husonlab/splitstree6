@@ -20,11 +20,14 @@
 package splitstree6.view.splits.layout;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -38,6 +41,7 @@ import jloda.graph.NodeArray;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
+import jloda.util.StringUtils;
 import jloda.util.Triplet;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
@@ -83,9 +87,9 @@ public class SplitNetworkLayout {
 	 * @return group of groups, namely loops, nodes, edges and node labels
 	 */
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
-					   SplitsRooting rooting, double rootAngle, boolean useWeights, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
+					   SplitsRooting rooting, double rootAngle, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
 					   ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
-					   ObservableList<LoopView> loopViews, DoubleProperty unitLength,
+					   ObservableList<LoopView> loopViews, ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
 					   double width, double height) throws IOException {
 
 		labelLayout.clear();
@@ -96,6 +100,7 @@ public class SplitNetworkLayout {
 		if (splitsBlock0.getCycle() == null || splitsBlock0.getCycle().length == 0) {
 			splitsBlock0.setCycle(SplitsUtilities.computeCycle(taxaBlock0.getNtax(), splitsBlock0.getSplits()));
 		}
+
 
 		// if rooting is desired, need to setup a modified set of taxa and splits
 		final TaxaBlock taxaBlock;
@@ -111,26 +116,26 @@ public class SplitNetworkLayout {
 				var selectedTaxa = taxonSelectionModel.getSelectedItems().stream().map(taxaBlock0::indexOf).collect(Collectors.toSet());
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, useWeights);
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(false, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 			case OutGroupAlt -> {
 				var selectedTaxa = taxonSelectionModel.getSelectedItems().stream().map(taxaBlock0::indexOf).collect(Collectors.toSet());
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, useWeights);
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), selectedTaxa, splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(true, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 			case MidPoint -> {
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, useWeights);
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(false, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(false, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 			case MidPointAlt -> {
 				taxaBlock = new TaxaBlock();
 				splitsBlock = new SplitsBlock();
-				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, useWeights);
+				final Triplet<Integer, Double, Double> rootLocation = RootingUtils.computeRootLocation(true, taxaBlock0.getNtax(), new HashSet<>(), splitsBlock0.getCycle(), splitsBlock0, diagram.isUsingWeights());
 				rootSplit = RootingUtils.setupForRootedNetwork(true, rootLocation, taxaBlock0, splitsBlock0, taxaBlock, splitsBlock);
 			}
 		}
@@ -146,10 +151,10 @@ public class SplitNetworkLayout {
 		nodeShapeMap.clear();
 		loopViews.clear();
 
-		if (diagram == SplitsDiagramType.Outline) {
+		if (diagram.isOutline()) {
 			try {
 				var usedSplits = new BitSet();
-				PhylogeneticOutline.apply(progress, useWeights, taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
+				PhylogeneticOutline.apply(progress, diagram.isUsingWeights(), taxaBlock, splitsBlock, graph, nodePointMap, usedSplits, loops, rootSplit, rootAngle);
 				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.cyclic && usedSplits.cardinality() < splitsBlock.getNsplits())
 					NotificationManager.showWarning(String.format("Outline algorithm: Showing only %d of %d splits", usedSplits.cardinality(), splitsBlock.getNsplits()));
 			} catch (CanceledException e) {
@@ -158,11 +163,11 @@ public class SplitNetworkLayout {
 		} else { // splits
 			var usedSplits = new BitSet();
 			try {
-				if (!EqualAngle.apply(progress, useWeights, taxaBlock, splitsBlock, graph, new BitSet(), usedSplits)) {
+				if (!EqualAngle.apply(progress, diagram.isUsingWeights(), taxaBlock, splitsBlock, graph, new BitSet(), usedSplits)) {
 					ConvexHull.apply(progress, taxaBlock, splitsBlock, graph, usedSplits);
 				}
 				EqualAngle.assignAnglesToEdges(taxaBlock.getNtax(), splitsBlock, splitsBlock.getCycle(), graph, new BitSet(), rootSplit == 0 ? 360 : rootAngle);
-				EqualAngle.assignCoordinatesToNodes(useWeights, graph, nodePointMap, splitsBlock.getCycle()[1], rootSplit);
+				EqualAngle.assignCoordinatesToNodes(diagram.isUsingWeights(), graph, nodePointMap, splitsBlock.getCycle()[1], rootSplit);
 
 			} catch (CanceledException e) {
 				NotificationManager.showWarning("User CANCELED 'splits network' computation");
@@ -240,6 +245,11 @@ public class SplitNetworkLayout {
 		}
 
 		var edgesGroup = new Group();
+
+
+		var confidenceLabels = new Group();
+		var splitsWithConfidenceLabels = new BitSet();
+
 		for (var e : graph.edges()) {
 			var line = new Line();
 			line.getStyleClass().add("graph-edge");
@@ -253,9 +263,21 @@ public class SplitNetworkLayout {
 			edgeCallback.accept(e, line);
 			edgesGroup.getChildren().add(line);
 
+
 			var split = graph.getSplit(e);
 			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
 			progress.incrementProgress();
+
+			if (split <= splitsBlock.getNsplits() && splitsBlock.get(split).getConfidence() != -1 && !splitsWithConfidenceLabels.get(split)) {
+				splitsWithConfidenceLabels.set(split);
+				var label = new Label(StringUtils.removeTrailingZerosAfterDot("%.1f", splitsBlock.get(split).getConfidence()));
+				if (false)
+					label.setStyle("-fx-background-color: rgba(128,128,128,0.2)");
+				placeLabel(line, label);
+				label.effectProperty().bind(line.effectProperty());
+				splitstree6.view.splits.layout.LayoutUtils.installTranslateUsingLayout(label, () -> splitSelectionModel.select(split));
+				confidenceLabels.getChildren().add(label);
+			}
 		}
 
 		var loopsGroup = new Group();
@@ -266,8 +288,24 @@ public class SplitNetworkLayout {
 		}
 		progress.reportTaskCompleted();
 
-		return new Group(loopsGroup, edgesGroup, nodesGroup, nodeLabelsGroup);
+		confidenceLabels.visibleProperty().bind(showConfidence);
+
+		return new Group(loopsGroup, edgesGroup, confidenceLabels, nodesGroup, nodeLabelsGroup);
 	}
+
+	private void placeLabel(Line line, Label label) {
+		InvalidationListener listener = e -> {
+			var dir = new Point2D(line.getStartX() - line.getEndX(), line.getStartY() - line.getEndY()).normalize().multiply(12);
+			label.setTranslateX(0.5 * (line.getStartX() + line.getEndX()) - dir.getY() - 12);
+			label.setTranslateY(0.5 * (line.getStartY() + line.getEndY()) + dir.getX() - 12);
+		};
+		line.startXProperty().addListener(listener);
+		line.startYProperty().addListener(listener);
+		line.endXProperty().addListener(listener);
+		line.endYProperty().addListener(listener);
+		listener.invalidated(null);
+	}
+
 
 	private void rotate90(PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap) {
 		for (var v : graph.nodes()) {

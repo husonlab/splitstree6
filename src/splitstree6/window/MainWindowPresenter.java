@@ -60,16 +60,16 @@ import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
+import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
+import splitstree6.algorithms.trees.trees2splits.BoostrapTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork;
-import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
-import splitstree6.algorithms.trees.trees2trees.ConsensusTree;
-import splitstree6.algorithms.trees.trees2trees.RerootOrLadderizeTrees;
-import splitstree6.algorithms.trees.trees2trees.TreeSelector;
+import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
+import splitstree6.data.CharactersBlock;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
 import splitstree6.io.FileLoader;
@@ -192,7 +192,7 @@ public class MainWindowPresenter {
 
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
 				m -> !List.of("File", "Window", "Open Recent", "Help").contains(m.getText()),
-				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
+				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(mainWindow.emptyProperty())));
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
@@ -466,10 +466,15 @@ public class MainWindowPresenter {
 		controller.getPcoaMenuItem().setOnAction(null);
 		controller.getBrayCurtisMenuItem().setOnAction(null);
 		controller.getJsdMenuItem().setOnAction(null);
-		controller.getBootstrappingMenuItem().setOnAction(null);
 
-		controller.getShowBootStrapTreeMenuItem().setOnAction(null);
-		controller.getShowBootStrapNetworkMenuItem().setOnAction(null);
+		controller.getBootStrapTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTree()));
+		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
+
+		controller.getBootstrapTreeAsNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BoostrapTreeSplits()));
+		controller.getBootstrapTreeAsNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BoostrapTreeSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
+
+		controller.getBootStrapNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapSplits()));
+		controller.getBootStrapNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
 
 		controller.getEstimateInvariableSitesMenuItem().setOnAction(null);
 		controller.getComputePhylogeneticDiversityMenuItem().setOnAction(null);

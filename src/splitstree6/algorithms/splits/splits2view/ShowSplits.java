@@ -22,6 +22,7 @@ package splitstree6.algorithms.splits.splits2view;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.value.ChangeListener;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
@@ -31,6 +32,8 @@ import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.SplitsNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.splits.viewer.SplitsView;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataNode;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -44,6 +47,7 @@ public class ShowSplits extends Splits2View {
 	public enum ViewType {SplitsNetwork, SplitsText}
 
 	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.SplitsNetwork);
+	private final ChangeListener<Boolean> validListener;
 
 	@Override
 	public List<String> listOptions() {
@@ -52,16 +56,33 @@ public class ShowSplits extends Splits2View {
 
 	public ShowSplits() {
 		super();
+
+		validListener = (v, o, n) -> {
+			if (getNode() != null && getNode().getPreferredChild() != null && ((DataNode) getNode().getPreferredChild()).getDataBlock() instanceof ViewBlock viewBlock) {
+				if (viewBlock.getView() != null)
+					viewBlock.getView().getRoot().setDisable(!n);
+			}
+		};
 	}
 
 	@Override
-    public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock viewBlock) {
+	public void setNode(AlgorithmNode node) {
+		if (getNode() != null)
+			getNode().validProperty().removeListener(validListener);
+		super.setNode(node);
+		if (getNode() != null) {
+			getNode().validProperty().addListener(validListener);
+		}
+	}
+
+	@Override
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock inputData, ViewBlock viewBlock) {
 		viewBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
 		Platform.runLater(() -> viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("SplitsNetworkViewer16.gif", 16)));
 
-        // if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
+		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 
-        switch (getOptionView()) {
+		switch (getOptionView()) {
 			case SplitsNetwork -> {
 				if (!(viewBlock.getView() instanceof SplitsView)) {
 					Platform.runLater(() -> {

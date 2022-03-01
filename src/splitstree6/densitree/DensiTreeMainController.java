@@ -50,6 +50,9 @@ public class DensiTreeMainController {
 	private MenuItem copyMenuItem;
 
 	@FXML
+	private MenuItem specificTreesMenuItem;
+
+	@FXML
 	private ToolBar toolBar;
 
 	@FXML
@@ -93,6 +96,10 @@ public class DensiTreeMainController {
 
 	public MenuItem getCopyMenuItem() {
 		return copyMenuItem;
+	}
+
+	public MenuItem getSpecificTreesMenuItem() {
+		return specificTreesMenuItem;
 	}
 
 	public ToolBar getToolBar() {

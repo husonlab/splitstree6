@@ -212,6 +212,11 @@ public class SplitsBlock extends DataBlock {
 		this.cycle = cycle;
 	}
 
+
+	public boolean hasConfidenceValues() {
+		return splits.stream().anyMatch(s -> s.getConfidence() != -1);
+	}
+
 	public Map<Integer, String> getSplitLabels() {
 		return splitLabels;
 	}

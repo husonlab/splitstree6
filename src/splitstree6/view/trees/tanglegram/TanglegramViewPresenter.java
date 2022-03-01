@@ -79,7 +79,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		);
 
 		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
-				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty());
+				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowInternalLabelsProperty());
 
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
@@ -98,7 +98,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		orientation2Property.set(tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg);
 
 		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
-				tanglegramView.optionDiagram2Property(), tanglegramView.optionAveraging2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty());
+				tanglegramView.optionDiagram2Property(), tanglegramView.optionAveraging2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowInternalLabelsProperty());
 
 		controller.getRightPane().getChildren().add(tree2Pane);
 
@@ -186,6 +186,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 					disabledDiagrams1.add(TreeDiagramType.TriangularCladogram);
 				}
 			});
+
+			controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(tanglegramView.optionShowInternalLabelsProperty());
 
 			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams1, TreeDiagramType::createNode, false));
 			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams1, TreeDiagramType::createNode, false));

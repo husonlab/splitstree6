@@ -48,7 +48,7 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 		setContent(loader.getRoot());
 		setClosable(true);
 
-		presenter = new AlgorithmTabPresenter(this);
+		presenter = new AlgorithmTabPresenter(mainWindow, this);
 
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
 			if (algorithm.getFromClass() == algorithmNode.getAlgorithm().getFromClass()

@@ -115,34 +115,34 @@ public class LogDet extends Characters2Distances {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-		final int ntax = charactersBlock.getNtax();
-		progress.setTasks("logDet distance", "Init.");
+		final var ntax = charactersBlock.getNtax();
+		progress.setTasks("logDet distance", "Calculating");
 		progress.setMaximum(ntax);
 		distancesBlock.setNtax(ntax);
 		int numUndefined = 0;
 
-		for (int t = 1; t <= ntax; t++) {
-			for (int s = t + 1; s <= ntax; s++) {
-				PairwiseCompare seqPair = new PairwiseCompare(charactersBlock, s, t);
-				double dist = -1.0;
+		for (var t = 1; t <= ntax; t++) {
+			for (var s = t + 1; s <= ntax; s++) {
+				var seqPair = new PairwiseCompare(charactersBlock, s, t);
+				var dist = -1.0;
 
-				int r = seqPair.getNumStates();
+				var r = seqPair.getNumStates();
 
-				double[][] F = seqPair.getF();
+				var F = seqPair.getF();
 				if (F == null) {
 					numUndefined++;
 				} else {
 					if (this.optionFudgeFactor.getValue()) {
                         /* LDDist 1.2 implements some questionable tricks to avoid singluar matrices. To enable
                    comparisons, I've implemented these here. */
-						double[][] extF = seqPair.getfCount();
+						var extF = seqPair.getfCount();
 
-						double[] rowsum = new double[r];
-						double[] colsum = new double[r];
-						double[] rowgaps = new double[r]; //sum of gap and missng cols
-						double[] colgaps = new double[r]; //sum of gap and missing rows
-						for (int i = 0; i < r + 2; i++) {
-							for (int j = 0; j < r + 2; j++) {
+						var rowsum = new double[r];
+						var colsum = new double[r];
+						var rowgaps = new double[r]; //sum of gap and missng cols
+						var colgaps = new double[r]; //sum of gap and missing rows
+						for (var i = 0; i < r + 2; i++) {
+							for (var j = 0; j < r + 2; j++) {
 								if (i < r && j < r) {
 									rowsum[i] += extF[i][j];
 									colsum[j] += extF[i][j];
@@ -155,8 +155,8 @@ public class LogDet extends Characters2Distances {
 						}
 
 						/* add fudge factors from sites with gap or missing */
-						for (int i = 0; i < r; i++) {
-							for (int j = 0; j < r; j++) {
+						for (var i = 0; i < r; i++) {
+							for (var j = 0; j < r; j++) {
 								double fudgei = 0.0, fudgej = 0.0;
 								if (rowsum[i] != 0) fudgei = rowgaps[i] / rowsum[i];
 								if (colsum[j] != 0) fudgej = colgaps[j] / colsum[j];
@@ -165,41 +165,41 @@ public class LogDet extends Characters2Distances {
 						}
 
 						/* Replace zeros with small numbers !?! but only in rows/columns with values present*/
-						double Fsum = 0.0;
-						for (int i = 0; i < r; i++) {
+						var Fsum = 0.0;
+						for (var i = 0; i < r; i++) {
 							if (rowsum[i] == 0) continue;
-							for (int j = 0; j < r; j++) {
+							for (var j = 0; j < r; j++) {
 								if (this.optionFillZeros.getValue() && colsum[j] != 0 && F[i][j] < 0.5) F[i][j] = 0.5;
 								Fsum += F[i][j];
 							}
 						}
 						/*Normalise */
-						for (int i = 0; i < r; i++)
-							for (int j = 0; j < r; j++)
+						for (var i = 0; i < r; i++)
+							for (var j = 0; j < r; j++)
 								F[i][j] /= Fsum;
 
 					}
 
 					/* Determine base frequencies */
-					double[] Pi_x = new double[r];
-					double[] Pi_y = new double[r];
-					double[] Pi = new double[r];
-					for (int i = 0; i < r; i++)
+					var Pi_x = new double[r];
+					var Pi_y = new double[r];
+					var Pi = new double[r];
+					for (var i = 0; i < r; i++)
 						Pi_x[i] = Pi_y[i] = Pi[i] = 0.0;
 
-					for (int i = 0; i < r; i++)
-						for (int j = 0; j < r; j++) {
+					for (var i = 0; i < r; i++)
+						for (var j = 0; j < r; j++) {
 							double Fij = F[i][j];
 							Pi_x[i] += Fij;
 							Pi_y[j] += Fij;
 						}
 
 
-					for (int i = 0; i < r; i++)
+					for (var i = 0; i < r; i++)
 						Pi[i] = (Pi_x[i] + Pi_y[i]) / 2.0;
 
-					double logPi = 0.0;
-					for (int i = 0; i < r; i++)
+					var logPi = 0.0;
+					for (var i = 0; i < r; i++)
 						if (Pi_x[i] != 0.0 && Pi_y[i] != 0.0)
 							logPi += Math.log(Pi_x[i]) + Math.log(Pi_y[i]);
 					logPi *= 0.5;
@@ -207,16 +207,16 @@ public class LogDet extends Characters2Distances {
 					/* Compute Log Det */
 
 					/* Incorporate proportion of invariable sites */
-					double pinv = getOptionPropInvariableSites();
+					var pinv = getOptionPropInvariableSites();
 					if (pinv > 0.0)
-						for (int i = 0; i < r; i++)
+						for (var i = 0; i < r; i++)
 							F[i][i] -= pinv * Pi[i];
 
-					final Matrix Fmatrix = new Matrix(F);
-					double[] Feigs = Fmatrix.eig().getRealEigenvalues();
-					double x = 0.0;
-					boolean thisIsSaturated = false;
-					for (double Feig : Feigs) {
+					final var Fmatrix = new Matrix(F);
+					var Feigs = Fmatrix.eig().getRealEigenvalues();
+					var x = 0.0;
+					var thisIsSaturated = false;
+					for (var Feig : Feigs) {
 						if (Feig <= 0.0)
 							thisIsSaturated = true;
 						else
@@ -228,8 +228,8 @@ public class LogDet extends Characters2Distances {
 						x = -10000000;
 					}
 
-					double PiSum = 0;
-					for (int i = 0; i < r; i++) {
+					var PiSum = 0.0;
+					for (var i = 0; i < r; i++) {
 						PiSum += Pi[i] * Pi[i];
 					}
 

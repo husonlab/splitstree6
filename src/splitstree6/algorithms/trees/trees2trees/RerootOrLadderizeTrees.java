@@ -22,7 +22,9 @@ package splitstree6.algorithms.trees.trees2trees;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.graph.Edge;
 import jloda.graph.Node;
@@ -56,10 +58,20 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 
 	private final ObjectProperty<Ladderize> optionLadderize = new SimpleObjectProperty<>(this, "optionLadderize", Ladderize.Off);
 
+	private final BooleanProperty optionHasBranchSupportValues = new SimpleBooleanProperty(this, "optionHasBranchSupportValues", false);
+
 	private final InvalidationListener selectionInvalidationListener;
 
 	public List<String> listOptions() {
-		return List.of(optionRootBy.getName(), optionOutGroupTaxa.getName(), optionLadderize.getName());
+		return List.of(optionRootBy.getName(), optionOutGroupTaxa.getName(), optionLadderize.getName(), optionHasBranchSupportValues.getName());
+	}
+
+	@Override
+	public String getToolTip(String optionName) {
+		if (optionName.equals(optionHasBranchSupportValues.getName()))
+			return "If internal node labels are numbers then will attempt to relabel correctly during rerooting";
+		else
+			return null;
 	}
 
 	public RerootOrLadderizeTrees() {
@@ -127,8 +139,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 							tree.redirectEdgesAwayFromRoot();
 						}
 						if (outGroupTaxonSet.cardinality() > 0)
-							// todo: ask about internal node labels
-							RerootingUtils.rerootByOutGroup(false, tree, outGroupTaxonSet);
+							RerootingUtils.rerootByOutGroup(getOptionHasBranchSupportValues(), tree, outGroupTaxonSet);
 						trees.add(tree);
 					}
 				}
@@ -195,6 +206,18 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 
 	public void setOptionLadderize(Ladderize optionLadderize) {
 		this.optionLadderize.set(optionLadderize);
+	}
+
+	public boolean getOptionHasBranchSupportValues() {
+		return optionHasBranchSupportValues.get();
+	}
+
+	public BooleanProperty optionHasBranchSupportValuesProperty() {
+		return optionHasBranchSupportValues;
+	}
+
+	public void setOptionHasBranchSupportValues(boolean optionHasBranchSupportValues) {
+		this.optionHasBranchSupportValues.set(optionHasBranchSupportValues);
 	}
 
 	@Override

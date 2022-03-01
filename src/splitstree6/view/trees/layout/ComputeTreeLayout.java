@@ -30,7 +30,6 @@ import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
-import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 
@@ -54,12 +53,13 @@ public class ComputeTreeLayout {
 	 * @param edgeCallback         callback to set up additional edges stuff
 	 * @param linkNodesEdgesLabels link coordinates nodes, edges and labels via listeners
 	 * @param alignLabels          align labels in rectangular and circular phylograms
-	 * @return group of all edges, nodes and node-labels
+	 * @return groups and layout consumer
 	 */
-	public static Pair<Group, Consumer<LayoutOrientation>> apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, double width, double height, TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
-																 BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
+	public static Result apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, double width, double height,
+							   TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
+							   BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
 		if (tree.getNumberOfNodes() == 0)
-			return new Pair<>(new Group(), null);
+			return new Result();
 
 		if (alignLabels && diagram != TreeDiagramType.RectangularPhylogram && diagram != TreeDiagramType.CircularPhylogram)
 			alignLabels = false; // can't or don't need to, or can't, align labels in all other cases
@@ -72,6 +72,7 @@ public class ComputeTreeLayout {
 		height = triplet.getThird();
 
 		final NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
+
 		for (var v : tree.nodes()) {
 			var label = LayoutUtils.getLabel(taxaBlock, tree, v);
 			if (label != null) {
@@ -100,7 +101,8 @@ public class ComputeTreeLayout {
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
 
 		var nodeGroup = new Group();
-		var nodeLabelGroup = new Group();
+		var internalLabelsGroup = new Group();
+		var taxonLabelsGroup = new Group();
 		var edgeGroup = new Group();
 
 		NodeArray<Shape> nodeShapeMap = tree.newNodeArray();
@@ -116,11 +118,16 @@ public class ComputeTreeLayout {
 
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
-				nodeLabelGroup.getChildren().add(label);
 				nodeCallback.accept(v, shape, label);
 				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
-				if (taxonId != null)
+				if (taxonId != null) {
+					taxonLabelsGroup.getChildren().add(label);
 					shape.setUserData(taxaBlock.get(taxonId));
+				} else {
+					internalLabelsGroup.getChildren().add(label);
+					splitstree6.view.splits.layout.LayoutUtils.installTranslateUsingLayout(label, () -> {
+					});
+				}
 			}
 		}
 
@@ -138,15 +145,33 @@ public class ComputeTreeLayout {
 
 		switch (diagram) {
 			case CircularPhylogram, CircularCladogram, RadialCladogram -> LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
-            case RadialPhylogram -> layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap);
-            default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, nodeLabelMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
+			case RadialPhylogram -> layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap);
+			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, nodeLabelMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
 
 		}
+		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, internalLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram);
+	}
 
-		if (labelConnectorGroup != null)
-			return new Pair<>(new Group(labelConnectorGroup, edgeGroup, nodeGroup, nodeLabelGroup), layoutLabelsRadialPhylogram);
-		else
-			return new Pair<>(new Group(edgeGroup, nodeGroup, nodeLabelGroup), layoutLabelsRadialPhylogram);
+	public record Result(Group labelConnectors, Group edges, Group nodes, Group internalLabels, Group taxonLabels,
+						 Consumer<LayoutOrientation> layoutOrientationConsumer) {
+		public Group getAllAsGroup() {
+			var group = new Group();
+			if (labelConnectors != null)
+				group.getChildren().add(labelConnectors);
+			if (edges != null)
+				group.getChildren().add(edges);
+			if (nodes != null)
+				group.getChildren().add(nodes);
+			if (internalLabels != null)
+				group.getChildren().add(internalLabels);
+			if (taxonLabels != null)
+				group.getChildren().add(taxonLabels);
+			return group;
+		}
+
+		public Result() {
+			this(null, null, null, null, null, null);
+		}
 	}
 
 }

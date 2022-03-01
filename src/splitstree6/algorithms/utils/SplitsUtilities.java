@@ -154,7 +154,7 @@ public class SplitsUtilities {
 	 */
 	public static void splitsToDistances(List<ASplit> splits, boolean useWeights, DistancesBlock distancesBlock) {
 		for (var i = 1; i <= distancesBlock.getNtax(); i++) {
-			for (var j = i + 1; j < distancesBlock.getNtax(); j++) {
+			for (var j = i + 1; j <= distancesBlock.getNtax(); j++) {
 				for (var s : splits) {
 					if (s.separates(i, j)) {
 						var dist = distancesBlock.get(i, j) + (useWeights ? s.getWeight() : 1);
@@ -339,5 +339,20 @@ public class SplitsUtilities {
 			result.add(split);
 		}
 		return result;
+	}
+
+	public static void addAllTrivial(int ntaxa, SplitsBlock splits) {
+		if (ntaxa > 2) {
+			final var taxaWithTrivialSplit = new BitSet();
+
+			for (var s = 1; s <= splits.getNsplits(); s++) {
+				final var split = splits.get(s);
+				if (split.isTrivial())
+					taxaWithTrivialSplit.set(split.getSmallerPart().nextSetBit(0));
+			}
+			for (var t = taxaWithTrivialSplit.nextClearBit(1); t != -1 && t <= ntaxa; t = taxaWithTrivialSplit.nextClearBit(t + 1)) {
+				splits.getSplits().add(new ASplit(BitSetUtils.asBitSet(t), ntaxa, 0.00001, 0.00001));
+			}
+		}
 	}
 }

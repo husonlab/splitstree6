@@ -244,7 +244,10 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 
 	public DataNode<? extends DataBlock> getWorkingDataNode() {
 		return dataNodesStream().filter(v -> v.getTitle().startsWith(WORKING_PREFIX)).filter(v -> !v.getTitle().equals(WORKING_TAXA)).findFirst().orElse(null);
+	}
 
+	public Object getWorkingDataBlock() {
+		return getWorkingDataNode() == null ? null : getWorkingDataNode().getDataBlock();
 	}
 
 	public AlgorithmNode<TaxaBlock, TaxaBlock> getInputTaxaFilterNode() {

@@ -66,7 +66,7 @@ public class LayoutLabelsCircular {
 							} else
 								angle = 0.0;
 						}
-						var add = (maxRadius > Double.MIN_VALUE ? maxRadius - GeometryUtilsFX.magnitude(shape.getTranslateX(), shape.getTranslateY()) : 0);
+						var add = v.isLeaf() ? (maxRadius > Double.MIN_VALUE ? maxRadius - GeometryUtilsFX.magnitude(shape.getTranslateX(), shape.getTranslateY()) : 0) : -10;
 
 						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, add + labelGap + 0.5 * label.getWidth());
 						if (linkNodesEdgesLabels) {

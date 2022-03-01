@@ -21,6 +21,10 @@ package splitstree6.densitree;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.util.AService;
@@ -29,6 +33,7 @@ import splitstree6.io.readers.trees.NewickReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Optional;
 
 /**
  * the presenter
@@ -40,8 +45,6 @@ public class DensiTreeMainPresenter {
 		controller.getCanvas().widthProperty().bind(controller.getMainPane().widthProperty());
 		controller.getCanvas().heightProperty().bind(controller.getMainPane().heightProperty());
 
-		//controller.getCanvas().prefWidth(controller.getMainPane().getPrefWidth());
-		//controller.getCanvas().prefHeight(controller.getMainPane().getPrefHeight());
 
 		controller.getMessageLabel().setText("");
 
@@ -73,17 +76,67 @@ public class DensiTreeMainPresenter {
             }
 		});
 
+		final String[] specTrees = new String[1];
 
-		InvalidationListener listener = observable -> DensiTree.draw(new DensiTree.Parameters(controller.getCheckBox().isSelected()), model, controller.getCanvas(), controller.getPane());
+		controller.getSpecificTreesMenuItem().setOnAction(e -> {
+			var dialog = new TextInputDialog();
+			dialog.setTitle("Highlight specific Trees");
+			dialog.setHeaderText("Enter the numbers of the trees you want to be highlighted, trees start at 1.\nE.g.: 1,2,3");
+			dialog.setContentText("Trees:");
+
+			Optional<String> result = dialog.showAndWait();
+
+			result.ifPresent(trees -> specTrees[0] = trees);
+		});
+
+		controller.getQuitMenuItem().setOnAction(e -> {
+			var alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.setTitle("Confirm Quit");
+			alert.setHeaderText("Closing open document");
+			alert.setContentText("Do you really want to quit?");
+
+			final ButtonType buttonTypeCancel = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+			final ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+			alert.getButtonTypes().setAll(buttonTypeCancel, buttonTypeYes);
+
+			Optional<ButtonType> result = alert.showAndWait();
+
+			if (result.get() == buttonTypeYes){
+				stage.close();
+			}
+		});
+
+		stage.setOnCloseRequest(e -> {
+			var alert = new Alert(Alert.AlertType.CONFIRMATION);
+			alert.setTitle("Confirm Quit");
+			alert.setHeaderText("Closing open document");
+			alert.setContentText("Do you really want to quit?");
+
+			final ButtonType buttonTypeCancel = new ButtonType("No", ButtonBar.ButtonData.CANCEL_CLOSE);
+			final ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
+			alert.getButtonTypes().setAll(buttonTypeCancel, buttonTypeYes);
+
+			Optional<ButtonType> result = alert.showAndWait();
+
+			if (result.get() == buttonTypeYes){
+				stage.close();
+			}
+		});
+
+
+		InvalidationListener listener = observable ->
+				DensiTree.draw(new DensiTree.Parameters(controller.getCheckBox().isSelected(), specTrees[0]), model, controller.getCanvas(), controller.getPane());
 
 		controller.getDrawButton().setOnAction(e -> {
-			var parameters = new DensiTree.Parameters(controller.getCheckBox().isSelected());
+			var parameters = new DensiTree.Parameters(controller.getCheckBox().isSelected(), specTrees[0]);
 			DensiTree.draw(parameters, model, controller.getCanvas(), controller.getPane());
 			controller.getMainPane().widthProperty().addListener(listener);
 			controller.getMainPane().heightProperty().addListener(listener);
 			controller.getCheckBox().selectedProperty().addListener(listener);
 		});
+
 		controller.getDrawButton().disableProperty().bind(Bindings.isEmpty(model.getTreesBlock().getTrees()));
+
 		controller.getClearButton().setOnAction(e -> {
 			DensiTree.clear(controller.getCanvas(), controller.getPane());
 			controller.getMainPane().widthProperty().removeListener(listener);

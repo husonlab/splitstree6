@@ -25,6 +25,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
 import splitstree6.algorithms.splits.IToCircularSplits;
@@ -99,7 +100,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		splitsBlock.getSplits().addAll(splits);
 
-		System.err.printf("Time: %,.1fs%n", (System.currentTimeMillis() - start) / 1000f);
+		if (!(progress instanceof ProgressSilent))
+			System.err.printf("Time: %,.1fs%n", (System.currentTimeMillis() - start) / 1000f);
 	}
 
 	@Override

@@ -413,12 +413,12 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="brayCurtisMenuItem" text="Bray Curtis"/>
                         <MenuItem fx:id="jsdMenuItem" text="JSD"/>
-                        <MenuItem fx:id="bootstrappingMenuItem" text="Euclidean"/>
+                        <MenuItem fx:id="euclideanMenuItem" text="Euclidean"/>
                     </Menu>
                     <Menu text="Analysis">
-                        <MenuItem fx:id="showBootStrapTreeMenuItem" text="Show Bootstrap Tree..."/>
-                        <MenuItem fx:id="showBootStrapNetworkMenuItem"
-                                  text="Show Bootstrap Network..."/>
+                        <MenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."/>
+                        <MenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network..."/>
+                        <MenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="estimateInvariableSitesMenuItem"
                                   text="Esimate Invariable Sites..."/>

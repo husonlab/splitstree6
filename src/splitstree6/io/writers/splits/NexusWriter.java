@@ -44,7 +44,7 @@ public class NexusWriter extends SplitsWriterBase {
 	private final BooleanProperty optionWeights = new SimpleBooleanProperty(this, "optionWeights", true);
 	private final BooleanProperty optionLabels = new SimpleBooleanProperty(this, "optionLabels", false);
 	private final BooleanProperty optionShowBothSides = new SimpleBooleanProperty(this, "optionShowBothSides", false);
-	private final BooleanProperty optionConfidences = new SimpleBooleanProperty(this, "optionConfidences", false);
+	private final BooleanProperty optionConfidences = new SimpleBooleanProperty(this, "optionConfidences", true);
 
 	public NexusWriter() {
 		setFileExtensions("nexus", "nex", "nxs");

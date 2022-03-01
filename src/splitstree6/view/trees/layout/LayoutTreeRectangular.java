@@ -96,7 +96,6 @@ public class LayoutTreeRectangular {
 		var rootHeight = yCoord.get(tree.getRoot());
 
 		try (var assigned = tree.newNodeSet()) {
-
 			// assign coordinates:
 			var queue = new LinkedList<Node>();
 			queue.add(tree.getRoot());

@@ -58,11 +58,12 @@
                             <Tooltip text="Choose rooting method"/>
                         </tooltip>
                     </ComboBox>
-                    <ToggleButton fx:id="useWeightsToggleButton" mnemonicParsing="false" selected="true" text="W">
-                        <tooltip>
-                            <Tooltip text="Use split weights"/>
-                        </tooltip>
-                    </ToggleButton>
+                     <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
+                                   text="L">
+                         <tooltip>
+                             <Tooltip text="Show internal labels"/>
+                         </tooltip>
+                     </ToggleButton>
                     <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
                     <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">

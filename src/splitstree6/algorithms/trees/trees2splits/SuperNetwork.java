@@ -61,7 +61,7 @@ public class SuperNetwork extends Trees2Splits {
 	private final BooleanProperty optionApplyRefineHeuristic = new SimpleBooleanProperty(this, "optionApplyRefineHeuristic", false);
 	private final IntegerProperty optionSeed = new SimpleIntegerProperty(this, "optionSeed", 0);
 	private final SimpleObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(EdgeWeights.TreeSizeWeightedMean);
-	private final BooleanProperty optionUseHighDimensionFilter = new SimpleBooleanProperty(this, "optionUseHighDimensionFilter", true);
+	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	@Override
 	public String getCitation() {
@@ -72,7 +72,7 @@ public class SuperNetwork extends Trees2Splits {
 	@Override
 	public List<String> listOptions() {
 		return Arrays.asList(optionEdgeWeights.getName(), optionZRule.getName(), optionSuperTree.getName(), optionNumberOfRuns.getName(),
-				optionApplyRefineHeuristic.getName(), optionSeed.getName(), optionUseHighDimensionFilter.getName());
+				optionApplyRefineHeuristic.getName(), optionSeed.getName(), optionHighDimensionFilter.getName());
 	}
 
 	@Override
@@ -91,7 +91,7 @@ public class SuperNetwork extends Trees2Splits {
 			return "Apply a simple refinement heuristic";
 		} else if (optionSeed.getName().equals(optionName)) {
 			return "Set seed used for random permutations";
-		} else if (optionUseHighDimensionFilter.getName().equals(optionName)) {
+		} else if (optionHighDimensionFilter.getName().equals(optionName)) {
 			return "Heuristically remove splits causing high-dimensional network";
 		} else
 			return super.getToolTip(optionName);
@@ -254,7 +254,7 @@ public class SuperNetwork extends Trees2Splits {
 			}
 		}
 
-		if (isOptionUseHighDimensionFilter()) {
+		if (isOptionHighDimensionFilter()) {
 			var dimensionsFilter = new DimensionFilter();
 			dimensionsFilter.compute(progress, taxaBlock, computedSplits, splitsBlock);
 		} else
@@ -692,16 +692,16 @@ public class SuperNetwork extends Trees2Splits {
 		this.optionEdgeWeights.set(optionEdgeWeights);
 	}
 
-	public boolean isOptionUseHighDimensionFilter() {
-		return optionUseHighDimensionFilter.get();
+	public boolean isOptionHighDimensionFilter() {
+		return optionHighDimensionFilter.get();
 	}
 
-	public BooleanProperty optionUseHighDimensionFilterProperty() {
-		return optionUseHighDimensionFilter;
+	public BooleanProperty optionHighDimensionFilterProperty() {
+		return optionHighDimensionFilter;
 	}
 
-	public void setOptionUseHighDimensionFilter(boolean optionUseHighDimensionFilter) {
-		this.optionUseHighDimensionFilter.set(optionUseHighDimensionFilter);
+	public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
+		this.optionHighDimensionFilter.set(optionHighDimensionFilter);
 	}
 
 	@Override

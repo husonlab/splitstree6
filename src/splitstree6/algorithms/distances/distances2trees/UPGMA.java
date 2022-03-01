@@ -23,6 +23,7 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.trees.IToSingleTree;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -37,7 +38,7 @@ import java.io.IOException;
  * @author Christian Rausch, David Bryant, Daniel Huson
  */
 
-public class UPGMA extends Distances2Trees {
+public class UPGMA extends Distances2Trees implements IToSingleTree {
 
 	@Override
 	public String getCitation() {
@@ -58,6 +59,7 @@ public class UPGMA extends Distances2Trees {
 	 */
 	public static PhyloTree computeUPGMATree(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances) throws CanceledException {
 		final var tree = new PhyloTree();
+		tree.setName("UPGMA");
 		final var ntax = distances.getNtax();
 
 		final var subtrees = new Node[ntax + 1];

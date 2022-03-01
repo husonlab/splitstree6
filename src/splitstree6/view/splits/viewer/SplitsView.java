@@ -70,7 +70,7 @@ public class SplitsView implements IView {
 	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting");
 	private final DoubleProperty optionRootAngle = new SimpleDoubleProperty(this, "optionRootAngle");
 
-	private final BooleanProperty optionUseWeights = new SimpleBooleanProperty(this, "optionUseWeights");
+	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence", true);
 
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
@@ -86,14 +86,13 @@ public class SplitsView implements IView {
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Outline);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionRooting, SplitsRooting::valueOf, SplitsRooting.None);
-		ProgramProperties.track(optionUseWeights, true);
 		ProgramProperties.track(optionRootAngle, 160.0);
 		ProgramProperties.track(optionOutlineFill, Color.SILVER);
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionUseWeights.getName(), optionZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName());
+		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(),
+				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(), optionShowConfidence.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -133,7 +132,6 @@ public class SplitsView implements IView {
 		optionRootingProperty().addListener(e -> mainWindow.setDirty(true));
 		optionRootAngleProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
-		optionUseWeightsProperty().addListener(e -> mainWindow.setDirty(true));
 		optionOutlineFillProperty().addListener(e -> mainWindow.setDirty(true));
 	}
 
@@ -277,20 +275,24 @@ public class SplitsView implements IView {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
 	}
 
-	public boolean isOptionUseWeights() {
-		return optionUseWeights.get();
-	}
-
-	public BooleanProperty optionUseWeightsProperty() {
-		return optionUseWeights;
-	}
-
 	public Color getOptionOutlineFill() {
 		return optionOutlineFill.get();
 	}
 
 	public ObjectProperty<Color> optionOutlineFillProperty() {
 		return optionOutlineFill;
+	}
+
+	public boolean isOptionShowConfidence() {
+		return optionShowConfidence.get();
+	}
+
+	public BooleanProperty optionShowConfidenceProperty() {
+		return optionShowConfidence;
+	}
+
+	public void setOptionShowConfidence(boolean optionShowConfidence) {
+		this.optionShowConfidence.set(optionShowConfidence);
 	}
 
 	public Bounds getTargetBounds() {

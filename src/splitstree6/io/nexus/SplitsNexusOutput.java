@@ -54,7 +54,10 @@ public class SplitsNexusOutput extends NexusIOBase implements INexusOutput<Split
 			w.write(" weights=yes");
 		else
 			w.write(" weights=no");
-		if (format.isOptionConfidences())
+
+		var writeConfidences = format.isOptionConfidences() && splitsBlock.hasConfidenceValues(); // only want to write confidences if they are set.
+
+		if (writeConfidences)
 			w.write(" confidences=yes");
 		else
 			w.write(" confidences=no");
@@ -112,7 +115,7 @@ public class SplitsNexusOutput extends NexusIOBase implements INexusOutput<Split
 			if (format.isOptionWeights()) {
 				w.write(" " + StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight()) + " \t");
 			}
-			if (format.isOptionConfidences()) {
+			if (writeConfidences) {
 				w.write(" " + StringUtils.removeTrailingZerosAfterDot("%.8f", split.getConfidence()) + " \t");
 			}
 			w.write(" " + StringUtils.toString(split.getA(), " "));

@@ -99,6 +99,12 @@
                                     <Font size="12.0"/>
                                 </font>
                             </ToggleButton>
+                            <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
+                                          text="L">
+                                <tooltip>
+                                    <Tooltip text="Show internal labels"/>
+                                </tooltip>
+                            </ToggleButton>
                             <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                             <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                                     minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"

@@ -59,8 +59,6 @@ public class TreeSelectorSplits extends Trees2Splits {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock trees, SplitsBlock splits) throws IOException {
-		progress.setTasks("Tree selector", "Init.");
-
 		if (getOptionWhich() < 1)
 			setOptionWhich(1);
 		if (getOptionWhich() > trees.getNTrees())
@@ -73,6 +71,8 @@ public class TreeSelectorSplits extends Trees2Splits {
 
 		if (tree.getNumberOfNodes() == 0)
 			return;
+
+		setShortDescription("using tree " + getOptionWhich() + " of " + trees.size() + " trees");
 
 		progress.setTasks("TreeSelectorSplits", "Extracting splits");
 		progress.incrementProgress();
@@ -96,16 +96,11 @@ public class TreeSelectorSplits extends Trees2Splits {
 		return optionWhich.get();
 	}
 
-	public IntegerProperty optionWhichProperty() {
-		return optionWhich;
-	}
-
 	public void setOptionWhich(int optionWhich) {
 		this.optionWhich.set(optionWhich);
 	}
 
-	@Override
-	public String getShortDescription() {
-		return "which=" + getOptionWhich();
+	public IntegerProperty optionWhichProperty() {
+		return optionWhich;
 	}
 }

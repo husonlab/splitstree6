@@ -39,7 +39,6 @@ public class CreateEdgesCircular {
 	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
-
 		var origin = new Point2D(0, 0);
 
 		LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {

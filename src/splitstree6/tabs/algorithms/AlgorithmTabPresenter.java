@@ -29,6 +29,7 @@ import jloda.util.StringUtils;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 
 import java.util.ArrayList;
@@ -38,18 +39,22 @@ import java.util.List;
 public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 	private final List<ChangeListener> changeListeners = new ArrayList<>();
 
-	public AlgorithmTabPresenter(AlgorithmTab algorithmTab) {
+	public AlgorithmTabPresenter(MainWindow mainWindow, AlgorithmTab algorithmTab) {
 		var controller = algorithmTab.getController();
 		var algorithmNode = algorithmTab.getAlgorithmNode();
+
+		var runningProperty = mainWindow.getWorkflow().runningProperty();
 
 		controller.getApplyButton().setOnAction(e -> {
 			algorithmNode.restart();
 			algorithmNode.setTitle(algorithmNode.getAlgorithm().getName());
 		});
-		controller.getApplyButton().disableProperty().bind(algorithmNode.getService().runningProperty().or(algorithmNode.allParentsValidProperty().not()));
+		controller.getApplyButton().disableProperty().bind(runningProperty.or(algorithmNode.allParentsValidProperty().not()));
 
 		var label = new Label(algorithmTab.getAlgorithmNode().getAlgorithm().getName());
 		algorithmTab.setGraphic(label);
+
+		controller.getMainPane().disableProperty().bind(runningProperty);
 
 		//AutoCompleteComboBox.install(controller.getAlgorithmCBox());
 
@@ -60,7 +65,7 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 					: new Tooltip(algorithm.getName() + (algorithm.getCitation() == null ? "" : "\n" + StringUtils.fold(algorithm.getCitation().replaceAll(".*;", ""), 80))));
 			controller.getAlgorithmCBox().setTooltip(tooltip);
 		});
-		controller.getAlgorithmCBox().disableProperty().bind(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1));
+		controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
 
 		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null)
 			setupOptionControls(controller, algorithmTab.getAlgorithmNode().getAlgorithm());
@@ -69,8 +74,9 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 			controller.getAlgorithmCBox().setValue(n);
 			setupOptionControls(controller, (Algorithm) n);
 			label.setText(n.getName());
-
 		});
+
+		controller.getMenuButton().disableProperty().bind(runningProperty);
 	}
 
 	public void setupOptionControls(AlgorithmTabController controller, Algorithm algorithm) {

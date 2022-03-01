@@ -73,8 +73,7 @@ public class SplitsViewController {
 	private Button decreaseFontButton;
 
 	@FXML
-	private ToggleButton useWeightsToggleButton;
-
+	private ToggleButton showInternalLabelsToggleButton;
 	@FXML
 	private AnchorPane innerAnchorPane;
 
@@ -178,8 +177,8 @@ public class SplitsViewController {
 		return zoomableScrollPane;
 	}
 
-	public ToggleButton getUseWeightsToggleButton() {
-		return useWeightsToggleButton;
+	public ToggleButton showInternalLabelsToggleButton() {
+		return showInternalLabelsToggleButton;
 	}
 
 	public ScaleBar getScaleBar() {

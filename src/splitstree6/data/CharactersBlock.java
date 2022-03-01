@@ -79,6 +79,28 @@ public class CharactersBlock extends DataBlock {
 		format = new CharactersFormat();
 	}
 
+	public CharactersBlock(CharactersBlock src) {
+		this(src, src.matrix);
+	}
+
+	public CharactersBlock(CharactersBlock src, char[][] matrixToUse) {
+		this.matrix = matrixToUse;
+		symbols = src.symbols;
+		gapCharacter = src.gapCharacter;
+		missingCharacter = src.missingCharacter;
+		characterWeights = src.characterWeights;
+		diploid = src.diploid;
+		respectCase = src.respectCase;
+		dataType = src.dataType;
+		hasAmbiguityCodes = src.hasAmbiguityCodes;
+		stateLabeler = src.stateLabeler;
+		format = src.format;
+		charLabeler = src.charLabeler;
+		ncolors = src.ncolors;
+		symbol2color = src.symbol2color;
+		color2symbols = src.color2symbols;
+	}
+
 	@Override
 	public void clear() {
 		super.clear();
