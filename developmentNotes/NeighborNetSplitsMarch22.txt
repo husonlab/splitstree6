@@ -1,0 +1,10 @@
+THE PLAN
+
+Add better output, so it is easy to tell exactly which versions of the algorithms are being called and how many iterations/seconds they take.
+
+
+Study bees.nex again, to see if it is an implementation or algorithm error
+
+
+Create a dataset with around 50 taxa, restricted from one of Oliviers
+

@@ -88,7 +88,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		var useBlockPivot = (getOptionInferenceAlgorithm() == InferenceAlgorithm.BlockPivot);
 		var useDual = isOptionUseDual();
 		var usePreconditioner = isOptionUsePreconditioner();
-		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDualDCG, progress);
+		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDual, usePreconditioner, progress);
 
 
 		if (Compatibility.isCompatible(splits))

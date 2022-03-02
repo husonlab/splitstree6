@@ -34,7 +34,7 @@ public class NeighborNetSplits {
         public double pcgTol = 1e-4; //Tolerance for pcg: will stop when residual has norm less than this. default  1e-7 //TODO rename to PCG_EPSILON
         public double finalTol = 1e-4; //Tolerance for the final 'tidy up' call to least squares.
         public double vectorCutoff = 1e-5; //Cutoff - values in block pivot with value smaller than this are set to zero.
-        public boolean usePreconditioner = false; //True if the conjugate gradient makes use of preconditioner.
+        public boolean usePreconditioner = false; //True if the conjugate gradient makes use of preconditioner (only implemented when useDual is true).
         public int preconditionerBands = 10; //Number of bands used when computing Y,Z submatrices in the preconditioner.
         // Note that alot of the calculations for preconditioning are done even if this is false, so use this flag only to assess #iterations.
         public boolean useBlockPivot = true; //Use the block pivot algorithm rather than least squares.
@@ -57,12 +57,13 @@ public class NeighborNetSplits {
      * @param distances     pairwise distances, 0-based
      * @param cutoff        min split weight
      * @param useBlockPivot Use the block pivoting algorithm
-     * @param useDualPCG    Use the dual preconditioned conjugate gradient algorithm for least squares
+     * @param useDual    Use the dual least squares method algorithm for least squares
+     * @param usePreconditioner Use the preconditioner with the dual problem.
      * @param progress      progress listener
      * @return weighted splits
      * @throws CanceledException
      */
-    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDualPCG, boolean usePreconditioner, ProgressListener progress) throws CanceledException {
+    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDual, boolean usePreconditioner, ProgressListener progress) throws CanceledException {
 
         int nTax = cycle.length - 1;
 
@@ -94,11 +95,16 @@ public class NeighborNetSplits {
 
         //Call the appropriate least squares routine
         NNLSParams params = new NNLSParams();
-        if (useDualPCG)
+        if (useDual)
             params.leastSquaresAlgorithm = params.DUAL_PCG;
         else
             params.leastSquaresAlgorithm = params.CG;
         params.maxPCGIterations = Math.max(1000, npairs / 10);
+        params.usePreconditioner = usePreconditioner;
+        params.useBlockPivot = useBlockPivot;
+
+
+
         double[] x = new double[npairs + 1];
         if (useBlockPivot)
             circularBlockPivot(nTax, d, x, progress, params);
