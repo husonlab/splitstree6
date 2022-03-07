@@ -28,8 +28,8 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
-import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
@@ -334,11 +334,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		tanglegramView.emptyProperty().addListener(e -> tanglegramView.getRoot().setDisable(tanglegramView.emptyProperty().get()));
 
-
 		Platform.runLater(this::setupMenuItems);
 	}
 
-	private static void setLabel(PhyloTree tree, boolean showName, boolean showInfo, Label label) {
+	// todo: make this the same as in single tree
+	private static void setLabel(PhyloTree tree, boolean showName, boolean showInfo, TextField label) {
 		if (tree != null && (showName || showInfo)) {
 			label.setText((showName ? tree.getName() : "") + (showName && showInfo ? " : " : "") + (showInfo ? RootedNetworkProperties.computeInfoString(tree) : ""));
 			label.setVisible(true);
@@ -397,6 +397,5 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				tanglegramView.setOptionOrientation(Rotate0Deg);
 		});
 		mainController.getFlipMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
-
 	}
 }

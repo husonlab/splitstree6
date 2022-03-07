@@ -35,36 +35,12 @@ import splitstree6.view.IView;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
 import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.layout.TreeLabel;
 import splitstree6.window.MainWindow;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class TreePagesView implements IView {
-	public enum TreeLabels {
-		None, Name, Info;
-
-		public String label() {
-			return switch (this) {
-				case None -> "-";
-				case Name -> "n";
-				case Info -> "i";
-			};
-		}
-
-		public static String[] labels() {
-			return Arrays.stream(values()).map(TreeLabels::label).toArray(String[]::new);
-		}
-
-		public static TreeLabels valueOfLabel(String label) {
-			return switch (label) {
-				case "-" -> None;
-				case "n" -> Name;
-				case "i" -> Info;
-				default -> None;
-			};
-		}
-	}
 
 	private final UndoManager undoManager = new UndoManager();
 
@@ -88,7 +64,7 @@ public class TreePagesView implements IView {
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
-	private final ObjectProperty<TreeLabels> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
+	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
 	private final BooleanProperty optionShowInternalLabels = new SimpleBooleanProperty(this, "optionShowInternalLabels");
 
@@ -103,7 +79,7 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionAveraging, ComputeHeightAndAngles.Averaging::valueOf, ComputeHeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
-		ProgramProperties.track(optionTreeLabels, TreeLabels::valueOf, TreeLabels.Name);
+		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
 		ProgramProperties.track(optionShowInternalLabels, true);
 	}
 
@@ -311,16 +287,16 @@ public class TreePagesView implements IView {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
 	}
 
-	public TreeLabels getOptionTreeLabels() {
+	public TreeLabel getOptionTreeLabels() {
 		return optionTreeLabels.get();
 	}
 
-	public ObjectProperty<TreeLabels> optionTreeLabelsProperty() {
+	public ObjectProperty<TreeLabel> optionTreeLabelsProperty() {
 		return optionTreeLabels;
 	}
 
-	public void setOptionTreeLabels(TreeLabels optionTreeLabels) {
-		this.optionTreeLabels.set(optionTreeLabels);
+	public void setOptionTreeLabels(TreeLabel optionTreeLabel) {
+		this.optionTreeLabels.set(optionTreeLabel);
 	}
 
 	public ViewTab getViewTab() {

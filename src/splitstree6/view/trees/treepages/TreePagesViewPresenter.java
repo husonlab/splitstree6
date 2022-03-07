@@ -43,6 +43,7 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
 import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.layout.TreeLabel;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Function;
@@ -199,8 +200,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		{
 			var labelProperty = new SimpleStringProperty();
-			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), treePagesView.getOptionTreeLabels().label(), labelProperty, TreePagesView.TreeLabels.labels());
-			labelProperty.addListener((v, o, n) -> treePagesView.setOptionTreeLabels(TreePagesView.TreeLabels.valueOfLabel(n)));
+			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), treePagesView.getOptionTreeLabels().label(), labelProperty, TreeLabel.labels());
+			labelProperty.addListener((v, o, n) -> treePagesView.setOptionTreeLabels(TreeLabel.valueOfLabel(n)));
 		}
 
 		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
@@ -281,7 +282,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(treePageView.getOptionOrientation()));
-		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 	}
 
     private record RowsCols(int rows, int cols) {

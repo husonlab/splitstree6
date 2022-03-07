@@ -72,6 +72,11 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 				}
 
 				if (v.isLeaf()) {
+					label.setVisible(false);
+					label.setLayoutX(0);
+					label.setLayoutY(0);
+					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
+					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
 
 					labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
 							xOffset -> {
@@ -81,6 +86,7 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 							yOffset -> {
 								label.setLayoutY(0);
 								label.translateYProperty().bind(translateYProperty.add(yOffset));
+								label.setVisible(true);
 							});
 				} else {
 					label.setLayoutX(0);

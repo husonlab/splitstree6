@@ -134,7 +134,6 @@ public class RadialLabelLayout {
 		this.gap = gap;
 	}
 
-
 	/**
 	 * setup the layout service
 	 */

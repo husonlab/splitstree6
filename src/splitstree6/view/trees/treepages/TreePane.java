@@ -37,10 +37,7 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
-import splitstree6.view.trees.layout.LayoutUtils;
-import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.layout.*;
 
 import java.util.function.Consumer;
 
@@ -54,7 +51,6 @@ public class TreePane extends StackPane {
 
 	private Pane pane;
 
-	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 
 	private final BooleanProperty showInternalLabels = new SimpleBooleanProperty();
@@ -71,12 +67,11 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
-					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels) {
+	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
+					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
+					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX) {
 
 		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, orientation);
-
 
 		//setStyle("-fx-background-color: transparent");
 
@@ -94,14 +89,6 @@ public class TreePane extends StackPane {
 			}
 		};
 		fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
-
-		zoomChangedListener = (v, o, n) -> {
-			if (pane != null) {
-				pane.setScaleX(pane.getScaleX() / o.doubleValue() * n.doubleValue());
-				pane.setScaleY(pane.getScaleY() / o.doubleValue() * n.doubleValue());
-			}
-		};
-		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
 		this.showInternalLabels.set(showInternalLabels.get());
 		internalLabelsListener = (v, o, n) -> {
@@ -146,14 +133,13 @@ public class TreePane extends StackPane {
 			if (result.internalLabels() != null)
 				result.internalLabels().visibleProperty().bind(this.showInternalLabels);
 
+			if (unitLengthX != null)
+				unitLengthX.set(result.unitLengthX());
+
 			orientationConsumer = result.layoutOrientationConsumer();
 
 			pane = new StackPane(group);
 			pane.setId("treeView");
-			if (zoomFactor.get() > 0 && zoomFactor.get() != 1) {
-				pane.setScaleX(zoomFactor.get());
-				pane.setScaleY(zoomFactor.get());
-			}
 
 			pane.setMinHeight(getPrefHeight() - 12);
 			pane.setMinWidth(getPrefWidth());
@@ -164,8 +150,8 @@ public class TreePane extends StackPane {
 				updateLabelLayout(orientation.get());
 			});
 
-			{
-				final var treeLabel = new Label(name);
+			if (showTreeLabels != null) {
+				final var treeLabel = new Label();
 				final InvalidationListener listener = e -> {
 					switch (showTreeLabels.get()) {
 						case None -> {
@@ -185,7 +171,8 @@ public class TreePane extends StackPane {
 				showTreeLabels.addListener(listener);
 				listener.invalidated(null);
 				getChildren().setAll(new VBox(treeLabel, pane));
-			}
+			} else
+				getChildren().setAll(pane);
 
 			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				if (e.isStillSincePress() && !e.isShiftDown()) {

@@ -52,7 +52,6 @@ import splitstree6.window.MainWindow;
 import java.util.ArrayList;
 
 public class SplitNetworkPane extends StackPane {
-
 	private final Group group = new Group();
 	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;

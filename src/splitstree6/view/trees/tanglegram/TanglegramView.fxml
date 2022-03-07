@@ -106,6 +106,7 @@
                                 </tooltip>
                             </ToggleButton>
                             <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+
                             <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                                     minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
                                     style="-fx-border-style: none; -fx-background-color: transparent;"
@@ -174,9 +175,9 @@
                                     <Tooltip text="Contract tree horizontally"/>
                                 </tooltip>
                             </Button>
-                            <Button fx:id="increaseFontButton" maxHeight="20.0"
-                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="A+">
+                            <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                                    prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    text="A+">
                                 <font>
                                     <Font size="11.0"/>
                                 </font>
@@ -184,9 +185,9 @@
                                     <Tooltip text="Increase font size"/>
                                 </tooltip>
                             </Button>
-                            <Button fx:id="decreaseFontButton" maxHeight="20.0"
-                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="A-">
+                            <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                                    prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    text="A-">
                                 <font>
                                     <Font size="11.0"/>
                                 </font>
@@ -224,10 +225,6 @@
                                    style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
                     </HBox>
                 </ScrollPane>
-                <Label fx:id="tree1NameLabel" layoutX="40.0" layoutY="5.0" style="-fx-background-color: transparent;"
-                       text="Tree 1" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0"/>
-                <Label fx:id="tree2NameLabel" layoutX="725.0" layoutY="5.0" style="-fx-background-color: transparent;"
-                       text="Tree 2" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="5.0"/>
                 <VBox fx:id="formatVBox" prefHeight="150.0" prefWidth="200.0" styleClass="context-menu"
                       AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="2.0"/>
             </AnchorPane>

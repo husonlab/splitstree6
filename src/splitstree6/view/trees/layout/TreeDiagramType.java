@@ -33,6 +33,10 @@ public enum TreeDiagramType {
 		return this == RadialPhylogram || this == RadialCladogram || this == CircularPhylogram || this == CircularCladogram;
 	}
 
+	public boolean isPhylogram() {
+		return this == RadialPhylogram || this == CircularPhylogram || this == RectangularPhylogram;
+	}
+
 	public Node createNode() {
 		return ResourceManagerFX.getIconAsImageView(name() + "16.gif", 16);
 	}

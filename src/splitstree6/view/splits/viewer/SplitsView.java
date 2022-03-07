@@ -35,7 +35,6 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
-import splitstree6.data.parts.Compatibility;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
@@ -123,8 +122,6 @@ public class SplitsView implements IView {
 
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);
-			if (n != null && getOptionDiagram() == SplitsDiagramType.Outline && n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic)
-				setOptionDiagram(SplitsDiagramType.Splits);
 			splitSelectionModel.clearSelection();
 		});
 

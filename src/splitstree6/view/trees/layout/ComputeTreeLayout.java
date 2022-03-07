@@ -95,7 +95,7 @@ public class ComputeTreeLayout {
 			case CircularPhylogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, true, averaging);
 		};
 
-		LayoutUtils.normalize(width, height, nodePointMap, diagram.isRadialOrCircular());
+		var unitLengthX = LayoutUtils.normalize(width, height, nodePointMap, diagram.isRadialOrCircular());
 
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getX()) < 0.000001);
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
@@ -149,11 +149,11 @@ public class ComputeTreeLayout {
 			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, nodeLabelMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
 
 		}
-		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, internalLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram);
+		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, internalLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);
 	}
 
 	public record Result(Group labelConnectors, Group edges, Group nodes, Group internalLabels, Group taxonLabels,
-						 Consumer<LayoutOrientation> layoutOrientationConsumer) {
+						 Consumer<LayoutOrientation> layoutOrientationConsumer, double unitLengthX) {
 		public Group getAllAsGroup() {
 			var group = new Group();
 			if (labelConnectors != null)
@@ -170,7 +170,7 @@ public class ComputeTreeLayout {
 		}
 
 		public Result() {
-			this(null, null, null, null, null, null);
+			this(null, null, null, null, null, null, 1.0);
 		}
 	}
 

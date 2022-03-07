@@ -31,6 +31,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.TreesNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
+import splitstree6.view.trees.singletree.SingleTreeView;
 import splitstree6.view.trees.tanglegram.TanglegramView;
 import splitstree6.view.trees.treepages.TreePagesView;
 import splitstree6.workflow.AlgorithmNode;
@@ -81,16 +82,16 @@ public class ShowTrees extends Trees2View {
 		Platform.runLater(() -> viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("TreeViewer16.gif", 16)));
 
 		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
+		if (viewBlock.getView() != null)
+			viewBlock.getView().clear();
 
 		switch (getOptionView()) {
 			case TreePages -> {
-					if (viewBlock.getView() != null)
-						viewBlock.getView().clear();
-					Platform.runLater(() -> {
-						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
-						viewBlock.setView(view);
-					});
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
+					viewBlock.setView(view);
+				});
 
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TreePagesView view) {
@@ -101,8 +102,6 @@ public class ShowTrees extends Trees2View {
 				});
 			}
 			case Tanglegram -> {
-					if (viewBlock.getView() != null)
-						viewBlock.getView().clear();
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
 						var view = new TanglegramView(mainWindow, "Tanglegram", viewBlock.getViewTab());
@@ -117,15 +116,29 @@ public class ShowTrees extends Trees2View {
 					}
 				});
 			}
-			case SingleTree, DensiTree -> throw new IOException("Not implemented: " + getOptionView());
+			case SingleTree -> {
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					var view = new SingleTreeView(mainWindow, "Tree View", viewBlock.getViewTab());
+					viewBlock.setView(view);
+				});
+
+				Platform.runLater(() -> {
+					if (viewBlock.getView() instanceof SingleTreeView view) {
+						view.getUndoManager().clear();
+						view.getTrees().setAll(inputData.getTrees());
+						view.setReticulated(inputData.isReticulated());
+					}
+				});
+
+			}
+			case DensiTree -> throw new IOException("Not implemented: " + getOptionView());
 			case Text -> {
-					if (viewBlock.getView() != null)
-						viewBlock.getView().clear();
-					Platform.runLater(() -> {
-						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new DisplayTextView(mainWindow, "Trees Text", false);
-						viewBlock.setView(view);
-					});
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					var view = new DisplayTextView(mainWindow, "Trees Text", false);
+					viewBlock.setView(view);
+				});
 
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof DisplayTextView view) {

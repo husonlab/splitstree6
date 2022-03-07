@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  SingleTreeView.fxml Copyright (C) 2022 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.view.trees.singletree.SingleTreeViewController">
+    <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <top>
+            <VBox fx:id="vBox">
+                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
+                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                            mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Find in selected tab"/>
+                        </tooltip>
+                    </Button>
+                    <Separator layoutX="44.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <ComboBox fx:id="treeCBox" minWidth="100.0"/>
+
+                    <Button fx:id="previousButton" mnemonicParsing="false"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="&lt;">
+                        <tooltip>
+                            <Tooltip text="Move to previous pair of trees"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="nextButton" mnemonicParsing="false"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;">
+                        <tooltip>
+                            <Tooltip text="Move to next pair of trees"/>
+                        </tooltip>
+                    </Button>
+                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <ComboBox fx:id="diagramCBox">
+                        <tooltip>
+                            <Tooltip text="Choose diagram type"/>
+                        </tooltip>
+                    </ComboBox>
+                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
+                        <tooltip>
+                            <Tooltip text="Choose orientation"/>
+                        </tooltip>
+                    </ComboBox>
+                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" maxHeight="-Infinity"
+                                  maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" text="T">
+                        <tooltip>
+                            <Tooltip text="Show tree names or info"/>
+                        </tooltip>
+                        <font>
+                            <Font size="12.0"/>
+                        </font>
+                    </ToggleButton>
+                    <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
+                                  text="L">
+                        <tooltip>
+                            <Tooltip text="Show internal labels"/>
+                        </tooltip>
+                    </ToggleButton>
+
+                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+
+                    <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Expand Vertically">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandVertical16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Expand tree vertically"/>
+                        </tooltip>
+                    </Button>
+
+                    <Button fx:id="contractVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Contract Vertically">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractVertical16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Contract tree vertically"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="expandHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Expand Horizontally">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandHorizontal16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Expand tree horizontally"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="contractHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Contract Horizontally">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractHorizontal16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Contract tree horizontally"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="A+">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                        <tooltip>
+                            <Tooltip text="Increase font size"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="A-">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                        <tooltip>
+                            <Tooltip text="Decrease font size"/>
+                        </tooltip>
+                    </Button>
+                </ToolBar>
+            </VBox>
+        </top>
+        <center>
+            <AnchorPane fx:id="innerAnchorPane" style="-fx-background-color: transparent;">
+                <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
+                      AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="0.0"/>
+            </AnchorPane>
+        </center>
+    </BorderPane>
+    <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER" expanded="false"
+                maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" prefWidth="100.0" text="Format"
+                AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="5.0">
+        <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
+    </TitledPane>
+</AnchorPane>

@@ -30,7 +30,7 @@ import java.util.*;
  */
 public class RunAfterAWhile {
 	private static final RunAfterAWhile instance;
-    public static final long DELAY = 500L;
+	public static final long DELAY = 400L;
 
 	static {
 		instance = new RunAfterAWhile();
@@ -41,13 +41,13 @@ public class RunAfterAWhile {
 	private RunAfterAWhile() {
 		keyTimeRunnableMap = new HashMap<>();
 
-		var timer = new Timer();
+		var timer = new Timer(true);
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
 				synchronized (keyTimeRunnableMap) {
                     var time = System.currentTimeMillis();
-                    var toDelete = new ArrayList<>();
+					var toDelete = new ArrayList<>();
 					for (var entry : keyTimeRunnableMap.entrySet()) {
 						if (time > entry.getValue().getFirst() + DELAY) {
 							toDelete.add(entry.getKey());
@@ -57,7 +57,7 @@ public class RunAfterAWhile {
 					toDelete.forEach(keyTimeRunnableMap.keySet()::remove);
 				}
 			}
-		}, 250, 250);
+		}, DELAY / 2, DELAY / 2);
 	}
 
 	/**

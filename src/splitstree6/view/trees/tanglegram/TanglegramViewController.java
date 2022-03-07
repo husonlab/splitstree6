@@ -25,6 +25,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import jloda.fx.control.CopyableLabel;
 import jloda.fx.util.DraggableLabel;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.treepages.LayoutOrientation;
@@ -107,12 +108,6 @@ public class TanglegramViewController {
 	private Pane middlePane;
 
 	@FXML
-	private Label tree1NameLabel;
-
-	@FXML
-	private Label tree2NameLabel;
-
-	@FXML
 	private AnchorPane innerAnchorPane;
 
 
@@ -121,6 +116,9 @@ public class TanglegramViewController {
 
 	@FXML
 	private TitledPane formatTitledPane;
+
+	private final CopyableLabel tree1NameLabel = new CopyableLabel();
+	private final CopyableLabel tree2NameLabel = new CopyableLabel();
 
 
 	@FXML
@@ -136,6 +134,14 @@ public class TanglegramViewController {
 		borderPane.setLeft(left);
 		borderPane.setRight(right);
 		borderPane.setTop(top);
+
+		innerAnchorPane.getChildren().add(tree1NameLabel);
+		AnchorPane.setTopAnchor(tree1NameLabel, 5.0);
+		AnchorPane.setLeftAnchor(tree1NameLabel, 10.0);
+
+		innerAnchorPane.getChildren().add(tree2NameLabel);
+		AnchorPane.setTopAnchor(tree2NameLabel, 5.0);
+		AnchorPane.setRightAnchor(tree2NameLabel, 10.0);
 
 		DraggableLabel.makeDraggable(tree1NameLabel);
 		DraggableLabel.makeDraggable(tree2NameLabel);
@@ -253,11 +259,11 @@ public class TanglegramViewController {
 		return borderPane;
 	}
 
-	public Label getTree1NameLabel() {
+	public CopyableLabel getTree1NameLabel() {
 		return tree1NameLabel;
 	}
 
-	public Label getTree2NameLabel() {
+	public CopyableLabel getTree2NameLabel() {
 		return tree2NameLabel;
 	}
 

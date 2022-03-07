@@ -94,10 +94,10 @@ public class SplitsViewController {
 	private void initialize() {
 		centerPane.getChildren().add(zoomableScrollPane);
 		innerAnchorPane.getChildren().add(scaleBar);
-		AnchorPane.setTopAnchor(scaleBar, 2.0);
+		AnchorPane.setTopAnchor(scaleBar, 25.0);
 		AnchorPane.setLeftAnchor(scaleBar, 5.0);
 
-		AnchorPane.setTopAnchor(fitLabel, 25.0);
+		AnchorPane.setTopAnchor(fitLabel, 2.0);
 		AnchorPane.setLeftAnchor(fitLabel, 2.0);
 		innerAnchorPane.getChildren().add(fitLabel);
 

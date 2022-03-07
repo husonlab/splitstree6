@@ -22,7 +22,10 @@ package splitstree6.view.trees.tanglegram;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.*;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import javafx.stage.Stage;
@@ -32,9 +35,9 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.trees.layout.TreeLabel;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.view.trees.treepages.RunAfterAWhile;
-import splitstree6.view.trees.treepages.TreePagesView;
 import splitstree6.view.trees.treepages.TreePane;
 
 /**
@@ -55,8 +58,8 @@ public class TanglegramTreePane extends Group {
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						var treePane = new TreePane(stage, taxaBlock, tree.get(), tree.get().getName(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), optionAveraging.get(), optionOrientation, new SimpleDoubleProperty(1.0), fontScaleFactor, new SimpleObjectProperty<>(TreePagesView.TreeLabels.None), showInternalLabels);
+						var treePane = new TreePane(stage, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+								optionDiagram.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(TreeLabel.None), showInternalLabels, null);
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
 						getChildren().add(treePane);
