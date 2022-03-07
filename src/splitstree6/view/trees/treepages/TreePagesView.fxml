@@ -58,7 +58,7 @@
                             </ComboBox>
                             <ComboBox fx:id="orientationCBox" prefWidth="50.0">
                                 <tooltip>
-                                    <Tooltip text="Choose root side"/>
+                                    <Tooltip text="Choose layout orientation"/>
                                 </tooltip>
                             </ComboBox>
                             <ComboBox fx:id="averagingCBox" minWidth="50.0">

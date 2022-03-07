@@ -70,18 +70,6 @@ public class LayoutTreeRectangular {
 		return nodePointMap;
 	}
 
-	public static double computeAverageEdgeWeight(PhyloTree tree) {
-		var weight = 0.0;
-		var count = 0;
-		for (var e : tree.edges()) {
-			if (!tree.isReticulatedEdge(e)) {
-				weight += Math.max(0, tree.getWeight(e));
-				count++;
-			}
-		}
-		return count == 0 ? 0 : weight / count;
-	}
-
 	/**
 	 * This code assumes that all edges are directed away from the root.
 	 *
@@ -91,7 +79,7 @@ public class LayoutTreeRectangular {
 		var percentOffset = 50.0;
 
 		var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);
-		var smallOffsetForRecticulateEdge = (percentOffset / 100.0) * averageWeight;
+		var smallOffsetForReticulateEdge = (percentOffset / 100.0) * averageWeight;
 
 		var rootHeight = yCoord.get(tree.getRoot());
 
@@ -131,7 +119,7 @@ public class LayoutTreeRectangular {
 						}
 					}
 					if (ok && x > Double.NEGATIVE_INFINITY) {
-						x += smallOffsetForRecticulateEdge;
+						x += smallOffsetForReticulateEdge;
 						nodePointMap.put(w, new Point2D(x, yCoord.get(w)));
 						assigned.add(w);
 					}

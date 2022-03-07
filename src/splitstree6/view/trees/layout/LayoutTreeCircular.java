@@ -55,7 +55,7 @@ public class LayoutTreeCircular {
 				var percentOffset = 50.0;
 
 				var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);
-				var smallOffsetForRecticulateEdge = (percentOffset / 100.0) * averageWeight;
+				var smallOffsetForReticulateEdge = (percentOffset / 100.0) * averageWeight;
 
 				nodeRadiusMap.put(tree.getRoot(), 0.0);
 				tree.preorderTraversal(v -> {
@@ -65,7 +65,7 @@ public class LayoutTreeCircular {
 						var wRadius = nodeRadiusMap.get(w);
 						if (wRadius != null) {
 							if (tree.isReticulatedEdge(e)) {
-								max = Math.max(max, wRadius + smallOffsetForRecticulateEdge);
+								max = Math.max(max, wRadius + smallOffsetForReticulateEdge);
 							} else
 								max = Math.max(max, wRadius + tree.getWeight(e));
 						}

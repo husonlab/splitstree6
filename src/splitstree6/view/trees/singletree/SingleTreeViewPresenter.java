@@ -25,6 +25,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -52,6 +53,7 @@ import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
+import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.layout.TreeLabel;
 import splitstree6.view.trees.treepages.LayoutOrientation;
@@ -140,7 +142,7 @@ public class SingleTreeViewPresenter implements IDisplayTabPresenter {
 		var scrollPane = controller.getScrollPane();
 		scrollPane.lockAspectRatioProperty().bind(lockAspectRatio);
 		scrollPane.setRequireShiftOrControlToZoom(true);
-		scrollPane.setPannable(false);
+		scrollPane.setPannable(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(FXCollections.observableSet(), null));
@@ -156,40 +158,51 @@ public class SingleTreeViewPresenter implements IDisplayTabPresenter {
 		controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(singleTreeView.optionShowConfidenceProperty());
 
 		controller.getScaleBar().visibleProperty().bind(toScale.and(showScaleBar));
-		controller.getScaleBar().factorXProperty().bind(singleTreeView.optionHorizontalZoomFactorProperty());
+
+		{
+			final InvalidationListener scaleListener = e -> {
+				if (treePane.get() == null) {
+					controller.getScaleBar().factorXProperty().unbind();
+				} else {
+					controller.getScaleBar().factorXProperty().bind(singleTreeView.getOptionOrientation().isWidthHeightSwitched() ? treePane.get().scaleYProperty() : treePane.get().scaleXProperty());
+				}
+			};
+			treePane.addListener(scaleListener);
+			singleTreeView.optionOrientationProperty().addListener(scaleListener);
+			scaleListener.invalidated(null);
+		}
 
 		var first = new Single<>(true);
 
 		updateListener = e -> {
 			if (treeProperty.get() != null) {
 				RunAfterAWhile.apply(treeProperty.get().getName(), () -> Platform.runLater(() -> {
-					var box = new Dimension2D(100, 100);
 					var bounds = targetBounds.get();
 					if (bounds != null) {
 						var width = bounds.getWidth();
 						var height = bounds.getHeight();
 						if (lockAspectRatio.get())
 							width = height = Math.min(width, height);
-						box = new Dimension2D(singleTreeView.getOptionHorizontalZoomFactor() * width, singleTreeView.getOptionVerticalZoomFactor() * height);
-					}
+						var box = new Dimension2D(singleTreeView.getOptionHorizontalZoomFactor() * width, singleTreeView.getOptionVerticalZoomFactor() * height);
 
-					if (first.get())
-						first.set(false);
-					else
-						SingleTreeEdits.clearEdits(singleTreeView.optionEditsProperty());
+						if (first.get())
+							first.set(false);
+						else
+							SingleTreeEdits.clearEdits(singleTreeView.optionEditsProperty());
 
-					if (!singleTreeView.emptyProperty().get()) {
-						treePane.set(new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), treeProperty.get(), mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
-								singleTreeView.getOptionDiagram(), singleTreeView.getOptionAveraging(), singleTreeView.optionOrientationProperty(), singleTreeView.optionFontScaleFactorProperty(), null,
-								singleTreeView.optionShowInternalLabelsProperty(), controller.getScaleBar().unitLengthXProperty()));
+						if (!singleTreeView.emptyProperty().get()) {
+							treePane.set(new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), treeProperty.get(), mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
+									singleTreeView.getOptionDiagram(), singleTreeView.getOptionAveraging(), singleTreeView.optionOrientationProperty(), singleTreeView.optionFontScaleFactorProperty(), null,
+									singleTreeView.optionShowInternalLabelsProperty(), controller.getScaleBar().unitLengthXProperty()));
 
-						treePane.get().drawTree();
-						treePane.get().setRunAfterUpdate(() -> {
-						});
-						scrollPane.setContent(treePane.get());
-					} else {
-						treePane.set(null);
-						scrollPane.setContent(new Pane());
+							treePane.get().drawTree();
+							treePane.get().setRunAfterUpdate(() -> {
+							});
+							scrollPane.setContent(treePane.get());
+						} else {
+							treePane.set(null);
+							scrollPane.setContent(new Pane());
+						}
 					}
 				}));
 			}
@@ -203,13 +216,13 @@ public class SingleTreeViewPresenter implements IDisplayTabPresenter {
 		});
 
 		singleTreeView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> {
-			scrollPane.getContentNode().setScaleX(scrollPane.getContentNode().getScaleX() / o.doubleValue() * n.doubleValue());
+			treePane.get().setScaleX(treePane.get().getScaleX() / o.doubleValue() * n.doubleValue());
 			if (!lockAspectRatio.get())
 				updateListener.invalidated(null);
 		});
 
 		singleTreeView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> {
-			scrollPane.getContentNode().setScaleY(scrollPane.getContentNode().getScaleY() / o.doubleValue() * n.doubleValue());
+			treePane.get().setScaleY(treePane.get().getScaleY() / o.doubleValue() * n.doubleValue());
 			updateListener.invalidated(null);
 		});
 
@@ -222,14 +235,27 @@ public class SingleTreeViewPresenter implements IDisplayTabPresenter {
 		singleTreeView.optionTreeProperty().addListener(updateListener);
 		singleTreeView.optionDiagramProperty().addListener(updateListener);
 
+		final ObservableSet<ComputeHeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		singleTreeView.optionDiagramProperty().addListener((v, o, n) -> {
+			disabledAveraging.clear();
+			if (n == TreeDiagramType.RadialPhylogram) {
+				disabledAveraging.add(ComputeHeightAndAngles.Averaging.ChildAverage);
+			}
+		});
+
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(ComputeHeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().valueProperty().bindBidirectional(singleTreeView.optionAveragingProperty());
+		singleTreeView.optionAveragingProperty().addListener(updateListener);
+
 		controller.getContractHorizontallyButton().setOnAction(e -> singleTreeView.setOptionHorizontalZoomFactor((1.0 / 1.1) * singleTreeView.getOptionHorizontalZoomFactor()));
 		controller.getContractHorizontallyButton().disableProperty().bind(singleTreeView.emptyProperty().or(lockAspectRatio));
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> singleTreeView.setOptionHorizontalZoomFactor(1.1 * singleTreeView.getOptionHorizontalZoomFactor()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(singleTreeView.emptyProperty().or(lockAspectRatio).or(singleTreeView.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
 
-		controller.getExpandVerticallyButton().setOnAction(e ->
-		{
+		controller.getExpandVerticallyButton().setOnAction(e -> {
 			singleTreeView.setOptionVerticalZoomFactor(1.1 * singleTreeView.getOptionVerticalZoomFactor());
 			if (lockAspectRatio.get())
 				singleTreeView.setOptionHorizontalZoomFactor(1.1 * singleTreeView.getOptionHorizontalZoomFactor());
@@ -312,7 +338,6 @@ public class SingleTreeViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
 		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
 		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
-
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getExpandVerticallyButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getExpandVerticallyButton().disableProperty());

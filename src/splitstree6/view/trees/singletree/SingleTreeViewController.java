@@ -29,6 +29,7 @@ import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
+import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 
@@ -57,6 +58,9 @@ public class SingleTreeViewController {
 
 	@FXML
 	private ComboBox<LayoutOrientation> orientationCBox;
+
+	@FXML
+	private ComboBox<ComputeHeightAndAngles.Averaging> averagingCBox;
 
 	@FXML
 	private ComboBox<String> treeCBox;
@@ -179,6 +183,10 @@ public class SingleTreeViewController {
 
 	public ComboBox<String> getTreeCBox() {
 		return treeCBox;
+	}
+
+	public ComboBox<ComputeHeightAndAngles.Averaging> getAveragingCBox() {
+		return averagingCBox;
 	}
 
 	public Button getPreviousButton() {

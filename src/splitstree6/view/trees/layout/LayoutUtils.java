@@ -113,7 +113,7 @@ public class LayoutUtils {
 		if (maintainAspectRatio) {
 			scaleX = scaleY = Math.min(scaleX, scaleY);
 		}
-		if (minX != 0 || scaleX != 1 || minY != 0 || scaleY != 1) {
+		if (scaleX != 1 || scaleY != 1) {
 			for (var v : nodePointMap.keySet()) {
 				var point = nodePointMap.get(v);
 				nodePointMap.put(v, new Point2D(point.getX() * scaleX, point.getY() * scaleY));
@@ -122,20 +122,6 @@ public class LayoutUtils {
 		return scaleX;
 	}
 
-	public static String getLabelText(TaxaBlock taxaBlock, PhyloGraph graph, Node v) {
-		if (graph.getNumberOfTaxa(v) == 1) {
-			var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
-			if (taxonId != null)
-				return taxaBlock.get(taxonId).getDisplayLabelOrName();
-			else
-				return graph.getLabel(v);
-		} else if (graph.getNumberOfTaxa(v) >= 2) {
-			return StringUtils.toString(taxaBlock.getLabels(graph.getTaxa(v)), ",");
-		} else if (v.getLabel() != null && !graph.getLabel(v).isBlank()) {
-			return graph.getLabel(v);
-		} else
-			return null;
-	}
 
 	public static RichTextLabel getLabel(TaxaBlock taxaBlock, PhyloGraph graph, Node v) {
 		if (graph.getNumberOfTaxa(v) == 1) {
@@ -152,9 +138,7 @@ public class LayoutUtils {
 		} else if (v.getLabel() != null && !v.getLabel().isBlank()) {
 			return new RichTextLabel(v.getLabel());
 		} else if (graph.getLabel(v) != null && !graph.getLabel(v).isBlank()) {
-			var label = new RichTextLabel(graph.getLabel(v));
-
-			return label;
+			return new RichTextLabel(graph.getLabel(v));
 		} else
 			return null;
 	}
