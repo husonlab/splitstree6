@@ -44,7 +44,7 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class ShowSplits extends Splits2View {
-	public enum ViewType {SplitsNetwork, SplitsText}
+	public enum ViewType {SplitsNetwork, Text}
 
 	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.SplitsNetwork);
 	private final ChangeListener<Boolean> validListener;
@@ -87,7 +87,7 @@ public class ShowSplits extends Splits2View {
 				if (!(viewBlock.getView() instanceof SplitsView)) {
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new SplitsView(mainWindow, "Splits Network", viewBlock.getViewTab());
+						var view = new SplitsView(mainWindow, ViewType.SplitsNetwork.name(), viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
 				}
@@ -99,13 +99,11 @@ public class ShowSplits extends Splits2View {
 					}
 				});
 			}
-			case SplitsText -> {
+			case Text -> {
 				if (!(viewBlock.getView() instanceof DisplayTextView)) {
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						viewBlock.setName("Splits Text");
-						var view = new DisplayTextView(mainWindow, inputData.getName() + " Text", false);
-						viewBlock.setView(view);
+						viewBlock.setView(new DisplayTextView(mainWindow, "Splits Text", false));
 					});
 				}
 				Platform.runLater(() -> {

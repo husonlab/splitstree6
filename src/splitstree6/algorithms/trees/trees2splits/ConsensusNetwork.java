@@ -20,10 +20,8 @@
 package splitstree6.algorithms.trees.trees2splits;
 
 import javafx.beans.property.*;
-import javafx.collections.ObservableList;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
-import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
@@ -39,7 +37,6 @@ import splitstree6.data.parts.Compatibility;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
 
 /**
  * implements consensus network
@@ -47,7 +44,7 @@ import java.util.concurrent.ExecutorService;
  * @author Daniel Huson, 1/2017
  */
 public class ConsensusNetwork extends Trees2Splits {
-	public enum EdgeWeights {Mean, TreeSizeWeightedMean, Median, Count, Sum, None}
+	public enum EdgeWeights {Mean, TreeSizeWeightedMean, Median, Count, Sum, Uniform}
 
 	private final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.TreeSizeWeightedMean);
 	private final DoubleProperty optionThresholdPercent = new SimpleDoubleProperty(this, "optionThresholdPercent", 30.0);
@@ -81,11 +78,11 @@ public class ConsensusNetwork extends Trees2Splits {
 	 * compute the consensus splits
 	 */
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
-		final ObservableList<PhyloTree> trees = treesBlock.getTrees();
-		final Map<BitSet, Pair<BitSet, WeightStats>> splitsAndWeights = new HashMap<>();
-		final BitSet taxaInTree = taxaBlock.getTaxaSet();
+		final var trees = treesBlock.getTrees();
+		final var splitsAndWeights = new HashMap<BitSet, Pair<BitSet, WeightStats>>();
+		final var taxaInTree = taxaBlock.getTaxaSet();
 
-		final ExecutorService executor = ProgramExecutorService.getInstance();
+		final var executor = ProgramExecutorService.getInstance();
 
 		if (treesBlock.getNTrees() == 1) System.err.println("Consensus network: only one tree specified");
 
@@ -93,21 +90,21 @@ public class ConsensusNetwork extends Trees2Splits {
 		progress.setProgress(0);
 
 		{
-			final int numberOfThreads = Math.max(1, NumberUtils.min(trees.size(), ProgramExecutorService.getNumberOfCoresToUse(), Runtime.getRuntime().availableProcessors()));
-			final CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
-			final Single<CanceledException> exception = new Single<>();
+			final var numberOfThreads = Math.max(1, NumberUtils.min(trees.size(), ProgramExecutorService.getNumberOfCoresToUse(), Runtime.getRuntime().availableProcessors()));
+			final var countDownLatch = new CountDownLatch(numberOfThreads);
+			final var exception = new Single<CanceledException>();
 
-			final Single<Boolean> warnedAboutZeroWeight = new Single<>(false);
+			final var warnedAboutZeroWeight = new Single<>(false);
 
-			for (int i = 0; i < numberOfThreads; i++) {
-				final int threadNumber = i;
+			for (var i = 0; i < numberOfThreads; i++) {
+				final var threadNumber = i;
 				executor.execute(() -> {
 					try {
-						for (int which = threadNumber + 1; which <= trees.size(); which += numberOfThreads) {
-							final PhyloTree tree = treesBlock.getTree(which);
+						for (var which = threadNumber + 1; which <= trees.size(); which += numberOfThreads) {
+							final var tree = treesBlock.getTree(which);
 							final double factor;
 							if (getOptionEdgeWeights() == EdgeWeights.TreeSizeWeightedMean) {
-								final double treeWeight = TreesUtilities.computeTotalWeight(tree);
+								final var treeWeight = TreesUtilities.computeTotalWeight(tree);
 								if (treeWeight == 0) {
 									synchronized (warnedAboutZeroWeight) {
 										if (!warnedAboutZeroWeight.get()) {
@@ -124,7 +121,7 @@ public class ConsensusNetwork extends Trees2Splits {
 
 							//System.err.println("Tree "+which+": "+factor);
 
-							final List<ASplit> splits = new ArrayList<>();
+							final var splits = new ArrayList<ASplit>();
 							TreesUtilities.computeSplits(taxaInTree, tree, splits);
 							try {
 								SplitsUtilities.verifySplits(splits, taxaBlock);
@@ -132,10 +129,10 @@ public class ConsensusNetwork extends Trees2Splits {
 								Basic.caught(ex);
 							}
 
-							for (ASplit split : splits) {
+							for (var split : splits) {
 								synchronized (sync) {
-									final Pair<BitSet, WeightStats> pair = splitsAndWeights.computeIfAbsent(split.getPartContaining(1), k -> new Pair<>(k, new WeightStats()));
-									pair.getSecond().add((float) (factor * split.getWeight()), which);
+									final var pair = splitsAndWeights.computeIfAbsent(split.getPartContaining(1), k -> new Pair<>(k, new WeightStats()));
+									pair.getSecond().add((float) (factor * split.getWeight()));
 									progress.checkForCancel();
 								}
 							}
@@ -165,21 +162,21 @@ public class ConsensusNetwork extends Trees2Splits {
 
 		var computedSplits = new SplitsBlock();
 		{
-			final int numberOfThreads = Math.min(splitsAndWeights.size(), 8);
-			final CountDownLatch countDownLatch = new CountDownLatch(numberOfThreads);
-			final Single<CanceledException> exception = new Single<>();
+			final var numberOfThreads = Math.min(splitsAndWeights.size(), 8);
+			final var countDownLatch = new CountDownLatch(numberOfThreads);
+			final var exception = new Single<CanceledException>();
 
-			final double threshold = (optionThresholdPercent.getValue() < 100 ? optionThresholdPercent.getValue() / 100.0 : 0.999999);
+			final var threshold = (optionThresholdPercent.getValue() < 100 ? optionThresholdPercent.getValue() / 100.0 : 0.999999);
 
-			final ArrayList<Pair<BitSet, WeightStats>> array = new ArrayList<>(splitsAndWeights.values());
+			final var array = new ArrayList<>(splitsAndWeights.values());
 
-			for (int i = 0; i < numberOfThreads; i++) {
-				final int threadNumber = i;
+			for (var i = 0; i < numberOfThreads; i++) {
+				final var threadNumber = i;
 				executor.execute(() -> {
 					try {
-						for (int which = threadNumber; which < array.size(); which += numberOfThreads) {
-							final BitSet side = array.get(which).getFirst();
-							final WeightStats weightStats = array.get(which).getSecond();
+						for (var which = threadNumber; which < array.size(); which += numberOfThreads) {
+							final var side = array.get(which).getFirst();
+							final var weightStats = array.get(which).getSecond();
 							final double wgt;
 							if (weightStats.getCount() / (double) trees.size() > threshold) {
 								wgt = switch (getOptionEdgeWeights()) {
@@ -191,9 +188,9 @@ public class ConsensusNetwork extends Trees2Splits {
 									case Sum -> weightStats.getSum();
 									default -> 1;
 								};
-								final float confidence = (float) weightStats.getCount() / (float) trees.size();
+								final var confidence = (float) weightStats.getCount() / (float) trees.size();
 								synchronized (sync) {
-									computedSplits.getSplits().add(new ASplit(side, taxaBlock.getNtax(), wgt, confidence));
+									computedSplits.getSplits().add(new ASplit(side, taxaBlock.getNtax(), wgt, 100 * confidence));
 								}
 							}
 							if (threadNumber == 0) {
@@ -283,7 +280,6 @@ public class ConsensusNetwork extends Trees2Splits {
 		private final ArrayList<Float> weights;
 		private int totalCount;
 		private double sum;
-		private int treeIndex;
 
 		/**
 		 * construct a new values map
@@ -292,17 +288,15 @@ public class ConsensusNetwork extends Trees2Splits {
 			weights = new ArrayList<>();
 			totalCount = 0;
 			sum = 0;
-			treeIndex = -1;
 		}
 
 		/**
 		 * add the given weight and count
 		 */
-		void add(float weight, int treeIndex) {
+		void add(float weight) {
 			weights.add(weight);
 			totalCount++;
 			sum += weight;
-			this.treeIndex = treeIndex;
 		}
 
 		/**

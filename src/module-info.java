@@ -89,7 +89,7 @@ module splitstreesix {
 
 	opens splitstree6.view.trees.treepages;
 	opens splitstree6.view.trees.tanglegram;
-	opens splitstree6.view.trees.singletree;
+	opens splitstree6.view.trees.treeview;
 
 	opens splitstree6.view.displaytext;
 	opens splitstree6.view.displaydatablock;

@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.singletree;
+package splitstree6.view.trees.treeview;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableMap;
@@ -38,7 +38,7 @@ import java.util.HashSet;
  * maintains string array recording of single tree edits
  * Daniel Huson, 2.2022
  */
-public class SingleTreeEdits {
+public class TreeViewEdits {
 	/**
 	 * apply the recorded edits
 	 *

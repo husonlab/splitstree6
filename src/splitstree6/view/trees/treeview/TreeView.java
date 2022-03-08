@@ -1,5 +1,5 @@
 /*
- *  SingleTreeView.java Copyright (C) 2022 Daniel H. Huson
+ *  TreeView.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.singletree;
+package splitstree6.view.trees.treeview;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
@@ -50,14 +50,14 @@ import java.util.List;
  * show a single tree
  * Daniel Huson, 3.2022
  */
-public class SingleTreeView implements IView {
+public class TreeView implements IView {
 
 	private final UndoManager undoManager = new UndoManager();
 
 	private final SelectionModel<Integer> splitSelectionModel = new SetSelectionModel<>();
 
-	private final SingleTreeViewController controller;
-	private final SingleTreeViewPresenter presenter;
+	private final TreeViewController controller;
+	private final TreeViewPresenter presenter;
 
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
@@ -108,16 +108,16 @@ public class SingleTreeView implements IView {
 				optionTreeLabels.getName(), optionShowInternalLabels.getName());
 	}
 
-	public SingleTreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
+	public TreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
 		this.name.set(name);
-		var loader = new ExtendedFXMLLoader<SingleTreeViewController>(SingleTreeViewController.class);
+		var loader = new ExtendedFXMLLoader<TreeViewController>(TreeViewController.class);
 		controller = loader.getController();
 
 		final ObservableMap<jloda.graph.Node, Shape> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, Shape> splitShapeMap = FXCollections.observableHashMap();
 
 		// this is the target area for the tree page:
-		presenter = new SingleTreeViewPresenter(mainWindow, this, targetBounds, nodeShapeMap, splitShapeMap);
+		presenter = new TreeViewPresenter(mainWindow, this, targetBounds, nodeShapeMap, splitShapeMap);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -346,7 +346,7 @@ public class SingleTreeView implements IView {
 		return targetBounds;
 	}
 
-	public SingleTreeViewController getController() {
+	public TreeViewController getController() {
 		return controller;
 	}
 

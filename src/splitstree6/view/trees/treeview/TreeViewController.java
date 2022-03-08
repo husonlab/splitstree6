@@ -1,5 +1,5 @@
 /*
- *  SingleTreeViewController.java Copyright (C) 2022 Daniel H. Huson
+ *  TreeViewController.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.singletree;
+package splitstree6.view.trees.treeview;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -33,7 +33,7 @@ import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 
-public class SingleTreeViewController {
+public class TreeViewController {
 
 	@FXML
 	private AnchorPane anchorPane;

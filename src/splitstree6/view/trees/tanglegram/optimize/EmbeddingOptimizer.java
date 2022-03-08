@@ -69,13 +69,12 @@ public class EmbeddingOptimizer {
      *
 	 */
     public static void apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
-        if (progressListener != null) {
-            progressListener.setTasks("Optimizing embedding", "Using Scornavacca, Zickmann & Huson, 2011");
+            progressListener.setTasks("Computing embedding", "optimizing");
             //progressListener.setCancelable(false);
             progressListener.setMaximum(-1);
             progressListener.setProgress(-1);
-        }
-        //System.err.println("Computing optimal embedding using circular-ordering algorithm");
+
+		//System.err.println("Computing optimal embedding using circular-ordering algorithm");
         final var taxon2Id = new TreeMap<String, Integer>();
         final var id2Taxon = new HashMap<Integer, String>();
 

@@ -56,7 +56,7 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 	private PhyloTree computeNJTree(ProgressListener progressListener, TaxaBlock taxaBlock, DistancesBlock distances) throws CanceledException {
 		final var ntax = distances.getNtax();
 		final var tree = new PhyloTree();
-		tree.setName("NJ");
+		tree.setName("NJ-tree");
 
 		final var alive = new BitSet(); // o-based
 

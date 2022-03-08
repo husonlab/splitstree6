@@ -31,9 +31,9 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.TreesNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
-import splitstree6.view.trees.singletree.SingleTreeView;
 import splitstree6.view.trees.tanglegram.TanglegramView;
 import splitstree6.view.trees.treepages.TreePagesView;
+import splitstree6.view.trees.treeview.TreeView;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 
@@ -46,9 +46,9 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class ShowTrees extends Trees2View {
-	public enum ViewType {SingleTree, TreePages, DensiTree, Tanglegram, Text}
+	public enum ViewType {TreeView, TreePages, Tanglegram, DensiTree, Text}
 
-	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.TreePages);
+	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.TreeView);
 	private final ChangeListener<Boolean> validListener;
 
 	@Override
@@ -89,7 +89,7 @@ public class ShowTrees extends Trees2View {
 			case TreePages -> {
 				Platform.runLater(() -> {
 					var mainWindow = getNode().getOwner().getMainWindow();
-					var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
+					var view = new TreePagesView(mainWindow, ViewType.TreePages.name(), viewBlock.getViewTab());
 					viewBlock.setView(view);
 				});
 
@@ -104,7 +104,7 @@ public class ShowTrees extends Trees2View {
 			case Tanglegram -> {
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new TanglegramView(mainWindow, "Tanglegram", viewBlock.getViewTab());
+						var view = new TanglegramView(mainWindow, ViewType.Tanglegram.name(), viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
 
@@ -116,15 +116,14 @@ public class ShowTrees extends Trees2View {
 					}
 				});
 			}
-			case SingleTree -> {
+			case TreeView -> {
 				Platform.runLater(() -> {
 					var mainWindow = getNode().getOwner().getMainWindow();
-					var view = new SingleTreeView(mainWindow, "Tree View", viewBlock.getViewTab());
-					viewBlock.setView(view);
+					viewBlock.setView(new TreeView(mainWindow, ViewType.TreeView.name(), viewBlock.getViewTab()));
 				});
 
 				Platform.runLater(() -> {
-					if (viewBlock.getView() instanceof SingleTreeView view) {
+					if (viewBlock.getView() instanceof TreeView view) {
 						view.getUndoManager().clear();
 						view.getTrees().setAll(inputData.getTrees());
 						view.setReticulated(inputData.isReticulated());

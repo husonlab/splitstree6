@@ -419,7 +419,7 @@ public class MainWindowPresenter {
 		controller.getRerootTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RerootOrLadderizeTrees()));
 
 		controller.getViewSingleTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
-				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.SingleTree))));
+				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.TreeView))));
 		controller.getViewSingleTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
 
 		controller.getViewTreePagesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
