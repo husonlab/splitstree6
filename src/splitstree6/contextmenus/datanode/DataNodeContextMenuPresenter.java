@@ -48,11 +48,13 @@ public class DataNodeContextMenuPresenter {
 		var workflow = mainWindow.getWorkflow();
 
 		controller.getShowTextMenuItem().setOnAction(e -> mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true));
+		controller.getShowTextMenuItem().disableProperty().bind(dataNode.validProperty().not().or(dataNode.allParentsValidProperty().not()));
 
 		controller.getExportMenuItem().setOnAction(e -> {
 			var exportDialog = new ExportDialog(mainWindow, dataNode);
 			exportDialog.getStage().show();
 		});
+		controller.getExportMenuItem().disableProperty().bind(dataNode.validProperty().not().or(dataNode.allParentsValidProperty().not()));
 
 		controller.getAddTreeMenu().getItems().setAll(createAddTreeMenuItems(workflow, undoManager, dataNode));
 		controller.getAddTreeMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddTreeMenu().getItems())));

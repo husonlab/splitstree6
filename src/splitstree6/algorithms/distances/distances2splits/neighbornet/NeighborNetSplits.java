@@ -136,7 +136,7 @@ public class NeighborNetSplits {
      * x is a vector of split weights, with pairs in same order as d. The split (i,j), for i<j, is {i,i+1,...,j-1}| rest
      * <p>
      */
-    static public void circularActiveSet(int nTax, double[] d, double[] x, ProgressListener progress, NNLSParams params) {
+    static public void circularActiveSet(int nTax, double[] d, double[] x, ProgressListener progress, NNLSParams params) throws CanceledException {
 
         int npairs = nTax * (nTax - 1) / 2;
         /* Allocate memory for the "utility" vectors */
@@ -211,6 +211,7 @@ public class NeighborNetSplits {
                 return;
             } else
                 active[min_i] = false;
+            progress.checkForCancel();
         }
     }
 

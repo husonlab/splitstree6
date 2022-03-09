@@ -179,7 +179,6 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		});
 		controller.getDeactivateSelectedMenuItem().disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
 
-
 		controller.getSelectCurrentlyActiveMenuItem().setOnAction(e -> tableView.getItems().stream()
 				.filter(item -> workingTaxonBlock.getTaxa().contains(item.getTaxon()))
 				.forEach(item -> tableView.getSelectionModel().select(item)));
@@ -263,6 +262,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		return searcher;
 	}
 
+	private boolean updatingActive = false;
 
 	public void updateView() {
 		var tableView = controller.getTableView();
@@ -274,6 +274,14 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 			item.setActive(!taxaEditor.isDisabled(taxon.getName()));
 			item.activeProperty().addListener((v, o, n) -> {
 				taxaEditor.setDisabled(taxon.getName(), !n);
+				if (!updatingActive && mainWindow.getTaxonSelectionModel().isSelected(taxon)) {
+					updatingActive = true;
+					if (n)
+						controller.getActivateSelectedMenuItem().getOnAction().handle(null);
+					else
+						controller.getDeactivateSelectedMenuItem().getOnAction().handle(null);
+					updatingActive = false;
+				}
 				controller.getTableView().refresh();
 			});
 			tableView.getItems().add(item);
