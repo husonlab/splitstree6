@@ -10,9 +10,10 @@ module splitstreesix {
     requires Jama;
     requires richtextfx.fat;
     requires org.apache.commons.collections4;
+	requires commons.math3;
 
-    opens splitstree6.resources.css;
-    opens splitstree6.resources.icons;
+	opens splitstree6.resources.css;
+	opens splitstree6.resources.icons;
     opens splitstree6.resources.images;
 
     opens splitstree6.algorithms.characters.characters2characters;

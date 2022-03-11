@@ -265,6 +265,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 	private boolean updatingActive = false;
 
 	public void updateView() {
+
 		var tableView = controller.getTableView();
 		var inputTaxa = mainWindow.getWorkflow().getInputTaxaNode().getDataBlock();
 		tableView.getItems().clear();
