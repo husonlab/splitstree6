@@ -41,7 +41,7 @@ public class TaxaEditor extends Taxa2Taxa implements IFilter {
 		final Map<String, String> name2displayLabel = new HashMap<>();
 		for (var t = 1; t <= inputData.getNtax(); t++) {
 			final Taxon taxon = inputData.get(t);
-			name2displayLabel.put(taxon.getName(), taxon.getDisplayLabel());
+				name2displayLabel.put(taxon.getName(), taxon.getDisplayLabel());
 		}
 
 		if (getNumberDisabledTaxa() == 0) {
@@ -50,13 +50,10 @@ public class TaxaEditor extends Taxa2Taxa implements IFilter {
 		} else {
 			outputData.clear();
 
-			for (var name : inputData.getLabels()) {
+			for (var taxon : inputData.getTaxa()) {
+				var name = taxon.getName();
 				if (!isDisabled(name)) {
-					outputData.addTaxaByNames(Collections.singleton(name));
-					if (inputData.get(name).getDisplayLabel() != null)
-						outputData.get(name).setDisplayLabel(inputData.get(name).getDisplayLabel());
-					else
-						outputData.get(name).setDisplayLabel(name2displayLabel.get(name));
+					outputData.add(taxon);
 				}
 			}
 			setShortDescription("using " + outputData.getNtax() + " of " + (inputData.getNtax() + " taxa"));

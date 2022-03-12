@@ -356,4 +356,19 @@ public class TaxaBlock extends DataBlock {
 		return BLOCK_NAME;
 	}
 
+	/**
+	 * we apply this to the working taxa when we have read in the data from a Splitstree6 file to ensure that
+	 * display labels are handled property
+	 *
+	 * @param inputTaxaBlock input data block
+	 */
+	public void overwriteTaxa(TaxaBlock inputTaxaBlock) {
+		for (var i = 0; i < taxa.size(); i++) {
+			var taxon = taxa.get(i);
+			var originalTaxon = inputTaxaBlock.getTaxa().stream().filter(t -> t.getName().equals(taxon.getName())).findAny().orElse(null);
+			if (originalTaxon != null) {
+				taxa.set(i, originalTaxon);
+			}
+		}
+	}
 }

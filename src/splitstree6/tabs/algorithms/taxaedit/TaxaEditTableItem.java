@@ -25,6 +25,10 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import splitstree6.data.parts.Taxon;
 
+/**
+ * taxa editor item, 1.2022
+ * Daniel Huson
+ */
 public class TaxaEditTableItem {
 	private final int id;
 	private final Taxon taxon;

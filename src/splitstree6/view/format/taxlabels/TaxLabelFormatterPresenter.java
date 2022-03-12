@@ -61,8 +61,10 @@ public class TaxLabelFormatterPresenter {
 						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
 					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
 			}
 		});
 
@@ -78,8 +80,10 @@ public class TaxLabelFormatterPresenter {
 						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
 					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
 			}
 		});
 
@@ -94,8 +98,10 @@ public class TaxLabelFormatterPresenter {
 						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
 					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
 			}
 		});
 
@@ -110,8 +116,10 @@ public class TaxLabelFormatterPresenter {
 						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
 					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
 			}
 		});
 
@@ -126,8 +134,10 @@ public class TaxLabelFormatterPresenter {
 						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
 					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
 			}
 		});
 
@@ -142,8 +152,10 @@ public class TaxLabelFormatterPresenter {
 						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
 					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
 			}
 		});
 
@@ -159,8 +171,10 @@ public class TaxLabelFormatterPresenter {
 						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 					}
 				}
-				if (undoList.size() > 0)
+				if (undoList.size() > 0) {
 					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
 			}
 		});
 

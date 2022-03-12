@@ -118,6 +118,7 @@ public class WorkflowNexusInput {
 			if (!(taxaFilter instanceof TaxaEditor))
 				throw new IOExceptionWithLineNumber("Excepted TaxaEditor", np.lineno());
 			var workingTaxaBlock = dataInput.parse(np);
+			workingTaxaBlock.overwriteTaxa(inputTaxaBlock);
 			var workingTaxaTitle = dataInput.getTitle();
 			var inputDataBlock = dataInput.parse(np, inputTaxaBlock);
 			var dataTaxaFilter = (new AlgorithmNexusInput()).parse(np);

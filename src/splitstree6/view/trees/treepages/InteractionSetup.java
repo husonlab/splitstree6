@@ -157,7 +157,6 @@ public class InteractionSetup {
 						label.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
 						shape.setOnMouseClicked(mouseClickedHandler);
 						label.setOnMouseClicked(mouseClickedHandler);
-
 						if (taxonSelectionModel.isSelected(taxon)) {
 							shape.setEffect(SelectionEffectBlue.getInstance());
 							label.setEffect(SelectionEffectBlue.getInstance());
@@ -168,14 +167,12 @@ public class InteractionSetup {
 		});
 	}
 
-	private static void showContextMenu(Stage stage, ContextMenuEvent event, Taxon taxon, RichTextLabel label) {
+	private void showContextMenu(Stage stage, ContextMenuEvent event, Taxon taxon, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
 			var editLabelDialog = new EditLabelDialog(stage, label);
 			var result = editLabelDialog.showAndWait();
-			if (result.isPresent()) {
-				label.setText(result.get());
-			}
+			result.ifPresent(label::setText);
 		});
 		var menu = new ContextMenu();
 		menu.getItems().add(editLabelMenuItem);

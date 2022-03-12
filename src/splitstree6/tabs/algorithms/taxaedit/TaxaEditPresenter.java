@@ -287,8 +287,10 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 			});
 			tableView.getItems().add(item);
 
-			item.displayLabelProperty().addListener((v, o, n) ->
-					tab.getUndoManager().add("edit label", item.displayLabelProperty(), o, n));
+			item.displayLabelProperty().addListener((v, o, n) -> {
+				tab.getUndoManager().add("edit label", item.displayLabelProperty(), o, n);
+				mainWindow.setDirty(true);
+			});
 		}
 		updateColumnWidths(tableView, controller.getDisplayLabelColumn());
 	}
