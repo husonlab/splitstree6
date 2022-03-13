@@ -89,8 +89,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		var treeProperty = new SimpleObjectProperty<PhyloTree>(this, "tree");
 		treeView.optionTreeProperty().addListener((v, o, n) -> {
-			if (n.intValue() > 0 && n.intValue() <= treeView.getTrees().size())
-				treeProperty.set(treeView.getTrees().get(n.intValue() - 1));
+			var nTree = n.intValue();
+			if (nTree > 0 && nTree <= treeView.getTrees().size())
+				treeProperty.set(treeView.getTrees().get(nTree - 1));
 			else
 				treeProperty.set(null);
 		});
@@ -99,8 +100,10 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			controller.getTreeCBox().getItems().setAll(treeView.getTrees().stream().map(Graph::getName).collect(Collectors.toList()));
 			if (treeView.getOptionTree() == 0 && treeView.getTrees().size() > 0)
 				treeView.setOptionTree(1);
-			if (treeView.getOptionTree() >= 1 && treeView.getOptionTree() <= treeView.getTrees().size())
+			if (treeView.getOptionTree() >= 1 && treeView.getOptionTree() <= treeView.getTrees().size()) {
 				controller.getTreeCBox().setValue(controller.getTreeCBox().getItems().get(treeView.getOptionTree() - 1));
+				treeProperty.set(treeView.getTrees().get(treeView.getOptionTree() - 1));
+			}
 		});
 
 		controller.getTreeCBox().valueProperty().addListener((v, o, n) -> {
@@ -307,9 +310,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		// treeView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("set show tree info", treeView.optionShowTreeInfoProperty(), o, n));
 
 		Platform.runLater(this::setupMenuItems);
-
-		// if(tree.get()==null && treeView.getOptionTree()>=0 && treeView.getOptionTree()<treeView.getTrees().size())
-		//	tree.set(treeView.getTrees().get(treeView.getOptionTree()-1));
 		updateListener.invalidated(null);
 	}
 
