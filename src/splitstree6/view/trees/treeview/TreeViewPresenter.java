@@ -147,8 +147,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		scrollPane.setPannable(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(FXCollections.observableSet(), null));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(FXCollections.observableSet(), null));
+		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, TreeDiagramType::createNode));
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, TreeDiagramType::createNode));
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treeView.optionDiagramProperty());
 

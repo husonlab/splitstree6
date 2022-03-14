@@ -230,8 +230,13 @@ public class MainWindowPresenter {
 		});
 		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-		controller.getSaveButton().setOnAction(e -> SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName())));
-		controller.getSaveButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(mainWindow.dirtyProperty().not()).or(mainWindow.hasSplitsTree6FileProperty().not()));
+		controller.getSaveButton().setOnAction(e -> {
+			if (mainWindow.isHasSplitsTree6File())
+				SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName()));
+			else
+				controller.getSaveAsMenuItem().getOnAction().handle(e);
+		});
+		controller.getSaveButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(mainWindow.dirtyProperty().not()));
 		controller.getSaveMenuItem().setOnAction(controller.getSaveButton().getOnAction());
 		controller.getSaveMenuItem().disableProperty().bind(controller.getSaveButton().disableProperty());
 

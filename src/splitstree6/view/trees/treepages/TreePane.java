@@ -146,8 +146,12 @@ public class TreePane extends StackPane {
 
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
 			Platform.runLater(() -> {
-				LayoutUtils.applyOrientation(orientation.get(), pane, false);
-				updateLabelLayout(orientation.get());
+				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg)
+					splitstree6.view.splits.layout.LayoutUtils.applyOrientation(pane, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
+				else {
+					LayoutUtils.applyOrientation(orientation.get(), pane, false);
+					updateLabelLayout(orientation.get());
+				}
 			});
 
 			if (showTreeLabels != null) {
@@ -180,6 +184,8 @@ public class TreePane extends StackPane {
 				}
 				e.consume();
 			});
+
+
 			if (getRunAfterUpdate() != null) {
 				Platform.runLater(() -> getRunAfterUpdate().run());
 			}

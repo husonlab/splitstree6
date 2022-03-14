@@ -96,6 +96,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		var taxonSelectionModel = mainWindow.getTaxonSelectionModel();
 
 		Platform.runLater(() -> gridPane.get().getChildren().clear());
+
 		var start = page * rows.get() * cols.get();
 		var top = Math.min(trees.size(), start + rows.get() * cols.get());
 		var r = 0;

@@ -32,6 +32,7 @@ import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
@@ -78,10 +79,10 @@ public class SplitNetworkPane extends StackPane {
 
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);
-		//setMinWidth(Pane.USE_PREF_SIZE);
-		//setMinHeight(Pane.USE_PREF_SIZE);
-		//setMaxWidth(Pane.USE_PREF_SIZE);
-		//setMaxHeight(Pane.USE_PREF_SIZE);
+		setMinWidth(Pane.USE_PREF_SIZE);
+		setMinHeight(Pane.USE_PREF_SIZE);
+		setMaxWidth(Pane.USE_PREF_SIZE);
+		setMaxHeight(Pane.USE_PREF_SIZE);
 
 		fontScaleChangeListener = (v, o, n) -> LayoutUtils.applyLabelScaleFactor(this, n.doubleValue() / o.doubleValue());
 		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));

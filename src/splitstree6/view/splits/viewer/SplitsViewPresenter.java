@@ -86,28 +86,13 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.splitsView = splitsView;
 		this.controller = splitsView.getController();
 
-        splitNetworkPane.addListener((v, o, n) -> controller.getScrollPane().setContent(n));
+		splitNetworkPane.addListener((v, o, n) -> {
+			controller.getScrollPane().setContent(n);
+		});
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
 		controller.getScrollPane().setUpdateScaleMethod(() -> splitsView.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * splitsView.getOptionZoomFactor()));
-
-		if (false) {
-			controller.getScrollPane().viewportBoundsProperty().addListener(e -> {
-				var scrollPane = controller.getScrollPane();
-				var pane = splitNetworkPane.get();
-				if (pane != null) {
-					var newWidth = scrollPane.getViewportBounds().getWidth();
-					var oldWidth = pane.getMinWidth();
-					if (Math.abs(oldWidth - newWidth) > 20)
-						pane.setMinWidth(newWidth);
-					var newHeight = scrollPane.getViewportBounds().getHeight();
-					var oldHeight = pane.getMinHeight();
-					if (Math.abs(oldHeight - newHeight) > 20)
-						pane.setMinHeight(newHeight);
-				}
-			});
-		}
 
 		final ObservableSet<SplitsDiagramType> disabledDiagramTypes = FXCollections.observableSet();
 
@@ -179,7 +164,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getFitLabel().visibleProperty().bind(controller.getScaleBar().visibleProperty());
 
 		var boxDimension = new SimpleObjectProperty<Dimension2D>();
-		targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 20, n.getHeight() - 40)));
+		targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 40, n.getHeight() - 80)));
 
 		var first = new Single<>(true);
 
@@ -195,6 +180,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty());
 
+			//pane.setStyle("-fx-background-color: green;");
 			splitNetworkPane.set(pane);
 
 			pane.setRunAfterUpdate(() -> {
@@ -302,8 +288,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 
-		mainController.getSelectAllMenuItem().setOnAction(e ->
-		{
+		mainController.getSelectAllMenuItem().setOnAction(e -> {
 			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
 			splitsView.getSplitSelectionModel().selectAll(IteratorUtils.asList(BitSetUtils.range(1, splitsView.getSplitsBlock().getNsplits() + 1)));
 		});

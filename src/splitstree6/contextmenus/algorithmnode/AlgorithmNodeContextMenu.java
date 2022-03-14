@@ -34,6 +34,7 @@ public class AlgorithmNodeContextMenu {
 		var controller = loader.getController();
 
 		new AlgorithmNodeContextMenuPresenter(mainWindow, undoManager, controller, algorithmNode);
+		undoManager.undoableProperty().addListener((v, o, n) -> mainWindow.setDirty(true));
 
 		contextMenu = controller.getContextMenu();
 	}
