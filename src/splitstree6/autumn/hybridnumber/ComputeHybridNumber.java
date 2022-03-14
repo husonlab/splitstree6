@@ -270,7 +270,7 @@ public class ComputeHybridNumber {
                 final CountDownLatch countDownLatch = new CountDownLatch(2);
                 final Integer fPrevious = previousHybrid;
 
-                // setup task:
+                // create task:
                 final var task1 = new splitstree6.autumn.Task(() -> {
                     try {
                         if (verbose) {
@@ -375,7 +375,7 @@ public class ComputeHybridNumber {
                 if (scoreAbove + additionalAbove.sum() + 1 >= bestScore.get())
                     return LARGE;  // other thread has found a better result, abort
 
-                // setup task:
+				// create task:
                 final var task = new splitstree6.autumn.Task();
                 task.setRunnable(() -> {
                     try {

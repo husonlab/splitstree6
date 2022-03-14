@@ -135,11 +135,11 @@ public class RadialLabelLayout {
 	}
 
 	/**
-	 * setup the layout service
+	 * create the layout service
 	 */
 	private void setupLayoutService() {
 		layoutService.setCallable(() -> {
-					// setup graph:
+			// create graph:
 					var graph = new Graph();
 					var itemNodesMap = new HashMap<LayoutItem, ArrayList<Node>>();
 					var itemBestChoiceMap = new HashMap<LayoutItem, Choice>();

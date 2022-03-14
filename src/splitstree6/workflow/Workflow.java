@@ -110,7 +110,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
 		var inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
 
-		// todo: setup nexus loader
+		// todo: create nexus loader
 		/*
 		var loaderNode = newAlgorithmNode(dataLoader, null, sourceNode, inputDataNode, INPUT_DATA_LOADER);
 		loaderNode.addChild(inputTaxaNode);

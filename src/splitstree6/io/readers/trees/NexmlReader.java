@@ -93,7 +93,7 @@ public class NexmlReader extends TreesReader {
 			trees.setPartial(handler.isPartial());
 			trees.setRooted(hasRootWithOutdegree2 || handler.isRooted());
 
-			if (taxa.size() == 0) { // try and setup all the taxa
+			if (taxa.size() == 0) { // try and create all the taxa
 				var labels = new HashSet<String>();
 				for (var tree : trees.getTrees()) {
 					labels.addAll(tree.nodeStream()

@@ -37,6 +37,7 @@ import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 
@@ -137,18 +138,9 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		var searcher = setupSearcher(tableView);
-		findToolBar = new FindToolBar(mainWindow.getStage(), searcher);
-		searcher.foundProperty().addListener((v, o, n) -> tableView.scrollTo(n));
-
-		controller.getFindAndReplaceRadioMenuItem().setOnAction(e -> {
-			if (!findToolBar.isShowReplaceToolBar()) {
-				findToolBar.setShowReplaceToolBar(true);
-			} else {
-				findToolBar.setShowReplaceToolBar(false);
-				findToolBar.setShowFindToolBar(false);
-			}
-		});
+		findToolBar = FindReplaceTaxa.create(mainWindow, tab.getUndoManager());
+		findToolBar.setShowFindToolBar(false);
+		controller.getFindAndReplaceRadioMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));
 
 		controller.getTopVBox().getChildren().add(0, findToolBar);
 

@@ -48,7 +48,7 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
- * setup dragging of selected taxon labels
+ * create dragging of selected taxon labels
  * Daniel Huson, 2021
  */
 public class InteractionSetup {

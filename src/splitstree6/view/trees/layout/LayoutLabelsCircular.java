@@ -31,7 +31,7 @@ import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 
 /**
- * setup labels for a circular layout
+ * create labels for a circular layout
  * Daniel Huson, 12.2021
  */
 public class LayoutLabelsCircular {

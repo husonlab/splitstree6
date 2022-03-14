@@ -98,7 +98,7 @@ public class RerootByHybridNumber {
 							else return a.getSecond().getFirst().compareTo(b.getSecond().getFirst());
                         });
 
-		// setup all pairs of rootings
+		// create all pairs of rootings
 		{
 			SortedSet<Triplet<Edge, Float, Float>> rerootingTriplets1 = RerootingUtils.getRankedMidpointRootings(tree1);
 			SortedSet<Triplet<Edge, Float, Float>> rerootingTriplets2 = RerootingUtils.getRankedMidpointRootings(tree2);

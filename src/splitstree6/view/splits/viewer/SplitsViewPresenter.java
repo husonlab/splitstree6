@@ -34,7 +34,6 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ContextMenuEvent;
@@ -43,7 +42,6 @@ import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.find.Searcher;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
@@ -55,14 +53,13 @@ import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * splits network presenter
@@ -186,7 +183,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		var first = new Single<>(true);
 
-		updateListener = ignored -> {
+		updateListener = e -> {
 			if (first.get())
 				first.set(false);
 			else
@@ -197,7 +194,9 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
 					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty());
+
 			splitNetworkPane.set(pane);
+
 			pane.setRunAfterUpdate(() -> {
 				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
 					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
@@ -241,15 +240,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().setOnAction(e -> splitsView.setOptionFontScaleFactor((1.0 / 1.2) * splitsView.getOptionFontScaleFactor()));
 		controller.getDecreaseFontButton().disableProperty().bind(splitsView.emptyProperty());
 
-		final Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
-
-		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(),
-				t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
-				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s),
-				new SimpleObjectProperty<>(SelectionMode.MULTIPLE),
-				t -> t2taxon.apply(t).getNameAndDisplayLabel("===="),
-				label -> label.replaceAll(".*====", ""),
-				null));
+		findToolBar = FindReplaceTaxa.create(mainWindow, splitsView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
 		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
@@ -287,8 +278,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				Clipboard.getSystemClipboard().setContent(content);
 			}
 		});
-		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-
+		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0).or(mainWindow.getStage().focusedProperty().not()));
 
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 		mainController.getCopyNewickMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
@@ -310,6 +300,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 
 		mainController.getSelectAllMenuItem().setOnAction(e ->
 		{

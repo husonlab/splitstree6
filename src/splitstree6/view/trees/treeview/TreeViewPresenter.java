@@ -31,7 +31,6 @@ import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.SelectionMode;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ContextMenuEvent;
@@ -41,7 +40,6 @@ import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.find.Searcher;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
@@ -52,6 +50,7 @@ import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
 import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
@@ -279,16 +278,12 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		final Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
-		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(),
-				t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
-				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s),
-				new SimpleObjectProperty<>(SelectionMode.MULTIPLE),
-				t -> t2taxon.apply(t).getNameAndDisplayLabel("===="),
-				label -> label.replaceAll(".*====", ""),
-				null));
+
+		findToolBar = FindReplaceTaxa.create(mainWindow, treeView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
 		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
+
 
 		treeView.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -354,6 +349,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+
+		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 
 		mainController.getSelectAllMenuItem().setOnAction(e ->
 		{

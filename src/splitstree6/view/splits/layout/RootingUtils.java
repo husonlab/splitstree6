@@ -177,7 +177,7 @@ public class RootingUtils {
 	}
 
 	/**
-	 * setup target taxa block and splits block for computing rooted network
+	 * create target taxa block and splits block for computing rooted network
 	 *
 	 * @return root split
 	 */
@@ -231,7 +231,7 @@ public class RootingUtils {
 		}
 		SplitsUtilities.rotateCycle(cycle, rootTaxonId);
 
-		// setup splits:
+		// create splits:
 		splitsBlockTarget.clear();
 		var totalWeight = 0.0;
 

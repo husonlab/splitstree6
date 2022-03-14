@@ -31,22 +31,18 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
-import javafx.scene.control.SelectionMode;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.find.Searcher;
 import jloda.fx.util.BasicFX;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
-import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
 import splitstree6.view.trees.layout.ComputeHeightAndAngles;
 import splitstree6.view.trees.layout.TreeDiagramType;
 import splitstree6.view.trees.layout.TreeLabel;
 import splitstree6.window.MainWindow;
-
-import java.util.function.Function;
 
 /**
  * multi tree view presenter
@@ -204,13 +200,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			labelProperty.addListener((v, o, n) -> treePagesView.setOptionTreeLabels(TreeLabel.valueOfLabel(n)));
 		}
 
-		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
-
-		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(), t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
-				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s), new SimpleObjectProperty<>(SelectionMode.MULTIPLE), t -> t2taxon.apply(t).getNameAndDisplayLabel("===="),
-				label -> label.replaceAll(".*====", ""), null));
+		findToolBar = FindReplaceTaxa.create(mainWindow, treePagesView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
-
 		controller.getvBox().getChildren().add(findToolBar);
 		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
 
@@ -276,6 +267,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 
 		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
 		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());

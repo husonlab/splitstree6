@@ -43,8 +43,7 @@ public class AuxiliaryThreadScheduler {
     final private Set<Long> running = new HashSet<>();
 
     /**
-     * setup a scheduler
-     *
+	 * create a scheduler
 	 */
     public AuxiliaryThreadScheduler(int maxNumberOfThreads) {
         executor = new ScheduledThreadPoolExecutor(maxNumberOfThreads);

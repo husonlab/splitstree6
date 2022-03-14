@@ -33,15 +33,14 @@ import splitstree6.view.trees.treepages.LayoutOrientation;
 import java.util.function.Consumer;
 
 /**
- * setup labels for a radial layout
+ * create labels for a radial layout
  * Daniel Huson, 12.2021
  */
 public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> {
 	private final RadialLabelLayout labelLayout;
 
 	/**
-	 * setup labels for tree
-	 *
+	 * create labels for tree
 	 */
 	public LayoutLabelsRadialPhylogram(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap, double labelGap) {
 

@@ -92,7 +92,7 @@ public class TreeView implements IView {
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
-	// setup properties:
+	// create properties:
 	{
 		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RadialPhylogram);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);

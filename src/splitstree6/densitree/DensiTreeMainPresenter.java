@@ -21,10 +21,12 @@ package splitstree6.densitree;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.geometry.Point3D;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.input.KeyCode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.util.AService;
@@ -44,7 +46,6 @@ public class DensiTreeMainPresenter {
 
 		controller.getCanvas().widthProperty().bind(controller.getMainPane().widthProperty());
 		controller.getCanvas().heightProperty().bind(controller.getMainPane().heightProperty());
-
 
 		controller.getMessageLabel().setText("");
 
@@ -99,9 +100,7 @@ public class DensiTreeMainPresenter {
 			final ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
 			alert.getButtonTypes().setAll(buttonTypeCancel, buttonTypeYes);
 
-			Optional<ButtonType> result = alert.showAndWait();
-
-			if (result.get() == buttonTypeYes){
+			if (alert.showAndWait().orElse(null) == buttonTypeYes) {
 				stage.close();
 			}
 		});
@@ -116,9 +115,7 @@ public class DensiTreeMainPresenter {
 			final ButtonType buttonTypeYes = new ButtonType("Yes", ButtonBar.ButtonData.OK_DONE);
 			alert.getButtonTypes().setAll(buttonTypeCancel, buttonTypeYes);
 
-			Optional<ButtonType> result = alert.showAndWait();
-
-			if (result.get() == buttonTypeYes){
+			if (alert.showAndWait().orElse(null) == buttonTypeYes) {
 				stage.close();
 			}
 		});
@@ -143,5 +140,21 @@ public class DensiTreeMainPresenter {
 			controller.getMainPane().heightProperty().removeListener(listener);
 			controller.getCheckBox().selectedProperty().removeListener(listener);
 		});
+
+		if (false) {
+			// this is to see what a canvas looks like when it is rotated in 3D
+			controller.getToolBar().setOnKeyPressed(e -> {
+				if (e.getCode() == KeyCode.L) {
+					controller.getCanvas().setRotationAxis(new Point3D(0, 1, 0));
+					controller.getCanvas().setRotate(controller.getCanvas().getRotate() + 5);
+				} else if (e.getCode() == KeyCode.R) {
+					controller.getCanvas().setRotationAxis(new Point3D(0, 1, 0));
+					controller.getCanvas().setRotate(controller.getCanvas().getRotate() - 5);
+				} else if (e.getCode() == KeyCode.EQUALS) {
+					controller.getCanvas().setRotationAxis(new Point3D(1, 0, 0));
+					controller.getCanvas().setRotate(0);
+				}
+			});
+		}
 	}
 }

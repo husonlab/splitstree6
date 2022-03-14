@@ -28,7 +28,7 @@ import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 
 /**
- * setup node labels for a rectangular layout
+ * create node labels for a rectangular layout
  * Daniel Huson, 12.2021
  */
 public class LayoutLabelsRectangular {

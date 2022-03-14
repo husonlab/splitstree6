@@ -94,7 +94,7 @@ public class LSATree {
 	private void computeReticulation2LSARec(PhyloTree tree, Node v) {
 		if (v.getInDegree() > 1) // this is a reticulate node, add paths to node and incoming edges
 		{
-			// setup new paths for this node:
+			// create new paths for this node:
 			EdgeArray<BitSet> edge2PathSet = new EdgeArray<>(tree);
 			ret2Edge2PathSet.put(v, edge2PathSet);
 			BitSet pathsForR = new BitSet();

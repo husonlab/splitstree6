@@ -102,7 +102,7 @@ public class SplitNetworkLayout {
 		}
 
 
-		// if rooting is desired, need to setup a modified set of taxa and splits
+		// if rooting is desired, need to create a modified set of taxa and splits
 		final TaxaBlock taxaBlock;
 		final SplitsBlock splitsBlock;
 		final int rootSplit;

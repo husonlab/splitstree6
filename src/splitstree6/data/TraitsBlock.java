@@ -62,7 +62,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 
 	public void setTraitValueLabel(int taxonId, int traitId, String label) {
 		if (matrixOfLabels == null)
-			matrixOfLabels = new String[matrix.length][getNTraits()]; // lazy setup
+			matrixOfLabels = new String[matrix.length][getNTraits()]; // lazy create
 
 		matrixOfLabels[taxonId - 1][traitId - 1] = label;
 	}
