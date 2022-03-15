@@ -23,11 +23,14 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -72,14 +75,27 @@
                     </Menu>
                <Menu mnemonicParsing="false" text="Highlighting">
                  <items>
+                     <CheckMenuItem fx:id="consensusMenuItem" mnemonicParsing="false" text="Consensus Tree" />
                      <MenuItem fx:id="specificTreesMenuItem" mnemonicParsing="false" text="Specific Trees" />
                  </items>
+               </Menu>
+               <Menu mnemonicParsing="false" text="Labels">
+                  <items>
+                     <RadioMenuItem fx:id="meanMenuItem" mnemonicParsing="false" text="Mean">
+                        <toggleGroup>
+                           <ToggleGroup fx:id="labelsGroup" />
+                        </toggleGroup>
+                     </RadioMenuItem>
+                     <RadioMenuItem fx:id="medianMenuItem" mnemonicParsing="false" text="Median" toggleGroup="$labelsGroup" />
+                     <RadioMenuItem fx:id="radialMenuItem" mnemonicParsing="false" text="Radial" toggleGroup="$labelsGroup" />
+                  </items>
                </Menu>
                 </MenuBar>
                 <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">
                     <Button fx:id="drawButton" mnemonicParsing="false" text="Draw" />
                     <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" />
-                    <CheckBox fx:id="checkBox" mnemonicParsing="false" text="To Scale" />
+                    <CheckBox fx:id="scaleCheckBox" mnemonicParsing="false" text="To Scale" />
+               <CheckBox fx:id="jitterCheckBox" mnemonicParsing="false" text="Jitter" />
                 </ToolBar>
             </VBox>
         </top>
