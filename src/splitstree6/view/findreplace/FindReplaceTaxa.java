@@ -24,7 +24,10 @@ import javafx.scene.control.SelectionMode;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
 import jloda.fx.undo.UndoManager;
+import splitstree6.data.parts.Taxon;
 import splitstree6.window.MainWindow;
+
+import java.util.ArrayList;
 
 /**
  * create the find and replace toolbar for taxa
@@ -37,6 +40,8 @@ public class FindReplaceTaxa {
 	 * @param mainWindow
 	 */
 	public static FindToolBar create(MainWindow mainWindow, UndoManager undoManager) {
+		var changes = new ArrayList<TaxonOldLabelNewLabel>();
+
 		var searcher = new Searcher<>(mainWindow.getActiveTaxa(),
 				i -> mainWindow.getTaxonSelectionModel().isSelected(mainWindow.getActiveTaxa().get(i)),
 				(i, select) -> {
@@ -45,16 +50,19 @@ public class FindReplaceTaxa {
 					else
 						mainWindow.getTaxonSelectionModel().clearSelection(mainWindow.getActiveTaxa().get(i));
 				},
-				new SimpleObjectProperty<SelectionMode>(SelectionMode.MULTIPLE),
+				new SimpleObjectProperty<>(SelectionMode.MULTIPLE),
 				i -> mainWindow.getActiveTaxa().get(i).getNameAndDisplayLabel("===="),
 				label -> label.replaceAll(".*====", ""),
 				(i, label) -> {
 					var taxon = mainWindow.getActiveTaxa().get(i);
-					var oldLabel = taxon.getDisplayLabel();
-					undoManager.doAndAdd("replace", () -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(label.replaceAll(".*====", "")));
-				}); // todo: need to change this so that on replace all - all replacements are undone together
+					changes.add(new TaxonOldLabelNewLabel(taxon, taxon.getDisplayLabel(), label.replaceAll(".*====", "")));
+				}, changes::clear, () -> undoManager.doAndAdd("replace", () -> changes.forEach(c -> c.taxon().setDisplayLabel(c.oldLabel())),
+				() -> changes.forEach(c -> c.taxon().setDisplayLabel(c.newLabel()))));
 		searcher.setSelectionFindable(true);
 
 		return new FindToolBar(mainWindow.getStage(), searcher);
+	}
+
+	private record TaxonOldLabelNewLabel(Taxon taxon, String oldLabel, String newLabel) {
 	}
 }

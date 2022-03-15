@@ -46,6 +46,7 @@ import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
+import jloda.fx.util.ResourceManagerFX;
 import jloda.graph.Node;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
@@ -229,7 +230,18 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		findToolBar = FindReplaceTaxa.create(mainWindow, splitsView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
+		controller.getFindButton().setOnAction(e -> {
+			if (!findToolBar.isShowFindToolBar()) {
+				findToolBar.setShowFindToolBar(true);
+				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
+			} else if (!findToolBar.isShowReplaceToolBar()) {
+				findToolBar.setShowReplaceToolBar(true);
+				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
+			} else {
+				findToolBar.setShowFindToolBar(false);
+				findToolBar.setShowReplaceToolBar(false);
+			}
+		});
 
 		splitsView.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -283,7 +295,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
-		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
+		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));

@@ -32,7 +32,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DefaultStringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.find.Searcher;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -235,23 +234,6 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 			}
 		}
 		menuButton.setVisible(true);
-	}
-
-	private Searcher<TaxaEditTableItem> setupSearcher(TableView<TaxaEditTableItem> tableView) {
-		var searcher = new Searcher<>(tableView.getItems(),
-				i -> tableView.getSelectionModel().isSelected(i),
-				(i, select) -> {
-					if (select)
-						tableView.getSelectionModel().select(i);
-					else
-						tableView.getSelectionModel().clearSelection(i);
-				},
-				tableView.getSelectionModel().selectionModeProperty(),
-				i -> tableView.getItems().get(i).getNameAndDisplayLabel("===="),
-				label -> label.replaceAll(".*====", ""),
-				(i, label) -> tableView.getItems().get(i).setDisplayLabel(label.replaceAll(".*====", "")));
-		searcher.setSelectionFindable(true);
-		return searcher;
 	}
 
 	private boolean updatingActive = false;

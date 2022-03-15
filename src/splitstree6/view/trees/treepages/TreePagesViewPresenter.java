@@ -33,6 +33,7 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ResourceManagerFX;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -203,7 +204,18 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		findToolBar = FindReplaceTaxa.create(mainWindow, treePagesView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
+		controller.getFindButton().setOnAction(e -> {
+			if (!findToolBar.isShowFindToolBar()) {
+				findToolBar.setShowFindToolBar(true);
+				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
+			} else if (!findToolBar.isShowReplaceToolBar()) {
+				findToolBar.setShowReplaceToolBar(true);
+				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
+			} else {
+				findToolBar.setShowFindToolBar(false);
+				findToolBar.setShowReplaceToolBar(false);
+			}
+		});
 
 		controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowInternalLabelsProperty());
 		controller.getShowInternalLabelsToggleButton().disableProperty().bind(treePageView.emptyProperty());
@@ -264,7 +276,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
-		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
+		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
