@@ -252,12 +252,12 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		var undoManager = splitsView.getUndoManager();
 
-		splitsView.optionRootAngleProperty().addListener((c, o, n) -> undoManager.add("set root angle", splitsView.optionRootAngleProperty(), o, n));
-		splitsView.optionRootingProperty().addListener((c, o, n) -> undoManager.add("set rooting", splitsView.optionRootingProperty(), o, n));
-		splitsView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" set diagram", splitsView.optionDiagramProperty(), o, n));
-		splitsView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" set layout orientatio", splitsView.optionOrientationProperty(), o, n));
-		splitsView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", splitsView.optionFontScaleFactorProperty(), o, n));
-		splitsView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("set zoom factor", splitsView.optionZoomFactorProperty(), o, n));
+		splitsView.optionRootAngleProperty().addListener((c, o, n) -> undoManager.add("root angle", splitsView.optionRootAngleProperty(), o, n));
+		splitsView.optionRootingProperty().addListener((c, o, n) -> undoManager.add("rooting", splitsView.optionRootingProperty(), o, n));
+		splitsView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram", splitsView.optionDiagramProperty(), o, n));
+		splitsView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", splitsView.optionOrientationProperty(), o, n));
+		splitsView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", splitsView.optionFontScaleFactorProperty(), o, n));
+		splitsView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", splitsView.optionZoomFactorProperty(), o, n));
 
 		Platform.runLater(this::setupMenuItems);
 	}

@@ -52,7 +52,7 @@ public class TaxLabelFormatterPresenter {
 		controller.getFontFamilyCbox().setValue((new RichTextLabel()).getFontFamily());
 		controller.getFontFamilyCbox().valueProperty().addListener((v, o, n) -> {
 			if (!inUpdatingDefaults && n != null && !n.isBlank() && controller.getFontFamilyCbox().getItems().contains(n)) {
-				var undoList = new UndoableRedoableCommandList("set font");
+				var undoList = new UndoableRedoableCommandList(" font");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && !RichTextLabel.getFontFamily(oldLabel).equals(n)) {
@@ -70,7 +70,7 @@ public class TaxLabelFormatterPresenter {
 
 		controller.getFontSizeTextArea().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
-				var undoList = new UndoableRedoableCommandList("set font size");
+				var undoList = new UndoableRedoableCommandList(" font size");
 				var size = Math.max(0.1, NumberUtils.parseDouble(controller.getFontSizeTextArea().getText()));
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
@@ -89,7 +89,7 @@ public class TaxLabelFormatterPresenter {
 
 		controller.getBoldToggleButton().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
-				var undoList = new UndoableRedoableCommandList("set bold");
+				var undoList = new UndoableRedoableCommandList(" bold");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isBold(oldLabel) != controller.getBoldToggleButton().isSelected()) {
@@ -107,7 +107,7 @@ public class TaxLabelFormatterPresenter {
 
 		controller.getItalicToggleButton().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
-				var undoList = new UndoableRedoableCommandList("set italic");
+				var undoList = new UndoableRedoableCommandList(" italic");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isItalic(oldLabel) != controller.getItalicToggleButton().isSelected()) {
@@ -125,7 +125,7 @@ public class TaxLabelFormatterPresenter {
 
 		controller.getUnderlineToggleButton().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
-				var undoList = new UndoableRedoableCommandList("set underline");
+				var undoList = new UndoableRedoableCommandList(" underline");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isUnderline(oldLabel) != controller.getUnderlineToggleButton().isSelected()) {
@@ -143,7 +143,7 @@ public class TaxLabelFormatterPresenter {
 
 		controller.getStrikeToggleButton().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
-				var undoList = new UndoableRedoableCommandList("set strike");
+				var undoList = new UndoableRedoableCommandList(" strike");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.isStrike(oldLabel) != controller.getStrikeToggleButton().isSelected()) {
@@ -162,7 +162,7 @@ public class TaxLabelFormatterPresenter {
 		controller.getTextFillColorChooser().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
 				var color = controller.getTextFillColorChooser().getValue();
-				var undoList = new UndoableRedoableCommandList("set label color");
+				var undoList = new UndoableRedoableCommandList(" label color");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && (RichTextLabel.getTextFill(oldLabel) == null || !RichTextLabel.getTextFill(oldLabel).equals(color))) {

@@ -65,7 +65,7 @@ public class SplitsFormatterPresenter {
 					if (n.doubleValue() < 0)
 						strokeWidth.set(0);
 					else {
-						var undoList = new UndoableRedoableCommandList("set line width");
+						var undoList = new UndoableRedoableCommandList("line width");
 						var width = n.doubleValue();
 						var edits = new ArrayList<SplitNetworkEdits.Edit>();
 
@@ -96,7 +96,7 @@ public class SplitsFormatterPresenter {
 
 		controller.getColorPicker().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
-				var undoList = new UndoableRedoableCommandList("set line color");
+				var undoList = new UndoableRedoableCommandList("line color");
 				var color = controller.getColorPicker().getValue();
 				var edits = new ArrayList<SplitNetworkEdits.Edit>();
 

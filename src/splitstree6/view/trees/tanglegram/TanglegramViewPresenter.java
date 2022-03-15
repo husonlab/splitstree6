@@ -302,16 +302,16 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 
 		var undoManager = tanglegramView.getUndoManager();
-		tanglegramView.optionTree1Property().addListener((v, o, n) -> undoManager.add("set tree 1", tanglegramView.optionTree1Property(), o, n));
-		tanglegramView.optionTree2Property().addListener((v, o, n) -> undoManager.add("set tree 2", tanglegramView.optionTree2Property(), o, n));
-		tanglegramView.optionDiagram1Property().addListener((v, o, n) -> undoManager.add("set diagram type 1", tanglegramView.optionDiagram1Property(), o, n));
-		tanglegramView.optionDiagram2Property().addListener((v, o, n) -> undoManager.add("set diagram type 2", tanglegramView.optionDiagram2Property(), o, n));
-		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("set layout orientation", tanglegramView.optionOrientationProperty(), o, n));
-		tanglegramView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", tanglegramView.optionFontScaleFactorProperty(), o, n));
-		tanglegramView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add(" set horizontal zoom", tanglegramView.optionHorizontalZoomFactorProperty(), o, n));
-		tanglegramView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add(" set vertical zoom", tanglegramView.optionVerticalZoomFactorProperty(), o, n));
-		tanglegramView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("set show tree names", tanglegramView.optionShowTreeNamesProperty(), o, n));
-		tanglegramView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("set show tree info", tanglegramView.optionShowTreeInfoProperty(), o, n));
+		tanglegramView.optionTree1Property().addListener((v, o, n) -> undoManager.add("tree 1", tanglegramView.optionTree1Property(), o, n));
+		tanglegramView.optionTree2Property().addListener((v, o, n) -> undoManager.add("tree 2", tanglegramView.optionTree2Property(), o, n));
+		tanglegramView.optionDiagram1Property().addListener((v, o, n) -> undoManager.add("diagram type 1", tanglegramView.optionDiagram1Property(), o, n));
+		tanglegramView.optionDiagram2Property().addListener((v, o, n) -> undoManager.add("diagram type 2", tanglegramView.optionDiagram2Property(), o, n));
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("layout orientation", tanglegramView.optionOrientationProperty(), o, n));
+		tanglegramView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", tanglegramView.optionFontScaleFactorProperty(), o, n));
+		tanglegramView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("horizontal zoom", tanglegramView.optionHorizontalZoomFactorProperty(), o, n));
+		tanglegramView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("vertical zoom", tanglegramView.optionVerticalZoomFactorProperty(), o, n));
+		tanglegramView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("show tree names", tanglegramView.optionShowTreeNamesProperty(), o, n));
+		tanglegramView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", tanglegramView.optionShowTreeInfoProperty(), o, n));
 
 		controller.getContractHorizontallyButton().setOnAction(e -> tanglegramView.setOptionHorizontalZoomFactor((1.0 / 1.1) * tanglegramView.getOptionHorizontalZoomFactor()));
 		controller.getContractHorizontallyButton().disableProperty().bind(tanglegramView.emptyProperty().or(tanglegramView.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));

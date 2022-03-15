@@ -231,13 +231,13 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().disableProperty().bind(treePageView.emptyProperty());
 
 		var undoManager = treePagesView.getUndoManager();
-		rowsAndCols.addListener((v, o, n) -> undoManager.add("set grid dimensions", rowsAndCols, o, n));
-		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("set page", treePagesView.pageNumberProperty(), o, n));
-		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("set diagram type", treePagesView.optionDiagramProperty(), o, n));
-		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("set layout orientation", treePagesView.optionOrientationProperty(), o, n));
-		treePagesView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("set show tree names", treePagesView.optionTreeLabelsProperty(), o, n));
-		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", treePagesView.optionFontScaleFactorProperty(), o, n));
-		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("set zoom", treePagesView.optionZoomFactorProperty(), o, n));
+		rowsAndCols.addListener((v, o, n) -> undoManager.add("grid dimensions", rowsAndCols, o, n));
+		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("page", treePagesView.pageNumberProperty(), o, n));
+		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram type", treePagesView.optionDiagramProperty(), o, n));
+		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("layout orientation", treePagesView.optionOrientationProperty(), o, n));
+		treePagesView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("show tree names", treePagesView.optionTreeLabelsProperty(), o, n));
+		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", treePagesView.optionFontScaleFactorProperty(), o, n));
+		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom", treePagesView.optionZoomFactorProperty(), o, n));
 
 		treePagesView.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {

@@ -306,15 +306,15 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		var undoManager = treeView.getUndoManager();
 
-		treeView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add(" set diagram", treeView.optionDiagramProperty(), o, n));
-		treeView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("set show tree names", treeView.optionTreeLabelsProperty(), o, n));
-		treeView.optionAveragingProperty().addListener((v, o, n) -> undoManager.add(" set node averaging", treeView.optionAveragingProperty(), o, n));
-		treeView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add(" set orientation", treeView.optionOrientationProperty(), o, n));
-		treeView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", treeView.optionFontScaleFactorProperty(), o, n));
-		treeView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add(" set horizontal zoom", treeView.optionHorizontalZoomFactorProperty(), o, n));
-		treeView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add(" set vertical zoom", treeView.optionVerticalZoomFactorProperty(), o, n));
-		// treeView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("set show tree names", treeView.optionShowTreeNamesProperty(), o, n));
-		// treeView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("set show tree info", treeView.optionShowTreeInfoProperty(), o, n));
+		treeView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram", treeView.optionDiagramProperty(), o, n));
+		treeView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("show tree names", treeView.optionTreeLabelsProperty(), o, n));
+		treeView.optionAveragingProperty().addListener((v, o, n) -> undoManager.add("node averaging", treeView.optionAveragingProperty(), o, n));
+		treeView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", treeView.optionOrientationProperty(), o, n));
+		treeView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", treeView.optionFontScaleFactorProperty(), o, n));
+		treeView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("horizontal zoom", treeView.optionHorizontalZoomFactorProperty(), o, n));
+		treeView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("vertical zoom", treeView.optionVerticalZoomFactorProperty(), o, n));
+		// treeView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("show tree names", treeView.optionShowTreeNamesProperty(), o, n));
+		// treeView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", treeView.optionShowTreeInfoProperty(), o, n));
 
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);

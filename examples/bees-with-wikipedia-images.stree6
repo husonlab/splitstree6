@@ -3,7 +3,7 @@
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=10 nAlgorithms=7;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1647100782861'; [Sat Mar 12 16:59:42 CET 2022]
+WORKFLOW creationDate='1647339390314'; [Tue Mar 15 11:16:30 CET 2022]
 END; [SPLITSTREE6]
 
 [
@@ -34,12 +34,12 @@ TAXLABELS
 	[6] 'A.KOSCHEV'
 ;
 DISPLAYLABELS
-	[1] 'A.ANDRENOF'
-	[2] 'A.MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
-	[3] 'A.DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
-	[4] 'A.CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
-	[5] 'A.FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
-	[6] 'A.KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
+	[1] '<i>A. ANDRENOF'
+	[2] '<i>A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
+	[3] '<i>A. DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
+	[4] '<i>A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
+	[5] '<i>A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
+	[6] '<i>A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
 [TAXINFO;]
 END; [TAXA]
@@ -64,12 +64,12 @@ TAXLABELS
 	[6] 'A.KOSCHEV'
 ;
 DISPLAYLABELS
-	[1] 'A.ANDRENOF'
-	[2] 'A.MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
-	[3] 'A.DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
-	[4] 'A.CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
-	[5] 'A.FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
-	[6] 'A.KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
+	[1] '<i>A. ANDRENOF'
+	[2] '<i>A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
+	[3] '<i>A. DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
+	[4] '<i>A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
+	[5] '<i>A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
+	[6] '<i>A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
 [TAXINFO;]
 END; [TAXA]
