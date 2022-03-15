@@ -308,7 +308,7 @@ public class DensiTree {
                 }
                 SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
                 SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
-                labelLayout.addAvoidable(x,y,1,1);
+                // labelLayout.addAvoidable(x,y,1,1);
             }
 
             if (jitter) {
