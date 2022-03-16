@@ -25,8 +25,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.phylo.PhyloTree;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreePagesViewController {
 
@@ -49,7 +50,7 @@ public class TreePagesViewController {
 	private ComboBox<LayoutOrientation> orientationCBox;
 
 	@FXML
-	private ComboBox<ComputeHeightAndAngles.Averaging> averagingCBox;
+	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
 
 	@FXML
 	private ComboBox<String> rowsColsCBox;
@@ -136,7 +137,7 @@ public class TreePagesViewController {
 		return orientationCBox;
 	}
 
-	public ComboBox<ComputeHeightAndAngles.Averaging> getAveragingCBox() {
+	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 

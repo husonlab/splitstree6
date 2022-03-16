@@ -17,11 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
 import javafx.animation.ParallelTransition;
 import javafx.animation.RotateTransition;
 import javafx.animation.ScaleTransition;
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
 import javafx.util.Duration;
@@ -32,11 +33,10 @@ import jloda.graph.NodeArray;
 import jloda.phylo.PhyloGraph;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
-import jloda.util.Triplet;
-import splitstree6.data.TaxaBlock;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 
 import java.util.LinkedList;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * some layout utilities
@@ -45,17 +45,17 @@ import java.util.LinkedList;
 public class LayoutUtils {
 	public static final double MAX_FONT_SIZE = 24;
 
-	public static Triplet<Double, Double, Double> computeFontHeightGraphWidthHeight(TaxaBlock taxaBlock, PhyloGraph graph, boolean radial, double width, double height) {
+	public static FontHeightGraphWidthHeight computeFontHeightGraphWidthHeight(int nTaxa, Function<Integer, StringProperty> taxonLabelMap, PhyloGraph graph, boolean radial, double width, double height) {
 		double fontHeight;
 		if (radial)
-			fontHeight = Math.min(MAX_FONT_SIZE, 0.5 * Math.min(width, height) * Math.PI / (taxaBlock.getNtax() + 1));
+			fontHeight = Math.min(MAX_FONT_SIZE, 0.5 * Math.min(width, height) * Math.PI / (nTaxa + 1));
 		else
-			fontHeight = Math.min(MAX_FONT_SIZE, height / (taxaBlock.getNtax() + 1));
+			fontHeight = Math.min(MAX_FONT_SIZE, height / (nTaxa + 1));
 
 		var maxLabelWidth = 0.0;
 		NodeArray<RichTextLabel> nodeLabelMap = graph.newNodeArray();
 		for (var v : graph.nodes()) {
-			var label = getLabel(taxaBlock, graph, v);
+			var label = getLabel(taxonLabelMap, graph, v);
 			if (label != null) {
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.applyCss();
@@ -99,7 +99,10 @@ public class LayoutUtils {
 			normalizeHeight = height - fontHeight;
 		}
 
-		return new Triplet<>(fontHeight, normalizeWidth, normalizeHeight);
+		return new FontHeightGraphWidthHeight(fontHeight, normalizeWidth, normalizeHeight);
+	}
+
+	public static record FontHeightGraphWidthHeight(double fontHeight, double width, double height) {
 	}
 
 	public static double normalize(double width, double height, NodeArray<Point2D> nodePointMap, boolean maintainAspectRatio) {
@@ -122,19 +125,19 @@ public class LayoutUtils {
 		return scaleX;
 	}
 
-
-	public static RichTextLabel getLabel(TaxaBlock taxaBlock, PhyloGraph graph, Node v) {
+	public static RichTextLabel getLabel(Function<Integer, StringProperty> taxonLabelMap, PhyloGraph graph, Node v) {
 		if (graph.getNumberOfTaxa(v) == 1) {
 			var label = new RichTextLabel();
 			var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
 			if (taxonId != null) {
-				var taxon = taxaBlock.get(taxonId);
-				label.textProperty().bindBidirectional(taxon.displayLabelProperty());
+				var taxon = taxonLabelMap.apply(taxonId);
+				label.textProperty().bindBidirectional(taxonLabelMap.apply(taxonId));
 			} else
 				label.setText(graph.getLabel(v));
 			return label;
 		} else if (graph.getNumberOfTaxa(v) >= 2) {
-			return new RichTextLabel(StringUtils.toString(taxaBlock.getLabels(graph.getTaxa(v)), ","));
+			var label = StringUtils.toString(IteratorUtils.asStream(graph.getTaxa(v)).map(t -> taxonLabelMap.apply(t).getValue()).collect(Collectors.toList()), ",");
+			return new RichTextLabel(label);
 		} else if (v.getLabel() != null && !v.getLabel().isBlank()) {
 			return new RichTextLabel(v.getLabel());
 		} else if (graph.getLabel(v) != null && !graph.getLabel(v).isBlank()) {

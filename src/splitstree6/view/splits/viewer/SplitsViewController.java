@@ -29,7 +29,7 @@ import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
-import splitstree6.view.trees.treepages.LayoutOrientation;
+import splitstree6.layout.tree.LayoutOrientation;
 
 public class SplitsViewController {
 

@@ -22,18 +22,16 @@ package splitstree6.densitree;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.geometry.Point3D;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.input.KeyCode;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.util.AService;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.util.ProgramProperties;
 import splitstree6.io.readers.trees.NewickReader;
-import splitstree6.view.trees.treepages.RunAfterAWhile;
 
 import java.io.File;
 import java.io.IOException;
@@ -160,20 +158,5 @@ public class DensiTreeMainPresenter {
 			controller.getJitterCheckBox().selectedProperty().removeListener(listener);
 			controller.getConsensusMenuItem().selectedProperty().removeListener(listener);
 		});
-
-		if (false) { // DHH: this is to see what a canvas looks like when it is rotated in 3D
-			controller.getToolBar().setOnKeyPressed(e -> {
-				if (e.getCode() == KeyCode.L) {
-					controller.getCanvas().setRotationAxis(new Point3D(0, 1, 0));
-					controller.getCanvas().setRotate(controller.getCanvas().getRotate() + 5);
-				} else if (e.getCode() == KeyCode.R) {
-					controller.getCanvas().setRotationAxis(new Point3D(0, 1, 0));
-					controller.getCanvas().setRotate(controller.getCanvas().getRotate() - 5);
-				} else if (e.getCode() == KeyCode.EQUALS) {
-					controller.getCanvas().setRotationAxis(new Point3D(1, 0, 0));
-					controller.getCanvas().setRotate(0);
-				}
-			});
-		}
 	}
 }

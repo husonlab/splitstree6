@@ -1,5 +1,5 @@
 /*
- * TreeDiagramType.java Copyright (C) 2022 Daniel H. Huson
+ * LabelConnector.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,27 +17,31 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
-import javafx.scene.Node;
-import jloda.fx.util.ResourceManagerFX;
+import javafx.beans.binding.DoubleBinding;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 
 /**
- * the tree diagram type
- * Daniel Huson, 12.2021
+ * connects a label to the corresponding node
  */
-public enum TreeDiagramType {
-	RectangularCladogram, RectangularPhylogram, CircularCladogram, CircularPhylogram, TriangularCladogram, RadialCladogram, RadialPhylogram;
-
-	public boolean isRadialOrCircular() {
-		return this == RadialPhylogram || this == RadialCladogram || this == CircularPhylogram || this == CircularCladogram;
+public class LabelConnector extends Line {
+	public LabelConnector(double x1, double y1, double x2, double y2) {
+		setStartX(x1);
+		setStartY(y1);
+		setEndX(x2);
+		setEndY(y2);
+		setStroke(Color.DARKGRAY);
+		getStrokeDashArray().addAll(2.0, 5.0);
 	}
 
-	public boolean isPhylogram() {
-		return this == RadialPhylogram || this == CircularPhylogram || this == RectangularPhylogram;
-	}
-
-	public Node createNode() {
-		return ResourceManagerFX.getIconAsImageView(name() + "16.gif", 16);
+	public LabelConnector(DoubleBinding x1, DoubleBinding y1, DoubleBinding x2, DoubleBinding y2) {
+		startXProperty().bind(x1);
+		startYProperty().bind(y1);
+		endXProperty().bind(x2);
+		endYProperty().bind(y2);
+		setStroke(Color.LIGHTGRAY);
+		getStrokeDashArray().addAll(2.0, 5.0);
 	}
 }

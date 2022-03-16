@@ -37,12 +37,13 @@ import jloda.fx.util.ResourceManagerFX;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.layout.TreeLabel;
 import splitstree6.window.MainWindow;
 
 /**
@@ -94,17 +95,17 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
 
-		final ObservableSet<ComputeHeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
 		treePagesView.optionDiagramProperty().addListener((v, o, n) -> {
 			disabledAveraging.clear();
 			if (n == TreeDiagramType.RadialPhylogram) {
-				disabledAveraging.add(ComputeHeightAndAngles.Averaging.ChildAverage);
+				disabledAveraging.add(HeightAndAngles.Averaging.ChildAverage);
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().getItems().addAll(ComputeHeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, HeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, HeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(HeightAndAngles.Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(treePagesView.optionAveragingProperty());
 
 		controller.getRowsColsCBox().getItems().setAll(gridValues);

@@ -37,7 +37,7 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.trees.layout.*;
+import splitstree6.layout.tree.*;
 
 import java.util.function.Consumer;
 
@@ -68,7 +68,7 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
+					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX) {
 
 		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, orientation);
@@ -102,7 +102,7 @@ public class TreePane extends StackPane {
 
 		orientation.addListener((v, o, n) -> {
 			if (diagram == TreeDiagramType.RadialPhylogram)
-				splitstree6.view.splits.layout.LayoutUtils.applyOrientation(pane, o, n, orientationConsumer);
+				splitstree6.layout.splits.LayoutUtils.applyOrientation(pane, o, n, orientationConsumer);
 			else
 				LayoutUtils.applyOrientation(pane, n, o, false);
 		});
@@ -122,7 +122,7 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			return ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, averaging, width - 4, height - 4,
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
 					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
 		});
 
@@ -147,7 +147,7 @@ public class TreePane extends StackPane {
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
 			Platform.runLater(() -> {
 				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg)
-					splitstree6.view.splits.layout.LayoutUtils.applyOrientation(pane, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
+					splitstree6.layout.splits.LayoutUtils.applyOrientation(pane, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
 				else {
 					LayoutUtils.applyOrientation(orientation.get(), pane, false);
 					updateLabelLayout(orientation.get());

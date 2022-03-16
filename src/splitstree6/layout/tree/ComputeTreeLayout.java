@@ -17,8 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
+import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
@@ -26,15 +27,15 @@ import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.TriConsumer;
 import jloda.graph.Edge;
+import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
-import splitstree6.data.TaxaBlock;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * computes an embedding of a tree
@@ -44,8 +45,9 @@ public class ComputeTreeLayout {
 	/**
 	 * compute a tree embedding
 	 *
-	 * @param taxaBlock            set of working taxa
 	 * @param tree                 tree
+	 * @param nTaxa                number of taxa
+	 * @param taxonLabelMap        taxon-id to label map, 1-based
 	 * @param diagram              diagram type
 	 * @param width                target width
 	 * @param height               target height
@@ -55,8 +57,8 @@ public class ComputeTreeLayout {
 	 * @param alignLabels          align labels in rectangular and circular phylograms
 	 * @return groups and layout consumer
 	 */
-	public static Result apply(TaxaBlock taxaBlock, PhyloTree tree, TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, double width, double height,
-							   TriConsumer<jloda.graph.Node, Shape, RichTextLabel> nodeCallback,
+	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging,
+							   double width, double height, TriConsumer<Node, Shape, RichTextLabel> nodeCallback,
 							   BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
@@ -66,23 +68,20 @@ public class ComputeTreeLayout {
 
 		//parentPlacement = ParentPlacement.LeafAverage;
 
-		var triplet = LayoutUtils.computeFontHeightGraphWidthHeight(taxaBlock, tree, diagram.isRadialOrCircular(), width, height);
-		var fontHeight = triplet.getFirst();
-		width = triplet.getSecond();
-		height = triplet.getThird();
+		var dimensions = LayoutUtils.computeFontHeightGraphWidthHeight(nTaxa, taxonLabelMap, tree, diagram.isRadialOrCircular(), width, height);
 
 		final NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
 
 		for (var v : tree.nodes()) {
-			var label = LayoutUtils.getLabel(taxaBlock, tree, v);
+			var label = LayoutUtils.getLabel(taxonLabelMap, tree, v);
 			if (label != null) {
-				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
+				label.setScale(dimensions.fontHeight() / RichTextLabel.DEFAULT_FONT.getSize());
 				label.applyCss();
 				nodeLabelMap.put(v, label);
 			}
 		}
 
-		var labelGap = fontHeight + 1;
+		var labelGap = dimensions.fontHeight()  + 1;
 
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 
@@ -95,7 +94,7 @@ public class ComputeTreeLayout {
 			case CircularPhylogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, true, averaging);
 		};
 
-		var unitLengthX = LayoutUtils.normalize(width, height, nodePointMap, diagram.isRadialOrCircular());
+		var unitLengthX = LayoutUtils.normalize(dimensions.width(), dimensions.height(), nodePointMap, diagram.isRadialOrCircular());
 
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getX()) < 0.000001);
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
@@ -122,10 +121,10 @@ public class ComputeTreeLayout {
 				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
 				if (taxonId != null) {
 					taxonLabelsGroup.getChildren().add(label);
-					shape.setUserData(taxaBlock.get(taxonId));
+					shape.setUserData(taxonLabelMap.apply(taxonId));
 				} else {
 					internalLabelsGroup.getChildren().add(label);
-					splitstree6.view.splits.layout.LayoutUtils.installTranslateUsingLayout(label, () -> {
+					splitstree6.layout.splits.LayoutUtils.installTranslateUsingLayout(label, () -> {
 					});
 				}
 			}
@@ -173,6 +172,5 @@ public class ComputeTreeLayout {
 			this(null, null, null, null, null, null, 1.0);
 		}
 	}
-
 }
 

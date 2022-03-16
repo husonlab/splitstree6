@@ -35,13 +35,13 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
+import splitstree6.layout.splits.algorithms.EqualAngle;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.view.format.splits.SplitsFormatter;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
-import splitstree6.view.splits.layout.algorithms.EqualAngle;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;

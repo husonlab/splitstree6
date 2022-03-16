@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.layout;
+package splitstree6.layout.tree;
 
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyDoubleProperty;
@@ -26,7 +26,6 @@ import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.util.IteratorUtils;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -44,9 +44,9 @@ import jloda.graph.Node;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.splits.layout.SplitNetworkLayout;
-import splitstree6.view.trees.layout.LayoutUtils;
-import splitstree6.view.trees.treepages.LayoutOrientation;
+import splitstree6.layout.splits.SplitNetworkLayout;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -93,7 +93,7 @@ public class SplitNetworkPane extends StackPane {
 		};
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
-		orientChangeListener = (v, o, n) -> splitstree6.view.splits.layout.LayoutUtils.applyOrientation(this, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or));
+		orientChangeListener = (v, o, n) -> splitstree6.layout.splits.LayoutUtils.applyOrientation(this, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or));
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
 		layoutLabelsListener = e -> layoutLabels(orientation.get());

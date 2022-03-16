@@ -17,8 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
-
+package splitstree6.layout.tree;
 
 import jloda.graph.*;
 import jloda.phylo.PhyloTree;
@@ -66,7 +65,6 @@ public class LSATree {
 			}
 		}
 	}
-
 
 	NodeArray<BitSet> ret2PathSet;
 	NodeArray<EdgeArray<BitSet>> ret2Edge2PathSet;

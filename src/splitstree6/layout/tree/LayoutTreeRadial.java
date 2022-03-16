@@ -17,13 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
-
 
 /**
  * compute a radial layout
@@ -36,7 +35,7 @@ public class LayoutTreeRadial {
 	public static NodeArray<Point2D> apply(PhyloTree tree) {
 		// compute angles:
 		try (var nodeAngleMap = tree.newNodeDoubleArray()) {
-			ComputeHeightAndAngles.computeAngles(tree, nodeAngleMap, ComputeHeightAndAngles.Averaging.LeafAverage);
+			HeightAndAngles.computeAngles(tree, nodeAngleMap, HeightAndAngles.Averaging.LeafAverage);
 
 			var percentOffset = 50.0;
 			var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
 import javafx.scene.shape.*;
@@ -32,8 +32,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
-import static splitstree6.view.trees.layout.CreateEdgesRectangular.addArrowHead;
+import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
 
+/**
+ * create edges for a circular layout
+ * Daniel GHuHuson, 1.2022
+ */
 public class CreateEdgesCircular {
 
 	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {

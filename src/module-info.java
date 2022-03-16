@@ -98,9 +98,9 @@ module splitstreesix {
 	opens splitstree6.view.format.taxlabels;
 	opens splitstree6.view.format.splits;
 
-	opens splitstree6.view.trees.layout;
-	opens splitstree6.view.splits.layout;
+	opens splitstree6.layout.splits;
 	opens splitstree6.tabs.algorithms.treefilter;
+	opens splitstree6.layout.tree;
 
 
 }

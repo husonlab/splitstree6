@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
-import static splitstree6.view.trees.layout.CreateEdgesRectangular.addArrowHead;
+import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
 
 /**
  * draws edges using straight lines

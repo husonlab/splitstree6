@@ -30,14 +30,14 @@ import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.layout.TreeLabel;
-import splitstree6.view.trees.treepages.LayoutOrientation;
-import splitstree6.view.trees.treepages.RunAfterAWhile;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.layout.tree.TreeLabel;
 import splitstree6.view.trees.treepages.TreePane;
 
 /**
@@ -50,7 +50,7 @@ public class TanglegramTreePane extends Group {
 
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
-							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
+							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
 							  ReadOnlyDoubleProperty fontScaleFactor,
 							  ReadOnlyBooleanProperty showInternalLabels) {
 

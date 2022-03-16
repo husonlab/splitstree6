@@ -1,5 +1,5 @@
 /*
- * ComputeHeightAndAngles.java Copyright (C) 2022 Daniel H. Huson
+ * HeightAndAngles.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
 import javafx.scene.control.Label;
 import jloda.graph.Node;
@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * computes the y-coordinates for the rectangular layout
  */
-public class ComputeHeightAndAngles {
+public class HeightAndAngles {
 	public enum Averaging {
 		ChildAverage, LeafAverage;
 
@@ -79,7 +79,7 @@ public class ComputeHeightAndAngles {
 	}
 
 	public static void computeAngles(PhyloTree tree, NodeDoubleArray nodeAngleMap, Averaging averaging) {
-		ComputeHeightAndAngles.apply(tree, nodeAngleMap, averaging);
+		HeightAndAngles.apply(tree, nodeAngleMap, averaging);
 		var max = nodeAngleMap.values().stream().mapToDouble(a -> a).max().orElse(0);
 		var factor = 360.0 / max;
 		for (var v : nodeAngleMap.keySet()) {

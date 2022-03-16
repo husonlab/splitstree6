@@ -42,6 +42,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.LayoutOrientation;
 
 import java.util.HashMap;
 import java.util.Map;

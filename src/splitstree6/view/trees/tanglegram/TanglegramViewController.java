@@ -27,8 +27,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.util.DraggableLabel;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.treepages.LayoutOrientation;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
 
 /**
  * tanglegram view controller

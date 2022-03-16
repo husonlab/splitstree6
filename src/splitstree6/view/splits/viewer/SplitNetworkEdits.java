@@ -27,7 +27,7 @@ import jloda.fx.util.BasicFX;
 import jloda.graph.Node;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
-import splitstree6.view.splits.layout.RotateSplit;
+import splitstree6.layout.splits.RotateSplit;
 
 import java.util.ArrayList;
 import java.util.Collection;

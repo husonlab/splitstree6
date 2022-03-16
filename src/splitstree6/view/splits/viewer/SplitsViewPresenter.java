@@ -54,9 +54,9 @@ import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.layout.algorithms;
+package splitstree6.layout.splits.algorithms;
 
 import jloda.graph.Edge;
 import jloda.graph.EdgeSet;

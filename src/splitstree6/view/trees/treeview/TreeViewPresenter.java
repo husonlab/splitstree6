@@ -44,20 +44,17 @@ import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.*;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.layout.TreeLabel;
-import splitstree6.view.trees.treepages.LayoutOrientation;
-import splitstree6.view.trees.treepages.RunAfterAWhile;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.window.MainWindow;
 
@@ -238,17 +235,17 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		treeView.optionTreeProperty().addListener(updateListener);
 		treeView.optionDiagramProperty().addListener(updateListener);
 
-		final ObservableSet<ComputeHeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
 		treeView.optionDiagramProperty().addListener((v, o, n) -> {
 			disabledAveraging.clear();
 			if (n == TreeDiagramType.RadialPhylogram) {
-				disabledAveraging.add(ComputeHeightAndAngles.Averaging.ChildAverage);
+				disabledAveraging.add(HeightAndAngles.Averaging.ChildAverage);
 			}
 		});
 
-		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, ComputeHeightAndAngles.Averaging::createLabel));
-		controller.getAveragingCBox().getItems().addAll(ComputeHeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, HeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, HeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(HeightAndAngles.Averaging.values());
 		controller.getAveragingCBox().valueProperty().bindBidirectional(treeView.optionAveragingProperty());
 		treeView.optionAveragingProperty().addListener(updateListener);
 
@@ -318,6 +315,17 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
+
+
+		if (false) {
+			var drawOnCanvas = new DrawOnCanvas();
+			treeView.optionTreeProperty().addListener((v, o, n) -> {
+				if (n.intValue() >= 1 && n.intValue() <= treeView.getTrees().size()) {
+					drawOnCanvas.draw(mainWindow.getController().getBottomFlowPane(), treeView.getTrees().get(n.intValue() - 1), mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(),
+							t -> mainWindow.getWorkflow().getWorkingTaxaBlock().get(t).displayLabelProperty(), treeView.getOptionDiagram(), treeView.getOptionAveraging(), 850, 850, true);
+				}
+			});
+		}
 	}
 
 	public void setupMenuItems() {

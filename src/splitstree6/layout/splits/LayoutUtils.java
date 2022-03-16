@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.layout;
+package splitstree6.layout.splits;
 
 import javafx.animation.ParallelTransition;
 import javafx.animation.Transition;
@@ -29,7 +29,7 @@ import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
-import splitstree6.view.trees.treepages.LayoutOrientation;
+import splitstree6.layout.tree.LayoutOrientation;
 
 import java.util.ArrayList;
 import java.util.function.Consumer;

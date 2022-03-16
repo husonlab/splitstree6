@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.layout;
+package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
 import jloda.graph.Node;
@@ -37,14 +37,14 @@ public class LayoutTreeRectangular {
 	/**
 	 * compute rectangular tree or network layout
 	 *
-	 * @param tree    tree
+	 * @param tree tree
 	 * @return node to point map
 	 */
-	public static NodeArray<Point2D> apply(PhyloTree tree, boolean toScale, ComputeHeightAndAngles.Averaging averaging) {
+	public static NodeArray<Point2D> apply(PhyloTree tree, boolean toScale, HeightAndAngles.Averaging averaging) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 		nodePointMap.put(tree.getRoot(), new Point2D(0, 0));
 		try (var yCoord = tree.newNodeDoubleArray()) {
-			ComputeHeightAndAngles.apply(tree, yCoord, averaging);
+			HeightAndAngles.apply(tree, yCoord, averaging);
 			if (toScale) {
 				setCoordinatesPhylogram(tree, yCoord, nodePointMap);
 			} else {

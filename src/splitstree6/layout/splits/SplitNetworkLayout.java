@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.layout;
+package splitstree6.layout.splits;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -49,13 +49,14 @@ import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.splits.layout.algorithms.ConvexHull;
-import splitstree6.view.splits.layout.algorithms.EqualAngle;
-import splitstree6.view.splits.layout.algorithms.PhylogeneticOutline;
+import splitstree6.layout.splits.algorithms.ConvexHull;
+import splitstree6.layout.splits.algorithms.EqualAngle;
+import splitstree6.layout.splits.algorithms.PhylogeneticOutline;
+import splitstree6.layout.tree.LayoutUtils;
+import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.view.splits.viewer.LoopView;
 import splitstree6.view.splits.viewer.SplitsDiagramType;
 import splitstree6.view.splits.viewer.SplitsRooting;
-import splitstree6.view.trees.layout.LayoutUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,8 +64,8 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
-import static splitstree6.view.trees.layout.LayoutUtils.computeFontHeightGraphWidthHeight;
-import static splitstree6.view.trees.layout.LayoutUtils.normalize;
+import static splitstree6.layout.tree.LayoutUtils.computeFontHeightGraphWidthHeight;
+import static splitstree6.layout.tree.LayoutUtils.normalize;
 
 /**
  * computes the splits network layout
@@ -181,10 +182,10 @@ public class SplitNetworkLayout {
 		if (rootSplit > 0) // want the root to be placed on the left by default
 			rotate90(graph, nodePointMap);
 
-		var triplet = computeFontHeightGraphWidthHeight(taxaBlock, graph, true, width, height);
-		var fontHeight = triplet.getFirst();
-		width = triplet.getSecond();
-		height = triplet.getThird();
+		var dimensions = computeFontHeightGraphWidthHeight(taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), graph, true, width, height);
+		var fontHeight = dimensions.fontHeight();
+		width = dimensions.width();
+		height = dimensions.height();
 
 		unitLength.set(normalize(width, height, nodePointMap, true));
 
@@ -208,7 +209,7 @@ public class SplitNetworkLayout {
 
 			nodesGroup.getChildren().add(shape);
 
-			var label = LayoutUtils.getLabel(taxaBlock, graph, v);
+			var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 
 			if (label != null && !isRootNode) {
 				label.getStyleClass().add("graph-label");
@@ -275,7 +276,7 @@ public class SplitNetworkLayout {
 					label.setStyle("-fx-background-color: rgba(128,128,128,0.2)");
 				placeLabel(line, label);
 				label.effectProperty().bind(line.effectProperty());
-				splitstree6.view.splits.layout.LayoutUtils.installTranslateUsingLayout(label, () -> splitSelectionModel.select(split));
+				splitstree6.layout.splits.LayoutUtils.installTranslateUsingLayout(label, () -> splitSelectionModel.select(split));
 				confidenceLabels.getChildren().add(label);
 			}
 		}

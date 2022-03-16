@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.layout;
+package splitstree6.layout.splits;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;

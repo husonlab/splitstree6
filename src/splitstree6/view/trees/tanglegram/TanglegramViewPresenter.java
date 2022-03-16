@@ -37,19 +37,19 @@ import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.LayoutUtils;
+import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.splits.viewer.ComboBoxUtils;
-import splitstree6.view.trees.layout.LayoutUtils;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.treepages.LayoutOrientation;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static splitstree6.view.trees.layout.TreeDiagramType.*;
-import static splitstree6.view.trees.treepages.LayoutOrientation.*;
+import static splitstree6.layout.tree.LayoutOrientation.*;
+import static splitstree6.layout.tree.TreeDiagramType.*;
 
 /**
  * tanglegram view presenter

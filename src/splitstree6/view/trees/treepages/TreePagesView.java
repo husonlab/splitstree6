@@ -30,12 +30,13 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.IView;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.layout.TreeLabel;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class TreePagesView implements IView {
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
 	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
-	private final ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
+	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
@@ -77,7 +78,7 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionRows, 1);
 		ProgramProperties.track(optionCols, 1);
 		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
-		ProgramProperties.track(optionAveraging, ComputeHeightAndAngles.Averaging::valueOf, ComputeHeightAndAngles.Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
 		ProgramProperties.track(optionShowInternalLabels, true);
@@ -193,15 +194,15 @@ public class TreePagesView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public ComputeHeightAndAngles.Averaging getOptionAveraging() {
+	public HeightAndAngles.Averaging getOptionAveraging() {
 		return optionAveraging.get();
 	}
 
-	public ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveragingProperty() {
+	public ObjectProperty<HeightAndAngles.Averaging> optionAveragingProperty() {
 		return optionAveraging;
 	}
 
-	public void setOptionAveraging(ComputeHeightAndAngles.Averaging optionAveraging) {
+	public void setOptionAveraging(HeightAndAngles.Averaging optionAveraging) {
 		this.optionAveraging.set(optionAveraging);
 	}
 

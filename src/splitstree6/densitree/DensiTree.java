@@ -32,7 +32,7 @@ import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.RandomGaussian;
-import splitstree6.view.splits.layout.RadialLabelLayout;
+import splitstree6.layout.tree.RadialLabelLayout;
 
 import java.io.IOException;
 import java.util.Arrays;
