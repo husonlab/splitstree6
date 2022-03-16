@@ -88,8 +88,8 @@ public class DensiTree {
         double[][] coords = new double[nTaxa][2];
         double[][][] coords2 = new double[nTaxa][nTrees][2];
 
-        RandomGaussian random = new RandomGaussian(0, 4, 187);
-        double shift = 0;
+        RandomGaussian random = new RandomGaussian(0, 3, 187);
+        double shift;
 
         var tree1 = model.getTreesBlock().getTree(1);
         int counter = 0;
@@ -311,10 +311,22 @@ public class DensiTree {
                 // labelLayout.addAvoidable(x,y,1,1);
             }
 
+            double x1 = vPt.getX();
+            double y1 = vPt.getY();
+            double x2 = wPt.getX();
+            double y2 = wPt.getY();
+
             if (jitter) {
-                gc.strokeLine(vPt.getX() + shift, vPt.getY(), wPt.getX() + shift, wPt.getY());
+                double dx = x2 - x1;
+                double dy = y2 - y1;
+
+                double absolute = Math.sqrt((-dy * -dy) + (dx * dx));
+                double nx = -dy / absolute;
+                double ny = dx / absolute;
+
+                gc.strokeLine(x1 + shift * nx, y1 + shift * ny, x2 + shift * nx, y2 + shift * ny);
             } else {
-                gc.strokeLine(vPt.getX(), vPt.getY(), wPt.getX(), wPt.getY());
+                gc.strokeLine(x1, y1, x2, y2);
             }
         }
     }
@@ -344,10 +356,22 @@ public class DensiTree {
                 }
             }
 
+            double x1 = vPt.getX();
+            double y1 = vPt.getY();
+            double x2 = wPt.getX();
+            double y2 = wPt.getY();
+
             if (jitter) {
-                gc.strokeLine(vPt.getX() + shift, vPt.getY(), wPt.getX() + shift, wPt.getY());
+                double dx = x2 - x1;
+                double dy = y2 - y1;
+
+                double absolute = Math.sqrt((-dy * -dy) + (dx * dx));
+                double nx = -dy / absolute;
+                double ny = dx / absolute;
+
+                gc.strokeLine(x1 + shift * nx, y1 + shift * ny, x2 + shift * nx, y2 + shift * ny);
             } else {
-                gc.strokeLine(vPt.getX(), vPt.getY(), wPt.getX(), wPt.getY());
+                gc.strokeLine(x1, y1, x2, y2);
             }
         }
     }
