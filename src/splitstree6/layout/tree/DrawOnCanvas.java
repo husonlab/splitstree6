@@ -21,7 +21,6 @@ package splitstree6.layout.tree;
 
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Point3D;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
@@ -33,7 +32,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import jloda.fx.util.AService;
-import jloda.fx.util.BasicFX;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
 
@@ -107,29 +105,20 @@ public class DrawOnCanvas {
 			var snapshotParams = new SnapshotParameters();
 			snapshotParams.setFill(Color.TRANSPARENT);
 
-			// to implement jittering, translate snapshot here
-
-			var offsetX = 50 - result.getAllAsGroup().getChildren().stream().mapToDouble(n -> n.getLayoutBounds().getMinX()).min().orElse(0);
-			var offsetY = 50 - result.getAllAsGroup().getChildren().stream().mapToDouble(n -> n.getLayoutBounds().getMinY()).min().orElse(0);
-
-			gc.strokeRect(100, 100, 50, 50);
 			try {
-				for (var node : BasicFX.getAllRecursively(result.getAllAsGroup(), Node.class)) {
+				var node = result.getAllAsGroup();
+				var offsetX = 50 - node.getLayoutBounds().getMinX();
+				var offsetY = 50 - node.getLayoutBounds().getMinY();
+				// to implement jittering, translate snapshot here
 
-
-					var bounds = node.getLayoutBounds();
-					var bWidth = (int) Math.ceil(bounds.getWidth());
-					var bheight = (int) Math.ceil(bounds.getWidth());
-					if (bWidth > 0 && bheight > 0) {
-						var snapshot = new WritableImage(bWidth, bheight);
-						snapshot = node.snapshot(snapshotParams, snapshot);
-						gc.drawImage(snapshot, bounds.getMinX() + offsetX + node.getTranslateX(), bounds.getMinY() + offsetY + node.getTranslateY());
-					}
+				var bounds = node.getLayoutBounds();
+				var bWidth = (int) Math.ceil(bounds.getWidth());
+				var bheight = (int) Math.ceil(bounds.getWidth());
+				if (bWidth > 0 && bheight > 0) {
+					var snapshot = new WritableImage(bWidth, bheight);
+					snapshot = node.snapshot(snapshotParams, snapshot);
+					gc.drawImage(snapshot, bounds.getMinX() + offsetX + node.getTranslateX(), bounds.getMinY() + offsetY + node.getTranslateY());
 				}
-				gc.strokeRect(100, 100, 100, 100);
-				gc.strokeRect(100, 100, 200, 200);
-				gc.strokeRect(100, 100, 400, 400);
-				gc.strokeRect(100, 100, 800, 800);
 
 			} catch (Exception ex) {
 				Basic.caught(ex);

@@ -115,7 +115,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		});
 
 		controller.getNextButton().setOnAction(e -> treeView.setOptionTree(treeView.getOptionTree() + 1));
-		controller.getNextButton().disableProperty().bind(Bindings.size(treeView.getTrees()).isEqualTo(0).or(treeView.optionTreeProperty().greaterThan(Bindings.size(treeView.getTrees()))));
+		controller.getNextButton().disableProperty().bind(Bindings.size(treeView.getTrees()).isEqualTo(0).or(treeView.optionTreeProperty().greaterThanOrEqualTo(Bindings.size(treeView.getTrees()))));
 
 		controller.getPreviousButton().setOnAction(e -> treeView.setOptionTree(treeView.getOptionTree() - 1));
 		controller.getPreviousButton().disableProperty().bind(Bindings.size(treeView.getTrees()).isEqualTo(0).or(treeView.optionTreeProperty().lessThanOrEqualTo(1)));
@@ -317,12 +317,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		updateListener.invalidated(null);
 
 
-		if (false) {
+		if (false) { // code for testing ideas about drawing on a canvas
 			var drawOnCanvas = new DrawOnCanvas();
+
 			treeView.optionTreeProperty().addListener((v, o, n) -> {
 				if (n.intValue() >= 1 && n.intValue() <= treeView.getTrees().size()) {
 					drawOnCanvas.draw(mainWindow.getController().getBottomFlowPane(), treeView.getTrees().get(n.intValue() - 1), mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(),
-							t -> mainWindow.getWorkflow().getWorkingTaxaBlock().get(t).displayLabelProperty(), treeView.getOptionDiagram(), treeView.getOptionAveraging(), 850, 850, true);
+							t -> mainWindow.getWorkflow().getWorkingTaxaBlock().get(t).displayLabelProperty(), treeView.getOptionDiagram(), treeView.getOptionAveraging(), 850, 850, false);
 				}
 			});
 		}
