@@ -62,6 +62,9 @@ public class DensiTreeMainController {
 	private RadioMenuItem medianMenuItem;
 
 	@FXML
+	private RadioMenuItem dbscanMenuItem;
+
+	@FXML
 	private RadioMenuItem radialMenuItem;
 
 	@FXML
@@ -130,6 +133,10 @@ public class DensiTreeMainController {
 
 	public RadioMenuItem getMedianMenuItem() {
 		return medianMenuItem;
+	}
+
+	public RadioMenuItem getDbscanMenuItem() {
+		return dbscanMenuItem;
 	}
 
 	public RadioMenuItem getRadialMenuItem() {
