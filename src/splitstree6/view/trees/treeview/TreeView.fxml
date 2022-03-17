@@ -69,16 +69,16 @@
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                     <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" maxHeight="-Infinity"
                                   maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" text="T">
+                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" text="n">
                         <tooltip>
-                            <Tooltip text="Show tree names or info"/>
+                            <Tooltip text="Show tree names or details"/>
                         </tooltip>
                         <font>
                             <Font size="12.0"/>
                         </font>
                     </ToggleButton>
                     <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
-                                  text="L">
+                                  text="i">
                         <tooltip>
                             <Tooltip text="Show internal labels"/>
                         </tooltip>

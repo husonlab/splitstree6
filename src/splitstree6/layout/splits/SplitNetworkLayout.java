@@ -269,7 +269,7 @@ public class SplitNetworkLayout {
 			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
 			progress.incrementProgress();
 
-			if (split <= splitsBlock.getNsplits() && splitsBlock.get(split).getConfidence() != -1 && !splitsWithConfidenceLabels.get(split)) {
+			if (split <= splitsBlock.getNsplits() && splitsBlock.get(split).getConfidence() > 0.05 && !splitsWithConfidenceLabels.get(split)) {
 				splitsWithConfidenceLabels.set(split);
 				var label = new Label(StringUtils.removeTrailingZerosAfterDot("%.1f", splitsBlock.get(split).getConfidence()));
 				if (false)

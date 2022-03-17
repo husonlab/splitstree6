@@ -26,17 +26,17 @@ import jloda.phylo.algorithms.RootedNetworkProperties;
 import java.util.Arrays;
 
 /**
- * tree label: name, name and info, or none
+ * tree label: name, name and details, or none
  * Daniel Huson, 1.2022
  */
 public enum TreeLabel {
-	None, Name, Info;
+	None, Name, Details;
 
 	public String label() {
 		return switch (this) {
 			case None -> "-";
 			case Name -> "n";
-			case Info -> "i";
+			case Details -> "d";
 		};
 	}
 
@@ -48,14 +48,14 @@ public enum TreeLabel {
 		return switch (label) {
 			case "-" -> None;
 			case "n" -> Name;
-			case "i" -> Info;
+			case "d" -> Details;
 			default -> None;
 		};
 	}
 
 	public static void setLabel(PhyloTree tree, TreeLabel treeLabel, TextInputControl label) {
-		if (tree != null && (treeLabel == Name || treeLabel == Info)) {
-			label.setText(tree.getName() + (treeLabel == Info ? " : " + RootedNetworkProperties.computeInfoString(tree) : ""));
+		if (tree != null && (treeLabel == Name || treeLabel == Details)) {
+			label.setText(tree.getName() + (treeLabel == Details ? " : " + RootedNetworkProperties.computeInfoString(tree) : ""));
 		} else
 			label.setText("");
 	}

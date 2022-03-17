@@ -98,7 +98,10 @@ public class SplitsViewController {
 
 	@FXML
 	private void initialize() {
+		zoomableScrollPane.setFitToWidth(true);
+		zoomableScrollPane.setFitToHeight(true);
 		centerPane.getChildren().add(zoomableScrollPane);
+
 		innerAnchorPane.getChildren().add(scaleBar);
 		AnchorPane.setTopAnchor(scaleBar, 2.0);
 		AnchorPane.setLeftAnchor(scaleBar, 5.0);

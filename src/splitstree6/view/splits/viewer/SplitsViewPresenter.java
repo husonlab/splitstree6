@@ -92,9 +92,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			controller.getScrollPane().setContent(n);
 		});
 
-		controller.getScrollPane().setFitToWidth(true);
-		controller.getScrollPane().setFitToHeight(true);
-
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
 		controller.getScrollPane().setUpdateScaleMethod(() -> splitsView.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * splitsView.getOptionZoomFactor()));

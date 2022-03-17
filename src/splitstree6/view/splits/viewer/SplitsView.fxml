@@ -42,7 +42,7 @@
                         </tooltip>
                     </ComboBox>
                     <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
-                                  text="L">
+                                  text="i">
                         <tooltip>
                             <Tooltip text="Show internal labels"/>
                         </tooltip>

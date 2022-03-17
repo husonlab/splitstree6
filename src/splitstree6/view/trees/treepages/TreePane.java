@@ -122,8 +122,9 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
+			var result = ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
 					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
+			return result;
 		});
 
 		service.setOnSucceeded(a -> {
@@ -166,7 +167,7 @@ public class TreePane extends StackPane {
 							treeLabel.setText(phyloTree.getName());
 							treeLabel.setVisible(true);
 						}
-						case Info -> {
+						case Details -> {
 							treeLabel.setText(phyloTree.getName() + " : " + getInfoString());
 							treeLabel.setVisible(true);
 						}
@@ -184,7 +185,6 @@ public class TreePane extends StackPane {
 				}
 				e.consume();
 			});
-
 
 			if (getRunAfterUpdate() != null) {
 				Platform.runLater(() -> getRunAfterUpdate().run());

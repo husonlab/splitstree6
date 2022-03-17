@@ -121,7 +121,7 @@ public class ComputeTreeLayout {
 				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
 				if (taxonId != null) {
 					taxonLabelsGroup.getChildren().add(label);
-					shape.setUserData(taxonLabelMap.apply(taxonId));
+					shape.setUserData(taxonId);
 				} else {
 					internalLabelsGroup.getChildren().add(label);
 					splitstree6.layout.splits.LayoutUtils.installTranslateUsingLayout(label, () -> {

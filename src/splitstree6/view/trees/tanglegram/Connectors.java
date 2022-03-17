@@ -97,61 +97,65 @@ public class Connectors {
 	}
 
 	public void update() {
+		var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
+
 		taxonShapeMap.clear();
 		var map1 = new HashMap<Taxon, Node>();
 		for (var node : BasicFX.getAllRecursively(tree1Pane, Shape.class)) {
-			if (node.getUserData() instanceof Taxon taxon) {
-				map1.put(taxon, node);
+			if (node.getUserData() instanceof Integer taxon) {
+				map1.put(taxonBlock.get(taxon), node);
 			}
 		}
 		var map2 = new HashMap<Taxon, Node>();
 		for (var node : BasicFX.getAllRecursively(tree2Pane, Shape.class)) {
-			if (node.getUserData() instanceof Taxon taxon) {
-				map2.put(taxon, node);
+			if (node.getUserData() instanceof Integer taxon) {
+				map2.put(taxonBlock.get(taxon), node);
 			}
 		}
 
 		group.getChildren().clear();
 
-		for (var taxon : map1.keySet()) {
-			var node1 = map1.get(taxon);
-			var node2 = map2.get(taxon);
-			if (node1 != null && node2 != null) {
-				var line = new Path();
-				group.getChildren().add(line);
-				taxonShapeMap.put(taxon, line);
+		if (map1.size() > 0 && map2.size() > 0) {
+			for (var taxon : map1.keySet()) {
+				var node1 = map1.get(taxon);
+				var node2 = map2.get(taxon);
+				if (node1 != null && node2 != null) {
+					var line = new Path();
+					group.getChildren().add(line);
+					taxonShapeMap.put(taxon, line);
 
-				line.setStrokeWidth(strokeWidth);
-                line.setStroke(strokeColor);
-                line.setOnMouseClicked(e -> {
-                    if (!e.isShiftDown())
-                        mainWindow.getTaxonSelectionModel().clearSelection();
-                    mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
-                });
+					line.setStrokeWidth(strokeWidth);
+					line.setStroke(strokeColor);
+					line.setOnMouseClicked(e -> {
+						if (!e.isShiftDown())
+							mainWindow.getTaxonSelectionModel().clearSelection();
+						mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
+					});
 
-                if (mainWindow.getTaxonSelectionModel().isSelected(taxon))
-                    line.setEffect(SelectionEffectBlue.getInstance());
+					if (mainWindow.getTaxonSelectionModel().isSelected(taxon))
+						line.setEffect(SelectionEffectBlue.getInstance());
 
-                InvalidationListener invalidationListener = e -> Platform.runLater(() -> {
-                    line.getElements().clear();
-                    var screenStartPoint = node1.getParent().localToScreen(node1.getTranslateX(), node1.getTranslateY());
-                    var screenEndPoint = node2.getParent().localToScreen(node2.getTranslateX(), node2.getTranslateY());
-                    if (screenStartPoint != null && screenEndPoint != null) {
-                        var localStartPoint = line.screenToLocal(screenStartPoint);
-                        var localEndPoint = line.screenToLocal(screenEndPoint);
-                        if (localStartPoint != null && localEndPoint != null) {
-                            line.getElements().add(new MoveTo(0, localStartPoint.getY()));
-                            line.getElements().add(new CubicCurveTo(0.3 * drawPane.getWidth(), localStartPoint.getY(),
-                                    0.7 * drawPane.getWidth(), localEndPoint.getY(),
-                                    drawPane.getWidth(), localEndPoint.getY()));
-                        }
-                    } else
-                        group.getChildren().remove(line);
-                });
-                tree1Pane.boundsInParentProperty().addListener(invalidationListener);
-                tree2Pane.boundsInParentProperty().addListener(invalidationListener);
-                invalidationListener.invalidated(null);
-            }
+					InvalidationListener invalidationListener = e -> Platform.runLater(() -> {
+						line.getElements().clear();
+						var screenStartPoint = node1.getParent().localToScreen(node1.getTranslateX(), node1.getTranslateY());
+						var screenEndPoint = node2.getParent().localToScreen(node2.getTranslateX(), node2.getTranslateY());
+						if (screenStartPoint != null && screenEndPoint != null) {
+							var localStartPoint = line.screenToLocal(screenStartPoint);
+							var localEndPoint = line.screenToLocal(screenEndPoint);
+							if (localStartPoint != null && localEndPoint != null) {
+								line.getElements().add(new MoveTo(0, localStartPoint.getY()));
+								line.getElements().add(new CubicCurveTo(0.3 * drawPane.getWidth(), localStartPoint.getY(),
+										0.7 * drawPane.getWidth(), localEndPoint.getY(),
+										drawPane.getWidth(), localEndPoint.getY()));
+							}
+						} else
+							group.getChildren().remove(line);
+					});
+					tree1Pane.boundsInParentProperty().addListener(invalidationListener);
+					tree2Pane.boundsInParentProperty().addListener(invalidationListener);
+					invalidationListener.invalidated(null);
+				}
+			}
 		}
 	}
 }

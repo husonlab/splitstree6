@@ -160,7 +160,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			tanglegramView.getTrees().addListener(treeChangedListener);
 			treeChangedListener.invalidated(null);
 
-
 			tanglegramView.optionShowTreeNamesProperty().addListener(e -> {
 				setLabel(tree1.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
 				setLabel(tree2.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
@@ -224,11 +223,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		{
 			var labelProperty = new SimpleStringProperty();
-			var defaultState = (tanglegramView.isOptionShowTreeInfo() ? "i" : tanglegramView.isOptionShowTreeNames() ? "t" : null);
-			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), defaultState, labelProperty, "-", "t", "i");
+			var defaultState = (tanglegramView.isOptionShowTreeInfo() ? "d" : tanglegramView.isOptionShowTreeNames() ? "n" : null);
+			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), defaultState, labelProperty, "-", "n", "d");
 			labelProperty.addListener((v, o, n) -> {
-				tanglegramView.setOptionShowTreeNames("t".equals(n) || "i".equals(n));
-				tanglegramView.setOptionShowTreeInfo("i".equals(n));
+				tanglegramView.setOptionShowTreeNames("n".equals(n) || "d".equals(n));
+				tanglegramView.setOptionShowTreeInfo("d".equals(n));
 			});
 		}
 

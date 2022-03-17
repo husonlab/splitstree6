@@ -137,6 +137,10 @@ public class TanglegramViewController {
 		borderPane.setLeft(left);
 		borderPane.setRight(right);
 		borderPane.setTop(top);
+		borderPane.setBottom(bottom);
+
+		scrollPane.setFitToWidth(true);
+		scrollPane.setFitToHeight(true);
 
 		innerAnchorPane.getChildren().add(tree1NameLabel);
 		AnchorPane.setTopAnchor(tree1NameLabel, 5.0);
@@ -144,7 +148,7 @@ public class TanglegramViewController {
 
 		innerAnchorPane.getChildren().add(tree2NameLabel);
 		AnchorPane.setTopAnchor(tree2NameLabel, 5.0);
-		AnchorPane.setRightAnchor(tree2NameLabel, 10.0);
+		AnchorPane.setRightAnchor(tree2NameLabel, 20.0);
 
 		DraggableLabel.makeDraggable(tree1NameLabel);
 		DraggableLabel.makeDraggable(tree2NameLabel);
@@ -160,7 +164,6 @@ public class TanglegramViewController {
 
 		innerAnchorPane.getChildren().remove(formatVBox);
 		innerAnchorPane.getChildren().add(formatVBox);
-
 	}
 
 	public AnchorPane getAnchorPane() {
