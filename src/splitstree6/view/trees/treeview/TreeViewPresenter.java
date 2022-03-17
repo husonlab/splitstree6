@@ -82,6 +82,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		this.treeView = treeView;
 		this.controller = treeView.getController();
 
+		controller.getScrollPane().setFitToWidth(true);
+		controller.getScrollPane().setFitToHeight(true);
+
 		var treeProperty = new SimpleObjectProperty<PhyloTree>(this, "tree");
 		treeView.optionTreeProperty().addListener((v, o, n) -> {
 			var nTree = n.intValue();

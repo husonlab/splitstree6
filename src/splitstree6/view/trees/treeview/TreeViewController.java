@@ -121,11 +121,12 @@ public class TreeViewController {
 	private void initialize() {
 		centerPane.getChildren().add(zoomableScrollPane);
 		innerAnchorPane.getChildren().add(scaleBar);
-		AnchorPane.setTopAnchor(scaleBar, 25.0);
-		AnchorPane.setLeftAnchor(scaleBar, 5.0);
 
-		AnchorPane.setTopAnchor(treeNameLabel, 2.0);
-		AnchorPane.setLeftAnchor(treeNameLabel, 2.0);
+		AnchorPane.setTopAnchor(scaleBar, 2.0);
+		AnchorPane.setLeftAnchor(scaleBar, 5.0);
+		AnchorPane.setTopAnchor(treeNameLabel, 5.0);
+		AnchorPane.setLeftAnchor(treeNameLabel, 180.0);
+
 		innerAnchorPane.getChildren().add(treeNameLabel);
 
 		innerAnchorPane.getChildren().remove(formatVBox);

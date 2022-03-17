@@ -92,6 +92,9 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			controller.getScrollPane().setContent(n);
 		});
 
+		controller.getScrollPane().setFitToWidth(true);
+		controller.getScrollPane().setFitToHeight(true);
+
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
 		controller.getScrollPane().setUpdateScaleMethod(() -> splitsView.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * splitsView.getOptionZoomFactor()));
@@ -182,7 +185,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty());
 
-			//pane.setStyle("-fx-background-color: green;");
 			splitNetworkPane.set(pane);
 
 			pane.setRunAfterUpdate(() -> {
