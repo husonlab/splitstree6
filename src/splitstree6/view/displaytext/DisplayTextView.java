@@ -29,7 +29,7 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 public class DisplayTextView implements IView {

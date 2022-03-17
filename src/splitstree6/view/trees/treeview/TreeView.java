@@ -40,8 +40,8 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.List;

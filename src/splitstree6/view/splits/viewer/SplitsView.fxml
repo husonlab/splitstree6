@@ -31,23 +31,6 @@
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
-                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
-                            </ImageView>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="Find in selected tab"/>
-                        </tooltip>
-                    </Button>
-                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
                     <ComboBox fx:id="diagramCBox">
                         <tooltip>
                             <Tooltip text="Choose diagram type"/>
@@ -58,12 +41,12 @@
                             <Tooltip text="Choose rooting method"/>
                         </tooltip>
                     </ComboBox>
-                     <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
-                                   text="L">
-                         <tooltip>
-                             <Tooltip text="Show internal labels"/>
-                         </tooltip>
-                     </ToggleButton>
+                    <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
+                                  text="L">
+                        <tooltip>
+                            <Tooltip text="Show internal labels"/>
+                        </tooltip>
+                    </ToggleButton>
                     <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
                     <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
@@ -102,9 +85,9 @@
                             <Tooltip text="Zoom in"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="increaseFontButton" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="A+">
+                    <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="A+">
                         <font>
                             <Font size="11.0"/>
                         </font>
@@ -112,9 +95,9 @@
                             <Tooltip text="Increase font size"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="decreaseFontButton" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="A-">
+                    <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="A-">
                         <font>
                             <Font size="11.0"/>
                         </font>
@@ -134,9 +117,53 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <TitledPane fx:id="formatTitledPane" alignment="TOP_LEFT" contentDisplay="CENTER" expanded="false"
-                maxHeight="-Infinity" minHeight="-Infinity" prefHeight="10.0" prefWidth="100.0" text="Format"
-                AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="5.0">
-        <AnchorPane prefHeight="200.0" prefWidth="200.0"/>
-    </TitledPane>
+    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="32.0"
+          AnchorPane.topAnchor="0.0">
+        <children>
+            <ToggleButton fx:id="settingsToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
+                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                          style="-fx-border-style: none;" text="Settings">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/jloda/resources/icons/sun/Edit24.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Settings toolbar"/>
+                </tooltip>
+            </ToggleButton>
+            <ToggleButton fx:id="findToggleButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                          mnemonicParsing="false" prefHeight="20.0" style="-fx-border-style: none;" text="Find">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Find or Find/Replace toolbar"/>
+                </tooltip>
+            </ToggleButton>
+            <ToggleButton fx:id="formatToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
+                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                          style="-fx-border-style: none;" text="Format">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/jloda/resources/icons/sun/Preferences24.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Format toolbar"/>
+                </tooltip>
+            </ToggleButton>
+        </children>
+    </HBox>
 </AnchorPane>

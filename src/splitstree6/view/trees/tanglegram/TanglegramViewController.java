@@ -19,6 +19,7 @@
 
 package splitstree6.view.trees.tanglegram;
 
+import javafx.beans.binding.When;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -49,7 +50,7 @@ public class TanglegramViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private Button findButton;
+	private ToggleButton findToggleButton;
 
 	@FXML
 	private Button expandVerticallyButton;
@@ -110,12 +111,14 @@ public class TanglegramViewController {
 	@FXML
 	private AnchorPane innerAnchorPane;
 
-
 	@FXML
 	private VBox formatVBox;
 
 	@FXML
-	private TitledPane formatTitledPane;
+	private ToggleButton settingsToggleButton;
+
+	@FXML
+	private ToggleButton formatToggleButton;
 
 	private final CopyableLabel tree1NameLabel = new CopyableLabel();
 	private final CopyableLabel tree2NameLabel = new CopyableLabel();
@@ -146,21 +149,14 @@ public class TanglegramViewController {
 		DraggableLabel.makeDraggable(tree1NameLabel);
 		DraggableLabel.makeDraggable(tree2NameLabel);
 
-		formatVBox.setMinHeight(0);
-		formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+		settingsToggleButton.setSelected(true);
+		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
+		toolBar.setMaxHeight(ToolBar.USE_COMPUTED_SIZE);
+		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());
+		toolBar.prefHeightProperty().bind(new When(settingsToggleButton.selectedProperty()).then(32.0).otherwise(0.0));
 
-		if (!formatTitledPane.isExpanded()) {
-			formatVBox.setVisible(false);
-			formatVBox.setMaxHeight(0);
-		} else {
-			formatVBox.setVisible(true);
-			formatVBox.setMaxHeight(formatVBox.getPrefHeight());
-		}
-
-		formatTitledPane.expandedProperty().addListener((v, o, n) -> {
-			formatVBox.setVisible(n);
-			formatVBox.setMaxHeight(n ? formatVBox.getPrefHeight() : 0);
-		});
+		formatToggleButton.setSelected(false);
+		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
 
 		innerAnchorPane.getChildren().remove(formatVBox);
 		innerAnchorPane.getChildren().add(formatVBox);
@@ -179,8 +175,8 @@ public class TanglegramViewController {
 		return toolBar;
 	}
 
-	public Button getFindButton() {
-		return findButton;
+	public ToggleButton getFindToggleButton() {
+		return findToggleButton;
 	}
 
 	public Button getExpandVerticallyButton() {

@@ -75,7 +75,6 @@ public class DrawOnCanvas {
 		}
 	}
 
-
 	/**
 	 * draw on canvas
 	 *
@@ -87,8 +86,7 @@ public class DrawOnCanvas {
 	 * @param averaging
 	 * @param clear         if set, clears the canvas
 	 */
-	public void draw(Pane progressPane, PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging,
-					 double width, double height, boolean clear) {
+	public void draw(Pane progressPane, PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging, double width, double height, boolean clear) {
 
 		service.setProgressParentPane(progressPane);
 		service.setCallable(() -> ComputeTreeLayout.apply(tree, nTaxa, taxonLabelMap, diagram, averaging, width - 200, height - 200, (a, b, c) -> {

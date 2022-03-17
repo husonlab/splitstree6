@@ -19,8 +19,12 @@
 
 package splitstree6.view.splits.viewer;
 
+import javafx.beans.binding.When;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
@@ -46,7 +50,7 @@ public class SplitsViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private Button findButton;
+	private ToggleButton findToggleButton;
 
 	@FXML
 	private StackPane centerPane;
@@ -78,11 +82,13 @@ public class SplitsViewController {
 	private AnchorPane innerAnchorPane;
 
 	@FXML
-	private TitledPane formatTitledPane;
-
-	@FXML
 	private VBox formatVBox;
 
+	@FXML
+	private ToggleButton settingsToggleButton;
+
+	@FXML
+	private ToggleButton formatToggleButton;
 
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
@@ -101,28 +107,19 @@ public class SplitsViewController {
 		AnchorPane.setLeftAnchor(fitLabel, 2.0);
 		innerAnchorPane.getChildren().add(fitLabel);
 
-		formatVBox.setMinHeight(0);
-		formatVBox.setMaxHeight(formatVBox.getPrefHeight());
-
-		if (!formatTitledPane.isExpanded()) {
-			formatVBox.setVisible(false);
-			formatVBox.setMaxHeight(0);
-		} else {
-			formatVBox.setVisible(true);
-			formatVBox.setMaxHeight(formatVBox.getPrefHeight());
-		}
-
-		formatTitledPane.expandedProperty().addListener((v, o, n) -> {
-			formatVBox.setVisible(n);
-			formatVBox.setMaxHeight(n ? formatVBox.getPrefHeight() : 0);
-		});
-
-		AnchorPane.setTopAnchor(formatTitledPane, AnchorPane.getTopAnchor(formatTitledPane) + 30);
+		DraggableLabel.makeDraggable(fitLabel);
 
 		innerAnchorPane.getChildren().remove(formatVBox);
 		innerAnchorPane.getChildren().add(formatVBox);
 
-		DraggableLabel.makeDraggable(fitLabel);
+		settingsToggleButton.setSelected(true);
+		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
+		toolBar.setMaxHeight(ToolBar.USE_COMPUTED_SIZE);
+		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());
+		toolBar.prefHeightProperty().bind(new When(settingsToggleButton.selectedProperty()).then(32.0).otherwise(0.0));
+
+		formatToggleButton.setSelected(false);
+		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -141,8 +138,8 @@ public class SplitsViewController {
 		return toolBar;
 	}
 
-	public Button getFindButton() {
-		return findButton;
+	public ToggleButton getFindToggleButton() {
+		return findToggleButton;
 	}
 
 	public ComboBox<SplitsDiagramType> getDiagramCBox() {
@@ -193,7 +190,8 @@ public class SplitsViewController {
 		return innerAnchorPane;
 	}
 
-	public VBox getFormatVbox() {
+	public VBox getFormatVBox() {
 		return formatVBox;
 	}
 }
+

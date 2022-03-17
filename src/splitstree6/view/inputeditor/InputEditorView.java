@@ -27,8 +27,8 @@ import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
 import splitstree6.view.displaytext.DisplayTextView;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.WorkflowSetup;
 

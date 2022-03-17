@@ -29,7 +29,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.options.OptionIO;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
+import splitstree6.view.utils.IView;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.DataTaxaFilter;

@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.viewer;
+package splitstree6.view.utils;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.When;

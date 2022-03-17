@@ -39,9 +39,9 @@ import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
 import splitstree6.view.format.splits.SplitsFormatter;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -118,7 +118,7 @@ public class SplitsView implements IView {
 
 		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
-		controller.getFormatVbox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), splitsFormatter);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), splitsFormatter);
 
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);

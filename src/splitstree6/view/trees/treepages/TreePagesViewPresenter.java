@@ -43,7 +43,7 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.splits.viewer.ComboBoxUtils;
+import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 /**
@@ -205,16 +205,19 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		findToolBar = FindReplaceTaxa.create(mainWindow, treePagesView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindButton().setOnAction(e -> {
+		controller.getFindToggleButton().setOnAction(e -> {
 			if (!findToolBar.isShowFindToolBar()) {
 				findToolBar.setShowFindToolBar(true);
-				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
+				controller.getFindToggleButton().setSelected(true);
+				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
 			} else if (!findToolBar.isShowReplaceToolBar()) {
 				findToolBar.setShowReplaceToolBar(true);
-				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
+				controller.getFindToggleButton().setSelected(true);
 			} else {
 				findToolBar.setShowFindToolBar(false);
 				findToolBar.setShowReplaceToolBar(false);
+				controller.getFindToggleButton().setSelected(false);
+				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
 			}
 		});
 

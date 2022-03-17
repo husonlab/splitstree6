@@ -50,16 +50,14 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.Single;
 import jloda.util.StringUtils;
-import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.*;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.splits.viewer.ComboBoxUtils;
 import splitstree6.view.trees.treepages.TreePane;
+import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -274,25 +272,24 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().setOnAction(e -> treeView.setOptionFontScaleFactor((1.0 / 1.2) * treeView.getOptionFontScaleFactor()));
 		controller.getDecreaseFontButton().disableProperty().bind(treeView.emptyProperty());
 
-		final Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
-
-
 		findToolBar = FindReplaceTaxa.create(mainWindow, treeView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindButton().setOnAction(e -> {
+		controller.getFindToggleButton().setOnAction(e -> {
 			if (!findToolBar.isShowFindToolBar()) {
 				findToolBar.setShowFindToolBar(true);
-				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
+				controller.getFindToggleButton().setSelected(true);
+				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
 			} else if (!findToolBar.isShowReplaceToolBar()) {
 				findToolBar.setShowReplaceToolBar(true);
-				controller.getFindButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
+				controller.getFindToggleButton().setSelected(true);
 			} else {
 				findToolBar.setShowFindToolBar(false);
 				findToolBar.setShowReplaceToolBar(false);
+				controller.getFindToggleButton().setSelected(false);
+				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
 			}
 		});
-
 
 		treeView.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {

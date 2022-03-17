@@ -101,6 +101,7 @@ module splitstreesix {
 	opens splitstree6.layout.splits;
 	opens splitstree6.tabs.algorithms.treefilter;
 	opens splitstree6.layout.tree;
+	opens splitstree6.view.utils;
 
 
 }

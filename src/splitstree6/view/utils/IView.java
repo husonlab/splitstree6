@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view;
+package splitstree6.view.utils;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Node;
