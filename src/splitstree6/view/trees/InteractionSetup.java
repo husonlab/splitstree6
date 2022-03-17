@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.trees.treepages;
+package splitstree6.view.trees;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -137,15 +137,17 @@ public class InteractionSetup {
 		taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(invalidationListener));
 	}
 
-	public TriConsumer<jloda.graph.Node, Shape, RichTextLabel> createNodeCallback() {
-        return (v, shape, label) -> Platform.runLater(() -> {
+	private boolean nodeShapeOrLabelEntered;
 
-            if (v.getOwner() instanceof PhyloGraph phyloGraph) {
-                for (var t : phyloGraph.getTaxa(v)) {
-                    if (t <= taxaBlock.getNtax()) {
-                        var taxon = taxaBlock.get(t);
-                        taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
-                        label.setOnMousePressed(mousePressedHandler);
+	public TriConsumer<jloda.graph.Node, Shape, RichTextLabel> createNodeCallback() {
+		return (v, shape, label) -> Platform.runLater(() -> {
+
+			if (v.getOwner() instanceof PhyloGraph phyloGraph) {
+				for (var t : phyloGraph.getTaxa(v)) {
+					if (t <= taxaBlock.getNtax()) {
+						var taxon = taxaBlock.get(t);
+						taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
+						label.setOnMousePressed(mousePressedHandler);
                         label.setOnMouseDragged(mouseDraggedHandler);
                         final EventHandler<MouseEvent> mouseClickedHandler = e -> {
                             if (e.isStillSincePress()) {
@@ -156,6 +158,7 @@ public class InteractionSetup {
                             }
                         };
 						label.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
+						shape.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
 						shape.setOnMouseClicked(mouseClickedHandler);
 						label.setOnMouseClicked(mouseClickedHandler);
 						if (taxonSelectionModel.isSelected(taxon)) {
@@ -165,6 +168,30 @@ public class InteractionSetup {
 					}
 				}
 			}
+
+			shape.setOnMouseEntered(e -> {
+				if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
+					nodeShapeOrLabelEntered = true;
+					shape.setScaleX(2 * shape.getScaleX());
+					shape.setScaleY(2 * shape.getScaleY());
+					label.setScaleX(1.1 * label.getScaleX());
+					label.setScaleY(1.1 * label.getScaleY());
+					e.consume();
+				}
+			});
+			shape.setOnMouseExited(e -> {
+				if (nodeShapeOrLabelEntered) {
+					shape.setScaleX(shape.getScaleX() / 2);
+					shape.setScaleY(shape.getScaleY() / 2);
+					label.setScaleX(label.getScaleX() / 1.1);
+					label.setScaleY(label.getScaleY() / 1.1);
+					nodeShapeOrLabelEntered = false;
+					e.consume();
+				}
+			});
+			label.setOnMouseEntered(shape.getOnMouseEntered());
+			label.setOnMouseExited(shape.getOnMouseExited());
+
 		});
 	}
 

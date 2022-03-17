@@ -29,19 +29,13 @@ import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
-import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.label.EditLabelDialog;
-import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
@@ -400,20 +394,5 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				treePane.get().updateLabelLayout(treeView.getOptionOrientation());
 		});
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(treeView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
-	}
-
-	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
-		var editLabelMenuItem = new MenuItem("Edit Label...");
-		editLabelMenuItem.setOnAction(e -> {
-			var oldText = label.getText();
-			var editLabelDialog = new EditLabelDialog(stage, label);
-			var result = editLabelDialog.showAndWait();
-			if (result.isPresent() && !result.get().equals(oldText)) {
-				undoManager.doAndAdd("Edit Label", () -> label.setText(oldText), () -> label.setText(result.get()));
-			}
-		});
-		var menu = new ContextMenu();
-		menu.getItems().add(editLabelMenuItem);
-		menu.show(label, event.getScreenX(), event.getScreenY());
 	}
 }

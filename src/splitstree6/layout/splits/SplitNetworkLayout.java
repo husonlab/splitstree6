@@ -191,7 +191,6 @@ public class SplitNetworkLayout {
 
 		// compute the shapes:
 
-
 		// nodes:
 		var nodesGroup = new Group();
 		var nodeLabelsGroup = new Group();
@@ -216,6 +215,7 @@ public class SplitNetworkLayout {
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
 				label.setTranslateX(nodeShapeMap.get(v).getTranslateX() + 10);
 				label.setTranslateY(nodeShapeMap.get(v).getTranslateY() + 10);
+				label.setUserData(shape);
 				nodeLabelsGroup.getChildren().add(label);
 				nodeCallback.accept(v, shape, label);
 

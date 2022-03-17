@@ -187,6 +187,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			pane.setRunAfterUpdate(() -> {
 				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
 					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
+					if (label.getUserData() instanceof Shape shape)
+						shape.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
 				}
 				if (splitsView.getOptionDiagram().isOutline()) {
 					for (var loop : loopViews) {

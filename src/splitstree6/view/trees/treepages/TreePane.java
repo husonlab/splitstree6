@@ -38,6 +38,7 @@ import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.*;
+import splitstree6.view.trees.InteractionSetup;
 
 import java.util.function.Consumer;
 

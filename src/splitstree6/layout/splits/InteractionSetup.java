@@ -133,23 +133,23 @@ public class InteractionSetup {
         return (v, shape, label) -> Platform.runLater(() -> {
             shape.setOnMouseEntered(e -> {
                 if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
-                    nodeShapeOrLabelEntered = true;
-                    shape.setScaleX(1.5 * shape.getScaleX());
-                    shape.setScaleY(1.5 * shape.getScaleY());
-                    label.setScaleX(1.1 * label.getScaleX());
-                    label.setScaleY(1.1 * label.getScaleY());
-                    e.consume();
-                }
+					nodeShapeOrLabelEntered = true;
+					shape.setScaleX(2 * shape.getScaleX());
+					shape.setScaleY(2 * shape.getScaleY());
+					label.setScaleX(1.1 * label.getScaleX());
+					label.setScaleY(1.1 * label.getScaleY());
+					e.consume();
+				}
             });
             shape.setOnMouseExited(e -> {
                 if (nodeShapeOrLabelEntered) {
-                    shape.setScaleX(shape.getScaleX() / 1.5);
-                    shape.setScaleY(shape.getScaleY() / 1.5);
-                    label.setScaleX(label.getScaleX() / 1.1);
-                    label.setScaleY(label.getScaleY() / 1.1);
-                    nodeShapeOrLabelEntered = false;
-                    e.consume();
-                }
+					shape.setScaleX(shape.getScaleX() / 2);
+					shape.setScaleY(shape.getScaleY() / 2);
+					label.setScaleX(label.getScaleX() / 1.1);
+					label.setScaleY(label.getScaleY() / 1.1);
+					nodeShapeOrLabelEntered = false;
+					e.consume();
+				}
             });
             label.setOnMouseEntered(shape.getOnMouseEntered());
             label.setOnMouseExited(shape.getOnMouseExited());
