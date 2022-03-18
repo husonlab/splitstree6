@@ -119,6 +119,7 @@ public class TreeViewController {
 
 	@FXML
 	private void initialize() {
+		zoomableScrollPane.setPannable(true);
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
 		centerPane.getChildren().add(zoomableScrollPane);

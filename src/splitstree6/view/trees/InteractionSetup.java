@@ -43,6 +43,7 @@ import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -66,7 +67,7 @@ public class InteractionSetup {
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, ObjectProperty<LayoutOrientation> orientation) {
+	public InteractionSetup(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation) {
 		this.stage = stage;
 		this.taxaBlock = taxaBlock;
 		this.taxonSelectionModel = taxonSelectionModel;
@@ -89,33 +90,35 @@ public class InteractionSetup {
 						var dx = e.getScreenX() - mouseDownX;
 						var dy = e.getScreenY() - mouseDownY;
 
-						switch (orientation.get()) {
-							case Rotate90Deg -> {
-								var tmp = dx;
-								dx = -dy;
-								dy = tmp;
+						if (diagram != TreeDiagramType.RadialPhylogram) {
+							switch (orientation.get()) {
+								case Rotate90Deg -> {
+									var tmp = dx;
+									dx = -dy;
+									dy = tmp;
+								}
+								case Rotate180Deg -> {
+									dx = -dx;
+									dy = -dy;
+								}
+								case Rotate270Deg -> {
+									var tmp = dx;
+									dx = dy;
+									dy = -tmp;
+								}
+								case FlipRotate0Deg -> dx = -dx;
+								case FlipRotate90Deg -> {
+									var tmp = dx;
+									dx = dy;
+									dy = tmp;
+								}
+								case FlipRotate180Deg -> dy = -dy;
+								case FlipRotate270Deg -> {
+									var tmp = dx;
+									dx = -dy;
+									dy = -tmp;
+								}
 							}
-							case Rotate180Deg -> {
-								dx = -dx;
-								dy = -dy;
-							}
-							case Rotate270Deg -> {
-                                var tmp = dx;
-                                dx = dy;
-                                dy = -tmp;
-                            }
-                            case FlipRotate0Deg -> dx = -dx;
-                            case FlipRotate90Deg -> {
-                                var tmp = dx;
-                                dx = dy;
-                                dy = tmp;
-                            }
-                            case FlipRotate180Deg -> dy = -dy;
-                            case FlipRotate270Deg -> {
-                                var tmp = dx;
-                                dx = -dy;
-                                dy = -tmp;
-                            }
 						}
 
 						label.setLayoutX(label.getLayoutX() + dx);
@@ -124,6 +127,7 @@ public class InteractionSetup {
 				}
 				mouseDownX = e.getScreenX();
 				mouseDownY = e.getScreenY();
+				e.consume();
 			}
 		};
 

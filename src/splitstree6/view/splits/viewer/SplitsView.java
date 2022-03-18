@@ -29,10 +29,12 @@ import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.util.Pair;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.algorithms.EqualAngle;
@@ -99,12 +101,12 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
-		final ObservableMap<jloda.graph.Node, Shape> nodeShapeMap = FXCollections.observableHashMap();
+		final ObservableMap<jloda.graph.Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
 		final ObservableList<LoopView> loopViews = FXCollections.observableArrayList();
 
 		// this is the target area for the tree page:
-		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, nodeShapeMap, splitShapeMap, loopViews);
+		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, nodeShapeLabelMap, splitShapeMap, loopViews);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -116,7 +118,7 @@ public class SplitsView implements IView {
 
 		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
 
-		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
+		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeLabelMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), splitsFormatter);
 

@@ -35,12 +35,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.graph.Node;
+import jloda.util.Pair;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -68,7 +70,7 @@ public class SplitNetworkPane extends StackPane {
 	 */
 	public SplitNetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, SplitsBlock splitsBlock, SelectionModel<Taxon> taxonSelectionModel,
 							SelectionModel<Integer> splitSelectionModel,
-							ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+							ObservableMap<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 							ObservableList<LoopView> loopViews, double boxWidth, double boxHeight,
 							SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, SplitsRooting rooting,
 							double rootAngle,
@@ -108,8 +110,8 @@ public class SplitNetworkPane extends StackPane {
 			if (taxaBlock == null || splitsBlock == null)
 				return new Group();
 
-			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram, rooting,
-					rootAngle, taxonSelectionModel, splitSelectionModel, nodeShapeMap, splitShapeMap,
+			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram,
+					rooting, rootAngle, taxonSelectionModel, splitSelectionModel, nodeShapeLabelMap, splitShapeMap,
 					loopViews, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16);
 
 			result.setId("networkGroup");

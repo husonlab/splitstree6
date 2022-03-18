@@ -54,7 +54,7 @@
                 <Tooltip text="Font size"/>
             </tooltip>
         </TextField>
-        <ToggleButton fx:id="boldToggleButton" mnemonicParsing="false" text="b">
+        <ToggleButton fx:id="boldToggleButton" mnemonicParsing="false" text="b" textOverrun="CLIP">
             <font>
                 <Font name="System Bold" size="12.0"/>
             </font>
@@ -62,15 +62,16 @@
                 <Tooltip text="Bold"/>
             </tooltip>
         </ToggleButton>
-        <ToggleButton fx:id="italicToggleButton" mnemonicParsing="false" text="i">
+        <ToggleButton fx:id="italicToggleButton" mnemonicParsing="false" text="i" textOverrun="CLIP">
             <font>
-                <Font name="System Italic" size="12.0"/>
+                <Font name="System Font" size="12.0"/>
             </font>
             <tooltip>
                 <Tooltip text="Italics"/>
             </tooltip>
         </ToggleButton>
-        <ToggleButton fx:id="underlineToggleButton" mnemonicParsing="false" text="u">
+        <ToggleButton fx:id="underlineToggleButton" mnemonicParsing="false" text="u" textOverrun="CLIP"
+                      underline="true">
             <font>
                 <Font size="12.0"/>
             </font>
@@ -78,7 +79,8 @@
                 <Tooltip text="Underlined"/>
             </tooltip>
         </ToggleButton>
-        <ToggleButton fx:id="strikeToggleButton" layoutX="152.0" layoutY="12.0" mnemonicParsing="false" text="s">
+        <ToggleButton fx:id="strikeToggleButton" layoutX="152.0" layoutY="12.0" mnemonicParsing="false" text="s"
+                      textOverrun="CLIP">
             <font>
                 <Font size="12.0"/>
             </font>

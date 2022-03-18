@@ -21,10 +21,12 @@ package splitstree6.layout.splits;
 
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.graph.GraphTraversals;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.phylo.PhyloSplitsGraph;
+import jloda.util.Pair;
 
 import java.util.Collection;
 import java.util.List;
@@ -38,25 +40,25 @@ public class RotateSplit {
 	/**
 	 * rotate multiple splits
 	 *
-	 * @param splits       the splits
-	 * @param angle        the angle to rotate by in degrees
-	 * @param nodeShapeMap the node shape map, note that the translateX and translateY properties will be changed
+	 * @param splits            the splits
+	 * @param angle             the angle to rotate by in degrees
+	 * @param nodeShapeLabelMap the node shape map, note that the translateX and translateY properties will be changed
 	 */
-	public static void apply(Collection<Integer> splits, double angle, Map<Node, Shape> nodeShapeMap) {
+	public static void apply(Collection<Integer> splits, double angle, Map<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap) {
 		for (var split : splits)
-			apply(split, angle, nodeShapeMap);
+			apply(split, angle, nodeShapeLabelMap);
 	}
 
 	/**
 	 * rotate about a split
 	 *
-	 * @param split        the split
-	 * @param angle        the angle to rotate by in degrees
-	 * @param nodeShapeMap the node shape map, note that the translateX and translateY properties will be changed
+	 * @param split             the split
+	 * @param angle             the angle to rotate by in degrees
+	 * @param nodeShapeLabelMap the node shape map, note that the translateX and translateY properties will be changed
 	 */
-	public static void apply(int split, double angle, Map<Node, Shape> nodeShapeMap) {
-		if (nodeShapeMap.keySet().size() > 0) {
-			var graph = (PhyloSplitsGraph) nodeShapeMap.keySet().iterator().next().getOwner();
+	public static void apply(int split, double angle, Map<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap) {
+		if (nodeShapeLabelMap.keySet().size() > 0) {
+			var graph = (PhyloSplitsGraph) nodeShapeLabelMap.keySet().iterator().next().getOwner();
 
 			if (angle != 0) {
 				var e = graph.edgeStream().filter(f -> graph.getSplit(f) == split).findAny().orElse(null);
@@ -64,16 +66,16 @@ public class RotateSplit {
 					var s = e.getSource();
 					var t = e.getTarget();
 
-					var mid = new Point2D(nodeShapeMap.get(s).getTranslateX() + nodeShapeMap.get(t).getTranslateX(),
-							nodeShapeMap.get(s).getTranslateY() + nodeShapeMap.get(t).getTranslateY()).multiply(0.5);
+					var mid = new Point2D(nodeShapeLabelMap.get(s).getFirst().getTranslateX() + nodeShapeLabelMap.get(t).getFirst().getTranslateX(),
+							nodeShapeLabelMap.get(s).getFirst().getTranslateY() + nodeShapeLabelMap.get(t).getFirst().getTranslateY()).multiply(0.5);
 
 					for (var v : List.of(s, t)) {
-						var shape = nodeShapeMap.get(v);
+						var shape = nodeShapeLabelMap.get(v).getFirst();
 						var posOld = new Point2D(shape.getTranslateX(), shape.getTranslateY());
 						var posNew = GeometryUtilsFX.rotateAbout(posOld, -angle, mid);
 						var diff = posNew.subtract(posOld);
 						GraphTraversals.traverseReachable(v, f -> graph.getSplit(f) != split, w -> {
-							var wShape = nodeShapeMap.get(w);
+							var wShape = nodeShapeLabelMap.get(w).getFirst();
 							wShape.setTranslateX(wShape.getTranslateX() + diff.getX());
 							wShape.setTranslateY(wShape.getTranslateY() + diff.getY());
 						});

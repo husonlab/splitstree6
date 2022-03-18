@@ -100,6 +100,8 @@ public class SplitsViewController {
 	private void initialize() {
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
+		zoomableScrollPane.setPannable(true);
+
 		centerPane.getChildren().add(zoomableScrollPane);
 
 		innerAnchorPane.getChildren().add(scaleBar);

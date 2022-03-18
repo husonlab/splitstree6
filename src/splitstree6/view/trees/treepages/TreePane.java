@@ -72,9 +72,7 @@ public class TreePane extends StackPane {
 					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX) {
 
-		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, orientation);
-
-		//setStyle("-fx-background-color: transparent");
+		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, diagram, orientation);
 
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);

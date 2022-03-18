@@ -134,7 +134,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		var scrollPane = controller.getScrollPane();
 		scrollPane.lockAspectRatioProperty().bind(lockAspectRatio);
 		scrollPane.setRequireShiftOrControlToZoom(true);
-		scrollPane.setPannable(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, TreeDiagramType::createNode));

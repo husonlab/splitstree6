@@ -27,7 +27,6 @@ import jloda.fx.util.BasicFX;
 import jloda.graph.Node;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
-import splitstree6.layout.splits.RotateSplit;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -72,8 +71,8 @@ public class TreeViewEdits {
 					case 'a' -> {
 						if (NumberUtils.isDouble(edit.parameter())) {
 							var angle = edit.parameterAsDouble();
-							if (angle != 0.0)
-								RotateSplit.apply(edit.split(), angle, nodeShapeMap);
+							//if (angle != 0.0)
+							//	RotateSplit.apply(edit.split(), angle, nodeShapeMap);
 						}
 					}
 				}

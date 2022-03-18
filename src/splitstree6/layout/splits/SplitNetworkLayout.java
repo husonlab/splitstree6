@@ -39,10 +39,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloSplitsGraph;
-import jloda.util.CanceledException;
-import jloda.util.IteratorUtils;
-import jloda.util.StringUtils;
-import jloda.util.Triplet;
+import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
@@ -89,7 +86,7 @@ public class SplitNetworkLayout {
 	 */
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
 					   SplitsRooting rooting, double rootAngle, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
-					   ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+					   ObservableMap<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 					   ObservableList<LoopView> loopViews, ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
 					   double width, double height) throws IOException {
 
@@ -101,7 +98,6 @@ public class SplitNetworkLayout {
 		if (splitsBlock0.getCycle() == null || splitsBlock0.getCycle().length == 0) {
 			splitsBlock0.setCycle(SplitsUtilities.computeCycle(taxaBlock0.getNtax(), splitsBlock0.getSplits()));
 		}
-
 
 		// if rooting is desired, need to create a modified set of taxa and splits
 		final TaxaBlock taxaBlock;
@@ -141,15 +137,11 @@ public class SplitNetworkLayout {
 			}
 		}
 
-		// interaction support:
-		var interactionSetup = new InteractionSetup(taxaBlock, splitsBlock, taxonSelectionModel, splitSelectionModel, nodeShapeMap, splitShapeMap);
-		var nodeCallback = interactionSetup.createNodeCallback();
-		var edgeCallback = interactionSetup.createEdgeCallback();
 
 		// compute the network and assign coordinates to nodes, and compute loops for outline:
 
 		graph.clear();
-		nodeShapeMap.clear();
+		nodeShapeLabelMap.clear();
 		loopViews.clear();
 
 		if (diagram.isOutline()) {
@@ -204,20 +196,19 @@ public class SplitNetworkLayout {
 			shape.setTranslateX(point.getX());
 			shape.setTranslateY(point.getY());
 
-			nodeShapeMap.put(v, shape);
-
 			nodesGroup.getChildren().add(shape);
 
 			var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 
+			nodeShapeLabelMap.put(v, new Pair<>(shape, label));
+
 			if (label != null && !isRootNode) {
 				label.getStyleClass().add("graph-label");
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-				label.setTranslateX(nodeShapeMap.get(v).getTranslateX() + 10);
-				label.setTranslateY(nodeShapeMap.get(v).getTranslateY() + 10);
+				label.setTranslateX(shape.getTranslateX() + 10);
+				label.setTranslateY(shape.getTranslateY() + 10);
 				label.setUserData(shape);
 				nodeLabelsGroup.getChildren().add(label);
-				nodeCallback.accept(v, shape, label);
 
 				label.applyCss();
 
@@ -247,7 +238,6 @@ public class SplitNetworkLayout {
 
 		var edgesGroup = new Group();
 
-
 		var confidenceLabels = new Group();
 		var splitsWithConfidenceLabels = new BitSet();
 
@@ -255,15 +245,13 @@ public class SplitNetworkLayout {
 			var line = new Line();
 			line.getStyleClass().add("graph-edge");
 
-			line.startXProperty().bind(nodeShapeMap.get(e.getSource()).translateXProperty());
-			line.startYProperty().bind(nodeShapeMap.get(e.getSource()).translateYProperty());
-			line.endXProperty().bind(nodeShapeMap.get(e.getTarget()).translateXProperty());
-			line.endYProperty().bind(nodeShapeMap.get(e.getTarget()).translateYProperty());
+			line.startXProperty().bind(nodeShapeLabelMap.get(e.getSource()).getFirst().translateXProperty());
+			line.startYProperty().bind(nodeShapeLabelMap.get(e.getSource()).getFirst().translateYProperty());
+			line.endXProperty().bind(nodeShapeLabelMap.get(e.getTarget()).getFirst().translateXProperty());
+			line.endYProperty().bind(nodeShapeLabelMap.get(e.getTarget()).getFirst().translateYProperty());
 			if (graph.getSplit(e) == rootSplit) // is added  split
 				line.setStroke(Color.GRAY);
-			edgeCallback.accept(e, line);
 			edgesGroup.getChildren().add(line);
-
 
 			var split = graph.getSplit(e);
 			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
@@ -283,7 +271,7 @@ public class SplitNetworkLayout {
 
 		var loopsGroup = new Group();
 		for (var loop : loops) {
-			var loopView = new LoopView(loop, v -> nodeShapeMap.get(v).translateXProperty(), v -> nodeShapeMap.get(v).translateYProperty());
+			var loopView = new LoopView(loop, v -> nodeShapeLabelMap.get(v).getFirst().translateXProperty(), v -> nodeShapeLabelMap.get(v).getFirst().translateYProperty());
 			loopsGroup.getChildren().add(loopView);
 			Platform.runLater(() -> loopViews.add(loopView));
 		}

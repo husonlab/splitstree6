@@ -23,9 +23,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableMap;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.BasicFX;
 import jloda.graph.Node;
 import jloda.util.NumberUtils;
+import jloda.util.Pair;
 import jloda.util.StringUtils;
 import splitstree6.layout.splits.RotateSplit;
 
@@ -43,10 +45,10 @@ public class SplitNetworkEdits {
 	 * apply the recorded edits
 	 *
 	 * @param editsString
-	 * @param nodeShapeMap
+	 * @param nodeShapeLabelMap
 	 * @param splitShapeMap
 	 */
-	public static void applyEdits(String[] editsString, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
+	public static void applyEdits(String[] editsString, ObservableMap<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
 		for (var editString : editsString) {
 			var edit = Edit.parse(editString);
 			if (edit != null) {
@@ -73,7 +75,7 @@ public class SplitNetworkEdits {
 						if (NumberUtils.isDouble(edit.parameter())) {
 							var angle = edit.parameterAsDouble();
 							if (angle != 0.0)
-								RotateSplit.apply(edit.split(), angle, nodeShapeMap);
+								RotateSplit.apply(edit.split(), angle, nodeShapeLabelMap);
 						}
 					}
 				}
