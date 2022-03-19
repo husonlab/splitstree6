@@ -99,7 +99,8 @@ public class DensiTree {
         DoublePoint[][] coords3 = new DoublePoint[nTaxa][nTrees];
 
         RandomGaussian random = new RandomGaussian(0, 3, 187);
-        double shift;
+        double shiftx;
+        double shifty;
 
         var tree1 = model.getTreesBlock().getTree(1);
         int counter = 0;
@@ -120,14 +121,15 @@ public class DensiTree {
         gc.setLineWidth(0.01);
         for (int i = 1; i <= nTrees; i++) {
             var tree = model.getTreesBlock().getTree(i);
-            shift = random.nextDouble();
+            shiftx = random.nextDouble();
+            shifty = random.nextDouble();
 
             if (labelMethod.contains("mean")) {
-                drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shift, coords, labels, labelLayout);
+                drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords, labels, labelLayout);
             } else if (labelMethod.contains("median")) {
-                drawEdges1(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shift, coords2, labels);
+                drawEdges1(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords2, labels);
             } else if (labelMethod.contains("dbscan")) {
-                drawEdges2(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shift, coords3, labels, labelLayout);
+                drawEdges2(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords3, labels, labelLayout);
             }
         }
 
@@ -153,7 +155,7 @@ public class DensiTree {
                 int treeNum = Integer.parseInt(specTree);
                 if (treeNum > 0 && treeNum <= nTrees) {
                     var tree = model.getTreesBlock().getTree(Integer.parseInt(specTree));
-                    drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, coords, labels, labelLayout);
+                    drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, 0, coords, labels, labelLayout);
                 }
             }
         }
@@ -162,7 +164,7 @@ public class DensiTree {
             try {
                 var consensusTree = MajorityConsensus.apply(model);
                 gc.setStroke(Color.BLUE);
-                drawEdges(consensusTree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, coords, labels, labelLayout);
+                drawEdges(consensusTree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, 0, coords, labels, labelLayout);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -389,7 +391,7 @@ public class DensiTree {
 
     public static void drawEdges(
             PhyloTree tree, int[] circle, GraphicsContext gc, int xmin, int ymin, int xmax, int ymax, boolean toScale,
-            boolean jitter, double shift, double[][] coords, String[] labels, RadialLabelLayout labelLayout
+            boolean jitter, double shiftx, double shifty, double[][] coords, String[] labels, RadialLabelLayout labelLayout
     ) {
         NodeArray<Point2D> nodePointMap = tree.newNodeArray();
         var nodeAngleMap = tree.newNodeDoubleArray();
@@ -421,14 +423,7 @@ public class DensiTree {
             double y2 = wPt.getY();
 
             if (jitter) {
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-
-                double absolute = Math.sqrt((-dy * -dy) + (dx * dx));
-                double nx = -dy / absolute;
-                double ny = dx / absolute;
-
-                gc.strokeLine(x1 + shift * nx, y1 + shift * ny, x2 + shift * nx, y2 + shift * ny);
+                gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
             } else {
                 gc.strokeLine(x1, y1, x2, y2);
             }
@@ -437,7 +432,7 @@ public class DensiTree {
 
     public static void drawEdges1(
             PhyloTree tree, int treeNum, int[] circle, GraphicsContext gc, int xmin, int ymin, int xmax, int ymax,
-            boolean toScale, boolean jitter, double shift, double[][][] coords2, String[] labels
+            boolean toScale, boolean jitter, double shiftx, double shifty, double[][][] coords2, String[] labels
     ) {
         NodeArray<Point2D> nodePointMap = tree.newNodeArray();
         var nodeAngleMap = tree.newNodeDoubleArray();
@@ -466,14 +461,7 @@ public class DensiTree {
             double y2 = wPt.getY();
 
             if (jitter) {
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-
-                double absolute = Math.sqrt((-dy * -dy) + (dx * dx));
-                double nx = -dy / absolute;
-                double ny = dx / absolute;
-
-                gc.strokeLine(x1 + shift * nx, y1 + shift * ny, x2 + shift * nx, y2 + shift * ny);
+                gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
             } else {
                 gc.strokeLine(x1, y1, x2, y2);
             }
@@ -482,7 +470,7 @@ public class DensiTree {
 
     public static void drawEdges2(
             PhyloTree tree, int treeNum, int[] circle, GraphicsContext gc, int xmin, int ymin, int xmax, int ymax, boolean toScale,
-            boolean jitter, double shift, DoublePoint[][] coords3, String[] labels, RadialLabelLayout labelLayout
+            boolean jitter, double shiftx, double shifty, DoublePoint[][] coords3, String[] labels, RadialLabelLayout labelLayout
     ) {
         NodeArray<Point2D> nodePointMap = tree.newNodeArray();
         var nodeAngleMap = tree.newNodeDoubleArray();
@@ -515,14 +503,7 @@ public class DensiTree {
             double y2 = wPt.getY();
 
             if (jitter) {
-                double dx = x2 - x1;
-                double dy = y2 - y1;
-
-                double absolute = Math.sqrt((-dy * -dy) + (dx * dx));
-                double nx = -dy / absolute;
-                double ny = dx / absolute;
-
-                gc.strokeLine(x1 + shift * nx, y1 + shift * ny, x2 + shift * nx, y2 + shift * ny);
+                gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
             } else {
                 gc.strokeLine(x1, y1, x2, y2);
             }
