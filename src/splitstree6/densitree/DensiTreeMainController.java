@@ -65,6 +65,9 @@ public class DensiTreeMainController {
 	private RadioMenuItem dbscanMenuItem;
 
 	@FXML
+	private RadioMenuItem kmeansMenuItem;
+
+	@FXML
 	private RadioMenuItem radialMenuItem;
 
 	@FXML
@@ -137,6 +140,10 @@ public class DensiTreeMainController {
 
 	public RadioMenuItem getDbscanMenuItem() {
 		return dbscanMenuItem;
+	}
+
+	public RadioMenuItem getKmeansMenuItem() {
+		return kmeansMenuItem;
 	}
 
 	public RadioMenuItem getRadialMenuItem() {
