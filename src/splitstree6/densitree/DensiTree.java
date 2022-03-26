@@ -84,7 +84,7 @@ public class DensiTree {
         var labelLayout = new RadialLabelLayout();
         labelLayout.setGap(1);
 
-        DBSCANClusterer dbscanClusterer = new DBSCANClusterer(1, 5);
+        DBSCANClusterer dbscanClusterer = new DBSCANClusterer(10, 10);
         KMeansPlusPlusClusterer kmeansClusterer = new KMeansPlusPlusClusterer(2);
 
         int[] circle = model.getCircularOrdering();
@@ -320,24 +320,36 @@ public class DensiTree {
                         Cluster cluster1 = (Cluster) clusters.get(0);
                         List<DoublePoint> cluster11 = cluster1.getPoints();
 
-                        double xsum = 0;
-                        double ysum = 0;
 
-                        for (DoublePoint p : cluster11) {
-                            var point = p.getPoint();
-                            xsum += point[0];
-                            ysum += point[1];
+                        List<List<DoublePoint>> sort = new ArrayList<List<DoublePoint>>();
+
+                        for (int j = 0; j < clusters.size(); j++) {
+                            Cluster clusterJ = (Cluster) clusters.get(j);
+                            sort.add(clusterJ.getPoints());
                         }
 
-                        double finalYsum = ysum;
-                        double finalXsum = xsum;
+                        Collections.sort(sort, (Comparator<List>) (a1, a2) -> a2.size() - a1.size());
+
+                        List<DoublePoint> big = sort.get(0);
+
+                        double xsumB = 0;
+                        double ysumB = 0;
+                        for (DoublePoint p : big) {
+                            var point = p.getPoint();
+                            xsumB += point[0];
+                            ysumB += point[1];
+                        }
+
+
+                        double xCenterB = xsumB / big.size();
+                        double yCenterB = ysumB / big.size();
 
                         ChangeListener<Number> listener = (observableValue, oldValue, newValue) -> { // use a listener because we have to wait until both width and height have been set
                             if (oldValue.doubleValue() == 0 && newValue.doubleValue() > 0 && label.getWidth() > 0 && label.getHeight() > 0) {
                                 var angle = nodeAngleMap.get(w);
                                 var delta = GeometryUtilsFX.translateByAngle(-0.5 * label.getWidth(), -0.5 * label.getHeight(), angle, 0.5 * label.getWidth() + 5);
-                                label.setLayoutX(finalXsum / cluster11.size() + delta.getX());
-                                label.setLayoutY(finalYsum / cluster11.size() + delta.getY());
+                                label.setLayoutX(xCenterB + delta.getX());
+                                label.setLayoutY(yCenterB + delta.getY());
                                 label.setRotate(angle);
                                 label.ensureUpright();
                                 label.setTextFill(Color.RED);
@@ -347,40 +359,45 @@ public class DensiTree {
                         label.heightProperty().addListener(listener);
                         pane.getChildren().add(label);
 
-                        int clusterNr = clusters.size();
-                        if (clusterNr > 1) {
-                            for (int j = 1; j < clusterNr; j++) {
-                                Cluster clusterJ = (Cluster) clusters.get(j);
-                                List<DoublePoint> clusterJ1 = clusterJ.getPoints();
-                                if (clusterJ1.size() > cluster11.size() * 0.9) {
-                                    xsum = 0;
-                                    ysum = 0;
-                                    for (DoublePoint p : clusterJ1) {
-                                        var point = p.getPoint();
-                                        xsum += point[0];
-                                        ysum += point[1];
+                        if (sort.size() > 1) {
+                            List<DoublePoint> small = sort.get(1);
+                            double xsumS = 0;
+                            double ysumS = 0;
+                            for (DoublePoint p : small) {
+                                var point = p.getPoint();
+                                xsumS += point[0];
+                                ysumS += point[1];
+                            }
+
+                            double xCenterS = xsumS / small.size();
+                            double yCenterS = ysumS / small.size();
+
+                            double xdist = xCenterB - xCenterS;
+                            double ydist = yCenterB - yCenterS;
+                            double distance = Math.sqrt(xdist * xdist + ydist * ydist);
+                            if(tree.getLabel(w).equals("t33")){
+                                System.out.println();
+                            }
+                            if (small.size() > big.size() * 0.7 && distance > 50) {
+
+                                var label1 = new RichTextLabel(tree.getLabel(w));
+
+                                ChangeListener<Number> listener1 = (observableValue, oldValue, newValue) -> { // use a listener because we have to wait until both width and height have been set
+                                    if (oldValue.doubleValue() == 0 && newValue.doubleValue() > 0 && label1.getWidth() > 0 && label1.getHeight() > 0) {
+                                        var angle = nodeAngleMap.get(w);
+                                        var delta = GeometryUtilsFX.translateByAngle(-0.5 * label1.getWidth(), -0.5 * label1.getHeight(), angle, 0.5 * label1.getWidth() + 5);
+                                        label1.setLayoutX(xCenterS + delta.getX());
+                                        label1.setLayoutY(yCenterS + delta.getY());
+                                        label1.setRotate(angle);
+                                        label1.ensureUpright();
+                                        label1.setTextFill(Color.BLUE);
                                     }
-                                    var label1 = new RichTextLabel(tree.getLabel(w));
-                                    double finalXsum1 = xsum;
-                                    double finalYsum1 = ysum;
-                                    ChangeListener<Number> listener1 = (observableValue, oldValue, newValue) -> { // use a listener because we have to wait until both width and height have been set
-                                        if (oldValue.doubleValue() == 0 && newValue.doubleValue() > 0 && label1.getWidth() > 0 && label1.getHeight() > 0) {
-                                            var angle = nodeAngleMap.get(w);
-                                            var delta = GeometryUtilsFX.translateByAngle(-0.5 * label1.getWidth(), -0.5 * label1.getHeight(), angle, 0.5 * label1.getWidth() + 5);
-                                            label1.setLayoutX(finalXsum1 / clusterJ1.size() + delta.getX());
-                                            label1.setLayoutY(finalYsum1 / clusterJ1.size() + delta.getY());
-                                            label1.setRotate(angle);
-                                            label1.ensureUpright();
-                                            label1.setTextFill(Color.BLUE);
-                                        }
-                                    };
-                                    label1.widthProperty().addListener(listener1);
-                                    label1.heightProperty().addListener(listener1);
-                                    pane.getChildren().add(label1);
-                                }
+                                };
+                                label1.widthProperty().addListener(listener1);
+                                label1.heightProperty().addListener(listener1);
+                                pane.getChildren().add(label1);
                             }
                         }
-
                         break;
                     }
                 }
@@ -418,13 +435,12 @@ public class DensiTree {
                         CentroidCluster smallC;
                         List bigP;
                         List smallP;
-                        if(cluster11.size() > cluster21.size()){
+                        if (cluster11.size() > cluster21.size()) {
                             bigC = cluster1;
                             smallC = cluster2;
                             bigP = cluster11;
                             smallP = cluster21;
-                        }
-                        else {
+                        } else {
                             bigC = cluster2;
                             smallC = cluster1;
                             bigP = cluster21;
@@ -512,8 +528,8 @@ public class DensiTree {
                         break;
                     }
                 }
-                SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
-                SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
+                //SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
+                //SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
                 // labelLayout.addAvoidable(x,y,1,1);
             }
 
@@ -592,8 +608,8 @@ public class DensiTree {
                         break;
                     }
                 }
-                SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
-                SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
+                //SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
+                //SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
                 // labelLayout.addAvoidable(x,y,1,1);
             }
 
