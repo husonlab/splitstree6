@@ -37,6 +37,7 @@ import splitstree6.layout.tree.RadialLabelLayout;
 
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * draw the densi-tree
@@ -106,20 +107,17 @@ public class DensiTree {
             }
         }
 
-        //Pair[] angles = getAngles(model);
-
         gc.setLineWidth(1.0);
-        //drawLabels(model, rmax, x0, y0, gc);
 
         gc.save();
-        //gc.translate(x0, y0);
+
         gc.setLineWidth(0.01);
         for (int i = 1; i <= nTrees; i++) {
             var tree = model.getTreesBlock().getTree(i);
             shiftx = random.nextDouble();
             shifty = random.nextDouble();
 
-            if (labelMethod.contains("dbscan") || labelMethod.contains("kmeans")) {
+            if (labelMethod.contains("kmeans")) {
                 drawEdges2(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords3, labels);
             } else if (labelMethod.contains("mean")) {
                 drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords, labels, labelLayout);
@@ -136,9 +134,12 @@ public class DensiTree {
             meanLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords, labels, nTrees);
         } else if (labelMethod.contains("median")) {
             medianLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords2, labels);
-        } else if (labelMethod.contains("dbscan")) {
-            dbscanLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords3, labels, dbscanClusterer);
         } else if (labelMethod.contains("radial")) {
+            for (int i = 0; i < 1; i++) {
+                int randomNum = ThreadLocalRandom.current().nextInt(1, nTrees + 1);
+                var ranTree = model.getTreesBlock().getTree(randomNum);
+                radialItems(ranTree, circle, xmin, ymin, xmax, ymax, toScale, labelLayout);
+            }
             radialLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords, labels, nTrees, labelLayout);
             labelLayout.layoutLabels();
         }
@@ -146,7 +147,6 @@ public class DensiTree {
         gc.setLineWidth(0.5);
 
 
-        //System.out.println(highlight);
         if (highlight.matches("[\\d\\,]*")) {
             String[] specTrees = parameters.highlight.split("\\,");
             gc.setStroke(Color.GREENYELLOW);
@@ -298,6 +298,27 @@ public class DensiTree {
         }
     }
 
+    public static void radialItems(
+            PhyloTree tree, int[] circle, int xmin, int ymin, int xmax, int ymax,
+            boolean toScale, RadialLabelLayout labelLayout
+    ) {
+        NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+        var nodeAngleMap = tree.newNodeDoubleArray();
+        LayoutAlgorithm.apply(tree, toScale, circle, nodePointMap, nodeAngleMap);
+        adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+
+        for (var e : tree.edges()) {
+            var w = e.getTarget();
+            var wPt = nodePointMap.get(w);
+
+            if (w.isLeaf()) {
+                SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
+                SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
+                labelLayout.addAvoidable(x, y, 1, 1);
+            }
+        }
+    }
+
     public static void dbscanLabels(
             PhyloTree tree, int[] circle, Pane pane, int xmin, int ymin, int xmax, int ymax, boolean toScale,
             DoublePoint[][] coords3, String[] labels, DBSCANClusterer dbscanClusterer
@@ -375,7 +396,7 @@ public class DensiTree {
                             double xdist = xCenterB - xCenterS;
                             double ydist = yCenterB - yCenterS;
                             double distance = Math.sqrt(xdist * xdist + ydist * ydist);
-                            if(tree.getLabel(w).equals("t33")){
+                            if (tree.getLabel(w).equals("t33")) {
                                 System.out.println();
                             }
                             if (small.size() > big.size() * 0.7 && distance > 50) {
