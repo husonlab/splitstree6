@@ -19,7 +19,6 @@
 
 package splitstree6.densitree;
 
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -312,9 +311,7 @@ public class DensiTree {
             var wPt = nodePointMap.get(w);
 
             if (w.isLeaf()) {
-                SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
-                SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
-                labelLayout.addAvoidable(x, y, 1, 1);
+                labelLayout.addAvoidable(wPt::getX, wPt::getY, () -> 1.0, () -> 1.0);
             }
         }
     }
