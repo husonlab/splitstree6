@@ -69,7 +69,7 @@ public class TaxaBlock extends DataBlock {
 		taxon2index.putAll(src.taxon2index);
 		name2taxon.clear();
 		name2taxon.putAll(src.name2taxon);
-		traitsBlock.set(src.traitsBlock.get());
+		setTraitsBlock(src.traitsBlock.get());
 	}
 
 	public Object clone() {
@@ -289,7 +289,6 @@ public class TaxaBlock extends DataBlock {
 		taxa.set(1, getNtax() + 1);
 		return taxa;
 	}
-
 
 	public TraitsBlock getTraitsBlock() {
 		return traitsBlock.get();

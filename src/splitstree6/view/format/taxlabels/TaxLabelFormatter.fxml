@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ TaxLabelFormatter.fxml Copyright (C) 2022 Daniel H. Huson
+  ~ TraitsPie.fxml Copyright (C) 2022 Daniel H. Huson
   ~
   ~ (Some files contain contributions from other authors, who are then mentioned separately.)
   ~
@@ -49,7 +49,7 @@
                 <Insets right="2.0"/>
             </HBox.margin>
         </Label>
-        <TextField fx:id="fontSizeTextArea" prefColumnCount="4" prefWidth="50.0">
+        <TextField fx:id="fontSizeField" prefColumnCount="4" prefWidth="50.0">
             <tooltip>
                 <Tooltip text="Font size"/>
             </tooltip>

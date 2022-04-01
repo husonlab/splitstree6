@@ -4,8 +4,6 @@ module splitstreesix {
     requires transitive javafx.graphics;
     requires transitive javafx.fxml;
     requires javafx.base;
-    requires java.xml;
-    requires transitive java.desktop;
 
     requires Jama;
     requires richtextfx.fat;
@@ -73,6 +71,7 @@ module splitstreesix {
 	opens splitstree6.tabs.workflow;
 	opens splitstree6.tabs.workflow.algorithm;
 	opens splitstree6.tabs.workflow.data;
+	opens splitstree6.tabs.algorithms.treefilter;
 
 	opens splitstree6.contextmenus.algorithmnode;
 	opens splitstree6.contextmenus.datanode;
@@ -86,6 +85,9 @@ module splitstreesix {
 
 	opens splitstree6.algorithms.taxa.taxa2view;
 
+	opens splitstree6.layout.splits;
+	opens splitstree6.layout.tree;
+
 	opens splitstree6.view.splits.viewer;
 
 	opens splitstree6.view.trees.treepages;
@@ -95,12 +97,13 @@ module splitstreesix {
 	opens splitstree6.view.displaytext;
 	opens splitstree6.view.displaydatablock;
 	opens splitstree6.view.inputeditor;
+
 	opens splitstree6.view.format.taxlabels;
 	opens splitstree6.view.format.splits;
+	opens splitstree6.view.format.traits;
 
-	opens splitstree6.layout.splits;
-	opens splitstree6.tabs.algorithms.treefilter;
-	opens splitstree6.layout.tree;
+	opens splitstree6.view.network;
+
 	opens splitstree6.view.utils;
 	opens splitstree6.view.trees;
 

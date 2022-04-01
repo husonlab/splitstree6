@@ -32,6 +32,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 /**
  * do radial layout of labels
@@ -113,7 +114,7 @@ public class RadialLabelLayout {
 	 * @param width  width
 	 * @param height height
 	 */
-	public void addAvoidable(ReadOnlyDoubleProperty x, ReadOnlyDoubleProperty y, double width, double height) {
+	public void addAvoidable(Supplier<Double> x, Supplier<Double> y, Supplier<Double> width, Supplier<Double> height) {
 		avoidList.add(new Box(x, y, width, height));
 	}
 
@@ -347,9 +348,9 @@ public class RadialLabelLayout {
 			return Integer.compare(((Choice) v.getData()).priority(), ((Choice) w.getData()).priority());
 	}
 
-    public record Box(ReadOnlyDoubleProperty x, ReadOnlyDoubleProperty y, double width, double height) {
-        private boolean intersects(Choice other) {
-            return (x.get() + width >= other.x() && x.get() <= other.x() + other.width()) && (y.get() + height >= other.y() && y.get() <= other.y() + other.height());
+	public record Box(Supplier<Double> x, Supplier<Double> y, Supplier<Double> width, Supplier<Double> height) {
+		private boolean intersects(Choice other) {
+			return (x.get() + width.get() >= other.x() && x.get() <= other.x() + other.width()) && (y.get() + height.get() >= other.y() && y.get() <= other.y() + other.height());
         }
     }
 }

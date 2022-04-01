@@ -39,7 +39,9 @@ import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloSplitsGraph;
-import jloda.util.*;
+import jloda.util.CanceledException;
+import jloda.util.StringUtils;
+import jloda.util.Triplet;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
@@ -85,10 +87,13 @@ public class SplitNetworkLayout {
 	 * @return group of groups, namely loops, nodes, edges and node labels
 	 */
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
-					   SplitsRooting rooting, double rootAngle, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
-					   ObservableMap<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
-					   ObservableList<LoopView> loopViews, ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
-					   double width, double height) throws IOException {
+					   SplitsRooting rooting, double rootAngle,
+					   SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
+					   ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength, double width, double height,
+					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, // todo: this should be input
+					   ObservableMap<Node, Group> nodeShapeMap,
+					   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+					   ObservableList<LoopView> loopViews) throws IOException {
 
 		labelLayout.clear();
 
@@ -137,11 +142,10 @@ public class SplitNetworkLayout {
 			}
 		}
 
-
 		// compute the network and assign coordinates to nodes, and compute loops for outline:
 
 		graph.clear();
-		nodeShapeLabelMap.clear();
+		nodeShapeMap.clear();
 		loopViews.clear();
 
 		if (diagram.isOutline()) {
@@ -190,38 +194,48 @@ public class SplitNetworkLayout {
 		for (var v : graph.nodes()) {
 			var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
 			var point = nodePointMap.get(v);
-			var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5);
-			shape.getStyleClass().add("graph-node");
 
-			shape.setTranslateX(point.getX());
-			shape.setTranslateY(point.getY());
+			var group = new Group();
+			group.setId("graph-node"); // the is used to rotate graph
+			{
+				var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5);
+				shape.setLayoutX(-shape.getRadius());
+				shape.setLayoutY(-shape.getRadius());
+				shape.getStyleClass().add("graph-node");
+				group.getChildren().add(shape);
+			}
+			group.setTranslateX(point.getX());
+			group.setTranslateY(point.getY());
 
-			nodesGroup.getChildren().add(shape);
+			nodesGroup.getChildren().add(group);
 
 			var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 
-			nodeShapeLabelMap.put(v, new Pair<>(shape, label));
+			if (graph.getNumberOfTaxa(v) == 1) {
+				group.setUserData(taxaBlock.get(graph.getTaxon(v)));
+			}
+			nodeShapeMap.put(v, group);
 
 			if (label != null && !isRootNode) {
+				if (graph.getNumberOfTaxa(v) == 1) {
+					taxonLabelMap.put(graph.getTaxon(v), label);
+				}
+
 				label.getStyleClass().add("graph-label");
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-				label.setTranslateX(shape.getTranslateX() + 10);
-				label.setTranslateY(shape.getTranslateY() + 10);
-				label.setUserData(shape);
+				label.setTranslateX(group.getTranslateX() + 10);
+				label.setTranslateY(group.getTranslateY() + 10);
+				label.setUserData(group);
 				nodeLabelsGroup.getChildren().add(label);
 
 				label.applyCss();
-
-				var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
-				if (taxonId != null)
-					shape.setUserData(taxaBlock.get(taxonId));
 
 				double angle = v.adjacentEdgesStream(false).mapToDouble(graph::getAngle).average().orElse(0);
 				if (rootSplit == 0 && v == graph.getTaxon2Node(1)) {
 					angle += 180;
 				}
-				var translateXProperty = shape.translateXProperty();
-				var translateYProperty = shape.translateYProperty();
+				var translateXProperty = group.translateXProperty();
+				var translateYProperty = group.translateYProperty();
 				labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
 						xOffset -> {
 							label.setLayoutX(0);
@@ -231,7 +245,8 @@ public class SplitNetworkLayout {
 							label.setLayoutY(0);
 							label.translateYProperty().bind(translateYProperty.add(yOffset));
 						});
-				labelLayout.addAvoidable(translateXProperty, translateYProperty, 2 * shape.getRadius(), 2 * shape.getRadius());
+
+				labelLayout.addAvoidable(() -> group.getTranslateX() - 0.5 * group.prefWidth(0), () -> group.getTranslateY() - 0.5 * group.prefHeight(0), () -> group.prefWidth(0), () -> group.prefHeight(0));
 			}
 			progress.incrementProgress();
 		}
@@ -245,10 +260,10 @@ public class SplitNetworkLayout {
 			var line = new Line();
 			line.getStyleClass().add("graph-edge");
 
-			line.startXProperty().bind(nodeShapeLabelMap.get(e.getSource()).getFirst().translateXProperty());
-			line.startYProperty().bind(nodeShapeLabelMap.get(e.getSource()).getFirst().translateYProperty());
-			line.endXProperty().bind(nodeShapeLabelMap.get(e.getTarget()).getFirst().translateXProperty());
-			line.endYProperty().bind(nodeShapeLabelMap.get(e.getTarget()).getFirst().translateYProperty());
+			line.startXProperty().bind(nodeShapeMap.get(e.getSource()).translateXProperty());
+			line.startYProperty().bind(nodeShapeMap.get(e.getSource()).translateYProperty());
+			line.endXProperty().bind(nodeShapeMap.get(e.getTarget()).translateXProperty());
+			line.endYProperty().bind(nodeShapeMap.get(e.getTarget()).translateYProperty());
 			if (graph.getSplit(e) == rootSplit) // is added  split
 				line.setStroke(Color.GRAY);
 			edgesGroup.getChildren().add(line);
@@ -271,7 +286,7 @@ public class SplitNetworkLayout {
 
 		var loopsGroup = new Group();
 		for (var loop : loops) {
-			var loopView = new LoopView(loop, v -> nodeShapeLabelMap.get(v).getFirst().translateXProperty(), v -> nodeShapeLabelMap.get(v).getFirst().translateYProperty());
+			var loopView = new LoopView(loop, v -> nodeShapeMap.get(v).translateXProperty(), v -> nodeShapeMap.get(v).translateYProperty());
 			loopsGroup.getChildren().add(loopView);
 			Platform.runLater(() -> loopViews.add(loopView));
 		}
@@ -294,7 +309,6 @@ public class SplitNetworkLayout {
 		line.endYProperty().addListener(listener);
 		listener.invalidated(null);
 	}
-
 
 	private void rotate90(PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap) {
 		for (var v : graph.nodes()) {

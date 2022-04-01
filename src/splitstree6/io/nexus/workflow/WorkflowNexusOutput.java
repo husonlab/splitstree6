@@ -78,18 +78,21 @@ public class WorkflowNexusOutput {
 		setupExporter(workflow.getInputTaxaNode(), nexusExporter);
 		nexusExporter.export(w, workflow.getInputTaxaNode().getDataBlock());
 
-		/*
-		if (workflow.getInputTraitsNode() != null) {
-			setupExporter(workflow.getInputTraitsNode(), nexusExporter);
-			nexusExporter.export(w, workflow.getInputTaxaNode().getDataBlock(), workflow.getInpuTraitsNode().getDataBlock());
+		if (workflow.getInputTaxaNode().getDataBlock().getTraitsBlock().getNTraits() > 0) {
+			nexusExporter.setTitle("Input Traits");
+			nexusExporter.export(w, workflow.getInputTaxaNode().getDataBlock(), workflow.getInputTaxaNode().getDataBlock().getTraitsBlock());
 		}
-		 */
 
 		setupExporter(workflow.getInputTaxaFilterNode(), nexusExporter);
 		nexusExporter.export(w, workflow.getInputTaxaFilterNode().getAlgorithm());
 
 		setupExporter(workflow.getWorkingTaxaNode(), nexusExporter);
 		nexusExporter.export(w, workflow.getWorkingTaxaNode().getDataBlock());
+
+		if (workflow.getWorkingTaxaNode().getDataBlock().getTraitsBlock().getNTraits() > 0) {
+			nexusExporter.setTitle("Working Traits");
+			nexusExporter.export(w, workflow.getWorkingTaxaNode().getDataBlock(), workflow.getWorkingTaxaNode().getDataBlock().getTraitsBlock());
+		}
 
 		/*
 		if (workflow.getWorkingTraitsNode() != null) {
@@ -121,6 +124,7 @@ public class WorkflowNexusOutput {
 
 		return splitsTree6Block.size();
 	}
+
 
 	/**
 	 * sets up the exporter so that it reports title and links

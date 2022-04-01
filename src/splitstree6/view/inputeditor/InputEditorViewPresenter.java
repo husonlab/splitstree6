@@ -52,9 +52,8 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 		view.setShowLineNumbers(true);
 		view.setWrapText(false);
 
-
 		var tabController = view.getController();
-		var toolBarController = view.getToolBarController();
+		var toolBarController = view.getInputEditorViewController();
 
 		var codeArea = tabController.getCodeArea();
 		codeArea.setEditable(true);
@@ -119,7 +118,10 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 		super.setupMenuItems();
 
 		var controller = mainWindow.getController();
-		var toolBarController = view.getToolBarController();
+		var toolBarController = view.getInputEditorViewController();
+
+		mainWindow.getController().getMenuBar().getMenus().stream().filter(m -> m.getText().equals("Edit"))
+				.forEach(m -> m.disableProperty().bind(new SimpleBooleanProperty(false)));
 
 		controller.getOpenMenuItem().setOnAction(toolBarController.getOpenButton().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(toolBarController.getOpenButton().disableProperty());

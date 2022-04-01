@@ -20,15 +20,14 @@
 package splitstree6.view.format.splits;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
-import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Node;
-import jloda.util.Pair;
 import splitstree6.view.splits.viewer.SplitsDiagramType;
 
 import java.util.ArrayList;
@@ -42,14 +41,14 @@ public class SplitsFormatter extends Pane {
 	private final SplitsFormatterController controller;
 	private final SplitsFormatterPresenter presenter;
 
-	public SplitsFormatter(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap,
+	public SplitsFormatter(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, Group> nodeShapeMap,
 						   Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
 						   ObjectProperty<Color> optionOutlineFill, ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<SplitsFormatterController>(SplitsFormatterController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new SplitsFormatterPresenter(undoManager, controller, splitSelectionModel, nodeShapeLabelMap, splitShapeMap, optionDiagram,
+		presenter = new SplitsFormatterPresenter(undoManager, controller, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram,
 				optionOutlineFill, editsProperty);
 	}
 }

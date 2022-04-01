@@ -32,7 +32,7 @@ public class TaxLabelFormatterController {
 	private ComboBox<String> fontFamilyCbox;
 
 	@FXML
-	private TextField fontSizeTextArea;
+	private TextField fontSizeField;
 
 	@FXML
 	private ToggleButton boldToggleButton;
@@ -51,7 +51,7 @@ public class TaxLabelFormatterController {
 
 	@FXML
 	private void initialize() {
-		fontSizeTextArea.setTextFormatter(new TextFormatter<>(new DoubleStringConverter()));
+		fontSizeField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter()));
 	}
 
 	public VBox getvBox() {
@@ -62,8 +62,8 @@ public class TaxLabelFormatterController {
 		return fontFamilyCbox;
 	}
 
-	public TextField getFontSizeTextArea() {
-		return fontSizeTextArea;
+	public TextField getFontSizeField() {
+		return fontSizeField;
 	}
 
 	public ToggleButton getBoldToggleButton() {

@@ -30,6 +30,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
+import splitstree6.data.TaxaBlock;
+import splitstree6.io.nexus.TraitsNexusOutput;
 import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.writers.ExportManager;
 import splitstree6.options.Option;
@@ -101,7 +103,13 @@ public class DisplayDataPresenter {
 		controller.getApplyButton().setOnAction(e -> {
 			if (exporter.get() != null) {
 				try (var w = new StringWriter()) {
-					exporter.get().write(w, taxaBlock, dataNode.getDataBlock());
+					var dataBlock = dataNode.getDataBlock();
+					exporter.get().write(w, taxaBlock, dataBlock);
+					if (dataBlock instanceof TaxaBlock taxaBlock1) {
+						if (taxaBlock1.getTraitsBlock() != null) {
+							(new TraitsNexusOutput()).write(w, taxaBlock, taxaBlock1.getTraitsBlock());
+						}
+					}
 					displayData.replaceText(w.toString());
 					controller.getTitledPane().setText("Format: " + exporter.get().getName());
 					controller.getTitledPane().setExpanded(false);

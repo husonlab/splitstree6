@@ -25,16 +25,18 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.util.Pair;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.algorithms.EqualAngle;
@@ -43,6 +45,7 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.splits.SplitsFormatter;
 import splitstree6.view.format.taxlabels.TaxLabelFormatter;
+import splitstree6.view.format.traits.TraitsPie;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
@@ -78,11 +81,15 @@ public class SplitsView implements IView {
 
 	private final ObjectProperty<Color> optionOutlineFill = new SimpleObjectProperty<>(this, "optionOutlineFill");
 
+	private final StringProperty optionShowTrait = new SimpleStringProperty(this, "optionShowTrait");
+	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
+	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
+
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
-	// create properties:
+	// setup properties:
 	{
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Outline);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
@@ -93,7 +100,8 @@ public class SplitsView implements IView {
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(), optionShowConfidence.getName());
+				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(),
+				optionShowConfidence.getName(), optionShowTrait.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -101,12 +109,12 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
-		final ObservableMap<jloda.graph.Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap = FXCollections.observableHashMap();
+		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
+		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
 		final ObservableList<LoopView> loopViews = FXCollections.observableArrayList();
 
-		// this is the target area for the tree page:
-		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, nodeShapeLabelMap, splitShapeMap, loopViews);
+		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -117,10 +125,25 @@ public class SplitsView implements IView {
 		setViewTab(viewTab);
 
 		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
+		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
-		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeLabelMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
+		var traitsFormatter = new TraitsPie(mainWindow, undoManager);
+		traitsFormatter.setNodeShapeMap(nodeShapeMap);
+		optionShowTrait.bindBidirectional(traitsFormatter.optionShowTraitProperty());
+		optionTraitLegend.bindBidirectional(traitsFormatter.optionTraitLegendProperty());
+		optionTraitSize.bindBidirectional(traitsFormatter.optionTraitSizeProperty());
+		traitsFormatter.getLegend().scaleProperty().bind(optionZoomFactorProperty());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), splitsFormatter);
+		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
+		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
+
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL),
+				splitsFormatter, new Separator(Orientation.HORIZONTAL), traitsFormatter);
+
+		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
+		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 30.0);
+		controller.getInnerAnchorPane().getChildren().add(traitsFormatter.getLegend());
+		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);
@@ -157,7 +180,6 @@ public class SplitsView implements IView {
 	public void setViewTab(ViewTab viewTab) {
 		this.viewTab.set(viewTab);
 	}
-
 
 	@Override
 	public int size() {
@@ -220,7 +242,6 @@ public class SplitsView implements IView {
 	public void setOptionOrientation(LayoutOrientation optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
 	}
-
 
 	public String[] getOptionEdits() {
 		return optionEdits.get();
@@ -292,6 +313,18 @@ public class SplitsView implements IView {
 
 	public void setOptionShowConfidence(boolean optionShowConfidence) {
 		this.optionShowConfidence.set(optionShowConfidence);
+	}
+
+	public StringProperty optionShowTraitProperty() {
+		return optionShowTrait;
+	}
+
+	public BooleanProperty optionTraitLegendProperty() {
+		return optionTraitLegend;
+	}
+
+	public IntegerProperty optionTraitSizeProperty() {
+		return optionTraitSize;
 	}
 
 	public Bounds getTargetBounds() {

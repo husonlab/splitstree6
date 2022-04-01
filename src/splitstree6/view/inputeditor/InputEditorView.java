@@ -45,8 +45,8 @@ import java.util.function.Consumer;
 public class InputEditorView extends DisplayTextView implements IView {
 	public static final String NAME = "Input Editor";
 	private final MainWindow mainWindow;
-	private final InputEditorViewController toolBarController;
-	private final InputEditorViewPresenter toolBarPresenter;
+	private final InputEditorViewController inputEditorViewController;
+	private final InputEditorViewPresenter inputEditorViewPresenter;
 	private File tmpFile;
 
 	private final ViewTab viewTab;
@@ -60,16 +60,23 @@ public class InputEditorView extends DisplayTextView implements IView {
 		this.viewTab = viewTab;
 
 		var loader = new ExtendedFXMLLoader<InputEditorViewController>(this.getClass());
-		toolBarController = loader.getController();
-		toolBarPresenter = new InputEditorViewPresenter(mainWindow, this);
+		inputEditorViewController = loader.getController();
+		inputEditorViewPresenter = new InputEditorViewPresenter(mainWindow, this);
 	}
 
-	public InputEditorViewController getToolBarController() {
-		return toolBarController;
+	public InputEditorViewController getInputEditorViewController() {
+		return inputEditorViewController;
 	}
 
-	public InputEditorViewPresenter getToolBarPresenter() {
-		return toolBarPresenter;
+	public InputEditorViewPresenter getInputEditorViewPresenter() {
+		return inputEditorViewPresenter;
+	}
+
+
+	@Override
+	public void setupMenuItems() {
+		super.setupMenuItems();
+
 	}
 
 	/**

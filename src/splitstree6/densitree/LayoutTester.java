@@ -75,7 +75,7 @@ public class LayoutTester extends Application {
 		var number = new Label();
 		number.textProperty().bind(treeNumber.asString());
 
-		var toScale = new CheckBox("To Scale");
+		var toScale = new CheckBox("To ScalingType");
 		var useOwnCycle = new CheckBox("Use Own Cycle");
 
 		borderPane.setCenter(pane);

@@ -24,14 +24,13 @@ import javafx.animation.Transition;
 import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
-import javafx.scene.Parent;
-import javafx.scene.shape.Shape;
+import javafx.scene.Node;
 import javafx.util.Duration;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import splitstree6.layout.tree.LayoutOrientation;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.Consumer;
 
 /**
@@ -42,29 +41,27 @@ public class LayoutUtils {
 	private static double mouseX;
 	private static double mouseY;
 
-	public static void applyOrientation(Parent node, LayoutOrientation oldOrientation, LayoutOrientation newOrientation, Consumer<LayoutOrientation> orientationConsumer) {
+	public static void applyOrientation(Collection<? extends Node> shapes, LayoutOrientation oldOrientation, LayoutOrientation newOrientation, Consumer<LayoutOrientation> orientationConsumer) {
 		var transitions = new ArrayList<Transition>();
 
-		BasicFX.preorderTraversal(node.getChildrenUnmodifiable().get(0), n -> {
-			if (n instanceof Shape shape) {
-				var translate = new TranslateTransition(Duration.seconds(1));
-				translate.setNode(shape);
-				var point = new Point2D(shape.getTranslateX(), shape.getTranslateY());
+		for (var shape : shapes) {
+			var translate = new TranslateTransition(Duration.seconds(1));
+			translate.setNode(shape);
+			var point = new Point2D(shape.getTranslateX(), shape.getTranslateY());
 
-				if (oldOrientation.angle() != 0)
-					point = GeometryUtilsFX.rotate(point, oldOrientation.angle());
-				if (oldOrientation.flip())
-					point = new Point2D(-point.getX(), point.getY());
+			if (oldOrientation.angle() != 0)
+				point = GeometryUtilsFX.rotate(point, oldOrientation.angle());
+			if (oldOrientation.flip())
+				point = new Point2D(-point.getX(), point.getY());
 
-				if (newOrientation.flip())
+			if (newOrientation.flip())
 					point = new Point2D(-point.getX(), point.getY());
 				if (newOrientation.angle() != 0)
 					point = GeometryUtilsFX.rotate(point, -newOrientation.angle());
 				translate.setToX(point.getX());
 				translate.setToY(point.getY());
 				transitions.add(translate);
-			}
-		});
+		}
 		var parallel = new ParallelTransition(transitions.toArray(new Transition[0]));
 		if (orientationConsumer != null)
 			parallel.setOnFinished(e -> Platform.runLater(() -> orientationConsumer.accept(newOrientation)));

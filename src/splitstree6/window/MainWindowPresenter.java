@@ -191,8 +191,13 @@ public class MainWindowPresenter {
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
-				m -> !List.of("File", "Window", "Open Recent", "Help").contains(m.getText()),
+				m -> !List.of("File", "Edit", "Window", "Open Recent", "Help").contains(m.getText()),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(mainWindow.emptyProperty())));
+		BasicFX.applyToAllMenus(controller.getMenuBar(),
+				m -> m.getText().equals("Edit"),
+				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
+
+
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {

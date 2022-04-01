@@ -22,6 +22,7 @@ package splitstree6.view.splits.viewer;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
@@ -37,8 +38,6 @@ import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Node;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.BitSetUtils;
-import jloda.util.Pair;
-import jloda.util.Single;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Taxon;
 
@@ -78,26 +77,26 @@ public class MouseInteraction {
 	/**
 	 * setup split network mouse interaction
 	 */
-	public void setup(Map<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap, Map<Integer, ArrayList<Shape>> splitShapesMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap, Function<Integer, ASplit> idSplitMap) {
+	public void setup(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, Group> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapesMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap, Function<Integer, ASplit> idSplitMap) {
+		var graphOptional = nodeShapeMap.keySet().stream().map(v -> (PhyloSplitsGraph) v.getOwner()).findAny();
 
-		var graph = new Single<PhyloSplitsGraph>();
-		for (var v : nodeShapeLabelMap.keySet()) {
-			graph.setIfCurrentValueIsNull((PhyloSplitsGraph) v.getOwner());
-			var id = graph.get().getTaxon(v);
-			if (id != -1) {
-				var taxon = idTaxonMap.apply(graph.get().getTaxon(v));
-				if (taxon != null) {
-					var shape = nodeShapeLabelMap.get(v).getFirst();
-					var label = nodeShapeLabelMap.get(v).getSecond();
+		if (graphOptional.isPresent()) {
+			var graph = graphOptional.get();
 
+			for (var id : taxonLabelMap.keySet()) {
+				var label = taxonLabelMap.get(id);
+				var v = graph.getTaxon2Node(id);
+				var shape = nodeShapeMap.get(v);
+				var taxon = idTaxonMap.apply(id);
+				if (taxon != null && shape != null) {
 					shape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 					label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 
 					shape.setOnMouseEntered(e -> {
 						if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
 							nodeShapeOrLabelEntered = true;
-							shape.setScaleX(2 * shape.getScaleX());
-							shape.setScaleY(2 * shape.getScaleY());
+							shape.setScaleX(1.2 * shape.getScaleX());
+							shape.setScaleY(1.2 * shape.getScaleY());
 							label.setScaleX(1.1 * label.getScaleX());
 							label.setScaleY(1.1 * label.getScaleY());
 							e.consume();
@@ -105,8 +104,8 @@ public class MouseInteraction {
 					});
 					shape.setOnMouseExited(e -> {
 						if (nodeShapeOrLabelEntered) {
-							shape.setScaleX(shape.getScaleX() / 2);
-							shape.setScaleY(shape.getScaleY() / 2);
+							shape.setScaleX(shape.getScaleX() / 1.2);
+							shape.setScaleY(shape.getScaleY() / 1.2);
 							label.setScaleX(label.getScaleX() / 1.1);
 							label.setScaleY(label.getScaleY() / 1.1);
 							nodeShapeOrLabelEntered = false;
@@ -138,19 +137,14 @@ public class MouseInteraction {
 
 					label.setOnMouseDragged(e -> {
 						if (taxonSelectionModel.isSelected(taxon)) {
-							graph.get().nodeStream().filter(a -> graph.get().getTaxon(a) != -1).forEach(w -> {
-								var wTaxon = idTaxonMap.apply(graph.get().getTaxon(w));
-								if (wTaxon != null && taxonSelectionModel.isSelected(wTaxon)) {
-									var shapeLabel = nodeShapeLabelMap.get(w);
-									if (shapeLabel != null) {
-										var wLabel = shapeLabel.getSecond();
-										var dx = e.getScreenX() - mouseDownX;
-										var dy = e.getScreenY() - mouseDownY;
-										wLabel.setLayoutX(wLabel.getLayoutX() + dx);
-										wLabel.setLayoutY(wLabel.getLayoutY() + dy);
-									}
-								}
-							});
+							for (var wTaxon : taxonSelectionModel.getSelectedItems()) {
+								var wLabel = taxonLabelMap.get(taxonIdMap.apply(wTaxon));
+
+								var dx = e.getScreenX() - mouseDownX;
+								var dy = e.getScreenY() - mouseDownY;
+								wLabel.setLayoutX(wLabel.getLayoutX() + dx);
+								wLabel.setLayoutY(wLabel.getLayoutY() + dy);
+							}
 							mouseDownX = e.getScreenX();
 							mouseDownY = e.getScreenY();
 							e.consume();
@@ -197,13 +191,13 @@ public class MouseInteraction {
 							}
 						} else if (e.getClickCount() == 2) {
 							var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxonIdMap).collect(Collectors.toList()));
-							var start = graph.get().nodeStream().filter(z -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.get().getTaxa(z))).cardinality() > 0).findAny();
+							var start = graph.nodeStream().filter(z -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(z))).cardinality() > 0).findAny();
 							if (start.isPresent()) {
-								try (var visited = graph.get().newNodeSet()) {
-									GraphTraversals.traverseReachable(start.get(), f -> graph.get().getSplit(f) != splitId, visited::add);
-									for (var f : graph.get().edges()) {
+								try (var visited = graph.newNodeSet()) {
+									GraphTraversals.traverseReachable(start.get(), f -> graph.getSplit(f) != splitId, visited::add);
+									for (var f : graph.edges()) {
 										if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
-											splitSelectionModel.select(graph.get().getSplit(f));
+											splitSelectionModel.select(graph.getSplit(f));
 									}
 								}
 							}
@@ -212,29 +206,30 @@ public class MouseInteraction {
 					});
 				}
 			}
+
+			taxonSelectionInvalidationListener = e -> {
+				for (var t : taxonLabelMap.keySet()) {
+					var taxon = idTaxonMap.apply(t);
+					if (taxon != null) {
+						var label = taxonLabelMap.get(t);
+						label.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
+						var shape = nodeShapeMap.get(graph.getTaxon2Node(t));
+						if (shape != null)
+							shape.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
+					}
+				}
+			};
+			taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionInvalidationListener));
+
+			splitSelectionInvalidationListener = e -> {
+				for (var splitId : splitShapesMap.keySet()) {
+					for (var shape : splitShapesMap.get(splitId)) {
+						shape.setEffect(splitSelectionModel.isSelected(splitId) ? SelectionEffectBlue.getInstance() : null);
+					}
+				}
+			};
+			splitSelectionModel.getSelectedItems().addListener(splitSelectionInvalidationListener);
 		}
-
-		taxonSelectionInvalidationListener = e -> {
-			nodeShapeLabelMap.keySet().stream().filter(a -> graph.get().getTaxon(a) != -1).forEach(v -> {
-				var t = graph.get().getTaxon(v);
-				var taxon = idTaxonMap.apply(t);
-				if (taxon != null) {
-					var shapeLabel = nodeShapeLabelMap.get(v);
-					shapeLabel.getFirst().setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
-					shapeLabel.getSecond().setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
-				}
-			});
-		};
-		taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionInvalidationListener));
-
-		splitSelectionInvalidationListener = e -> {
-			for (var splitId : splitShapesMap.keySet()) {
-				for (var shape : splitShapesMap.get(splitId)) {
-					shape.setEffect(splitSelectionModel.isSelected(splitId) ? SelectionEffectBlue.getInstance() : null);
-				}
-			}
-		};
-		splitSelectionModel.getSelectedItems().addListener(splitSelectionInvalidationListener);
 	}
 
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {

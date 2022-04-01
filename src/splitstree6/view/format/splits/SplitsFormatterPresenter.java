@@ -24,15 +24,14 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
-import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Node;
-import jloda.util.Pair;
 import splitstree6.layout.splits.RotateSplit;
 import splitstree6.view.splits.viewer.SplitNetworkEdits;
 import splitstree6.view.splits.viewer.SplitsDiagramType;
@@ -51,7 +50,7 @@ public class SplitsFormatterPresenter {
 	private boolean inUpdatingDefaults = false;
 
 	public SplitsFormatterPresenter(UndoManager undoManager, SplitsFormatterController controller, SelectionModel<Integer> splitSelectionModel,
-									Map<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
+									Map<Node, Group> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
 									ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty) {
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
@@ -167,11 +166,11 @@ public class SplitsFormatterPresenter {
 			var oldEdits = editsProperty.get();
 
 			undoManager.doAndAdd("rotate splits", () -> {
-						RotateSplit.apply(splits, -5, nodeShapeLabelMap);
+						RotateSplit.apply(splits, -5, nodeShapeMap);
 						editsProperty.set(oldEdits);
 					}
 					, () -> {
-						RotateSplit.apply(splits, 5, nodeShapeLabelMap);
+						RotateSplit.apply(splits, 5, nodeShapeMap);
 						editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, 5));
 					});
 		});
@@ -181,10 +180,10 @@ public class SplitsFormatterPresenter {
 			var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
 			var oldEdits = editsProperty.get();
 			undoManager.doAndAdd("rotate splits", () -> {
-				RotateSplit.apply(splits, 5, nodeShapeLabelMap);
+				RotateSplit.apply(splits, 5, nodeShapeMap);
 				editsProperty.set(oldEdits);
 			}, () -> {
-				RotateSplit.apply(splits, -5, nodeShapeLabelMap);
+				RotateSplit.apply(splits, -5, nodeShapeMap);
 				editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, -5));
 			});
 		});

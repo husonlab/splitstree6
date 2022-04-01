@@ -141,11 +141,11 @@ public enum OptionValueType {
 	public static String toStringType(OptionValueType type, Object object) {
 		switch (type) {
 			case Integer:
-				return java.lang.String.format("%d", object);
+				return java.lang.String.format("%d", (Integer) object);
 			case Float:
-				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.6f", object));
+				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.6f", (Float) object));
 			case Double:
-				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.8f", object));
+				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.8f", (Double) object));
 			case doubleArray: {
 				StringBuilder buf = new StringBuilder();
 				final double[] array = (double[]) object;

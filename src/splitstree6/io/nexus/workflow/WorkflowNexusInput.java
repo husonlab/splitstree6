@@ -30,6 +30,7 @@ import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.SplitsTree6Block;
+import splitstree6.data.TraitsBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.AlgorithmNexusInput;
 import splitstree6.io.nexus.SplitsTree6NexusInput;
@@ -114,11 +115,19 @@ public class WorkflowNexusInput {
 			final NexusDataBlockInput dataInput = new NexusDataBlockInput();
 
 			var inputTaxaBlock = dataInput.parse(np);
+
+			if (np.peekMatchBeginBlock("traits")) {
+				inputTaxaBlock.setTraitsBlock((TraitsBlock) dataInput.parse(np, inputTaxaBlock));
+			}
+
 			var taxaFilter = (new AlgorithmNexusInput()).parse(np);
 			if (!(taxaFilter instanceof TaxaEditor))
 				throw new IOExceptionWithLineNumber("Excepted TaxaEditor", np.lineno());
 			var workingTaxaBlock = dataInput.parse(np);
 			workingTaxaBlock.overwriteTaxa(inputTaxaBlock);
+			if (np.peekMatchBeginBlock("traits")) {
+				workingTaxaBlock.setTraitsBlock((TraitsBlock) dataInput.parse(np, inputTaxaBlock));
+			}
 			var workingTaxaTitle = dataInput.getTitle();
 			var inputDataBlock = dataInput.parse(np, inputTaxaBlock);
 			var dataTaxaFilter = (new AlgorithmNexusInput()).parse(np);

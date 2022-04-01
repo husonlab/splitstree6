@@ -19,12 +19,14 @@
 
 package splitstree6.algorithms.taxa.taxa2taxa;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.TraitsBlock;
 import splitstree6.data.parts.Taxon;
 
 import java.util.*;
@@ -58,12 +60,22 @@ public class TaxaEditor extends Taxa2Taxa implements IFilter {
 			}
 			setShortDescription("using " + outputData.getNtax() + " of " + (inputData.getNtax() + " taxa"));
 		}
+
+		final var parentTraits = inputData.getTraitsBlock();
+		final TraitsBlock childTraits = outputData.getTraitsBlock();
+
+		if (parentTraits != null && childTraits != null && childTraits.getNode() != null) {
+			Platform.runLater(() -> {
+				childTraits.getNode().setValid(false);
+				childTraits.copySubset(inputData, parentTraits, outputData.getTaxa());
+				childTraits.getNode().setValid(true);
+			});
+		}
 	}
 
 	public boolean isDisabled(String name) {
 		return Arrays.asList(getOptionDisabledTaxa()).contains(name);
 	}
-
 
 	public void setDisabled(String name, boolean state) {
 		setDisabled(Collections.singleton(name), state);

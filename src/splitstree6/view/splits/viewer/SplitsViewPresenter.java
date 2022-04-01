@@ -22,16 +22,14 @@ package splitstree6.view.splits.viewer;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.Clipboard;
@@ -47,8 +45,10 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.graph.Node;
-import jloda.util.*;
+import jloda.util.BitSetUtils;
+import jloda.util.IteratorUtils;
+import jloda.util.Single;
+import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
 import splitstree6.layout.tree.LayoutOrientation;
@@ -80,8 +80,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
+	private final LongProperty updateCounter = new SimpleLongProperty(0L);
+
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
-							   ObservableMap<Node, Pair<Shape, RichTextLabel>> nodeShapeLabelMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+							   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<jloda.graph.Node, Group> nodeShapeMap,
+							   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 							   ObservableList<LoopView> loopViews) {
 		this.mainWindow = mainWindow;
 		this.splitsView = splitsView;
@@ -171,7 +174,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(splitsView.optionOrientationProperty());
 
-
 		controller.showInternalLabelsToggleButton().selectedProperty().bindBidirectional(splitsView.optionShowConfidenceProperty());
 
 		controller.getScaleBar().visibleProperty().bind((splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.Outline).or(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.Splits)))
@@ -194,17 +196,16 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				SplitNetworkEdits.clearEdits(splitsView.optionEditsProperty());
 
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
-					splitsView.getSplitSelectionModel(), nodeShapeLabelMap, splitShapeMap, loopViews,
-					boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
-					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
-					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty());
+					splitsView.getSplitSelectionModel(), boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
+					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(), splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(),
+					taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
 
 			splitNetworkPane.set(pane);
 
 			pane.setRunAfterUpdate(() -> {
 				var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
 				var splits = splitsBlock.get();
-				mouseInteraction.setup(nodeShapeLabelMap, splitShapeMap, taxa::get, taxa::indexOf, splits::get);
+				mouseInteraction.setup(taxonLabelMap, nodeShapeMap, splitShapeMap, taxa::get, taxa::indexOf, splits::get);
 
 				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
 					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
@@ -217,8 +218,9 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 					}
 				}
 				if (splitsView.getOptionEdits().length > 0) {
-					SplitNetworkEdits.applyEdits(splitsView.getOptionEdits(), nodeShapeLabelMap, splitShapeMap);
+					SplitNetworkEdits.applyEdits(splitsView.getOptionEdits(), nodeShapeMap, splitShapeMap);
 				}
+				updateCounter.set(updateCounter.get() + 1);
 			});
 			pane.drawNetwork();
 		};
@@ -336,7 +338,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
-		mainController.getLayoutLabelsMenuItem().setOnAction(e -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation())));
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
@@ -363,5 +365,15 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		var menu = new ContextMenu();
 		menu.getItems().add(editLabelMenuItem);
 		menu.show(label, event.getScreenX(), event.getScreenY());
+	}
+
+	public void updateLabelLayout() {
+		if (splitNetworkPane.get() != null)
+			Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation()));
+	}
+
+
+	public ReadOnlyLongProperty updateCounterProperty() {
+		return updateCounter;
 	}
 }

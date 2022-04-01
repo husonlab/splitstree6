@@ -68,10 +68,10 @@ public class TaxLabelFormatterPresenter {
 			}
 		});
 
-		controller.getFontSizeTextArea().setOnAction(e -> {
+		controller.getFontSizeField().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
 				var undoList = new UndoableRedoableCommandList(" font size");
-				var size = Math.max(0.1, NumberUtils.parseDouble(controller.getFontSizeTextArea().getText()));
+				var size = Math.max(0.1, NumberUtils.parseDouble(controller.getFontSizeField().getText()));
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
 					if (oldLabel != null && RichTextLabel.getFontSize(oldLabel) != size) {
@@ -182,14 +182,14 @@ public class TaxLabelFormatterPresenter {
 			inUpdatingDefaults = true;
 			try {
 				controller.getFontFamilyCbox().setDisable(selectionModel.size() == 0);
-				controller.getFontSizeTextArea().setDisable(selectionModel.size() == 0);
+				controller.getFontSizeField().setDisable(selectionModel.size() == 0);
 				controller.getBoldToggleButton().setDisable(selectionModel.size() == 0);
 				controller.getItalicToggleButton().setDisable(selectionModel.size() == 0);
 				controller.getUnderlineToggleButton().setDisable(selectionModel.size() == 0);
 				controller.getStrikeToggleButton().setDisable(selectionModel.size() == 0);
 				controller.getTextFillColorChooser().setDisable(selectionModel.size() == 0);
 
-				controller.getFontSizeTextArea().setText("");
+				controller.getFontSizeField().setText("");
 				controller.getBoldToggleButton().setSelected(false);
 				controller.getItalicToggleButton().setSelected(false);
 				controller.getUnderlineToggleButton().setSelected(false);
@@ -216,7 +216,7 @@ public class TaxLabelFormatterPresenter {
 					}
 				}
 				controller.getFontFamilyCbox().setValue(fontFamilies.size() == 1 ? fontFamilies.iterator().next() : null);
-				controller.getFontSizeTextArea().setText(fontSizes.size() == 1 ? String.valueOf(fontSizes.iterator().next()) : "");
+				controller.getFontSizeField().setText(fontSizes.size() == 1 ? String.valueOf(fontSizes.iterator().next()) : "");
 				controller.getBoldToggleButton().setSelected(boldStates.size() == 1 ? boldStates.iterator().next() : false);
 				controller.getItalicToggleButton().setSelected(boldStates.size() == 1 ? italicStates.iterator().next() : false);
 				controller.getUnderlineToggleButton().setSelected(boldStates.size() == 1 ? underlineStates.iterator().next() : false);

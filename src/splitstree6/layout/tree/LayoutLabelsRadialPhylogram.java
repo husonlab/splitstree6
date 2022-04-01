@@ -50,9 +50,6 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 
 			if (label != null) {
 				var shape = nodeShapeMap.get(v);
-				var translateXProperty = shape.translateXProperty();
-				var translateYProperty = shape.translateYProperty();
-
 				var angle = nodeAngleMap.get(v);
 				if (angle == null) {
 					if (v.getParent() != null) {
@@ -75,14 +72,14 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
 					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
 
-					labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
+					labelLayout.addItem(shape.translateXProperty(), shape.translateYProperty(), angle, label.widthProperty(), label.heightProperty(),
 							xOffset -> {
 								label.setLayoutX(0);
-								label.translateXProperty().bind(translateXProperty.add(xOffset));
+								label.translateXProperty().bind(shape.translateXProperty().add(xOffset));
 							},
 							yOffset -> {
 								label.setLayoutY(0);
-								label.translateYProperty().bind(translateYProperty.add(yOffset));
+								label.translateYProperty().bind(shape.translateYProperty().add(yOffset));
 								label.setVisible(true);
 							});
 				} else {
@@ -90,11 +87,10 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 					label.setLayoutY(0);
 					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
 					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
-					labelLayout.addAvoidable(label.translateXProperty(), label.translateYProperty(), label.getLayoutBounds().getWidth(), label.getLayoutBounds().getHeight());
+					labelLayout.addAvoidable(label::getTranslateX, label::getTranslateY, () -> label.getLayoutBounds().getWidth(), () -> label.getLayoutBounds().getHeight());
 
 				}
-
-				labelLayout.addAvoidable(translateXProperty, translateYProperty, shape.getLayoutBounds().getWidth(), shape.getLayoutBounds().getHeight());
+				labelLayout.addAvoidable(shape::getTranslateX, shape::getTranslateY, () -> shape.getLayoutBounds().getWidth(), () -> shape.getLayoutBounds().getHeight());
 			}
 		}
 	}

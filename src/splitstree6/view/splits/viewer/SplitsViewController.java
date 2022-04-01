@@ -130,6 +130,7 @@ public class SplitsViewController {
 		return anchorPane;
 	}
 
+
 	public BorderPane getBorderPane() {
 		return borderPane;
 	}

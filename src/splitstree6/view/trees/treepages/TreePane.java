@@ -29,9 +29,11 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
@@ -100,9 +102,10 @@ public class TreePane extends StackPane {
 		service.setExecutor(ProgramExecutorService.getInstance());
 
 		orientation.addListener((v, o, n) -> {
-			if (diagram == TreeDiagramType.RadialPhylogram)
-				splitstree6.layout.splits.LayoutUtils.applyOrientation(pane, o, n, orientationConsumer);
-			else
+			if (diagram == TreeDiagramType.RadialPhylogram) {
+				var shapes = BasicFX.getAllRecursively(pane, Shape.class);
+				splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, o, n, orientationConsumer);
+			} else
 				LayoutUtils.applyOrientation(pane, n, o, false);
 		});
 
@@ -146,9 +149,10 @@ public class TreePane extends StackPane {
 
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
 			Platform.runLater(() -> {
-				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg)
-					splitstree6.layout.splits.LayoutUtils.applyOrientation(pane, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
-				else {
+				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg) {
+					var shapes = BasicFX.getAllRecursively(pane, Shape.class);
+					splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
+				} else {
 					LayoutUtils.applyOrientation(orientation.get(), pane, false);
 					updateLabelLayout(orientation.get());
 				}
