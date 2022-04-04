@@ -33,8 +33,8 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Node;
 import splitstree6.layout.splits.RotateSplit;
+import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.view.splits.viewer.SplitNetworkEdits;
-import splitstree6.view.splits.viewer.SplitsDiagramType;
 
 import java.util.ArrayList;
 import java.util.HashSet;

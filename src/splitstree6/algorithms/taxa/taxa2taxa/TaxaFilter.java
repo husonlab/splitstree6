@@ -1,5 +1,5 @@
 /*
- * TaxaEditor.java Copyright (C) 2022 Daniel H. Huson
+ * TaxaFilter.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -27,11 +27,10 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
-import splitstree6.data.parts.Taxon;
 
 import java.util.*;
 
-public class TaxaEditor extends Taxa2Taxa implements IFilter {
+public class TaxaFilter extends Taxa2Taxa implements IFilter {
 	private final ObjectProperty<String[]> optionDisabledTaxa = new SimpleObjectProperty<>(this, "optionDisabledTaxa", new String[0]);
 
 	public List<String> listOptions() {
@@ -39,35 +38,29 @@ public class TaxaEditor extends Taxa2Taxa implements IFilter {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputData, TaxaBlock outputData) {
-		final Map<String, String> name2displayLabel = new HashMap<>();
-		for (var t = 1; t <= inputData.getNtax(); t++) {
-			final Taxon taxon = inputData.get(t);
-				name2displayLabel.put(taxon.getName(), taxon.getDisplayLabel());
-		}
-
+	public void compute(ProgressListener progress, TaxaBlock ignored, TaxaBlock inputTaxaBlock, TaxaBlock outputTaxaBlock) {
 		if (getNumberDisabledTaxa() == 0) {
-			outputData.copy(inputData);
+			outputTaxaBlock.copy(inputTaxaBlock);
 			setShortDescription(StringUtils.fromCamelCase(getClass().getSimpleName()));
 		} else {
-			outputData.clear();
+			outputTaxaBlock.clear();
 
-			for (var taxon : inputData.getTaxa()) {
+			for (var taxon : inputTaxaBlock.getTaxa()) {
 				var name = taxon.getName();
 				if (!isDisabled(name)) {
-					outputData.add(taxon);
+					outputTaxaBlock.add(taxon);
 				}
 			}
-			setShortDescription("using " + outputData.getNtax() + " of " + (inputData.getNtax() + " taxa"));
+			setShortDescription("using " + outputTaxaBlock.getNtax() + " of " + (inputTaxaBlock.getNtax() + " taxa"));
 		}
 
-		final var parentTraits = inputData.getTraitsBlock();
-		final TraitsBlock childTraits = outputData.getTraitsBlock();
+		final var parentTraits = inputTaxaBlock.getTraitsBlock();
+		final TraitsBlock childTraits = outputTaxaBlock.getTraitsBlock();
 
 		if (parentTraits != null && childTraits != null && childTraits.getNode() != null) {
 			Platform.runLater(() -> {
 				childTraits.getNode().setValid(false);
-				childTraits.copySubset(inputData, parentTraits, outputData.getTaxa());
+				childTraits.copySubset(inputTaxaBlock, parentTraits, outputTaxaBlock.getTaxa());
 				childTraits.getNode().setValid(true);
 			});
 		}

@@ -1,17 +1,18 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=8 nAlgorithms=6;
+DIMENSIONS nDataNodes=8 nAlgorithms=5;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1648792979489'; [Fri Apr 01 08:02:59 CEST 2022]
+WORKFLOW creationDate='1648978482984'; [Sun Apr 03 11:34:42 CEST 2022]
 END; [SPLITSTREE6]
 
 [
 Methods:
 Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 7 taxa and 7 DNA sequences of length 56.
-The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 7 x 7 distance matrix.
-The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 15 splits, cyclic.
+After removal of 2 taxa, the input consisted of 5 taxa and 5 DNA sequences of length 56.
+The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 5 x 5 distance matrix.
+The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 6 splits, cyclic.
 The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
 
 References:
@@ -23,7 +24,6 @@ Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic net
 
 BEGIN TAXA;
 TITLE 'Input Taxa';
-LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS ntax=7;
 TAXLABELS
 	[1] 'seq_1'
@@ -40,22 +40,10 @@ END; [TAXA]
 
 BEGIN TRAITS;
 TITLE 'Input Traits';
-LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS [nTax=7] nTraits=11;
 FORMAT labels=yes missing=? separator=Comma;
 TRAITLABELS
-	Europe
-	Asia
-	Africa
-	Australia
-	America
-	a
-	b
-	c
-	d
-	e
-	f
-;
+ 'Europe' 'Asia' 'Africa' 'Australia' 'America' 'a' 'b' 'c' 'd' 'e' 'f';
 MATRIX
 [1] 'seq_1'  0,0,0,3,3,1,1,33,4,3,1
 [2] 'seq_2'  10,5,0,6,0,2,444,5,6,7,1
@@ -68,25 +56,22 @@ MATRIX
 END; [TRAITS]
 
 BEGIN ALGORITHM;
-TITLE 'Taxa Editor';
-LINK ALGORITHM = 'Input Data Loader';
-NAME 'Taxa Editor';
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
 OPTIONS
-;
+	DisabledTaxa = 'seq_1' 'seq_2';
 END; [ALGORITHM]
 
 BEGIN TAXA;
 TITLE 'Working Taxa';
-LINK ALGORITHM = 'Taxa Editor';
-DIMENSIONS ntax=7;
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=5;
 TAXLABELS
-	[1] 'seq_1'
-	[2] 'seq_2'
-	[3] 'seq_3'
-	[4] 'seq_4'
-	[5] 'seq_5'
-	[6] 'seq_6'
-	[7] 'seq_7'
+	[1] 'seq_3'
+	[2] 'seq_4'
+	[3] 'seq_5'
+	[4] 'seq_6'
+	[5] 'seq_7'
 ;
 [DISPLAYLABELS;]
 [TAXINFO;]
@@ -94,36 +79,23 @@ END; [TAXA]
 
 BEGIN TRAITS;
 TITLE 'Working Traits';
-LINK ALGORITHM = 'Taxa Editor';
-DIMENSIONS [nTax=7] nTraits=11;
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS [nTax=5] nTraits=11;
 FORMAT labels=yes missing=? separator=Comma;
 TRAITLABELS
-	Europe
-	Asia
-	Africa
-	Australia
-	America
-	a
-	b
-	c
-	d
-	e
-	f
-;
+ 'Europe' 'Asia' 'Africa' 'Australia' 'America' 'a' 'b' 'c' 'd' 'e' 'f';
 MATRIX
-[1] 'seq_1'  0,0,0,3,3,1,1,33,4,3,1
-[2] 'seq_2'  10,5,0,6,0,2,444,5,6,7,1
-[3] 'seq_3'  0,0,0,3,5,3,0,0,0,0,0
-[4] 'seq_4'  0,0,0,4,2,4,3,5,6,7,8
-[5] 'seq_5'  4,0,10,0,0,5,1,1,1,11,1
-[6] 'seq_6'  0,0,0,7,3,6,1,1,111,1,1
-[7] 'seq_7'  0,0,5,0,0,7,3,4,5,6,1
+[1] 'seq_3'  0,0,0,3,3,1,1,33,4,3,1
+[2] 'seq_4'  10,5,0,6,0,2,444,5,6,7,1
+[3] 'seq_5'  0,0,0,3,5,3,0,0,0,0,0
+[4] 'seq_6'  0,0,0,4,2,4,3,5,6,7,8
+[5] 'seq_7'  4,0,10,0,0,5,1,1,1,11,1
 ;
 END; [TRAITS]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Input Data Loader';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=7 nchar=56;
 FORMAT
 	datatype='DNA' missing=n gap=- symbols="acgt" labels=left transpose=no interleave=no;
@@ -147,12 +119,10 @@ END; [ALGORITHM]
 BEGIN CHARACTERS;
 TITLE 'Working Characters';
 LINK ALGORITHM = 'Input Data Filter';
-DIMENSIONS ntax=7 nchar=56;
+DIMENSIONS ntax=5 nchar=56;
 FORMAT
 	datatype='DNA' missing=n gap=- symbols="acgt" labels=left transpose=no interleave=yes;
 MATRIX
-seq_1 atatacggggtta---ttaga----aaaatgtgtgtgtgttttttttttcatgtgg
-seq_2 atatac--ggata---ttaca----agaatctatgtctgctttctttttcatgtgg
 seq_3 atatacggggata---ttata----agaatgtgtgtgtgttttttttttcatgtgg
 seq_4 atatacggggata---gtagt----aaaatgtgtgtgtgttttttttttcatgtga
 seq_5 atatacggggata---gtagg----aaaatgtgtgtgtgttttttttttcatgtgc
@@ -173,16 +143,14 @@ END; [ALGORITHM]
 BEGIN DISTANCES;
 TITLE 'Distances';
 LINK ALGORITHM = 'Hamming Distances';
-DIMENSIONS ntax=7;
+DIMENSIONS ntax=5;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
-[1] 'seq_1'   0 0.170213 0.061224 0.081633 0.081633 0.081633 0.061224
-[2] 'seq_2'   0.170213 0 0.12766 0.212766 0.212766 0.212766 0.191489
-[3] 'seq_3'   0.061224 0.12766 0 0.102041 0.102041 0.102041 0.081633
-[4] 'seq_4'   0.081633 0.212766 0.102041 0 0.040816 0.040816 0.020408
-[5] 'seq_5'   0.081633 0.212766 0.102041 0.040816 0 0.040816 0.040816
-[6] 'seq_6'   0.081633 0.212766 0.102041 0.040816 0.040816 0 0.040816
-[7] 'seq_7'   0.061224 0.191489 0.081633 0.020408 0.040816 0.040816 0
+[1] 'seq_3'   0 0.102041 0.102041 0.102041 0.081633
+[2] 'seq_4'   0.102041 0 0.040816 0.040816 0.020408
+[3] 'seq_5'   0.102041 0.040816 0 0.040816 0.040816
+[4] 'seq_6'   0.102041 0.040816 0.040816 0 0.040816
+[5] 'seq_7'   0.081633 0.020408 0.040816 0.040816 0
 ;
 END; [DISTANCES]
 
@@ -198,26 +166,17 @@ END; [ALGORITHM]
 BEGIN SPLITS;
 TITLE 'Splits';
 LINK ALGORITHM = 'Neighbor Net';
-DIMENSIONS ntax=7 nsplits=15;
+DIMENSIONS ntax=5 nsplits=6;
 FORMAT labels=no weights=yes confidences=no;
 PROPERTIES fit=100 cyclic;
-CYCLE 1 2 3 7 4 5 6;
+CYCLE 1 3 4 2 5;
 MATRIX
-[1, size=1] 	 0.01958517 	 1,
-[2, size=2] 	 0.00077755 	 1 2,
-[3, size=3] 	 0.03065769 	 1 2 3,
-[4, size=3] 	 0.01020408 	 1 2 3 7,
-[5, size=1] 	 0.02040816 	 1 2 3 4 5 7,
-[6, size=1] 	 0.11832392 	 1 3 4 5 6 7,
-[7, size=2] 	 0.03213074 	 1 4 5 6 7,
-[8, size=3] 	 0.00009846 	 1 4 5 6,
-[9, size=3] 	 0.00006942 	 1 5 6,
-[10, size=2] 	 0.00000505 	 1 6,
-[11, size=1] 	 0.00858839 	 1 2 4 5 6 7,
-[12, size=2] 	 0.0100362 	 1 2 3 5 6,
-[13, size=3] 	 0.00000505 	 1 2 3 6,
-[14, size=1] 	 0.01032273 	 1 2 3 5 6 7,
-[15, size=1] 	 0.02040816 	 1 2 3 4 6 7,
+[1, size=1] 	 0.07142857 	 1,
+[2, size=2] 	 0.01020408 	 1 3 4,
+[3, size=1] 	 0.02040816 	 1 2 4 5,
+[4, size=2] 	 0.01020408 	 1 5,
+[5, size=1] 	 0.02040816 	 1 2 3 5,
+[6, size=1] 	 0.01020408 	 1 3 4 5,
 ;
 END; [SPLITS]
 
@@ -243,7 +202,5 @@ OPTIONS
 	RootAngle = 160,
 	OutlineFill = 0xccccccff,
 	ShowConfidence = 'false',
-	ShowTrait = 'America',
-	TraitLegend = 'true',
-	TraitSize = 64;
+	ActiveTraits = '*All*';
 END; [VIEW]

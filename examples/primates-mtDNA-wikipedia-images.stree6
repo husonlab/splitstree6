@@ -56,15 +56,15 @@ DISPLAYLABELS
 END; [TAXA]
 
 BEGIN ALGORITHM;
-TITLE 'Taxa Editor';
-NAME 'Taxa Editor';
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
 OPTIONS
 ;
 END; [ALGORITHM]
 
 BEGIN TAXA;
 TITLE 'Working Taxa';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=12;
 TAXLABELS
 	[1] 'Lemur_catta'
@@ -99,7 +99,7 @@ END; [TAXA]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=12 nchar=898;
 FORMAT
 	datatype='DNA' missing=? matchChar=. gap=- symbols="acgt" labels=left transpose=no interleave=yes;

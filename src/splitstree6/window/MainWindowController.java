@@ -232,16 +232,16 @@ public class MainWindowController {
 	private MenuItem useFullScreenMenuItem;
 
 	@FXML
-	private MenuItem editTaxaMenuItem;
+	private MenuItem filterTaxaMenuItem;
 
 	@FXML
-	private MenuItem editCharactersMenuItem;
+	private MenuItem filterCharactersMenuItem;
 
 	@FXML
-	private MenuItem editTreesMenuItem;
+	private MenuItem filterTreesMenuItem;
 
 	@FXML
-	private MenuItem editSplitsMenuItem;
+	private MenuItem filterSplitsMenuItem;
 
 	@FXML
 	private MenuItem traitsMenuItem;
@@ -749,20 +749,20 @@ public class MainWindowController {
 		return useFullScreenMenuItem;
 	}
 
-	public MenuItem getEditTaxaMenuItem() {
-		return editTaxaMenuItem;
+	public MenuItem getFilterTaxaMenuItem() {
+		return filterTaxaMenuItem;
 	}
 
-	public MenuItem getEditCharactersMenuItem() {
-		return editCharactersMenuItem;
+	public MenuItem getFilterCharactersMenuItem() {
+		return filterCharactersMenuItem;
 	}
 
-	public MenuItem getEditTreesMenuItem() {
-		return editTreesMenuItem;
+	public MenuItem getFilterTreesMenuItem() {
+		return filterTreesMenuItem;
 	}
 
-	public MenuItem getEditSplitsMenuItem() {
-		return editSplitsMenuItem;
+	public MenuItem getFilterSplitsMenuItem() {
+		return filterSplitsMenuItem;
 	}
 
 	public MenuItem getTraitsMenuItem() {

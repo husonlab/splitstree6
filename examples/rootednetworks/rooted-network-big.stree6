@@ -73,16 +73,16 @@ TAXLABELS
 END; [TAXA]
 
 BEGIN ALGORITHM;
-TITLE 'Taxa Editor';
+TITLE 'Taxa Filter';
 LINK ALGORITHM = 'Input Data Loader';
-NAME 'Taxa Editor';
+NAME 'Taxa Filter';
 OPTIONS
 ;
 END; [ALGORITHM]
 
 BEGIN TAXA;
 TITLE 'Working Taxa';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=47;
 TAXLABELS
 	[1] 'Flageliaria'

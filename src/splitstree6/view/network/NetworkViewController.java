@@ -1,5 +1,5 @@
 /*
- * SplitsViewController.java Copyright (C) 2022 Daniel H. Huson
+ * NetworkViewController.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.viewer;
+package splitstree6.view.network;
 
 import javafx.beans.binding.When;
 import javafx.fxml.FXML;
@@ -29,16 +29,11 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
-import jloda.fx.util.DraggableLabel;
-import jloda.fx.util.ScaleBar;
-import splitstree6.layout.splits.SplitsDiagramType;
-import splitstree6.layout.splits.SplitsRooting;
+import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LayoutOrientation;
 
-public class SplitsViewController {
-
+public class NetworkViewController {
 	@FXML
 	private AnchorPane anchorPane;
 
@@ -52,16 +47,7 @@ public class SplitsViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private ToggleButton findToggleButton;
-
-	@FXML
-	private StackPane centerPane;
-
-	@FXML
-	private ComboBox<SplitsDiagramType> diagramCBox;
-
-	@FXML
-	private ComboBox<SplitsRooting> rootingCBox;
+	private ComboBox<DiagramType> diagramCBox;
 
 	@FXML
 	private ComboBox<LayoutOrientation> orientationCBox;
@@ -79,9 +65,10 @@ public class SplitsViewController {
 	private Button decreaseFontButton;
 
 	@FXML
-	private ToggleButton showInternalLabelsToggleButton;
-	@FXML
 	private AnchorPane innerAnchorPane;
+
+	@FXML
+	private StackPane centerPane;
 
 	@FXML
 	private VBox formatVBox;
@@ -90,13 +77,12 @@ public class SplitsViewController {
 	private ToggleButton settingsToggleButton;
 
 	@FXML
+	private ToggleButton findToggleButton;
+
+	@FXML
 	private ToggleButton formatToggleButton;
 
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
-
-	private final ScaleBar scaleBar = new ScaleBar();
-
-	private final CopyableLabel fitLabel = new CopyableLabel();
 
 	@FXML
 	private void initialize() {
@@ -105,15 +91,6 @@ public class SplitsViewController {
 		zoomableScrollPane.setPannable(true);
 
 		centerPane.getChildren().add(zoomableScrollPane);
-
-		innerAnchorPane.getChildren().add(scaleBar);
-		AnchorPane.setTopAnchor(scaleBar, 2.0);
-		AnchorPane.setLeftAnchor(scaleBar, 5.0);
-		AnchorPane.setTopAnchor(fitLabel, 5.0);
-		AnchorPane.setLeftAnchor(fitLabel, 180.0);
-		innerAnchorPane.getChildren().add(fitLabel);
-
-		DraggableLabel.makeDraggable(fitLabel);
 
 		innerAnchorPane.getChildren().remove(formatVBox);
 		innerAnchorPane.getChildren().add(formatVBox);
@@ -144,16 +121,8 @@ public class SplitsViewController {
 		return toolBar;
 	}
 
-	public ToggleButton getFindToggleButton() {
-		return findToggleButton;
-	}
-
-	public ComboBox<SplitsDiagramType> getDiagramCBox() {
+	public ComboBox<DiagramType> getDiagramCBox() {
 		return diagramCBox;
-	}
-
-	public ComboBox<SplitsRooting> getRootingCBox() {
-		return rootingCBox;
 	}
 
 	public ComboBox<LayoutOrientation> getOrientationCBox() {
@@ -176,28 +145,31 @@ public class SplitsViewController {
 		return decreaseFontButton;
 	}
 
-	public ZoomableScrollPane getScrollPane() {
-		return zoomableScrollPane;
-	}
-
-	public ToggleButton showInternalLabelsToggleButton() {
-		return showInternalLabelsToggleButton;
-	}
-
-	public ScaleBar getScaleBar() {
-		return scaleBar;
-	}
-
-	public CopyableLabel getFitLabel() {
-		return fitLabel;
-	}
-
 	public AnchorPane getInnerAnchorPane() {
 		return innerAnchorPane;
+	}
+
+	public StackPane getCenterPane() {
+		return centerPane;
 	}
 
 	public VBox getFormatVBox() {
 		return formatVBox;
 	}
-}
 
+	public ToggleButton getSettingsToggleButton() {
+		return settingsToggleButton;
+	}
+
+	public ToggleButton getFindToggleButton() {
+		return findToggleButton;
+	}
+
+	public ToggleButton getFormatToggleButton() {
+		return formatToggleButton;
+	}
+
+	public ZoomableScrollPane getScrollPane() {
+		return zoomableScrollPane;
+	}
+}

@@ -31,8 +31,8 @@ import splitstree6.workflow.AlgorithmNode;
 
 import java.util.HashSet;
 
-import static splitstree6.tabs.algorithms.taxaedit.TaxaEditPresenter.setupEditMenuButton;
-import static splitstree6.tabs.algorithms.taxaedit.TaxaEditPresenter.updateColumnWidths;
+import static splitstree6.tabs.algorithms.taxafilter.TaxaFilterPresenter.setupEditMenuButton;
+import static splitstree6.tabs.algorithms.taxafilter.TaxaFilterPresenter.updateColumnWidths;
 
 public class TreeFilterTabPresenter implements IDisplayTabPresenter {
 

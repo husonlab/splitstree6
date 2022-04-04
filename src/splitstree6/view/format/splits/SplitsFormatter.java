@@ -28,7 +28,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Node;
-import splitstree6.view.splits.viewer.SplitsDiagramType;
+import splitstree6.layout.splits.SplitsDiagramType;
 
 import java.util.ArrayList;
 import java.util.Map;

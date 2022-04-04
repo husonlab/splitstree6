@@ -45,15 +45,15 @@ DISPLAYLABELS
 END; [TAXA]
 
 BEGIN ALGORITHM;
-TITLE 'Taxa Editor';
-NAME 'Taxa Editor';
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
 OPTIONS
 ;
 END; [ALGORITHM]
 
 BEGIN TAXA;
 TITLE 'Working Taxa';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=6;
 TAXLABELS
 	[1] 'A.ANDRENOF'
@@ -76,7 +76,7 @@ END; [TAXA]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=6 nchar=677;
 FORMAT
 	datatype='DNA' missing=n gap=- symbols="acgt" labels=left transpose=no interleave=yes;

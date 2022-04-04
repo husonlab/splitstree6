@@ -26,6 +26,7 @@ import jloda.util.FileLineIterator;
 import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
+import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.utils.IView;
@@ -160,7 +161,10 @@ public class InputEditorView extends DisplayTextView implements IView {
 				mainWindow.setFileName(name);
 				mainWindow.setDirty(true);
 			};
-			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler, runOnSuccess);
+			if (WorkflowNexusInput.isApplicable(tmpFile.getPath())) {
+				WorkflowNexusInput.open(mainWindow, tmpFile.getPath(), failedHandler, runOnSuccess);
+			} else
+				WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler, runOnSuccess);
 
 		} catch (Exception ex) {
 			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());

@@ -1,65 +1,58 @@
 /*
- * SplitNetworkPane.java Copyright (C) 2022 Daniel H. Huson
+ *  NetworkPane.java Copyright (C) 2022 Daniel H. Huson
  *
- * (Some files contain contributions from other authors, who are then mentioned separately.)
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.splits.viewer;
+package splitstree6.view.network;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.ProgramExecutorService;
+import jloda.graph.Edge;
 import jloda.graph.Node;
-import splitstree6.data.SplitsBlock;
+import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.splits.LoopView;
-import splitstree6.layout.splits.SplitNetworkLayout;
-import splitstree6.layout.splits.SplitsDiagramType;
-import splitstree6.layout.splits.SplitsRooting;
+import splitstree6.layout.network.DiagramType;
+import splitstree6.layout.network.NetworkLayout;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.window.MainWindow;
 
-import java.util.ArrayList;
-
 /**
- * split network pane
- * Daniel Huson, 3.2022
+ * network pane
+ * Daniel Huson, 4.2022
  */
-public class SplitNetworkPane extends StackPane {
+public class NetworkPane extends StackPane {
 	private final Group group = new Group();
 	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
@@ -67,22 +60,16 @@ public class SplitNetworkPane extends StackPane {
 	private final InvalidationListener layoutLabelsListener;
 	private final InvalidationListener redrawListener;
 
+
 	private final AService<Group> service;
-	private final SplitNetworkLayout splitNetworkLayout = new SplitNetworkLayout();
+	private final NetworkLayout networkLayout = new NetworkLayout();
 	private Runnable runAfterUpdate;
 
 	/**
-	 * split network pane
+	 * network pane
 	 */
-	public SplitNetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, SplitsBlock splitsBlock,
-							SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
-							double boxWidth, double boxHeight, SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation,
-							SplitsRooting rooting, double rootAngle, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
-							ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
-							ObservableMap<Integer, RichTextLabel> taxonLabelMap,
-							ObservableMap<Node, Group> nodeShapeMap,
-							ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
-							ObservableList<LoopView> loopViews) {
+	public NetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, NetworkBlock networkBlock, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight, DiagramType diagram, ObjectProperty<LayoutOrientation> orientation, DoubleProperty zoomFactor, DoubleProperty labelScaleFactor,
+					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, Group> nodeShapeMap, ObservableMap<Edge, Group> edgeShapeMap) {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
 
@@ -103,7 +90,7 @@ public class SplitNetworkPane extends StackPane {
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
 		orientChangeListener = (v, o, n) -> {
-			splitstree6.layout.splits.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or));
+			splitstree6.layout.splits.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n, or -> networkLayout.getLabelLayout().layoutLabels(or));
 		};
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
@@ -116,21 +103,18 @@ public class SplitNetworkPane extends StackPane {
 		service.setExecutor(ProgramExecutorService.getInstance());
 
 		service.setCallable(() -> {
-			if (taxaBlock == null || splitsBlock == null)
+			if (taxaBlock == null || networkBlock == null)
 				return new Group();
 
-			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram,
-					rooting, rootAngle, taxonSelectionModel, splitSelectionModel, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16,
-					taxonLabelMap, nodeShapeMap, splitShapeMap,
-					loopViews);
+			var result = networkLayout.apply(service.getProgressListener(), taxaBlock, networkBlock, diagram,
+					getPrefWidth() - 4, getPrefHeight() - 16,
+					taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());
 
 			return result;
 		});
-
-		service.setOnScheduled(a -> unitLength.set(0));
 
 		service.setOnSucceeded(a -> {
 			if (zoomFactor.get() != 1) {
@@ -146,7 +130,6 @@ public class SplitNetworkPane extends StackPane {
 				if (e.isStillSincePress() && !e.isShiftDown()) {
 					Platform.runLater(() -> {
 						taxonSelectionModel.clearSelection();
-						splitSelectionModel.clearSelection();
 					});
 				}
 				e.consume();
@@ -163,15 +146,9 @@ public class SplitNetworkPane extends StackPane {
 	}
 
 	public void drawNetwork() {
-		//System.err.println("redraw");
 		service.restart();
+
 	}
-
-
-	public AService<Group> getService() {
-		return service;
-	}
-
 
 	public Runnable getRunAfterUpdate() {
 		return runAfterUpdate;
@@ -182,7 +159,7 @@ public class SplitNetworkPane extends StackPane {
 	}
 
 	public void layoutLabels(LayoutOrientation orientation) {
-		splitNetworkLayout.getLabelLayout().layoutLabels(orientation);
+		networkLayout.getLabelLayout().layoutLabels(orientation);
 	}
 
 	private void applyOrientation(LayoutOrientation orientation) {

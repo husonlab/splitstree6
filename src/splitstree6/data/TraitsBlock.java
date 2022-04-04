@@ -69,7 +69,10 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 	public int getTraitValue(int taxonId, int traitId) {
-		return matrix[taxonId - 1][traitId - 1];
+		if (taxonId <= 0 || taxonId > matrix.length || traitId <= 0 || traitId > matrix[0].length)
+			return 0;
+		else
+			return matrix[taxonId - 1][traitId - 1];
 	}
 
 	public String getTraitValueLabel(int taxonId, int traitId) {
@@ -197,15 +200,5 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 			if (labels[i].equals(label))
 				return i + 1;
 		return -1;
-	}
-
-	public int getMaxAll() {
-		var max = 0;
-		for (var row : matrix) {
-			var rowSum = 0;
-			for (var value : row) rowSum += value;
-			max = Math.max(max, rowSum);
-		}
-		return max;
 	}
 }

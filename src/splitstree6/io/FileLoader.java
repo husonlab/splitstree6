@@ -64,15 +64,13 @@ public class FileLoader {
 
 			var newWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(mainWindow);
 			if (WorkflowNexusInput.isApplicable(fileName)) {
-				WorkflowNexusInput.open(newWindow, fileName);
-				RecentFilesManager.getInstance().insertRecentFile(fileName);
+				WorkflowNexusInput.open(newWindow, fileName, exceptionHandler, () -> RecentFilesManager.getInstance().insertRecentFile(fileName));
 			} else {
 				var importManager = ImportManager.getInstance();
 				if (importManager.getReaders(fileName).size() == 1) { // unique input format
 					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
-					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler, null);
+					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler, () -> RecentFilesManager.getInstance().insertRecentFile(fileName));
 					newWindow.setFileName(fileName);
-					RecentFilesManager.getInstance().insertRecentFile(fileName);
 					newWindow.setDirty(true);
 				} else {
 					// ImportDialog.show(mainWindow, fileName);

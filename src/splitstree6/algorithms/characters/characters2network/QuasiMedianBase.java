@@ -97,6 +97,7 @@ public abstract class QuasiMedianBase {
 		final Set<String> condensedInputSet = new TreeSet<>(Arrays.asList(condensedCharacters));
 
 		final PhyloGraph graph = networkBlock.getGraph();
+		graph.clear();
 
 		computeGraph(progress, condensedInputSet, weights, graph);
 

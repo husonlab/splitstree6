@@ -35,8 +35,9 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.ColorSchemeManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Node;
-import jloda.phylo.PhyloSplitsGraph;
+import jloda.phylo.PhyloGraph;
 import jloda.util.ProgramProperties;
+import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import splitstree6.window.MainWindow;
@@ -46,6 +47,8 @@ import splitstree6.window.MainWindow;
  * Daniel Huson, 3.2022
  */
 public class TraitsPie extends Pane {
+	public static final String ALL = "*All*";
+
 	private final TraitsPieController controller;
 	private final TraitsPiePresenter presenter;
 
@@ -57,7 +60,7 @@ public class TraitsPie extends Pane {
 	private Runnable runAfterUpdateNodes;
 	private final Legend legend;
 
-	private final StringProperty optionShowTrait = new SimpleStringProperty(this, "optionShowTrait", "None");
+	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits", new String[]{ALL});
 	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
 	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
 
@@ -96,16 +99,30 @@ public class TraitsPie extends Pane {
 		return traitsBlock;
 	}
 
-	public String getOptionShowTrait() {
-		return optionShowTrait.get();
+	public String[] getOptionActiveTraits() {
+		return optionActiveTraits.get();
 	}
 
-	public StringProperty optionShowTraitProperty() {
-		return optionShowTrait;
+	public ObjectProperty<String[]> optionActiveTraitsProperty() {
+		return optionActiveTraits;
 	}
 
-	public void setOptionShowTrait(String traitLabel) {
-		this.optionShowTrait.set(traitLabel);
+	public void setOptionActiveTraits(String[] optionActiveTraits) {
+		this.optionActiveTraits.set(optionActiveTraits);
+	}
+
+	public boolean isAllTraitsActive() {
+		return getOptionActiveTraits().length == 1 && getOptionActiveTraits()[0].equals(ALL) || getOptionActiveTraits().length > 0 && getOptionActiveTraits().length == traitsBlock.get().getNTraits();
+	}
+
+	public boolean isNoneTraitsActive() {
+		return getOptionActiveTraits().length == 0;
+	}
+
+	public boolean isTraitActive(String traitName) {
+		if (isAllTraitsActive())
+			return true;
+		return StringUtils.getIndex(traitName, getOptionActiveTraits()) >= 0;
 	}
 
 	public boolean getOptionTraitLegend() {
@@ -151,16 +168,18 @@ public class TraitsPie extends Pane {
 
 	public void updateNodes() {
 		if (traitsBlock.get() != null && nodeShapeMap != null && traitsBlock.get().getNTraits() > 0) {
-			var graphOptional = nodeShapeMap.keySet().stream().map(v -> (PhyloSplitsGraph) v.getOwner()).findAny();
+			var graphOptional = nodeShapeMap.keySet().stream().filter(v -> v.getOwner() != null).map(v -> (PhyloGraph) v.getOwner()).findAny();
 			if (graphOptional.isPresent()) {
 				var traitsBlock = getTraitsBlock();
 
 				legend.getLabels().setAll(traitsBlock.getTraitLabels());
 				legend.getActive().clear();
-				if (getOptionShowTrait().equalsIgnoreCase(TraitItem.All))
+				if (isAllTraitsActive()) {
 					legend.getActive().addAll(traitsBlock.getTraitLabels());
-				else if (!getOptionShowTrait().equalsIgnoreCase(TraitItem.None)) {
-					legend.getActive().add(getOptionShowTrait());
+				} else {
+					for (var active : getOptionActiveTraits()) {
+						legend.getActive().add(active);
+					}
 				}
 
 				var unitSize = 0.0;
@@ -168,54 +187,54 @@ public class TraitsPie extends Pane {
 				var graph = graphOptional.get();
 				for (var v : nodeShapeMap.keySet()) {
 					var group = nodeShapeMap.get(v);
-					group.getChildren().removeAll(BasicFX.getAllRecursively(group, PieChart.class));
+					if (group != null) {
+						group.getChildren().removeAll(BasicFX.getAllRecursively(group, PieChart.class));
 
-					if (graph.getNumberOfTaxa(v) == 1) {
-						var taxonId = graph.getTaxon(v);
+						if (graph.getNumberOfTaxa(v) == 1) {
+							var taxonId = graph.getTaxon(v);
 
-						if (!getOptionShowTrait().equalsIgnoreCase(TraitItem.None)) {
-							var pieChart = new PieChart();
-							pieChart.setLabelsVisible(false);
-							pieChart.setLegendVisible(false);
+							if (!isNoneTraitsActive()) {
+								var pieChart = new PieChart();
+								pieChart.setLabelsVisible(false);
+								pieChart.setLegendVisible(false);
 
-							var sum = 0;
-							var max = (getOptionShowTrait().equalsIgnoreCase(TraitItem.All) ? Math.max(1, getTraitsBlock().getMaxAll()) : getTraitsBlock().getMax(getOptionShowTrait()));
+								var sum = 0;
+								int max = 0;
 
-							var tooltipBuf = new StringBuilder();
+								for (var trait : traitsBlock.getTraitLabels()) {
+									if (isTraitActive(trait))
+										max = Math.max(max, getTraitsBlock().getMax(trait));
+								}
 
-							var count = 0;
-							for (var traitId = 1; traitId <= traitsBlock.getNTraits(); traitId++) {
-								var label = traitsBlock.getTraitLabel(traitId);
-								if (getOptionShowTrait().equalsIgnoreCase(TraitItem.All) || getOptionShowTrait().equals(label)) {
-									var value = traitsBlock.getTraitValue(taxonId, traitId);
-									tooltipBuf.append(String.format("%s: %,d%n", label, value));
-									sum += value;
-									pieChart.getData().add(new PieChart.Data(traitsBlock.getTraitLabel(traitId), value));
-									count++;
-								} else
-									pieChart.getData().add(new PieChart.Data(traitsBlock.getTraitLabel(traitId), 0));
-							}
+								var tooltipBuf = new StringBuilder();
 
-							if (sum > 0) {
-								var pieSize = (Math.sqrt(sum) / Math.sqrt(max)) * getOptionTraitSize();
-								unitSize = Math.max(unitSize, (1 / Math.sqrt(max)) * getOptionTraitSize());
-								pieChart.setMinSize(5, 5);
-								pieChart.setPrefSize(pieSize, pieSize);
-								pieChart.setMaxSize(pieSize, pieSize);
-								pieChart.setLayoutX(-0.5 * pieSize);
-								pieChart.setLayoutY(-0.5 * pieSize);
+								for (var traitId = 1; traitId <= traitsBlock.getNTraits(); traitId++) {
+									var label = traitsBlock.getTraitLabel(traitId);
+									if (isTraitActive(label)) {
+										var value = traitsBlock.getTraitValue(taxonId, traitId);
+										tooltipBuf.append(String.format("%s: %,d%n", label, value));
+										sum += value;
+										pieChart.getData().add(new PieChart.Data(traitsBlock.getTraitLabel(traitId), value));
+									} else
+										pieChart.getData().add(new PieChart.Data(traitsBlock.getTraitLabel(traitId), 0));
+								}
 
-								group.getChildren().add(pieChart);
-								ColorSchemeManager.setPieChartColors(pieChart, legend.getColorSchemeName());
-								pieChart.setStyle("-fx-padding: -10;"); // remove white space around pie
+								if (sum > 0) {
+									var pieSize = (Math.sqrt(sum) / Math.sqrt(max)) * getOptionTraitSize();
+									unitSize = Math.max(unitSize, (1 / Math.sqrt(max)) * getOptionTraitSize());
+									pieChart.setMinSize(5, 5);
+									pieChart.setPrefSize(pieSize, pieSize);
+									pieChart.setMaxSize(pieSize, pieSize);
+									pieChart.setLayoutX(-0.5 * pieSize);
+									pieChart.setLayoutY(-0.5 * pieSize);
 
+									group.getChildren().add(pieChart);
+									ColorSchemeManager.setPieChartColors(pieChart, legend.getColorSchemeName());
+									pieChart.setStyle("-fx-padding: -10;"); // remove white space around pie
 
-								if (count == 1)
-									pieChart.getStyleClass().add("single-pie");
-
-
-								if (tooltipBuf.length() > 0) {
-									Tooltip.install(pieChart, new Tooltip(tooltipBuf.toString()));
+									if (tooltipBuf.length() > 0) {
+										Tooltip.install(pieChart, new Tooltip(tooltipBuf.toString()));
+									}
 								}
 							}
 						}

@@ -62,7 +62,7 @@ import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2splits.BoostrapTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
@@ -364,16 +364,16 @@ public class MainWindowPresenter {
 
 		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
 
-		controller.getEditTaxaMenuItem().setOnAction(e -> {
-			var nodes = workflow.getNodes(TaxaEditor.class);
+		controller.getFilterTaxaMenuItem().setOnAction(e -> {
+			var nodes = workflow.getNodes(TaxaFilter.class);
 			if (nodes.size() == 1)
 				mainWindow.getAlgorithmTabsManager().showTab(nodes.iterator().next(), true);
 		});
-		controller.getEditTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> workflow.getNodes(TaxaEditor.class).size() != 1, workflow.nodes()));
+		controller.getFilterTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> workflow.getNodes(TaxaFilter.class).size() != 1, workflow.nodes()));
 
-		controller.getEditCharactersMenuItem().setOnAction(null);
-		controller.getEditTreesMenuItem().setOnAction(null);
-		controller.getEditSplitsMenuItem().setOnAction(null);
+		controller.getFilterCharactersMenuItem().setOnAction(null);
+		controller.getFilterTreesMenuItem().setOnAction(null);
+		controller.getFilterSplitsMenuItem().setOnAction(null);
 
 		controller.getTraitsMenuItem().setOnAction(null);
 

@@ -39,6 +39,9 @@ import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
+import splitstree6.layout.splits.LoopView;
+import splitstree6.layout.splits.SplitsDiagramType;
+import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -81,7 +84,7 @@ public class SplitsView implements IView {
 
 	private final ObjectProperty<Color> optionOutlineFill = new SimpleObjectProperty<>(this, "optionOutlineFill");
 
-	private final StringProperty optionShowTrait = new SimpleStringProperty(this, "optionShowTrait");
+	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
 	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
 	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
 
@@ -101,7 +104,7 @@ public class SplitsView implements IView {
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(),
-				optionShowConfidence.getName(), optionShowTrait.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
+				optionShowConfidence.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -129,7 +132,7 @@ public class SplitsView implements IView {
 
 		var traitsFormatter = new TraitsPie(mainWindow, undoManager);
 		traitsFormatter.setNodeShapeMap(nodeShapeMap);
-		optionShowTrait.bindBidirectional(traitsFormatter.optionShowTraitProperty());
+		optionActiveTraits.bindBidirectional(traitsFormatter.optionActiveTraitsProperty());
 		optionTraitLegend.bindBidirectional(traitsFormatter.optionTraitLegendProperty());
 		optionTraitSize.bindBidirectional(traitsFormatter.optionTraitSizeProperty());
 		traitsFormatter.getLegend().scaleProperty().bind(optionZoomFactorProperty());
@@ -142,7 +145,7 @@ public class SplitsView implements IView {
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 30.0);
-		controller.getInnerAnchorPane().getChildren().add(traitsFormatter.getLegend());
+		controller.getInnerAnchorPane().getChildren().add(controller.getInnerAnchorPane().getChildren().size() - 1, traitsFormatter.getLegend());
 		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
 		splitsBlock.addListener((v, o, n) -> {
@@ -315,24 +318,12 @@ public class SplitsView implements IView {
 		this.optionShowConfidence.set(optionShowConfidence);
 	}
 
-	public StringProperty optionShowTraitProperty() {
-		return optionShowTrait;
+	public String[] getOptionActiveTraits() {
+		return optionActiveTraits.get();
 	}
 
-	public BooleanProperty optionTraitLegendProperty() {
-		return optionTraitLegend;
-	}
-
-	public IntegerProperty optionTraitSizeProperty() {
-		return optionTraitSize;
-	}
-
-	public Bounds getTargetBounds() {
-		return targetBounds.get();
-	}
-
-	public ObjectProperty<Bounds> targetBoundsProperty() {
-		return targetBounds;
+	public ObjectProperty<String[]> optionActiveTraitsProperty() {
+		return optionActiveTraits;
 	}
 
 	public SplitsViewController getController() {

@@ -15,13 +15,17 @@
             </tooltip>
         </Label>
     </HBox>
-    <HBox alignment="CENTER_LEFT" spacing="4.0">
-        <Label text="Show:" textOverrun="CLIP"/>
-        <ComboBox fx:id="showCBox" prefWidth="150.0">
-            <tooltip>
-                <Tooltip text="Font family"/>
-            </tooltip>
-        </ComboBox>
+    <HBox alignment="CENTER_LEFT" spacing="4.0"/>
+    <HBox alignment="CENTER" layoutX="15.0" layoutY="37.0" spacing="4.0">
+        <children>
+            <MenuButton fx:id="showMenuButton" mnemonicParsing="false" prefWidth="180.0" text="Show">
+                <items>
+                    <MenuItem fx:id="showAllMenuItem" mnemonicParsing="false" text="All"/>
+                    <MenuItem fx:id="showNoneMenuItem" mnemonicParsing="false" text="None"/>
+                    <SeparatorMenuItem mnemonicParsing="false"/>
+                </items>
+            </MenuButton>
+        </children>
     </HBox>
     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
         <CheckBox fx:id="legendCBox" contentDisplay="RIGHT" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT"

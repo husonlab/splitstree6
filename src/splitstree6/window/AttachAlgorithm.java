@@ -25,8 +25,10 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.window.NotificationManager;
 import jloda.util.IteratorUtils;
+import splitstree6.algorithms.network.network2view.ShowNetwork;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
+import splitstree6.data.NetworkBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
@@ -70,7 +72,6 @@ public class AttachAlgorithm {
 			if (algorithmSetupCallback != null)
 				algorithmSetupCallback.accept(algorithm);
 
-
 			if (algorithm.getToClass() == SplitsBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
@@ -79,6 +80,10 @@ public class AttachAlgorithm {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
 				workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+			} else if (algorithm.getToClass() == NetworkBlock.class) {
+				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+				workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 			}
 
 			if (algorithm.isApplicable(workflow.getWorkingTaxaBlock(), algorithmNode.getPreferredParent().getDataBlock()))

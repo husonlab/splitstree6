@@ -1,5 +1,5 @@
 /*
- * TaxaEditPresenter.java Copyright (C) 2022 Daniel H. Huson
+ * TaxaFilterPresenter.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.algorithms.taxaedit;
+package splitstree6.tabs.algorithms.taxafilter;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -32,7 +32,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DefaultStringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -44,14 +44,14 @@ import splitstree6.workflow.AlgorithmNode;
  * taxa edit presenter
  * Daniel Huson, 11.2021
  */
-public class TaxaEditPresenter implements IDisplayTabPresenter {
+public class TaxaFilterPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
-	private final TaxaEditTab tab;
-	private final TaxaEditController controller;
+	private final TaxaFilterTab tab;
+	private final TaxaFilterController controller;
 
 	private final FindToolBar findToolBar;
 
-	private final TaxaEditor taxaEditor;
+	private final TaxaFilter taxaFilter;
 
 	private boolean inSelection = false;
 
@@ -60,10 +60,10 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 	/**
 	 * constructor
 	 */
-	public TaxaEditPresenter(MainWindow mainWindow, TaxaEditTab tab, AlgorithmNode<TaxaBlock, TaxaBlock> taxaEditorNode) {
+	public TaxaFilterPresenter(MainWindow mainWindow, TaxaFilterTab tab, AlgorithmNode<TaxaBlock, TaxaBlock> taxaEditorNode) {
 		this.mainWindow = mainWindow;
 		this.tab = tab;
-		this.taxaEditor = (TaxaEditor) taxaEditorNode.getAlgorithm();
+		this.taxaFilter = (TaxaFilter) taxaEditorNode.getAlgorithm();
 		this.controller = tab.getTaxaFilterController();
 
 		var inputTaxonBlock = mainWindow.getWorkflow().getInputTaxonBlock();
@@ -86,7 +86,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		controller.getDisplayLabelColumn().setCellFactory(TextFieldTableCell.forTableColumn(new DefaultStringConverter()));
 		tableView.widthProperty().addListener(c -> updateColumnWidths(tableView, controller.getDisplayLabelColumn()));
 
-		tableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super TaxaEditTableItem>) e -> {
+		tableView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super TaxaFilterTableItem>) e -> {
 			if (!inSelection) {
 				inSelection = true;
 				try {
@@ -143,7 +143,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 
 		controller.getTopVBox().getChildren().add(0, findToolBar);
 
-		//controller.getActivateAllMenuItem().setDisable(taxaEditor.getNumberDisabledTaxa()==0);
+		//controller.getActivateAllMenuItem().setDisable(taxaFilter.getNumberDisabledTaxa()==0);
 		controller.getActivateAllMenuItem().setOnAction(e -> {
 			for (var item : tableView.getItems()) {
 				item.setActive(true);
@@ -175,7 +175,7 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 				.forEach(item -> tableView.getSelectionModel().select(item)));
 
 		controller.getSelectActivatedMenuItem().setOnAction(e -> tableView.getItems().stream()
-				.filter(TaxaEditTableItem::isActive).forEach(item -> tableView.getSelectionModel().select(item)));
+				.filter(TaxaFilterTableItem::isActive).forEach(item -> tableView.getSelectionModel().select(item)));
 
 		controller.getShowHTMLInfoMenuItem().selectedProperty().addListener((v, o, n) -> {
 			controller.getHtmlInfoFlowPane().getChildren().clear();
@@ -199,12 +199,12 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 
 		activeChangedListener = e -> {
 			var label = (tableView.getSelectionModel().getSelectedItems().size() > 0 ? String.format("Selected: %d, ", tableView.getSelectionModel().getSelectedItems().size()) : "");
-			label += String.format("Active: %d (%d in use), total: %d", (inputTaxonBlock.getNtax() - taxaEditor.getNumberDisabledTaxa()), workingTaxonBlock.getNtax(), inputTaxonBlock.getNtax());
+			label += String.format("Active: %d (%d in use), total: %d", (inputTaxonBlock.getNtax() - taxaFilter.getNumberDisabledTaxa()), workingTaxonBlock.getNtax(), inputTaxonBlock.getNtax());
 			controller.getInfoLabel().setText(label);
 		};
 
 		tableView.getSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(activeChangedListener));
-		taxaEditor.optionDisabledTaxaProperty().addListener(new WeakInvalidationListener(activeChangedListener));
+		taxaFilter.optionDisabledTaxaProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 		taxaEditorNode.validProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 		activeChangedListener.invalidated(null);
 
@@ -245,10 +245,10 @@ public class TaxaEditPresenter implements IDisplayTabPresenter {
 		tableView.getItems().clear();
 		for (int t = 1; t <= inputTaxa.getNtax(); t++) {
 			var taxon = inputTaxa.get(t);
-			var item = new TaxaEditTableItem(t, taxon);
-			item.setActive(!taxaEditor.isDisabled(taxon.getName()));
+			var item = new TaxaFilterTableItem(t, taxon);
+			item.setActive(!taxaFilter.isDisabled(taxon.getName()));
 			item.activeProperty().addListener((v, o, n) -> {
-				taxaEditor.setDisabled(taxon.getName(), !n);
+				taxaFilter.setDisabled(taxon.getName(), !n);
 				if (!updatingActive && mainWindow.getTaxonSelectionModel().isSelected(taxon)) {
 					updatingActive = true;
 					if (n)

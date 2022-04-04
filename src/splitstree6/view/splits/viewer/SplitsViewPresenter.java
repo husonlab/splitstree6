@@ -51,6 +51,9 @@ import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.layout.splits.LoopView;
+import splitstree6.layout.splits.SplitsDiagramType;
+import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
@@ -67,6 +70,8 @@ import java.util.stream.Collectors;
  * Daniel Huson 1.2022
  */
 public class SplitsViewPresenter implements IDisplayTabPresenter {
+	private final LongProperty updateCounter = new SimpleLongProperty(0L);
+
 	private final MainWindow mainWindow;
 	private final SplitsView splitsView;
 	private final SplitsViewController controller;
@@ -80,7 +85,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
-	private final LongProperty updateCounter = new SimpleLongProperty(0L);
 
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
 							   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<jloda.graph.Node, Group> nodeShapeMap,

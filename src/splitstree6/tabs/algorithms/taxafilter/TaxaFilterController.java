@@ -1,5 +1,5 @@
 /*
- * TaxaEditController.java Copyright (C) 2022 Daniel H. Huson
+ * TaxaFilterController.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.algorithms.taxaedit;
+package splitstree6.tabs.algorithms.taxafilter;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -25,7 +25,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 
-public class TaxaEditController {
+public class TaxaFilterController {
 
 	@FXML
 	private AnchorPane anchorPane;
@@ -34,10 +34,10 @@ public class TaxaEditController {
 	private VBox topVBox;
 
 	@FXML
-	private TableView<TaxaEditTableItem> tableView;
+	private TableView<TaxaFilterTableItem> tableView;
 
 	@FXML
-	private TableColumn<TaxaEditTableItem, Boolean> activeColumn;
+	private TableColumn<TaxaFilterTableItem, Boolean> activeColumn;
 
 	@FXML
 	private MenuItem activateAllMenuItem;
@@ -57,13 +57,13 @@ public class TaxaEditController {
 	private MenuItem selectActivatedMenuItem;
 
 	@FXML
-	private TableColumn<TaxaEditTableItem, Integer> idColumn;
+	private TableColumn<TaxaFilterTableItem, Integer> idColumn;
 
 	@FXML
-	private TableColumn<TaxaEditTableItem, String> nameColumn;
+	private TableColumn<TaxaFilterTableItem, String> nameColumn;
 
 	@FXML
-	private TableColumn<TaxaEditTableItem, String> displayLabelColumn;
+	private TableColumn<TaxaFilterTableItem, String> displayLabelColumn;
 
 	@FXML
 	private MenuItem findAndReplaceRadioMenuItem;
@@ -85,11 +85,11 @@ public class TaxaEditController {
 		return topVBox;
 	}
 
-	public TableView<TaxaEditTableItem> getTableView() {
+	public TableView<TaxaFilterTableItem> getTableView() {
 		return tableView;
 	}
 
-	public TableColumn<TaxaEditTableItem, Boolean> getActiveColumn() {
+	public TableColumn<TaxaFilterTableItem, Boolean> getActiveColumn() {
 		return activeColumn;
 	}
 
@@ -117,15 +117,15 @@ public class TaxaEditController {
 		return selectActivatedMenuItem;
 	}
 
-	public TableColumn<TaxaEditTableItem, Integer> getIdColumn() {
+	public TableColumn<TaxaFilterTableItem, Integer> getIdColumn() {
 		return idColumn;
 	}
 
-	public TableColumn<TaxaEditTableItem, String> getNameColumn() {
+	public TableColumn<TaxaFilterTableItem, String> getNameColumn() {
 		return nameColumn;
 	}
 
-	public TableColumn<TaxaEditTableItem, String> getDisplayLabelColumn() {
+	public TableColumn<TaxaFilterTableItem, String> getDisplayLabelColumn() {
 		return displayLabelColumn;
 	}
 

@@ -20,10 +20,7 @@
 package splitstree6.view.format.traits;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextFormatter;
+import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 
@@ -33,13 +30,19 @@ public class TraitsPieController {
 	private VBox vBox;
 
 	@FXML
-	private ComboBox<String> showCBox;
+	private MenuButton showMenuButton;
 
 	@FXML
-	private TextField maxSizeField;
+	private MenuItem showAllMenuItem;
+
+	@FXML
+	private MenuItem showNoneMenuItem;
 
 	@FXML
 	private CheckBox legendCBox;
+
+	@FXML
+	private TextField maxSizeField;
 
 	@FXML
 	private void initialize() {
@@ -52,15 +55,23 @@ public class TraitsPieController {
 		return vBox;
 	}
 
-	public ComboBox<String> getShowCBox() {
-		return showCBox;
+	public MenuButton getShowMenuButton() {
+		return showMenuButton;
 	}
 
-	public TextField getMaxSizeField() {
-		return maxSizeField;
+	public MenuItem getShowAllMenuItem() {
+		return showAllMenuItem;
+	}
+
+	public MenuItem getShowNoneMenuItem() {
+		return showNoneMenuItem;
 	}
 
 	public CheckBox getLegendCBox() {
 		return legendCBox;
+	}
+
+	public TextField getMaxSizeField() {
+		return maxSizeField;
 	}
 }

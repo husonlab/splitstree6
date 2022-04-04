@@ -53,9 +53,6 @@ import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.splits.algorithms.PhylogeneticOutline;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
-import splitstree6.view.splits.viewer.LoopView;
-import splitstree6.view.splits.viewer.SplitsDiagramType;
-import splitstree6.view.splits.viewer.SplitsRooting;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -199,8 +196,6 @@ public class SplitNetworkLayout {
 			group.setId("graph-node"); // the is used to rotate graph
 			{
 				var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5);
-				shape.setLayoutX(-shape.getRadius());
-				shape.setLayoutY(-shape.getRadius());
 				shape.getStyleClass().add("graph-node");
 				group.getChildren().add(shape);
 			}
@@ -270,7 +265,6 @@ public class SplitNetworkLayout {
 
 			var split = graph.getSplit(e);
 			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
-			progress.incrementProgress();
 
 			if (split <= splitsBlock.getNsplits() && splitsBlock.get(split).getConfidence() > 0.05 && !splitsWithConfidenceLabels.get(split)) {
 				splitsWithConfidenceLabels.set(split);
@@ -282,6 +276,7 @@ public class SplitNetworkLayout {
 				splitstree6.layout.splits.LayoutUtils.installTranslateUsingLayout(label, () -> splitSelectionModel.select(split));
 				confidenceLabels.getChildren().add(label);
 			}
+			progress.incrementProgress();
 		}
 
 		var loopsGroup = new Group();

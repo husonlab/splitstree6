@@ -67,7 +67,7 @@ public class TraitsNexusOutput extends NexusIOBase implements INexusOutput<Trait
 		{
 			w.write("TRAITLABELS\n");
 			for (int i = 1; i <= traitsBlock.getNTraits(); i++) {
-				w.write("\t" + traitsBlock.getTraitLabel(i) + "\n");
+				w.write(" '" + traitsBlock.getTraitLabel(i) + "'");
 			}
 			w.write(";\n");
 		}

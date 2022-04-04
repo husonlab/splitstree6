@@ -23,6 +23,7 @@ import javafx.collections.ListChangeListener;
 import javafx.scene.control.TreeItem;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
+import splitstree6.data.TaxaBlock;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -95,10 +96,18 @@ public class WorkflowTreeViewLayout {
 					// todo: add input source
 					treeView.getRoot().setExpanded(true);
 				} else if (workflow.isInputTaxaNode(dataNode)) {
+					var inputTaxa = (TaxaBlock) dataNode.getDataBlock();
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
 					treeView.getRoot().getChildren().add(item);
 					inputTaxaItem = item;
+					/*
+					if(inputTaxa.getTraitsBlock()!=null && inputTaxa.getTraitsBlock().getNTraits()>0) {
+						var traitsBlockNode=workflow.newDataNode(inputTaxa.getTraitsBlock());
+						var traitsBlockItem=new WorkflowTreeItem(mainWindow,traitsBlockNode);
+						inputTaxaItem.getChildren().add(traitsBlockItem);
+					}
+					 */
 					treeView.getRoot().setExpanded(true);
 				} else if (workflow.isInputDataNode(dataNode)) {
 					var item = new WorkflowTreeItem(mainWindow, dataNode);

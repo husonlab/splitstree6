@@ -1,5 +1,5 @@
 /*
- * TaxaEditTableItem.java Copyright (C) 2022 Daniel H. Huson
+ * TaxaFilterTableItem.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.tabs.algorithms.taxaedit;
+package splitstree6.tabs.algorithms.taxafilter;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -29,13 +29,13 @@ import splitstree6.data.parts.Taxon;
  * taxa editor item, 1.2022
  * Daniel Huson
  */
-public class TaxaEditTableItem {
+public class TaxaFilterTableItem {
 	private final int id;
 	private final Taxon taxon;
 	private final StringProperty displayLabel = new SimpleStringProperty(this, "DisplayLabel");
 	private final BooleanProperty active = new SimpleBooleanProperty(this, "Active", false);
 
-	public TaxaEditTableItem(int id, Taxon taxon) {
+	public TaxaFilterTableItem(int id, Taxon taxon) {
 		this.id = id;
 		this.taxon = taxon;
 		displayLabel.bindBidirectional(taxon.displayLabelProperty());

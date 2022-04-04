@@ -79,7 +79,7 @@ module splitstreesix {
 	exports splitstree6.xtra;
 	exports splitstree6.main;
 	opens splitstree6.tabs.algorithms;
-	opens splitstree6.tabs.algorithms.taxaedit;
+	opens splitstree6.tabs.algorithms.taxafilter;
 
 	opens splitstree6.densitree;
 
@@ -94,6 +94,8 @@ module splitstreesix {
 	opens splitstree6.view.trees.tanglegram;
 	opens splitstree6.view.trees.treeview;
 
+	opens splitstree6.view.network;
+
 	opens splitstree6.view.displaytext;
 	opens splitstree6.view.displaydatablock;
 	opens splitstree6.view.inputeditor;
@@ -101,11 +103,11 @@ module splitstreesix {
 	opens splitstree6.view.format.taxlabels;
 	opens splitstree6.view.format.splits;
 	opens splitstree6.view.format.traits;
-
-	opens splitstree6.view.network;
+	opens splitstree6.view.format.sites;
 
 	opens splitstree6.view.utils;
 	opens splitstree6.view.trees;
+	opens splitstree6.layout.network;
 
 
 }

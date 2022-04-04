@@ -99,15 +99,15 @@ TAXLABELS
 END; [TAXA]
 
 BEGIN ALGORITHM;
-TITLE 'Taxa Editor';
-NAME 'Taxa Editor';
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
 OPTIONS
 ;
 END; [ALGORITHM]
 
 BEGIN TAXA;
 TITLE 'Working Taxa';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=70;
 TAXLABELS
 	[1] 'Joinvillea'
@@ -187,7 +187,7 @@ END; [TAXA]
 
 BEGIN TREES;
 TITLE 'Input Trees';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 [Number of trees: 2]
 PROPERTIES partialTrees=yes rooted=yes;
 TRANSLATE
