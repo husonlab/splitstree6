@@ -66,7 +66,7 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		this.taxaFilter = (TaxaFilter) taxaEditorNode.getAlgorithm();
 		this.controller = tab.getTaxaFilterController();
 
-		var inputTaxonBlock = mainWindow.getWorkflow().getInputTaxonBlock();
+		var inputTaxonBlock = mainWindow.getWorkflow().getInputTaxaBlock();
 		var workingTaxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
 
 		var tableView = controller.getTableView();

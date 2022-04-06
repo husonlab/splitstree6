@@ -271,7 +271,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 			return null;
 	}
 
-	public TaxaBlock getInputTaxonBlock() {
+	public TaxaBlock getInputTaxaBlock() {
 		if (getInputTaxaNode() != null)
 			return getInputTaxaNode().getDataBlock();
 		else

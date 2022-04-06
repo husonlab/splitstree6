@@ -110,7 +110,7 @@ public class SimplePipeline extends Application {
 			ProgramExecutorService.submit(1000, () -> {
 				for (var node : workflow.getNodes(TaxaFilter.class)) {
 					var taxaFilter = (TaxaFilter) node.getAlgorithm();
-					taxaFilter.setDisabled(workflow.getInputTaxonBlock().getLabel(1), true);
+					taxaFilter.setDisabled(workflow.getInputTaxaBlock().getLabel(1), true);
 
 					if (!workflow.isValid()) {
 						System.err.println("Rerunning Analysis");
