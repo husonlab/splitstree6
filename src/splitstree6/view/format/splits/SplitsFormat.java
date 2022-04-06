@@ -51,4 +51,8 @@ public class SplitsFormat extends Pane {
 		presenter = new SplitsFormatPresenter(undoManager, controller, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram,
 				optionOutlineFill, editsProperty);
 	}
+
+	public SplitsFormatPresenter getPresenter() {
+		return presenter;
+	}
 }

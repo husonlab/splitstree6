@@ -201,7 +201,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
 					splitsView.getSplitSelectionModel(), boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
-					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(), splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(),
+					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
+					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(),
 					taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
 
 			splitNetworkPane.set(pane);
@@ -348,9 +349,19 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.SplitsTopology).or(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.OutlineTopology)));
 
-		mainController.getRotateLeftMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateLeft()));
+		mainController.getRotateLeftMenuItem().setOnAction(e -> {
+			if (splitsView.getSplitSelectionModel().size() == 0)
+				splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateLeft());
+			else
+				splitsView.getSplitsFormat().getPresenter().rotateSplitsLeft();
+		});
 		mainController.getRotateLeftMenuItem().disableProperty().bind(splitsView.emptyProperty());
-		mainController.getRotateRightMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateRight()));
+		mainController.getRotateRightMenuItem().setOnAction(e -> {
+			if (splitsView.getSplitSelectionModel().size() == 0)
+				splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateRight());
+			else
+				splitsView.getSplitsFormat().getPresenter().rotateSplitsRight();
+		});
 		mainController.getRotateRightMenuItem().disableProperty().bind(splitsView.emptyProperty());
 		mainController.getFlipMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getFlip()));
 		mainController.getFlipMenuItem().disableProperty().bind(splitsView.emptyProperty());

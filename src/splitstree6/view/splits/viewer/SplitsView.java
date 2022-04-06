@@ -65,6 +65,8 @@ public class SplitsView implements IView {
 	private final SplitsViewController controller;
 	private final SplitsViewPresenter presenter;
 
+	private final SplitsFormat splitsFormat;
+
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
 	private final StringProperty name = new SimpleStringProperty(this, "name");
@@ -128,8 +130,8 @@ public class SplitsView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
-		var splitsFormatter = new SplitsFormat(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
+		var taxLabelFormat = new TaxLabelFormat(mainWindow, undoManager);
+		splitsFormat = new SplitsFormat(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
 		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
 		traitsFormatter.setNodeShapeMap(nodeShapeMap);
@@ -141,8 +143,8 @@ public class SplitsView implements IView {
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL),
-				splitsFormatter, new Separator(Orientation.HORIZONTAL), traitsFormatter);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormat, new Separator(Orientation.HORIZONTAL),
+				traitsFormatter, new Separator(Orientation.HORIZONTAL), splitsFormat);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
@@ -345,5 +347,9 @@ public class SplitsView implements IView {
 
 	public SelectionModel<Integer> getSplitSelectionModel() {
 		return splitSelectionModel;
+	}
+
+	public SplitsFormat getSplitsFormat() {
+		return splitsFormat;
 	}
 }

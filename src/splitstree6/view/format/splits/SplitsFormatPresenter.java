@@ -47,11 +47,21 @@ import java.util.Map;
 public class SplitsFormatPresenter {
 	private final InvalidationListener selectionListener;
 
+	final private SelectionModel<Integer> splitSelectionModel;
+	final private UndoManager undoManager;
+	final private ObjectProperty<String[]> editsProperty;
+	final private Map<Node, Group> nodeShapeMap;
+
 	private boolean inUpdatingDefaults = false;
 
 	public SplitsFormatPresenter(UndoManager undoManager, SplitsFormatController controller, SelectionModel<Integer> splitSelectionModel,
 								 Map<Node, Group> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
 								 ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty) {
+
+		this.splitSelectionModel = splitSelectionModel;
+		this.undoManager = undoManager;
+		this.editsProperty = editsProperty;
+		this.nodeShapeMap = nodeShapeMap;
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
@@ -162,30 +172,12 @@ public class SplitsFormatPresenter {
 		};
 
 		controller.getRotateLeftButton().setOnAction(e -> {
-			var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
-			var oldEdits = editsProperty.get();
-
-			undoManager.doAndAdd("rotate splits", () -> {
-						RotateSplit.apply(splits, -5, nodeShapeMap);
-						editsProperty.set(oldEdits);
-					}
-					, () -> {
-						RotateSplit.apply(splits, 5, nodeShapeMap);
-						editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, 5));
-					});
+			rotateSplitsLeft();
 		});
 		controller.getRotateLeftButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
 		controller.getRotateRightButton().setOnAction(e -> {
-			var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
-			var oldEdits = editsProperty.get();
-			undoManager.doAndAdd("rotate splits", () -> {
-				RotateSplit.apply(splits, 5, nodeShapeMap);
-				editsProperty.set(oldEdits);
-			}, () -> {
-				RotateSplit.apply(splits, -5, nodeShapeMap);
-				editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, -5));
-			});
+			rotateSplitsRight();
 		});
 		controller.getRotateRightButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
@@ -196,5 +188,31 @@ public class SplitsFormatPresenter {
 		splitSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));
 		selectionListener.invalidated(null);
 
+	}
+
+	public void rotateSplitsLeft() {
+		var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
+		var oldEdits = editsProperty.get();
+
+		undoManager.doAndAdd("rotate splits", () -> {
+					RotateSplit.apply(splits, -5, nodeShapeMap);
+					editsProperty.set(oldEdits);
+				}
+				, () -> {
+					RotateSplit.apply(splits, 5, nodeShapeMap);
+					editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, 5));
+				});
+	}
+
+	public void rotateSplitsRight() {
+		var splits = new ArrayList<>(splitSelectionModel.getSelectedItems());
+		var oldEdits = editsProperty.get();
+		undoManager.doAndAdd("rotate splits", () -> {
+			RotateSplit.apply(splits, 5, nodeShapeMap);
+			editsProperty.set(oldEdits);
+		}, () -> {
+			RotateSplit.apply(splits, -5, nodeShapeMap);
+			editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, -5));
+		});
 	}
 }
