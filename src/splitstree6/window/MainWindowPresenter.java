@@ -58,6 +58,7 @@ import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
+import splitstree6.algorithms.distances.distances2trees.MinSpanningTree;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
@@ -424,6 +425,9 @@ public class MainWindowPresenter {
 
 		controller.getConsensusTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTreeSplits.Consensus.Majority)));
 		controller.getConsensusTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusTree()));
+
+		controller.getMinSpanningTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningTree()));
+		controller.getMinSpanningTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MinSpanningTree()));
 
 		controller.getRerootTreesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RerootOrLadderizeTrees()));
 		controller.getRerootTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RerootOrLadderizeTrees()));

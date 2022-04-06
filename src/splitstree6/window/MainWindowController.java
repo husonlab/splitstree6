@@ -295,6 +295,9 @@ public class MainWindowController {
 	private MenuItem consensusTreeMenuItem;
 
 	@FXML
+	private MenuItem minSpanningTreeMenuItem;
+
+	@FXML
 	private MenuItem rerootTreesMenuItem;
 
 	@FXML
@@ -833,6 +836,9 @@ public class MainWindowController {
 		return consensusTreeMenuItem;
 	}
 
+	public MenuItem getMinSpanningTreeMenuItem() {
+		return minSpanningTreeMenuItem;
+	}
 
 	public MenuItem getRerootTreesMenuItem() {
 		return rerootTreesMenuItem;

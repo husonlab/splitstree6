@@ -47,7 +47,7 @@ public class MinSpanningTree extends Distances2Trees {
 		tree.copy(networkBlock.getGraph());
 		tree.setRoot(tree.getFirstNode());
 		tree.redirectEdgesAwayFromRoot();
-		System.err.println(tree.toBracketString(true) + ";");
+		//System.err.println(tree.toBracketString(true) + ";");
 		var reroot = new RerootOrLadderizeTrees();
 		reroot.setOptionRootBy(RerootOrLadderizeTrees.RootBy.MidPoint);
 		var tmpTreesBlock = new TreesBlock();
