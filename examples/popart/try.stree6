@@ -3,7 +3,7 @@
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=8 nAlgorithms=5;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1648978482984'; [Sun Apr 03 11:34:42 CEST 2022]
+WORKFLOW creationDate='1649234471599'; [Wed Apr 06 10:41:11 CEST 2022]
 END; [SPLITSTREE6]
 
 [
@@ -197,7 +197,7 @@ OPTIONS
 	Diagram = 'Outline',
 	Orientation = 'Rotate90Deg',
 	Rooting = 'None',
-	ZoomFactor = 1,
+	ZoomFactor = 0.7513148,
 	FontScaleFactor = 1,
 	RootAngle = 160,
 	OutlineFill = 0xccccccff,

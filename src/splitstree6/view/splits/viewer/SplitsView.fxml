@@ -24,7 +24,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
-            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.splits.viewer.SplitsViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -109,11 +109,17 @@
             </VBox>
         </top>
         <center>
-            <AnchorPane fx:id="innerAnchorPane" style="-fx-background-color: transparent;">
-                <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
-                      AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="0.0"/>
+            <AnchorPane fx:id="outerAnchorPane">
+                <children>
+                    <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
+                                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                AnchorPane.topAnchor="0.0">
+                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    </AnchorPane>
+                    <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
+                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
+                </children>
             </AnchorPane>
         </center>
     </BorderPane>

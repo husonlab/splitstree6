@@ -19,14 +19,16 @@
 
 package splitstree6.layout.tree;
 
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import jloda.graph.Edge;
-import jloda.graph.NodeArray;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
@@ -37,7 +39,7 @@ import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
  */
 public class CreateEdgesStraight {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, ? extends Group> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 		for (var e : tree.edges()) {
 			var sourceShape = nodeShapeMap.get(e.getSource());

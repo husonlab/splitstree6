@@ -116,7 +116,7 @@ public class SitesFormat extends Pane {
 		public SitesView(NetworkBlock networkBlock, Edge e, Group edgeGroup, SitesStyle sitesStyle) {
 			var lines = BasicFX.getAllRecursively(edgeGroup, Line.class);
 			for (var line : lines) {
-				if (networkBlock.getEdge2data().get(e).containsKey("sites")) {
+				if (networkBlock.getEdge2data().get(e) != null && networkBlock.getEdge2data().get(e).containsKey("sites")) {
 					var sites = networkBlock.getEdge2data().get(e).get("sites").trim();
 					if (!sites.isEmpty()) {
 						InvalidationListener invalidationListener = null;

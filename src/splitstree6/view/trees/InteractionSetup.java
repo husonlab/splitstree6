@@ -58,7 +58,7 @@ public class InteractionSetup {
 	private final TaxaBlock taxaBlock;
 	private final SelectionModel<Taxon> taxonSelectionModel;
 
-	private final Map<Taxon, Pair<Shape, RichTextLabel>> taxonShapeLabelMap;
+	private final Map<Taxon, Pair<javafx.scene.Node, RichTextLabel>> taxonShapeLabelMap;
 	private final EventHandler<MouseEvent> mousePressedHandler;
 	private final EventHandler<MouseEvent> mouseDraggedHandler;
 
@@ -143,7 +143,7 @@ public class InteractionSetup {
 
 	private boolean nodeShapeOrLabelEntered;
 
-	public TriConsumer<jloda.graph.Node, Shape, RichTextLabel> createNodeCallback() {
+	public TriConsumer<jloda.graph.Node, javafx.scene.Node, RichTextLabel> createNodeCallback() {
 		return (v, shape, label) -> Platform.runLater(() -> {
 
 			if (v.getOwner() instanceof PhyloGraph phyloGraph) {
@@ -152,8 +152,8 @@ public class InteractionSetup {
 						var taxon = taxaBlock.get(t);
 						taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
 						label.setOnMousePressed(mousePressedHandler);
-                        label.setOnMouseDragged(mouseDraggedHandler);
-                        final EventHandler<MouseEvent> mouseClickedHandler = e -> {
+						label.setOnMouseDragged(mouseDraggedHandler);
+						final EventHandler<MouseEvent> mouseClickedHandler = e -> {
                             if (e.isStillSincePress()) {
                                 if (!e.isShiftDown())
                                     taxonSelectionModel.clearSelection();

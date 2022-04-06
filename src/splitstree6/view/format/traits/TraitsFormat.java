@@ -1,5 +1,5 @@
 /*
- * TraitsPie.java Copyright (C) 2022 Daniel H. Huson
+ * TraitsFormat.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -46,11 +46,11 @@ import splitstree6.window.MainWindow;
  * provides trait formatter
  * Daniel Huson, 3.2022
  */
-public class TraitsPie extends Pane {
+public class TraitsFormat extends Pane {
 	public static final String ALL = "*All*";
 
-	private final TraitsPieController controller;
-	private final TraitsPiePresenter presenter;
+	private final TraitsFormatController controller;
+	private final TraitsFormatPresenter presenter;
 
 	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
 	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
@@ -69,8 +69,8 @@ public class TraitsPie extends Pane {
 		ProgramProperties.track(optionTraitSize, 64);
 	}
 
-	public TraitsPie(MainWindow mainWindow, UndoManager undoManager) {
-		var loader = new ExtendedFXMLLoader<TraitsPieController>(TraitsPieController.class);
+	public TraitsFormat(MainWindow mainWindow, UndoManager undoManager) {
+		var loader = new ExtendedFXMLLoader<TraitsFormatController>(TraitsFormatController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
@@ -88,7 +88,7 @@ public class TraitsPie extends Pane {
 		legend.setScalingType(Legend.ScalingType.sqrt);
 		legend.circleMinSizeProperty().bind(optionTraitSizeProperty().multiply(0.5));
 
-		presenter = new TraitsPiePresenter(mainWindow, this, controller, undoManager);
+		presenter = new TraitsFormatPresenter(mainWindow, this, controller, undoManager);
 	}
 
 	public TraitsBlock getTraitsBlock() {
@@ -227,6 +227,7 @@ public class TraitsPie extends Pane {
 									pieChart.setMaxSize(pieSize, pieSize);
 									pieChart.setLayoutX(-0.5 * pieSize);
 									pieChart.setLayoutY(-0.5 * pieSize);
+
 
 									group.getChildren().add(pieChart);
 									ColorSchemeManager.setPieChartColors(pieChart, legend.getColorSchemeName());

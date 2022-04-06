@@ -28,6 +28,7 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.PrintUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.layout.tree.HeightAndAngles;
@@ -35,7 +36,7 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.format.taxlabels.TaxLabelFormatter;
+import splitstree6.view.format.taxlabels.TaxLabelFormat;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
@@ -112,7 +113,7 @@ public class TreePagesView implements IView {
 
 		empty.bind(Bindings.isEmpty(getTrees()));
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
+		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter);
 	}
@@ -315,7 +316,7 @@ public class TreePagesView implements IView {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getPagination();
+		return PrintUtils.createImage(controller.getPagination(), null);
 	}
 
 	@Override

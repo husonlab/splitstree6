@@ -24,6 +24,8 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.ObservableMap;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
@@ -72,7 +74,7 @@ public class TreePane extends StackPane {
 	 */
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
-					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX) {
+					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX, ObservableMap<jloda.graph.Node, Group> nodeShapeMap) {
 
 		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, diagram, orientation);
 
@@ -124,9 +126,8 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			var result = ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
-					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
-			return result;
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
+					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true, nodeShapeMap);
 		});
 
 		service.setOnSucceeded(a -> {
@@ -150,7 +151,7 @@ public class TreePane extends StackPane {
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
 			Platform.runLater(() -> {
 				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg) {
-					var shapes = BasicFX.getAllRecursively(pane, Shape.class);
+					var shapes = BasicFX.getAllRecursively(pane, Group.class);
 					splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
 				} else {
 					LayoutUtils.applyOrientation(orientation.get(), pane, false);

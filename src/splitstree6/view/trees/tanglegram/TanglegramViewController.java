@@ -109,6 +109,9 @@ public class TanglegramViewController {
 	private Pane middlePane;
 
 	@FXML
+	private AnchorPane outerAnchorPane;
+
+	@FXML
 	private AnchorPane innerAnchorPane;
 
 	@FXML
@@ -162,8 +165,8 @@ public class TanglegramViewController {
 		formatToggleButton.setSelected(false);
 		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
 
-		innerAnchorPane.getChildren().remove(formatVBox);
-		innerAnchorPane.getChildren().add(formatVBox);
+		outerAnchorPane.getChildren().remove(formatVBox);
+		outerAnchorPane.getChildren().add(formatVBox);
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -272,5 +275,9 @@ public class TanglegramViewController {
 
 	public VBox getFormatVBox() {
 		return formatVBox;
+	}
+
+	public ScrollPane getScrollPane() {
+		return scrollPane;
 	}
 }

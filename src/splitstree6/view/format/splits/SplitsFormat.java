@@ -1,5 +1,5 @@
 /*
- * SplitsFormatter.java Copyright (C) 2022 Daniel H. Huson
+ * SplitsFormat.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -37,18 +37,18 @@ import java.util.Map;
  * splits formatter pane
  * Daniel Huson, 1.2022
  */
-public class SplitsFormatter extends Pane {
-	private final SplitsFormatterController controller;
-	private final SplitsFormatterPresenter presenter;
+public class SplitsFormat extends Pane {
+	private final SplitsFormatController controller;
+	private final SplitsFormatPresenter presenter;
 
-	public SplitsFormatter(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, Group> nodeShapeMap,
-						   Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
-						   ObjectProperty<Color> optionOutlineFill, ObjectProperty<String[]> editsProperty) {
-		var loader = new ExtendedFXMLLoader<SplitsFormatterController>(SplitsFormatterController.class);
+	public SplitsFormat(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, Group> nodeShapeMap,
+						Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
+						ObjectProperty<Color> optionOutlineFill, ObjectProperty<String[]> editsProperty) {
+		var loader = new ExtendedFXMLLoader<SplitsFormatController>(SplitsFormatController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new SplitsFormatterPresenter(undoManager, controller, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram,
+		presenter = new SplitsFormatPresenter(undoManager, controller, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram,
 				optionOutlineFill, editsProperty);
 	}
 }

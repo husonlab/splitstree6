@@ -1,5 +1,5 @@
 /*
- * TraitsPiePresenter.java Copyright (C) 2022 Daniel H. Huson
+ * TraitsFormatPresenter.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -29,30 +29,30 @@ import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.window.MainWindow;
 
-public class TraitsPiePresenter {
+public class TraitsFormatPresenter {
 	private final InvalidationListener traitsBlockListener;
 	private boolean inUpdatingDefaults = false;
 
 	private final ObservableList<CheckMenuItem> traitMenuItems = FXCollections.observableArrayList();
 
-	public TraitsPiePresenter(MainWindow mainWindow, TraitsPie traitsPie, TraitsPieController controller, UndoManager undoManager) {
-		controller.getMaxSizeField().setText(String.valueOf(traitsPie.getOptionTraitSize()));
+	public TraitsFormatPresenter(MainWindow mainWindow, TraitsFormat traitsFormat, TraitsFormatController controller, UndoManager undoManager) {
+		controller.getMaxSizeField().setText(String.valueOf(traitsFormat.getOptionTraitSize()));
 
 
-		traitsPie.optionTraitLegendProperty().bindBidirectional(controller.getLegendCBox().selectedProperty());
-		traitsPie.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
-		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> traitsPie.setOptionTraitSize(NumberUtils.parseInt(n)));
+		traitsFormat.optionTraitLegendProperty().bindBidirectional(controller.getLegendCBox().selectedProperty());
+		traitsFormat.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
+		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> traitsFormat.setOptionTraitSize(NumberUtils.parseInt(n)));
 
-		traitsPie.getLegend().visibleProperty().bindBidirectional(traitsPie.optionTraitLegendProperty());
+		traitsFormat.getLegend().visibleProperty().bindBidirectional(traitsFormat.optionTraitLegendProperty());
 
-		traitsPie.optionActiveTraitsProperty().addListener(e ->
+		traitsFormat.optionActiveTraitsProperty().addListener(e ->
 		{
-			traitMenuItems.forEach(m -> m.setSelected(traitsPie.isTraitActive(m.getText())));
-			traitsPie.updateNodes();
+			traitMenuItems.forEach(m -> m.setSelected(traitsFormat.isTraitActive(m.getText())));
+			traitsFormat.updateNodes();
 		});
 
 		traitsBlockListener = e -> {
-			var traitsBlock = traitsPie.getTraitsBlock();
+			var traitsBlock = traitsFormat.getTraitsBlock();
 			if (traitsBlock != null) {
 				if (traitsBlock.getNTraits() == 0) {
 					controller.getvBox().setDisable(true);
@@ -65,9 +65,9 @@ public class TraitsPiePresenter {
 						var menuItem = new CheckMenuItem(label);
 						menuItem.setSelected(true);
 						menuItem.selectedProperty().addListener((b, o, n) -> {
-							var oldState = traitsPie.getOptionActiveTraits().clone();
+							var oldState = traitsFormat.getOptionActiveTraits().clone();
 							var newState = StringUtils.addOrRemove(oldState, label, menuItem.isSelected());
-							undoManager.doAndAdd("activate trait", () -> traitsPie.setOptionActiveTraits(oldState), () -> traitsPie.setOptionActiveTraits(newState));
+							undoManager.doAndAdd("activate trait", () -> traitsFormat.setOptionActiveTraits(oldState), () -> traitsFormat.setOptionActiveTraits(newState));
 						});
 						traitMenuItems.add(menuItem);
 					}
@@ -76,32 +76,32 @@ public class TraitsPiePresenter {
 			}
 		};
 		controller.getShowAllMenuItem().setOnAction(e -> {
-			var oldState = traitsPie.getOptionActiveTraits().clone();
-			var newState = traitsPie.getTraitsBlock().getTraitLabels().toArray(new String[0]);
-			undoManager.doAndAdd("activate all traits", () -> traitsPie.setOptionActiveTraits(oldState), () -> traitsPie.setOptionActiveTraits(newState));
+			var oldState = traitsFormat.getOptionActiveTraits().clone();
+			var newState = traitsFormat.getTraitsBlock().getTraitLabels().toArray(new String[0]);
+			undoManager.doAndAdd("activate all traits", () -> traitsFormat.setOptionActiveTraits(oldState), () -> traitsFormat.setOptionActiveTraits(newState));
 		});
 		controller.getShowNoneMenuItem().setOnAction(e -> {
-			var oldState = traitsPie.getOptionActiveTraits().clone();
+			var oldState = traitsFormat.getOptionActiveTraits().clone();
 			var newState = new String[0];
-			undoManager.doAndAdd("deactivate all traits", () -> traitsPie.setOptionActiveTraits(oldState), () -> traitsPie.setOptionActiveTraits(newState));
+			undoManager.doAndAdd("deactivate all traits", () -> traitsFormat.setOptionActiveTraits(oldState), () -> traitsFormat.setOptionActiveTraits(newState));
 		});
 
-		traitsPie.traitsBlockProperty().addListener(new WeakInvalidationListener(traitsBlockListener));
+		traitsFormat.traitsBlockProperty().addListener(new WeakInvalidationListener(traitsBlockListener));
 		traitsBlockListener.invalidated(null);
 
-		traitsPie.optionActiveTraitsProperty().addListener(e -> {
-			if (traitsPie.isAllTraitsActive())
+		traitsFormat.optionActiveTraitsProperty().addListener(e -> {
+			if (traitsFormat.isAllTraitsActive())
 				controller.getShowMenuButton().setText("All");
-			else if (traitsPie.isNoneTraitsActive())
+			else if (traitsFormat.isNoneTraitsActive())
 				controller.getShowMenuButton().setText("None");
 			else
 				controller.getShowMenuButton().setText("Some");
 		});
 
-		traitsPie.optionTraitSizeProperty().addListener((v, o, n) -> undoManager.add("traits node size", traitsPie.optionTraitSizeProperty(), o, n));
-		traitsPie.optionTraitLegendProperty().addListener((v, o, n) -> undoManager.add("show legend", traitsPie.optionTraitLegendProperty(), o, n));
+		traitsFormat.optionTraitSizeProperty().addListener((v, o, n) -> undoManager.add("traits node size", traitsFormat.optionTraitSizeProperty(), o, n));
+		traitsFormat.optionTraitLegendProperty().addListener((v, o, n) -> undoManager.add("show legend", traitsFormat.optionTraitLegendProperty(), o, n));
 
-		traitsPie.optionTraitSizeProperty().addListener(e -> traitsPie.updateNodes());
-		traitsPie.optionTraitLegendProperty().addListener(e -> traitsPie.updateNodes());
+		traitsFormat.optionTraitSizeProperty().addListener(e -> traitsFormat.updateNodes());
+		traitsFormat.optionTraitLegendProperty().addListener(e -> traitsFormat.updateNodes());
 	}
 }

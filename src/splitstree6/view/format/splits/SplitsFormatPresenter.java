@@ -1,5 +1,5 @@
 /*
- * SplitsFormatterPresenter.java Copyright (C) 2022 Daniel H. Huson
+ * SplitsFormatPresenter.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -44,14 +44,14 @@ import java.util.Map;
  * splits formatter presenter
  * Daniel Huson, 1.2022
  */
-public class SplitsFormatterPresenter {
+public class SplitsFormatPresenter {
 	private final InvalidationListener selectionListener;
 
 	private boolean inUpdatingDefaults = false;
 
-	public SplitsFormatterPresenter(UndoManager undoManager, SplitsFormatterController controller, SelectionModel<Integer> splitSelectionModel,
-									Map<Node, Group> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
-									ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty) {
+	public SplitsFormatPresenter(UndoManager undoManager, SplitsFormatController controller, SelectionModel<Integer> splitSelectionModel,
+								 Map<Node, Group> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
+								 ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty) {
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);

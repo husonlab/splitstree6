@@ -23,13 +23,13 @@ import javafx.geometry.Point2D;
 import javafx.scene.shape.*;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
-import jloda.graph.NodeArray;
-import jloda.graph.NodeDoubleArray;
+import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
@@ -40,7 +40,7 @@ import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
  */
 public class CreateEdgesCircular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, Point2D> nodePointMap, Map<Node, Double> nodeAngleMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
 		var origin = new Point2D(0, 0);

@@ -65,6 +65,9 @@ public class NetworkViewController {
 	private Button decreaseFontButton;
 
 	@FXML
+	private AnchorPane outerAnchorPane;
+
+	@FXML
 	private AnchorPane innerAnchorPane;
 
 	@FXML
@@ -92,8 +95,8 @@ public class NetworkViewController {
 
 		centerPane.getChildren().add(zoomableScrollPane);
 
-		innerAnchorPane.getChildren().remove(formatVBox);
-		innerAnchorPane.getChildren().add(formatVBox);
+		outerAnchorPane.getChildren().remove(formatVBox);
+		outerAnchorPane.getChildren().add(formatVBox);
 
 		settingsToggleButton.setSelected(true);
 		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);

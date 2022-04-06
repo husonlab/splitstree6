@@ -1,5 +1,5 @@
 /*
- * TraitsPieController.java Copyright (C) 2022 Daniel H. Huson
+ * TraitsFormatController.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -24,7 +24,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.IntegerStringConverter;
 
-public class TraitsPieController {
+public class TraitsFormatController {
 
 	@FXML
 	private VBox vBox;

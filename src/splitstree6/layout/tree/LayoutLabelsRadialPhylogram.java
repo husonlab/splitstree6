@@ -21,13 +21,12 @@ package splitstree6.layout.tree;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
-import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.graph.NodeArray;
-import jloda.graph.NodeDoubleArray;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 
+import java.util.Map;
 import java.util.function.Consumer;
 
 /**
@@ -40,7 +39,7 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 	/**
 	 * create labels for tree
 	 */
-	public LayoutLabelsRadialPhylogram(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap, double labelGap) {
+	public LayoutLabelsRadialPhylogram(PhyloTree tree, Map<Node, ? extends javafx.scene.Node> nodeShapeMap, Map<Node, RichTextLabel> nodeLabelMap, Map<Node, Double> nodeAngleMap, double labelGap) {
 
 		labelLayout = new RadialLabelLayout();
 		labelLayout.setGap(labelGap);
@@ -90,7 +89,7 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 					labelLayout.addAvoidable(label::getTranslateX, label::getTranslateY, () -> label.getLayoutBounds().getWidth(), () -> label.getLayoutBounds().getHeight());
 
 				}
-				labelLayout.addAvoidable(shape::getTranslateX, shape::getTranslateY, () -> shape.getLayoutBounds().getWidth(), () -> shape.getLayoutBounds().getHeight());
+				labelLayout.addAvoidable(() -> shape.getTranslateX() - 0.5 * shape.prefWidth(0), () -> shape.getTranslateY() - 0.5 * shape.prefHeight(0), () -> shape.prefWidth(0), () -> shape.prefHeight(0));
 			}
 		}
 	}

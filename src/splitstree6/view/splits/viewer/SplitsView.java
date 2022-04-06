@@ -37,6 +37,7 @@ import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.PrintUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.LoopView;
@@ -46,9 +47,9 @@ import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.format.splits.SplitsFormatter;
-import splitstree6.view.format.taxlabels.TaxLabelFormatter;
-import splitstree6.view.format.traits.TraitsPie;
+import splitstree6.view.format.splits.SplitsFormat;
+import splitstree6.view.format.taxlabels.TaxLabelFormat;
+import splitstree6.view.format.traits.TraitsFormat;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
@@ -127,10 +128,10 @@ public class SplitsView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
-		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
+		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
+		var splitsFormatter = new SplitsFormat(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
-		var traitsFormatter = new TraitsPie(mainWindow, undoManager);
+		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
 		traitsFormatter.setNodeShapeMap(nodeShapeMap);
 		optionActiveTraits.bindBidirectional(traitsFormatter.optionActiveTraitsProperty());
 		optionTraitLegend.bindBidirectional(traitsFormatter.optionTraitLegendProperty());
@@ -144,8 +145,8 @@ public class SplitsView implements IView {
 				splitsFormatter, new Separator(Orientation.HORIZONTAL), traitsFormatter);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
-		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 30.0);
-		controller.getInnerAnchorPane().getChildren().add(controller.getInnerAnchorPane().getChildren().size() - 1, traitsFormatter.getLegend());
+		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
+		controller.getInnerAnchorPane().getChildren().add(traitsFormatter.getLegend());
 		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
 		splitsBlock.addListener((v, o, n) -> {
@@ -201,7 +202,7 @@ public class SplitsView implements IView {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getInnerAnchorPane();
+		return PrintUtils.createImage(controller.getInnerAnchorPane(), controller.getScrollPane());
 	}
 
 	@Override

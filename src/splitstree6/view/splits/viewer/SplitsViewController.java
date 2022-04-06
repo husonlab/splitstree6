@@ -80,6 +80,10 @@ public class SplitsViewController {
 
 	@FXML
 	private ToggleButton showInternalLabelsToggleButton;
+
+	@FXML
+	private AnchorPane outerAnchorPane;
+
 	@FXML
 	private AnchorPane innerAnchorPane;
 
@@ -115,8 +119,8 @@ public class SplitsViewController {
 
 		DraggableLabel.makeDraggable(fitLabel);
 
-		innerAnchorPane.getChildren().remove(formatVBox);
-		innerAnchorPane.getChildren().add(formatVBox);
+		outerAnchorPane.getChildren().remove(formatVBox);
+		outerAnchorPane.getChildren().add(formatVBox);
 
 		settingsToggleButton.setSelected(true);
 		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);

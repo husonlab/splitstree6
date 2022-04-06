@@ -1,5 +1,5 @@
 /*
- * SplitsFormatterController.java Copyright (C) 2022 Daniel H. Huson
+ * SplitsFormatController.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -27,7 +27,7 @@ import javafx.util.converter.FormatStringConverter;
 
 import java.text.NumberFormat;
 
-public class SplitsFormatterController {
+public class SplitsFormatController {
 
 	@FXML
 	private ComboBox<Number> widthCBox;

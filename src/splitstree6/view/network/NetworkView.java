@@ -20,6 +20,7 @@
 package splitstree6.view.network;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
@@ -33,6 +34,7 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.PrintUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
@@ -40,8 +42,8 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.sites.SitesFormat;
 import splitstree6.view.format.sites.SitesStyle;
-import splitstree6.view.format.taxlabels.TaxLabelFormatter;
-import splitstree6.view.format.traits.TraitsPie;
+import splitstree6.view.format.taxlabels.TaxLabelFormat;
+import splitstree6.view.format.traits.TraitsFormat;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
@@ -95,7 +97,6 @@ public class NetworkView implements IView {
 		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<jloda.graph.Edge, Group> edgeShapeMap = FXCollections.observableHashMap();
 
-
 		presenter = new NetworkViewPresenter(mainWindow, this, targetBounds, networkBlock, taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
 		this.viewTab.addListener((v, o, n) -> {
@@ -106,15 +107,14 @@ public class NetworkView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
+		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
 
-		var traitsFormatter = new TraitsPie(mainWindow, undoManager);
+		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
 		traitsFormatter.setNodeShapeMap(nodeShapeMap);
 		optionActiveTraits.bindBidirectional(traitsFormatter.optionActiveTraitsProperty());
 		optionTraitLegend.bindBidirectional(traitsFormatter.optionTraitLegendProperty());
 		optionTraitSize.bindBidirectional(traitsFormatter.optionTraitSizeProperty());
 		traitsFormatter.getLegend().scaleProperty().bind(optionZoomFactorProperty());
-
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
@@ -131,11 +131,13 @@ public class NetworkView implements IView {
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 30.0);
-		controller.getInnerAnchorPane().getChildren().add(controller.getInnerAnchorPane().getChildren().size() - 1, traitsFormatter.getLegend());
+		controller.getInnerAnchorPane().getChildren().add(traitsFormatter.getLegend());
 		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
+
+		empty.bind(Bindings.createBooleanBinding(() -> getNetworkBlock() != null && getNetworkBlock().size() > 0, networkBlockProperty()));
 	}
 
 	@Override
@@ -189,7 +191,7 @@ public class NetworkView implements IView {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getInnerAnchorPane();
+		return PrintUtils.createImage(controller.getInnerAnchorPane(), controller.getScrollPane());
 	}
 
 	public ViewTab getViewTab() {

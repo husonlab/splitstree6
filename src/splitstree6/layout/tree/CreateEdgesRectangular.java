@@ -24,12 +24,13 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
-import jloda.graph.NodeArray;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
 /**
@@ -38,7 +39,7 @@ import java.util.function.BiConsumer;
  */
 public class CreateEdgesRectangular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, NodeArray<Shape> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, ? extends javafx.scene.Node> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
 		for (var e : tree.edges()) {

@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <VBox fx:id="vBox" prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/16"
-      xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.traits.TraitsPieController">
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.traits.TraitsFormatController">
     <padding>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
     </padding>

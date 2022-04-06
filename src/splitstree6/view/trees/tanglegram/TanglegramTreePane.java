@@ -26,11 +26,13 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.collections.ObservableMap;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.RunAfterAWhile;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -51,15 +53,14 @@ public class TanglegramTreePane extends Group {
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
-							  ReadOnlyDoubleProperty fontScaleFactor,
-							  ReadOnlyBooleanProperty showInternalLabels) {
+							  ReadOnlyDoubleProperty fontScaleFactor, ReadOnlyBooleanProperty showInternalLabels, ObservableMap<Node, Group> nodeShapeMap) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						var treePane = new TreePane(stage, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(TreeLabel.None), showInternalLabels, null);
+								optionDiagram.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(TreeLabel.None), showInternalLabels, null, nodeShapeMap);
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
 						getChildren().add(treePane);

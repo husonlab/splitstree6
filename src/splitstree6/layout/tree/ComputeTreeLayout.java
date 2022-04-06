@@ -33,6 +33,8 @@ import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -58,10 +60,15 @@ public class ComputeTreeLayout {
 	 * @return groups and layout consumer
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging,
-							   double width, double height, TriConsumer<Node, Shape, RichTextLabel> nodeCallback,
-							   BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels) {
+							   double width, double height, TriConsumer<Node, javafx.scene.Node, RichTextLabel> nodeCallback,
+							   BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels, Map<Node, Group> nodeShapeMap) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
+
+		if (nodeShapeMap != null)
+			nodeShapeMap.clear();
+		else
+			nodeShapeMap = new HashMap<>();
 
 		if (alignLabels && diagram != TreeDiagramType.RectangularPhylogram && diagram != TreeDiagramType.CircularPhylogram)
 			alignLabels = false; // can't or don't need to, or can't, align labels in all other cases
@@ -104,24 +111,24 @@ public class ComputeTreeLayout {
 		var taxonLabelsGroup = new Group();
 		var edgeGroup = new Group();
 
-		NodeArray<Shape> nodeShapeMap = tree.newNodeArray();
-
 		for (var v : tree.nodes()) {
 			var point = nodePointMap.get(v);
 			var shape = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
 			shape.getStyleClass().add("graph-node");
-			nodeGroup.getChildren().add(shape);
-			shape.setTranslateX(point.getX());
-			shape.setTranslateY(point.getY());
-			nodeShapeMap.put(v, shape);
+			var group = new Group(shape);
+			group.setId("graph-node");
+			nodeShapeMap.put(v, group);
+			group.setTranslateX(point.getX());
+			group.setTranslateY(point.getY());
+			nodeGroup.getChildren().add(group);
 
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
-				nodeCallback.accept(v, shape, label);
+				nodeCallback.accept(v, group, label);
 				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
 				if (taxonId != null) {
 					taxonLabelsGroup.getChildren().add(label);
-					shape.setUserData(taxonId);
+					group.setUserData(taxonId);
 				} else {
 					internalLabelsGroup.getChildren().add(label);
 					splitstree6.layout.splits.LayoutUtils.installTranslateUsingLayout(label, () -> {

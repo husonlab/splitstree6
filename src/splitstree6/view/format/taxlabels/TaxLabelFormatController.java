@@ -1,5 +1,5 @@
 /*
- * TaxLabelFormatterController.java Copyright (C) 2022 Daniel H. Huson
+ * TaxLabelFormatController.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -24,7 +24,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DoubleStringConverter;
 
-public class TaxLabelFormatterController {
+public class TaxLabelFormatController {
 	@FXML
 	private VBox vBox;
 

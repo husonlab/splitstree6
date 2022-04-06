@@ -23,12 +23,12 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.graph.NodeArray;
-import jloda.graph.NodeDoubleArray;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
+
+import java.util.Map;
 
 /**
  * create labels for a circular layout
@@ -36,7 +36,7 @@ import jloda.phylo.PhyloTree;
  */
 public class LayoutLabelsCircular {
 
-	public static void apply(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, NodeDoubleArray nodeAngleMap, double labelGap,
+	public static void apply(PhyloTree tree, Map<Node, ? extends javafx.scene.Node> nodeShapeMap, Map<Node, RichTextLabel> nodeLabelMap, Map<Node, Double> nodeAngleMap, double labelGap,
 							 boolean linkNodesEdgesLabels, Group labelConnectors) {
 
 		var alignLabels = (labelConnectors != null);

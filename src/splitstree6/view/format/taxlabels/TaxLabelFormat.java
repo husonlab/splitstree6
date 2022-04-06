@@ -1,5 +1,5 @@
 /*
- * TaxLabelFormatter.java Copyright (C) 2022 Daniel H. Huson
+ * TaxLabelFormat.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -28,15 +28,15 @@ import splitstree6.window.MainWindow;
  * provides taxon label formatter
  * Daniel Huson, 1.2022
  */
-public class TaxLabelFormatter extends Pane {
-	private final TaxLabelFormatterController controller;
-	private final TaxLabelFormatterPresenter presenter;
+public class TaxLabelFormat extends Pane {
+	private final TaxLabelFormatController controller;
+	private final TaxLabelFormatPresenter presenter;
 
-	public TaxLabelFormatter(MainWindow mainWindow, UndoManager undoManager) {
-		var loader = new ExtendedFXMLLoader<TaxLabelFormatterController>(TaxLabelFormatterController.class);
+	public TaxLabelFormat(MainWindow mainWindow, UndoManager undoManager) {
+		var loader = new ExtendedFXMLLoader<TaxLabelFormatController>(TaxLabelFormatController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new TaxLabelFormatterPresenter(mainWindow, controller, undoManager);
+		presenter = new TaxLabelFormatPresenter(mainWindow, controller, undoManager);
 	}
 }

@@ -118,7 +118,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(mainWindow.getStage(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
-						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty(), null);
+						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty(), null, null);
 				treePane.setRunAfterUpdate(() -> {
 					for (var treeViewPane : BasicFX.findRecursively(treePane, p -> p.getId() != null && p.getId().equals("treeView"))) {
 						treeViewPane.setScaleX(treeViewPane.getScaleX() * treePagesView.getOptionZoomFactor());

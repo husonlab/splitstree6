@@ -19,8 +19,6 @@
 
 package splitstree6.algorithms.characters.characters2network;
 
-import jloda.graph.Edge;
-import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
 import jloda.util.Basic;
 import jloda.util.CanceledException;
@@ -38,8 +36,6 @@ import java.util.*;
  * huson 10.2009
  */
 public abstract class QuasiMedianBase {
-	public static final String NODE_STATES_KEY = "states";
-	public static final String EDGE_SITES_KEY = "sites";
 
 	/**
 	 * Applies the method to the given data
@@ -101,12 +97,13 @@ public abstract class QuasiMedianBase {
 
 		computeGraph(progress, condensedInputSet, weights, graph);
 
-		for (Node v : graph.nodes()) {
-			String condensed = (String) v.getInfo();
+
+		for (var v : graph.nodes()) {
+			var condensed = (String) v.getInfo();
 			graph.setLabel(v, null);
 			if (condensedInputSet.contains(condensed)) {
-				for (int t = 1; t <= taxa.getNtax(); t++) {
-					int o = orig2CondensedTaxa[t];
+				for (var t = 1; t <= taxa.getNtax(); t++) {
+					var o = orig2CondensedTaxa[t];
 					if (condensedCharacters[o].equals(condensed)) {
 						graph.addTaxon(v, t);
 					}
@@ -127,13 +124,13 @@ public abstract class QuasiMedianBase {
 						graph.setLabel(v, "{" + buf + "}");
 				}
 			}
-			String full = expandCondensed(condensed, orig2CondensedPos, translator);
-			networkBlock.getNodeData(v).put(NODE_STATES_KEY, full);
+			var full = expandCondensed(condensed, orig2CondensedPos, translator);
+			networkBlock.getNodeData(v).put(NetworkBlock.NODE_STATES_KEY, full);
 		}
 
-		for (Edge e : graph.edges()) {
-			String label = computeEdgeLabel(characterLabels, (String) e.getSource().getInfo(), (String) e.getTarget().getInfo(), orig2CondensedPos, translator);
-			networkBlock.getEdgeData(e).put(EDGE_SITES_KEY, label);
+		for (var e : graph.edges()) {
+			var label = computeEdgeLabel(characterLabels, (String) e.getSource().getInfo(), (String) e.getTarget().getInfo(), orig2CondensedPos, translator);
+			networkBlock.getEdgeData(e).put(NetworkBlock.EDGE_SITES_KEY, label);
 		}
 		networkBlock.setNetworkType(NetworkBlock.Type.HaplotypeNetwork);
 	}

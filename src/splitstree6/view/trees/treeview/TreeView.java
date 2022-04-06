@@ -25,12 +25,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
+import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.PrintUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.layout.splits.algorithms.EqualAngle;
@@ -40,7 +44,8 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.format.taxlabels.TaxLabelFormatter;
+import splitstree6.view.format.taxlabels.TaxLabelFormat;
+import splitstree6.view.format.traits.TraitsFormat;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
@@ -74,19 +79,16 @@ public class TreeView implements IView {
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
-
 	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence", true);
-
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0);
-
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0);
-
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
-
 	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
-
 	private final BooleanProperty optionShowInternalLabels = new SimpleBooleanProperty(this, "optionShowInternalLabels");
 
+	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
+	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
+	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
 
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
@@ -102,10 +104,11 @@ public class TreeView implements IView {
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionTree.getName(), optionDiagram.getName(), optionAveraging.getName(), optionOrientation.getName(), optionHorizontalZoomFactor.getName(),
-				optionVerticalZoomFactor.getName(),
+		return List.of(optionTree.getName(), optionDiagram.getName(), optionAveraging.getName(), optionOrientation.getName(),
+				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionEdits.getName(), optionShowConfidence.getName(),
-				optionTreeLabels.getName(), optionShowInternalLabels.getName());
+				optionTreeLabels.getName(), optionShowInternalLabels.getName(),
+				optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
 	}
 
 	public TreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -113,7 +116,7 @@ public class TreeView implements IView {
 		var loader = new ExtendedFXMLLoader<TreeViewController>(TreeViewController.class);
 		controller = loader.getController();
 
-		final ObservableMap<jloda.graph.Node, Shape> nodeShapeMap = FXCollections.observableHashMap();
+		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, Shape> splitShapeMap = FXCollections.observableHashMap();
 
 		// this is the target area for the tree page:
@@ -127,9 +130,23 @@ public class TreeView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
+		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter);
+		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
+		traitsFormatter.setNodeShapeMap(nodeShapeMap);
+		optionActiveTraits.bindBidirectional(traitsFormatter.optionActiveTraitsProperty());
+		optionTraitLegend.bindBidirectional(traitsFormatter.optionTraitLegendProperty());
+		optionTraitSize.bindBidirectional(traitsFormatter.optionTraitSizeProperty());
+		traitsFormatter.getLegend().scaleProperty().bind(optionHorizontalZoomFactorProperty());
+		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
+		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
+
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, traitsFormatter);
+
+		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
+		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
+		controller.getInnerAnchorPane().getChildren().add(controller.getInnerAnchorPane().getChildren().size() - 1, traitsFormatter.getLegend());
+		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
 		trees.addListener((InvalidationListener) e -> {
 			empty.set(trees.size() == 0);
@@ -184,7 +201,7 @@ public class TreeView implements IView {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getInnerAnchorPane();
+		return PrintUtils.createImage(controller.getInnerAnchorPane(), controller.getScrollPane());
 	}
 
 	@Override

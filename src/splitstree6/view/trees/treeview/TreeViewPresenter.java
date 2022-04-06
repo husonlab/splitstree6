@@ -29,6 +29,7 @@ import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
+import javafx.scene.Group;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -40,7 +41,6 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Graph;
-import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.Single;
 import jloda.util.StringUtils;
@@ -59,6 +59,8 @@ import java.util.stream.Collectors;
  * Daniel Huson 3.2022
  */
 public class TreeViewPresenter implements IDisplayTabPresenter {
+	private final LongProperty updateCounter = new SimpleLongProperty(0L);
+
 	private final MainWindow mainWindow;
 	private final TreeView treeView;
 	private final TreeViewController controller;
@@ -71,7 +73,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
 	public TreeViewPresenter(MainWindow mainWindow, TreeView treeView, ObjectProperty<Bounds> targetBounds,
-							 ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, Shape> splitShapeMap) {
+							 ObservableMap<jloda.graph.Node, Group> nodeShapeMap, ObservableMap<Integer, Shape> splitShapeMap) {
 		this.mainWindow = mainWindow;
 		this.treeView = treeView;
 		this.controller = treeView.getController();
@@ -182,16 +184,18 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 							TreeViewEdits.clearEdits(treeView.optionEditsProperty());
 
 						if (!treeView.emptyProperty().get()) {
-							treePane.set(new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), treeProperty.get(), mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
+							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), treeProperty.get(), mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
 									treeView.getOptionDiagram(), treeView.getOptionAveraging(), treeView.optionOrientationProperty(), treeView.optionFontScaleFactorProperty(), null,
-									treeView.optionShowInternalLabelsProperty(), controller.getScaleBar().unitLengthXProperty()));
-
-							treePane.get().drawTree();
-							treePane.get().setRunAfterUpdate(() -> {
+									treeView.optionShowInternalLabelsProperty(), controller.getScaleBar().unitLengthXProperty(), nodeShapeMap);
+							treePane.set(pane);
+							pane.setRunAfterUpdate(() -> {
+								updateCounter.set(updateCounter.get() + 1);
 							});
-							scrollPane.setContent(treePane.get());
+							pane.drawTree();
+							scrollPane.setContent(pane);
 						} else {
 							treePane.set(null);
+							updateCounter.set(updateCounter.get() + 1);
 							scrollPane.setContent(new Pane());
 						}
 					}
@@ -388,10 +392,16 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(e -> treeView.setOptionOrientation(treeView.getOptionOrientation().getFlip()));
 		mainController.getFlipMenuItem().disableProperty().bind(treeView.emptyProperty());
 
-		mainController.getLayoutLabelsMenuItem().setOnAction(e -> {
-			if (treePane.get() != null)
-				treePane.get().updateLabelLayout(treeView.getOptionOrientation());
-		});
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(treeView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
+	}
+
+	public void updateLabelLayout() {
+		if (treePane.get() != null)
+			Platform.runLater(() -> treePane.get().updateLabelLayout(treeView.getOptionOrientation()));
+	}
+
+	public LongProperty updateCounterProperty() {
+		return updateCounter;
 	}
 }

@@ -106,7 +106,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			pane.setRunAfterUpdate(() -> {
 				var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
 				mouseInteraction.setup(taxonLabelMap, nodeShapeMap, taxa::get, taxa::indexOf);
-
 				updateCounter.set(updateCounter.get() + 1);
 			});
 			pane.drawNetwork();
@@ -114,7 +113,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		networkBlock.addListener(updateListener);
 		networkView.optionDiagramProperty().addListener(updateListener);
-
 
 		controller.getZoomInButton().setOnAction(e -> networkView.setOptionZoomFactor(1.1 * networkView.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(networkView.emptyProperty().or(networkView.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
@@ -221,10 +219,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(e -> networkView.setOptionOrientation(networkView.getOptionOrientation().getFlip()));
 		mainController.getFlipMenuItem().disableProperty().bind(networkView.emptyProperty());
 
-	}
-
-	public long getUpdateCounter() {
-		return updateCounter.get();
 	}
 
 	public LongProperty updateCounterProperty() {

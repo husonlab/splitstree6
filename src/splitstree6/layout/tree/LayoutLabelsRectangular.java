@@ -22,10 +22,11 @@ package splitstree6.layout.tree;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.scene.Group;
-import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
-import jloda.graph.NodeArray;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
+
+import java.util.Map;
 
 /**
  * create node labels for a rectangular layout
@@ -33,7 +34,7 @@ import jloda.phylo.PhyloTree;
  */
 public class LayoutLabelsRectangular {
 
-	public static void apply(PhyloTree tree, NodeArray<Shape> nodeShapeMap, NodeArray<RichTextLabel> nodeLabelMap, double labelGap,
+	public static void apply(PhyloTree tree, Map<Node, ? extends javafx.scene.Node> nodeShapeMap, Map<Node, RichTextLabel> nodeLabelMap, double labelGap,
 							 boolean linkNodesEdgesLabels, Group labelConnectors) {
 		var alignLabels = (labelConnectors != null);
 		double max;

@@ -1,5 +1,5 @@
 /*
- * TaxLabelFormatterPresenter.java Copyright (C) 2022 Daniel H. Huson
+ * TaxLabelFormatPresenter.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -36,14 +36,14 @@ import splitstree6.window.MainWindow;
 
 import java.util.HashSet;
 
-public class TaxLabelFormatterPresenter {
+public class TaxLabelFormatPresenter {
 	private final InvalidationListener selectionListener;
 
 	private final static ObservableList<String> fontFamilies = FXCollections.observableArrayList(Font.getFamilies());
 
 	private boolean inUpdatingDefaults = false;
 
-	public TaxLabelFormatterPresenter(MainWindow mainWindow, TaxLabelFormatterController controller, UndoManager undoManager) {
+	public TaxLabelFormatPresenter(MainWindow mainWindow, TaxLabelFormatController controller, UndoManager undoManager) {
 		var selectionModel = mainWindow.getTaxonSelectionModel();
 
 		controller.getFontFamilyCbox().setItems(fontFamilies);

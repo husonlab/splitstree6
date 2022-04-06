@@ -91,7 +91,7 @@ public class DrawOnCanvas {
 		service.setProgressParentPane(progressPane);
 		service.setCallable(() -> ComputeTreeLayout.apply(tree, nTaxa, taxonLabelMap, diagram, averaging, width - 200, height - 200, (a, b, c) -> {
 		}, (a, b) -> {
-		}, false, false));
+		}, false, false, null));
 
 		service.setOnSucceeded(e -> {
 			var result = service.getValue();

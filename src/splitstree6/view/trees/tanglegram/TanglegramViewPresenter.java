@@ -25,15 +25,18 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import javafx.scene.Group;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.graph.Graph;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.parts.Taxon;
@@ -78,8 +81,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 		);
 
+		final ObservableMap<Node, Group> nodeShapeMap1 = FXCollections.observableHashMap();
 		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
-				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowInternalLabelsProperty());
+				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty(),
+				tanglegramView.optionShowInternalLabelsProperty(), nodeShapeMap1);
 
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
@@ -97,8 +102,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		orientation2Property.set(tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg);
 
+		ObservableMap<Node, Group> nodeShapeMap2 = FXCollections.observableHashMap();
 		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
-				tanglegramView.optionDiagram2Property(), tanglegramView.optionAveraging2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowInternalLabelsProperty());
+				tanglegramView.optionDiagram2Property(), tanglegramView.optionAveraging2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty(),
+				tanglegramView.optionShowInternalLabelsProperty(), nodeShapeMap2);
 
 		controller.getRightPane().getChildren().add(tree2Pane);
 
@@ -171,7 +178,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		}
 
 		{
-			var connectors = new Connectors(mainWindow, controller.getMiddlePane(), controller.getLeftPane(), controller.getRightPane(), new SimpleObjectProperty<>(Color.DARKGRAY), new SimpleDoubleProperty(1.0));
+			var connectors = new Connectors(mainWindow, controller.getMiddlePane(), controller.getLeftPane(), nodeShapeMap1, controller.getRightPane(), nodeShapeMap2,
+					new SimpleObjectProperty<>(Color.DARKGRAY), new SimpleDoubleProperty(1.0));
 			tree1Pane.setRunAfterUpdate(connectors::update);
 			tree2Pane.setRunAfterUpdate(connectors::update);
 			tanglegramView.optionFontScaleFactorProperty().addListener(e -> connectors.update());
