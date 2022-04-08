@@ -87,6 +87,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		var useDualDCG = isOptionUsePreconditioner();
 		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDualDCG, progress);
 
+		// add all missing trivial
+		splits.addAll(SplitsUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax()));
 
 		if (Compatibility.isCompatible(splits))
 			splitsBlock.setCompatibility(Compatibility.compatible);

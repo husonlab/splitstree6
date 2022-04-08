@@ -22,14 +22,14 @@ package splitstree6.densitree;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 
 public class DensiTreeMainController {
+	@FXML
+	private AnchorPane anchorPane;
 
 	@FXML
-	private Pane mainPane;
+	private BorderPane borderPane;
 
 	@FXML
 	private StackPane stackPane;
@@ -42,6 +42,9 @@ public class DensiTreeMainController {
 
 	@FXML
 	private MenuItem openMenuItem;
+
+	@FXML
+	private MenuItem printMenuItem;
 
 	@FXML
 	private MenuItem quitMenuItem;
@@ -94,11 +97,15 @@ public class DensiTreeMainController {
 	@FXML
 	private Label messageLabel;
 
-	public Pane getMainPane() {
-		return mainPane;
+	@FXML
+	private void initialize() {
 	}
 
-	public StackPane getStackPane(){
+	public AnchorPane getAnchorPane() {
+		return anchorPane;
+	}
+
+	public StackPane getStackPane() {
 		return stackPane;
 	}
 
@@ -106,7 +113,7 @@ public class DensiTreeMainController {
 		return canvas;
 	}
 
-	public Pane getPane(){
+	public Pane getPane() {
 		return pane;
 	}
 
@@ -114,9 +121,14 @@ public class DensiTreeMainController {
 		return openMenuItem;
 	}
 
+	public MenuItem getPrintMenuItem() {
+		return printMenuItem;
+	}
+
 	public MenuItem getQuitMenuItem() {
 		return quitMenuItem;
 	}
+
 
 	public MenuItem getCopyMenuItem() {
 		return copyMenuItem;

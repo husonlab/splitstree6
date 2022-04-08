@@ -22,8 +22,9 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.*?>
-<VBox fx:id="vBox" prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/16"
+<VBox fx:id="vBox" prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/18"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.taxlabels.TaxLabelFormatController">
     <padding>
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
@@ -36,7 +37,7 @@
         </Label>
     </HBox>
     <HBox alignment="CENTER_LEFT" spacing="4.0">
-        <Label text="Font:"/>
+        <Label text="Font"/>
         <ComboBox fx:id="fontFamilyCbox" prefWidth="150.0">
             <tooltip>
                 <Tooltip text="Font family"/>
@@ -44,7 +45,7 @@
         </ComboBox>
     </HBox>
     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
-        <Label text="Size:">
+        <Label text="Size">
             <HBox.margin>
                 <Insets right="2.0"/>
             </HBox.margin>
@@ -90,15 +91,51 @@
         </ToggleButton>
     </HBox>
     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0" spacing="4.0">
-        <Label text="Color:">
+        <Label text="Color">
             <font>
                 <Font size="12.0"/>
             </font>
         </Label>
-        <ColorPicker fx:id="textFillColorChooser">
+        <ColorPicker fx:id="textFillColorPicker" prefWidth="130.0">
             <tooltip>
                 <Tooltip text="Text color"/>
             </tooltip>
+            <value>
+                <Color opacity="0.0"/>
+            </value>
         </ColorPicker>
+        <Button fx:id="clearColorButton" mnemonicParsing="false" text="x">
+            <font>
+                <Font size="10.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Clear color"/>
+            </tooltip>
+        </Button>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="99.0" spacing="4.0">
+        <children>
+            <Label text="Back.">
+                <font>
+                    <Font size="12.0"/>
+                </font>
+            </Label>
+            <ColorPicker fx:id="backgroundColorPicker" prefWidth="130.0">
+                <tooltip>
+                    <Tooltip text="Label background color"/>
+                </tooltip>
+                <value>
+                    <Color opacity="0.0"/>
+                </value>
+            </ColorPicker>
+            <Button fx:id="clearBackgroundButton" mnemonicParsing="false" text="x">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <tooltip>
+                    <Tooltip text="Clear background color"/>
+                </tooltip>
+            </Button>
+        </children>
     </HBox>
 </VBox>

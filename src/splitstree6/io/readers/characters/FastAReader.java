@@ -62,12 +62,12 @@ public class FastAReader extends CharactersReader {
 		int nchar = 0;
 		int counter = 0;
 
-		try (FileLineIterator it = new FileLineIterator(inputFile)) {
+		try (var it = new FileLineIterator(inputFile)) {
 			progressListener.setMaximum(it.getMaximumProgress());
 			progressListener.setProgress(0);
 			int currentSequenceLength = 0;
-			StringBuilder currentSequence = new StringBuilder();
-			boolean ignoreNext = false;
+			var currentSequence = new StringBuilder();
+			var ignoreNext = false;
 
 			while (it.hasNext()) {
 				final String line = it.next();
@@ -109,9 +109,9 @@ public class FastAReader extends CharactersReader {
 						tmpLine = line.substring(0, line.length() - 1); // cut the last symbol
 					else
 						tmpLine = line;
-					String allowedChars = "" + getMissing() + getGap();
+					var allowedChars = "" + getMissing() + getGap();
 					checkIfCharactersValid(tmpLine, counter, allowedChars);
-					String add = tmpLine.replaceAll("\\s+", "");
+					var add = tmpLine.replaceAll("\\s+", "");
 					currentSequenceLength += add.length();
 					currentSequence.append(add);
 				}
@@ -155,7 +155,7 @@ public class FastAReader extends CharactersReader {
 		}
 
 		// check if the info line contains any of databases IDs
-		infoLine = infoLine.toLowerCase();
+		infoLine = infoLine;
 		String foundID = "";
 		for (String id : possibleIDs) {
 			if (infoLine.contains(">" + id + "|") || infoLine.contains("|" + id + "|")) {
@@ -173,14 +173,14 @@ public class FastAReader extends CharactersReader {
 					index1 = afterID.indexOf('|') + 2;
 				else
 					index1 = afterID.indexOf('|') + 1;
-				return ">" + afterID.substring(index1).toUpperCase();
+				return ">" + afterID.substring(index1);
 			} else {
 				index1 = afterID.indexOf('|') + 1;
 				index2 = afterID.substring(index1 + 1).indexOf('|') + 2;
-				return ">" + afterID.substring(index1, index2).toUpperCase();
+				return ">" + afterID.substring(index1, index2);
 			}
 		}
-		return ">" + infoLine.substring(1).toUpperCase();
+		return ">" + infoLine.substring(1);
 	}
 
 	public boolean isOptionFullLabels() {
@@ -225,7 +225,7 @@ public class FastAReader extends CharactersReader {
 	 * if repeating taxa label is found, convert to "label + number" form
 	 */
 	static void addTaxaName(String line, ArrayList<String> taxonNames, int linesCounter) {
-		int sameNamesCounter = 0;
+		var sameNamesCounter = 0;
 		if (taxonNames.contains(line.substring(1))) {
 			System.err.println("Warning: Repeated taxon name " + line.substring(1) + ". Line: " + linesCounter);
 			sameNamesCounter++;

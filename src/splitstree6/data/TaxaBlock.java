@@ -24,10 +24,15 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import jloda.util.Single;
+import jloda.util.StringUtils;
 import splitstree6.data.parts.Taxon;
+import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
+import java.io.BufferedReader;
+import java.io.Reader;
 import java.util.*;
 
 public class TaxaBlock extends DataBlock {
@@ -368,6 +373,25 @@ public class TaxaBlock extends DataBlock {
 			if (originalTaxon != null) {
 				taxa.set(i, originalTaxon);
 			}
+		}
+	}
+
+	public void importDisplayLabels(Reader reader) {
+		var changed = new Single<>(false);
+
+		(new BufferedReader(reader)).lines().filter(s -> !s.isBlank()).map(s -> StringUtils.split(s, '\t'))
+				.forEach(tokens -> {
+					var taxon = get(tokens[0]);
+					if (taxon != null) {
+						if (tokens.length >= 2)
+							taxon.setDisplayLabel(tokens[1]);
+						else
+							taxon.setDisplayLabel(taxon.getName());
+						changed.set(true);
+					}
+				});
+		if (changed.get() && getNode() != null) {
+			((AlgorithmNode) getNode().getPreferredChild()).restart();
 		}
 	}
 }

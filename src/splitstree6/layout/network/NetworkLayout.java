@@ -63,14 +63,14 @@ public class NetworkLayout {
 
 		var graph = networkBlock.getGraph();
 
-		progress.setTasks("Drawing", "network");
+		progress.setTasks("Network", "computing layout");
 		progress.setMaximum(graph.getNumberOfNodes() + graph.getNumberOfEdges());
 		progress.setProgress(0);
 
 		try (NodeArray<Point2D> nodePointMap = graph.newNodeArray()) {
 			Function<Edge, Double> edgeWeightFunction;
 			if (diagram == DiagramType.Network) {
-				edgeWeightFunction = graph::getWeight;
+				edgeWeightFunction = e -> Math.max(0.00001, graph.getWeight(e));
 			} else {
 				edgeWeightFunction = e -> 1.0;
 			}

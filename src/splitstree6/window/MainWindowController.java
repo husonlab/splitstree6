@@ -56,7 +56,10 @@ public class MainWindowController {
 	private Menu openRecentMenu;
 
 	@FXML
-	private MenuItem importMenuItem;
+	private MenuItem importDataMenuItem;
+
+	@FXML
+	private MenuItem importTaxonDisplayMenuItem;
 
 	@FXML
 	private MenuItem replaceDataMenuItem;
@@ -516,8 +519,12 @@ public class MainWindowController {
 		return openRecentMenu;
 	}
 
-	public MenuItem getImportMenuItem() {
-		return importMenuItem;
+	public MenuItem getImportDataMenuItem() {
+		return importDataMenuItem;
+	}
+
+	public MenuItem getImportTaxonDisplayMenuItem() {
+		return importTaxonDisplayMenuItem;
 	}
 
 	public MenuItem getReplaceDataMenuItem() {

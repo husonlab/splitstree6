@@ -32,7 +32,6 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
@@ -139,7 +138,6 @@ public class NetworkView implements IView {
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
 
 		empty.bind(Bindings.createBooleanBinding(() -> getNetworkBlock() == null || getNetworkBlock().size() == 0, networkBlockProperty()));
-		BasicFX.reportChanges(emptyProperty());
 	}
 
 	@Override

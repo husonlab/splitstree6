@@ -40,11 +40,13 @@ import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
+import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.window.WindowGeometry;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
+import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
@@ -80,6 +82,7 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 
@@ -223,8 +226,32 @@ public class MainWindowPresenter {
 		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(workflow.runningProperty());
 
-		controller.getImportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
-		controller.getImportMenuItem().disableProperty().bind(workflow.runningProperty());
+		controller.getImportDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
+		controller.getImportDataMenuItem().disableProperty().bind(workflow.runningProperty());
+
+		controller.getImportTaxonDisplayMenuItem().setOnAction(e -> {
+			final FileChooser fileChooser = new FileChooser();
+			fileChooser.setTitle("Import Taxa Display Labels");
+
+			final File previousFile = new File(ProgramProperties.get("TaxaDisplayLabelsFile", ""));
+			if (previousFile.isFile()) {
+				fileChooser.setInitialDirectory(previousFile.getParentFile());
+				fileChooser.setInitialFileName(previousFile.getName());
+			}
+			fileChooser.setSelectedExtensionFilter(TextFileFilter.getInstance());
+			fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance(), new FileChooser.ExtensionFilter("TSV", "*.tsv", "*.tsv.gz"));
+			var file = fileChooser.showOpenDialog(mainWindow.getStage());
+			if (file != null) {
+				try {
+					workflow.getInputTaxaBlock().importDisplayLabels(FileUtils.getReaderPossiblyZIPorGZIP(file.getPath()));
+				} catch (IOException ex) {
+					NotificationManager.showError("Import failed: " + ex);
+				}
+			}
+
+		});
+		controller.getImportTaxonDisplayMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
+
 
 		controller.getReplaceDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
 		controller.getReplaceDataMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));

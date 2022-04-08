@@ -47,7 +47,16 @@ public class TaxLabelFormatController {
 	private ToggleButton strikeToggleButton;
 
 	@FXML
-	private ColorPicker textFillColorChooser;
+	private ColorPicker textFillColorPicker;
+
+	@FXML
+	private ColorPicker backgroundColorPicker;
+
+	@FXML
+	private Button clearBackgroundButton;
+
+	@FXML
+	private Button clearColorButton;
 
 	@FXML
 	private void initialize() {
@@ -82,7 +91,19 @@ public class TaxLabelFormatController {
 		return strikeToggleButton;
 	}
 
-	public ColorPicker getTextFillColorChooser() {
-		return textFillColorChooser;
+	public ColorPicker getTextFillColorPicker() {
+		return textFillColorPicker;
+	}
+
+	public ColorPicker getBackgroundColorPicker() {
+		return backgroundColorPicker;
+	}
+
+	public Button getClearBackgroundButton() {
+		return clearBackgroundButton;
+	}
+
+	public Button getClearColorButton() {
+		return clearColorButton;
 	}
 }

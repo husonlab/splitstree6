@@ -159,16 +159,19 @@ public class TaxLabelFormatPresenter {
 			}
 		});
 
-		controller.getTextFillColorChooser().setOnAction(e -> {
+		controller.getTextFillColorPicker().valueProperty().addListener(e -> {
 			if (!inUpdatingDefaults) {
-				var color = controller.getTextFillColorChooser().getValue();
+				var color = controller.getTextFillColorPicker().getValue();
 				var undoList = new UndoableRedoableCommandList(" label color");
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
-					if (oldLabel != null && (RichTextLabel.getTextFill(oldLabel) == null || !RichTextLabel.getTextFill(oldLabel).equals(color))) {
-						var newLabel = RichTextLabel.setTextFill(oldLabel, color);
-						Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
-						undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
+					if (oldLabel != null) {
+						var oldColor = RichTextLabel.getTextFill(oldLabel);
+						if (oldColor == null || !oldColor.equals(color)) {
+							var newLabel = RichTextLabel.setTextFill(oldLabel, color);
+							Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+							undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
+						}
 					}
 				}
 				if (undoList.size() > 0) {
@@ -177,6 +180,38 @@ public class TaxLabelFormatPresenter {
 				}
 			}
 		});
+
+		controller.getClearColorButton().setOnAction(e -> {
+			controller.getTextFillColorPicker().setValue(null);
+		});
+		controller.getClearColorButton().disableProperty().bind(controller.getTextFillColorPicker().valueProperty().isNull());
+
+		controller.getBackgroundColorPicker().valueProperty().addListener(e -> {
+			if (!inUpdatingDefaults) {
+				var color = controller.getBackgroundColorPicker().getValue();
+				var undoList = new UndoableRedoableCommandList(" background color");
+				for (var taxon : selectionModel.getSelectedItems()) {
+					var oldLabel = taxon.getDisplayLabelOrName();
+					if (oldLabel != null) {
+						var oldColor = RichTextLabel.getBackgroundColor(oldLabel);
+						if (oldColor == null || !oldColor.equals(color)) {
+							var newLabel = RichTextLabel.setBackgroundColor(oldLabel, color);
+							Platform.runLater(() -> taxon.setDisplayLabel(newLabel));
+							undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
+						}
+					}
+				}
+				if (undoList.size() > 0) {
+					undoManager.add(undoList);
+					mainWindow.setDirty(true);
+				}
+			}
+		});
+
+		controller.getClearBackgroundButton().setOnAction(e -> {
+			controller.getBackgroundColorPicker().setValue(null);
+		});
+		controller.getClearBackgroundButton().disableProperty().bind(controller.getBackgroundColorPicker().valueProperty().isNull());
 
 		selectionListener = e -> {
 			inUpdatingDefaults = true;
@@ -187,14 +222,16 @@ public class TaxLabelFormatPresenter {
 				controller.getItalicToggleButton().setDisable(selectionModel.size() == 0);
 				controller.getUnderlineToggleButton().setDisable(selectionModel.size() == 0);
 				controller.getStrikeToggleButton().setDisable(selectionModel.size() == 0);
-				controller.getTextFillColorChooser().setDisable(selectionModel.size() == 0);
+				controller.getTextFillColorPicker().setDisable(selectionModel.size() == 0);
+				controller.getBackgroundColorPicker().setDisable(selectionModel.size() == 0);
 
 				controller.getFontSizeField().setText("");
 				controller.getBoldToggleButton().setSelected(false);
 				controller.getItalicToggleButton().setSelected(false);
 				controller.getUnderlineToggleButton().setSelected(false);
 				controller.getStrikeToggleButton().setSelected(false);
-				controller.getTextFillColorChooser().setValue(null);
+				controller.getTextFillColorPicker().setValue(null);
+				controller.getBackgroundColorPicker().setValue(null);
 
 				var fontFamilies = new HashSet<String>();
 				var fontSizes = new HashSet<Double>();
@@ -203,6 +240,7 @@ public class TaxLabelFormatPresenter {
 				var underlineStates = new HashSet<Boolean>();
 				var strikeStates = new HashSet<Boolean>();
 				var colors = new HashSet<Paint>();
+				var backgroundColors = new HashSet<Paint>();
 				for (var taxon : selectionModel.getSelectedItems()) {
 					var text = taxon.getDisplayLabelOrName();
 					if (text != null) {
@@ -213,6 +251,7 @@ public class TaxLabelFormatPresenter {
 						underlineStates.add(RichTextLabel.isUnderline(text));
 						strikeStates.add(RichTextLabel.isStrike(text));
 						colors.add(RichTextLabel.getTextFill(text));
+						backgroundColors.add(RichTextLabel.getBackgroundColor(text));
 					}
 				}
 				controller.getFontFamilyCbox().setValue(fontFamilies.size() == 1 ? fontFamilies.iterator().next() : null);
@@ -221,7 +260,8 @@ public class TaxLabelFormatPresenter {
 				controller.getItalicToggleButton().setSelected(boldStates.size() == 1 ? italicStates.iterator().next() : false);
 				controller.getUnderlineToggleButton().setSelected(boldStates.size() == 1 ? underlineStates.iterator().next() : false);
 				controller.getStrikeToggleButton().setSelected(strikeStates.size() == 1 ? strikeStates.iterator().next() : false);
-				controller.getTextFillColorChooser().setValue(colors.size() == 1 ? (Color) colors.iterator().next() : null);
+				controller.getTextFillColorPicker().setValue(colors.size() == 1 ? (Color) colors.iterator().next() : null);
+				controller.getBackgroundColorPicker().setValue(backgroundColors.size() == 1 ? (Color) backgroundColors.iterator().next() : null);
 			} finally {
 				inUpdatingDefaults = false;
 			}
