@@ -2,12 +2,12 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNe
 
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms.circularAtx;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms.circularAx;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.maskEntries;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.normSquared;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.*;
 
 
 public class CircularConjugateGradient {
@@ -28,6 +28,20 @@ public class CircularConjugateGradient {
         // min 1/2 ||Ax - d|| -> (A'A) x =A'd
         // WE use the CGNR algorithm on pg 236 of Saad.
 
+        long startTime = System.currentTimeMillis();
+        if (params.verboseOutput) {
+            int nG = count(G);
+
+            try {
+                params.writer.write("\t\t %Entering circularConjugateGradient. |G| = "+nG+"\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+
         final int npairs = nTax * (nTax - 1) / 2;
         double[] r = new double[npairs + 1];
         double[] z = new double[npairs + 1];
@@ -46,6 +60,13 @@ public class CircularConjugateGradient {
 
         double ztz, ztz_new, alpha, beta;
         ztz = normSquared(z);
+
+        double[] residuals= new double[1];
+        if (params.printCGconvergence) {
+            residuals = new double[params.maxPCGIterations];
+        }
+
+
         while (k < params.maxPCGIterations && ztz > tol * tol) {
             /* Check residual is calculated correctly. ***
             double[] resvec = new double[npairs+1];
@@ -54,6 +75,10 @@ public class CircularConjugateGradient {
                 resvec[i] = d[i] - resvec[i];
             double res2 = normSquared(resvec); //Should be the same as res
             */
+
+            if (params.printCGconvergence) {
+                residuals[k] = Math.sqrt(ztz);
+            }
 
             k = k + 1;
             circularAx(nTax, p, w);
@@ -71,9 +96,32 @@ public class CircularConjugateGradient {
                 p[i] = z[i] + beta * p[i];
             ztz = ztz_new;
         }
+
+        if (params.printCGconvergence) {
+            try {
+                params.writer.write("res = [");
+                for(int i=0;i<k;i++) {
+                    params.writer.write("\t\t\t"+i+"\t"+residuals[i]+";\n");
+                }
+                params.writer.write("]; hold on; plot(res(:,1),log(res(:,2)),'LineWidth',8,'DisplayName','"+count(G)+"'); hold off \n\n");
+                params.writer.write("numIters(rep,:)=["+count(G)+" size(res,1)]; rep=rep+1;\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
         if (k >= params.maxPCGIterations)
             throw new RuntimeException("Maximum number of iterations exceeded in circularConjugateGradient");
 
+        if (params.verboseOutput) {
+            try {
+                params.writer.write("\t\t%Exiting circularConjugateGradient. Number of iterations was "+k+"\tTime = "+(System.currentTimeMillis()-startTime)+"\t");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         //Overwrite z[G] with the gradient. //TODO try using gradient from CG.
         circularAx(nTax, x, w);

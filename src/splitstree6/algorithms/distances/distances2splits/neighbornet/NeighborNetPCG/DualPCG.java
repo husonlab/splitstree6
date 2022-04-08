@@ -3,6 +3,7 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNe
 
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms.*;
@@ -33,9 +34,19 @@ public class DualPCG {
         as a single block.
 
 
+
         TODO: Investigate precomputing B as a block matrix?
          */
 
+        long startTime = System.currentTimeMillis();
+
+        if (params.verboseOutput) {
+            try {
+                params.writer.write("\t\t%Entering dualPCG. |G| = "+nG+"\tPreconditioner="+params.usePreconditioner+"\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         int npairs = n * (n - 1) / 2; //Dimensions of G,d.
         double tol = params.pcgTol;
@@ -63,8 +74,23 @@ public class DualPCG {
 
         double zrt = dotProduct(z, rt);
 
+        double[] residuals = new double[1];
+        if (params.printCGconvergence) {
+            residuals = new double[params.maxPCGIterations];
+        }
+
+
+
+
+
         int k = 1;
         while (k < params.maxPCGIterations && normSquared(z) > tol * tol) {
+
+            if (params.printCGconvergence) {
+                residuals[k] = normSquared(z);
+            }
+
+
             calculateBx(n, p, G, w);  //w = Bp
             double alpha = zrt / normSquared(w);
             for (int i = 1; i <= nG; i++)
@@ -96,7 +122,21 @@ public class DualPCG {
         System.err.println("DUAL PCG error = "+ normSquared(gradnu));
          */
 
+        if (params.printCGconvergence) {
+            if (params.printCGconvergence) {
+                try {
+                    params.writer.write("res = [");
+                    for(int i=0;i<k;i++) {
+                        params.writer.write("\t\t\t"+i+"\t"+residuals[i]+";\n");
+                    }
+                    params.writer.write("]; hold on; plot(res(:,1),log(res(:,2)),'LineWidth',8,'DisplayName','"+count(G)+"'); hold off \n\n");
+                    params.writer.write("numIters(rep,:)=["+count(G)+" size(res,1)]; rep=rep+1;\n");
 
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
 
 
         /* Compute x and y and copy them into z.*/
@@ -113,6 +153,17 @@ public class DualPCG {
             y[i] = d[i] - y[i];
         circularSolve(n, y, x);
         circularAtx(n, Rv, y);
+
+        if (params.verboseOutput) {
+            try {
+                params.writer.write("\t\t%Exiting dualPCG. Number of iterations was "+k+"\tTime = "+(System.currentTimeMillis()-startTime)+"\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
 
         /* ***
         double[] Ax = new double[npairs+1];

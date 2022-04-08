@@ -8,6 +8,8 @@ import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNet
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities;
 import splitstree6.data.parts.ASplit;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -23,7 +25,6 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Neig
 
 
 public class NeighborNetSplits {
-    private static boolean verbose = true;
 
     public static class NNLSParams {
         static public int CG = 0;
@@ -34,7 +35,7 @@ public class NeighborNetSplits {
         public double pcgTol = 1e-4; //Tolerance for pcg: will stop when residual has norm less than this. default  1e-7 //TODO rename to PCG_EPSILON
         public double finalTol = 1e-4; //Tolerance for the final 'tidy up' call to least squares.
         public double vectorCutoff = 1e-5; //Cutoff - values in block pivot with value smaller than this are set to zero.
-        public boolean usePreconditioner = false; //True if the conjugate gradient makes use of preconditioner.
+        public boolean usePreconditioner = false; //True if the conjugate gradient makes use of preconditioner (only implemented when useDual is true).
         public int preconditionerBands = 10; //Number of bands used when computing Y,Z submatrices in the preconditioner.
         // Note that alot of the calculations for preconditioning are done even if this is false, so use this flag only to assess #iterations.
         public boolean useBlockPivot = true; //Use the block pivot algorithm rather than least squares.
@@ -44,6 +45,24 @@ public class NeighborNetSplits {
         //public double pgBound = 0.0; //Terminate if the l_infinity of the projected gradient is smaller that this.
         public double propKept = 0.6; //Proportion of negative splits to keep in the first iteration of the active set method.
         public int leastSquaresAlgorithm = CG;
+
+        public boolean printCGconvergence = true; //For debugging and profiling - prints the appropriate residual at each step of CG/PCG
+        public boolean printNNLSconvergence = true; //For debugging and profiling - prints the residual at each step of blockPivot/ActiveSet
+        public String CGconvergenceFilename = "cgConvergeTest.txt";
+
+        public boolean verboseOutput= true;
+        public String verboseFilename = "nnetConvergeData.m";
+        public FileWriter writer = null;
+
+        //Some active set method choices, here just for development.
+        public double proportionInitiallyActive = 1.0;  // After finding the LS solution, this proportion of negative indices are added to the active set.
+
+        public int moveStrategy = 0; //Trying different strategies for adding constraints.
+        public double proportionConstraintsRemoved=0.0; //Which proportion of indices with negative gradients are added back to the active set.
+        //If zero, then exactly one is added.
+
+
+
     }
 
     /**
@@ -57,12 +76,13 @@ public class NeighborNetSplits {
      * @param distances     pairwise distances, 0-based
      * @param cutoff        min split weight
      * @param useBlockPivot Use the block pivoting algorithm
-     * @param useDualPCG    Use the dual preconditioned conjugate gradient algorithm for least squares
+     * @param useDual    Use the dual least squares method algorithm for least squares
+     * @param usePreconditioner Use the preconditioner with the dual problem.
      * @param progress      progress listener
      * @return weighted splits
      * @throws CanceledException
      */
-    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDualPCG, ProgressListener progress) throws CanceledException {
+    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDual, boolean usePreconditioner, ProgressListener progress) throws CanceledException {
 
         int nTax = cycle.length - 1;
 
@@ -94,11 +114,23 @@ public class NeighborNetSplits {
 
         //Call the appropriate least squares routine
         NNLSParams params = new NNLSParams();
-        if (useDualPCG)
+        if (useDual)
             params.leastSquaresAlgorithm = params.DUAL_PCG;
         else
             params.leastSquaresAlgorithm = params.CG;
         params.maxPCGIterations = Math.max(1000, npairs / 10);
+        params.usePreconditioner = usePreconditioner;
+        params.useBlockPivot = useBlockPivot;
+
+        if (params.verboseOutput) {
+            try {
+                params.writer = new FileWriter(params.verboseFilename,false);
+                params.writer.write("figure()\n\nrep=1;\nnumIters=zeros(1000,2);\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         double[] x = new double[npairs + 1];
         if (useBlockPivot)
             circularBlockPivot(nTax, d, x, progress, params);
@@ -122,6 +154,16 @@ public class NeighborNetSplits {
 
             }
         }
+
+        if (params.verboseOutput) {
+            try {
+                params.writer.write("numIters = numIters(1:(rep-1),:)\n");
+                params.writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         return splitList;
 
     }
@@ -136,83 +178,115 @@ public class NeighborNetSplits {
      * x is a vector of split weights, with pairs in same order as d. The split (i,j), for i<j, is {i,i+1,...,j-1}| rest
      * <p>
      */
-    static public void circularActiveSet(int nTax, double[] d, double[] x, ProgressListener progress, NNLSParams params) throws CanceledException {
+    static public void circularActiveSet(int nTax, double[] d, double[] x, ProgressListener progress, NNLSParams params) {
 
         int npairs = nTax * (nTax - 1) / 2;
-        /* Allocate memory for the "utility" vectors */
-        double[] grad = new double[npairs + 1];
-        double[] s = new double[npairs + 1];
-
-        final double[] old_x = new double[npairs + 1];
-        final boolean[] active = new boolean[npairs + 1];
+        int iter = 0; //Iteration number. This is the number of calls to least squares.
 
         /* First evaluate the unconstrained optima. If this is feasible then we don't have to do anything more! */
         CircularSplitAlgorithms.circularSolve(nTax, d, x);
         if (VectorUtilities.allPositive(x))
             return;
 
+
+
+
+        /* Allocate memory for the "utility" vectors */
+        double[] grad = new double[npairs + 1];
+        double[] s = new double[npairs + 1];
+        final double[] old_x = new double[npairs + 1];
+        final boolean[] active = new boolean[npairs + 1];
+
+        //The following is for debugging. It could be removed, but only after everything is working really well.
+        //Columns: iterate, num active, num inactive,function val, log(residual)
+        double[][] convergenceStats = new double[1][1];
+        if (params.printNNLSconvergence) {
+            convergenceStats = new double[params.maxOuterIterations+1][6];
+        }
+        if (params.verboseOutput) {
+            try {
+                params.writer.write("\t%Entering circularActiveSet\tntax = "+nTax+"\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+
+
         /* Typically, we need to contract a lot of the splits in the full set. For the first iteration we contact all
         but a proportion params.propKept of the splits with negative weight, chosen so that the splits with more
         negative weight are contracted preferentially.
          */
-        final int[] entriesToContract = worstIndicesRevised(x, params.propKept);
+        final int[] entriesToContract = worstIndicesRevised(x, 1.0 - params.proportionInitiallyActive);
         for (int index : entriesToContract) {
             x[index] = 0.0;
             active[index] = true;
         }
 
-        //We start the active search from a vector of all ones. (guaranteed to be feasible, but maybe not optimal?)
-        Arrays.fill(old_x, 1, npairs + 1, 1.0);
-        Arrays.fill(active, false);
-
         while (true) {
-            while (true) /* Inner loop: find the next feasible optimum */ {
-                circularLeastSquares(nTax, active, d, x, params);
-                double err1 = checkCircularLeastsquares(nTax, d, active, x);
+            while (iter<params.maxOuterIterations) /* Inner loop: find the next feasible optimum */ {
+                circularLeastSquares(nTax, active, d, x, params); //x is optimal s.t. xi = 0 when active[i] true.
+                iter++;
+
+                int c=0;
+                for(int i=1;i<=npairs;i++)
+                    if (old_x[i]==0 && !active[i])
+                        c++;
+                System.err.println("c = "+c + "\n");
 
 
-                int numInactive = 0;
-                for (int i = 1; i <= npairs; i++) { //s is the search direction.
-                    if (!active[i]) {
-                        s[i] = x[i] - old_x[i];
-                        numInactive++;
-                    }
+
+                if (params.printNNLSconvergence) {
+                    convergenceStats[iter][0] = iter;
+                    convergenceStats[iter][1] = count(active);
+                    convergenceStats[iter][2] = npairs - convergenceStats[iter][1];
+                    double[] cleanx = new double[npairs+1];
+                    System.arraycopy(old_x,1,cleanx,1,npairs);
+                    maskEntries(cleanx,active);
+                    double[] debugStats = computeStats(nTax,cleanx,d);
+                    for(int j = 0;j<3;j++)
+                        convergenceStats[iter][3+j] = debugStats[j];
                 }
-                //System.out.println("Error1 = "+err1+"   num splits = "+numInactive); ***
 
-                //Move along the search direction until an index hits zero. First one is 'firstBoundary'
-                int firstBoundary = moveToBoundary(old_x, s, active);
-                if (firstBoundary > 0) {
-                    active[firstBoundary] = true;
-                    old_x[firstBoundary] = 0.0;
-                } else
+                //Move old_x as far as we can towards x while remaining feasible. If x is already feasible, exit inner loop.
+                if (addConstraints(x,old_x, active,params))
                     break;
             }
+            //At this point, old_x is feasible, and is the best estimate so far. Check if it is optimal
 
-            /* Set active indices to zero: the least squares algorithms use those spots for the gradient.
-             */
-            for (int i = 1; i <= npairs; i++)
-                if (active[i])
-                    x[i] = 0.0;
-
-
-
-            /* Find i,j that minimizes the gradient over all i,j in the active set. Note that grad = (AtAb-Atd)  */
+            /* Compute the gradient */
             circularAx(nTax, x, s);
             for (int i = 1; i <= npairs; i++) {
                 s[i] -= d[i];
             }
             circularAtx(nTax, s, grad);
-
             int min_i = indexOfMin(grad, active); //Get active index giving minimum gradient
             if (min_i == 0 || grad[min_i] >= 0) {
-                //double err = CircularSplitAlgorithms.checkNnegLeastsquares(nTax,d,x); ***
-                //System.err.println("Checking NNLS optimality gave: "+err); ***
-                return;
-            } else
+                break;
+            } else if (iter>=params.maxOuterIterations) {
+                System.err.println("Exceeded max number of iterations in the Active Set procedure");
+                break;
+            } else {
                 active[min_i] = false;
-            progress.checkForCancel();
+            }
         }
+
+        if (params.verboseOutput&&params.printNNLSconvergence) {
+            try {
+                params.writer.write("nnlsStats=[\n");
+                for(int k=1;k<=iter;k++) {
+                    for(int j=1;j<5;j++)
+                        params.writer.write("\t"+convergenceStats[k][j]);
+                    params.writer.write(";\n");
+                }
+                params.writer.write("];\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
     }
 
     /**
@@ -273,45 +347,49 @@ public class NeighborNetSplits {
     }
 
     /**
-     * Given a point oldx and a direction s, this computes the maximum value of alpha such that oldx + alpha s is feasible,
-     * with an upper bound of 1. Overwrites oldx with oldx + alpha s, and returns the variable index which first hits zero,
-     * or 0 if oldx+s is feasible.
-     *
-     * @param oldx
-     * @param s
-     * @param active
-     * @return
+     * Finds the last feasible point on the line segment from old_x to x.
+     * Dimensions i for which alpha[i] = true are ignore (and should be zero for both anyway)
+     * @param oldx  feasible vector
+     * @param x vector which may or may not be feasible
+     * @param active vector indicating entries constrained to zero.
+     * @return boolean, true if x is feasible. Note, will also change active.
      */
-    static private int moveToBoundary(double[] oldx, double[] s, boolean[] active) {
+    static private boolean addConstraints(double[] x, double[] oldx, boolean[] active, NNLSParams params) {
         /*
-        For any i such that s_i <0 let alpha_i solve oldx_i + alpha_i s_i = 0. Then alpha  is the minimum of
-        these alpha_i and 1. Note that
-            alpha_i <alpha_j
-        iff
-            oldx_i s_j < oldx_j s_i
-        and this comparison is more stable than evaluating and comparing the alpha_i's.
+        oldx is a
          */
+        int npairs = oldx.length - 1;
 
-        double xopt = 1.0;
-        double sopt = -1.0;
-        int minIndex = 0;
-        for (int i = 1; i < oldx.length; i++) {
-            if (!active[i] && s[i] < 0)
-                if (oldx[i] * sopt > xopt * s[i]) {
-                    xopt = oldx[i];
-                    sopt = s[i];
-                    minIndex = i;
+
+            //Classical case: we add the first constraint that we come across
+
+            double alpha = 1.0;
+            int firstBoundary = 0;
+            boolean isFeasible = true;
+
+            //Find optimal value of alpha
+            for (int i = 1; i <= npairs; i++) {
+                if (!active[i] && x[i] < 0.0) {
+                    double alphai = oldx[i] / (oldx[i] - x[i]);
+                    if (alphai < alpha) {
+                        alpha = alphai;
+                        firstBoundary = i;
+                        isFeasible = false;
+                    }
                 }
-        }
-        double alpha = -xopt / sopt;
-
-
-        for (int i = 1; i < oldx.length; i++) {
-            if (!active[i])
-                oldx[i] += alpha * s[i];
-        }
-
-        return minIndex;
+            }
+            if (isFeasible)
+                return true;
+            else {
+                //move old_x to  alpha x + (1-alpha) oldx
+                for (int i = 1; i <= npairs; i++) {
+                    if (!active[i])
+                        oldx[i] = Math.max(alpha * x[i] + (1 - alpha) * oldx[i], 0);
+                }
+                oldx[firstBoundary] = 0.0;
+                active[firstBoundary] = true;
+                return false;
+            }
 
     }
 
@@ -331,6 +409,16 @@ public class NeighborNetSplits {
      * @throws CanceledException
      */
     static public void circularBlockPivot(int n, double[] d, double[] z, ProgressListener progress, NNLSParams params) throws CanceledException {
+
+        if (params.verboseOutput) {
+            try {
+                params.writer.write("\t%Entering circularBlockPivot. ntax = "+n+"\n");
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
 
         //Initialise G, x & y (these are stored in the vector z)
         final int npairs = n * (n - 1) / 2;
@@ -421,78 +509,43 @@ public class NeighborNetSplits {
         } else if (params.leastSquaresAlgorithm == NNLSParams.DUAL_PCG) {
             DualPCG.dualPCG(n, d, G, z, params);
         }
-
-        //DEBUGGING CODE.
-        /*  ***
-        double[] Ax = new double[npairs+1];
-        double[] x = new double[npairs+1];
-        for(int i=1;i<=npairs;i++)
-            if (!G[i])
-                x[i] = zold[i];
-        double[] g = new double[npairs+1];
-
-
-        circularAx(n,x,Ax);
-        for(int i=1;i<=npairs;i++)
-            Ax[i] = Ax[i] - d[i];
-        circularAtx(n,Ax,g);
-
-        double gdiff1=0.0;
-        double gdiff2=0.0;
-
-        for(int i=1;i<=npairs;i++) {
-            if (G[i]) {
-                gdiff1 += (z[i] - g[i]) * (z[i] - g[i]);
-                gdiff2 += (g[i] - zold[i]) * (g[i] - zold[i]);
-            }
-        }
-
-        double norm2 = CircularSplitAlgorithms.checkCircularLeastsquares(n,d,G,z);
-        System.err.println("Circular least squares terminated with grad^2 = "+norm2);
-        System.err.println();
-        System.err.println("diff1 = "+diff1+"\t diff2 = "+diff2);
-
-         */
     }
 
     /**
-     * Computes gradient at x:   grad = A'(Ax - d)
-     *
-     * @param ntax
-     * @param x
-     * @param d
-     * @param grad
+     * Computes statistics from the optimization search for use in profiling and debugging.
+     * @param ntax  number of taxa
+     * @param x     current split weights
+     * @param d     vector of distances
+     * @return array with 0th entry equal to min value of x, 1st entry equal to function value, 2nd entry equal to log of projected gradient.
      */
-    public static void computeGradient(int ntax, double[] x, double[] d, double[] grad) {
+    private static double[] computeStats(int ntax, double[] x, double[] d) {
+        double[] output = new double[3];
         int npairs = ntax * (ntax - 1) / 2;
+
+        double minx = 1e10;
+        for(int i=1;i<=npairs;i++)
+            if (x[i]<minx)
+                minx = x[i];
+        output[0]=minx;
+
         double[] r = new double[npairs + 1];
+        double[] grad = new double[npairs+1];
+
         circularAx(ntax, x, r);
         for (int i = 1; i <= npairs; i++)
             r[i] -= d[i];
+        output[1]=normSquared(r); // ||Ax-d||^2
         circularAtx(ntax, r, grad);
+        double pgnorm = 0.0;
+        for(int i=1;i<=npairs;i++) {
+            if (x[i]==0)
+                grad[i] = Math.min(grad[i],0.0);
+        }
+        output[2] = normSquared(grad);
+        return output;
     }
 
-    /** ***
-     * Computes the projected gradient and returns the sum of the squares of its entries
-     * @param ntax
-     * @param x
-     * @param d
-     * @param active
-     * @return sum of the squares of the entries of the projected gradient. (= 0 at exact optimum)
 
-    public static double projectedGradient(int ntax, double[] x, double[] d, boolean[] active) {
-    int npairs = ntax*(ntax-1)/2;
-    double[] gradient = new double[npairs+1];
-    computeGradient(ntax,x,d,gradient);
-    double pg2 = 0.0;
-    for(int i=1;i<=npairs;i++) {
-    if (active[i])
-    gradient[i] = Math.min(0.0,gradient[i]);
-    pg2 += gradient[i] * gradient[i];
-    }
-    return pg2;
-    }
-     */
 
 
 }
