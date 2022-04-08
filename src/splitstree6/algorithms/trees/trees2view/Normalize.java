@@ -47,7 +47,7 @@ public class Normalize {
 
 		var sourceRoot = inputGraph.getRoot();
 
-		// setup new nodes:
+		// create new nodes:
 		try (NodeArray<Node> src2tar = inputGraph.newNodeArray()) {
 			for (var s : visibleAndLeaves) {
 				var t = outputGraph.newNode();

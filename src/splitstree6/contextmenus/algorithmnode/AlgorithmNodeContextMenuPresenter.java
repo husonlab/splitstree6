@@ -30,9 +30,10 @@ public class AlgorithmNodeContextMenuPresenter {
 		var workflow = mainWindow.getWorkflow();
 
 		controller.getEditMenuItem().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true));
+		controller.getEditMenuItem().disableProperty().bind(algorithmNode.validProperty().not().or(algorithmNode.allParentsValidProperty().not()));
 
 		controller.getRunMenuItem().setOnAction(e -> algorithmNode.restart());
-		controller.getRunMenuItem().disableProperty().bind((algorithmNode.getService().runningProperty().not().and(algorithmNode.allParentsValidProperty()).not()));
+		controller.getRunMenuItem().disableProperty().bind(workflow.runningProperty().or(algorithmNode.allParentsValidProperty().not()));
 
 		controller.getStopMenuItem().setOnAction(e -> algorithmNode.getService().cancel());
 		controller.getStopMenuItem().disableProperty().bind(algorithmNode.getService().runningProperty().not());
@@ -48,7 +49,5 @@ public class AlgorithmNodeContextMenuPresenter {
 			controller.getDeleteMenuItem().disableProperty().bind(workflow.runningProperty());
 		else
 			controller.getDeleteMenuItem().setDisable(true);
-
-
 	}
 }

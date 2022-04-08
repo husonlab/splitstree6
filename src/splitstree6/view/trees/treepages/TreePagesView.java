@@ -28,43 +28,21 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.PrintUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
-import splitstree6.view.format.taxlabels.TaxLabelFormatter;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.view.format.taxlabels.TaxLabelFormat;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
-import java.util.Arrays;
 import java.util.List;
 
 public class TreePagesView implements IView {
-	public enum TreeLabels {
-		None, Name, Info;
-
-		public String label() {
-			return switch (this) {
-				case None -> "-";
-				case Name -> "n";
-				case Info -> "i";
-			};
-		}
-
-		public static String[] labels() {
-			return Arrays.stream(values()).map(TreeLabels::label).toArray(String[]::new);
-		}
-
-		public static TreeLabels valueOfLabel(String label) {
-			return switch (label) {
-				case "-" -> None;
-				case "n" -> Name;
-				case "i" -> Info;
-				default -> None;
-			};
-		}
-	}
 
 	private final UndoManager undoManager = new UndoManager();
 
@@ -83,12 +61,12 @@ public class TreePagesView implements IView {
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
 	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
-	private final ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
+	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
-	private final ObjectProperty<TreeLabels> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
+	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
 	private final BooleanProperty optionShowInternalLabels = new SimpleBooleanProperty(this, "optionShowInternalLabels");
 
@@ -101,9 +79,9 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionRows, 1);
 		ProgramProperties.track(optionCols, 1);
 		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
-		ProgramProperties.track(optionAveraging, ComputeHeightAndAngles.Averaging::valueOf, ComputeHeightAndAngles.Averaging.ChildAverage);
+		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
-		ProgramProperties.track(optionTreeLabels, TreeLabels::valueOf, TreeLabels.Name);
+		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
 		ProgramProperties.track(optionShowInternalLabels, true);
 	}
 
@@ -135,7 +113,7 @@ public class TreePagesView implements IView {
 
 		empty.bind(Bindings.isEmpty(getTrees()));
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
+		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter);
 	}
@@ -217,15 +195,15 @@ public class TreePagesView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
-	public ComputeHeightAndAngles.Averaging getOptionAveraging() {
+	public HeightAndAngles.Averaging getOptionAveraging() {
 		return optionAveraging.get();
 	}
 
-	public ObjectProperty<ComputeHeightAndAngles.Averaging> optionAveragingProperty() {
+	public ObjectProperty<HeightAndAngles.Averaging> optionAveragingProperty() {
 		return optionAveraging;
 	}
 
-	public void setOptionAveraging(ComputeHeightAndAngles.Averaging optionAveraging) {
+	public void setOptionAveraging(HeightAndAngles.Averaging optionAveraging) {
 		this.optionAveraging.set(optionAveraging);
 	}
 
@@ -311,16 +289,16 @@ public class TreePagesView implements IView {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
 	}
 
-	public TreeLabels getOptionTreeLabels() {
+	public TreeLabel getOptionTreeLabels() {
 		return optionTreeLabels.get();
 	}
 
-	public ObjectProperty<TreeLabels> optionTreeLabelsProperty() {
+	public ObjectProperty<TreeLabel> optionTreeLabelsProperty() {
 		return optionTreeLabels;
 	}
 
-	public void setOptionTreeLabels(TreeLabels optionTreeLabels) {
-		this.optionTreeLabels.set(optionTreeLabels);
+	public void setOptionTreeLabels(TreeLabel optionTreeLabel) {
+		this.optionTreeLabels.set(optionTreeLabel);
 	}
 
 	public ViewTab getViewTab() {
@@ -338,7 +316,7 @@ public class TreePagesView implements IView {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getPagination();
+		return PrintUtils.createImage(controller.getPagination(), null);
 	}
 
 	@Override

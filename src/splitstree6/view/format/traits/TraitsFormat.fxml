@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<VBox fx:id="vBox" prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/16"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.traits.TraitsFormatController">
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+    <HBox alignment="CENTER">
+        <Label text="Traits">
+            <tooltip>
+                <Tooltip text="Formatting of whole taxon labels. Edit indvidual labels to add specific formatting."/>
+            </tooltip>
+        </Label>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="4.0"/>
+    <HBox alignment="CENTER" layoutX="15.0" layoutY="37.0" spacing="4.0">
+        <children>
+            <MenuButton fx:id="showMenuButton" mnemonicParsing="false" prefWidth="180.0" text="Show">
+                <items>
+                    <MenuItem fx:id="showAllMenuItem" mnemonicParsing="false" text="All"/>
+                    <MenuItem fx:id="showNoneMenuItem" mnemonicParsing="false" text="None"/>
+                    <SeparatorMenuItem mnemonicParsing="false"/>
+                </items>
+            </MenuButton>
+        </children>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
+        <CheckBox fx:id="legendCBox" contentDisplay="RIGHT" mnemonicParsing="false" nodeOrientation="RIGHT_TO_LEFT"
+                  text="Legend:">
+            <HBox.margin>
+                <Insets right="10.0"/>
+            </HBox.margin>
+        </CheckBox>
+        <Label alignment="CENTER_RIGHT" text="Size:" textOverrun="CLIP">
+            <HBox.margin>
+                <Insets right="2.0"/>
+            </HBox.margin>
+        </Label>
+        <TextField fx:id="maxSizeField" prefColumnCount="4" prefWidth="50.0">
+            <tooltip>
+                <Tooltip text="Font size"/>
+            </tooltip>
+        </TextField>
+    </HBox>
+</VBox>

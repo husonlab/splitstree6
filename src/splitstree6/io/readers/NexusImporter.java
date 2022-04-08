@@ -53,7 +53,10 @@ public class NexusImporter {
 					np.skipBlock();
 				}
 				if (np.isAtBeginOfBlock("TRAITS")) {
-					np.skipBlock();
+					var parser = new TraitsNexusInput();
+					var traitsBlock = new TraitsBlock();
+					parser.parse(np, taxaBlock, traitsBlock);
+					taxaBlock.setTraitsBlock(traitsBlock);
 				}
 			} else if (np.isAtBeginOfBlock("TAXA")) {
 				{
@@ -61,11 +64,14 @@ public class NexusImporter {
 					parser.parse(np, taxaBlock);
 				}
 				if (np.isAtBeginOfBlock("TRAITS")) {
-					np.skipBlock();
+					var parser = new TraitsNexusInput();
+					var traitsBlock = new TraitsBlock();
+					parser.parse(np, taxaBlock, traitsBlock);
+					taxaBlock.setTraitsBlock(traitsBlock);
 				}
 			}
 
-			while (!np.isAtBeginOfBlock(dataBlock.getBlockName()))
+			while (!np.isAtBeginOfBlock(dataBlock.getBlockName()) && !(dataBlock instanceof CharactersBlock && np.isAtBeginOfBlock("data")))
 				np.skipBlock();
 
 			if (dataBlock instanceof DistancesBlock distancesBlock) {
@@ -87,11 +93,17 @@ public class NexusImporter {
 				throw new IOException("Not implemented: import '" + dataBlock.getName());
 			}
 
-			if (taxaBlock.getNtax() > 0 && taxaBlock.size() == 0) {
-				if (taxLabels != null && taxLabels.size() == taxaBlock.getNtax())
+			if (taxaBlock.getNtax() == 0 || taxaBlock.size() == 0) {
+				if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || taxLabels.size() > 0 && taxaBlock.getNtax() == 0))
 					taxaBlock.addTaxaByNames(taxLabels);
 				else
 					throw new IOException("Can't infer taxon names");
+			}
+			if (np.isAtBeginOfBlock("TRAITS")) {
+				var parser = new TraitsNexusInput();
+				var traitsBlock = new TraitsBlock();
+				parser.parse(np, taxaBlock, traitsBlock);
+				taxaBlock.setTraitsBlock(traitsBlock);
 			}
 		}
 	}

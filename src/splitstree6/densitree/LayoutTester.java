@@ -57,6 +57,9 @@ public class LayoutTester extends Application {
 
 		model.setCircularOrdering(Utilities.computeCycle(model.getTaxaBlock().getTaxaSet(), model.getTreesBlock()));
 
+		var consensusTree = MajorityConsensus.apply(model);
+		System.err.printf("Majority consensus: %,d nodes and %,d edges%n", consensusTree.getNumberOfNodes(), consensusTree.getNumberOfEdges());
+
 		var pane = new Pane();
 		pane.setPrefWidth(800);
 		pane.setPrefHeight(800);
@@ -72,7 +75,7 @@ public class LayoutTester extends Application {
 		var number = new Label();
 		number.textProperty().bind(treeNumber.asString());
 
-		var toScale = new CheckBox("To Scale");
+		var toScale = new CheckBox("To ScalingType");
 		var useOwnCycle = new CheckBox("Use Own Cycle");
 
 		borderPane.setCenter(pane);

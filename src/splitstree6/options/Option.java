@@ -19,7 +19,7 @@
 
 package splitstree6.options;
 
-import javafx.beans.property.Property;
+import javafx.beans.property.*;
 import jloda.util.Basic;
 import jloda.util.StringUtils;
 
@@ -73,6 +73,14 @@ public class Option<T> {
 	 * @return option value type
 	 */
 	public OptionValueType getOptionValueType() {
+		if (property instanceof StringProperty)
+			return OptionValueType.String;
+		else if (property instanceof IntegerProperty)
+			return OptionValueType.Integer;
+		else if (property instanceof DoubleProperty)
+			return OptionValueType.Double;
+		else if (property instanceof BooleanProperty)
+			return OptionValueType.Boolean;
 		return OptionValueType.getValueType(property.getValue());
 	}
 

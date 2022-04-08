@@ -58,11 +58,12 @@ import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
+import splitstree6.algorithms.distances.distances2trees.MinSpanningTree;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2splits.BoostrapTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
@@ -191,8 +192,13 @@ public class MainWindowPresenter {
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
-				m -> !List.of("File", "Window", "Open Recent", "Help").contains(m.getText()),
+				m -> !List.of("File", "Edit", "Window", "Open Recent", "Help").contains(m.getText()),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(mainWindow.emptyProperty())));
+		BasicFX.applyToAllMenus(controller.getMenuBar(),
+				m -> m.getText().equals("Edit"),
+				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
+
+
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
@@ -230,8 +236,13 @@ public class MainWindowPresenter {
 		});
 		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-		controller.getSaveButton().setOnAction(e -> SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName())));
-		controller.getSaveButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(mainWindow.dirtyProperty().not()).or(mainWindow.hasSplitsTree6FileProperty().not()));
+		controller.getSaveButton().setOnAction(e -> {
+			if (mainWindow.isHasSplitsTree6File())
+				SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName()));
+			else
+				controller.getSaveAsMenuItem().getOnAction().handle(e);
+		});
+		controller.getSaveButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(mainWindow.dirtyProperty().not()));
 		controller.getSaveMenuItem().setOnAction(controller.getSaveButton().getOnAction());
 		controller.getSaveMenuItem().disableProperty().bind(controller.getSaveButton().disableProperty());
 
@@ -354,16 +365,16 @@ public class MainWindowPresenter {
 
 		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
 
-		controller.getEditTaxaMenuItem().setOnAction(e -> {
-			var nodes = workflow.getNodes(TaxaEditor.class);
+		controller.getFilterTaxaMenuItem().setOnAction(e -> {
+			var nodes = workflow.getNodes(TaxaFilter.class);
 			if (nodes.size() == 1)
 				mainWindow.getAlgorithmTabsManager().showTab(nodes.iterator().next(), true);
 		});
-		controller.getEditTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> workflow.getNodes(TaxaEditor.class).size() != 1, workflow.nodes()));
+		controller.getFilterTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> workflow.getNodes(TaxaFilter.class).size() != 1, workflow.nodes()));
 
-		controller.getEditCharactersMenuItem().setOnAction(null);
-		controller.getEditTreesMenuItem().setOnAction(null);
-		controller.getEditSplitsMenuItem().setOnAction(null);
+		controller.getFilterCharactersMenuItem().setOnAction(null);
+		controller.getFilterTreesMenuItem().setOnAction(null);
+		controller.getFilterSplitsMenuItem().setOnAction(null);
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
@@ -415,11 +426,14 @@ public class MainWindowPresenter {
 		controller.getConsensusTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTreeSplits.Consensus.Majority)));
 		controller.getConsensusTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusTree()));
 
+		controller.getMinSpanningTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningTree()));
+		controller.getMinSpanningTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MinSpanningTree()));
+
 		controller.getRerootTreesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RerootOrLadderizeTrees()));
 		controller.getRerootTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RerootOrLadderizeTrees()));
 
 		controller.getViewSingleTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
-				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.SingleTree))));
+				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.TreeView))));
 		controller.getViewSingleTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
 
 		controller.getViewTreePagesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),

@@ -62,7 +62,7 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 
 	@Override
 	public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, TraitsBlock traitsBlock) throws IOException {
-		final ArrayList<String> taxonNamesFound = new ArrayList<>();
+		final var taxonNamesFound = new ArrayList<String>();
 
 		traitsBlock.clear();
 

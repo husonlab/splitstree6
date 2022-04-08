@@ -47,7 +47,7 @@ public class ClusterReduction {
 	 * @return subtree-reduced trees followed by all reduced subtrees
 	 */
 	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2) throws IOException {
-		// setup rooted trees with nodes labeled by taxa ids
+		// create rooted trees with nodes labeled by taxa ids
 		var allTaxa = new TaxaBlock();
 		var roots = PreProcess.apply(tree1, tree2, allTaxa);
 

@@ -108,7 +108,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 		final var taxonNamesFound = new ArrayList<String>();
 		var haveSetKnownTaxonNames = false;
 
-		// setup translator:
+		// create translator:
 		final Map<String, String> translator; // maps node labels to taxon labels
 
 		if (np.peekMatchIgnoreCase("TRANSLATE")) {

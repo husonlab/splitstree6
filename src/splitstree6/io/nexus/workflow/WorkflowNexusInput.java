@@ -27,9 +27,10 @@ import jloda.util.Pair;
 import jloda.util.parse.NexusStreamParser;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
-import splitstree6.algorithms.taxa.taxa2taxa.TaxaEditor;
+import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.SplitsTree6Block;
+import splitstree6.data.TraitsBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.AlgorithmNexusInput;
 import splitstree6.io.nexus.SplitsTree6NexusInput;
@@ -41,6 +42,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.function.Consumer;
 
 /**
  * imports a file in SplitsTree6 nexus input format
@@ -59,7 +61,7 @@ public class WorkflowNexusInput {
 		return false;
 	}
 
-	public static void open(MainWindow mainWindow, String fileName) {
+	public static void open(MainWindow mainWindow, String fileName, Consumer<Throwable> exceptionHandler, Runnable runOnSuccess) {
 		var workflow = mainWindow.getWorkflow();
 		workflow.clear();
 		mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
@@ -89,9 +91,17 @@ public class WorkflowNexusInput {
 						node.restart();
 					}
 				}
+				if (runOnSuccess != null)
+					runOnSuccess.run();
 			});
 
-			service.setOnFailed(e -> NotificationManager.showError("Open file failed : " + service.getException()));
+			service.setOnFailed(e -> {
+						if (exceptionHandler != null)
+							exceptionHandler.accept(service.getException());
+						else
+							NotificationManager.showError("Open file failed : " + service.getException());
+					}
+			);
 			service.setOnCancelled(e -> NotificationManager.showError("Open file : canceled"));
 			service.start();
 		}
@@ -114,10 +124,19 @@ public class WorkflowNexusInput {
 			final NexusDataBlockInput dataInput = new NexusDataBlockInput();
 
 			var inputTaxaBlock = dataInput.parse(np);
+
+			if (np.peekMatchBeginBlock("traits")) {
+				inputTaxaBlock.setTraitsBlock((TraitsBlock) dataInput.parse(np, inputTaxaBlock));
+			}
+
 			var taxaFilter = (new AlgorithmNexusInput()).parse(np);
-			if (!(taxaFilter instanceof TaxaEditor))
-				throw new IOExceptionWithLineNumber("Excepted TaxaEditor", np.lineno());
+			if (!(taxaFilter instanceof TaxaFilter))
+				throw new IOExceptionWithLineNumber("Excepted TaxaFilter", np.lineno());
 			var workingTaxaBlock = dataInput.parse(np);
+			workingTaxaBlock.overwriteTaxa(inputTaxaBlock);
+			if (np.peekMatchBeginBlock("traits")) {
+				workingTaxaBlock.setTraitsBlock((TraitsBlock) dataInput.parse(np, workingTaxaBlock));
+			}
 			var workingTaxaTitle = dataInput.getTitle();
 			var inputDataBlock = dataInput.parse(np, inputTaxaBlock);
 			var dataTaxaFilter = (new AlgorithmNexusInput()).parse(np);
@@ -125,12 +144,12 @@ public class WorkflowNexusInput {
 				throw new IOExceptionWithLineNumber("Excepted DataTaxaFilter", np.lineno());
 			if (dataTaxaFilter.getFromClass() != inputDataBlock.getClass())
 				throw new IOExceptionWithLineNumber("Input data and DataTaxaFilter of incompatible types", np.lineno());
-			var workingDataBlock = dataInput.parse(np, inputTaxaBlock);
+			var workingDataBlock = dataInput.parse(np, workingTaxaBlock);
 			var workingDataTitle = dataInput.getTitle();
 			if (dataTaxaFilter.getToClass() != workingDataBlock.getClass())
 				throw new IOExceptionWithLineNumber("Working data and DataTaxaFilter of incompatible types", np.lineno());
 
-			workflow.setupInputAndWorkingNodes(new SourceBlock(), inputTaxaBlock, (TaxaEditor) taxaFilter, workingTaxaBlock, inputDataBlock, (DataTaxaFilter) dataTaxaFilter, workingDataBlock);
+			workflow.setupInputAndWorkingNodes(new SourceBlock(), inputTaxaBlock, (TaxaFilter) taxaFilter, workingTaxaBlock, inputDataBlock, (DataTaxaFilter) dataTaxaFilter, workingDataBlock);
 
 			final var titleNodeMap = new HashMap<String, DataNode>();
 			titleNodeMap.put(workingTaxaTitle, workflow.getWorkingTaxaNode());

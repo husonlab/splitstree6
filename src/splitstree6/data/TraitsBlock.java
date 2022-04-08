@@ -24,6 +24,7 @@ import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * traits block
@@ -62,13 +63,16 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 
 	public void setTraitValueLabel(int taxonId, int traitId, String label) {
 		if (matrixOfLabels == null)
-			matrixOfLabels = new String[matrix.length][getNTraits()]; // lazy setup
+			matrixOfLabels = new String[matrix.length][getNTraits()]; // lazy create
 
 		matrixOfLabels[taxonId - 1][traitId - 1] = label;
 	}
 
 	public int getTraitValue(int taxonId, int traitId) {
-		return matrix[taxonId - 1][traitId - 1];
+		if (taxonId <= 0 || taxonId > matrix.length || traitId <= 0 || traitId > matrix[0].length)
+			return 0;
+		else
+			return matrix[taxonId - 1][traitId - 1];
 	}
 
 	public String getTraitValueLabel(int taxonId, int traitId) {
@@ -84,6 +88,10 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 
 	public void setTraitLabel(int traitId, String label) {
 		labels[traitId - 1] = label;
+	}
+
+	public Collection<String> getTraitLabels() {
+		return List.of(labels);
 	}
 
 	public float getTraitLongitude(int traitId) {
@@ -128,9 +136,6 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		traitLongitude = null;
 	}
 
-	/**
-	 *
-	 */
 	public void copySubset(TaxaBlock srcTaxa, TraitsBlock srcTraits, Collection<Taxon> enabledTaxa) {
 		labels = srcTraits.labels;
 		traitLongitude = srcTraits.traitLongitude;
@@ -180,4 +185,20 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return BLOCK_NAME;
 	}
 
+
+	public int getMax(String traitLabel) {
+		var traitId = indexOf(traitLabel);
+		var max = 0;
+		for (var row : matrix) {
+			max = Math.max(max, row[traitId - 1]);
+		}
+		return max;
+	}
+
+	private int indexOf(String label) {
+		for (var i = 0; i < labels.length; i++)
+			if (labels[i].equals(label))
+				return i + 1;
+		return -1;
+	}
 }

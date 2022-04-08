@@ -25,31 +25,34 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
-import javafx.scene.control.Label;
-import javafx.scene.control.SelectionMode;
+import javafx.scene.Group;
+import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.find.Searcher;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ResourceManagerFX;
 import jloda.graph.Graph;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.LayoutUtils;
+import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
-import splitstree6.view.splits.viewer.ComboBoxUtils;
-import splitstree6.view.trees.layout.LayoutUtils;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.treepages.LayoutOrientation;
+import splitstree6.view.findreplace.FindReplaceTaxa;
+import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static splitstree6.view.trees.layout.TreeDiagramType.*;
-import static splitstree6.view.trees.treepages.LayoutOrientation.*;
+import static splitstree6.layout.tree.LayoutOrientation.*;
+import static splitstree6.layout.tree.TreeDiagramType.*;
 
 /**
  * tanglegram view presenter
@@ -78,8 +81,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 		);
 
+		final ObservableMap<Node, Group> nodeShapeMap1 = FXCollections.observableHashMap();
 		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
-				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowInternalLabelsProperty());
+				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty(),
+				tanglegramView.optionShowInternalLabelsProperty(), nodeShapeMap1);
 
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
@@ -97,8 +102,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		orientation2Property.set(tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg);
 
+		ObservableMap<Node, Group> nodeShapeMap2 = FXCollections.observableHashMap();
 		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
-				tanglegramView.optionDiagram2Property(), tanglegramView.optionAveraging2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty(), tanglegramView.optionShowInternalLabelsProperty());
+				tanglegramView.optionDiagram2Property(), tanglegramView.optionAveraging2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty(),
+				tanglegramView.optionShowInternalLabelsProperty(), nodeShapeMap2);
 
 		controller.getRightPane().getChildren().add(tree2Pane);
 
@@ -160,7 +167,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			tanglegramView.getTrees().addListener(treeChangedListener);
 			treeChangedListener.invalidated(null);
 
-
 			tanglegramView.optionShowTreeNamesProperty().addListener(e -> {
 				setLabel(tree1.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
 				setLabel(tree2.get(), tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
@@ -172,7 +178,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		}
 
 		{
-			var connectors = new Connectors(mainWindow, controller.getMiddlePane(), controller.getLeftPane(), controller.getRightPane(), new SimpleObjectProperty<>(Color.DARKGRAY), new SimpleDoubleProperty(1.0));
+			var connectors = new Connectors(mainWindow, controller.getMiddlePane(), controller.getLeftPane(), nodeShapeMap1, controller.getRightPane(), nodeShapeMap2,
+					new SimpleObjectProperty<>(Color.DARKGRAY), new SimpleDoubleProperty(1.0));
 			tree1Pane.setRunAfterUpdate(connectors::update);
 			tree2Pane.setRunAfterUpdate(connectors::update);
 			tanglegramView.optionFontScaleFactorProperty().addListener(e -> connectors.update());
@@ -224,11 +231,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		{
 			var labelProperty = new SimpleStringProperty();
-			var defaultState = (tanglegramView.isOptionShowTreeInfo() ? "i" : tanglegramView.isOptionShowTreeNames() ? "t" : null);
-			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), defaultState, labelProperty, "-", "t", "i");
+			var defaultState = (tanglegramView.isOptionShowTreeInfo() ? "d" : tanglegramView.isOptionShowTreeNames() ? "n" : null);
+			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), defaultState, labelProperty, "-", "n", "d");
 			labelProperty.addListener((v, o, n) -> {
-				tanglegramView.setOptionShowTreeNames("t".equals(n) || "i".equals(n));
-				tanglegramView.setOptionShowTreeInfo("i".equals(n));
+				tanglegramView.setOptionShowTreeNames("n".equals(n) || "d".equals(n));
+				tanglegramView.setOptionShowTreeInfo("d".equals(n));
 			});
 		}
 
@@ -285,29 +292,36 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
-		findToolBar = new FindToolBar(mainWindow.getStage(), new Searcher<>(mainWindow.getActiveTaxa(),
-				t -> mainWindow.getTaxonSelectionModel().isSelected(t2taxon.apply(t)),
-				(t, s) -> mainWindow.getTaxonSelectionModel().setSelected(t2taxon.apply(t), s),
-				new SimpleObjectProperty<>(SelectionMode.MULTIPLE),
-				t -> t2taxon.apply(t).getNameAndDisplayLabel("===="),
-				label -> label.replaceAll(".*====", ""),
-				null));
+		findToolBar = FindReplaceTaxa.create(mainWindow, tanglegramView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
-
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindButton().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
+		controller.getFindToggleButton().setOnAction(e -> {
+			if (!findToolBar.isShowFindToolBar()) {
+				findToolBar.setShowFindToolBar(true);
+				controller.getFindToggleButton().setSelected(true);
+				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
+			} else if (!findToolBar.isShowReplaceToolBar()) {
+				findToolBar.setShowReplaceToolBar(true);
+				controller.getFindToggleButton().setSelected(true);
+			} else {
+				findToolBar.setShowFindToolBar(false);
+				findToolBar.setShowReplaceToolBar(false);
+				controller.getFindToggleButton().setSelected(false);
+				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
+			}
+		});
 
 		var undoManager = tanglegramView.getUndoManager();
-		tanglegramView.optionTree1Property().addListener((v, o, n) -> undoManager.add("set tree 1", tanglegramView.optionTree1Property(), o, n));
-		tanglegramView.optionTree2Property().addListener((v, o, n) -> undoManager.add("set tree 2", tanglegramView.optionTree2Property(), o, n));
-		tanglegramView.optionDiagram1Property().addListener((v, o, n) -> undoManager.add("set diagram type 1", tanglegramView.optionDiagram1Property(), o, n));
-		tanglegramView.optionDiagram2Property().addListener((v, o, n) -> undoManager.add("set diagram type 2", tanglegramView.optionDiagram2Property(), o, n));
-		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("set layout orientation", tanglegramView.optionOrientationProperty(), o, n));
-		tanglegramView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("set font size", tanglegramView.optionFontScaleFactorProperty(), o, n));
-		tanglegramView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add(" set horizontal zoom", tanglegramView.optionHorizontalZoomFactorProperty(), o, n));
-		tanglegramView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add(" set vertical zoom", tanglegramView.optionVerticalZoomFactorProperty(), o, n));
-		tanglegramView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("set show tree names", tanglegramView.optionShowTreeNamesProperty(), o, n));
-		tanglegramView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("set show tree info", tanglegramView.optionShowTreeInfoProperty(), o, n));
+		tanglegramView.optionTree1Property().addListener((v, o, n) -> undoManager.add("tree 1", tanglegramView.optionTree1Property(), o, n));
+		tanglegramView.optionTree2Property().addListener((v, o, n) -> undoManager.add("tree 2", tanglegramView.optionTree2Property(), o, n));
+		tanglegramView.optionDiagram1Property().addListener((v, o, n) -> undoManager.add("diagram type 1", tanglegramView.optionDiagram1Property(), o, n));
+		tanglegramView.optionDiagram2Property().addListener((v, o, n) -> undoManager.add("diagram type 2", tanglegramView.optionDiagram2Property(), o, n));
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("layout orientation", tanglegramView.optionOrientationProperty(), o, n));
+		tanglegramView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", tanglegramView.optionFontScaleFactorProperty(), o, n));
+		tanglegramView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("horizontal zoom", tanglegramView.optionHorizontalZoomFactorProperty(), o, n));
+		tanglegramView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("vertical zoom", tanglegramView.optionVerticalZoomFactorProperty(), o, n));
+		tanglegramView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("show tree names", tanglegramView.optionShowTreeNamesProperty(), o, n));
+		tanglegramView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", tanglegramView.optionShowTreeInfoProperty(), o, n));
 
 		controller.getContractHorizontallyButton().setOnAction(e -> tanglegramView.setOptionHorizontalZoomFactor((1.0 / 1.1) * tanglegramView.getOptionHorizontalZoomFactor()));
 		controller.getContractHorizontallyButton().disableProperty().bind(tanglegramView.emptyProperty().or(tanglegramView.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
@@ -334,11 +348,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		tanglegramView.emptyProperty().addListener(e -> tanglegramView.getRoot().setDisable(tanglegramView.emptyProperty().get()));
 
-
 		Platform.runLater(this::setupMenuItems);
 	}
 
-	private static void setLabel(PhyloTree tree, boolean showName, boolean showInfo, Label label) {
+	// todo: make this the same as in single tree
+	private static void setLabel(PhyloTree tree, boolean showName, boolean showInfo, TextField label) {
 		if (tree != null && (showName || showInfo)) {
 			label.setText((showName ? tree.getName() : "") + (showName && showInfo ? " : " : "") + (showInfo ? RootedNetworkProperties.computeInfoString(tree) : ""));
 			label.setVisible(true);
@@ -382,9 +396,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutHorizontalMenuItem().setOnAction(controller.getContractHorizontallyButton().getOnAction());
 		mainController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
 
-		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
+		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 
 		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
 		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
@@ -397,6 +412,5 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				tanglegramView.setOptionOrientation(Rotate0Deg);
 		});
 		mainController.getFlipMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
-
 	}
 }

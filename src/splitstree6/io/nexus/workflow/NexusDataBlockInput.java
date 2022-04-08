@@ -51,7 +51,6 @@ public class NexusDataBlockInput {
 				link = input.getLink();
 				return dataBlock;
 			}
-            /*
             else if (np.peekMatchBeginBlock(TraitsBlock.BLOCK_NAME)) {
                 final TraitsNexusInput input = new TraitsNexusInput();
                 final TraitsBlock dataBlock = new TraitsBlock();
@@ -60,7 +59,6 @@ public class NexusDataBlockInput {
                 link = input.getLink();
                 return dataBlock;
             }
-            */
 			else if (np.peekMatchBeginBlock(CharactersBlock.BLOCK_NAME)) {
 				final var input = new CharactersNexusInput();
 				final var dataBlock = new CharactersBlock();

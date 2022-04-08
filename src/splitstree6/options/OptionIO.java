@@ -55,24 +55,24 @@ public class OptionIO {
 						np.matchIgnoreCase("=");
 						final var option = nameOptionMap.get(name);
 						if (option != null) {
-							final OptionValueType type = option.getOptionValueType();
+							final var type = option.getOptionValueType();
 							switch (type) {
 								case doubleArray -> {
-									final double[] array = (double[]) option.getProperty().getValue();
-									for (int i = 0; i < array.length; i++) {
+									final var array = (double[]) option.getProperty().getValue();
+									for (var i = 0; i < array.length; i++) {
 										array[i] = np.getDouble();
 									}
 								}
 								case doubleSquareMatrix -> {
-                                    final double[][] matrix = (double[][]) option.getProperty().getValue();
-                                    for (int i = 0; i < matrix.length; i++) {
-                                        for (int j = 0; j < matrix.length; j++)
-                                            matrix[i][j] = np.getDouble();
-                                    }
-                                }
+									final var matrix = (double[][]) option.getProperty().getValue();
+									for (var i = 0; i < matrix.length; i++) {
+										for (var j = 0; j < matrix.length; j++)
+											matrix[i][j] = np.getDouble();
+									}
+								}
                                 case Enum -> option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
                                 case stringArray -> {
-                                    final ArrayList<String> list = new ArrayList<>();
+									final var list = new ArrayList<String>();
                                     while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
                                         list.add(np.getWordRespectCase());
                                     option.getProperty().setValue(list.toArray(new String[0]));

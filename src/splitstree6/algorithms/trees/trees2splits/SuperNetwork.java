@@ -23,7 +23,6 @@ import javafx.beans.property.*;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Edge;
 import jloda.graph.Node;
-import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
@@ -176,7 +175,7 @@ public class SuperNetwork extends Trees2Splits {
 		var pSplitsOfTrees = (Map<PartialSplit, PartialSplit>[]) new Map[treesBlock.getNTrees() + 1];
 		// for each tree, identity map on set of splits
 		var supportSet = new BitSet[treesBlock.getNTrees() + 1];
-		Set<PartialSplit> allPSplits = new HashSet<>();
+		var allPSplits = new HashSet<PartialSplit>();
 
 		progress.setSubtask("extracting partial splits from trees");
 		progress.setMaximum(treesBlock.getNTrees());
@@ -278,10 +277,10 @@ public class SuperNetwork extends Trees2Splits {
 			//new PartialSplit(splits.get(s),
 			//splits.get(s).getComplement(taxa.getNtax()));
 
-			float min = 1000000;
-			float sum = 0;
-			float weighted = 0;
-			float confidence = 0;
+			var min = 1000000f;
+			var sum = 0f;
+			var weighted = 0f;
+			var confidence = 0f;
 			int total = 0;
 			for (int t = 1; t < pSplits.length; t++) {
 				PartialSplit projection = current.getInduced(supportSet[t]);
@@ -299,7 +298,7 @@ public class SuperNetwork extends Trees2Splits {
 				}
 			}
 
-			float value = switch (getOptionEdgeWeights()) {
+			var value = switch (getOptionEdgeWeights()) {
 				case Min -> min;
 				case Mean -> (total > 0 ? weighted / total : 0);
 				case TreeSizeWeightedMean -> (total > 0 ? sum / total : 0);
@@ -307,7 +306,7 @@ public class SuperNetwork extends Trees2Splits {
 				default -> 1;
 			};
 			splits.getSplits().get(s - 1).setWeight(value);
-			splits.getSplits().get(s - 1).setConfidence(total);
+			// splits.getSplits().get(s - 1).setConfidence(total);
 		}
 	}
 
@@ -318,13 +317,13 @@ public class SuperNetwork extends Trees2Splits {
 	 */
 	private void setWeightAverageReleativeLength(Map[] pSplits, BitSet[] supportSet, SplitsBlock splits) {
 		// compute average of weights and num of edges for each input tree
-		float[] averageWeight = new float[pSplits.length];
-		int[] numEdges = new int[pSplits.length];
+		var averageWeight = new float[pSplits.length];
+		var numEdges = new int[pSplits.length];
 
-		for (int t = 1; t < pSplits.length; t++) {
+		for (var t = 1; t < pSplits.length; t++) {
 			numEdges[t] = pSplits[t].size();
-			float sum = 0;
-			for (Object o : pSplits[t].keySet()) {
+			var sum = 0f;
+			for (var o : pSplits[t].keySet()) {
 				PartialSplit ps = (PartialSplit) o;
 				sum += ps.getWeight();
 			}
@@ -332,25 +331,25 @@ public class SuperNetwork extends Trees2Splits {
 		}
 
 		// consider each network split in turn:
-		for (int s = 1; s <= splits.getNsplits(); s++) {
+		for (var s = 1; s <= splits.getNsplits(); s++) {
 			//doc.notifySetProgress(-1);
 			PartialSplit current = new PartialSplit(splits.getSplits().get(s - 1).getA(), splits.getSplits().get(s - 1).getB());
 			//new PartialSplit(splits.get(s),
 			//splits.get(s).getComplement(taxa.getNtax()));
 
-			BitSet activeTrees = new BitSet(); // trees that contain projection of
+			var activeTrees = new BitSet(); // trees that contain projection of
 			// current split
 
-			for (int t = 1; t < pSplits.length; t++) {
+			for (var t = 1; t < pSplits.length; t++) {
 				PartialSplit projection = current.getInduced(supportSet[t]);
 				if (projection != null && pSplits[t].containsKey(projection)) {
 					activeTrees.set(t);
 				}
 			}
 
-			float weight = 0;
-			for (int t = activeTrees.nextSetBit(1); t >= 0; t = activeTrees.nextSetBit(t + 1)) {
-				PartialSplit projection = current.getInduced(supportSet[t]);
+			var weight = 0f;
+			for (var t = activeTrees.nextSetBit(1); t >= 0; t = activeTrees.nextSetBit(t + 1)) {
+				var projection = current.getInduced(supportSet[t]);
 
 				weight += ((PartialSplit) pSplits[t].get(projection)).getWeight()
 						  / averageWeight[t];
@@ -380,20 +379,20 @@ public class SuperNetwork extends Trees2Splits {
 	// recursively compute the splits:
 
 	private BitSet computePSplitsFromTreeRecursively(Node v, Edge e, TreesBlock trees, TaxaBlock taxa, List<PartialSplit> list, int which, BitSet seen) {
-		PhyloTree tree = trees.getTrees().get(which - 1);
-		BitSet e_taxa = new BitSet();
+		var tree = trees.getTrees().get(which - 1);
+		var e_taxa = new BitSet();
 		if (taxa.indexOf(tree.getLabel(v)) != -1)
 			e_taxa.set(taxa.indexOf(tree.getLabel(v)));
 
 		seen.or(e_taxa);
 
-		for (Edge f : v.adjacentEdges()) {
+		for (var f : v.adjacentEdges()) {
 			if (f != e) {
-				final BitSet f_taxa = computePSplitsFromTreeRecursively(tree.getOpposite(v, f), f, trees, taxa, list, which, seen);
-				PartialSplit ps = new PartialSplit(f_taxa);
+				final var f_taxa = computePSplitsFromTreeRecursively(tree.getOpposite(v, f), f, trees, taxa, list, which, seen);
+				var ps = new PartialSplit(f_taxa);
 				ps.setWeight((float) tree.getWeight(f));
 				list.add(ps);
-				for (int t = 1; t < f_taxa.length(); t++) {
+				for (var t = 1; t < f_taxa.length(); t++) {
 					if (f_taxa.get(t))
 						e_taxa.set(t);
 				}
@@ -411,15 +410,15 @@ public class SuperNetwork extends Trees2Splits {
 	private void computeClosureOuterLoop(ProgressListener progress, Set<PartialSplit> partialSplits) throws CanceledException {
 		this.rand = new Random(getOptionSeed());
 
-		final Set<PartialSplit> allEverComputed = new HashSet<>(partialSplits);
+		final var allEverComputed = new HashSet<>(partialSplits);
 
-		for (int i = 0; i < getOptionNumberOfRuns(); i++) {
+		for (var i = 0; i < getOptionNumberOfRuns(); i++) {
 			////doc.notifySubtask("compute closure" + (i == 0 ? "" : "(" + (i + 1) + ")"));
 
-			Set<PartialSplit> clone = new LinkedHashSet<>(partialSplits);
+			var clone = new LinkedHashSet<>(partialSplits);
 
 			{
-				final Vector<PartialSplit> tmp = new Vector<>(clone);
+				final var tmp = new Vector<>(clone);
 				Collections.shuffle(tmp, rand);
 				clone = new LinkedHashSet<>(tmp);
 				computeClosure(progress, clone);
@@ -438,11 +437,10 @@ public class SuperNetwork extends Trees2Splits {
 	 *
 	 * @return number of full splits
 	 */
-	public int getNumberOfFullSplits(int numAllTaxa, Set partialSplits) {
+	public int getNumberOfFullSplits(int numAllTaxa, Set<PartialSplit> partialSplits) {
 		int nfs = 0;
-		for (Object partialSplit1 : partialSplits) {
-			PartialSplit partialSplit = (PartialSplit) partialSplit1;
-			if (partialSplit.getXsize() == numAllTaxa) nfs++;
+		for (var partialSplit1 : partialSplits) {
+			if (partialSplit1.getXsize() == numAllTaxa) nfs++;
 		}
 		return nfs;
 	}
@@ -453,17 +451,15 @@ public class SuperNetwork extends Trees2Splits {
 	 *
 	 */
 	private void computeClosure(ProgressListener progress, Set<PartialSplit> partialSplits) throws CanceledException {
-
 		PartialSplit[] splits;
-		Set<Integer> seniorSplits = new LinkedHashSet<>();
-		Set<Integer> activeSplits = new LinkedHashSet<>();
-		Set<Integer> newSplits = new LinkedHashSet<>();
+		var seniorSplits = new LinkedHashSet<Integer>();
+		var activeSplits = new LinkedHashSet<Integer>();
+		var newSplits = new LinkedHashSet<Integer>();
 		{
 			splits = new PartialSplit[partialSplits.size()];
-			Iterator it = partialSplits.iterator();
-			int pos = 0;
-			while (it.hasNext()) {
-				splits[pos] = (PartialSplit) it.next();
+			var pos = 0;
+			for (var partialSplit : partialSplits) {
+				splits[pos] = partialSplit;
 				seniorSplits.add(pos);
 				pos++;
 				progress.checkForCancel();
@@ -472,13 +468,12 @@ public class SuperNetwork extends Trees2Splits {
 
 		// init:
 		{
-			for (int pos1 = 0; pos1 < splits.length; pos1++) {
-
-				for (int pos2 = pos1 + 1; pos2 < splits.length; pos2++) {
-					PartialSplit ps1 = splits[pos1];
-					PartialSplit ps2 = splits[pos2];
-					PartialSplit qs1 = new PartialSplit();
-					PartialSplit qs2 = new PartialSplit();
+			for (var pos1 = 0; pos1 < splits.length; pos1++) {
+				for (var pos2 = pos1 + 1; pos2 < splits.length; pos2++) {
+					var ps1 = splits[pos1];
+					var ps2 = splits[pos2];
+					var qs1 = new PartialSplit();
+					var qs2 = new PartialSplit();
 					if (PartialSplit.applyZigZagRule(ps1, ps2, qs1, qs2)) {
 						splits[pos1] = qs1;
 						splits[pos2] = qs2;
@@ -495,18 +490,14 @@ public class SuperNetwork extends Trees2Splits {
 			while (newSplits.size() != 0) {
 				seniorSplits.addAll(activeSplits);
 				activeSplits = newSplits;
-				newSplits = new HashSet<>();
+				newSplits = new LinkedHashSet<>();
 
-				Iterator it1 = seniorSplits.iterator();
-				while (it1.hasNext()) {
-					Integer pos1 = ((Integer) it1.next());
-
-					for (Integer activeSplit : activeSplits) {
-						Integer pos2 = activeSplit;
-						PartialSplit ps1 = splits[pos1];
-						PartialSplit ps2 = splits[pos2];
-						PartialSplit qs1 = new PartialSplit();
-						PartialSplit qs2 = new PartialSplit();
+				for (var pos1 : seniorSplits) {
+					for (var pos2 : activeSplits) {
+						var ps1 = splits[pos1];
+						var ps2 = splits[pos2];
+						var qs1 = new PartialSplit();
+						var qs2 = new PartialSplit();
 						if (PartialSplit.applyZigZagRule(ps1, ps2, qs1, qs2)) {
 							splits[pos1] = qs1;
 							splits[pos2] = qs2;
@@ -516,21 +507,17 @@ public class SuperNetwork extends Trees2Splits {
 					}
 					progress.checkForCancel();
 				}
-				it1 = activeSplits.iterator();
-				while (it1.hasNext()) {
-					Integer pos1 = ((Integer) it1.next());
-
-					for (Integer activeSplit : activeSplits) {
-						Integer pos2 = activeSplit;
-						PartialSplit ps1 = splits[pos1];
-						PartialSplit ps2 = splits[pos2];
-						PartialSplit qs1 = new PartialSplit();
-						PartialSplit qs2 = new PartialSplit();
+				for (var pos1 : activeSplits) {
+					for (var activeSplit : activeSplits) {
+						var ps1 = splits[pos1];
+						var ps2 = splits[activeSplit];
+						var qs1 = new PartialSplit();
+						var qs2 = new PartialSplit();
 						if (PartialSplit.applyZigZagRule(ps1, ps2, qs1, qs2)) {
 							splits[pos1] = qs1;
-							splits[pos2] = qs2;
+							splits[activeSplit] = qs2;
 							newSplits.add(pos1);
-							newSplits.add(pos2);
+							newSplits.add(activeSplit);
 						}
 					}
 					progress.checkForCancel();
@@ -539,15 +526,11 @@ public class SuperNetwork extends Trees2Splits {
 		}
 
 		partialSplits.clear();
-		Iterator it = seniorSplits.iterator();
-		while (it.hasNext()) {
-			Integer pos1 = (Integer) it.next();
+		for (var pos1 : seniorSplits) {
 			partialSplits.add(splits[pos1]);
 			progress.checkForCancel();
 		}
-		it = activeSplits.iterator();
-		while (it.hasNext()) {
-			Integer pos1 = (Integer) it.next();
+		for (var pos1 : activeSplits) {
 			partialSplits.add(splits[pos1]);
 			progress.checkForCancel();
 		}
@@ -555,19 +538,17 @@ public class SuperNetwork extends Trees2Splits {
 
 	/**
 	 * applies a simple refinement heuristic
-	 *
 	 */
-	private void applyRefineHeuristic(Set partialSplits) {
+	private void applyRefineHeuristic(Set<PartialSplit> partialSplits) {
 
 
-		for (int i = 1; i <= 10; i++) {
-			int count = 0;
-			PartialSplit[] splits = new PartialSplit[partialSplits.size()];
-			splits = (PartialSplit[]) partialSplits.toArray(splits);
+		for (var i = 1; i <= 10; i++) {
+			var count = 0;
+			var splits = partialSplits.toArray(new PartialSplit[0]);
 
-			for (int a = 0; a < splits.length; a++) {
+			for (var a = 0; a < splits.length; a++) {
 				//doc.notifySetMaximumProgress(a);
-				final PartialSplit psa = splits[a];
+				final var psa = splits[a];
 				for (int p = 1; p <= 2; p++) {
 					final BitSet Aa, Ba;
 					if (p == 1) {
@@ -577,9 +558,9 @@ public class SuperNetwork extends Trees2Splits {
 						Aa = psa.getB();
 						Ba = psa.getA();
 					}
-					for (int b = a + 1; b < splits.length; b++) {
-						final PartialSplit psb = splits[b];
-						for (int q = 1; q <= 2; q++) {
+					for (var b = a + 1; b < splits.length; b++) {
+						final var psb = splits[b];
+						for (var q = 1; q <= 2; q++) {
 							final BitSet Ab, Bb;
 							if (q == 1) {
 								Ab = psb.getA();

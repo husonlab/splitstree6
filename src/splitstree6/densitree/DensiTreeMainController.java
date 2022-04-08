@@ -50,7 +50,28 @@ public class DensiTreeMainController {
 	private MenuItem copyMenuItem;
 
 	@FXML
+	private CheckMenuItem consensusMenuItem;
+
+	@FXML
 	private MenuItem specificTreesMenuItem;
+
+	@FXML
+	private RadioMenuItem meanMenuItem;
+
+	@FXML
+	private RadioMenuItem medianMenuItem;
+
+	@FXML
+	private RadioMenuItem dbscanMenuItem;
+
+	@FXML
+	private RadioMenuItem kmeansMenuItem;
+
+	@FXML
+	private RadioMenuItem radialMenuItem;
+
+	@FXML
+	private ToggleGroup labelsGroup;
 
 	@FXML
 	private ToolBar toolBar;
@@ -62,7 +83,10 @@ public class DensiTreeMainController {
 	private Button clearButton;
 
 	@FXML
-	private CheckBox checkBox;
+	private CheckBox scaleCheckBox;
+
+	@FXML
+	private CheckBox jitterCheckBox;
 
 	@FXML
 	private FlowPane bottomFlowPane;
@@ -98,8 +122,36 @@ public class DensiTreeMainController {
 		return copyMenuItem;
 	}
 
+	public CheckMenuItem getConsensusMenuItem(){
+		return consensusMenuItem;
+	}
+
 	public MenuItem getSpecificTreesMenuItem() {
 		return specificTreesMenuItem;
+	}
+
+	public RadioMenuItem getMeanMenuItem() {
+		return meanMenuItem;
+	}
+
+	public RadioMenuItem getMedianMenuItem() {
+		return medianMenuItem;
+	}
+
+	public RadioMenuItem getDbscanMenuItem() {
+		return dbscanMenuItem;
+	}
+
+	public RadioMenuItem getKmeansMenuItem() {
+		return kmeansMenuItem;
+	}
+
+	public RadioMenuItem getRadialMenuItem() {
+		return radialMenuItem;
+	}
+
+	public ToggleGroup getLabelsGroup() {
+		return labelsGroup;
 	}
 
 	public ToolBar getToolBar() {
@@ -114,8 +166,12 @@ public class DensiTreeMainController {
 		return clearButton;
 	}
 
-	public CheckBox getCheckBox() {
-		return checkBox;
+	public CheckBox getScaleCheckBox() {
+		return scaleCheckBox;
+	}
+
+	public CheckBox getJitterCheckBox() {
+		return jitterCheckBox;
 	}
 
 	public FlowPane getBottomFlowPane() {
@@ -125,5 +181,6 @@ public class DensiTreeMainController {
 	public Label getMessageLabel() {
 		return messageLabel;
 	}
+
 }
 

@@ -31,6 +31,9 @@ import splitstree6.workflow.DataTaxaFilter;
 import java.util.HashMap;
 
 public class NetworkBlock extends DataBlock {
+	public static final String NODE_STATES_KEY = "states";
+	public static final String EDGE_SITES_KEY = "sites";
+
 	public enum Type {HaplotypeNetwork, Other}
 
 	private final PhyloGraph graph;

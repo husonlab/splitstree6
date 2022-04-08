@@ -91,7 +91,7 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 	public void setupBeforeDisplay(TaxaBlock taxaBlock, CharactersBlock parent) {
 		if (listenerSetSiteVarParams != null)
 			optionSetSiteVarParamsProperty().removeListener(listenerSetSiteVarParams);
-		// setup set Parameters control:
+		// create set Parameters control:
 		listenerSetSiteVarParams = (c, o, n) -> {
             switch (n) {
                 case defaultValues -> {
@@ -116,7 +116,7 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 
 		if (listenerSetBaseFrequencies != null)
 			optionSetBaseFrequenciesProperty().removeListener(listenerSetBaseFrequencies);
-		// setup set Parameters control:
+		// create set Parameters control:
 		listenerSetBaseFrequencies = (c, o, n) -> {
             switch (n) {
                 case defaultValues -> {

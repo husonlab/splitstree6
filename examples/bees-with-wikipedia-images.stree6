@@ -3,7 +3,7 @@
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=10 nAlgorithms=7;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1645447349298'; [Mon Feb 21 13:42:29 CET 2022]
+WORKFLOW creationDate='1647339390314'; [Tue Mar 15 11:16:30 CET 2022]
 END; [SPLITSTREE6]
 
 [
@@ -34,26 +34,26 @@ TAXLABELS
 	[6] 'A.KOSCHEV'
 ;
 DISPLAYLABELS
-	[1] 'A.ANDRENOF'
-	[2] 'A.MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
-	[3] 'A.DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
-	[4] 'A.CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
-	[5] 'A.FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
-	[6] 'A.KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
+	[1] '<i>A. ANDRENOF'
+	[2] '<i>A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
+	[3] '<i>A. DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
+	[4] '<i>A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
+	[5] '<i>A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
+	[6] '<i>A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
 [TAXINFO;]
 END; [TAXA]
 
 BEGIN ALGORITHM;
-TITLE 'Taxa Editor';
-NAME 'Taxa Editor';
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
 OPTIONS
 ;
 END; [ALGORITHM]
 
 BEGIN TAXA;
 TITLE 'Working Taxa';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=6;
 TAXLABELS
 	[1] 'A.ANDRENOF'
@@ -64,19 +64,19 @@ TAXLABELS
 	[6] 'A.KOSCHEV'
 ;
 DISPLAYLABELS
-	[1] 'A.ANDRENOF'
-	[2] '   A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
-	[3] 'A. DORSATA<br><img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
-	[4] '   A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
-	[5] '  A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
-	[6] ' A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
+	[1] '<i>A. ANDRENOF'
+	[2] '<i>A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
+	[3] '<i>A. DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
+	[4] '<i>A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
+	[5] '<i>A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
+	[6] '<i>A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
 [TAXINFO;]
 END; [TAXA]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Taxa Editor';
+LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=6 nchar=677;
 FORMAT
 	datatype='DNA' missing=n gap=- symbols="acgt" labels=left transpose=no interleave=yes;
@@ -296,19 +296,19 @@ OPTIONS
 	Replicates = 100,
 	MinPercent = 10,
 	ShowAllSplits = 'false',
-	RandomSeed = 42;
+	RandomSeed = 42,
+	HighDimensionFilter = 'true';
 END; [ALGORITHM]
 
 BEGIN VIEW;
-TITLE 'Splits Network';
+TITLE 'SplitsNetwork';
 LINK ALGORITHM = 'Show Splits';
-NAME 'Splits Network';
+NAME 'SplitsNetwork';
 INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',
 	Orientation = 'Rotate0Deg',
 	Rooting = 'None',
-	UseWeights = 'true',
 	ZoomFactor = 1,
 	FontScaleFactor = 1,
 	RootAngle = 160,
@@ -317,7 +317,7 @@ OPTIONS
 END; [VIEW]
 
 BEGIN SPLITS;
-TITLE 'Splits';
+TITLE 'Splits-2';
 LINK ALGORITHM = 'Bootstrap Splits';
 DIMENSIONS ntax=6 nsplits=11;
 FORMAT labels=no weights=yes confidences=yes;
@@ -340,22 +340,21 @@ END; [SPLITS]
 
 BEGIN ALGORITHM;
 TITLE 'Show Splits-2';
-LINK SPLITS = 'Splits';
+LINK SPLITS = 'Splits-2';
 NAME 'Show Splits';
 OPTIONS
 	View = 'SplitsNetwork';
 END; [ALGORITHM]
 
 BEGIN VIEW;
-TITLE 'Splits Network';
+TITLE 'SplitsNetwork';
 LINK ALGORITHM = 'Show Splits-2';
-NAME 'Splits Network';
+NAME 'SplitsNetwork';
 INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',
 	Orientation = 'Rotate0Deg',
 	Rooting = 'None',
-	UseWeights = 'true',
 	ZoomFactor = 1,
 	FontScaleFactor = 1,
 	RootAngle = 160,

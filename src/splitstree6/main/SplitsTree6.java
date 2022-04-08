@@ -20,6 +20,7 @@
 package splitstree6.main;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.stage.Stage;
 import jloda.fx.util.ArgsOptions;
@@ -33,12 +34,15 @@ import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.ProgramProperties;
 import jloda.util.UsageException;
+import splitstree6.io.FileLoader;
 import splitstree6.window.MainWindow;
 
 import java.io.File;
 import java.time.Duration;
+import java.util.ArrayList;
 
 public class SplitsTree6 extends Application {
+	private static final ArrayList<String> inputFiles = new ArrayList<>();
 
 	/**
 	 * main
@@ -92,16 +96,19 @@ public class SplitsTree6 extends Application {
 		options.setVersion(ProgramProperties.getProgramVersion());
 
 		options.comment("Input:");
+		inputFiles.addAll(options.getOption("-i", "input", "Input files to open upon startup", new ArrayList<String>()));
 
 		final String defaultPropertiesFile;
 		if (ProgramProperties.isMacOS())
 			defaultPropertiesFile = System.getProperty("user.home") + "/Library/Preferences/SplitsTree6.def";
 		else
 			defaultPropertiesFile = System.getProperty("user.home") + File.separator + ".SplitsTree6.def";
-		final String propertiesFile = options.getOption("-p", "propertiesFile", "Properties file", defaultPropertiesFile);
-		final boolean showVersion = options.getOption("-V", "version", "Show version string", false);
-		final boolean silentMode = options.getOption("-S", "silentMode", "Silent mode", false);
+		final var propertiesFile = options.getOption("-p", "propertiesFile", "Properties file", defaultPropertiesFile);
+		final var showVersion = options.getOption("-V", "version", "Show version string", false);
+		final var silentMode = options.getOption("-S", "silentMode", "Silent mode", false);
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Maximum number of threads to use in a parallel algorithm (0=all available)", 0));
+		ProgramProperties.setConfirmQuit(options.getOption("-q", "confirmQuit", "Confirm quit on exit", ProgramProperties.isConfirmQuit()));
+
 		options.done();
 
 		ProgramProperties.load(propertiesFile);
@@ -133,6 +140,11 @@ public class SplitsTree6 extends Application {
 			mainWindow.show(stage, windowGeometry.getX(), windowGeometry.getY(), windowGeometry.getWidth(), windowGeometry.getHeight());
 
 			MainWindowManager.getInstance().addMainWindow(mainWindow);
+
+			if (inputFiles.size() > 0) {
+				for (var file : inputFiles)
+					Platform.runLater(() -> FileLoader.apply(false, mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
+			}
 		} catch (Exception ex) {
 			Basic.caught(ex);
 			throw ex;

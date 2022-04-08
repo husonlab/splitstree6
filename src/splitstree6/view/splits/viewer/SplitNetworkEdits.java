@@ -21,13 +21,14 @@ package splitstree6.view.splits.viewer;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableMap;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jloda.fx.util.BasicFX;
 import jloda.graph.Node;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
-import splitstree6.view.splits.layout.RotateSplit;
+import splitstree6.layout.splits.RotateSplit;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -46,7 +47,7 @@ public class SplitNetworkEdits {
 	 * @param nodeShapeMap
 	 * @param splitShapeMap
 	 */
-	public static void applyEdits(String[] editsString, ObservableMap<Node, Shape> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
+	public static void applyEdits(String[] editsString, ObservableMap<Node, Group> nodeShapeMap, ObservableMap<Integer, ArrayList<Shape>> splitShapeMap) {
 		for (var editString : editsString) {
 			var edit = Edit.parse(editString);
 			if (edit != null) {

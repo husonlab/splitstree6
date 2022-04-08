@@ -29,7 +29,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.options.OptionIO;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
+import splitstree6.view.utils.IView;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.DataTaxaFilter;
@@ -138,12 +138,14 @@ public class ViewBlock extends DataBlock {
 			getNode().setTitle(getName());
 
 		// process an option lines that may have been provided
+		var dirty = viewTab.getMainWindow().isDirty();
 		try {
 			OptionIO.parseOptions(initializationLinesProperty(), view);
 		} catch (IOException e) {
 			NotificationManager.showError("Error parsing options");
 		} finally {
 			initializationLinesProperty().set("");
+			viewTab.getMainWindow().setDirty(dirty);
 		}
 	}
 

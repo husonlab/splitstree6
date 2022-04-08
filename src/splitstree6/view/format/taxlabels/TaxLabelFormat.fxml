@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ TraitsFormat.fxml Copyright (C) 2022 Daniel H. Huson
+  ~
+  ~ (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~ This program is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ This program is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<VBox fx:id="vBox" prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/16"
+      xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.taxlabels.TaxLabelFormatController">
+    <padding>
+        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+    </padding>
+    <HBox alignment="CENTER">
+        <Label text="Labels">
+            <tooltip>
+                <Tooltip text="Formatting of whole taxon labels. Edit indvidual labels to add specific formatting."/>
+            </tooltip>
+        </Label>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" spacing="4.0">
+        <Label text="Font:"/>
+        <ComboBox fx:id="fontFamilyCbox" prefWidth="150.0">
+            <tooltip>
+                <Tooltip text="Font family"/>
+            </tooltip>
+        </ComboBox>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
+        <Label text="Size:">
+            <HBox.margin>
+                <Insets right="2.0"/>
+            </HBox.margin>
+        </Label>
+        <TextField fx:id="fontSizeField" prefColumnCount="4" prefWidth="50.0">
+            <tooltip>
+                <Tooltip text="Font size"/>
+            </tooltip>
+        </TextField>
+        <ToggleButton fx:id="boldToggleButton" mnemonicParsing="false" text="b" textOverrun="CLIP">
+            <font>
+                <Font name="System Bold" size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Bold"/>
+            </tooltip>
+        </ToggleButton>
+        <ToggleButton fx:id="italicToggleButton" mnemonicParsing="false" text="i" textOverrun="CLIP">
+            <font>
+                <Font name="System Font" size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Italics"/>
+            </tooltip>
+        </ToggleButton>
+        <ToggleButton fx:id="underlineToggleButton" mnemonicParsing="false" text="u" textOverrun="CLIP"
+                      underline="true">
+            <font>
+                <Font size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Underlined"/>
+            </tooltip>
+        </ToggleButton>
+        <ToggleButton fx:id="strikeToggleButton" layoutX="152.0" layoutY="12.0" mnemonicParsing="false" text="s"
+                      textOverrun="CLIP">
+            <font>
+                <Font size="12.0"/>
+            </font>
+            <tooltip>
+                <Tooltip text="Strike"/>
+            </tooltip>
+        </ToggleButton>
+    </HBox>
+    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0" spacing="4.0">
+        <Label text="Color:">
+            <font>
+                <Font size="12.0"/>
+            </font>
+        </Label>
+        <ColorPicker fx:id="textFillColorChooser">
+            <tooltip>
+                <Tooltip text="Text color"/>
+            </tooltip>
+        </ColorPicker>
+    </HBox>
+</VBox>

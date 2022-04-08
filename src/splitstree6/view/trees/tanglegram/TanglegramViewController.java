@@ -19,15 +19,17 @@
 
 package splitstree6.view.trees.tanglegram;
 
+import javafx.beans.binding.When;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import jloda.fx.control.CopyableLabel;
 import jloda.fx.util.DraggableLabel;
-import splitstree6.view.trees.layout.TreeDiagramType;
-import splitstree6.view.trees.treepages.LayoutOrientation;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
 
 /**
  * tanglegram view controller
@@ -48,7 +50,7 @@ public class TanglegramViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private Button findButton;
+	private ToggleButton findToggleButton;
 
 	@FXML
 	private Button expandVerticallyButton;
@@ -107,20 +109,22 @@ public class TanglegramViewController {
 	private Pane middlePane;
 
 	@FXML
-	private Label tree1NameLabel;
-
-	@FXML
-	private Label tree2NameLabel;
+	private AnchorPane outerAnchorPane;
 
 	@FXML
 	private AnchorPane innerAnchorPane;
-
 
 	@FXML
 	private VBox formatVBox;
 
 	@FXML
-	private TitledPane formatTitledPane;
+	private ToggleButton settingsToggleButton;
+
+	@FXML
+	private ToggleButton formatToggleButton;
+
+	private final CopyableLabel tree1NameLabel = new CopyableLabel();
+	private final CopyableLabel tree2NameLabel = new CopyableLabel();
 
 
 	@FXML
@@ -136,29 +140,33 @@ public class TanglegramViewController {
 		borderPane.setLeft(left);
 		borderPane.setRight(right);
 		borderPane.setTop(top);
+		borderPane.setBottom(bottom);
+
+		scrollPane.setFitToWidth(true);
+		scrollPane.setFitToHeight(true);
+
+		innerAnchorPane.getChildren().add(tree1NameLabel);
+		AnchorPane.setTopAnchor(tree1NameLabel, 5.0);
+		AnchorPane.setLeftAnchor(tree1NameLabel, 10.0);
+
+		innerAnchorPane.getChildren().add(tree2NameLabel);
+		AnchorPane.setTopAnchor(tree2NameLabel, 5.0);
+		AnchorPane.setRightAnchor(tree2NameLabel, 20.0);
 
 		DraggableLabel.makeDraggable(tree1NameLabel);
 		DraggableLabel.makeDraggable(tree2NameLabel);
 
-		formatVBox.setMinHeight(0);
-		formatVBox.setMaxHeight(formatVBox.getPrefHeight());
+		settingsToggleButton.setSelected(true);
+		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
+		toolBar.setMaxHeight(ToolBar.USE_COMPUTED_SIZE);
+		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());
+		toolBar.prefHeightProperty().bind(new When(settingsToggleButton.selectedProperty()).then(32.0).otherwise(0.0));
 
-		if (!formatTitledPane.isExpanded()) {
-			formatVBox.setVisible(false);
-			formatVBox.setMaxHeight(0);
-		} else {
-			formatVBox.setVisible(true);
-			formatVBox.setMaxHeight(formatVBox.getPrefHeight());
-		}
+		formatToggleButton.setSelected(false);
+		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
 
-		formatTitledPane.expandedProperty().addListener((v, o, n) -> {
-			formatVBox.setVisible(n);
-			formatVBox.setMaxHeight(n ? formatVBox.getPrefHeight() : 0);
-		});
-
-		innerAnchorPane.getChildren().remove(formatVBox);
-		innerAnchorPane.getChildren().add(formatVBox);
-
+		outerAnchorPane.getChildren().remove(formatVBox);
+		outerAnchorPane.getChildren().add(formatVBox);
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -173,8 +181,8 @@ public class TanglegramViewController {
 		return toolBar;
 	}
 
-	public Button getFindButton() {
-		return findButton;
+	public ToggleButton getFindToggleButton() {
+		return findToggleButton;
 	}
 
 	public Button getExpandVerticallyButton() {
@@ -253,11 +261,11 @@ public class TanglegramViewController {
 		return borderPane;
 	}
 
-	public Label getTree1NameLabel() {
+	public CopyableLabel getTree1NameLabel() {
 		return tree1NameLabel;
 	}
 
-	public Label getTree2NameLabel() {
+	public CopyableLabel getTree2NameLabel() {
 		return tree2NameLabel;
 	}
 
@@ -267,5 +275,9 @@ public class TanglegramViewController {
 
 	public VBox getFormatVBox() {
 		return formatVBox;
+	}
+
+	public ScrollPane getScrollPane() {
+		return scrollPane;
 	}
 }

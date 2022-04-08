@@ -87,7 +87,7 @@ public class ExtractMethodsText {
 
 		buf.append(format(inputDataTemplate, workflow.getInputTaxaNode().getDataBlock().getShortDescription(), workflow.getInputDataNode().getDataBlock().getShortDescription()));
 
-		var topTaxaBlock = workflow.getInputTaxonBlock();
+		var topTaxaBlock = workflow.getInputTaxaBlock();
 		var workingTaxaBlock = workflow.getWorkingTaxaBlock();
 		if (workingTaxaBlock != null && workingTaxaBlock.getNtax() < topTaxaBlock.getNtax()) {
 			int removed = (topTaxaBlock.getNtax() - workingTaxaBlock.getNtax());

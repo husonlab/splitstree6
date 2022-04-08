@@ -30,7 +30,7 @@ import javafx.scene.control.Tab;
 import jloda.fx.undo.UndoManager;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.IDisplayTabPresenter;
-import splitstree6.view.IView;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataNode;
 

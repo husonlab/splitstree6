@@ -40,7 +40,7 @@ public class Refine {
 	 * @return refined trees
 	 */
 	public static PhyloTree[] apply(PhyloTree tree1, PhyloTree tree2) throws IOException {
-		// setup rooted trees with nodes labeled by taxa ids
+		// create rooted trees with nodes labeled by taxa ids
 		var allTaxa = new TaxaBlock();
 		Pair<Root, Root> roots = PreProcess.apply(tree1, tree2, allTaxa);
 		Root v1 = roots.getFirst();

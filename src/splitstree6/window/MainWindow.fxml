@@ -351,12 +351,12 @@
                         <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
                     </Menu>
                     <Menu text="Data">
-                        <MenuItem fx:id="editTaxaMenuItem" text="Edit Taxa..."/>
-                        <MenuItem fx:id="editCharactersMenuItem" text="Edit Characters..."/>
-                        <MenuItem fx:id="editTreesMenuItem" text="Edit Trees..."/>
-                        <MenuItem fx:id="editSplitsMenuItem" text="Edit Splits..."/>
+                        <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa..."/>
+                        <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."/>
+                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees..."/>
+                        <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="traitsMenuItem" text="Traits"/>
+                        <MenuItem fx:id="traitsMenuItem" text="Edit Traits..."/>
                     </Menu>
                     <Menu text="Distances">
                         <MenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"/>
@@ -382,6 +382,8 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
                         <MenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="minSpanningTreeMenuItem" text="Minimum Spanning Tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="rerootTreesMenuItem" text="Reroot Or Ladderize Trees"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>

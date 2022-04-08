@@ -19,14 +19,16 @@
 
 package splitstree6.view.trees.treepages;
 
+import javafx.beans.binding.When;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.phylo.PhyloTree;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreePagesViewController {
 
@@ -40,7 +42,7 @@ public class TreePagesViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private Button findButton;
+	private ToggleButton findToggleButton;
 
 	@FXML
 	private ComboBox<TreeDiagramType> diagramCBox;
@@ -49,7 +51,7 @@ public class TreePagesViewController {
 	private ComboBox<LayoutOrientation> orientationCBox;
 
 	@FXML
-	private ComboBox<ComputeHeightAndAngles.Averaging> averagingCBox;
+	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
 
 	@FXML
 	private ComboBox<String> rowsColsCBox;
@@ -85,31 +87,27 @@ public class TreePagesViewController {
 	private VBox formatVBox;
 
 	@FXML
-	private TitledPane formatTitledPane;
+	private ToggleButton settingsToggleButton;
+
+	@FXML
+	private ToggleButton formatToggleButton;
 
 	@FXML
 	private AnchorPane innerAnchorPane;
 
 	@FXML
 	private void initialize() {
-		formatVBox.setMinHeight(0);
-		formatVBox.setMaxHeight(formatVBox.getPrefHeight());
-
-		if (!formatTitledPane.isExpanded()) {
-			formatVBox.setVisible(false);
-			formatVBox.setMaxHeight(0);
-		} else {
-			formatVBox.setVisible(true);
-			formatVBox.setMaxHeight(formatVBox.getPrefHeight());
-		}
-
-		formatTitledPane.expandedProperty().addListener((v, o, n) -> {
-			formatVBox.setVisible(n);
-			formatVBox.setMaxHeight(n ? formatVBox.getPrefHeight() : 0);
-		});
-
 		innerAnchorPane.getChildren().remove(formatVBox);
 		innerAnchorPane.getChildren().add(formatVBox);
+
+		settingsToggleButton.setSelected(true);
+		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
+		toolBar.setMaxHeight(ToolBar.USE_COMPUTED_SIZE);
+		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());
+		toolBar.prefHeightProperty().bind(new When(settingsToggleButton.selectedProperty()).then(32.0).otherwise(0.0));
+
+		formatToggleButton.setSelected(false);
+		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -124,8 +122,8 @@ public class TreePagesViewController {
 		return toolBar;
 	}
 
-	public Button getFindButton() {
-		return findButton;
+	public ToggleButton getFindToggleButton() {
+		return findToggleButton;
 	}
 
 	public ComboBox<TreeDiagramType> getDiagramCBox() {
@@ -136,7 +134,7 @@ public class TreePagesViewController {
 		return orientationCBox;
 	}
 
-	public ComboBox<ComputeHeightAndAngles.Averaging> getAveragingCBox() {
+	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
 		return averagingCBox;
 	}
 
@@ -182,9 +180,5 @@ public class TreePagesViewController {
 
 	public VBox getFormatVBox() {
 		return formatVBox;
-	}
-
-	public TitledPane getFormatTitledPane() {
-		return formatTitledPane;
 	}
 }

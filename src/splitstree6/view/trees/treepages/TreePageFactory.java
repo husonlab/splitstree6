@@ -33,9 +33,11 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressSilent;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.window.MainWindow;
 
@@ -82,6 +84,13 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		rows.addListener(new WeakInvalidationListener(updater));
 		cols.addListener(new WeakInvalidationListener(updater));
 		dimensions.addListener(new WeakInvalidationListener(updater));
+
+		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> {
+			for (var treeViewPane : BasicFX.findRecursively(gridPane.get(), p -> p.getId() != null && p.getId().equals("treeView"))) {
+				treeViewPane.setScaleX(treeViewPane.getScaleX() / o.doubleValue() * n.doubleValue());
+				treeViewPane.setScaleY(treeViewPane.getScaleY() / o.doubleValue() * n.doubleValue());
+			}
+		});
 	}
 
 	private void update() {
@@ -89,6 +98,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		var taxonSelectionModel = mainWindow.getTaxonSelectionModel();
 
 		Platform.runLater(() -> gridPane.get().getChildren().clear());
+
 		var start = page * rows.get() * cols.get();
 		var top = Math.min(trees.size(), start + rows.get() * cols.get());
 		var r = 0;
@@ -106,9 +116,15 @@ public class TreePageFactory implements Callback<Integer, Node> {
 
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
-				var treePane = new TreePane(mainWindow.getStage(), taxaBlock, tree, name, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-						treePagesView.getOptionDiagram(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(), treePagesView.optionZoomFactorProperty(),
-						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty());
+				var treePane = new TreePane(mainWindow.getStage(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+						treePagesView.getOptionDiagram(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
+						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty(), null, null);
+				treePane.setRunAfterUpdate(() -> {
+					for (var treeViewPane : BasicFX.findRecursively(treePane, p -> p.getId() != null && p.getId().equals("treeView"))) {
+						treeViewPane.setScaleX(treeViewPane.getScaleX() * treePagesView.getOptionZoomFactor());
+						treeViewPane.setScaleY(treeViewPane.getScaleY() * treePagesView.getOptionZoomFactor());
+					}
+				});
 				treePane.drawTree();
 				pane = treePane;
 			} else
@@ -117,6 +133,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			pane.setPrefSize(dimensions.get().getWidth(), dimensions.get().getHeight());
 			pane.setMinSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
 			pane.setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
+
 			GridPane.setRowIndex(pane, r);
 			GridPane.setColumnIndex(pane, c);
 			Platform.runLater(() -> gridPane.get().getChildren().add(pane));

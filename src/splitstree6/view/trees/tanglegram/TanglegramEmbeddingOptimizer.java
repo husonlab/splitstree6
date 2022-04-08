@@ -41,7 +41,7 @@ public class TanglegramEmbeddingOptimizer {
 	private final BooleanProperty useFastAlignmentHeuristic = new SimpleBooleanProperty(this, "useFastAlignmentHeuristic", false);
 
 	/**
-	 * setup the optimizer
+	 * create the optimizer
 	 *
 	 * @param mainWindow main window
 	 */

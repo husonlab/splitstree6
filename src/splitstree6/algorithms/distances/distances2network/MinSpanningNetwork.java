@@ -154,11 +154,40 @@ public class MinSpanningNetwork extends Distances2Network {
 			}
 			if (numComponentsMSN == 1) {
 				if (optionMinSpanningTree.getValue())
-					return; // tree
+					break; // tree
 				if (maxValue == Double.POSITIVE_INFINITY)
 					maxValue = threshold + getOptionEpsilon(); // once network is connected, add all edges upto threshold+epsilon
 			}
 		}
+
+		var parent = distancesBlock.getNode().getPreferredParent();
+		if (parent != null && parent.getPreferredParent() != null && parent.getPreferredParent().getDataBlock() instanceof CharactersBlock charactersBlock) {
+			graph.nodeStream().filter(v -> graph.getNumberOfTaxa(v) == 1).forEach(v -> {
+				var row = graph.getTaxon(v) - 1;
+				var sequence = String.valueOf(charactersBlock.getRow0(row));
+				networkBlock.getNodeData(v).put(NetworkBlock.NODE_STATES_KEY, sequence);
+			});
+
+			for (var e : graph.edges()) {
+				var sequence1 = networkBlock.getNodeData(e.getSource()).get(NetworkBlock.NODE_STATES_KEY);
+				var sequence2 = networkBlock.getNodeData(e.getTarget()).get(NetworkBlock.NODE_STATES_KEY);
+				if (sequence1 != null && sequence2 != null) {
+					networkBlock.getEdgeData(e).put(NetworkBlock.EDGE_SITES_KEY, computeEdgeLabel(sequence1, sequence2));
+				}
+			}
+		}
+	}
+
+	private static String computeEdgeLabel(String sequence1, String sequence2) {
+		var buf = new StringBuilder();
+		for (var i = 0; i < sequence1.length(); i++) {
+			if (Character.toLowerCase(sequence1.charAt(i)) != Character.toLowerCase(sequence2.charAt(i))) {
+				if (buf.length() > 0)
+					buf.append(",");
+				buf.append(i + 1);
+			}
+		}
+		return buf.toString();
 	}
 
 	public double getOptionEpsilon() {

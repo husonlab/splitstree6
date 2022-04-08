@@ -34,6 +34,7 @@ public class DataNodeContextMenu {
 		var controller = loader.getController();
 
 		new DataNodeContextMenuPresenter(mainWindow, undoManager, controller, dataNode);
+		undoManager.undoableProperty().addListener((v, o, n) -> mainWindow.setDirty(true));
 
 		contextMenu = controller.getContextMenu();
 	}

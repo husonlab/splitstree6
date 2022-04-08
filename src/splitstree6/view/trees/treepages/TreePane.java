@@ -24,23 +24,25 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.ObservableMap;
+import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.view.trees.layout.ComputeHeightAndAngles;
-import splitstree6.view.trees.layout.ComputeTreeLayout;
-import splitstree6.view.trees.layout.LayoutUtils;
-import splitstree6.view.trees.layout.TreeDiagramType;
+import splitstree6.layout.tree.*;
+import splitstree6.view.trees.InteractionSetup;
 
 import java.util.function.Consumer;
 
@@ -54,7 +56,6 @@ public class TreePane extends StackPane {
 
 	private Pane pane;
 
-	private final ChangeListener<Number> zoomChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 
 	private final BooleanProperty showInternalLabels = new SimpleBooleanProperty();
@@ -71,14 +72,11 @@ public class TreePane extends StackPane {
 	/**
 	 * single tree pane
 	 */
-	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, String name, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, ComputeHeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
-					ReadOnlyObjectProperty<TreePagesView.TreeLabels> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels) {
+	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
+					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
+					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX, ObservableMap<jloda.graph.Node, Group> nodeShapeMap) {
 
-		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, orientation);
-
-
-		//setStyle("-fx-background-color: transparent");
+		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, diagram, orientation);
 
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);
@@ -95,14 +93,6 @@ public class TreePane extends StackPane {
 		};
 		fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 
-		zoomChangedListener = (v, o, n) -> {
-			if (pane != null) {
-				pane.setScaleX(pane.getScaleX() / o.doubleValue() * n.doubleValue());
-				pane.setScaleY(pane.getScaleY() / o.doubleValue() * n.doubleValue());
-			}
-		};
-		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
-
 		this.showInternalLabels.set(showInternalLabels.get());
 		internalLabelsListener = (v, o, n) -> {
 			this.showInternalLabels.set(n);
@@ -114,9 +104,10 @@ public class TreePane extends StackPane {
 		service.setExecutor(ProgramExecutorService.getInstance());
 
 		orientation.addListener((v, o, n) -> {
-			if (diagram == TreeDiagramType.RadialPhylogram)
-				splitstree6.view.splits.layout.LayoutUtils.applyOrientation(pane, o, n, orientationConsumer);
-			else
+			if (diagram == TreeDiagramType.RadialPhylogram) {
+				var shapes = BasicFX.getAllRecursively(pane, Shape.class);
+				splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, o, n, orientationConsumer);
+			} else
 				LayoutUtils.applyOrientation(pane, n, o, false);
 		});
 
@@ -135,8 +126,8 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			return ComputeTreeLayout.apply(taxaBlock, phyloTree, diagram, averaging, width - 4, height - 4,
-					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true);
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
+					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true, nodeShapeMap);
 		});
 
 		service.setOnSucceeded(a -> {
@@ -146,26 +137,30 @@ public class TreePane extends StackPane {
 			if (result.internalLabels() != null)
 				result.internalLabels().visibleProperty().bind(this.showInternalLabels);
 
+			if (unitLengthX != null)
+				unitLengthX.set(result.unitLengthX());
+
 			orientationConsumer = result.layoutOrientationConsumer();
 
 			pane = new StackPane(group);
 			pane.setId("treeView");
-			if (zoomFactor.get() > 0 && zoomFactor.get() != 1) {
-				pane.setScaleX(zoomFactor.get());
-				pane.setScaleY(zoomFactor.get());
-			}
 
 			pane.setMinHeight(getPrefHeight() - 12);
 			pane.setMinWidth(getPrefWidth());
 
 			LayoutUtils.applyLabelScaleFactor(group, fontScaleFactor.get());
 			Platform.runLater(() -> {
-				LayoutUtils.applyOrientation(orientation.get(), pane, false);
-				updateLabelLayout(orientation.get());
+				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg) {
+					var shapes = BasicFX.getAllRecursively(pane, Group.class);
+					splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
+				} else {
+					LayoutUtils.applyOrientation(orientation.get(), pane, false);
+					updateLabelLayout(orientation.get());
+				}
 			});
 
-			{
-				final var treeLabel = new Label(name);
+			if (showTreeLabels != null) {
+				final var treeLabel = new Label();
 				final InvalidationListener listener = e -> {
 					switch (showTreeLabels.get()) {
 						case None -> {
@@ -176,7 +171,7 @@ public class TreePane extends StackPane {
 							treeLabel.setText(phyloTree.getName());
 							treeLabel.setVisible(true);
 						}
-						case Info -> {
+						case Details -> {
 							treeLabel.setText(phyloTree.getName() + " : " + getInfoString());
 							treeLabel.setVisible(true);
 						}
@@ -185,7 +180,8 @@ public class TreePane extends StackPane {
 				showTreeLabels.addListener(listener);
 				listener.invalidated(null);
 				getChildren().setAll(new VBox(treeLabel, pane));
-			}
+			} else
+				getChildren().setAll(pane);
 
 			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				if (e.isStillSincePress() && !e.isShiftDown()) {
@@ -193,6 +189,7 @@ public class TreePane extends StackPane {
 				}
 				e.consume();
 			});
+
 			if (getRunAfterUpdate() != null) {
 				Platform.runLater(() -> getRunAfterUpdate().run());
 			}

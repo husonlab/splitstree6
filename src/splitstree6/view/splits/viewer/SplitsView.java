@@ -25,24 +25,32 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
+import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.PrintUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.layout.splits.LoopView;
+import splitstree6.layout.splits.SplitsDiagramType;
+import splitstree6.layout.splits.SplitsRooting;
+import splitstree6.layout.splits.algorithms.EqualAngle;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
-import splitstree6.view.format.splits.SplitsFormatter;
-import splitstree6.view.format.taxlabels.TaxLabelFormatter;
-import splitstree6.view.splits.layout.algorithms.EqualAngle;
-import splitstree6.view.trees.treepages.LayoutOrientation;
+import splitstree6.view.format.splits.SplitsFormat;
+import splitstree6.view.format.taxlabels.TaxLabelFormat;
+import splitstree6.view.format.traits.TraitsFormat;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -56,6 +64,8 @@ public class SplitsView implements IView {
 
 	private final SplitsViewController controller;
 	private final SplitsViewPresenter presenter;
+
+	private final SplitsFormat splitsFormat;
 
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
@@ -77,6 +87,10 @@ public class SplitsView implements IView {
 
 	private final ObjectProperty<Color> optionOutlineFill = new SimpleObjectProperty<>(this, "optionOutlineFill");
 
+	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
+	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
+	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
+
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
@@ -92,7 +106,8 @@ public class SplitsView implements IView {
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(), optionShowConfidence.getName());
+				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(),
+				optionShowConfidence.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -100,12 +115,12 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
-		final ObservableMap<jloda.graph.Node, Shape> nodeShapeMap = FXCollections.observableHashMap();
+		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
+		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
 		final ObservableList<LoopView> loopViews = FXCollections.observableArrayList();
 
-		// this is the target area for the tree page:
-		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, nodeShapeMap, splitShapeMap, loopViews);
+		presenter = new SplitsViewPresenter(mainWindow, this, targetBounds, splitsBlock, taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -115,16 +130,29 @@ public class SplitsView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormatter(mainWindow, undoManager);
+		var taxLabelFormat = new TaxLabelFormat(mainWindow, undoManager);
+		splitsFormat = new SplitsFormat(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
-		var splitsFormatter = new SplitsFormatter(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
+		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
+		traitsFormatter.setNodeShapeMap(nodeShapeMap);
+		optionActiveTraits.bindBidirectional(traitsFormatter.optionActiveTraitsProperty());
+		optionTraitLegend.bindBidirectional(traitsFormatter.optionTraitLegendProperty());
+		optionTraitSize.bindBidirectional(traitsFormatter.optionTraitSizeProperty());
+		traitsFormatter.getLegend().scaleProperty().bind(optionZoomFactorProperty());
 
-		controller.getFormatVbox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), splitsFormatter);
+		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
+		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
+
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormat, new Separator(Orientation.HORIZONTAL),
+				traitsFormatter, new Separator(Orientation.HORIZONTAL), splitsFormat);
+
+		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
+		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
+		controller.getInnerAnchorPane().getChildren().add(traitsFormatter.getLegend());
+		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);
-			if (n != null && getOptionDiagram() == SplitsDiagramType.Outline && n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic)
-				setOptionDiagram(SplitsDiagramType.Splits);
 			splitSelectionModel.clearSelection();
 		});
 
@@ -159,7 +187,6 @@ public class SplitsView implements IView {
 		this.viewTab.set(viewTab);
 	}
 
-
 	@Override
 	public int size() {
 		return getSplitsBlock() == null ? 0 : getSplitsBlock().size();
@@ -177,7 +204,7 @@ public class SplitsView implements IView {
 
 	@Override
 	public Node getImageNode() {
-		return controller.getInnerAnchorPane();
+		return PrintUtils.createImage(controller.getInnerAnchorPane(), controller.getScrollPane());
 	}
 
 	@Override
@@ -221,7 +248,6 @@ public class SplitsView implements IView {
 	public void setOptionOrientation(LayoutOrientation optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
 	}
-
 
 	public String[] getOptionEdits() {
 		return optionEdits.get();
@@ -295,12 +321,12 @@ public class SplitsView implements IView {
 		this.optionShowConfidence.set(optionShowConfidence);
 	}
 
-	public Bounds getTargetBounds() {
-		return targetBounds.get();
+	public String[] getOptionActiveTraits() {
+		return optionActiveTraits.get();
 	}
 
-	public ObjectProperty<Bounds> targetBoundsProperty() {
-		return targetBounds;
+	public ObjectProperty<String[]> optionActiveTraitsProperty() {
+		return optionActiveTraits;
 	}
 
 	public SplitsViewController getController() {
@@ -321,5 +347,9 @@ public class SplitsView implements IView {
 
 	public SelectionModel<Integer> getSplitSelectionModel() {
 		return splitSelectionModel;
+	}
+
+	public SplitsFormat getSplitsFormat() {
+		return splitsFormat;
 	}
 }

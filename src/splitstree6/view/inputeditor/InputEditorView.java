@@ -26,9 +26,10 @@ import jloda.util.FileLineIterator;
 import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
+import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.IView;
 import splitstree6.view.displaytext.DisplayTextView;
+import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.WorkflowSetup;
 
@@ -45,8 +46,8 @@ import java.util.function.Consumer;
 public class InputEditorView extends DisplayTextView implements IView {
 	public static final String NAME = "Input Editor";
 	private final MainWindow mainWindow;
-	private final InputEditorViewController toolBarController;
-	private final InputEditorViewPresenter toolBarPresenter;
+	private final InputEditorViewController inputEditorViewController;
+	private final InputEditorViewPresenter inputEditorViewPresenter;
 	private File tmpFile;
 
 	private final ViewTab viewTab;
@@ -60,16 +61,23 @@ public class InputEditorView extends DisplayTextView implements IView {
 		this.viewTab = viewTab;
 
 		var loader = new ExtendedFXMLLoader<InputEditorViewController>(this.getClass());
-		toolBarController = loader.getController();
-		toolBarPresenter = new InputEditorViewPresenter(mainWindow, this);
+		inputEditorViewController = loader.getController();
+		inputEditorViewPresenter = new InputEditorViewPresenter(mainWindow, this);
 	}
 
-	public InputEditorViewController getToolBarController() {
-		return toolBarController;
+	public InputEditorViewController getInputEditorViewController() {
+		return inputEditorViewController;
 	}
 
-	public InputEditorViewPresenter getToolBarPresenter() {
-		return toolBarPresenter;
+	public InputEditorViewPresenter getInputEditorViewPresenter() {
+		return inputEditorViewPresenter;
+	}
+
+
+	@Override
+	public void setupMenuItems() {
+		super.setupMenuItems();
+
 	}
 
 	/**
@@ -153,7 +161,10 @@ public class InputEditorView extends DisplayTextView implements IView {
 				mainWindow.setFileName(name);
 				mainWindow.setDirty(true);
 			};
-			WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler, runOnSuccess);
+			if (WorkflowNexusInput.isApplicable(tmpFile.getPath())) {
+				WorkflowNexusInput.open(mainWindow, tmpFile.getPath(), failedHandler, runOnSuccess);
+			} else
+				WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler, runOnSuccess);
 
 		} catch (Exception ex) {
 			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());

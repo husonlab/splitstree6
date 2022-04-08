@@ -33,6 +33,7 @@ import splitstree6.io.nexus.TreesNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.trees.tanglegram.TanglegramView;
 import splitstree6.view.trees.treepages.TreePagesView;
+import splitstree6.view.trees.treeview.TreeView;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 
@@ -45,9 +46,9 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class ShowTrees extends Trees2View {
-	public enum ViewType {SingleTree, TreePages, DensiTree, Tanglegram, Text}
+	public enum ViewType {TreeView, TreePages, Tanglegram, DensiTree, Text}
 
-	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.TreePages);
+	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.TreeView);
 	private final ChangeListener<Boolean> validListener;
 
 	@Override
@@ -81,16 +82,16 @@ public class ShowTrees extends Trees2View {
 		Platform.runLater(() -> viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("TreeViewer16.gif", 16)));
 
 		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
+		if (viewBlock.getView() != null)
+			viewBlock.getView().clear();
 
 		switch (getOptionView()) {
 			case TreePages -> {
-					if (viewBlock.getView() != null)
-						viewBlock.getView().clear();
-					Platform.runLater(() -> {
-						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new TreePagesView(mainWindow, "Tree Pages", viewBlock.getViewTab());
-						viewBlock.setView(view);
-					});
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					var view = new TreePagesView(mainWindow, ViewType.TreePages.name(), viewBlock.getViewTab());
+					viewBlock.setView(view);
+				});
 
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TreePagesView view) {
@@ -101,11 +102,9 @@ public class ShowTrees extends Trees2View {
 				});
 			}
 			case Tanglegram -> {
-					if (viewBlock.getView() != null)
-						viewBlock.getView().clear();
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new TanglegramView(mainWindow, "Tanglegram", viewBlock.getViewTab());
+						var view = new TanglegramView(mainWindow, ViewType.Tanglegram.name(), viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
 
@@ -117,15 +116,28 @@ public class ShowTrees extends Trees2View {
 					}
 				});
 			}
-			case SingleTree, DensiTree -> throw new IOException("Not implemented: " + getOptionView());
+			case TreeView -> {
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					viewBlock.setView(new TreeView(mainWindow, ViewType.TreeView.name(), viewBlock.getViewTab()));
+				});
+
+				Platform.runLater(() -> {
+					if (viewBlock.getView() instanceof TreeView view) {
+						view.getUndoManager().clear();
+						view.getTrees().setAll(inputData.getTrees());
+						view.setReticulated(inputData.isReticulated());
+					}
+				});
+
+			}
+			case DensiTree -> throw new IOException("Not implemented: " + getOptionView());
 			case Text -> {
-					if (viewBlock.getView() != null)
-						viewBlock.getView().clear();
-					Platform.runLater(() -> {
-						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new DisplayTextView(mainWindow, "Trees Text", false);
-						viewBlock.setView(view);
-					});
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					var view = new DisplayTextView(mainWindow, "Trees Text", false);
+					viewBlock.setView(view);
+				});
 
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof DisplayTextView view) {
