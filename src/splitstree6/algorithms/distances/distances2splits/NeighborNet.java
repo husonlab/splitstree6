@@ -45,16 +45,17 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	//private final ObjectProperty<WeightsAlgorithm> optionWeights = new SimpleObjectProperty<>(this,"optionWeights",WeightsAlgorithm.NNet2004);
 
-	public enum InferenceAlgorithm {ActiveSet, BlockPivot}
+	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
+	public enum InferenceAlgorithm {BlockPivot}  //TODO: ActiveSet not working at present. Will be rewritten.
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.BlockPivot);
 
-	private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", true);
+	private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", false);
 
 	private final BooleanProperty optionUseDual = new SimpleBooleanProperty(this, "optionUseDual", true);
 
 	public List<String> listOptions() {
-		return List.of(optionInferenceAlgorithm.getName(), optionUsePreconditioner.getName());
+		return List.of(optionInferenceAlgorithm.getName(), optionUsePreconditioner.getName(),optionUseDual.getName());
 	}
 
 	@Override
