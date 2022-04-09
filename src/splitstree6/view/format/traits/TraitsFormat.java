@@ -184,11 +184,12 @@ public class TraitsFormat extends Pane {
 
 				var graph = graphOptional.get();
 				for (var v : nodeShapeMap.keySet()) {
+
 					var group = nodeShapeMap.get(v);
 					if (group != null) {
 						group.getChildren().removeAll(BasicFX.getAllRecursively(group, PieChart.class));
 
-						if (graph.getNumberOfTaxa(v) == 1) {
+						if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
 							var taxonId = graph.getTaxon(v);
 
 							if (!isNoneTraitsActive()) {
@@ -205,7 +206,6 @@ public class TraitsFormat extends Pane {
 								}
 
 								var tooltipBuf = new StringBuilder();
-
 
 								for (var traitId : traitsBlock.numericalTraits()) {
 									var label = traitsBlock.getTraitLabel(traitId);

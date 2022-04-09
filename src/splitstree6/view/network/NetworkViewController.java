@@ -21,15 +21,13 @@ package splitstree6.view.network;
 
 import javafx.beans.binding.When;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.util.BasicFX;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LayoutOrientation;
 
@@ -106,6 +104,12 @@ public class NetworkViewController {
 
 		formatToggleButton.setSelected(false);
 		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
+		formatVBox.visibleProperty().addListener((v, o, n) -> {
+			for (var titledPane : BasicFX.getAllRecursively(formatVBox, TitledPane.class)) {
+				if (!titledPane.isDisable())
+					titledPane.setExpanded(n);
+			}
+		});
 	}
 
 	public AnchorPane getAnchorPane() {

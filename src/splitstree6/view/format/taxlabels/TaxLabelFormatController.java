@@ -59,6 +59,9 @@ public class TaxLabelFormatController {
 	private Button clearColorButton;
 
 	@FXML
+	private TitledPane titledPane;
+
+	@FXML
 	private void initialize() {
 		fontSizeField.setTextFormatter(new TextFormatter<>(new DoubleStringConverter()));
 	}
@@ -105,5 +108,9 @@ public class TaxLabelFormatController {
 
 	public Button getClearColorButton() {
 		return clearColorButton;
+	}
+
+	public TitledPane getTitledPane() {
+		return titledPane;
 	}
 }

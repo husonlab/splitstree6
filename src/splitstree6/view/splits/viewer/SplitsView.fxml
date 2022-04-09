@@ -19,6 +19,7 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
@@ -117,8 +118,12 @@
                         <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
                     </AnchorPane>
-                    <VBox fx:id="formatVBox" minHeight="100.0" prefWidth="200.0" styleClass="context-menu"
-                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
+                    <VBox fx:id="formatVBox" minHeight="30.0" minWidth="-Infinity" prefWidth="200.0"
+                          styleClass="context-menu" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0">
+                        <opaqueInsets>
+                            <Insets/>
+                        </opaqueInsets>
+                    </VBox>
                 </children>
             </AnchorPane>
         </center>

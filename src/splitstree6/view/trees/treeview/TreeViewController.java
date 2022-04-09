@@ -21,16 +21,14 @@ package splitstree6.view.trees.treeview;
 
 import javafx.beans.binding.When;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToolBar;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
 import splitstree6.layout.tree.HeightAndAngles;
@@ -147,6 +145,12 @@ public class TreeViewController {
 
 		formatToggleButton.setSelected(false);
 		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
+		formatVBox.visibleProperty().addListener((v, o, n) -> {
+			for (var titledPane : BasicFX.getAllRecursively(formatVBox, TitledPane.class)) {
+				if (!titledPane.isDisable())
+					titledPane.setExpanded(n);
+			}
+		});
 
 		DraggableLabel.makeDraggable(treeNameLabel);
 	}

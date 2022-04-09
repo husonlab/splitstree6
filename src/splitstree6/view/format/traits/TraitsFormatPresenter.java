@@ -54,12 +54,12 @@ public class TraitsFormatPresenter {
 			var traitsBlock = traitsFormat.getTraitsBlock();
 			if (traitsBlock != null) {
 				if (traitsBlock.getNumberNumericalTraits() == 0) {
-					controller.getvBox().setDisable(true);
+					controller.getTitledPane().setDisable(true);
 					controller.getShowMenuButton().getItems().removeAll(traitMenuItems);
 					traitMenuItems.clear();
 				} else {
 					traitMenuItems.clear();
-					controller.getvBox().setDisable(false);
+					controller.getTitledPane().setDisable(false);
 					for (var label : traitsBlock.getNumericalTraitLabels()) {
 						var menuItem = new CheckMenuItem(label);
 						menuItem.setSelected(true);

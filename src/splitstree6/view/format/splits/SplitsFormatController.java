@@ -23,6 +23,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.TitledPane;
 import javafx.util.converter.FormatStringConverter;
 
 import java.text.NumberFormat;
@@ -44,6 +45,8 @@ public class SplitsFormatController {
 	@FXML
 	private ColorPicker outlineColorPicker;
 
+	@FXML
+	private TitledPane titledPane;
 
 	@FXML
 	private void initialize() {
@@ -68,5 +71,9 @@ public class SplitsFormatController {
 
 	public ColorPicker getOutlineColorPicker() {
 		return outlineColorPicker;
+	}
+
+	public TitledPane getTitledPane() {
+		return titledPane;
 	}
 }

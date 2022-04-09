@@ -21,12 +21,24 @@ package splitstree6.view.format.sites;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.MenuButton;
+import javafx.scene.control.TitledPane;
 
 public class SitesFormatController {
 	@FXML
 	private MenuButton showMenuButton;
 
+	@FXML
+	private TitledPane titledPane;
+
+	@FXML
+	private void initialized() {
+	}
+
 	public MenuButton getShowMenuButton() {
 		return showMenuButton;
+	}
+
+	public TitledPane getTitledPane() {
+		return titledPane;
 	}
 }

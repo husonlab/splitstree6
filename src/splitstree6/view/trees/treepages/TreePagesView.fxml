@@ -148,7 +148,7 @@
                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
                     </Pane>
-                    <VBox fx:id="formatVBox" prefHeight="150.0" prefWidth="200.0" styleClass="context-menu"
+                    <VBox fx:id="formatVBox" prefHeight="30.0" prefWidth="200.0" styleClass="context-menu"
                           AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="2.0"/>
                 </children>
             </AnchorPane>
