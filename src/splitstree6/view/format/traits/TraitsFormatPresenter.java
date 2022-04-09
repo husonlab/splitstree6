@@ -24,6 +24,7 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.SeparatorMenuItem;
 import jloda.fx.undo.UndoManager;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -38,15 +39,13 @@ public class TraitsFormatPresenter {
 	public TraitsFormatPresenter(MainWindow mainWindow, TraitsFormat traitsFormat, TraitsFormatController controller, UndoManager undoManager) {
 		controller.getMaxSizeField().setText(String.valueOf(traitsFormat.getOptionTraitSize()));
 
-
 		traitsFormat.optionTraitLegendProperty().bindBidirectional(controller.getLegendCBox().selectedProperty());
 		traitsFormat.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
 		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> traitsFormat.setOptionTraitSize(NumberUtils.parseInt(n)));
 
 		traitsFormat.getLegend().visibleProperty().bindBidirectional(traitsFormat.optionTraitLegendProperty());
 
-		traitsFormat.optionActiveTraitsProperty().addListener(e ->
-		{
+		traitsFormat.optionActiveTraitsProperty().addListener(e -> {
 			traitMenuItems.forEach(m -> m.setSelected(traitsFormat.isTraitActive(m.getText())));
 			traitsFormat.updateNodes();
 		});
@@ -54,14 +53,14 @@ public class TraitsFormatPresenter {
 		traitsBlockListener = e -> {
 			var traitsBlock = traitsFormat.getTraitsBlock();
 			if (traitsBlock != null) {
-				if (traitsBlock.getNTraits() == 0) {
+				if (traitsBlock.getNumberNumericalTraits() == 0) {
 					controller.getvBox().setDisable(true);
 					controller.getShowMenuButton().getItems().removeAll(traitMenuItems);
 					traitMenuItems.clear();
 				} else {
+					traitMenuItems.clear();
 					controller.getvBox().setDisable(false);
-					for (var trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
-						var label = traitsBlock.getTraitLabel(trait);
+					for (var label : traitsBlock.getNumericalTraitLabels()) {
 						var menuItem = new CheckMenuItem(label);
 						menuItem.setSelected(true);
 						menuItem.selectedProperty().addListener((b, o, n) -> {
@@ -71,6 +70,7 @@ public class TraitsFormatPresenter {
 						});
 						traitMenuItems.add(menuItem);
 					}
+					controller.getShowMenuButton().getItems().setAll(controller.getShowAllMenuItem(), controller.getShowNoneMenuItem(), new SeparatorMenuItem());
 					controller.getShowMenuButton().getItems().addAll(traitMenuItems);
 				}
 			}

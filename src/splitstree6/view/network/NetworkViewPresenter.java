@@ -188,7 +188,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
 		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
 
-
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 

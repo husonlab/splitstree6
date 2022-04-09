@@ -20,6 +20,7 @@
 package splitstree6.io.nexus;
 
 
+import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 
@@ -82,14 +83,17 @@ public class TraitsNexusOutput extends NexusIOBase implements INexusOutput<Trait
 					w.write(" '" + taxaBlock.get(t).getName() + "'");
 					pad(w, taxaBlock, t);
 				}
-				for (int j = 1; j <= traitsBlock.getNTraits(); j++) {
-					if (j > 1)
+				for (int tr = 1; tr <= traitsBlock.getNTraits(); tr++) {
+					if (tr > 1)
 						w.write(format.getSeparatorString());
-					int value = traitsBlock.getTraitValue(t, j);
+					var value = traitsBlock.getTraitValue(t, tr);
 					if (value == Integer.MAX_VALUE)
 						w.write(format.getOptionMissingCharacter());
+					else if (traitsBlock.isNumerical(tr))
+						w.write(StringUtils.removeTrailingZerosAfterDot(traitsBlock.getTraitValueLabel(t, tr)));
 					else
-						w.write(traitsBlock.getTraitValueLabel(t, j));
+						w.write(traitsBlock.getTraitValueLabel(t, tr));
+
 				}
 				w.write("\n");
 			}

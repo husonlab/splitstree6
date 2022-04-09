@@ -87,7 +87,7 @@
     </HBox>
     <Separator prefWidth="200.0"/>
     <HBox alignment="CENTER" layoutX="15.0" layoutY="99.0">
-        <Label text="Rotate">
+        <Label text="Rotate Splits">
             <tooltip>
                 <Tooltip text="Branch formatting"/>
             </tooltip>

@@ -250,4 +250,8 @@ public class TreeViewController {
 	public CopyableLabel getTreeNameLabel() {
 		return treeNameLabel;
 	}
+
+	public ToggleButton getFormatToggleButton() {
+		return formatToggleButton;
+	}
 }

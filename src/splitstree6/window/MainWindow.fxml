@@ -50,14 +50,12 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu mnemonicParsing="false" text="Import">
                             <items>
-                                <MenuItem fx:id="importDataMenuItem" text="Data...">
-                                    <accelerator>
-                                        <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="UP"
-                                                            shortcut="DOWN"/>
-                                    </accelerator>
-                                </MenuItem>
+                                <MenuItem fx:id="importTaxonTraitsMenuItem" mnemonicParsing="false"
+                                          text="Taxon Traits..."/>
                                 <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
                                           text="Taxon Display Labels..."/>
+                                <MenuItem fx:id="importMultipleTreeFilesMenuItem" mnemonicParsing="false"
+                                          text="Import Trees from Multiple Files..."/>
                             </items>
                         </Menu>
                         <MenuItem fx:id="replaceDataMenuItem" text="Replace Data...">
@@ -105,8 +103,6 @@
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu fx:id="toolsMenu" text="Tools">
-                            <MenuItem fx:id="importMultipleTreeFilesMenuItem"
-                                      text="Import Trees from Multiple Files..."/>
                             <MenuItem fx:id="GroupIdenticalHaplotypesFilesMenuItem"
                                       text="Group Identical Haplotypes...">
                             </MenuItem>
@@ -335,12 +331,7 @@
                         <MenuItem fx:id="flipMenuItem" text="Flip">
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="formatNodesMenuItem" text="Format...">
-                            <accelerator>
-                                <KeyCodeCombination alt="UP" code="J" control="UP" meta="UP" shift="DOWN"
-                                                    shortcut="DOWN"/>
-                            </accelerator>
-                        </MenuItem>
+                        <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels">
                             <accelerator>
@@ -348,9 +339,8 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
                     </Menu>
+
                     <Menu text="Data">
                         <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa..."/>
                         <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."/>

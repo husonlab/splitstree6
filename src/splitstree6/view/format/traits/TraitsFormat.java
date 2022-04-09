@@ -74,12 +74,10 @@ public class TraitsFormat extends Pane {
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		workingTaxa.addListener((c, o, n) -> {
-			traitsBlock.set(n == null ? null : n.getTraitsBlock());
-		});
-
 		validListener = (v, o, n) -> {
 			workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
+			if (n)
+				traitsBlock.set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock());
 		};
 		workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
 		mainWindow.getWorkflow().validProperty().addListener(new WeakChangeListener<>(validListener));
@@ -112,7 +110,7 @@ public class TraitsFormat extends Pane {
 	}
 
 	public boolean isAllTraitsActive() {
-		return getOptionActiveTraits().length == 1 && getOptionActiveTraits()[0].equals(ALL) || getOptionActiveTraits().length > 0 && getOptionActiveTraits().length == traitsBlock.get().getNTraits();
+		return getOptionActiveTraits().length == 1 && getOptionActiveTraits()[0].equals(ALL) || getOptionActiveTraits().length > 0 && getOptionActiveTraits().length >= traitsBlock.get().getNumberNumericalTraits();
 	}
 
 	public boolean isNoneTraitsActive() {
@@ -167,15 +165,15 @@ public class TraitsFormat extends Pane {
 	}
 
 	public void updateNodes() {
-		if (traitsBlock.get() != null && nodeShapeMap != null && traitsBlock.get().getNTraits() > 0) {
+		if (traitsBlock.get() != null && nodeShapeMap != null && traitsBlock.get().getNumberNumericalTraits() > 0) {
 			var graphOptional = nodeShapeMap.keySet().stream().filter(v -> v.getOwner() != null).map(v -> (PhyloGraph) v.getOwner()).findAny();
 			if (graphOptional.isPresent()) {
 				var traitsBlock = getTraitsBlock();
 
-				legend.getLabels().setAll(traitsBlock.getTraitLabels());
+				legend.getLabels().setAll(traitsBlock.getNumericalTraitLabels());
 				legend.getActive().clear();
 				if (isAllTraitsActive()) {
-					legend.getActive().addAll(traitsBlock.getTraitLabels());
+					legend.getActive().addAll(traitsBlock.getNumericalTraitLabels());
 				} else {
 					for (var active : getOptionActiveTraits()) {
 						legend.getActive().add(active);
@@ -198,21 +196,22 @@ public class TraitsFormat extends Pane {
 								pieChart.setLabelsVisible(false);
 								pieChart.setLegendVisible(false);
 
-								var sum = 0;
-								int max = 0;
+								var sum = 0.0;
+								var max = 0.0;
 
-								for (var trait : traitsBlock.getTraitLabels()) {
+								for (var trait : traitsBlock.getNumericalTraitLabels()) {
 									if (isTraitActive(trait))
 										max = Math.max(max, getTraitsBlock().getMax(trait));
 								}
 
 								var tooltipBuf = new StringBuilder();
 
-								for (var traitId = 1; traitId <= traitsBlock.getNTraits(); traitId++) {
+
+								for (var traitId : traitsBlock.numericalTraits()) {
 									var label = traitsBlock.getTraitLabel(traitId);
 									if (isTraitActive(label)) {
 										var value = traitsBlock.getTraitValue(taxonId, traitId);
-										tooltipBuf.append(String.format("%s: %,d%n", label, value));
+										tooltipBuf.append(String.format("%s: %,.2f%n", label, value));
 										sum += value;
 										pieChart.getData().add(new PieChart.Data(traitsBlock.getTraitLabel(traitId), value));
 									} else

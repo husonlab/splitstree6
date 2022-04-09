@@ -126,7 +126,6 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 		controller.getOpenMenuItem().setOnAction(toolBarController.getOpenButton().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(toolBarController.getOpenButton().disableProperty());
 
-		controller.getImportDataMenuItem().disableProperty().bind(TRUE);
 		controller.getReplaceDataMenuItem().disableProperty().bind(TRUE);
 		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(TRUE);
 		controller.getInputEditorMenuItem().disableProperty().bind(TRUE);

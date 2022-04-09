@@ -9,7 +9,7 @@
         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
     </padding>
     <HBox alignment="CENTER">
-        <Label text="Traits">
+        <Label text="Numerical Traits">
             <tooltip>
                 <Tooltip text="Formatting of whole taxon labels. Edit indvidual labels to add specific formatting."/>
             </tooltip>

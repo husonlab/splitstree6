@@ -38,26 +38,32 @@ import java.util.*;
  * Daniel Huson, Daria Evseeva, 2017
  */
 public class NewickReader extends TreesReader {
+	public static final String[] extensions = {"tree", "tre", "trees", "new", "nwk", "treefile"};
 	private final BooleanProperty optionConvertMultiLabeledTree = new SimpleBooleanProperty(false);
 
 	public NewickReader() {
-		setFileExtensions("tree", "tre", "trees", "new", "nwk", "treefile");
+		setFileExtensions(extensions);
 	}
 
 	@Override
 	public void read(ProgressListener progress, String inputFile, TaxaBlock taxa, TreesBlock treesBlock) throws IOException {
-		var lineno = 0;
 		try (var it = new FileLineIterator(inputFile)) {
-			progress.setMaximum(it.getMaximumProgress());
-			progress.setProgress(0);
+			read(progress, it, taxa, treesBlock);
+		}
+	}
 
-			final var taxName2Id = new HashMap<String, Integer>(); // starts at 1
-			final var taxonNamesFound = new HashSet<String>();
-			final ArrayList<String> orderedTaxonNames = new ArrayList<>();
+	public void read(ProgressListener progress, ICloseableIterator<String> it, TaxaBlock taxa, TreesBlock treesBlock) throws IOException {
+		var lineno = 0;
+		progress.setMaximum(it.getMaximumProgress());
+		progress.setProgress(0);
 
-			final var parts = new ArrayList<String>();
+		final var taxName2Id = new HashMap<String, Integer>(); // starts at 1
+		final var taxonNamesFound = new HashSet<String>();
+		final ArrayList<String> orderedTaxonNames = new ArrayList<>();
 
-			treesBlock.clear();
+		final var parts = new ArrayList<String>();
+
+		treesBlock.clear();
 			treesBlock.setReticulated(false);
 			treesBlock.setPartial(false);
 			treesBlock.setRooted(true);
@@ -156,7 +162,6 @@ public class NewickReader extends TreesReader {
 			if (parts.size() > 0)
 				System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
 			taxa.addTaxaByNames(orderedTaxonNames);
-		}
 	}
 
 	public boolean isOptionConvertMultiLabeledTree() {
@@ -170,7 +175,6 @@ public class NewickReader extends TreesReader {
 	public void setOptionConvertMultiLabeledTree(boolean optionConvertMultiLabeledTree) {
 		this.optionConvertMultiLabeledTree.set(optionConvertMultiLabeledTree);
 	}
-
 
 	/**
 	 * list node labels in pre-order

@@ -203,5 +203,9 @@ public class SplitsViewController {
 	public VBox getFormatVBox() {
 		return formatVBox;
 	}
+
+	public ToggleButton getFormatToggleButton() {
+		return formatToggleButton;
+	}
 }
 
