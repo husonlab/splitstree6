@@ -51,124 +51,116 @@ public class DensiTree {
     }
 
     public static void draw(Parameters parameters, Model model, Canvas canvas, Pane pane) {
-        System.out.println("Canvas:");
-        System.err.println("Width: " + canvas.getWidth());
-        System.err.println("Height: " + canvas.getHeight());
+        if (model.getTreesBlock().getNTrees() > 0) {
+            var gc = canvas.getGraphicsContext2D();
+            gc.setFont(Font.font("Courier New", 11));
+            gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+            gc.setStroke(Color.BLACK);
 
-        var gc = canvas.getGraphicsContext2D();
-        gc.setFont(Font.font("Courier New", 11));
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setStroke(Color.BLACK);
+            pane.getChildren().clear();
 
-        pane.getChildren().clear();
+            int xmin = 100;
+            int ymin = 100;
+            int xmax = (int) (canvas.getWidth() - 100);
+            int ymax = (int) (canvas.getHeight() - 100);
 
-        System.out.println("Pane:");
-        System.out.println("Width: " + pane.getWidth());
-        System.out.println("Height: " + pane.getHeight());
+            boolean toScale = parameters.toScale;
+            boolean jitter = parameters.jitter;
+            boolean consensus = parameters.consensus;
+            String highlight = parameters.highlight + ",";
+            String labelMethod = parameters.labelMethod;
 
+            int nTrees = model.getTreesBlock().size();
+            int nTaxa = model.getTaxaBlock().getNtax();
 
-        int xmin = 100;
-        int ymin = 100;
-        int xmax = (int) (canvas.getWidth() - 100);
-        int ymax = (int) (canvas.getHeight() - 100);
+            var labelLayout = new RadialLabelLayout();
+            labelLayout.setGap(1);
 
-        boolean toScale = parameters.toScale;
-        boolean jitter = parameters.jitter;
-        boolean consensus = parameters.consensus;
-        String highlight = parameters.highlight + ",";
-        String labelMethod = parameters.labelMethod;
+            DBSCANClusterer dbscanClusterer = new DBSCANClusterer(10, 10);
+            KMeansPlusPlusClusterer kmeansClusterer = new KMeansPlusPlusClusterer(2);
 
-        int nTrees = model.getTreesBlock().size();
-        int nTaxa = model.getTaxaBlock().getNtax();
+            int[] circle = model.getCircularOrdering();
+            String[] labels = new String[nTaxa];
+            double[][] coords = new double[nTaxa][2];
+            double[][][] coords2 = new double[nTaxa][nTrees][2];
+            DoublePoint[][] coords3 = new DoublePoint[nTaxa][nTrees];
 
-        var labelLayout = new RadialLabelLayout();
-        labelLayout.setGap(1);
+            RandomGaussian random = new RandomGaussian(0, 3, 187);
+            double shiftx;
+            double shifty;
 
-        DBSCANClusterer dbscanClusterer = new DBSCANClusterer(10, 10);
-        KMeansPlusPlusClusterer kmeansClusterer = new KMeansPlusPlusClusterer(2);
-
-        int[] circle = model.getCircularOrdering();
-        String[] labels = new String[nTaxa];
-        double[][] coords = new double[nTaxa][2];
-        double[][][] coords2 = new double[nTaxa][nTrees][2];
-        DoublePoint[][] coords3 = new DoublePoint[nTaxa][nTrees];
-
-        RandomGaussian random = new RandomGaussian(0, 3, 187);
-        double shiftx;
-        double shifty;
-
-        var tree1 = model.getTreesBlock().getTree(1);
-        int counter = 0;
-        for (int j : circle) {
-            if (j > 0) {
-                labels[counter] = tree1.getTaxon2Node(j).getLabel();
-                counter++;
-            }
-        }
-
-        gc.setLineWidth(1.0);
-
-        gc.save();
-
-        gc.setLineWidth(0.01);
-        for (int i = 1; i <= nTrees; i++) {
-            var tree = model.getTreesBlock().getTree(i);
-            shiftx = random.nextDouble();
-            shifty = random.nextDouble();
-
-            if (labelMethod.contains("kmeans")) {
-                drawEdges2(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords3, labels);
-            } else if (labelMethod.contains("mean")) {
-                drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords, labels, labelLayout);
-            } else if (labelMethod.contains("median")) {
-                drawEdges1(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords2, labels);
-            } else if (labelMethod.contains("radial")) {
-                drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords, labels, labelLayout);
-            }
-        }
-
-        if (labelMethod.contains("kmeans")) {
-            kmeansLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords3, labels, kmeansClusterer);
-        } else if (labelMethod.contains("mean")) {
-            meanLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords, labels, nTrees);
-        } else if (labelMethod.contains("median")) {
-            medianLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords2, labels);
-        } else if (labelMethod.contains("radial")) {
-            for (int i = 0; i < 1; i++) {
-                int randomNum = ThreadLocalRandom.current().nextInt(1, nTrees + 1);
-                var ranTree = model.getTreesBlock().getTree(randomNum);
-                radialItems(ranTree, circle, xmin, ymin, xmax, ymax, toScale, labelLayout);
-            }
-            radialLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords, labels, nTrees, labelLayout);
-            labelLayout.layoutLabels();
-        }
-
-        gc.setLineWidth(0.5);
-
-
-        if (highlight.matches("[\\d\\,]*")) {
-            String[] specTrees = parameters.highlight.split("\\,");
-            gc.setStroke(Color.GREENYELLOW);
-            for (String specTree : specTrees) {
-                int treeNum = Integer.parseInt(specTree);
-                if (treeNum > 0 && treeNum <= nTrees) {
-                    var tree = model.getTreesBlock().getTree(Integer.parseInt(specTree));
-                    drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, 0, coords, labels, labelLayout);
+            var tree1 = model.getTreesBlock().getTree(1);
+            int counter = 0;
+            for (int j : circle) {
+                if (j > 0) {
+                    labels[counter] = tree1.getTaxon2Node(j).getLabel();
+                    counter++;
                 }
             }
-        }
 
-        if (consensus) {
-            try {
-                var consensusTree = MajorityConsensus.apply(model);
-                gc.setStroke(Color.BLUE);
-                drawEdges(consensusTree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, 0, coords, labels, labelLayout);
-            } catch (IOException e) {
-                e.printStackTrace();
+            gc.setLineWidth(1.0);
+
+            gc.save();
+
+            gc.setLineWidth(0.01);
+            for (int i = 1; i <= nTrees; i++) {
+                var tree = model.getTreesBlock().getTree(i);
+                shiftx = random.nextDouble();
+                shifty = random.nextDouble();
+
+                if (labelMethod.contains("kmeans")) {
+                    drawEdges2(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords3, labels);
+                } else if (labelMethod.contains("mean")) {
+                    drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords, labels, labelLayout);
+                } else if (labelMethod.contains("median")) {
+                    drawEdges1(tree, i - 1, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords2, labels);
+                } else if (labelMethod.contains("radial")) {
+                    drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, jitter, shiftx, shifty, coords, labels, labelLayout);
+                }
             }
-        }
 
-        gc.setStroke(Color.BLACK);
+            if (labelMethod.contains("kmeans")) {
+                kmeansLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords3, labels, kmeansClusterer);
+            } else if (labelMethod.contains("mean")) {
+                meanLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords, labels, nTrees);
+            } else if (labelMethod.contains("median")) {
+                medianLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords2, labels);
+            } else if (labelMethod.contains("radial")) {
+                for (int i = 0; i < 1; i++) {
+                    int randomNum = ThreadLocalRandom.current().nextInt(1, nTrees + 1);
+                    var ranTree = model.getTreesBlock().getTree(randomNum);
+                    radialItems(ranTree, circle, xmin, ymin, xmax, ymax, toScale, labelLayout);
+                }
+                radialLabels(tree1, circle, pane, xmin, ymin, xmax, ymax, toScale, coords, labels, nTrees, labelLayout);
+                labelLayout.layoutLabels();
+            }
+
+            gc.setLineWidth(0.5);
+
+
+            if (highlight.matches("[\\d,]*")) {
+                String[] specTrees = parameters.highlight.split(",");
+                gc.setStroke(Color.GREENYELLOW);
+                for (String specTree : specTrees) {
+                    int treeNum = Integer.parseInt(specTree);
+                    if (treeNum > 0 && treeNum <= nTrees) {
+                        var tree = model.getTreesBlock().getTree(Integer.parseInt(specTree));
+                        drawEdges(tree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, 0, coords, labels, labelLayout);
+                    }
+                }
+            }
+
+            if (consensus) {
+                try {
+                    var consensusTree = MajorityConsensus.apply(model);
+                    gc.setStroke(Color.BLUE);
+                    drawEdges(consensusTree, circle, gc, xmin, ymin, xmax, ymax, toScale, false, 0, 0, coords, labels, labelLayout);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            gc.setStroke(Color.BLACK);
+        }
     }
 
 
@@ -523,9 +515,8 @@ public class DensiTree {
         }
     }
 
-    public static void drawEdges(
-            PhyloTree tree, int[] circle, GraphicsContext gc, int xmin, int ymin, int xmax, int ymax, boolean toScale,
-            boolean jitter, double shiftx, double shifty, double[][] coords, String[] labels, RadialLabelLayout labelLayout
+    public static void drawEdges(PhyloTree tree, int[] circle, GraphicsContext gc, int xmin, int ymin, int xmax, int ymax, boolean toScale,
+                                 boolean jitter, double shiftx, double shifty, double[][] coords, String[] labels, RadialLabelLayout labelLayout
     ) {
         NodeArray<Point2D> nodePointMap = tree.newNodeArray();
         var nodeAngleMap = tree.newNodeDoubleArray();
@@ -538,28 +529,31 @@ public class DensiTree {
             var vPt = nodePointMap.get(v);
             var wPt = nodePointMap.get(w);
 
-            if (w.isLeaf()) {
-                for (int i = 0; i < labels.length; i++) {
-                    if (tree.getLabel(w).equals(labels[i])) {
-                        coords[i][0] += wPt.getX();
-                        coords[i][1] += wPt.getY();
-                        break;
+            if (vPt != null & wPt != null) {
+
+                if (w.isLeaf()) {
+                    for (int i = 0; i < labels.length; i++) {
+                        if (tree.getLabel(w).equals(labels[i])) {
+                            coords[i][0] += wPt.getX();
+                            coords[i][1] += wPt.getY();
+                            break;
+                        }
                     }
+                    //SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
+                    //SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
+                    // labelLayout.addAvoidable(x,y,1,1);
                 }
-                //SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
-                //SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
-                // labelLayout.addAvoidable(x,y,1,1);
-            }
 
-            double x1 = vPt.getX();
-            double y1 = vPt.getY();
-            double x2 = wPt.getX();
-            double y2 = wPt.getY();
+                double x1 = vPt.getX();
+                double y1 = vPt.getY();
+                double x2 = wPt.getX();
+                double y2 = wPt.getY();
 
-            if (jitter) {
-                gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
-            } else {
-                gc.strokeLine(x1, y1, x2, y2);
+                if (jitter) {
+                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
+                } else {
+                    gc.strokeLine(x1, y1, x2, y2);
+                }
             }
         }
     }
@@ -658,7 +652,7 @@ public class DensiTree {
 
         for (var v : nodePointMap.keySet()) {
             var point = nodePointMap.get(v);
-            nodePointMap.put(v, point.multiply(scale).add(0.5 * (xMinTarget + xMaxTarget), 0.5 * (yMinTarget + yMaxTarget)));
+            nodePointMap.put(v, point.subtract(0.5 * (xMin + xMax), 0.5 * (yMin + yMax)).multiply(scale).add(0.5 * (xMinTarget + xMaxTarget), 0.5 * (yMinTarget + yMaxTarget)));
         }
     }
 

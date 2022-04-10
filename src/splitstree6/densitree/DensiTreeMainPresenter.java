@@ -30,10 +30,7 @@ import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jloda.fx.util.AService;
-import jloda.fx.util.Print;
-import jloda.fx.util.PrintUtils;
-import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.util.*;
 import jloda.util.ProgramProperties;
 import splitstree6.io.readers.trees.NewickReader;
 
@@ -52,6 +49,15 @@ public class DensiTreeMainPresenter {
 		controller.getCanvas().widthProperty().bind(controller.getPane().widthProperty());
 		controller.getPane().prefHeightProperty().bind(stage.heightProperty().subtract(200));
 		controller.getCanvas().heightProperty().bind(controller.getPane().heightProperty());
+
+		if (false) {
+			BasicFX.reportChanges("stageWidth", stage.widthProperty());
+			BasicFX.reportChanges("stageHeight", stage.heightProperty());
+			BasicFX.reportChanges("canvasWidth", controller.getCanvas().widthProperty());
+			BasicFX.reportChanges("canvasHeight", controller.getCanvas().heightProperty());
+			BasicFX.reportChanges("paneWidth", controller.getPane().widthProperty());
+			BasicFX.reportChanges("paneHeight", controller.getPane().heightProperty());
+		}
 
 		controller.getLabelsGroup().selectToggle(controller.getMeanMenuItem());
 
@@ -155,26 +161,22 @@ public class DensiTreeMainPresenter {
 							controller.getLabelsGroup().getSelectedToggle().toString()), model, controller.getCanvas(), controller.getPane())));
 		}
 
+		controller.getStackPane().widthProperty().addListener(listener);
+		controller.getStackPane().heightProperty().addListener(listener);
+		controller.getScaleCheckBox().selectedProperty().addListener(listener);
+		controller.getJitterCheckBox().selectedProperty().addListener(listener);
+		controller.getConsensusMenuItem().selectedProperty().addListener(listener);
+
 		controller.getDrawButton().setOnAction(e -> {
 			var parameters = new DensiTree.Parameters(controller.getScaleCheckBox().isSelected(), controller.getJitterCheckBox().isSelected(),
 					controller.getConsensusMenuItem().isSelected(), specTrees[0], controller.getLabelsGroup().getSelectedToggle().toString());
 			DensiTree.draw(parameters, model, controller.getCanvas(), controller.getPane());
-			controller.getStackPane().widthProperty().addListener(listener);
-			controller.getStackPane().heightProperty().addListener(listener);
-			controller.getScaleCheckBox().selectedProperty().addListener(listener);
-			controller.getJitterCheckBox().selectedProperty().addListener(listener);
-			controller.getConsensusMenuItem().selectedProperty().addListener(listener);
 		});
 
 		controller.getDrawButton().disableProperty().bind(Bindings.isEmpty(model.getTreesBlock().getTrees()));
 
 		controller.getClearButton().setOnAction(e -> {
 			DensiTree.clear(controller.getCanvas(), controller.getPane());
-			controller.getStackPane().widthProperty().removeListener(listener);
-			controller.getStackPane().heightProperty().removeListener(listener);
-			controller.getScaleCheckBox().selectedProperty().removeListener(listener);
-			controller.getJitterCheckBox().selectedProperty().removeListener(listener);
-			controller.getConsensusMenuItem().selectedProperty().removeListener(listener);
 		});
 	}
 }
