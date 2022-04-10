@@ -56,7 +56,7 @@ public class MainWindowController {
 	private Menu openRecentMenu;
 
 	@FXML
-	private MenuItem importDataMenuItem;
+	private MenuItem importTaxonTraitsMenuItem;
 
 	@FXML
 	private MenuItem importTaxonDisplayMenuItem;
@@ -219,9 +219,6 @@ public class MainWindowController {
 
 	@FXML
 	private MenuItem flipMenuItem;
-
-	@FXML
-	private MenuItem formatNodesMenuItem;
 
 	@FXML
 	private MenuItem layoutLabelsMenuItem;
@@ -519,12 +516,16 @@ public class MainWindowController {
 		return openRecentMenu;
 	}
 
-	public MenuItem getImportDataMenuItem() {
-		return importDataMenuItem;
+	public MenuItem getImportTaxonTraitsMenuItem() {
+		return importTaxonTraitsMenuItem;
 	}
 
 	public MenuItem getImportTaxonDisplayMenuItem() {
 		return importTaxonDisplayMenuItem;
+	}
+
+	public MenuItem getImportMultipleTreeFilesMenuItem() {
+		return importMultipleTreeFilesMenuItem;
 	}
 
 	public MenuItem getReplaceDataMenuItem() {
@@ -567,9 +568,6 @@ public class MainWindowController {
 		return toolsMenu;
 	}
 
-	public MenuItem getImportMultipleTreeFilesMenuItem() {
-		return importMultipleTreeFilesMenuItem;
-	}
 
 	public MenuItem getGroupIdenticalHaplotypesFilesMenuItem() {
 		return GroupIdenticalHaplotypesFilesMenuItem;
@@ -737,10 +735,6 @@ public class MainWindowController {
 
 	public MenuItem getFlipMenuItem() {
 		return flipMenuItem;
-	}
-
-	public MenuItem getFormatNodesMenuItem() {
-		return formatNodesMenuItem;
 	}
 
 	public MenuItem getLayoutLabelsMenuItem() {

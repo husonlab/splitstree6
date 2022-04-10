@@ -26,7 +26,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import jloda.fx.control.CopyableLabel;
@@ -44,7 +43,7 @@ import splitstree6.data.NetworkBlock;
  * format sites for haplotype network
  * Daniel Huson, 4.2022
  */
-public class SitesFormat extends Pane {
+public class SitesFormat extends Group {
 	private final SitesFormatController controller;
 	private final SitesFormatPresenter presenter;
 

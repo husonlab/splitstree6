@@ -29,12 +29,10 @@ import splitstree6.data.TraitsNexusFormat;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
- * taxa nexus input
+ * TRAITS nexus input
  * Daniel Huson, 2.2018
  */
 public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsBlock> {
@@ -90,9 +88,9 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 		traitsBlock.setDimensions(ntax, ntraits);
 
 		if (np.peekMatchIgnoreCase("FORMAT")) {
-			final List<String> formatTokens = np.getTokensLowerCase("FORMAT", ";");
+			final var formatTokens = np.getTokensLowerCase("FORMAT", ";");
 
-			boolean labels = np.findIgnoreCase(formatTokens, "labels=no", false, false);
+			var labels = np.findIgnoreCase(formatTokens, "labels=no", false, false);
 			labels = np.findIgnoreCase(formatTokens, "labels=yes", true, labels);
 			labels = np.findIgnoreCase(formatTokens, "labels=left", true, labels);
 			labels = np.findIgnoreCase(formatTokens, "no labels", false, labels);
@@ -102,7 +100,7 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 			if (ntax == 0 && !format.isOptionLabel())
 				throw new IOExceptionWithLineNumber("Format 'no labels' invalid because no taxLabels given in TAXA block", np.lineno());
 
-			final String separator = np.findIgnoreCase(formatTokens, "separator=", StringUtils.toString(TraitsNexusFormat.Separator.values(), " "), "");
+			final var separator = np.findIgnoreCase(formatTokens, "separator=", StringUtils.toString(TraitsNexusFormat.Separator.values(), " "), "");
 			if (separator.length() > 0) {
 				format.setOptionSeparator(separator);
 			}
@@ -115,28 +113,24 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 
 		if (np.peekMatchIgnoreCase("TRAITLATITUDE")) {
 			np.matchIgnoreCase("TRAITLATITUDE");
-			for (int i = 1; i <= ntraits; i++)
+			for (var i = 1; i <= ntraits; i++)
 				traitsBlock.setTraitLatitude(i, (float) np.getDouble());
 			np.matchIgnoreCase(";");
 			np.matchIgnoreCase("TRAITLONGITUDE");
-			for (int i = 1; i <= ntraits; i++)
+			for (var i = 1; i <= ntraits; i++)
 				traitsBlock.setTraitLongitude(i, (float) np.getDouble());
 			np.matchIgnoreCase(";");
 		}
 
 		np.matchIgnoreCase("TRAITLABELS");
-		for (int j = 1; j <= ntraits; j++) {
+		for (var j = 1; j <= ntraits; j++) {
 			traitsBlock.setTraitLabel(j, np.getWordRespectCase());
 		}
 		np.matchIgnoreCase(";");
 
 		np.matchIgnoreCase("MATRIX");
 
-		// need these two to map trait state labels to integer values
-		final Map<String, Integer>[] trait2map = new Map[ntraits + 1];
-		final int[] trait2count = new int[ntraits + 1];
-
-		for (int i = 1; i <= ntax; i++) {
+		for (var i = 1; i <= ntax; i++) {
 			int taxonId = i;
 			if (format.isOptionLabel()) {
 				String taxonName = np.getWordRespectCase();
@@ -146,7 +140,9 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 						throw new IOExceptionWithLineNumber("Unknown taxon: '" + taxonName, np.lineno());
 				}
 			}
-			for (int traitId = 1; traitId <= ntraits; traitId++) {
+
+			var traitCount = new int[ntraits + 1];
+			for (var traitId = 1; traitId <= ntraits; traitId++) {
 				if (traitId > 1) {
 					if (format.getOptionSeparator() != TraitsNexusFormat.Separator.WhiteSpace)
 						np.matchIgnoreCase(format.getSeparatorString());
@@ -157,20 +153,10 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 				} else {
 					final String word = np.getWordRespectCase();
 
-					if (NumberUtils.isInteger(word))
-						traitsBlock.setTraitValue(taxonId, traitId, NumberUtils.parseInt(word));
-					else {
-						Map<String, Integer> map = trait2map[traitId];
-						if (map == null) {
-							map = new HashMap<>();
-							trait2map[traitId] = map;
-						}
-						Integer value = map.get(word);
-						if (value == null) {
-							value = (++trait2count[traitId]);
-							map.put(word, value);
-						}
-						traitsBlock.setTraitValue(taxonId, traitId, value);
+					if (NumberUtils.isDouble(word)) {
+						traitsBlock.setTraitValue(taxonId, traitId, NumberUtils.parseDouble(word));
+					} else {
+						traitsBlock.setTraitValue(taxonId, traitId, ++traitCount[traitId]);
 						traitsBlock.setTraitValueLabel(taxonId, traitId, word);
 					}
 				}

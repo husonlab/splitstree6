@@ -21,7 +21,6 @@ package splitstree6.view.format.splits;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.scene.Group;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
@@ -37,7 +36,7 @@ import java.util.Map;
  * splits formatter pane
  * Daniel Huson, 1.2022
  */
-public class SplitsFormat extends Pane {
+public class SplitsFormat extends Group {
 	private final SplitsFormatController controller;
 	private final SplitsFormatPresenter presenter;
 

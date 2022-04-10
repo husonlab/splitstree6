@@ -45,8 +45,11 @@ public class TraitsFormatController {
 	private TextField maxSizeField;
 
 	@FXML
+	private TitledPane titledPane;
+
+	@FXML
 	private void initialize() {
-		vBox.setDisable(true);
+		titledPane.setDisable(true);
 		maxSizeField.setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
 		legendCBox.setSelected(true);
 	}
@@ -73,5 +76,9 @@ public class TraitsFormatController {
 
 	public TextField getMaxSizeField() {
 		return maxSizeField;
+	}
+
+	public TitledPane getTitledPane() {
+		return titledPane;
 	}
 }

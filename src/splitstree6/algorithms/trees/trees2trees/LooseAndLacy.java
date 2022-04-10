@@ -143,9 +143,9 @@ public class LooseAndLacy extends Trees2Trees {
 	 * @return taxon to value mapping
 	 */
 	public int[] computeTax2ValueForTrait(int ntax, int trait, TraitsBlock traitsBlock) {
-		final int[] tax2value = new int[ntax + 1];
+		final var tax2value = new int[ntax + 1];
 		for (int tax = 1; tax <= ntax; tax++) {
-			tax2value[tax] = traitsBlock.getTraitValue(tax, trait);
+			tax2value[tax] = (int) traitsBlock.getTraitValue(tax, trait);
 		}
 		return tax2value;
 	}
@@ -180,7 +180,7 @@ public class LooseAndLacy extends Trees2Trees {
 		for (int trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
 			final Map<Integer, BitSet> state2set = new HashMap<>();
 			for (int tax = 1; tax <= ntax; tax++) {
-				final int state = traitsBlock.getTraitValue(tax, trait);
+				final int state = (int) traitsBlock.getTraitValue(tax, trait);
 				final BitSet set = state2set.computeIfAbsent(state, k -> new BitSet());
 				set.set(tax);
 			}
@@ -215,7 +215,7 @@ public class LooseAndLacy extends Trees2Trees {
 			trait2tax2set[trait] = new HashMap<>();
 			final Map<Integer, BitSet> state2set = new HashMap<>();
 			for (int tax = 1; tax <= ntax; tax++) {
-				final int state = traitsBlock.getTraitValue(tax, trait);
+				final int state = (int) traitsBlock.getTraitValue(tax, trait);
 				final BitSet set = state2set.computeIfAbsent(state, k -> new BitSet());
 				set.set(tax);
 				trait2tax2set[trait].put(tax, set);

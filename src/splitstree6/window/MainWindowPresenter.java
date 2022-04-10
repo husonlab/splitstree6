@@ -40,13 +40,11 @@ import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
-import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.window.WindowGeometry;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
-import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
@@ -75,6 +73,9 @@ import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.CharactersBlock;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
+import splitstree6.dialog.importing.ImportMultipleTrees;
+import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
+import splitstree6.dialog.importing.ImportTraits;
 import splitstree6.io.FileLoader;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.tabs.IDisplayTab;
@@ -82,7 +83,6 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 import java.util.Stack;
 
@@ -195,7 +195,7 @@ public class MainWindowPresenter {
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
-				m -> !List.of("File", "Edit", "Window", "Open Recent", "Help").contains(m.getText()),
+				m -> !List.of("File", "Edit", "Import", "Window", "Open Recent", "Help").contains(m.getText()),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(mainWindow.emptyProperty())));
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
 				m -> m.getText().equals("Edit"),
@@ -226,32 +226,14 @@ public class MainWindowPresenter {
 		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(workflow.runningProperty());
 
-		controller.getImportDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
-		controller.getImportDataMenuItem().disableProperty().bind(workflow.runningProperty());
-
-		controller.getImportTaxonDisplayMenuItem().setOnAction(e -> {
-			final FileChooser fileChooser = new FileChooser();
-			fileChooser.setTitle("Import Taxa Display Labels");
-
-			final File previousFile = new File(ProgramProperties.get("TaxaDisplayLabelsFile", ""));
-			if (previousFile.isFile()) {
-				fileChooser.setInitialDirectory(previousFile.getParentFile());
-				fileChooser.setInitialFileName(previousFile.getName());
-			}
-			fileChooser.setSelectedExtensionFilter(TextFileFilter.getInstance());
-			fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance(), new FileChooser.ExtensionFilter("TSV", "*.tsv", "*.tsv.gz"));
-			var file = fileChooser.showOpenDialog(mainWindow.getStage());
-			if (file != null) {
-				try {
-					workflow.getInputTaxaBlock().importDisplayLabels(FileUtils.getReaderPossiblyZIPorGZIP(file.getPath()));
-				} catch (IOException ex) {
-					NotificationManager.showError("Import failed: " + ex);
-				}
-			}
-
-		});
+		controller.getImportTaxonDisplayMenuItem().setOnAction(e -> ImportTaxonDisplayLabels.apply(mainWindow));
 		controller.getImportTaxonDisplayMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
 
+		controller.getImportTaxonTraitsMenuItem().setOnAction(e -> ImportTraits.apply(mainWindow));
+		controller.getImportTaxonTraitsMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
+
+		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> ImportMultipleTrees.apply(mainWindow));
+		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not());
 
 		controller.getReplaceDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
 		controller.getReplaceDataMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
@@ -292,9 +274,6 @@ public class MainWindowPresenter {
 		}
 		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
 		controller.getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
-
-		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> System.err.println("Not implemented"));
-		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty().not()));
 
 		controller.getGroupIdenticalHaplotypesFilesMenuItem().setOnAction(null);
 

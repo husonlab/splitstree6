@@ -25,10 +25,8 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
-import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.undo.UndoManager;
@@ -127,7 +125,7 @@ public class NetworkView implements IView {
 		});
 		presenter.updateCounterProperty().addListener(e -> sitesFormat.updateEdges());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Separator(Orientation.HORIZONTAL), traitsFormatter, new Separator(Orientation.HORIZONTAL), sitesFormat);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, traitsFormatter, sitesFormat);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 30.0);

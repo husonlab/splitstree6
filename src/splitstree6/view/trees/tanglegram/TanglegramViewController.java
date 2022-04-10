@@ -27,6 +27,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -164,6 +165,12 @@ public class TanglegramViewController {
 
 		formatToggleButton.setSelected(false);
 		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
+		formatVBox.visibleProperty().addListener((v, o, n) -> {
+			for (var titledPane : BasicFX.getAllRecursively(formatVBox, TitledPane.class)) {
+				if (!titledPane.isDisable())
+					titledPane.setExpanded(n);
+			}
+		});
 
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);

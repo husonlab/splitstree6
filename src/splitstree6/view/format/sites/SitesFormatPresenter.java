@@ -24,7 +24,10 @@ import javafx.scene.control.SeparatorMenuItem;
 import javafx.scene.control.ToggleGroup;
 import jloda.fx.undo.UndoManager;
 
-
+/**
+ * the sites format presenter
+ * Daniel Huson, 3.2022
+ */
 public class SitesFormatPresenter {
 
 	public SitesFormatPresenter(SitesFormat sitesFormat, UndoManager undoManager, SitesFormatController controller) {

@@ -120,7 +120,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 			mainWindow.setFileName(name);
 			RecentFilesManager.getInstance().insertRecentFile(fileName);
 		} catch (IOException ex) {
-			NotificationManager.showError("Import text failed: " + ex.getMessage());
+			NotificationManager.showError("Import failed: " + ex.getMessage());
 		}
 	}
 
@@ -129,7 +129,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 			Files.writeString(file.toPath(), getController().getCodeArea().getText());
 			mainWindow.setFileName(file.getName());
 		} catch (IOException ex) {
-			NotificationManager.showError("Save text failed: " + ex.getMessage());
+			NotificationManager.showError("Save failed: " + ex.getMessage());
 		}
 	}
 

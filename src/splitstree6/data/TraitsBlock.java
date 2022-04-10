@@ -19,11 +19,14 @@
 
 package splitstree6.data;
 
+import jloda.util.IteratorUtils;
 import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -31,7 +34,7 @@ import java.util.List;
  * daniel Huson, 2.2018
  */
 public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
-	private int[][] matrix = {};  // computation is done on values
+	private double[][] matrix = {};  // computation is done on values
 	private String[][] matrixOfLabels = null; // values have labels
 	private String[] labels = {};
 	private float[] traitLatitude = null;
@@ -46,7 +49,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 	public void setDimensions(int ntax, int ntraits) {
-		matrix = new int[ntax][ntraits];
+		matrix = new double[ntax][ntraits];
 		labels = new String[ntraits];
 	}
 
@@ -57,7 +60,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		traitLatitude = null;
 	}
 
-	public void setTraitValue(int taxonId, int traitId, int value) {
+	public void setTraitValue(int taxonId, int traitId, double value) {
 		matrix[taxonId - 1][traitId - 1] = value;
 	}
 
@@ -68,7 +71,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		matrixOfLabels[taxonId - 1][traitId - 1] = label;
 	}
 
-	public int getTraitValue(int taxonId, int traitId) {
+	public double getTraitValue(int taxonId, int traitId) {
 		if (taxonId <= 0 || taxonId > matrix.length || traitId <= 0 || traitId > matrix[0].length)
 			return 0;
 		else
@@ -86,6 +89,12 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return labels[traitId - 1];
 	}
 
+	/**
+	 * set trait label
+	 *
+	 * @param traitId id, 1-based
+	 * @param label   label
+	 */
 	public void setTraitLabel(int traitId, String label) {
 		labels[traitId - 1] = label;
 	}
@@ -136,20 +145,69 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		traitLongitude = null;
 	}
 
+	/**
+	 * is this trait numerical? We assume so if it doesn't have a label
+	 *
+	 * @param traitId the trait
+	 * @return true, if unlabeled trait
+	 */
+	public boolean isNumerical(int traitId) {
+		return matrixOfLabels == null || matrixOfLabels[0][traitId - 1] == null;
+	}
+
+	public Iterable<Integer> numericalTraits() {
+		return () -> new Iterator<>() {
+			private int t = 1;
+
+			{
+				while (t <= getNTraits() && !isNumerical(t))
+					t++;
+			}
+
+			@Override
+			public boolean hasNext() {
+				return t <= getNTraits();
+			}
+
+			@Override
+			public Integer next() {
+				var result = t;
+				do {
+					t++;
+				}
+				while (t <= getNTraits() && !isNumerical(t));
+				return result;
+			}
+		};
+	}
+
+	public Collection<String> getNumericalTraitLabels() {
+		var list = new ArrayList<String>();
+		for (var t : numericalTraits())
+			list.add(getTraitLabel(t));
+		return list;
+	}
+
+
+	public int getNumberNumericalTraits() {
+		return IteratorUtils.count(numericalTraits());
+	}
+
+
 	public void copySubset(TaxaBlock srcTaxa, TraitsBlock srcTraits, Collection<Taxon> enabledTaxa) {
 		labels = srcTraits.labels;
 		traitLongitude = srcTraits.traitLongitude;
 		traitLatitude = srcTraits.traitLatitude;
-		matrix = new int[enabledTaxa.size()][srcTraits.getNTraits()];
+		matrix = new double[enabledTaxa.size()][srcTraits.getNTraits()];
 		matrixOfLabels = null; // will be set in setTraitValueLabel if required
 		int tarTaxonIdx = 1;
 		for (Taxon taxon : enabledTaxa) {
 			final int srcTaxonIdx = srcTaxa.indexOf(taxon);
 			for (int traitIdx = 1; traitIdx <= srcTraits.getNTraits(); traitIdx++) {
 				setTraitValue(tarTaxonIdx, traitIdx, srcTraits.getTraitValue(srcTaxonIdx, traitIdx));
-				if (srcTraits.matrixOfLabels != null)
+				if (srcTraits.matrixOfLabels != null) {
 					setTraitValueLabel(tarTaxonIdx, traitIdx, srcTraits.getTraitValueLabel(srcTaxonIdx, traitIdx));
-
+				}
 			}
 			tarTaxonIdx++;
 		}
@@ -186,9 +244,9 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	}
 
 
-	public int getMax(String traitLabel) {
+	public double getMax(String traitLabel) {
 		var traitId = indexOf(traitLabel);
-		var max = 0;
+		var max = 0.0;
 		for (var row : matrix) {
 			max = Math.max(max, row[traitId - 1]);
 		}

@@ -201,7 +201,7 @@
                                            style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
                             </HBox>
                         </ScrollPane>
-                        <VBox fx:id="formatVBox" prefHeight="150.0" prefWidth="200.0" styleClass="context-menu"
+                        <VBox fx:id="formatVBox" prefHeight="30.0" prefWidth="200.0" styleClass="context-menu"
                               AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
                     </AnchorPane>
                 </children>

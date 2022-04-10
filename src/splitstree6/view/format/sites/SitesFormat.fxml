@@ -20,26 +20,27 @@
   -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<VBox prefWidth="200.0" spacing="5.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="splitstree6.view.format.sites.SitesFormatController">
-    <padding>
-        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
-    </padding>
-    <HBox alignment="CENTER">
-        <Label text="State changes">
-            <tooltip>
-                <Tooltip text="Branch formatting"/>
-            </tooltip>
-        </Label>
-    </HBox>
-    <HBox alignment="CENTER" layoutX="15.0" layoutY="37.0" spacing="6.0">
-        <children>
-            <MenuButton fx:id="showMenuButton" mnemonicParsing="false" prefWidth="180.0" text="Show"/>
-        </children>
-    </HBox>
-</VBox>
+<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="splitstree6.view.format.sites.SitesFormatController">
+    <panes>
+        <TitledPane fx:id="titledPane" text="State changes">
+            <content>
+                <VBox prefWidth="200.0" spacing="5.0">
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </padding>
+                    <HBox alignment="CENTER" layoutX="15.0" layoutY="37.0" spacing="6.0">
+                        <children>
+                            <MenuButton fx:id="showMenuButton" mnemonicParsing="false" prefWidth="180.0" text="Show"/>
+                        </children>
+                    </HBox>
+                </VBox>
+            </content>
+        </TitledPane>
+    </panes>
+</Accordion>
