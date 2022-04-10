@@ -49,7 +49,112 @@ public class SpeedKnitter {
     }
 
 
+    /**
+     *
+     * @param x
+     * @param d
+     * @param G
+     * @param nonNeg
+     * @param tol
+     * @param maxIterations
+     * @return
+     *
+     * TODO: Explore potential 2x speedup by taking advantage of symmetry.
+     */
+   /** public double[][] ConstrainedCG(double[][] x,
+                                    double[][] d,
+                                    boolean[][] G,
+                                    boolean nonNeg,
+                                    double tol,
+                                    int maxIterations) {
 
+        final double EPSILON = 1e-12;
+        int n=x.length-1;
+
+        for(int i = 1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                if (G[i][j])
+                    x[i][j]=0; //x(G)=0;
+
+        double[][] res = calcAx(x);
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                res[i][j]-=d[i][j]; //res = Ax-d
+        double[][] r = calcAtd(res); //r = A'(Ax-d)
+
+        double[][] p = new double[n+1][n+1];
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                p[i][j] = - r[i][j];  //p = -r
+
+        int k=0;
+        double rtr = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                rtr += r[i][j]*r[i][j]; //rtr = ||r||^2
+
+        double[][] w;
+        double alpha_cg, alpha_bd, alpha;
+
+        while (rtr>tol && k<maxIterations) {
+            w = calcAx(p); //w = Ap
+
+            double wtw = 0.0;
+            for(int i=1;i<=n;i++)
+                for (int j=1;j<=n;j++)
+                    wtw+=w[i][j]*w[i][j]; //wtw = ||w||^2
+
+            alpha_cg = rtr/wtw; //Standard CG steplength
+
+            if (nonNeg) {
+                alpha_bd = alpha_cg;
+                for (int i=1;i<=n;i++)
+                    for (int j=1;j<=n;j++) {
+                        if (p(i,j)<0)
+                            alpha_bd = Math.min(alpha_bd,-x[i][j]/p[i][j]);
+                    }
+            }  //Max feasiblse step length.
+            if (!nonNeg || alpha_cg<=alpha_bd) {
+                alpha = alpha_cg;
+                double[][] Atw = calcAtd(w);
+                double rtr2 = 0.0;
+                for(int i=1;i<=n;i++) {
+                    for(int j=1;j<=n;j++) {
+                        x[i][j] += alpha*p[i][j];
+                        if (G[i][j])
+                            r[i][j]=0;
+                        else
+                            r[i][j] += alpha*Atw[i][j];
+                        rtr2 += r[i][j]*r[i][j];
+                    }
+                }
+                double beta = rtr2/rtr;
+                for(int i=1;i<=n;i++)
+                    for(int j=1;j<=n;j++)
+                        p[i][j] = -r[i][j] + beta*p[i][j];
+
+                k=k+1;
+                rtr = rtr2;
+            } else {
+                alpha = alpha_bd;
+                for(int i=1;i<=n;i++)
+                    for(int j=1;j<=n;j++)
+                        x[i][j] += alpha*p[i][j];
+
+                //Check - if we are already adbutting the boundary, add boundary elements
+                //to the active set G
+                if (alpha_bd<EPSILON)
+                    for(int i=1;i<=n;i++)
+                        for(int j=1;j<=n;j++) {
+                            G[i][j] = G[i][j] | ((i!=j)&&x[i][j]<EPSILON&&p[i][j]<0);
+                        }
+
+            }
+
+        }
+
+    }
+**/
 
     /**
      * Sum the elements in the vector over a range of indices.
@@ -66,4 +171,14 @@ public class SpeedKnitter {
             s+=v[i];
         return s;
     }
+
+
+    static private double[][] calcAtd(double[][] d) {
+        return splitSum(d);
+    }
+    static private double[][] calcAx(double[][] x) {
+        return circularDistance(x);
+    }
+
+
 }
