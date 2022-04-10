@@ -71,11 +71,14 @@ import splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork;
 import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.parts.Taxon;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
+import splitstree6.dialog.exporting.ExportTaxonDisplayLabels;
+import splitstree6.dialog.exporting.ExportTaxonTraits;
 import splitstree6.dialog.importing.ImportMultipleTrees;
 import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
-import splitstree6.dialog.importing.ImportTraits;
+import splitstree6.dialog.importing.ImportTaxonTraits;
 import splitstree6.io.FileLoader;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.tabs.IDisplayTab;
@@ -85,6 +88,7 @@ import splitstree6.tabs.workflow.WorkflowTab;
 import java.io.File;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class MainWindowPresenter {
 	private final MainWindow mainWindow;
@@ -138,6 +142,13 @@ public class MainWindowPresenter {
 				}
 			} catch (Exception ex) {
 				Basic.caught(ex);
+			}
+		});
+
+		mainWindow.getStage().focusedProperty().addListener((v, o, n) -> {
+			if (!n && mainWindow.getTaxonSelectionModel().getSelectedItems().size() > 0) {
+				MainWindowManager.getPreviousSelection().clear();
+				MainWindowManager.getPreviousSelection().addAll(mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(Taxon::getName).collect(Collectors.toList()));
 			}
 		});
 
@@ -210,13 +221,13 @@ public class MainWindowPresenter {
 		controller.getNewMenuItem().setOnAction(e -> MainWindowManager.getInstance().createAndShowWindow(false));
 
 		controller.getOpenButton().setOnAction(e -> {
-			final File previousDir = new File(ProgramProperties.get("InputDir", ""));
-			final FileChooser fileChooser = new FileChooser();
+			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
+			final var fileChooser = new FileChooser();
 			if (previousDir.isDirectory())
 				fileChooser.setInitialDirectory(previousDir);
 			fileChooser.setTitle("Open input file");
 			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
-			final File selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
+			final var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
 			if (selectedFile != null) {
 				FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
 			}
@@ -229,7 +240,7 @@ public class MainWindowPresenter {
 		controller.getImportTaxonDisplayMenuItem().setOnAction(e -> ImportTaxonDisplayLabels.apply(mainWindow));
 		controller.getImportTaxonDisplayMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
 
-		controller.getImportTaxonTraitsMenuItem().setOnAction(e -> ImportTraits.apply(mainWindow));
+		controller.getImportTaxonTraitsMenuItem().setOnAction(e -> ImportTaxonTraits.apply(mainWindow));
 		controller.getImportTaxonTraitsMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
 
 		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> ImportMultipleTrees.apply(mainWindow));
@@ -258,8 +269,11 @@ public class MainWindowPresenter {
 		controller.getSaveAsMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, false));
 		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-		controller.getExportMenuItem().setOnAction(e -> System.err.println("Not implemented"));
-		controller.getExportMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
+		controller.getExportTaxonDisplayLabelsMenuItem().setOnAction(e -> ExportTaxonDisplayLabels.apply(mainWindow));
+		controller.getExportTaxonDisplayLabelsMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
+
+		controller.getExportTaxonTraitsMenuItem().setOnAction(e -> ExportTaxonTraits.apply(mainWindow));
+		controller.getExportTaxonTraitsMenuItem().disableProperty().bind(workflow.runningProperty().or(Bindings.createBooleanBinding(() -> workflow.getWorkingTaxaBlock() != null && workflow.getWorkingTaxaBlock().getTraitsBlock() != null, workflow.validProperty())));
 
 		controller.getExportWorkflowMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, true));
 		controller.getExportWorkflowMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
@@ -331,21 +345,8 @@ public class MainWindowPresenter {
 
 		controller.getSelectAllMenuItem().setOnAction(null);
 		controller.getSelectNoneMenuItem().setOnAction(null);
-
-		/*
-		controller.getSelectAllNodesMenuItem().setOnAction(null);
-		controller.getSelectAllLabeledNodesMenuItem().setOnAction(null);
-		controller.getSelectAllBelowMenuItem().setOnAction(null);
-		controller.getSelectBracketsMenuItem().setOnAction(null);
-		controller.getInvertNodeSelectionMenuItem().setOnAction(null);
-		controller.getDeselectAllNodesMenuItem().setOnAction(null);
-		controller.getSelectAllEdgesMenuItem().setOnAction(null);
-		controller.getSelectAllLabeledEdgesMenuItem().setOnAction(null);
-		controller.getSelectAllEdgesBelowMenuItem().setOnAction(null);
-		controller.getInvertEdgeSelectionMenuItem().setOnAction(null);
-		controller.getDeselectEdgesMenuItem().setOnAction(null);
+		controller.getSelectInverseMenuItem().setOnAction(null);
 		controller.getSelectFromPreviousMenuItem().setOnAction(null);
-		 */
 
 		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
 		controller.getDecreaseFontSizeMenuItem().setOnAction(null);

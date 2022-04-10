@@ -137,8 +137,8 @@ public class Connectors {
 					group.getChildren().add(line);
 					taxonConnectorMap.put(taxon, line);
 
-					line.setStrokeWidth(strokeWidth);
-					line.setStroke(strokeColor);
+					line.getStyleClass().add("graph-special-edge");
+
 					line.setOnMouseClicked(e -> {
 						if (!e.isShiftDown())
 							mainWindow.getTaxonSelectionModel().clearSelection();

@@ -24,7 +24,6 @@ import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
-import jloda.util.StringUtils;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Workflow;
 
@@ -34,7 +33,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static splitstree6.dialog.importing.ImportTraits.isTraitsFile;
+import static splitstree6.dialog.importing.ImportTaxonTraits.isTraitsFile;
 
 /**
  * allows user to import taxon display labels from a file
@@ -63,7 +62,7 @@ public class ImportTaxonDisplayLabels {
 
 				try (var reader = new BufferedReader(FileUtils.getReaderPossiblyZIPorGZIP(file.getPath()))) {
 					var nameDisplayLabelMap = new HashMap<String, String>();
-					reader.lines().map(s -> StringUtils.split(s, '\t'))
+					reader.lines().map(s -> s.split("\t"))
 							.forEach(s -> {
 								if (s.length == 1)
 									nameDisplayLabelMap.put(s[0], s[0]);

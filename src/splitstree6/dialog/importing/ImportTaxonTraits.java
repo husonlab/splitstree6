@@ -36,7 +36,7 @@ import java.util.Map;
  * allows user to import traits
  * Daniel Huson, 4.2022
  */
-public class ImportTraits {
+public class ImportTaxonTraits {
 	/**
 	 * show the import traits dialog and apply
 	 */

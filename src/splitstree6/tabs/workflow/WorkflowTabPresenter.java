@@ -20,6 +20,7 @@
 package splitstree6.tabs.workflow;
 
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
@@ -117,6 +118,9 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		windowController.getSelectAllMenuItem().setOnAction(e -> workflow.getSelectionModel().selectAll(workflow.nodes()));
 		windowController.getSelectNoneMenuItem().setOnAction(e -> workflow.getSelectionModel().clearSelection());
+		windowController.getSelectInverseMenuItem().setOnAction(e -> {
+			workflow.nodes().forEach(n -> Platform.runLater(() -> workflow.getSelectionModel().toggleSelection(n)));
+		});
 
 		windowController.getIncreaseFontSizeMenuItem().setOnAction(null);
 		windowController.getDecreaseFontSizeMenuItem().setOnAction(null);

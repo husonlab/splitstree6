@@ -1,9 +1,9 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=10 nAlgorithms=7;
+DIMENSIONS nDataNodes=8 nAlgorithms=6;
 PROGRAM version='SplitsTree6 Community Edition';
-WORKFLOW creationDate='1647339390314'; [Tue Mar 15 11:16:30 CET 2022]
+WORKFLOW creationDate='1649588531649'; [Sun Apr 10 13:02:11 CEST 2022]
 END; [SPLITSTREE6]
 
 [
@@ -13,7 +13,6 @@ The original input consisted of 6 taxa and 6 DNA sequences of length 677.
 The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 6 x 6 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 11 splits, cyclic.
 The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
-The Bootstrap Splits method was used (default options) so as to obtain 11 splits, cyclic.
 
 References:
 Bryant & Moulton 2004: D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255– 265, 2004.
@@ -24,28 +23,30 @@ Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic net
 
 BEGIN TAXA;
 TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS ntax=6;
 TAXLABELS
-	[1] 'A.ANDRENOF'
-	[2] 'A.MELLIFER'
-	[3] 'A.DORSATA'
-	[4] 'A.CERANA'
-	[5] 'A.FLOREA'
-	[6] 'A.KOSCHEV'
+	[1] 'A.andrenof'
+	[2] 'A.mellifer'
+	[3] 'A.dorsata'
+	[4] 'A.cerana'
+	[5] 'A.florea'
+	[6] 'A.koschev'
 ;
 DISPLAYLABELS
-	[1] '<i>A. ANDRENOF'
-	[2] '<i>A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
-	[3] '<i>A. DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
-	[4] '<i>A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
-	[5] '<i>A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
-	[6] '<i>A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
+	[1] 'A. andrenof'
+	[2] '   A. mellifer <br><img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
+	[3] '  A. dorsata <br><img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
+	[4] '    A. cerana <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
+	[5] '   A. florea<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
+	[6] '  A. koschev <br><img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
 [TAXINFO;]
 END; [TAXA]
 
 BEGIN ALGORITHM;
 TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
 NAME 'Taxa Filter';
 OPTIONS
 ;
@@ -56,93 +57,93 @@ TITLE 'Working Taxa';
 LINK ALGORITHM = 'Taxa Filter';
 DIMENSIONS ntax=6;
 TAXLABELS
-	[1] 'A.ANDRENOF'
-	[2] 'A.MELLIFER'
-	[3] 'A.DORSATA'
-	[4] 'A.CERANA'
-	[5] 'A.FLOREA'
-	[6] 'A.KOSCHEV'
+	[1] 'A.andrenof'
+	[2] 'A.mellifer'
+	[3] 'A.dorsata'
+	[4] 'A.cerana'
+	[5] 'A.florea'
+	[6] 'A.koschev'
 ;
 DISPLAYLABELS
-	[1] '<i>A. ANDRENOF'
-	[2] '<i>A. MELLIFER <br> <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
-	[3] '<i>A. DORSATA<br> <img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
-	[4] '<i>A. CERANA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
-	[5] '<i>A. FLOREA<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
-	[6] '<i>A. KOSCHEV<br> <img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
+	[1] 'A. andrenof'
+	[2] '   A. mellifer <br><img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/Honey_bee_%28Apis_mellifera%29.jpg" height=64>'
+	[3] '  A. dorsata <br><img src="https://upload.wikimedia.org/wikipedia/commons/4/4a/Bidens-Apis_dorsata-pollen_baskets.jpg" height=64>'
+	[4] '    A. cerana <br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fb/Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg/2560px-Apis_cerana%2C_Asiatic_honey_bee_-_Khao_Yai_National_Park.jpg" height=64>'
+	[5] '   A. florea<br><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Apis_florea_worker_1.jpg/1920px-Apis_florea_worker_1.jpg" height=64>'
+	[6] '  A. koschev <br><img src="https://upload.wikimedia.org/wikipedia/commons/2/2b/Apis_koschevnikovi_W_AMNH_BEE00199797-2%2CI_HHG554.jpg" height=64>'
 ;
 [TAXINFO;]
 END; [TAXA]
 
 BEGIN CHARACTERS;
 TITLE 'Input Characters';
-LINK ALGORITHM = 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
 DIMENSIONS ntax=6 nchar=677;
 FORMAT
 	datatype='DNA' missing=n gap=- symbols="acgt" labels=left transpose=no interleave=yes;
 MATRIX
-'A.ANDRENOF' atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
-'A.MELLIFER' atttccacatgatttatatttatatttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
-'A.DORSATA'  atttcaacatgaataatattaatatttcaagaatcaaattcattttacgcagataatttaatttcatttcataatatagt
-'A.CERANA'   atttctacatgattcatatttatgtttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
-'A.FLOREA'   atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
-'A.KOSCHEV'  atttctacatgaataatatttatatttcaagaatcaaactcattttatgctgataatttagtgtcatttcacaatttagt
+'A.andrenof' atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
+'A.mellifer' atttccacatgatttatatttatatttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
+'A.dorsata'  atttcaacatgaataatattaatatttcaagaatcaaattcattttacgcagataatttaatttcatttcataatatagt
+'A.cerana'   atttctacatgattcatatttatgtttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
+'A.florea'   atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
+'A.koschev'  atttctacatgaataatatttatatttcaagaatcaaactcattttatgctgataatttagtgtcatttcacaatttagt
 
-'A.ANDRENOF' aataatgattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
-'A.MELLIFER' tataataattattattataatttcaacattaactgtatatattattttagatttatttttaaataaattttcaaatttat
-'A.DORSATA'  aataacaataattgtaataatttcaacattaacaatttatatcattatagatctattcataaataaattttcaaatttat
-'A.CERANA'   aataataattattattataatttctactttaacagtatatattattatagatctatttttaaataaattttcaaatctat
-'A.FLOREA'   aataattattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
-'A.KOSCHEV'  aataataattattattataatttcaacacttacaatttatattatttttgatttatttataaataaattttcaaatttat
+'A.andrenof' aataatgattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
+'A.mellifer' tataataattattattataatttcaacattaactgtatatattattttagatttatttttaaataaattttcaaatttat
+'A.dorsata'  aataacaataattgtaataatttcaacattaacaatttatatcattatagatctattcataaataaattttcaaatttat
+'A.cerana'   aataataattattattataatttctactttaacagtatatattattatagatctatttttaaataaattttcaaatctat
+'A.florea'   aataattattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
+'A.koschev'  aataataattattattataatttcaacacttacaatttatattatttttgatttatttataaataaattttcaaatttat
 
-'A.ANDRENOF' atttacttaaaaatcataatattgaaattatctgaacaattgttcctattgttattttattaattatttgttttccatca
-'A.MELLIFER' atttacttaaaaatcataatattgaaattatttgaacaattattccaattattattctattaattatttgttttccatca
-'A.DORSATA'  ttttattaaaaaatcataatattgaaattatttgaacaattattcctatttttgttcttttaataatttgttttccatca
-'A.CERANA'   ttttattaaaaaatcataatattgaaatcatttgaacagtaattccaattattattttattaattatttgttttccatca
-'A.FLOREA'   atttacttaaaaatcataatattgaaattatctgaataattgttcctattgttattttattaattatttgttttccatca
-'A.KOSCHEV'  ttttattaaaaaatcataatattgaaattatttgaacaattgttcctattgtaattttattaattatttgttttccatca
+'A.andrenof' atttacttaaaaatcataatattgaaattatctgaacaattgttcctattgttattttattaattatttgttttccatca
+'A.mellifer' atttacttaaaaatcataatattgaaattatttgaacaattattccaattattattctattaattatttgttttccatca
+'A.dorsata'  ttttattaaaaaatcataatattgaaattatttgaacaattattcctatttttgttcttttaataatttgttttccatca
+'A.cerana'   ttttattaaaaaatcataatattgaaatcatttgaacagtaattccaattattattttattaattatttgttttccatca
+'A.florea'   atttacttaaaaatcataatattgaaattatctgaataattgttcctattgttattttattaattatttgttttccatca
+'A.koschev'  ttttattaaaaaatcataatattgaaattatttgaacaattgttcctattgtaattttattaattatttgttttccatca
 
-'A.ANDRENOF' ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
-'A.MELLIFER' ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatcaattggtcatcaatgatattgatc
-'A.DORSATA'  ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatctattggccaccaatgatattgatc
-'A.CERANA'   ttaaaaattttatatttaattgatgaaattgtaaatccattcttttctgtaaaatcaattggtcatcaatgatattgatc
-'A.FLOREA'   ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
-'A.KOSCHEV'  ttaaaaattttatatttaattgatgaaattattaatccattcttttctattaaatcaattggacaccaatgatactgatc
+'A.andrenof' ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
+'A.mellifer' ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatcaattggtcatcaatgatattgatc
+'A.dorsata'  ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatctattggccaccaatgatattgatc
+'A.cerana'   ttaaaaattttatatttaattgatgaaattgtaaatccattcttttctgtaaaatcaattggtcatcaatgatattgatc
+'A.florea'   ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
+'A.koschev'  ttaaaaattttatatttaattgatgaaattattaatccattcttttctattaaatcaattggacaccaatgatactgatc
 
-'A.ANDRENOF' atatgagtatcctgaatttaataatattgaatttgattcatatatattaaattatagagatttaaatcaatttcgtttat
-'A.MELLIFER' atatgaatatccagaatttaataatattgaatttgattcatatatactaaattataataatttaaaccaatttcgtttac
-'A.DORSATA'  atatgaatatcctgaattcaataatattgaatttgattcatatatattaaattatacaaatttaaatcaatttcgattat
-'A.CERANA'   ctatgaatatcctgaatttaataatattgaatttgattcttatatattaaattatagaaatttaaatcaatttcgattat
-'A.FLOREA'   atatgagtatcctgaatttaataatattgaattttattcatatatattaaattatagagatttaaatcaatttcgtttat
-'A.KOSCHEV'  atatgaataccctgaatttaataatattgaatttgattcatatatattaaattatagaaatttaaatcaatttcgattat
+'A.andrenof' atatgagtatcctgaatttaataatattgaatttgattcatatatattaaattatagagatttaaatcaatttcgtttat
+'A.mellifer' atatgaatatccagaatttaataatattgaatttgattcatatatactaaattataataatttaaaccaatttcgtttac
+'A.dorsata'  atatgaatatcctgaattcaataatattgaatttgattcatatatattaaattatacaaatttaaatcaatttcgattat
+'A.cerana'   ctatgaatatcctgaatttaataatattgaatttgattcttatatattaaattatagaaatttaaatcaatttcgattat
+'A.florea'   atatgagtatcctgaatttaataatattgaattttattcatatatattaaattatagagatttaaatcaatttcgtttat
+'A.koschev'  atatgaataccctgaatttaataatattgaatttgattcatatatattaaattatagaaatttaaatcaatttcgattat
 
-'A.ANDRENOF' tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
-'A.MELLIFER' tagaaactgataatcgaatagtaattccaataaaaatcccactacgtttaattacaacatcaacagatgtaattcattca
-'A.DORSATA'  tagaaacagataatcgaatagtaattcctataagaatacctatacgtttaattactacatcaacagatgtaattcattca
-'A.CERANA'   tagaaactgataatcgaataattatccctataaatattccattacgattaattacaacttctacagatgtaattcattca
-'A.FLOREA'   tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
-'A.KOSCHEV'  tagaaactgacaatcgaataattatcccaataaaaattcctatacgattaattactacatcaactgatgtaattcattca
+'A.andrenof' tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
+'A.mellifer' tagaaactgataatcgaatagtaattccaataaaaatcccactacgtttaattacaacatcaacagatgtaattcattca
+'A.dorsata'  tagaaacagataatcgaatagtaattcctataagaatacctatacgtttaattactacatcaacagatgtaattcattca
+'A.cerana'   tagaaactgataatcgaataattatccctataaatattccattacgattaattacaacttctacagatgtaattcattca
+'A.florea'   tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
+'A.koschev'  tagaaactgacaatcgaataattatcccaataaaaattcctatacgattaattactacatcaactgatgtaattcattca
 
-'A.ANDRENOF' tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
-'A.MELLIFER' tgaacagttccatccttaggtattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgtcc
-'A.DORSATA'  tgaactgttccatctttaggaattaaagtagatgctgttccaggacgaattaatcaattaaatttaattagaaaacgacc
-'A.CERANA'   tgaactgttccatcacttggaattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgacc
-'A.FLOREA'   tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
-'A.KOSCHEV'  tgaactgtgccttcattaggtattaaagttgatgcagttccaggtcgaattaatcaattaaatttaattagaaaacgtcc
+'A.andrenof' tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
+'A.mellifer' tgaacagttccatccttaggtattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgtcc
+'A.dorsata'  tgaactgttccatctttaggaattaaagtagatgctgttccaggacgaattaatcaattaaatttaattagaaaacgacc
+'A.cerana'   tgaactgttccatcacttggaattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgacc
+'A.florea'   tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
+'A.koschev'  tgaactgtgccttcattaggtattaaagttgatgcagttccaggtcgaattaatcaattaaatttaattagaaaacgtcc
 
-'A.ANDRENOF' tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
-'A.MELLIFER' aggaattttttttggtcaatgttcagaaatttgtggtataaatcatagatttataccaattataattgaatcaacttcat
-'A.DORSATA'  aggaattttcttcggtcaatgttctgaaatctgtggaataaatcatagatttataccaattataattgaatcaacttcat
-'A.CERANA'   tggaatcttttttggtcaatgttcagaaatttgtggtataaatcatagattcataccaattatagtagaatctacatcat
-'A.FLOREA'   tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
-'A.KOSCHEV'  aggaattttttttggtcaatgttcagaaatttgtggaataaatcatagattcatacctattatagttgaatcaacatcat
+'A.andrenof' tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
+'A.mellifer' aggaattttttttggtcaatgttcagaaatttgtggtataaatcatagatttataccaattataattgaatcaacttcat
+'A.dorsata'  aggaattttcttcggtcaatgttctgaaatctgtggaataaatcatagatttataccaattataattgaatcaacttcat
+'A.cerana'   tggaatcttttttggtcaatgttcagaaatttgtggtataaatcatagattcataccaattatagtagaatctacatcat
+'A.florea'   tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
+'A.koschev'  aggaattttttttggtcaatgttcagaaatttgtggaataaatcatagattcatacctattatagttgaatcaacatcat
 
-'A.ANDRENOF' ttaaatattttataaattgaatttataaaataaatta
-'A.MELLIFER' ttcaatattttttaaattgagtaaataaacaaatcta
-'A.DORSATA'  ttaattattttttaaattgagttaataaacaatctta
-'A.CERANA'   ttaaatattttcttaattgggtaaataaacaaaataa
-'A.FLOREA'   ttaaatattttataaattgaatttataaaataaatta
-'A.KOSCHEV'  ttaaatttttcttaaattgaattaataaacaaaatta
+'A.andrenof' ttaaatattttataaattgaatttataaaataaatta
+'A.mellifer' ttcaatattttttaaattgagtaaataaacaaatcta
+'A.dorsata'  ttaattattttttaaattgagttaataaacaatctta
+'A.cerana'   ttaaatattttcttaattgggtaaataaacaaaataa
+'A.florea'   ttaaatattttataaattgaatttataaaataaatta
+'A.koschev'  ttaaatttttcttaaattgaattaataaacaaaatta
 
 ;
 END; [CHARACTERS]
@@ -160,68 +161,68 @@ DIMENSIONS ntax=6 nchar=677;
 FORMAT
 	datatype='DNA' missing=n gap=- symbols="acgt" labels=left transpose=no interleave=yes;
 MATRIX
-'A.ANDRENOF' atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
-'A.MELLIFER' atttccacatgatttatatttatatttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
-'A.DORSATA'  atttcaacatgaataatattaatatttcaagaatcaaattcattttacgcagataatttaatttcatttcataatatagt
-'A.CERANA'   atttctacatgattcatatttatgtttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
-'A.FLOREA'   atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
-'A.KOSCHEV'  atttctacatgaataatatttatatttcaagaatcaaactcattttatgctgataatttagtgtcatttcacaatttagt
+'A.andrenof' atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
+'A.mellifer' atttccacatgatttatatttatatttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
+'A.dorsata'  atttcaacatgaataatattaatatttcaagaatcaaattcattttacgcagataatttaatttcatttcataatatagt
+'A.cerana'   atttctacatgattcatatttatgtttcaagaatcaaattcatattatgctgataatttaatttcatttcataatatagt
+'A.florea'   atttctacatgaataatatttatatttcaagagtcaaattcattatatgctgataatttagtatcttttcataacatagt
+'A.koschev'  atttctacatgaataatatttatatttcaagaatcaaactcattttatgctgataatttagtgtcatttcacaatttagt
 
-'A.ANDRENOF' aataatgattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
-'A.MELLIFER' tataataattattattataatttcaacattaactgtatatattattttagatttatttttaaataaattttcaaatttat
-'A.DORSATA'  aataacaataattgtaataatttcaacattaacaatttatatcattatagatctattcataaataaattttcaaatttat
-'A.CERANA'   aataataattattattataatttctactttaacagtatatattattatagatctatttttaaataaattttcaaatctat
-'A.FLOREA'   aataattattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
-'A.KOSCHEV'  aataataattattattataatttcaacacttacaatttatattatttttgatttatttataaataaattttcaaatttat
+'A.andrenof' aataatgattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
+'A.mellifer' tataataattattattataatttcaacattaactgtatatattattttagatttatttttaaataaattttcaaatttat
+'A.dorsata'  aataacaataattgtaataatttcaacattaacaatttatatcattatagatctattcataaataaattttcaaatttat
+'A.cerana'   aataataattattattataatttctactttaacagtatatattattatagatctatttttaaataaattttcaaatctat
+'A.florea'   aataattattgtaattataatttcaacattaacagtttatattatttttgatttatttttaaataaattttcaaatttat
+'A.koschev'  aataataattattattataatttcaacacttacaatttatattatttttgatttatttataaataaattttcaaatttat
 
-'A.ANDRENOF' atttacttaaaaatcataatattgaaattatctgaacaattgttcctattgttattttattaattatttgttttccatca
-'A.MELLIFER' atttacttaaaaatcataatattgaaattatttgaacaattattccaattattattctattaattatttgttttccatca
-'A.DORSATA'  ttttattaaaaaatcataatattgaaattatttgaacaattattcctatttttgttcttttaataatttgttttccatca
-'A.CERANA'   ttttattaaaaaatcataatattgaaatcatttgaacagtaattccaattattattttattaattatttgttttccatca
-'A.FLOREA'   atttacttaaaaatcataatattgaaattatctgaataattgttcctattgttattttattaattatttgttttccatca
-'A.KOSCHEV'  ttttattaaaaaatcataatattgaaattatttgaacaattgttcctattgtaattttattaattatttgttttccatca
+'A.andrenof' atttacttaaaaatcataatattgaaattatctgaacaattgttcctattgttattttattaattatttgttttccatca
+'A.mellifer' atttacttaaaaatcataatattgaaattatttgaacaattattccaattattattctattaattatttgttttccatca
+'A.dorsata'  ttttattaaaaaatcataatattgaaattatttgaacaattattcctatttttgttcttttaataatttgttttccatca
+'A.cerana'   ttttattaaaaaatcataatattgaaatcatttgaacagtaattccaattattattttattaattatttgttttccatca
+'A.florea'   atttacttaaaaatcataatattgaaattatctgaataattgttcctattgttattttattaattatttgttttccatca
+'A.koschev'  ttttattaaaaaatcataatattgaaattatttgaacaattgttcctattgtaattttattaattatttgttttccatca
 
-'A.ANDRENOF' ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
-'A.MELLIFER' ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatcaattggtcatcaatgatattgatc
-'A.DORSATA'  ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatctattggccaccaatgatattgatc
-'A.CERANA'   ttaaaaattttatatttaattgatgaaattgtaaatccattcttttctgtaaaatcaattggtcatcaatgatattgatc
-'A.FLOREA'   ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
-'A.KOSCHEV'  ttaaaaattttatatttaattgatgaaattattaatccattcttttctattaaatcaattggacaccaatgatactgatc
+'A.andrenof' ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
+'A.mellifer' ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatcaattggtcatcaatgatattgatc
+'A.dorsata'  ttaaaaattttatatttaattgatgaaattgtaaatccttttttttcaattaaatctattggccaccaatgatattgatc
+'A.cerana'   ttaaaaattttatatttaattgatgaaattgtaaatccattcttttctgtaaaatcaattggtcatcaatgatattgatc
+'A.florea'   ttaaaaattttatatttaattgatgaaattgtgaatccatttttttctattaaatcaattggtcatcaatgatattgatc
+'A.koschev'  ttaaaaattttatatttaattgatgaaattattaatccattcttttctattaaatcaattggacaccaatgatactgatc
 
-'A.ANDRENOF' atatgagtatcctgaatttaataatattgaatttgattcatatatattaaattatagagatttaaatcaatttcgtttat
-'A.MELLIFER' atatgaatatccagaatttaataatattgaatttgattcatatatactaaattataataatttaaaccaatttcgtttac
-'A.DORSATA'  atatgaatatcctgaattcaataatattgaatttgattcatatatattaaattatacaaatttaaatcaatttcgattat
-'A.CERANA'   ctatgaatatcctgaatttaataatattgaatttgattcttatatattaaattatagaaatttaaatcaatttcgattat
-'A.FLOREA'   atatgagtatcctgaatttaataatattgaattttattcatatatattaaattatagagatttaaatcaatttcgtttat
-'A.KOSCHEV'  atatgaataccctgaatttaataatattgaatttgattcatatatattaaattatagaaatttaaatcaatttcgattat
+'A.andrenof' atatgagtatcctgaatttaataatattgaatttgattcatatatattaaattatagagatttaaatcaatttcgtttat
+'A.mellifer' atatgaatatccagaatttaataatattgaatttgattcatatatactaaattataataatttaaaccaatttcgtttac
+'A.dorsata'  atatgaatatcctgaattcaataatattgaatttgattcatatatattaaattatacaaatttaaatcaatttcgattat
+'A.cerana'   ctatgaatatcctgaatttaataatattgaatttgattcttatatattaaattatagaaatttaaatcaatttcgattat
+'A.florea'   atatgagtatcctgaatttaataatattgaattttattcatatatattaaattatagagatttaaatcaatttcgtttat
+'A.koschev'  atatgaataccctgaatttaataatattgaatttgattcatatatattaaattatagaaatttaaatcaatttcgattat
 
-'A.ANDRENOF' tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
-'A.MELLIFER' tagaaactgataatcgaatagtaattccaataaaaatcccactacgtttaattacaacatcaacagatgtaattcattca
-'A.DORSATA'  tagaaacagataatcgaatagtaattcctataagaatacctatacgtttaattactacatcaacagatgtaattcattca
-'A.CERANA'   tagaaactgataatcgaataattatccctataaatattccattacgattaattacaacttctacagatgtaattcattca
-'A.FLOREA'   tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
-'A.KOSCHEV'  tagaaactgacaatcgaataattatcccaataaaaattcctatacgattaattactacatcaactgatgtaattcattca
+'A.andrenof' tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
+'A.mellifer' tagaaactgataatcgaatagtaattccaataaaaatcccactacgtttaattacaacatcaacagatgtaattcattca
+'A.dorsata'  tagaaacagataatcgaatagtaattcctataagaatacctatacgtttaattactacatcaacagatgtaattcattca
+'A.cerana'   tagaaactgataatcgaataattatccctataaatattccattacgattaattacaacttctacagatgtaattcattca
+'A.florea'   tagaaactgataatcgaataattattcctataaaaattcctttacgattaattactacatcaactgatgtaattcattca
+'A.koschev'  tagaaactgacaatcgaataattatcccaataaaaattcctatacgattaattactacatcaactgatgtaattcattca
 
-'A.ANDRENOF' tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
-'A.MELLIFER' tgaacagttccatccttaggtattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgtcc
-'A.DORSATA'  tgaactgttccatctttaggaattaaagtagatgctgttccaggacgaattaatcaattaaatttaattagaaaacgacc
-'A.CERANA'   tgaactgttccatcacttggaattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgacc
-'A.FLOREA'   tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
-'A.KOSCHEV'  tgaactgtgccttcattaggtattaaagttgatgcagttccaggtcgaattaatcaattaaatttaattagaaaacgtcc
+'A.andrenof' tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
+'A.mellifer' tgaacagttccatccttaggtattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgtcc
+'A.dorsata'  tgaactgttccatctttaggaattaaagtagatgctgttccaggacgaattaatcaattaaatttaattagaaaacgacc
+'A.cerana'   tgaactgttccatcacttggaattaaagttgatgcagttccaggacgaattaatcaattaaatttaattagaaaacgacc
+'A.florea'   tgaactgttccatctttaggaattaaagttgatgcagttccaggacgaattaatcaattgaatttaattagaaaacgacc
+'A.koschev'  tgaactgtgccttcattaggtattaaagttgatgcagttccaggtcgaattaatcaattaaatttaattagaaaacgtcc
 
-'A.ANDRENOF' tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
-'A.MELLIFER' aggaattttttttggtcaatgttcagaaatttgtggtataaatcatagatttataccaattataattgaatcaacttcat
-'A.DORSATA'  aggaattttcttcggtcaatgttctgaaatctgtggaataaatcatagatttataccaattataattgaatcaacttcat
-'A.CERANA'   tggaatcttttttggtcaatgttcagaaatttgtggtataaatcatagattcataccaattatagtagaatctacatcat
-'A.FLOREA'   tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
-'A.KOSCHEV'  aggaattttttttggtcaatgttcagaaatttgtggaataaatcatagattcatacctattatagttgaatcaacatcat
+'A.andrenof' tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
+'A.mellifer' aggaattttttttggtcaatgttcagaaatttgtggtataaatcatagatttataccaattataattgaatcaacttcat
+'A.dorsata'  aggaattttcttcggtcaatgttctgaaatctgtggaataaatcatagatttataccaattataattgaatcaacttcat
+'A.cerana'   tggaatcttttttggtcaatgttcagaaatttgtggtataaatcatagattcataccaattatagtagaatctacatcat
+'A.florea'   tggaattttttttggtcaatgttctgaaatttgtggaataaatcatagatttataccaattatagttgaatcaacatcat
+'A.koschev'  aggaattttttttggtcaatgttcagaaatttgtggaataaatcatagattcatacctattatagttgaatcaacatcat
 
-'A.ANDRENOF' ttaaatattttataaattgaatttataaaataaatta
-'A.MELLIFER' ttcaatattttttaaattgagtaaataaacaaatcta
-'A.DORSATA'  ttaattattttttaaattgagttaataaacaatctta
-'A.CERANA'   ttaaatattttcttaattgggtaaataaacaaaataa
-'A.FLOREA'   ttaaatattttataaattgaatttataaaataaatta
-'A.KOSCHEV'  ttaaatttttcttaaattgaattaataaacaaaatta
+'A.andrenof' ttaaatattttataaattgaatttataaaataaatta
+'A.mellifer' ttcaatattttttaaattgagtaaataaacaaatcta
+'A.dorsata'  ttaattattttttaaattgagttaataaacaatctta
+'A.cerana'   ttaaatattttcttaattgggtaaataaacaaaataa
+'A.florea'   ttaaatattttataaattgaatttataaaataaatta
+'A.koschev'  ttaaatttttcttaaattgaattaataaacaaaatta
 
 ;
 END; [CHARACTERS]
@@ -240,12 +241,12 @@ LINK ALGORITHM = 'Hamming Distances';
 DIMENSIONS ntax=6;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
-[1] 'A.ANDRENOF'   0 0.090103 0.103397 0.096012 0.004431 0.075332
-[2] 'A.MELLIFER'   0.090103 0 0.093058 0.090103 0.093058 0.100443
-[3] 'A.DORSATA'    0.103397 0.093058 0 0.116691 0.106352 0.103397
-[4] 'A.CERANA'     0.096012 0.090103 0.116691 0 0.098966 0.098966
-[5] 'A.FLOREA'     0.004431 0.093058 0.106352 0.098966 0 0.078287
-[6] 'A.KOSCHEV'    0.075332 0.100443 0.103397 0.098966 0.078287 0
+[1] 'A.andrenof'   0 0.090103 0.103397 0.096012 0.004431 0.075332
+[2] 'A.mellifer'   0.090103 0 0.093058 0.090103 0.093058 0.100443
+[3] 'A.dorsata'    0.103397 0.093058 0 0.116691 0.106352 0.103397
+[4] 'A.cerana'     0.096012 0.090103 0.116691 0 0.098966 0.098966
+[5] 'A.florea'     0.004431 0.093058 0.106352 0.098966 0 0.078287
+[6] 'A.koschev'    0.075332 0.100443 0.103397 0.098966 0.078287 0
 ;
 END; [DISTANCES]
 
@@ -255,7 +256,8 @@ LINK DISTANCES = 'Distances';
 NAME 'Neighbor Net';
 OPTIONS
 	InferenceAlgorithm = 'BlockPivot',
-	UsePreconditioner = 'true';
+	UsePreconditioner = 'false',
+	UseDual = 'true';
 END; [ALGORITHM]
 
 BEGIN SPLITS;
@@ -266,17 +268,17 @@ FORMAT labels=no weights=yes confidences=no;
 PROPERTIES fit=100 cyclic;
 CYCLE 1 5 4 2 3 6;
 MATRIX
-[1, size=1] 	 0.000738 	 1,
-[2, size=1] 	 0.00369275 	 1 2 3 4 6,
-[3, size=1] 	 0.037666 	 1 2 3 4 5,
-[4, size=2] 	 0.0033235 	 1 2 4 5,
-[5, size=2] 	 0.0336045 	 1 5,
-[6, size=1] 	 0.04923692 	 1 2 4 5 6,
-[7, size=2] 	 0.01009317 	 1 4 5 6,
-[8, size=3] 	 0.00640092 	 1 5 6,
-[9, size=1] 	 0.033235 	 1 3 4 5 6,
-[10, size=2] 	 0.00726233 	 1 3 5 6,
-[11, size=1] 	 0.04677483 	 1 2 3 5 6,
+[1, size=1] 	 0.00073855 	 1,
+[2, size=1] 	 0.00369276 	 1 2 3 4 6,
+[3, size=1] 	 0.03766618 	 1 2 3 4 5,
+[4, size=2] 	 0.00332349 	 1 2 4 5,
+[5, size=2] 	 0.03360414 	 1 5,
+[6, size=1] 	 0.04923683 	 1 2 4 5 6,
+[7, size=2] 	 0.01009355 	 1 4 5 6,
+[8, size=3] 	 0.00640079 	 1 5 6,
+[9, size=1] 	 0.03323486 	 1 3 4 5 6,
+[10, size=2] 	 0.00726243 	 1 3 5 6,
+[11, size=1] 	 0.04677499 	 1 2 3 5 6,
 ;
 END; [SPLITS]
 
@@ -286,18 +288,6 @@ LINK SPLITS = 'Splits';
 NAME 'Show Splits';
 OPTIONS
 	View = 'SplitsNetwork';
-END; [ALGORITHM]
-
-BEGIN ALGORITHM;
-TITLE 'Bootstrap Splits';
-LINK SPLITS = 'Splits';
-NAME 'Bootstrap Splits';
-OPTIONS
-	Replicates = 100,
-	MinPercent = 10,
-	ShowAllSplits = 'false',
-	RandomSeed = 42,
-	HighDimensionFilter = 'true';
 END; [ALGORITHM]
 
 BEGIN VIEW;
@@ -312,52 +302,7 @@ OPTIONS
 	ZoomFactor = 1,
 	FontScaleFactor = 1,
 	RootAngle = 160,
-	OutlineFill = 0x800080ff,
-	ShowConfidence = 'false';
-END; [VIEW]
-
-BEGIN SPLITS;
-TITLE 'Splits-2';
-LINK ALGORITHM = 'Bootstrap Splits';
-DIMENSIONS ntax=6 nsplits=11;
-FORMAT labels=no weights=yes confidences=yes;
-PROPERTIES fit=-1 cyclic;
-CYCLE 1 5 4 2 3 6;
-MATRIX
-[1, size=1] 	 0.0012717 	 56 	 1,
-[2, size=2] 	 0.03321419 	 98 	 1 5,
-[3, size=2] 	 0.01020673 	 98 	 1 4 5 6,
-[4, size=3] 	 0.00874623 	 91 	 1 5 6,
-[5, size=2] 	 0.0063885 	 55 	 1 2 4 5,
-[6, size=1] 	 0.04706935 	 100 	 1 2 4 5 6,
-[7, size=1] 	 0.03328578 	 99 	 1 3 4 5 6,
-[8, size=2] 	 0.00884173 	 86 	 1 3 5 6,
-[9, size=1] 	 0.00405412 	 94 	 1 2 3 4 6,
-[10, size=1] 	 0.03635105 	 99 	 1 2 3 4 5,
-[11, size=1] 	 0.04517012 	 100 	 1 2 3 5 6,
-;
-END; [SPLITS]
-
-BEGIN ALGORITHM;
-TITLE 'Show Splits-2';
-LINK SPLITS = 'Splits-2';
-NAME 'Show Splits';
-OPTIONS
-	View = 'SplitsNetwork';
-END; [ALGORITHM]
-
-BEGIN VIEW;
-TITLE 'SplitsNetwork';
-LINK ALGORITHM = 'Show Splits-2';
-NAME 'SplitsNetwork';
-INPUT 'SPLITS';
-OPTIONS
-	Diagram = 'Outline',
-	Orientation = 'Rotate0Deg',
-	Rooting = 'None',
-	ZoomFactor = 1,
-	FontScaleFactor = 1,
-	RootAngle = 160,
-	OutlineFill = 0x800080ff,
-	ShowConfidence = 'true';
+	OutlineFill = 0xffe6b3ff,
+	ShowConfidence = 'false',
+	ActiveTraits = '*All*';
 END; [VIEW]

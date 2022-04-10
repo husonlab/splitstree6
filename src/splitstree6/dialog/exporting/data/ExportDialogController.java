@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.dialog.export;
+package splitstree6.dialog.exporting.data;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;

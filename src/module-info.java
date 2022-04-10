@@ -62,7 +62,7 @@ module splitstreesix {
 
 	opens splitstree6.window;
 
-	opens splitstree6.dialog.export;
+	opens splitstree6.dialog.exporting.data;
 
 	opens splitstree6.workflowtree;
 
@@ -108,6 +108,7 @@ module splitstreesix {
 	opens splitstree6.view.utils;
 	opens splitstree6.view.trees;
 	opens splitstree6.layout.network;
+	opens splitstree6.dialog.exporting;
 
 
 }

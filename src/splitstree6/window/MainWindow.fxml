@@ -48,16 +48,6 @@
                         </MenuItem>
                         <Menu fx:id="openRecentMenu" text="Open Recent"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <Menu mnemonicParsing="false" text="Import">
-                            <items>
-                                <MenuItem fx:id="importTaxonTraitsMenuItem" mnemonicParsing="false"
-                                          text="Taxon Traits..."/>
-                                <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
-                                          text="Taxon Display Labels..."/>
-                                <MenuItem fx:id="importMultipleTreeFilesMenuItem" mnemonicParsing="false"
-                                          text="Import Trees from Multiple Files..."/>
-                            </items>
-                        </Menu>
                         <MenuItem fx:id="replaceDataMenuItem" text="Replace Data...">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="DOWN"
@@ -70,6 +60,16 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
+                        <Menu mnemonicParsing="false" text="Import">
+                            <items>
+                                <MenuItem fx:id="importTaxonTraitsMenuItem" mnemonicParsing="false"
+                                          text="Taxon Traits..."/>
+                                <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
+                                          text="Taxon Display Labels..."/>
+                                <MenuItem fx:id="importMultipleTreeFilesMenuItem" mnemonicParsing="false"
+                                          text="Trees from Multiple Files..."/>
+                            </items>
+                        </Menu>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="analyzeGenomesMenuItem" text="Analyze Genomes..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
@@ -86,13 +86,14 @@
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="exportMenuItem" text="Export...">
-                            <accelerator>
-                                <KeyCodeCombination alt="UP" code="E" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
-                            </accelerator>
-                        </MenuItem>
-                        <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."/>
+                        <Menu mnemonicParsing="false" text="Export">
+                            <items>
+                                <MenuItem fx:id="exportTaxonTraitsMenuItem" text="Taxon Traits..."/>
+                                <MenuItem fx:id="exportTaxonDisplayLabelsMenuItem" mnemonicParsing="false"
+                                          text="Taxon Display Labels..."/>
+                                <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."/>
+                            </items>
+                        </Menu>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="pageSetupMenuItem" text="Page Setup..."/>
                         <MenuItem fx:id="printMenuItem" text="Print...">
@@ -219,17 +220,16 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="selectAllNodesMenuItem" text="All Nodes"/>
-                        <MenuItem fx:id="selectAllLabeledNodesMenuItem" text="All Labeled Nodes">
+                        <MenuItem fx:id="selectInverseMenuItem" text="Select Inverse">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="L" control="UP" meta="UP" shift="DOWN"
+                                <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="selectAllBelowMenuItem" text="All Nodes Below">
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="selectFromPreviousMenuItem" text="From Previous Window">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP"
+                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
@@ -240,26 +240,7 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="invertNodeSelectionMenuItem" mnemonicParsing="false"
-                                  text="Invert Node Selection"/>
-                        <MenuItem fx:id="deselectAllNodesMenuItem" mnemonicParsing="false" text="Deselect Nodes"/>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="selectAllEdgesMenuItem" text="All Edges"/>
-                        <MenuItem fx:id="selectAllLabeledEdgesMenuItem" mnemonicParsing="false"
-                                  text="All Labeled Edges"/>
-                        <MenuItem fx:id="selectAllEdgesBelowMenuItem" mnemonicParsing="false" text="All Edges Below"/>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="invertEdgeSelectionMenuItem" mnemonicParsing="false"
-                                  text="Invert Edge Selection"/>
-                        <MenuItem fx:id="deselectEdgesMenuItem" mnemonicParsing="false" text="Deselect Edges"/>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="selectFromPreviousMenuItem" text="From Previous">
-                            <accelerator>
-                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
-                            </accelerator>
-                        </MenuItem>
+
                     </Menu>
                     <Menu text="View">
                         <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false" text="Use Dark Theme"/>

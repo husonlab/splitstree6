@@ -40,6 +40,7 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.window.MainWindowManager;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.util.Single;
@@ -52,6 +53,7 @@ import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -373,11 +375,24 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
 			//treeView.getSplitSelectionModel().selectAll(IteratorUtils.asList(BitSetUtils.range(1, treeView.getTreesBlock().getNsplits() + 1)));
 		});
+		mainController.getSelectAllMenuItem().disableProperty().bind(treeView.emptyProperty());
+
 		mainController.getSelectNoneMenuItem().setOnAction(e -> {
 			mainWindow.getTaxonSelectionModel().clearSelection();
 			//treeView.getSplitSelectionModel().clearSelection();
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+
+		mainController.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
+		mainController.getSelectInverseMenuItem().disableProperty().bind(treeView.emptyProperty());
+
+		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
+			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
+			if (taxonBlock != null) {
+				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
+			}
+		});
+		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(

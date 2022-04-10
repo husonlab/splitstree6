@@ -45,6 +45,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.window.MainWindowManager;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.Single;
@@ -60,9 +61,7 @@ import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -337,11 +336,29 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
 			splitsView.getSplitSelectionModel().selectAll(IteratorUtils.asList(BitSetUtils.range(1, splitsView.getSplitsBlock().getNsplits() + 1)));
 		});
+		mainController.getSelectAllMenuItem().disableProperty().bind(splitsView.emptyProperty());
+
 		mainController.getSelectNoneMenuItem().setOnAction(e -> {
 			mainWindow.getTaxonSelectionModel().clearSelection();
 			splitsView.getSplitSelectionModel().clearSelection();
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+
+		mainController.getSelectInverseMenuItem().setOnAction(e -> {
+			var selectedSplits = new HashSet<>(splitsView.getSplitSelectionModel().getSelectedItems());
+			mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t));
+			IteratorUtils.asList(BitSetUtils.range(1, splitsView.getSplitsBlock().getNsplits() + 1)).forEach(s -> splitsView.getSplitSelectionModel().setSelected(s, !selectedSplits.contains(s)));
+		});
+		mainController.getSelectInverseMenuItem().disableProperty().bind(splitsView.emptyProperty());
+
+		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
+			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
+			if (taxonBlock != null) {
+				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
+			}
+		});
+		mainController.getSelectFromPreviousMenuItem().setDisable(false);
+		//mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());

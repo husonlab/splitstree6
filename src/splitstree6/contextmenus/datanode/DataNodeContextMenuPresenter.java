@@ -24,7 +24,7 @@ import javafx.scene.control.MenuItem;
 import javafx.util.Pair;
 import jloda.fx.undo.UndoManager;
 import jloda.util.PluginClassLoader;
-import splitstree6.dialog.export.ExportDialog;
+import splitstree6.dialog.exporting.data.ExportDialog;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataNode;

@@ -21,6 +21,7 @@ package splitstree6.view.network;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
@@ -32,6 +33,7 @@ import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
 import jloda.util.Single;
 import jloda.util.StringUtils;
@@ -44,6 +46,7 @@ import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
@@ -199,17 +202,25 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 
-		mainController.getSelectAllMenuItem().setOnAction(e -> {
-			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
-		});
-		mainController.getSelectNoneMenuItem().setOnAction(e -> {
-			mainWindow.getTaxonSelectionModel().clearSelection();
-		});
+		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
+		mainController.getSelectAllMenuItem().disableProperty().bind(networkView.emptyProperty());
+
+		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+
+		mainController.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
+		mainController.getSelectInverseMenuItem().disableProperty().bind(networkView.emptyProperty());
+
+		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
+			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
+			if (taxonBlock != null) {
+				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
+			}
+		});
+		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(networkPane.isNull());
-
 
 		mainController.getRotateLeftMenuItem().setOnAction(e -> networkView.setOptionOrientation(networkView.getOptionOrientation().getRotateLeft()));
 		mainController.getRotateLeftMenuItem().disableProperty().bind(networkView.emptyProperty());

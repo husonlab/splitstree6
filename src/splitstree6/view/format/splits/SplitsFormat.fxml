@@ -19,7 +19,6 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -32,7 +31,7 @@
             <content>
                 <VBox maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0" spacing="5.0">
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="6.0">
-                        <Label text=" Width"/>
+                        <Label text="Width"/>
                         <ComboBox fx:id="widthCBox" editable="true" prefWidth="100.0" visibleRowCount="14">
                             <tooltip>
                                 <Tooltip text="Line width"/>
@@ -50,30 +49,20 @@
                         </Label>
                         <ColorPicker fx:id="colorPicker" editable="true">
                             <tooltip>
-                                <Tooltip text="Text color"/>
+                                <Tooltip text="Line color"/>
                             </tooltip>
                         </ColorPicker>
                     </HBox>
                     <Separator prefWidth="200.0"/>
-                    <HBox alignment="CENTER" layoutX="15.0" layoutY="15.0">
-                        <Label text="Outline">
-                            <tooltip>
-                                <Tooltip text="Branch formatting"/>
-                            </tooltip>
-                        </Label>
-                    </HBox>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0" spacing="4.0">
                         <Label text="Fill">
-                            <font>
-                                <Font size="12.0"/>
-                            </font>
                             <HBox.margin>
                                 <Insets right="20.0"/>
                             </HBox.margin>
                         </Label>
                         <ColorPicker fx:id="outlineColorPicker">
                             <tooltip>
-                                <Tooltip text="Text color"/>
+                                <Tooltip text="Fill color for phylogenetic outlines"/>
                             </tooltip>
                             <value>
                                 <Color red="0.7529411911964417" green="0.7529411911964417" blue="0.7529411911964417"/>
@@ -81,14 +70,12 @@
                         </ColorPicker>
                     </HBox>
                     <Separator prefWidth="200.0"/>
-                    <HBox alignment="CENTER" layoutX="15.0" layoutY="99.0">
-                        <Label text="Rotate Splits">
-                            <tooltip>
-                                <Tooltip text="Branch formatting"/>
-                            </tooltip>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                        <Label text="Rotate">
+                            <HBox.margin>
+                                <Insets/>
+                            </HBox.margin>
                         </Label>
-                    </HBox>
-                    <HBox alignment="CENTER" spacing="4.0">
                         <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="&lt;"/>
                         <Button fx:id="rotateRightButton" mnemonicParsing="false" text="&gt;"/>
                     </HBox>

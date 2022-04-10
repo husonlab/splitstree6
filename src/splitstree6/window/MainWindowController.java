@@ -77,7 +77,10 @@ public class MainWindowController {
 	private MenuItem saveAsMenuItem;
 
 	@FXML
-	private MenuItem exportMenuItem;
+	private MenuItem exportTaxonDisplayLabelsMenuItem;
+
+	@FXML
+	private MenuItem exportTaxonTraitsMenuItem;
 
 	@FXML
 	private MenuItem exportWorkflowMenuItem;
@@ -155,40 +158,14 @@ public class MainWindowController {
 	private MenuItem selectNoneMenuItem;
 
 	@FXML
-	private MenuItem selectAllNodesMenuItem;
-
-	@FXML
-	private MenuItem selectAllLabeledNodesMenuItem;
-
-	@FXML
-	private MenuItem selectAllBelowMenuItem;
-
-	@FXML
-	private MenuItem selectBracketsMenuItem;
-
-	@FXML
-	private MenuItem invertNodeSelectionMenuItem;
-
-	@FXML
-	private MenuItem deselectAllNodesMenuItem;
-
-	@FXML
-	private MenuItem selectAllEdgesMenuItem;
-
-	@FXML
-	private MenuItem selectAllLabeledEdgesMenuItem;
-
-	@FXML
-	private MenuItem selectAllEdgesBelowMenuItem;
-
-	@FXML
-	private MenuItem invertEdgeSelectionMenuItem;
-
-	@FXML
-	private MenuItem deselectEdgesMenuItem;
+	private MenuItem selectInverseMenuItem;
 
 	@FXML
 	private MenuItem selectFromPreviousMenuItem;
+
+
+	@FXML
+	private MenuItem selectBracketsMenuItem;
 
 	@FXML
 	private MenuItem increaseFontSizeMenuItem;
@@ -548,8 +525,12 @@ public class MainWindowController {
 		return saveAsMenuItem;
 	}
 
-	public MenuItem getExportMenuItem() {
-		return exportMenuItem;
+	public MenuItem getExportTaxonDisplayLabelsMenuItem() {
+		return exportTaxonDisplayLabelsMenuItem;
+	}
+
+	public MenuItem getExportTaxonTraitsMenuItem() {
+		return exportTaxonTraitsMenuItem;
 	}
 
 	public MenuItem getExportWorkflowMenuItem() {
@@ -649,52 +630,16 @@ public class MainWindowController {
 		return selectNoneMenuItem;
 	}
 
-	public MenuItem getSelectAllNodesMenuItem() {
-		return selectAllNodesMenuItem;
-	}
-
-	public MenuItem getSelectAllLabeledNodesMenuItem() {
-		return selectAllLabeledNodesMenuItem;
-	}
-
-	public MenuItem getSelectAllBelowMenuItem() {
-		return selectAllBelowMenuItem;
-	}
-
-	public MenuItem getSelectBracketsMenuItem() {
-		return selectBracketsMenuItem;
-	}
-
-	public MenuItem getInvertNodeSelectionMenuItem() {
-		return invertNodeSelectionMenuItem;
-	}
-
-	public MenuItem getDeselectAllNodesMenuItem() {
-		return deselectAllNodesMenuItem;
-	}
-
-	public MenuItem getSelectAllEdgesMenuItem() {
-		return selectAllEdgesMenuItem;
-	}
-
-	public MenuItem getSelectAllLabeledEdgesMenuItem() {
-		return selectAllLabeledEdgesMenuItem;
-	}
-
-	public MenuItem getSelectAllEdgesBelowMenuItem() {
-		return selectAllEdgesBelowMenuItem;
-	}
-
-	public MenuItem getInvertEdgeSelectionMenuItem() {
-		return invertEdgeSelectionMenuItem;
-	}
-
-	public MenuItem getDeselectEdgesMenuItem() {
-		return deselectEdgesMenuItem;
+	public MenuItem getSelectInverseMenuItem() {
+		return selectInverseMenuItem;
 	}
 
 	public MenuItem getSelectFromPreviousMenuItem() {
 		return selectFromPreviousMenuItem;
+	}
+
+	public MenuItem getSelectBracketsMenuItem() {
+		return selectBracketsMenuItem;
 	}
 
 	public MenuItem getIncreaseFontSizeMenuItem() {

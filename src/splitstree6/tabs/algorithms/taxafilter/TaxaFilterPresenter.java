@@ -32,6 +32,7 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DefaultStringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.window.MainWindowManager;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -39,6 +40,8 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
+
+import java.util.Objects;
 
 /**
  * taxa edit presenter
@@ -271,26 +274,45 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 
 	@Override
 	public void setupMenuItems() {
-		var mainWindowController = mainWindow.getController();
+		var mainController = mainWindow.getController();
 
-		mainWindowController.getUndoMenuItem().textProperty().bind(tab.getUndoManager().undoNameProperty());
-		mainWindowController.getUndoMenuItem().setOnAction(e -> tab.getUndoManager().undo());
-		mainWindowController.getUndoMenuItem().disableProperty().bind(tab.getUndoManager().undoableProperty().not());
+		mainController.getUndoMenuItem().textProperty().bind(tab.getUndoManager().undoNameProperty());
+		mainController.getUndoMenuItem().setOnAction(e -> tab.getUndoManager().undo());
+		mainController.getUndoMenuItem().disableProperty().bind(tab.getUndoManager().undoableProperty().not());
 
-		mainWindowController.getRedoMenuItem().textProperty().bind(tab.getUndoManager().redoNameProperty());
-		mainWindowController.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
-		mainWindowController.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
+		mainController.getRedoMenuItem().textProperty().bind(tab.getUndoManager().redoNameProperty());
+		mainController.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
+		mainController.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
 
-		mainWindowController.getSelectAllMenuItem().setOnAction(e -> controller.getTableView().getSelectionModel().selectAll());
-		mainWindowController.getSelectAllMenuItem().disableProperty().bind(Bindings.size(controller.getTableView().getSelectionModel().getSelectedItems()).isEqualTo(
+		mainController.getSelectAllMenuItem().setOnAction(e -> controller.getTableView().getSelectionModel().selectAll());
+		mainController.getSelectAllMenuItem().disableProperty().bind(Bindings.size(controller.getTableView().getSelectionModel().getSelectedItems()).isEqualTo(
 				Bindings.size(controller.getTableView().getItems())));
-		mainWindowController.getSelectNoneMenuItem().setOnAction(e -> controller.getTableView().getSelectionModel().clearSelection());
-		mainWindowController.getSelectNoneMenuItem().disableProperty().bind(Bindings.isEmpty(controller.getTableView().getSelectionModel().getSelectedItems()));
+		mainController.getSelectNoneMenuItem().setOnAction(e -> controller.getTableView().getSelectionModel().clearSelection());
+		mainController.getSelectNoneMenuItem().disableProperty().bind(Bindings.isEmpty(controller.getTableView().getSelectionModel().getSelectedItems()));
 
-		mainWindowController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
-		mainWindowController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainWindowController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		mainWindowController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));
+		mainController.getSelectInverseMenuItem().setOnAction(e -> {
+			var tableView = controller.getTableView();
+			for (var i = 0; i < tableView.getItems().size(); i++) {
+				if (tableView.getSelectionModel().isSelected(i))
+					tableView.getSelectionModel().clearSelection(i);
+				else
+					tableView.getSelectionModel().select(i);
+			}
+		});
+		mainController.getSelectInverseMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+
+		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
+			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
+			if (taxonBlock != null) {
+				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
+			}
+		});
+		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
+
+		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
+		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));
 	}
 
 	public static <T, S> void updateColumnWidths(TableView<T> tableView, TableColumn<T, S> displayCol) {
