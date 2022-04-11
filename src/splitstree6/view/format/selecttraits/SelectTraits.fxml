@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="splitstree6.view.format.selecttraits.SelectTraitsController">
+   <panes>
+      <TitledPane fx:id="titledPane" prefWidth="200.0" text="Select Taxa By Trait Values">
+         <content>
+            <VBox prefWidth="200.0" spacing="5.0">
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+               </padding>
+               <children>
+                  <HBox alignment="CENTER" spacing="4.0"/>
+                  <MenuButton fx:id="traitMenuButton" mnemonicParsing="false" prefWidth="180.0" text="Trait">
+                     <tooltip>
+                        <Tooltip text="Choose trait to select by"/>
+                     </tooltip>
+                  </MenuButton>
+                  <HBox alignment="CENTER" spacing="4.0"/>
+                  <MenuButton fx:id="traitValuesMenuButton" mnemonicParsing="false" prefWidth="180.0" text="Values">
+                     <items>
+                        <MenuItem fx:id="allValuesMenuItem" mnemonicParsing="false" text="All"/>
+                        <MenuItem fx:id="noneValueMenuItem" mnemonicParsing="false" text="None"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                     </items>
+                     <tooltip>
+                        <Tooltip text="Choose trait values to select"/>
+                     </tooltip>
+                  </MenuButton>
+               </children>
+            </VBox>
+         </content>
+      </TitledPane>
+   </panes>
+</Accordion>

@@ -53,6 +53,12 @@ public class TextDisplayController {
 	private ToggleButton lineNumbersToggle;
 
 	@FXML
+	private Button decreaseFontButton;
+
+	@FXML
+	private Button increaseFontButton;
+
+	@FXML
 	private VBox topVBox;
 
 	private CodeArea codeArea;
@@ -104,5 +110,13 @@ public class TextDisplayController {
 
 	public VirtualizedScrollPane<CodeArea> getScrollPane() {
 		return scrollPane;
+	}
+
+	public Button getDecreaseFontButton() {
+		return decreaseFontButton;
+	}
+
+	public Button getIncreaseFontButton() {
+		return increaseFontButton;
 	}
 }

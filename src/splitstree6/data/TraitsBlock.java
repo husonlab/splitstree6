@@ -245,7 +245,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 
 
 	public double getMax(String traitLabel) {
-		var traitId = indexOf(traitLabel);
+		var traitId = getTraitId(traitLabel);
 		var max = 0.0;
 		for (var row : matrix) {
 			max = Math.max(max, row[traitId - 1]);
@@ -253,7 +253,7 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return max;
 	}
 
-	private int indexOf(String label) {
+	public int getTraitId(String label) {
 		for (var i = 0; i < labels.length; i++)
 			if (labels[i].equals(label))
 				return i + 1;

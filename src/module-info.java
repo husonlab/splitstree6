@@ -103,6 +103,7 @@ module splitstreesix {
 	opens splitstree6.view.format.taxlabels;
 	opens splitstree6.view.format.splits;
 	opens splitstree6.view.format.traits;
+	opens splitstree6.view.format.selecttraits;
 	opens splitstree6.view.format.sites;
 
 	opens splitstree6.view.utils;
