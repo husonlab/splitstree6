@@ -53,6 +53,18 @@ public class DensiTreeMainController {
 	private MenuItem copyMenuItem;
 
 	@FXML
+	private RadioMenuItem circularMenuItem;
+
+	@FXML
+	private RadioMenuItem toscaleMenuItem;
+
+	@FXML
+	private RadioMenuItem uniformMenuItem;
+
+	@FXML
+	private ToggleGroup drawingGroup;
+
+	@FXML
 	private CheckMenuItem consensusMenuItem;
 
 	@FXML
@@ -84,9 +96,6 @@ public class DensiTreeMainController {
 
 	@FXML
 	private Button clearButton;
-
-	@FXML
-	private CheckBox scaleCheckBox;
 
 	@FXML
 	private CheckBox jitterCheckBox;
@@ -129,12 +138,27 @@ public class DensiTreeMainController {
 		return quitMenuItem;
 	}
 
-
 	public MenuItem getCopyMenuItem() {
 		return copyMenuItem;
 	}
 
-	public CheckMenuItem getConsensusMenuItem(){
+	public RadioMenuItem getCircularMenuItem() {
+		return circularMenuItem;
+	}
+
+	public RadioMenuItem getToscaleMenuItem() {
+		return toscaleMenuItem;
+	}
+
+	public RadioMenuItem getUniformMenuItem() {
+		return uniformMenuItem;
+	}
+
+	public ToggleGroup getDrawingGroup() {
+		return drawingGroup;
+	}
+
+	public CheckMenuItem getConsensusMenuItem() {
 		return consensusMenuItem;
 	}
 
@@ -176,10 +200,6 @@ public class DensiTreeMainController {
 
 	public Button getClearButton() {
 		return clearButton;
-	}
-
-	public CheckBox getScaleCheckBox() {
-		return scaleCheckBox;
 	}
 
 	public CheckBox getJitterCheckBox() {
