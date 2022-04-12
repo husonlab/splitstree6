@@ -19,7 +19,6 @@
 
 package splitstree6.layout.splits;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
@@ -91,7 +90,6 @@ public class SplitNetworkLayout {
 					   ObservableMap<Node, Group> nodeShapeMap,
 					   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 					   ObservableList<LoopView> loopViews) throws IOException {
-
 		labelLayout.clear();
 
 		if (splitsBlock0.getNsplits() == 0)
@@ -144,6 +142,7 @@ public class SplitNetworkLayout {
 		graph.clear();
 		nodeShapeMap.clear();
 		loopViews.clear();
+		loops.clear();
 
 		if (diagram.isOutline()) {
 			try {
@@ -163,8 +162,7 @@ public class SplitNetworkLayout {
 				EqualAngle.assignAnglesToEdges(taxaBlock.getNtax(), splitsBlock, splitsBlock.getCycle(), graph, new BitSet(), rootSplit == 0 ? 360 : rootAngle);
 				EqualAngle.assignCoordinatesToNodes(diagram.isUsingWeights(), graph, nodePointMap, splitsBlock.getCycle()[1], rootSplit);
 
-			} catch (CanceledException e) {
-				NotificationManager.showWarning("User CANCELED 'splits network' computation");
+			} catch (CanceledException ignored) {
 			}
 		}
 
@@ -283,7 +281,7 @@ public class SplitNetworkLayout {
 		for (var loop : loops) {
 			var loopView = new LoopView(loop, v -> nodeShapeMap.get(v).translateXProperty(), v -> nodeShapeMap.get(v).translateYProperty());
 			loopsGroup.getChildren().add(loopView);
-			Platform.runLater(() -> loopViews.add(loopView));
+			loopViews.add(loopView);
 		}
 		progress.reportTaskCompleted();
 

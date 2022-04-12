@@ -40,6 +40,7 @@ import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
 import jloda.util.Single;
+import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
@@ -62,6 +63,8 @@ public class MainWindow implements IMainWindow {
 	private final BooleanProperty dirty = new SimpleBooleanProperty(this, "dirty", false);
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 	private final StringProperty name = new SimpleStringProperty(this, "name", "");
+
+	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
 
 	private final WorkflowTab workflowTab;
 	private final TextDisplayTab methodsTab;
@@ -98,6 +101,7 @@ public class MainWindow implements IMainWindow {
 				if (!Basic.equal(activeTaxa, workflow.getWorkingTaxaBlock().getTaxa()))
 					activeTaxa.setAll(workflow.getWorkingTaxaBlock().getTaxa());
 			}
+			workingTaxa.set(workflow.getWorkingTaxaBlock());
 		});
 
 		//BasicFX.reportChanges("running",workflow.runningProperty());
@@ -288,5 +292,13 @@ public class MainWindow implements IMainWindow {
 
 	public ObservableList<Taxon> getActiveTaxa() {
 		return activeTaxa;
+	}
+
+	public TaxaBlock getWorkingTaxa() {
+		return workingTaxa.get();
+	}
+
+	public ReadOnlyObjectProperty<TaxaBlock> workingTaxaProperty() {
+		return workingTaxa;
 	}
 }

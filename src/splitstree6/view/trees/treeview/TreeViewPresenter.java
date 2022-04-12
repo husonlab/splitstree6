@@ -143,8 +143,17 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		scrollPane.setRequireShiftOrControlToZoom(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, TreeDiagramType::createNode));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, TreeDiagramType::createNode));
+		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();
+		treeView.reticulatedProperty().addListener((v, o, n) -> {
+			disabledDiagrams.clear();
+			if (n) {
+				disabledDiagrams.add(TreeDiagramType.TriangularCladogram);
+				disabledDiagrams.add(TreeDiagramType.RadialCladogram);
+				disabledDiagrams.add(TreeDiagramType.RadialPhylogram);
+			}
+		});
+		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::createNode));
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::createNode));
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treeView.optionDiagramProperty());
 

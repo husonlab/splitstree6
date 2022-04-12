@@ -33,6 +33,7 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
@@ -113,6 +114,8 @@ public class SplitsView implements IView {
 		this.name.set(name);
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
+
+		BasicFX.reportChanges(optionDiagram);
 
 		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
 		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
