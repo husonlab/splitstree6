@@ -43,11 +43,14 @@ import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.MainWindowManager;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
+import jloda.util.CanceledException;
 import jloda.util.Single;
 import jloda.util.StringUtils;
+import jloda.util.progress.ProgressSilent;
 import splitstree6.layout.tree.*;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
+import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
@@ -140,8 +143,17 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		scrollPane.setRequireShiftOrControlToZoom(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, TreeDiagramType::createNode));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, TreeDiagramType::createNode));
+		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();
+		treeView.reticulatedProperty().addListener((v, o, n) -> {
+			disabledDiagrams.clear();
+			if (n) {
+				disabledDiagrams.add(TreeDiagramType.TriangularCladogram);
+				disabledDiagrams.add(TreeDiagramType.RadialCladogram);
+				disabledDiagrams.add(TreeDiagramType.RadialPhylogram);
+			}
+		});
+		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::createNode));
+		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::createNode));
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(treeView.optionDiagramProperty());
 
@@ -172,6 +184,14 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		updateListener = e -> {
 			if (treeProperty.get() != null) {
 				RunAfterAWhile.apply(treeProperty.get().getName(), () -> Platform.runLater(() -> {
+					var tree = treeProperty.get();
+					if (tree.isReticulated()) {
+						tree = new PhyloTree(tree);
+						try {
+							EmbeddingOptimizer.apply(tree, new ProgressSilent());
+						} catch (CanceledException ignored) {
+						}
+					}
 					var bounds = targetBounds.get();
 					if (bounds != null) {
 						var width = bounds.getWidth();
@@ -186,7 +206,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 							TreeViewEdits.clearEdits(treeView.optionEditsProperty());
 
 						if (!treeView.emptyProperty().get()) {
-							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), treeProperty.get(), mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
+							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
 									treeView.getOptionDiagram(), treeView.getOptionAveraging(), treeView.optionOrientationProperty(), treeView.optionFontScaleFactorProperty(), null,
 									treeView.optionShowInternalLabelsProperty(), controller.getScaleBar().unitLengthXProperty(), nodeShapeMap);
 							treePane.set(pane);

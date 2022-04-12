@@ -22,7 +22,9 @@ package splitstree6.tabs.textdisplay;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
@@ -50,6 +52,8 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 	private final boolean editable;
 
 	private final BooleanBinding selectionEmpty;
+
+	private final DoubleProperty fontSize = new SimpleDoubleProperty(12);
 
 	public TextDisplayTabPresenter(MainWindow mainWindow, TextDisplayTab tab, boolean editable) {
 		this.mainWindow = mainWindow;
@@ -113,6 +117,20 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
 			}
 		});
+
+		controller.getIncreaseFontButton().setOnAction(e -> {
+			fontSize.set(1.1 * fontSize.get());
+			codeArea.setStyle("-fx-font-size: " + fontSize.getValue() + "px");
+		});
+		controller.getIncreaseFontButton().disableProperty().bind(fontSize.greaterThan(128));
+
+		controller.getDecreaseFontButton().setOnAction(e -> {
+			fontSize.set(1.0 / 1.1 * fontSize.get());
+			codeArea.setStyle("-fx-font-size: " + fontSize.getValue() + "px");
+		});
+		controller.getDecreaseFontButton().disableProperty().bind(fontSize.lessThan(6));
+
+		codeArea.setStyle("-fx-font-size: " + fontSize.getValue() + "px");
 	}
 
 	public void setupMenuItems() {
@@ -203,8 +221,11 @@ public class TextDisplayTabPresenter implements IDisplayTabPresenter {
 		windowController.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
 		windowController.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		windowController.getIncreaseFontSizeMenuItem().setOnAction(null);
-		windowController.getDecreaseFontSizeMenuItem().setOnAction(null);
+		windowController.getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
+		windowController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
+
+		windowController.getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
+		windowController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
 
 		windowController.getZoomInMenuItem().setOnAction(null);
 		windowController.getZoomOutMenuItem().setOnAction(null);

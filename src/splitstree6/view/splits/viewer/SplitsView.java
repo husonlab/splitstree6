@@ -33,6 +33,7 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
@@ -45,6 +46,7 @@ import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.splits.SplitsFormat;
 import splitstree6.view.format.taxlabels.TaxLabelFormat;
 import splitstree6.view.format.traits.TraitsFormat;
@@ -113,6 +115,8 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
+		BasicFX.reportChanges(optionDiagram);
+
 		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
 		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
 		final ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
@@ -141,7 +145,9 @@ public class SplitsView implements IView {
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormat, traitsFormatter, splitsFormat);
+		var selectTraits = new SelectTraits(mainWindow);
+
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormat, traitsFormatter, selectTraits, splitsFormat);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);

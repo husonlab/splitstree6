@@ -43,11 +43,13 @@ public class LoopView extends Polygon {
             var v = nodes.get(i);
             var x = nodeXMap.apply(v);
             var y = nodeYMap.apply(v);
-            getPoints().addAll(x.get(), y.get());
-            var ix = 2 * i;
-            x.addListener(e -> getPoints().set(ix, x.get()));
-            var iy = 2 * i + 1;
-            y.addListener(e -> getPoints().set(iy, y.get()));
+            if (x != null && y != null) {
+                getPoints().addAll(x.get(), y.get());
+                var ix = 2 * i;
+                x.addListener(e -> getPoints().set(ix, x.get()));
+                var iy = 2 * i + 1;
+                y.addListener(e -> getPoints().set(iy, y.get()));
+            }
         }
     }
 

@@ -28,7 +28,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
-import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -45,10 +44,10 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
-import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
@@ -79,10 +78,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final InvalidationListener selectionListener;
 
-	private final ObjectProperty<SplitNetworkPane> splitNetworkPane = new SimpleObjectProperty<>();
 	private final InvalidationListener updateListener;
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
+
+	private final SplitNetworkPane splitNetworkPane;
 
 
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
@@ -93,9 +93,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.splitsView = splitsView;
 		this.controller = splitsView.getController();
 
-		splitNetworkPane.addListener((v, o, n) -> {
-			controller.getScrollPane().setContent(n);
-		});
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
@@ -110,10 +107,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			if (n == null) {
 				disabledDiagramTypes.addAll(List.of(SplitsDiagramType.values()));
 			} else {
-				if (n.getCompatibility() == Compatibility.compatible || n.getCompatibility() == Compatibility.cyclic) {
-					if (splitsView.getOptionDiagram() == SplitsDiagramType.Splits)
-						splitsView.setOptionDiagram(SplitsDiagramType.Outline);
-				} else {
+				if (n.getCompatibility() != Compatibility.compatible && n.getCompatibility() != Compatibility.cyclic) {
 					disabledDiagramTypes.add(SplitsDiagramType.Outline);
 					disabledDiagramTypes.add(SplitsDiagramType.OutlineTopology);
 					if (splitsView.getOptionDiagram() == SplitsDiagramType.Outline)
@@ -185,49 +179,47 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		controller.getFitLabel().visibleProperty().bind(controller.getScaleBar().visibleProperty());
 
-		var boxDimension = new SimpleObjectProperty<Dimension2D>();
-		targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 40, n.getHeight() - 80)));
-
-		var first = new Single<>(true);
+		var boxWidth = new SimpleDoubleProperty();
+		var boxHeight = new SimpleDoubleProperty();
+		targetBounds.addListener((v, o, n) -> {
+			boxWidth.set(n.getWidth() - 40);
+			boxHeight.set(n.getHeight() - 80);
+		});
 
 		var mouseInteraction = new MouseInteraction(mainWindow.getStage(), splitsView.getUndoManager(), mainWindow.getTaxonSelectionModel(), splitsView.getSplitSelectionModel());
 
-		updateListener = e -> {
-			if (first.get())
-				first.set(false);
-			else
-				SplitNetworkEdits.clearEdits(splitsView.optionEditsProperty());
+		splitNetworkPane = new SplitNetworkPane(mainWindow, mainWindow.workingTaxaProperty(), splitsBlock, mainWindow.getTaxonSelectionModel(),
+				splitsView.getSplitSelectionModel(), boxWidth, boxHeight, splitsView.optionDiagramProperty(), splitsView.optionOrientationProperty(),
+				splitsView.optionRootingProperty(), splitsView.optionRootAngleProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
+				splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(),
+				taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
 
-			var pane = new SplitNetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), splitsBlock.get(), mainWindow.getTaxonSelectionModel(),
-					splitsView.getSplitSelectionModel(), boxDimension.get().getWidth(), boxDimension.get().getHeight(), splitsView.getOptionDiagram(), splitsView.optionOrientationProperty(),
-					splitsView.getOptionRooting(), splitsView.getOptionRootAngle(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
-					splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(),
-					taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
+		splitNetworkPane.setRunAfterUpdate(() -> {
+			var taxa = mainWindow.getWorkingTaxa();
+			var splits = splitsBlock.get();
+			mouseInteraction.setup(taxonLabelMap, nodeShapeMap, splitShapeMap, taxa::get, taxa::indexOf, splits::get);
 
-			splitNetworkPane.set(pane);
-
-			pane.setRunAfterUpdate(() -> {
-				var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
-				var splits = splitsBlock.get();
-				mouseInteraction.setup(taxonLabelMap, nodeShapeMap, splitShapeMap, taxa::get, taxa::indexOf, splits::get);
-
-				for (var label : BasicFX.getAllRecursively(pane, RichTextLabel.class)) {
-					label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
-					if (label.getUserData() instanceof Shape shape)
-						shape.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
+			for (var label : BasicFX.getAllRecursively(splitNetworkPane, RichTextLabel.class)) {
+				label.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
+				if (label.getUserData() instanceof Shape shape)
+					shape.setOnContextMenuRequested(m -> showContextMenu(m, mainWindow.getStage(), splitsView.getUndoManager(), label));
+			}
+			if (splitsView.getOptionDiagram().isOutline()) {
+				for (var loop : loopViews) {
+					loop.setFill(splitsView.getOptionOutlineFill());
 				}
-				if (splitsView.getOptionDiagram().isOutline()) {
-					for (var loop : loopViews) {
-						loop.setFill(splitsView.getOptionOutlineFill());
-					}
-				}
-				if (splitsView.getOptionEdits().length > 0) {
-					SplitNetworkEdits.applyEdits(splitsView.getOptionEdits(), nodeShapeMap, splitShapeMap);
-				}
-				updateCounter.set(updateCounter.get() + 1);
-			});
-			pane.drawNetwork();
-		};
+			}
+			if (splitsView.getOptionEdits().length > 0) {
+				SplitNetworkEdits.applyEdits(splitsView.getOptionEdits(), nodeShapeMap, splitShapeMap);
+				Platform.runLater(() -> SplitNetworkEdits.clearEdits(splitsView.optionEditsProperty()));
+			}
+			updateCounter.set(updateCounter.get() + 1);
+		});
+
+		controller.getScrollPane().setContent(splitNetworkPane);
+
+
+		updateListener = e -> RunAfterAWhile.apply(splitNetworkPane, () -> Platform.runLater(splitNetworkPane::drawNetwork));
 
 		splitsView.optionOutlineFillProperty().addListener((v, o, n) -> {
 			if (splitsView.getOptionDiagram().isOutline()) {
@@ -238,8 +230,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 
 		splitsView.optionFontScaleFactorProperty().addListener(e -> {
-			if (splitNetworkPane.get() != null)
-				ProgramExecutorService.submit(100, () -> Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation())));
+			ProgramExecutorService.submit(100, () -> Platform.runLater(() -> splitNetworkPane.layoutLabels(splitsView.getOptionOrientation())));
 		});
 
 		splitsBlock.addListener(updateListener);
@@ -361,7 +352,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		//mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
-		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitNetworkPane.isNull());
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitsView.emptyProperty());
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.SplitsTopology).or(splitsView.optionDiagramProperty().isEqualTo(SplitsDiagramType.OutlineTopology)));
@@ -400,8 +391,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	}
 
 	public void updateLabelLayout() {
-		if (splitNetworkPane.get() != null)
-			Platform.runLater(() -> splitNetworkPane.get().layoutLabels(splitsView.getOptionOrientation()));
+		Platform.runLater(() -> splitNetworkPane.layoutLabels(splitsView.getOptionOrientation()));
 	}
 
 

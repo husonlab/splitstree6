@@ -74,10 +74,11 @@ public class SplitNetworkPane extends StackPane {
 	/**
 	 * split network pane
 	 */
-	public SplitNetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, SplitsBlock splitsBlock,
+	public SplitNetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<SplitsBlock> splitsBlock,
 							SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
-							double boxWidth, double boxHeight, SplitsDiagramType diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation,
-							SplitsRooting rooting, double rootAngle, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+							ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight, ReadOnlyObjectProperty<SplitsDiagramType> diagram,
+							ReadOnlyObjectProperty<LayoutOrientation> orientation,
+							ReadOnlyObjectProperty<SplitsRooting> rooting, ReadOnlyDoubleProperty rootAngle, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 							ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
 							ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 							ObservableMap<Node, Group> nodeShapeMap,
@@ -86,8 +87,8 @@ public class SplitNetworkPane extends StackPane {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
 
-		setPrefWidth(boxWidth);
-		setPrefHeight(boxHeight);
+		prefWidthProperty().bind(boxWidth);
+		prefHeightProperty().bind(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);
 		setMinHeight(Pane.USE_PREF_SIZE);
 		setMaxWidth(Pane.USE_PREF_SIZE);
@@ -119,8 +120,8 @@ public class SplitNetworkPane extends StackPane {
 			if (taxaBlock == null || splitsBlock == null)
 				return new Group();
 
-			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock, splitsBlock, diagram,
-					rooting, rootAngle, taxonSelectionModel, splitSelectionModel, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16,
+			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock.get(), splitsBlock.get(), diagram.get(),
+					rooting.get(), rootAngle.get(), taxonSelectionModel, splitSelectionModel, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16,
 					taxonLabelMap, nodeShapeMap, splitShapeMap,
 					loopViews);
 
@@ -163,10 +164,8 @@ public class SplitNetworkPane extends StackPane {
 	}
 
 	public void drawNetwork() {
-		//System.err.println("redraw");
 		service.restart();
 	}
-
 
 	public AService<Group> getService() {
 		return service;
