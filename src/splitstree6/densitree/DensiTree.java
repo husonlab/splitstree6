@@ -37,7 +37,6 @@ import splitstree6.layout.tree.RadialLabelLayout;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * draw the densi-tree
@@ -65,11 +64,17 @@ public class DensiTree {
             int xmax = (int) (canvas.getWidth() - 100);
             int ymax = (int) (canvas.getHeight() - 100);
 
-            boolean toScale = parameters.toScale;
+
             boolean jitter = parameters.jitter;
             boolean consensus = parameters.consensus;
             String highlight = parameters.highlight + ",";
             String labelMethod = parameters.labelMethod;
+            int drawingMethod = 0; //circular
+            if (parameters.drawingMethod.contains("toscale")) {
+                drawingMethod = 1; //To Scale
+            } else if (parameters.drawingMethod.contains("uniform")) {
+                drawingMethod = 2; //Uniform
+            }
 
             int nTrees = model.getTreesBlock().size();
             int nTaxa = model.getTaxaBlock().getNtax();
@@ -111,7 +116,7 @@ public class DensiTree {
 
                 NodeArray<Point2D> nodePointMap = tree.newNodeArray();
                 var nodeAngleMap = tree.newNodeDoubleArray();
-                LayoutAlgorithm.apply(tree, toScale, circle, nodePointMap, nodeAngleMap);
+                LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                 adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
                 if (labelMethod.contains("kmeans")) {
@@ -137,7 +142,7 @@ public class DensiTree {
 
                         NodeArray<Point2D> nodePointMap = tree.newNodeArray();
                         var nodeAngleMap = tree.newNodeDoubleArray();
-                        LayoutAlgorithm.apply(tree, toScale, circle, nodePointMap, nodeAngleMap);
+                        LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                         adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
                         drawEdges(tree, gc, nodePointMap, false, 0, 0, coords, labels);
@@ -157,7 +162,7 @@ public class DensiTree {
 
                     NodeArray<Point2D> nodePointMap = consensusTree.newNodeArray();
                     var nodeAngleMap = consensusTree.newNodeDoubleArray();
-                    LayoutAlgorithm.apply(consensusTree, toScale, circle, nodePointMap, nodeAngleMap);
+                    LayoutAlgorithm.apply(consensusTree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                     adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
                     drawEdges(consensusTree, gc, nodePointMap, false, 0, 0, coords, labels);
@@ -172,7 +177,7 @@ public class DensiTree {
 
             NodeArray<Point2D> nodePointMap = tree1.newNodeArray();
             var nodeAngleMap = tree1.newNodeDoubleArray();
-            LayoutAlgorithm.apply(tree1, toScale, circle, nodePointMap, nodeAngleMap);
+            LayoutAlgorithm.apply(tree1, drawingMethod, circle, nodePointMap, nodeAngleMap);
             adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
             if (labelMethod.contains("kmeans")) {
@@ -313,18 +318,13 @@ public class DensiTree {
     }
 
     public static void dbscanLabels(
-            PhyloTree tree, int[] circle, Pane pane, int xmin, int ymin, int xmax, int ymax, boolean toScale,
+            PhyloTree tree, Pane pane, NodeDoubleArray nodeAngleMap,
             DoublePoint[][] coords3, String[] labels, DBSCANClusterer dbscanClusterer
     ) {
-        NodeArray<Point2D> nodePointMap = tree.newNodeArray();
-        var nodeAngleMap = tree.newNodeDoubleArray();
-        LayoutAlgorithm.apply(tree, toScale, circle, nodePointMap, nodeAngleMap);
-        adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+
 
         for (var e : tree.edges()) {
-            var v = e.getSource();
             var w = e.getTarget();
-            var wPt = nodePointMap.get(w);
             if (e.getTarget().isLeaf()) {
                 var label = new RichTextLabel(tree.getLabel(w));
                 for (int i = 0; i < labels.length; i++) {
@@ -516,7 +516,6 @@ public class DensiTree {
             PhyloTree tree, GraphicsContext gc, NodeArray<Point2D> nodePointMap,
             boolean jitter, double shiftx, double shifty, double[][] coords, String[] labels
     ) {
-        double maxY = 0;
 
         for (var e : tree.edges()) {
             var v = e.getSource();
@@ -534,9 +533,6 @@ public class DensiTree {
                             break;
                         }
                     }
-                    //SimpleDoubleProperty x = new SimpleDoubleProperty(wPt.getX());
-                    //SimpleDoubleProperty y = new SimpleDoubleProperty(wPt.getY());
-                    // labelLayout.addAvoidable(x,y,1,1);
                 }
 
                 double x1 = vPt.getX();
@@ -564,25 +560,28 @@ public class DensiTree {
             var vPt = nodePointMap.get(v);
             var wPt = nodePointMap.get(w);
 
-            if (w.isLeaf()) {
-                for (int i = 0; i < labels.length; i++) {
-                    if (tree.getLabel(w).equals(labels[i])) {
-                        coords2[i][treeNum][0] += wPt.getX();
-                        coords2[i][treeNum][1] += wPt.getY();
-                        break;
+            if (vPt != null & wPt != null) {
+
+                if (w.isLeaf()) {
+                    for (int i = 0; i < labels.length; i++) {
+                        if (tree.getLabel(w).equals(labels[i])) {
+                            coords2[i][treeNum][0] += wPt.getX();
+                            coords2[i][treeNum][1] += wPt.getY();
+                            break;
+                        }
                     }
                 }
-            }
 
-            double x1 = vPt.getX();
-            double y1 = vPt.getY();
-            double x2 = wPt.getX();
-            double y2 = wPt.getY();
+                double x1 = vPt.getX();
+                double y1 = vPt.getY();
+                double x2 = wPt.getX();
+                double y2 = wPt.getY();
 
-            if (jitter) {
-                gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
-            } else {
-                gc.strokeLine(x1, y1, x2, y2);
+                if (jitter) {
+                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
+                } else {
+                    gc.strokeLine(x1, y1, x2, y2);
+                }
             }
         }
     }
@@ -598,26 +597,29 @@ public class DensiTree {
             var vPt = nodePointMap.get(v);
             var wPt = nodePointMap.get(w);
 
-            if (w.isLeaf()) {
-                for (int i = 0; i < labels.length; i++) {
-                    if (tree.getLabel(w).equals(labels[i])) {
-                        double[] points = {wPt.getX(), wPt.getY()};
-                        DoublePoint point = new DoublePoint(points);
-                        coords3[i][treeNum] = point;
-                        break;
+            if (vPt != null & wPt != null) {
+
+                if (w.isLeaf()) {
+                    for (int i = 0; i < labels.length; i++) {
+                        if (tree.getLabel(w).equals(labels[i])) {
+                            double[] points = {wPt.getX(), wPt.getY()};
+                            DoublePoint point = new DoublePoint(points);
+                            coords3[i][treeNum] = point;
+                            break;
+                        }
                     }
                 }
-            }
 
-            double x1 = vPt.getX();
-            double y1 = vPt.getY();
-            double x2 = wPt.getX();
-            double y2 = wPt.getY();
+                double x1 = vPt.getX();
+                double y1 = vPt.getY();
+                double x2 = wPt.getX();
+                double y2 = wPt.getY();
 
-            if (jitter) {
-                gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
-            } else {
-                gc.strokeLine(x1, y1, x2, y2);
+                if (jitter) {
+                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
+                } else {
+                    gc.strokeLine(x1, y1, x2, y2);
+                }
             }
         }
     }
@@ -643,10 +645,10 @@ public class DensiTree {
     /**
      * this contains all the parameters used for drawing
      */
-    public record Parameters(boolean toScale,
-                             boolean jitter,
+    public record Parameters(boolean jitter,
                              boolean consensus,
                              String highlight,
-                             String labelMethod) {
+                             String labelMethod,
+                             String drawingMethod) {
     }
 }

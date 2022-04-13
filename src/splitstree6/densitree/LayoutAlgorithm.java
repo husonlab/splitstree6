@@ -36,86 +36,96 @@ import java.util.stream.Collectors;
  * Daniel Huson, 12.2021
  */
 public class LayoutAlgorithm {
-	/**
-	 * compute coordinates for all nodes
-	 *
-	 * @param toScale use weights or scale all edges so that leaves are equi-distance from root?
-	 */
-	public static void apply(PhyloTree tree, boolean toScale, int[] cycle, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
-		nodePointMap.clear();
-		if (cycle.length > 0) {
-			final var taxon2pos = new int[cycle.length];
-			for (var pos = 1; pos < cycle.length; pos++)
-				taxon2pos[cycle[pos]] = pos;
+    /**
+     * compute coordinates for all nodes
+     *
+     * @param drawingMethod use weights or scale all edges so that leaves are equi-distance from root or have all edges the same length?
+     */
+    public static void apply(PhyloTree tree, int drawingMethod, int[] cycle, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
+        nodePointMap.clear();
+        if (cycle.length > 0) {
+            final var taxon2pos = new int[cycle.length];
+            for (var pos = 1; pos < cycle.length; pos++)
+                taxon2pos[cycle[pos]] = pos;
 
-			final var lastTaxon = cycle[cycle.length - 1];
-			int numberOfTaxa = cycle.length - 1; // cycle[0] is not used
+            final var lastTaxon = cycle[cycle.length - 1];
+            int numberOfTaxa = cycle.length - 1; // cycle[0] is not used
 
-			if (numberOfTaxa > 0) {
-				var alpha = 360.0 / numberOfTaxa;
+            if (numberOfTaxa > 0) {
+                var alpha = 360.0 / numberOfTaxa;
 
-				try (NodeArray<BitSet> taxaBelow = tree.newNodeArray()) {
-					tree.postorderTraversal(v -> {
-						if (v.isLeaf()) {
-							var taxa = BitSetUtils.asBitSet(tree.getTaxa(v));
-							taxaBelow.put(v, taxa);
-						} else {
-							var taxa = BitSetUtils.union(v.childrenStream().map(taxaBelow::get).collect(Collectors.toList()));
-							taxaBelow.put(v, taxa);
-						}
-					});
-
-
-					var treeTaxa = BitSetUtils.asBitSet(tree.getTaxa());
-					tree.postorderTraversal(v -> {
-						var taxa = taxaBelow.get(v);
-						int add;
-						if (taxa.get(lastTaxon)) {
-							taxa = BitSetUtils.minus(treeTaxa, taxa);
-							add = 180;
-						} else
-							add = 0;
-						nodeAngleMap.put(v, BitSetUtils.asStream(taxa).mapToDouble(t -> alpha * taxon2pos[t] + add).average().orElse(0));
-					});
+                try (NodeArray<BitSet> taxaBelow = tree.newNodeArray()) {
+                    tree.postorderTraversal(v -> {
+                        if (v.isLeaf()) {
+                            var taxa = BitSetUtils.asBitSet(tree.getTaxa(v));
+                            taxaBelow.put(v, taxa);
+                        } else {
+                            var taxa = BitSetUtils.union(v.childrenStream().map(taxaBelow::get).collect(Collectors.toList()));
+                            taxaBelow.put(v, taxa);
+                        }
+                    });
 
 
-					if (toScale) {
-						tree.preorderTraversal(v -> {
-							if (v.getInDegree() == 0) { // the root
-								nodePointMap.put(v, new Point2D(0, 0));
-							} else {
-								var e = v.getFirstInEdge();
-								var p = e.getSource();
-								nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), tree.getWeight(e)));
-							}
-						});
-					} else {
-						var maxDepth = computeMaxDepth(tree);
-						try (var nodeRadiusMap = tree.newNodeDoubleArray()) {
-							tree.postorderTraversal(v -> {
-								if (tree.isLeaf(v)) {
-									nodeRadiusMap.put(v, (double) maxDepth);
-								} else {
-									nodeRadiusMap.put(v, IteratorUtils.asStream(tree.lsaChildren(v)).mapToDouble(nodeRadiusMap::get).min().orElse(maxDepth) - 1);
-								}
-							});
-							tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
-						}
-					}
-				}
-			}
-		}
-	}
+                    var treeTaxa = BitSetUtils.asBitSet(tree.getTaxa());
+                    tree.postorderTraversal(v -> {
+                        var taxa = taxaBelow.get(v);
+                        int add;
+                        if (taxa.get(lastTaxon)) {
+                            taxa = BitSetUtils.minus(treeTaxa, taxa);
+                            add = 180;
+                        } else
+                            add = 0;
+                        nodeAngleMap.put(v, BitSetUtils.asStream(taxa).mapToDouble(t -> alpha * taxon2pos[t] + add).average().orElse(0));
+                    });
 
-	/**
-	 * compute the maximum number of edges from the root to a leaf
-	 *
-	 * @param tree the tree
-	 * @return length of longest path
-	 */
-	public static int computeMaxDepth(PhyloTree tree) {
-		var max = new Single<>(0);
-		tree.breathFirstTraversal((level, v) -> max.set(Math.max(max.get(), level)));
-		return max.get();
-	}
+
+                    if (drawingMethod == 0) {
+                        var maxDepth = computeMaxDepth(tree);
+                        try (var nodeRadiusMap = tree.newNodeDoubleArray()) {
+                            tree.postorderTraversal(v -> {
+                                if (tree.isLeaf(v)) {
+                                    nodeRadiusMap.put(v, (double) maxDepth);
+                                } else {
+                                    nodeRadiusMap.put(v, IteratorUtils.asStream(tree.lsaChildren(v)).mapToDouble(nodeRadiusMap::get).min().orElse(maxDepth) - 1);
+                                }
+                            });
+                            tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
+                        }
+                    } else if (drawingMethod == 1) {
+                        tree.preorderTraversal(v -> {
+                            if (v.getInDegree() == 0) { // the root
+                                nodePointMap.put(v, new Point2D(0, 0));
+                            } else {
+                                var e = v.getFirstInEdge();
+                                var p = e.getSource();
+                                nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), tree.getWeight(e)));
+                            }
+                        });
+                    } else if (drawingMethod == 2){
+                        tree.preorderTraversal(v -> {
+                            if (v.getInDegree() == 0) { // the root
+                                nodePointMap.put(v, new Point2D(0, 0));
+                            } else {
+                                var e = v.getFirstInEdge();
+                                var p = e.getSource();
+                                nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), 1));
+                            }
+                        });
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * compute the maximum number of edges from the root to a leaf
+     *
+     * @param tree the tree
+     * @return length of longest path
+     */
+    public static int computeMaxDepth(PhyloTree tree) {
+        var max = new Single<>(0);
+        tree.breathFirstTraversal((level, v) -> max.set(Math.max(max.get(), level)));
+        return max.get();
+    }
 }

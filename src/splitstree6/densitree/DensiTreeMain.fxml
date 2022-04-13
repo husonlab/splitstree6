@@ -21,19 +21,33 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioMenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.*?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.densitree.DensiTreeMainController">
-    <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.densitree.DensiTreeMainController">
+    <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <center>
             <StackPane fx:id="stackPane">
-                <Canvas fx:id="canvas" height="200.0" width="200.0"/>
-                <Pane fx:id="pane"/>
+                <Canvas fx:id="canvas" height="200.0" width="200.0" />
+                <Pane fx:id="pane" />
                 <BorderPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0"/>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                 </BorderPane.margin>
             </StackPane>
         </center>
@@ -43,22 +57,19 @@
                     <Menu mnemonicParsing="false" text="File">
                         <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open...">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                             </accelerator>
                         </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="printMenuItem" mnemonicParsing="false" text="Print...">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                             </accelerator>
                         </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <SeparatorMenuItem mnemonicParsing="false" />
                         <MenuItem fx:id="quitMenuItem" mnemonicParsing="false" text="Quit">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                             </accelerator>
                         </MenuItem>
                     </Menu>
@@ -69,40 +80,49 @@
                             </accelerator>
                         </MenuItem>
                     </Menu>
-               <Menu mnemonicParsing="false" text="Highlighting">
-                 <items>
-                     <CheckMenuItem fx:id="consensusMenuItem" mnemonicParsing="false" text="Consensus Tree" />
-                     <MenuItem fx:id="specificTreesMenuItem" mnemonicParsing="false" text="Specific Trees" />
-                 </items>
-               </Menu>
-               <Menu mnemonicParsing="false" text="Labels">
-                  <items>
-                     <RadioMenuItem fx:id="meanMenuItem" mnemonicParsing="false" text="Mean">
-                        <toggleGroup>
-                           <ToggleGroup fx:id="labelsGroup" />
-                        </toggleGroup>
-                     </RadioMenuItem>
-                     <RadioMenuItem fx:id="medianMenuItem" mnemonicParsing="false" text="Median" toggleGroup="$labelsGroup" />
-                     <RadioMenuItem fx:id="kmeansMenuItem" mnemonicParsing="false" text="k-means Clustering" toggleGroup="$labelsGroup" />
-                     <RadioMenuItem fx:id="radialMenuItem" mnemonicParsing="false" text="Radial" toggleGroup="$labelsGroup" />
-                  </items>
-               </Menu>
+                    <Menu mnemonicParsing="false" text="Drawing">
+                        <items>
+                            <RadioMenuItem fx:id="circularMenuItem" mnemonicParsing="false" text="Circular">
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="drawingGroup" />
+                                </toggleGroup>
+                            </RadioMenuItem>
+                            <RadioMenuItem fx:id="toscaleMenuItem" mnemonicParsing="false" text="To Scale" toggleGroup="$drawingGroup" />
+                            <RadioMenuItem fx:id="uniformMenuItem" mnemonicParsing="false" text="Uniform" toggleGroup="$drawingGroup" />
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Highlighting">
+                        <items>
+                            <CheckMenuItem fx:id="consensusMenuItem" mnemonicParsing="false" text="Consensus Tree" />
+                            <MenuItem fx:id="specificTreesMenuItem" mnemonicParsing="false" text="Specific Trees" />
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Labels">
+                        <items>
+                            <RadioMenuItem fx:id="meanMenuItem" mnemonicParsing="false" text="Mean">
+                                <toggleGroup>
+                                    <ToggleGroup fx:id="labelsGroup" />
+                                </toggleGroup>
+                            </RadioMenuItem>
+                            <RadioMenuItem fx:id="medianMenuItem" mnemonicParsing="false" text="Median" toggleGroup="$labelsGroup" />
+                            <RadioMenuItem fx:id="kmeansMenuItem" mnemonicParsing="false" text="k-means Clustering" toggleGroup="$labelsGroup" />
+                            <RadioMenuItem fx:id="radialMenuItem" mnemonicParsing="false" text="Radial" toggleGroup="$labelsGroup" />
+                        </items>
+                    </Menu>
                 </MenuBar>
                 <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">
                     <Button fx:id="drawButton" mnemonicParsing="false" text="Draw" />
                     <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" />
-                    <CheckBox fx:id="scaleCheckBox" mnemonicParsing="false" text="To Scale" />
-               <CheckBox fx:id="jitterCheckBox" mnemonicParsing="false" text="Jitter" />
+                    <CheckBox fx:id="jitterCheckBox" mnemonicParsing="false" text="Jitter" />
                 </ToolBar>
             </VBox>
         </top>
         <bottom>
-            <FlowPane fx:id="bottomFlowPane" alignment="CENTER_LEFT" hgap="5.0" minHeight="32.0" styleClass="tool-bar"
-                      vgap="5.0">
+            <FlowPane fx:id="bottomFlowPane" alignment="CENTER_LEFT" hgap="5.0" minHeight="32.0" styleClass="tool-bar" vgap="5.0">
                 <padding>
-                    <Insets bottom="5.0" left="5.0" right="30.0" top="5.0"/>
+                    <Insets bottom="5.0" left="5.0" right="30.0" top="5.0" />
                 </padding>
-                <Label fx:id="messageLabel" text="Label"/>
+                <Label fx:id="messageLabel" text="Label" />
             </FlowPane>
         </bottom>
     </BorderPane>
