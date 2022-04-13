@@ -21,11 +21,9 @@ package splitstree6.view.network;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
-import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -33,9 +31,7 @@ import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
-import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
@@ -46,7 +42,6 @@ import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
@@ -57,23 +52,19 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 	private final FindToolBar findToolBar;
 
-
-	private final ObjectProperty<NetworkPane> networkPane = new SimpleObjectProperty<>();
 	private final InvalidationListener updateListener;
+
+	private final NetworkPane networkPane;
 
 	private final MouseInteraction mouseInteraction;
 
 	public NetworkViewPresenter(MainWindow mainWindow, NetworkView networkView, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
-								ObservableMap<Node, Group> nodeShapeMap,
-								ObservableMap<jloda.graph.Edge, Group> edgeShapeMap) {
+								ObservableMap<Node, Group> nodeShapeMap, ObservableMap<jloda.graph.Edge, Group> edgeShapeMap) {
 		this.mainWindow = mainWindow;
 		this.networkView = networkView;
 		this.controller = networkView.getController();
 
 		mouseInteraction = new MouseInteraction(mainWindow.getStage(), networkView.getUndoManager(), mainWindow.getTaxonSelectionModel());
-		networkPane.addListener((v, o, n) -> {
-			controller.getScrollPane().setContent(n);
-		});
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
@@ -89,30 +80,34 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(networkView.optionOrientationProperty());
 
-		var boxDimension = new SimpleObjectProperty<Dimension2D>();
-		targetBounds.addListener((v, o, n) -> boxDimension.set(new Dimension2D(n.getWidth() - 40, n.getHeight() - 80)));
+		var paneWidth = new SimpleDoubleProperty();
+		var paneHeight = new SimpleDoubleProperty();
+		targetBounds.addListener((v, o, n) -> {
+			paneWidth.set(n.getWidth() - 40);
+			paneHeight.set(n.getHeight() - 80);
+		});
 
-		var first = new Single<>(true);
+		networkPane = new NetworkPane(mainWindow, mainWindow.workingTaxaProperty(), networkBlock, mainWindow.getTaxonSelectionModel(),
+				paneWidth, paneHeight, networkView.optionDiagramProperty(), networkView.optionOrientationProperty(),
+				networkView.optionZoomFactorProperty(), networkView.optionFontScaleFactorProperty(),
+				taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
-		updateListener = e -> {
-			if (first.get())
-				first.set(false);
-			// else  SplitNetworkEdits.clearEdits(splitsView.optionEditsProperty());
+		networkPane.setRunAfterUpdate(() -> {
+			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
+			mouseInteraction.setup(taxonLabelMap, nodeShapeMap, taxa::get, taxa::indexOf);
 
-			var pane = new NetworkPane(mainWindow, mainWindow.getWorkflow().getWorkingTaxaBlock(), networkBlock.get(), mainWindow.getTaxonSelectionModel(),
-					boxDimension.get().getWidth(), boxDimension.get().getHeight(), networkView.getOptionDiagram(), networkView.optionOrientationProperty(),
-					networkView.optionZoomFactorProperty(), networkView.optionFontScaleFactorProperty(),
-					taxonLabelMap, nodeShapeMap, edgeShapeMap);
+			/*
+			if (networkView.getOptionEdits().length > 0) {
+				SplitNetworkEdits.applyEdits(networkView.getOptionEdits(), nodeShapeMap, null);
+				Platform.runLater(() -> SplitNetworkEdits.clearEdits(networkView.optionEditsProperty()));
+			}
+			 */
+			updateCounter.set(updateCounter.get() + 1);
+		});
 
-			networkPane.set(pane);
+		controller.getScrollPane().setContent(networkPane);
 
-			pane.setRunAfterUpdate(() -> {
-				var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
-				mouseInteraction.setup(taxonLabelMap, nodeShapeMap, taxa::get, taxa::indexOf);
-				updateCounter.set(updateCounter.get() + 1);
-			});
-			pane.drawNetwork();
-		};
+		updateListener = e -> networkPane.drawNetwork();
 
 		networkBlock.addListener(updateListener);
 		networkView.optionDiagramProperty().addListener(updateListener);
@@ -202,25 +197,8 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 
-		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
-		mainController.getSelectAllMenuItem().disableProperty().bind(networkView.emptyProperty());
-
-		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
-		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-
-		mainController.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
-		mainController.getSelectInverseMenuItem().disableProperty().bind(networkView.emptyProperty());
-
-		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
-			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			if (taxonBlock != null) {
-				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
-			}
-		});
-		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
-
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
-		mainController.getLayoutLabelsMenuItem().disableProperty().bind(networkPane.isNull());
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(networkView.emptyProperty());
 
 		mainController.getRotateLeftMenuItem().setOnAction(e -> networkView.setOptionOrientation(networkView.getOptionOrientation().getRotateLeft()));
 		mainController.getRotateLeftMenuItem().disableProperty().bind(networkView.emptyProperty());
@@ -236,7 +214,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	}
 
 	public void updateLabelLayout() {
-		if (networkPane.get() != null)
-			Platform.runLater(() -> networkPane.get().layoutLabels(networkView.getOptionOrientation()));
+		Platform.runLater(() -> networkPane.layoutLabels(networkView.getOptionOrientation()));
 	}
 }

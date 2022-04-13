@@ -45,7 +45,6 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.window.MainWindowManager;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
@@ -60,7 +59,10 @@ import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -179,17 +181,17 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		controller.getFitLabel().visibleProperty().bind(controller.getScaleBar().visibleProperty());
 
-		var boxWidth = new SimpleDoubleProperty();
-		var boxHeight = new SimpleDoubleProperty();
+		var paneWidth = new SimpleDoubleProperty();
+		var paneHeight = new SimpleDoubleProperty();
 		targetBounds.addListener((v, o, n) -> {
-			boxWidth.set(n.getWidth() - 40);
-			boxHeight.set(n.getHeight() - 80);
+			paneWidth.set(n.getWidth() - 40);
+			paneHeight.set(n.getHeight() - 80);
 		});
 
 		var mouseInteraction = new MouseInteraction(mainWindow.getStage(), splitsView.getUndoManager(), mainWindow.getTaxonSelectionModel(), splitsView.getSplitSelectionModel());
 
 		splitNetworkPane = new SplitNetworkPane(mainWindow, mainWindow.workingTaxaProperty(), splitsBlock, mainWindow.getTaxonSelectionModel(),
-				splitsView.getSplitSelectionModel(), boxWidth, boxHeight, splitsView.optionDiagramProperty(), splitsView.optionOrientationProperty(),
+				splitsView.getSplitSelectionModel(), paneWidth, paneHeight, splitsView.optionDiagramProperty(), splitsView.optionOrientationProperty(),
 				splitsView.optionRootingProperty(), splitsView.optionRootAngleProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
 				splitsView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(),
 				taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
@@ -341,15 +343,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			IteratorUtils.asList(BitSetUtils.range(1, splitsView.getSplitsBlock().getNsplits() + 1)).forEach(s -> splitsView.getSplitSelectionModel().setSelected(s, !selectedSplits.contains(s)));
 		});
 		mainController.getSelectInverseMenuItem().disableProperty().bind(splitsView.emptyProperty());
-
-		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
-			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			if (taxonBlock != null) {
-				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
-			}
-		});
-		mainController.getSelectFromPreviousMenuItem().setDisable(false);
-		//mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitsView.emptyProperty());

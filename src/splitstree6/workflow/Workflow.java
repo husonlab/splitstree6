@@ -286,41 +286,41 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	}
 
 	public boolean isInputSourceNode(WorkflowNode v) {
-		return v instanceof DataNode dataNode && dataNode.getTitle().equals(INPUT_SOURCE);
+		return v != null && v == getSourceNode();
 	}
 
 	public boolean isInputTaxaNode(WorkflowNode v) {
-		return v instanceof DataNode dataNode && dataNode.getTitle().equals(INPUT_TAXA);
+		return v != null && v == getInputTaxaNode();
 	}
 
 	public boolean isInputDataNode(WorkflowNode v) {
-		return v instanceof DataNode dataNode && dataNode.getTitle().startsWith(INPUT_PREFIX) && !isInputTaxaNode(v);
+		return v != null && v == getInputDataNode();
 	}
 
 	public boolean isWorkingTaxaNode(WorkflowNode v) {
-		return v instanceof DataNode dataNode && dataNode.getTitle().equals(WORKING_TAXA);
+		return v != null && v == getWorkingTaxaNode();
 
 	}
 
 	public boolean isWorkingDataNode(WorkflowNode v) {
-		return v instanceof DataNode dataNode && dataNode.getTitle().startsWith(WORKING_PREFIX) && !isWorkingTaxaNode(v);
+		return v != null && v == getWorkingDataNode();
 	}
 
-	public boolean isInputTaxaEditor(WorkflowNode v) {
-		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getTitle().equals(INPUT_TAXA_FILTER);
+	public boolean isInputTaxaFilterNode(WorkflowNode v) {
+		return v != null && v == getInputTaxaFilterNode();
 	}
 
 	public boolean isInputDataLoader(WorkflowNode v) {
-		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getTitle().equals(INPUT_DATA_LOADER);
+		return v != null && v == getInputDataLoaderNode();
 	}
 
-	public boolean isInputTaxaDataFilter(WorkflowNode v) {
-		return v instanceof AlgorithmNode algorithmNode && algorithmNode.getTitle().equals(INPUT_TAXA_DATA_FILTER);
+	public boolean isInputDataFilter(WorkflowNode v) {
+		return v != null && v == getInputDataFilterNode();
 	}
 
 	public boolean isDerivedNode(WorkflowNode v) {
 		return !isInputSourceNode(v) && !isInputTaxaNode(v) && !isInputDataNode(v) && !isWorkingTaxaNode(v) && !isWorkingDataNode(v)
-			   && !isInputTaxaEditor(v) && !isInputDataLoader(v) && !isInputTaxaDataFilter(v);
+			   && !isInputTaxaFilterNode(v) && !isInputDataLoader(v) && !isInputDataFilter(v);
 	}
 
 	public Consumer<AService<Boolean>> getServiceConfigurator() {

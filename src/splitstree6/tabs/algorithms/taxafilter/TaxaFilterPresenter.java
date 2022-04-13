@@ -32,7 +32,6 @@ import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.util.converter.DefaultStringConverter;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.window.MainWindowManager;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -40,8 +39,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
-
-import java.util.Objects;
 
 /**
  * taxa edit presenter
@@ -300,14 +297,6 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			}
 		});
 		mainController.getSelectInverseMenuItem().disableProperty().bind(mainWindow.emptyProperty());
-
-		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
-			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			if (taxonBlock != null) {
-				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
-			}
-		});
-		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());

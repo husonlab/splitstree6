@@ -56,14 +56,20 @@ public class DataNodeContextMenuPresenter {
 		});
 		controller.getExportMenuItem().disableProperty().bind(dataNode.validProperty().not().or(dataNode.allParentsValidProperty().not()));
 
-		controller.getAddTreeMenu().getItems().setAll(createAddTreeMenuItems(workflow, undoManager, dataNode));
-		controller.getAddTreeMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddTreeMenu().getItems())));
+		if (workflow.isDerivedNode(dataNode) || workflow.getWorkingDataNode() == dataNode) {
+			controller.getAddTreeMenu().getItems().setAll(createAddTreeMenuItems(workflow, undoManager, dataNode));
+			controller.getAddTreeMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddTreeMenu().getItems())));
 
-		controller.getAddNetworkMenu().getItems().setAll(createAddNetworkMenuItems(workflow, undoManager, dataNode));
-		controller.getAddNetworkMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddNetworkMenu().getItems())));
+			controller.getAddNetworkMenu().getItems().setAll(createAddNetworkMenuItems(workflow, undoManager, dataNode));
+			controller.getAddNetworkMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddNetworkMenu().getItems())));
 
-		controller.getAddAlgorithmMenu().getItems().setAll(createAddAlgorithmMenuItems(workflow, undoManager, dataNode));
-		controller.getAddAlgorithmMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddAlgorithmMenu().getItems())));
+			controller.getAddAlgorithmMenu().getItems().setAll(createAddAlgorithmMenuItems(workflow, undoManager, dataNode));
+			controller.getAddAlgorithmMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddAlgorithmMenu().getItems())));
+		} else {
+			controller.getAddTreeMenu().setDisable(true);
+			controller.getAddNetworkMenu().setDisable(true);
+			controller.getAddAlgorithmMenu().setDisable(true);
+		}
 	}
 
 	private List<MenuItem> createAddTreeMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {

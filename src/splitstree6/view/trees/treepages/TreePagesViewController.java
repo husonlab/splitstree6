@@ -26,6 +26,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.DraggableLabel;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
@@ -115,6 +116,8 @@ public class TreePagesViewController {
 					titledPane.setExpanded(n);
 			}
 		});
+
+		DraggableLabel.makeDraggable(formatVBox);
 	}
 
 	public AnchorPane getAnchorPane() {

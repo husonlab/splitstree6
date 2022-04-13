@@ -46,6 +46,7 @@ import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.marks.Marks;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.splits.SplitsFormat;
 import splitstree6.view.format.taxlabels.TaxLabelFormat;
@@ -147,7 +148,7 @@ public class SplitsView implements IView {
 
 		var selectTraits = new SelectTraits(mainWindow);
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormat, traitsFormatter, selectTraits, splitsFormat);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormat, new Marks(mainWindow, undoManager), traitsFormatter, selectTraits, splitsFormat);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
@@ -164,6 +165,8 @@ public class SplitsView implements IView {
 		optionRootAngleProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
 		optionOutlineFillProperty().addListener(e -> mainWindow.setDirty(true));
+
+		optionDiagramProperty().addListener(e -> mainWindow.updateMethodsTab());
 	}
 
 	@Override

@@ -153,6 +153,7 @@ public class TreeViewController {
 		});
 
 		DraggableLabel.makeDraggable(treeNameLabel);
+		DraggableLabel.makeDraggable(formatVBox);
 	}
 
 	public ZoomableScrollPane getScrollPane() {

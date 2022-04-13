@@ -66,8 +66,6 @@ module splitstreesix {
 
 	opens splitstree6.workflowtree;
 
-	opens splitstree6.tabs.inputeditor;
-	opens splitstree6.tabs.textdisplay;
 	opens splitstree6.tabs.workflow;
 	opens splitstree6.tabs.workflow.algorithm;
 	opens splitstree6.tabs.workflow.data;
@@ -100,6 +98,7 @@ module splitstreesix {
 	opens splitstree6.view.displaydatablock;
 	opens splitstree6.view.inputeditor;
 
+	opens splitstree6.view.format.marks;
 	opens splitstree6.view.format.taxlabels;
 	opens splitstree6.view.format.splits;
 	opens splitstree6.view.format.traits;

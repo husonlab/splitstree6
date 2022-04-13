@@ -27,6 +27,7 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.Distortion;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -65,32 +66,32 @@ public class FilteredSuperNetwork extends SuperNetwork {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock trees, SplitsBlock child) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
 		// first compute splits using Z-closure method:
-		SplitsBlock splits = new SplitsBlock();
-		super.compute(progress, taxaBlock, trees, splits);
+		SplitsBlock zClosureSplits = new SplitsBlock();
+		super.compute(progress, taxaBlock, treesBlock, zClosureSplits);
 
 		progress.setSubtask("Processing trees");
-		progress.setMaximum(splits.getNsplits());
+		progress.setMaximum(zClosureSplits.getNsplits());
 
-		final BitSet[] tree2taxa = new BitSet[trees.getNTrees() + 1];
-		for (int t = 1; t <= trees.getNTrees(); t++) {
-			tree2taxa[t] = TreesUtilities.getTaxa(trees.getTree(t));
+		final BitSet[] tree2taxa = new BitSet[treesBlock.getNTrees() + 1];
+		for (int t = 1; t <= treesBlock.getNTrees(); t++) {
+			tree2taxa[t] = TreesUtilities.getTaxa(treesBlock.getTree(t));
 			//System.err.println("number of taxa in tree " + t + ":" + tree2taxa[t].cardinality());
 			progress.setProgress(t);
 		}
 
 		progress.setSubtask("Processing splits");
-        progress.setMaximum((long) splits.getNsplits() * trees.getNTrees());
-        progress.setProgress(0);
+		progress.setMaximum((long) zClosureSplits.getNsplits() * treesBlock.getNTrees());
+		progress.setProgress(0);
 
 		System.err.println("Filtering splits:");
 		if (isOptionUseTotalScore()) {
-			for (int s = 1; s <= splits.getNsplits(); s++) {
+			for (int s = 1; s <= zClosureSplits.getNsplits(); s++) {
 				int totalScore = 0;
-				BitSet A = splits.get(s).getA();
-				BitSet B = splits.get(s).getB();
-				for (int t = 1; t <= trees.getNTrees(); t++) {
+				BitSet A = zClosureSplits.get(s).getA();
+				BitSet B = zClosureSplits.get(s).getB();
+				for (int t = 1; t <= treesBlock.getNTrees(); t++) {
 					final BitSet treeTaxa = tree2taxa[t];
 					final BitSet treeTaxaAndA = (BitSet) (treeTaxa.clone());
 					treeTaxaAndA.and(A);
@@ -98,24 +99,24 @@ public class FilteredSuperNetwork extends SuperNetwork {
 					treeTaxaAndB.and(B);
 
 					if (treeTaxaAndA.cardinality() > 1 && treeTaxaAndB.cardinality() > 1) {
-						final PhyloTree tree = trees.getTree(t);
+						final PhyloTree tree = treesBlock.getTree(t);
 						totalScore += Distortion.computeDistortionForSplit(tree, A, B);
 					}
 					progress.incrementProgress();
 				}
 				if (totalScore <= getOptionMaxDistortionScore()) {
-					final ASplit aSplit = splits.get(s);
-					child.getSplits().add(new ASplit(aSplit.getA(), aSplit.getB(), aSplit.getWeight()));
+					final ASplit aSplit = zClosureSplits.get(s);
+					splitsBlock.getSplits().add(new ASplit(aSplit.getA(), aSplit.getB(), aSplit.getWeight()));
 				}
 			}
 		} else // do not use total score
 		{
-			for (int s = 1; s <= splits.getNsplits(); s++) {
+			for (int s = 1; s <= zClosureSplits.getNsplits(); s++) {
 				//System.err.print("s " + s + ":");
-				final BitSet A = splits.get(s).getA();
-				final BitSet B = splits.get(s).getB();
+				final BitSet A = zClosureSplits.get(s).getA();
+				final BitSet B = zClosureSplits.get(s).getB();
 				int count = 0;
-				for (int t = 1; t <= trees.getNTrees(); t++) {
+				for (int t = 1; t <= treesBlock.getNTrees(); t++) {
 					BitSet treeTaxa = tree2taxa[t];
 					BitSet treeTaxaAndA = (BitSet) (treeTaxa.clone());
 					treeTaxaAndA.and(A);
@@ -123,12 +124,12 @@ public class FilteredSuperNetwork extends SuperNetwork {
 					treeTaxaAndB.and(B);
 
 					if (treeTaxaAndA.cardinality() > 1 && treeTaxaAndB.cardinality() > 1) {
-						final PhyloTree tree = trees.getTree(t);
+						final PhyloTree tree = treesBlock.getTree(t);
 						int score = Distortion.computeDistortionForSplit(tree, A, B);
 						//System.err.print(" " + score);
 						if (score <= getOptionMaxDistortionScore())
 							count++;
-						if (count + (trees.getNTrees() - t) < getOptionMinNumberTrees())
+						if (count + (treesBlock.getNTrees() - t) < getOptionMinNumberTrees())
 							break; // no hope to get above threshold
 					} else if ((A.cardinality() == 1 || B.cardinality() == 1)
 							   && treeTaxaAndB.cardinality() > 0 && treeTaxaAndB.cardinality() > 0) {
@@ -141,12 +142,14 @@ public class FilteredSuperNetwork extends SuperNetwork {
 				}
 				//System.err.println(" sum=" + count);
 				if (A.cardinality() == 1 || B.cardinality() == 1 || count >= getOptionMinNumberTrees()) {
-					final ASplit aSplit = splits.get(s);
-					child.getSplits().add(new ASplit(aSplit.getA(), aSplit.getB(), aSplit.getWeight(), (float) count / (float) trees.getNTrees()));
+					final ASplit aSplit = zClosureSplits.get(s);
+					splitsBlock.getSplits().add(new ASplit(aSplit.getA(), aSplit.getB(), aSplit.getWeight(), (float) count / (float) treesBlock.getNTrees()));
 				}
 			}
 		}
-		System.err.println("Splits: " + splits.getNsplits() + " -> " + child.getNsplits());
+		splitsBlock.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(splitsBlock.getSplits(), taxaBlock.getNtax()));
+
+		System.err.println("Splits: " + zClosureSplits.getNsplits() + " -> " + splitsBlock.getNsplits());
 	}
 
 	public int getOptionMinNumberTrees() {

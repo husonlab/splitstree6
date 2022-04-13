@@ -74,18 +74,23 @@ public class AttachAlgorithm {
 
 			if (algorithm.getToClass() == SplitsBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
-				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				if (targetDataNode.getPreferredChild() == null) {
+					var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+					workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				}
 			} else if (algorithm.getToClass() == TreesBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
-				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				if (targetDataNode.getPreferredChild() == null) {
+					var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+					workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				}
 			} else if (algorithm.getToClass() == NetworkBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
-				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-				workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				if (targetDataNode.getPreferredChild() == null) {
+					var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+					workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				}
 			}
-
 			if (algorithm.isApplicable(workflow.getWorkingTaxaBlock(), algorithmNode.getPreferredParent().getDataBlock()))
 				algorithmNode.restart();
 		}
@@ -121,16 +126,22 @@ public class AttachAlgorithm {
 			var algorithmNode = algorithmNodes.get(0);
 			if (algorithmNode.getAlgorithm().getClass() != algorithm.getClass()) {
 				algorithmNode.setAlgorithm(algorithm);
+				algorithmNode.setTitle(algorithmNode.getAlgorithm().getName());
 				algorithmNode.restart();
+				return null; // have restarted algorithm, no need to do anything further
+			} else {
+				return algorithmNode;
 			}
-			return algorithmNode;
 		} else if (algorithmNodes.size() > 1) {
 			var algorithmNode = SetParameterDialog.apply(null, "There are multiple possible choices for this algorithm:", algorithmNodes, algorithmNodes.get(0));
 			if (algorithmNode != null && algorithmNode.getAlgorithm().getClass() != algorithm.getClass()) {
 				algorithmNode.setAlgorithm(algorithm);
+				algorithmNode.setTitle(algorithmNode.getAlgorithm().getName());
 				algorithmNode.restart();
+				return null;  // have restarted algorithm, no need to do anything further
+			} else {
+				return algorithmNode;
 			}
-			return algorithmNode;
 		} else {
 			var dataNodes = (List<DataNode>) IteratorUtils.asStream(workflow.dataNodes()).filter(d -> workflow.isDerivedNode(d) || workflow.isWorkingDataNode(d))
 					.filter(d -> d.getDataBlock().getClass() == algorithm.getFromClass()).collect(Collectors.toList());

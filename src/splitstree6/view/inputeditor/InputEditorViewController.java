@@ -39,6 +39,12 @@ public class InputEditorViewController {
 	@FXML
 	private Button parseAndLoadButton;
 
+	@FXML
+	public Button increaseFontButton;
+
+	@FXML
+	public Button decreaseFontButton;
+
 	public ToolBar getFirstToolBar() {
 		return firstToolBar;
 	}
@@ -57,5 +63,13 @@ public class InputEditorViewController {
 
 	public Button getParseAndLoadButton() {
 		return parseAndLoadButton;
+	}
+
+	public Button getIncreaseFontButton() {
+		return increaseFontButton;
+	}
+
+	public Button getDecreaseFontButton() {
+		return decreaseFontButton;
 	}
 }

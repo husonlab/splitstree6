@@ -28,6 +28,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.DraggableLabel;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LayoutOrientation;
 
@@ -110,6 +111,8 @@ public class NetworkViewController {
 					titledPane.setExpanded(n);
 			}
 		});
+
+		DraggableLabel.makeDraggable(formatVBox);
 	}
 
 	public AnchorPane getAnchorPane() {

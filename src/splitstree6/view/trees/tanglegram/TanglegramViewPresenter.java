@@ -35,7 +35,6 @@ import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.window.MainWindowManager;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
@@ -49,7 +48,6 @@ import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
-import java.util.Objects;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -402,23 +400,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-
-		mainController.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
-		mainController.getSelectAllMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
-
-		mainController.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
-		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-
-		mainController.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
-		mainController.getSelectInverseMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
-
-		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
-			var taxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			if (taxonBlock != null) {
-				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
-			}
-		});
-		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
 		mainController.getFlipMenuItem().setOnAction(e -> {
 			if (tanglegramView.getOptionOrientation() == Rotate0Deg)

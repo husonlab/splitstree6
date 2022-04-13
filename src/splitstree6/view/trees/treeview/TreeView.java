@@ -44,6 +44,7 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.marks.Marks;
 import splitstree6.view.format.taxlabels.TaxLabelFormat;
 import splitstree6.view.format.traits.TraitsFormat;
 import splitstree6.view.utils.IView;
@@ -141,7 +142,7 @@ public class TreeView implements IView {
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, traitsFormatter);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Marks(mainWindow, undoManager), traitsFormatter);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);

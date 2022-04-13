@@ -20,12 +20,11 @@
 package splitstree6.view.displaytext;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.util.ProgramProperties;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -41,8 +40,16 @@ public class DisplayTextView implements IView {
 
 	private final String name;
 
-	private final BooleanProperty showLineNumbers = new SimpleBooleanProperty(false);
-	private final BooleanProperty wrapText = new SimpleBooleanProperty(true);
+	private final BooleanProperty showLineNumbers = new SimpleBooleanProperty(this, "showLineNumbers");
+	private final BooleanProperty wrapText = new SimpleBooleanProperty(this, "wrapText");
+
+	private final DoubleProperty fontSize = new SimpleDoubleProperty(this, "fontSize");
+
+	{
+		ProgramProperties.track(showLineNumbers, false);
+		ProgramProperties.track(wrapText, true);
+		ProgramProperties.track(fontSize, 12.0);
+	}
 
 	/**
 	 * constructor
@@ -61,12 +68,16 @@ public class DisplayTextView implements IView {
 		controller.getCodeArea().getStyleClass().add("viewer-background");
 
 		showLineNumbers.addListener((v, o, n) -> controller.getCodeArea().setParagraphGraphicFactory(n ? LineNumberFactory.get(controller.getCodeArea()) : null));
+		if (isShowLineNumbers())
+			controller.getCodeArea().setParagraphGraphicFactory(LineNumberFactory.get(controller.getCodeArea()));
+
+		controller.getCodeArea().setWrapText(isWrapText());
 		wrapText.bindBidirectional(controller.getCodeArea().wrapTextProperty());
 	}
 
 	public void replaceText(String text) {
 		controller.getCodeArea().clear();
-		controller.getCodeArea().replaceText(text);
+		Platform.runLater(() -> controller.getCodeArea().replaceText(text));
 	}
 
 	@Override
@@ -207,6 +218,18 @@ public class DisplayTextView implements IView {
 
 	public void setWrapText(boolean wrapText) {
 		this.wrapText.set(wrapText);
+	}
+
+	public double getFontSize() {
+		return fontSize.get();
+	}
+
+	public DoubleProperty fontSizeProperty() {
+		return fontSize;
+	}
+
+	public void setFontSize(double fontSize) {
+		this.fontSize.set(fontSize);
 	}
 
 	@Override

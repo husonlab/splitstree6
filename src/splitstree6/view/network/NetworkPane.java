@@ -21,8 +21,8 @@ package splitstree6.view.network;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
@@ -68,13 +68,15 @@ public class NetworkPane extends StackPane {
 	/**
 	 * network pane
 	 */
-	public NetworkPane(MainWindow mainWindow, TaxaBlock taxaBlock, NetworkBlock networkBlock, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight, DiagramType diagram, ObjectProperty<LayoutOrientation> orientation, DoubleProperty zoomFactor, DoubleProperty labelScaleFactor,
+	public NetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<NetworkBlock> networkBlock, SelectionModel<Taxon> taxonSelectionModel,
+					   ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
+					   ReadOnlyObjectProperty<DiagramType> diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, Group> nodeShapeMap, ObservableMap<Edge, Group> edgeShapeMap) {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
 
-		setPrefWidth(boxWidth);
-		setPrefHeight(boxHeight);
+		prefWidthProperty().bind(boxWidth);
+		prefHeightProperty().bind(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);
 		setMinHeight(Pane.USE_PREF_SIZE);
 		setMaxWidth(Pane.USE_PREF_SIZE);
@@ -103,10 +105,10 @@ public class NetworkPane extends StackPane {
 		service.setExecutor(ProgramExecutorService.getInstance());
 
 		service.setCallable(() -> {
-			if (taxaBlock == null || networkBlock == null)
+			if (taxaBlock.get() == null || networkBlock.get() == null)
 				return new Group();
 
-			var result = networkLayout.apply(service.getProgressListener(), taxaBlock, networkBlock, diagram,
+			var result = networkLayout.apply(service.getProgressListener(), taxaBlock.get(), networkBlock.get(), diagram.get(),
 					getPrefWidth() - 4, getPrefHeight() - 16,
 					taxonLabelMap, nodeShapeMap, edgeShapeMap);
 

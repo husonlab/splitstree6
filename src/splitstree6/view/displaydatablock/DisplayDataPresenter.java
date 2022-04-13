@@ -59,7 +59,7 @@ public class DisplayDataPresenter {
 			var displayTextController = displayData.getController();
 			displayTextController.getToolBar().getItems().add(new Separator(Orientation.VERTICAL));
 			var titledPane = controller.getTitledPane();
-			AnchorPane.setLeftAnchor(titledPane, 100.0);
+			AnchorPane.setLeftAnchor(titledPane, 160.0);
 			AnchorPane.setTopAnchor(titledPane, 4.0);
 			displayTextController.getAnchorPane().getChildren().add(titledPane);
 

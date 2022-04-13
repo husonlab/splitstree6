@@ -183,7 +183,7 @@ public class WorkflowTabLayout {
 				if (workflow.isInputDataLoader(algorithmNode)) {
 					System.err.println("Skipped: " + algorithmNode.getTitle());
 					// ignore
-				} else if (workflow.isInputTaxaDataFilter(algorithmNode)) {
+				} else if (workflow.isInputDataFilter(algorithmNode)) {
 					var item = workflowTab.newAlgorithmItem(algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					nodeItems.add(item);
@@ -191,7 +191,7 @@ public class WorkflowTabLayout {
 					item.setTranslateY(3 * dy);
 					usedLocations.add(new Point2D(item.getTranslateX(), item.getTranslateY()));
 					algorithmNode.getParents().addListener(createParentsChangeListenerForInputAndWorkingNodes(algorithmNode));
-				} else if (workflow.isInputTaxaEditor(algorithmNode)) {
+				} else if (workflow.isInputTaxaFilterNode(algorithmNode)) {
 					var item = workflowTab.newAlgorithmItem(algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					algorithmNode.getParents().addListener(createParentsChangeListenerForInputAndWorkingNodes(algorithmNode));

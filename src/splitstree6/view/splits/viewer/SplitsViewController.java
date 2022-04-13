@@ -136,7 +136,6 @@ public class SplitsViewController {
 		});
 
 		DraggableLabel.makeDraggable(formatVBox);
-
 	}
 
 	public AnchorPane getAnchorPane() {

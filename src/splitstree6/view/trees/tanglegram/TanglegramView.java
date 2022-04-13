@@ -35,6 +35,7 @@ import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.marks.Marks;
 import splitstree6.view.format.taxlabels.TaxLabelFormat;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
@@ -132,7 +133,7 @@ public class TanglegramView implements IView {
 
 		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Marks(mainWindow, undoManager));
 	}
 
 	public void setViewTab(ViewTab viewTab) {

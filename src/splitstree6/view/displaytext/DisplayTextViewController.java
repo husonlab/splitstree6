@@ -56,6 +56,12 @@ public class DisplayTextViewController {
 	@FXML
 	private VBox topVBox;
 
+	@FXML
+	public Button increaseFontButton;
+
+	@FXML
+	public Button decreaseFontButton;
+
 	private CodeArea codeArea;
 
 	private VirtualizedScrollPane<CodeArea> scrollPane;
@@ -106,5 +112,13 @@ public class DisplayTextViewController {
 
 	public VirtualizedScrollPane<CodeArea> getScrollPane() {
 		return scrollPane;
+	}
+
+	public Button getIncreaseFontButton() {
+		return increaseFontButton;
+	}
+
+	public Button getDecreaseFontButton() {
+		return decreaseFontButton;
 	}
 }

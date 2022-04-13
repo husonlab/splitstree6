@@ -133,10 +133,10 @@ public class WorkflowTreeViewLayout {
 					dataNode.getParents().addListener(createParentsChangeListener(dataNode));
 				}
 			} else if (node instanceof AlgorithmNode algorithmNode) {
-				if (workflow.isInputDataLoader(algorithmNode) || workflow.isInputTaxaDataFilter(algorithmNode)) {
+				if (workflow.isInputDataLoader(algorithmNode) || workflow.isInputDataFilter(algorithmNode)) {
 					//System.err.println("Skipped: " + algorithmNode);
 					// ignore
-				} else if (workflow.isInputTaxaEditor(algorithmNode)) {
+				} else if (workflow.isInputTaxaFilterNode(algorithmNode)) {
 					var item = new WorkflowTreeItem(mainWindow, algorithmNode);
 					nodeItemMap.put(algorithmNode, item);
 					if (inputTaxaItem.getChildren().size() > 1)

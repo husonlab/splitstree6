@@ -44,7 +44,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
-import splitstree6.tabs.textdisplay.TextDisplayTab;
+import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.workflow.Workflow;
 import splitstree6.workflowtree.WorkflowTreeView;
@@ -67,7 +67,7 @@ public class MainWindow implements IMainWindow {
 	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
 
 	private final WorkflowTab workflowTab;
-	private final TextDisplayTab methodsTab;
+	private final DisplayTextTab methodsTab;
 	private final WorkflowTreeView workflowTreeView;
 
 	private final StringProperty fileName = new SimpleStringProperty(this, "fileName", "Untitled");
@@ -89,11 +89,14 @@ public class MainWindow implements IMainWindow {
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
+		methodsTab = new DisplayTextTab(this, "Methods", false);
+		methodsTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/History24.gif", 16));
+
+		workflow.validProperty().addListener(e -> updateMethodsTab());
+		workflow.numberOfNodesProperty().addListener(e -> Platform.runLater(this::updateMethodsTab));
+
 		workflowTab = new WorkflowTab(this);
 		workflowTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Preferences24.gif", 16));
-		methodsTab = new TextDisplayTab(this, "Methods", false, false);
-		methodsTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/History24.gif", 16));
-		workflow.validProperty().addListener((v, o, n) -> methodsTab.replaceText(n ? ExtractMethodsText.getInstance().apply(workflow) : ""));
 		workflow.validProperty().addListener((v, o, n) -> {
 			if (workflow.getWorkingTaxaBlock() == null) {
 				activeTaxa.clear();
@@ -154,7 +157,7 @@ public class MainWindow implements IMainWindow {
 
 		presenter = new MainWindowPresenter(this);
 
-		getController().getMainTabPane().getTabs().addAll(workflowTab, methodsTab);
+		getController().getMainTabPane().getTabs().addAll(workflowTab);
 
 		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
 
@@ -300,5 +303,9 @@ public class MainWindow implements IMainWindow {
 
 	public ReadOnlyObjectProperty<TaxaBlock> workingTaxaProperty() {
 		return workingTaxa;
+	}
+
+	public void updateMethodsTab() {
+		methodsTab.replaceText(workflow.isValid() ? ExtractMethodsText.getInstance().apply(workflow) : "");
 	}
 }

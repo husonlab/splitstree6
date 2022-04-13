@@ -38,6 +38,7 @@ import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.marks.Marks;
 import splitstree6.view.format.sites.SitesFormat;
 import splitstree6.view.format.sites.SitesStyle;
 import splitstree6.view.format.taxlabels.TaxLabelFormat;
@@ -125,7 +126,7 @@ public class NetworkView implements IView {
 		});
 		presenter.updateCounterProperty().addListener(e -> sitesFormat.updateEdges());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, traitsFormatter, sitesFormat);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Marks(mainWindow, undoManager), traitsFormatter, sitesFormat);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 30.0);

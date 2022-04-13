@@ -57,8 +57,8 @@
                 <Tooltip text="Save input to text file"/>
             </tooltip>
         </Button>
-        <Separator layoutX="71.0" layoutY="18.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                   prefHeight="20.0"/>
+         <Separator layoutX="71.0" layoutY="18.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                    prefHeight="20.0"/>
     </ToolBar>
     <ToolBar fx:id="lastToolBar" prefHeight="40.0" prefWidth="200.0">
         <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>

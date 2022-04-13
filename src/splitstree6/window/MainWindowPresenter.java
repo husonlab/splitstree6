@@ -87,8 +87,8 @@ import splitstree6.tabs.workflow.WorkflowTab;
 
 import java.io.File;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
-import java.util.stream.Collectors;
 
 public class MainWindowPresenter {
 	private final MainWindow mainWindow;
@@ -148,7 +148,7 @@ public class MainWindowPresenter {
 		mainWindow.getStage().focusedProperty().addListener((v, o, n) -> {
 			if (!n && mainWindow.getTaxonSelectionModel().getSelectedItems().size() > 0) {
 				MainWindowManager.getPreviousSelection().clear();
-				MainWindowManager.getPreviousSelection().addAll(mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(Taxon::getName).collect(Collectors.toList()));
+				mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(Taxon::getName).filter(s -> !s.isBlank()).forEach(s -> MainWindowManager.getPreviousSelection().add(s));
 			}
 		});
 
@@ -211,8 +211,6 @@ public class MainWindowPresenter {
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
 				m -> m.getText().equals("Edit"),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
-
-
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
@@ -278,7 +276,6 @@ public class MainWindowPresenter {
 		controller.getExportWorkflowMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, true));
 		controller.getExportWorkflowMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
 		controller.getPageSetupMenuItem().disableProperty().bind(workflow.runningProperty());
 
@@ -343,10 +340,22 @@ public class MainWindowPresenter {
 
 		controller.getPreferencesMenuItem().setOnAction(null);
 
-		controller.getSelectAllMenuItem().setOnAction(null);
-		controller.getSelectNoneMenuItem().setOnAction(null);
-		controller.getSelectInverseMenuItem().setOnAction(null);
-		controller.getSelectFromPreviousMenuItem().setOnAction(null);
+		controller.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
+		controller.getSelectAllMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+
+		controller.getSelectNoneMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().clearSelection());
+		controller.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+
+		controller.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
+		controller.getSelectInverseMenuItem().disableProperty().bind(mainWindow.emptyProperty());
+
+		controller.getSelectFromPreviousMenuItem().setOnAction(e -> {
+			var taxonBlock = workflow.getWorkingTaxaBlock();
+			if (taxonBlock != null) {
+				MainWindowManager.getPreviousSelection().stream().map(taxonBlock::get).filter(Objects::nonNull).forEach(t -> mainWindow.getTaxonSelectionModel().select(t));
+			}
+		});
+		controller.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()).or(mainWindow.emptyProperty()));
 
 		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
 		controller.getDecreaseFontSizeMenuItem().setOnAction(null);

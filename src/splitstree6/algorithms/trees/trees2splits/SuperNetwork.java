@@ -25,14 +25,10 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
-import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
-import splitstree6.algorithms.splits.splits2splits.LeastSquaresWeights;
-import splitstree6.algorithms.trees.trees2distances.AverageDistances;
 import splitstree6.algorithms.utils.PartialSplit;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
-import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -53,7 +49,6 @@ import java.util.*;
 public class SuperNetwork extends Trees2Splits {
 	public enum EdgeWeights {AverageRelative, Mean, TreeSizeWeightedMean, Sum, Min, None}
 
-	private final BooleanProperty optionZRule = new SimpleBooleanProperty(this, "optionZRule", true);
 	private final BooleanProperty noOptionLeastSquare = new SimpleBooleanProperty(this, "noOptionLeastSquare", false); // todo this needs work
 	private final BooleanProperty optionSuperTree = new SimpleBooleanProperty(this, "optionSuperTree", false);
 	private final IntegerProperty optionNumberOfRuns = new SimpleIntegerProperty(this, "optionNumberOfRuns", 1);
@@ -70,7 +65,7 @@ public class SuperNetwork extends Trees2Splits {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList(optionEdgeWeights.getName(), optionZRule.getName(), optionSuperTree.getName(), optionNumberOfRuns.getName(),
+		return Arrays.asList(optionEdgeWeights.getName(), optionSuperTree.getName(), optionNumberOfRuns.getName(),
 				optionApplyRefineHeuristic.getName(), optionSeed.getName(), optionHighDimensionFilter.getName());
 	}
 
@@ -80,8 +75,6 @@ public class SuperNetwork extends Trees2Splits {
 			return "Determine how to calculate edge weights in resulting network";
 		} else if (noOptionLeastSquare.getName().equals(optionName)) {
 			return "Use least squares";
-		} else if (optionZRule.getName().equals(optionName)) {
-			return "Apply the Z-closure rule";
 		} else if (optionSuperTree.getName().equals(optionName)) {
 			return "Enforce the strong induction property, which results in a super tree";
 		} else if (optionNumberOfRuns.getName().equals(optionName)) {
@@ -192,11 +185,8 @@ public class SuperNetwork extends Trees2Splits {
 				}
 			}
 		}
-		var computedSplits = new SplitsBlock();
 
-		if (isOptionZRule()) {
-			computeClosureOuterLoop(progress, allPSplits);
-		}
+		computeClosureOuterLoop(progress, allPSplits);
 
 		if (isOptionApplyRefineHeuristic()) {
 			progress.setSubtask("Refinement heuristic");
@@ -205,6 +195,8 @@ public class SuperNetwork extends Trees2Splits {
 
 		////doc.notifySubtask("collecting full splits");
 		////doc.notifySetMaximumProgress(allPSplits.size());
+		var computedSplits = new SplitsBlock();
+
 		for (PartialSplit ps : allPSplits) {
 			var size = ps.getXsize();
 
@@ -228,7 +220,7 @@ public class SuperNetwork extends Trees2Splits {
 		}
 
 		// add all missing trivial splits
-		SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax());
+		computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax()));
 
 		if (getOptionEdgeWeights().equals(EdgeWeights.AverageRelative)) {
 			setWeightAverageReleativeLength(pSplitsOfTrees, supportSet, computedSplits);
@@ -236,29 +228,11 @@ public class SuperNetwork extends Trees2Splits {
 			setWeightsConfidences(pSplitsOfTrees, supportSet, computedSplits);
 		}
 
-		// todo how do we get here ?
-		if (getNoOptionLeastSquare()) {
-			if (!TreesUtilities.hasAllPairs(taxaBlock, treesBlock)) {
-				NotificationManager.showWarning("Partial trees don't have the 'All Pairs' property, can't computeCycle Least Squares");
-				setNoOptionLeastSquare(false);
-			} else {
-				DistancesBlock distances = new DistancesBlock();
-				AverageDistances ad = new AverageDistances();
-				ad.compute(new ProgressPercentage(), taxaBlock, treesBlock, distances);
-
-				LeastSquaresWeights leastSquares = new LeastSquaresWeights();
-				leastSquares.setDistancesBlock(distances);
-
-				leastSquares.compute(new ProgressPercentage(), taxaBlock, computedSplits, splitsBlock);
-			}
-		}
-
 		if (isOptionHighDimensionFilter()) {
 			var dimensionsFilter = new DimensionFilter();
 			dimensionsFilter.compute(progress, taxaBlock, computedSplits, splitsBlock);
 		} else
 			splitsBlock.copy(computedSplits);
-
 
 		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		progress.close();
@@ -586,30 +560,6 @@ public class SuperNetwork extends Trees2Splits {
 			if (count == 0)
 				break;
 		}
-	}
-
-	public boolean isOptionZRule() {
-		return optionZRule.get();
-	}
-
-	public BooleanProperty optionZRuleProperty() {
-		return optionZRule;
-	}
-
-	public void setOptionZRule(boolean optionZRule) {
-		this.optionZRule.set(optionZRule);
-	}
-
-	public boolean getNoOptionLeastSquare() {
-		return noOptionLeastSquare.get();
-	}
-
-	public BooleanProperty noOptionLeastSquareProperty() {
-		return noOptionLeastSquare;
-	}
-
-	public void setNoOptionLeastSquare(boolean noOptionLeastSquare) {
-		this.noOptionLeastSquare.set(noOptionLeastSquare);
 	}
 
 	public boolean isOptionSuperTree() {

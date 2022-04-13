@@ -55,17 +55,17 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		this.tab = tab;
 		this.editable = editable;
 
-		var tabController = tab.getController();
+		var controller = tab.getController();
 
-		var codeArea = tabController.getCodeArea();
+		var codeArea = controller.getCodeArea();
 
 		codeArea.setEditable(editable);
 
-		tabController.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
+		controller.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
 		codeArea.setWrapText(true);
 
 		findToolBar = new FindToolBar(null, new CodeAreaSearcher("Text", codeArea));
-		tabController.getTopVBox().getChildren().add(findToolBar);
+		controller.getTopVBox().getChildren().add(findToolBar);
 
 		selectionEmpty = new BooleanBinding() {
 			{
@@ -79,22 +79,24 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		};
 
 		codeArea.selectionProperty().addListener((c, o, n) -> {
-			MainWindowManager.getPreviousSelection().clear();
-			MainWindowManager.getPreviousSelection().add(codeArea.getText(n.getStart(), n.getEnd()));
+			if (n.getLength() > 0) {
+				MainWindowManager.getPreviousSelection().clear();
+				MainWindowManager.getPreviousSelection().add(codeArea.getText(n.getStart(), n.getEnd()));
+			}
 		});
 
-		tabController.getFindButton().setOnAction((e) -> findToolBar.setShowFindToolBar(true));
+		controller.getFindButton().setOnAction((e) -> findToolBar.setShowFindToolBar(true));
 
 		if (editable) {
-			tabController.getFindAndReplaceButton().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+			controller.getFindAndReplaceButton().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
 		}
 		if (!editable) {
-			var items = tabController.getToolBar().getItems();
-			items.remove(tabController.getFindAndReplaceButton());
+			var items = controller.getToolBar().getItems();
+			items.remove(controller.getFindAndReplaceButton());
 		}
 
-		tabController.getWrapTextToggle().selectedProperty().bindBidirectional(tab.wrapTextProperty());
-		tabController.getLineNumbersToggle().selectedProperty().bindBidirectional(tab.showLineNumbersProperty());
+		controller.getWrapTextToggle().selectedProperty().bindBidirectional(tab.wrapTextProperty());
+		controller.getLineNumbersToggle().selectedProperty().bindBidirectional(tab.showLineNumbersProperty());
 
 
 		// prevent double paste:
@@ -106,59 +108,79 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
-		codeArea.focusedProperty().addListener((c, o, n) -> {
-			if (n)
-				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
+		if (editable)
+			codeArea.focusedProperty().addListener((c, o, n) -> {
+				if (n)
+					mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
+			});
+
+		controller.getIncreaseFontButton().setOnAction(e -> {
+			tab.setFontSize(1.1 * tab.getFontSize());
+			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
 		});
+		controller.getIncreaseFontButton().disableProperty().bind(tab.fontSizeProperty().greaterThan(128));
+
+		controller.getDecreaseFontButton().setOnAction(e -> {
+			tab.setFontSize(1.0 / 1.1 * tab.getFontSize());
+			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
+		});
+		controller.getDecreaseFontButton().disableProperty().bind(tab.fontSizeProperty().lessThan(6));
+
+		codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
 	}
 
 	public void setupMenuItems() {
-		var controller = mainWindow.getController();
-		var tabController = tab.getController();
+		var mainController = mainWindow.getController();
+		var controller = tab.getController();
 
-		var codeArea = tabController.getCodeArea();
+		var codeArea = controller.getCodeArea();
 
-		controller.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
-		controller.getPrintMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
+		mainController.getPrintMenuItem().disableProperty().bind(tab.emptyProperty());
 
 		if (editable) {
-			controller.getCutMenuItem().setOnAction(e -> codeArea.cut());
-			controller.getCutMenuItem().disableProperty().bind(selectionEmpty);
+			mainController.getCutMenuItem().setOnAction(e -> codeArea.cut());
+			mainController.getCutMenuItem().disableProperty().bind(selectionEmpty);
 		}
 
-		controller.getCopyMenuItem().setOnAction(e -> codeArea.copy());
-		controller.getCopyMenuItem().disableProperty().bind(selectionEmpty);
+		mainController.getCopyMenuItem().setOnAction(e -> codeArea.copy());
+		mainController.getCopyMenuItem().disableProperty().bind(selectionEmpty);
 
 		if (editable) {
-			controller.getPasteMenuItem().setOnAction(e -> codeArea.paste());
+			mainController.getCutMenuItem().setOnAction(e -> codeArea.cut());
+			mainController.getCutMenuItem().disableProperty().bind(selectionEmpty);
 
-			controller.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
-			controller.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());
+			mainController.getPasteMenuItem().setOnAction(e -> codeArea.paste());
 
-			controller.getUndoMenuItem().setOnAction(e -> codeArea.undo());
+			mainController.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
+			mainController.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());
+
+			mainController.getUndoMenuItem().setOnAction(e -> codeArea.undo());
 			{
 				var undoAvailable = new SimpleBooleanProperty();
 				undoAvailable.bind(codeArea.undoAvailableProperty());
-				controller.getUndoMenuItem().disableProperty().bind(undoAvailable.not());
+				mainController.getUndoMenuItem().disableProperty().bind(undoAvailable.not());
 			}
 
-			controller.getRedoMenuItem().setOnAction(e -> codeArea.redo());
+			mainController.getRedoMenuItem().setOnAction(e -> codeArea.redo());
 			{
 				var redoAvailable = new SimpleBooleanProperty();
 				redoAvailable.bind(codeArea.redoAvailableProperty());
-				controller.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
+				mainController.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
 			}
 		}
+		mainController.getPasteMenuItem().disableProperty().unbind();
+		mainController.getPasteMenuItem().setDisable(true);
 
-		controller.getFindMenuItem().setOnAction(tabController.getFindButton().getOnAction());
+		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
 		if (editable) {
-			controller.getReplaceMenuItem().setOnAction(tabController.getFindAndReplaceButton().getOnAction());
+			mainController.getReplaceMenuItem().setOnAction(controller.getFindAndReplaceButton().getOnAction());
 		}
 
-		controller.getFindAgainMenuItem().setOnAction((e) -> findToolBar.findAgain());
-		controller.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+		mainController.getFindAgainMenuItem().setOnAction((e) -> findToolBar.findAgain());
+		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
-		controller.getGotoLineMenuItem().setOnAction((e) -> {
+		mainController.getGotoLineMenuItem().setOnAction((e) -> {
 			final TextInputDialog dialog = new TextInputDialog("");
 			if (MainWindowManager.isUseDarkTheme()) {
 				dialog.getDialogPane().getScene().getWindow().getScene().getStylesheets().add("jloda/resources/css/dark.css");
@@ -177,13 +199,13 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getSelectAllMenuItem().setOnAction(e -> codeArea.selectAll());
-		controller.getSelectAllMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getSelectAllMenuItem().setOnAction(e -> codeArea.selectAll());
+		mainController.getSelectAllMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		controller.getSelectNoneMenuItem().setOnAction(e -> codeArea.selectRange(0, 0));
-		controller.getSelectNoneMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getSelectNoneMenuItem().setOnAction(e -> codeArea.selectRange(0, 0));
+		mainController.getSelectNoneMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		controller.getSelectFromPreviousMenuItem().setOnAction(e -> {
+		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
 			for (String word : MainWindowManager.getPreviousSelection()) {
 				final Pattern pattern = Pattern.compile(word);
 				String source = codeArea.getText();
@@ -195,15 +217,18 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				}
 			}
 		});
-		controller.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
+		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
-		controller.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
-		controller.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
+		mainController.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
-		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
 
-		controller.getZoomInMenuItem().setOnAction(null);
-		controller.getZoomOutMenuItem().setOnAction(null);
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
+
+		mainController.getZoomInMenuItem().setOnAction(null);
+		mainController.getZoomOutMenuItem().setOnAction(null);
 	}
 }

@@ -120,6 +120,8 @@ public class ParsimonySplits extends Characters2Splits {
 			progress.incrementProgress();
 		}
 
+		previousSplits.addAll(SplitsUtilities.createAllMissingTrivial(previousSplits, taxaBlock.getNtax()));
+
 		splitsBlock.getSplits().addAll(previousSplits);
 
 		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), previousSplits));

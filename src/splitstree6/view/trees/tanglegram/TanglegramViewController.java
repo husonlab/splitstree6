@@ -174,6 +174,8 @@ public class TanglegramViewController {
 
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);
+
+		DraggableLabel.makeDraggable(formatVBox);
 	}
 
 	public AnchorPane getAnchorPane() {
