@@ -31,7 +31,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
@@ -105,7 +104,7 @@ public class TreePane extends StackPane {
 
 		orientation.addListener((v, o, n) -> {
 			if (diagram == TreeDiagramType.RadialPhylogram) {
-				var shapes = BasicFX.getAllRecursively(pane, Shape.class);
+				var shapes = BasicFX.getAllRecursively(pane, a -> "graph-node".equals(a.getId()));
 				splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, o, n, orientationConsumer);
 			} else
 				LayoutUtils.applyOrientation(pane, n, o, false);

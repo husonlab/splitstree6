@@ -73,11 +73,9 @@ public class InputEditorView extends DisplayTextView implements IView {
 		return inputEditorViewPresenter;
 	}
 
-
 	@Override
 	public void setupMenuItems() {
 		super.setupMenuItems();
-
 	}
 
 	/**

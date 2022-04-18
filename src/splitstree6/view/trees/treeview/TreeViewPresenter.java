@@ -231,20 +231,25 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		});
 
 		treeView.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> {
-			treePane.get().setScaleX(treePane.get().getScaleX() / o.doubleValue() * n.doubleValue());
-			if (!lockAspectRatio.get())
-				updateListener.invalidated(null);
+			if (treePane.get() != null) {
+				treePane.get().setScaleX(treePane.get().getScaleX() / o.doubleValue() * n.doubleValue());
+				if (!lockAspectRatio.get())
+					updateListener.invalidated(null);
+			}
 		});
 
 		treeView.optionVerticalZoomFactorProperty().addListener((v, o, n) -> {
-			treePane.get().setScaleY(treePane.get().getScaleY() / o.doubleValue() * n.doubleValue());
-			updateListener.invalidated(null);
+			if (treePane.get() != null) {
+				treePane.get().setScaleY(treePane.get().getScaleY() / o.doubleValue() * n.doubleValue());
+				updateListener.invalidated(null);
+			}
 		});
 
-		treeView.optionFontScaleFactorProperty().addListener(e -> {
-			//if (treePane.get() != null)
-			//	ProgramExecutorService.submit(100, () -> Platform.runLater(() -> treePane.get().layoutLabels(treeView.getOptionOrientation())));
-		});
+		if (false)
+			treeView.optionFontScaleFactorProperty().addListener(e -> {
+				//if (treePane.get() != null)
+				//	ProgramExecutorService.submit(100, () -> Platform.runLater(() -> treePane.get().layoutLabels(treeView.getOptionOrientation())));
+			});
 
 		treeView.getTrees().addListener(updateListener);
 		treeView.optionTreeProperty().addListener(updateListener);

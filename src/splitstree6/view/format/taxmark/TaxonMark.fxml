@@ -24,7 +24,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
-<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="splitstree6.view.format.taxmark.TaxonMarkController">
     <panes>
         <TitledPane fx:id="titledPane" text="Taxon Marks">
