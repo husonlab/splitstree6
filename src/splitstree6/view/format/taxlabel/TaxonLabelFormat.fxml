@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ TaxLabelFormat.fxml Copyright (C) 2022 Daniel H. Huson
+  ~ TaxonLabelFormat.fxml Copyright (C) 2022 Daniel H. Huson
   ~
   ~ (Some files contain contributions from other authors, who are then mentioned separately.)
   ~
@@ -24,10 +24,11 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.*?>
-<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="splitstree6.view.format.taxlabels.TaxLabelFormatController">
+<Accordion minHeight="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="splitstree6.view.format.taxlabel.TaxonLabelFormatController">
     <panes>
-        <TitledPane fx:id="titledPane" text="Taxon Labels">
+        <TitledPane fx:id="titledPane" prefWidth="200.0" text="Taxon Labels">
             <content>
                 <VBox fx:id="vBox" prefWidth="200.0" spacing="5.0">
                     <padding>

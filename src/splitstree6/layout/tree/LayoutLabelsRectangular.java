@@ -47,6 +47,8 @@ public class LayoutLabelsRectangular {
 			var shape = nodeShapeMap.get(v);
 			var label = nodeLabelMap.get(v);
 			if (label != null) {
+				label.setAnchor(shape);
+
 				InvalidationListener invalidationListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
 						if (linkNodesEdgesLabels) {

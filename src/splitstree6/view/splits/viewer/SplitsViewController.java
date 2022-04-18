@@ -117,14 +117,14 @@ public class SplitsViewController {
 
 		DraggableLabel.makeDraggable(fitLabel);
 
-		outerAnchorPane.getChildren().remove(formatVBox);
-		outerAnchorPane.getChildren().add(formatVBox);
-
 		settingsToggleButton.setSelected(true);
 		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
 		toolBar.setMaxHeight(ToolBar.USE_COMPUTED_SIZE);
 		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());
 		toolBar.prefHeightProperty().bind(new When(settingsToggleButton.selectedProperty()).then(32.0).otherwise(0.0));
+
+		outerAnchorPane.getChildren().remove(formatVBox);
+		outerAnchorPane.getChildren().add(formatVBox);
 
 		formatToggleButton.setSelected(false);
 		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());

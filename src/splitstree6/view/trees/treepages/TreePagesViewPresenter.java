@@ -234,6 +234,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
 		controller.getDecreaseFontButton().disableProperty().bind(treePageView.emptyProperty());
 
+
 		var undoManager = treePagesView.getUndoManager();
 		rowsAndCols.addListener((v, o, n) -> undoManager.add("grid dimensions", rowsAndCols, o, n));
 		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("page", treePagesView.pageNumberProperty(), o, n));
@@ -287,6 +288,13 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(treePageView.getOptionOrientation()));
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
+
+		mainController.getRotateLeftMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getRotateLeft()));
+		mainController.getRotateLeftMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getRotateRightMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getRotateRight()));
+		mainController.getRotateRightMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getFlipMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getFlip()));
+		mainController.getFlipMenuItem().disableProperty().bind(treePageView.emptyProperty());
 	}
 
     private record RowsCols(int rows, int cols) {

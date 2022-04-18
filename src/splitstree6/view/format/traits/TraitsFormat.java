@@ -29,6 +29,7 @@ import javafx.scene.Group;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Shape;
 import jloda.fx.control.Legend;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
@@ -227,6 +228,14 @@ public class TraitsFormat extends Pane {
 									pieChart.setLayoutX(-0.5 * pieSize);
 									pieChart.setLayoutY(-0.5 * pieSize);
 
+									var shapes = BasicFX.getAllRecursively(group, Shape.class);
+									if (shapes.size() == 1) {
+										var shape = shapes.iterator().next();
+										if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
+											shape.setScaleX(pieSize / shape.prefWidth(0));
+											shape.setScaleY(pieSize / shape.prefHeight(0));
+										}
+									}
 
 									group.getChildren().add(pieChart);
 									ColorSchemeManager.setPieChartColors(pieChart, legend.getColorSchemeName());

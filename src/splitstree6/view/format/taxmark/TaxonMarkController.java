@@ -1,12 +1,14 @@
-package splitstree6.view.format.marks;
+package splitstree6.view.format.taxmark;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
+import jloda.fx.shapes.NodeShape;
 
-public class MarksController {
+public class TaxonMarkController {
 
 	@FXML
 	private Button clearColorButton;
@@ -19,6 +21,17 @@ public class MarksController {
 
 	@FXML
 	private VBox vBox;
+
+	@FXML
+	private Button addButton;
+
+	@FXML
+	private ChoiceBox<NodeShape> shapeCBox;
+
+	@FXML
+	private void initialize() {
+		shapeCBox.getItems().addAll(NodeShape.values());
+	}
 
 	public Button getClearColorButton() {
 		return clearColorButton;
@@ -34,5 +47,13 @@ public class MarksController {
 
 	public VBox getvBox() {
 		return vBox;
+	}
+
+	public ChoiceBox<NodeShape> getShapeCBox() {
+		return shapeCBox;
+	}
+
+	public Button getAddButton() {
+		return addButton;
 	}
 }

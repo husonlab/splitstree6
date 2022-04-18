@@ -1,5 +1,5 @@
 /*
- * TaxLabelFormat.java Copyright (C) 2022 Daniel H. Huson
+ * TaxonLabelFormat.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.format.taxlabels;
+package splitstree6.view.format.taxlabel;
 
 import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
@@ -28,15 +28,15 @@ import splitstree6.window.MainWindow;
  * provides taxon label formatter
  * Daniel Huson, 1.2022
  */
-public class TaxLabelFormat extends Pane {
-	private final TaxLabelFormatController controller;
-	private final TaxLabelFormatPresenter presenter;
+public class TaxonLabelFormat extends Pane {
+	private final TaxonLabelFormatController controller;
+	private final TaxonLabelFormatPresenter presenter;
 
-	public TaxLabelFormat(MainWindow mainWindow, UndoManager undoManager) {
-		var loader = new ExtendedFXMLLoader<TaxLabelFormatController>(TaxLabelFormatController.class);
+	public TaxonLabelFormat(MainWindow mainWindow, UndoManager undoManager) {
+		var loader = new ExtendedFXMLLoader<TaxonLabelFormatController>(TaxonLabelFormatController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new TaxLabelFormatPresenter(mainWindow, controller, undoManager);
+		presenter = new TaxonLabelFormatPresenter(mainWindow, controller, undoManager);
 	}
 }

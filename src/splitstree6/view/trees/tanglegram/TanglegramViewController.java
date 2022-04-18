@@ -163,6 +163,9 @@ public class TanglegramViewController {
 		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());
 		toolBar.prefHeightProperty().bind(new When(settingsToggleButton.selectedProperty()).then(32.0).otherwise(0.0));
 
+		outerAnchorPane.getChildren().remove(formatVBox);
+		outerAnchorPane.getChildren().add(formatVBox);
+
 		formatToggleButton.setSelected(false);
 		formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
 		formatVBox.visibleProperty().addListener((v, o, n) -> {
@@ -171,9 +174,6 @@ public class TanglegramViewController {
 					titledPane.setExpanded(n);
 			}
 		});
-
-		outerAnchorPane.getChildren().remove(formatVBox);
-		outerAnchorPane.getChildren().add(formatVBox);
 
 		DraggableLabel.makeDraggable(formatVBox);
 	}

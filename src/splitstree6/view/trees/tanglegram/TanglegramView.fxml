@@ -25,7 +25,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
-            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.tanglegram.TanglegramViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -201,7 +201,7 @@
                                            style="-fx-background-color: transparent;" HBox.hgrow="ALWAYS"/>
                             </HBox>
                         </ScrollPane>
-                        <VBox fx:id="formatVBox" prefHeight="30.0" prefWidth="200.0" styleClass="context-menu"
+                        <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
                               AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
                     </AnchorPane>
                 </children>

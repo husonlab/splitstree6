@@ -1,5 +1,5 @@
 /*
- * TaxLabelFormatController.java Copyright (C) 2022 Daniel H. Huson
+ * TaxonLabelFormatController.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,14 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.format.taxlabels;
+package splitstree6.view.format.taxlabel;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DoubleStringConverter;
 
-public class TaxLabelFormatController {
+public class TaxonLabelFormatController {
 	@FXML
 	private VBox vBox;
 

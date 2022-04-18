@@ -4,7 +4,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="splitstree6.view.format.selecttraits.SelectTraitsController">
    <panes>
       <TitledPane fx:id="titledPane" prefWidth="200.0" text="Select Taxa By Trait Values">

@@ -1,5 +1,5 @@
 /*
- *  Marks.java Copyright (C) 2022 Daniel H. Huson
+ *  TaxonMark.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.format.marks;
+package splitstree6.view.format.taxmark;
 
 import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
@@ -25,17 +25,16 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.window.MainWindow;
 
 
-public class Marks extends Pane {
-	private final MarksController controller;
-	private final MarksPresenter presenter;
+public class TaxonMark extends Pane {
+	private final TaxonMarkController controller;
+	private final TaxonMarkPresenter presenter;
 
-
-	public Marks(MainWindow mainWindow, UndoManager undoManager) {
-		var loader = new ExtendedFXMLLoader<MarksController>(MarksController.class);
+	public TaxonMark(MainWindow mainWindow, UndoManager undoManager) {
+		var loader = new ExtendedFXMLLoader<TaxonMarkController>(TaxonMarkController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new MarksPresenter(mainWindow, undoManager, controller);
+		presenter = new TaxonMarkPresenter(mainWindow, undoManager, controller);
 	}
 
 }

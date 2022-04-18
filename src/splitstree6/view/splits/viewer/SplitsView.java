@@ -46,10 +46,10 @@ import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.format.marks.Marks;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.splits.SplitsFormat;
-import splitstree6.view.format.taxlabels.TaxLabelFormat;
+import splitstree6.view.format.taxlabel.TaxonLabelFormat;
+import splitstree6.view.format.taxmark.TaxonMark;
 import splitstree6.view.format.traits.TraitsFormat;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
@@ -133,7 +133,6 @@ public class SplitsView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormat = new TaxLabelFormat(mainWindow, undoManager);
 		splitsFormat = new SplitsFormat(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
 
 		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
@@ -146,9 +145,7 @@ public class SplitsView implements IView {
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
-		var selectTraits = new SelectTraits(mainWindow);
-
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormat, new Marks(mainWindow, undoManager), traitsFormatter, selectTraits, splitsFormat);
+		controller.getFormatVBox().getChildren().addAll(new TaxonLabelFormat(mainWindow, undoManager), new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow), splitsFormat);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);

@@ -1,5 +1,5 @@
 /*
- * TaxLabelFormatPresenter.java Copyright (C) 2022 Daniel H. Huson
+ * TaxonLabelFormatPresenter.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.format.taxlabels;
+package splitstree6.view.format.taxlabel;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -36,14 +36,14 @@ import splitstree6.window.MainWindow;
 
 import java.util.HashSet;
 
-public class TaxLabelFormatPresenter {
+public class TaxonLabelFormatPresenter {
 	private final InvalidationListener selectionListener;
 
 	private final static ObservableList<String> fontFamilies = FXCollections.observableArrayList(Font.getFamilies());
 
 	private boolean inUpdatingDefaults = false;
 
-	public TaxLabelFormatPresenter(MainWindow mainWindow, TaxLabelFormatController controller, UndoManager undoManager) {
+	public TaxonLabelFormatPresenter(MainWindow mainWindow, TaxonLabelFormatController controller, UndoManager undoManager) {
 		var selectionModel = mainWindow.getTaxonSelectionModel();
 
 		controller.getFontFamilyCbox().setItems(fontFamilies);

@@ -99,8 +99,7 @@ public class RadialLabelLayout {
 	 * @param xSetter         method to set computed x-coordinate of label
 	 * @param ySetter         method to set computed y-coordinate of label
 	 */
-	public void addItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
-						double angle,
+	public void addItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty, double angle,
 						ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
 						Consumer<Double> xSetter, Consumer<Double> ySetter) {
 		items.add(new RadialLabelLayout.LayoutItem(anchorXProperty, anchorYProperty, angle, widthProperty, heightProperty, xSetter, ySetter));
@@ -298,27 +297,27 @@ public class RadialLabelLayout {
 	}
 
 	/**
-     * item for radial layout
-     *
-     * @param anchorXProperty x coordinate of anchor
-     * @param anchorYProperty y coordinate of anchor
-     * @param angle           ideal angle of direction to move label, in degrees
-     * @param widthProperty   label width
-     * @param heightProperty  label height
-     * @param xSetter         method to set computed x-coordinate of label
-     * @param ySetter         method to set computed y-coordinate of label
-     */
-    private record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
-                              double angle,
-                              ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
-                              Consumer<Double> xSetter, Consumer<Double> ySetter) {
-        public double width() {
-            return widthProperty.get();
-        }
+	 * item for radial layout
+	 *
+	 * @param anchorXProperty x coordinate of anchor
+	 * @param anchorYProperty y coordinate of anchor
+	 * @param angle           ideal angle of direction to move label, in degrees
+	 * @param widthProperty   label width
+	 * @param heightProperty  label height
+	 * @param xSetter         method to set computed x-coordinate of label
+	 * @param ySetter         method to set computed y-coordinate of label
+	 */
+	private record LayoutItem(ReadOnlyDoubleProperty anchorXProperty, ReadOnlyDoubleProperty anchorYProperty,
+							  double angle,
+							  ReadOnlyDoubleProperty widthProperty, ReadOnlyDoubleProperty heightProperty,
+							  Consumer<Double> xSetter, Consumer<Double> ySetter) {
+		public double width() {
+			return widthProperty.get();
+		}
 
-        public double height() {
-            return heightProperty.get();
-        }
+		public double height() {
+			return heightProperty.get();
+		}
 
         public double anchorX() {
             return anchorXProperty.get();

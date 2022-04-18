@@ -44,8 +44,9 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
-import splitstree6.view.format.marks.Marks;
-import splitstree6.view.format.taxlabels.TaxLabelFormat;
+import splitstree6.view.format.selecttraits.SelectTraits;
+import splitstree6.view.format.taxlabel.TaxonLabelFormat;
+import splitstree6.view.format.taxmark.TaxonMark;
 import splitstree6.view.format.traits.TraitsFormat;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
@@ -131,7 +132,7 @@ public class TreeView implements IView {
 
 		setViewTab(viewTab);
 
-		var taxLabelFormatter = new TaxLabelFormat(mainWindow, undoManager);
+		var taxLabelFormatter = new TaxonLabelFormat(mainWindow, undoManager);
 
 		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
 		traitsFormatter.setNodeShapeMap(nodeShapeMap);
@@ -142,7 +143,7 @@ public class TreeView implements IView {
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new Marks(mainWindow, undoManager), traitsFormatter);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow));
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
