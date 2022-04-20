@@ -119,6 +119,35 @@ public class DensiTree {
                 LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                 adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
+                double xsum = nodePointMap.get(tree.getRoot()).getX();
+                double ysum = nodePointMap.get(tree.getRoot()).getY();
+                int nodeCount = 1;
+
+                for (var e : tree.edges()) {
+                    var v = e.getSource();
+                    var w = e.getTarget();
+                    var vPt = nodePointMap.get(v);
+                    var wPt = nodePointMap.get(w);
+
+                    if (vPt != null & wPt != null) {
+
+                        xsum += wPt.getX();
+                        ysum += wPt.getY();
+                        nodeCount++;
+                    }
+                }
+
+                double comX = xsum / nodeCount;
+                double comY = ysum / nodeCount;
+
+                double centerX = canvas.getWidth()/2 - comX;
+                double centerY = canvas.getHeight()/2 - comY;
+
+                for(var k: nodePointMap.keySet()){
+                    var point = nodePointMap.get(k);
+                    nodePointMap.put(k, new Point2D(point.getX()+centerX, point.getY()+centerY));
+                }
+
                 if (labelMethod.contains("kmeans")) {
                     drawEdges2(tree, i - 1, gc, nodePointMap, jitter, shiftx, shifty, coords3, labels);
                 } else if (labelMethod.contains("mean") || labelMethod.contains("radial")) {
@@ -539,6 +568,43 @@ public class DensiTree {
                 double y1 = vPt.getY();
                 double x2 = wPt.getX();
                 double y2 = wPt.getY();
+
+                if (jitter) {
+                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
+                } else {
+                    gc.strokeLine(x1, y1, x2, y2);
+                }
+            }
+        }
+    }
+
+    public static void drawEdgesTest(
+            PhyloTree tree, GraphicsContext gc, NodeArray<Point2D> nodePointMap,
+            boolean jitter, double shiftx, double shifty, double[][] coords, String[] labels
+    ) {
+
+        for (var e : tree.edges()) {
+            var v = e.getSource();
+            var w = e.getTarget();
+            var vPt = nodePointMap.get(v);
+            var wPt = nodePointMap.get(w);
+
+            if (vPt != null & wPt != null) {
+
+                double x1 = vPt.getX();
+                double y1 = vPt.getY();
+                double x2 = wPt.getX();
+                double y2 = wPt.getY();
+
+                if (w.isLeaf()) {
+                    for (int i = 0; i < labels.length; i++) {
+                        if (tree.getLabel(w).equals(labels[i])) {
+                            coords[i][0] += x2;
+                            coords[i][1] += y2;
+                            break;
+                        }
+                    }
+                }
 
                 if (jitter) {
                     gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
