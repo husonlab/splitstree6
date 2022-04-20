@@ -69,6 +69,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		controller.getTaxaListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
+
 		var inUpdate = new Single<>(false);
 
 		controller.getTaxaListView().getSelectionModel().getSelectedItems().addListener((ListChangeListener<? super Taxon>) e -> {
@@ -115,16 +116,18 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		var workingCharacters = new SimpleObjectProperty<CharactersBlock>(this, "workingCharacters");
 
 		updateListener = e -> Platform.runLater(() -> {
-			controller.getAxis().setPadding(new Insets(0, 0, 0, alignmentView.getOptionFontSize()));
-			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionFontSize());
-			updateAxisAndScrollBar(controller.getAxis(), controller.gethScrollBar(), controller.getCanvas().getWidth(), alignmentView.getOptionFontSize(),
-					workingCharacters.get() != null ? workingCharacters.get().getNchar() : 0);
-			updateCanvas(controller.getCanvas(), workingTaxa.get(), workingCharacters.get(), alignmentView.getOptionColorScheme(), alignmentView.getOptionFontSize(),
-					controller.getvScrollBar(), controller.getAxis());
+			controller.getAxis().setPadding(new Insets(0, 0, 0, alignmentView.getOptionUnitWidth()));
+			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight());
+			updateAxisAndScrollBar(controller.getAxis(), controller.gethScrollBar(), controller.getCanvas().getWidth(),
+					alignmentView.getOptionUnitWidth(), workingCharacters.get() != null ? workingCharacters.get().getNchar() : 0);
+			updateCanvas(controller.getCanvas(), workingTaxa.get(), workingCharacters.get(), alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitWidth(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis());
 		});
 
 		controller.getCanvas().widthProperty().addListener(updateListener);
 		controller.getCanvas().heightProperty().addListener(updateListener);
+		alignmentView.optionUnitWidthProperty().addListener(updateListener);
+		alignmentView.optionUnitHeightProperty().addListener(updateListener);
 
 		invalidationListener = e -> {
 			if (workflow.getWorkingDataNode() != null && workflow.getWorkingDataNode().getDataBlock() instanceof CharactersBlock charactersBlock) {
@@ -141,16 +144,10 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		alignmentView.optionColorSchemeProperty().addListener(updateListener);
 		alignmentView.optionColorSchemeProperty().addListener((v, o, n) -> alignmentView.getUndoManager().add("color scheme", alignmentView.optionColorSchemeProperty(), o, n));
-		alignmentView.optionFontSizeProperty().addListener(updateListener);
-		alignmentView.optionFontSizeProperty().addListener((v, o, n) -> alignmentView.getUndoManager().add("font size", alignmentView.optionFontSizeProperty(), o, n));
+		alignmentView.optionUnitWidthProperty().addListener((v, o, n) -> alignmentView.getUndoManager().add("column width", alignmentView.optionUnitWidthProperty(), o, n));
+		alignmentView.optionUnitHeightProperty().addListener((v, o, n) -> alignmentView.getUndoManager().add("row height", alignmentView.optionUnitHeightProperty(), o, n));
 
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updateListener));
-
-		controller.getIncreaseFontButton().setOnAction(e -> alignmentView.setOptionFontSize(1.2 * alignmentView.getOptionFontSize()));
-		controller.getIncreaseFontButton().disableProperty().bind(alignmentView.optionFontSizeProperty().greaterThan(64));
-
-		controller.getDecreaseFontButton().setOnAction(e -> alignmentView.setOptionFontSize(1 / 1.2 * alignmentView.getOptionFontSize()));
-		controller.getDecreaseFontButton().disableProperty().bind(alignmentView.optionFontSizeProperty().lessThan(2.0));
 
 		controller.gethScrollBar().valueProperty().addListener(updateListener);
 		controller.gethScrollBar().valueProperty().addListener((v, o, n) -> {
@@ -159,6 +156,18 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			controller.getAxis().setUpperBound(controller.getAxis().getUpperBound() + diff);
 		});
 		controller.getvScrollBar().valueProperty().addListener(updateListener);
+
+		controller.getExpandHorizontallyButton().setOnAction(e -> alignmentView.setOptionUnitWidth(1.2 * alignmentView.getOptionUnitWidth()));
+		controller.getExpandHorizontallyButton().disableProperty().bind(alignmentView.optionUnitWidthProperty().greaterThan(64));
+
+		controller.getContractHorizontallyButton().setOnAction(e -> alignmentView.setOptionUnitWidth(1 / 1.2 * alignmentView.getOptionUnitWidth()));
+		controller.getContractHorizontallyButton().disableProperty().bind(alignmentView.optionUnitWidthProperty().lessThan(0.01));
+
+		controller.getExpandVerticallyButton().setOnAction(e -> alignmentView.setOptionUnitHeight(1.2 * alignmentView.getOptionUnitHeight()));
+		controller.getExpandVerticallyButton().disableProperty().bind(alignmentView.optionUnitHeightProperty().greaterThan(64));
+
+		controller.getContractVerticallyButton().setOnAction(e -> alignmentView.setOptionUnitHeight(1 / 1.2 * alignmentView.getOptionUnitHeight()));
+		controller.getContractVerticallyButton().disableProperty().bind(alignmentView.optionUnitHeightProperty().lessThan(0.01));
 
 		Platform.runLater(() -> invalidationListener.invalidated(null));
 		Platform.runLater(() -> updateListener.invalidated(null));
@@ -181,8 +190,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		});
 	}
 
-	private void updateTaxaCellFactory(ListView<Taxon> listView, double fontSize) {
-		listView.setFixedCellSize(1.3 * fontSize);
+	private void updateTaxaCellFactory(ListView<Taxon> listView, double unitHeight) {
+		listView.setFixedCellSize(unitHeight);
 
 		listView.setCellFactory(cell -> new ListCell<>() {
 			@Override
@@ -193,7 +202,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					setGraphic(null);
 				} else {
 					setGraphic(null);
-					setStyle(String.format("-fx-font-size: %.1f;", Math.min(18, 0.8 * fontSize)));
+					setStyle(String.format("-fx-font-size: %.1f;", Math.min(18, 0.6 * unitHeight)));
 					setText(item.getName());
 					setAlignment(Pos.CENTER_LEFT);
 				}
@@ -201,7 +210,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		});
 	}
 
-	private void updateCanvas(Canvas canvas, TaxaBlock taxaBlock, CharactersBlock charactersBlock, ColorScheme colorScheme, Double fontSize, ScrollBar vScrollBar, NumberAxis axis) {
+	private void updateCanvas(Canvas canvas, TaxaBlock taxaBlock, CharactersBlock charactersBlock, ColorScheme colorScheme,
+							  double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis) {
 		var gc = canvas.getGraphicsContext2D();
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
@@ -212,20 +222,20 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				controller.getTaxaListView().getItems().add(taxon);
 			}
 
+			var fontSize = 0.9 * Math.min(boxWidth, boxHeight);
 			gc.setFont(Font.font("monospaced", fontSize));
 			var showColors = (colorScheme != ColorScheme.None);
 
 			var textFill = !showColors && MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK;
 
-			var unitHeight = 1.3 * fontSize;
-			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - taxaBlock.getNtax() * unitHeight)) : 0;
+			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - taxaBlock.getNtax() * boxHeight)) : 0;
 
 			for (var t = 1; t <= taxaBlock.getNtax(); t++) {
-				var y = t * unitHeight + offset;
+				var y = t * boxHeight + offset;
 				if (y < 0)
 					continue;
 				;
-				if (y > canvas.getHeight() + unitHeight)
+				if (y > canvas.getHeight() + boxHeight)
 					break;
 
 				var bot = (int) Math.max(1, Math.floor(axis.getLowerBound()));
@@ -233,26 +243,26 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				var col = 0;
 				for (var c = bot; c <= top; c++) {
 					var ch = charactersBlock.get(t, c);
-					var x = (col++) * fontSize;
+					var x = (col++) * boxWidth;
 					if (showColors) {
 						gc.setFill(colorScheme.apply(ch));
-						gc.fillRect(x, y - unitHeight, fontSize, unitHeight);
+						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
 					}
 					gc.setFill(textFill);
-					gc.fillText(String.valueOf(ch), x + 0.25 * fontSize, y - unitHeight + fontSize);
+					gc.fillText(String.valueOf(ch), x + 0.25 * fontSize, y - 0.4 * fontSize);
 				}
 			}
 		}
 	}
 
-	private void updateAxisAndScrollBar(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double fontSize, int nChar) {
+	private void updateAxisAndScrollBar(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar) {
 		if (nChar < 1) {
 			scrollBar.setVisible(false);
 			axis.setVisible(false);
 		} else {
 			scrollBar.setVisible(true);
 			axis.setVisible(true);
-			var numberOnCanvas = canvasWidth / fontSize;
+			var numberOnCanvas = canvasWidth / boxWidth;
 			scrollBar.setMin(1);
 			scrollBar.setMax(nChar);
 			scrollBar.setVisibleAmount(numberOnCanvas);
@@ -283,9 +293,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 	@Override
 	public void setupMenuItems() {
-		mainWindowController.getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
-		mainWindowController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
-		mainWindowController.getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
-		mainWindowController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
+		mainWindowController.getZoomInMenuItem().setOnAction(controller.getExpandVerticallyButton().getOnAction());
+		mainWindowController.getZoomOutMenuItem().disableProperty().bind(controller.getContractVerticallyButton().disableProperty());
+		mainWindowController.getZoomInHorizontalMenuItem().setOnAction(controller.getExpandHorizontallyButton().getOnAction());
+		mainWindowController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
 	}
 }

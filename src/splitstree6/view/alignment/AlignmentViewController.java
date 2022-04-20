@@ -46,9 +46,6 @@ public class AlignmentViewController {
     private ComboBox<ColorScheme> colorSchemeCBox;
 
     @FXML
-    private Button decreaseFontButton;
-
-    @FXML
     private CheckMenuItem disableCodon0CheckItem;
 
     @FXML
@@ -82,9 +79,6 @@ public class AlignmentViewController {
     private ScrollBar hScrollBar;
 
     @FXML
-    private Button increaseFontButton;
-
-    @FXML
     private AnchorPane innerAnchorPane;
 
     @FXML
@@ -113,6 +107,19 @@ public class AlignmentViewController {
 
     @FXML
     private VBox vBox;
+
+    @FXML
+    private Button expandVerticallyButton;
+
+    @FXML
+    private Button contractVerticallyButton;
+
+    @FXML
+    private Button expandHorizontallyButton;
+
+    @FXML
+    private Button contractHorizontallyButton;
+
 
     @FXML
     private ScrollBar vScrollBar;
@@ -175,10 +182,6 @@ public class AlignmentViewController {
         return colorSchemeCBox;
     }
 
-    public Button getDecreaseFontButton() {
-        return decreaseFontButton;
-    }
-
     public CheckMenuItem getDisableCodon0CheckItem() {
         return disableCodon0CheckItem;
     }
@@ -223,9 +226,6 @@ public class AlignmentViewController {
         return hScrollBar;
     }
 
-    public Button getIncreaseFontButton() {
-        return increaseFontButton;
-    }
 
     public AnchorPane getInnerAnchorPane() {
         return innerAnchorPane;
@@ -273,5 +273,21 @@ public class AlignmentViewController {
 
     public NumberAxis getAxis() {
         return axis;
+    }
+
+    public Button getExpandVerticallyButton() {
+        return expandVerticallyButton;
+    }
+
+    public Button getContractVerticallyButton() {
+        return contractVerticallyButton;
+    }
+
+    public Button getExpandHorizontallyButton() {
+        return expandHorizontallyButton;
+    }
+
+    public Button getContractHorizontallyButton() {
+        return contractHorizontallyButton;
     }
 }

@@ -58,26 +58,70 @@
                             <Tooltip text="Choose Color Scheme"/>
                         </tooltip>
                     </ComboBox>
-                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
-                    <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
-                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="A+">
+                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+
+                    <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Expand Vertically">
                         <font>
-                            <Font size="11.0"/>
+                            <Font size="10.0"/>
                         </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandVertical16.gif"/>
+                            </ImageView>
+                        </graphic>
                         <tooltip>
-                            <Tooltip text="Increase font size"/>
+                            <Tooltip text="Expand vertically"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
-                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="A-">
+
+                    <Button fx:id="contractVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Contract Vertically">
                         <font>
-                            <Font size="11.0"/>
+                            <Font size="10.0"/>
                         </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractVertical16.gif"/>
+                            </ImageView>
+                        </graphic>
                         <tooltip>
-                            <Tooltip text="Decrease font size"/>
+                            <Tooltip text="Contract vertically"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="expandHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Expand Horizontally">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandHorizontal16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Expand horizontally"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="contractHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Contract Horizontally">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractHorizontal16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Contract horizontally"/>
                         </tooltip>
                     </Button>
                 </ToolBar>

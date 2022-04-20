@@ -42,7 +42,8 @@ public class AlignmentView implements IView {
 	private final AlignmentViewPresenter presenter;
 
 	private final ObjectProperty<ColorScheme> optionColorScheme = new SimpleObjectProperty<>(this, "optionColorScheme", ColorScheme.None);
-	private final DoubleProperty optionFontSize = new SimpleDoubleProperty(this, "optionFontSize");
+	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth");
+	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight");
 
 	private final BooleanProperty optionDisableCodon0 = new SimpleBooleanProperty(this, "optionDisableCodon0", false);
 	private final BooleanProperty optionDisableCodon1 = new SimpleBooleanProperty(this, "optionDisableCodon1", false);
@@ -59,12 +60,13 @@ public class AlignmentView implements IView {
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	public List<String> listOptions() {
-		return List.of(optionColorScheme.getName(), optionFontSize.getName(), optionDisableCodon0.getName(), optionDisableCodon1.getName(), optionDisableCodon2.getName(),
+		return List.of(optionColorScheme.getName(), optionUnitWidth.getName(), optionUnitHeight.getName(), optionDisableCodon0.getName(), optionDisableCodon1.getName(), optionDisableCodon2.getName(),
 				optionDisableConstant.getName(), optionDisableNonInformative.getName(), optionDisableHyperVariable.getName());
 	}
 
 	{
-		ProgramProperties.track(optionFontSize, 14.0);
+		ProgramProperties.track(optionUnitWidth, 14.0);
+		ProgramProperties.track(optionUnitHeight, 14.0);
 
 	}
 
@@ -232,16 +234,28 @@ public class AlignmentView implements IView {
 		this.optionDisableHyperVariable.set(optionDisableHyperVariable);
 	}
 
-	public double getOptionFontSize() {
-		return optionFontSize.get();
+	public double getOptionUnitWidth() {
+		return optionUnitWidth.get();
 	}
 
-	public DoubleProperty optionFontSizeProperty() {
-		return optionFontSize;
+	public DoubleProperty optionUnitWidthProperty() {
+		return optionUnitWidth;
 	}
 
-	public void setOptionFontSize(double optionFontSize) {
-		this.optionFontSize.set(optionFontSize);
+	public void setOptionUnitWidth(double optionUnitWidth) {
+		this.optionUnitWidth.set(optionUnitWidth);
+	}
+
+	public double getOptionUnitHeight() {
+		return optionUnitHeight.get();
+	}
+
+	public DoubleProperty optionUnitHeightProperty() {
+		return optionUnitHeight;
+	}
+
+	public void setOptionUnitHeight(double optionUnitHeight) {
+		this.optionUnitHeight.set(optionUnitHeight);
 	}
 
 	public AlignmentViewController getController() {
