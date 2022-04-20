@@ -88,7 +88,7 @@ public class AlignmentView implements IView {
 
 	@Override
 	public String getName() {
-		return name.getName();
+		return name.get();
 	}
 
 	@Override
