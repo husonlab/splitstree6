@@ -83,7 +83,9 @@ import splitstree6.io.FileLoader;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
+import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
+import splitstree6.view.alignment.AlignmentView;
 
 import java.io.File;
 import java.util.List;
@@ -388,7 +390,13 @@ public class MainWindowPresenter {
 		});
 		controller.getFilterTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> workflow.getNodes(TaxaFilter.class).size() != 1, workflow.nodes()));
 
-		controller.getFilterCharactersMenuItem().setOnAction(null);
+		controller.getShowCharactersMenuItem().setOnAction(e -> {
+			var viewTab = new ViewTab(mainWindow, null, true);
+			var alignmentView = new AlignmentView(mainWindow, "Characters", viewTab);
+			viewTab.setView(alignmentView);
+		});
+		controller.getShowCharactersMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new Uncorrected_P()));
+
 		controller.getFilterTreesMenuItem().setOnAction(null);
 		controller.getFilterSplitsMenuItem().setOnAction(null);
 

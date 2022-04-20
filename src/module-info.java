@@ -105,7 +105,8 @@ module splitstreesix {
 	opens splitstree6.view.format.selecttraits;
 	opens splitstree6.view.format.sites;
 
-	opens splitstree6.view.utils;
+	//opens splitstree6.view.utils;
+	opens splitstree6.view.alignment;
 	opens splitstree6.view.trees;
 	opens splitstree6.layout.network;
 	opens splitstree6.dialog.exporting;

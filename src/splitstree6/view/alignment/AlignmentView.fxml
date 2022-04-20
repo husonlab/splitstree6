@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  AlignmentView.fxml Copyright (C) 2022 Daniel H. Huson
+  ~  
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~  
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~  
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~  
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane fx:id="root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.alignment.AlignmentViewController">
+    <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
+                AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <top>
+            <VBox fx:id="vBox">
+                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
+                    <MenuButton fx:id="chooseColumnsMenu" mnemonicParsing="false" text="Characters">
+                        <items>
+                            <MenuItem fx:id="enableAllCheckMenuItem" mnemonicParsing="false" text="Enable All"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
+                            <CheckMenuItem fx:id="disableCodon0CheckItem" mnemonicParsing="false"
+                                           text="Disable Codon 0"/>
+                            <CheckMenuItem fx:id="disableCodon1CheckItem" mnemonicParsing="false"
+                                           text="Disable Codon 1"/>
+                            <CheckMenuItem fx:id="disableCodon2CheckItem" mnemonicParsing="false"
+                                           text="Disable Codon 2"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
+                            <CheckMenuItem fx:id="disableConstantCheckItem" mnemonicParsing="false"
+                                           text="Disable Constant"/>
+                            <CheckMenuItem fx:id="disableNonInformativeCheckItem" mnemonicParsing="false"
+                                           text="Disable Non Informative"/>
+                            <CheckMenuItem fx:id="disableHyperVariableCheckItem" mnemonicParsing="false"
+                                           text="Disable Hyper Variable"/>
+                        </items>
+                    </MenuButton>
+                    <Separator layoutX="119.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <ComboBox fx:id="colorSchemeCBox">
+                        <tooltip>
+                            <Tooltip text="Choose Color Scheme"/>
+                        </tooltip>
+                    </ComboBox>
+                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="A+">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                        <tooltip>
+                            <Tooltip text="Increase font size"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="A-">
+                        <font>
+                            <Font size="11.0"/>
+                        </font>
+                        <tooltip>
+                            <Tooltip text="Decrease font size"/>
+                        </tooltip>
+                    </Button>
+                </ToolBar>
+            </VBox>
+        </top>
+        <center>
+            <AnchorPane fx:id="outerAnchorPane">
+                <children>
+                    <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
+                                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                AnchorPane.topAnchor="0.0">
+                        <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <SplitPane fx:id="splitPane" dividerPositions="0.2" prefHeight="200.0"
+                                           prefWidth="160.0">
+                                    <items>
+                                        <VBox>
+                                            <children>
+                                                <StackPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="36.0"
+                                                           styleClass="tool-bar">
+                                                    <children>
+                                                        <Label alignment="CENTER" text="Taxa">
+                                                            <font>
+                                                                <Font size="12.0"/>
+                                                            </font>
+                                                        </Label>
+                                                    </children>
+                                                </StackPane>
+                                                <ListView fx:id="taxaListView" VBox.vgrow="ALWAYS"/>
+                                                <Pane fx:id="leftBottomPane" maxHeight="-Infinity" minHeight="-Infinity"
+                                                      prefHeight="16.0"/>
+                                            </children>
+                                        </VBox>
+                                        <VBox>
+                                            <children>
+                                                <BorderPane VBox.vgrow="ALWAYS">
+                                                    <center>
+                                                        <ScrollPane fx:id="centerPane" hbarPolicy="NEVER"
+                                                                    vbarPolicy="NEVER">
+                                                            <content>
+                                                                <Canvas fx:id="canvas" height="200.0" width="200.0"/>
+                                                            </content>
+                                                        </ScrollPane>
+                                                    </center>
+                                                    <bottom>
+                                                        <ScrollBar fx:id="hScrollBar" BorderPane.alignment="CENTER"/>
+                                                    </bottom>
+                                                    <right>
+                                                        <ScrollBar fx:id="vScrollBar" orientation="VERTICAL"
+                                                                   BorderPane.alignment="CENTER"/>
+                                                    </right>
+                                                    <top>
+                                                        <StackPane fx:id="rightTopStackPane" maxHeight="-Infinity"
+                                                                   minHeight="-Infinity" prefHeight="36.0"
+                                                                   styleClass="tool-bar" BorderPane.alignment="CENTER">
+                                                            <BorderPane.margin>
+                                                                <Insets right="16.0"/>
+                                                            </BorderPane.margin>
+                                                        </StackPane>
+                                                    </top>
+                                                </BorderPane>
+                                            </children>
+                                        </VBox>
+                                    </items>
+                                </SplitPane>
+                            </children>
+                        </StackPane>
+                    </AnchorPane>
+                    <VBox fx:id="formatVBox" minHeight="30.0" minWidth="-Infinity" prefWidth="200.0"
+                          styleClass="context-menu" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0">
+                    </VBox>
+                </children>
+            </AnchorPane>
+        </center>
+    </BorderPane>
+    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="32.0"
+          AnchorPane.topAnchor="0.0">
+        <children>
+            <ToggleButton fx:id="settingsToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
+                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                          style="-fx-border-style: none;" text="Settings">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/jloda/resources/icons/sun/Edit24.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Settings toolbar"/>
+                </tooltip>
+            </ToggleButton>
+            <ToggleButton fx:id="findToggleButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                          mnemonicParsing="false" prefHeight="20.0" style="-fx-border-style: none;" text="Find">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Find or Find/Replace toolbar"/>
+                </tooltip>
+            </ToggleButton>
+            <ToggleButton fx:id="formatToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
+                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                          style="-fx-border-style: none;" text="Format">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/jloda/resources/icons/sun/Preferences24.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Format toolbar"/>
+                </tooltip>
+            </ToggleButton>
+        </children>
+    </HBox>
+</AnchorPane>

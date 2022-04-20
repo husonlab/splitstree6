@@ -212,7 +212,7 @@ public class MainWindowController {
 	private MenuItem filterTaxaMenuItem;
 
 	@FXML
-	private MenuItem filterCharactersMenuItem;
+	private MenuItem showCharactersMenuItem;
 
 	@FXML
 	private MenuItem filterTreesMenuItem;
@@ -702,8 +702,8 @@ public class MainWindowController {
 		return filterTaxaMenuItem;
 	}
 
-	public MenuItem getFilterCharactersMenuItem() {
-		return filterCharactersMenuItem;
+	public MenuItem getShowCharactersMenuItem() {
+		return showCharactersMenuItem;
 	}
 
 	public MenuItem getFilterTreesMenuItem() {

@@ -33,7 +33,6 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
@@ -116,7 +115,7 @@ public class SplitsView implements IView {
 		var loader = new ExtendedFXMLLoader<SplitsViewController>(SplitsViewController.class);
 		controller = loader.getController();
 
-		BasicFX.reportChanges(optionDiagram);
+		// BasicFX.reportChanges(optionDiagram);
 
 		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
 		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
@@ -190,6 +189,14 @@ public class SplitsView implements IView {
 		this.viewTab.set(viewTab);
 	}
 
+	public ViewTab getViewTab() {
+		return viewTab.get();
+	}
+
+	public ObjectProperty<ViewTab> viewTabProperty() {
+		return viewTab;
+	}
+
 	@Override
 	public int size() {
 		return getSplitsBlock() == null ? 0 : getSplitsBlock().size();
@@ -220,13 +227,6 @@ public class SplitsView implements IView {
 		return EqualAngle.getCitation();
 	}
 
-	public ViewTab getViewTab() {
-		return viewTab.get();
-	}
-
-	public ObjectProperty<ViewTab> viewTabProperty() {
-		return viewTab;
-	}
 
 	public SplitsDiagramType getOptionDiagram() {
 		return optionDiagram.get();
