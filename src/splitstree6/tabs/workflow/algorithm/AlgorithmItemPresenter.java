@@ -23,6 +23,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ProgressIndicator;
 import jloda.fx.util.ResourceManagerFX;
+import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
@@ -30,8 +31,11 @@ import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
 
+/**
+ * Algorithm Item presenter
+ * Daniel Huson, 2021
+ */
 public class AlgorithmItemPresenter {
-
 	public AlgorithmItemPresenter(MainWindow mainWindow, WorkflowTab workflowTab, AlgorithmItem algorithmItem) {
 
 		var node = algorithmItem.getWorkflowNode();
@@ -44,9 +48,8 @@ public class AlgorithmItemPresenter {
 		var selected = new SimpleBooleanProperty(false);
 		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node)));
 
-
 		controller.getEditButton().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(node, true));
-		if (algorithmItem.getWorkflowNode().getAlgorithm() instanceof DataTaxaFilter)
+		if (algorithmItem.getWorkflowNode().getAlgorithm() instanceof DataTaxaFilter && !(algorithmItem.getWorkflowNode().getAlgorithm() instanceof CharactersTaxaFilter))
 			controller.getEditButton().setDisable(true);
 		else
 			controller.getEditButton().disableProperty().bind(selected.not());

@@ -215,15 +215,18 @@ public class MouseInteraction {
 			}
 
 			taxonSelectionInvalidationListener = e -> {
-				for (var t : taxonLabelMap.keySet()) {
-					var taxon = idTaxonMap.apply(t);
-					if (taxon != null) {
-						var label = taxonLabelMap.get(t);
-						label.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
-						var shape = nodeShapeMap.get(graph.getTaxon2Node(t));
-						if (shape != null)
-							shape.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
+				try {
+					for (var t : taxonLabelMap.keySet()) {
+						var taxon = idTaxonMap.apply(t);
+						if (taxon != null) {
+							var label = taxonLabelMap.get(t);
+							label.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
+							var shape = nodeShapeMap.get(graph.getTaxon2Node(t));
+							if (shape != null)
+								shape.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
+						}
 					}
+				} catch (Exception ignored) {
 				}
 			};
 			taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionInvalidationListener));

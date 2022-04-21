@@ -40,31 +40,35 @@ public class AlignmentViewController {
     private ScrollPane centerPane;
 
     @FXML
-    private MenuButton chooseColumnsMenu;
+    private MenuButton selectSitesMenu;
 
     @FXML
     private ComboBox<ColorScheme> colorSchemeCBox;
 
     @FXML
-    private CheckMenuItem disableCodon0CheckItem;
+    private MenuItem selectCodon0MenuItem;
 
     @FXML
-    private CheckMenuItem disableCodon1CheckItem;
+    private MenuItem selectCodon1MenuItem;
 
     @FXML
-    private CheckMenuItem disableCodon2CheckItem;
+    private MenuItem selectCodon2MenuItem;
 
     @FXML
-    private CheckMenuItem disableConstantCheckItem;
+    private MenuItem selectConstantMenuItem;
 
     @FXML
-    private CheckMenuItem disableHyperVariableCheckItem;
+    private MenuItem selectGapMenuItem;
 
     @FXML
-    private CheckMenuItem disableNonInformativeCheckItem;
+    private MenuItem selectAllNonInformativeMenuItem;
 
     @FXML
-    private MenuItem enableAllCheckMenuItem;
+    private MenuItem selectAllMenuItem;
+
+    @FXML
+    private MenuItem selectNoneMenuItem;
+
 
     @FXML
     private ToggleButton findToggleButton;
@@ -175,39 +179,47 @@ public class AlignmentViewController {
     }
 
     public MenuButton getChooseColumnsMenu() {
-        return chooseColumnsMenu;
+        return selectSitesMenu;
     }
 
     public ComboBox<ColorScheme> getColorSchemeCBox() {
         return colorSchemeCBox;
     }
 
-    public CheckMenuItem getDisableCodon0CheckItem() {
-        return disableCodon0CheckItem;
+    public MenuButton getSelectSitesMenu() {
+        return selectSitesMenu;
     }
 
-    public CheckMenuItem getDisableCodon1CheckItem() {
-        return disableCodon1CheckItem;
+    public MenuItem getSelectCodon0MenuItem() {
+        return selectCodon0MenuItem;
     }
 
-    public CheckMenuItem getDisableCodon2CheckItem() {
-        return disableCodon2CheckItem;
+    public MenuItem getSelectCodon1MenuItem() {
+        return selectCodon1MenuItem;
     }
 
-    public CheckMenuItem getDisableConstantCheckItem() {
-        return disableConstantCheckItem;
+    public MenuItem getSelectCodon2MenuItem() {
+        return selectCodon2MenuItem;
     }
 
-    public CheckMenuItem getDisableHyperVariableCheckItem() {
-        return disableHyperVariableCheckItem;
+    public MenuItem getSelectConstantMenuItem() {
+        return selectConstantMenuItem;
     }
 
-    public CheckMenuItem getDisableNonInformativeCheckItem() {
-        return disableNonInformativeCheckItem;
+    public MenuItem getSelectGapMenuItem() {
+        return selectGapMenuItem;
     }
 
-    public MenuItem getEnableAllCheckMenuItem() {
-        return enableAllCheckMenuItem;
+    public MenuItem getSelectAllNonInformativeMenuItem() {
+        return selectAllNonInformativeMenuItem;
+    }
+
+    public MenuItem getSelectAllMenuItem() {
+        return selectAllMenuItem;
+    }
+
+    public MenuItem getSelectNoneMenuItem() {
+        return selectNoneMenuItem;
     }
 
     public ToggleButton getFindToggleButton() {

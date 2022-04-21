@@ -22,10 +22,12 @@ package splitstree6.view.alignment;
 import javafx.beans.property.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
-import jloda.util.ProgramProperties;
+import jloda.fx.util.ResourceManagerFX;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.utils.IView;
@@ -41,9 +43,11 @@ public class AlignmentView implements IView {
 	private final AlignmentViewController controller;
 	private final AlignmentViewPresenter presenter;
 
+	private SelectionModel<Integer> siteSelectionModel = new SetSelectionModel<>();
+
 	private final ObjectProperty<ColorScheme> optionColorScheme = new SimpleObjectProperty<>(this, "optionColorScheme", ColorScheme.None);
-	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth");
-	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight");
+	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", 14);
+	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", 14);
 
 	private final BooleanProperty optionDisableCodon0 = new SimpleBooleanProperty(this, "optionDisableCodon0", false);
 	private final BooleanProperty optionDisableCodon1 = new SimpleBooleanProperty(this, "optionDisableCodon1", false);
@@ -64,12 +68,6 @@ public class AlignmentView implements IView {
 				optionDisableConstant.getName(), optionDisableNonInformative.getName(), optionDisableHyperVariable.getName());
 	}
 
-	{
-		ProgramProperties.track(optionUnitWidth, 14.0);
-		ProgramProperties.track(optionUnitHeight, 14.0);
-
-	}
-
 	public AlignmentView(MainWindow mainWindow, String name, ViewTab viewTab) {
 		this.name.set(name);
 		var loader = new ExtendedFXMLLoader<AlignmentViewController>(AlignmentViewController.class);
@@ -79,9 +77,13 @@ public class AlignmentView implements IView {
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
-			if (n != null)
+			if (n != null) {
 				targetBounds.bind(n.layoutBoundsProperty());
+				n.setGraphic(ResourceManagerFX.getIconAsImageView("Alignment16.gif", 16));
+			}
 		});
+
+		empty.bind(mainWindow.emptyProperty());
 
 		setViewTab(viewTab);
 
@@ -148,6 +150,10 @@ public class AlignmentView implements IView {
 	@Override
 	public String getCitation() {
 		return null;
+	}
+
+	public SelectionModel<Integer> getSiteSelectionModel() {
+		return siteSelectionModel;
 	}
 
 	public ColorScheme getOptionColorScheme() {

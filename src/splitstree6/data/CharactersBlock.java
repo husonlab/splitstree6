@@ -431,4 +431,56 @@ public class CharactersBlock extends DataBlock {
 	public String getBlockName() {
 		return BLOCK_NAME;
 	}
+
+	/**
+	 * is this a constant site?
+	 *
+	 * @param column 1-based
+	 * @return true, if all letters the same
+	 */
+	public boolean isConstantSite(int column) {
+		column -= 1;
+		var ch = matrix[0][column];
+		for (int r = 1; r < matrix.length; r++) {
+			if (matrix[r][column] != ch)
+				return false;
+		}
+		return true;
+	}
+
+	/**
+	 * is this a gap site?
+	 *
+	 * @param column 1-based
+	 * @return true, some letter is gap
+	 */
+	public boolean isGapSite(int column) {
+		for (int r = 1; r < matrix.length; r++) {
+			if (matrix[r][column] == getGapCharacter())
+				return true;
+		}
+		return false;
+	}
+
+	/**
+	 * is this a non-parsimony informative site?
+	 *
+	 * @param column 1-based
+	 * @return true, if at most two different letters present
+	 */
+	public boolean isNonParsimonyInformative(int column) {
+		column -= 1;
+		var ch1 = 0;
+		var ch2 = 0;
+		for (int r = 0; r < matrix.length; r++) {
+			var ch = matrix[r][column];
+			if (ch1 == 0)
+				ch1 = ch;
+			else if (ch2 == 0)
+				ch2 = ch;
+			else if (ch != ch1 && ch != ch2)
+				return false;
+		}
+		return true;
+	}
 }

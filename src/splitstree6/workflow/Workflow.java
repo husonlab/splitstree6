@@ -255,7 +255,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	}
 
 	public AlgorithmNode<? extends DataBlock, ? extends DataBlock> getInputDataFilterNode() {
-		return algorithmNodesStream().filter(v -> v.getTitle().startsWith(INPUT_TAXA_DATA_FILTER)).findFirst().orElse(null);
+		return algorithmNodesStream().filter(v -> v.getAlgorithm() instanceof DataTaxaFilter).findFirst().orElse(null);
 	}
 
 	public AlgorithmNode<? extends DataBlock, ? extends DataBlock> getInputDataLoaderNode() {

@@ -146,7 +146,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			splitsView.getSplitSelectionModel().clearSelection();
 			if (mainWindow.getTaxonSelectionModel().size() > 0) {
 				var workingTaxaBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
-				var set = BitSetUtils.asBitSet(mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(workingTaxaBlock::indexOf).collect(Collectors.toList()));
+				var set = BitSetUtils.asBitSet(mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(workingTaxaBlock::indexOf).filter(t -> t >= 0).collect(Collectors.toList()));
 				var first = set.nextSetBit(0);
 				if (first != -1) {
 					var split = splitsBlock.get().getSplits().parallelStream().filter(s -> BitSetUtils.contains(s.getPartContaining(first), set)).min(Comparator.comparingInt(a -> a.getPartContaining(first).cardinality()));

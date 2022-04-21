@@ -35,16 +35,17 @@ import java.util.*;
 public class CharactersFilter extends Characters2Characters implements IFilter {
 	private final BitSet columnMask = new BitSet(); // positions set here are ignored
 
-	private final BooleanProperty optionExcludeGapSites = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionExcludeParsimonyUninformativeSites = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionExcludeConstantSites = new SimpleBooleanProperty(false);
+	private final BooleanProperty optionExcludeGapSites = new SimpleBooleanProperty(this, "optionExcludeGapSites", false);
+	private final BooleanProperty optionExcludeParsimonyUninformativeSites = new SimpleBooleanProperty(this, "optionExcludeParsimonyUninformativeSites", false);
+	private final BooleanProperty optionExcludeConstantSites = new SimpleBooleanProperty(this, "optionExcludeConstantSites", false);
 
-	private final BooleanProperty optionExcludeFirstCodonPosition = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionExcludeSecondCodonPosition = new SimpleBooleanProperty(false);
-	private final BooleanProperty optionExcludeThirdCodonPosition = new SimpleBooleanProperty(false);
+	private final BooleanProperty optionExcludeFirstCodonPosition = new SimpleBooleanProperty(this, "optionExcludeFirstCodonPosition", false);
+	private final BooleanProperty optionExcludeSecondCodonPosition = new SimpleBooleanProperty(this, "optionExcludeSecondCodonPosition", false);
+	private final BooleanProperty optionExcludeThirdCodonPosition = new SimpleBooleanProperty(this, "optionExcludeThirdCodonPosition", false);
 
 	public List<String> listOptions() {
-		return Arrays.asList("ExcludeGapSites", "ExcludeConstantSites", "ExcludeParsimonyUninformativeSites", "ExcludeFirstCodonPosition", "ExcludeSecondCodonPosition", "ExcludeThirdCodonPosition");
+		return Arrays.asList(optionExcludeGapSites.getName(), optionExcludeParsimonyUninformativeSites.getName(), optionExcludeConstantSites.getName(),
+				optionExcludeFirstCodonPosition.getName(), optionExcludeSecondCodonPosition.getName(), optionExcludeThirdCodonPosition.getName());
 	}
 
 	@Override

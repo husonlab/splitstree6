@@ -32,23 +32,24 @@
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
-                    <MenuButton fx:id="chooseColumnsMenu" mnemonicParsing="false" text="Characters">
+                    <MenuButton fx:id="selectSitesMenu" mnemonicParsing="false" text="Select Sites">
                         <items>
-                            <MenuItem fx:id="enableAllCheckMenuItem" mnemonicParsing="false" text="Enable All"/>
+                            <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" text="Select All"/>
+                            <MenuItem fx:id="selectNoneMenuItem" mnemonicParsing="false" text="Select None"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
-                            <CheckMenuItem fx:id="disableCodon0CheckItem" mnemonicParsing="false"
-                                           text="Disable Codon 0"/>
-                            <CheckMenuItem fx:id="disableCodon1CheckItem" mnemonicParsing="false"
-                                           text="Disable Codon 1"/>
-                            <CheckMenuItem fx:id="disableCodon2CheckItem" mnemonicParsing="false"
-                                           text="Disable Codon 2"/>
+                            <MenuItem fx:id="selectConstantMenuItem" mnemonicParsing="false"
+                                      text="Constant Sites"/>
+                            <MenuItem fx:id="selectGapMenuItem" mnemonicParsing="false"
+                                      text="Gap Sites"/>
+                            <MenuItem fx:id="selectAllNonInformativeMenuItem" mnemonicParsing="false"
+                                      text="Non Informative Sites"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
-                            <CheckMenuItem fx:id="disableConstantCheckItem" mnemonicParsing="false"
-                                           text="Disable Constant"/>
-                            <CheckMenuItem fx:id="disableNonInformativeCheckItem" mnemonicParsing="false"
-                                           text="Disable Non Informative"/>
-                            <CheckMenuItem fx:id="disableHyperVariableCheckItem" mnemonicParsing="false"
-                                           text="Disable Hyper Variable"/>
+                            <MenuItem fx:id="selectCodon0MenuItem" mnemonicParsing="false"
+                                      text="First Codon Position"/>
+                            <MenuItem fx:id="selectCodon1MenuItem" mnemonicParsing="false"
+                                      text="Second Codon Position"/>
+                            <MenuItem fx:id="selectCodon2MenuItem" mnemonicParsing="false"
+                                      text="Third Codon Position 2"/>
                         </items>
                     </MenuButton>
                     <Separator layoutX="119.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
