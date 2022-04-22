@@ -46,8 +46,8 @@ public class AlignmentView implements IView {
 	private SelectionModel<Integer> siteSelectionModel = new SetSelectionModel<>();
 
 	private final ObjectProperty<ColorScheme> optionColorScheme = new SimpleObjectProperty<>(this, "optionColorScheme", ColorScheme.None);
-	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", 14);
-	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", 14);
+	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", 18);
+	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", 18);
 
 	private final BooleanProperty optionDisableCodon0 = new SimpleBooleanProperty(this, "optionDisableCodon0", false);
 	private final BooleanProperty optionDisableCodon1 = new SimpleBooleanProperty(this, "optionDisableCodon1", false);

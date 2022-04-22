@@ -28,7 +28,6 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.geometry.Point2D;
 import javafx.geometry.Pos;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
@@ -61,7 +60,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 	private final InvalidationListener invalidationListener;
 	private final InvalidationListener updateAxisScrollBarCanvasListener;
 	private final InvalidationListener updateCanvasListener;
-	private final InvalidationListener selectionListener;
+	private final InvalidationListener taxonSelectionListener;
 
 	private final AlignmentViewController controller;
 	private final MainWindowController mainWindowController;
@@ -122,7 +121,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		updateAxisScrollBarCanvasListener = e -> {
 			controller.getAxis().setPadding(new Insets(0, 0, 0, alignmentView.getOptionUnitWidth()));
-			Platform.runLater(() -> updateAxisAndScrollBar(controller.getAxis(), controller.gethScrollBar(), controller.getCanvas().getWidth(),
+			Platform.runLater(() -> AxisAndScrollBarUpdate.apply(controller.getAxis(), controller.gethScrollBar(), controller.getCanvas().getWidth(),
 					alignmentView.getOptionUnitWidth(), workingCharacters.get() != null ? workingCharacters.get().getNchar() : 0, siteSelectionModel));
 			updateCanvasListener.invalidated(null);
 		};
@@ -132,16 +131,10 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		alignmentView.optionUnitWidthProperty().addListener(updateAxisScrollBarCanvasListener);
 		alignmentView.optionUnitHeightProperty().addListener(updateAxisScrollBarCanvasListener);
 
-		siteSelectionModel.getSelectedItems().addListener((InvalidationListener) e -> {
-			if (!inSelectionUpdate.get()) {
-				if (siteSelectionModel.size() > 0)
-					mainWindow.getTaxonSelectionModel().clearSelection();
-				Platform.runLater(() -> updateCanvasListener.invalidated(null));
-			}
-		});
+		siteSelectionModel.getSelectedItems().addListener((InvalidationListener) e -> updateCanvasListener.invalidated(null));
 
 
-		selectionListener = e -> {
+		taxonSelectionListener = e -> {
 			if (!inSelectionUpdate.get()) {
 				try {
 					inSelectionUpdate.set(true);
@@ -149,15 +142,13 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					for (var t : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 						controller.getTaxaListView().getSelectionModel().select(t);
 					}
-					if (mainWindow.getTaxonSelectionModel().size() > 0)
-						siteSelectionModel.clearSelection();
-					Platform.runLater(() -> updateCanvasListener.invalidated(null));
+					updateCanvasListener.invalidated(null);
 				} finally {
 					inSelectionUpdate.set(false);
 				}
 			}
 		};
-		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));
+		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionListener));
 
 		InvalidationListener updateTaxaListener = e -> {
 			controller.getTaxaListView().getItems().clear();
@@ -383,10 +374,13 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					}
 					gc.setFill(textFill);
 					gc.fillText(String.valueOf(ch), x + 0.25 * fontSize, y - 0.4 * fontSize);
-					if (siteSelectionModel.isSelected(c) || taxonSelectionModel.isSelected(taxaBlock.get(t))) {
-						gc.setLineWidth(Math.min(2, 0.5 * fontSize));
-						gc.setStroke(Color.YELLOW);
-						gc.strokeRect(x + 0.5 * gc.getLineWidth(), y - boxHeight + 0.5 * gc.getLineWidth(), boxWidth - gc.getLineWidth(), boxHeight - gc.getLineWidth());
+					if (taxonSelectionModel.isSelected(taxaBlock.get(t))) {
+						gc.setFill(Color.DEEPSKYBLUE.deriveColor(1, 1, 1, 0.4));
+						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
+					}
+					if (siteSelectionModel.isSelected(c)) {
+						gc.setFill(Color.DEEPSKYBLUE.deriveColor(1, 1, 1, 0.4));
+						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
 					}
 					if (c == charactersBlock.getNchar()) {
 						gc.setLineWidth(0.75);
@@ -399,69 +393,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 						gc.strokeLine(x, y, x + boxWidth, y);
 					}
 				}
-			}
-		}
-	}
-
-	private void updateAxisAndScrollBar(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar, SelectionModel<Integer> siteSelectionModel) {
-		if (nChar < 1) {
-			scrollBar.setVisible(false);
-			axis.setVisible(false);
-		} else {
-			scrollBar.setVisible(true);
-			axis.setVisible(true);
-			var numberOnCanvas = canvasWidth / boxWidth;
-			scrollBar.setMin(1);
-			scrollBar.setMax(nChar);
-			scrollBar.setVisibleAmount(numberOnCanvas);
-
-			axis.setLowerBound(Math.max(1, Math.floor(scrollBar.getValue())));
-			axis.setUpperBound(Math.round(scrollBar.getValue() + numberOnCanvas));
-
-			axis.setOnMouseClicked(event -> {
-				var pointInScene = new Point2D(event.getSceneX(), event.getSceneY());
-				double xPosInAxis = axis.sceneToLocal(new Point2D(pointInScene.getX(), 0)).getX();
-				var site = (int) Math.round(axis.getValueForDisplay(xPosInAxis).doubleValue());
-				if (site >= 1 && site <= nChar) {
-					if (event.isShiftDown()) {
-						if (siteSelectionModel.size() == 0 || siteSelectionModel.size() == 1 && siteSelectionModel.isSelected(site)) {
-							siteSelectionModel.toggleSelection(site);
-						} else {
-							var left = site;
-							while (left >= 1 && !siteSelectionModel.isSelected(left))
-								left--;
-							var right = site;
-							while (right <= nChar && !siteSelectionModel.isSelected(right))
-								right++;
-							if (left >= 1) {
-								for (var s = left; s <= site; s++)
-									siteSelectionModel.select(s);
-							}
-							if (right <= nChar) {
-								for (var s = site; s <= right; s++)
-									siteSelectionModel.select(s);
-							}
-						}
-					} else if (event.isShortcutDown()) {
-						siteSelectionModel.toggleSelection(site);
-					} else {
-						siteSelectionModel.clearSelection();
-						siteSelectionModel.select(site);
-					}
-				}
-			});
-			if (numberOnCanvas < 100) {
-				axis.setTickUnit(1);
-				axis.setMinorTickVisible(false);
-			} else if (numberOnCanvas < 500) {
-				axis.setTickUnit(10);
-				axis.setMinorTickVisible(true);
-			} else if (numberOnCanvas < 5000) {
-				axis.setTickUnit(100);
-				axis.setMinorTickVisible(true);
-			} else {
-				axis.setTickUnit(1000);
-				axis.setMinorTickVisible(true);
 			}
 		}
 	}
