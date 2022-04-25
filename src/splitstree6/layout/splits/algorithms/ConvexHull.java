@@ -41,8 +41,7 @@ import java.util.TreeSet;
  */
 public class ConvexHull {
     /**
-     * apply the algorithm to build a new graph
-     *
+	 * update the algorithm to build a new graph
 	 */
     public static void apply(ProgressListener progress, TaxaBlock taxa, SplitsBlock splits, PhyloSplitsGraph splitsGraph) throws CanceledException {
         splitsGraph.clear();
@@ -247,19 +246,19 @@ public class ConvexHull {
             for (var e : graph.edges()) {
                 var s = graph.getSplit(e);
                 if (s > 0 && !seen.get(s)) {
-                    seen.set(s);
-                    graph.setLabel(e, "" + s);
-                } else
-                    graph.setLabel(e, null);
-            }
-        } catch (CanceledException ex) {
-            graph.clear();
-            throw ex;
-        }
-        graph.edgeStream().forEach(e -> graph.setLabel(e, null));
-    }//end apply
+					seen.set(s);
+					graph.setLabel(e, "" + s);
+				} else
+					graph.setLabel(e, null);
+			}
+		} catch (CanceledException ex) {
+			graph.clear();
+			throw ex;
+		}
+		graph.edgeStream().forEach(e -> graph.setLabel(e, null));
+	}//end update
 
-    /**
+	/**
      * convex hull path
      */
     private static void convexHullPath(PhyloSplitsGraph g, Node start, EdgeSet visited, NodeArray<Integer> hulls, BitSet allowedSplits, ArrayList<Node> intersectionNodes, int side) {

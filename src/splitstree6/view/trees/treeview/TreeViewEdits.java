@@ -39,7 +39,7 @@ import java.util.HashSet;
  */
 public class TreeViewEdits {
 	/**
-	 * apply the recorded edits
+	 * update the recorded edits
 	 *
 	 * @param editsString
 	 * @param nodeShapeMap
@@ -72,7 +72,7 @@ public class TreeViewEdits {
 						if (NumberUtils.isDouble(edit.parameter())) {
 							var angle = edit.parameterAsDouble();
 							//if (angle != 0.0)
-							//	RotateSplit.apply(edit.split(), angle, nodeShapeMap);
+							//	RotateSplit.update(edit.split(), angle, nodeShapeMap);
 						}
 					}
 				}

@@ -22,7 +22,6 @@ package splitstree6.view.alignment;
 import javafx.beans.property.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
-import javafx.scene.paint.Color;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -85,12 +84,6 @@ public class AlignmentView implements IView {
 		setViewTab(viewTab);
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
-
-		System.err.println("A: " + Color.web("0x64F73F").deriveColor(1.0, 0.4, 1.0, 1.0));
-		System.err.println("C: " + Color.web("0xFFB340").deriveColor(1.0, 0.4, 1.0, 1.0));
-		System.err.println("G: " + Color.web("0xEB413C").deriveColor(1.0, 0.4, 1.0, 1.0));
-		System.err.println("T: " + Color.web("0x3C88EE").deriveColor(1.0, 0.4, 1.0, 1.0));
-
 	}
 
 	@Override

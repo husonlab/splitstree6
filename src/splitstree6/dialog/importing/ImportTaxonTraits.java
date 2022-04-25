@@ -38,7 +38,7 @@ import java.util.Map;
  */
 public class ImportTaxonTraits {
 	/**
-	 * show the import traits dialog and apply
+	 * show the import traits dialog and update
 	 */
 	public static void apply(MainWindow mainWindow) {
 		final var fileChooser = new FileChooser();
@@ -114,7 +114,7 @@ public class ImportTaxonTraits {
 	}
 
 	/**
-	 * apply the given display labels
+	 * update the given display labels
 	 *
 	 * @param workflow            the workflow
 	 * @param nameDisplayLabelMap mapping of taxon names to the desired display labels

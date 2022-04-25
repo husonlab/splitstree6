@@ -83,7 +83,7 @@ public class Refine {
 		BitSet Y = v2.getTaxa();
 
 		if (X.cardinality() == 1 || Y.cardinality() == 1 || !X.intersects(Y))
-			return; // doesn't apply
+			return; // doesn't update
 
 		// System.err.println("Refining with v1=" + Basic.toString(X) + "  v2=" + Basic.toString(Y));
 

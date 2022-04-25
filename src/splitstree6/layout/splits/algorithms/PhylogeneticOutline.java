@@ -46,8 +46,8 @@ import java.util.function.Function;
  */
 public class PhylogeneticOutline {
     /**
-     * apply the algorithm to build a new graph
-     */
+	 * update the algorithm to build a new graph
+	 */
     public static void apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits0,
                              PhyloSplitsGraph graph, NodeArray<Point2D> nodePointMap, BitSet usedSplits,
                              ArrayList<ArrayList<Node>> loops, int rootSplit, double rootAngle) throws CanceledException {

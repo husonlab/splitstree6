@@ -41,8 +41,8 @@ import java.util.TreeSet;
  */
 public class EqualAngle {
 	/**
-     * apply the algorithm to build a new graph
-     */
+	 * update the algorithm to build a new graph
+	 */
     public static boolean apply(ProgressListener progress, boolean useWeights, TaxaBlock taxaBlock, SplitsBlock splits, PhyloSplitsGraph graph, BitSet forbiddenSplits, BitSet usedSplits) throws CanceledException {
         //System.err.println("Running equals angle algorithm");
         graph.clear();

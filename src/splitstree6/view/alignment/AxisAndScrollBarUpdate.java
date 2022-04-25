@@ -19,11 +19,12 @@
 
 package splitstree6.view.alignment;
 
-import javafx.beans.InvalidationListener;
 import javafx.geometry.Point2D;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ScrollBar;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Line;
 import jloda.fx.selection.SelectionModel;
 
 /**
@@ -32,14 +33,14 @@ import jloda.fx.selection.SelectionModel;
  */
 public class AxisAndScrollBarUpdate {
 
-	public static void apply(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar,
-							 SelectionModel<Integer> siteSelectionModel) {
+	public static void update(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar, SelectionModel<Integer> siteSelectionModel) {
 		if (nChar < 1) {
 			scrollBar.setVisible(false);
 			axis.setVisible(false);
 		} else {
 			scrollBar.setVisible(true);
 			axis.setVisible(true);
+
 			var numberOnCanvas = canvasWidth / boxWidth;
 			scrollBar.setMin(1);
 			scrollBar.setMax(nChar);
@@ -96,7 +97,16 @@ public class AxisAndScrollBarUpdate {
 		}
 	}
 
-	public static InvalidationListener setupSelectionVisualization(StackPane pane, NumberAxis axis, SelectionModel<Integer> siteSelectionModel) {
-		return null;
+	public static void updateSelection(Pane selectionPane, NumberAxis axis, double boxWidth, SelectionModel<Integer> siteSelectionModel) {
+		selectionPane.setVisible(axis.isVisible());
+		selectionPane.getChildren().clear();
+		for (var site : siteSelectionModel.getSelectedItems()) {
+			var x = (site - axis.getLowerBound() - 0.25) * boxWidth;
+			var line = new Line(x + 1, selectionPane.getHeight(), x + boxWidth - 2, selectionPane.getHeight());
+			line.setStrokeWidth(4);
+			line.setStroke(Color.web("#039ED3"));
+			line.setFill(Color.TRANSPARENT);
+			selectionPane.getChildren().add(line);
+		}
 	}
 }

@@ -387,7 +387,7 @@ public class ComputeHybridizationNetwork {
         /*
         if (leaves1.size() <= 2) // try 2 rather than one...
         {
-            totalResults.add(MergeNetworks.apply(root1,root2)); // todo: this needs to be fixed
+            totalResults.add(MergeNetworks.update(root1,root2)); // todo: this needs to be fixed
             return 0;
         }
         */

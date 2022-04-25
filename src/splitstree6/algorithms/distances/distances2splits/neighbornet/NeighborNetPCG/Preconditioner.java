@@ -1,7 +1,5 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG;
 
-import Jama.Matrix;
-
 import java.util.Random;
 
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.BlockXMatrix.blocks2vector;
@@ -300,7 +298,7 @@ public class Preconditioner {
 				nu[i] = U[i].solveU(v);
 			}
 		}
-		//TODO Some efficiency gains possible here - apply L[i].solveL once instead of twice
+		//TODO Some efficiency gains possible here - update L[i].solveL once instead of twice
 		return nu;
 	}
 

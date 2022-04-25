@@ -41,7 +41,7 @@ import static splitstree6.dialog.importing.ImportTaxonTraits.isTraitsFile;
  */
 public class ImportTaxonDisplayLabels {
 	/**
-	 * show the import taxon display labels dialog and apply
+	 * show the import taxon display labels dialog and update
 	 */
 	public static void apply(MainWindow mainWindow) {
 		final var fileChooser = new FileChooser();
@@ -79,7 +79,7 @@ public class ImportTaxonDisplayLabels {
 	}
 
 	/**
-	 * apply the given display labels
+	 * update the given display labels
 	 *
 	 * @param workflow            the workflow
 	 * @param nameDisplayLabelMap mapping of taxon names to the desired display labels

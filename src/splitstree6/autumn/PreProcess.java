@@ -33,8 +33,7 @@ import java.util.BitSet;
  */
 public class PreProcess {
 	/**
-	 * apply preprocessing to two trees
-	 *
+	 * update preprocessing to two trees
 	 */
 	static public Pair<Root, Root> apply(PhyloTree tree1, PhyloTree tree2, TaxaBlock allTaxa) throws IOException {
 
@@ -54,7 +53,7 @@ public class PreProcess {
 	}
 
 	/**
-	 * apply preprocessing to one tree
+	 * update preprocessing to one tree
 	 *
 	 */
 	static public Root apply(PhyloTree tree1, TaxaBlock allTaxa, boolean mustHaveSameTaxa) throws IOException {

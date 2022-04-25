@@ -92,7 +92,7 @@ public class LayoutTester extends Application {
 			}
 
 			try (NodeArray<Point2D> nodePointMap = tree.newNodeArray(); var nodeAngleMap = tree.newNodeDoubleArray()) {
-				//LayoutAlgorithm.apply(tree, toScale.isSelected(), cycle, nodePointMap, nodeAngleMap);
+				//LayoutAlgorithm.update(tree, toScale.isSelected(), cycle, nodePointMap, nodeAngleMap);
 				adjustCoordinatesToBox(nodePointMap, 100, 100, 800, 800);
 
 				pane.getChildren().clear();

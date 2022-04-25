@@ -41,7 +41,7 @@ import java.util.HashSet;
  */
 public class SplitNetworkEdits {
 	/**
-	 * apply the recorded edits
+	 * update the recorded edits
 	 *
 	 * @param editsString
 	 * @param nodeShapeMap

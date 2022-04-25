@@ -42,8 +42,7 @@ public class EmbeddingOptimizer {
 	public static final boolean printILP = false;
 
 	/**
-	 * apply the embedding algorithm to a single tree
-	 *
+	 * update the embedding algorithm to a single tree
 	 */
 	public static void apply(PhyloTree tree, ProgressListener progressListener) throws CanceledException {
 		if (printILP) {
@@ -65,8 +64,8 @@ public class EmbeddingOptimizer {
 	}
 
 	/**
-     * apply the embedding algorithm to a whole set of trees
-     *
+	 * update the embedding algorithm to a whole set of trees
+	 *
 	 */
     public static void apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
             progressListener.setTasks("Computing embedding", "optimizing");

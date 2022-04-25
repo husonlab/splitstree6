@@ -25,8 +25,6 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.DraggableLabel;
 import splitstree6.data.parts.Taxon;
 
 public class AlignmentViewController {
@@ -74,11 +72,6 @@ public class AlignmentViewController {
     @FXML
     private ToggleButton findToggleButton;
 
-    @FXML
-    private ToggleButton formatToggleButton;
-
-    @FXML
-    private VBox formatVBox;
 
     @FXML
     private ScrollBar hScrollBar;
@@ -97,9 +90,6 @@ public class AlignmentViewController {
 
     @FXML
     private AnchorPane root;
-
-    @FXML
-    private ToggleButton settingsToggleButton;
 
     @FXML
     private SplitPane splitPane;
@@ -139,11 +129,19 @@ public class AlignmentViewController {
     @FXML
     private Group siteSelectionGroup;
 
+    @FXML
+    private Button disableButton;
+
+    @FXML
+    private Button enableButton;
+
 
     @FXML
     private Group taxaSelectionGroup;
 
     private final NumberAxis axis = new NumberAxis();
+
+    private final Pane rightTopPane = new Pane();
 
     @FXML
     private void initialize() {
@@ -154,31 +152,23 @@ public class AlignmentViewController {
         axis.setAutoRanging(false);
         axis.setTickUnit(100);
 
+        rightTopPane.setMouseTransparent(true);
+        rightTopPane.prefWidthProperty().bind(rightTopStackPane.widthProperty());
+        rightTopPane.prefHeightProperty().bind(rightTopStackPane.heightProperty());
+        rightTopStackPane.getChildren().add(rightTopPane);
+
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
         hScrollBar.widthProperty().addListener((v, o, n) -> canvas.setWidth(n.doubleValue() - 16));
         vScrollBar.heightProperty().addListener((v, o, n) -> canvas.setHeight(n.doubleValue()));
 
-        outerAnchorPane.getChildren().remove(formatVBox);
-        outerAnchorPane.getChildren().add(formatVBox);
-
-        formatToggleButton.setSelected(false);
-        formatVBox.visibleProperty().bind(formatToggleButton.selectedProperty());
-        formatVBox.visibleProperty().addListener((v, o, n) -> {
-            for (var titledPane : BasicFX.getAllRecursively(formatVBox, TitledPane.class)) {
-                if (!titledPane.isDisable())
-                    titledPane.setExpanded(n);
-            }
-        });
 
         splitPane.widthProperty().addListener((v, o, n) -> {
             if (n.doubleValue() > 0 && o.doubleValue() > 0) {
                 splitPane.setDividerPositions(splitPane.getDividerPositions()[0] / n.doubleValue() * o.doubleValue());
             }
         });
-
-        DraggableLabel.makeDraggable(formatVBox);
     }
 
     public BorderPane getBorderPane() {
@@ -245,13 +235,6 @@ public class AlignmentViewController {
         return findToggleButton;
     }
 
-    public ToggleButton getFormatToggleButton() {
-        return formatToggleButton;
-    }
-
-    public VBox getFormatVBox() {
-        return formatVBox;
-    }
 
     public ScrollBar gethScrollBar() {
         return hScrollBar;
@@ -276,10 +259,6 @@ public class AlignmentViewController {
 
     public AnchorPane getRoot() {
         return root;
-    }
-
-    public ToggleButton getSettingsToggleButton() {
-        return settingsToggleButton;
     }
 
     public SplitPane getSplitPane() {
@@ -328,5 +307,17 @@ public class AlignmentViewController {
 
     public Group getTaxaSelectionGroup() {
         return taxaSelectionGroup;
+    }
+
+    public Pane getRightTopPane() {
+        return rightTopPane;
+    }
+
+    public Button getDisableButton() {
+        return disableButton;
+    }
+
+    public Button getEnableButton() {
+        return enableButton;
     }
 }

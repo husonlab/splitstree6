@@ -120,8 +120,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		updateAxisScrollBarCanvasListener = e -> {
 			controller.getAxis().setPadding(new Insets(0, 0, 0, alignmentView.getOptionUnitWidth()));
-			Platform.runLater(() -> AxisAndScrollBarUpdate.apply(controller.getAxis(), controller.gethScrollBar(), controller.getCanvas().getWidth(),
-					alignmentView.getOptionUnitWidth(), workingCharacters.get() != null ? workingCharacters.get().getNchar() : 0, siteSelectionModel));
+			Platform.runLater(() -> {
+				AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), controller.getCanvas().getWidth(),
+						alignmentView.getOptionUnitWidth(), workingCharacters.get() != null ? workingCharacters.get().getNchar() : 0, siteSelectionModel);
+				AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getOptionUnitWidth(), siteSelectionModel);
+			});
 			updateCanvasListener.invalidated(null);
 		};
 
@@ -130,8 +133,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		alignmentView.optionUnitWidthProperty().addListener(updateAxisScrollBarCanvasListener);
 		alignmentView.optionUnitHeightProperty().addListener(updateAxisScrollBarCanvasListener);
 
-		siteSelectionModel.getSelectedItems().addListener((InvalidationListener) e -> DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), workingTaxa.get(),
-				workingCharacters.get(), alignmentView.getOptionUnitWidth(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), siteSelectionModel));
+		siteSelectionModel.getSelectedItems().addListener((InvalidationListener) e -> {
+			DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), workingTaxa.get(),
+					workingCharacters.get(), alignmentView.getOptionUnitWidth(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), siteSelectionModel);
+			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getOptionUnitWidth(), siteSelectionModel);
+		});
 
 		taxonSelectionListener = e -> {
 			if (!inSelectionUpdate.get()) {
@@ -298,6 +304,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		controller.getSelectAllNonInformativeMenuItem().disableProperty().bind(nucleotideData.not());
+
+		controller.getEnableButton().disableProperty().bind(Bindings.isEmpty(siteSelectionModel.getSelectedItems()).and(Bindings.isEmpty(mainWindow.getTaxonSelectionModel().getSelectedItems())));
+		controller.getDisableButton().disableProperty().bind(Bindings.isEmpty(siteSelectionModel.getSelectedItems()).and(Bindings.isEmpty(mainWindow.getTaxonSelectionModel().getSelectedItems())));
 
 		Platform.runLater(() -> invalidationListener.invalidated(null));
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
