@@ -20,6 +20,7 @@
 package splitstree6.view.alignment;
 
 import javafx.fxml.FXML;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
@@ -37,7 +38,7 @@ public class AlignmentViewController {
     private Canvas canvas;
 
     @FXML
-    private ScrollPane centerPane;
+    private ScrollPane scrollPane;
 
     @FXML
     private MenuButton selectSitesMenu;
@@ -126,7 +127,21 @@ public class AlignmentViewController {
 
 
     @FXML
+    private StackPane stackPane;
+
+    @FXML
+    private Pane selectionPane;
+
+    @FXML
     private ScrollBar vScrollBar;
+
+
+    @FXML
+    private Group siteSelectionGroup;
+
+
+    @FXML
+    private Group taxaSelectionGroup;
 
     private final NumberAxis axis = new NumberAxis();
 
@@ -139,8 +154,8 @@ public class AlignmentViewController {
         axis.setAutoRanging(false);
         axis.setTickUnit(100);
 
-        centerPane.setFitToWidth(true);
-        centerPane.setFitToHeight(true);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
 
         hScrollBar.widthProperty().addListener((v, o, n) -> canvas.setWidth(n.doubleValue() - 16));
         vScrollBar.heightProperty().addListener((v, o, n) -> canvas.setHeight(n.doubleValue()));
@@ -174,8 +189,12 @@ public class AlignmentViewController {
         return canvas;
     }
 
-    public ScrollPane getCenterPane() {
-        return centerPane;
+    public Pane getSelectionPane() {
+        return selectionPane;
+    }
+
+    public ScrollPane getScrollPane() {
+        return scrollPane;
     }
 
     public MenuButton getChooseColumnsMenu() {
@@ -301,5 +320,13 @@ public class AlignmentViewController {
 
     public Button getContractHorizontallyButton() {
         return contractHorizontallyButton;
+    }
+
+    public Group getSiteSelectionGroup() {
+        return siteSelectionGroup;
+    }
+
+    public Group getTaxaSelectionGroup() {
+        return taxaSelectionGroup;
     }
 }

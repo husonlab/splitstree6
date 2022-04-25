@@ -29,14 +29,9 @@ import javafx.collections.ListChangeListener;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ScrollBar;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
@@ -115,8 +110,12 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		updateCanvasListener = e -> Platform.runLater(() -> {
 			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight());
-			updateCanvas(controller.getCanvas(), workingTaxa.get(), workingCharacters.get(), alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitWidth(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), mainWindow.getTaxonSelectionModel(), siteSelectionModel);
+			DrawAlignment.updateCanvas(controller.getCanvas(), workingTaxa.get(), workingCharacters.get(), alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitWidth(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis());
+			DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), workingTaxa.get(), workingCharacters.get(), alignmentView.getOptionUnitWidth(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), mainWindow.getTaxonSelectionModel());
+			DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), workingTaxa.get(), workingCharacters.get(), alignmentView.getOptionUnitWidth(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), siteSelectionModel);
 		});
 
 		updateAxisScrollBarCanvasListener = e -> {
@@ -131,8 +130,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		alignmentView.optionUnitWidthProperty().addListener(updateAxisScrollBarCanvasListener);
 		alignmentView.optionUnitHeightProperty().addListener(updateAxisScrollBarCanvasListener);
 
-		siteSelectionModel.getSelectedItems().addListener((InvalidationListener) e -> updateCanvasListener.invalidated(null));
-
+		siteSelectionModel.getSelectedItems().addListener((InvalidationListener) e -> DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), workingTaxa.get(),
+				workingCharacters.get(), alignmentView.getOptionUnitWidth(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), siteSelectionModel));
 
 		taxonSelectionListener = e -> {
 			if (!inSelectionUpdate.get()) {
@@ -142,7 +141,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					for (var t : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 						controller.getTaxaListView().getSelectionModel().select(t);
 					}
-					updateCanvasListener.invalidated(null);
+					DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), workingTaxa.get(), workingCharacters.get(), alignmentView.getOptionUnitWidth(),
+							alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), mainWindow.getTaxonSelectionModel());
 				} finally {
 					inSelectionUpdate.set(false);
 				}
@@ -155,6 +155,27 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			if (workingTaxa.get() != null) {
 				for (var taxon : workingTaxa.get().getTaxa()) {
 					controller.getTaxaListView().getItems().add(taxon);
+				}
+			}
+		};
+
+		InvalidationListener updateCharactersListener = e -> {
+			var theWorkingCharacters = workingCharacters.get();
+			if (theWorkingCharacters != null) {
+				if (theWorkingCharacters.getDataType() == CharactersType.Protein) {
+					if (!colorSchemeSet || alignmentView.getOptionColorScheme() == ColorScheme.Nucleotide) {
+						alignmentView.setOptionColorScheme(ColorScheme.Diamond11);
+					}
+					nucleotideData.set(false);
+					colorSchemeSet = true;
+				} else if ((theWorkingCharacters.getDataType() == CharactersType.DNA || theWorkingCharacters.getDataType() == CharactersType.RNA)) {
+					if (!colorSchemeSet || alignmentView.getOptionColorScheme() != ColorScheme.Nucleotide && alignmentView.getOptionColorScheme() != ColorScheme.Random && alignmentView.getOptionColorScheme() != ColorScheme.None) {
+						alignmentView.setOptionColorScheme(ColorScheme.Nucleotide);
+					}
+					nucleotideData.set(true);
+					colorSchemeSet = true;
+				} else {
+					nucleotideData.set(false);
 				}
 			}
 		};
@@ -173,6 +194,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				workingCharactersNode.set(workflow.getWorkingDataNode());
 				workingCharactersNode.get().validProperty().addListener(a -> siteSelectionModel.clearSelection());
 				workingCharactersNode.get().validProperty().addListener(updateAxisScrollBarCanvasListener);
+				workingCharactersNode.get().validProperty().addListener(updateCharactersListener);
 				workingCharacters.set(charactersBlock);
 			} else {
 				workingCharactersNode.set(null);
@@ -180,25 +202,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		};
 		mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
-
-		workingCharacters.addListener((v, o, n) -> {
-			if (n != null) {
-				if (n.getDataType() == CharactersType.Protein) {
-					if (!colorSchemeSet || alignmentView.getOptionColorScheme() == ColorScheme.Nucleotide) {
-						alignmentView.setOptionColorScheme(ColorScheme.Diamond11);
-					}
-					nucleotideData.set(false);
-				} else if ((n.getDataType() == CharactersType.DNA || n.getDataType() == CharactersType.RNA)) {
-					if (!colorSchemeSet || alignmentView.getOptionColorScheme() != ColorScheme.Nucleotide && alignmentView.getOptionColorScheme() != ColorScheme.Random && alignmentView.getOptionColorScheme() != ColorScheme.None) {
-						alignmentView.setOptionColorScheme(ColorScheme.Nucleotide);
-					}
-					nucleotideData.set(true);
-				} else {
-					nucleotideData.set(false);
-				}
-				colorSchemeSet = true;
-			}
-		});
 
 		invalidationListener.invalidated(null);
 
@@ -336,65 +339,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				}
 			}
 		});
-	}
-
-	private void updateCanvas(Canvas canvas, TaxaBlock taxaBlock, CharactersBlock charactersBlock, ColorScheme colorScheme,
-							  double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> siteSelectionModel) {
-		var gc = canvas.getGraphicsContext2D();
-		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-
-		if (taxaBlock != null && charactersBlock != null) {
-			var fontSize = 0.9 * Math.min(boxWidth, boxHeight);
-			gc.setFont(Font.font("monospaced", fontSize));
-			var showColors = (colorScheme != ColorScheme.None);
-
-			var lineStroke = MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK;
-			var textFill = !showColors && MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK;
-			// will only stroke to show selection:
-
-			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - taxaBlock.getNtax() * boxHeight)) : 0;
-
-			for (var t = 1; t <= taxaBlock.getNtax(); t++) {
-				var y = t * boxHeight + offset;
-				if (y < 0)
-					continue;
-				;
-				if (y > canvas.getHeight() + boxHeight)
-					break;
-
-				var bot = (int) Math.max(1, Math.floor(axis.getLowerBound()));
-				var top = Math.min(charactersBlock.getNchar(), Math.ceil(axis.getUpperBound()));
-				var col = 0;
-				for (var c = bot; c <= top; c++) {
-					var ch = charactersBlock.get(t, c);
-					var x = (col++) * boxWidth;
-					if (showColors) {
-						gc.setFill(colorScheme.apply(ch));
-						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
-					}
-					gc.setFill(textFill);
-					gc.fillText(String.valueOf(ch), x + 0.25 * fontSize, y - 0.4 * fontSize);
-					if (taxonSelectionModel.isSelected(taxaBlock.get(t))) {
-						gc.setFill(Color.DEEPSKYBLUE.deriveColor(1, 1, 1, 0.4));
-						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
-					}
-					if (siteSelectionModel.isSelected(c)) {
-						gc.setFill(Color.DEEPSKYBLUE.deriveColor(1, 1, 1, 0.4));
-						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
-					}
-					if (c == charactersBlock.getNchar()) {
-						gc.setLineWidth(0.75);
-						gc.setStroke(lineStroke);
-						gc.strokeLine(x + boxWidth, y - boxHeight, x + boxWidth, y);
-					}
-					if (t == taxaBlock.getNtax()) {
-						gc.setLineWidth(0.75);
-						gc.setStroke(lineStroke);
-						gc.strokeLine(x, y, x + boxWidth, y);
-					}
-				}
-			}
-		}
 	}
 
 	@Override

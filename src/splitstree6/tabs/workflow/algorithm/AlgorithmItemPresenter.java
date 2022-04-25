@@ -23,7 +23,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ProgressIndicator;
 import jloda.fx.util.ResourceManagerFX;
-import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
@@ -49,7 +48,7 @@ public class AlgorithmItemPresenter {
 		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node)));
 
 		controller.getEditButton().setOnAction(e -> mainWindow.getAlgorithmTabsManager().showTab(node, true));
-		if (algorithmItem.getWorkflowNode().getAlgorithm() instanceof DataTaxaFilter && !(algorithmItem.getWorkflowNode().getAlgorithm() instanceof CharactersTaxaFilter))
+		if (algorithmItem.getWorkflowNode().getAlgorithm() instanceof DataTaxaFilter)
 			controller.getEditButton().setDisable(true);
 		else
 			controller.getEditButton().disableProperty().bind(selected.not());

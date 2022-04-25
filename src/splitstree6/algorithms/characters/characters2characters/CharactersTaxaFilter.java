@@ -19,16 +19,16 @@
 
 package splitstree6.algorithms.characters.characters2characters;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.DataTaxaFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 /**
@@ -36,17 +36,10 @@ import java.util.List;
  * Daniel Huson, 2020
  */
 public class CharactersTaxaFilter extends DataTaxaFilter<CharactersBlock, CharactersBlock> {
-	private final BooleanProperty optionExcludeGapSites = new SimpleBooleanProperty(this, "optionExcludeGapSites", false);
-	private final BooleanProperty optionExcludeParsimonyUninformativeSites = new SimpleBooleanProperty(this, "optionExcludeParsimonyUninformativeSites", false);
-	private final BooleanProperty optionExcludeConstantSites = new SimpleBooleanProperty(this, "optionExcludeConstantSites", false);
-
-	private final BooleanProperty optionExcludeFirstCodonPosition = new SimpleBooleanProperty(this, "optionExcludeFirstCodonPosition", false);
-	private final BooleanProperty optionExcludeSecondCodonPosition = new SimpleBooleanProperty(this, "optionExcludeSecondCodonPosition", false);
-	private final BooleanProperty optionExcludeThirdCodonPosition = new SimpleBooleanProperty(this, "optionExcludeThirdCodonPosition", false);
+	private final ObjectProperty<int[]> optionDisabledCharacters = new SimpleObjectProperty<>(this, "optionDisabledCharacters", new int[0]);
 
 	public List<String> listOptions() {
-		return Arrays.asList(optionExcludeGapSites.getName(), optionExcludeParsimonyUninformativeSites.getName(), optionExcludeConstantSites.getName(),
-				optionExcludeFirstCodonPosition.getName(), optionExcludeSecondCodonPosition.getName(), optionExcludeThirdCodonPosition.getName());
+		return List.of(optionDisabledCharacters.getName());
 	}
 
 	public CharactersTaxaFilter() {
@@ -54,135 +47,66 @@ public class CharactersTaxaFilter extends DataTaxaFilter<CharactersBlock, Charac
 	}
 
 	@Override
-	public void filter(ProgressListener progress, TaxaBlock originalTaxaBlock, TaxaBlock modifiedTaxaBlock, CharactersBlock inputData, CharactersBlock outputData) throws IOException {
+	public void filter(ProgressListener progress, TaxaBlock inputTaxa, TaxaBlock workingTaxa, CharactersBlock inputCharacters, CharactersBlock workingCharacters) throws IOException {
+		progress.setMaximum(workingTaxa.size());
 		// todo: implement direct copy?
-		{
-			//System.err.println("******* CharactersTaxaFilter");
-			progress.setMaximum(modifiedTaxaBlock.size());
-			/*
-			final StringWriter w = new StringWriter();
-			try {
-				final CharactersNexusOutput charactersNexusOutput = new CharactersNexusOutput();
-				charactersNexusOutput.setIgnoreMatrix(true);
-				charactersNexusOutput.write(w, originalTaxaBlock, parent);
-				final CharactersNexusInput charactersNexusInput = new CharactersNexusInput();
-				charactersNexusInput.setIgnoreMatrix(true);
-				charactersNexusInput.parse(new NexusStreamParser(new StringReader(w.toString())), originalTaxaBlock, outputData);
-			} catch (IOException e) {
-				Basic.caught(e);
+
+		var enabledSites = new BitSet();
+		if (getOptionDisabledCharacters().length > 0) {
+			enabledSites.set(1, inputCharacters.getNchar() + 1);
+			for (var site : getOptionDisabledCharacters()) {
+				enabledSites.clear(site);
 			}
-			 */
-		}
-		outputData.setDimension(modifiedTaxaBlock.getNtax(), 0);
-
-		for (Taxon a : modifiedTaxaBlock.getTaxa()) {
-			final int originalI = originalTaxaBlock.indexOf(a);
-			final int modifiedI = modifiedTaxaBlock.indexOf(a);
-			outputData.copyRow(inputData, originalI, modifiedI);
-			progress.incrementProgress();
 		}
 
-		outputData.setDataType(inputData.getDataType());
+		if (enabledSites.cardinality() == 0 || enabledSites.cardinality() >= inputCharacters.getNchar()) {
+			workingCharacters.setDimension(workingTaxa.getNtax(), 0);
+			for (var taxon : workingTaxa.getTaxa()) {
+				var tIn = inputTaxa.indexOf(taxon);
+				var tOut = workingTaxa.indexOf(taxon);
+				workingCharacters.copyRow(inputCharacters, tIn, tOut);
+				progress.incrementProgress();
+			}
+		} else {
+			workingCharacters.setDimension(workingTaxa.getNtax(), enabledSites.cardinality());
+			for (var taxon : workingTaxa.getTaxa()) {
+				var tIn = inputTaxa.indexOf(taxon);
+				var tOut = workingTaxa.indexOf(taxon);
+				var cOut = 1;
+				for (var cIn : BitSetUtils.members(enabledSites)) {
+					workingCharacters.set(tOut, cOut++, inputCharacters.get(tIn, cIn));
+				}
+				progress.incrementProgress();
+			}
 
-		outputData.setMissingCharacter(inputData.getMissingCharacter());
-		outputData.setGapCharacter(inputData.getGapCharacter());
-		outputData.setHasAmbiguityCodes(inputData.isHasAmbiguityCodes());
-		outputData.setSymbols(inputData.getSymbols());
-		outputData.setCharacterWeights(inputData.getCharacterWeights());
-		outputData.setStateLabeler(inputData.getStateLabeler());
-		outputData.setCharLabeler(inputData.getCharLabeler());
-		outputData.setRespectCase(inputData.isRespectCase());
-		outputData.setUseCharacterWeights(inputData.isUseCharacterWeights());
-
-		if (isOptionExcludeConstantSites() || isOptionExcludeGapSites() || isOptionExcludeFirstCodonPosition() || isOptionExcludeSecondCodonPosition() || isOptionExcludeThirdCodonPosition()
-			|| isOptionExcludeParsimonyUninformativeSites()) {
-			var charactersFilter = new CharactersFilter();
-			charactersFilter.setOptionExcludeConstantSites(isOptionExcludeConstantSites());
-			charactersFilter.setOptionExcludeFirstCodonPosition(isOptionExcludeFirstCodonPosition());
-			charactersFilter.setOptionExcludeSecondCodonPosition(isOptionExcludeSecondCodonPosition());
-			charactersFilter.setOptionExcludeThirdCodonPosition(isOptionExcludeThirdCodonPosition());
-			charactersFilter.setOptionExcludeGapSites(isOptionExcludeGapSites());
-			charactersFilter.setOptionExcludeParsimonyUninformativeSites(isOptionExcludeParsimonyUninformativeSites());
-
-			var charactersBlock = new CharactersBlock(outputData);
-			charactersFilter.compute(progress, modifiedTaxaBlock, charactersBlock, outputData);
 		}
+		workingCharacters.setDataType(inputCharacters.getDataType());
 
-		if (modifiedTaxaBlock.size() == originalTaxaBlock.size())
-			setShortDescription("using all " + modifiedTaxaBlock.size() + " sequences");
+		workingCharacters.setMissingCharacter(inputCharacters.getMissingCharacter());
+		workingCharacters.setGapCharacter(inputCharacters.getGapCharacter());
+		workingCharacters.setHasAmbiguityCodes(inputCharacters.isHasAmbiguityCodes());
+		workingCharacters.setSymbols(inputCharacters.getSymbols());
+		workingCharacters.setCharacterWeights(inputCharacters.getCharacterWeights());
+		workingCharacters.setStateLabeler(inputCharacters.getStateLabeler());
+		workingCharacters.setCharLabeler(inputCharacters.getCharLabeler());
+		workingCharacters.setRespectCase(inputCharacters.isRespectCase());
+		workingCharacters.setUseCharacterWeights(inputCharacters.isUseCharacterWeights());
+
+		if (workingTaxa.size() == inputTaxa.size())
+			setShortDescription("using all " + workingTaxa.size() + " sequences");
 		else
-			setShortDescription("using " + modifiedTaxaBlock.size() + " of " + originalTaxaBlock.size() + " sequences");
+			setShortDescription("using " + workingTaxa.size() + " of " + inputTaxa.size() + " sequences");
 	}
 
-	public boolean isOptionExcludeGapSites() {
-		return optionExcludeGapSites.get();
+	public int[] getOptionDisabledCharacters() {
+		return optionDisabledCharacters.get();
 	}
 
-	public BooleanProperty optionExcludeGapSitesProperty() {
-		return optionExcludeGapSites;
+	public ObjectProperty<int[]> optionDisabledCharactersProperty() {
+		return optionDisabledCharacters;
 	}
 
-	public void setOptionExcludeGapSites(boolean optionExcludeGapSites) {
-		this.optionExcludeGapSites.set(optionExcludeGapSites);
-	}
-
-	public boolean isOptionExcludeParsimonyUninformativeSites() {
-		return optionExcludeParsimonyUninformativeSites.get();
-	}
-
-	public BooleanProperty optionExcludeParsimonyUninformativeSitesProperty() {
-		return optionExcludeParsimonyUninformativeSites;
-	}
-
-	public void setOptionExcludeParsimonyUninformativeSites(boolean optionExcludeParsimonyUninformativeSites) {
-		this.optionExcludeParsimonyUninformativeSites.set(optionExcludeParsimonyUninformativeSites);
-	}
-
-	public boolean isOptionExcludeConstantSites() {
-		return optionExcludeConstantSites.get();
-	}
-
-	public BooleanProperty optionExcludeConstantSitesProperty() {
-		return optionExcludeConstantSites;
-	}
-
-	public void setOptionExcludeConstantSites(boolean optionExcludeConstantSites) {
-		this.optionExcludeConstantSites.set(optionExcludeConstantSites);
-	}
-
-	public boolean isOptionExcludeFirstCodonPosition() {
-		return optionExcludeFirstCodonPosition.get();
-	}
-
-	public BooleanProperty optionExcludeFirstCodonPositionProperty() {
-		return optionExcludeFirstCodonPosition;
-	}
-
-	public void setOptionExcludeFirstCodonPosition(boolean optionExcludeFirstCodonPosition) {
-		this.optionExcludeFirstCodonPosition.set(optionExcludeFirstCodonPosition);
-	}
-
-	public boolean isOptionExcludeSecondCodonPosition() {
-		return optionExcludeSecondCodonPosition.get();
-	}
-
-	public BooleanProperty optionExcludeSecondCodonPositionProperty() {
-		return optionExcludeSecondCodonPosition;
-	}
-
-	public void setOptionExcludeSecondCodonPosition(boolean optionExcludeSecondCodonPosition) {
-		this.optionExcludeSecondCodonPosition.set(optionExcludeSecondCodonPosition);
-	}
-
-	public boolean isOptionExcludeThirdCodonPosition() {
-		return optionExcludeThirdCodonPosition.get();
-	}
-
-	public BooleanProperty optionExcludeThirdCodonPositionProperty() {
-		return optionExcludeThirdCodonPosition;
-	}
-
-	public void setOptionExcludeThirdCodonPosition(boolean optionExcludeThirdCodonPosition) {
-		this.optionExcludeThirdCodonPosition.set(optionExcludeThirdCodonPosition);
+	public void setOptionDisabledCharacters(int[] optionDisabledCharacters) {
+		this.optionDisabledCharacters.set(optionDisabledCharacters);
 	}
 }

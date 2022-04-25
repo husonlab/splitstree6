@@ -138,6 +138,8 @@ public class OptionControlCreator {
 			}
 			case stringArray -> {
 			}
+			case intArray -> {
+			}
 			case doubleArray -> {
 			}
 			case doubleSquareMatrix -> {

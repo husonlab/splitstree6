@@ -22,6 +22,7 @@ package splitstree6.view.alignment;
 import javafx.beans.property.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import javafx.scene.paint.Color;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -35,6 +36,10 @@ import splitstree6.window.MainWindow;
 
 import java.util.List;
 
+/**
+ * displays the input alignment
+ * Daniel Huson, 4.2022
+ */
 public class AlignmentView implements IView {
 	private final UndoManager undoManager = new UndoManager();
 
@@ -43,19 +48,12 @@ public class AlignmentView implements IView {
 	private final AlignmentViewController controller;
 	private final AlignmentViewPresenter presenter;
 
-	private SelectionModel<Integer> siteSelectionModel = new SetSelectionModel<>();
+	private final SelectionModel<Integer> siteSelectionModel = new SetSelectionModel<>();
 
 	private final ObjectProperty<ColorScheme> optionColorScheme = new SimpleObjectProperty<>(this, "optionColorScheme", ColorScheme.None);
 	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", 18);
 	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", 18);
 
-	private final BooleanProperty optionDisableCodon0 = new SimpleBooleanProperty(this, "optionDisableCodon0", false);
-	private final BooleanProperty optionDisableCodon1 = new SimpleBooleanProperty(this, "optionDisableCodon1", false);
-	private final BooleanProperty optionDisableCodon2 = new SimpleBooleanProperty(this, "optionDisableCodon2", false);
-
-	private final BooleanProperty optionDisableConstant = new SimpleBooleanProperty(this, "optionDisableConstant", false);
-	private final BooleanProperty optionDisableNonInformative = new SimpleBooleanProperty(this, "optionDisableNonInformative", false);
-	private final BooleanProperty optionDisableHyperVariable = new SimpleBooleanProperty(this, "optionDisableHyperVariable", false);
 
 	private final StringProperty name = new SimpleStringProperty(this, "name");
 
@@ -64,8 +62,7 @@ public class AlignmentView implements IView {
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	public List<String> listOptions() {
-		return List.of(optionColorScheme.getName(), optionUnitWidth.getName(), optionUnitHeight.getName(), optionDisableCodon0.getName(), optionDisableCodon1.getName(), optionDisableCodon2.getName(),
-				optionDisableConstant.getName(), optionDisableNonInformative.getName(), optionDisableHyperVariable.getName());
+		return List.of(optionColorScheme.getName(), optionUnitWidth.getName(), optionUnitHeight.getName());
 	}
 
 	public AlignmentView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -88,6 +85,12 @@ public class AlignmentView implements IView {
 		setViewTab(viewTab);
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
+
+		System.err.println("A: " + Color.web("0x64F73F").deriveColor(1.0, 0.4, 1.0, 1.0));
+		System.err.println("C: " + Color.web("0xFFB340").deriveColor(1.0, 0.4, 1.0, 1.0));
+		System.err.println("G: " + Color.web("0xEB413C").deriveColor(1.0, 0.4, 1.0, 1.0));
+		System.err.println("T: " + Color.web("0x3C88EE").deriveColor(1.0, 0.4, 1.0, 1.0));
+
 	}
 
 	@Override
@@ -120,7 +123,7 @@ public class AlignmentView implements IView {
 
 	@Override
 	public int size() {
-		return 0;
+		return controller.getTaxaListView().getItems().size();
 	}
 
 	@Override
@@ -166,78 +169,6 @@ public class AlignmentView implements IView {
 
 	public void setOptionColorScheme(ColorScheme optionColorScheme) {
 		this.optionColorScheme.set(optionColorScheme);
-	}
-
-	public boolean isOptionDisableCodon0() {
-		return optionDisableCodon0.get();
-	}
-
-	public BooleanProperty optionDisableCodon0Property() {
-		return optionDisableCodon0;
-	}
-
-	public void setOptionDisableCodon0(boolean optionDisableCodon0) {
-		this.optionDisableCodon0.set(optionDisableCodon0);
-	}
-
-	public boolean isOptionDisableCodon1() {
-		return optionDisableCodon1.get();
-	}
-
-	public BooleanProperty optionDisableCodon1Property() {
-		return optionDisableCodon1;
-	}
-
-	public void setOptionDisableCodon1(boolean optionDisableCodon1) {
-		this.optionDisableCodon1.set(optionDisableCodon1);
-	}
-
-	public boolean isOptionDisableCodon2() {
-		return optionDisableCodon2.get();
-	}
-
-	public BooleanProperty optionDisableCodon2Property() {
-		return optionDisableCodon2;
-	}
-
-	public void setOptionDisableCodon2(boolean optionDisableCodon2) {
-		this.optionDisableCodon2.set(optionDisableCodon2);
-	}
-
-	public boolean isOptionDisableConstant() {
-		return optionDisableConstant.get();
-	}
-
-	public BooleanProperty optionDisableConstantProperty() {
-		return optionDisableConstant;
-	}
-
-	public void setOptionDisableConstant(boolean optionDisableConstant) {
-		this.optionDisableConstant.set(optionDisableConstant);
-	}
-
-	public boolean isOptionDisableNonInformative() {
-		return optionDisableNonInformative.get();
-	}
-
-	public BooleanProperty optionDisableNonInformativeProperty() {
-		return optionDisableNonInformative;
-	}
-
-	public void setOptionDisableNonInformative(boolean optionDisableNonInformative) {
-		this.optionDisableNonInformative.set(optionDisableNonInformative);
-	}
-
-	public boolean isOptionDisableHyperVariable() {
-		return optionDisableHyperVariable.get();
-	}
-
-	public BooleanProperty optionDisableHyperVariableProperty() {
-		return optionDisableHyperVariable;
-	}
-
-	public void setOptionDisableHyperVariable(boolean optionDisableHyperVariable) {
-		this.optionDisableHyperVariable.set(optionDisableHyperVariable);
 	}
 
 	public double getOptionUnitWidth() {

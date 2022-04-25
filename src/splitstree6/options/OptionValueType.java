@@ -32,7 +32,7 @@ import java.io.StringReader;
  * Daniel Huson, 2.2019
  */
 public enum OptionValueType {
-	Integer, Float, Double, String, Boolean, stringArray, doubleArray, doubleSquareMatrix, Enum, Color;
+	Integer, Float, Double, String, Boolean, stringArray, intArray, doubleArray, doubleSquareMatrix, Enum, Color;
 
 	/**
 	 * get the type of a value
@@ -52,6 +52,8 @@ public enum OptionValueType {
 			return String;
 		else if (value instanceof String[])
 			return stringArray;
+		else if (value instanceof int[])
+			return intArray;
 		else if (value instanceof double[])
 			return doubleArray;
 		else if (value instanceof double[][])
@@ -71,8 +73,8 @@ public enum OptionValueType {
 	 */
 	public static boolean isType(OptionValueType type, String text) {
         return switch (type) {
-            case Integer -> NumberUtils.isInteger(text);
-            case Float -> NumberUtils.isFloat(text);
+			case Integer, intArray -> NumberUtils.isInteger(text);
+			case Float -> NumberUtils.isFloat(text);
             case Double, doubleArray, doubleSquareMatrix -> NumberUtils.isDouble(text);
             case Boolean -> NumberUtils.isBoolean(text);
             case String -> text.length() > 0;
@@ -95,22 +97,29 @@ public enum OptionValueType {
 				return NumberUtils.parseFloat(text);
 			case Double:
 				return NumberUtils.parseDouble(text);
-			case doubleArray: {
+			case intArray: {
 				final String[] tokens = text.split("\\s+");
-				final double[] array = new double[tokens.length];
+				final int[] array = new int[tokens.length];
 				for (int i = 0; i < tokens.length; i++)
+					array[i] = NumberUtils.parseInt(tokens[i]);
+				return array;
+			}
+			case doubleArray: {
+				var tokens = text.split("\\s+");
+				var array = new double[tokens.length];
+				for (var i = 0; i < tokens.length; i++)
 					array[i] = NumberUtils.parseDouble(tokens[i]);
 				return array;
 			}
 			case doubleSquareMatrix: {
-				final String[] tokens = text.split("\\s+");
-				final int length = (int) Math.round(Math.sqrt(tokens.length));
+				var tokens = text.split("\\s+");
+				var length = (int) Math.round(Math.sqrt(tokens.length));
 				if (length * length != tokens.length)
 					throw new RuntimeException("doubleSquareMatrix: wrong number of tokens: " + tokens.length);
-				final double[][] matrix = new double[length][length];
-				int count = 0;
-				for (int i = 0; i < length; i++) {
-					for (int j = 0; j < length; j++) {
+				var matrix = new double[length][length];
+				var count = 0;
+				for (var i = 0; i < length; i++) {
+					for (var j = 0; j < length; j++) {
 						matrix[i][j] = NumberUtils.parseDouble(tokens[count++]);
 					}
 				}
@@ -141,36 +150,46 @@ public enum OptionValueType {
 	public static String toStringType(OptionValueType type, Object object) {
 		switch (type) {
 			case Integer:
-				return java.lang.String.format("%d", (Integer) object);
+				return "%d".formatted((Integer) object);
 			case Float:
-				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.6f", (Float) object));
+				return StringUtils.removeTrailingZerosAfterDot("%.6f", (Float) object);
 			case Double:
-				return StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.8f", (Double) object));
+				return StringUtils.removeTrailingZerosAfterDot("%.8f", (Double) object);
+			case intArray: {
+				var buf = new StringBuilder();
+				var array = (int[]) object;
+				for (var value : array) {
+					if (buf.length() > 0)
+						buf.append(" ");
+					buf.append(StringUtils.removeTrailingZerosAfterDot("%d", value));
+				}
+				return buf.toString();
+			}
 			case doubleArray: {
-				StringBuilder buf = new StringBuilder();
-				final double[] array = (double[]) object;
+				var buf = new StringBuilder();
+				var array = (double[]) object;
 				for (double value : array) {
 					if (buf.length() > 0)
 						buf.append(" ");
-					buf.append(StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.4f", value)));
+					buf.append(StringUtils.removeTrailingZerosAfterDot("%.4f", value));
 				}
 				return buf.toString();
 			}
 			case doubleSquareMatrix: {
-				StringBuilder buf = new StringBuilder();
-				final double[][] matrix = (double[][]) object;
-				for (double[] row : matrix) {
-					for (int j = 0; j < matrix.length; j++) {
+				var buf = new StringBuilder();
+				var matrix = (double[][]) object;
+				for (var row : matrix) {
+					for (var j = 0; j < matrix.length; j++) {
 						if (j > 0)
 							buf.append(" ");
-						buf.append(StringUtils.removeTrailingZerosAfterDot(java.lang.String.format("%.4f", row[j])));
+						buf.append(StringUtils.removeTrailingZerosAfterDot("%.4f", row[j]));
 					}
 					buf.append(" "); // could also put \n here
 				}
 				return buf.toString();
 			}
 			case stringArray: {
-				final String[] array = (String[]) object;
+				var array = (String[]) object;
 				if (array.length == 0)
 					return "";
 				else

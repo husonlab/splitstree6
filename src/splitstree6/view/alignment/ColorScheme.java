@@ -35,10 +35,10 @@ public enum ColorScheme {
 		ch = Character.toUpperCase(ch);
 		return switch (colorScheme) {
 			case Nucleotide -> switch (ch) {
-				case 'A' -> Color.web("0x64F73F");
-				case 'C' -> Color.web("0xFFB340");
-				case 'G' -> Color.web("0xEB413C");
-				case 'T', 'U' -> Color.web("0x3C88EE");
+				case 'A' -> Color.web("0xbbf7adff");
+				case 'C' -> Color.web("0xffe2b3ff");
+				case 'G' -> Color.web("0xeba8a5ff");
+				case 'T', 'U' -> Color.web("0xa7c4eeff");
 				case '-' -> Color.GRAY;
 				default -> otherColor;
 			};

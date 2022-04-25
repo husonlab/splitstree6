@@ -22,6 +22,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.Group?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
@@ -37,19 +38,15 @@
                             <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" text="Select All"/>
                             <MenuItem fx:id="selectNoneMenuItem" mnemonicParsing="false" text="Select None"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
-                            <MenuItem fx:id="selectConstantMenuItem" mnemonicParsing="false"
-                                      text="Constant Sites"/>
-                            <MenuItem fx:id="selectGapMenuItem" mnemonicParsing="false"
-                                      text="Gap Sites"/>
+                            <MenuItem fx:id="selectConstantMenuItem" mnemonicParsing="false" text="Constant Sites"/>
+                            <MenuItem fx:id="selectGapMenuItem" mnemonicParsing="false" text="Gap Sites"/>
                             <MenuItem fx:id="selectAllNonInformativeMenuItem" mnemonicParsing="false"
                                       text="Non Informative Sites"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
-                            <MenuItem fx:id="selectCodon0MenuItem" mnemonicParsing="false"
-                                      text="First Codon Position"/>
+                            <MenuItem fx:id="selectCodon0MenuItem" mnemonicParsing="false" text="First Codon Position"/>
                             <MenuItem fx:id="selectCodon1MenuItem" mnemonicParsing="false"
                                       text="Second Codon Position"/>
-                            <MenuItem fx:id="selectCodon2MenuItem" mnemonicParsing="false"
-                                      text="Third Codon Position 2"/>
+                            <MenuItem fx:id="selectCodon2MenuItem" mnemonicParsing="false" text="Third Codon Position"/>
                         </items>
                     </MenuButton>
                     <Separator layoutX="119.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
@@ -161,10 +158,22 @@
                                             <children>
                                                 <BorderPane VBox.vgrow="ALWAYS">
                                                     <center>
-                                                        <ScrollPane fx:id="centerPane" hbarPolicy="NEVER"
+                                                        <ScrollPane fx:id="scrollPane" hbarPolicy="NEVER"
                                                                     vbarPolicy="NEVER">
                                                             <content>
-                                                                <Canvas fx:id="canvas" height="200.0" width="200.0"/>
+                                                                <StackPane fx:id="stackPane">
+                                                                    <children>
+                                                                        <Canvas fx:id="canvas" height="200.0"
+                                                                                width="200.0"/>
+                                                                        <Pane fx:id="selectionPane">
+                                                                            <children>
+                                                                                <Group fx:id="taxaSelectionGroup"/>
+                                                                                <Group fx:id="siteSelectionGroup"
+                                                                                       layoutX="10.0" layoutY="10.0"/>
+                                                                            </children>
+                                                                        </Pane>
+                                                                    </children>
+                                                                </StackPane>
                                                             </content>
                                                         </ScrollPane>
                                                     </center>

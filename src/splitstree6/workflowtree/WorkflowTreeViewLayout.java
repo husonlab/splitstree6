@@ -163,17 +163,19 @@ public class WorkflowTreeViewLayout {
 					if (e.wasAdded()) {
 						if (isNotContainedInTreeView(item)) {
 							for (var parentNode : e.getAddedSubList()) {
-								if (parentNode instanceof AlgorithmNode && node instanceof DataNode dataNode && parentNode == dataNode.getPreferredParent()) {
-									var parentItem = nodeItemMap.get(parentNode);
-									parentItem.getChildren().add(item);
-									compress(parentItem);
-									break;
+								var parentItem = nodeItemMap.get(parentNode);
 
-								} else if (parentNode instanceof DataNode && node instanceof AlgorithmNode algorithmNode && parentNode == algorithmNode.getPreferredParent()) {
-									var parentItem = nodeItemMap.get(parentNode);
-									parentItem.getChildren().add(item);
-									compress(parentItem);
-									break;
+								if (parentItem != null) {
+									if (parentNode instanceof AlgorithmNode && node instanceof DataNode dataNode && parentNode == dataNode.getPreferredParent()) {
+										parentItem.getChildren().add(item);
+										compress(parentItem);
+										break;
+
+									} else if (parentNode instanceof DataNode && node instanceof AlgorithmNode algorithmNode && parentNode == algorithmNode.getPreferredParent()) {
+										parentItem.getChildren().add(item);
+										compress(parentItem);
+										break;
+									}
 								}
 							}
 						}

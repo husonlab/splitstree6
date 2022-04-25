@@ -57,6 +57,12 @@ public class OptionIO {
 						if (option != null) {
 							final var type = option.getOptionValueType();
 							switch (type) {
+								case intArray -> {
+									final var array = (int[]) option.getProperty().getValue();
+									for (var i = 0; i < array.length; i++) {
+										array[i] = np.getInt();
+									}
+								}
 								case doubleArray -> {
 									final var array = (double[]) option.getProperty().getValue();
 									for (var i = 0; i < array.length; i++) {
