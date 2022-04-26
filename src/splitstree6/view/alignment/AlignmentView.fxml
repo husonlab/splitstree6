@@ -139,6 +139,9 @@
                             <Tooltip text="Contract horizontally"/>
                         </tooltip>
                     </Button>
+                    <Separator layoutX="223.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <Label fx:id="selectionLabel" text="Selected"/>
                 </ToolBar>
             </VBox>
         </top>
@@ -224,16 +227,20 @@
     </BorderPane>
     <HBox prefHeight="24.0" spacing="5.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="2.0">
         <children>
-            <Button fx:id="disableButton" mnemonicParsing="false" text="Disable">
-                <tooltip>
-                    <Tooltip text="Disable selected taxa and/or sites"/>
-                </tooltip>
-            </Button>
-            <Button fx:id="enableButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" text="Enable">
-                <tooltip>
-                    <Tooltip text="Enable selected taxa and/or sites"/>
-                </tooltip>
-            </Button>
+            <MenuButton fx:id="filterMenu" mnemonicParsing="false" text="Filter">
+                <items>
+                    <MenuItem fx:id="enableAllTaxaMenuItem" mnemonicParsing="false" text="Enable All Taxa"/>
+                    <MenuItem fx:id="enableSelectedTaxaOnlyMenuItem" mnemonicParsing="false"
+                              text="Enable Selected Taxa Only"/>
+                    <MenuItem fx:id="disableSelectedTaxaMenuItem" mnemonicParsing="false" text="Disable Selected Taxa"/>
+                    <SeparatorMenuItem mnemonicParsing="false"/>
+                    <MenuItem fx:id="enableAllSitesMenuItem" mnemonicParsing="false" text="Enable All Sites"/>
+                    <MenuItem fx:id="enableSelectedSitesOnlyMenuItem" mnemonicParsing="false"
+                              text="Enable Selected Sites Only"/>
+                    <MenuItem fx:id="disableSelectedSitesMenuItem" mnemonicParsing="false"
+                              text="Disable Selected Sites"/>
+                </items>
+            </MenuButton>
         </children>
     </HBox>
 </AnchorPane>

@@ -25,9 +25,12 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import jloda.fx.control.CopyableLabel;
 import splitstree6.data.parts.Taxon;
 
 public class AlignmentViewController {
+    @FXML
+    private MenuButton filterMenu;
 
     @FXML
     private BorderPane borderPane;
@@ -130,11 +133,25 @@ public class AlignmentViewController {
     private Group siteSelectionGroup;
 
     @FXML
-    private Button disableButton;
+    private MenuItem disableSelectedSitesMenuItem;
 
     @FXML
-    private Button enableButton;
+    private MenuItem enableSelectedSitesOnlyMenuItem;
 
+    @FXML
+    private MenuItem disableSelectedTaxaMenuItem;
+
+    @FXML
+    private MenuItem enableAllSitesMenuItem;
+
+    @FXML
+    private MenuItem enableAllTaxaMenuItem;
+
+    @FXML
+    private MenuItem enableSelectedTaxaOnlyMenuItem;
+
+    @FXML
+    private Label selectionLabel;
 
     @FXML
     private Group taxaSelectionGroup;
@@ -142,6 +159,8 @@ public class AlignmentViewController {
     private final NumberAxis axis = new NumberAxis();
 
     private final Pane rightTopPane = new Pane();
+
+    private final CopyableLabel copyableSelectionLabel = new CopyableLabel("Selection");
 
     @FXML
     private void initialize() {
@@ -160,15 +179,22 @@ public class AlignmentViewController {
         scrollPane.setFitToWidth(true);
         scrollPane.setFitToHeight(true);
 
+        var pos = toolBar.getItems().indexOf(selectionLabel);
+        toolBar.getItems().add(pos, copyableSelectionLabel);
+        toolBar.getItems().remove(selectionLabel);
+
         hScrollBar.widthProperty().addListener((v, o, n) -> canvas.setWidth(n.doubleValue() - 16));
         vScrollBar.heightProperty().addListener((v, o, n) -> canvas.setHeight(n.doubleValue()));
-
 
         splitPane.widthProperty().addListener((v, o, n) -> {
             if (n.doubleValue() > 0 && o.doubleValue() > 0) {
                 splitPane.setDividerPositions(splitPane.getDividerPositions()[0] / n.doubleValue() * o.doubleValue());
             }
         });
+
+        filterMenu.disableProperty().bind(enableAllTaxaMenuItem.disableProperty().and(enableSelectedTaxaOnlyMenuItem.disableProperty())
+                .and(disableSelectedTaxaMenuItem.disableProperty()).and(enableAllSitesMenuItem.disableProperty())
+                .and(enableSelectedSitesOnlyMenuItem.disableProperty()).and(disableSelectedSitesMenuItem.disableProperty()));
     }
 
     public BorderPane getBorderPane() {
@@ -239,7 +265,6 @@ public class AlignmentViewController {
     public ScrollBar gethScrollBar() {
         return hScrollBar;
     }
-
 
     public AnchorPane getInnerAnchorPane() {
         return innerAnchorPane;
@@ -313,11 +338,31 @@ public class AlignmentViewController {
         return rightTopPane;
     }
 
-    public Button getDisableButton() {
-        return disableButton;
+    public MenuItem getDisableSelectedSitesMenuItem() {
+        return disableSelectedSitesMenuItem;
     }
 
-    public Button getEnableButton() {
-        return enableButton;
+    public MenuItem getEnableSelectedSitesOnlyMenuItem() {
+        return enableSelectedSitesOnlyMenuItem;
+    }
+
+    public MenuItem getDisableSelectedTaxaMenuItem() {
+        return disableSelectedTaxaMenuItem;
+    }
+
+    public MenuItem getEnableAllSitesMenuItem() {
+        return enableAllSitesMenuItem;
+    }
+
+    public MenuItem getEnableAllTaxaMenuItem() {
+        return enableAllTaxaMenuItem;
+    }
+
+    public MenuItem getEnableSelectedTaxaOnlyMenuItem() {
+        return enableSelectedTaxaOnlyMenuItem;
+    }
+
+    public CopyableLabel getSelectionLabel() {
+        return copyableSelectionLabel;
     }
 }

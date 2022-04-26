@@ -47,7 +47,7 @@ public class AlignmentView implements IView {
 	private final AlignmentViewController controller;
 	private final AlignmentViewPresenter presenter;
 
-	private final SelectionModel<Integer> siteSelectionModel = new SetSelectionModel<>();
+	private final SelectionModel<Integer> sitesSelectionModel = new SetSelectionModel<>();
 
 	private final ObjectProperty<ColorScheme> optionColorScheme = new SimpleObjectProperty<>(this, "optionColorScheme", ColorScheme.None);
 	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", 18);
@@ -148,8 +148,8 @@ public class AlignmentView implements IView {
 		return null;
 	}
 
-	public SelectionModel<Integer> getSiteSelectionModel() {
-		return siteSelectionModel;
+	public SelectionModel<Integer> getSitesSelectionModel() {
+		return sitesSelectionModel;
 	}
 
 	public ColorScheme getOptionColorScheme() {

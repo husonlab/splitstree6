@@ -123,7 +123,7 @@ public class WorkflowSetup {
 		var viewBlock = new ViewBlock();
 		var dataNode = workflow.newDataNode(viewBlock);
 		Platform.runLater(() -> {
-			var alignmentView = new AlignmentView(workflow.getMainWindow(), "MSA", viewBlock.getViewTab());
+			var alignmentView = new AlignmentView(workflow.getMainWindow(), "Alignment", viewBlock.getViewTab());
 			viewBlock.setView(alignmentView);
 			viewBlock.setNode(dataNode);
 		});

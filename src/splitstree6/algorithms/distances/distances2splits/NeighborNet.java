@@ -103,8 +103,11 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		splitsBlock.getSplits().addAll(splits);
 
-		if (!(progress instanceof ProgressSilent))
-			System.err.printf("Time: %,.1fs%n", (System.currentTimeMillis() - start) / 1000f);
+		if (!(progress instanceof ProgressSilent)) {
+			var seconds = (System.currentTimeMillis() - start) / 1000.0;
+			if (seconds > 10)
+				System.err.printf("Time: %,.1fs%n", seconds);
+		}
 	}
 
 	@Override

@@ -439,10 +439,9 @@ public class CharactersBlock extends DataBlock {
 	 * @return true, if all letters the same
 	 */
 	public boolean isConstantSite(int column) {
-		column -= 1;
-		var ch = matrix[0][column];
+		var ch = matrix[0][column - 1];
 		for (int r = 1; r < matrix.length; r++) {
-			if (matrix[r][column] != ch)
+			if (matrix[r][column - 1] != ch)
 				return false;
 		}
 		return true;
@@ -455,8 +454,8 @@ public class CharactersBlock extends DataBlock {
 	 * @return true, some letter is gap
 	 */
 	public boolean isGapSite(int column) {
-		for (int r = 1; r < matrix.length; r++) {
-			if (matrix[r][column] == getGapCharacter())
+		for (char[] row : matrix) {
+			if (row[column - 1] == getGapCharacter())
 				return true;
 		}
 		return false;
@@ -469,11 +468,10 @@ public class CharactersBlock extends DataBlock {
 	 * @return true, if at most two different letters present
 	 */
 	public boolean isNonParsimonyInformative(int column) {
-		column -= 1;
 		var ch1 = 0;
 		var ch2 = 0;
-		for (int r = 0; r < matrix.length; r++) {
-			var ch = matrix[r][column];
+		for (char[] row : matrix) {
+			var ch = row[column - 1];
 			if (ch1 == 0)
 				ch1 = ch;
 			else if (ch2 == 0)
