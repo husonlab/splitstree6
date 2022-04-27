@@ -32,6 +32,8 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 
+import java.util.BitSet;
+
 /**
  * draw the alignment and indicate selection
  * Daniel Huson, 4.2022
@@ -40,12 +42,15 @@ public class DrawAlignment {
 	/**
 	 * draw the alignment
 	 */
-	public static void updateCanvas(Canvas canvas, TaxaBlock taxaBlock, CharactersBlock charactersBlock, ColorScheme colorScheme,
-									double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis) {
+	public static void updateCanvas(Canvas canvas, TaxaBlock inputTaxa, CharactersBlock inputCharacters, ColorScheme colorScheme,
+									double boxHeight, ScrollBar vScrollBar, NumberAxis axis) {
 		var gc = canvas.getGraphicsContext2D();
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-		if (taxaBlock != null && charactersBlock != null) {
+		if (inputTaxa != null && inputCharacters != null) {
+			var axisStartOffset = 7;
+			var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
+
 			var fontSize = 0.9 * Math.min(boxWidth, boxHeight);
 			gc.setFont(Font.font("monospaced", fontSize));
 			var showColors = (colorScheme != ColorScheme.None);
@@ -54,35 +59,33 @@ public class DrawAlignment {
 			var textFill = !showColors && MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK;
 			// will only stroke to show selection:
 
-			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - taxaBlock.getNtax() * boxHeight)) : 0;
+			var vOffset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - inputTaxa.getNtax() * boxHeight)) : 0;
 
-			for (var t = 1; t <= taxaBlock.getNtax(); t++) {
-				var y = t * boxHeight + offset;
+			for (var t = 1; t <= inputTaxa.getNtax(); t++) {
+				var y = t * boxHeight + vOffset;
 				if (y < 0)
 					continue;
-				;
 				if (y > canvas.getHeight() + boxHeight)
 					break;
 
-				var left = (int) Math.max(1, Math.floor(axis.getLowerBound()));
-				var right = Math.min(charactersBlock.getNchar(), Math.ceil(axis.getUpperBound()));
+				var left = Math.max(1, (int) axis.getLowerBound() - 1);
+				var right = Math.min(inputCharacters.getNchar(), Math.ceil(axis.getUpperBound()));
 
-				var col = 0;
-				for (var c = left; c <= right; c++) {
-					var ch = charactersBlock.get(t, c);
-					var x = (col++) * boxWidth;
+				for (var site = left; site <= right; site++) {
+					var ch = inputCharacters.get(t, site);
+					var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
 					if (showColors) {
 						gc.setFill(colorScheme.apply(ch));
 						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
 					}
 					gc.setFill(textFill);
-					gc.fillText(String.valueOf(ch), x + 0.25 * fontSize, y - 0.4 * fontSize);
-					if (c == charactersBlock.getNchar()) {
+					gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.4 * fontSize);
+					if (site == 1) {
 						gc.setLineWidth(0.75);
 						gc.setStroke(lineStroke);
-						gc.strokeLine(x + boxWidth, y - boxHeight, x + boxWidth, y);
+						gc.strokeLine(x, y - boxHeight, x, y);
 					}
-					if (t == taxaBlock.getNtax()) {
+					if (t == inputTaxa.getNtax()) {
 						gc.setLineWidth(0.75);
 						gc.setStroke(lineStroke);
 						gc.strokeLine(x, y, x + boxWidth, y);
@@ -92,26 +95,36 @@ public class DrawAlignment {
 		}
 	}
 
+	public final static Color SELECTION_FILL = Color.web("#039ED3").deriveColor(1, 1, 1, 0.4);
+	public final static Color SELECTION_STROKE = (Color.web("#039ED3"));
+	public final static Color INACTIVE_FILL = Color.LIGHTGRAY.deriveColor(1, 1, 1, 0.8);
+	public final static Color INACTIVE_STROKE = Color.DARKGRAY;
+
 	/**
 	 * update the site selection visualization
 	 */
-	public static void updateSiteSelection(Canvas canvas, Group selectionGroup, TaxaBlock taxaBlock, CharactersBlock charactersBlock,
-										   double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis, SelectionModel<Integer> siteSelectionModel) {
+	public static void updateSiteSelection(Canvas canvas, Group selectionGroup, TaxaBlock inputTaxa, CharactersBlock inputCharacters,
+										   double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activeSites, BitSet selectedSites) {
 		selectionGroup.getChildren().clear();
-		if (taxaBlock != null && charactersBlock != null) {
-			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - taxaBlock.getNtax() * boxHeight)) : 0;
+		if (inputTaxa != null && inputCharacters != null) {
+			var axisStartOffset = 7;
+			var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
 
-			var height = Math.min(canvas.getHeight(), taxaBlock.getNtax() * boxHeight + offset);
-			var left = (int) Math.max(1, Math.floor(axis.getLowerBound()));
-			var right = Math.min(charactersBlock.getNchar(), Math.ceil(axis.getUpperBound()));
+			var vOffset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - inputTaxa.getNtax() * boxHeight)) : 0;
 
-			var col = 0;
-			for (var c = left; c <= right; c++) {
-				var x = (col++) * boxWidth;
-				if (siteSelectionModel.isSelected(c)) {
+			var height = Math.min(canvas.getHeight(), inputTaxa.getNtax() * boxHeight + vOffset);
+			var left = (int) Math.max(1, Math.floor(axis.getLowerBound()) - 1);
+			var right = Math.min(inputCharacters.getNchar(), Math.ceil(axis.getUpperBound()));
+
+			for (var site = left; site <= right; site++) {
+				var inactive = !activeSites.get(site);
+				var selected = selectedSites.get(site);
+
+				var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
+				if (selected || inactive) {
 					var rectangle = new Rectangle(x - 10, -10, boxWidth, height);
-					rectangle.setFill(Color.web("#039ED3").deriveColor(1, 1, 1, 0.4));
-					rectangle.setStroke(Color.web("#039ED3"));
+					rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_FILL);
+					rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_STROKE);
 					selectionGroup.getChildren().add(rectangle);
 				}
 			}
@@ -121,14 +134,14 @@ public class DrawAlignment {
 	/**
 	 * update the taxon selection visualization
 	 */
-	public static void updateTaxaSelection(Canvas canvas, Group selectionGroup, TaxaBlock taxaBlock, CharactersBlock charactersBlock,
+	public static void updateTaxaSelection(Canvas canvas, Group selectionGroup, TaxaBlock inputTaxa, CharactersBlock inputCharacters,
 										   double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis, SelectionModel<Taxon> taxonSelectionModel) {
 		selectionGroup.getChildren().clear();
-		if (taxaBlock != null && charactersBlock != null) {
-			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - taxaBlock.getNtax() * boxHeight)) : 0;
+		if (inputTaxa != null && inputCharacters != null) {
+			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - inputTaxa.getNtax() * boxHeight)) : 0;
 
-			var width = Math.min(canvas.getWidth(), (charactersBlock.getNchar() - axis.getLowerBound() + 1) * boxWidth);
-			for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+			var width = Math.min(canvas.getWidth(), (inputCharacters.getNchar() - axis.getLowerBound() + 1) * boxWidth);
+			for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 				var y = t * boxHeight + offset;
 				if (y < 0)
 					continue;
@@ -136,7 +149,7 @@ public class DrawAlignment {
 				if (y > canvas.getHeight() + boxHeight)
 					break;
 
-				if (taxonSelectionModel.isSelected(taxaBlock.get(t))) {
+				if (taxonSelectionModel.isSelected(inputTaxa.get(t))) {
 					var rectangle = new Rectangle(0, y - boxHeight, width, boxHeight);
 					rectangle.setFill(Color.web("#039ED3").deriveColor(1, 1, 1, 0.4));
 					rectangle.setStroke(Color.web("#039ED3"));

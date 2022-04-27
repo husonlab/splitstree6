@@ -47,7 +47,9 @@ public class DataNodeContextMenuPresenter {
 	public DataNodeContextMenuPresenter(MainWindow mainWindow, UndoManager undoManager, DataNodeContextMenuController controller, DataNode dataNode) {
 		var workflow = mainWindow.getWorkflow();
 
-		controller.getShowTextMenuItem().setOnAction(e -> mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true));
+		controller.getShowTextMenuItem().setOnAction(e -> {
+			mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
+		});
 		controller.getShowTextMenuItem().disableProperty().bind(dataNode.validProperty().not().or(dataNode.allParentsValidProperty().not()));
 
 		controller.getExportMenuItem().setOnAction(e -> {

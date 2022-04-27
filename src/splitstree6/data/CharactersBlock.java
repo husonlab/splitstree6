@@ -465,20 +465,24 @@ public class CharactersBlock extends DataBlock {
 	 * is this a non-parsimony informative site?
 	 *
 	 * @param column 1-based
-	 * @return true, if at most two different letters present
+	 * @return true, if at most two different letters present, and one only present once
 	 */
 	public boolean isNonParsimonyInformative(int column) {
 		var ch1 = 0;
+		var count1 = 0;
 		var ch2 = 0;
+		var count2=0;
 		for (char[] row : matrix) {
 			var ch = row[column - 1];
-			if (ch1 == 0)
+			if (ch1 == 0 || ch == ch1) {
 				ch1 = ch;
-			else if (ch2 == 0)
+				count1++;
+			} else if (ch2 == 0 || ch2 == ch) {
 				ch2 = ch;
-			else if (ch != ch1 && ch != ch2)
+				count2++;
+			} else
 				return false;
 		}
-		return true;
+		return ch1 == 0 || ch2 == 0 || count1 ==1 || count2==1;
 	}
 }

@@ -19,13 +19,17 @@
 
 package splitstree6.view.alignment;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Line;
-import jloda.fx.selection.SelectionModel;
+import javafx.scene.shape.Rectangle;
+import splitstree6.data.CharactersBlock;
+
+import java.util.BitSet;
+
+import static splitstree6.view.alignment.DrawAlignment.*;
 
 /**
  * update axis and horizontal scroll bar
@@ -33,7 +37,7 @@ import jloda.fx.selection.SelectionModel;
  */
 public class AxisAndScrollBarUpdate {
 
-	public static void update(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar, SelectionModel<Integer> siteSelectionModel) {
+	public static void update(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar, ObjectProperty<BitSet> selectedSites) {
 		if (nChar < 1) {
 			scrollBar.setVisible(false);
 			axis.setVisible(false);
@@ -41,9 +45,9 @@ public class AxisAndScrollBarUpdate {
 			scrollBar.setVisible(true);
 			axis.setVisible(true);
 
-			var numberOnCanvas = canvasWidth / boxWidth;
+			var numberOnCanvas = (canvasWidth - 10) / boxWidth;
 			scrollBar.setMin(1);
-			scrollBar.setMax(nChar);
+			scrollBar.setMax(nChar - numberOnCanvas + 1);
 			scrollBar.setVisibleAmount(numberOnCanvas);
 
 			axis.setLowerBound(Math.max(1, Math.floor(scrollBar.getValue())));
@@ -54,31 +58,36 @@ public class AxisAndScrollBarUpdate {
 				double xPosInAxis = axis.sceneToLocal(new Point2D(pointInScene.getX(), 0)).getX();
 				var site = (int) Math.round(axis.getValueForDisplay(xPosInAxis).doubleValue());
 				if (site >= 1 && site <= nChar) {
+					var bits = new BitSet();
+					bits.or(selectedSites.get());
 					if (event.isShiftDown()) {
-						if (siteSelectionModel.size() == 0 || siteSelectionModel.size() == 1 && siteSelectionModel.isSelected(site)) {
-							siteSelectionModel.toggleSelection(site);
+						if (bits.cardinality() == 0 || bits.cardinality() == 1 && bits.get(site)) {
+							bits.set(site, !bits.get(site));
 						} else {
 							var left = site;
-							while (left >= 1 && !siteSelectionModel.isSelected(left))
+							while (left >= 1 && !bits.get(left))
 								left--;
 							var right = site;
-							while (right <= nChar && !siteSelectionModel.isSelected(right))
+							while (right <= nChar && !bits.get(right))
 								right++;
 							if (left >= 1) {
 								for (var s = left; s <= site; s++)
-									siteSelectionModel.select(s);
+									bits.set(s);
 							}
 							if (right <= nChar) {
 								for (var s = site; s <= right; s++)
-									siteSelectionModel.select(s);
+									bits.set(s);
 							}
 						}
 					} else if (event.isShortcutDown()) {
-						siteSelectionModel.toggleSelection(site);
+						bits.set(site, !bits.get(site));
 					} else {
-						siteSelectionModel.clearSelection();
-						siteSelectionModel.select(site);
+						bits.clear();
+						bits.set(site);
 					}
+					if (!bits.equals(selectedSites.get()))
+						selectedSites.set(bits);
+
 				}
 			});
 			if (numberOnCanvas < 100) {
@@ -97,16 +106,28 @@ public class AxisAndScrollBarUpdate {
 		}
 	}
 
-	public static void updateSelection(Pane selectionPane, NumberAxis axis, double boxWidth, SelectionModel<Integer> siteSelectionModel) {
+
+	public static void updateSelection(Pane selectionPane, NumberAxis axis, CharactersBlock inputCharacters, BitSet activeSites, BitSet selectedSites) {
 		selectionPane.setVisible(axis.isVisible());
 		selectionPane.getChildren().clear();
-		for (var site : siteSelectionModel.getSelectedItems()) {
-			var x = (site - axis.getLowerBound() - 0.25) * boxWidth;
-			var line = new Line(x + 1, selectionPane.getHeight(), x + boxWidth - 2, selectionPane.getHeight());
-			line.setStrokeWidth(4);
-			line.setStroke(Color.web("#039ED3"));
-			line.setFill(Color.TRANSPARENT);
-			selectionPane.getChildren().add(line);
+
+		var axisStartOffset = 2;
+		var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
+
+		var left = Math.max(1, (int) axis.getLowerBound() - 1);
+		var right = Math.min(inputCharacters.getNchar(), axis.getUpperBound() - 1);
+
+		for (var site = left; site <= right; site++) {
+			var inactive = !activeSites.get(site);
+			var selected = selectedSites.get(site);
+			if (selected || inactive) {
+				var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
+				var rectangle = new Rectangle(x, selectionPane.getHeight() - 4, Math.max(0.5, boxWidth), 8);
+				rectangle.setStrokeWidth(1);
+				rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_STROKE);
+				rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_FILL);
+				selectionPane.getChildren().add(rectangle);
+			}
 		}
 	}
 }

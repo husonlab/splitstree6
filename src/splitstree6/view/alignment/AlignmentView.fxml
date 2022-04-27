@@ -197,13 +197,6 @@
                                                             </content>
                                                         </ScrollPane>
                                                     </center>
-                                                    <bottom>
-                                                        <ScrollBar fx:id="hScrollBar" BorderPane.alignment="CENTER"/>
-                                                    </bottom>
-                                                    <right>
-                                                        <ScrollBar fx:id="vScrollBar" orientation="VERTICAL"
-                                                                   BorderPane.alignment="CENTER"/>
-                                                    </right>
                                                     <top>
                                                         <StackPane fx:id="rightTopStackPane" maxHeight="-Infinity"
                                                                    minHeight="-Infinity" prefHeight="36.0"
@@ -213,6 +206,13 @@
                                                             </BorderPane.margin>
                                                         </StackPane>
                                                     </top>
+                                                    <bottom>
+                                                        <ScrollBar fx:id="hScrollBar" BorderPane.alignment="CENTER"/>
+                                                    </bottom>
+                                                    <right>
+                                                        <ScrollBar fx:id="vScrollBar" orientation="VERTICAL"
+                                                                   BorderPane.alignment="CENTER"/>
+                                                    </right>
                                                 </BorderPane>
                                             </children>
                                         </VBox>
