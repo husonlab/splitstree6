@@ -19,7 +19,6 @@
 
 package splitstree6.view.alignment;
 
-import javafx.beans.property.ObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ScrollBar;
@@ -37,7 +36,7 @@ import static splitstree6.view.alignment.DrawAlignment.*;
  */
 public class AxisAndScrollBarUpdate {
 
-	public static void update(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar, ObjectProperty<BitSet> selectedSites) {
+	public static void update(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar, AlignmentView alignmentView) {
 		if (nChar < 1) {
 			scrollBar.setVisible(false);
 			axis.setVisible(false);
@@ -59,7 +58,7 @@ public class AxisAndScrollBarUpdate {
 				var site = (int) Math.round(axis.getValueForDisplay(xPosInAxis).doubleValue());
 				if (site >= 1 && site <= nChar) {
 					var bits = new BitSet();
-					bits.or(selectedSites.get());
+					bits.or(alignmentView.getSelectedSites());
 					if (event.isShiftDown()) {
 						if (bits.cardinality() == 0 || bits.cardinality() == 1 && bits.get(site)) {
 							bits.set(site, !bits.get(site));
@@ -85,9 +84,7 @@ public class AxisAndScrollBarUpdate {
 						bits.clear();
 						bits.set(site);
 					}
-					if (!bits.equals(selectedSites.get()))
-						selectedSites.set(bits);
-
+					alignmentView.setSelectedSites(bits);
 				}
 			});
 			if (numberOnCanvas < 100) {
@@ -122,10 +119,10 @@ public class AxisAndScrollBarUpdate {
 			var selected = selectedSites.get(site);
 			if (selected || inactive) {
 				var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
-				var rectangle = new Rectangle(x, selectionPane.getHeight() - 4, Math.max(0.5, boxWidth), 8);
+				var rectangle = new Rectangle(x, selectionPane.getHeight() - 4, Math.max(0.5, boxWidth), 6);
 				rectangle.setStrokeWidth(1);
 				rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_STROKE);
-				rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_FILL);
+				rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_STROKE);
 				selectionPane.getChildren().add(rectangle);
 			}
 		}

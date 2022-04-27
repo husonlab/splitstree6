@@ -187,9 +187,9 @@
                                                                                 width="200.0"/>
                                                                         <Pane fx:id="selectionPane">
                                                                             <children>
-                                                                                <Group fx:id="taxaSelectionGroup"/>
                                                                                 <Group fx:id="siteSelectionGroup"
                                                                                        layoutX="10.0" layoutY="10.0"/>
+                                                                                <Group fx:id="taxaSelectionGroup"/>
                                                                             </children>
                                                                         </Pane>
                                                                     </children>
@@ -232,11 +232,15 @@
                     <MenuItem fx:id="enableAllTaxaMenuItem" mnemonicParsing="false" text="Enable All Taxa"/>
                     <MenuItem fx:id="enableSelectedTaxaOnlyMenuItem" mnemonicParsing="false"
                               text="Enable Selected Taxa Only"/>
+                    <SeparatorMenuItem mnemonicParsing="false"/>
+                    <MenuItem fx:id="enableSelectedTaxaMenuItem" mnemonicParsing="false" text="Enable Selected Taxa"/>
                     <MenuItem fx:id="disableSelectedTaxaMenuItem" mnemonicParsing="false" text="Disable Selected Taxa"/>
                     <SeparatorMenuItem mnemonicParsing="false"/>
                     <MenuItem fx:id="enableAllSitesMenuItem" mnemonicParsing="false" text="Enable All Sites"/>
                     <MenuItem fx:id="enableSelectedSitesOnlyMenuItem" mnemonicParsing="false"
                               text="Enable Selected Sites Only"/>
+                    <SeparatorMenuItem mnemonicParsing="false"/>
+                    <MenuItem fx:id="enableSelectedSitesMenuItem" mnemonicParsing="false" text="Enable Selected Sites"/>
                     <MenuItem fx:id="disableSelectedSitesMenuItem" mnemonicParsing="false"
                               text="Disable Selected Sites"/>
                 </items>

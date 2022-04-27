@@ -26,11 +26,9 @@ import javafx.scene.control.ScrollBar;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
-import jloda.fx.selection.SelectionModel;
 import jloda.fx.window.MainWindowManager;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.Taxon;
 
 import java.util.BitSet;
 
@@ -97,7 +95,7 @@ public class DrawAlignment {
 
 	public final static Color SELECTION_FILL = Color.web("#039ED3").deriveColor(1, 1, 1, 0.4);
 	public final static Color SELECTION_STROKE = (Color.web("#039ED3"));
-	public final static Color INACTIVE_FILL = Color.LIGHTGRAY.deriveColor(1, 1, 1, 0.8);
+	public final static Color INACTIVE_FILL = Color.LIGHTGRAY.brighter().deriveColor(1, 1, 1, 0.8);
 	public final static Color INACTIVE_STROKE = Color.DARKGRAY;
 
 	/**
@@ -107,7 +105,7 @@ public class DrawAlignment {
 										   double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activeSites, BitSet selectedSites) {
 		selectionGroup.getChildren().clear();
 		if (inputTaxa != null && inputCharacters != null) {
-			var axisStartOffset = 7;
+			var axisStartOffset = -3;
 			var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
 
 			var vOffset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - inputTaxa.getNtax() * boxHeight)) : 0;
@@ -116,15 +114,18 @@ public class DrawAlignment {
 			var left = (int) Math.max(1, Math.floor(axis.getLowerBound()) - 1);
 			var right = Math.min(inputCharacters.getNchar(), Math.ceil(axis.getUpperBound()));
 
+			var strokeWidth = Math.min(1, boxWidth / 3);
+
 			for (var site = left; site <= right; site++) {
 				var inactive = !activeSites.get(site);
 				var selected = selectedSites.get(site);
 
 				var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
 				if (selected || inactive) {
-					var rectangle = new Rectangle(x - 10, -10, boxWidth, height);
+					var rectangle = new Rectangle(x + 0.5 * strokeWidth, -10, boxWidth - strokeWidth, height);
+					rectangle.setStrokeWidth(strokeWidth);
 					rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_FILL);
-					rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_STROKE);
+					rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_FILL);
 					selectionGroup.getChildren().add(rectangle);
 				}
 			}
@@ -135,10 +136,13 @@ public class DrawAlignment {
 	 * update the taxon selection visualization
 	 */
 	public static void updateTaxaSelection(Canvas canvas, Group selectionGroup, TaxaBlock inputTaxa, CharactersBlock inputCharacters,
-										   double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis, SelectionModel<Taxon> taxonSelectionModel) {
+										   double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activeTaxa, BitSet selectedTaxa) {
 		selectionGroup.getChildren().clear();
+
 		if (inputTaxa != null && inputCharacters != null) {
 			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - inputTaxa.getNtax() * boxHeight)) : 0;
+
+			var strokeWidth = Math.min(1, boxHeight / 3);
 
 			var width = Math.min(canvas.getWidth(), (inputCharacters.getNchar() - axis.getLowerBound() + 1) * boxWidth);
 			for (var t = 1; t <= inputTaxa.getNtax(); t++) {
@@ -149,10 +153,13 @@ public class DrawAlignment {
 				if (y > canvas.getHeight() + boxHeight)
 					break;
 
-				if (taxonSelectionModel.isSelected(inputTaxa.get(t))) {
-					var rectangle = new Rectangle(0, y - boxHeight, width, boxHeight);
-					rectangle.setFill(Color.web("#039ED3").deriveColor(1, 1, 1, 0.4));
-					rectangle.setStroke(Color.web("#039ED3"));
+				var inactive = !activeTaxa.get(t);
+				var selected = selectedTaxa.get(t);
+
+				if (inactive || selected) {
+					var rectangle = new Rectangle(0, y - boxHeight + 0.5 * strokeWidth, width, boxHeight - strokeWidth);
+					rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_FILL);
+					rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_FILL);
 					selectionGroup.getChildren().add(rectangle);
 				}
 			}

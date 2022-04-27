@@ -74,8 +74,8 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 		setDisabled(Collections.singleton(name), state);
 	}
 
-	public void setDisabled(Collection<? extends String> names, boolean state) {
-		if (state) {
+	public void setDisabled(Collection<? extends String> names, boolean disable) {
+		if (disable) {
 			var disabled = new TreeSet<>(Arrays.asList(getOptionDisabledTaxa()));
 			disabled.addAll(names);
 			setOptionDisabledTaxa(disabled.toArray(new String[0]));

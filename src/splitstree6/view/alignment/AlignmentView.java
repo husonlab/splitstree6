@@ -19,7 +19,6 @@
 
 package splitstree6.view.alignment;
 
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
@@ -29,7 +28,6 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.util.RunAfterAWhile;
 import jloda.util.BitSetUtils;
 import jloda.util.Single;
 import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
@@ -37,6 +35,7 @@ import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
+import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.utils.IView;
@@ -120,70 +119,44 @@ public class AlignmentView implements IView {
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 
-		var workflow = mainWindow.getWorkflow();
-		invalidationListener = e -> {
-			if (workflow.getInputTaxaNode() != null) {
-				inputTaxaNode.set(workflow.getInputTaxaNode());
-				inputTaxaNodeValid.bind(inputTaxaNode.get().validProperty());
-			} else {
-				inputTaxaNode.set(null);
-				inputTaxaNodeValid.bind(new SimpleBooleanProperty(false));
-			}
-			if (workflow.getInputTaxaFilterNode() != null) {
-				taxaFilterNode.set(workflow.getInputTaxaFilterNode());
-				taxaFilterValid.bind(taxaFilterNode.get().validProperty());
-			} else {
-				taxaFilterNode.set(null);
-				taxaFilterValid.bind(new SimpleBooleanProperty(false));
-			}
-			if (workingTaxaNode.get() != null) {
-				workingTaxaNode.set(workflow.getWorkingTaxaNode());
-				workingTaxaNodeValid.bind(workingTaxaNode.get().validProperty());
-			} else {
-				workingTaxaNode.set(null);
-				workingTaxaNodeValid.bind(new SimpleBooleanProperty(false));
-			}
-			if (workflow.getInputDataNode() != null && workflow.getInputDataNode().getDataBlock() instanceof CharactersBlock) {
-				inputCharactersNode.set((DataNode<CharactersBlock>) workflow.getInputDataNode());
-				inputCharactersNodeValid.bind(inputCharactersNode.get().validProperty());
-			} else {
-				inputCharactersNode.set(null);
-				inputCharactersNodeValid.bind(new SimpleBooleanProperty(false));
-			}
-			if (workflow.getWorkingDataNode() != null && workflow.getWorkingDataNode().getDataBlock() instanceof CharactersBlock) {
-				workingCharactersNode.set((DataNode<CharactersBlock>) workflow.getWorkingDataNode());
-				workingCharactersNodeValid.bind(workingCharactersNode.get().validProperty());
-			} else {
-				workingCharactersNode.set(null);
-				workingCharactersNodeValid.bind(new SimpleBooleanProperty(false));
-			}
-			if (workflow.getInputDataFilterNode() != null && workflow.getInputDataFilterNode().getAlgorithm() instanceof CharactersTaxaFilter) {
-				charactersTaxaFilterNode.set((AlgorithmNode<CharactersBlock, CharactersBlock>) workflow.getInputDataFilterNode());
-				charactersTaxaFilterValid.bind(charactersTaxaFilterNode.get().validProperty());
-			} else {
-				charactersTaxaFilterNode.set(null);
-				charactersTaxaFilterValid.bind(new SimpleBooleanProperty(false));
-			}
-		};
-		mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
-
 		inputTaxaNodeValid.addListener((v, o, n) -> {
 			if (n) {
-				activeTaxa.set(BitSetUtils.asBitSet(BitSetUtils.range(1, inputTaxaNode.get().getDataBlock().getNtax() + 1)));
-			} else {
-				activeTaxa.set(new BitSet());
+				setActiveTaxa(BitSetUtils.asBitSet(BitSetUtils.range(1, inputTaxaNode.get().getDataBlock().getNtax() + 1)));
 			}
 			selectedTaxa.set(new BitSet());
 		});
+
+		var ignoreActiveTaxaUpdate = new Single<>(false);
+
+		workingTaxaNodeValid.addListener((v, o, n) -> {
+			if (n) {
+				var bits = new BitSet();
+				var inputTaxa = getInputTaxa();
+				var workingTaxa = getWorkingTaxa();
+				if (inputTaxa != null && workingTaxa != null) {
+					for (var t = 1; t <= inputTaxa.getNtax(); t++) {
+						if (workingTaxa.indexOf(inputTaxa.get(t)) != -1)
+							bits.set(t);
+					}
+					try {
+						ignoreActiveTaxaUpdate.set(true);
+						setActiveTaxa(bits);
+					} finally {
+						ignoreActiveTaxaUpdate.set(false);
+					}
+				}
+			}
+		});
+
 		inputCharactersNodeValid.addListener((v, o, n) -> {
 			if (n) {
-				activeSites.set(BitSetUtils.asBitSet(BitSetUtils.range(1, getInputCharacters().getNchar() + 1)));
-				nucleotideData.set(getInputCharacters().getDataType() == CharactersType.DNA || getInputCharacters().getDataType() == CharactersType.RNA);
-			} else {
-				activeSites.set(new BitSet());
-				nucleotideData.set(false);
+				var inputCharacters = getInputCharacters();
+				if (inputCharacters != null) {
+					setActiveSites(BitSetUtils.asBitSet(BitSetUtils.range(1, inputCharacters.getNchar() + 1)));
+					nucleotideData.set(inputCharacters.getDataType() == CharactersType.DNA || inputCharacters.getDataType() == CharactersType.RNA);
+				}
 			}
-			selectedSites.set(new BitSet());
+			setSelectedSites(new BitSet());
 		});
 
 		var inTaxaSelection = new Single<>(false);
@@ -195,12 +168,12 @@ public class AlignmentView implements IView {
 					var inputTaxa = getInputTaxa();
 					if (inputTaxa != null) {
 
-						var set = new BitSet();
+						var bits = new BitSet();
 						for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 							if (mainWindow.getTaxonSelectionModel().isSelected(inputTaxa.get(t)))
-								set.set(t);
+								bits.set(t);
 						}
-						selectedTaxa.set(set);
+						setSelectedTaxa(bits);
 					}
 				} finally {
 					inTaxaSelection.set(false);
@@ -215,11 +188,13 @@ public class AlignmentView implements IView {
 					inTaxaSelection.set(true);
 					var inputTaxa = getInputTaxa();
 					var workingTaxa = getWorkingTaxa();
-					if (inputTaxa != null && workingTaxa != null) {
-						for (var t : BitSetUtils.members(n)) {
-							var taxon = inputTaxa.get(t);
-							if (workingTaxa.indexOf(taxon) != -1)
+					for (var t = 1; t <= inputTaxa.getNtax(); t++) {
+						var taxon = inputTaxa.get(t);
+						if (workingTaxa.indexOf(taxon) != -1) {
+							if (n.get(t))
 								mainWindow.getTaxonSelectionModel().select(taxon);
+							else
+								mainWindow.getTaxonSelectionModel().clearSelection(taxon);
 						}
 					}
 				} finally {
@@ -229,36 +204,96 @@ public class AlignmentView implements IView {
 		});
 
 		activeTaxa.addListener((v, o, n) -> {
-			var inputTaxa = getInputTaxa();
-			var taxaFilter = getTaxaFilter();
-			if (inputTaxa != null && taxaFilter != null) {
-				var disable = new HashSet<String>();
-				for (var t = 1; t <= inputTaxa.getNtax(); t++) {
-					if (!n.get(t))
-						disable.add(inputTaxa.getLabel(t));
+			if (!ignoreActiveTaxaUpdate.get()) {
+				var inputTaxa = getInputTaxa();
+				var taxaFilter = getTaxaFilter();
+				if (inputTaxa != null && taxaFilter != null) {
+					var disable = new HashSet<String>();
+					for (var t = 1; t <= inputTaxa.getNtax(); t++) {
+						if (!n.get(t))
+							disable.add(inputTaxa.getLabel(t));
+					}
+					taxaFilter.clear();
+					taxaFilter.setDisabled(disable, true);
+					getTaxaFilterNode().restart();
 				}
-				taxaFilter.clear();
-				taxaFilter.setDisabled(disable, false);
-				getTaxaFilterNode().restart();
 			}
 		});
 
 		activeSites.addListener((v, o, n) -> {
-			RunAfterAWhile.apply(activeSites, () -> Platform.runLater(() -> {
-				var inputCharacters = getInputCharacters();
-				var charactersFilter = getCharactersTaxaFilter();
-				if (inputCharacters != null && charactersFilter != null) {
-					var disable = new HashSet<Integer>();
-					for (var s = 1; s <= inputCharacters.getNchar(); s++) {
-						if (!n.get(s))
-							disable.add(s);
-					}
-					charactersFilter.clear();
-					charactersFilter.setOptionDisabledCharacters(disable.stream().mapToInt(Integer::intValue).toArray());
-					getCharactersTaxaFilterNode().restart();
+			var inputCharacters = getInputCharacters();
+			var charactersFilter = getCharactersTaxaFilter();
+			if (inputCharacters != null && charactersFilter != null) {
+				var disable = new HashSet<Integer>();
+				for (var s = 1; s <= inputCharacters.getNchar(); s++) {
+					if (!n.get(s))
+						disable.add(s);
 				}
-			}));
+				charactersFilter.clear();
+				charactersFilter.setOptionDisabledCharacters(disable.stream().mapToInt(Integer::intValue).toArray());
+				getCharactersTaxaFilterNode().restart();
+			}
 		});
+
+		var workflow = mainWindow.getWorkflow();
+		invalidationListener = e -> {
+			if (workflow.getInputTaxaNode() != null) {
+				if (workflow.getInputTaxaNode() != getInputTaxaNode()) {
+					inputTaxaNode.set(workflow.getInputTaxaNode());
+					inputTaxaNodeValid.bind(inputTaxaNode.get().validProperty());
+				}
+			} else {
+				inputTaxaNode.set(null);
+				inputTaxaNodeValid.bind(new SimpleBooleanProperty(false));
+			}
+			if (workflow.getInputTaxaFilterNode() != null) {
+				if (workflow.getInputTaxaFilterNode() != getTaxaFilterNode()) {
+					taxaFilterNode.set(workflow.getInputTaxaFilterNode());
+					taxaFilterValid.bind(taxaFilterNode.get().validProperty());
+				}
+			} else {
+				taxaFilterNode.set(null);
+				taxaFilterValid.bind(new SimpleBooleanProperty(false));
+			}
+			if (workflow.getWorkingTaxaNode() != null) {
+				if (workflow.getWorkingTaxaNode() != getWorkingTaxaNode()) {
+					workingTaxaNode.set(workflow.getWorkingTaxaNode());
+					workingTaxaNodeValid.bind(workingTaxaNode.get().validProperty());
+				}
+			} else {
+				workingTaxaNode.set(null);
+				workingTaxaNodeValid.bind(new SimpleBooleanProperty(false));
+			}
+			if (workflow.getInputDataNode() != null && workflow.getInputDataNode().getDataBlock() instanceof CharactersBlock) {
+				if (workflow.getInputDataNode() != getInputCharactersNode()) {
+					inputCharactersNode.set((DataNode<CharactersBlock>) workflow.getInputDataNode());
+					inputCharactersNodeValid.bind(inputCharactersNode.get().validProperty());
+				}
+			} else {
+				inputCharactersNode.set(null);
+				inputCharactersNodeValid.bind(new SimpleBooleanProperty(false));
+			}
+			if (workflow.getWorkingDataNode() != null && workflow.getWorkingDataNode().getDataBlock() instanceof CharactersBlock) {
+				if (workflow.getWorkingDataNode() != getWorkingCharactersNode()) {
+					workingCharactersNode.set((DataNode<CharactersBlock>) workflow.getWorkingDataNode());
+					workingCharactersNodeValid.bind(workingCharactersNode.get().validProperty());
+				}
+			} else {
+				workingCharactersNode.set(null);
+				workingCharactersNodeValid.bind(new SimpleBooleanProperty(false));
+			}
+			if (workflow.getInputDataFilterNode() != null && workflow.getInputDataFilterNode().getAlgorithm() instanceof CharactersTaxaFilter) {
+				if (workflow.getInputDataFilterNode() != getCharactersTaxaFilterNode()) {
+					charactersTaxaFilterNode.set((AlgorithmNode<CharactersBlock, CharactersBlock>) workflow.getInputDataFilterNode());
+					charactersTaxaFilterValid.bind(charactersTaxaFilterNode.get().validProperty());
+				}
+			} else {
+				charactersTaxaFilterNode.set(null);
+				charactersTaxaFilterValid.bind(new SimpleBooleanProperty(false));
+			}
+		};
+		mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
+		invalidationListener.invalidated(null);
 	}
 
 	public String createSelectionString() {
@@ -397,47 +432,52 @@ public class AlignmentView implements IView {
 		return selectedTaxa.get();
 	}
 
-	public ObjectProperty<BitSet> selectedTaxaProperty() {
+	public ReadOnlyObjectProperty<BitSet> selectedTaxaProperty() {
 		return selectedTaxa;
 	}
 
 	public void setSelectedTaxa(BitSet selectedTaxa) {
-		this.selectedTaxa.set(selectedTaxa);
-	}
-
-	public void setSelectedSites(BitSet selectedSites) {
-		this.selectedSites.set(selectedSites);
+		if (!selectedTaxa.equals(getSelectedTaxa()))
+			this.selectedTaxa.set(selectedTaxa);
 	}
 
 	public void setActiveTaxa(BitSet activeTaxa) {
-		this.activeTaxa.set(activeTaxa);
-	}
-
-	public void setActiveSites(BitSet activeSites) {
-		this.activeSites.set(activeSites);
-	}
-
-	public BitSet getSelectedSites() {
-		return selectedSites.get();
-	}
-
-	public ObjectProperty<BitSet> selectedSitesProperty() {
-		return selectedSites;
+		if (!activeTaxa.equals(getActiveTaxa()))
+			this.activeTaxa.set(activeTaxa);
 	}
 
 	public BitSet getActiveTaxa() {
 		return activeTaxa.get();
 	}
 
-	public ObjectProperty<BitSet> activeTaxaProperty() {
+	public ReadOnlyObjectProperty<BitSet> activeTaxaProperty() {
 		return activeTaxa;
+	}
+
+
+	public void setActiveSites(BitSet activeSites) {
+		if (!activeSites.equals(getActiveSites()))
+			this.activeSites.set(activeSites);
+	}
+
+	public BitSet getSelectedSites() {
+		return selectedSites.get();
+	}
+
+	public void setSelectedSites(BitSet selectedSites) {
+		if (!selectedSites.equals(getSelectedSites()))
+			this.selectedSites.set(selectedSites);
+	}
+
+	public ReadOnlyObjectProperty<BitSet> selectedSitesProperty() {
+		return selectedSites;
 	}
 
 	public BitSet getActiveSites() {
 		return activeSites.get();
 	}
 
-	public ObjectProperty<BitSet> activeSitesProperty() {
+	public ReadOnlyObjectProperty<BitSet> activeSitesProperty() {
 		return activeSites;
 	}
 
@@ -586,5 +626,9 @@ public class AlignmentView implements IView {
 
 	public ReadOnlyBooleanProperty nucleotideDataProperty() {
 		return nucleotideData;
+	}
+
+	public boolean isDisabled(Taxon taxon) {
+		return getWorkingTaxaNode() == null || getWorkingTaxa().indexOf(taxon) == -1;
 	}
 }

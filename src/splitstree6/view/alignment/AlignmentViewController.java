@@ -139,6 +139,9 @@ public class AlignmentViewController {
     private MenuItem enableSelectedSitesOnlyMenuItem;
 
     @FXML
+    private MenuItem enableSelectedSitesMenuItem;
+
+    @FXML
     private MenuItem disableSelectedTaxaMenuItem;
 
     @FXML
@@ -149,6 +152,9 @@ public class AlignmentViewController {
 
     @FXML
     private MenuItem enableSelectedTaxaOnlyMenuItem;
+
+    @FXML
+    private MenuItem enableSelectedTaxaMenuItem;
 
     @FXML
     private Label selectionLabel;
@@ -193,8 +199,13 @@ public class AlignmentViewController {
         });
 
         filterMenu.disableProperty().bind(enableAllTaxaMenuItem.disableProperty().and(enableSelectedTaxaOnlyMenuItem.disableProperty())
+                .and(enableSelectedTaxaMenuItem.disableProperty())
                 .and(disableSelectedTaxaMenuItem.disableProperty()).and(enableAllSitesMenuItem.disableProperty())
+                .and(enableSelectedSitesMenuItem.disableProperty())
                 .and(enableSelectedSitesOnlyMenuItem.disableProperty()).and(disableSelectedSitesMenuItem.disableProperty()));
+
+        // never want gray in the list of selected taxa, because we are using gray to indicate inactive items
+        taxaListView.setStyle("-fx-selection-bar-non-focused: -fx-focus-color;");
     }
 
     public BorderPane getBorderPane() {
@@ -360,6 +371,14 @@ public class AlignmentViewController {
 
     public MenuItem getEnableSelectedTaxaOnlyMenuItem() {
         return enableSelectedTaxaOnlyMenuItem;
+    }
+
+    public MenuItem getEnableSelectedSitesMenuItem() {
+        return enableSelectedSitesMenuItem;
+    }
+
+    public MenuItem getEnableSelectedTaxaMenuItem() {
+        return enableSelectedTaxaMenuItem;
     }
 
     public CopyableLabel getSelectionLabel() {
