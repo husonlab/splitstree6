@@ -156,6 +156,7 @@ public class SitesFormat extends Group {
 									if (sitesStyle == SitesStyle.Hatches) {
 										var hatch = new Line(left.getX(), left.getY(), right.getX(), right.getY());
 										hatch.setStroke(Color.BLACK);
+										hatch.getStyleClass().add("graph-edge");
 										getChildren().add(hatch);
 									} else /* if(sitesStyle==SitesStyle.Labels) */ {
 										var text = new CopyableLabel(labels[i]);
