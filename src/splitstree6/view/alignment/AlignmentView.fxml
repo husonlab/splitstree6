@@ -187,8 +187,7 @@
                                                                                 width="200.0"/>
                                                                         <Pane fx:id="selectionPane">
                                                                             <children>
-                                                                                <Group fx:id="siteSelectionGroup"
-                                                                                       layoutX="10.0" layoutY="10.0"/>
+                                                                                <Group fx:id="siteSelectionGroup"/>
                                                                                 <Group fx:id="taxaSelectionGroup"/>
                                                                             </children>
                                                                         </Pane>

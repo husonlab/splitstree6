@@ -30,8 +30,6 @@ public enum ColorScheme {
 	}
 
 	public static Color apply(ColorScheme colorScheme, char ch) {
-		var otherColor = Color.WHITESMOKE;
-
 		ch = Character.toUpperCase(ch);
 		return switch (colorScheme) {
 			case Nucleotide -> switch (ch) {
@@ -39,8 +37,8 @@ public enum ColorScheme {
 				case 'C' -> Color.web("0xffe2b3ff");
 				case 'G' -> Color.web("0xeba8a5ff");
 				case 'T', 'U' -> Color.web("0xa7c4eeff");
-				case '-' -> Color.GRAY;
-				default -> otherColor;
+				case '-' -> Color.LIGHTGRAY;
+				default -> Color.LIGHTGRAY;
 			};
 			case Diamond11 -> switch (ch) {
 				case 'K', 'R', 'E', 'D', 'Q', 'N' -> Color.web("0xba7bbd");
@@ -54,7 +52,7 @@ public enum ColorScheme {
 				case 'W' -> Color.web("0xb3e46c");
 				case 'P' -> Color.web("0x95d6c8");
 				case 'S', 'T', 'A' -> Color.web("0x86b0d2");
-				default -> otherColor;
+				default -> Color.LIGHTGRAY;
 			};
 			case Zappo -> switch (ch) {
 				case 'I', 'L', 'V', 'A', 'M' -> Color.web("0xFFAFAF");
@@ -64,7 +62,7 @@ public enum ColorScheme {
 				case 'S', 'T', 'N', 'Q' -> Color.web("0x00FF00");
 				case 'G', 'P' -> Color.web("0xFFFFFF");
 				case 'C' -> Color.web("0xFFFF00");
-				default -> otherColor;
+				default -> Color.LIGHTGRAY;
 			};
 
 			case PDNA -> switch (ch) {
@@ -72,7 +70,7 @@ public enum ColorScheme {
 				case 'A', 'G', 'S', 'T', 'P' -> Color.web("0xF09048"); // orange
 				case 'F', 'Y', 'W' -> Color.web("0x80A0F0"); // blue
 				case 'R', 'N', 'D', 'Q', 'E', 'H', 'K' -> Color.web("0xF01505"); // red
-				default -> otherColor;
+				default -> Color.LIGHTGRAY;
 			};
 			case CINEMA -> switch (ch) {
 				case 'H', 'K', 'R' -> Color.web("0x00FFFF");
@@ -82,7 +80,7 @@ public enum ColorScheme {
 				case 'F', 'W', 'Y' -> Color.web("0xFF00FF");
 				case 'P', 'G' -> Color.web("0x996600");
 				case 'C' -> Color.web("0xFFFF00");
-				default -> otherColor;
+				default -> Color.LIGHTGRAY;
 			};
 			case ClustalX -> switch (ch) {
 				case 'A', 'C', 'I', 'L', 'M', 'F', 'W', 'V' -> Color.web("0x80A0F0");
@@ -92,7 +90,7 @@ public enum ColorScheme {
 				case 'G' -> Color.web("0xF09048");
 				case 'P' -> Color.web("0xC0C000");
 				case 'H', 'Y' -> Color.web("0x15A4A4");
-				default -> otherColor;
+				default -> Color.LIGHTGRAY;
 			};
 			case MAEditor -> switch (ch) {
 				case 'A', 'G' -> Color.web("0x77DD88");
@@ -104,7 +102,7 @@ public enum ColorScheme {
 				case 'K', 'R' -> Color.web("0xFFCC77");
 				case 'P' -> Color.web("0xEEAAAA");
 				case 'S', 'T' -> Color.web("0xFF4455");
-				default -> otherColor;
+				default -> Color.LIGHTGRAY;
 			};
 			case Random -> {
 				var i = ch - 'A';
@@ -112,9 +110,9 @@ public enum ColorScheme {
 					var colors = ColorSchemeManager.getInstance().getColorScheme("Twenty");
 					yield colors.get(i % colors.size()).deriveColor(1.0, 0.4, 1.0, 1.0);
 				} else
-					yield otherColor;
+					yield Color.LIGHTGRAY;
 			}
-			case None -> otherColor;
+			case None -> Color.WHITESMOKE;
 		};
 	}
 }

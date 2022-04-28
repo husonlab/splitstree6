@@ -23,12 +23,13 @@ import javafx.geometry.Point2D;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ScrollBar;
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import splitstree6.data.CharactersBlock;
 
 import java.util.BitSet;
 
-import static splitstree6.view.alignment.DrawAlignment.*;
+import static splitstree6.view.alignment.DrawAlignment.SELECTION_STROKE;
 
 /**
  * update axis and horizontal scroll bar
@@ -48,6 +49,9 @@ public class AxisAndScrollBarUpdate {
 			scrollBar.setMin(1);
 			scrollBar.setMax(nChar - numberOnCanvas + 1);
 			scrollBar.setVisibleAmount(numberOnCanvas);
+			if (numberOnCanvas >= nChar) {
+				scrollBar.setValue(0);
+			}
 
 			axis.setLowerBound(Math.max(1, Math.floor(scrollBar.getValue())));
 			axis.setUpperBound(Math.round(scrollBar.getValue() + numberOnCanvas));
@@ -108,21 +112,26 @@ public class AxisAndScrollBarUpdate {
 		selectionPane.setVisible(axis.isVisible());
 		selectionPane.getChildren().clear();
 
-		var axisStartOffset = 2;
 		var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
 
 		var left = Math.max(1, (int) axis.getLowerBound() - 1);
 		var right = Math.min(inputCharacters.getNchar(), axis.getUpperBound() - 1);
 
+		var inactiveFill = Color.DARKGRAY.deriveColor(1, 1, 1, 0.3);
+
 		for (var site = left; site <= right; site++) {
 			var inactive = !activeSites.get(site);
 			var selected = selectedSites.get(site);
 			if (selected || inactive) {
-				var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
-				var rectangle = new Rectangle(x, selectionPane.getHeight() - 4, Math.max(0.5, boxWidth), 6);
-				rectangle.setStrokeWidth(1);
-				rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_STROKE);
-				rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_STROKE);
+				var x = (site - axis.getLowerBound()) * boxWidth;
+				var rectangle = new Rectangle(x, axis.getHeight(), Math.max(0.5, boxWidth), 3);
+				rectangle.setStrokeWidth(0.5);
+				if (selected) {
+					rectangle.setStroke(SELECTION_STROKE);
+					rectangle.setFill(SELECTION_STROKE);
+				} else {
+					rectangle.setFill(inactiveFill);
+				}
 				selectionPane.getChildren().add(rectangle);
 			}
 		}

@@ -41,7 +41,7 @@ public class DrawAlignment {
 	 * draw the alignment
 	 */
 	public static void updateCanvas(Canvas canvas, TaxaBlock inputTaxa, CharactersBlock inputCharacters, ColorScheme colorScheme,
-									double boxHeight, ScrollBar vScrollBar, NumberAxis axis) {
+									double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activateTaxa, BitSet activeSites) {
 		var gc = canvas.getGraphicsContext2D();
 		gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
@@ -72,11 +72,16 @@ public class DrawAlignment {
 				for (var site = left; site <= right; site++) {
 					var ch = inputCharacters.get(t, site);
 					var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
-					if (showColors) {
+					if (!activateTaxa.get(t) || !activeSites.get(site)) {
+						gc.setFill(Color.TRANSPARENT);
+						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
+						gc.setFill(MainWindowManager.isUseDarkTheme() ? Color.web("0x6F6F6F") : Color.LIGHTGRAY);
+					} else if (showColors) {
 						gc.setFill(colorScheme.apply(ch));
 						gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
-					}
-					gc.setFill(textFill);
+						gc.setFill(textFill);
+					} else
+						gc.setFill(textFill);
 					gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.4 * fontSize);
 					if (site == 1) {
 						gc.setLineWidth(0.75);
@@ -88,6 +93,11 @@ public class DrawAlignment {
 						gc.setStroke(lineStroke);
 						gc.strokeLine(x, y, x + boxWidth, y);
 					}
+					if (site == inputCharacters.getNchar()) {
+						gc.setLineWidth(0.75);
+						gc.setStroke(lineStroke);
+						gc.strokeLine(x + boxWidth, y - boxHeight, x + boxWidth, y);
+					}
 				}
 			}
 		}
@@ -95,17 +105,16 @@ public class DrawAlignment {
 
 	public final static Color SELECTION_FILL = Color.web("#039ED3").deriveColor(1, 1, 1, 0.4);
 	public final static Color SELECTION_STROKE = (Color.web("#039ED3"));
-	public final static Color INACTIVE_FILL = Color.LIGHTGRAY.brighter().deriveColor(1, 1, 1, 0.8);
-	public final static Color INACTIVE_STROKE = Color.DARKGRAY;
 
 	/**
 	 * update the site selection visualization
 	 */
 	public static void updateSiteSelection(Canvas canvas, Group selectionGroup, TaxaBlock inputTaxa, CharactersBlock inputCharacters,
-										   double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activeSites, BitSet selectedSites) {
+										   double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet selectedSites) {
 		selectionGroup.getChildren().clear();
+
 		if (inputTaxa != null && inputCharacters != null) {
-			var axisStartOffset = -3;
+			var axisStartOffset = 7;
 			var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
 
 			var vOffset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - inputTaxa.getNtax() * boxHeight)) : 0;
@@ -117,15 +126,12 @@ public class DrawAlignment {
 			var strokeWidth = Math.min(1, boxWidth / 3);
 
 			for (var site = left; site <= right; site++) {
-				var inactive = !activeSites.get(site);
-				var selected = selectedSites.get(site);
-
 				var x = (site - axis.getLowerBound()) * boxWidth + axisStartOffset;
-				if (selected || inactive) {
-					var rectangle = new Rectangle(x + 0.5 * strokeWidth, -10, boxWidth - strokeWidth, height);
+				if (selectedSites.get(site)) {
+					var rectangle = new Rectangle(x + 0.5 * strokeWidth, 0, boxWidth - strokeWidth, height);
 					rectangle.setStrokeWidth(strokeWidth);
-					rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_FILL);
-					rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_FILL);
+					rectangle.setFill(SELECTION_FILL);
+					rectangle.setStroke(SELECTION_STROKE);
 					selectionGroup.getChildren().add(rectangle);
 				}
 			}
@@ -136,15 +142,16 @@ public class DrawAlignment {
 	 * update the taxon selection visualization
 	 */
 	public static void updateTaxaSelection(Canvas canvas, Group selectionGroup, TaxaBlock inputTaxa, CharactersBlock inputCharacters,
-										   double boxWidth, double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activeTaxa, BitSet selectedTaxa) {
+										   double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet selectedTaxa) {
 		selectionGroup.getChildren().clear();
 
 		if (inputTaxa != null && inputCharacters != null) {
+			var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
 			var offset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvas.getHeight() - inputTaxa.getNtax() * boxHeight)) : 0;
 
 			var strokeWidth = Math.min(1, boxHeight / 3);
 
-			var width = Math.min(canvas.getWidth(), (inputCharacters.getNchar() - axis.getLowerBound() + 1) * boxWidth);
+			var width = (inputCharacters.getNchar() - axis.getLowerBound() + 1) * boxWidth;
 			for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 				var y = t * boxHeight + offset;
 				if (y < 0)
@@ -153,13 +160,10 @@ public class DrawAlignment {
 				if (y > canvas.getHeight() + boxHeight)
 					break;
 
-				var inactive = !activeTaxa.get(t);
-				var selected = selectedTaxa.get(t);
-
-				if (inactive || selected) {
-					var rectangle = new Rectangle(0, y - boxHeight + 0.5 * strokeWidth, width, boxHeight - strokeWidth);
-					rectangle.setFill(inactive ? INACTIVE_FILL : SELECTION_FILL);
-					rectangle.setStroke(selected ? SELECTION_STROKE : INACTIVE_FILL);
+				if (selectedTaxa.get(t)) {
+					var rectangle = new Rectangle(7, y - boxHeight + 0.5 * strokeWidth, width, boxHeight - strokeWidth);
+					rectangle.setFill(SELECTION_FILL);
+					rectangle.setStroke(SELECTION_STROKE);
 					selectionGroup.getChildren().add(rectangle);
 				}
 			}

@@ -101,11 +101,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		updateCanvasListener = e -> Platform.runLater(() -> {
 			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), taxon -> alignmentView.isDisabled(taxon));
 			DrawAlignment.updateCanvas(controller.getCanvas(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionColorScheme(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis());
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
 
-			DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveSites(), alignmentView.getSelectedSites());
-			DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionUnitWidth(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveTaxa(), alignmentView.getSelectedTaxa());
+			DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
+			DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 		});
 
@@ -126,7 +126,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		alignmentView.selectedSitesProperty().addListener(e -> {
 			DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveSites(), alignmentView.getSelectedSites());
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
 			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(), alignmentView.getActiveSites(), alignmentView.getSelectedSites());
 			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 		});
@@ -144,8 +144,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 							if (t != -1 && n.get(t))
 								controller.getTaxaListView().getSelectionModel().select(taxon);
 						}
-						DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), inputTaxa, alignmentView.getInputCharacters(), alignmentView.getOptionUnitWidth(),
-								alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveTaxa(), alignmentView.getSelectedTaxa());
+						DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), inputTaxa, alignmentView.getInputCharacters(),
+								alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 					}
 					controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 				} finally {
@@ -215,7 +215,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller.getSelectAllMenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not());
 
 		controller.getSelectNoneMenuItem().setOnAction(e -> alignmentView.setSelectedSites(new BitSet()));
-		controller.getSelectAllMenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not().or(Bindings.createBooleanBinding(() -> alignmentView.getSelectedSites().cardinality() == 0, alignmentView.selectedSitesProperty())));
+		controller.getSelectNoneMenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not().or(Bindings.createBooleanBinding(() -> alignmentView.getSelectedSites().cardinality() == 0, alignmentView.selectedSitesProperty())));
 
 		controller.getSelectCodon0MenuItem().setOnAction(e -> {
 			var inputCharacters = alignmentView.getInputCharacters();
