@@ -253,6 +253,18 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		});
 		controller.getSelectCodon2MenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not().or(alignmentView.nucleotideDataProperty().not()));
 
+		controller.getSelectSynapomorphiesMenuItem().setOnAction(e -> {
+			var inputCharacters = alignmentView.getInputCharacters();
+			var bits = new BitSet();
+			for (var s = 1; s <= inputCharacters.getNchar(); s++) {
+				if (inputCharacters.isSynapomorphy(s, alignmentView.getSelectedTaxa()))
+					bits.set(s);
+			}
+			bits.or(alignmentView.getSelectedSites());
+			alignmentView.setSelectedSites(bits);
+		});
+		controller.getSelectSynapomorphiesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().cardinality() == 0, alignmentView.selectedTaxaProperty()));
+
 		controller.getSelectConstantMenuItem().setOnAction(e -> {
 			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
@@ -433,9 +445,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			alignmentView.setSelectedTaxa(new BitSet());
 			alignmentView.setSelectedSites(new BitSet());
 		});
-		mainWindowController.getSelectNoneMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().cardinality() == 0
-																												&& alignmentView.getSelectedSites().cardinality() == 0, alignmentView.selectedTaxaProperty(), alignmentView.selectedSitesProperty()));
-
+		mainWindowController.getSelectNoneMenuItem().disableProperty().bind(
+				Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().cardinality() == 0
+													&& alignmentView.getSelectedSites().cardinality() == 0, alignmentView.selectedTaxaProperty(), alignmentView.selectedSitesProperty()));
 		mainWindowController.getSelectInverseMenuItem().setOnAction(e -> {
 			if (alignmentView.getSelectedTaxa().cardinality() > 0) {
 				var inputTaxa = alignmentView.getInputTaxa();
@@ -443,7 +455,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					var bits = BitSetUtils.minus(BitSetUtils.asBitSet(NumberUtils.range(1, inputTaxa.getNtax() + 1)), alignmentView.getSelectedTaxa());
 					alignmentView.setSelectedTaxa(bits);
 				}
-
 			}
 			if (alignmentView.getSelectedSites().cardinality() > 0) {
 				var inputCharacters = alignmentView.getInputCharacters();

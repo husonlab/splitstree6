@@ -27,6 +27,7 @@ import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -483,6 +484,25 @@ public class CharactersBlock extends DataBlock {
 			} else
 				return false;
 		}
-		return ch1 == 0 || ch2 == 0 || count1 ==1 || count2==1;
+		return ch1 == 0 || ch2 == 0 || count1 == 1 || count2 == 1;
+	}
+
+	public boolean isSynapomorphy(int site, BitSet selectedTaxa) {
+		var derivedState = 0;
+		for (var t = selectedTaxa.nextSetBit(1); t != -1; t = selectedTaxa.nextSetBit(t + 1)) {
+			var ch = get(t, site);
+			if (ch == getGapCharacter())
+				return false;
+			if (derivedState == 0)
+				derivedState = ch;
+			else if (ch != derivedState)
+				return false;
+		}
+		for (var t = selectedTaxa.nextClearBit(1); t <= getNtax(); t = selectedTaxa.nextClearBit(t + 1)) {
+			var ch = get(t, site);
+			if (ch == derivedState)
+				return false;
+		}
+		return true;
 	}
 }

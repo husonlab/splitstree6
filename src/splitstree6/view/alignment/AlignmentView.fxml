@@ -47,6 +47,9 @@
                             <MenuItem fx:id="selectCodon1MenuItem" mnemonicParsing="false"
                                       text="Second Codon Position"/>
                             <MenuItem fx:id="selectCodon2MenuItem" mnemonicParsing="false" text="Third Codon Position"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
+                            <MenuItem fx:id="selectSynapomorphiesMenuItem" mnemonicParsing="false"
+                                      text="Synapomorphies"/>
                         </items>
                     </MenuButton>
                     <Separator layoutX="119.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"

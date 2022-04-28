@@ -57,6 +57,9 @@ public class AlignmentViewController {
     private MenuItem selectCodon2MenuItem;
 
     @FXML
+    private MenuItem selectSynapomorphiesMenuItem;
+
+    @FXML
     private MenuItem selectConstantMenuItem;
 
     @FXML
@@ -246,6 +249,10 @@ public class AlignmentViewController {
 
     public MenuItem getSelectCodon2MenuItem() {
         return selectCodon2MenuItem;
+    }
+
+    public MenuItem getSelectSynapomorphiesMenuItem() {
+        return selectSynapomorphiesMenuItem;
     }
 
     public MenuItem getSelectConstantMenuItem() {
