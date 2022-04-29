@@ -279,6 +279,21 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		});
 		controller.getSelectConstantMenuItem().disableProperty().bind(alignmentView.emptyProperty());
 
+		controller.getSelectMissingMenuItem().setOnAction(e -> {
+			var inputCharacters = alignmentView.getInputCharacters();
+			if (inputCharacters != null) {
+				var bits = new BitSet();
+				for (var s = 1; s <= inputCharacters.getNchar(); s++) {
+					if (inputCharacters.isMissingSite(s))
+						bits.set(s);
+				}
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
+			}
+		});
+		controller.getSelectMissingMenuItem().disableProperty().bind(alignmentView.emptyProperty());
+
+
 		controller.getSelectGapMenuItem().setOnAction(e -> {
 			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {

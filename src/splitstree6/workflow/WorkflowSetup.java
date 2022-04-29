@@ -19,7 +19,6 @@
 
 package splitstree6.workflow;
 
-import javafx.application.Platform;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
 import jloda.fx.window.NotificationManager;
@@ -35,7 +34,6 @@ import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.*;
 import splitstree6.io.readers.ImportManager;
-import splitstree6.view.alignment.AlignmentView;
 import splitstree6.window.MainWindow;
 
 import java.util.function.Consumer;
@@ -64,7 +62,7 @@ public class WorkflowSetup {
 		}
 		if (clazz.equals(CharactersBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
-			setupAlignmentView(workflow);
+			workflow.ensureAlignmentView();
 			var distancesNode = workflow.newDataNode(new DistancesBlock());
 			workflow.newAlgorithmNode(new HammingDistances(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
@@ -112,21 +110,5 @@ public class WorkflowSetup {
 			workflow.getInputDataLoaderNode().restart();
 		}
 		return workflow;
-	}
-
-	/**
-	 * if the input data is a characters block, use this to setup the alignment viewer
-	 *
-	 * @param workflow the workflow
-	 */
-	private static void setupAlignmentView(Workflow workflow) {
-		var viewBlock = new ViewBlock();
-		var dataNode = workflow.newDataNode(viewBlock);
-		Platform.runLater(() -> {
-			var alignmentView = new AlignmentView(workflow.getMainWindow(), "Alignment", viewBlock.getViewTab());
-			viewBlock.setView(alignmentView);
-			viewBlock.setNode(dataNode);
-		});
-		workflow.getInputDataFilterNode().getChildren().add(dataNode);
 	}
 }

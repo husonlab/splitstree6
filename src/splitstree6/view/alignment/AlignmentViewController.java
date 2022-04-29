@@ -66,6 +66,9 @@ public class AlignmentViewController {
     private MenuItem selectGapMenuItem;
 
     @FXML
+    private MenuItem selectMissingMenuItem;
+
+    @FXML
     private MenuItem selectAllNonInformativeMenuItem;
 
     @FXML
@@ -261,6 +264,10 @@ public class AlignmentViewController {
 
     public MenuItem getSelectGapMenuItem() {
         return selectGapMenuItem;
+    }
+
+    public MenuItem getSelectMissingMenuItem() {
+        return selectMissingMenuItem;
     }
 
     public MenuItem getSelectAllNonInformativeMenuItem() {

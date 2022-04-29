@@ -462,6 +462,15 @@ public class CharactersBlock extends DataBlock {
 		return false;
 	}
 
+
+	public boolean isMissingSite(int column) {
+		for (char[] row : matrix) {
+			if (row[column - 1] == getMissingCharacter())
+				return true;
+		}
+		return false;
+	}
+
 	/**
 	 * is this a non-parsimony informative site?
 	 *

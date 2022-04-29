@@ -112,27 +112,28 @@ public class AxisAndScrollBarUpdate {
 		selectionPane.setVisible(axis.isVisible());
 		selectionPane.getChildren().clear();
 
-		var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
+		if (inputCharacters != null) {
+			var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axis.getLowerBound());
+			var left = Math.max(1, (int) axis.getLowerBound() - 1);
+			var right = Math.min(inputCharacters.getNchar(), axis.getUpperBound() - 1);
 
-		var left = Math.max(1, (int) axis.getLowerBound() - 1);
-		var right = Math.min(inputCharacters.getNchar(), axis.getUpperBound() - 1);
+			var inactiveFill = Color.DARKGRAY.deriveColor(1, 1, 1, 0.3);
 
-		var inactiveFill = Color.DARKGRAY.deriveColor(1, 1, 1, 0.3);
-
-		for (var site = left; site <= right; site++) {
-			var inactive = !activeSites.get(site);
-			var selected = selectedSites.get(site);
-			if (selected || inactive) {
-				var x = (site - axis.getLowerBound()) * boxWidth;
-				var rectangle = new Rectangle(x, axis.getHeight(), Math.max(0.5, boxWidth), 3);
-				rectangle.setStrokeWidth(0.5);
-				if (selected) {
-					rectangle.setStroke(SELECTION_STROKE);
-					rectangle.setFill(SELECTION_STROKE);
-				} else {
-					rectangle.setFill(inactiveFill);
+			for (var site = left; site <= right; site++) {
+				var inactive = !activeSites.get(site);
+				var selected = selectedSites.get(site);
+				if (selected || inactive) {
+					var x = (site - axis.getLowerBound()) * boxWidth;
+					var rectangle = new Rectangle(x, axis.getHeight(), Math.max(0.5, boxWidth), 3);
+					rectangle.setStrokeWidth(0.5);
+					if (selected) {
+						rectangle.setStroke(SELECTION_STROKE);
+						rectangle.setFill(SELECTION_STROKE);
+					} else {
+						rectangle.setFill(inactiveFill);
+					}
+					selectionPane.getChildren().add(rectangle);
 				}
-				selectionPane.getChildren().add(rectangle);
 			}
 		}
 	}

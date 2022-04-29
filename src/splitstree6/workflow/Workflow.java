@@ -19,14 +19,19 @@
 
 package splitstree6.workflow;
 
+import javafx.application.Platform;
 import javafx.collections.ListChangeListener;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.workflow.WorkflowNode;
+import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
+import splitstree6.data.CharactersBlock;
 import splitstree6.data.SourceBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.ViewBlock;
+import splitstree6.view.alignment.AlignmentView;
 import splitstree6.window.MainWindow;
 
 import java.util.*;
@@ -106,7 +111,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 
 	public <T extends DataBlock> void setupInputAndWorkingNodes(SourceBlock source, TaxaBlock inputTaxaBlock, TaxaFilter taxaFilter, TaxaBlock workingTaxaBlock,
 																DataBlock inputDataBlock, DataTaxaFilter dataTaxaFilter, DataBlock workingDataBlock) {
-		var sourceNode = newDataNode(source, INPUT_SOURCE); // what is the purpose of the source node?
+		var sourceNode = newDataNode(source, INPUT_SOURCE); // todo: what is the purpose of the source node?
 		var inputTaxaNode = newDataNode(inputTaxaBlock, INPUT_TAXA);
 		var inputDataNode = newDataNode(inputDataBlock, INPUT_PREFIX + inputDataBlock.getName());
 
@@ -246,6 +251,11 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		return dataNodesStream().filter(v -> v.getTitle().startsWith(WORKING_PREFIX)).filter(v -> !v.getTitle().equals(WORKING_TAXA)).findFirst().orElse(null);
 	}
 
+
+	public DataNode<? extends DataBlock> getAlignmentViewNode() {
+		return dataNodesStream().filter(v -> v.getDataBlock() instanceof ViewBlock viewBlock && viewBlock.getView() instanceof AlignmentView).findFirst().orElse(null);
+	}
+
 	public Object getWorkingDataBlock() {
 		return getWorkingDataNode() == null ? null : getWorkingDataNode().getDataBlock();
 	}
@@ -371,5 +381,30 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 
 	public MainWindow getMainWindow() {
 		return mainWindow;
+	}
+
+
+	/**
+	 * if the input data is a characters block, use this to setup the alignment viewer
+	 */
+	public void ensureAlignmentView() {
+		if (getInputDataFilterNode() != null && getInputDataFilterNode().getAlgorithm() instanceof CharactersTaxaFilter) {
+			var tabs = mainWindow.getController().getMainTabPane().getTabs().size();
+			var previous = tabs > 0 ? mainWindow.getController().getMainTabPane().getTabs().get(tabs - 1) : null;
+			var viewBlock = new ViewBlock();
+			viewBlock.setInputBlockName(CharactersBlock.BLOCK_NAME);
+			var dataNode = newDataNode(viewBlock);
+			getInputDataFilterNode().getChildren().add(dataNode);
+			Platform.runLater(() -> {
+				var alignmentView = new AlignmentView(getMainWindow(), "Alignment", viewBlock.getViewTab());
+				viewBlock.setView(alignmentView);
+				viewBlock.setNode(dataNode);
+				if (previous != null) {
+					mainWindow.getController().getMainTabPane().getTabs().remove(previous);
+					mainWindow.getController().getMainTabPane().getTabs().add(previous);
+					Platform.runLater(() -> mainWindow.getController().getMainTabPane().getSelectionModel().select(previous));
+				}
+			});
+		}
 	}
 }

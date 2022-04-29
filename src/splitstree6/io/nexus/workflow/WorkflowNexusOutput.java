@@ -52,7 +52,6 @@ public class WorkflowNexusOutput {
 			final int count = save(workflow, w, asWorkflowOnly);
 			NotificationManager.showInformation("Saved " + count + " blocks to file: " + file.getPath());
 		}
-
 	}
 
 	/**
@@ -94,13 +93,6 @@ public class WorkflowNexusOutput {
 			nexusExporter.export(w, workflow.getWorkingTaxaBlock(), workflow.getWorkingTaxaBlock().getTraitsBlock());
 		}
 
-		/*
-		if (workflow.getWorkingTraitsNode() != null) {
-			setupExporter(workflow.getWorkingTraitsNode(), nexusExporter);
-			nexusExporter.export(w, workflow.getWorkingTaxaBlock(), workflow.getWorkingTraitsNode().getDataBlock());
-		}
-		 */
-
 		setupExporter(workflow.getInputDataNode(), nexusExporter);
 		nexusExporter.export(w, workflow.getInputTaxaBlock(), workflow.getInputDataNode().getDataBlock());
 
@@ -109,16 +101,20 @@ public class WorkflowNexusOutput {
 
 		final var queue = new LinkedList<WorkflowNode>();
 		queue.add(workflow.getWorkingDataNode());
+		/* todo: input doesn't work (yet), so don't output
+		if(workflow.getAlignmentViewNode()!=null)
+			queue.add(workflow.getAlignmentViewNode());
+		 */
 		while (queue.size() > 0) {
-            final WorkflowNode node = queue.poll();
-            if (node instanceof final DataNode dataNode) {
-                setupExporter(dataNode, nexusExporter);
-                nexusExporter.export(w, workflow.getWorkingTaxaBlock(), dataNode.getDataBlock());
-            } else {
-                final var algorithm = (AlgorithmNode) node;
-                setupExporter(algorithm, nexusExporter);
-                nexusExporter.export(w, algorithm.getAlgorithm());
-            }
+			final WorkflowNode node = queue.poll();
+			if (node instanceof final DataNode dataNode) {
+				setupExporter(dataNode, nexusExporter);
+				nexusExporter.export(w, workflow.getWorkingTaxaBlock(), dataNode.getDataBlock());
+			} else {
+				final var algorithm = (AlgorithmNode) node;
+				setupExporter(algorithm, nexusExporter);
+				nexusExporter.export(w, algorithm.getAlgorithm());
+			}
             queue.addAll(node.getChildren());
         }
 
