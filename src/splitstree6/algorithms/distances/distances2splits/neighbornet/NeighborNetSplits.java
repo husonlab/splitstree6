@@ -16,6 +16,7 @@ import java.util.BitSet;
 
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.SpeedKnitter.incrementalFitting;
 
 
 //Things to do next
@@ -101,6 +102,31 @@ public class NeighborNetSplits {
             return splits;
         }
 
+        if (false) {
+            double[][] d = new double[nTax+1][nTax+1];
+            for(int i=1;i<=nTax;i++)
+                for (int j=i+1;j<=nTax;j++)
+                    d[i][j] = d[j][i] = distances[cycle[i]-1][cycle[j]-1];
+
+            double[][] x = incrementalFitting(d,1e-5);
+
+//Copy back to the splits
+            final ArrayList<ASplit> splitList = new ArrayList<>();
+
+            for (int i = 1; i <= nTax; i++) {
+                final BitSet A = new BitSet();
+                for (int j = i + 1; j <= nTax; j++) {
+                    A.set(cycle[j - 1]);
+                    if (x[i][j] > cutoff)
+                        splitList.add(new ASplit(A, nTax, (float) (x[i][j])));
+
+                }
+            }
+            return splitList;
+
+        }
+
+
 
         final int npairs = (nTax * (nTax - 1)) / 2;
         //Set up the distance vector.
@@ -111,6 +137,13 @@ public class NeighborNetSplits {
                 d[index++] = distances[cycle[i] - 1][cycle[j] - 1];
             }
         }
+
+
+
+
+
+
+
 
         //Call the appropriate least squares routine
         NNLSParams params = new NNLSParams();
@@ -361,35 +394,35 @@ public class NeighborNetSplits {
         int npairs = oldx.length - 1;
 
 
-            //Classical case: we add the first constraint that we come across
+        //Classical case: we add the first constraint that we come across
 
-            double alpha = 1.0;
-            int firstBoundary = 0;
-            boolean isFeasible = true;
+        double alpha = 1.0;
+        int firstBoundary = 0;
+        boolean isFeasible = true;
 
-            //Find optimal value of alpha
+        //Find optimal value of alpha
+        for (int i = 1; i <= npairs; i++) {
+            if (!active[i] && x[i] < 0.0) {
+                double alphai = oldx[i] / (oldx[i] - x[i]);
+                if (alphai < alpha) {
+                    alpha = alphai;
+                    firstBoundary = i;
+                    isFeasible = false;
+                }
+            }
+        }
+        if (isFeasible)
+            return true;
+        else {
+            //move old_x to  alpha x + (1-alpha) oldx
             for (int i = 1; i <= npairs; i++) {
-                if (!active[i] && x[i] < 0.0) {
-                    double alphai = oldx[i] / (oldx[i] - x[i]);
-                    if (alphai < alpha) {
-                        alpha = alphai;
-                        firstBoundary = i;
-                        isFeasible = false;
-                    }
-                }
+                if (!active[i])
+                    oldx[i] = Math.max(alpha * x[i] + (1 - alpha) * oldx[i], 0);
             }
-            if (isFeasible)
-                return true;
-            else {
-                //move old_x to  alpha x + (1-alpha) oldx
-                for (int i = 1; i <= npairs; i++) {
-                    if (!active[i])
-                        oldx[i] = Math.max(alpha * x[i] + (1 - alpha) * oldx[i], 0);
-                }
-                oldx[firstBoundary] = 0.0;
-                active[firstBoundary] = true;
-                return false;
-            }
+            oldx[firstBoundary] = 0.0;
+            active[firstBoundary] = true;
+            return false;
+        }
 
     }
 

@@ -97,7 +97,7 @@ public class SpeedKnitter {
             double[] b = new double[k];
             for(int j=1;j<k;j++) {
                 z[j] = d[cycle[j]][sk] - p[cycle[j]][u];
-                b[k] = x[cycle[j]][v];
+                b[j] = x[cycle[j]][v];
             }
             int trivialSplit = r1+1;
             if (trivialSplit > k-1)
@@ -108,7 +108,7 @@ public class SpeedKnitter {
             //and complete guess for sk|AB
             double[] gamma0 = new double[k];
             for(int j=1;j<k;j++)
-                gamma0[k]=b[j]/2.0;
+                gamma0[j]=b[j]/2.0;
             double meanz = 0.0;
             for(int j=1;j<k;j++)
                 meanz += z[j]/(k-1);
