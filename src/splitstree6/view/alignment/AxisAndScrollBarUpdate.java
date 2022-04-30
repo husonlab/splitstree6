@@ -107,7 +107,6 @@ public class AxisAndScrollBarUpdate {
 		}
 	}
 
-
 	public static void updateSelection(Pane selectionPane, NumberAxis axis, CharactersBlock inputCharacters, BitSet activeSites, BitSet selectedSites) {
 		selectionPane.setVisible(axis.isVisible());
 		selectionPane.getChildren().clear();

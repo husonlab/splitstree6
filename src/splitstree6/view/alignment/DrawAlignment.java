@@ -19,6 +19,7 @@
 
 package splitstree6.view.alignment;
 
+import javafx.beans.property.DoubleProperty;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
@@ -166,6 +167,20 @@ public class DrawAlignment {
 					rectangle.setStroke(SELECTION_STROKE);
 					selectionGroup.getChildren().add(rectangle);
 				}
+			}
+		}
+	}
+
+	public static void zoomToFit(Canvas canvas, TaxaBlock inputTaxa, CharactersBlock inputCharacters, DoubleProperty unitWidthProperty, DoubleProperty unitHeightProperty) {
+		if (inputTaxa != null && inputCharacters != null) {
+			var newWidth = Math.min(18, canvas.getWidth() / (inputCharacters.getNchar() + 3));
+			var newHeight = Math.min(18, canvas.getHeight() / (inputTaxa.getNtax() + 2));
+			if (newWidth < unitWidthProperty.get() && newHeight < unitHeightProperty.get()) {
+				unitWidthProperty.set(newWidth);
+				unitHeightProperty.set(newHeight);
+			} else {
+				unitWidthProperty.set(18);
+				unitHeightProperty.set(18);
 			}
 		}
 	}

@@ -30,6 +30,8 @@ import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Tooltip;
+import javafx.scene.text.Font;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.BitSetUtils;
@@ -210,6 +212,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller.getContractVerticallyButton().setOnAction(e -> alignmentView.setOptionUnitHeight(1 / 1.2 * alignmentView.getOptionUnitHeight()));
 		controller.getContractVerticallyButton().disableProperty().bind(alignmentView.optionUnitHeightProperty().lessThan(0.01));
 
+		controller.getZoomToFitButton().setOnAction(e -> DrawAlignment.zoomToFit(controller.getCanvas(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.optionUnitWidthProperty(), alignmentView.optionUnitHeightProperty()));
+		controller.getZoomToFitButton().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not());
+
 		controller.getSelectAllMenuItem().setOnAction(e ->
 				alignmentView.setSelectedSites(BitSetUtils.asBitSet(BitSetUtils.range(1, alignmentView.getInputCharacters().getNchar() + 1))));
 		controller.getSelectAllMenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not());
@@ -292,7 +297,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		controller.getSelectMissingMenuItem().disableProperty().bind(alignmentView.emptyProperty());
-
 
 		controller.getSelectGapMenuItem().setOnAction(e -> {
 			var inputCharacters = alignmentView.getInputCharacters();
@@ -425,6 +429,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					setGraphic(null);
 				} else {
 					setGraphic(null);
+					var tooltip = new Tooltip(item.getName());
+					tooltip.setFont(Font.font(tooltip.getFont().getFamily(), 11));
+					setTooltip(tooltip);
 					if (isDisabled.test(item))
 						setStyle(String.format("-fx-text-fill: gray; -fx-font-size: %.1f;", Math.min(18, 0.6 * unitHeight)));
 					else

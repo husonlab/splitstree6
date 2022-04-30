@@ -124,6 +124,8 @@ public class AlignmentViewController {
     @FXML
     private Button contractHorizontallyButton;
 
+    @FXML
+    private Button zoomToFitButton;
 
     @FXML
     private StackPane stackPane;
@@ -349,6 +351,10 @@ public class AlignmentViewController {
 
     public Button getContractHorizontallyButton() {
         return contractHorizontallyButton;
+    }
+
+    public Button getZoomToFitButton() {
+        return zoomToFitButton;
     }
 
     public Group getSiteSelectionGroup() {

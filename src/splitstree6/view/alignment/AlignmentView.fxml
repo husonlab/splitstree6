@@ -78,7 +78,22 @@
                     </ToggleButton>
                     <Separator layoutX="179.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
-
+                    <Button fx:id="zoomToFitButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Zoom to Fit">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ZoomToFit32.png"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Zoom to fit or zoom to default"/>
+                        </tooltip>
+                    </Button>
                     <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                             minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
                             style="-fx-border-style: none; -fx-background-color: transparent;" text="Expand Vertically">
@@ -143,6 +158,7 @@
                             <Tooltip text="Contract horizontally"/>
                         </tooltip>
                     </Button>
+
                     <Separator layoutX="223.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
                     <Label fx:id="selectionLabel" text="Selected"/>
