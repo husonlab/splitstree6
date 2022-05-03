@@ -8,8 +8,7 @@ import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNet
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities;
 import splitstree6.data.parts.ASplit;
 
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -103,10 +102,31 @@ public class NeighborNetSplits {
         }
 
         if (false) {
+
+
+
+
             double[][] d = new double[nTax+1][nTax+1];
             for(int i=1;i<=nTax;i++)
                 for (int j=i+1;j<=nTax;j++)
                     d[i][j] = d[j][i] = distances[cycle[i]-1][cycle[j]-1];
+
+            /* Output matlab code for comparison */
+            try {
+                FileWriter os = new FileWriter("testDist.m");
+                os.write("D=[");
+                for(int i=1;i<=nTax;i++) {
+                    for(int j=1;j<=nTax;j++)
+                        os.write(d[i][j] + " ");
+                    os.write(";\n");
+                }
+                os.write("];\n");
+                os.close();
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
             double[][] x = incrementalFitting(d,1e-5);
 
