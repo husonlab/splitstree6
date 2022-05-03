@@ -83,6 +83,7 @@ public class DrawAlignment {
 						gc.setFill(textFill);
 					} else
 						gc.setFill(textFill);
+					//if(fontSize>=6)
 					gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.4 * fontSize);
 					if (site == 1) {
 						gc.setLineWidth(0.75);

@@ -42,6 +42,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.window.MainWindowController;
+import splitstree6.workflow.Workflow;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -58,15 +59,18 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 	private final AlignmentView alignmentView;
 	private final AlignmentViewController controller;
 	private final MainWindowController mainWindowController;
+	private final Workflow workflow;
 
 	private boolean colorSchemeSet = false;
 
 
 	public AlignmentViewPresenter(MainWindow mainWindow, AlignmentView alignmentView) {
 		this.alignmentView = alignmentView;
+		this.workflow = mainWindow.getWorkflow();
 
 		controller = alignmentView.getController();
 		mainWindowController = mainWindow.getController();
+
 
 		controller.getColorSchemeCBox().getItems().addAll(ColorScheme.values());
 		controller.getColorSchemeCBox().valueProperty().bindBidirectional(alignmentView.optionColorSchemeProperty());
@@ -101,7 +105,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 
 		updateCanvasListener = e -> Platform.runLater(() -> {
-			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), taxon -> alignmentView.isDisabled(taxon));
+			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
 			DrawAlignment.updateCanvas(controller.getCanvas(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionColorScheme(),
 					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
 
@@ -395,6 +399,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				alignmentView.getUndoManager().doAndAdd("disable selected sites", () -> alignmentView.setActiveSites(oldBits), () -> alignmentView.setActiveSites(newBits));
 		});
 		controller.getDisableSelectedSitesMenuItem().disableProperty().bind(controller.getEnableSelectedSitesOnlyMenuItem().disableProperty());
+
+		controller.getFilterMenu().disableProperty().bind(workflow.runningProperty());
 
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
 		Platform.runLater(() -> updateAxisScrollBarCanvasListener.invalidated(null));

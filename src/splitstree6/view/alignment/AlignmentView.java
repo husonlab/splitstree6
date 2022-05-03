@@ -629,6 +629,6 @@ public class AlignmentView implements IView {
 	}
 
 	public boolean isDisabled(Taxon taxon) {
-		return getWorkingTaxaNode() == null || getWorkingTaxa().indexOf(taxon) == -1;
+		return getWorkingTaxa() == null || getWorkingTaxa().indexOf(taxon) == -1;
 	}
 }

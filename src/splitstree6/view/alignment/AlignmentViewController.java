@@ -206,12 +206,6 @@ public class AlignmentViewController {
             }
         });
 
-        filterMenu.disableProperty().bind(enableAllTaxaMenuItem.disableProperty().and(enableSelectedTaxaOnlyMenuItem.disableProperty())
-                .and(enableSelectedTaxaMenuItem.disableProperty())
-                .and(disableSelectedTaxaMenuItem.disableProperty()).and(enableAllSitesMenuItem.disableProperty())
-                .and(enableSelectedSitesMenuItem.disableProperty())
-                .and(enableSelectedSitesOnlyMenuItem.disableProperty()).and(disableSelectedSitesMenuItem.disableProperty()));
-
         // never want gray in the list of selected taxa, because we are using gray to indicate inactive items
         taxaListView.setStyle("-fx-selection-bar-non-focused: -fx-focus-color;");
     }
@@ -403,5 +397,9 @@ public class AlignmentViewController {
 
     public CopyableLabel getSelectionLabel() {
         return copyableSelectionLabel;
+    }
+
+    public MenuButton getFilterMenu() {
+        return filterMenu;
     }
 }
