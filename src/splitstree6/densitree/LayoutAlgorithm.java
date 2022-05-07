@@ -41,7 +41,7 @@ public class LayoutAlgorithm {
      *
      * @param drawingMethod use weights or scale all edges so that leaves are equi-distance from root or have all edges the same length?
      */
-    public static void apply(PhyloTree tree, int drawingMethod, int[] cycle, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
+    public static void apply(PhyloTree tree, drawingMethod drawingMethod, int[] cycle, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
         nodePointMap.clear();
         if (cycle.length > 0) {
             final var taxon2pos = new int[cycle.length];
@@ -79,7 +79,7 @@ public class LayoutAlgorithm {
                     });
 
 
-                    if (drawingMethod == 0) {
+                    if (drawingMethod == splitstree6.densitree.drawingMethod.CIRCULAR) {
                         var maxDepth = computeMaxDepth(tree);
                         try (var nodeRadiusMap = tree.newNodeDoubleArray()) {
                             tree.postorderTraversal(v -> {
@@ -91,7 +91,7 @@ public class LayoutAlgorithm {
                             });
                             tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
                         }
-                    } else if (drawingMethod == 1) {
+                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.TOSCALE) {
                         tree.preorderTraversal(v -> {
                             if (v.getInDegree() == 0) { // the root
                                 nodePointMap.put(v, new Point2D(0, 0));
@@ -101,7 +101,7 @@ public class LayoutAlgorithm {
                                 nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), tree.getWeight(e)));
                             }
                         });
-                    } else if (drawingMethod == 2){
+                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.UNIFORM){
                         tree.preorderTraversal(v -> {
                             if (v.getInDegree() == 0) { // the root
                                 nodePointMap.put(v, new Point2D(0, 0));
