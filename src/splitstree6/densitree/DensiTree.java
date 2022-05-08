@@ -69,11 +69,11 @@ public class DensiTree {
             boolean consensus = parameters.consensus;
             String highlight = parameters.highlight + ",";
             String labelMethod = parameters.labelMethod;
-            int drawingMethod = 0; //circular
+            drawingMethod drawingMethod = splitstree6.densitree.drawingMethod.CIRCULAR;
             if (parameters.drawingMethod.contains("toscale")) {
-                drawingMethod = 1; //To Scale
+                drawingMethod = splitstree6.densitree.drawingMethod.TOSCALE;
             } else if (parameters.drawingMethod.contains("uniform")) {
-                drawingMethod = 2; //Uniform
+                drawingMethod = splitstree6.densitree.drawingMethod.UNIFORM;
             }
 
             int nTrees = model.getTreesBlock().size();
