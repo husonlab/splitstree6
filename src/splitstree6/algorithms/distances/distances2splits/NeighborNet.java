@@ -46,7 +46,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	//private final ObjectProperty<WeightsAlgorithm> optionWeights = new SimpleObjectProperty<>(this,"optionWeights",WeightsAlgorithm.NNet2004);
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {BlockPivot}  //TODO: ActiveSet not working at present. Will be rewritten.
+	public enum InferenceAlgorithm {BlockPivot,SpeedKnitter}  //TODO: ActiveSet not working at present. Will be rewritten.
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.BlockPivot);
 
@@ -87,9 +87,10 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		final var start = System.currentTimeMillis();
 
 		var useBlockPivot = (getOptionInferenceAlgorithm() == InferenceAlgorithm.BlockPivot);
+		var speedKnitter =  (getOptionInferenceAlgorithm() == InferenceAlgorithm.SpeedKnitter);
 		var useDual = isOptionUseDual();
 		var usePreconditioner = isOptionUsePreconditioner();
-		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDual, usePreconditioner, progress);
+		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDual, usePreconditioner, speedKnitter, progress);
 
 		// add all missing trivial
 		splits.addAll(SplitsUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax()));

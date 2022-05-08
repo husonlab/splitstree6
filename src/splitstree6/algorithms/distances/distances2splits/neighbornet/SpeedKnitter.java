@@ -1,5 +1,8 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+
+import static java.lang.Math.*;
+
 public class SpeedKnitter {
 
     /**
@@ -7,15 +10,14 @@ public class SpeedKnitter {
      *
      * @param x split weights. Symmetric array. For i<j, x(i,j)  is the weight of the
      *          split {i,i+1,...,j-1} | rest.
-     * @return
+     * @return double[][] circular metric corresponding to these split weights.
      */
-    static public double[][] calcAx(double[][] x) {
+    static private double[][] calcAx(double[][] x) {
         int n = x.length - 1;
         double[][] d = new double[n+1][n+1];
 
         for (int i=1;i<=(n-1);i++)
-            d[i+1][i]=d[i][i+1] =sum(x[i+1],i+1,n) + sum(x[i+1],1,i);
-
+            d[i+1][i]=d[i][i+1] =sumSubvector(x[i+1],i+1,n)+sumSubvector(x[i+1],1,i);
 
         for (int i=1;i<=(n-2);i++)
             d[i+2][i]=d[i][i+2]=d[i][i+1]+d[i+1][i+2]-2*x[i+1][i+2];
@@ -29,12 +31,29 @@ public class SpeedKnitter {
         return d;
     }
 
-    static public double[][]  calcAtx(double[][] x) {
+    /**
+     * Sum the elements in the vector over a range of indices.
+     *
+     * Separating this out in case we can improve efficiency with threading.
+     * @param v vector
+     * @param from   start index
+     * @param to  end index
+     * @return  \sum_{i=from}^to v(i)
+     */
+    static private double sumSubvector(double[] v, int from, int to) {
+        double s=0.0;
+        for(int i=from;i<=to;i++)
+            s+=v[i];
+        return s;
+    }
+
+
+    static private double[][]  calcAtx(double[][] x) {
         int n=x.length-1;
         double[][] p = new double[n+1][n+1];
 
         for(int i=1;i<=n-1;i++)
-            p[i+1][i] = p[i][i+1]=sum(x[i],1,n);
+            p[i+1][i] = p[i][i+1]=sumSubvector(x[i],1,n);
 
         for(int i=1;i<=n-2;i++) {  //TODO This can be threaded
             p[i+2][i]=p[i][i+2] = p[i][i+1]+p[i+1][i+2]-2*x[i][i+1];
@@ -54,18 +73,14 @@ public class SpeedKnitter {
         double[][] p = new double[n+1][n+1];
 
         int[] s = maxDivergenceOrder(d);
-
-        boolean[] S = new boolean[n+1]; //Set of taxa already placed.
         int[] cycle = new int[n+1]; //Circular ordering for taxa already placed - in increasing order
 
         //First two taxa
-        //Swap if s1>s2
         int s1=s[1], s2 = s[2];
-               S[s1]=S[s2]=true;
         x[s1][s2] = x[s2][s1] = d[s1][s2];
         p[s1][s2] = p[s2][s1] = d[s1][s2];
-        cycle[1]=Math.min(s1,s2);
-        cycle[2]=Math.max(s1,s2);
+        cycle[1]=min(s1,s2);
+        cycle[2]=max(s1,s2);
 
         for (int k=3;k<=n;k++) {
             int sk = s[k];
@@ -102,24 +117,28 @@ public class SpeedKnitter {
             int trivialSplit = r1+1;
             if (trivialSplit > k-1)
                 trivialSplit = 1;
-            b[trivialSplit]=Integer.MAX_VALUE; // No upper bound for this weight.
+            b[trivialSplit]=Double.MAX_VALUE; // No upper bound for this weight.
 
             //gamma0 is an initial guess of the weights - equal weights for splits A sk | B and A| sk B,
             //and complete guess for sk|AB
             double[] gamma0 = new double[k];
             for(int j=1;j<k;j++)
                 gamma0[j]=b[j]/2.0;
-            double meanz = 0.0;
+
+
+            double sumz2 = 0.0;
             for(int j=1;j<k;j++)
-                meanz += z[j]/(k-1);
-            gamma0[trivialSplit] = meanz;
+                sumz2 += z[j]*z[j];
+            gamma0[trivialSplit] = sqrt(sumz2)/(k-1);
 
             double[] gamma1 = solveM(r1,r2,z);
 
             boolean isFeasible = true;
-            for(int j=1;j<k && isFeasible; j++)
-                if (gamma1[j]<0 || gamma1[j]>b[j])
+            for(int j=1;j<k; j++)
+                if (gamma1[j]<0 || gamma1[j]>b[j]) {
                     isFeasible = false;
+                    break;
+                }
 
             double[] gamma = new double[k];
             if (isFeasible)
@@ -130,14 +149,33 @@ public class SpeedKnitter {
 
             //Update the circular distances and split weights
             double[] Mgamma = multiplyM(r1,r2,gamma);
-            for(int j=1;j<=r1;j++) {
+            for(int j=1;j<k;j++) {
                 int sj = cycle[j];
                 p[sk][sj] = p[sj][sk] = p[u][sj] + Mgamma[j];
                 x[sk][sj] = x[sj][sk] = gamma[j];
-                x[v][sj] -= gamma[j];
-                x[sj][v] -= gamma[j];
-                //TODO Check all non-negative
+                x[v][sj] = max(x[v][sj] - gamma[j],0);
+                x[sj][v] = x[v][sj];
             }
+
+            //Insert sk into the cycle
+            for(int j=1;j<=r2;j++)
+                cycle[k-j+1]=cycle[k-j];
+            cycle[r1+1]=sk;
+
+            //DEBUGGING
+            double[][] pS = new double[k+1][k+1];
+            double[][] xS = new double[k+1][k+1];
+
+            for(int i=1;i<=k;i++) {
+                for (int j = 1; j <= k; j++) {
+                    pS[i][j] = p[cycle[i]][cycle[j]];
+                    xS[i][j] = x[cycle[i]][cycle[j]];
+                }
+            }
+
+            pS[1][1] = pS[1][1];
+
+
         }
         return x;
     }
@@ -256,20 +294,32 @@ public class SpeedKnitter {
             }
             public double eval(double x) {
                 for (int i = 1; i <= m; i++)   //Project onto box
-                    gammax[i] = Math.min(Math.max((1 - x) * gamma0[i] + x * gamma1[i], 0.0), b[i]);
+                    gammax[i] = min(max((1 - x) * gamma0[i] + x * gamma1[i], 0.0), b[i]);
                 double[] mg = multiplyM(r1, r2, gammax);
                 double val = 0.0;
                 for (int i = 1; i <= m; i++) {
                     val += (mg[i] - z[i]) * (mg[i] - z[i]);
                 }
-                return Math.sqrt(val);
+                return sqrt(val);
             }
 
         }
 
 
         int m = r1+r2;
-        double C = (3.0 - Math.sqrt(5))/2.0;
+        double maxdiff = 0.0;
+
+        for(int i=1;i<=m;i++) {
+            maxdiff = max(maxdiff,abs(gamma0[i]-gamma1[i]));
+        }
+        if (maxdiff == 0.0) {
+            double[] gamma = new double[m + 1];
+            System.arraycopy(gamma0, 1, gamma, 1, m);
+            return gamma;
+        }
+
+
+        double C = (3.0 - sqrt(5))/2.0;
         double R = 1.0 - C;
         ObjectiveFunction f = new ObjectiveFunction();
         double x0 = 0, x1=C, x2 = C + C*(1-C), x3 = 1;
@@ -277,8 +327,7 @@ public class SpeedKnitter {
         double f1 = f.eval(x1);
         double f2 = f.eval(x2);
 
-        int k=1;
-        while(Math.abs(x3-x0)>tol) {
+        while(abs(x3-x0)>tol/maxdiff) {
             if (f2<f1) {
                 x0 = x1;
                 x1 = x2;
@@ -300,137 +349,233 @@ public class SpeedKnitter {
 
         double[] gamma = new double[m+1];
         for (int i = 1; i <= m; i++)   //Project onto box
-            gamma[i] = Math.min(Math.max((1 - x) * gamma0[i] + x * gamma1[i], 0.0), b[i]);
+            gamma[i] = min(max((1 - x) * gamma0[i] + x * gamma1[i], 0.0), b[i]);
 
         return gamma;
     }
 
 
+    static public void greedyGradientProjection(double[][] x, double[][] d, double tolerance, int maxIterations) {
+        int n = x.length - 1; //Number of taxa
+        double fx_old = evalf(x,d);
 
-
-
-    /**
-     *
-     * @param x
-     * @param d
-     * @param G
-     * @param nonNeg
-     * @param tol
-     * @param maxIterations
-     * @return
-     *
-     * TODO: Explore potential 2x speedup by taking advantage of symmetry.
-     */
-   /** public double[][] ConstrainedCG(double[][] x,
-                                    double[][] d,
-                                    boolean[][] G,
-                                    boolean nonNeg,
-                                    double tol,
-                                    int maxIterations) {
-
-        final double EPSILON = 1e-12;
-        int n=x.length-1;
-
-        for(int i = 1;i<=n;i++)
-            for(int j=1;j<=n;j++)
-                if (G[i][j])
-                    x[i][j]=0; //x(G)=0;
-
-        double[][] res = calcAx(x);
-        for(int i=1;i<=n;i++)
-            for(int j=1;j<=n;j++)
-                res[i][j]-=d[i][j]; //res = Ax-d
-        double[][] r = calcAtd(res); //r = A'(Ax-d)
-
-        double[][] p = new double[n+1][n+1];
-        for(int i=1;i<=n;i++)
-            for(int j=1;j<=n;j++)
-                p[i][j] = - r[i][j];  //p = -r
-
-        int k=0;
-        double rtr = 0.0;
-        for(int i=1;i<=n;i++)
-            for(int j=1;j<=n;j++)
-                rtr += r[i][j]*r[i][j]; //rtr = ||r||^2
-
-        double[][] w;
-        double alpha_cg, alpha_bd, alpha;
-
-        while (rtr>tol && k<maxIterations) {
-            w = calcAx(p); //w = Ap
-
-            double wtw = 0.0;
-            for(int i=1;i<=n;i++)
-                for (int j=1;j<=n;j++)
-                    wtw+=w[i][j]*w[i][j]; //wtw = ||w||^2
-
-            alpha_cg = rtr/wtw; //Standard CG steplength
-
-            if (nonNeg) {
-                alpha_bd = alpha_cg;
-                for (int i=1;i<=n;i++)
-                    for (int j=1;j<=n;j++) {
-                        if (p(i,j)<0)
-                            alpha_bd = Math.min(alpha_bd,-x[i][j]/p[i][j]);
-                    }
-            }  //Max feasiblse step length.
-            if (!nonNeg || alpha_cg<=alpha_bd) {
-                alpha = alpha_cg;
-                double[][] Atw = calcAtd(w);
-                double rtr2 = 0.0;
-                for(int i=1;i<=n;i++) {
-                    for(int j=1;j<=n;j++) {
-                        x[i][j] += alpha*p[i][j];
-                        if (G[i][j])
-                            r[i][j]=0;
-                        else
-                            r[i][j] += alpha*Atw[i][j];
-                        rtr2 += r[i][j]*r[i][j];
-                    }
-                }
-                double beta = rtr2/rtr;
-                for(int i=1;i<=n;i++)
-                    for(int j=1;j<=n;j++)
-                        p[i][j] = -r[i][j] + beta*p[i][j];
-
-                k=k+1;
-                rtr = rtr2;
-            } else {
-                alpha = alpha_bd;
-                for(int i=1;i<=n;i++)
-                    for(int j=1;j<=n;j++)
-                        x[i][j] += alpha*p[i][j];
-
-                //Check - if we are already adbutting the boundary, add boundary elements
-                //to the active set G
-                if (alpha_bd<EPSILON)
-                    for(int i=1;i<=n;i++)
-                        for(int j=1;j<=n;j++) {
-                            G[i][j] = G[i][j] | ((i!=j)&&x[i][j]<EPSILON&&p[i][j]<0);
-                        }
-
+        for (int k = 1; k <= maxIterations; k++) {
+            //TODO Sort out proper handling of arrays and references to arrays to avoid needless copying
+            searchFace(x, d,tolerance);
+            double fx = evalf(x,d);
+            if (fx_old-fx<tolerance) {
+                return;
             }
+                fx_old = fx;
 
         }
+        System.err.println("Gradient projection algorithm failed to converge");
+    }
+
+
+    //Returns the l_infinity difference
+    static private double diff(double[][] x, double[][] y) {
+        int n = x.length-1;
+        double delta=0.0;
+        for(int i=1;i<=n;i++) {
+            for (int j = 1; j <=n; j++) {
+                delta = max(delta,abs(x[i][j] - y[i][j]));
+            }
+        }
+        return delta;
+    }
+
+    static private void copyArray(double[][] from, double[][] to) {
+        int n=from.length-1;
+        for(int i=1;i<=n;i++) {
+            System.arraycopy(from[i],1,to[i],1,n);
+        }
+    }
+
+
+    static private void searchFace(double[][] x, double[][] d, double tolerance) {
+        int n=x.length-1;
+        int maxIterations = n;
+
+        double[][] x0 = new double[n+1][n+1];
+        copyArray(x,x0);
+        boolean[][] A = new boolean[n+1][n+1];
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                A[i][j] = (x[i][j] == 0);
+
+        double[][] p = new double[n+1][n+1];
+
+        //Implementing CGNR in Saad's book
+
+        double[][] r = calcAx(x);
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                r[i][j] = d[i][j] - r[i][j];
+        double[][] z = calcAtx(r);
+        zeroElements(z,A);
+        copyArray(z,p);
+        double ztz=sumArraySquared(z);
+
+
+        int k=1;
+
+        while(true) {
+
+            double[][] w = calcAx(p);
+            double alpha = ztz/sumArraySquared(w);
+
+            for(int i=1;i<=n;i++) {
+                for (int j = 1; j <= n; j++) {
+                    x[i][j] += alpha * p[i][j];
+                    r[i][j] -= alpha * w[i][j];
+                }
+            }
+            z = calcAtx(r);
+            zeroElements(z,A);
+            double ztz2 = sumArraySquared(z);
+            double beta = ztz2/ztz;
+
+            if (ztz2<tolerance || k >= maxIterations)
+                break;
+
+            for(int i=1;i<=n;i++) {
+                for (int j = 1; j <= n; j++) {
+                    p[i][j] = z[i][j] + beta * p[i][j];
+                }
+            }
+            ztz = ztz2;
+            //System.err.println(ztz);
+            k++;
+        }
+        double s = sumArray(x);
+        double s2 = sumArraySquared(x);
+
+        if (minArray(x)<0) {
+            //Use gradient projection to return the best projection of points on the line between x0 and x
+            goldenProjection(x,x0,d,tolerance);
+        }
+    }
+
+    static private void zeroElements(double[][] r, boolean[][] A) {
+        int n=r.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                if (A[i][j])
+                    r[i][j]=0;
+    }
+
+    static private double sumArray(double[][] x) {
+        double total = 0.0;
+        double si;
+        int n=x.length-1;
+
+        for(int i=1;i<=n;i++) {
+            si = 0.0;
+            for (int j = 1; j <= n; j++) {
+                si += x[i][j];
+            }
+            total += si;
+        }
+        return total;
+    }
+
+    static private double sumArraySquared(double[][] x) {
+        double total = 0.0;
+        int n=x.length-1;
+        double si;
+        for(int i=1;i<=n;i++) {
+            si=0.0;
+            for (int j = 1; j <= n; j++) {
+                double x_ij = x[i][j];
+                si += x_ij * x_ij;
+            }
+            total+=si;
+        }
+        return total;
+    }
+
+    static private double minArray(double[][] x) {
+        double minx = 0.0;
+        int n=x.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                minx = min(minx,x[i][j]);
+        return minx;
+    }
+
+    static private int numTrue(boolean[][] x) {
+        int total = 0;
+        int n=x.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++) {
+                if (x[i][j])
+                    total++;
+            }
+        return total;
+    }
+
+
+    static private void goldenProjection(double[][] x, double[][] x0,double[][] d, double tolerance) {
+        //Minimize ||A \pi((1-t)x0 + tx) - d||  for t in [0,1]
+        double C = (3-sqrt(5))/2.0;
+        double R = 1.0 - C;
+
+        double t0=0,t1=C,t2 = C+C*(1-C), t3 = 1.0;
+        double f1 = evalfprojected(t1,x0,x,d);
+        double f2 = evalfprojected(t2,x0,x,d);
+        while(abs(t3-t0)>tolerance) {
+            if (f2<f1) {
+                t0=t1;
+                t1=t2;
+                t2 = R*t1 + C*t3;
+                f1=f2;
+                f2 = evalfprojected(t2,x0,x,d);
+            } else {
+                t3=t2;
+                t2=t1;
+                t1 = R*t2+C*t0;
+                f2=f1;
+                f1 = evalfprojected(t1,x0,x,d);
+            }
+        }
+        double tmin = t1;
+        if (f2<f1)
+            tmin = t2;
+
+        int n=x.length-1;
+        for(int i=1;i<=n;i++) {
+            for(int j=1;j<=n;j++) {
+                double newx_ij = max((1-tmin)*x0[i][j] + tmin*x[i][j],0);
+                x[i][j] = newx_ij;
+            }
+        }
+    }
+
+    static private double evalf(double[][] x, double[][] d) {
+        int n = x.length-1;
+        double[][] Axt = calcAx(x);
+        double fx = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++) {
+                double res_ij = Axt[i][j] - d[i][j];
+                fx += res_ij * res_ij;
+            }
+        return sqrt(fx);
+    }
+
+    static private double evalfprojected(double t, double[][] x0, double[][] x, double[][] d) {
+        int n = x.length-1;
+        double[][] xt = new double[n+1][n+1];
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++) {
+                xt[i][j] = max(x0[i][j]*(1-t) + x[i][j]*t,0.0);
+            }
+        return evalf(xt,d);
 
     }
-**/
-
-    /**
-     * Sum the elements in the vector over a range of indices.
-     *
-     * Separating this out in case we can improve efficiency with threading.
-     * @param v vector
-     * @param from   start index
-     * @param to  end index
-     * @return  \sum_{i=from}^to v(i)
-     */
-    static private double sum(double[] v, int from, int to) {
-        double s=0.0;
-        for(int i=from;i<=to;i++)
-            s+=v[i];
-        return s;
-    }
+    
+    
 
 
 

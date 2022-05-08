@@ -15,6 +15,7 @@ import java.util.BitSet;
 
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.SpeedKnitter.greedyGradientProjection;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SpeedKnitter.incrementalFitting;
 
 
@@ -40,10 +41,8 @@ public class NeighborNetSplits {
         // Note that alot of the calculations for preconditioning are done even if this is false, so use this flag only to assess #iterations.
         public boolean useBlockPivot = true; //Use the block pivot algorithm rather than least squares.
         public boolean initAllActive; //Start active set / block pivot iterations with x = 0, otherwise x = A\d.
-        public boolean useWarmStart = false; //Initialise the CG iterations with the current best guess.
         //public double proportionToZero = 0.4; //The proportion of indices to keep when doing a partial initialization.
         //public double pgBound = 0.0; //Terminate if the l_infinity of the projected gradient is smaller that this.
-        public double propKept = 0.6; //Proportion of negative splits to keep in the first iteration of the active set method.
         public int leastSquaresAlgorithm = CG;
 
         public boolean printCGconvergence = true; //For debugging and profiling - prints the appropriate residual at each step of CG/PCG
@@ -82,8 +81,9 @@ public class NeighborNetSplits {
      * @return weighted splits
      * @throws CanceledException
      */
-    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDual, boolean usePreconditioner, ProgressListener progress) throws CanceledException {
+    static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, double cutoff, boolean useBlockPivot, boolean useDual, boolean usePreconditioner, boolean speedKnitter, ProgressListener progress) throws CanceledException {
 
+        double tolerance = 1e-6; //TODO: Should be controlled by user, or set for the dataset.
         int nTax = cycle.length - 1;
 
         //Handle cases for n<3 directly.
@@ -101,7 +101,7 @@ public class NeighborNetSplits {
             return splits;
         }
 
-        if (false) {
+        if (speedKnitter) {
 
 
 
@@ -128,7 +128,8 @@ public class NeighborNetSplits {
             }
 
 
-            double[][] x = incrementalFitting(d,1e-5);
+            double[][] x = incrementalFitting(d,tolerance/100);
+            greedyGradientProjection(x,d,tolerance,nTax);
 
 //Copy back to the splits
             final ArrayList<ASplit> splitList = new ArrayList<>();
