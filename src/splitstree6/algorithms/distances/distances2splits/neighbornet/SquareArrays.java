@@ -1,0 +1,138 @@
+package splitstree6.algorithms.distances.distances2splits.neighbornet;
+
+import static java.lang.Math.*;
+
+/** A collection of utility routines for handling 2D symmetric arrays.
+ * In all of these routines, rows and columns with index 0 are ignored (for consistency with Matlab)
+ * **/
+
+public class SquareArrays {
+
+
+    /**
+     * Set a subset of elements of an array to zero
+     * @param r  square array of double  (ignore 0 indexed rows and columns)
+     * @param A   square array of boolean (ditto)
+     *
+     * set r[i][j] = 0 whenever A[i][j] is true.
+     */
+    static public void maskElements(double[][] r, boolean[][] A) {
+        int n=r.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                if (A[i][j])
+                    r[i][j]=0;
+    }
+
+    /**
+     * Return a boolean array indicating the elements of an array which are identically zero.
+     * @param x square array of doubles
+     * @return square array of boolean, with A[i][j] = (x[i][j]==0);
+     */
+    static boolean[][] getZeroElements(double[][] x) {
+        int n= x.length-1;
+        boolean[][] A = new boolean[n+1][n+1];
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                A[i][j] = (x[i][j] == 0);
+        return A;
+    }
+
+
+
+
+    /**
+     * Sum the entries of an array
+     * @param x Square array of doubles
+     * @return double sum of the entries in x
+     */
+    static  double sumArray(double[][] x) {
+        double total = 0.0;
+        double si;
+        int n=x.length-1;
+
+        for(int i=1;i<=n;i++) {
+            si = 0.0;
+            for (int j = 1; j <= n; j++) {   //Note we sum rows individually.
+                si += x[i][j];
+            }
+            total += si;
+        }
+        return total;
+    }
+
+    /**
+     * Sum the squares of entries of an array
+     * @param x Square array of doubles
+     * @return double sum of the squares of entries in x
+     */
+    static public double sumArraySquared(double[][] x) {
+        double total = 0.0;
+        int n=x.length-1;
+        double si;
+        for(int i=1;i<=n;i++) {
+            si=0.0;
+            for (int j = 1; j <= n; j++) {
+                double x_ij = x[i][j];
+                si += x_ij * x_ij;
+            }
+            total+=si;
+        }
+        return total;
+    }
+
+    /**
+     * Find the minimum value of an entry in a square array
+     * @param x square array of double
+     * @return  double min_ij  x_ij
+     */
+    static public double minArray(double[][] x) {
+        double minx = 0.0;
+        int n=x.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=n;j++)
+                minx = min(minx,x[i][j]);
+        return minx;
+    }
+
+
+
+
+    /**
+     * Copy elements from one square array to another of the same size.
+     * @param from square array
+     * @param to square array (assumed to be allocated already)
+     */
+    static public void copyArray(double[][] from, double[][] to) {
+        int n=from.length-1;
+        for(int i=1;i<=n;i++) {
+            System.arraycopy(from[i],1,to[i],1,n);
+        }
+    }
+
+    /**
+     * fro_dist
+     *
+     * Computes the Frobenius norm of (x-y)
+     * @param x square array of double
+     * @param y square array of double with the same dimensions as x
+     * @return   \sum_ij (x[i][j] - y[i][j])^2
+     */
+    static public double fro_dist(double[][] x, double[][] y) {
+        int n=x.length-1;
+        double fx = 0.0;
+        for(int i=1;i<=n;i++) {
+            double fx_i = 0.0;
+            for (int j = 1; j <= n; j++) {
+                double res_ij = x[i][j] - y[i][j];
+                fx_i += res_ij * res_ij;
+            }
+            fx += fx_i;
+        }
+        return sqrt(fx);
+    }
+
+
+
+
+}

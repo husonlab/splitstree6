@@ -13,10 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.CircularSplitAlgorithms.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetPCG.VectorUtilities.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SpeedKnitter.greedyGradientProjection;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.SpeedKnitter.incrementalFitting;
 
 
 //Things to do next
