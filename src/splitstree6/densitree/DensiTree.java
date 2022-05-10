@@ -119,34 +119,7 @@ public class DensiTree {
                 LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                 adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
-                double xsum = nodePointMap.get(tree.getRoot()).getX();
-                double ysum = nodePointMap.get(tree.getRoot()).getY();
-                int nodeCount = 1;
-
-                for (var e : tree.edges()) {
-                    var v = e.getSource();
-                    var w = e.getTarget();
-                    var vPt = nodePointMap.get(v);
-                    var wPt = nodePointMap.get(w);
-
-                    if (vPt != null & wPt != null) {
-
-                        xsum += wPt.getX();
-                        ysum += wPt.getY();
-                        nodeCount++;
-                    }
-                }
-
-                double comX = xsum / nodeCount;
-                double comY = ysum / nodeCount;
-
-                double centerX = canvas.getWidth()/2 - comX;
-                double centerY = canvas.getHeight()/2 - comY;
-
-                for(var k: nodePointMap.keySet()){
-                    var point = nodePointMap.get(k);
-                    nodePointMap.put(k, new Point2D(point.getX()+centerX, point.getY()+centerY));
-                }
+                centerByMass(tree, nodePointMap, canvas);
 
                 if (labelMethod.contains("kmeans")) {
                     drawEdges2(tree, i - 1, gc, nodePointMap, jitter, shiftx, shifty, coords3, labels);
@@ -174,6 +147,8 @@ public class DensiTree {
                         LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                         adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
 
+                        centerByMass(tree, nodePointMap, canvas);
+
                         drawEdges(tree, gc, nodePointMap, false, 0, 0, coords, labels);
 
                         if (labelMethod.contains("radial")) {
@@ -193,6 +168,8 @@ public class DensiTree {
                     var nodeAngleMap = consensusTree.newNodeDoubleArray();
                     LayoutAlgorithm.apply(consensusTree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                     adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+
+                    centerByMass(consensusTree, nodePointMap, canvas);
 
                     drawEdges(consensusTree, gc, nodePointMap, false, 0, 0, coords, labels);
 
@@ -225,6 +202,37 @@ public class DensiTree {
         }
     }
 
+
+    public static void centerByMass(PhyloTree tree, NodeArray<Point2D> nodePointMap, Canvas canvas){
+        double xsum = nodePointMap.get(tree.getRoot()).getX();
+        double ysum = nodePointMap.get(tree.getRoot()).getY();
+        int nodeCount = 1;
+
+        for (var e : tree.edges()) {
+            var v = e.getSource();
+            var w = e.getTarget();
+            var vPt = nodePointMap.get(v);
+            var wPt = nodePointMap.get(w);
+
+            if (vPt != null & wPt != null) {
+
+                xsum += wPt.getX();
+                ysum += wPt.getY();
+                nodeCount++;
+            }
+        }
+
+        double comX = xsum / nodeCount;
+        double comY = ysum / nodeCount;
+
+        double centerX = canvas.getWidth()/2 - comX;
+        double centerY = canvas.getHeight()/2 - comY;
+
+        for(var k: nodePointMap.keySet()){
+            var point = nodePointMap.get(k);
+            nodePointMap.put(k, new Point2D(point.getX()+centerX, point.getY()+centerY));
+        }
+    }
 
     public static void meanLabels(
             PhyloTree tree, Pane pane, NodeDoubleArray nodeAngleMap,
