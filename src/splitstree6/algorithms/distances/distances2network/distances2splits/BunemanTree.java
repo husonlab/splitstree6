@@ -1,5 +1,5 @@
 /*
- * SplitDecomposition.java Copyright (C) 2022 Daniel H. Huson
+ * BunemanTree.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,9 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2splits;
+package splitstree6.algorithms.distances.distances2network.distances2splits;
 
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.splits.IToCompatibleSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
@@ -32,16 +33,18 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 /**
- * Split decomposition
- * Created on 12/30/16.
+ * Implements the buneman tree
+ * <p>
+ * Created on 2007-09-11
  *
- * @author Daniel Huson
+ * @author Daniel Huson, David Bryant, Tobias Kloepper and Daria Evseeva
  */
-public class SplitDecomposition extends Distances2Splits {
 
+public class BunemanTree extends Distances2Splits implements IToCompatibleSplits {
 	@Override
 	public String getCitation() {
-		return "Bandelt and Dress 1992; H.-J.Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. Advances in Mathematics, 92:47–105, 1992.";
+		return "Bandelt and Dress 1992; H.-J. Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. " +
+			   "Advances in Mathematics, 92:47–105, 1992.";
 	}
 
 	@Override
@@ -49,7 +52,7 @@ public class SplitDecomposition extends Distances2Splits {
 		if (SplitsUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;
 
-		var previousSplits = new ArrayList<ASplit>(); // list of previously computed splits
+		ArrayList<ASplit> previousSplits = new ArrayList<>(); // list of previously computed splits
 		ArrayList<ASplit> nextSplits; // current list of splits
 
 		// ProgressDialog pd = new ProgressDialog("Split Decomposition...",""); //Set new progress bar.
@@ -57,31 +60,33 @@ public class SplitDecomposition extends Distances2Splits {
 		progress.setMaximum(taxaBlock.getNtax());    //initialize maximum progress
 		progress.setProgress(0);
 
-		final var previousTaxa = new BitSet(); // taxa already processed
-		final var ntax = taxaBlock.getNtax();
+		final BitSet previousTaxa = new BitSet(); // taxa already processed
+		final int ntax = taxaBlock.getNtax();
 
 		previousTaxa.set(1);
 
-		for (var t = 2; t <= ntax; t++) {
+		for (int t = 2; t <= ntax; t++) {
 			nextSplits = new ArrayList<>(t); // restart current list of splits
 
 			// Does t vs previous set of taxa form a split?
 			{
-				final var At = new BitSet();
+				final BitSet At = new BitSet();
 				At.set(t);
-				final var wgt = getIsolationIndex(t, At, previousTaxa, distancesBlock);
-				nextSplits.add(new ASplit((BitSet) At.clone(), t, wgt));
+				final float wgt = getIsolationIndex(t, At, previousTaxa, distancesBlock);
+				if (wgt > 0) {
+					nextSplits.add(new ASplit((BitSet) At.clone(), t, wgt));
+				}
 			}
 
 			// consider all previously computed splits:
-			for (final var previousSplit : previousSplits) {
-				final var A = previousSplit.getA();
-				final var B = getComplement(previousSplit.getA(), t - 1);
+			for (final ASplit previousSplit : previousSplits) {
+				final BitSet A = previousSplit.getA();
+				final BitSet B = getComplement(previousSplit.getA(), t - 1);
 
 				// is Au{t} vs B a split?
 				{
 					A.set(t);
-					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, A, B, distancesBlock));
+					final double wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, A, B, distancesBlock));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) A.clone(), t, wgt));
 
@@ -92,7 +97,7 @@ public class SplitDecomposition extends Distances2Splits {
 				// is A vs Bu{t} a split?
 				{
 					B.set(t);
-					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, B, A, distancesBlock));
+					final double wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, B, A, distancesBlock));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) B.clone(), t, wgt));
 					}
@@ -102,7 +107,7 @@ public class SplitDecomposition extends Distances2Splits {
 
 			previousTaxa.set(t);
 
-			progress.setProgress(t);
+			progress.incrementProgress();
 		}
 
 		// add all missing trivial
@@ -111,13 +116,11 @@ public class SplitDecomposition extends Distances2Splits {
 		// copy splits to splits
 		splitsBlock.getSplits().addAll(previousSplits);
 
+		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		splitsBlock.setFit(SplitsUtilities.computeSplitDecompositionFit(distancesBlock, splitsBlock.getSplits()));
 		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
-		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
-
-		progress.setProgress(taxaBlock.getNtax());   //set progress to 100%
-		progress.close();
 	}
+
 
 	/**
 	 * Returns the isolation index for Au{x} vs B
@@ -129,15 +132,15 @@ public class SplitDecomposition extends Distances2Splits {
 	 * @return the isolation index
 	 */
 	public static float getIsolationIndex(int t, BitSet A, BitSet B, DistancesBlock d) {
-		var min_val = Float.MAX_VALUE;
+		float min_val = Float.MAX_VALUE;
 
-		for (var i = 1; i <= t; i++) {
+		for (int i = 1; i <= t; i++) {
 			if (A.get(i)) {
-				for (var j = 1; j <= t; j++) {
+				for (int j = 1; j <= t; j++)
 					if (B.get(j)) {
-						for (var k = j; k <= t; k++) {
+						for (int k = j; k <= t; k++) {
 							if (B.get(k)) {
-								var val = getIsolationIndex(t, i, j, k, d);
+								float val = getIsolationIndex(t, i, j, k, d);
 								if (val < min_val) {
 									if (val <= 0.0000001)
 										return 0;
@@ -146,7 +149,6 @@ public class SplitDecomposition extends Distances2Splits {
 							}
 						}
 					}
-				}
 			}
 		}
 		return min_val;
@@ -163,12 +165,14 @@ public class SplitDecomposition extends Distances2Splits {
 	 * @return the isolation index
 	 */
 	public static float getIsolationIndex(int i, int j, int k, int m, DistancesBlock d) {
-		return (float) (0.5 * (Math.max(d.get(i, k) + d.get(j, m), d.get(i, m) + d.get(j, k)) - d.get(i, j) - d.get(k, m)));
+		return (float)
+				(0.5 * (Math.min(d.get(i, k) + d.get(j, m), d.get(i, m) + d.get(j, k))
+						- d.get(i, j) - d.get(k, m)));
 	}
 
 	private static BitSet getComplement(BitSet A, int ntax) {
-		var result = new BitSet();
-		for (var t = A.nextClearBit(1); t != -1 && t <= ntax; t = A.nextClearBit(t + 1))
+		BitSet result = new BitSet();
+		for (int t = A.nextClearBit(1); t != -1 && t <= ntax; t = A.nextClearBit(t + 1))
 			result.set(t);
 		return result;
 	}

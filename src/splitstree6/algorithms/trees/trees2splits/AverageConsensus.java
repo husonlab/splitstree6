@@ -20,7 +20,7 @@
 package splitstree6.algorithms.trees.trees2splits;
 
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.distances.distances2splits.NeighborNet;
+import splitstree6.algorithms.distances.distances2network.distances2splits.NeighborNet;
 import splitstree6.algorithms.trees.trees2distances.AverageDistances;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;

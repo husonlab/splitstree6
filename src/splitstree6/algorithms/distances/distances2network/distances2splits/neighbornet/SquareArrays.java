@@ -1,4 +1,6 @@
-package splitstree6.algorithms.distances.distances2splits.neighbornet;
+package splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet;
+
+import java.util.Arrays;
 
 import static java.lang.Math.*;
 
@@ -8,6 +10,17 @@ import static java.lang.Math.*;
 
 public class SquareArrays {
 
+    /**
+     * Construct an array of all ones.
+     * @param n size
+     * @return square array of ones.
+     */
+    static public double[][] ones(int n) {
+        double[][] X = new double[n+1][n+1];
+        for(int i=1;i<=n;i++)
+            Arrays.fill(X[i],1,n,1.0);
+        return X;
+    }
 
     /**
      * Set a subset of elements of an array to zero
@@ -25,41 +38,29 @@ public class SquareArrays {
     }
 
     /**
-     * Return a boolean array indicating the elements of an array which are identically zero.
+     * Fill a boolean array indicating the elements of an array which are identically zero.
+     * @param x square array of doubles
+     * @return square array of boolean, with A[i][j] = (x[i][j]==0);
+     */
+    static void getZeroElements(double[][] x, boolean[][] A) {
+        int n= x.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=1;j<=i;j++)
+                A[i][j] = A[j][i] = (x[i][j] == 0);
+    }
+
+    /**
+     * Returns a boolean array indicating the elements of an array which are identically zero.
      * @param x square array of doubles
      * @return square array of boolean, with A[i][j] = (x[i][j]==0);
      */
     static boolean[][] getZeroElements(double[][] x) {
         int n= x.length-1;
         boolean[][] A = new boolean[n+1][n+1];
-        for(int i=1;i<=n;i++)
-            for(int j=1;j<=n;j++)
-                A[i][j] = (x[i][j] == 0);
+        getZeroElements(x,A);
         return A;
     }
 
-
-
-
-    /**
-     * Sum the entries of an array
-     * @param x Square array of doubles
-     * @return double sum of the entries in x
-     */
-    static  double sumArray(double[][] x) {
-        double total = 0.0;
-        double si;
-        int n=x.length-1;
-
-        for(int i=1;i<=n;i++) {
-            si = 0.0;
-            for (int j = 1; j <= n; j++) {   //Note we sum rows individually.
-                si += x[i][j];
-            }
-            total += si;
-        }
-        return total;
-    }
 
     /**
      * Sum the squares of entries of an array

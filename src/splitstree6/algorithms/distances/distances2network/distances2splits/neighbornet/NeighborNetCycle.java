@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2splits.neighbornet;
+package splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;

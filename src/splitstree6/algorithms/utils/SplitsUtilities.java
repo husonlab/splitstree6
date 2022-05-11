@@ -23,7 +23,7 @@ import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
@@ -284,6 +284,7 @@ public class SplitsUtilities {
 	}
 
 	public static boolean computeSplitsForLessThan4Taxa(TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws CanceledException {
+		//TODO: Check that all trivial splits are included.
 		if (taxaBlock.getNtax() < 4) {
 			final TreesBlock treesBlock = new TreesBlock();
 			new NeighborJoining().compute(new ProgressSilent(), taxaBlock, distancesBlock, treesBlock);

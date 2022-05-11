@@ -20,7 +20,7 @@
 package splitstree6.densitree;
 
 import javafx.stage.FileChooser;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.DistancesBlock;

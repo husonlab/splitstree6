@@ -17,17 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2splits;
+package splitstree6.algorithms.distances.distances2network.distances2splits;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplits;
+import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetSplitWeights;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
@@ -40,22 +38,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
-	// public enum WeightsAlgorithm {NNet2004, NNet2021, LP}
-	//public enum WeightsAlgorithm {NNet2004, NNet2021}
-
-	//private final ObjectProperty<WeightsAlgorithm> optionWeights = new SimpleObjectProperty<>(this,"optionWeights",WeightsAlgorithm.NNet2004);
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {BlockPivot,SpeedKnitter}  //TODO: ActiveSet not working at present. Will be rewritten.
+	public enum InferenceAlgorithm {FastMethod,CarefulMethod,SplitsTree4Method}  //TODO: ActiveSet not working at present. Will be rewritten.
 
-	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.BlockPivot);
+	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.FastMethod);
 
-	private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", false);
+	//private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", false);
 
-	private final BooleanProperty optionUseDual = new SimpleBooleanProperty(this, "optionUseDual", true);
+	//private final BooleanProperty optionUseDual = new SimpleBooleanProperty(this, "optionUseDual", true);
 
 	public List<String> listOptions() {
-		return List.of(optionInferenceAlgorithm.getName(), optionUsePreconditioner.getName(),optionUseDual.getName());
+		return List.of(optionInferenceAlgorithm.getName());
 	}
 
 	@Override
@@ -71,28 +65,50 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	 */
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws CanceledException {
-		double optionThreshold = 1e-6; //TODO This should be a parameter, or maybe just set to zero and use the splits filter.
 
 		if (SplitsUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
-			return;
+			return; //TODO: Incorporate this into later code.
 
 		progress.setMaximum(-1);
 
 		final var cycle = NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock.getDistances());
 
-		progress.setTasks("NNet", "edge weight optimization");
+		progress.setTasks("NNet", "split weight optimization");
 
 		final ArrayList<ASplit> splits;
 
 		final var start = System.currentTimeMillis();
 
-		var useBlockPivot = (getOptionInferenceAlgorithm() == InferenceAlgorithm.BlockPivot);
-		var speedKnitter =  (getOptionInferenceAlgorithm() == InferenceAlgorithm.SpeedKnitter);
-		var useDual = isOptionUseDual();
-		var usePreconditioner = isOptionUsePreconditioner();
-		splits = NeighborNetSplits.compute(cycle, distancesBlock.getDistances(), optionThreshold, useBlockPivot, useDual, usePreconditioner, speedKnitter, progress);
+
+		NeighborNetSplitWeights.NNLSParams params = new NeighborNetSplitWeights.NNLSParams(taxaBlock.getNtax());
+
+		params.tolerance =1e-6;
+		if (getOptionInferenceAlgorithm()==InferenceAlgorithm.FastMethod) {
+			params.greedy=true;
+			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.PROJ_GRAD;
+			params.collapseMultiple = false;
+		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.CarefulMethod) {
+			params.greedy = false;
+			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.PROJ_GRAD;
+			params.collapseMultiple = false;
+			int n = cycle.length - 1; //ntax
+			params.outerIterations = n*(n-1)/2;
+		} else {
+			params.greedy = false;
+			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
+			int n = cycle.length - 1;
+			params.outerIterations = n*(n-1)/2;
+			params.collapseMultiple = true;
+			params.fractionNegativeToKeep = 0.4;
+		}
+
+			splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
+
+		progress.setTasks("NNet", "post-analysis");
+
 
 		// add all missing trivial
+		//TODO: Daniel, should we just return all of these from NeighborNetSplitWeights.compute?
 		splits.addAll(SplitsUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax()));
 
 		if (Compatibility.isCompatible(splits))
@@ -111,23 +127,28 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		}
 	}
 
+	/**
+	 * Compute the average distance in the distances block, used to pick an appropriately scaled tolerance level.
+	 * @param dist  distances block
+	 * @return  average distance between taxa
+	 */
+	private double averageDistance(DistancesBlock dist) {
+		double total = 0.0;
+		for(int i=1;i<=dist.getNtax();i++) {
+			double rowSum = 0.0;
+
+			for (int j = 1; j < i; j++)
+				rowSum += dist.get(i, j);
+			total += rowSum;
+		}
+		return total / (dist.getNtax()*(dist.getNtax()-1)/2.0);
+	}
+
+
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, DistancesBlock parent) {
 		return parent.getNtax() > 0;
 	}
-
-    /* public WeightsAlgorithm getOptionWeights() {
-        return optionWeights.get();
-    }
-
-    public ObjectProperty<WeightsAlgorithm> optionWeightsProperty() {
-        return optionWeights;
-    }
-
-    public void setOptionWeights(WeightsAlgorithm optionWeights) {
-        this.optionWeights.set(optionWeights);
-    }
-    */
 
 	public InferenceAlgorithm getOptionInferenceAlgorithm() {
 		return optionInferenceAlgorithm.get();
@@ -140,31 +161,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public void setOptionInferenceAlgorithm(InferenceAlgorithm optionInferenceAlgorithm) {
 		this.optionInferenceAlgorithm.set(optionInferenceAlgorithm);
 	}
-
-	public boolean isOptionUsePreconditioner() {
-		return optionUsePreconditioner.get();
-	}
-
-	public BooleanProperty optionUsePreconditionerProperty() {
-		return optionUsePreconditioner;
-	}
-
-	public void setOptionUsePreconditioner(boolean optionUsePreconditioner) {
-		this.optionUsePreconditioner.set(optionUsePreconditioner);
-	}
-
-	public boolean isOptionUseDual() {
-		return optionUseDual.get();
-	}
-
-	public BooleanProperty optionUseDualProperty() {
-		return optionUseDual;
-	}
-
-	public void setOptionUseDual(boolean optionUseDual) {
-		this.optionUseDual.set(optionUseDual);
-	}
-
 
 
 }
