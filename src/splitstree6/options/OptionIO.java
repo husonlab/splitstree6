@@ -76,14 +76,18 @@ public class OptionIO {
 											matrix[i][j] = np.getDouble();
 									}
 								}
-                                case Enum -> option.getProperty().setValue(option.getEnumValueForName(np.getWordRespectCase()));
-                                case stringArray -> {
+								case Enum -> {
+									var value = option.getEnumValueForName(np.getWordRespectCase());
+									if (value != null)
+										option.getProperty().setValue(value);
+								}
+								case stringArray -> {
 									final var list = new ArrayList<String>();
-                                    while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
-                                        list.add(np.getWordRespectCase());
-                                    option.getProperty().setValue(list.toArray(new String[0]));
-                                }
-                                default -> option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
+									while (!np.peekMatchAnyTokenIgnoreCase(", ;"))
+										list.add(np.getWordRespectCase());
+									option.getProperty().setValue(list.toArray(new String[0]));
+								}
+								default -> option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
 							}
 
 						} else {

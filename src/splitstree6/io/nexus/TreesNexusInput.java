@@ -21,6 +21,7 @@ package splitstree6.io.nexus;
 
 import jloda.phylo.PhyloTree;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.NumberUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -159,7 +160,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 				name = "t" + treeNumber;
 
 			np.matchIgnoreCase("=");
-			np.getComment(); // clears comments
+			np.popComments(); // clears comments
 
 			final StringBuilder buf = new StringBuilder();
 
@@ -171,7 +172,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			final boolean isRooted; // In SplitsTree6 we ignore this because trees are now always rooted
 			if (rootedExplicitySet) {
 			} else {
-				String comment = np.getComment();
+				String comment = np.popComments();
 			}
 
 			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
@@ -179,11 +180,17 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			tree.parseBracketNotation(buf.toString(), true);
 
 			if (translator != null)
-				tree.changeLabels(translator);
+				tree.changeLabels(translator, true);
 
 			for (var v : tree.nodes()) {
 				final var label = tree.getLabel(v);
-				if (label != null && label.length() > 0) {
+				if (label != null && !label.isBlank()) {
+					if (NumberUtils.isDouble(label)) {
+						if (v.isLeaf())
+							throw new IOExceptionWithLineNumber(np.lineno(), "Leaf labels must not be numbers");
+						else
+							continue;
+					}
 					if (!knownTaxonNames.contains(label)) {
 						if (haveSetKnownTaxonNames) {
 							System.err.println("Tree '" + name + "' contains unknown taxon: " + label);

@@ -34,6 +34,7 @@ import splitstree6.data.TraitsBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.AlgorithmNexusInput;
 import splitstree6.io.nexus.SplitsTree6NexusInput;
+import splitstree6.io.nexus.TaxaNexusInput;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.*;
 
@@ -116,6 +117,8 @@ public class WorkflowNexusInput {
 	 */
 	public static void input(ProgressListener progress, Workflow workflow, Reader reader) throws IOException {
 		try (NexusStreamParser np = new NexusStreamParser(reader)) {
+			np.setCollectAllComments(false);
+			np.setCollectAllCommentsWithExclamationMark(true);
 			np.matchIgnoreCase("#nexus");
 
 			final SplitsTree6Block splitsTree6Block = new SplitsTree6Block();
@@ -125,6 +128,7 @@ public class WorkflowNexusInput {
 			final NexusDataBlockInput dataInput = new NexusDataBlockInput();
 
 			var inputTaxaBlock = dataInput.parse(np);
+			TaxaNexusInput.captureComments(np, inputTaxaBlock);
 
 			if (np.peekMatchBeginBlock("traits")) {
 				inputTaxaBlock.setTraitsBlock((TraitsBlock) dataInput.parse(np, inputTaxaBlock));
@@ -132,7 +136,7 @@ public class WorkflowNexusInput {
 
 			var taxaFilter = (new AlgorithmNexusInput()).parse(np);
 			if (!(taxaFilter instanceof TaxaFilter))
-				throw new IOExceptionWithLineNumber("Excepted TaxaFilter", np.lineno());
+				throw new IOExceptionWithLineNumber("Expected TaxaFilter", np.lineno());
 			var workingTaxaBlock = dataInput.parse(np);
 			workingTaxaBlock.overwriteTaxa(inputTaxaBlock);
 			if (np.peekMatchBeginBlock("traits")) {
@@ -142,7 +146,7 @@ public class WorkflowNexusInput {
 			var inputDataBlock = dataInput.parse(np, inputTaxaBlock);
 			var dataTaxaFilter = (new AlgorithmNexusInput()).parse(np);
 			if (!(dataTaxaFilter instanceof DataTaxaFilter))
-				throw new IOExceptionWithLineNumber("Excepted DataTaxaFilter", np.lineno());
+				throw new IOExceptionWithLineNumber("Expected DataTaxaFilter", np.lineno());
 			if (dataTaxaFilter.getFromClass() != inputDataBlock.getClass())
 				throw new IOExceptionWithLineNumber("Input data and DataTaxaFilter of incompatible types", np.lineno());
 			var workingDataBlock = dataInput.parse(np, workingTaxaBlock);

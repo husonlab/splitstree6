@@ -23,7 +23,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
 import jloda.fx.window.NotificationManager;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
-import splitstree6.algorithms.distances.distances2network.distances2splits.NeighborNet;
+import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
 import splitstree6.algorithms.source.source2distances.DistancesLoader;
@@ -71,7 +71,7 @@ public class WorkflowSetup {
 			workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), splitsNode, viewerNode);
 		} else if (clazz.equals(DistancesBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new DistancesLoader(), new TaxaBlock(), new DistancesBlock());
-			var distancesNode = workflow.getInputDataNode();
+			var distancesNode = workflow.getWorkingDataNode();
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
 			var viewerNode = workflow.newDataNode(new ViewBlock());

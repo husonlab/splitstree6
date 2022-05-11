@@ -1,4 +1,4 @@
-package splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet;
+package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import static java.lang.Math.*;
-import static splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.SquareArrays.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
 public class NeighborNetSplitWeights {
 

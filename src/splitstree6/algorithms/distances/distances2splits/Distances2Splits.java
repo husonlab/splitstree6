@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2network.distances2splits;
+package splitstree6.algorithms.distances.distances2splits;
 
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;

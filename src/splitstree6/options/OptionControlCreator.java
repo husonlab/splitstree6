@@ -43,6 +43,9 @@ public class OptionControlCreator {
 	 * @return the corresponding control
 	 */
 	public static Control apply(Option option, Collection<ChangeListener> changeListeners) {
+		if (option.getOptionValueType() == null)
+			return new Label("Invalid");
+
 		switch (option.getOptionValueType()) {
 			case Integer -> {
 				var control = new TextField();
@@ -155,6 +158,9 @@ public class OptionControlCreator {
 					option.getProperty().addListener(new WeakChangeListener(changeListener));
 				}
 				return control;
+			}
+			default -> {
+				return null;
 			}
 		}
 		return null;

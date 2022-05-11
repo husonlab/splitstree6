@@ -19,6 +19,7 @@
 
 package splitstree6.io.nexus;
 
+import jloda.util.Basic;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.PluginClassLoader;
 import jloda.util.parse.NexusStreamParser;
@@ -61,7 +62,7 @@ public class AlgorithmNexusInput extends NexusIOBase {
 		parseTitleAndLink(np);
 
 		np.matchAnyTokenIgnoreCase("NAME ALGORITHM"); // ALGORITHM for SplitsTree5 compatiblity
-		final String algorithmName = np.getWordRespectCase();
+		final String algorithmName = np.getWordRespectCase().replaceAll(" ", "");
 		np.matchIgnoreCase(";");
 
 		final Algorithm algorithm = createAlgorithmFromName(algorithmName);
@@ -69,7 +70,12 @@ public class AlgorithmNexusInput extends NexusIOBase {
 			throw new IOExceptionWithLineNumber("Unknown algorithm: " + algorithmName, np.lineno());
 
 		if (np.peekMatchIgnoreCase("OPTIONS")) {
-			OptionIO.parseOptions(np, algorithm);
+			try {
+				OptionIO.parseOptions(np, algorithm);
+			} catch (IOException ex) {
+				Basic.caught(ex);
+				throw ex;
+			}
 		}
 		np.matchEndBlock();
 		return algorithm;
@@ -81,9 +87,8 @@ public class AlgorithmNexusInput extends NexusIOBase {
 	 * @return instance or null
 	 */
 	public static Algorithm createAlgorithmFromName(String algorithmName) {
-		algorithmName = algorithmName.replaceAll(" ", "");
 		var algorithms = PluginClassLoader.getInstances(algorithmName, Algorithm.class, null, "splitstree6.algorithms");
-		if (algorithms.size() == 1)
+		if (algorithms.size() > 0)
 			return algorithms.get(0);
 		else
 			return null;

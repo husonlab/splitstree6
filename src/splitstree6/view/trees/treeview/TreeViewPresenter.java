@@ -100,6 +100,12 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
+		treeView.optionTreeProperty().addListener((v, o, n) -> {
+			var index = n.intValue() - 1;
+			if (index >= 0 && index < controller.getTreeCBox().getItems().size())
+				controller.getTreeCBox().setValue(controller.getTreeCBox().getItems().get(index));
+		});
+
 		controller.getTreeCBox().valueProperty().addListener((v, o, n) -> {
 			if (n != null) {
 				var i = controller.getTreeCBox().getItems().indexOf(n);
@@ -206,7 +212,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						if (!treeView.emptyProperty().get()) {
 							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
 									treeView.getOptionDiagram(), treeView.getOptionAveraging(), treeView.optionOrientationProperty(), treeView.optionFontScaleFactorProperty(), null,
-									treeView.optionShowInternalLabelsProperty(), controller.getScaleBar().unitLengthXProperty(), nodeShapeMap);
+									treeView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(), nodeShapeMap);
 							treePane.set(pane);
 							pane.setRunAfterUpdate(() -> {
 								updateCounter.set(updateCounter.get() + 1);

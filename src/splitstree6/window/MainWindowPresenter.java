@@ -42,6 +42,7 @@ import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import jloda.fx.window.SplashScreen;
 import jloda.fx.window.WindowGeometry;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
@@ -54,9 +55,9 @@ import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
-import splitstree6.algorithms.distances.distances2network.distances2splits.BunemanTree;
-import splitstree6.algorithms.distances.distances2network.distances2splits.NeighborNet;
-import splitstree6.algorithms.distances.distances2network.distances2splits.SplitDecomposition;
+import splitstree6.algorithms.distances.distances2splits.BunemanTree;
+import splitstree6.algorithms.distances.distances2splits.NeighborNet;
+import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.MinSpanningTree;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
@@ -81,6 +82,7 @@ import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
 import splitstree6.dialog.importing.ImportTaxonTraits;
 import splitstree6.io.FileLoader;
 import splitstree6.io.readers.ImportManager;
+import splitstree6.main.CheckForUpdate;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -88,6 +90,7 @@ import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
 
 import java.io.File;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
@@ -270,10 +273,10 @@ public class MainWindowPresenter {
 		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
 		controller.getExportTaxonDisplayLabelsMenuItem().setOnAction(e -> ExportTaxonDisplayLabels.apply(mainWindow));
-		controller.getExportTaxonDisplayLabelsMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
+		controller.getExportTaxonDisplayLabelsMenuItem().disableProperty().bind(workflow.runningProperty().or(Bindings.createBooleanBinding(() -> workflow.getWorkingTaxaBlock() == null, workflow.validProperty())));
 
 		controller.getExportTaxonTraitsMenuItem().setOnAction(e -> ExportTaxonTraits.apply(mainWindow));
-		controller.getExportTaxonTraitsMenuItem().disableProperty().bind(workflow.runningProperty().or(Bindings.createBooleanBinding(() -> workflow.getWorkingTaxaBlock() != null && workflow.getWorkingTaxaBlock().getTraitsBlock() != null, workflow.validProperty())));
+		controller.getExportTaxonTraitsMenuItem().disableProperty().bind(workflow.runningProperty().or(Bindings.createBooleanBinding(() -> workflow.getWorkingTaxaBlock() == null || workflow.getWorkingTaxaBlock().getTraitsBlock() == null, workflow.validProperty())));
 
 		controller.getExportWorkflowMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, true));
 		controller.getExportWorkflowMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
@@ -522,8 +525,10 @@ public class MainWindowPresenter {
 
 		controller.getShowMessageWindowMenuItem().setOnAction(e -> MessageWindow.getInstance().setVisible(true));
 
-		controller.getCheckForUpdatesMenuItem().setOnAction(null);
-		controller.getAboutMenuItem().setOnAction(null);
+		controller.getAboutMenuItem().setOnAction((e) -> SplashScreen.showSplash(Duration.ofMinutes(1)));
+
+		controller.getCheckForUpdatesMenuItem().setOnAction(e -> CheckForUpdate.apply());
+		controller.getCheckForUpdatesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not().or(MainWindowManager.getInstance().sizeProperty().greaterThan(1)));
 	}
 
 	public void showInputEditor() {

@@ -20,6 +20,7 @@
 package splitstree6.io.readers;
 
 import jloda.util.FileUtils;
+import jloda.util.Single;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.*;
 import splitstree6.io.nexus.*;
@@ -42,68 +43,91 @@ public class NexusImporter {
 			np.matchIgnoreCase("#nexus");
 
 			List<String> taxLabels;
+			var comments = new Single<String>(null);
 
-			if (np.isAtBeginOfBlock("SplitsTree6") || np.isAtBeginOfBlock("SplitsTree5")) {
-				np.skipBlock();
-				{
-					var parser = new TaxaNexusInput();
-					parser.parse(np, taxaBlock);
-				}
-				while (np.isAtBeginOfBlock("ALGORITHM") || np.isAtBeginOfBlock("TAXA")) {
+			try {
+				np.setCollectAllCommentsWithExclamationMark(true);
+				np.setEchoCommentsWithExclamationMark(true);
+				if (np.isAtBeginOfBlock("SplitsTree6") || np.isAtBeginOfBlock("SplitsTree5")) {
+
 					np.skipBlock();
+					comments.setIfCurrentValueIsNull(np.popComments());
+					{
+						var parser = new TaxaNexusInput();
+						parser.parse(np, taxaBlock);
+						comments.setIfCurrentValueIsNull(np.popComments());
+					}
+					while (np.isAtBeginOfBlock("ALGORITHM") || np.isAtBeginOfBlock("TAXA")) {
+						np.skipBlock();
+						comments.setIfCurrentValueIsNull(np.popComments());
+					}
+					if (np.isAtBeginOfBlock("TRAITS")) {
+						var parser = new TraitsNexusInput();
+						var traitsBlock = new TraitsBlock();
+						parser.parse(np, taxaBlock, traitsBlock);
+						comments.setIfCurrentValueIsNull(np.popComments());
+						taxaBlock.setTraitsBlock(traitsBlock);
+					}
+				} else if (np.isAtBeginOfBlock("TAXA")) {
+					{
+						var parser = new TaxaNexusInput();
+						parser.parse(np, taxaBlock);
+						comments.setIfCurrentValueIsNull(np.popComments());
+					}
+					if (np.isAtBeginOfBlock("TRAITS")) {
+						var parser = new TraitsNexusInput();
+						var traitsBlock = new TraitsBlock();
+						parser.parse(np, taxaBlock, traitsBlock);
+						comments.setIfCurrentValueIsNull(np.popComments());
+						taxaBlock.setTraitsBlock(traitsBlock);
+					}
+				}
+
+				while (!np.isAtBeginOfBlock(dataBlock.getBlockName()) && !(dataBlock instanceof CharactersBlock && np.isAtBeginOfBlock("data")))
+					np.skipBlock();
+
+				if (dataBlock instanceof DistancesBlock distancesBlock) {
+					var parser = new DistancesNexusInput();
+					taxLabels = parser.parse(np, taxaBlock, distancesBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				} else if (dataBlock instanceof CharactersBlock charactersBlock) {
+					var parser = new CharactersNexusInput();
+					taxLabels = parser.parse(np, taxaBlock, charactersBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				} else if (dataBlock instanceof SplitsBlock splitsBlock) {
+					var parser = new SplitsNexusInput();
+					taxLabels = parser.parse(np, taxaBlock, splitsBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				} else if (dataBlock instanceof TreesBlock treesBlock) {
+					var parser = new TreesNexusInput();
+					taxLabels = parser.parse(np, taxaBlock, treesBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				} else if (dataBlock instanceof NetworkBlock networkBlock) {
+					var parser = new NetworkNexusInput();
+					taxLabels = parser.parse(np, taxaBlock, networkBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				} else {
+					throw new IOException("Not implemented: import '" + dataBlock.getName());
+				}
+
+
+				if (taxaBlock.getNtax() == 0 || taxaBlock.size() == 0) {
+					if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || taxLabels.size() > 0 && taxaBlock.getNtax() == 0))
+						taxaBlock.addTaxaByNames(taxLabels);
+					else
+						throw new IOException("Can't infer taxon names");
 				}
 				if (np.isAtBeginOfBlock("TRAITS")) {
 					var parser = new TraitsNexusInput();
 					var traitsBlock = new TraitsBlock();
 					parser.parse(np, taxaBlock, traitsBlock);
 					taxaBlock.setTraitsBlock(traitsBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
 				}
-			} else if (np.isAtBeginOfBlock("TAXA")) {
-				{
-					var parser = new TaxaNexusInput();
-					parser.parse(np, taxaBlock);
-				}
-				if (np.isAtBeginOfBlock("TRAITS")) {
-					var parser = new TraitsNexusInput();
-					var traitsBlock = new TraitsBlock();
-					parser.parse(np, taxaBlock, traitsBlock);
-					taxaBlock.setTraitsBlock(traitsBlock);
-				}
-			}
-
-			while (!np.isAtBeginOfBlock(dataBlock.getBlockName()) && !(dataBlock instanceof CharactersBlock && np.isAtBeginOfBlock("data")))
-				np.skipBlock();
-
-			if (dataBlock instanceof DistancesBlock distancesBlock) {
-				var parser = new DistancesNexusInput();
-				taxLabels = parser.parse(np, taxaBlock, distancesBlock);
-			} else if (dataBlock instanceof CharactersBlock charactersBlock) {
-				var parser = new CharactersNexusInput();
-				taxLabels = parser.parse(np, taxaBlock, charactersBlock);
-			} else if (dataBlock instanceof SplitsBlock splitsBlock) {
-				var parser = new SplitsNexusInput();
-				taxLabels = parser.parse(np, taxaBlock, splitsBlock);
-			} else if (dataBlock instanceof TreesBlock treesBlock) {
-				var parser = new TreesNexusInput();
-				taxLabels = parser.parse(np, taxaBlock, treesBlock);
-			} else if (dataBlock instanceof NetworkBlock networkBlock) {
-				var parser = new NetworkNexusInput();
-				taxLabels = parser.parse(np, taxaBlock, networkBlock);
-			} else {
-				throw new IOException("Not implemented: import '" + dataBlock.getName());
-			}
-
-			if (taxaBlock.getNtax() == 0 || taxaBlock.size() == 0) {
-				if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || taxLabels.size() > 0 && taxaBlock.getNtax() == 0))
-					taxaBlock.addTaxaByNames(taxLabels);
-				else
-					throw new IOException("Can't infer taxon names");
-			}
-			if (np.isAtBeginOfBlock("TRAITS")) {
-				var parser = new TraitsNexusInput();
-				var traitsBlock = new TraitsBlock();
-				parser.parse(np, taxaBlock, traitsBlock);
-				taxaBlock.setTraitsBlock(traitsBlock);
+			} finally {
+				taxaBlock.setComments(comments.get());
+				np.setCollectAllCommentsWithExclamationMark(false);
+				np.setEchoCommentsWithExclamationMark(false);
 			}
 		}
 	}
@@ -123,6 +147,9 @@ public class NexusImporter {
 				}
 			} else if (np.isAtBeginOfBlock("TAXA")) {
 				np.skipBlock();
+				if (np.isAtBeginOfBlock("TRAITS")) {
+					np.skipBlock();
+				}
 			}
 
 			if (np.isAtBeginOfBlock("DISTANCES")) {

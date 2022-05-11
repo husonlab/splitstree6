@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2network.distances2splits;
+package splitstree6.algorithms.distances.distances2splits;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetCycle;
-import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetSplitWeights;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
@@ -59,7 +59,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			   "Molecular Biology and Evolution, 21(2):255– 265, 2004.";
 	}
 
-
 	/**
 	 * run the neighbor net algorithm
 	 */
@@ -70,7 +69,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			return; //TODO: Incorporate this into later code.
 
 		progress.setMaximum(-1);
-
 		final var cycle = NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock.getDistances());
 
 		progress.setTasks("NNet", "split weight optimization");
@@ -161,6 +159,4 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public void setOptionInferenceAlgorithm(InferenceAlgorithm optionInferenceAlgorithm) {
 		this.optionInferenceAlgorithm.set(optionInferenceAlgorithm);
 	}
-
-
 }

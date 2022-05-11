@@ -59,4 +59,10 @@ public class TaxaNexusOutput extends NexusIOBase {
 
 		w.write("END; [TAXA]\n");
 	}
+
+	public static void writeComments(Writer w, TaxaBlock taxaBlock) throws IOException {
+		if (taxaBlock.getComments() != null) {
+			w.write("\n[!" + taxaBlock.getComments() + "]\n");
+		}
+	}
 }

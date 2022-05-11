@@ -44,8 +44,10 @@ public class NexusWriter extends TaxaWriterBase {
 
 	@Override
 	public void write(Writer w, TaxaBlock ignored, TaxaBlock taxaBlock) throws IOException {
-		if (isOptionPrependNexus())
+		if (isOptionPrependNexus()) {
 			w.write("#nexus\n");
+			TaxaNexusOutput.writeComments(w, taxaBlock);
+		}
 		var output = new TaxaNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly)

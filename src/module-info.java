@@ -9,6 +9,7 @@ module splitstreesix {
     requires richtextfx.fat;
     requires org.apache.commons.collections4;
 	requires commons.math3;
+	requires com.install4j.runtime;
 
 	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
@@ -20,23 +21,30 @@ module splitstreesix {
 	opens splitstree6.algorithms.characters.characters2view;
 	opens splitstree6.algorithms.characters.characters2splits;
 	opens splitstree6.algorithms.characters.characters2trees;
+
 	opens splitstree6.algorithms.distances.distances2distances;
 	opens splitstree6.algorithms.distances.distances2network;
 	opens splitstree6.algorithms.distances.distances2view;
-	opens splitstree6.algorithms.distances.distances2network.distances2splits;
+	opens splitstree6.algorithms.distances.distances2splits;
 	opens splitstree6.algorithms.distances.distances2trees;
+
 	opens splitstree6.algorithms.network.network2network;
 	opens splitstree6.algorithms.network.network2view;
+
 	opens splitstree6.algorithms.source.source2characters;
 	opens splitstree6.algorithms.source.source2distances;
 	opens splitstree6.algorithms.source.source2splits;
 	opens splitstree6.algorithms.source.source2trees;
+
 	opens splitstree6.algorithms.splits.splits2distances;
 	opens splitstree6.algorithms.splits.splits2view;
 	opens splitstree6.algorithms.splits.splits2splits;
 	opens splitstree6.algorithms.splits.splits2trees;
 	opens splitstree6.algorithms.splits.splits2network;
+
 	opens splitstree6.algorithms.taxa.taxa2taxa;
+	opens splitstree6.algorithms.taxa.taxa2view;
+
 	opens splitstree6.algorithms.trees.trees2distances;
 	opens splitstree6.algorithms.trees.trees2network;
 	opens splitstree6.algorithms.trees.trees2view;
@@ -81,7 +89,6 @@ module splitstreesix {
 
 	opens splitstree6.densitree;
 
-	opens splitstree6.algorithms.taxa.taxa2view;
 
 	opens splitstree6.layout.splits;
 	opens splitstree6.layout.tree;

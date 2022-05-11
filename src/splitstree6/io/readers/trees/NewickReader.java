@@ -59,7 +59,7 @@ public class NewickReader extends TreesReader {
 
 		final var taxName2Id = new HashMap<String, Integer>(); // starts at 1
 		final var taxonNamesFound = new HashSet<String>();
-		final ArrayList<String> orderedTaxonNames = new ArrayList<>();
+		final var orderedTaxonNames = new ArrayList<String>();
 
 		final var parts = new ArrayList<String>();
 

@@ -22,6 +22,8 @@ package splitstree6.data;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jloda.util.Single;
@@ -44,7 +46,9 @@ public class TaxaBlock extends DataBlock {
 	private final Map<Taxon, Integer> taxon2index;
 	private final Map<String, Taxon> name2taxon;
 
-	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
+	private final StringProperty comments = new SimpleStringProperty(this, "comments");
+
+	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>(this, "traitsBlock");
 
 	/**
 	 * constructor
@@ -65,16 +69,17 @@ public class TaxaBlock extends DataBlock {
 	/**
 	 * copy a taxon block
 	 *
-	 * @param src copy from here
+	 * @param that copy from here
 	 */
-	public void copy(TaxaBlock src) {
+	public void copy(TaxaBlock that) {
 		clear();
-		taxa.setAll(src.taxa);
+		taxa.setAll(that.taxa);
 		taxon2index.clear();
-		taxon2index.putAll(src.taxon2index);
+		taxon2index.putAll(that.taxon2index);
 		name2taxon.clear();
-		name2taxon.putAll(src.name2taxon);
-		setTraitsBlock(src.traitsBlock.get());
+		name2taxon.putAll(that.name2taxon);
+		comments.set(that.getComments());
+		setTraitsBlock(that.traitsBlock.get());
 	}
 
 	public Object clone() {
@@ -393,5 +398,17 @@ public class TaxaBlock extends DataBlock {
 		if (changed.get() && getNode() != null) {
 			((AlgorithmNode) getNode().getPreferredChild()).restart();
 		}
+	}
+
+	public String getComments() {
+		return comments.get();
+	}
+
+	public StringProperty commentsProperty() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments.set(comments);
 	}
 }
