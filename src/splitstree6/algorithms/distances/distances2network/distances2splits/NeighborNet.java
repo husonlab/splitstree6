@@ -93,13 +93,14 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.collapseMultiple = false;
 			int n = cycle.length - 1; //ntax
 			params.outerIterations = n*(n-1)/2;
-		} else {
+		} else {//ST4 version
 			params.greedy = false;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
 			int n = cycle.length - 1;
 			params.outerIterations = n*(n-1)/2;
 			params.collapseMultiple = true;
 			params.fractionNegativeToKeep = 0.4;
+			params.useInsertionAlgorithm = false;
 		}
 
 			splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);

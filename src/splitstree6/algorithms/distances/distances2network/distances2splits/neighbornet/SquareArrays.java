@@ -18,7 +18,7 @@ public class SquareArrays {
     static public double[][] ones(int n) {
         double[][] X = new double[n+1][n+1];
         for(int i=1;i<=n;i++)
-            Arrays.fill(X[i],1,n,1.0);
+            Arrays.fill(X[i],1,n+1,1.0);
         return X;
     }
 
@@ -35,6 +35,20 @@ public class SquareArrays {
             for(int j=1;j<=n;j++)
                 if (A[i][j])
                     r[i][j]=0;
+    }
+
+    /**
+     * Checks if A is empty (all entries set to false).
+     * @param A  square array of boolean
+     * @return  true if A is empty, false otherwise
+     */
+    static public boolean isEmpty(boolean[][] A) {
+        int n = A.length-1;
+        boolean allFalse = true;
+        for(int i=1;i<=n && allFalse;i++)
+            for(int j=i+1;j<=n && allFalse;j++)
+                allFalse = allFalse && !A[i][j];
+        return allFalse;
     }
 
     /**
@@ -61,6 +75,16 @@ public class SquareArrays {
         return A;
     }
 
+    /**
+     * Make all negative entries zero.
+     * @param x square array
+     */
+    static void makeNegElementsZero(double[][] x) {
+        int n = x.length - 1;
+        for (int i = 1; i <= n; i++)
+            for (int j = i + 1; j <= n; j++)
+                x[i][j] = x[j][i] = max(x[i][j], 0);
+    }
 
     /**
      * Sum the squares of entries of an array

@@ -60,14 +60,21 @@ public class NeighborNetSplitWeights {
             for (int j=i+1;j<=n;j++)
                 d[i][j] = d[j][i] = distances[cycle[i]-1][cycle[j]-1];
 
-        //Initial value for x given by insertion algorithm (for ST4, this should be all ones???)
         double[][] x;
-        if (params.useInsertionAlgorithm)
-            x = IncrementalFitting.incrementalFitting(d,params.tolerance/100);
-        else
-            x =  ones(n);
 
-        optimizeFit(x,d,params,progress);
+        //Check - if d is circular then we return the weights.
+        x = calcAinvx(d);
+        if (minArray(x)>=-params.tolerance)
+            makeNegElementsZero(x);
+        else if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
+            double[][] unconstrained = new double[n+1][n+1];
+            copyArray(x,unconstrained);
+            x = ones(n);
+            activeSetMethod(x,unconstrained,d,params,progress);  //ST4 Algorithm
+        } else {
+            x = IncrementalFitting.incrementalFitting(d,params.tolerance/100);
+            projectedConjugateGradient(x,d,params,progress);
+        }
 
         final ArrayList<ASplit> splitList = new ArrayList<>();
 
@@ -84,7 +91,26 @@ public class NeighborNetSplitWeights {
         return splitList;
     }
 
-    static private void optimizeFit(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+    static private void activeSetMethod(double[][] x, double[][] unconstrained, double[][] d, NNLSParams params, ProgressListener progress) {
+        double fx_old = evalf(x,d);
+        int n=x.length-1;
+        boolean[][] activeSet = getZeroElements(x);
+        double[][] x0 = new double[n+1][n+1];
+
+        for (int k = 1; k <= params.outerIterations; k++) {
+            copyArray(x,x0);
+            if (k==1) {
+                copyArray(unconstrained,x);
+                makeNegElementsZero(x);
+                boolean cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations);
+
+
+        }
+    }
+
+
+
+    static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
         double fx_old = evalf(x,d);
         int n=x.length-1;
@@ -133,6 +159,7 @@ public class NeighborNetSplitWeights {
         boolean cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations);
         if (params.collapseMultiple) {
             filterMostNegative(x,activeSet,params.fractionNegativeToKeep);
+            maskElements(x,activeSet);
             cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations);
         }
 
@@ -338,8 +365,10 @@ public class NeighborNetSplitWeights {
 
         for(int i=1;i<=n;i++) {
             for(int j=1;j<=n;j++) {
-                if (x[i][j]<0)
-                    tmin = min(tmin,x0[i][j]/(x0[i][j] - x[i][j]));
+                if (x[i][j]<0) {
+                    double t_ij = x0[i][j] / (x0[i][j] - x[i][j]);
+                    tmin = min(tmin, t_ij);
+                }
             }
         }
 
@@ -427,7 +456,32 @@ public class NeighborNetSplitWeights {
         return p;
     }
 
+    /**
+     * calcAinvx
+     *
+     * Computes A^{-1}(d).
+     *
+     * When d is circular, result will be corresponding weights. If d is not circular, some
+     * elements will be negative.
+     * @param d square array
+     * @return square array
+     */
+    static private double[][] calcAinvx(double[][] d) {
+        int n=d.length-1;
+        double[][] x = new double[n+1][n+1];
+        x[1][2] = x[2][1] = (d[1][n] + d[1][2] - d[2][n])/2.0;
+        for (int j=2;j<=n-1;j++) {
+            x[1][j] = x[j][1] = (d[j - 1][n] + d[1][j] - d[1][j - 1] - d[j][n]) / 2.0;
+        }
+        x[1][n] = x[n][1] = (d[1][n] + d[n-1][n] - d[1][n-1])/2.0;
 
+        for (int i=2;i<=(n-1);i++) {
+            x[i][i+1] = (d[i-1][i] + d[i][i+1] - d[i-1][i+1])/2.0;
+            for (int j=(i+2);j<=n;j++)
+                x[i][j] = x[j][i] = (d[i-1][j-1] + d[i][j] - d[i][j-1] - d[i-1][j])/2.0;
+        }
+        return x;
+    }
 
 
 
