@@ -76,7 +76,12 @@ public class ExtractMethodsText {
 		if (workflow.getInputTaxaNode() == null || workflow.getInputDataNode() == null)
 			return "";
 
-		var buf = new StringBuilder();
+		final var buf = new StringBuilder();
+
+		if (workflow.getInputTaxaBlock().getComments() != null) {
+			buf.append("Input:\n").append(workflow.getInputTaxaBlock().getComments().trim()).append("\n\n");
+		}
+
 		buf.append("Methods:\n");
 
 		buf.append(format(preambleTemplate, Version.VERSION, ExtractCitations.getSplitsTreeKeysString()));

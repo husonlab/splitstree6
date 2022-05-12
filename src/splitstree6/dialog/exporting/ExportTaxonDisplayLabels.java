@@ -41,7 +41,7 @@ public class ExportTaxonDisplayLabels {
 		final var previousFile = new File(ProgramProperties.get("TaxaDisplayLabelsFile", ""));
 		if (previousFile.isFile()) {
 			fileChooser.setInitialDirectory(previousFile.getParentFile());
-			fileChooser.setInitialFileName(previousFile.getName());
+			fileChooser.setInitialFileName(mainWindow.getName() + "-labels.txt");
 		}
 		fileChooser.setSelectedExtensionFilter(TextFileFilter.getInstance());
 		fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance(), new FileChooser.ExtensionFilter("TSV", "*.tsv", "*.tsv.gz"));

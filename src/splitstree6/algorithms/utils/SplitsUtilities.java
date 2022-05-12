@@ -23,7 +23,7 @@ import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;

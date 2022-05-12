@@ -92,7 +92,7 @@ public class TraitsNexusOutput extends NexusIOBase implements INexusOutput<Trait
 					else if (traitsBlock.isNumerical(tr))
 						w.write(StringUtils.removeTrailingZerosAfterDot(traitsBlock.getTraitValueLabel(t, tr)));
 					else
-						w.write(traitsBlock.getTraitValueLabel(t, tr));
+						w.write("'" + traitsBlock.getTraitValueLabel(t, tr) + "'");
 
 				}
 				w.write("\n");

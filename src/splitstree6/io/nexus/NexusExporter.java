@@ -43,14 +43,18 @@ public class NexusExporter {
 	}
 
 	public void export(Writer w, TaxaBlock taxa) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
 			w.write("#nexus\n");
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
+		}
 		final TaxaNexusOutput output = new TaxaNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly)
 			output.write(w, new TaxaBlock());
-		else
+		else {
 			output.write(w, taxa);
+		}
 	}
 
     /*
@@ -67,8 +71,11 @@ public class NexusExporter {
 
 
 	public void export(Writer w, TaxaBlock taxa, CharactersBlock block) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
+		}
 		final CharactersNexusOutput output = new CharactersNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
@@ -76,8 +83,9 @@ public class NexusExporter {
 			newBlock.setDataType(block.getDataType());
 			newBlock.setFormat(block.getFormat());
 			output.write(w, new TaxaBlock(), new CharactersBlock());
-		} else
+		} else {
 			output.write(w, taxa, block);
+		}
 	}
 
     /*
@@ -97,8 +105,11 @@ public class NexusExporter {
      */
 
 	public void export(Writer w, TaxaBlock taxa, DistancesBlock distances) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
+		}
 		final DistancesNexusOutput output = new DistancesNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
@@ -110,8 +121,11 @@ public class NexusExporter {
 	}
 
 	public void export(Writer w, TaxaBlock taxa, NetworkBlock block) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
+		}
 		final NetworkNexusOutput output = new NetworkNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
@@ -123,8 +137,11 @@ public class NexusExporter {
 	}
 
 	public void export(Writer w, TaxaBlock taxa, SplitsBlock block) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
+		}
 		final SplitsNexusOutput output = new SplitsNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
@@ -136,8 +153,11 @@ public class NexusExporter {
 	}
 
 	public void export(Writer w, TaxaBlock taxa, TreesBlock block) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
+		}
 		final TreesNexusOutput output = new TreesNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
@@ -149,8 +169,11 @@ public class NexusExporter {
 	}
 
 	public void export(Writer w, TaxaBlock taxa, TraitsBlock block) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
+		}
 		final TraitsNexusOutput output = new TraitsNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
@@ -162,8 +185,11 @@ public class NexusExporter {
 	}
 
 	public void export(Writer w, TaxaBlock taxa, ViewBlock block) throws IOException {
-		if (prependTaxa)
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
+		}
 		final var output = new ViewNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
@@ -176,7 +202,6 @@ public class NexusExporter {
 
 	/**
 	 * save an algorithms block
-	 *
 	 */
 	public void export(Writer w, Algorithm algorithm) throws IOException {
 		final AlgorithmNexusOutput output = new AlgorithmNexusOutput();

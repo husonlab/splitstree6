@@ -28,7 +28,7 @@ import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 
 import java.io.IOException;
 import java.util.*;

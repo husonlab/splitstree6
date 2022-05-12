@@ -42,7 +42,7 @@ public class ExportTaxonTraits {
 		final var previousFile = new File(ProgramProperties.get("TaxonTraitsFile", ""));
 		if (previousFile.isFile()) {
 			fileChooser.setInitialDirectory(previousFile.getParentFile());
-			fileChooser.setInitialFileName(previousFile.getName());
+			fileChooser.setInitialFileName(mainWindow.getName() + "-traits.txt");
 		}
 		fileChooser.setSelectedExtensionFilter(TextFileFilter.getInstance());
 		fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance(), new FileChooser.ExtensionFilter("TSV", "*.tsv", "*.tsv.gz"));

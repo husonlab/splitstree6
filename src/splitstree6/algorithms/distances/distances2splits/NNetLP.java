@@ -17,10 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2network.distances2splits;
+package splitstree6.algorithms.distances.distances2splits;
 
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;

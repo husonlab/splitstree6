@@ -25,13 +25,14 @@ import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.geometry.Insets;
 import javafx.scene.Group;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import jloda.fx.control.CopyableLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
@@ -159,7 +160,8 @@ public class TreePane extends StackPane {
 			});
 
 			if (showTreeLabels != null) {
-				final var treeLabel = new Label();
+				final var treeLabel = new CopyableLabel();
+				treeLabel.setPadding(new Insets(0, 0, 0, 5));
 				final InvalidationListener listener = e -> {
 					switch (showTreeLabels.get()) {
 						case None -> {

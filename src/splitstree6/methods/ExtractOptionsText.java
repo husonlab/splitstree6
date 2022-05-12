@@ -44,7 +44,7 @@ public class ExtractOptionsText {
 					var optionName = methodName.replaceAll("^option", "").replaceAll("Property$", "");
 					var property = (Property) method.invoke(algorithm);
 					var defaultProperty = (Property) method.invoke(algorithmWithDefaultOptions);
-					if (property.getValue().equals(defaultProperty.getValue())) {
+					if (property.getValue() == null || property.getValue().equals(defaultProperty.getValue())) {
 						hasDefaultOption = true;
 					} else {
 						list.add(optionName + "=" + property.getValue());

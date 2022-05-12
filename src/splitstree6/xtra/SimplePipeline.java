@@ -25,7 +25,7 @@ import javafx.stage.Stage;
 import jloda.fx.util.ProgramExecutorService;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
-import splitstree6.algorithms.distances.distances2network.distances2splits.NeighborNet;
+import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;

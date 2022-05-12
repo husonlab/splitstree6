@@ -19,14 +19,12 @@
 
 package splitstree6.io.nexus;
 
-import jloda.fx.window.NotificationManager;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 /**
  * taxa nexus input
@@ -57,20 +55,9 @@ public class TaxaNexusInput extends NexusIOBase {
      * parse a taxa block
      */
     public void parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
-        final var taxonNamesFound = new ArrayList<String>();
-
         taxaBlock.clear();
-
-        np.setCollectAllComments(true);
-
-        if (np.peekMatchIgnoreCase("#nexus"))
-            np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
-
-        var comment = np.getComment();
-		if (comment != null && comment.startsWith("!")) {
-			NotificationManager.showInformation(comment);
-		}
-		np.setCollectAllComments(false);
+      if (np.peekMatchIgnoreCase("#nexus"))
+		  np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
 
 		np.matchBeginBlock("TAXA");
 		parseTitleAndLink(np);
@@ -99,7 +86,6 @@ public class TaxaNexusInput extends NexusIOBase {
 						throw new IOExceptionWithLineNumber("taxon name '" + taxonName + "' appears multiple times, at " + taxaBlock.indexOf(taxon) + " and " + t, np.lineno());
 					}
 					taxaBlock.add(taxon);
-					taxonNamesFound.add(taxon.getName());
 				}
 				labelsDetected = true;
 			}
@@ -140,6 +126,15 @@ public class TaxaNexusInput extends NexusIOBase {
 		}
 
 		np.matchEndBlock();
-    }
+	}
 
+	public static void captureComments(NexusStreamParser np, TaxaBlock taxaBlock) {
+		var comments = np.popComments();
+		if (comments != null) {
+			if (taxaBlock.getComments() == null)
+				taxaBlock.setComments(comments);
+			else
+				taxaBlock.setComments(taxaBlock.getComments() + "\n" + comments);
+		}
+	}
 }

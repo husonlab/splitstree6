@@ -1,7 +1,6 @@
-package splitstree6.algorithms.distances.distances2network.distances2splits.neighbornet;
+package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import static java.lang.Math.*;
-import static java.lang.Math.max;
 
 public class IncrementalFitting {
     /**

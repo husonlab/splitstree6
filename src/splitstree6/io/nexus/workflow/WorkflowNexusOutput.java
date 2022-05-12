@@ -26,6 +26,7 @@ import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsTree6Block;
 import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.nexus.SplitsTree6NexusOutput;
+import splitstree6.io.nexus.TaxaNexusOutput;
 import splitstree6.methods.ExtractMethodsText;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
@@ -70,6 +71,9 @@ public class WorkflowNexusOutput {
 		w.write("#nexus [SplitsTree6]\n");
 
 		(new SplitsTree6NexusOutput()).write(w, splitsTree6Block);
+
+		if (workflow.getInputTaxaBlock() != null)
+			TaxaNexusOutput.writeComments(w, workflow.getWorkingTaxaBlock());
 
 		if (!asWorkflowOnly)
 			w.write("\n[\n" + ExtractMethodsText.getInstance().apply(workflow).replaceAll("\\[", "(").replaceAll("]", ")") + "]\n");

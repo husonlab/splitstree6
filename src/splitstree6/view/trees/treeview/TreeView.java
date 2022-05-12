@@ -86,7 +86,6 @@ public class TreeView implements IView {
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
-	private final BooleanProperty optionShowInternalLabels = new SimpleBooleanProperty(this, "optionShowInternalLabels");
 
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
 	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
@@ -102,14 +101,13 @@ public class TreeView implements IView {
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
-		ProgramProperties.track(optionShowInternalLabels, true);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionTree.getName(), optionDiagram.getName(), optionAveraging.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionEdits.getName(), optionShowConfidence.getName(),
-				optionTreeLabels.getName(), optionShowInternalLabels.getName(),
+				optionTreeLabels.getName(),
 				optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
 	}
 
@@ -282,18 +280,6 @@ public class TreeView implements IView {
 
 	public void setOptionTreeLabels(TreeLabel optionTreeLabel) {
 		this.optionTreeLabels.set(optionTreeLabel);
-	}
-
-	public boolean isOptionShowInternalLabels() {
-		return optionShowInternalLabels.get();
-	}
-
-	public BooleanProperty optionShowInternalLabelsProperty() {
-		return optionShowInternalLabels;
-	}
-
-	public void setOptionShowInternalLabels(boolean optionShowInternalLabels) {
-		this.optionShowInternalLabels.set(optionShowInternalLabels);
 	}
 
 	public String[] getOptionEdits() {
