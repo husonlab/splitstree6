@@ -2,8 +2,7 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import java.util.Arrays;
 
-import static java.lang.Math.min;
-import static java.lang.Math.sqrt;
+import static java.lang.Math.*;
 
 /** A collection of utility routines for handling 2D symmetric arrays.
  * In all of these routines, rows and columns with index 0 are ignored (for consistency with Matlab)
