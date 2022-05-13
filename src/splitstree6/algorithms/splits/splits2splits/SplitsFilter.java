@@ -20,7 +20,6 @@
 package splitstree6.algorithms.splits.splits2splits;
 
 import javafx.beans.property.*;
-import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.algorithms.utils.ClosestTree;
@@ -33,37 +32,37 @@ import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * splits filter
  * Daniel Huson 12/2016
  */
 public class SplitsFilter extends Splits2Splits implements IFilter {
-	public enum FilterAlgorithm {DimensionFilter, ClosestTree, GreedyCompatible, GreedyWeaklyCompatible, None}
+	public enum FilterAlgorithm {None, ClosestTree, GreedyCompatible, GreedyWeaklyCompatible}
 
-	private final ObjectProperty<FilterAlgorithm> optionFilterAlgorithm = new SimpleObjectProperty<>(this, "FilterAlgorithm", FilterAlgorithm.DimensionFilter);
+	private final ObjectProperty<FilterAlgorithm> optionFilterAlgorithm = new SimpleObjectProperty<>(this, "optionFilterAlgorithm", FilterAlgorithm.None);
 
-	private final FloatProperty optionWeightThreshold = new SimpleFloatProperty(this, "WeightThreshold", 0);
-	private final FloatProperty optionConfidenceThreshold = new SimpleFloatProperty(this, "ConfidenceThreshold", 0);
-	private final IntegerProperty optionMaximumDimension = new SimpleIntegerProperty(this, "MaximumDimension", 4);
-
-	private final BooleanProperty optionModifyWeightsUsingLeastSquares = new SimpleBooleanProperty(this, "ModifyWeightsUsingLeastSquares", false);
+	private final FloatProperty optionWeightThreshold = new SimpleFloatProperty(this, "optionWeightThreshold", 0);
+	private final FloatProperty optionConfidenceThreshold = new SimpleFloatProperty(this, "optionConfidenceThreshold", 0);
+	private final IntegerProperty optionMaximumDimension = new SimpleIntegerProperty(this, "optionMaximumDimension", 4);
 
 	private boolean active = false;
 
 	public List<String> listOptions() {
-		return Arrays.asList(optionFilterAlgorithm.getName(), optionWeightThreshold.getName(),
-				optionConfidenceThreshold.getName(), optionMaximumDimension.getName());
+		return List.of(optionWeightThreshold.getName(), optionConfidenceThreshold.getName(), optionMaximumDimension.getName(), optionFilterAlgorithm.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
 		return switch (optionName) {
-			case "FilterAlgorithm" -> "Set the filter algorithm";
-			case "WeightThreshold" -> "Set minimum split weight threshold";
-			case "ConfidenceThreshold" -> "Set the minimum split confidence threshold";
-			case "MaximumDimension" -> "Set the maximum threshold used by the dimension filter";
+			case "optionFilterAlgorithm" -> "Set the filter algorithm";
+			case "optionWeightThreshold" -> "Set minimum split weight threshold";
+			case "optionConfidenceThreshold" -> "Set the minimum split confidence threshold";
+			case "optionMaximumDimension" -> "Set maximum dimension threshold (necessary to avoid computational overload)";
 			default -> optionName;
 		};
 	}
@@ -74,85 +73,53 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock parent, SplitsBlock child) throws IOException {
 		active = false;
 
-		ArrayList<ASplit> splits = new ArrayList<>(parent.getSplits());
-
-		if (isOptionModifyWeightsUsingLeastSquares()) {
-			NotificationManager.showWarning("optionModifyWeightsUsingLeastSquares: not implemented");
-			// modify weights least squares
-			//active = true;
-		}
-
-		final Map<ASplit, String> split2label = new HashMap<>();
-		for (int s = 1; s <= parent.getSplitLabels().size(); s++) {
+		final var split2label = new HashMap<ASplit, String>();
+		for (var s = 1; s <= parent.getSplitLabels().size(); s++) {
 			split2label.put(parent.get(s), parent.getSplitLabels().get(s));
 		}
 
-		Compatibility compatibility = Compatibility.unknown;
+		var compatibility = Compatibility.unknown;
 
-		switch (getOptionFilterAlgorithm()) {
+		final var splits = switch (getOptionFilterAlgorithm()) {
 			case GreedyCompatible -> {
-				final int oldSize = splits.size();
-				splits = GreedyCompatible.apply(progress, splits);
 				compatibility = Compatibility.compatible;
-				if (splits.size() != oldSize)
-					active = true;
+				yield GreedyCompatible.apply(progress, parent.getSplits());
 			}
 			case ClosestTree -> {
-				final int oldSize = splits.size();
-				splits = ClosestTree.apply(progress, taxaBlock.getNtax(), splits, parent.getCycle());
 				compatibility = Compatibility.compatible;
-				if (splits.size() != oldSize)
-					active = true;
+				yield ClosestTree.apply(progress, taxaBlock.getNtax(), parent.getSplits(), parent.getCycle());
 			}
-			case GreedyWeaklyCompatible -> {
-				final int oldSize = splits.size();
-				splits = GreedyWeaklyCompatible.apply(progress, splits);
-				if (splits.size() != oldSize)
-					active = true;
-			}
-		}
+			case GreedyWeaklyCompatible -> GreedyWeaklyCompatible.apply(progress, parent.getSplits());
+			default -> new ArrayList<>(parent.getSplits());
+		};
+
 		if (getOptionWeightThreshold() > 0) {
-			final int oldSize = splits.size();
-			ArrayList<ASplit> tmp = new ArrayList<>(splits.size());
-			for (ASplit split : splits) {
-				if (split.getWeight() >= getOptionWeightThreshold())
-					tmp.add(split);
-			}
-			splits = tmp;
-			if (splits.size() != oldSize)
-				active = true;
+			var filtered = splits.stream().filter(s -> s.getWeight() >= getOptionWeightThreshold()).collect(Collectors.toList());
+			splits.clear();
+			splits.addAll(filtered);
 		}
 
 		if (getOptionConfidenceThreshold() > 0) {
-			final int oldSize = splits.size();
-			final ArrayList<ASplit> tmp = new ArrayList<>(splits.size());
-			for (ASplit split : splits) {
-				if (split.getConfidence() >= getOptionConfidenceThreshold())
-					tmp.add(split);
-			}
-			splits = tmp;
-			if (splits.size() != oldSize)
-				active = true;
+			var filtered = splits.stream().filter(s -> s.getConfidence() >= getOptionConfidenceThreshold()).collect(Collectors.toList());
+			splits.clear();
+			splits.addAll(filtered);
 		}
 
 		if (getOptionMaximumDimension() > 0 && getOptionFilterAlgorithm() == FilterAlgorithm.GreedyCompatible && parent.getCompatibility() != Compatibility.compatible && parent.getCompatibility() != Compatibility.cyclic && parent.getCompatibility() != Compatibility.weaklyCompatible) {
-			final int oldSize = splits.size();
-
-			final DimensionFilter dimensionFilter = new DimensionFilter();
-			ArrayList<ASplit> existing = new ArrayList<>(splits);
-			splits.clear();
-			dimensionFilter.apply(progress, getOptionMaximumDimension(), existing, splits);
-			if (splits.size() != oldSize)
-				active = true;
+			var filtered = new ArrayList<ASplit>();
+			DimensionFilter.apply(progress, getOptionMaximumDimension(), splits, filtered);
 		}
 
 		child.getSplits().addAll(splits);
 		if (split2label.size() > 0) {
-			for (int s = 1; s <= child.getNsplits(); s++) {
-				final String label = split2label.get(child.get(s));
+			for (var s = 1; s <= child.getNsplits(); s++) {
+				var label = split2label.get(child.get(s));
 				child.getSplitLabels().put(s, label);
 			}
 		}
+
+		if (splits.size() != parent.getSplits().size())
+			active = true;
 
 		if (!active) {
 			child.setCycle(parent.getCycle());
@@ -233,17 +200,5 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 
 	public void setOptionMaximumDimension(int optionMaximumDimension) {
 		this.optionMaximumDimension.set(optionMaximumDimension);
-	}
-
-	public boolean isOptionModifyWeightsUsingLeastSquares() {
-		return optionModifyWeightsUsingLeastSquares.get();
-	}
-
-	public BooleanProperty optionModifyWeightsUsingLeastSquaresProperty() {
-		return optionModifyWeightsUsingLeastSquares;
-	}
-
-	public void setOptionModifyWeightsUsingLeastSquares(boolean optionModifyWeightsUsingLeastSquares) {
-		this.optionModifyWeightsUsingLeastSquares.set(optionModifyWeightsUsingLeastSquares);
 	}
 }

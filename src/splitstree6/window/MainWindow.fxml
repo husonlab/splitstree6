@@ -324,7 +324,7 @@
 
                     <Menu text="Data">
                         <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa..."/>
-                        <MenuItem fx:id="showCharactersMenuItem" text="Show Characters..."/>
+                        <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."/>
                         <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees..."/>
                         <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>

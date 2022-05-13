@@ -91,11 +91,11 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	/**
 	 * does the work
 	 */
-	public void apply(ProgressListener progress, int maxDimension, List<ASplit> srcSplits, List<ASplit> targetSplits) {
+	public static void apply(ProgressListener progress, int maxDimension, List<ASplit> srcSplits, List<ASplit> targetSplits) {
 		final BitSet toDelete = new BitSet(); // set of splits to be removed from split set
 
 		try {
-			progress.setTasks("Dimension filter", "optionMaxDimension=" + optionMaxDimension.get());
+			progress.setTasks("Dimension filter", "optionMaxDimension=" + maxDimension);
 			// build initial incompatibility graph:
 			Graph graph = buildIncompatibilityGraph(srcSplits);
 
@@ -144,7 +144,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	 *
 	 * @return incompatibility graph
 	 */
-	private Graph buildIncompatibilityGraph(List<ASplit> splits) {
+	private static Graph buildIncompatibilityGraph(List<ASplit> splits) {
 		final Graph graph = new Graph();
 
 		final Node[] split2node = new Node[splits.size()];
@@ -166,9 +166,9 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	/**
 	 * computes the subgraph in which every node is contained in a d-clique
 	 *
-	 * @param d     clique size
+	 * @param d clique size
 	 */
-	private void computeDSubgraph(ProgressListener progress, Graph graph, int d) throws CanceledException {
+	private static void computeDSubgraph(ProgressListener progress, Graph graph, int d) throws CanceledException {
 		//System.err.print("Compute D-subgraph: ");
 		NodeSet keep = new NodeSet(graph);
 		NodeSet discard = new NodeSet(graph);
@@ -197,7 +197,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	 *
 	 * @return true, if v contained in a d-clique
 	 */
-	private boolean findClique(Graph graph, Node v, Edge e, int i, int d, NodeSet clique, NodeSet discard) {
+	private static boolean findClique(Graph graph, Node v, Edge e, int i, int d, NodeSet clique, NodeSet discard) {
 		if (i == d)
 			return true;  // found clique, retreat
 		else {
@@ -221,7 +221,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	 *
 	 * @return true, if w is connected to all nodes in U
 	 */
-	private boolean isConnectedTo(Node w, NodeSet U) {
+	private static boolean isConnectedTo(Node w, NodeSet U) {
 		int count = 0;
 		for (Node u : w.adjacentNodes()) {
 			if (U.contains(u)) {
@@ -237,7 +237,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	 * Modify graph to become the maximal induced graph in which all nodes have degree >maxDegree
 	 * If maxDegree==1, then we additionally require that all remaining nodes are contained in a triangle
 	 */
-	private void relaxGraph(ProgressListener progress, Graph graph, int maxDegree) throws CanceledException {
+	private static void relaxGraph(ProgressListener progress, Graph graph, int maxDegree) throws CanceledException {
 		System.err.print("Relax graph: ");
 
 		int maxDegreeHeuristicThreshold = 6; // use heuristic for max degrees above this threshold
@@ -269,7 +269,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	 *
 	 * @return worst node
 	 */
-	private Node getWorstNode(Graph graph) {
+	private static Node getWorstNode(Graph graph) {
 		float worstCompatibility = 0;
 		Node worstNode = null;
 		for (Node v : graph.nodes()) {
@@ -288,7 +288,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	 *
 	 * @return compatibility score
 	 */
-	private int getCompatibilityScore(Node v) {
+	private static int getCompatibilityScore(Node v) {
 		int score = ((Pair<Integer, Integer>) v.getInfo()).getSecond();
 		for (Node w : v.adjacentNodes()) {
 			score -= ((Pair<Integer, Integer>) w.getInfo()).getSecond();
@@ -303,7 +303,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 	 * @param d* @param graph
 	 * @return false, if the node v has degree!=d or is contained in a d+1 clique
 	 */
-	private boolean hasDegreeDButNotInClique(int d, Graph graph, Node v) {
+	private static boolean hasDegreeDButNotInClique(int d, Graph graph, Node v) {
 		if (v.getDegree() != d)
 			return false;
 		for (Edge e = v.getFirstAdjacentEdge(); e != null; e = v.getNextAdjacentEdge(e)) {

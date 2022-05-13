@@ -63,6 +63,7 @@ import splitstree6.algorithms.distances.distances2trees.MinSpanningTree;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
+import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2splits.BoostrapTreeSplits;
@@ -393,15 +394,16 @@ public class MainWindowPresenter {
 		});
 		controller.getFilterTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> workflow.getNodes(TaxaFilter.class).size() != 1, workflow.nodes()));
 
-		controller.getShowCharactersMenuItem().setOnAction(e -> {
-			var viewTab = new ViewTab(mainWindow, null, true);
-			var alignmentView = new AlignmentView(mainWindow, "Characters", viewTab);
-			viewTab.setView(alignmentView);
+		controller.getFilterCharactersMenuItem().setOnAction(e -> {
+			var tab = controller.getMainTabPane().getTabs().stream().filter(t -> t instanceof ViewTab && ((ViewTab) t).getView() instanceof AlignmentView).findAny();
+			tab.ifPresent(value -> controller.getMainTabPane().getSelectionModel().select(value));
 		});
-		controller.getShowCharactersMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new Uncorrected_P()));
+		controller.getFilterCharactersMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> !(workflow.getWorkingDataNode() != null && workflow.getWorkingDataNode().getDataBlock() instanceof CharactersBlock), workflow.validProperty()));
 
 		controller.getFilterTreesMenuItem().setOnAction(null);
-		controller.getFilterSplitsMenuItem().setOnAction(null);
+
+		controller.getFilterSplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new SplitsFilter()));
+		controller.getFilterSplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new SplitsFilter()));
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
