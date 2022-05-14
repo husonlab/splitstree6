@@ -84,7 +84,7 @@ public class SquareArrays {
         int n = x.length - 1;
         for (int i = 1; i <= n; i++)
             for (int j = i + 1; j <= n; j++)
-                x[i][j] = x[j][i] = max(x[i][j], 0);
+                x[i][j] = x[j][i] = Math.max(x[i][j], 0);
     }
 
     /**

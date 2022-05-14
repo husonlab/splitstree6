@@ -19,21 +19,32 @@
 
 package splitstree6.tabs.algorithms;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import jloda.fx.control.sliderhistogram.SliderHistogramView;
 import jloda.util.StringUtils;
+import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.parts.ASplit;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
+import splitstree6.workflow.AlgorithmNode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class AlgorithmTabPresenter implements IDisplayTabPresenter {
@@ -68,36 +79,58 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
 
 		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null)
-			setupOptionControls(controller, algorithmTab.getAlgorithmNode().getAlgorithm());
+			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithmNode().getAlgorithm());
 
 		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((v, o, n) -> {
 			controller.getAlgorithmCBox().setValue(n);
-			setupOptionControls(controller, (Algorithm) n);
+			setupOptionControls(algorithmTab, controller, (Algorithm) n);
 			label.setText(n.getName());
 		});
 
 		controller.getMenuButton().disableProperty().bind(runningProperty);
 	}
 
-	public void setupOptionControls(AlgorithmTabController controller, Algorithm algorithm) {
+	public void setupOptionControls(AlgorithmTab algorithmTab, AlgorithmTabController controller, Algorithm algorithm) {
 		controller.getMainPane().getChildren().clear();
 		changeListeners.clear();
 
-		for (var option : Option.getAllOptions(algorithm)) {
-			var control = OptionControlCreator.apply(option, changeListeners);
-			if (control != null) {
-				var label = new Label(StringUtils.fromCamelCase(option.getName()));
-				label.setMinWidth(120);
-				var hbox = new HBox(label, control);
-				hbox.setAlignment(Pos.CENTER_LEFT);
-				hbox.setSpacing(3);
-				hbox.prefWidthProperty().bind(controller.getMainPane().widthProperty());
-				controller.getMainPane().getChildren().add(hbox);
-				var toolTip = new Tooltip(option.getToolTipText());
-				label.setTooltip(toolTip);
-				control.setTooltip(toolTip);
+		if (algorithm instanceof WeightsSlider weightsSlider) {
+			setupSplitsSlider(algorithmTab.getAlgorithmNode(), weightsSlider, controller.getMainPane());
+		} else {
+			for (var option : Option.getAllOptions(algorithm)) {
+				var control = OptionControlCreator.apply(option, changeListeners);
+				if (control != null) {
+					var label = new Label(StringUtils.fromCamelCase(option.getName()));
+					label.setMinWidth(120);
+					var hbox = new HBox(label, control);
+					hbox.setAlignment(Pos.CENTER_LEFT);
+					hbox.setSpacing(3);
+					hbox.prefWidthProperty().bind(controller.getMainPane().widthProperty());
+					controller.getMainPane().getChildren().add(hbox);
+					var toolTip = new Tooltip(option.getToolTipText());
+					label.setTooltip(toolTip);
+					control.setTooltip(toolTip);
+				}
 			}
 		}
+	}
+
+	private void setupSplitsSlider(AlgorithmNode node, WeightsSlider weightsSlider, Pane pane) {
+		ObservableList<Double> values = FXCollections.observableArrayList();
+		var max = new SimpleDoubleProperty(0);
+		InvalidationListener invalidationListener = e -> {
+			if (node.isValid()) {
+				var splits = (SplitsBlock) node.getPreferredParent().getDataBlock();
+				values.setAll(splits.getSplits().stream().map(ASplit::getWeight).collect(Collectors.toList()));
+				max.set(values.stream().mapToDouble(Double::doubleValue).max().orElse(1.0));
+			}
+		};
+		node.validProperty().addListener(invalidationListener);
+		invalidationListener.invalidated(null);
+
+		var slider = new SliderHistogramView(values, weightsSlider.optionWeightThresholdProperty(), new SimpleDoubleProperty(0), max);
+		slider.getController().getRootPane().setPrefHeight(Pane.USE_COMPUTED_SIZE);
+		pane.getChildren().add(slider.getRoot());
 	}
 
 	@Override

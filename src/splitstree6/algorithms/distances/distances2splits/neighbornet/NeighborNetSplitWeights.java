@@ -92,23 +92,22 @@ public class NeighborNetSplitWeights {
     }
 
     static private void activeSetMethod(double[][] x, double[][] unconstrained, double[][] d, NNLSParams params, ProgressListener progress) {
-        double fx_old = evalf(x,d);
-        int n=x.length-1;
-        boolean[][] activeSet = getZeroElements(x);
-        double[][] x0 = new double[n+1][n+1];
+		double fx_old = evalf(x, d);
+		int n = x.length - 1;
+		boolean[][] activeSet = getZeroElements(x);
+		double[][] x0 = new double[n + 1][n + 1];
 
-        for (int k = 1; k <= params.outerIterations; k++) {
-            copyArray(x,x0);
-            if (k==1) {
-                copyArray(unconstrained,x);
-                makeNegElementsZero(x);
-                boolean cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations);
-
-
-        }
-    }
+		for (int k = 1; k <= params.outerIterations; k++) {
+			copyArray(x, x0);
+			if (k == 1) {
+				copyArray(unconstrained, x);
+				makeNegElementsZero(x);
+				boolean cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations);
 
 
+			}
+		}
+	}
 
     static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 

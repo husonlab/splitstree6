@@ -89,7 +89,6 @@ module splitstreesix {
 
 	opens splitstree6.densitree;
 
-
 	opens splitstree6.layout.splits;
 	opens splitstree6.layout.tree;
 
