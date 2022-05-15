@@ -111,6 +111,27 @@ public class LayoutAlgorithm {
                                 nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), 1));
                             }
                         });
+                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.STAGGERED){
+                        tree.postorderTraversal(v -> {
+                            if(tree.isLeaf(v)){
+                                int y = 0;
+                                for(var j: cycle){
+                                    if(j>0 && tree.getTaxon2Node(j).equals(v)){
+                                        y = j;
+                                    }
+                                }
+                                nodePointMap.put(v, new Point2D(0,y));
+                            }
+                            else{
+                                double y1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
+                                double y2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();
+
+                                double x = nodePointMap.get(v.getFirstOutEdge().getTarget()).getX();
+
+                                nodePointMap.put(v, new Point2D(x-1,(y1+y2)/2));
+                            }
+                        });
+                        nodeAngleMap.putAll(0.0);
                     }
                 }
             }

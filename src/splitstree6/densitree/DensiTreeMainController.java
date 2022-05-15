@@ -62,6 +62,9 @@ public class DensiTreeMainController {
 	private RadioMenuItem uniformMenuItem;
 
 	@FXML
+	private RadioMenuItem staggeredMenuItem;
+
+	@FXML
 	private ToggleGroup drawingGroup;
 
 	@FXML
@@ -153,6 +156,8 @@ public class DensiTreeMainController {
 	public RadioMenuItem getUniformMenuItem() {
 		return uniformMenuItem;
 	}
+
+	public RadioMenuItem getStaggeredMenuItem(){return staggeredMenuItem;}
 
 	public ToggleGroup getDrawingGroup() {
 		return drawingGroup;

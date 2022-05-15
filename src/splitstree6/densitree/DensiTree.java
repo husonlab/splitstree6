@@ -67,6 +67,7 @@ public class DensiTree {
 
             boolean jitter = parameters.jitter;
             boolean consensus = parameters.consensus;
+            boolean staggered = false;
             String highlight = parameters.highlight + ",";
             String labelMethod = parameters.labelMethod;
             drawingMethod drawingMethod = splitstree6.densitree.drawingMethod.CIRCULAR;
@@ -74,6 +75,9 @@ public class DensiTree {
                 drawingMethod = splitstree6.densitree.drawingMethod.TOSCALE;
             } else if (parameters.drawingMethod.contains("uniform")) {
                 drawingMethod = splitstree6.densitree.drawingMethod.UNIFORM;
+            } else if (parameters.drawingMethod.contains("staggered")){
+                drawingMethod = splitstree6.densitree.drawingMethod.STAGGERED;
+                staggered = true;
             }
 
             int nTrees = model.getTreesBlock().size();
@@ -122,11 +126,11 @@ public class DensiTree {
                 centerByMass(tree, nodePointMap, canvas);
 
                 if (labelMethod.contains("kmeans")) {
-                    drawEdges2(tree, i - 1, gc, nodePointMap, jitter, shiftx, shifty, coords3, labels);
+                    drawEdges2(tree, i - 1, gc, nodePointMap, jitter, staggered, shiftx, shifty, coords3, labels);
                 } else if (labelMethod.contains("mean") || labelMethod.contains("radial")) {
-                    drawEdges(tree, gc, nodePointMap, jitter, shiftx, shifty, coords, labels);
+                    drawEdges(tree, gc, nodePointMap, jitter, staggered, shiftx, shifty, coords, labels);
                 } else if (labelMethod.contains("median")) {
-                    drawEdges1(tree, i - 1, gc, nodePointMap, jitter, shiftx, shifty, coords2, labels);
+                    drawEdges1(tree, i - 1, gc, nodePointMap, jitter, staggered, shiftx, shifty, coords2, labels);
                 }
             }
 
@@ -149,7 +153,7 @@ public class DensiTree {
 
                         centerByMass(tree, nodePointMap, canvas);
 
-                        drawEdges(tree, gc, nodePointMap, false, 0, 0, coords, labels);
+                        drawEdges(tree, gc, nodePointMap, false, staggered, 0, 0, coords, labels);
 
                         if (labelMethod.contains("radial")) {
                             radialItems(tree, nodePointMap, labelLayout);
@@ -171,7 +175,7 @@ public class DensiTree {
 
                     centerByMass(consensusTree, nodePointMap, canvas);
 
-                    drawEdges(consensusTree, gc, nodePointMap, false, 0, 0, coords, labels);
+                    drawEdges(consensusTree, gc, nodePointMap, false, staggered, 0, 0, coords, labels);
 
                     if (labelMethod.contains("radial")) {
                         radialItems(consensusTree, nodePointMap, labelLayout);
@@ -551,7 +555,7 @@ public class DensiTree {
 
     public static void drawEdges(
             PhyloTree tree, GraphicsContext gc, NodeArray<Point2D> nodePointMap,
-            boolean jitter, double shiftx, double shifty, double[][] coords, String[] labels
+            boolean jitter, boolean staggered, double shiftx, double shifty, double[][] coords, String[] labels
     ) {
 
         for (var e : tree.edges()) {
@@ -577,41 +581,13 @@ public class DensiTree {
                 double x2 = wPt.getX();
                 double y2 = wPt.getY();
 
-                if (jitter) {
-                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
-                } else {
-                    gc.strokeLine(x1, y1, x2, y2);
-                }
-            }
-        }
-    }
-
-    public static void drawEdgesTest(
-            PhyloTree tree, GraphicsContext gc, NodeArray<Point2D> nodePointMap,
-            boolean jitter, double shiftx, double shifty, double[][] coords, String[] labels
-    ) {
-
-        for (var e : tree.edges()) {
-            var v = e.getSource();
-            var w = e.getTarget();
-            var vPt = nodePointMap.get(v);
-            var wPt = nodePointMap.get(w);
-
-            if (vPt != null & wPt != null) {
-
-                double x1 = vPt.getX();
-                double y1 = vPt.getY();
-                double x2 = wPt.getX();
-                double y2 = wPt.getY();
-
-                if (w.isLeaf()) {
-                    for (int i = 0; i < labels.length; i++) {
-                        if (tree.getLabel(w).equals(labels[i])) {
-                            coords[i][0] += x2;
-                            coords[i][1] += y2;
-                            break;
-                        }
+                if(staggered){
+                    gc.strokeLine(x1,y1,x1,y2);
+                    gc.strokeLine(x1,y2,x2,y2);
+                    if(v.getInDegree()==0){
+                        gc.strokeLine(x1,y1,x1-25,y1);
                     }
+                    continue;
                 }
 
                 if (jitter) {
@@ -625,7 +601,7 @@ public class DensiTree {
 
     public static void drawEdges1(
             PhyloTree tree, int treeNum, GraphicsContext gc, NodeArray<Point2D> nodePointMap,
-            boolean jitter, double shiftx, double shifty, double[][][] coords2, String[] labels
+            boolean jitter, boolean staggered, double shiftx, double shifty, double[][][] coords2, String[] labels
     ) {
 
         for (var e : tree.edges()) {
@@ -651,6 +627,15 @@ public class DensiTree {
                 double x2 = wPt.getX();
                 double y2 = wPt.getY();
 
+                if(staggered){
+                    gc.strokeLine(x1,y1,x1,y2);
+                    gc.strokeLine(x1,y2,x2,y2);
+                    if(v.getInDegree()==0){
+                        gc.strokeLine(x1,y1,x1-25,y1);
+                    }
+                    continue;
+                }
+
                 if (jitter) {
                     gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
                 } else {
@@ -662,7 +647,7 @@ public class DensiTree {
 
     public static void drawEdges2(
             PhyloTree tree, int treeNum, GraphicsContext gc, NodeArray<Point2D> nodePointMap,
-            boolean jitter, double shiftx, double shifty, DoublePoint[][] coords3, String[] labels
+            boolean jitter, boolean staggered, double shiftx, double shifty, DoublePoint[][] coords3, String[] labels
     ) {
 
         for (var e : tree.edges()) {
@@ -688,6 +673,15 @@ public class DensiTree {
                 double y1 = vPt.getY();
                 double x2 = wPt.getX();
                 double y2 = wPt.getY();
+
+                if(staggered){
+                    gc.strokeLine(x1,y1,x1,y2);
+                    gc.strokeLine(x1,y2,x2,y2);
+                    if(v.getInDegree()==0){
+                        gc.strokeLine(x1,y1,x1-25,y1);
+                    }
+                    continue;
+                }
 
                 if (jitter) {
                     gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
