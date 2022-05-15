@@ -120,15 +120,18 @@ public class LayoutAlgorithm {
                                         y = j;
                                     }
                                 }
-                                nodePointMap.put(v, new Point2D(0,y));
+                                nodePointMap.put(v, new Point2D(0,y*75));
                             }
                             else{
                                 double y1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
                                 double y2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();
 
-                                double x = nodePointMap.get(v.getFirstOutEdge().getTarget()).getX();
+                                double x1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getX();
+                                double x2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getX();
 
-                                nodePointMap.put(v, new Point2D(x-1,(y1+y2)/2));
+                                double xmin = Math.min(x1, x2);
+
+                                nodePointMap.put(v, new Point2D(xmin-100,(y1+y2)/2));
                             }
                         });
                         nodeAngleMap.putAll(0.0);

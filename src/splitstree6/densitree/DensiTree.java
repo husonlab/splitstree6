@@ -75,7 +75,7 @@ public class DensiTree {
                 drawingMethod = splitstree6.densitree.drawingMethod.TOSCALE;
             } else if (parameters.drawingMethod.contains("uniform")) {
                 drawingMethod = splitstree6.densitree.drawingMethod.UNIFORM;
-            } else if (parameters.drawingMethod.contains("staggered")){
+            } else if (parameters.drawingMethod.contains("staggered")) {
                 drawingMethod = splitstree6.densitree.drawingMethod.STAGGERED;
                 staggered = true;
             }
@@ -121,7 +121,9 @@ public class DensiTree {
                 NodeArray<Point2D> nodePointMap = tree.newNodeArray();
                 var nodeAngleMap = tree.newNodeDoubleArray();
                 LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
-                adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+                if (!staggered) {
+                    adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+                }
 
                 centerByMass(tree, nodePointMap, canvas);
 
@@ -207,7 +209,7 @@ public class DensiTree {
     }
 
 
-    public static void centerByMass(PhyloTree tree, NodeArray<Point2D> nodePointMap, Canvas canvas){
+    public static void centerByMass(PhyloTree tree, NodeArray<Point2D> nodePointMap, Canvas canvas) {
         double xsum = nodePointMap.get(tree.getRoot()).getX();
         double ysum = nodePointMap.get(tree.getRoot()).getY();
         int nodeCount = 1;
@@ -229,12 +231,12 @@ public class DensiTree {
         double comX = xsum / nodeCount;
         double comY = ysum / nodeCount;
 
-        double centerX = canvas.getWidth()/2 - comX;
-        double centerY = canvas.getHeight()/2 - comY;
+        double centerX = canvas.getWidth() / 2 - comX;
+        double centerY = canvas.getHeight() / 2 - comY;
 
-        for(var k: nodePointMap.keySet()){
+        for (var k : nodePointMap.keySet()) {
             var point = nodePointMap.get(k);
-            nodePointMap.put(k, new Point2D(point.getX()+centerX, point.getY()+centerY));
+            nodePointMap.put(k, new Point2D(point.getX() + centerX, point.getY() + centerY));
         }
     }
 
@@ -581,17 +583,19 @@ public class DensiTree {
                 double x2 = wPt.getX();
                 double y2 = wPt.getY();
 
-                if(staggered){
-                    gc.strokeLine(x1,y1,x1,y2);
-                    gc.strokeLine(x1,y2,x2,y2);
-                    if(v.getInDegree()==0){
-                        gc.strokeLine(x1,y1,x1-25,y1);
-                    }
-                    continue;
+                if (jitter) {
+                    x1 += shiftx;
+                    y1 += shifty;
+                    x2 += shiftx;
+                    y2 += shifty;
                 }
 
-                if (jitter) {
-                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
+                if (staggered) {
+                    gc.strokeLine(x1, y1, x1, y2);
+                    gc.strokeLine(x1, y2, x2, y2);
+                    if (v.getInDegree() == 0) {
+                        gc.strokeLine(x1, y1, x1 - 25, y1);
+                    }
                 } else {
                     gc.strokeLine(x1, y1, x2, y2);
                 }
@@ -627,17 +631,19 @@ public class DensiTree {
                 double x2 = wPt.getX();
                 double y2 = wPt.getY();
 
-                if(staggered){
-                    gc.strokeLine(x1,y1,x1,y2);
-                    gc.strokeLine(x1,y2,x2,y2);
-                    if(v.getInDegree()==0){
-                        gc.strokeLine(x1,y1,x1-25,y1);
-                    }
-                    continue;
+                if (jitter) {
+                    x1 += shiftx;
+                    y1 += shifty;
+                    x2 += shiftx;
+                    y2 += shifty;
                 }
 
-                if (jitter) {
-                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
+                if (staggered) {
+                    gc.strokeLine(x1, y1, x1, y2);
+                    gc.strokeLine(x1, y2, x2, y2);
+                    if (v.getInDegree() == 0) {
+                        gc.strokeLine(x1, y1, x1 - 25, y1);
+                    }
                 } else {
                     gc.strokeLine(x1, y1, x2, y2);
                 }
@@ -674,17 +680,19 @@ public class DensiTree {
                 double x2 = wPt.getX();
                 double y2 = wPt.getY();
 
-                if(staggered){
-                    gc.strokeLine(x1,y1,x1,y2);
-                    gc.strokeLine(x1,y2,x2,y2);
-                    if(v.getInDegree()==0){
-                        gc.strokeLine(x1,y1,x1-25,y1);
-                    }
-                    continue;
+                if (jitter) {
+                    x1 += shiftx;
+                    y1 += shifty;
+                    x2 += shiftx;
+                    y2 += shifty;
                 }
 
-                if (jitter) {
-                    gc.strokeLine(x1 + shiftx, y1 + shifty, x2 + shiftx, y2 + shifty);
+                if (staggered) {
+                    gc.strokeLine(x1, y1, x1, y2);
+                    gc.strokeLine(x1, y2, x2, y2);
+                    if (v.getInDegree() == 0) {
+                        gc.strokeLine(x1, y1, x1 - 25, y1);
+                    }
                 } else {
                     gc.strokeLine(x1, y1, x2, y2);
                 }
