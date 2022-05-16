@@ -26,6 +26,7 @@ module splitstreesix {
 	opens splitstree6.algorithms.distances.distances2network;
 	opens splitstree6.algorithms.distances.distances2view;
 	opens splitstree6.algorithms.distances.distances2splits;
+	opens splitstree6.algorithms.distances.distances2splits.legacy;
 	opens splitstree6.algorithms.distances.distances2trees;
 
 	opens splitstree6.algorithms.network.network2network;
