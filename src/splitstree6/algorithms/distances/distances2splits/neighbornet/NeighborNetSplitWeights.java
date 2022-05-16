@@ -9,6 +9,8 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import static java.lang.Math.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitstree4.activeSetST4;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
 public class NeighborNetSplitWeights {
@@ -34,7 +36,15 @@ public class NeighborNetSplitWeights {
         public double kktBound = tolerance/100;
     }
 
-
+    /**
+     * Estimate the split weights using non-negative least squares
+     * @param cycle   Neighbor-net cycle
+     * @param distances   Array of distances, indexed 0..(n-1)
+     * @param params     Parameters
+     * @param progress   Progress bar - used to implement cancel
+     * @return  Array list of splits with associated weights.
+     * @throws CanceledException  User pressed cancel in progress bar
+     */
     static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, NNLSParams params, ProgressListener progress) throws CanceledException {
 
         int n = cycle.length - 1;  //Number of taxa
@@ -60,20 +70,18 @@ public class NeighborNetSplitWeights {
             for (int j=i+1;j<=n;j++)
                 d[i][j] = d[j][i] = distances[cycle[i]-1][cycle[j]-1];
 
-        double[][] x;
+        double[][] x = new double[n+1][n+1];
 
-        //Check - if d is circular then we return the weights.
-        x = calcAinvx(d);
-        if (minArray(x)>=-params.tolerance)
-            makeNegElementsZero(x);
-        else if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-            double[][] unconstrained = new double[n+1][n+1];
-            copyArray(x,unconstrained);
-            x = ones(n);
-            activeSetMethod(x,unconstrained,d,params,progress);  //ST4 Algorithm
+        if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
+            activeSetST4(x,d,progress);  //ST4 Algorithm
         } else {
-            x = IncrementalFitting.incrementalFitting(d,params.tolerance/100);
-            projectedConjugateGradient(x,d,params,progress);
+            x = calcAinvx(d); //Check if unconstrained solution is feasible.
+            if (minArray(x) >= -params.tolerance)
+                makeNegElementsZero(x); //Fix roundoff
+            else {
+                incrementalFitting(x, d, params.tolerance / 100);
+                projectedConjugateGradient(x, d, params, progress);
+            }
         }
 
         final ArrayList<ASplit> splitList = new ArrayList<>();
@@ -91,56 +99,17 @@ public class NeighborNetSplitWeights {
         return splitList;
     }
 
-    static private void activeSetMethod(double[][] x, double[][] unconstrained, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
-        double fx_old = evalf(x, d);
-        int n = x.length - 1;
-        boolean[][] activeSet = getZeroElements(x);
-        double[][] x0 = new double[n + 1][n + 1];
-        boolean firstPass = true;
-
-        for (int k = 1; k <= params.outerIterations; k++) {
-            while(true) {
-                copyArray(x, x0);
-                if (firstPass) { //First pass, start CG at unconstrained solution
-                    firstPass = false;
-                    copyArray(unconstrained, x);
-                    makeNegElementsZero(x);
-                }
-
-                boolean cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations);
-                progress.checkForCancel();
-
-                if (params.collapseMultiple) {
-                    filterMostNegative(x, activeSet, params.fractionNegativeToKeep);
-                    maskElements(x, activeSet);
-                    cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations);
-                    progress.checkForCancel();
-                }
-
-                if (minArray(x) > params.tolerance) {
-                    break; //Feasible solution
-                } else {
-                    furthestFeasible(x,x0,params.tolerance);
-                    getZeroElements(x,activeSet);
-                }
-            }
-            boolean finished = checkKKT(x, d, activeSet,params);
-            if (finished)
-                return;
-        }
-        System.err.println("Active set method (Splitstree4) did not converge");
-    }
-
 
         static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
-            double fx_old = evalf(x,d);
-            int n=x.length-1;
+            int n = x.length-1;
+            NNLSFunctionObject f = new NNLSFunctionObject(n);
+            double fx_old = f.evalf(x,d);
             boolean[][] activeSet = getZeroElements(x);
 
             for (int k = 1; k <= params.outerIterations; k++) {
-                boolean optimalForFace = searchFace(x, d, activeSet, params);
-                double fx = evalf(x,d);
+                boolean optimalForFace = searchFace(x, d, activeSet, f,params);
+                double fx = f.evalf(x,d);
                 if (optimalForFace || fx_old-fx<params.tolerance) {
                     if (params.greedy)
                         return;
@@ -173,7 +142,7 @@ public class NeighborNetSplitWeights {
          * @param params   options - search depends on nnls algorithm
          * @return boolean. True if method finishes with x as the approx minimizer of the current face.
          */
-        static private boolean searchFace(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params) {
+        static private boolean searchFace(double[][] x, double[][] d, boolean[][] activeSet, NNLSFunctionObject f, NNLSParams params) {
             int n=x.length-1;
             double[][] x0 = new double[n+1][n+1];
             copyArray(x,x0);
@@ -188,7 +157,7 @@ public class NeighborNetSplitWeights {
             if (minArray(x)<0) {
                 if (params.nnlsAlgorithm == NNLSParams.PROJ_GRAD)
                     //Use gradient projection to return the best projection of points on the line between x0 and x
-                    goldenProjection(x,x0,d,params.tolerance);
+                    goldenProjection(x,x0,d,f,params.tolerance);
                 else
                     furthestFeasible(x,x0,params.tolerance);
                 getZeroElements(x,activeSet);
@@ -214,11 +183,14 @@ public class NeighborNetSplitWeights {
             int n = x.length-1;
 
             double[][] p = new double[n+1][n+1];
-            double[][] r = calcAx(x);
+            double[][] r = new double[n+1][n+1];
+            calcAx(x,r);
             for(int i=1;i<=n;i++)
                 for(int j=1;j<=n;j++)
                     r[i][j] = d[i][j] - r[i][j];
-            double[][] z = calcAtx(r);
+            double[][] z = new double[n+1][n+1];
+            calcAtx(r,z);
+            double[][] w = new double[n+1][n+1];
             maskElements(z,activeSet);
             copyArray(z,p);
             double ztz=sumArraySquared(z);
@@ -226,7 +198,7 @@ public class NeighborNetSplitWeights {
             int k=1;
 
             while(true) {
-                double[][] w = calcAx(p);
+                calcAx(p,w);
                 double alpha = ztz/sumArraySquared(w);
 
                 for(int i=1;i<=n;i++) {
@@ -235,7 +207,7 @@ public class NeighborNetSplitWeights {
                         r[i][j] -= alpha * w[i][j];
                     }
                 }
-                z = calcAtx(r);
+                calcAtx(r,z);
                 maskElements(z,activeSet);
                 double ztz2 = sumArraySquared(z);
                 double beta = ztz2/ztz;
@@ -300,7 +272,40 @@ public class NeighborNetSplitWeights {
         }
 
 
+        static private class NNLSFunctionObject {
+            //Utility class for evaluating ||Ax - b|| without additional allocation.
+            private double[][] xt;
+            private double[][] Axt;
 
+            NNLSFunctionObject(int n) {
+                xt = new double[n+1][n+1];
+                Axt = new double[n+1][n+1];
+            }
+
+            public double evalf(double[][] x, double[][] d) {
+                calcAx(x,Axt);
+                int n = x.length-1;
+                double fx = 0.0;
+                for(int i=1;i<=n;i++) {
+                    double fx_i = 0.0;
+                    for (int j = 1; j <= n; j++) {
+                        double res_ij = Axt[i][j] - d[i][j];
+                        fx_i += res_ij * res_ij;
+                    }
+                    fx += fx_i;
+                }
+                return sqrt(fx);
+            }
+
+            public double evalfprojected(double t, double[][] x0, double[][] x, double[][] d) {
+                int n = x.length-1;
+                for(int i=1;i<=n;i++)
+                    for(int j=1;j<=n;j++) {
+                        xt[i][j] = max(x0[i][j]*(1-t) + x[i][j]*t,0.0);
+                    }
+                return evalf(xt,d);
+            }
+        }
 
         /**
          * Minimizes ||Ax-b|| along the projection of the line segment between x0 and x, where the projection of a point
@@ -312,16 +317,14 @@ public class NeighborNetSplitWeights {
          * @param tolerance tolerance used for golden section search
          */
 
-        static private void goldenProjection(double[][] x, double[][] x0,double[][] d, double tolerance) {
+        static private void goldenProjection(double[][] x, double[][] x0,double[][] d, NNLSFunctionObject f,double tolerance) {
             //Minimize ||A \pi((1-t)x0 + tx) - d||  for t in [0,1]
             double C = (3-sqrt(5))/2.0;
             double R = 1.0 - C;
 
             double t0=0,t1=C,t2 = C+C*(1-C), t3 = 1.0;
-            double f1 = evalfprojected(t1,x0,x,d);
-            double f2 = evalfprojected(t2,x0,x,d);
-
-            double f3 = evalfprojected(t3,x0,x,d);
+            double f1 = f.evalfprojected(t1,x0,x,d);
+            double f2 = f.evalfprojected(t2,x0,x,d);
 
             while(abs(t3-t0)>tolerance) {
                 if (f2<f1) {
@@ -329,20 +332,20 @@ public class NeighborNetSplitWeights {
                     t1=t2;
                     t2 = R*t1 + C*t3;
                     f1=f2;
-                    f2 = evalfprojected(t2,x0,x,d);
+                    f2 = f.evalfprojected(t2,x0,x,d);
                 } else {
                     t3=t2;
                     t2=t1;
                     t1 = R*t2+C*t0;
                     f2=f1;
-                    f1 = evalfprojected(t1,x0,x,d);
+                    f1 = f.evalfprojected(t1,x0,x,d);
                 }
             }
             double tmin = t1;
             if (f2<f1)
                 tmin = t2;
             else if (t0==0) {  //Handle a special case so that if minimum is at the boundary t=0 then this is exactly what is returned
-                double f0 = evalfprojected(t0,x0,x,d);
+                double f0 = f.evalfprojected(t0,x0,x,d);
                 if (f0<f1)
                     tmin = t0;
             }
@@ -355,24 +358,7 @@ public class NeighborNetSplitWeights {
             }
         }
 
-        /**
-         * Evaluates ||A x_t - d|| where x_t is the projection of (1-t)x0 + t x.
-         * @param t  double between 0 and 1
-         * @param x0  initial point
-         * @param x   final point
-         * @param d   square array of distances
-         * @return  value of ||A x_t - d||
-         */
-        static private double evalfprojected(double t, double[][] x0, double[][] x, double[][] d) {
-            int n = x.length-1;
-            double[][] xt = new double[n+1][n+1];
-            for(int i=1;i<=n;i++)
-                for(int j=1;j<=n;j++) {
-                    xt[i][j] = max(x0[i][j]*(1-t) + x[i][j]*t,0.0);
-                }
-            return evalf(xt,d);
 
-        }
 
         /**
          * Determines the point on the path from x0 to x that is furthest from x0 and still feasible.
@@ -407,21 +393,16 @@ public class NeighborNetSplitWeights {
 
 
 
-
-
-
-
-
         /**
          * Computes circular distances from an array of split weights.
          *
          * @param x split weights. Symmetric array. For i<j, x(i,j)  is the weight of the
          *          split {i,i+1,...,j-1} | rest.
-         * @return double[][] circular metric corresponding to these split weights.
+         * @param d square array, overwritten with circular metric corresponding to these split weights.
          */
-        static private double[][] calcAx(double[][] x) {
+        static private void calcAx(double[][] x, double[][] d) {
             int n = x.length - 1;
-            double[][] d = new double[n+1][n+1];
+//            double[][] d = new double[n+1][n+1];
 
             for (int i=1;i<=(n-1);i++)
                 d[i+1][i]=d[i][i+1] =sumSubvector(x[i+1],i+1,n)+sumSubvector(x[i+1],1,i);
@@ -435,7 +416,7 @@ public class NeighborNetSplitWeights {
                     d[j][i]=d[i][j] = d[i][j-1]+d[i+1][j] - d[i+1][j-1]-2*x[i+1][j];
                 }
             }
-            return d;
+     //       return d;
         }
 
         /**
@@ -455,13 +436,15 @@ public class NeighborNetSplitWeights {
         }
 
 
+    /**
+     * Compute Atx, when x and the result are represented as square arrays
+     * @param x square array
+     * @param p square array. Overwritten with result
+     */
 
-
-
-
-        static private double[][]  calcAtx(double[][] x) {
+        static private void calcAtx(double[][] x, double[][] p) {
             int n=x.length-1;
-            double[][] p = new double[n+1][n+1];
+            //double[][] p = new double[n+1][n+1];
 
             for(int i=1;i<=n-1;i++)
                 p[i+1][i] = p[i][i+1]=sumSubvector(x[i],1,n);
@@ -475,7 +458,7 @@ public class NeighborNetSplitWeights {
                     p[i+k][i]=p[i][i+k]=p[i][i+k-1]+p[i+1][i+k]-p[i+1][i+k-1]-2*x[i][i+k-1];
                 }
             }
-            return p;
+            //return p;
         }
 
         /**
@@ -505,20 +488,6 @@ public class NeighborNetSplitWeights {
             return x;
         }
 
-
-
-        /**
-         * Evaluates ||Ax - d||
-         *
-         * @param x  square array
-         * @param d square array of distances
-         * @return   value of function at x.
-         */
-        static private double evalf(double[][] x, double[][] d) {
-            double[][] Axt = calcAx(x);
-            return fro_dist(Axt,d);
-        }
-
         /**
          * checkKKT
          *
@@ -531,7 +500,8 @@ public class NeighborNetSplitWeights {
          */
         static private boolean checkKKT(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params) {
             int n = x.length-1;
-            double[][] gradient = evalGradient(x,d);
+            double[][] gradient = new double[n+1][n+1];
+            evalGradient(x,d,gradient);
             double mingrad = 0.0;
             int min_i=0,min_j=0;
             for(int i=1;i<=n;i++)
@@ -567,15 +537,16 @@ public class NeighborNetSplitWeights {
          * Compute the gradient at x of 1/2 ||Ax - d||
          * @param x square array
          * @param d square array
-         * @return  square array containing the gradient.
+         * @param gradient  square array, overwritten by the gradient.
          */
-        static private double[][] evalGradient(double[][] x, double[][] d) {
+        static private void evalGradient(double[][] x, double[][] d, double[][] gradient) {
             int n = x.length-1;
-            double[][] res = calcAx(x);
+            double[][] res = new double[n+1][n+1];
+            calcAx(x,res);
             for(int i=1;i<=n;i++)
                 for(int j=1;j<=n;j++)
                     res[i][j] -= d[i][j];
-            return calcAtx(res);
+            calcAtx(res,gradient);
         }
 
 

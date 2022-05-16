@@ -135,27 +135,7 @@ public class SquareArrays {
         }
     }
 
-    /**
-     * fro_dist
-     *
-     * Computes the Frobenius norm of (x-y)
-     * @param x square array of double
-     * @param y square array of double with the same dimensions as x
-     * @return   \sum_ij (x[i][j] - y[i][j])^2
-     */
-    static public double fro_dist(double[][] x, double[][] y) {
-        int n=x.length-1;
-        double fx = 0.0;
-        for(int i=1;i<=n;i++) {
-            double fx_i = 0.0;
-            for (int j = 1; j <= n; j++) {
-                double res_ij = x[i][j] - y[i][j];
-                fx_i += res_ij * res_ij;
-            }
-            fx += fx_i;
-        }
-        return sqrt(fx);
-    }
+
 
 
 

@@ -22,12 +22,11 @@ public class IncrementalFitting {
      * TODO: Replace golden section search with an Apache implementation of Brent's method.
      *
      * @param d  Square (symmetric) array of distances
+     * @param x  Square array, overwritten with the solution
      * @param tol    Tolerance in split weight error. Used to determine convergence of the golden section method.
-     * @return   Square (symmetric) array of split weights
      */
-    static public double[][] incrementalFitting(double[][] d, double tol) {
+    static public void incrementalFitting(double[][] x, double[][] d, double tol) {
         int n = d.length - 1; //ntax
-        double[][] x = new double[n+1][n+1];
         double[][] p = new double[n+1][n+1];
 
         int[] s = maxDivergenceOrder(d);
@@ -120,7 +119,6 @@ public class IncrementalFitting {
                 cycle[k-j+1]=cycle[k-j];
             cycle[r1+1]=sk;
         }
-        return x;
     }
 
     /**
