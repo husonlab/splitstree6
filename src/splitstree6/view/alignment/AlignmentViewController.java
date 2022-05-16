@@ -170,6 +170,9 @@ public class AlignmentViewController {
     @FXML
     private Group taxaSelectionGroup;
 
+    @FXML
+    private Group canvasGroup;
+
     private final NumberAxis axis = new NumberAxis();
 
     private final Pane rightTopPane = new Pane();
@@ -401,5 +404,9 @@ public class AlignmentViewController {
 
     public MenuButton getFilterMenu() {
         return filterMenu;
+    }
+
+    public Group getCanvasGroup() {
+        return canvasGroup;
     }
 }

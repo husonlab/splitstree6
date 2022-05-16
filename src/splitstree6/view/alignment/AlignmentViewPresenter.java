@@ -103,9 +103,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-
 		updateCanvasListener = e -> Platform.runLater(() -> {
 			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
+
 			DrawAlignment.updateCanvas(controller.getCanvas(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionColorScheme(),
 					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
 
@@ -182,6 +182,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					} else if ((inputCharacters.getDataType() == CharactersType.DNA || inputCharacters.getDataType() == CharactersType.RNA)) {
 						if (!colorSchemeSet || alignmentView.getOptionColorScheme() != ColorScheme.Nucleotide && alignmentView.getOptionColorScheme() != ColorScheme.Random && alignmentView.getOptionColorScheme() != ColorScheme.None) {
 							alignmentView.setOptionColorScheme(ColorScheme.Nucleotide);
+						}
+						colorSchemeSet = true;
+					} else if (inputCharacters.getDataType() == CharactersType.Standard) {
+						if (!colorSchemeSet || alignmentView.getOptionColorScheme() != ColorScheme.Nucleotide && alignmentView.getOptionColorScheme() != ColorScheme.Random && alignmentView.getOptionColorScheme() != ColorScheme.None) {
+							alignmentView.setOptionColorScheme(ColorScheme.Binary);
 						}
 						colorSchemeSet = true;
 					}

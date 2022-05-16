@@ -78,10 +78,9 @@
                     </ToggleButton>
                     <Separator layoutX="179.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
-                    <Button fx:id="zoomToFitButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="Zoom to Fit">
+                    <Button fx:id="zoomToFitButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                            mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom to Fit">
                         <font>
                             <Font size="10.0"/>
                         </font>
@@ -203,8 +202,12 @@
                                                             <content>
                                                                 <StackPane fx:id="stackPane">
                                                                     <children>
-                                                                        <Canvas fx:id="canvas" height="200.0"
-                                                                                width="200.0"/>
+                                                                        <Group fx:id="canvasGroup">
+                                                                            <children>
+                                                                                <Canvas fx:id="canvas" height="200.0"
+                                                                                        width="200.0"/>
+                                                                            </children>
+                                                                        </Group>
                                                                         <Pane fx:id="selectionPane">
                                                                             <children>
                                                                                 <Group fx:id="siteSelectionGroup"/>

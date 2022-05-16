@@ -1,0 +1,644 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=7 nAlgorithms=4;
+PROGRAM version='SplitsTree6 Community Edition';
+WORKFLOW creationDate='1652091232946'; [Mon May 09 12:13:52 CEST 2022]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 63 taxa and one tree.
+A Reroot Or Ladderize Trees (default options, except OutGroupTaxa=(Ljava.lang.String;@5f8e25c, Ladderize=Up) was applied so as to be The Reroot Or Ladderize Trees algorithm.
+The Show Trees method was used (default options) so as to obtain a Tree View visualization (Dress & Huson 2004).
+
+References:
+Dress & Huson 2004: A.W.M. Dress and D.H. Huson, Constructing splits graphs, IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+DIMENSIONS ntax=63;
+TAXLABELS
+	[1] 'Caes_0741'
+	[2] 'Cpyr_1053'
+	[3] 'Cpyr_0021'
+	[4] 'Cang_1157'
+	[5] 'Cpol_1016'
+	[6] 'Cbor_1063'
+	[7] 'Cbor_1015'
+	[8] 'Ctat_1290'
+	[9] 'Ctat_1306'
+	[10] 'Cang_1023'
+	[11] 'Ctri_1288'
+	[12] 'Ctri_1287'
+	[13] 'Ctri_1370'
+	[14] 'Ctri_1371'
+	[15] 'Cdan_0654'
+	[16] 'Imega_1776'
+	[17] 'Cdan_1778'
+	[18] 'Cdan_1067'
+	[19] 'Cdan_1766'
+	[20] 'Cdan_1261'
+	[21] 'Coff_1073'
+	[22] 'Coff_1024'
+	[23] 'Coff_1364'
+	[24] 'Coff_1365'
+	[25] 'Cses_1286'
+	[26] 'Cses_1285'
+	[27] 'Coff_1357'
+	[28] 'Coff_1367'
+	[29] 'Coff_1366'
+	[30] 'Cgro_1038'
+	[31] 'Cgro_0474'
+	[32] 'Cgro_1764'
+	[33] 'Cisla_1765'
+	[34] 'Cisla_1233'
+	[35] 'Cscot_1009'
+	[36] 'Cscot_0963'
+	[37] 'Cmica_0979'
+	[38] 'Calp_0828'
+	[39] 'Cmica_0983'
+	[40] 'Coff_1012'
+	[41] 'Calp_1127'
+	[42] 'Calp_0165'
+	[43] 'Cbav_1207'
+	[44] 'Cbav_1208'
+	[45] 'Cmac_1022'
+	[46] 'Cexc_0297'
+	[47] 'Cexc_1253'
+	[48] 'Cpyr_0310'
+	[49] 'Cpyr_1537'
+	[50] 'Cpyr_0396'
+	[51] 'Cpyr_0456'
+	[52] 'Cpyr_1058'
+	[53] 'Cpyr_0106'
+	[54] 'Cpyr_0506'
+	[55] 'Cpyr_0560'
+	[56] 'Cpyr_0198'
+	[57] 'Cpyr_0252a'
+	[58] 'Cpyr_0260'
+	[59] 'Cpyr_0699'
+	[60] 'Cpyr_1442'
+	[61] 'Calp_0759'
+	[62] 'Cpyr_1552'
+	[63] 'Cpyr_1211'
+;
+DISPLAYLABELS
+	[1] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Caes</i> 0741'
+	[2] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1053'
+	[3] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0021'
+	[4] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cang</i> 1157'
+	[5] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Cpol</i> 1016'
+	[6] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cbor</i> 1063'
+	[7] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cbor</i> 1015'
+	[8] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Ctat</i> 1290'
+	[9] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Ctat</i> 1306'
+	[10] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cang</i> 1023'
+	[11] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1288'
+	[12] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1287'
+	[13] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1370'
+	[14] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1371'
+	[15] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 0654'
+	[16] '<i>Imega</i> 1776'
+	[17] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1778'
+	[18] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1067'
+	[19] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1766'
+	[20] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1261'
+	[21] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Coff</i> 1073'
+	[22] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Coff</i> 1024'
+	[23] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1364'
+	[24] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1365'
+	[25] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cses</i> 1286'
+	[26] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cses</i> 1285'
+	[27] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1357'
+	[28] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1367'
+	[29] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1366'
+	[30] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cgro</i> 1038'
+	[31] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cgro</i> 0474'
+	[32] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cgro</i> 1764'
+	[33] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cisla</i> 1765'
+	[34] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cisla</i> 1233'
+	[35] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cscot</i> 1009'
+	[36] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cscot</i> 0963'
+	[37] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cmica</i> 0979'
+	[38] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Calp</i> 0828'
+	[39] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cmica</i> 0983'
+	[40] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Coff</i> 1012'
+	[41] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Calp</i> 1127'
+	[42] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Calp</i> 0165'
+	[43] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Cbav</i> 1207'
+	[44] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Cbav</i> 1208'
+	[45] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cmac</i> 1022'
+	[46] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cexc</i> 0297'
+	[47] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cexc</i> 1253'
+	[48] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0310'
+	[49] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1537'
+	[50] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0396'
+	[51] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0456'
+	[52] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1058'
+	[53] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0106'
+	[54] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0506'
+	[55] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0560'
+	[56] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0198'
+	[57] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0252a'
+	[58] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0260'
+	[59] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0699'
+	[60] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1442'
+	[61] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Calp</i> 0759'
+	[62] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1552'
+	[63] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1211'
+;
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TRAITS;
+TITLE 'Input Traits';
+DIMENSIONS [nTax=63] nTraits=1;
+FORMAT labels=yes missing=? separator=Comma;
+TRAITLABELS
+ 'Lineage';
+MATRIX
+[1] 'Caes_0741'   'Central European diploids'
+[2] 'Cpyr_1053'   'Central European diploids'
+[3] 'Cpyr_0021'   'Central European diploids'
+[4] 'Cang_1157'   'Inland/coastal octoploids'
+[5] 'Cpol_1016'   'Inland hexaploids'
+[6] 'Cbor_1063'   'Inland/coastal octoploids'
+[7] 'Cbor_1015'   'Inland/coastal octoploids'
+[8] 'Ctat_1290'   'Inland hexaploids'
+[9] 'Ctat_1306'   'Inland hexaploids'
+[10] 'Cang_1023'   'Inland/coastal octoploids'
+[11] 'Ctri_1288'   'C. tridactylites'
+[12] 'Ctri_1287'   'C. tridactylites'
+[13] 'Ctri_1370'   'C. tridactylites'
+[14] 'Ctri_1371'   'C. tridactylites'
+[15] 'Cdan_0654'   'C. danica'
+[16] 'Imega_1776'  'Outgroup'
+[17] 'Cdan_1778'   'C. danica'
+[18] 'Cdan_1067'   'C. danica'
+[19] 'Cdan_1766'   'C. danica'
+[20] 'Cdan_1261'   'C. danica'
+[21] 'Coff_1073'   'European tetraploids'
+[22] 'Coff_1024'   'European tetraploids'
+[23] 'Coff_1364'   'Arctic diploids'
+[24] 'Coff_1365'   'Arctic diploids'
+[25] 'Cses_1286'   'Arctic diploids'
+[26] 'Cses_1285'   'Arctic diploids'
+[27] 'Coff_1357'   'Arctic diploids'
+[28] 'Coff_1367'   'Arctic diploids'
+[29] 'Coff_1366'   'Arctic diploids'
+[30] 'Cgro_1038'   'Arctic diploids'
+[31] 'Cgro_0474'   'Arctic diploids'
+[32] 'Cgro_1764'   'Arctic diploids'
+[33] 'Cisla_1765'  'Arctic diploids'
+[34] 'Cisla_1233'  'Arctic diploids'
+[35] 'Cscot_1009'  'European tetraploids'
+[36] 'Cscot_0963'  'European tetraploids'
+[37] 'Cmica_0979'  'European tetraploids'
+[38] 'Calp_0828'   'European tetraploids'
+[39] 'Cmica_0983'  'European tetraploids'
+[40] 'Coff_1012'   'European tetraploids'
+[41] 'Calp_1127'   'European tetraploids'
+[42] 'Calp_0165'   'European tetraploids'
+[43] 'Cbav_1207'   'Inland hexaploids'
+[44] 'Cbav_1208'   'Inland hexaploids'
+[45] 'Cmac_1022'   'Central European diploids'
+[46] 'Cexc_0297'   'Central European diploids'
+[47] 'Cexc_1253'   'Central European diploids'
+[48] 'Cpyr_0310'   'Central European diploids'
+[49] 'Cpyr_1537'   'Central European diploids'
+[50] 'Cpyr_0396'   'Central European diploids'
+[51] 'Cpyr_0456'   'Central European diploids'
+[52] 'Cpyr_1058'   'Central European diploids'
+[53] 'Cpyr_0106'   'Central European diploids'
+[54] 'Cpyr_0506'   'Central European diploids'
+[55] 'Cpyr_0560'   'Central European diploids'
+[56] 'Cpyr_0198'   'Central European diploids'
+[57] 'Cpyr_0252a'  'Central European diploids'
+[58] 'Cpyr_0260'   'Central European diploids'
+[59] 'Cpyr_0699'   'Central European diploids'
+[60] 'Cpyr_1442'   'Central European diploids'
+[61] 'Calp_0759'   'Central European diploids'
+[62] 'Cpyr_1552'   'Central European diploids'
+[63] 'Cpyr_1211'   'Central European diploids'
+;
+END; [TRAITS]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=63;
+TAXLABELS
+	[1] 'Caes_0741'
+	[2] 'Cpyr_1053'
+	[3] 'Cpyr_0021'
+	[4] 'Cang_1157'
+	[5] 'Cpol_1016'
+	[6] 'Cbor_1063'
+	[7] 'Cbor_1015'
+	[8] 'Ctat_1290'
+	[9] 'Ctat_1306'
+	[10] 'Cang_1023'
+	[11] 'Ctri_1288'
+	[12] 'Ctri_1287'
+	[13] 'Ctri_1370'
+	[14] 'Ctri_1371'
+	[15] 'Cdan_0654'
+	[16] 'Imega_1776'
+	[17] 'Cdan_1778'
+	[18] 'Cdan_1067'
+	[19] 'Cdan_1766'
+	[20] 'Cdan_1261'
+	[21] 'Coff_1073'
+	[22] 'Coff_1024'
+	[23] 'Coff_1364'
+	[24] 'Coff_1365'
+	[25] 'Cses_1286'
+	[26] 'Cses_1285'
+	[27] 'Coff_1357'
+	[28] 'Coff_1367'
+	[29] 'Coff_1366'
+	[30] 'Cgro_1038'
+	[31] 'Cgro_0474'
+	[32] 'Cgro_1764'
+	[33] 'Cisla_1765'
+	[34] 'Cisla_1233'
+	[35] 'Cscot_1009'
+	[36] 'Cscot_0963'
+	[37] 'Cmica_0979'
+	[38] 'Calp_0828'
+	[39] 'Cmica_0983'
+	[40] 'Coff_1012'
+	[41] 'Calp_1127'
+	[42] 'Calp_0165'
+	[43] 'Cbav_1207'
+	[44] 'Cbav_1208'
+	[45] 'Cmac_1022'
+	[46] 'Cexc_0297'
+	[47] 'Cexc_1253'
+	[48] 'Cpyr_0310'
+	[49] 'Cpyr_1537'
+	[50] 'Cpyr_0396'
+	[51] 'Cpyr_0456'
+	[52] 'Cpyr_1058'
+	[53] 'Cpyr_0106'
+	[54] 'Cpyr_0506'
+	[55] 'Cpyr_0560'
+	[56] 'Cpyr_0198'
+	[57] 'Cpyr_0252a'
+	[58] 'Cpyr_0260'
+	[59] 'Cpyr_0699'
+	[60] 'Cpyr_1442'
+	[61] 'Calp_0759'
+	[62] 'Cpyr_1552'
+	[63] 'Cpyr_1211'
+;
+DISPLAYLABELS
+	[1] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Caes</i> 0741'
+	[2] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1053'
+	[3] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0021'
+	[4] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cang</i> 1157'
+	[5] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Cpol</i> 1016'
+	[6] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cbor</i> 1063'
+	[7] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cbor</i> 1015'
+	[8] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Ctat</i> 1290'
+	[9] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Ctat</i> 1306'
+	[10] '<i><mark shape="Square" fill="#e6804dff" stroke="lightgray">Cang</i> 1023'
+	[11] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1288'
+	[12] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1287'
+	[13] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1370'
+	[14] '<i><mark shape="Square" fill="#b399ffff" stroke="lightgray">Ctri</i> 1371'
+	[15] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 0654'
+	[16] '<i>Imega</i> 1776'
+	[17] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1778'
+	[18] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1067'
+	[19] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1766'
+	[20] '<i><mark shape="Square" fill="#80b380ff" stroke="lightgray">Cdan</i> 1261'
+	[21] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Coff</i> 1073'
+	[22] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Coff</i> 1024'
+	[23] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1364'
+	[24] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1365'
+	[25] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cses</i> 1286'
+	[26] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cses</i> 1285'
+	[27] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1357'
+	[28] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1367'
+	[29] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Coff</i> 1366'
+	[30] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cgro</i> 1038'
+	[31] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cgro</i> 0474'
+	[32] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cgro</i> 1764'
+	[33] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cisla</i> 1765'
+	[34] '<i><mark shape="Square" fill="#99b3ffff" stroke="lightgray">Cisla</i> 1233'
+	[35] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cscot</i> 1009'
+	[36] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cscot</i> 0963'
+	[37] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cmica</i> 0979'
+	[38] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Calp</i> 0828'
+	[39] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Cmica</i> 0983'
+	[40] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Coff</i> 1012'
+	[41] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Calp</i> 1127'
+	[42] '<i><mark shape="Square" fill="#1a3399ff" stroke="lightgray">Calp</i> 0165'
+	[43] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Cbav</i> 1207'
+	[44] '<i><mark shape="Square" fill="#e6b34dff" stroke="lightgray">Cbav</i> 1208'
+	[45] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cmac</i> 1022'
+	[46] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cexc</i> 0297'
+	[47] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cexc</i> 1253'
+	[48] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0310'
+	[49] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1537'
+	[50] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0396'
+	[51] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0456'
+	[52] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1058'
+	[53] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0106'
+	[54] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0506'
+	[55] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0560'
+	[56] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0198'
+	[57] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0252a'
+	[58] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0260'
+	[59] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 0699'
+	[60] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1442'
+	[61] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Calp</i> 0759'
+	[62] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1552'
+	[63] '<i><mark shape="Square" fill="#e64d4dff" stroke="lightgray">Cpyr</i> 1211'
+;
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TRAITS;
+TITLE 'Working Traits';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS [nTax=63] nTraits=1;
+FORMAT labels=yes missing=? separator=Comma;
+TRAITLABELS
+ 'Lineage';
+MATRIX
+[1] 'Caes_0741'   'Central European diploids'
+[2] 'Cpyr_1053'   'Central European diploids'
+[3] 'Cpyr_0021'   'Central European diploids'
+[4] 'Cang_1157'   'Inland/coastal octoploids'
+[5] 'Cpol_1016'   'Inland hexaploids'
+[6] 'Cbor_1063'   'Inland/coastal octoploids'
+[7] 'Cbor_1015'   'Inland/coastal octoploids'
+[8] 'Ctat_1290'   'Inland hexaploids'
+[9] 'Ctat_1306'   'Inland hexaploids'
+[10] 'Cang_1023'   'Inland/coastal octoploids'
+[11] 'Ctri_1288'   'C. tridactylites'
+[12] 'Ctri_1287'   'C. tridactylites'
+[13] 'Ctri_1370'   'C. tridactylites'
+[14] 'Ctri_1371'   'C. tridactylites'
+[15] 'Cdan_0654'   'C. danica'
+[16] 'Imega_1776'  'Outgroup'
+[17] 'Cdan_1778'   'C. danica'
+[18] 'Cdan_1067'   'C. danica'
+[19] 'Cdan_1766'   'C. danica'
+[20] 'Cdan_1261'   'C. danica'
+[21] 'Coff_1073'   'European tetraploids'
+[22] 'Coff_1024'   'European tetraploids'
+[23] 'Coff_1364'   'Arctic diploids'
+[24] 'Coff_1365'   'Arctic diploids'
+[25] 'Cses_1286'   'Arctic diploids'
+[26] 'Cses_1285'   'Arctic diploids'
+[27] 'Coff_1357'   'Arctic diploids'
+[28] 'Coff_1367'   'Arctic diploids'
+[29] 'Coff_1366'   'Arctic diploids'
+[30] 'Cgro_1038'   'Arctic diploids'
+[31] 'Cgro_0474'   'Arctic diploids'
+[32] 'Cgro_1764'   'Arctic diploids'
+[33] 'Cisla_1765'  'Arctic diploids'
+[34] 'Cisla_1233'  'Arctic diploids'
+[35] 'Cscot_1009'  'European tetraploids'
+[36] 'Cscot_0963'  'European tetraploids'
+[37] 'Cmica_0979'  'European tetraploids'
+[38] 'Calp_0828'   'European tetraploids'
+[39] 'Cmica_0983'  'European tetraploids'
+[40] 'Coff_1012'   'European tetraploids'
+[41] 'Calp_1127'   'European tetraploids'
+[42] 'Calp_0165'   'European tetraploids'
+[43] 'Cbav_1207'   'Inland hexaploids'
+[44] 'Cbav_1208'   'Inland hexaploids'
+[45] 'Cmac_1022'   'Central European diploids'
+[46] 'Cexc_0297'   'Central European diploids'
+[47] 'Cexc_1253'   'Central European diploids'
+[48] 'Cpyr_0310'   'Central European diploids'
+[49] 'Cpyr_1537'   'Central European diploids'
+[50] 'Cpyr_0396'   'Central European diploids'
+[51] 'Cpyr_0456'   'Central European diploids'
+[52] 'Cpyr_1058'   'Central European diploids'
+[53] 'Cpyr_0106'   'Central European diploids'
+[54] 'Cpyr_0506'   'Central European diploids'
+[55] 'Cpyr_0560'   'Central European diploids'
+[56] 'Cpyr_0198'   'Central European diploids'
+[57] 'Cpyr_0252a'  'Central European diploids'
+[58] 'Cpyr_0260'   'Central European diploids'
+[59] 'Cpyr_0699'   'Central European diploids'
+[60] 'Cpyr_1442'   'Central European diploids'
+[61] 'Calp_0759'   'Central European diploids'
+[62] 'Cpyr_1552'   'Central European diploids'
+[63] 'Cpyr_1211'   'Central European diploids'
+;
+END; [TRAITS]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Taxa Filter';
+[Number of trees: 1]
+PROPERTIES partialTrees=no rooted=yes;
+[TREES]
+		[1] tree 'tree-1'=[&R] (Caes_0741:0.04896057,((Cpyr_1053:0.05482415,Cpyr_0021:0.03629949)100:0.01358644,(((((Cang_1157:0.01487553,((Cpol_1016:0.01663048,((Cbor_1063:0.00141675,Cbor_1015:0.00209635)100:0.03779877,(Ctat_1290:0.00293179,Ctat_1306:0.00303448)100:0.00791413)100:0.00725983)100:0.02287275,(Cang_1023:0.00487015,((Ctri_1288:0.00298199,(Ctri_1287:0.00446529,(Ctri_1370:0.00426814,Ctri_1371:0.00707267)100:0.00477447)100:0.00506051)100:0.06031182,(Cdan_0654:0.00207921,(Imega_1776:0.85282632,(Cdan_1778:0.01049801,(Cdan_1067:0.01395358,(Cdan_1766:0.00386959,Cdan_1261:0.0040618)100:0.00635483)100:0.00347191)100:0.04885734)100:0.03466442)100:0.01167145)100:0.01521777)93:0.00575513)100:0.01081016)96:0.00641354,(Coff_1073:0.00998413,((Coff_1024:0.01654222,((((((((Coff_1364:0.00079763,Coff_1365:0.00108339)100:0.00108072,(Cses_1286:0.00030284,Cses_1285:0.00044027)100:0.00302436)100:0.02183107,Coff_1357:0.0071793)100:0.01215982,(Coff_1367:0.00006076,Coff_1366:0.00008956)100:0.01613144)100:0.01079499,Cgro_1038:0.01859245)100:0.0085897,Cgro_0474:0.01805119)100:0.02032741,Cgro_1764:0.02353517)100:0.03073795,(Cisla_1765:0.05949275,Cisla_1233:0.03077007)100:0.02692087)100:0.03172642)100:0.01389444,(Cscot_1009:0.01770378,Cscot_0963:0.00952952)90:0.00893472)42:0.00692758)88:0.00658584)90:0.00745919,((Cmica_0979:0.01545723,(Calp_0828:0.0149373,(Cmica_0983:0.01765751,Coff_1012:0.00573144)92:0.00406438)88:0.0049192)100:0.00619719,Calp_1127:0.00959488)97:0.00691159)100:0.00735933,Calp_0165:0.01568892)85:0.0050752,(((Cbav_1207:0.01802038,Cbav_1208:0.01575392)100:0.01200439,((((Cmac_1022:0.04083079,(Cexc_0297:0.05107842,Cexc_1253:0.02631106)100:0.01668097)94:0.00789081,(Cpyr_0310:0.04313907,(Cpyr_1537:0.03380815,Cpyr_0396:0.03213981)100:0.02287665)94:0.0096174)100:0.0116264,(Cpyr_0456:0.04257802,Cpyr_1058:0.03223799)100:0.01857279)100:0.00843832,(((Cpyr_0106:0.05844225,Cpyr_0506:0.05293838)43:0.01074008,(Cpyr_0560:0.04197521,Cpyr_0198:0.05468849)72:0.0111133)71:0.0064134,(Cpyr_0252a:0.03693387,Cpyr_0260:0.05007146)71:0.00956053)89:0.00669846)80:0.00629832)100:0.01666846,((Cpyr_0699:0.01822489,Cpyr_1442:0.02002899)100:0.01347712,(Calp_0759:0.02880767,Cpyr_1552:0.0194085)100:0.01311655)100:0.01255144)86:0.00629228)86:0.00684088)100:0.0267275,Cpyr_1211:0.05505372);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 1]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'Caes_0741',
+	2 'Cpyr_1053',
+	3 'Cpyr_0021',
+	4 'Cang_1157',
+	5 'Cpol_1016',
+	6 'Cbor_1063',
+	7 'Cbor_1015',
+	8 'Ctat_1290',
+	9 'Ctat_1306',
+	10 'Cang_1023',
+	11 'Ctri_1288',
+	12 'Ctri_1287',
+	13 'Ctri_1370',
+	14 'Ctri_1371',
+	15 'Cdan_0654',
+	16 'Imega_1776',
+	17 'Cdan_1778',
+	18 'Cdan_1067',
+	19 'Cdan_1766',
+	20 'Cdan_1261',
+	21 'Coff_1073',
+	22 'Coff_1024',
+	23 'Coff_1364',
+	24 'Coff_1365',
+	25 'Cses_1286',
+	26 'Cses_1285',
+	27 'Coff_1357',
+	28 'Coff_1367',
+	29 'Coff_1366',
+	30 'Cgro_1038',
+	31 'Cgro_0474',
+	32 'Cgro_1764',
+	33 'Cisla_1765',
+	34 'Cisla_1233',
+	35 'Cscot_1009',
+	36 'Cscot_0963',
+	37 'Cmica_0979',
+	38 'Calp_0828',
+	39 'Cmica_0983',
+	40 'Coff_1012',
+	41 'Calp_1127',
+	42 'Calp_0165',
+	43 'Cbav_1207',
+	44 'Cbav_1208',
+	45 'Cmac_1022',
+	46 'Cexc_0297',
+	47 'Cexc_1253',
+	48 'Cpyr_0310',
+	49 'Cpyr_1537',
+	50 'Cpyr_0396',
+	51 'Cpyr_0456',
+	52 'Cpyr_1058',
+	53 'Cpyr_0106',
+	54 'Cpyr_0506',
+	55 'Cpyr_0560',
+	56 'Cpyr_0198',
+	57 'Cpyr_0252a',
+	58 'Cpyr_0260',
+	59 'Cpyr_0699',
+	60 'Cpyr_1442',
+	61 'Calp_0759',
+	62 'Cpyr_1552',
+	63 'Cpyr_1211',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] (1:0.04896057,((2:0.05482415,3:0.03629949)100:0.01358644,(((((4:0.01487553,((5:0.01663048,((6:0.00141675,7:0.00209635)100:0.03779877,(8:0.00293179,9:0.00303448)100:0.00791413)100:0.00725983)100:0.02287275,(10:0.00487015,((11:0.00298199,(12:0.00446529,(13:0.00426814,14:0.00707267)100:0.00477447)100:0.00506051)100:0.06031182,(15:0.00207921,(16:0.85282632,(17:0.01049801,(18:0.01395358,(19:0.00386959,20:0.0040618)100:0.00635483)100:0.00347191)100:0.04885734)100:0.03466442)100:0.01167145)100:0.01521777)93:0.00575513)100:0.01081016)96:0.00641354,(21:0.00998413,((22:0.01654222,((((((((23:0.00079763,24:0.00108339)100:0.00108072,(25:0.00030284,26:0.00044027)100:0.00302436)100:0.02183107,27:0.0071793)100:0.01215982,(28:0.00006076,29:0.00008956)100:0.01613144)100:0.01079499,30:0.01859245)100:0.0085897,31:0.01805119)100:0.02032741,32:0.02353517)100:0.03073795,(33:0.05949275,34:0.03077007)100:0.02692087)100:0.03172642)100:0.01389444,(35:0.01770378,36:0.00952952)90:0.00893472)42:0.00692758)88:0.00658584)90:0.00745919,((37:0.01545723,(38:0.0149373,(39:0.01765751,40:0.00573144)92:0.00406438)88:0.0049192)100:0.00619719,41:0.00959488)97:0.00691159)100:0.00735933,42:0.01568892)85:0.0050752,(((43:0.01802038,44:0.01575392)100:0.01200439,((((45:0.04083079,(46:0.05107842,47:0.02631106)100:0.01668097)94:0.00789081,(48:0.04313907,(49:0.03380815,50:0.03213981)100:0.02287665)94:0.0096174)100:0.0116264,(51:0.04257802,52:0.03223799)100:0.01857279)100:0.00843832,(((53:0.05844225,54:0.05293838)43:0.01074008,(55:0.04197521,56:0.05468849)72:0.0111133)71:0.0064134,(57:0.03693387,58:0.05007146)71:0.00956053)89:0.00669846)80:0.00629832)100:0.01666846,((59:0.01822489,60:0.02002899)100:0.01347712,(61:0.02880767,62:0.0194085)100:0.01311655)100:0.01255144)86:0.00629228)86:0.00684088)100:0.0267275,63:0.05505372);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Reroot Or Ladderize Trees';
+LINK TREES = 'Working Trees';
+NAME 'Reroot Or Ladderize Trees';
+OPTIONS
+	RootBy = 'MidPoint',
+	Ladderize = 'Up',
+	HasBranchSupportValues = 'false';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Trees';
+LINK ALGORITHM = 'Reroot Or Ladderize Trees';
+[Number of trees: 1]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'Caes_0741',
+	2 'Cpyr_1053',
+	3 'Cpyr_0021',
+	4 'Cang_1157',
+	5 'Cpol_1016',
+	6 'Cbor_1063',
+	7 'Cbor_1015',
+	8 'Ctat_1290',
+	9 'Ctat_1306',
+	10 'Cang_1023',
+	11 'Ctri_1288',
+	12 'Ctri_1287',
+	13 'Ctri_1370',
+	14 'Ctri_1371',
+	15 'Cdan_0654',
+	16 'Imega_1776',
+	17 'Cdan_1778',
+	18 'Cdan_1067',
+	19 'Cdan_1766',
+	20 'Cdan_1261',
+	21 'Coff_1073',
+	22 'Coff_1024',
+	23 'Coff_1364',
+	24 'Coff_1365',
+	25 'Cses_1286',
+	26 'Cses_1285',
+	27 'Coff_1357',
+	28 'Coff_1367',
+	29 'Coff_1366',
+	30 'Cgro_1038',
+	31 'Cgro_0474',
+	32 'Cgro_1764',
+	33 'Cisla_1765',
+	34 'Cisla_1233',
+	35 'Cscot_1009',
+	36 'Cscot_0963',
+	37 'Cmica_0979',
+	38 'Calp_0828',
+	39 'Cmica_0983',
+	40 'Coff_1012',
+	41 'Calp_1127',
+	42 'Calp_0165',
+	43 'Cbav_1207',
+	44 'Cbav_1208',
+	45 'Cmac_1022',
+	46 'Cexc_0297',
+	47 'Cexc_1253',
+	48 'Cpyr_0310',
+	49 'Cpyr_1537',
+	50 'Cpyr_0396',
+	51 'Cpyr_0456',
+	52 'Cpyr_1058',
+	53 'Cpyr_0106',
+	54 'Cpyr_0506',
+	55 'Cpyr_0560',
+	56 'Cpyr_0198',
+	57 'Cpyr_0252a',
+	58 'Cpyr_0260',
+	59 'Cpyr_0699',
+	60 'Cpyr_1442',
+	61 'Calp_0759',
+	62 'Cpyr_1552',
+	63 'Cpyr_1211',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] (((((((((((((((((((23:0.00079763,24:0.00108339)100:0.00108072,(25:0.00030284,26:0.00044027)100:0.00302436)100:0.02183107,27:0.0071793)100:0.01215982,(28:0.00006076,29:0.00008956)100:0.01613144)100:0.01079499,30:0.01859245)100:0.0085897,31:0.01805119)100:0.02032741,32:0.02353517)100:0.03073795,(33:0.05949275,34:0.03077007)100:0.02692087)100:0.03172642,22:0.01654222)100:0.01389444,(35:0.01770378,36:0.00952952)90:0.00893472)42:0.00692758,21:0.00998413)88:0.00658584,((((((((((46:0.05107842,47:0.02631106)100:0.01668097,45:0.04083079)94:0.00789081,((49:0.03380815,50:0.03213981)100:0.02287665,48:0.04313907)94:0.0096174)100:0.0116264,(51:0.04257802,52:0.03223799)100:0.01857279)100:0.00843832,(((53:0.05844225,54:0.05293838)43:0.01074008,(55:0.04197521,56:0.05468849)72:0.0111133)71:0.0064134,(57:0.03693387,58:0.05007146)71:0.00956053)89:0.00669846)80:0.00629832,(43:0.01802038,44:0.01575392)100:0.01200439)100:0.01666846,((59:0.01822489,60:0.02002899)100:0.01347712,(61:0.02880767,62:0.0194085)100:0.01311655)100:0.01255144)86:0.00629228,((2:0.05482415,3:0.03629949)100:0.01358644,(1:0.04896057,63:0.05505372):0.0267275)100:0.00684088)86:0.0050752,42:0.01568892)85:0.00735933,((((39:0.01765751,40:0.00573144)92:0.00406438,38:0.0149373)88:0.0049192,37:0.01545723)100:0.00619719,41:0.00959488)97:0.00691159)100:0.00745919)90:0.00641354,4:0.01487553)96:0.01081016,(((6:0.00141675,7:0.00209635)100:0.03779877,(8:0.00293179,9:0.00303448)100:0.00791413)100:0.00725983,5:0.01663048)100:0.02287275)100:0.00575513,10:0.00487015)93:0.01521777,(((13:0.00426814,14:0.00707267)100:0.00477447,12:0.00446529)100:0.00506051,11:0.00298199)100:0.06031182)100:0.01167145,15:0.00207921)100:0.03466442,(((19:0.00386959,20:0.0040618)100:0.00635483,18:0.01395358)100:0.00347191,17:0.01049801)100:0.04885734)100:0.33998485,16:0.51284147);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees-2';
+LINK TREES = 'Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreeView';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreeView';
+LINK ALGORITHM = 'Show Trees-2';
+NAME 'TreeView';
+INPUT 'TREES';
+OPTIONS
+	Tree = 1,
+	Diagram = 'RectangularPhylogram',
+	Averaging = 'ChildAverage',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 0.7513148,
+	VerticalZoomFactor = 0.7513148,
+	FontScaleFactor = 1,
+	ShowConfidence = 'false',
+	TreeLabels = 'None';
+END; [VIEW]

@@ -1,0 +1,64 @@
+TRAITS	Lineage
+Caes_0741	Central European diploids
+Cpyr_1053	Central European diploids
+Cpyr_0021	Central European diploids
+Cang_1157	Inland/coastal octoploids
+Cpol_1016	Inland hexaploids
+Cbor_1063	Inland/coastal octoploids
+Cbor_1015	Inland/coastal octoploids
+Ctat_1290	Inland hexaploids
+Ctat_1306	Inland hexaploids
+Cang_1023	Inland/coastal octoploids
+Ctri_1288	C. tridactylites
+Ctri_1287	C. tridactylites
+Ctri_1370	C. tridactylites
+Ctri_1371	C. tridactylites
+Cdan_0654	C. danica
+Imega_1776	Outgroup
+Cdan_1778	C. danica
+Cdan_1067	C. danica
+Cdan_1766	C. danica
+Cdan_1261	C. danica
+Coff_1073	European tetraploids
+Coff_1024	European tetraploids
+Coff_1364	Arctic diploids
+Coff_1365	Arctic diploids
+Cses_1286	Arctic diploids
+Cses_1285	Arctic diploids
+Coff_1357	Arctic diploids
+Coff_1367	Arctic diploids
+Coff_1366	Arctic diploids
+Cgro_1038	Arctic diploids
+Cgro_0474	Arctic diploids
+Cgro_1764	Arctic diploids
+Cisla_1765	Arctic diploids
+Cisla_1233	Arctic diploids
+Cscot_1009	European tetraploids
+Cscot_0963	European tetraploids
+Cmica_0979	European tetraploids
+Calp_0828	European tetraploids
+Cmica_0983	European tetraploids
+Coff_1012	European tetraploids
+Calp_1127	European tetraploids
+Calp_0165	European tetraploids
+Cbav_1207	Inland hexaploids
+Cbav_1208	Inland hexaploids
+Cmac_1022	Central European diploids
+Cexc_0297	Central European diploids
+Cexc_1253	Central European diploids
+Cpyr_0310	Central European diploids
+Cpyr_1537	Central European diploids
+Cpyr_0396	Central European diploids
+Cpyr_0456	Central European diploids
+Cpyr_1058	Central European diploids
+Cpyr_0106	Central European diploids
+Cpyr_0506	Central European diploids
+Cpyr_0560	Central European diploids
+Cpyr_0198	Central European diploids
+Cpyr_0252a	Central European diploids
+Cpyr_0260	Central European diploids
+Cpyr_0699	Central European diploids
+Cpyr_1442	Central European diploids
+Calp_0759	Central European diploids
+Cpyr_1552	Central European diploids
+Cpyr_1211	Central European diploids

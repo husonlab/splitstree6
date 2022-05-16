@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 import jloda.fx.util.ColorSchemeManager;
 
 public enum ColorScheme {
-	Nucleotide, CINEMA, ClustalX, Diamond11, MAEditor, PDNA, Zappo, Random, None;
+	Nucleotide, CINEMA, ClustalX, Diamond11, MAEditor, PDNA, Zappo, Binary, Random, None;
 
 	public Color apply(char ch) {
 		return apply(this, ch);
@@ -37,7 +37,6 @@ public enum ColorScheme {
 				case 'C' -> Color.web("0xffe2b3ff");
 				case 'G' -> Color.web("0xeba8a5ff");
 				case 'T', 'U' -> Color.web("0xa7c4eeff");
-				case '-' -> Color.LIGHTGRAY;
 				default -> Color.LIGHTGRAY;
 			};
 			case Diamond11 -> switch (ch) {
@@ -104,7 +103,16 @@ public enum ColorScheme {
 				case 'S', 'T' -> Color.web("0xFF4455");
 				default -> Color.LIGHTGRAY;
 			};
+			case Binary -> switch (ch) {
+				case '1' -> Color.web("0xbbf7adff");
+				case '0' -> Color.web("0xffe2b3ff");
+				default -> Color.LIGHTGRAY;
+			};
 			case Random -> {
+				if (ch == '0')
+					ch = 'X';
+				else if (ch == '1')
+					ch = 'Y';
 				var i = ch - 'A';
 				if (i >= 0 && i < 26) {
 					var colors = ColorSchemeManager.getInstance().getColorScheme("Twenty");

@@ -71,6 +71,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 	private final FindToolBar findToolBar;
 
 	private final ObjectProperty<TreePane> treePane = new SimpleObjectProperty<>(this, "treePane");
+	private final ObjectProperty<PhyloTree> treeProperty = new SimpleObjectProperty<PhyloTree>(this, "tree");
+
 	private final InvalidationListener updateListener;
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
@@ -81,7 +83,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		this.treeView = treeView;
 		this.controller = treeView.getController();
 
-		var treeProperty = new SimpleObjectProperty<PhyloTree>(this, "tree");
 		treeView.optionTreeProperty().addListener((v, o, n) -> {
 			var nTree = n.intValue();
 			if (nTree > 0 && nTree <= treeView.getTrees().size())
@@ -371,7 +372,15 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
-		mainController.getCopyNewickMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+
+
+		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
+			var tree = treeProperty.get();
+			if (tree != null)
+				BasicFX.putTextOnClipBoard(tree.toBracketString(true) + ";\n");
+		});
+		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(treeView.emptyProperty());
+
 
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
