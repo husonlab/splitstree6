@@ -103,9 +103,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-
 		updateCanvasListener = e -> Platform.runLater(() -> {
 			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
+
 			DrawAlignment.updateCanvas(controller.getCanvas(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionColorScheme(),
 					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
 

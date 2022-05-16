@@ -49,7 +49,6 @@ public class NexusImporter {
 				np.setCollectAllCommentsWithExclamationMark(true);
 				np.setEchoCommentsWithExclamationMark(true);
 				if (np.isAtBeginOfBlock("SplitsTree6") || np.isAtBeginOfBlock("SplitsTree5")) {
-
 					np.skipBlock();
 					comments.setIfCurrentValueIsNull(np.popComments());
 					{
@@ -83,8 +82,11 @@ public class NexusImporter {
 					}
 				}
 
-				while (!np.isAtBeginOfBlock(dataBlock.getBlockName()) && !(dataBlock instanceof CharactersBlock && np.isAtBeginOfBlock("data")))
+				while (!np.isAtBeginOfBlock(dataBlock.getBlockName()) && !(dataBlock instanceof CharactersBlock && np.isAtBeginOfBlock("data"))) {
 					np.skipBlock();
+					comments.setIfCurrentValueIsNull(np.popComments());
+				}
+				comments.setIfCurrentValueIsNull(np.popComments());
 
 				if (dataBlock instanceof DistancesBlock distancesBlock) {
 					var parser = new DistancesNexusInput();

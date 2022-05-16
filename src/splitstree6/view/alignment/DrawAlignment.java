@@ -38,6 +38,7 @@ import java.util.BitSet;
  * Daniel Huson, 4.2022
  */
 public class DrawAlignment {
+
 	/**
 	 * draw the alignment
 	 */
