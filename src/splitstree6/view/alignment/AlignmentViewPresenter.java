@@ -184,6 +184,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 							alignmentView.setOptionColorScheme(ColorScheme.Nucleotide);
 						}
 						colorSchemeSet = true;
+					} else if (inputCharacters.getDataType() == CharactersType.Standard) {
+						if (!colorSchemeSet || alignmentView.getOptionColorScheme() != ColorScheme.Nucleotide && alignmentView.getOptionColorScheme() != ColorScheme.Random && alignmentView.getOptionColorScheme() != ColorScheme.None) {
+							alignmentView.setOptionColorScheme(ColorScheme.Binary);
+						}
+						colorSchemeSet = true;
 					}
 				}
 			}
