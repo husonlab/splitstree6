@@ -40,7 +40,7 @@ import java.util.List;
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4}  
+	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4}
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.FastMethod);
 
@@ -85,6 +85,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.greedy=true;
 			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.PROJ_GRAD;
 			params.collapseMultiple = false;
+			int n = cycle.length - 1; //ntax
+			params.cgIterations = Math.min(Math.max(n,10),20);
 		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.CarefulMethod) {
 			params.greedy = false;
 			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.PROJ_GRAD;
