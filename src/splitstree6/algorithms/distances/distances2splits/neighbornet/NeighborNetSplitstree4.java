@@ -9,7 +9,7 @@ public class NeighborNetSplitstree4 {
 
     static public void activeSetST4(double[][] xArray, double[][] distances, ProgressListener progress) throws CanceledException {
 
-        int ntax = distances.length;
+        int ntax = distances.length-1;
         int npairs = (ntax * (ntax - 1)) / 2;
 
         //Copy distance array into a 1dim vector
@@ -23,7 +23,7 @@ public class NeighborNetSplitstree4 {
             all_positive =  (x[k] >= 0.0);
 
         if (all_positive) {
-            convertVec2Array(x,xArray);
+            convertLegacyVec2Array(x,xArray);
             return;
         }
 
@@ -42,7 +42,7 @@ public class NeighborNetSplitstree4 {
         /* Allocate and compute Atd */
         double[] Atd = new double[npairs];
 
-        calculateAtx(ntax, y, Atd);
+        calculateAtx(ntax, d, Atd);
 
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
@@ -94,6 +94,7 @@ public class NeighborNetSplitstree4 {
              */
             int min_i = -1;
             double min_grad = 1.0;
+            double max_abs_grad = 0.0;
             for (int i = 0; i < npairs; i++) {
                 r[i] -= Atd[i];
                 //r[i] *= 2.0;
@@ -104,6 +105,8 @@ public class NeighborNetSplitstree4 {
                         min_grad = grad_ij;
                     }
                 }
+                else
+                    max_abs_grad = Math.max(max_abs_grad,Math.abs(r[i]));
             }
 
             if ((min_i == -1) || (min_grad > -0.0001))
@@ -111,7 +114,10 @@ public class NeighborNetSplitstree4 {
             active[min_i] = false;
             progress.checkForCancel();
         }
-        convertVec2Array(x,xArray);
+
+
+
+        convertLegacyVec2Array(x,xArray);
 
     }
 
@@ -136,14 +142,16 @@ public class NeighborNetSplitstree4 {
      * @param xvec vector
      * @param x square array
      */
-    private static void convertVec2Array(double[] xvec, double[][] x) {
+    private static void convertLegacyVec2Array(double[] xvec, double[][] x) {
         int n=x.length-1;
         int index = 0;
-        for(int i=1;i<=n;i++) {
-            for(int j=i+1;j<=n;j++) {
-                x[i][j] = x[j][i] = xvec[index];
+        for(int i=1;i<n;i++) {
+            for(int j=i+1;j<n;j++) {
+                x[i+1][j+1] = x[j+1][i+1] = xvec[index];
                 index++;
             }
+            x[1][i+1]=x[i+1][1] = xvec[index];
+            index++;
         }
     }
 

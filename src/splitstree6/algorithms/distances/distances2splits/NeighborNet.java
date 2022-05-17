@@ -40,7 +40,7 @@ import java.util.List;
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {FastMethod,CarefulMethod,SplitsTree4Method}  //TODO: ActiveSet not working at present. Will be rewritten.
+	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4}  
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.FastMethod);
 
