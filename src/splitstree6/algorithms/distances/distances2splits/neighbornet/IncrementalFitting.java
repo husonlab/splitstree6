@@ -95,7 +95,7 @@ public class IncrementalFitting {
 
             boolean isFeasible = true;
             for(int j=1;isFeasible && j<k; j++)
-                isFeasible = (gamma1[j]<0 || gamma1[j]>b[j]);
+                isFeasible = (gamma1[j]>=0 && gamma1[j]<=b[j]);
 
             double[] gamma = new double[k];
             if (isFeasible)
@@ -103,6 +103,12 @@ public class IncrementalFitting {
             else {
                 gamma = goldenInsertion(gamma0,gamma1,b,r1,r2,z,tol);
             }
+
+
+            isFeasible = true;
+            for(int j=1;isFeasible && j<k; j++)
+                isFeasible = (gamma[j]>=0 && gamma[j]<=b[j]);
+
 
             //Update the circular distances and split weights
             double[] Mgamma = multiplyM(r1,r2,gamma);
@@ -287,8 +293,11 @@ public class IncrementalFitting {
             x = x1;
 
         double[] gamma = new double[m+1];
-        for (int i = 1; i <= m; i++)   //Project onto box
-            gamma[i] = min(max((1 - x) * gamma0[i] + x * gamma1[i], 0.0), b[i]);
+        for (int i = 1; i <= m; i++) { //Project onto box {
+            double g_i = (1 - x) * gamma0[i] + x * gamma1[i];
+            g_i = min(max(g_i, 0.0), b[i]);
+            gamma[i] = g_i;
+        }
 
         return gamma;
     }

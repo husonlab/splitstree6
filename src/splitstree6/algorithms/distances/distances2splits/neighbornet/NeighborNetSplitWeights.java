@@ -18,7 +18,7 @@ public class NeighborNetSplitWeights {
     public static class NNLSParams {
 
         public NNLSParams(int ntax) {
-            cgIterations = max(ntax,10);
+            cgIterations = min(max(ntax,10),25);
             outerIterations = max(ntax,10);
         }
 
@@ -147,11 +147,11 @@ public class NeighborNetSplitWeights {
             double[][] x0 = new double[n+1][n+1];
             copyArray(x,x0);
 
-            boolean cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations);
+            boolean cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations,f);
             if (params.collapseMultiple) {
                 filterMostNegative(x,activeSet,params.fractionNegativeToKeep);
                 maskElements(x,activeSet);
-                cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations);
+                cgConverged = cgnr(x,d,activeSet,params.tolerance,params.cgIterations,f);
             }
 
             if (minArray(x)<0) {
@@ -179,8 +179,13 @@ public class NeighborNetSplitWeights {
          * @param maxIterations  maximum number of iterations
          * @return boolean  true if the method converged (didn't hit max number of iterations)
          */
-        static private boolean cgnr(double[][] x, double[][] d, boolean[][] activeSet, double tol, int maxIterations) {
+        static private boolean cgnr(double[][] x, double[][] d, boolean[][] activeSet, double tol, int maxIterations, NNLSFunctionObject f) {
             int n = x.length-1;
+
+            double fx_orig = f.evalf(x,d);
+            double fxp = f.evalfprojected(x,d);
+           //System.err.println("\t\tEntering cgnr. fx = "+fx_orig+"\t"+fxp);
+
 
             double[][] p = new double[n+1][n+1];
             double[][] r = new double[n+1][n+1];
@@ -207,6 +212,10 @@ public class NeighborNetSplitWeights {
                         r[i][j] -= alpha * w[i][j];
                     }
                 }
+
+                double fx = f.evalf(x,d);
+                fxp = f.evalfprojected(x,d);
+                //System.err.println("\t\t\t"+fx+"\t"+fxp);
                 calcAtx(r,z);
                 maskElements(z,activeSet);
                 double ztz2 = sumArraySquared(z);
@@ -300,11 +309,21 @@ public class NeighborNetSplitWeights {
             public double evalfprojected(double t, double[][] x0, double[][] x, double[][] d) {
                 int n = x.length-1;
                 for(int i=1;i<=n;i++)
-                    for(int j=1;j<=n;j++) {
-                        xt[i][j] = max(x0[i][j]*(1-t) + x[i][j]*t,0.0);
+                    for(int j=i+1;j<=n;j++) {
+                        xt[i][j] = xt[j][i] = max(x0[i][j]*(1-t) + x[i][j]*t,0.0);
                     }
                 return evalf(xt,d);
             }
+
+            public double evalfprojected(double[][] x, double[][] d) {
+                int n = x.length-1;
+                for(int i=1;i<=n;i++)
+                    for(int j=1;j<=n;j++) {
+                        xt[i][j] = xt[j][i]=max(x[i][j],0.0);
+                    }
+                return evalf(xt,d);
+            }
+
         }
 
         /**
@@ -351,11 +370,12 @@ public class NeighborNetSplitWeights {
             }
             int n=x.length-1;
             for(int i=1;i<=n;i++) {
-                for(int j=1;j<=n;j++) {
+                for(int j=i+1;j<=n;j++) {
                     double newx_ij = max((1-tmin)*x0[i][j] + tmin*x[i][j],0);
-                    x[i][j] = newx_ij;
+                    x[i][j] = x[j][i] = newx_ij;
                 }
             }
+            double fmin = f.evalf(x,d);
         }
 
 
