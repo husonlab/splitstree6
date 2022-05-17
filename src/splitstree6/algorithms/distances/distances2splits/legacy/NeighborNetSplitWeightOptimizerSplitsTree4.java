@@ -90,11 +90,10 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
         }
 
         //private boolean constrained = true; //Constrain non-negative weights
-        private double cutoff = 0.0; //Threshold for split weights
-        private Regularization regularization = Regularization.NNLS;
-        private double lambdaFraction = 1.0; //L1 regularization parameter
-        private double[] lassoWeights = null;
-        private String var = null;
+        private final double cutoff; //Threshold for split weights
+        private final Regularization regularization;
+        private final double lambdaFraction = 1.0; //L1 regularization parameter
+        private final String var;
 
         public Options(String var, double cutoff) {
             this.var = var;
@@ -106,14 +105,6 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
             this.var = var;
             this.cutoff = cutoff;
             this.regularization = regularization;
-        }
-
-        public void setLambdaFraction(double lambdaFraction) {
-            this.lambdaFraction = lambdaFraction;
-        }
-
-        public void setLassoWeights(double[] lassoWeights) {
-            this.lassoWeights = lassoWeights.clone();
         }
     }
 
@@ -353,7 +344,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
         /* First evaluate the unconstrained optima. If this is feasible then we don't have to do anything more! */
         NeighborNetSplitWeightOptimizerSplitsTree4.runUnconstrainedLS(ntax, d, x);
         boolean all_positive = true;
-        for (int k = 0; k < npairs && all_positive; k++)
+        for (int k = 0; k < npairs; k++)
             if (x[k] < 0.0) {
                 all_positive = false;
                 break;

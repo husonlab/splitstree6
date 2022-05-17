@@ -51,12 +51,11 @@ public class NeighborNetSplitsTree4 extends Distances2Splits {
         progress.setTasks("Neighbor-Net", null);
         progress.setMaximum(-1);    //initialize maximum progress
 
-
         cycle = runNeighborNet(progress, dist);
 
         progress.setSubtask("edge weights");
 
-        NeighborNetSplitWeightOptimizerSplitsTree4.Options options = new NeighborNetSplitWeightOptimizerSplitsTree4.Options("Ordinary_Least_Squares", optionThreshold);
+        NeighborNetSplitWeightOptimizerSplitsTree4.Options options = new NeighborNetSplitWeightOptimizerSplitsTree4.Options("ols", optionThreshold);
         splits.getSplits().addAll(NeighborNetSplitWeightOptimizerSplitsTree4.computeWeightedSplits(cycle, dist, options));
 
         if (Compatibility.isCompatible(splits.getSplits()))
@@ -65,29 +64,6 @@ public class NeighborNetSplitsTree4 extends Distances2Splits {
             splits.setCompatibility(Compatibility.cyclic);
 
         splits.setFit(SplitsUtilities.computeLeastSquaresFit(dist, splits.getSplits()));
-    }
-
-    /**
-     * A scaled down version of NeighborNet that only returns the cycle, and does not
-     * access the document or progress bar.
-     *
-     * @param dist Distance matrix
-     */
-    static public int[] computeNeighborNetOrdering(DistancesBlock dist) {
-        int ntax = dist.getNtax();
-        int[] ordering;
-        if (ntax < 4) {
-            ordering = new int[ntax + 1];
-            for (int i = 1; i <= ntax; i++)
-                ordering[i] = i;
-        } else {
-            try {
-                ordering = runNeighborNet(null, dist);
-            } catch (CanceledException e) {
-                ordering = null;
-            }
-        }
-        return ordering;
     }
 
     /**
