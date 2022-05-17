@@ -77,7 +77,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		final var start = System.currentTimeMillis();
 
-
 		NeighborNetSplitWeights.NNLSParams params = new NeighborNetSplitWeights.NNLSParams(taxaBlock.getNtax());
 
 		params.tolerance =1e-6;
@@ -103,14 +102,9 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.useInsertionAlgorithm = false;
 		}
 
-			splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
+		splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
 
 		progress.setTasks("NNet", "post-analysis");
-
-
-		// add all missing trivial
-		//TODO: Daniel, should we just return all of these from NeighborNetSplitWeights.compute?
-		splits.addAll(SplitsUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax()));
 
 		if (Compatibility.isCompatible(splits))
 			splitsBlock.setCompatibility(Compatibility.compatible);
@@ -124,7 +118,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		if (!(progress instanceof ProgressSilent)) {
 			var seconds = (System.currentTimeMillis() - start) / 1000.0;
 			if (seconds > 10)
-				System.err.printf("Time: %,.1fs%n", seconds);
+				System.err.printf("NNet time: %,.1fs%n", seconds);
 		}
 	}
 
@@ -144,7 +138,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		}
 		return total / (dist.getNtax()*(dist.getNtax()-1)/2.0);
 	}
-
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, DistancesBlock parent) {

@@ -125,7 +125,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 		if (np.peekMatchIgnoreCase("FORMAT")) {
 			final var formatTokens = np.getTokensLowerCase("FORMAT", ";");
 			{
-				final String dataType = np.findIgnoreCase(formatTokens, "dataType=", StringUtils.toString(CharactersType.values(), " ") + " nucleotide", CharactersType.Unknown.toString());
+				final var dataType = np.findIgnoreCase(formatTokens, "dataType=", StringUtils.toString(CharactersType.values(), " ") + " nucleotide", CharactersType.Unknown.toString());
 				charactersBlock.setDataType(dataType.equalsIgnoreCase("nucleotide") ? CharactersType.DNA : CharactersType.valueOfIgnoreCase(dataType));
 			}
 
