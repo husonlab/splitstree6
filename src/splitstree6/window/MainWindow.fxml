@@ -327,6 +327,7 @@
                         <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."/>
                         <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees..."/>
                         <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits..."/>
+                        <MenuItem fx:id="splitsSliderMenuItem" text="Splits Slider..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="traitsMenuItem" text="Edit Traits..."/>
                     </Menu>

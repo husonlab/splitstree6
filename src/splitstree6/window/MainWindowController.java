@@ -221,6 +221,9 @@ public class MainWindowController {
 	private MenuItem filterSplitsMenuItem;
 
 	@FXML
+	private MenuItem splitsSliderMenuItem;
+
+	@FXML
 	private MenuItem traitsMenuItem;
 
 	@FXML
@@ -715,6 +718,10 @@ public class MainWindowController {
 
 	public MenuItem getFilterSplitsMenuItem() {
 		return filterSplitsMenuItem;
+	}
+
+	public MenuItem getSplitsSliderMenuItem() {
+		return splitsSliderMenuItem;
 	}
 
 	public MenuItem getTraitsMenuItem() {
