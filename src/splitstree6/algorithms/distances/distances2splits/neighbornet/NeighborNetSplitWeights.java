@@ -54,10 +54,10 @@ public class NeighborNetSplitWeights {
             return new ArrayList<>();
         }
         if (n == 2) {
-            final ArrayList<ASplit> splits = new ArrayList<>();
-            float d_ij = (float) distances[cycle[1] - 1][cycle[2] - 1];
+            final var splits = new ArrayList<ASplit>();
+            var d_ij = (float) distances[cycle[1] - 1][cycle[2] - 1];
             if (d_ij > 0.0) {
-                final BitSet A = new BitSet();
+                final var A = new BitSet();
                 A.set(cycle[1]);
                 splits.add(new ASplit(A, 2, d_ij));
             }
@@ -65,15 +65,15 @@ public class NeighborNetSplitWeights {
         }
 
         //Set up square array of distances
-        double[][] d = new double[n+1][n+1];
-        for(int i=1;i<=n;i++)
-            for (int j=i+1;j<=n;j++)
-                d[i][j] = d[j][i] = distances[cycle[i]-1][cycle[j]-1];
+        var d = new double[n + 1][n + 1];
+        for (var i = 1; i <= n; i++)
+            for (var j = i + 1; j <= n; j++)
+                d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1];
 
-        double[][] x = new double[n+1][n+1];
+        var x = new double[n + 1][n + 1];
 
         if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-            activeSetST4(x,d,progress);  //ST4 Algorithm
+            activeSetST4(x, d, progress);  //ST4 Algorithm
         } else {
             x = calcAinvx(d); //Check if unconstrained solution is feasible.
             if (minArray(x) >= -params.tolerance)
@@ -84,21 +84,20 @@ public class NeighborNetSplitWeights {
             }
         }
 
-        final ArrayList<ASplit> splitList = new ArrayList<>();
+        final var splitList = new ArrayList<ASplit>();
 
-        double cutoff = params.tolerance/10;
-        for (int i = 1; i <= n; i++) {
-            final BitSet A = new BitSet();
-            for (int j = i + 1; j <= n; j++) {
+        var cutoff = params.tolerance / 10;
+        for (var i = 1; i <= n; i++) {
+            final var A = new BitSet();
+            for (var j = i + 1; j <= n; j++) {
                 A.set(cycle[j - 1]);
-                if (x[i][j] > cutoff)
-                    splitList.add(new ASplit(A, n, (float) (x[i][j])));
-
+                if (x[i][j] > cutoff || A.cardinality() == 1 || A.cardinality() == n - 1) { // positive weight or trivial split
+                    splitList.add(new ASplit(A, n, Math.max(0, (float) (x[i][j]))));
+                }
             }
         }
         return splitList;
     }
-
 
         static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 

@@ -21,6 +21,7 @@ package splitstree6.io.readers.distances;
 
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
+import splitstree6.data.DistancesFormat;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.readers.NexusImporter;
 
@@ -33,8 +34,11 @@ public class NexusReader extends DistancesReader {
 	}
 
 	@Override
-	public void read(ProgressListener progress, String fileName, TaxaBlock taxaBlock, DistancesBlock dataBlock) throws IOException {
-		NexusImporter.parse(fileName, taxaBlock, dataBlock);
+	public void read(ProgressListener progress, String fileName, TaxaBlock taxaBlock, DistancesBlock distances) throws IOException {
+		NexusImporter.parse(fileName, taxaBlock, distances);
+		if (distances.getFormat().getOptionTriangle() == DistancesFormat.Triangle.Both) {
+			ensureSymmetric(taxaBlock, distances);
+		}
 	}
 
 	@Override

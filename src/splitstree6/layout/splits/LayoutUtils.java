@@ -73,6 +73,7 @@ public class LayoutUtils {
 			mouseX = e.getSceneX();
 			mouseY = e.getSceneY();
 			select.run();
+			e.consume();
 		});
 
 		node.setOnMouseDragged(e -> {
@@ -80,6 +81,7 @@ public class LayoutUtils {
 			node.setLayoutY(node.getLayoutY() + (e.getSceneY() - mouseY));
 			mouseX = e.getSceneX();
 			mouseY = e.getSceneY();
+			e.consume();
 		});
 	}
 }

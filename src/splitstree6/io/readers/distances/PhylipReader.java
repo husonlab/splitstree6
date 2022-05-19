@@ -38,7 +38,7 @@ import java.util.StringTokenizer;
  */
 public class PhylipReader extends DistancesReader {
 	public PhylipReader() {
-		setFileExtensions("dist", "dst");
+		setFileExtensions("dist", "dst", "matrix", "mat", "phylip", "phy");
 	}
 
 	public enum Triangle {Both, Lower, Upper}
@@ -49,9 +49,9 @@ public class PhylipReader extends DistancesReader {
 		int row = 0;
 		int numberOfTaxa = 0;
 
-		try (FileLineIterator it = new FileLineIterator(inputFile)) {
+		try (var it = new FileLineIterator(inputFile)) {
 			while (it.hasNext()) {
-				final String line = it.next().trim();
+				final var line = it.next().trim();
 
 				if (line.startsWith("#") || line.length() == 0)
 					continue;
@@ -59,7 +59,7 @@ public class PhylipReader extends DistancesReader {
 					numberOfTaxa = Integer.parseInt(line);
 					distances.setNtax(numberOfTaxa);
 				} else {
-					final String[] tokens = line.split("\\s+");
+					final var tokens = line.split("\\s+");
 					if (row == 1) {
 						if (tokens.length == 1)
 							triangle = Triangle.Lower;
@@ -105,6 +105,9 @@ public class PhylipReader extends DistancesReader {
 				}
 				row++;
 			}
+		}
+		if (triangle == Triangle.Both) {
+			ensureSymmetric(taxa, distances);
 		}
 	}
 

@@ -19,11 +19,34 @@
 
 package splitstree6.io.readers.distances;
 
+import jloda.fx.window.NotificationManager;
 import splitstree6.data.DistancesBlock;
+import splitstree6.data.DistancesFormat;
+import splitstree6.data.TaxaBlock;
 import splitstree6.io.utils.DataReaderBase;
 
 public abstract class DistancesReader extends DataReaderBase<DistancesBlock> {
 	public DistancesReader() {
 		super(DistancesBlock.class);
+	}
+
+	public static void ensureSymmetric(TaxaBlock taxa, DistancesBlock distances) {
+		if (distances.getFormat().getOptionTriangle() == DistancesFormat.Triangle.Both) {
+			var changed = false;
+			for (var s = 1; s <= taxa.getNtax(); s++) {
+				for (var t = s + 1; t <= taxa.getNtax(); t++) {
+					if (distances.get(s, t) != distances.get(t, s)) {
+						var mean = 0.5 * (distances.get(s, t) + distances.get(t, s));
+						distances.set(s, t, mean);
+						distances.set(t, s, mean);
+						changed = true;
+					}
+				}
+			}
+			if (changed)
+				NotificationManager.showWarning("Distance matrix not symmetric, using mean values");
+		}
+
+
 	}
 }
