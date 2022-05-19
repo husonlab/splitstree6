@@ -562,7 +562,6 @@ public class EmbeddingOptimizer {
 	//working
 	public static int[] computerCircularOrderingHardwiredMatrix(PhyloTree[] trees, Map<String, Integer> taxon2ID, Map<Integer, String> id2Taxon) {
 		if (taxon2ID.size() > 2) {
-
 			double[][] distMat = null;
 
 			var taxaTrees = new Taxa[2];
@@ -654,7 +653,6 @@ public class EmbeddingOptimizer {
 			var ordering = NeighborNetCycle.compute(ntax, distMat);
 			if (trees.length == 2) {
 				// we restrict the ordering to the common taxa. If solution zero exist, we will find it
-
 				if (taxaNotInTrees[0] != null && taxaNotInTrees[1] != null) {
 					var takeAway = taxaNotInTrees[0].size() + taxaNotInTrees[1].size();
 					var newOrdering = new int[ordering.length - takeAway];
@@ -662,8 +660,7 @@ public class EmbeddingOptimizer {
 					int index = 0;
 					for (int i : ordering) {
 						if (i > 0 && !taxaNotInTrees[0].contains(id2Taxon.get(i)) && !taxaNotInTrees[1].contains(id2Taxon.get(i))) {
-							newOrdering[index] = i;
-							index++;
+							newOrdering[++index] = i;
 						}
 					}
 					return newOrdering;
