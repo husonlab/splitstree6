@@ -34,11 +34,13 @@ public class NetworkBlock extends DataBlock {
 	public static final String NODE_STATES_KEY = "states";
 	public static final String EDGE_SITES_KEY = "sites";
 
-	public enum Type {HaplotypeNetwork, Other}
+	public enum Type {HaplotypeNetwork, Points, Other}
 
 	private final PhyloGraph graph;
 	private final NodeArray<NodeData> node2data;
 	private final EdgeArray<EdgeData> edge2data;
+
+	private String infoString = "";
 
 	private Type networkType;
 
@@ -54,20 +56,22 @@ public class NetworkBlock extends DataBlock {
 		node2data.clear();
 		edge2data.clear();
 		networkType = Type.Other;
+		infoString = "";
 	}
 
-	public void copy(NetworkBlock sourceBlock) {
+	public void copy(NetworkBlock that) {
 		clear();
-		NodeArray<Node> oldNode2new = sourceBlock.getGraph().newNodeArray();
-		EdgeArray<Edge> oldEdge2new = sourceBlock.getGraph().newEdgeArray();
-		graph.copy(sourceBlock.getGraph(), oldNode2new, oldEdge2new);
-		this.networkType = sourceBlock.getNetworkType();
+		NodeArray<Node> oldNode2new = that.getGraph().newNodeArray();
+		EdgeArray<Edge> oldEdge2new = that.getGraph().newEdgeArray();
+		graph.copy(that.getGraph(), oldNode2new, oldEdge2new);
+		this.networkType = that.getNetworkType();
 		for (var v : oldNode2new.keys()) {
-			getNodeData(oldNode2new.get(v)).putAll((sourceBlock.getNodeData(v)));
+			getNodeData(oldNode2new.get(v)).putAll((that.getNodeData(v)));
 		}
 		for (var e : oldEdge2new.keys()) {
-			getEdgeData(oldEdge2new.get(e)).putAll((sourceBlock.getEdgeData(e)));
+			getEdgeData(oldEdge2new.get(e)).putAll((that.getEdgeData(e)));
 		}
+		this.infoString = that.infoString;
 	}
 
 	public PhyloGraph getGraph() {
@@ -150,5 +154,13 @@ public class NetworkBlock extends DataBlock {
 	@Override
 	public String getBlockName() {
 		return BLOCK_NAME;
+	}
+
+	public String getInfoString() {
+		return infoString;
+	}
+
+	public void setInfoString(String infoString) {
+		this.infoString = infoString;
 	}
 }

@@ -21,7 +21,6 @@ package splitstree6.io.nexus;
 
 import jloda.graph.Edge;
 import jloda.graph.Node;
-import jloda.phylo.PhyloGraph;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
@@ -41,10 +40,11 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			    [TITLE {title};]
 				[LINK {type} = {title};]
 				[DIMENSIONS [NNODES=number-of-nodes] [NEDGES=number-of-edges];]
-					[NETWORK={HaplotypeNetwork|Other};]
+					[NETWORK={HaplotypeNetwork|Points|Other};]
 				[FORMAT
 				;]
 				[PROPERTIES
+					[info =' information string to be shown with plot']
 				;]
 				NODES
 					ID=number [LABEL=label] [x=number] [y=number] [key=value ...],
@@ -71,7 +71,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 	public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, NetworkBlock networkBlock) throws IOException {
 		networkBlock.clear();
 
-		final ArrayList<String> taxonNamesFound = new ArrayList<>();
+		final var taxonNamesFound = new ArrayList<String>();
 
 		np.matchBeginBlock("NETWORK");
 		parseTitleAndLink(np);
@@ -103,8 +103,8 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 
 		if (np.peekMatchIgnoreCase("TYPE")) {
 			np.matchIgnoreCase("TYPE=");
-			String typeString = np.getWordRespectCase().toUpperCase();
-			NetworkBlock.Type type = StringUtils.valueOfIgnoreCase(NetworkBlock.Type.class, typeString);
+			var typeString = np.getWordRespectCase().toUpperCase();
+			var type = StringUtils.valueOfIgnoreCase(NetworkBlock.Type.class, typeString);
 			if (type == null)
 				throw new IOExceptionWithLineNumber("Unknown network type: " + typeString, np.lineno());
 			networkBlock.setNetworkType(type);
@@ -118,28 +118,32 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 
 		if (np.peekMatchIgnoreCase("PROPERTIES")) {
 			np.matchIgnoreCase("PROPERTIES");
+			if (np.peekMatchIgnoreCase("info")) {
+				np.matchIgnoreCase("info=");
+				networkBlock.setInfoString(np.getWordRespectCase());
+			}
 			np.matchIgnoreCase(":");
 		}
 
-		final PhyloGraph graph = networkBlock.getGraph();
+		final var graph = networkBlock.getGraph();
 
-		final Map<Integer, Node> id2node = new TreeMap<>();
+		final var id2node = new TreeMap<Integer, Node>();
 
 		np.matchIgnoreCase("NODES");
 		{
-			boolean first = true;
-			for (int i = 0; i < nNodes; i++) {
+			var first = true;
+			for (var i = 0; i < nNodes; i++) {
 				if (first)
 					first = false;
 				else
 					np.matchIgnoreCase(",");
 
 				np.matchIgnoreCase("id=");
-				final int id = np.getInt();
+				var id = np.getInt();
 				if (id2node.containsKey(id))
 					throw new IOExceptionWithLineNumber("Multiple occurrence of node id: " + id, np.lineno());
 
-				final Node v = graph.newNode();
+				var v = graph.newNode();
 				id2node.put(id, v);
 
 				if (np.peekMatchIgnoreCase("label")) {
@@ -159,36 +163,36 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		}
 		np.matchIgnoreCase(";");
 
-		final Map<Integer, Edge> id2edge = new TreeMap<>();
+		final var id2edge = new TreeMap<Integer, Edge>();
 
 		np.matchIgnoreCase("EDGES");
 		{
-			boolean first = true;
-			for (int i = 0; i < nEdges; i++) {
+			var first = true;
+			for (var i = 0; i < nEdges; i++) {
 				if (first)
 					first = false;
 				else
 					np.matchIgnoreCase(",");
 
 				np.matchIgnoreCase("id=");
-				final int id = np.getInt();
+				var id = np.getInt();
 				if (id2edge.containsKey(id))
 					throw new IOExceptionWithLineNumber("Multiple occurrence of edge id: " + id, np.lineno());
 
 				np.matchIgnoreCase("sid=");
-				final int sid = np.getInt();
+				var sid = np.getInt();
 				if (!id2node.containsKey(sid))
 					throw new IOExceptionWithLineNumber("Unknown node id: " + sid, np.lineno());
 
 				np.matchIgnoreCase("tid=");
-				final int tid = np.getInt();
+				var tid = np.getInt();
 				if (!id2node.containsKey(tid))
 					throw new IOExceptionWithLineNumber("Unknown node id: " + tid, np.lineno());
 
-				final Node source = id2node.get(sid);
-				final Node target = id2node.get(tid);
+				final var source = id2node.get(sid);
+				final var target = id2node.get(tid);
 
-				final Edge e = graph.newEdge(source, target);
+				final var e = graph.newEdge(source, target);
 				id2edge.put(id, e);
 
 				if (np.peekMatchIgnoreCase("label")) {
@@ -247,7 +251,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 		var nodeId2Node = new HashMap<Integer, Node>();
 		{
 			np.matchIgnoreCase("vertices");
-			for (int i = 1; i <= nVertices; i++) {
+			for (var i = 1; i <= nVertices; i++) {
 				var v = graph.newNode();
 
 				var id = np.getInt();

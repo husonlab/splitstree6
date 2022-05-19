@@ -381,13 +381,8 @@
                         <MenuItem fx:id="splitsNetworkViewMenuItem" text="Splits Network View"/>
                         <MenuItem fx:id="haplotypeNetworkViewMenuItem" text="Haplotype Network View"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                    </Menu>
-                    <Menu text="PCoA">
                         <MenuItem fx:id="pcoaMenuItem" text="PCoA"/>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="brayCurtisMenuItem" text="Bray Curtis"/>
-                        <MenuItem fx:id="jsdMenuItem" text="JSD"/>
-                        <MenuItem fx:id="euclideanMenuItem" text="Euclidean"/>
+                        <MenuItem fx:id="tsneMenuItem" text="tSNE"/>
                     </Menu>
                     <Menu text="Analysis">
                         <MenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."/>

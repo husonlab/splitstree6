@@ -55,6 +55,8 @@ import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
+import splitstree6.algorithms.distances.distances2network.PCoA;
+import splitstree6.algorithms.distances.distances2network.TSne;
 import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
@@ -506,9 +508,11 @@ public class MainWindowPresenter {
 
 		controller.getHaplotypeNetworkViewMenuItem().setOnAction(null);
 
-		controller.getPcoaMenuItem().setOnAction(null);
-		controller.getBrayCurtisMenuItem().setOnAction(null);
-		controller.getJsdMenuItem().setOnAction(null);
+		controller.getPcoaMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PCoA()));
+		controller.getPcoaMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PCoA()));
+
+		controller.getTsneMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TSne()));
+		controller.getTsneMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TSne()));
 
 		controller.getBootStrapTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTree()));
 		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));

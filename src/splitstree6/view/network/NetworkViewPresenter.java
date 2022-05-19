@@ -103,6 +103,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			}
 			 */
 			updateCounter.set(updateCounter.get() + 1);
+			controller.getInfoLabel().setText(networkBlock.get().getInfoString());
 		});
 
 		controller.getScrollPane().setContent(networkPane);

@@ -75,7 +75,16 @@ public class NetworkLayout {
 				edgeWeightFunction = e -> 1.0;
 			}
 
-			FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, (v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY())));
+			if (networkBlock.getNetworkType().equals(NetworkBlock.Type.Points)) {
+				for (int t = 1; t <= taxaBlock.getNtax(); t++) {
+					var v = networkBlock.getGraph().getTaxon2Node(t);
+					var x = Double.parseDouble(networkBlock.getNodeData(v).get(NetworkBlock.NodeData.BasicKey.x.name()));
+					var y = Double.parseDouble(networkBlock.getNodeData(v).get(NetworkBlock.NodeData.BasicKey.y.name()));
+					nodePointMap.put(v, new Point2D(x, y));
+				}
+			} else {
+				FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, (v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY())));
+			}
 
 			var dimensions = computeFontHeightGraphWidthHeight(taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), graph, true, width, height);
 			var fontHeight = dimensions.fontHeight();

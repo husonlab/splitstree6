@@ -333,6 +333,9 @@ public class MainWindowController {
 	private MenuItem euclideanMenuItem;
 
 	@FXML
+	private MenuItem tsneMenuItem;
+
+	@FXML
 	private MenuItem bootStrapTreeMenuItem;
 
 	@FXML
@@ -862,6 +865,10 @@ public class MainWindowController {
 
 	public MenuItem getEuclideanMenuItem() {
 		return euclideanMenuItem;
+	}
+
+	public MenuItem getTsneMenuItem() {
+		return tsneMenuItem;
 	}
 
 	public MenuItem getBootStrapTreeMenuItem() {

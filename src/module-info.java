@@ -10,8 +10,9 @@ module splitstreesix {
     requires org.apache.commons.collections4;
 	requires commons.math3;
     requires com.install4j.runtime;
+	requires tsne;
 
-    opens splitstree6.resources.css;
+	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
     opens splitstree6.resources.images;
 

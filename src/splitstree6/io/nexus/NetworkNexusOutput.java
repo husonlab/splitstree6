@@ -22,6 +22,7 @@ package splitstree6.io.nexus;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
+import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 
@@ -49,6 +50,9 @@ public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<Netw
 		// format?
 
 		// properties?
+		if (networkBlock.getInfoString() != null && !networkBlock.getInfoString().isBlank()) {
+			w.write("\tPROPERTIES info ='" + StringUtils.fold(networkBlock.getInfoString().trim(), 256) + "';\n");
+		}
 
 		{
 			w.write("NODES\n");

@@ -111,6 +111,7 @@ public class SplitsViewController {
 		innerAnchorPane.getChildren().add(scaleBar);
 		AnchorPane.setTopAnchor(scaleBar, 2.0);
 		AnchorPane.setLeftAnchor(scaleBar, 5.0);
+
 		AnchorPane.setTopAnchor(fitLabel, 5.0);
 		AnchorPane.setLeftAnchor(fitLabel, 180.0);
 		innerAnchorPane.getChildren().add(fitLabel);
