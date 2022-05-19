@@ -128,22 +128,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		}
 	}
 
-	/**
-	 * Compute the average distance in the distances block, used to pick an appropriately scaled tolerance level.
-	 * @param dist  distances block
-	 * @return  average distance between taxa
-	 */
-	private double averageDistance(DistancesBlock dist) {
-		double total = 0.0;
-		for(int i=1;i<=dist.getNtax();i++) {
-			double rowSum = 0.0;
-
-			for (int j = 1; j < i; j++)
-				rowSum += dist.get(i, j);
-			total += rowSum;
-		}
-		return total / (dist.getNtax()*(dist.getNtax()-1)/2.0);
-	}
 
 
 	@Override

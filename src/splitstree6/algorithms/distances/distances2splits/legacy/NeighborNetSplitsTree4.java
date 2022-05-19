@@ -34,19 +34,19 @@ import java.util.Stack;
 /**
  * Implements Neighbor Net method of Bryant and Moulton (2004).
  */
-public class NeighborNetSplitsTree4 extends Distances2Splits {
+public class NeighborNetSplitsTree4 /* extends Distances2Splits*/ {
     private final double optionThreshold = 0.000001; // min weight of split that we consider
     private int[] cycle = null; // the computed cycle
     public final static String DESCRIPTION = "Computes the Neighbor-Net network (Bryant and Moulton 2004)";
 
-    @Override
+    //@Override
     public String getCitation() {
         return "Bryant & Moulton 2004; " +
                "D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. " +
                "Molecular Biology and Evolution, 21(2):255– 265, 2004.";
     }
 
-    @Override
+    //@Override
     public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock dist, SplitsBlock splits) throws IOException {
         progress.setTasks("Neighbor-Net", null);
         progress.setMaximum(-1);    //initialize maximum progress
@@ -56,7 +56,7 @@ public class NeighborNetSplitsTree4 extends Distances2Splits {
 
         progress.setSubtask("edge weights");
 
-        NeighborNetSplitWeightOptimizerSplitsTree4.Options options = new NeighborNetSplitWeightOptimizerSplitsTree4.Options("Ordinary_Least_Squares", optionThreshold);
+        NeighborNetSplitWeightOptimizerSplitsTree4.Options options = new NeighborNetSplitWeightOptimizerSplitsTree4.Options("ols", optionThreshold);
         splits.getSplits().addAll(NeighborNetSplitWeightOptimizerSplitsTree4.computeWeightedSplits(cycle, dist, options));
 
         if (Compatibility.isCompatible(splits.getSplits()))

@@ -402,7 +402,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
         while (true) {
             while (true) /* Inner loop: find the next feasible optimum */ {
                 if (!first_pass)  /* The first time through we use the unconstrained branch lengths */
-                    NeighborNetSplitWeightOptimizerSplitsTree4.circularConjugateGrads(ntax, npairs, r, w, p, y, W, AtWd, active, x);
+                         NeighborNetSplitWeightOptimizerSplitsTree4.circularConjugateGrads(ntax, npairs, r, w, p, y, W, AtWd, active, x);
                 first_pass = false;
 
                 if (collapse_many_negs) { /* Typically, a large number of edges are negative, so on the first
@@ -653,7 +653,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
         double rho = norm(r);
         double rho_old = 0;
 
-        double e_0 = CG_EPSILON * Math.sqrt(norm(b)); e_0 = 1e-7;
+        double e_0 = CG_EPSILON * Math.sqrt(norm(b)); //e_0 = 1e-7;
         int k = 0;
 
         while ((rho > e_0 * e_0) && (k < kmax)) {
