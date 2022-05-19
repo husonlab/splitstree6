@@ -65,6 +65,8 @@ public class TreePane extends StackPane {
 
 	private final StringProperty infoString = new SimpleStringProperty("");
 
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
+
 	private final AService<ComputeTreeLayout.Result> service;
 
 	private ComputeTreeLayout.Result result;
@@ -106,9 +108,9 @@ public class TreePane extends StackPane {
 		orientation.addListener((v, o, n) -> {
 			if (diagram == TreeDiagramType.RadialPhylogram) {
 				var shapes = BasicFX.getAllRecursively(pane, a -> "graph-node".equals(a.getId()));
-				splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, o, n, orientationConsumer);
+				splitstree6.layout.LayoutUtils.applyOrientation(shapes, o, n, orientationConsumer, changingOrientation);
 			} else
-				LayoutUtils.applyOrientation(pane, n, o, false);
+				LayoutUtils.applyOrientation(pane, n, o, false, changingOrientation);
 		});
 
 		service.setCallable(() -> {
@@ -152,7 +154,7 @@ public class TreePane extends StackPane {
 			Platform.runLater(() -> {
 				if (diagram == TreeDiagramType.RadialPhylogram && orientation.get() != LayoutOrientation.Rotate0Deg) {
 					var shapes = BasicFX.getAllRecursively(pane, Group.class);
-					splitstree6.layout.splits.LayoutUtils.applyOrientation(shapes, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer);
+					splitstree6.layout.LayoutUtils.applyOrientation(shapes, LayoutOrientation.Rotate0Deg, orientation.get(), orientationConsumer, changingOrientation);
 				} else {
 					LayoutUtils.applyOrientation(orientation.get(), pane, false);
 					updateLabelLayout(orientation.get());
@@ -222,6 +224,14 @@ public class TreePane extends StackPane {
 
 	public StringProperty infoStringProperty() {
 		return infoString;
+	}
+
+	public boolean isChangingOrientation() {
+		return changingOrientation.get();
+	}
+
+	public BooleanProperty changingOrientationProperty() {
+		return changingOrientation;
 	}
 
 	public void updateLabelLayout(LayoutOrientation orientation) {

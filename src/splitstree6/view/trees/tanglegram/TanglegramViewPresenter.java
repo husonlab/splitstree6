@@ -66,6 +66,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 	private final ObjectProperty<PhyloTree> tree1 = new SimpleObjectProperty<>(this, "tree1");
 	private final ObjectProperty<PhyloTree> tree2 = new SimpleObjectProperty<>(this, "tree2");
 
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
+
 	private final FindToolBar findToolBar;
 
 	private final ObjectProperty<Dimension2D> treePaneDimensions = new SimpleObjectProperty<>(new Dimension2D(0, 0));
@@ -85,6 +87,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
 				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty(),
 				tanglegramView.optionShowInternalLabelsProperty(), nodeShapeMap1);
+
 
 		controller.getLeftPane().getChildren().add(tree1Pane);
 
@@ -112,6 +115,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		final ObservableList<String> treeNames = FXCollections.observableArrayList();
 		trees.addListener((InvalidationListener) e -> treeNames.setAll(trees.stream().map(Graph::getName).collect(Collectors.toList())));
 
+		changingOrientation.bind(tree1Pane.changingOrientationProperty().or(tree2Pane.changingOrientationProperty()));
 
 		{
 			controller.getTree1CBox().setItems(treeNames);
@@ -225,9 +229,11 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().getItems().addAll(Rotate0Deg, FlipRotate180Deg);
 		controller.getOrientationCBox().setValue(tanglegramView.getOptionOrientation());
 		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> tanglegramView.optionOrientationProperty().set(n));
-		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> controller.getOrientationCBox().setValue(n));
+		controller.getOrientationCBox().disableProperty().bind(tanglegramView.emptyProperty().or(changingOrientation));
 
-		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> LayoutUtils.applyOrientation(controller.getMiddlePane().getChildren().get(0), n, o, false));
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> controller.getOrientationCBox().setValue(n));
+		tanglegramView.optionOrientationProperty().addListener((v, o, n) ->
+				LayoutUtils.applyOrientation(controller.getMiddlePane().getChildren().get(0), n, o, false, new SimpleBooleanProperty(false)));
 
 		{
 			var labelProperty = new SimpleStringProperty();
@@ -407,6 +413,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			else
 				tanglegramView.setOptionOrientation(Rotate0Deg);
 		});
-		mainController.getFlipMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
+		mainController.getFlipMenuItem().disableProperty().bind(tanglegramView.emptyProperty().or(changingOrientation));
 	}
 }

@@ -21,10 +21,7 @@ package splitstree6.view.trees.treepages;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
@@ -63,6 +60,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	private final ObjectProperty<Dimension2D> boxDimensions = new SimpleObjectProperty<>(this, "boxDimensions", new Dimension2D(0, 0));
 
 	private final ObjectProperty<TreePageFactory> treePageFactory = new SimpleObjectProperty<>(this, "treePageFactory", null);
+
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
 	private final FindToolBar findToolBar;
 
@@ -178,6 +177,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> treePagesView.setPageNumber(n.intValue() + 1));
 
 		treePageFactory.set(new TreePageFactory(mainWindow, treePagesView, phyloTrees, treePagesView.optionRowsProperty(), treePagesView.optionColsProperty(), boxDimensions));
+		changingOrientation.bind(treePageFactory.get().changingOrientationBinding());
+		controller.getOrientationCBox().disableProperty().bind(treePageView.emptyProperty().or(changingOrientation));
 
 		controller.getPagination().pageFactoryProperty().bind(treePageFactory);
 		controller.getPagination().pageCountProperty().bind(numberOfPages);
@@ -290,11 +291,11 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 
 		mainController.getRotateLeftMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getRotateLeft()));
-		mainController.getRotateLeftMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(treePageView.emptyProperty().or(changingOrientation));
 		mainController.getRotateRightMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getRotateRight()));
-		mainController.getRotateRightMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 	}
 
     private record RowsCols(int rows, int cols) {

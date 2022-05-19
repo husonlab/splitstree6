@@ -177,7 +177,7 @@ public class DrawAlignment {
 		if (inputTaxa != null && inputCharacters != null) {
 			var newWidth = Math.min(18, canvas.getWidth() / (inputCharacters.getNchar() + 3));
 			var newHeight = Math.min(18, canvas.getHeight() / (inputTaxa.getNtax() + 2));
-			if (newWidth < unitWidthProperty.get() && newHeight < unitHeightProperty.get()) {
+			if (newWidth < unitWidthProperty.get() || newHeight < unitHeightProperty.get()) {
 				unitWidthProperty.set(newWidth);
 				unitHeightProperty.set(newHeight);
 			} else {

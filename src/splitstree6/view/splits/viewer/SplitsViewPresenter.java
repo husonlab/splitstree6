@@ -218,8 +218,9 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			updateCounter.set(updateCounter.get() + 1);
 		});
 
-		controller.getScrollPane().setContent(splitNetworkPane);
+		controller.getOrientationCBox().disableProperty().bind(splitsView.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
 
+		controller.getScrollPane().setContent(splitNetworkPane);
 
 		updateListener = e -> RunAfterAWhile.apply(splitNetworkPane, () -> Platform.runLater(splitNetworkPane::drawNetwork));
 
@@ -356,16 +357,17 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			else
 				splitsView.getSplitsFormat().getPresenter().rotateSplitsLeft();
 		});
-		mainController.getRotateLeftMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(splitsView.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
+
 		mainController.getRotateRightMenuItem().setOnAction(e -> {
 			if (splitsView.getSplitSelectionModel().size() == 0)
 				splitsView.setOptionOrientation(splitsView.getOptionOrientation().getRotateRight());
 			else
 				splitsView.getSplitsFormat().getPresenter().rotateSplitsRight();
 		});
-		mainController.getRotateRightMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(splitsView.emptyProperty());
+		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 	}
 
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {

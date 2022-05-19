@@ -21,10 +21,7 @@ package splitstree6.view.splits.viewer;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableList;
@@ -67,6 +64,8 @@ public class SplitNetworkPane extends StackPane {
 	private final InvalidationListener layoutLabelsListener;
 	private final InvalidationListener redrawListener;
 
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
+
 	private final AService<Group> service;
 	private final SplitNetworkLayout splitNetworkLayout = new SplitNetworkLayout();
 	private Runnable runAfterUpdate;
@@ -104,7 +103,8 @@ public class SplitNetworkPane extends StackPane {
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
 		orientChangeListener = (v, o, n) -> {
-			splitstree6.layout.splits.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or));
+			splitstree6.layout.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n,
+					or -> splitNetworkLayout.getLabelLayout().layoutLabels(or), changingOrientation);
 		};
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
@@ -184,18 +184,32 @@ public class SplitNetworkPane extends StackPane {
 		splitNetworkLayout.getLabelLayout().layoutLabels(orientation);
 	}
 
+	public boolean isChangingOrientation() {
+		return changingOrientation.get();
+	}
+
+	public ReadOnlyBooleanProperty changingOrientationProperty() {
+		return changingOrientation;
+	}
+
 	private void applyOrientation(LayoutOrientation orientation) {
-		BasicFX.preorderTraversal(getChildren().get(0), n -> {
-			if ("graph-node".equals(n.getId())) {
-				var point = new Point2D(n.getTranslateX(), n.getTranslateY());
-				if (orientation.flip())
-					point = new Point2D(-point.getX(), point.getY());
-				if (orientation.angle() != 0)
-					point = GeometryUtilsFX.rotate(point, -orientation.angle());
-				n.setTranslateX(point.getX());
-				n.setTranslateY(point.getY());
-			}
-		});
-		ProgramExecutorService.submit(100, () -> Platform.runLater(() -> layoutLabels(orientation)));
+		if (!isChangingOrientation()) {
+			changingOrientation.set(true);
+			BasicFX.preorderTraversal(getChildren().get(0), n -> {
+				if ("graph-node".equals(n.getId())) {
+					var point = new Point2D(n.getTranslateX(), n.getTranslateY());
+					if (orientation.flip())
+						point = new Point2D(-point.getX(), point.getY());
+					if (orientation.angle() != 0)
+						point = GeometryUtilsFX.rotate(point, -orientation.angle());
+					n.setTranslateX(point.getX());
+					n.setTranslateY(point.getY());
+				}
+			});
+			ProgramExecutorService.submit(100, () -> Platform.runLater(() -> {
+				layoutLabels(orientation);
+				changingOrientation.set(false);
+			}));
+		}
 	}
 }

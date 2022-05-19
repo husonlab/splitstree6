@@ -73,6 +73,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 	private final ObjectProperty<TreePane> treePane = new SimpleObjectProperty<>(this, "treePane");
 	private final ObjectProperty<PhyloTree> treeProperty = new SimpleObjectProperty<PhyloTree>(this, "tree");
 
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
+
 	private final InvalidationListener updateListener;
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
@@ -166,6 +168,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(treeView.optionOrientationProperty());
+		controller.getOrientationCBox().disableProperty().bind(treeView.emptyProperty().or(changingOrientation));
 
 		controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(treeView.optionShowConfidenceProperty());
 
@@ -175,8 +178,10 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			final InvalidationListener scaleListener = e -> {
 				if (treePane.get() == null) {
 					controller.getScaleBar().factorXProperty().unbind();
+					changingOrientation.unbind();
 				} else {
 					controller.getScaleBar().factorXProperty().bind(treeView.getOptionOrientation().isWidthHeightSwitched() ? treePane.get().scaleYProperty() : treePane.get().scaleXProperty());
+					changingOrientation.bind(treePane.get().changingOrientationProperty());
 				}
 			};
 			treePane.addListener(scaleListener);
@@ -431,11 +436,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						.or(treeView.optionDiagramProperty().isEqualTo(TreeDiagramType.RectangularCladogram)));
 
 		mainController.getRotateLeftMenuItem().setOnAction(e -> treeView.setOptionOrientation(treeView.getOptionOrientation().getRotateLeft()));
-		mainController.getRotateLeftMenuItem().disableProperty().bind(treeView.emptyProperty());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(treeView.emptyProperty().or(changingOrientation));
 		mainController.getRotateRightMenuItem().setOnAction(e -> treeView.setOptionOrientation(treeView.getOptionOrientation().getRotateRight()));
-		mainController.getRotateRightMenuItem().disableProperty().bind(treeView.emptyProperty());
+		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(e -> treeView.setOptionOrientation(treeView.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(treeView.emptyProperty());
+		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(treeView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));

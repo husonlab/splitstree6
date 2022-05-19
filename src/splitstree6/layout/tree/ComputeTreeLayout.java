@@ -131,7 +131,7 @@ public class ComputeTreeLayout {
 					group.setUserData(taxonId);
 				} else {
 					internalLabelsGroup.getChildren().add(label);
-					splitstree6.layout.splits.LayoutUtils.installTranslateUsingLayout(label, () -> {
+					splitstree6.layout.LayoutUtils.installTranslateUsingLayout(label, () -> {
 					});
 				}
 			}
