@@ -205,8 +205,12 @@ public class MainWindowController {
 
 	@FXML
 	private CheckMenuItem useDarkThemeMenuItem;
+
 	@FXML
 	private MenuItem useFullScreenMenuItem;
+
+	@FXML
+	private CheckMenuItem presentationModeMenuItem;
 
 	@FXML
 	private MenuItem filterTaxaMenuItem;
@@ -702,6 +706,10 @@ public class MainWindowController {
 
 	public MenuItem getUseFullScreenMenuItem() {
 		return useFullScreenMenuItem;
+	}
+
+	public CheckMenuItem getPresentationModeMenuItem() {
+		return presentationModeMenuItem;
 	}
 
 	public MenuItem getFilterTaxaMenuItem() {

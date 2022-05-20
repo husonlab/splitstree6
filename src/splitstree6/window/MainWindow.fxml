@@ -250,6 +250,8 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
+                        <CheckMenuItem fx:id="presentationModeMenuItem" mnemonicParsing="false"
+                                       text="Presentation Mode"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
                             <accelerator>

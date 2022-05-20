@@ -167,7 +167,6 @@ public class MouseInteraction {
 				} catch (Exception ignored) {
 				}
 			}
-
 			taxonSelectionInvalidationListener = e -> {
 				for (var t : taxonLabelMap.keySet()) {
 					var taxon = idTaxonMap.apply(t);
@@ -181,6 +180,7 @@ public class MouseInteraction {
 				}
 			};
 			taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionInvalidationListener));
+			taxonSelectionInvalidationListener.invalidated(null);
 		}
 	}
 

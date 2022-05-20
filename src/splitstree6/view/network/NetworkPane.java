@@ -64,7 +64,6 @@ public class NetworkPane extends StackPane {
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
-
 	private final AService<Group> service;
 	private final NetworkLayout networkLayout = new NetworkLayout();
 	private Runnable runAfterUpdate;
@@ -130,11 +129,9 @@ public class NetworkPane extends StackPane {
 			setMinWidth(getPrefWidth());
 			group.getChildren().setAll(service.getValue());
 
-			addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+			NetworkPane.this.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(() -> {
-						taxonSelectionModel.clearSelection();
-					});
+					Platform.runLater(taxonSelectionModel::clearSelection);
 				}
 				e.consume();
 			});
@@ -151,7 +148,6 @@ public class NetworkPane extends StackPane {
 
 	public void drawNetwork() {
 		service.restart();
-
 	}
 
 	public Runnable getRunAfterUpdate() {

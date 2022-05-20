@@ -25,6 +25,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import jloda.graph.Node;
 import jloda.util.Pair;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
@@ -65,7 +66,6 @@ public class MinSpanningNetwork extends Distances2Network {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, NetworkBlock networkBlock) throws IOException {
 		final var ntax = taxaBlock.getNtax();
-
 		final var graph = networkBlock.getGraph();
 
 		final var distancesToTaxonPairs = new TreeMap<Double, List<Pair<Integer, Integer>>>();
@@ -165,6 +165,12 @@ public class MinSpanningNetwork extends Distances2Network {
 				}
 			}
 		}
+
+		if (isOptionMinSpanningTree())
+			networkBlock.setInfoString("Minimum spanning tree");
+		else
+			networkBlock.setInfoString("Minimum spanning network" + (getOptionEpsilon() > 0 ?
+					", epsilon=" + StringUtils.removeTrailingZerosAfterDot(getOptionEpsilon()) : ""));
 	}
 
 	private static String computeEdgeLabel(String sequence1, String sequence2) {

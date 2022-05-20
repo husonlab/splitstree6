@@ -25,6 +25,7 @@ import com.jujutsu.tsne.barneshut.BHTSne;
 import com.jujutsu.tsne.barneshut.ParallelBHTsne;
 import com.jujutsu.utils.TSneUtils;
 import javafx.beans.property.*;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.NetworkBlock;
@@ -78,8 +79,7 @@ public class TSne extends Distances2Network {
 			case ParallelBarnesHutSne -> new ParallelBHTsne();
 		};
 
-		var perplexity = (getOptionPerplexity() <= 0 ? Math.sqrt(taxaBlock.getNtax()) : getOptionPerplexity());
-
+		var perplexity = (getOptionPerplexity() <= 0 ? Double.parseDouble(StringUtils.removeTrailingZerosAfterDot("%.1f", Math.sqrt(taxaBlock.getNtax()))) : getOptionPerplexity());
 
 		var config = TSneUtils.buildConfig(distancesBlock.getDistances(), 2, taxaBlock.getNtax(), perplexity, getOptionIterations());
 		var points = tSne.tsne(config);
@@ -96,7 +96,7 @@ public class TSne extends Distances2Network {
 			networkBlock.getNodeData(v).put(NetworkBlock.NodeData.BasicKey.y.name(), String.valueOf(points[t - 1][1]));
 		}
 
-		networkBlock.setInfoString("tSNE on %,d taxa,  perplexity=%.1f".formatted(taxaBlock.getNtax(), perplexity));
+		networkBlock.setInfoString("tSNE on %,d taxa,  perplexity=".formatted(taxaBlock.getNtax()) + StringUtils.removeTrailingZerosAfterDot("%.1f", perplexity));
 	}
 
 	public double getOptionPerplexity() {

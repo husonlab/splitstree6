@@ -40,10 +40,7 @@ import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
-import jloda.fx.window.MainWindowManager;
-import jloda.fx.window.NotificationManager;
-import jloda.fx.window.SplashScreen;
-import jloda.fx.window.WindowGeometry;
+import jloda.fx.window.*;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
@@ -387,6 +384,9 @@ public class MainWindowPresenter {
 		controller.getUseDarkThemeMenuItem().selectedProperty().bindBidirectional(MainWindowManager.useDarkThemeProperty());
 		controller.getUseDarkThemeMenuItem().setSelected(MainWindowManager.isUseDarkTheme());
 		controller.getUseDarkThemeMenuItem().setDisable(false);
+
+		controller.getPresentationModeMenuItem().selectedProperty().bindBidirectional(PresentationMode.presentationModeProperty());
+		controller.getPresentationModeMenuItem().setDisable(false);
 
 		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
 

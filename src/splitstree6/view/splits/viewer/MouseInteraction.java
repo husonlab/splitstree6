@@ -230,6 +230,7 @@ public class MouseInteraction {
 				}
 			};
 			taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionInvalidationListener));
+			taxonSelectionInvalidationListener.invalidated(null);
 
 			splitSelectionInvalidationListener = e -> {
 				for (var splitId : splitShapesMap.keySet()) {

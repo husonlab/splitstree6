@@ -97,7 +97,7 @@ public class SplitsView implements IView {
 
 	// setup properties:
 	{
-		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Outline);
+		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Splits);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionRooting, SplitsRooting::valueOf, SplitsRooting.None);
 		ProgramProperties.track(optionRootAngle, 160.0);
