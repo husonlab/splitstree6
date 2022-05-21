@@ -4,5 +4,6 @@ public enum drawingMethod {
     CIRCULAR,
     TOSCALE,
     UNIFORM,
-    STAGGERED;
+    BLOCK,
+    ROOTED;
 }

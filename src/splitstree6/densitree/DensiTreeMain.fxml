@@ -89,7 +89,8 @@
                             </RadioMenuItem>
                             <RadioMenuItem fx:id="toscaleMenuItem" mnemonicParsing="false" text="To Scale" toggleGroup="$drawingGroup" />
                             <RadioMenuItem fx:id="uniformMenuItem" mnemonicParsing="false" text="Uniform" toggleGroup="$drawingGroup" />
-                     <RadioMenuItem fx:id="staggeredMenuItem" mnemonicParsing="false" text="Staggered" toggleGroup="$drawingGroup" />
+                     <RadioMenuItem fx:id="rootedMenuItem" mnemonicParsing="false" text="Rooted" toggleGroup="$drawingGroup" />
+                     <RadioMenuItem fx:id="blockMenuItem" mnemonicParsing="false" text="Block" toggleGroup="$drawingGroup" />
                         </items>
                     </Menu>
                     <Menu mnemonicParsing="false" text="Highlighting">

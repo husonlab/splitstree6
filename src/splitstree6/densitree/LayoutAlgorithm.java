@@ -101,7 +101,7 @@ public class LayoutAlgorithm {
                                 nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), tree.getWeight(e)));
                             }
                         });
-                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.UNIFORM){
+                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.UNIFORM) {
                         tree.preorderTraversal(v -> {
                             if (v.getInDegree() == 0) { // the root
                                 nodePointMap.put(v, new Point2D(0, 0));
@@ -111,18 +111,17 @@ public class LayoutAlgorithm {
                                 nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), 1));
                             }
                         });
-                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.STAGGERED){
+                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.ROOTED || drawingMethod == splitstree6.densitree.drawingMethod.BLOCK) {
                         tree.postorderTraversal(v -> {
-                            if(tree.isLeaf(v)){
+                            if (tree.isLeaf(v)) {
                                 int y = 0;
-                                for(var j: cycle){
-                                    if(j>0 && tree.getTaxon2Node(j).equals(v)){
+                                for (var j : cycle) {
+                                    if (j > 0 && tree.getTaxon2Node(j).equals(v)) {
                                         y = j;
                                     }
                                 }
-                                nodePointMap.put(v, new Point2D(0,y*75));
-                            }
-                            else{
+                                nodePointMap.put(v, new Point2D(0, y * 75));
+                            } else {
                                 double y1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
                                 double y2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();
 
@@ -131,7 +130,7 @@ public class LayoutAlgorithm {
 
                                 double xmin = Math.min(x1, x2);
 
-                                nodePointMap.put(v, new Point2D(xmin-100,(y1+y2)/2));
+                                nodePointMap.put(v, new Point2D(x1 - tree.getWeight(v.getFirstOutEdge()) * 2250, (y1 + y2) / 2));
                             }
                         });
                         nodeAngleMap.putAll(0.0);
