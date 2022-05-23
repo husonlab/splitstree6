@@ -177,34 +177,35 @@ public class MouseInteraction {
 						}
 					});
 
-
 					shape.setOnMouseClicked(e -> {
-						if (e.isStillSincePress() && e.getClickCount() == 1 && idSplitMap.apply(splitId) != null) {
-							if (e.isShiftDown()) {
-								if (splitSelectionModel.isSelected(splitId)) {
-									splitSelectionModel.clearSelection(splitId);
-								} else {
-									splitSelectionModel.select(splitId);
-								}
-							} else {
-								splitSelectionModel.select(splitId);
+						if (e.isStillSincePress() && idSplitMap.apply(splitId) != null) {
+							if (e.getClickCount() == 1) {
+								if (!e.isShiftDown())
+									splitSelectionModel.clearSelection();
+								splitSelectionModel.toggleSelection(splitId);
 
 								var split = idSplitMap.apply(splitId);
 								var partA = split.getA();
 								var partB = split.getB();
 								var whichPart = ((partA.cardinality() < partB.cardinality()) == !e.isAltDown() ? partA : partB);
 								var taxa = BitSetUtils.asStream(whichPart).map(idTaxonMap).collect(Collectors.toList());
-								taxonSelectionModel.selectAll(taxa);
-							}
+								if (splitSelectionModel.isSelected(splitId)) {
+									taxonSelectionModel.clearSelection();
+									taxonSelectionModel.selectAll(taxa);
+								} else
+									taxonSelectionModel.clearSelection(taxa);
+							} else if (e.getClickCount() == 2) {
+								splitSelectionModel.select(splitId);
 
-							var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxonIdMap).collect(Collectors.toList()));
-							var start = graph.nodeStream().filter(z -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(z))).cardinality() > 0).findAny();
-							if (start.isPresent()) {
-								try (var visited = graph.newNodeSet()) {
-									GraphTraversals.traverseReachable(start.get(), f -> graph.getSplit(f) != splitId, visited::add);
-									for (var f : graph.edges()) {
-										if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
-											splitSelectionModel.select(graph.getSplit(f));
+								var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxonIdMap).collect(Collectors.toList()));
+								var start = graph.nodeStream().filter(z -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(z))).cardinality() > 0).findAny();
+								if (start.isPresent()) {
+									try (var visited = graph.newNodeSet()) {
+										GraphTraversals.traverseReachable(start.get(), f -> graph.getSplit(f) != splitId, visited::add);
+										for (var f : graph.edges()) {
+											if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
+												splitSelectionModel.select(graph.getSplit(f));
+										}
 									}
 								}
 							}

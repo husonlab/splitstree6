@@ -40,7 +40,8 @@ import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
  */
 public class CreateEdgesCircular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, Point2D> nodePointMap, Map<Node, Double> nodeAngleMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
+	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, Point2D> nodePointMap, Map<Node, Double> nodeAngleMap,
+										  boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
 		var shapes = new ArrayList<Shape>();
 
 		var origin = new Point2D(0, 0);

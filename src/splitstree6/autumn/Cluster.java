@@ -303,7 +303,7 @@ public class Cluster extends BitSet {
 	}
 
 	/**
-	 * does the given set intersect all of the given clusters?
+	 * does the given set intersects all of the given clusters?
 	 *
 	 * @return true, if set intersects one of the clusters
 	 */

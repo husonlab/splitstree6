@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -37,17 +38,20 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.util.TriConsumer;
 import jloda.graph.Edge;
-import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
+import jloda.util.IteratorUtils;
 import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 
+import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 /**
  * create dragging of selected taxon labels
@@ -55,6 +59,7 @@ import java.util.function.BiConsumer;
  */
 public class InteractionSetup {
 	private final Stage stage;
+	private final PhyloTree tree;
 	private final TaxaBlock taxaBlock;
 	private final SelectionModel<Taxon> taxonSelectionModel;
 
@@ -62,16 +67,25 @@ public class InteractionSetup {
 	private final EventHandler<MouseEvent> mousePressedHandler;
 	private final EventHandler<MouseEvent> mouseDraggedHandler;
 
+	private final Map<Edge, Shape> edgeShapeMap;
+	private final SelectionModel<Edge> edgeSelectionModel;
+
 	private final InvalidationListener invalidationListener;
 
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	public InteractionSetup(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation) {
+	private boolean inMouseClickedOnEdge = false;
+
+	public InteractionSetup(Stage stage, PhyloTree tree, TaxaBlock taxaBlock, Map<Edge, Shape> edgeShapeMap, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
+							TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation) {
 		this.stage = stage;
+		this.tree = tree;
 		this.taxaBlock = taxaBlock;
 		this.taxonSelectionModel = taxonSelectionModel;
+		this.edgeSelectionModel = edgeSelectionModel;
 		taxonShapeLabelMap = new HashMap<>();
+		this.edgeShapeMap = (edgeShapeMap == null ? new HashMap<>() : edgeShapeMap);
 
 		mousePressedHandler = e -> {
 			if (e.getSource() instanceof Pane pane && pane.getEffect() != null) { // need a better way to determine whether this label is selected
@@ -137,8 +151,29 @@ public class InteractionSetup {
 				shapeLabel.getFirst().setEffect(taxonSelectionModel.isSelected(t) ? SelectionEffectBlue.getInstance() : null);
 				shapeLabel.getSecond().setEffect(taxonSelectionModel.isSelected(t) ? SelectionEffectBlue.getInstance() : null);
 			}
+			if (!inMouseClickedOnEdge) {
+				edgeSelectionModel.clearSelection();
+				var selected = taxonSelectionModel.getSelectedItems().stream().mapToInt(taxaBlock::indexOf).toArray();
+				var bits = BitSetUtils.asBitSet(selected);
+				var edge = tree.getEdgeForSplit(bits, BitSetUtils.getComplement(bits, 1, taxaBlock.getNtax() + 1));
+				if (edge != null)
+					edgeSelectionModel.select(edge);
+			}
+
 		};
 		taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(invalidationListener));
+
+		edgeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Edge>) e -> {
+			if (e.wasAdded()) {
+				var shape = edgeShapeMap.get(e.getElementAdded());
+				if (shape != null)
+					shape.setEffect(SelectionEffectBlue.getInstance());
+			} else if (e.wasRemoved()) {
+				var shape = edgeShapeMap.get(e.getElementRemoved());
+				if (shape != null)
+					shape.setEffect(null);
+			}
+		});
 	}
 
 	private boolean nodeShapeOrLabelEntered;
@@ -146,29 +181,27 @@ public class InteractionSetup {
 	public TriConsumer<jloda.graph.Node, javafx.scene.Node, RichTextLabel> createNodeCallback() {
 		return (v, shape, label) -> Platform.runLater(() -> {
 
-			if (v.getOwner() instanceof PhyloGraph phyloGraph) {
-				for (var t : phyloGraph.getTaxa(v)) {
-					if (t <= taxaBlock.getNtax()) {
-						var taxon = taxaBlock.get(t);
-						taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
-						label.setOnMousePressed(mousePressedHandler);
-						label.setOnMouseDragged(mouseDraggedHandler);
-						final EventHandler<MouseEvent> mouseClickedHandler = e -> {
-                            if (e.isStillSincePress()) {
-                                if (!e.isShiftDown())
-                                    taxonSelectionModel.clearSelection();
-                                taxonSelectionModel.toggleSelection(taxon);
-                                e.consume();
-                            }
-                        };
-						label.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
-						shape.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
-						shape.setOnMouseClicked(mouseClickedHandler);
-						label.setOnMouseClicked(mouseClickedHandler);
-						if (taxonSelectionModel.isSelected(taxon)) {
-							shape.setEffect(SelectionEffectBlue.getInstance());
-							label.setEffect(SelectionEffectBlue.getInstance());
+			for (var t : tree.getTaxa(v)) {
+				if (t <= taxaBlock.getNtax()) {
+					var taxon = taxaBlock.get(t);
+					taxonShapeLabelMap.put(taxaBlock.get(t), new Pair<>(shape, label));
+					label.setOnMousePressed(mousePressedHandler);
+					label.setOnMouseDragged(mouseDraggedHandler);
+					final EventHandler<MouseEvent> mouseClickedHandler = e -> {
+						if (e.isStillSincePress()) {
+							if (!e.isShiftDown())
+								taxonSelectionModel.clearSelection();
+							taxonSelectionModel.toggleSelection(taxon);
+							e.consume();
 						}
+					};
+					label.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
+					shape.setOnContextMenuRequested(m -> showContextMenu(stage, m, taxon, label));
+					shape.setOnMouseClicked(mouseClickedHandler);
+					label.setOnMouseClicked(mouseClickedHandler);
+					if (taxonSelectionModel.isSelected(taxon)) {
+						shape.setEffect(SelectionEffectBlue.getInstance());
+						label.setEffect(SelectionEffectBlue.getInstance());
 					}
 				}
 			}
@@ -212,41 +245,68 @@ public class InteractionSetup {
 	}
 
 	public BiConsumer<Edge, Shape> createEdgeCallback() {
+		edgeShapeMap.clear();
 		return (edge, shape) -> {
 			shape.setPickOnBounds(false);
+			edgeShapeMap.put(edge, shape);
 
-			shape.setOnMouseEntered(e ->
-			{
+			shape.setOnMouseEntered(e -> {
 				shape.setUserData(shape.getStrokeWidth());
 				shape.setStrokeWidth(shape.getStrokeWidth() + 4);
+				e.consume();
 			});
 			shape.setOnMouseExited(e -> {
 				shape.setStrokeWidth(shape.getStrokeWidth() - 4);
 				shape.setUserData(null);
+				e.consume();
 			});
 
-			if (edge.getOwner() instanceof PhyloTree tree) {
-				shape.setOnMouseClicked(e -> {
-					if (e.getClickCount() >= 1) {
-						if (!e.isShiftDown())
-							taxonSelectionModel.clearSelection();
-						if (!e.isAltDown()) {
-							tree.preorderTraversal(edge.getTarget(), v -> {
-								for (var t : tree.getTaxa(v)) {
-									taxonSelectionModel.select(taxaBlock.get(t));
-								}
-							});
-						} else {
-							tree.preorderTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> {
-								for (var t : tree.getTaxa(v)) {
-									taxonSelectionModel.select(taxaBlock.get(t));
-								}
-							});
-						}
-						e.consume();
+			shape.setOnMouseClicked(e -> handleMouseClicked(e, edge));
+		};
+	}
+
+	private void handleMouseClicked(MouseEvent e, Edge edge) {
+		inMouseClickedOnEdge = true;
+		try {
+			if (e.getClickCount() == 1) {
+				if (!e.isShiftDown())
+					edgeSelectionModel.clearSelection();
+				edgeSelectionModel.toggleSelection(edge);
+
+				var bits = new BitSet();
+				tree.preorderTraversal(edge.getTarget(), v -> {
+					for (var t : tree.getTaxa(v)) {
+						bits.set(t);
 					}
 				});
+
+				if (e.isAltDown()) {
+					bits.flip(1, taxaBlock.getNtax() + 1);
+				}
+				var taxa = bits.stream().mapToObj(taxaBlock::get).collect(Collectors.toList());
+				if (edgeSelectionModel.isSelected(edge)) {
+					taxonSelectionModel.clearSelection();
+					taxonSelectionModel.selectAll(taxa);
+				} else
+					taxonSelectionModel.clearSelection(taxa);
+			} else if (e.getClickCount() == 2) {
+				if (!e.isAltDown()) {
+					tree.preorderTraversal(edge.getTarget(), v -> {
+						edgeSelectionModel.selectAll(IteratorUtils.asList(v.inEdges()));
+					});
+				} else {
+					tree.preorderTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> {
+						edgeSelectionModel.selectAll(IteratorUtils.asList(v.inEdges()));
+					});
+				}
 			}
-		};
+			e.consume();
+		} finally {
+			inMouseClickedOnEdge = false;
+		}
+	}
+
+	public Map<Edge, Shape> getEdgeShapeMap() {
+		return edgeShapeMap;
 	}
 }

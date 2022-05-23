@@ -61,7 +61,8 @@ public class ComputeTreeLayout {
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging,
 							   double width, double height, TriConsumer<Node, javafx.scene.Node, RichTextLabel> nodeCallback,
-							   BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels, Map<Node, Group> nodeShapeMap) {
+							   BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels,
+							   Map<Node, Group> nodeShapeMap) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
 
@@ -145,7 +146,7 @@ public class ComputeTreeLayout {
 			edgeGroup.getChildren().addAll(CreateEdgesRectangular.apply(diagram, tree, nodeShapeMap, linkNodesEdgesLabels, edgeCallback));
 		}
 
-		Group labelConnectorGroup = alignLabels ? new Group() : null;
+		var labelConnectorGroup = alignLabels ? new Group() : null;
 
 		LayoutLabelsRadialPhylogram layoutLabelsRadialPhylogram = null;
 
@@ -160,6 +161,7 @@ public class ComputeTreeLayout {
 
 	public record Result(Group labelConnectors, Group edges, Group nodes, Group internalLabels, Group taxonLabels,
 						 Consumer<LayoutOrientation> layoutOrientationConsumer, double unitLengthX) {
+
 		public Group getAllAsGroup() {
 			var group = new Group();
 			if (labelConnectors != null)

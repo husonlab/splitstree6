@@ -23,7 +23,7 @@ import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.data.parts.BiPartition;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,7 @@ public class GreedyWeaklyCompatible {
 			boolean ok = true;
 			for (int t = 0; ok && t < result.size(); t++) {
 				for (int q = t + 1; ok && q < result.size(); q++) {
-					if (!Compatibility.areWeaklyCompatible(split, result.get(t), result.get(q)))
+					if (!BiPartition.areWeaklyCompatible(split, result.get(t), result.get(q)))
 						ok = false;
 				}
 			}

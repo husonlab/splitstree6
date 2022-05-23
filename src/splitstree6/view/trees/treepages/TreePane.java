@@ -31,12 +31,15 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
+import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
 import splitstree6.data.TaxaBlock;
@@ -69,6 +72,8 @@ public class TreePane extends StackPane {
 
 	private final AService<ComputeTreeLayout.Result> service;
 
+	private final SelectionModel<Edge> edgeSelectionModel = new SetSelectionModel<>();
+
 	private ComputeTreeLayout.Result result;
 
 	/**
@@ -76,16 +81,16 @@ public class TreePane extends StackPane {
 	 */
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
-					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX, ObservableMap<jloda.graph.Node, Group> nodeShapeMap) {
-
-		var interactionSetup = new InteractionSetup(stage, taxaBlock, taxonSelectionModel, diagram, orientation);
-
+					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX,
+					ObservableMap<jloda.graph.Node, Group> nodeShapeMap, ObservableMap<Edge, Shape> edgeShapeMap) {
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);
 		setMinHeight(Pane.USE_PREF_SIZE);
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
+
+		var interactionSetup = new InteractionSetup(stage, phyloTree, taxaBlock, edgeShapeMap, taxonSelectionModel, edgeSelectionModel, diagram, orientation);
 
 		fontScaleChangeListener = (v, o, n) -> {
 			if (result != null) {
@@ -114,6 +119,7 @@ public class TreePane extends StackPane {
 		});
 
 		service.setCallable(() -> {
+			edgeSelectionModel.clearSelection();
 			double width;
 			double height;
 			if (orientation.get().isWidthHeightSwitched()) {
@@ -237,5 +243,9 @@ public class TreePane extends StackPane {
 	public void updateLabelLayout(LayoutOrientation orientation) {
 		if (orientationConsumer != null)
 			ProgramExecutorService.submit(100, () -> Platform.runLater(() -> orientationConsumer.accept(orientation)));
+	}
+
+	public SelectionModel<Edge> getEdgeSelectionModel() {
+		return edgeSelectionModel;
 	}
 }

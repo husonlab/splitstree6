@@ -119,5 +119,4 @@ public class SplitPanePresenter {
 		timeline.play();
 		timeline.setOnFinished(x -> runnable.run());
 	}
-
 }

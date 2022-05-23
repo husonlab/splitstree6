@@ -134,10 +134,9 @@ public class SplitsTree6 extends Application {
 			NotificationManager.setShowNotifications(true);
 
 			final MainWindow mainWindow = new MainWindow();
-
-			final WindowGeometry windowGeometry = new WindowGeometry(ProgramProperties.get("WindowGeometry", "50 50 800 800"));
-
-			mainWindow.show(stage, windowGeometry.getX(), windowGeometry.getY(), windowGeometry.getWidth(), windowGeometry.getHeight());
+			WindowGeometry.setToStage(stage);
+			mainWindow.show(stage, stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+			WindowGeometry.listenToStage(stage);
 
 			MainWindowManager.getInstance().addMainWindow(mainWindow);
 

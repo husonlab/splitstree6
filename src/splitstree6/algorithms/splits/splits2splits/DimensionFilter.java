@@ -35,6 +35,7 @@ import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
+import splitstree6.data.parts.BiPartition;
 import splitstree6.data.parts.Compatibility;
 
 import java.util.BitSet;
@@ -156,7 +157,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 		for (int s = 0; s < splits.size(); s++) {
 
 			for (int t = s + 1; t < splits.size(); t++)
-				if (!Compatibility.areCompatible(splits.get(s), splits.get(t))) {
+				if (!BiPartition.areCompatible(splits.get(s), splits.get(t))) {
 					graph.newEdge(split2node[s], split2node[t]);
 				}
 		}

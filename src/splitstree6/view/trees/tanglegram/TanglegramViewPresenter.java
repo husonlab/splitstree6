@@ -39,7 +39,6 @@ import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
-import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -48,7 +47,6 @@ import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static splitstree6.layout.tree.LayoutOrientation.*;
@@ -295,8 +293,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		targetBounds.addListener(updateDimensions);
 		tanglegramView.optionVerticalZoomFactorProperty().addListener(updateDimensions);
 		tanglegramView.optionHorizontalZoomFactorProperty().addListener(updateDimensions);
-
-		Function<Integer, Taxon> t2taxon = t -> mainWindow.getActiveTaxa().get(t);
 
 		findToolBar = FindReplaceTaxa.create(mainWindow, tanglegramView.getUndoManager());
 		findToolBar.setShowFindToolBar(false);

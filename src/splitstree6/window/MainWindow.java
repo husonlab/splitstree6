@@ -61,6 +61,7 @@ public class MainWindow implements IMainWindow {
 
 	private final ObservableList<Taxon> activeTaxa = FXCollections.observableArrayList();
 	private final SelectionModel<Taxon> taxonSelectionModel = new SetSelectionModel<>();
+
 	private final BooleanProperty dirty = new SimpleBooleanProperty(this, "dirty", false);
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 	private final StringProperty name = new SimpleStringProperty(this, "name", "");
@@ -168,7 +169,10 @@ public class MainWindow implements IMainWindow {
 		invalidationListener.invalidated(null);
 		PresentationMode.ensurePresentationMode(stage);
 		stage.show();
-		Platform.runLater(() -> stage.setWidth(stage.getWidth() - 1));// this hack ensures that bottom flowpane is shown
+		Platform.runLater(() -> {
+			stage.setWidth(stage.getWidth() - 1);
+			stage.setWidth(stage.getWidth() + 1);
+		});// this hack ensures that bottom flowpane is shown
 	}
 
 	@Override
