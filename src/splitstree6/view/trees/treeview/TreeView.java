@@ -35,7 +35,6 @@ import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
@@ -165,8 +164,6 @@ public class TreeView implements IView {
 			else if (getOptionTree() > trees.size())
 				setOptionTree(trees.size());
 		});
-
-		BasicFX.reportChanges(optionEditsProperty());
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));

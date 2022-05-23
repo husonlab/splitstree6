@@ -22,6 +22,8 @@ package splitstree6.densitree;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -41,6 +43,8 @@ import java.io.IOException;
  * the presenter
  */
 public class DensiTreeMainPresenter {
+
+	private final DoubleProperty scalingFactor = new SimpleDoubleProperty(1);
 
 	public DensiTreeMainPresenter(Stage stage, DensiTreeMainController controller, Model model) {
 		stage.setMinWidth(400);
@@ -148,16 +152,25 @@ public class DensiTreeMainPresenter {
 			}
 		});
 
+		controller.getScaleSlider().valueProperty().addListener((v, o, n) -> {
+			var value = n.doubleValue();
+			if (value >= 0) {
+				scalingFactor.set(Math.pow(2, value));
+			} else {
+				scalingFactor.set(1.0 / Math.pow(2, -value));
+			}
+		});
+
 
 		final InvalidationListener listener;
 
-		if (true) {
+		if (false) {
 			listener = observable -> DensiTree.draw(
 					new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
 							controller.getConsensusMenuItem().isSelected(), specTrees[0],
 							controller.getLabelsGroup().getSelectedToggle().toString(),
 							controller.getDrawingGroup().getSelectedToggle().toString()),
-					model, controller.getCanvas(), controller.getPane());
+					model, controller.getCanvas(), controller.getPane(), scalingFactor);
 		} else { // DHH: only draw once user has stopped using controls
 			listener = observable -> RunAfterAWhile.apply(controller, () ->
 					Platform.runLater(() -> DensiTree.draw(
@@ -165,7 +178,7 @@ public class DensiTreeMainPresenter {
 									controller.getConsensusMenuItem().isSelected(), specTrees[0],
 									controller.getLabelsGroup().getSelectedToggle().toString(),
 									controller.getDrawingGroup().getSelectedToggle().toString()),
-							model, controller.getCanvas(), controller.getPane())));
+							model, controller.getCanvas(), controller.getPane(), scalingFactor)));
 		}
 
 		controller.getStackPane().widthProperty().addListener(listener);
@@ -174,13 +187,14 @@ public class DensiTreeMainPresenter {
 		controller.getConsensusMenuItem().selectedProperty().addListener(listener);
 		controller.getDrawingGroup().selectedToggleProperty().addListener(listener);
 		controller.getLabelsGroup().selectedToggleProperty().addListener(listener);
+		controller.getScaleSlider().valueProperty().addListener(listener);
 
 		controller.getDrawButton().setOnAction(e -> {
 			var parameters = new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
 					controller.getConsensusMenuItem().isSelected(), specTrees[0],
 					controller.getLabelsGroup().getSelectedToggle().toString(),
 					controller.getDrawingGroup().getSelectedToggle().toString());
-			DensiTree.draw(parameters, model, controller.getCanvas(), controller.getPane());
+			DensiTree.draw(parameters, model, controller.getCanvas(), controller.getPane(), scalingFactor);
 		});
 
 		controller.getDrawButton().disableProperty().bind(Bindings.isEmpty(model.getTreesBlock().getTrees()));

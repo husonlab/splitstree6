@@ -113,7 +113,11 @@ public class DensiTreeMainController {
 	private Label messageLabel;
 
 	@FXML
+	private Slider scaleSlider;
+
+	@FXML
 	private void initialize() {
+		stackPane.setStyle("-fx-background-color: white;");
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -226,5 +230,8 @@ public class DensiTreeMainController {
 		return messageLabel;
 	}
 
+	public Slider getScaleSlider() {
+		return scaleSlider;
+	}
 }
 

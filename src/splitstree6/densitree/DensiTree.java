@@ -19,6 +19,7 @@
 
 package splitstree6.densitree;
 
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
@@ -50,7 +51,7 @@ public class DensiTree {
         pane.getChildren().clear();
     }
 
-    public static void draw(Parameters parameters, Model model, Canvas canvas, Pane pane) {
+    public static void draw(Parameters parameters, Model model, Canvas canvas, Pane pane, ReadOnlyDoubleProperty scalingFactor) {
         if (model.getTreesBlock().getNTrees() > 0) {
             var gc = canvas.getGraphicsContext2D();
             gc.setFont(Font.font("Courier New", 11));
@@ -59,11 +60,10 @@ public class DensiTree {
 
             pane.getChildren().clear();
 
-            int xmin = 100;
-            int ymin = 100;
-            int xmax = (int) (canvas.getWidth() - 100);
-            int ymax = (int) (canvas.getHeight() - 100);
-
+            var xmin = (int) (100 * scalingFactor.get());
+            var ymin = (int) (100 * scalingFactor.get());
+            var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
+            var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
 
             boolean jitter = parameters.jitter;
             boolean consensus = parameters.consensus;
