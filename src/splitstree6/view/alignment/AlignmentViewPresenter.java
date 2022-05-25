@@ -34,6 +34,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.text.Font;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
+import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.NumberUtils;
 import jloda.util.Single;
@@ -69,7 +70,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller = alignmentView.getController();
 		mainWindowController = mainWindow.getController();
 
-
 		controller.getColorSchemeCBox().getItems().addAll(ColorScheme.values());
 		controller.getColorSchemeCBox().valueProperty().bindBidirectional(alignmentView.optionColorSchemeProperty());
 
@@ -100,6 +100,16 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				}
 			}
 		});
+
+		InvalidationListener updateTaxaListener = e -> {
+			controller.getTaxaListView().getItems().clear();
+			if (alignmentView.getInputTaxa() != null) {
+				for (var taxon : alignmentView.getInputTaxa().getTaxa()) {
+					controller.getTaxaListView().getItems().add(taxon);
+				}
+			}
+		};
+		alignmentView.inputTaxaNodeValidProperty().addListener(updateTaxaListener);
 
 		var canvasWidth = new SimpleDoubleProperty();
 		canvasWidth.bind(controller.gethScrollBar().widthProperty());
@@ -177,15 +187,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		InvalidationListener updateTaxaListener = e -> {
-			controller.getTaxaListView().getItems().clear();
-			if (alignmentView.getInputTaxa() != null) {
-				for (var taxon : alignmentView.getInputTaxa().getTaxa()) {
-					controller.getTaxaListView().getItems().add(taxon);
-				}
-			}
-		};
-
 		alignmentView.inputCharactersNodeValidProperty().addListener((v, o, n) -> {
 			if (n) {
 				var inputCharacters = alignmentView.getInputCharacters();
@@ -242,11 +243,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				|| alignmentView.getInputCharacters().getNtax() * alignmentView.getOptionUnitHeight() > canvasHeight.get()) {
 				controller.getvScrollBar().setValue(controller.getvScrollBar().getMin());
 				controller.gethScrollBar().setValue(controller.gethScrollBar().getMin());
-				alignmentView.setOptionUnitWidth(canvasWidth.get() / alignmentView.getInputCharacters().getNchar());
-				alignmentView.setOptionUnitHeight(canvasHeight.get() / alignmentView.getInputCharacters().getNtax());
+				alignmentView.setOptionUnitWidth(Math.min(AlignmentView.DEFAULT_UNIT_WIDTH, canvasWidth.get() / alignmentView.getInputCharacters().getNchar()));
+				alignmentView.setOptionUnitHeight(Math.min(AlignmentView.DEFAULT_UNIT_HEIGHT, canvasHeight.get() / alignmentView.getInputCharacters().getNtax()));
 			} else {
-				alignmentView.setOptionUnitWidth(18);
-				alignmentView.setOptionUnitHeight(18);
+				alignmentView.setOptionUnitWidth(AlignmentView.DEFAULT_UNIT_WIDTH);
+				alignmentView.setOptionUnitHeight(AlignmentView.DEFAULT_UNIT_HEIGHT);
 			}
 		});
 		controller.getZoomToFitButton().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not());
@@ -461,21 +462,25 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		listView.setCellFactory(cell -> new ListCell<>() {
 			@Override
 			protected void updateItem(Taxon item, boolean empty) {
-				super.updateItem(item, empty);
-				if (empty) {
-					setText(null);
-					setGraphic(null);
-				} else {
-					setGraphic(null);
-					var tooltip = new Tooltip(item.getName());
-					tooltip.setFont(Font.font(tooltip.getFont().getFamily(), 11));
-					setTooltip(tooltip);
-					if (isDisabled.test(item))
-						setStyle(String.format("-fx-text-fill: gray; -fx-font-size: %.1f;", Math.min(18, 0.6 * unitHeight)));
-					else
-						setStyle(String.format("-fx-font-size: %.1f;", Math.min(18, 0.6 * unitHeight)));
-					setText(item.getName());
-					setAlignment(Pos.CENTER_LEFT);
+				try {
+					super.updateItem(item, empty);
+					if (empty) {
+						setText(null);
+						setGraphic(null);
+					} else {
+						setGraphic(null);
+						var tooltip = new Tooltip(item.getName());
+						tooltip.setFont(Font.font(tooltip.getFont().getFamily(), 11));
+						setTooltip(tooltip);
+						if (isDisabled.test(item))
+							setStyle(String.format("-fx-text-fill: gray; -fx-font-size: %.1f;", Math.min(18, 0.6 * unitHeight)));
+						else
+							setStyle(String.format("-fx-font-size: %.1f;", Math.min(18, 0.6 * unitHeight)));
+						setText(item.getName());
+						setAlignment(Pos.CENTER_LEFT);
+					}
+				} catch (Exception ex) {
+					Basic.caught(ex);
 				}
 			}
 		});

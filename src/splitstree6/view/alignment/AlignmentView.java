@@ -52,6 +52,9 @@ import java.util.List;
  * Daniel Huson, 4.2022
  */
 public class AlignmentView implements IView {
+	public static final double DEFAULT_UNIT_WIDTH = 18;
+	public static final double DEFAULT_UNIT_HEIGHT = 24;
+
 	private final UndoManager undoManager = new UndoManager();
 
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
@@ -85,8 +88,8 @@ public class AlignmentView implements IView {
 	private final BooleanProperty nucleotideData = new SimpleBooleanProperty(this, "nucleotideData");
 
 	private final ObjectProperty<ColorScheme> optionColorScheme = new SimpleObjectProperty<>(this, "optionColorScheme", ColorScheme.None);
-	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", 18);
-	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", 18);
+	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", DEFAULT_UNIT_WIDTH);
+	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", DEFAULT_UNIT_HEIGHT);
 
 	private final StringProperty name = new SimpleStringProperty(this, "name");
 
