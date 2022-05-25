@@ -31,7 +31,9 @@ import java.util.Set;
 public enum CharactersType {
 	Standard("01"),
 	DNA("acgt"), // todo: have changed this to acgt from atgc 25Feb2019, does this break anything?
+	DNAwithAmbiguityCodes("acgtvhdbry"),
 	RNA("acgu"),
+	RNAwithAmbiguityCodes("acgury"),
 	Protein("arndcqeghilkmfpstwyvz"),
 	Microsat(""),
 	Unknown("");
@@ -60,7 +62,7 @@ public enum CharactersType {
 	}
 
 	public boolean isNucleotides() {
-		return this == DNA || this == RNA;
+		return this == DNA || this == RNA || this == RNAwithAmbiguityCodes || this == DNAwithAmbiguityCodes;
 	}
 
 	public static CharactersType guessType(String sequence) {
@@ -78,9 +80,14 @@ public enum CharactersType {
 		var best = 0.0;
 
 		for (var type : values()) {
-			var size = (float) intersection(type.symbols, alphabet).size() / (float) union(type.symbols, alphabet).size();
+			var size = (float) intersection(type.symbols, alphabet).size() / (float) Math.min(type.symbols.length(), alphabet.length());
 			if (size > best) {
-				result = type;
+				if (type == DNAwithAmbiguityCodes)
+					result = DNA;
+				else if (type == RNAwithAmbiguityCodes)
+					result = RNA;
+				else
+					result = type;
 				best = size;
 			}
 

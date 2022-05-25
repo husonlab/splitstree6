@@ -29,7 +29,7 @@ import splitstree6.data.CharactersBlock;
 
 import java.util.BitSet;
 
-import static splitstree6.view.alignment.DrawAlignment.SELECTION_STROKE;
+import static splitstree6.view.alignment.AlignmentDrawer.SELECTION_STROKE;
 
 /**
  * update axis and horizontal scroll bar

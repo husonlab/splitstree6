@@ -23,8 +23,8 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ListChangeListener;
-import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.ListCell;
@@ -53,7 +53,6 @@ import java.util.function.Predicate;
  * Daniel Huson, 4.2022
  */
 public class AlignmentViewPresenter implements IDisplayTabPresenter {
-	private final InvalidationListener updateAxisScrollBarCanvasListener;
 	private final InvalidationListener updateCanvasListener;
 
 	private final AlignmentView alignmentView;
@@ -62,7 +61,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 	private final Workflow workflow;
 
 	private boolean colorSchemeSet = false;
-
 
 	public AlignmentViewPresenter(MainWindow mainWindow, AlignmentView alignmentView) {
 		this.alignmentView = alignmentView;
@@ -103,35 +101,54 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		updateCanvasListener = e -> Platform.runLater(() -> {
-			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
+		var canvasWidth = new SimpleDoubleProperty();
+		canvasWidth.bind(controller.gethScrollBar().widthProperty());
+		var canvasHeight = new SimpleDoubleProperty();
+		canvasHeight.bind(controller.getvScrollBar().heightProperty());
 
-			DrawAlignment.updateCanvas(controller.getCanvas(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionColorScheme(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
+		var alignmentDrawer = new AlignmentDrawer(controller.getCanvasGroup(), mainWindowController.getBottomFlowPane());
 
-			DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
-			DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
-			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
-		});
+		var inUpdateCanvas = new Single<>(false);
 
-		updateAxisScrollBarCanvasListener = e -> {
-			controller.getAxis().setPadding(new Insets(0, 0, 0, alignmentView.getOptionUnitWidth()));
-			Platform.runLater(() -> {
-				AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), controller.getCanvas().getWidth(),
-						alignmentView.getOptionUnitWidth(), alignmentView.getInputCharacters() != null ? alignmentView.getInputCharacters().getNchar() : 0, alignmentView);
-				AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(), alignmentView.getActiveSites(), alignmentView.getSelectedSites());
-			});
-			updateCanvasListener.invalidated(null);
+		updateCanvasListener = e -> {
+			if (!inUpdateCanvas.get()) {
+				inUpdateCanvas.set(true);
+				try {
+					AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), canvasWidth.get(),
+							alignmentView.getOptionUnitWidth(), alignmentView.getInputCharacters() != null ? alignmentView.getInputCharacters().getNchar() : 0, alignmentView);
+					AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(),
+							alignmentView.getActiveSites(), alignmentView.getSelectedSites());
+
+					updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
+
+					alignmentDrawer.updateCanvas(canvasWidth.get(), canvasHeight.get(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+							alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(),
+							alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
+
+					alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+							alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
+
+					alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+							alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
+
+					controller.getSelectionLabel().setText(alignmentView.createSelectionString());
+				} finally {
+					inUpdateCanvas.set(false);
+				}
+			}
 		};
 
-		controller.getCanvas().widthProperty().addListener(updateAxisScrollBarCanvasListener);
-		controller.getCanvas().heightProperty().addListener(updateAxisScrollBarCanvasListener);
-		alignmentView.optionUnitWidthProperty().addListener(updateAxisScrollBarCanvasListener);
-		alignmentView.optionUnitHeightProperty().addListener(updateAxisScrollBarCanvasListener);
+		canvasWidth.addListener(updateCanvasListener);
+		canvasHeight.addListener(updateCanvasListener);
+
+		alignmentView.optionUnitWidthProperty().addListener(updateCanvasListener);
+		alignmentView.optionUnitHeightProperty().addListener(updateCanvasListener);
+
+		alignmentView.activeSitesProperty().addListener(updateCanvasListener);
+		alignmentView.activeTaxaProperty().addListener(updateCanvasListener);
 
 		alignmentView.selectedSitesProperty().addListener(e -> {
-			DrawAlignment.updateSiteSelection(controller.getCanvas(), controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
 					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
 			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(), alignmentView.getActiveSites(), alignmentView.getSelectedSites());
 			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
@@ -150,7 +167,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 							if (t != -1 && n.get(t))
 								controller.getTaxaListView().getSelectionModel().select(taxon);
 						}
-						DrawAlignment.updateTaxaSelection(controller.getCanvas(), controller.getTaxaSelectionGroup(), inputTaxa, alignmentView.getInputCharacters(),
+						alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), inputTaxa, alignmentView.getInputCharacters(),
 								alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 					}
 					controller.getSelectionLabel().setText(alignmentView.createSelectionString());
@@ -158,7 +175,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					inSelectionUpdate.set(false);
 				}
 			}
-
 		});
 
 		InvalidationListener updateTaxaListener = e -> {
@@ -201,13 +217,13 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updateCanvasListener));
 
-		controller.gethScrollBar().valueProperty().addListener(updateAxisScrollBarCanvasListener);
+		controller.gethScrollBar().valueProperty().addListener(updateCanvasListener);
 		controller.gethScrollBar().valueProperty().addListener((v, o, n) -> {
 			var diff = n.doubleValue() - o.doubleValue();
 			controller.getAxis().setLowerBound(controller.getAxis().getLowerBound() + diff);
 			controller.getAxis().setUpperBound(controller.getAxis().getUpperBound() + diff);
 		});
-		controller.getvScrollBar().valueProperty().addListener(updateAxisScrollBarCanvasListener);
+		controller.getvScrollBar().valueProperty().addListener(updateCanvasListener);
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> alignmentView.setOptionUnitWidth(1.2 * alignmentView.getOptionUnitWidth()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(alignmentView.optionUnitWidthProperty().greaterThan(64));
@@ -221,7 +237,18 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller.getContractVerticallyButton().setOnAction(e -> alignmentView.setOptionUnitHeight(1 / 1.2 * alignmentView.getOptionUnitHeight()));
 		controller.getContractVerticallyButton().disableProperty().bind(alignmentView.optionUnitHeightProperty().lessThan(0.01));
 
-		controller.getZoomToFitButton().setOnAction(e -> DrawAlignment.zoomToFit(controller.getCanvas(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.optionUnitWidthProperty(), alignmentView.optionUnitHeightProperty()));
+		controller.getZoomToFitButton().setOnAction(e -> {
+			if (alignmentView.getInputCharacters().getNchar() * alignmentView.getOptionUnitWidth() > canvasWidth.get()
+				|| alignmentView.getInputCharacters().getNtax() * alignmentView.getOptionUnitHeight() > canvasHeight.get()) {
+				controller.getvScrollBar().setValue(controller.getvScrollBar().getMin());
+				controller.gethScrollBar().setValue(controller.gethScrollBar().getMin());
+				alignmentView.setOptionUnitWidth(canvasWidth.get() / alignmentView.getInputCharacters().getNchar());
+				alignmentView.setOptionUnitHeight(canvasHeight.get() / alignmentView.getInputCharacters().getNtax());
+			} else {
+				alignmentView.setOptionUnitWidth(18);
+				alignmentView.setOptionUnitHeight(18);
+			}
+		});
 		controller.getZoomToFitButton().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not());
 
 		controller.getSelectAllMenuItem().setOnAction(e ->
@@ -407,9 +434,6 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		controller.getFilterMenu().disableProperty().bind(workflow.runningProperty());
 
-		Platform.runLater(() -> updateTaxaListener.invalidated(null));
-		Platform.runLater(() -> updateAxisScrollBarCanvasListener.invalidated(null));
-
 		Platform.runLater(() -> {
 			var taxonHBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.HORIZONTAL);
 			if (taxonHBar != null) {
@@ -426,6 +450,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				taxonVBar.valueProperty().bindBidirectional(controller.getvScrollBar().valueProperty());
 			}
 		});
+
+		Platform.runLater(() -> updateTaxaListener.invalidated(null));
+		Platform.runLater(() -> updateCanvasListener.invalidated(null));
 	}
 
 	public static void updateTaxaCellFactory(ListView<Taxon> listView, double unitHeight, Predicate<Taxon> isDisabled) {

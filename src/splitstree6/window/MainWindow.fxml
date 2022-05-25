@@ -25,7 +25,7 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.window.MainWindowController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                 AnchorPane.topAnchor="0.0">
@@ -549,7 +549,7 @@
         <bottom>
             <HBox minHeight="-Infinity" spacing="5.0" style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
                   BorderPane.alignment="BOTTOM_CENTER">
-                <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="30.0" vgap="5.0" HBox.hgrow="ALWAYS">
+                <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="35.0" vgap="5.0" HBox.hgrow="ALWAYS">
                     <padding>
                         <Insets bottom="2.0" right="50.0" top="2.0"/>
                     </padding>

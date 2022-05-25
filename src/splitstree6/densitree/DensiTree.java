@@ -125,7 +125,7 @@ public class DensiTree {
                 NodeArray<Point2D> nodePointMap = tree.newNodeArray();
                 var nodeAngleMap = tree.newNodeDoubleArray();
                 LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
-                if (!block && !rooted) {
+                if (true || !block && !rooted) {
                     adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
                 }
 

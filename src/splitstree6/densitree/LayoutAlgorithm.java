@@ -112,6 +112,8 @@ public class LayoutAlgorithm {
                             }
                         });
                     } else if (drawingMethod == splitstree6.densitree.drawingMethod.ROOTED || drawingMethod == splitstree6.densitree.drawingMethod.BLOCK) {
+
+
                         tree.postorderTraversal(v -> {
                             if (tree.isLeaf(v)) {
                                 int y = 0;
@@ -120,7 +122,7 @@ public class LayoutAlgorithm {
                                         y = j;
                                     }
                                 }
-                                nodePointMap.put(v, new Point2D(0, y * 75));
+                                nodePointMap.put(v, new Point2D(0, y /* * 75*/));
                             } else {
                                 double y1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
                                 double y2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();
@@ -130,9 +132,11 @@ public class LayoutAlgorithm {
 
                                 double xmin = Math.min(x1, x2);
 
-                                nodePointMap.put(v, new Point2D(x1 - tree.getWeight(v.getFirstOutEdge()) * 2250, (y1 + y2) / 2));
+                                nodePointMap.put(v, new Point2D(x1 - tree.getWeight(v.getFirstOutEdge()) /* * 2250 */, (y1 + y2) / 2));
                             }
                         });
+
+
                         nodeAngleMap.putAll(0.0);
                     }
                 }

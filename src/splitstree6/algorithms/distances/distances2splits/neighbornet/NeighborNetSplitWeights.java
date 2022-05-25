@@ -1,5 +1,6 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.parts.ASplit;
@@ -119,7 +120,7 @@ public class NeighborNetSplitWeights {
                 fx_old = fx;
                 progress.checkForCancel();
             }
-            System.err.println("NNLS algorithm failed to converge");
+            NotificationManager.showError("Neighbor-net algorithm failed to converge");
         }
 
 
