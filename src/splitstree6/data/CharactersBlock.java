@@ -514,4 +514,31 @@ public class CharactersBlock extends DataBlock {
 		}
 		return true;
 	}
+
+	/**
+	 * computes the consensus sequence
+	 *
+	 * @return consensus sequence, 1-base
+	 */
+	public char[] computeConsensusSequence() {
+		var consensus = new char[getNchar() + 1];
+		var charCountMap = new HashMap<Character, Integer>();
+		for (var site = 1; site <= getNchar(); site++) {
+			for (var tax = 1; tax <= getNtax(); tax++) {
+				var ch = get(tax, site);
+				charCountMap.put(ch, charCountMap.getOrDefault(ch, 0) + 1);
+			}
+			var bestCh = ' ';
+			var bestCount = 0;
+			for (var entry : charCountMap.entrySet()) {
+				if (entry.getValue() > bestCount) {
+					bestCh = entry.getKey();
+					bestCount = entry.getValue();
+				}
+			}
+			consensus[site] = bestCh;
+			charCountMap.clear();
+		}
+		return consensus;
+	}
 }

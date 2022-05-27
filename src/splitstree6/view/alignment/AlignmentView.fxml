@@ -173,8 +173,7 @@
                         <StackPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
-                                <SplitPane fx:id="splitPane" dividerPositions="0.2" prefHeight="200.0"
-                                           prefWidth="160.0">
+                                <SplitPane fx:id="splitPane" dividerPositions="0.15">
                                     <items>
                                         <VBox>
                                             <children>

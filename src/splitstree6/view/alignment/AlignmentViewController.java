@@ -206,6 +206,8 @@ public class AlignmentViewController {
             }
         });
 
+        splitPane.setDividerPositions(0.15);
+
         // never want gray in the list of selected taxa, because we are using gray to indicate inactive items
         taxaListView.setStyle("-fx-selection-bar-non-focused: -fx-focus-color;");
     }

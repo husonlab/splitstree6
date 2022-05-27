@@ -19,6 +19,9 @@
 
 package splitstree6.view.alignment;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
@@ -42,18 +45,22 @@ import java.util.BitSet;
  */
 public class AlignmentDrawer {
 	private final Group canvasGroup;
+	private final ObjectProperty<Canvas> canvas = new SimpleObjectProperty<>(this, "canvas");
 
 	private final AService<Canvas> service;
 
 	public AlignmentDrawer(Group canvasGroup, Pane bottomPane) {
 		this.canvasGroup = canvasGroup;
+		canvas.set((Canvas) canvasGroup.getChildren().get(0));
+		canvas.addListener((c, o, n) -> canvasGroup.getChildren().setAll(n));
 		service = new AService<>(bottomPane);
 	}
 
 	/**
 	 * update the canvas
 	 */
-	public void updateCanvas(double canvasWidth, double canvasHeight, TaxaBlock inputTaxa, CharactersBlock inputCharacters, ColorScheme colorScheme,
+	public void updateCanvas(double canvasWidth, double canvasHeight, TaxaBlock inputTaxa, CharactersBlock inputCharacters,
+							 char[] consensusSequence, ColorScheme colorScheme,
 							 double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activateTaxa, BitSet activeSites) {
 
 		if (inputTaxa != null && inputCharacters != null) {
@@ -79,6 +86,8 @@ public class AlignmentDrawer {
 				var canvas = new Canvas(canvasWidth, canvasHeight);
 				var gc = canvas.getGraphicsContext2D();
 				gc.setFont(Font.font("monospaced", fontSize));
+				gc.setLineWidth(0.75);
+				gc.setStroke(lineStroke);
 
 				progress.setMaximum(inputTaxa.getNtax());
 				progress.setProgress(0);
@@ -108,6 +117,8 @@ public class AlignmentDrawer {
 
 					for (var site = left; site <= right; site++) {
 						var ch = inputCharacters.get(t, site);
+						var consensusCharacter = (consensusSequence == null ? ' ' : consensusSequence[site]);
+
 						var x = (site - axisLowerBound) * boxWidth + axisStartOffset;
 						if (!activateTaxa.get(t) || !activeSites.get(site)) {
 							gc.setFill(Color.TRANSPARENT);
@@ -117,23 +128,21 @@ public class AlignmentDrawer {
 							gc.setFill(colorScheme.apply(ch));
 							gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
 							gc.setFill(textFill);
-						} else
+						} else {
 							gc.setFill(textFill);
-						if (fontSize >= 2)
-							gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.4 * fontSize);
+						}
+
+						if (fontSize >= 2) {
+							gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.5 * boxHeight);
+						}
+
 						if (site == 1) {
-							gc.setLineWidth(0.75);
-							gc.setStroke(lineStroke);
 							gc.strokeLine(x, y - boxHeight, x, y);
 						}
 						if (t == inputTaxa.getNtax()) {
-							gc.setLineWidth(0.75);
-							gc.setStroke(lineStroke);
 							gc.strokeLine(x, y, x + boxWidth, y);
 						}
 						if (site == inputCharacters.getNchar()) {
-							gc.setLineWidth(0.75);
-							gc.setStroke(lineStroke);
 							gc.strokeLine(x + boxWidth, y - boxHeight, x + boxWidth, y);
 						}
 					}
@@ -150,12 +159,16 @@ public class AlignmentDrawer {
 		}
 	}
 
-	private Canvas getCanvas() {
-		return (Canvas) canvasGroup.getChildren().get(0);
+	public Canvas getCanvas() {
+		return canvas.get();
+	}
+
+	public ReadOnlyObjectProperty<Canvas> canvasProperty() {
+		return canvas;
 	}
 
 	private void setCanvas(Canvas canvas) {
-		canvasGroup.getChildren().setAll(canvas);
+		this.canvas.set(canvas);
 	}
 
 	public final static Color SELECTION_FILL = Color.web("#039ED3").deriveColor(1, 1, 1, 0.4);
