@@ -1,0 +1,56 @@
+#nexus
+
+[!
+Koblmüller, S., Duftner, N., Sefc, K. M., Aibara, M., Stipacek, M.,
+Blanc, M., Egger, B., & Sturmbauer, C. (2007).
+Reticulate phylogeny of gastropod-shell-breeding cichlids from
+Lake Tanganyika--the result of repeated introgressive hybridization.
+BMC evolutionary biology, 7, 7. https://doi.org/10.1186/1471-2148-7-7
+]
+
+BEGIN TREES;
+[Number of trees: 2]
+PROPERTIES partialTrees=yes rooted=yes;
+TRANSLATE
+	1 'Neolamprologus similis',
+	2 'Variabilichromis moorii',
+	3 'Neolamprologus multifasciatus',
+	4 'Lamprologus omatipinnis',
+	5 'Julidochromis ornatus',
+	6 'Telmatochromis vittatus',
+	7 'Lamprologus meleagris',
+	8 'Neolamprologus leloupi',
+	9 'Lamprologus kungweensis',
+	10 'Neolamprologus caudopunctatus',
+	11 'Lamprologus lemairii',
+	12 'Lamprologus speciosus',
+	13 'Hybrid 1.2',
+	14 'Neolamprologus calliurus',
+	15 'Lamprologus signatus',
+	16 'Lamprologus laparogramma',
+	17 'Lamprologus ocellatus',
+	18 'Lepidiolamprologus elongatus',
+	19 'Hybrid 1.1 Hybrid 2.1 Hybrid 2.2',
+	20 'Neolamprologus brevis',
+	21 'Lepidiolamprologus profundicola',
+	22 'Lamprologus cailipterus',
+	23 'Noalamprologus wauthioni',
+	24 'Noalamprologus fascratus',
+	25 'Altolamprologus calvus',
+	26 'Altolamprologus sp. shell',
+	27 'Altolamprologus compressiceps',
+	28 'Lepidiolamprologus boulengeri',
+	29 'Lepidiolamprologus sp. meeli-boulengeri',
+	30 'Lepidiolamprologus attenuatus',
+	31 'Lepidiolamprologus meeli',
+	32 'Lepidiolamprologus hecqui',
+	33 'Lamprologus callipterus',
+	34 'Neolamprologus fasciatus',
+	35 'Lamprologus lemainii',
+	36 'Neolamprologus wauthioni',
+	37 'Lepidiolamprologus sp. nov.',
+;
+[TREES]
+		[1] tree 'ND2'=[&R] ((((((((22:1,23:1,24:1):1,((26:1,27:1):1,25:1):1):1,17:1):1,(((((31:1,32:1):1,28:1):1,(29:1,30:1):1):1,21:1):1,18:1):1):1,(10:1,11:1):1,7:1,8:1):1,(((19:1,20:1):1,12:1):1,(13:1,14:1):1):1,3:1):1,(((15:1,16:1):1,9:1):1,4:1):1,1:1):0.475,((5:1,6:1):1,2:1):0.025);
+		[2] tree 'AFLP'=[&R] (((((31:1,29:1):1,(37:1,21:1):1,32:1,18:1,30:1):1,35:1):1,((36:1,12:1):1,7:1,17:1):1,((26:1,27:1):1,25:1):1,(8:1,10:1):1,(15:1,4:1):1,33:1,34:1,3:1,1:1):1,(14:1,20:1):1,5:1,6:1,2:0.5);
+END; [TREES]

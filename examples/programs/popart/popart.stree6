@@ -1,0 +1,245 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=9 nAlgorithms=6;
+PROGRAM version='SplitsTree6 (version 0.0.9-alpha, built 25 May 2022)';
+WORKFLOW creationDate='1653755376628'; [Sat May 28 18:29:36 CEST 2022]
+END; [SPLITSTREE6]
+
+[!
+Source: http://popart.otago.ac.nz/examplenex.shtml
+This is an example of a Nexus file, modified from a sample file distributed
+with DNASP. It should run in PopART. Any text appearing between square braces is
+a comment and will be ignored by the program.]
+
+[
+Input:
+Source: http://popart.otago.ac.nz/examplenex.shtml
+This is an example of a Nexus file, modified from a sample file distributed
+with DNASP. It should run in PopART. Any text appearing between square braces is
+a comment and will be ignored by the program.
+
+Methods:
+Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 7 taxa and 7 DNA sequences of length 56.
+The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 7 x 7 distance matrix.
+The Median Joining method (Bandelt et al, 1999) was used (default options) so as to obtain 9 nodes and 11 edges.
+
+References:
+Bandelt et al, 1999: H. -J. Bandelt, P. Forster, and A. Röhl. Median-joining networks for inferring intraspecific phylogenies. Molecular Biology and Evolution, 16:37–48, 1999.
+Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=7;
+TAXLABELS
+	[1] 'seq_1'
+	[2] 'seq_2'
+	[3] 'seq_3'
+	[4] 'seq_4'
+	[5] 'seq_5'
+	[6] 'seq_6'
+	[7] 'seq_7'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TRAITS;
+TITLE 'Input Traits';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS [nTax=7] nTraits=5;
+FORMAT labels=yes missing=? separator=Comma;
+TRAITLATITUDE 53.0 43.6811 5.4 -25.61 -0.0;
+TRAITLONGITUDE 16.75 87.3311 26.5 134.355 -76.0;
+TRAITLABELS
+ 'Europe' 'Asia' 'Africa' 'Australia' 'America';
+MATRIX
+[1] 'seq_1'  0,0,0,3,3
+[2] 'seq_2'  10,5,0,6,0
+[3] 'seq_3'  0,0,0,3,5
+[4] 'seq_4'  0,0,0,4,2
+[5] 'seq_5'  4,0,10,0,0
+[6] 'seq_6'  0,0,0,7,3
+[7] 'seq_7'  0,0,5,0,0
+;
+END; [TRAITS]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=7;
+TAXLABELS
+	[1] 'seq_1'
+	[2] 'seq_2'
+	[3] 'seq_3'
+	[4] 'seq_4'
+	[5] 'seq_5'
+	[6] 'seq_6'
+	[7] 'seq_7'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TRAITS;
+TITLE 'Working Traits';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS [nTax=7] nTraits=5;
+FORMAT labels=yes missing=? separator=Comma;
+TRAITLATITUDE 53.0 43.6811 5.4 -25.61 -0.0;
+TRAITLONGITUDE 16.75 87.3311 26.5 134.355 -76.0;
+TRAITLABELS
+ 'Europe' 'Asia' 'Africa' 'Australia' 'America';
+MATRIX
+[1] 'seq_1'  0,0,0,3,3
+[2] 'seq_2'  10,5,0,6,0
+[3] 'seq_3'  0,0,0,3,5
+[4] 'seq_4'  0,0,0,4,2
+[5] 'seq_5'  4,0,10,0,0
+[6] 'seq_6'  0,0,0,7,3
+[7] 'seq_7'  0,0,5,0,0
+;
+END; [TRAITS]
+
+BEGIN CHARACTERS;
+TITLE 'Input Characters';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=7 nchar=56;
+FORMAT
+	datatype='DNA' missing=? matchChar=. gap=- symbols="acgt" labels=left transpose=no interleave=no;
+MATRIX
+seq_1 atatacggggtta---ttaga----aaaatgtgtgtgtgttttttttttcatgtgg
+seq_2 ......--..a........c......g...c.a...c..c...c............
+seq_3 ..........a........t......g.............................
+seq_4 ..........a.....g...t..................................a
+seq_5 ..........a.....g...g..................................c
+seq_6 ..........a.....g...c..................................t
+seq_7 ..........a.....g......................................a
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK CHARACTERS = 'Input Characters';
+NAME 'Characters Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN CHARACTERS;
+TITLE 'Working Characters';
+LINK ALGORITHM = 'Input Data Filter';
+DIMENSIONS ntax=7 nchar=56;
+FORMAT
+	datatype='DNA' missing=? gap=- symbols="acgt" labels=left transpose=no interleave=yes;
+MATRIX
+seq_1 atatacggggtta---ttaga----aaaatgtgtgtgtgttttttttttcatgtgg
+seq_2 atatac--ggata---ttaca----agaatctatgtctgctttctttttcatgtgg
+seq_3 atatacggggata---ttata----agaatgtgtgtgtgttttttttttcatgtgg
+seq_4 atatacggggata---gtagt----aaaatgtgtgtgtgttttttttttcatgtga
+seq_5 atatacggggata---gtagg----aaaatgtgtgtgtgttttttttttcatgtgc
+seq_6 atatacggggata---gtagc----aaaatgtgtgtgtgttttttttttcatgtgt
+seq_7 atatacggggata---gtaga----aaaatgtgtgtgtgttttttttttcatgtga
+
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Hamming Distances';
+LINK CHARACTERS = 'Working Characters';
+NAME 'Hamming Distances';
+OPTIONS
+	Normalize = 'true';
+END; [ALGORITHM]
+
+BEGIN ALGORITHM;
+TITLE 'Median Joining';
+LINK CHARACTERS = 'Working Characters';
+NAME 'Median Joining';
+OPTIONS
+	Epsilon = 0;
+END; [ALGORITHM]
+
+BEGIN DISTANCES;
+TITLE 'Distances';
+LINK ALGORITHM = 'Hamming Distances';
+DIMENSIONS ntax=7;
+FORMAT labels=left diagonal triangle=Both;
+MATRIX
+[1] 'seq_1'   0 0.170213 0.061224 0.081633 0.081633 0.081633 0.061224
+[2] 'seq_2'   0.170213 0 0.12766 0.212766 0.212766 0.212766 0.191489
+[3] 'seq_3'   0.061224 0.12766 0 0.102041 0.102041 0.102041 0.081633
+[4] 'seq_4'   0.081633 0.212766 0.102041 0 0.040816 0.040816 0.020408
+[5] 'seq_5'   0.081633 0.212766 0.102041 0.040816 0 0.040816 0.040816
+[6] 'seq_6'   0.081633 0.212766 0.102041 0.040816 0.040816 0 0.040816
+[7] 'seq_7'   0.061224 0.191489 0.081633 0.020408 0.040816 0.040816 0
+;
+END; [DISTANCES]
+
+BEGIN NETWORK;
+TITLE 'Network';
+LINK ALGORITHM = 'Median Joining';
+DIMENSIONS nNodes=9 nEdges=11;
+	TYPE=HaplotypeNetwork;
+	PROPERTIES info ='Median-joining network';
+NODES
+	id=1 label='seq_7' states='atatacggggata---gtaga----aaaatgtgtgtgtgttttttttttcatgtga',
+	id=2 label='seq_6' states='atatacggggata---gtagc----aaaatgtgtgtgtgttttttttttcatgtgt',
+	id=3 states='atatacggggata---gtagc----aaaatgtgtgtgtgttttttttttcatgtga',
+	id=4 label='seq_4' states='atatacggggata---gtagt----aaaatgtgtgtgtgttttttttttcatgtga',
+	id=5 label='seq_3' states='atatacggggata---ttata----agaatgtgtgtgtgttttttttttcatgtgg',
+	id=6 label='seq_1' states='atatacggggtta---ttaga----aaaatgtgtgtgtgttttttttttcatgtgg',
+	id=7 label='seq_2' states='atatacggggata---ttaca----agaatctatgtctgctttctttttcatgtgg',
+	id=8 states='atatacggggata---gtagg----aaaatgtgtgtgtgttttttttttcatgtga',
+	id=9 label='seq_5' states='atatacggggata---gtagg----aaaatgtgtgtgtgttttttttttcatgtgc'
+;
+EDGES
+	id=1 sid=1 tid=3 sites='21',
+	id=2 sid=1 tid=4 sites='21',
+	id=3 sid=1 tid=8 sites='21',
+	id=4 sid=2 tid=3 sites='56',
+	id=5 sid=3 tid=4 sites='21',
+	id=6 sid=3 tid=8 sites='21',
+	id=7 sid=4 tid=8 sites='21',
+	id=8 sid=8 tid=9 sites='56',
+	id=16 sid=1 tid=6 sites='11,17,56',
+	id=17 sid=5 tid=6 sites='11,20,27',
+	id=29 sid=5 tid=7 sites='20,31,33,37,40,44'
+;
+END; [NETWORK]
+
+BEGIN ALGORITHM;
+TITLE 'Show Network';
+LINK NETWORK = 'Network';
+NAME 'Show Network';
+OPTIONS
+	View = 'Network';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Network';
+LINK ALGORITHM = 'Show Network';
+NAME 'Network';
+INPUT 'SPLITS';
+OPTIONS
+	Diagram = 'Network',
+	Orientation = 'Rotate0Deg',
+	ZoomFactor = 1,
+	FontScaleFactor = 1,
+	ActiveTraits = '*All*',
+	TraitLegend = 'true',
+	TraitSize = 64,
+	SitesStyle = 'Labels';
+END; [VIEW]

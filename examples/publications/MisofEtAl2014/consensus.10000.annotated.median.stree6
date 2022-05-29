@@ -1,0 +1,883 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=8 nAlgorithms=6;
+PROGRAM version='SplitsTree6 (version 0.0.9-alpha, built 25 May 2022)';
+WORKFLOW creationDate='1653728655561'; [Sat May 28 11:04:15 CEST 2022]
+END; [SPLITSTREE6]
+
+[!Insect Evolution
+Citation:
+Misof, Bernhard & Liu, Shanlin & Meusemann, Karen & Peters, Ralph & Donath, Alexander & Mayer, Christoph & Frandsen,
+Paul & Ware, Jessica & Flouri, Tom
+š & Beutel, Rolf & Niehuis, Oliver & Petersen Malte & Izquierdo-Carrasco,
+Fernando & Wappler, Torsten & Rust, Jes & Aberer, Andre & Asp
+ck, Ulrike & Asp
+ck, Horst & Bartel, Daniela & Zhou, Xin.
+(2014). Phylogenomics resolves the timing and pattern of insect evolution. Science. 346. 763-767. 10.1126/science.1257570.]
+
+[
+Input:
+Insect Evolution
+Citation:
+Misof, Bernhard & Liu, Shanlin & Meusemann, Karen & Peters, Ralph & Donath, Alexander & Mayer, Christoph & Frandsen,
+Paul & Ware, Jessica & Flouri, Tom
+š & Beutel, Rolf & Niehuis, Oliver & Petersen Malte & Izquierdo-Carrasco,
+Fernando & Wappler, Torsten & Rust, Jes & Aberer, Andre & Asp
+ck, Ulrike & Asp
+ck, Horst & Bartel, Daniela & Zhou, Xin.
+(2014). Phylogenomics resolves the timing and pattern of insect evolution. Science. 346. 763-767. 10.1126/science.1257570.
+
+Methods:
+Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 144 taxa and one tree.
+The Show Trees method was used (default options) so as to obtain a Tree View visualization (Dress & Huson 2004).
+
+References:
+Dress & Huson 2004: A.W.M. Dress and D.H. Huson, Constructing splits graphs, IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=144;
+TAXLABELS
+	[1] 'ACROMYRM'
+	[2] 'ACYRTOSI'
+	[3] 'ANOPHELE'
+	[4] 'APIS_MEL'
+	[5] 'Acanthoc'
+	[6] 'Acanthos'
+	[7] 'Acerento'
+	[8] 'Aedes_AE'
+	[9] 'Aleochar'
+	[10] 'Anurida_'
+	[11] 'Apachyus'
+	[12] 'Aphis_go'
+	[13] 'Aposthon'
+	[14] 'Archaeop'
+	[15] 'Aretaon_'
+	[16] 'Atelura_'
+	[17] 'BOMBYX_M'
+	[18] 'Baetis_p'
+	[19] 'Bemisia_'
+	[20] 'Bibio_ma'
+	[21] 'Bittacus'
+	[22] 'Blaberus'
+	[23] 'Bombus_t'
+	[24] 'Bombyliu'
+	[25] 'Boreus_h'
+	[26] 'Calopter'
+	[27] 'Campodea'
+	[28] 'Carabus_'
+	[29] 'Celuca_p'
+	[30] 'Ceratoph'
+	[31] 'Cercopis'
+	[32] 'Ceuthoph'
+	[33] 'Cheumato'
+	[34] 'Chrysis_'
+	[35] 'Conwentz'
+	[36] 'Corduleg'
+	[37] 'Corydalu'
+	[38] 'Cosmiope'
+	[39] 'Cotesia_'
+	[40] 'Cryptoce'
+	[41] 'Ctenocep'
+	[42] 'Cypridin'
+	[43] 'DAPHNIA_'
+	[44] 'DROSOPHI'
+	[45] 'Dendroct'
+	[46] 'Dichochr'
+	[47] 'Ectopsoc'
+	[48] 'Empusa_p'
+	[49] 'Ephemera'
+	[50] 'Epiophle'
+	[51] 'Eriocran'
+	[52] 'Essigell'
+	[53] 'Euroleon'
+	[54] 'Euryloph'
+	[55] 'Exoneura'
+	[56] 'Folsomia'
+	[57] 'Forficul'
+	[58] 'Franklin'
+	[59] 'Galloisi'
+	[60] 'Glomeris'
+	[61] 'Glossina'
+	[62] 'Gryllobl'
+	[63] 'Gryllota'
+	[64] 'Gynaikot'
+	[65] 'Gyrinus_'
+	[66] 'Haploemb'
+	[67] 'Harpegna'
+	[68] 'Hydropti'
+	[69] 'IXODES_S'
+	[70] 'Inocelli'
+	[71] 'Isonychi'
+	[72] 'Lepeopht'
+	[73] 'Lepiceru'
+	[74] 'Leptopil'
+	[75] 'Leuctra_'
+	[76] 'Lipara_l'
+	[77] 'Liposcel'
+	[78] 'Litopena'
+	[79] 'Machilis'
+	[80] 'Manduca_'
+	[81] 'Mantis_r'
+	[82] 'Mastoter'
+	[83] 'Meinerte'
+	[84] 'Meloe_vi'
+	[85] 'Mengenil'
+	[86] 'Menopon_'
+	[87] 'Metallyt'
+	[88] 'Micropte'
+	[89] 'NASONIA_'
+	[90] 'Nannocho'
+	[91] 'Nemophor'
+	[92] 'Nilaparv'
+	[93] 'Notostir'
+	[94] 'Occasjap'
+	[95] 'Okanagan'
+	[96] 'Orussus_'
+	[97] 'Osmylus_'
+	[98] 'PEDICULU'
+	[99] 'Panorpa_'
+	[100] 'Parides_'
+	[101] 'Periplan'
+	[102] 'Perla_ma'
+	[103] 'Peruphas'
+	[104] 'Philopot'
+	[105] 'Phleboto'
+	[106] 'Planococ'
+	[107] 'Platycen'
+	[108] 'Pogonogn'
+	[109] 'Polyomma'
+	[110] 'Priacma_'
+	[111] 'Prorhino'
+	[112] 'Prosarth'
+	[113] 'Ranatra_'
+	[114] 'Rhagolet'
+	[115] 'Rhyacoph'
+	[116] 'Sarcopha'
+	[117] 'Sarsineb'
+	[118] 'Sialis_l'
+	[119] 'Sminthur'
+	[120] 'Speleone'
+	[121] 'Stenobot'
+	[122] 'Stylops_'
+	[123] 'Symphyle'
+	[124] 'TRIBOLIU'
+	[125] 'Tanzanio'
+	[126] 'Tenthred'
+	[127] 'Tetrix_s'
+	[128] 'Tetrodon'
+	[129] 'Thermobi'
+	[130] 'Thrips_p'
+	[131] 'Timema_c'
+	[132] 'Tipula_m'
+	[133] 'Trialeur'
+	[134] 'Triarthr'
+	[135] 'Trichoce'
+	[136] 'Trichole'
+	[137] 'Triodia_'
+	[138] 'Velia_ca'
+	[139] 'Xanthost'
+	[140] 'Xenophys'
+	[141] 'Yponomeu'
+	[142] 'ZOOTERMO'
+	[143] 'Zorotypu'
+	[144] 'Zygaena_'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=144;
+TAXLABELS
+	[1] 'ACROMYRM'
+	[2] 'ACYRTOSI'
+	[3] 'ANOPHELE'
+	[4] 'APIS_MEL'
+	[5] 'Acanthoc'
+	[6] 'Acanthos'
+	[7] 'Acerento'
+	[8] 'Aedes_AE'
+	[9] 'Aleochar'
+	[10] 'Anurida_'
+	[11] 'Apachyus'
+	[12] 'Aphis_go'
+	[13] 'Aposthon'
+	[14] 'Archaeop'
+	[15] 'Aretaon_'
+	[16] 'Atelura_'
+	[17] 'BOMBYX_M'
+	[18] 'Baetis_p'
+	[19] 'Bemisia_'
+	[20] 'Bibio_ma'
+	[21] 'Bittacus'
+	[22] 'Blaberus'
+	[23] 'Bombus_t'
+	[24] 'Bombyliu'
+	[25] 'Boreus_h'
+	[26] 'Calopter'
+	[27] 'Campodea'
+	[28] 'Carabus_'
+	[29] 'Celuca_p'
+	[30] 'Ceratoph'
+	[31] 'Cercopis'
+	[32] 'Ceuthoph'
+	[33] 'Cheumato'
+	[34] 'Chrysis_'
+	[35] 'Conwentz'
+	[36] 'Corduleg'
+	[37] 'Corydalu'
+	[38] 'Cosmiope'
+	[39] 'Cotesia_'
+	[40] 'Cryptoce'
+	[41] 'Ctenocep'
+	[42] 'Cypridin'
+	[43] 'DAPHNIA_'
+	[44] 'DROSOPHI'
+	[45] 'Dendroct'
+	[46] 'Dichochr'
+	[47] 'Ectopsoc'
+	[48] 'Empusa_p'
+	[49] 'Ephemera'
+	[50] 'Epiophle'
+	[51] 'Eriocran'
+	[52] 'Essigell'
+	[53] 'Euroleon'
+	[54] 'Euryloph'
+	[55] 'Exoneura'
+	[56] 'Folsomia'
+	[57] 'Forficul'
+	[58] 'Franklin'
+	[59] 'Galloisi'
+	[60] 'Glomeris'
+	[61] 'Glossina'
+	[62] 'Gryllobl'
+	[63] 'Gryllota'
+	[64] 'Gynaikot'
+	[65] 'Gyrinus_'
+	[66] 'Haploemb'
+	[67] 'Harpegna'
+	[68] 'Hydropti'
+	[69] 'IXODES_S'
+	[70] 'Inocelli'
+	[71] 'Isonychi'
+	[72] 'Lepeopht'
+	[73] 'Lepiceru'
+	[74] 'Leptopil'
+	[75] 'Leuctra_'
+	[76] 'Lipara_l'
+	[77] 'Liposcel'
+	[78] 'Litopena'
+	[79] 'Machilis'
+	[80] 'Manduca_'
+	[81] 'Mantis_r'
+	[82] 'Mastoter'
+	[83] 'Meinerte'
+	[84] 'Meloe_vi'
+	[85] 'Mengenil'
+	[86] 'Menopon_'
+	[87] 'Metallyt'
+	[88] 'Micropte'
+	[89] 'NASONIA_'
+	[90] 'Nannocho'
+	[91] 'Nemophor'
+	[92] 'Nilaparv'
+	[93] 'Notostir'
+	[94] 'Occasjap'
+	[95] 'Okanagan'
+	[96] 'Orussus_'
+	[97] 'Osmylus_'
+	[98] 'PEDICULU'
+	[99] 'Panorpa_'
+	[100] 'Parides_'
+	[101] 'Periplan'
+	[102] 'Perla_ma'
+	[103] 'Peruphas'
+	[104] 'Philopot'
+	[105] 'Phleboto'
+	[106] 'Planococ'
+	[107] 'Platycen'
+	[108] 'Pogonogn'
+	[109] 'Polyomma'
+	[110] 'Priacma_'
+	[111] 'Prorhino'
+	[112] 'Prosarth'
+	[113] 'Ranatra_'
+	[114] 'Rhagolet'
+	[115] 'Rhyacoph'
+	[116] 'Sarcopha'
+	[117] 'Sarsineb'
+	[118] 'Sialis_l'
+	[119] 'Sminthur'
+	[120] 'Speleone'
+	[121] 'Stenobot'
+	[122] 'Stylops_'
+	[123] 'Symphyle'
+	[124] 'TRIBOLIU'
+	[125] 'Tanzanio'
+	[126] 'Tenthred'
+	[127] 'Tetrix_s'
+	[128] 'Tetrodon'
+	[129] 'Thermobi'
+	[130] 'Thrips_p'
+	[131] 'Timema_c'
+	[132] 'Tipula_m'
+	[133] 'Trialeur'
+	[134] 'Triarthr'
+	[135] 'Trichoce'
+	[136] 'Trichole'
+	[137] 'Triodia_'
+	[138] 'Velia_ca'
+	[139] 'Xanthost'
+	[140] 'Xenophys'
+	[141] 'Yponomeu'
+	[142] 'ZOOTERMO'
+	[143] 'Zorotypu'
+	[144] 'Zygaena_'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 1]
+TRANSLATE
+	1 'ACROMYRM',
+	2 'ACYRTOSI',
+	3 'ANOPHELE',
+	4 'APIS_MEL',
+	5 'Acanthoc',
+	6 'Acanthos',
+	7 'Acerento',
+	8 'Aedes_AE',
+	9 'Aleochar',
+	10 'Anurida_',
+	11 'Apachyus',
+	12 'Aphis_go',
+	13 'Aposthon',
+	14 'Archaeop',
+	15 'Aretaon_',
+	16 'Atelura_',
+	17 'BOMBYX_M',
+	18 'Baetis_p',
+	19 'Bemisia_',
+	20 'Bibio_ma',
+	21 'Bittacus',
+	22 'Blaberus',
+	23 'Bombus_t',
+	24 'Bombyliu',
+	25 'Boreus_h',
+	26 'Calopter',
+	27 'Campodea',
+	28 'Carabus_',
+	29 'Celuca_p',
+	30 'Ceratoph',
+	31 'Cercopis',
+	32 'Ceuthoph',
+	33 'Cheumato',
+	34 'Chrysis_',
+	35 'Conwentz',
+	36 'Corduleg',
+	37 'Corydalu',
+	38 'Cosmiope',
+	39 'Cotesia_',
+	40 'Cryptoce',
+	41 'Ctenocep',
+	42 'Cypridin',
+	43 'DAPHNIA_',
+	44 'DROSOPHI',
+	45 'Dendroct',
+	46 'Dichochr',
+	47 'Ectopsoc',
+	48 'Empusa_p',
+	49 'Ephemera',
+	50 'Epiophle',
+	51 'Eriocran',
+	52 'Essigell',
+	53 'Euroleon',
+	54 'Euryloph',
+	55 'Exoneura',
+	56 'Folsomia',
+	57 'Forficul',
+	58 'Franklin',
+	59 'Galloisi',
+	60 'Glomeris',
+	61 'Glossina',
+	62 'Gryllobl',
+	63 'Gryllota',
+	64 'Gynaikot',
+	65 'Gyrinus_',
+	66 'Haploemb',
+	67 'Harpegna',
+	68 'Hydropti',
+	69 'IXODES_S',
+	70 'Inocelli',
+	71 'Isonychi',
+	72 'Lepeopht',
+	73 'Lepiceru',
+	74 'Leptopil',
+	75 'Leuctra_',
+	76 'Lipara_l',
+	77 'Liposcel',
+	78 'Litopena',
+	79 'Machilis',
+	80 'Manduca_',
+	81 'Mantis_r',
+	82 'Mastoter',
+	83 'Meinerte',
+	84 'Meloe_vi',
+	85 'Mengenil',
+	86 'Menopon_',
+	87 'Metallyt',
+	88 'Micropte',
+	89 'NASONIA_',
+	90 'Nannocho',
+	91 'Nemophor',
+	92 'Nilaparv',
+	93 'Notostir',
+	94 'Occasjap',
+	95 'Okanagan',
+	96 'Orussus_',
+	97 'Osmylus_',
+	98 'PEDICULU',
+	99 'Panorpa_',
+	100 'Parides_',
+	101 'Periplan',
+	102 'Perla_ma',
+	103 'Peruphas',
+	104 'Philopot',
+	105 'Phleboto',
+	106 'Planococ',
+	107 'Platycen',
+	108 'Pogonogn',
+	109 'Polyomma',
+	110 'Priacma_',
+	111 'Prorhino',
+	112 'Prosarth',
+	113 'Ranatra_',
+	114 'Rhagolet',
+	115 'Rhyacoph',
+	116 'Sarcopha',
+	117 'Sarsineb',
+	118 'Sialis_l',
+	119 'Sminthur',
+	120 'Speleone',
+	121 'Stenobot',
+	122 'Stylops_',
+	123 'Symphyle',
+	124 'TRIBOLIU',
+	125 'Tanzanio',
+	126 'Tenthred',
+	127 'Tetrix_s',
+	128 'Tetrodon',
+	129 'Thermobi',
+	130 'Thrips_p',
+	131 'Timema_c',
+	132 'Tipula_m',
+	133 'Trialeur',
+	134 'Triarthr',
+	135 'Trichoce',
+	136 'Trichole',
+	137 'Triodia_',
+	138 'Velia_ca',
+	139 'Xanthost',
+	140 'Xenophys',
+	141 'Yponomeu',
+	142 'ZOOTERMO',
+	143 'Zorotypu',
+	144 'Zygaena_',
+;
+[TREES]
+		[1] tree 'TREE1'=[&R] (69:568.82452992,((123:407.24672744,60:407.24672744):148.29444327,((42:468.47894114,(117:254.20865399,(78:121.30689499,29:121.30689499):132.901759):214.27028715):60.48948101,((72:399.31838246,43:399.31838246):109.03593258,(120:493.33209449,((7:430.0653301,(119:242.69491757,((128:134.13391979,10:134.13391979):63.37107902,(108:142.40764941,56:142.40764941):55.0973494):45.18991876):187.37041253):49.05937257,((27:303.3996001,94:303.3996001):158.18065581,((83:145.64526412,79:145.64526412):294.69340606,((136:214.10404304,(129:160.22978376,16:160.22978376):53.87425928):206.4450174,(((26:234.72987434,(36:107.07992654,50:107.07992654):127.6499478):127.72455902,(18:178.82063298,(71:110.64714402,(54:70.81589524,49:70.81589524):39.83124878):68.17348896):183.63380038):43.99679494,(((143:168.52337552,(57:79.38618729,11:79.38618729):89.13718824):133.52205023,((75:167.41119947,(102:107.80417899,38:107.80417899):59.60702048):101.70385795,(((63:149.03564395,32:149.03564395):53.66044366,(127:129.53299243,(112:71.47587538,121:71.47587538):58.05711705):73.16309518):45.14849036,(((125:152.66928204,(59:37.5755174,62:37.5755174):115.09376464):51.066677,((66:43.47313146,13:43.47313146):120.74812698,(131:124.7066864,(103:46.0166079,15:46.0166079):78.6900785):39.51457205):39.51470059):27.53525195,((87:74.18365391,(48:29.60455501,81:29.60455501):44.5790989):123.13603936,(22:172.97567781,(101:158.09997964,(40:143.98732864,(82:135.83331697,(111:122.54112649,142:122.54112649):13.29219048):8.15401167):14.112651):14.87569816):24.34401546):33.95151771):16.57336699):21.27047945):32.93036833):84.8437082,(((64:119.93139503,(58:54.75797108,130:54.75797108):65.17342395):219.19624686,((((6:108.0598443,93:108.0598443):47.49614964,(113:107.60346238,138:107.60346238):47.95253155):88.9194089,(140:202.58666735,(92:169.58023747,(31:105.5876649,95:105.5876649):63.99257257):33.00642987):41.88873549):46.36249014,((133:80.47110533,19:80.47110533):164.55774247,(5:211.86587904,(106:167.97387546,(52:59.44504373,(2:23.00135341,12:23.00135341):36.44369031):108.52883173):43.89200358):33.16296876):45.80904518):48.28974892):34.15908015,((47:187.32639057,(77:106.89178042,(86:53.40954074,98:53.40954074):53.48223967):80.43461015):174.20585296,((126:239.52711194,(96:187.88025277,((39:139.15077384,(74:107.35711376,89:107.35711376):31.79366008):23.2571331,(34:121.2663444,((1:54.79881961,67:54.79881961):42.51521537,(55:54.89713772,(4:30.43335987,23:30.43335987):24.46377785):42.41689727):23.95230941):41.14156254):25.47234584):51.64685917):105.15265705,((((85:107.55896028,122:107.55896028):178.91394772,((9:222.04550425,(45:166.91176671,(84:102.01318287,124:102.01318287):64.89858383):55.13373755):47.93048091,(73:250.04365308,(110:233.74996917,(65:211.96735136,28:211.96735136):21.78261781):16.29368391):19.93233208):16.49692284):21.23566401,((70:95.12902956,139:95.12902956):181.12844638,((37:212.38638539,118:212.38638539):46.64771119,(35:224.70858462,(97:166.87917242,(46:101.62074984,53:101.62074984):65.25842257):57.82941221):34.32551195):17.22337937):31.45109606):18.98302762,((((115:109.71753554,107:109.71753554):44.60231298,(68:125.99438246,(104:80.05699045,33:80.05699045):45.93739201):28.32546605):52.88089242,(88:141.46539181,(51:127.65328827,(137:116.96300126,(91:100.92448316,(141:79.82198361,(144:67.06321273,((109:41.45587473,100:41.45587473):14.35338215,(17:39.78963918,80:39.78963918):16.0196177):11.25395585):12.75877088):21.10249955):16.0385181):10.69028701):13.81210354):65.73534912):82.44876683,(((30:86.08928254,(14:34.53715192,41:34.53715192):51.55213063):81.45968273,(25:108.5582524,(90:94.33057619,(21:58.74620454,99:58.74620454):35.58437165):14.22767621):58.99071287):75.19386749,((3:75.20822315,8:75.20822315):82.62576782,((105:122.52301166,(135:92.68064077,132:92.68064077):29.84237089):21.26755928,(20:129.68976943,(24:108.29360947,(44:81.30378313,(76:68.69884347,(114:59.45278769,(61:42.22876809,(116:27.33769638,134:27.33769638):14.89107171):17.2240196):9.24605578):12.60493966):26.98982635):21.39615996):14.1008015):14.04342004):84.90884179):46.906675):37.04209186):17.98816937):16.85247454):11.75447852):13.60241191):19.56209435):14.09783214):19.78960975):21.24158573):17.54444675):14.20739183):15.02222055):20.61410711):26.57274856):13.28335921);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 1]
+TRANSLATE
+	1 'ACROMYRM',
+	2 'ACYRTOSI',
+	3 'ANOPHELE',
+	4 'APIS_MEL',
+	5 'Acanthoc',
+	6 'Acanthos',
+	7 'Acerento',
+	8 'Aedes_AE',
+	9 'Aleochar',
+	10 'Anurida_',
+	11 'Apachyus',
+	12 'Aphis_go',
+	13 'Aposthon',
+	14 'Archaeop',
+	15 'Aretaon_',
+	16 'Atelura_',
+	17 'BOMBYX_M',
+	18 'Baetis_p',
+	19 'Bemisia_',
+	20 'Bibio_ma',
+	21 'Bittacus',
+	22 'Blaberus',
+	23 'Bombus_t',
+	24 'Bombyliu',
+	25 'Boreus_h',
+	26 'Calopter',
+	27 'Campodea',
+	28 'Carabus_',
+	29 'Celuca_p',
+	30 'Ceratoph',
+	31 'Cercopis',
+	32 'Ceuthoph',
+	33 'Cheumato',
+	34 'Chrysis_',
+	35 'Conwentz',
+	36 'Corduleg',
+	37 'Corydalu',
+	38 'Cosmiope',
+	39 'Cotesia_',
+	40 'Cryptoce',
+	41 'Ctenocep',
+	42 'Cypridin',
+	43 'DAPHNIA_',
+	44 'DROSOPHI',
+	45 'Dendroct',
+	46 'Dichochr',
+	47 'Ectopsoc',
+	48 'Empusa_p',
+	49 'Ephemera',
+	50 'Epiophle',
+	51 'Eriocran',
+	52 'Essigell',
+	53 'Euroleon',
+	54 'Euryloph',
+	55 'Exoneura',
+	56 'Folsomia',
+	57 'Forficul',
+	58 'Franklin',
+	59 'Galloisi',
+	60 'Glomeris',
+	61 'Glossina',
+	62 'Gryllobl',
+	63 'Gryllota',
+	64 'Gynaikot',
+	65 'Gyrinus_',
+	66 'Haploemb',
+	67 'Harpegna',
+	68 'Hydropti',
+	69 'IXODES_S',
+	70 'Inocelli',
+	71 'Isonychi',
+	72 'Lepeopht',
+	73 'Lepiceru',
+	74 'Leptopil',
+	75 'Leuctra_',
+	76 'Lipara_l',
+	77 'Liposcel',
+	78 'Litopena',
+	79 'Machilis',
+	80 'Manduca_',
+	81 'Mantis_r',
+	82 'Mastoter',
+	83 'Meinerte',
+	84 'Meloe_vi',
+	85 'Mengenil',
+	86 'Menopon_',
+	87 'Metallyt',
+	88 'Micropte',
+	89 'NASONIA_',
+	90 'Nannocho',
+	91 'Nemophor',
+	92 'Nilaparv',
+	93 'Notostir',
+	94 'Occasjap',
+	95 'Okanagan',
+	96 'Orussus_',
+	97 'Osmylus_',
+	98 'PEDICULU',
+	99 'Panorpa_',
+	100 'Parides_',
+	101 'Periplan',
+	102 'Perla_ma',
+	103 'Peruphas',
+	104 'Philopot',
+	105 'Phleboto',
+	106 'Planococ',
+	107 'Platycen',
+	108 'Pogonogn',
+	109 'Polyomma',
+	110 'Priacma_',
+	111 'Prorhino',
+	112 'Prosarth',
+	113 'Ranatra_',
+	114 'Rhagolet',
+	115 'Rhyacoph',
+	116 'Sarcopha',
+	117 'Sarsineb',
+	118 'Sialis_l',
+	119 'Sminthur',
+	120 'Speleone',
+	121 'Stenobot',
+	122 'Stylops_',
+	123 'Symphyle',
+	124 'TRIBOLIU',
+	125 'Tanzanio',
+	126 'Tenthred',
+	127 'Tetrix_s',
+	128 'Tetrodon',
+	129 'Thermobi',
+	130 'Thrips_p',
+	131 'Timema_c',
+	132 'Tipula_m',
+	133 'Trialeur',
+	134 'Triarthr',
+	135 'Trichoce',
+	136 'Trichole',
+	137 'Triodia_',
+	138 'Velia_ca',
+	139 'Xanthost',
+	140 'Xenophys',
+	141 'Yponomeu',
+	142 'ZOOTERMO',
+	143 'Zorotypu',
+	144 'Zygaena_',
+;
+[TREES]
+		[1] tree 'TREE1'=[&R] (69:568.82452992,((123:407.24672744,60:407.24672744):148.29444327,((42:468.47894114,(117:254.20865399,(78:121.30689499,29:121.30689499):132.901759):214.27028715):60.48948101,((72:399.31838246,43:399.31838246):109.03593258,(120:493.33209449,((7:430.0653301,(119:242.69491757,((128:134.13391979,10:134.13391979):63.37107902,(108:142.40764941,56:142.40764941):55.0973494):45.18991876):187.37041253):49.05937257,((27:303.3996001,94:303.3996001):158.18065581,((83:145.64526412,79:145.64526412):294.69340606,((136:214.10404304,(129:160.22978376,16:160.22978376):53.87425928):206.4450174,(((26:234.72987434,(36:107.07992654,50:107.07992654):127.6499478):127.72455902,(18:178.82063298,(71:110.64714402,(54:70.81589524,49:70.81589524):39.83124878):68.17348896):183.63380038):43.99679494,(((143:168.52337552,(57:79.38618729,11:79.38618729):89.13718824):133.52205023,((75:167.41119947,(102:107.80417899,38:107.80417899):59.60702048):101.70385795,(((63:149.03564395,32:149.03564395):53.66044366,(127:129.53299243,(112:71.47587538,121:71.47587538):58.05711705):73.16309518):45.14849036,(((125:152.66928204,(59:37.5755174,62:37.5755174):115.09376464):51.066677,((66:43.47313146,13:43.47313146):120.74812698,(131:124.7066864,(103:46.0166079,15:46.0166079):78.6900785):39.51457205):39.51470059):27.53525195,((87:74.18365391,(48:29.60455501,81:29.60455501):44.5790989):123.13603936,(22:172.97567781,(101:158.09997964,(40:143.98732864,(82:135.83331697,(111:122.54112649,142:122.54112649):13.29219048):8.15401167):14.112651):14.87569816):24.34401546):33.95151771):16.57336699):21.27047945):32.93036833):84.8437082,(((64:119.93139503,(58:54.75797108,130:54.75797108):65.17342395):219.19624686,((((6:108.0598443,93:108.0598443):47.49614964,(113:107.60346238,138:107.60346238):47.95253155):88.9194089,(140:202.58666735,(92:169.58023747,(31:105.5876649,95:105.5876649):63.99257257):33.00642987):41.88873549):46.36249014,((133:80.47110533,19:80.47110533):164.55774247,(5:211.86587904,(106:167.97387546,(52:59.44504373,(2:23.00135341,12:23.00135341):36.44369031):108.52883173):43.89200358):33.16296876):45.80904518):48.28974892):34.15908015,((47:187.32639057,(77:106.89178042,(86:53.40954074,98:53.40954074):53.48223967):80.43461015):174.20585296,((126:239.52711194,(96:187.88025277,((39:139.15077384,(74:107.35711376,89:107.35711376):31.79366008):23.2571331,(34:121.2663444,((1:54.79881961,67:54.79881961):42.51521537,(55:54.89713772,(4:30.43335987,23:30.43335987):24.46377785):42.41689727):23.95230941):41.14156254):25.47234584):51.64685917):105.15265705,((((85:107.55896028,122:107.55896028):178.91394772,((9:222.04550425,(45:166.91176671,(84:102.01318287,124:102.01318287):64.89858383):55.13373755):47.93048091,(73:250.04365308,(110:233.74996917,(65:211.96735136,28:211.96735136):21.78261781):16.29368391):19.93233208):16.49692284):21.23566401,((70:95.12902956,139:95.12902956):181.12844638,((37:212.38638539,118:212.38638539):46.64771119,(35:224.70858462,(97:166.87917242,(46:101.62074984,53:101.62074984):65.25842257):57.82941221):34.32551195):17.22337937):31.45109606):18.98302762,((((115:109.71753554,107:109.71753554):44.60231298,(68:125.99438246,(104:80.05699045,33:80.05699045):45.93739201):28.32546605):52.88089242,(88:141.46539181,(51:127.65328827,(137:116.96300126,(91:100.92448316,(141:79.82198361,(144:67.06321273,((109:41.45587473,100:41.45587473):14.35338215,(17:39.78963918,80:39.78963918):16.0196177):11.25395585):12.75877088):21.10249955):16.0385181):10.69028701):13.81210354):65.73534912):82.44876683,(((30:86.08928254,(14:34.53715192,41:34.53715192):51.55213063):81.45968273,(25:108.5582524,(90:94.33057619,(21:58.74620454,99:58.74620454):35.58437165):14.22767621):58.99071287):75.19386749,((3:75.20822315,8:75.20822315):82.62576782,((105:122.52301166,(135:92.68064077,132:92.68064077):29.84237089):21.26755928,(20:129.68976943,(24:108.29360947,(44:81.30378313,(76:68.69884347,(114:59.45278769,(61:42.22876809,(116:27.33769638,134:27.33769638):14.89107171):17.2240196):9.24605578):12.60493966):26.98982635):21.39615996):14.1008015):14.04342004):84.90884179):46.906675):37.04209186):17.98816937):16.85247454):11.75447852):13.60241191):19.56209435):14.09783214):19.78960975):21.24158573):17.54444675):14.20739183):15.02222055):20.61410711):26.57274856):13.28335921);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreeView';
+END; [ALGORITHM]
+
+BEGIN ALGORITHM;
+TITLE 'Reroot Or Ladderize Trees';
+LINK TREES = 'Working Trees';
+NAME 'Reroot Or Ladderize Trees';
+OPTIONS
+	RootBy = 'Off',
+	Ladderize = 'Down',
+	HasBranchSupportValues = 'false';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreeView';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TreeView';
+INPUT 'TREES';
+OPTIONS
+	Tree = 1,
+	Diagram = 'RectangularPhylogram',
+	Averaging = 'ChildAverage',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 1,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	ShowConfidence = 'true',
+	TreeLabels = 'None';
+END; [VIEW]
+
+BEGIN TREES;
+TITLE 'Trees';
+LINK ALGORITHM = 'Reroot Or Ladderize Trees';
+[Number of trees: 1]
+TRANSLATE
+	1 'ACROMYRM',
+	2 'ACYRTOSI',
+	3 'ANOPHELE',
+	4 'APIS_MEL',
+	5 'Acanthoc',
+	6 'Acanthos',
+	7 'Acerento',
+	8 'Aedes_AE',
+	9 'Aleochar',
+	10 'Anurida_',
+	11 'Apachyus',
+	12 'Aphis_go',
+	13 'Aposthon',
+	14 'Archaeop',
+	15 'Aretaon_',
+	16 'Atelura_',
+	17 'BOMBYX_M',
+	18 'Baetis_p',
+	19 'Bemisia_',
+	20 'Bibio_ma',
+	21 'Bittacus',
+	22 'Blaberus',
+	23 'Bombus_t',
+	24 'Bombyliu',
+	25 'Boreus_h',
+	26 'Calopter',
+	27 'Campodea',
+	28 'Carabus_',
+	29 'Celuca_p',
+	30 'Ceratoph',
+	31 'Cercopis',
+	32 'Ceuthoph',
+	33 'Cheumato',
+	34 'Chrysis_',
+	35 'Conwentz',
+	36 'Corduleg',
+	37 'Corydalu',
+	38 'Cosmiope',
+	39 'Cotesia_',
+	40 'Cryptoce',
+	41 'Ctenocep',
+	42 'Cypridin',
+	43 'DAPHNIA_',
+	44 'DROSOPHI',
+	45 'Dendroct',
+	46 'Dichochr',
+	47 'Ectopsoc',
+	48 'Empusa_p',
+	49 'Ephemera',
+	50 'Epiophle',
+	51 'Eriocran',
+	52 'Essigell',
+	53 'Euroleon',
+	54 'Euryloph',
+	55 'Exoneura',
+	56 'Folsomia',
+	57 'Forficul',
+	58 'Franklin',
+	59 'Galloisi',
+	60 'Glomeris',
+	61 'Glossina',
+	62 'Gryllobl',
+	63 'Gryllota',
+	64 'Gynaikot',
+	65 'Gyrinus_',
+	66 'Haploemb',
+	67 'Harpegna',
+	68 'Hydropti',
+	69 'IXODES_S',
+	70 'Inocelli',
+	71 'Isonychi',
+	72 'Lepeopht',
+	73 'Lepiceru',
+	74 'Leptopil',
+	75 'Leuctra_',
+	76 'Lipara_l',
+	77 'Liposcel',
+	78 'Litopena',
+	79 'Machilis',
+	80 'Manduca_',
+	81 'Mantis_r',
+	82 'Mastoter',
+	83 'Meinerte',
+	84 'Meloe_vi',
+	85 'Mengenil',
+	86 'Menopon_',
+	87 'Metallyt',
+	88 'Micropte',
+	89 'NASONIA_',
+	90 'Nannocho',
+	91 'Nemophor',
+	92 'Nilaparv',
+	93 'Notostir',
+	94 'Occasjap',
+	95 'Okanagan',
+	96 'Orussus_',
+	97 'Osmylus_',
+	98 'PEDICULU',
+	99 'Panorpa_',
+	100 'Parides_',
+	101 'Periplan',
+	102 'Perla_ma',
+	103 'Peruphas',
+	104 'Philopot',
+	105 'Phleboto',
+	106 'Planococ',
+	107 'Platycen',
+	108 'Pogonogn',
+	109 'Polyomma',
+	110 'Priacma_',
+	111 'Prorhino',
+	112 'Prosarth',
+	113 'Ranatra_',
+	114 'Rhagolet',
+	115 'Rhyacoph',
+	116 'Sarcopha',
+	117 'Sarsineb',
+	118 'Sialis_l',
+	119 'Sminthur',
+	120 'Speleone',
+	121 'Stenobot',
+	122 'Stylops_',
+	123 'Symphyle',
+	124 'TRIBOLIU',
+	125 'Tanzanio',
+	126 'Tenthred',
+	127 'Tetrix_s',
+	128 'Tetrodon',
+	129 'Thermobi',
+	130 'Thrips_p',
+	131 'Timema_c',
+	132 'Tipula_m',
+	133 'Trialeur',
+	134 'Triarthr',
+	135 'Trichoce',
+	136 'Trichole',
+	137 'Triodia_',
+	138 'Velia_ca',
+	139 'Xanthost',
+	140 'Xenophys',
+	141 'Yponomeu',
+	142 'ZOOTERMO',
+	143 'Zorotypu',
+	144 'Zygaena_',
+;
+[TREES]
+		[1] tree 'TREE1'=[&R] (69:568.82452992,((123:407.24672744,60:407.24672744):148.29444327,((42:468.47894114,(117:254.20865399,(78:121.30689499,29:121.30689499):132.901759):214.27028715):60.48948101,((72:399.31838246,43:399.31838246):109.03593258,(120:493.33209449,((7:430.0653301,(119:242.69491757,((128:134.13391979,10:134.13391979):63.37107902,(108:142.40764941,56:142.40764941):55.0973494):45.18991876):187.37041253):49.05937257,((27:303.3996001,94:303.3996001):158.18065581,((83:145.64526412,79:145.64526412):294.69340606,((136:214.10404304,(129:160.22978376,16:160.22978376):53.87425928):206.4450174,(((26:234.72987434,(36:107.07992654,50:107.07992654):127.6499478):127.72455902,(18:178.82063298,(71:110.64714402,(54:70.81589524,49:70.81589524):39.83124878):68.17348896):183.63380038):43.99679494,(((143:168.52337552,(57:79.38618729,11:79.38618729):89.13718824):133.52205023,((75:167.41119947,(102:107.80417899,38:107.80417899):59.60702048):101.70385795,(((63:149.03564395,32:149.03564395):53.66044366,(127:129.53299243,(112:71.47587538,121:71.47587538):58.05711705):73.16309518):45.14849036,(((125:152.66928204,(59:37.5755174,62:37.5755174):115.09376464):51.066677,((66:43.47313146,13:43.47313146):120.74812698,(131:124.7066864,(103:46.0166079,15:46.0166079):78.6900785):39.51457205):39.51470059):27.53525195,((87:74.18365391,(48:29.60455501,81:29.60455501):44.5790989):123.13603936,(22:172.97567781,(101:158.09997964,(40:143.98732864,(82:135.83331697,(111:122.54112649,142:122.54112649):13.29219048):8.15401167):14.112651):14.87569816):24.34401546):33.95151771):16.57336699):21.27047945):32.93036833):84.8437082,(((64:119.93139503,(58:54.75797108,130:54.75797108):65.17342395):219.19624686,((((6:108.0598443,93:108.0598443):47.49614964,(113:107.60346238,138:107.60346238):47.95253155):88.9194089,(140:202.58666735,(92:169.58023747,(31:105.5876649,95:105.5876649):63.99257257):33.00642987):41.88873549):46.36249014,((133:80.47110533,19:80.47110533):164.55774247,(5:211.86587904,(106:167.97387546,(52:59.44504373,(2:23.00135341,12:23.00135341):36.44369031):108.52883173):43.89200358):33.16296876):45.80904518):48.28974892):34.15908015,((47:187.32639057,(77:106.89178042,(86:53.40954074,98:53.40954074):53.48223967):80.43461015):174.20585296,((126:239.52711194,(96:187.88025277,((39:139.15077384,(74:107.35711376,89:107.35711376):31.79366008):23.2571331,(34:121.2663444,((1:54.79881961,67:54.79881961):42.51521537,(55:54.89713772,(4:30.43335987,23:30.43335987):24.46377785):42.41689727):23.95230941):41.14156254):25.47234584):51.64685917):105.15265705,((((85:107.55896028,122:107.55896028):178.91394772,((9:222.04550425,(45:166.91176671,(84:102.01318287,124:102.01318287):64.89858383):55.13373755):47.93048091,(73:250.04365308,(110:233.74996917,(65:211.96735136,28:211.96735136):21.78261781):16.29368391):19.93233208):16.49692284):21.23566401,((70:95.12902956,139:95.12902956):181.12844638,((37:212.38638539,118:212.38638539):46.64771119,(35:224.70858462,(97:166.87917242,(46:101.62074984,53:101.62074984):65.25842257):57.82941221):34.32551195):17.22337937):31.45109606):18.98302762,((((115:109.71753554,107:109.71753554):44.60231298,(68:125.99438246,(104:80.05699045,33:80.05699045):45.93739201):28.32546605):52.88089242,(88:141.46539181,(51:127.65328827,(137:116.96300126,(91:100.92448316,(141:79.82198361,(144:67.06321273,((109:41.45587473,100:41.45587473):14.35338215,(17:39.78963918,80:39.78963918):16.0196177):11.25395585):12.75877088):21.10249955):16.0385181):10.69028701):13.81210354):65.73534912):82.44876683,(((30:86.08928254,(14:34.53715192,41:34.53715192):51.55213063):81.45968273,(25:108.5582524,(90:94.33057619,(21:58.74620454,99:58.74620454):35.58437165):14.22767621):58.99071287):75.19386749,((3:75.20822315,8:75.20822315):82.62576782,((105:122.52301166,(135:92.68064077,132:92.68064077):29.84237089):21.26755928,(20:129.68976943,(24:108.29360947,(44:81.30378313,(76:68.69884347,(114:59.45278769,(61:42.22876809,(116:27.33769638,134:27.33769638):14.89107171):17.2240196):9.24605578):12.60493966):26.98982635):21.39615996):14.1008015):14.04342004):84.90884179):46.906675):37.04209186):17.98816937):16.85247454):11.75447852):13.60241191):19.56209435):14.09783214):19.78960975):21.24158573):17.54444675):14.20739183):15.02222055):20.61410711):26.57274856):13.28335921);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees-2';
+LINK TREES = 'Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreeView';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreeView';
+LINK ALGORITHM = 'Show Trees-2';
+NAME 'TreeView';
+INPUT 'TREES';
+OPTIONS
+	Tree = 1,
+	Diagram = 'RectangularPhylogram',
+	Averaging = 'ChildAverage',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 0.90909091,
+	VerticalZoomFactor = 0.82644628,
+	FontScaleFactor = 0.83333333,
+	ShowConfidence = 'true',
+	TreeLabels = 'None';
+END; [VIEW]
