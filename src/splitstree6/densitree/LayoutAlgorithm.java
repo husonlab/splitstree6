@@ -136,6 +136,17 @@ public class LayoutAlgorithm {
                             }
                         });
 
+                        tree.preorderTraversal(v -> {
+                            var point = nodePointMap.get(v);
+                            if (v.getInDegree() == 0) {
+                                nodePointMap.put(v, new Point2D(0, point.getY()));
+
+                            } else {
+                                double x = nodePointMap.get(v.getFirstInEdge().getSource()).getX();
+                                nodePointMap.put(v, new Point2D(x + tree.getWeight(v.getFirstInEdge()), point.getY()));
+                            }
+                        });
+
 
                         nodeAngleMap.putAll(0.0);
                     }

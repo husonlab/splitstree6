@@ -38,7 +38,13 @@ public class DensiTreeMainController {
 	private Canvas canvas;
 
 	@FXML
-	private Pane pane;
+	private Pane labelPane;
+
+	@FXML
+	private Pane highlightingPane;
+
+	@FXML
+	private Pane consensusPane;
 
 	@FXML
 	private MenuItem openMenuItem;
@@ -132,8 +138,16 @@ public class DensiTreeMainController {
 		return canvas;
 	}
 
-	public Pane getPane() {
-		return pane;
+	public Pane getLabelPane() {
+		return labelPane;
+	}
+
+	public Pane getHighlightingPane() {
+		return highlightingPane;
+	}
+
+	public Pane getConsensusPane() {
+		return consensusPane;
 	}
 
 	public MenuItem getOpenMenuItem() {
