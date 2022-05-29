@@ -209,7 +209,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						var height = bounds.getHeight();
 						if (lockAspectRatio.get())
 							width = height = Math.min(width, height);
-						var box = new Dimension2D(treeView.getOptionHorizontalZoomFactor() * width, treeView.getOptionVerticalZoomFactor() * height);
+						var box = new Dimension2D(treeView.getOptionHorizontalZoomFactor() * width - 100, treeView.getOptionVerticalZoomFactor() * height - 150);
 
 						if (!treeView.emptyProperty().get()) {
 							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
