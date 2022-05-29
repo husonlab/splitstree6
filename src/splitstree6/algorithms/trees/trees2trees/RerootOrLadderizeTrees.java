@@ -52,7 +52,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 
 	public enum Ladderize {Off, Up, Down, Random}
 
-	private final ObjectProperty<RootBy> optionRootBy = new SimpleObjectProperty<>(this, "optionRootBy", RootBy.MidPoint);
+	private final ObjectProperty<RootBy> optionRootBy = new SimpleObjectProperty<>(this, "optionRootBy", RootBy.Off);
 
 	private final ObjectProperty<String[]> optionOutGroupTaxa = new SimpleObjectProperty<>(this, "optionOutGroupTaxa", new String[0]);
 
@@ -222,7 +222,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isPartial() && !parent.isReticulated();
+		return !parent.isReticulated();
 	}
 
 	/**

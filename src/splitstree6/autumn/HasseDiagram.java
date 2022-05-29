@@ -21,10 +21,8 @@ package splitstree6.autumn;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 
+import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * compute a Hasse diagram
@@ -36,42 +34,37 @@ public class HasseDiagram {
 	 *
 	 */
 	public static PhyloTree constructHasse(Cluster[] clusters) {
-		// make clusters unique:
-		Set<Cluster> set = new HashSet<>();
-		Collections.addAll(set, clusters);
-		// sort
-		clusters = Cluster.getClustersSortedByDecreasingCardinality(set.toArray(new Cluster[0]));
-
-		PhyloTree tree = new PhyloTree();
+		Arrays.sort(clusters, Cluster.getComparatorByDecreasingSize());
+		var tree = new PhyloTree();
 
 		// build the diagram
-		Node root = tree.newNode();
+		var root = tree.newNode();
 		tree.setRoot(root);
 		tree.setLabel(root, "" + new Cluster(Cluster.extractTaxa(clusters)));
 		tree.setInfo(root, new Cluster());
 
-		int[] cardinality = new int[clusters.length];
-		Node[] nodes = new Node[clusters.length];
+		var cardinality = new int[clusters.length];
+		var nodes = new Node[clusters.length];
 
-		for (int i = 0; i < clusters.length; i++) {
+		for (var i = 0; i < clusters.length; i++) {
 			cardinality[i] = clusters[i].cardinality();
 			nodes[i] = tree.newNode();
 			tree.setLabel(nodes[i], "" + clusters[i]);
 			tree.setInfo(nodes[i], clusters[i]);
 		}
 
-		for (int i = 0; i < clusters.length; i++) {
-			BitSet cluster = clusters[i];
+		for (var i = 0; i < clusters.length; i++) {
+			var cluster = clusters[i];
 
 			if (nodes[i].getInDegree() == 0) {
 				tree.newEdge(root, nodes[i]);
 			}
 
-			BitSet covered = new BitSet();
+			var covered = new BitSet();
 
-			for (int j = i + 1; j < clusters.length; j++) {
+			for (var j = i + 1; j < clusters.length; j++) {
 				if (cardinality[j] < cardinality[i]) {
-					BitSet subCluster = clusters[j];
+					var subCluster = clusters[j];
 					if (Cluster.contains(cluster, subCluster) && !Cluster.contains(covered, subCluster)) {
 						tree.newEdge(nodes[i], nodes[j]);
 						covered.or(subCluster);

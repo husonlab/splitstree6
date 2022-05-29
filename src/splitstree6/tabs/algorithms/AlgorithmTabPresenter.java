@@ -66,6 +66,7 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		algorithmTab.setGraphic(label);
 
 		controller.getMainPane().disableProperty().bind(runningProperty);
+		controller.getMenuButton().disableProperty().bind(runningProperty);
 
 		//AutoCompleteComboBox.install(controller.getAlgorithmCBox());
 
@@ -78,15 +79,17 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		});
 		controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
 
-		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null)
+		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null) {
 			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithmNode().getAlgorithm());
+		}
 
 		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((v, o, n) -> {
-			controller.getAlgorithmCBox().setValue(n);
-			setupOptionControls(algorithmTab, controller, (Algorithm) n);
-			label.setText(n.getName());
+			if (n != null) {
+				controller.getAlgorithmCBox().setValue(n);
+				setupOptionControls(algorithmTab, controller, (Algorithm) n);
+				label.setText(n.getName());
+			}
 		});
-
 		controller.getMenuButton().disableProperty().bind(runningProperty);
 	}
 
@@ -106,10 +109,10 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 					hbox.setAlignment(Pos.CENTER_LEFT);
 					hbox.setSpacing(3);
 					hbox.prefWidthProperty().bind(controller.getMainPane().widthProperty());
-					controller.getMainPane().getChildren().add(hbox);
 					var toolTip = new Tooltip(option.getToolTipText());
 					label.setTooltip(toolTip);
 					control.setTooltip(toolTip);
+					controller.getMainPane().getChildren().add(hbox);
 				}
 			}
 		}
@@ -137,5 +140,4 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 	@Override
 	public void setupMenuItems() {
 	}
-
 }

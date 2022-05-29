@@ -156,7 +156,9 @@ public class OptionControlCreator {
 				var control = new ChoiceBox<String>();
 				control.getItems().addAll(option.getLegalValues());
 				control.setValue(option.getProperty().getValue().toString());
-				control.valueProperty().addListener((v, o, n) -> option.getProperty().setValue(option.getEnumValueForName(n)));
+				control.valueProperty().addListener((v, o, n) -> {
+					option.getProperty().setValue(option.getEnumValueForName(n));
+				});
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setValue(n.toString());
 					changeListeners.add(changeListener);

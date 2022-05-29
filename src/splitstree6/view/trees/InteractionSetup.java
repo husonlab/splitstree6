@@ -77,7 +77,7 @@ public class InteractionSetup {
 
 	private boolean inMouseClickedOnEdge = false;
 
-	public InteractionSetup(Stage stage, PhyloTree tree, TaxaBlock taxaBlock, Map<Edge, Shape> edgeShapeMap, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
+	public InteractionSetup(Stage stage, PhyloTree tree, TaxaBlock taxaBlock, Map<Edge, Shape> edgeShapeMap0, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
 							TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation) {
 		this.stage = stage;
 		this.tree = tree;
@@ -85,7 +85,7 @@ public class InteractionSetup {
 		this.taxonSelectionModel = taxonSelectionModel;
 		this.edgeSelectionModel = edgeSelectionModel;
 		taxonShapeLabelMap = new HashMap<>();
-		this.edgeShapeMap = (edgeShapeMap == null ? new HashMap<>() : edgeShapeMap);
+		this.edgeShapeMap = (edgeShapeMap0 == null ? new HashMap<>() : edgeShapeMap0);
 
 		mousePressedHandler = e -> {
 			if (e.getSource() instanceof Pane pane && pane.getEffect() != null) { // need a better way to determine whether this label is selected
@@ -291,13 +291,9 @@ public class InteractionSetup {
 					taxonSelectionModel.clearSelection(taxa);
 			} else if (e.getClickCount() == 2) {
 				if (!e.isAltDown()) {
-					tree.preorderTraversal(edge.getTarget(), v -> {
-						edgeSelectionModel.selectAll(IteratorUtils.asList(v.inEdges()));
-					});
+					tree.preorderTraversal(edge.getTarget(), v -> edgeSelectionModel.selectAll(IteratorUtils.asList(v.inEdges())));
 				} else {
-					tree.preorderTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> {
-						edgeSelectionModel.selectAll(IteratorUtils.asList(v.inEdges()));
-					});
+					tree.preorderTraversal(tree.getRoot(), v -> v != edge.getTarget(), v -> edgeSelectionModel.selectAll(IteratorUtils.asList(v.inEdges())));
 				}
 			}
 			e.consume();

@@ -20,7 +20,10 @@ package splitstree6.autumn;
 
 import jloda.util.StringUtils;
 
-import java.util.*;
+import java.util.BitSet;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * a weighted cluster
@@ -123,17 +126,17 @@ public class Cluster extends BitSet {
 	/**
 	 * compare clusters first by size and then lexicographically
 	 */
-	static public Comparator<Cluster> getComparator() {
-        return (cluster1, cluster2) -> {
-            if (cluster1.cardinality() > cluster2.cardinality())
-                return -1;
-            else if (cluster1.cardinality() < cluster2.cardinality())
-                return 1;
+	static public Comparator<Cluster> getComparatorByDecreasingSize() {
+		return (cluster1, cluster2) -> {
+			if (cluster1.cardinality() > cluster2.cardinality())
+				return -1;
+			else if (cluster1.cardinality() < cluster2.cardinality())
+				return 1;
 
-            int t1 = cluster1.nextSetBit(0);
-            int t2 = cluster2.nextSetBit(0);
-            while (true) {
-                if (t1 < t2)
+			int t1 = cluster1.nextSetBit(0);
+			int t2 = cluster2.nextSetBit(0);
+			while (true) {
+				if (t1 < t2)
                     return -1;
                 else if (t1 > t2)
                     return 1;
@@ -264,17 +267,6 @@ public class Cluster extends BitSet {
 		BitSet taxa = new BitSet();
 		for (Cluster cluster : clusters) taxa.or(cluster);
 		return taxa;
-	}
-
-	/**
-	 * get clusters sorted by decreasing cardinality
-	 *
-	 * @return sorted clusters
-	 */
-	public static Cluster[] getClustersSortedByDecreasingCardinality(Cluster[] clusters) {
-		Set<Cluster> sorted = new TreeSet<>(Cluster.getComparator());
-		Collections.addAll(sorted, clusters);
-        return sorted.toArray(new Cluster[0]);
 	}
 
 	/**

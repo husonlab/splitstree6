@@ -157,7 +157,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		networkView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", networkView.optionZoomFactorProperty(), o, n));
 
 		Platform.runLater(this::setupMenuItems);
-
 	}
 
 	@Override

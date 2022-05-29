@@ -77,21 +77,21 @@ public class AlgorithmTabsManager {
 		var tab = nodeTabMap.get(node);
 		if (tab != null) {
 			if (show) {
-				mainWindow.getPresenter().getSplitPanePresenter().ensureAlgorithmsTabPaneIsOpen();
-				if (!tabPane.getTabs().contains(tab)) {
-					var newTab = new Tab();
-					newTab.setText(tab.getText());
-					newTab.setGraphic(tab.getGraphic());
-					var content = tab.getContent();
-					tab.setContent(null);
-					newTab.setContent(content);
-					nodeTabMap.put(node, newTab);
-					tabPane.getTabs().add(newTab);
-				}
-				if (true)
+				mainWindow.getPresenter().getSplitPanePresenter().ensureAlgorithmsTabPaneIsOpen(() -> {
+					if (!tabPane.getTabs().contains(tab)) {
+						var newTab = new Tab();
+						newTab.setText(tab.getText());
+						newTab.setGraphic(tab.getGraphic());
+						var content = tab.getContent();
+						tab.setContent(null);
+						newTab.setContent(content);
+						nodeTabMap.put(node, newTab);
+						tabPane.getTabs().add(newTab);
+					}
 					tabPane.getSelectionModel().select(tab);
+				});
+			}
 			} else
 				tabPane.getTabs().remove(tab);
-		}
 	}
 }

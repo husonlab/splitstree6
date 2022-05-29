@@ -44,8 +44,8 @@ public class ValuesList extends LinkedList<Value> {
 	 * @return total
 	 */
 	public int sum() {
-		int total = 0;
-		for (Value value : this) {
+		var total = 0;
+		for (var value : this) {
 			total += value.get();
 		}
 		return total;

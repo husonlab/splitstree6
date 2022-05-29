@@ -119,29 +119,18 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		var alignmentDrawer = new AlignmentDrawer(controller.getCanvasGroup(), mainWindowController.getBottomFlowPane());
 
-		var inUpdateCanvas = new Single<>(false);
-
 		updateCanvasListener = e -> {
-			if (!inUpdateCanvas.get()) {
-				inUpdateCanvas.set(true);
-				try {
-					AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), canvasWidth.get(),
-							alignmentView.getOptionUnitWidth(), alignmentView.getInputCharacters() != null ? alignmentView.getInputCharacters().getNchar() : 0, alignmentView);
-					AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(),
-							alignmentView.getActiveSites(), alignmentView.getSelectedSites());
+			alignmentDrawer.updateCanvas(canvasWidth.get(), canvasHeight.get(), alignmentView.getInputTaxa(),
+					alignmentView.getInputCharacters(), alignmentView.getConsensusSequence(),
+					alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(),
+					alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
+			AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), canvasWidth.get(),
+					alignmentView.getOptionUnitWidth(), alignmentView.getInputCharacters() != null ? alignmentView.getInputCharacters().getNchar() : 0, alignmentView);
+			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(),
+					alignmentView.getActiveSites(), alignmentView.getSelectedSites());
 
-					updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
+			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
 
-					alignmentDrawer.updateCanvas(canvasWidth.get(), canvasHeight.get(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getConsensusSequence(),
-							alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(),
-							alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
-				} finally {
-					inUpdateCanvas.set(false);
-				}
-			}
-		};
-
-		alignmentDrawer.canvasProperty().addListener(e -> {
 			alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
 					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 
@@ -152,7 +141,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 
 			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
-		});
+		};
 
 		canvasWidth.addListener(updateCanvasListener);
 		canvasHeight.addListener(updateCanvasListener);

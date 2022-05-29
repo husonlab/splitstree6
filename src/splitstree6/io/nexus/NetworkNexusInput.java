@@ -122,7 +122,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				np.matchIgnoreCase("info=");
 				networkBlock.setInfoString(np.getWordRespectCase());
 			}
-			np.matchIgnoreCase(":");
+			np.matchIgnoreCase(";");
 		}
 
 		final var graph = networkBlock.getGraph();
@@ -151,6 +151,9 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 					graph.setLabel(v, np.getWordRespectCase());
 					if (taxaBlock.getLabels().size() == 0) {
 						taxonNamesFound.add(graph.getLabel(v));
+						graph.addTaxon(v, taxonNamesFound.size());
+					} else {
+						graph.addTaxon(v, taxaBlock.indexOf(graph.getLabel(v)));
 					}
 				}
 				while (!np.peekMatchAnyTokenIgnoreCase(", ;")) {

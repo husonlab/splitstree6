@@ -19,14 +19,11 @@
 package splitstree6.autumn;
 
 
-import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
-import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,41 +34,35 @@ import java.util.Set;
 public class Utilities {
 
     /**
-     * get the number of reticulations in a cluster network
-     *
-     * @return number of reticulate nodes
+	 * get the number of reticulations in a cluster network
+	 *
+	 * @return number of reticulate nodes
 	 */
-    public static int getNumberOfReticulationsInClusterNetwork(PhyloTree tree1, PhyloTree tree2, ProgressListener progress) throws IOException {
+	public static int getNumberOfReticulationsInClusterNetwork(PhyloTree tree1, PhyloTree tree2) throws IOException {
+		var allTaxa = new TaxaBlock();
+		AutumnUtilities.extractTaxa(1, tree1, allTaxa);
+		AutumnUtilities.extractTaxa(2, tree2, allTaxa);
 
-        var allTaxa = new TaxaBlock();
-        AutumnUtilities.extractTaxa(1, tree1, allTaxa);
-        AutumnUtilities.extractTaxa(2, tree2, allTaxa);
+		var clusters = extractClusters(allTaxa, tree1, tree2);
+		PhyloTree hasseDiagram = HasseDiagram.constructHasse(clusters);
 
-        var clusters = extractClusters(allTaxa, tree1, tree2);
-        PhyloTree hasseDiagram = HasseDiagram.constructHasse(clusters.toArray(new Cluster[0]));
+		return (int) hasseDiagram.nodeStream().filter(v -> v.getInDegree() > 1).count();
+	}
 
-        int count = 0;
-        for (Node v = hasseDiagram.getFirstNode(); v != null; v = v.getNext()) {
-            if (v.getInDegree() > 1)
-                count++;
-        }
-        return count;
-    }
+	/**
+	 * extract the set of clusters from the two given trees
+	 *
+	 * @return set of clusters, each cluster a BitSet
+	 */
+	static public Cluster[] extractClusters(TaxaBlock allTaxa, PhyloTree tree1, PhyloTree tree2) {
+		var result = new HashSet<Cluster>();
 
-    /**
-     * extract the set of clusters from the two given trees
-     *
-     * @return set of clusters, each cluster a BitSet
-     */
-    static public Set<Cluster> extractClusters(TaxaBlock allTaxa, PhyloTree tree1, PhyloTree tree2) {
-        Set<Cluster> result = new HashSet<>();
+		var taxa = extractClustersRec(tree1, tree1.getRoot(), allTaxa, result);
+		taxa.or(extractClustersRec(tree2, tree2.getRoot(), allTaxa, result));
+		assert (taxa.cardinality() == allTaxa.size());
 
-        BitSet taxa = extractClustersRec(tree1, tree1.getRoot(), allTaxa, result);
-        taxa.or(extractClustersRec(tree2, tree2.getRoot(), allTaxa, result));
-        assert (taxa.cardinality() == allTaxa.size());
-
-        return result;
-    }
+		return result.toArray(new Cluster[0]);
+	}
 
     /**
      * recursively find all clusters in a tree
@@ -79,19 +70,19 @@ public class Utilities {
      * @return all taxa on or below v
      */
     private static Cluster extractClustersRec(PhyloTree tree, Node v, TaxaBlock taxa, Set<Cluster> clusters) {
-        Cluster clusterV = new Cluster();
-        String label = tree.getLabel(v);
-        if (label != null && label.length() > 0 && taxa.indexOf(label) != -1)
-            clusterV.set(taxa.indexOf(label));
+		var clusterV = new Cluster();
+		var label = tree.getLabel(v);
+		if (label != null && label.length() > 0 && taxa.indexOf(label) != -1)
+			clusterV.set(taxa.indexOf(label));
 
-        for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-            Node w = e.getTarget();
-            Cluster clusterW = extractClustersRec(tree, w, taxa, clusters);
-            assert (clusterW.cardinality() > 0);
-            clusters.add(new Cluster(clusterW, tree.getWeight(e), tree.getConfidence(e), 0));
-            clusters.add(clusterW);
-            clusterV.or(clusterW);
-        }
-        return clusterV;
-    }
+		for (var e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
+			var w = e.getTarget();
+			var clusterW = extractClustersRec(tree, w, taxa, clusters);
+			assert (clusterW.cardinality() > 0);
+			clusters.add(new Cluster(clusterW, tree.getWeight(e), tree.getConfidence(e), 0));
+			clusters.add(clusterW);
+			clusterV.or(clusterW);
+		}
+		return clusterV;
+	}
 }

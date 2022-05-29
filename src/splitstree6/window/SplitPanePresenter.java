@@ -106,11 +106,19 @@ public class SplitPanePresenter {
 	}
 
 
-	public void ensureAlgorithmsTabPaneIsOpen() {
+	public void ensureAlgorithmsTabPaneIsOpen(Runnable runAfterward) {
 		if (mainSplitPane.getDividerPositions()[0] <= 0.01)
-			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> controller.getOpenCloseLeftButton().setText("<"), false);
-		if (leftSplitPane.getDividerPositions()[0] >= (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight())
-			animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight(), () -> controller.getOpenCloseLeftButton().setText("<"), true);
+			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> {
+				controller.getOpenCloseLeftButton().setText("<");
+				runAfterward.run();
+			}, false);
+		else if (leftSplitPane.getDividerPositions()[0] >= (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight())
+			animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight(), () -> {
+				controller.getOpenCloseLeftButton().setText("<");
+				runAfterward.run();
+			}, true);
+		else
+			runAfterward.run();
 	}
 
 	private void animateSplitPane(SplitPane splitPane, double target, Runnable runnable, boolean animate) {
