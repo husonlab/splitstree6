@@ -224,18 +224,12 @@ public class RerootingUtils {
 		else
 			edgeLabels = null;
 
-		var source = e.getSource();
-		var target = e.getTarget();
 		// not under a special node, reroot in simple way
-		tree.setRoot(e, edgeLabels);
+		tree.setRoot(e, weight2source, weight2target, edgeLabels);
 
 		tree.redirectEdgesAwayFromRoot();
 
 		if (internalNodeLabelsAreEdgeLabels)
 			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
-
-		var root = tree.getRoot();
-		tree.setWeight(root.getCommonEdge(source), weight2source);
-		tree.setWeight(root.getCommonEdge(target), weight2target);
 	}
 }
