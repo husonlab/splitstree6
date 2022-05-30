@@ -19,14 +19,18 @@
 
 package splitstree6.algorithms.utils;
 
-import jloda.graph.*;
+import jloda.fx.window.NotificationManager;
+import jloda.graph.Edge;
+import jloda.graph.EdgeArray;
+import jloda.graph.EdgeDoubleArray;
+import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.Pair;
-import jloda.util.Triplet;
+import jloda.util.BitSetUtils;
 
+import java.util.ArrayList;
 import java.util.BitSet;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.Comparator;
+import java.util.stream.Collectors;
 
 /**
  * rerooting methods
@@ -34,41 +38,155 @@ import java.util.TreeSet;
  */
 public class RerootingUtils {
 	/**
-	 * reroot tree by edge
+	 * reroot a tree by midpoint
 	 */
-	public static void rerootByEdge(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Edge e) {
-		final EdgeArray<String> edgeLabels;
-		if (internalNodeLabelsAreEdgeLabels)
-			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
-		else
-			edgeLabels = null;
+	public static void rerootByMidpoint(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree) {
+		if (tree.isReticulated()) {
+			NotificationManager.showWarning(tree.getName() + ": reticulated, re-root not implemented");
+			return;
+		}
 
-		// not under a special node, reroot in simple way
-		tree.setRoot(e, edgeLabels);
-
-		tree.redirectEdgesAwayFromRoot();
-
-		if (internalNodeLabelsAreEdgeLabels)
-			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
-
-		var root = tree.getRoot();
-
-		if (root.getDegree() == 2 && tree.getLabel(root) == null) {
-			final var ea = root.getFirstAdjacentEdge();
-			final var eb = root.getLastAdjacentEdge();
-			final var weight = tree.getWeight(ea) + tree.getWeight(eb);
-			final var a = computeAverageDistanceToALeaf(tree, ea.getOpposite(root));
-			final var b = computeAverageDistanceToALeaf(tree, eb.getOpposite(root));
-			var na = 0.5 * (b - a + weight);
-			if (na >= weight)
-				na = 0.95 * weight;
-			else if (na <= 0)
-				na = 0.05 * weight;
-			final var nb = weight - na;
-			tree.setWeight(ea, na);
-			tree.setWeight(eb, nb);
+		var list = computeRootingRecords(tree);
+		if (list.size() > 0) {
+			list.sort(RootingRecord.comparatorForMidpointRooting());
+			reroot(internalNodeLabelsAreEdgeLabels, tree, list.get(0), false);
 		}
 	}
+
+
+	private static void reroot(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, RootingRecord rootingRecord, boolean forceOnEdge) {
+		var half = 0.5 * rootingRecord.total();
+
+		if (rootingRecord.sourceToLeafMaxDistance() - rootingRecord.weight() >= half) {
+			if (forceOnEdge) {
+				var weight2source = 0.9 * rootingRecord.weight();
+				var weight2target = 0.1 * rootingRecord.weight();
+				rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+			} else {
+				var root = rootingRecord.edge().getTarget(); // yes, target!
+				if (root != tree.getRoot())
+					rerootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
+			}
+		} else if (rootingRecord.targetToLeafMaxDistance() - rootingRecord.weight() >= half) {
+			if (forceOnEdge) {
+				var weight2source = 0.1 * rootingRecord.weight();
+				var weight2target = 0.9 * rootingRecord.weight();
+				rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+			} else {
+				var root = rootingRecord.edge().getSource(); // yes, source!
+				if (root != tree.getRoot())
+					rerootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
+			}
+		} else {
+			var weight2source = half - (rootingRecord.targetToLeafMaxDistance() - rootingRecord.weight());
+			var weight2target = half - (rootingRecord.sourceToLeafMaxDistance() - rootingRecord.weight());
+			rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+		}
+	}
+
+	/**
+	 * compute edge max distances in decreasing length
+	 *
+	 * @param tree tree
+	 * @return edge max distances
+	 */
+	public static ArrayList<RootingRecord> computeRootingRecords(PhyloTree tree) {
+		try (var sourceMap = tree.newEdgeDoubleArray(); var targetMap = tree.newEdgeDoubleArray()) {
+			for (var start : tree.nodeStream().filter(v -> v.getDegree() == 1).collect(Collectors.toList())) {
+				computeRootingRecordsRec(tree, start, null, sourceMap, targetMap);
+			}
+			var result = new ArrayList<RootingRecord>();
+			for (var e : tree.edges()) {
+				result.add(new RootingRecord(e, tree.getWeight(e), sourceMap.get(e), targetMap.get(e)));
+			}
+			return result;
+		}
+	}
+
+	private static double computeRootingRecordsRec(PhyloTree tree, Node v, Edge inEdge, EdgeDoubleArray sourceMap, EdgeDoubleArray targetMap) {
+		var maxDistance = 0.0;
+		for (var f : v.adjacentEdges()) {
+			if (f != inEdge) {
+				var map = (v == f.getSource() ? sourceMap : targetMap);
+				maxDistance = Math.max(maxDistance, map.computeIfAbsent(f, a -> computeRootingRecordsRec(tree, a.getOpposite(v), a, sourceMap, targetMap) + tree.getWeight(f)));
+			}
+		}
+		return maxDistance;
+	}
+
+	public static record RootingRecord(Edge edge, double weight, double sourceToLeafMaxDistance,
+									   double targetToLeafMaxDistance) {
+
+		public static Comparator<RootingRecord> comparatorForMidpointRooting() {
+			return (a, b) -> {
+				if (Math.abs(a.total() - b.total()) < 0.001)
+					return Double.compare(Math.max(a.sourceToLeafMaxDistance() - a.weight(), a.targetToLeafMaxDistance() - a.weight()), Math.max(b.sourceToLeafMaxDistance() - b.weight(), b.targetToLeafMaxDistance() - b.weight()));
+				else
+					return -Double.compare(a.total(), b.total());
+			};
+		}
+
+		public double total() {
+			return sourceToLeafMaxDistance + targetToLeafMaxDistance - weight;
+		}
+
+		public String toString() {
+			return "weight=%f sourceToLeaf=%f targetToLeaf=%f total=%f".formatted(weight, sourceToLeafMaxDistance, targetToLeafMaxDistance, total());
+		}
+	}
+
+	/**
+	 * reroot a tree by outgroup. Use tightest edge that separates all outgroup taxa
+	 */
+	public static void rerootByOutGroup(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, BitSet outgroupTaxa) {
+		if (tree.isReticulated()) {
+			NotificationManager.showWarning(tree.getName() + ": reticulated, re-root not implemented");
+			return;
+		}
+
+		try (EdgeArray<BitSet> sourceMap = tree.newEdgeArray(); EdgeArray<BitSet> targetMap = tree.newEdgeArray()) {
+			for (var start : tree.nodeStream().filter(v -> v.getDegree() == 1).collect(Collectors.toList())) {
+				computeTaxaRec(tree, start, null, sourceMap, targetMap);
+			}
+
+			Edge best = null;
+			BitSet bestSet = null;
+			for (var e : tree.edges()) {
+				var set = sourceMap.get(e);
+				if (BitSetUtils.intersection(set, outgroupTaxa).cardinality() < outgroupTaxa.cardinality())
+					set = targetMap.get(e);
+				if (BitSetUtils.contains(set, outgroupTaxa)) {
+					if (bestSet == null || set.cardinality() < bestSet.cardinality()) {
+						best = e;
+						bestSet = set;
+					}
+				}
+			}
+			if (best != null) {
+				for (var rootingRecord : computeRootingRecords(tree)) {
+					if (rootingRecord.edge() == best) {
+						reroot(internalNodeLabelsAreEdgeLabels, tree, rootingRecord, true);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	private static BitSet computeTaxaRec(PhyloTree tree, Node v, Edge inEdge, EdgeArray<BitSet> sourceMap, EdgeArray<BitSet> targetMap) {
+		var taxa = new BitSet();
+		for (var f : v.adjacentEdges()) {
+			if (f != inEdge) {
+				var map = (v == f.getSource() ? sourceMap : targetMap);
+				if (f.getOpposite(v).isLeaf()) {
+					taxa.or(map.computeIfAbsent(f, a -> BitSetUtils.asBitSet(tree.getTaxa(a.getOpposite(v)))));
+				} else
+					taxa.or(map.computeIfAbsent(f, a -> computeTaxaRec(tree, a.getOpposite(v), a, sourceMap, targetMap)));
+			}
+		}
+		return taxa;
+	}
+
 
 	/**
 	 * reroot tree by node
@@ -96,338 +214,28 @@ public class RerootingUtils {
 			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
 	}
 
-
 	/**
-	 * reroot a tree by outgroup. Find the node or edge middle point so that tree is optimally rooted for
-	 * the given outgroup  labels
+	 * reroot tree by edge
 	 */
-	public static void rerootByOutGroup(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, BitSet outgroupTaxa) {
-		if (tree.getRoot() == null)
-			return;
-
-		if (tree.isReticulated()) {
-			System.err.println(tree.getName() + ": reticulated, re-root not implemented");
-			return;
-		}
-
-		var totalOutgroupTaxa = 0;
-		var totalIngroupNodes = 0;
-		var totalNodes = tree.getNumberOfNodes();
-
-		// compute number of outgroup taxa for each node
-		NodeIntArray node2NumberOutgroup = new NodeIntArray(tree);
-		for (var v : tree.nodes()) {
-			if (tree.getNumberOfTaxa(v) > 0) {
-				var isOutgroupNode = false;
-				for (var t : tree.getTaxa(v)) {
-					if (outgroupTaxa.get(t)) {
-						isOutgroupNode = true;
-						node2NumberOutgroup.set(v, node2NumberOutgroup.getInt(v) + 1);
-						totalOutgroupTaxa++;
-						break;
-					}
-				}
-				if (!isOutgroupNode)
-					totalIngroupNodes++;
-			}
-		}
-
-		if (totalOutgroupTaxa == 0 || totalIngroupNodes == 0) {
-			System.err.println(tree.getName() + ": no outgroup or ingroup");
-			return;
-		}
-
-		var edge2OutgroupBelow = new EdgeIntArray(tree); // how many outgroup taxa below this edge?
-		var edge2NodesBelow = new EdgeIntArray(tree);  // how many nodes below this edge?
-		var node2OutgroupBelow = new NodeIntArray(tree); // how many outgroup taxa below this multifurcation?
-		var node2NodesBelow = new NodeIntArray(tree);     // how many nodes below this multifurcation (including this?)
-
-		rerootByOutgroupRec(tree.getRoot(), null, node2NumberOutgroup, edge2OutgroupBelow, edge2NodesBelow, node2OutgroupBelow, node2NodesBelow, totalNodes, totalOutgroupTaxa);
-
-		// find best edge for rooting
-
-		Edge bestEdge = null;
-		var outgroupBelowBestEdge = 0;
-		var nodesBelowBestEdge = 0;
-
-		for (var e : tree.edges()) {
-			var outgroupBelowE = edge2OutgroupBelow.getInt(e);
-			var nodesBelowE = edge2NodesBelow.getInt(e);
-			if (outgroupBelowE < 0.5 * totalOutgroupTaxa) {
-				outgroupBelowE = totalOutgroupTaxa - outgroupBelowE;
-				nodesBelowE = totalNodes - nodesBelowE;
-			}
-			if (bestEdge == null || outgroupBelowE > outgroupBelowBestEdge || (outgroupBelowE == outgroupBelowBestEdge && nodesBelowE < nodesBelowBestEdge)) {
-				bestEdge = e;
-				outgroupBelowBestEdge = outgroupBelowE;
-				nodesBelowBestEdge = nodesBelowE;
-			}
-			//tree.setLabel(e,""+outgroupBelowE+" "+nodesBelowE);
-		}
-
-		// try to find better node for rooting:
-
-		Node bestNode = null;
-		var outgroupBelowBestNode = outgroupBelowBestEdge;
-		var nodesBelowBestNode = nodesBelowBestEdge;
-
-		for (var v : tree.nodes()) {
-			var outgroupBelowV = node2OutgroupBelow.getInt(v);
-			int nodesBelowV = node2NodesBelow.getInt(v);
-			if (outgroupBelowV > 0 && (outgroupBelowV > outgroupBelowBestNode || (outgroupBelowV == outgroupBelowBestNode && nodesBelowV < nodesBelowBestNode))) {
-				bestNode = v;
-				outgroupBelowBestNode = outgroupBelowV;
-				nodesBelowBestNode = nodesBelowV;
-				// System.err.println("node score: "+outgroupBelowV+" "+nodesBelowV);
-			}
-		}
-		if (bestNode != null && bestNode != tree.getRoot()) {
-			rerootByNode(internalNodeLabelsAreEdgeLabels, tree, bestNode);
-		} else if (bestEdge != null) {
-			rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, bestEdge);
-		}
-	}
-
-	/**
-	 * recursively determine the best place to root the tree for the given outgroup
-	 */
-	private static void rerootByOutgroupRec(Node v, Edge e, NodeIntArray node2NumberOutgroup, EdgeIntArray edge2OutgroupBelow,
-											EdgeIntArray edge2NodesBelow, NodeIntArray node2OutgroupBelow, NodeIntArray node2NodesBelow, int totalNodes, int totalOutgroup) {
-		var outgroupBelowE = node2NumberOutgroup.getInt(v);
-		var nodesBelowE = 1; // including v
-
-		for (var f : v.outEdges()) {
-			rerootByOutgroupRec(f.getTarget(), f, node2NumberOutgroup, edge2OutgroupBelow, edge2NodesBelow, node2OutgroupBelow, node2NodesBelow, totalNodes, totalOutgroup);
-			outgroupBelowE += edge2OutgroupBelow.getInt(f);
-			nodesBelowE += edge2NodesBelow.getInt(f);
-		}
-		if (e != null) {
-			edge2NodesBelow.set(e, nodesBelowE);
-			edge2OutgroupBelow.set(e, outgroupBelowE);
-		}
-
-		// if v is a multifurcation then we may need to use it as root
-		if (v.getOutDegree() > 2) // multifurcation
-		{
-			final var outgroupBelowV = outgroupBelowE + node2NumberOutgroup.getInt(v);
-
-			if (outgroupBelowV == totalOutgroup) // all outgroup taxa lie below here
-			{
-				// count nodes below in straight-forward way
-				node2OutgroupBelow.set(v, outgroupBelowV);
-
-				var nodesBelowV = 1;
-				for (var f : v.outEdges()) {
-					if (edge2OutgroupBelow.getInt(f) > 0)
-						nodesBelowV += edge2NodesBelow.getInt(f);
-				}
-				node2NodesBelow.set(v, nodesBelowV);
-			} else // outgroupBelowE<totalOutgroup, i.e. some outgroup nodes lie above e
-			{
-				// count nodes below in parts not containing outgroup taxa and then subtract appropriately
-
-				var keep = false;
-				var nodesBelowV = 0;
-				for (var f : v.outEdges()) {
-					if (edge2OutgroupBelow.getInt(f) > 0)
-						keep = true;   // need to have at least one node below that contains outgroup taxa
-					else
-						nodesBelowV += edge2NodesBelow.getInt(f);
-				}
-				if (keep) {
-					node2OutgroupBelow.set(v, totalOutgroup);
-					node2NodesBelow.set(v, totalNodes - nodesBelowV);
-				}
-			}
-		}
-	}
-
-	/**
-	 * re-root tree using midpoint rooting
-	 */
-	public static void rerootByMidpoint(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree) {
-		final SortedSet<Triplet<Edge, Float, Float>> rankedMidpointRootings = getRankedMidpointRootings(tree);
-
-		final var best = rankedMidpointRootings.first();
-		final var e = best.getFirst();
-		final var v = e.getSource();
-		final var w = e.getTarget();
-		final var a = best.getSecond();
-		final var b = best.getThird();
-		final var weight = (float) tree.getWeight(e);
-		final var halfOfTotal = (a + b + weight) / 2;
-
-		if (halfOfTotal <= a) {
-			if (tree.getRoot() == v)
-				return;
-			rerootByNode(internalNodeLabelsAreEdgeLabels, tree, v);
-		} else if (halfOfTotal >= a + weight) {
-			if (tree.getRoot() == w)
-				return;
-			rerootByNode(internalNodeLabelsAreEdgeLabels, tree, w);
-		} else {
-			rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, e);
-		}
-	}
-
-	/**
-	 * gets all mid-point rootings edges ranked by increasing level of imbalance (absolute difference of distances of
-	 * source and target to furtherest leaf without through e)
-	 *
-	 * @return collection of triplets: edge,
-	 */
-	public static SortedSet<Triplet<Edge, Float, Float>> getRankedMidpointRootings(final PhyloTree tree) {
-		final var maxBottomUpDistance = new EdgeFloatArray(tree);
-		final var maxTopDownDistance = new EdgeFloatArray(tree);
-
-		for (var e : tree.getRoot().outEdges())
-			computeMaxBottomUpDistance(tree, e, maxBottomUpDistance);
-		computeMaxTopDownDistanceRec(tree, tree.getRoot(), maxBottomUpDistance, maxTopDownDistance);
-
-		var result = new TreeSet<Triplet<Edge, Float, Float>>((a, b) -> {
-			float compare = Math.abs(a.getSecond() - a.getThird()) - Math.abs(b.getSecond() - b.getThird());
-			if (compare < 0)
-				return -1;
-			else if (compare > 0)
-                return 1;
-            else return Integer.compare(a.getFirst().getId(), b.getFirst().getId());
-		});
-		for (var e : tree.edges()) {
-			Triplet<Edge, Float, Float> triplet = new Triplet<>(e, maxTopDownDistance.getFloat(e), maxBottomUpDistance.getFloat(e));
-			result.add(triplet);
-		}
-		if (false) {
-			System.err.println("Ranking:");
-			for (var triplet : result) {
-				System.err.println(triplet);
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * compute the midpoint score for all edges
-	 *
-	 * @return midpoint scores
-	 */
-	public static EdgeFloatArray getMidpointScores(PhyloTree tree) {
-		final var maxBottomUpDistance = new EdgeFloatArray(tree);
-		final var maxTopDownDistance = new EdgeFloatArray(tree);
-		for (var e : tree.getRoot().outEdges()) {
-			computeMaxBottomUpDistance(tree, e, maxBottomUpDistance);
-		}
-		computeMaxTopDownDistanceRec(tree, tree.getRoot(), maxBottomUpDistance, maxTopDownDistance);
-
-		final var scores = new EdgeFloatArray(tree);
-		for (var e : tree.getRoot().outEdges()) {
-			scores.put(e, Math.abs(maxBottomUpDistance.getFloat(e) - maxTopDownDistance.getFloat(e)));
-		}
-		return scores;
-	}
-
-	/**
-	 * compute the midpoint score a given root node
-	 *
-	 * @return midpoint score
-	 */
-	public static float getMidpointScore(PhyloTree tree, Node root) {
-		SortedSet<Double> distances = new TreeSet<>();
-
-		for (var e : tree.getRoot().outEdges()) {
-			distances.add(computeMaxDistanceRec(tree, e.getTarget(), e) + tree.getWeight(e));
-		}
-		var first = distances.last();
-		distances.remove(distances.last());
-		var second = distances.last();
-		return (float) Math.abs(first - second);
-	}
-
-	/**
-	 * compute the maximum distance from v to a leaf in a tree, avoiding edge f
-	 *
-	 * @return max distance
-	 */
-	private static float computeMaxDistanceRec(PhyloTree tree, Node v, Edge f) {
-		var dist = 0.0f;
-		for (var e : v.adjacentEdges()) {
-			if (e != f) {
-				dist = Math.max(dist, computeMaxDistanceRec(tree, e.getOpposite(v), e) + (float) tree.getWeight(e));
-			}
-		}
-		return dist;
-	}
-
-	/**
-	 * bottom up calculation of max down distance
-	 *
-	 * @return distance down (including length of e)
-	 */
-	private static float computeMaxBottomUpDistance(PhyloTree tree, Edge e, EdgeFloatArray maxDownDistance) {
-		var w = e.getTarget();
-		var depth = 0f;
-		for (var f : w.outEdges()) {
-			depth = Math.max(computeMaxBottomUpDistance(tree, f, maxDownDistance), depth);
-		}
-		maxDownDistance.put(e, depth);
-		return depth + (float) tree.getWeight(e);
-	}
-
-	/**
-	 * recursively compute best topdown distance
-	 */
-	private static void computeMaxTopDownDistanceRec(PhyloTree tree, Node v, EdgeFloatArray maxDownDistance, EdgeFloatArray maxUpDistance) {
-		float bestUp;
-		var inEdge = v.getFirstInEdge();
-		if (inEdge != null)
-			bestUp = maxUpDistance.getFloat(inEdge) + (float) tree.getWeight(inEdge);
+	public static void rerootByEdge(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Edge e, double weight2source, double weight2target) {
+		final EdgeArray<String> edgeLabels;
+		if (internalNodeLabelsAreEdgeLabels)
+			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
 		else
-			bestUp = 0;
+			edgeLabels = null;
 
-		for (var e : v.outEdges()) {
-			float best = bestUp;
-			for (var f : v.outEdges()) {
-				if (f != e) {
-					best = Math.max(best, maxDownDistance.getFloat(f) + (float) tree.getWeight(f));
-				}
-			}
-			maxUpDistance.put(e, best);
-		}
-		for (var e : v.outEdges()) {
-			computeMaxTopDownDistanceRec(tree, e.getTarget(), maxDownDistance, maxUpDistance);
-		}
-	}
+		var source = e.getSource();
+		var target = e.getTarget();
+		// not under a special node, reroot in simple way
+		tree.setRoot(e, edgeLabels);
 
-	/**
-	 * gets the average distance from this node to a leaf.
-	 */
-	public static double computeAverageDistanceToALeaf(PhyloTree tree, Node v) {
-		// assumes that all edges are oriented away from the root
-		var seen = new NodeSet(tree);
-		var pair = new Pair<>(0.0, 0);
-		computeAverageDistanceToLeafRec(tree, v, null, 0, seen, pair);
-		var sum = pair.getFirst();
-		var leaves = pair.getSecond();
-		if (leaves > 0)
-			return sum / leaves;
-		else
-			return 0;
-	}
+		tree.redirectEdgesAwayFromRoot();
 
-	/**
-	 * recursively does the work
-	 */
-	private static void computeAverageDistanceToLeafRec(PhyloTree tree, Node v, Edge e, double distance, NodeSet seen, Pair<Double, Integer> pair) {
-		if (!seen.contains(v)) {
-			seen.add(v);
-			if (v.getOutDegree() > 0) {
-				for (Edge f : v.adjacentEdges()) {
-					if (f != e)
-						computeAverageDistanceToLeafRec(tree, f.getOpposite(v), f, distance + tree.getWeight(f), seen, pair);
-				}
-			} else {
-				pair.setFirst(pair.getFirst() + distance);
-				pair.setSecond(pair.getSecond() + 1);
-			}
-		}
+		if (internalNodeLabelsAreEdgeLabels)
+			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
+
+		var root = tree.getRoot();
+		tree.setWeight(root.getCommonEdge(source), weight2source);
+		tree.setWeight(root.getCommonEdge(target), weight2target);
 	}
 }

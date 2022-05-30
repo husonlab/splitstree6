@@ -100,18 +100,17 @@ public class RerootByHybridNumber {
 
 		// create all pairs of rootings
 		{
-			SortedSet<Triplet<Edge, Float, Float>> rerootingTriplets1 = RerootingUtils.getRankedMidpointRootings(tree1);
-			SortedSet<Triplet<Edge, Float, Float>> rerootingTriplets2 = RerootingUtils.getRankedMidpointRootings(tree2);
+			var rerootingTriplets1 = RerootingUtils.computeRootingRecords(tree1);
+			var rerootingTriplets2 = RerootingUtils.computeRootingRecords(tree2);
 
 			System.err.println("Determining all pairs of possible rootings");
-			for (Triplet<Edge, Float, Float> triplet1 : rerootingTriplets1) {
-                Triplet<Integer, Float, Float> newTriplet1 = new Triplet<>(edge2number1.get(triplet1.getFirst()), triplet1.getSecond(), triplet1.getThird());
-				for (Triplet<Edge, Float, Float> triplet2 : rerootingTriplets2) {
-					if (triplet2.getFirst().getTarget().getOutDegree() > 0) {
-                        Triplet<Integer, Float, Float> newTriplet2 = new Triplet<>(edge2number2.get(triplet2.getFirst()), triplet2.getSecond(), triplet2.getThird());
+			for (var triplet1 : rerootingTriplets1) {
+				var newTriplet1 = new Triplet<>(edge2number1.get(triplet1.edge()), (float) (triplet1.targetToLeafMaxDistance() - triplet1.weight()), (float) (triplet1.sourceToLeafMaxDistance() - triplet1.weight()));
+				for (var triplet2 : rerootingTriplets2) {
+					if (triplet2.edge().getTarget().getOutDegree() > 0) {
+						var newTriplet2 = new Triplet<>(edge2number2.get(triplet2.edge()), (float) (triplet2.targetToLeafMaxDistance() - triplet2.weight()), (float) (triplet1.sourceToLeafMaxDistance() - triplet2.weight()));
 
-                        Pair<Triplet<Integer, Float, Float>, Triplet<Integer, Float, Float>>
-                                pair = new Pair<>(newTriplet1, newTriplet2);
+						var pair = new Pair<>(newTriplet1, newTriplet2);
 						allPairs.add(pair);
 					}
 				}

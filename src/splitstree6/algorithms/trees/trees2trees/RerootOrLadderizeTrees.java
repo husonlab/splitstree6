@@ -109,14 +109,14 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 			case MidPoint -> {
 				optionOutGroupTaxa.set(new String[0]);
 				for (PhyloTree orig : inputData.getTrees()) {
-					final PhyloTree tree = new PhyloTree();
+					final var tree = new PhyloTree();
 					tree.copy(orig);
 					if (tree.getRoot() == null) {
 						tree.setRoot(tree.getFirstNode());
 						tree.redirectEdgesAwayFromRoot();
 					}
 					// todo: ask about internal node labels
-					RerootingUtils.rerootByMidpoint(false, tree);
+					RerootingUtils.rerootByMidpoint(getOptionHasBranchSupportValues(), tree);
 					trees.add(tree);
 					outputData.setRooted(true);
 				}

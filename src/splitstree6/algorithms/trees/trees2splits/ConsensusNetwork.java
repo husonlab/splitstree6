@@ -220,8 +220,7 @@ public class ConsensusNetwork extends Trees2Splits {
 		}
 
 		if (getOptionHighDimensionFilter()) {
-			var dimensionsFilter = new DimensionFilter();
-			dimensionsFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
+			DimensionFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
 		} else
 			splitsBlock.copy(computedSplits);
 
