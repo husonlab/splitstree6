@@ -68,23 +68,23 @@ public class DensiTree {
 
             var xmin = (int) (100 * scalingFactor.get());
             var ymin = (int) (100 * scalingFactor.get());
-            var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
+            var xmax = (int) ((canvas.getWidth() - 200) * scalingFactor.get());
             var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
 
             boolean jitter = parameters.jitter;
             boolean block = false;
             boolean rooted = false;
             String labelMethod = parameters.labelMethod;
-            drawingMethod drawingMethod = splitstree6.densitree.drawingMethod.CIRCULAR;
+            DrawingMethod drawingMethod = DrawingMethod.CIRCULAR;
             if (parameters.drawingMethod.contains("toscale")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.TOSCALE;
+                drawingMethod = DrawingMethod.TOSCALE;
             } else if (parameters.drawingMethod.contains("uniform")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.UNIFORM;
+                drawingMethod = DrawingMethod.UNIFORM;
             } else if (parameters.drawingMethod.contains("block")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.BLOCK;
+                drawingMethod = DrawingMethod.BLOCK;
                 block = true;
             } else if (parameters.drawingMethod.contains("rooted")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.ROOTED;
+                drawingMethod = DrawingMethod.ROOTED;
                 rooted = true;
             }
 
@@ -129,9 +129,7 @@ public class DensiTree {
                 NodeArray<Point2D> nodePointMap = tree.newNodeArray();
                 var nodeAngleMap = tree.newNodeDoubleArray();
                 LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
-                if (true || !block && !rooted) {
-                    adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
-                }
+                adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap, xmin, ymin, xmax, ymax);
 
                 centerByMass(tree, nodePointMap, canvas);
 
@@ -152,7 +150,7 @@ public class DensiTree {
             NodeArray<Point2D> nodePointMap = tree1.newNodeArray();
             var nodeAngleMap = tree1.newNodeDoubleArray();
             LayoutAlgorithm.apply(tree1, drawingMethod, circle, nodePointMap, nodeAngleMap);
-            adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+            adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap, xmin, ymin, xmax, ymax);
 
             if (labelMethod.contains("kmeans")) {
                 kmeansLabels(tree1, labelPane, nodeAngleMap, coords3, labels, kmeansClusterer);
@@ -177,13 +175,13 @@ public class DensiTree {
             var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
             var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
 
-            drawingMethod drawingMethod = splitstree6.densitree.drawingMethod.CIRCULAR;
+            var drawingMethod = DrawingMethod.CIRCULAR;
             if (parameters.drawingMethod.contains("toscale")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.TOSCALE;
+                drawingMethod = DrawingMethod.TOSCALE;
             } else if (parameters.drawingMethod.contains("uniform")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.UNIFORM;
+                drawingMethod = DrawingMethod.UNIFORM;
             } else if (parameters.drawingMethod.contains("rooted")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.ROOTED;
+                drawingMethod = DrawingMethod.ROOTED;
             }
 
             var circle = model.getCircularOrdering();
@@ -192,7 +190,7 @@ public class DensiTree {
             NodeArray<Point2D> nodePointMap = consensusTree.newNodeArray();
             var nodeAngleMap = consensusTree.newNodeDoubleArray();
             LayoutAlgorithm.apply(consensusTree, drawingMethod, circle, nodePointMap, nodeAngleMap);
-            adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+            adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap, xmin, ymin, xmax, ymax);
 
             centerByMass(consensusTree, nodePointMap, canvas);
 
@@ -221,13 +219,13 @@ public class DensiTree {
 
             var nTrees = model.getTreesBlock().size();
 
-            drawingMethod drawingMethod = splitstree6.densitree.drawingMethod.CIRCULAR;
+            DrawingMethod drawingMethod = DrawingMethod.CIRCULAR;
             if (parameters.drawingMethod.contains("toscale")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.TOSCALE;
+                drawingMethod = DrawingMethod.TOSCALE;
             } else if (parameters.drawingMethod.contains("uniform")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.UNIFORM;
+                drawingMethod = DrawingMethod.UNIFORM;
             } else if (parameters.drawingMethod.contains("rooted")) {
-                drawingMethod = splitstree6.densitree.drawingMethod.ROOTED;
+                drawingMethod = DrawingMethod.ROOTED;
             }
 
             var circle = model.getCircularOrdering();
@@ -242,7 +240,7 @@ public class DensiTree {
                     NodeArray<Point2D> nodePointMap = tree.newNodeArray();
                     var nodeAngleMap = tree.newNodeDoubleArray();
                     LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
-                    adjustCoordinatesToBox(nodePointMap, xmin, ymin, xmax, ymax);
+                    adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap, xmin, ymin, xmax, ymax);
 
                     centerByMass(tree, nodePointMap, canvas);
 
@@ -296,10 +294,7 @@ public class DensiTree {
         }
     }
 
-    public static void meanLabels(
-            PhyloTree tree, Pane labelPane, NodeDoubleArray nodeAngleMap,
-            double[][] coords, String[] labels, int nTrees
-    ) {
+    public static void meanLabels(PhyloTree tree, Pane labelPane, NodeDoubleArray nodeAngleMap, double[][] coords, String[] labels, int nTrees) {
 
         for (var e : tree.edges()) {
             var w = e.getTarget();
@@ -329,9 +324,7 @@ public class DensiTree {
         }
     }
 
-    public static void medianLabels(
-            PhyloTree tree, Pane labelPane, NodeDoubleArray nodeAngleMap, double[][][] coords2, String[] labels
-    ) {
+    public static void medianLabels(PhyloTree tree, Pane labelPane, NodeDoubleArray nodeAngleMap, double[][][] coords2, String[] labels) {
 
         for (var e : tree.edges()) {
             var w = e.getTarget();
@@ -362,10 +355,8 @@ public class DensiTree {
         }
     }
 
-    public static void radialLabels(
-            PhyloTree tree, Pane labelPane, NodeDoubleArray nodeAngleMap,
-            double[][] coords, String[] labels, int nTrees, RadialLabelLayout labelLayout
-    ) {
+    public static void radialLabels(PhyloTree tree, Pane labelPane, NodeDoubleArray nodeAngleMap,
+                                    double[][] coords, String[] labels, int nTrees, RadialLabelLayout labelLayout) {
 
         for (var e : tree.edges()) {
             var w = e.getTarget();
@@ -756,8 +747,7 @@ public class DensiTree {
         }
     }
 
-
-    public static void adjustCoordinatesToBox(NodeArray<Point2D> nodePointMap, double xMinTarget, int yMinTarget, double xMaxTarget, double yMaxTarget) {
+    public static void adjustCoordinatesToBox(boolean maintainAspectRatio, NodeArray<Point2D> nodePointMap, double xMinTarget, int yMinTarget, double xMaxTarget, double yMaxTarget) {
 
         var xMin = nodePointMap.values().stream().mapToDouble(Point2D::getX).min().orElse(0);
         var xMax = nodePointMap.values().stream().mapToDouble(Point2D::getX).max().orElse(0);
@@ -766,11 +756,15 @@ public class DensiTree {
 
         var scaleX = (xMaxTarget - xMinTarget) / (xMax - xMin);
         var scaleY = (yMaxTarget - yMinTarget) / (yMax - yMin);
-        var scale = Math.min(scaleX, scaleY);
+
+        if (maintainAspectRatio)
+            scaleX = scaleY = Math.min(scaleX, scaleY);
 
         for (var v : nodePointMap.keySet()) {
             var point = nodePointMap.get(v);
-            nodePointMap.put(v, point.subtract(0.5 * (xMin + xMax), 0.5 * (yMin + yMax)).multiply(scale).add(0.5 * (xMinTarget + xMaxTarget), 0.5 * (yMinTarget + yMaxTarget)));
+            nodePointMap.replace(v,
+                    new Point2D((point.getX() - 0.5 * (xMin + xMax)) * scaleX, (point.getY() - 0.5 * (yMin + yMax)) * scaleY)
+                            .add(0.5 * (xMinTarget + xMaxTarget), 0.5 * (yMinTarget + yMaxTarget)));
         }
     }
 

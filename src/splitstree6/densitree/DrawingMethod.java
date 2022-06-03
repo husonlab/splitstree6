@@ -1,6 +1,6 @@
 package splitstree6.densitree;
 
-public enum drawingMethod {
+public enum DrawingMethod {
     CIRCULAR,
     TOSCALE,
     UNIFORM,
