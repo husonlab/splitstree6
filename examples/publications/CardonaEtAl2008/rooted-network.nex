@@ -1,0 +1,9 @@
+#nexus
+[!
+Cardona, G., Rosselló, F. & Valiente, G. Extended Newick: it is time for a standard representation of phylogenetic networks.
+BMC Bioinformatics 9, 532 (2008). https://doi.org/10.1186/1471-2105-9-532
+]
+begin trees;
+tree figure2= ((t1, ((t2, (t3, (t4)Y#H1)g)e, (((Y#H1, t5)h, t6)f)X#H2)c)a, ((X#H2,t7)d,t8)b)r;
+end;
+
