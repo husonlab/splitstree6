@@ -120,7 +120,7 @@ public class LayoutAlgorithm {
                                         y = j;
                                     }
                                 }
-                                nodePointMap.put(v, new Point2D(0, y /* * 75*/));
+                                nodePointMap.put(v, new Point2D(0, y));
                             } else {
                                 var y1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
                                 var y2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();

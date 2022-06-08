@@ -116,6 +116,8 @@ public class DensiTree {
                 }
             }
 
+            double[] comT1 = getCenterofMass(model, parameters, canvas, scalingFactor, 1);
+
             gc.setLineWidth(1.0);
 
             gc.save();
@@ -131,7 +133,7 @@ public class DensiTree {
                 LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                 adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap, xmin, ymin, xmax, ymax);
 
-                centerByMass(tree, nodePointMap, canvas);
+                centerByMass(tree, nodePointMap, comT1);
 
                 if (labelMethod.contains("kmeans")) {
                     drawEdges2(tree, i - 1, gc, nodePointMap, jitter, block, shiftx, shifty, coords3, labels);
@@ -192,7 +194,8 @@ public class DensiTree {
             LayoutAlgorithm.apply(consensusTree, drawingMethod, circle, nodePointMap, nodeAngleMap);
             adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap, xmin, ymin, xmax, ymax);
 
-            centerByMass(consensusTree, nodePointMap, canvas);
+            double[] comT1 = getCenterofMass(model, parameters, canvas, scalingFactor, 1);
+            centerByMass(consensusTree, nodePointMap, comT1);
 
             for (var e : consensusTree.edges()) {
                 var v = e.getSource();
@@ -230,6 +233,8 @@ public class DensiTree {
 
             var circle = model.getCircularOrdering();
 
+            double[] comT1 = getCenterofMass(model, parameters, canvas, scalingFactor, 1);
+
             String[] specTrees = parameters.highlight.split(",");
             for (String specTree : specTrees) {
                 int treeNum = Integer.parseInt(specTree);
@@ -242,7 +247,7 @@ public class DensiTree {
                     LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap, nodeAngleMap);
                     adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap, xmin, ymin, xmax, ymax);
 
-                    centerByMass(tree, nodePointMap, canvas);
+                    centerByMass(tree, nodePointMap, comT1);
 
                     for (var e : tree.edges()) {
                         var v = e.getSource();
@@ -262,8 +267,54 @@ public class DensiTree {
         }
     }
 
+    public static double[] getCenterofMass(Model model, Parameters parameters, Canvas canvas, ReadOnlyDoubleProperty scalingFactor, int treeNum){
+        var xmin = (int) (100 * scalingFactor.get());
+        var ymin = (int) (100 * scalingFactor.get());
+        var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
+        var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
 
-    public static void centerByMass(PhyloTree tree, NodeArray<Point2D> nodePointMap, Canvas canvas) {
+        DrawingMethod drawingMethod = DrawingMethod.CIRCULAR;
+        if (parameters.drawingMethod.contains("toscale")) {
+            drawingMethod = DrawingMethod.TOSCALE;
+        } else if (parameters.drawingMethod.contains("uniform")) {
+            drawingMethod = DrawingMethod.UNIFORM;
+        } else if (parameters.drawingMethod.contains("rooted")) {
+            drawingMethod = DrawingMethod.ROOTED;
+        }
+
+        var circle = model.getCircularOrdering();
+
+        PhyloTree tree = model.getTreesBlock().getTree(treeNum);
+
+        NodeArray<Point2D> nodePointMap1 = tree.newNodeArray();
+        var nodeAngleMap1 = tree.newNodeDoubleArray();
+        LayoutAlgorithm.apply(tree, drawingMethod, circle, nodePointMap1, nodeAngleMap1);
+        adjustCoordinatesToBox(drawingMethod == DrawingMethod.CIRCULAR, nodePointMap1, xmin, ymin, xmax, ymax);
+
+        double xsum = nodePointMap1.get(tree.getRoot()).getX();
+        double ysum = nodePointMap1.get(tree.getRoot()).getY();
+        int nodeCount = 1;
+
+        for (var e : tree.edges()) {
+            var v = e.getSource();
+            var w = e.getTarget();
+            var vPt = nodePointMap1.get(v);
+            var wPt = nodePointMap1.get(w);
+
+            if (vPt != null & wPt != null) {
+
+                xsum += wPt.getX();
+                ysum += wPt.getY();
+                nodeCount++;
+            }
+        }
+
+        double comX = xsum / nodeCount;
+        double comY = ysum / nodeCount;
+        return new double[]{comX, comY};
+    }
+
+    public static void centerByMass(PhyloTree tree, NodeArray<Point2D> nodePointMap, double[] comT1) {
         double xsum = nodePointMap.get(tree.getRoot()).getX();
         double ysum = nodePointMap.get(tree.getRoot()).getY();
         int nodeCount = 1;
@@ -285,8 +336,8 @@ public class DensiTree {
         double comX = xsum / nodeCount;
         double comY = ysum / nodeCount;
 
-        double centerX = canvas.getWidth() / 2 - comX;
-        double centerY = canvas.getHeight() / 2 - comY;
+        double centerX = comT1[0] - comX;
+        double centerY = comT1[1] - comY;
 
         for (var k : nodePointMap.keySet()) {
             var point = nodePointMap.get(k);
