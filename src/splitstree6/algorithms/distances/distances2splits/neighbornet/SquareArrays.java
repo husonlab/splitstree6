@@ -135,7 +135,23 @@ public class SquareArrays {
         }
     }
 
-
+    /**
+     * Return the sum of squares of entries in the matrix
+     * @param x square array of doubles
+     * @return double, sum of squares
+     */
+    static public double sumSquares(double[][] x) {
+        int n = x.length-1;
+        double si = 0.0, total=0.0;
+        for(int i=1;i<=n;i++) {
+            si = 0.0;
+            for(int j=i+1;j<=n;j++) {
+                si += x[i][j]*x[i][j];
+            }
+            total+=si;
+        }
+        return 2.0*total;
+    }
 
 
 

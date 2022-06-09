@@ -1,5 +1,7 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import java.util.Random;
+
 import static java.lang.Math.*;
 
 public class IncrementalFitting {
@@ -40,6 +42,16 @@ public class IncrementalFitting {
         cycle[2]=max(s1,s2);
 
         for (int k=3;k<=n;k++) {
+
+            //DEBUG
+            double maxdiff = 0.0;
+            for(int i=1;i<k;i++)
+                for(int j=i+1;j<k;j++)
+                    maxdiff = max(maxdiff,abs(p[cycle[i]][cycle[j]]-d[cycle[i]][cycle[j]]));
+            System.err.println("k="+k+"\t diff = "+maxdiff);
+
+
+
             int sk = s[k];  //Taxon to re-insert
 
             //Determine taxa before and after sk in the ordering which have been already inserted
@@ -103,6 +115,7 @@ public class IncrementalFitting {
             else {
                 gamma = goldenInsertion(gamma0,gamma1,b,r1,r2,z,tol);
             }
+            //TODO Perhaps use a projected gradient method here instead?
 
 
             isFeasible = true;
@@ -124,6 +137,9 @@ public class IncrementalFitting {
             for(int j=1;j<=r2;j++)
                 cycle[k-j+1]=cycle[k-j];
             cycle[r1+1]=sk;
+
+
+
         }
     }
 
@@ -301,5 +317,9 @@ public class IncrementalFitting {
 
         return gamma;
     }
+
+
+
+
 
 }
