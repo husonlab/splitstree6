@@ -122,7 +122,8 @@ public class DensiTree {
 
             gc.save();
 
-            gc.setLineWidth(0.01);
+            gc.setLineWidth(0.2);
+            gc.setGlobalAlpha(0.1);
             for (int i = 1; i <= nTrees; i++) {
                 var tree = model.getTreesBlock().getTree(i);
                 shiftx = random.nextDouble();
