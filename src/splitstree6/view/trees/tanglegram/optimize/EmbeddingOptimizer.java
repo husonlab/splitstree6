@@ -375,7 +375,8 @@ public class EmbeddingOptimizer {
 				var root = v.getFirstAdjacentEdge().getOpposite(v);
 				tree.deleteNode(v);
 				v = root;
-				root = v.getFirstAdjacentEdge().getOpposite(v);
+				if (v.getDegree() > 0)
+					root = v.getFirstAdjacentEdge().getOpposite(v);
 				tree.deleteNode(v);
 				tree.setRoot(root);
 			}

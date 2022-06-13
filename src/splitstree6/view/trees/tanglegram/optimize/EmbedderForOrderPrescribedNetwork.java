@@ -324,20 +324,23 @@ public class EmbedderForOrderPrescribedNetwork {
 	 * @return all children
 	 */
 	private static List<Node> getLSAChildren(Node v) {
-		var tree = (PhyloTree) v.getOwner();
-
-		List<Node> targetNodes = null;
-		if (tree.getLSAChildrenMap().get(v) != null)
-			targetNodes = tree.getLSAChildrenMap().get(v);
 		var list = new LinkedList<Node>();
 
-		if (targetNodes == null) {
-			for (var e : v.outEdges()) {
-				if (!tree.isReticulatedEdge(e))
-					list.add(e.getTarget());
+		var tree = (PhyloTree) v.getOwner();
+
+		if (tree != null) {
+			List<Node> targetNodes = null;
+			if (tree.getLSAChildrenMap().get(v) != null)
+				targetNodes = tree.getLSAChildrenMap().get(v);
+
+			if (targetNodes == null) {
+				for (var e : v.outEdges()) {
+					if (!tree.isReticulatedEdge(e))
+						list.add(e.getTarget());
+				}
+			} else {
+				list.addAll(targetNodes);
 			}
-		} else {
-			list.addAll(targetNodes);
 		}
 		return list;
 	}
