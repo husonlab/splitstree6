@@ -97,14 +97,18 @@
                                     <ToggleGroup fx:id="drawingGroup" />
                                 </toggleGroup>
                             </RadioMenuItem>
+                     <SeparatorMenuItem mnemonicParsing="false" />
                             <RadioMenuItem fx:id="toscaleMenuItem" mnemonicParsing="false" text="To Scale" toggleGroup="$drawingGroup" />
+                     <SeparatorMenuItem mnemonicParsing="false" />
                             <RadioMenuItem fx:id="uniformMenuItem" mnemonicParsing="false" text="Uniform" toggleGroup="$drawingGroup" />
+                     <SeparatorMenuItem mnemonicParsing="false" />
                      <RadioMenuItem fx:id="rootedMenuItem" mnemonicParsing="false" text="Rooted" toggleGroup="$drawingGroup" />
                         </items>
                     </Menu>
                     <Menu mnemonicParsing="false" text="Highlighting">
                         <items>
                             <CheckMenuItem fx:id="consensusMenuItem" mnemonicParsing="false" text="Consensus Tree" />
+                     <SeparatorMenuItem mnemonicParsing="false" />
                             <MenuItem fx:id="specificTreesMenuItem" mnemonicParsing="false" text="Specific Trees" />
                         </items>
                     </Menu>
@@ -115,8 +119,11 @@
                                     <ToggleGroup fx:id="labelsGroup" />
                                 </toggleGroup>
                             </RadioMenuItem>
+                     <SeparatorMenuItem mnemonicParsing="false" />
                             <RadioMenuItem fx:id="medianMenuItem" mnemonicParsing="false" text="Median" toggleGroup="$labelsGroup" />
+                     <SeparatorMenuItem mnemonicParsing="false" />
                             <RadioMenuItem fx:id="kmeansMenuItem" mnemonicParsing="false" text="k-means Clustering" toggleGroup="$labelsGroup" />
+                     <SeparatorMenuItem mnemonicParsing="false" />
                             <RadioMenuItem fx:id="radialMenuItem" mnemonicParsing="false" text="Radial" toggleGroup="$labelsGroup" />
                         </items>
                     </Menu>
