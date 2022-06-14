@@ -1,0 +1,189 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=8 nAlgorithms=6;
+PROGRAM version='SplitsTree6 (version 0.0.12-alpha, built 30 May 2022)';
+WORKFLOW creationDate='1655100388476'; [Mon Jun 13 08:06:28 CEST 2022]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 10 taxa and 2 trees.
+The Show Trees method was used (default options) so as to obtain a Tree View visualization (Dress & Huson 2004).
+The Autumn Algorithm method (Huson, and Linz 2018) was used (default options) so as to obtain 3 trees, network.
+The Show Trees method was used (View=TreePages) so as to obtain a Tree Pages visualization (Huson et al 2012).
+
+References:
+Dress & Huson 2004: A.W.M. Dress and D.H. Huson, Constructing splits graphs, IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+Huson et al 2012: D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.
+Huson, and Linz 2018: D.H. Huson an S. Linz. Autumn Algorithm—Computation of Hybridization Networks for Realistic Phylogenetic Trees. IEEE/ACM Transactions on Computational Biology and Bioinformatics: 15:398-420, 2018.
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=10;
+TAXLABELS
+	[1] 'Hordeum'
+	[2] 'Ae_tauschii'
+	[3] 'Ae_uniaristata'
+	[4] 'Ae_comosa'
+	[5] 'Ae_sharonensis'
+	[6] 'Ae_longissima'
+	[7] 'Ae_bicornis'
+	[8] 'T_urartu'
+	[9] 'T_monococcum'
+	[10] 'Ae_speltoides'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=10;
+TAXLABELS
+	[1] 'Hordeum'
+	[2] 'Ae_tauschii'
+	[3] 'Ae_uniaristata'
+	[4] 'Ae_comosa'
+	[5] 'Ae_sharonensis'
+	[6] 'Ae_longissima'
+	[7] 'Ae_bicornis'
+	[8] 'T_urartu'
+	[9] 'T_monococcum'
+	[10] 'Ae_speltoides'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes;
+[TREES]
+		[1] tree 'matK'=[&R] (Hordeum:0.5,((((Ae_tauschii:1,(Ae_uniaristata:1,Ae_comosa:1):1):1,((Ae_sharonensis:1,Ae_longissima:1):1,Ae_bicornis:1):1):1,(T_urartu:1,T_monococcum:1):1):1,Ae_speltoides:1):0.5);
+		[2] tree 'pinA'=[&R] (Hordeum:0.5,((T_urartu:1,T_monococcum:1):1,(Ae_tauschii:1,((Ae_uniaristata:1,Ae_comosa:1):1,(((Ae_sharonensis:1,Ae_longissima:1):1,Ae_bicornis:1):1,Ae_speltoides:1):1):1):1):0.5);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'Hordeum',
+	2 'Ae_tauschii',
+	3 'Ae_uniaristata',
+	4 'Ae_comosa',
+	5 'Ae_sharonensis',
+	6 'Ae_longissima',
+	7 'Ae_bicornis',
+	8 'T_urartu',
+	9 'T_monococcum',
+	10 'Ae_speltoides',
+;
+[TREES]
+		[1] tree 'matK'=[&R] (1:0.5,((((2:1,(3:1,4:1):1):1,((5:1,6:1):1,7:1):1):1,(8:1,9:1):1):1,10:1):0.5);
+		[2] tree 'pinA'=[&R] (1:0.5,((8:1,9:1):1,(2:1,((3:1,4:1):1,(((5:1,6:1):1,7:1):1,10:1):1):1):1):0.5);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreeView';
+END; [ALGORITHM]
+
+BEGIN ALGORITHM;
+TITLE 'Autumn Algorithm';
+LINK TREES = 'Working Trees';
+NAME 'Autumn Algorithm';
+OPTIONS
+	FirstTree = 1,
+	SecondTree = 2;
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreeView';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TreeView';
+INPUT 'TREES';
+OPTIONS
+	Tree = 1,
+	Diagram = 'RectangularCladogram',
+	Averaging = 'ChildAverage',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 1,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	ShowConfidence = 'true',
+	TreeLabels = 'None';
+END; [VIEW]
+
+BEGIN TREES;
+TITLE 'Trees';
+LINK ALGORITHM = 'Autumn Algorithm';
+[Number of trees: 3]
+PROPERTIES partialTrees=no rooted=yes reticulated=yes;
+TRANSLATE
+	1 'Hordeum',
+	2 'Ae_tauschii',
+	3 'Ae_uniaristata',
+	4 'Ae_comosa',
+	5 'Ae_sharonensis',
+	6 'Ae_longissima',
+	7 'Ae_bicornis',
+	8 'T_urartu',
+	9 'T_monococcum',
+	10 'Ae_speltoides',
+;
+[TREES]
+		[1] tree 'H1'=[&R] ((1:1,((((2:1,(((((5:1,6:1):1,7:1):1)#H1:0,(10:1)#H2:0):1,(3:1,4:1):1):1):1,#H1:0):1,(8:1,9:1):1):1,#H2:0):1):1);
+		[2] tree 'H2'=[&R] ((1:1,((((2:1,((3:1,4:1):1)#H1:0):1,(#H1:0,(((5:1,6:1):1,7:1):1,(10:1)#H2:0):1):1):1,(8:1,9:1):1):1,#H2:0):1):1);
+		[3] tree 'H3'=[&R] ((1:1,((((2:1)#H1:0,((#H1:0,(3:1,4:1):1):1,(((5:1,6:1):1,7:1):1,(10:1)#H2:0):1):1):1,(8:1,9:1):1):1,#H2:0):1):1);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreePages';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreePages';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TreePages';
+INPUT 'TREES';
+OPTIONS
+	Diagram = 'RectangularCladogram',
+	Orientation = 'Rotate0Deg',
+	Rows = 2,
+	Cols = 2,
+	ZoomFactor = 1,
+	FontScaleFactor = 1,
+	TreeLabels = 'Name',
+	ShowInternalLabels = 'true';
+END; [VIEW]
