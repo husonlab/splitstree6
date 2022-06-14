@@ -1,0 +1,29 @@
+#nexus
+
+[!
+Koblmueller, S., Duftner, N., Sefc, K. M., Aibara, M., Stipacek, M.,
+Blanc, M., Egger, B., & Sturmbauer, C. (2007).
+Reticulate phylogeny of gastropod-shell-breeding cichlids from
+Lake Tanganyika--the result of repeated introgressive hybridization.
+BMC evolutionary biology, 7, 7. https://doi.org/10.1186/1471-2148-7-7
+
+Additional file 2.
+]
+
+begin characters;
+dimensions ntax=10 nchar=13;
+format labels datatype=standard;
+matrix
+[	1	2	3	4	5	6	7	8	9	10	11	12	13]
+'A Hybrid 1'	0	0	0	1	0	0	1	1	0	0	0	1	0
+'B Hybrid 2'	1	0	0	0	0	1	0	0	0	0	0	1	0
+'C L. callipterus'	0	0	0	1	0	0	1	1	0	0	0	0	0
+'D L. lemairii'	0	0	0	0	0	0	0	1	0	1	0	0	0
+'E L. attenuatus'	1	0	0	1	0	0	1	1	1	0	0	1	0
+'F N. brevis/calliurus'	0	0	0	1	0	0	1	1	0	0	0	1	0
+'G N. caudopunctatus'	0	0	0	1	0	0	1	1	1	0	0	1	0
+'H N. fasciatus'	1	0	0	1	1	1	1	0	1	0	0	1	0
+'I T. temporalis'	0	0	0	1	0	0	0	0	0	1	1	1	0
+'J T. vittatus'	0	1	1	0	1	1	0	0	0	1	1	1	0
+;
+end;

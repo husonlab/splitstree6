@@ -30,6 +30,7 @@
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
@@ -44,11 +45,20 @@
     <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <center>
             <StackPane fx:id="stackPane">
-                <Canvas fx:id="canvas" height="200.0" width="200.0" />
-                <Pane fx:id="pane" />
+                <Canvas fx:id="canvas" height="200.0" width="200.0">
+                    <StackPane.margin>
+                        <Insets />
+                    </StackPane.margin>
+                </Canvas>
+                <Pane fx:id="labelPane" />
+            <Pane fx:id="highlightingPane" prefHeight="200.0" prefWidth="200.0" />
+            <Pane fx:id="consensusPane" prefHeight="200.0" prefWidth="200.0" />
                 <BorderPane.margin>
-                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                    <Insets />
                 </BorderPane.margin>
+                <padding>
+                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                </padding>
             </StackPane>
         </center>
         <top>
@@ -89,7 +99,7 @@
                             </RadioMenuItem>
                             <RadioMenuItem fx:id="toscaleMenuItem" mnemonicParsing="false" text="To Scale" toggleGroup="$drawingGroup" />
                             <RadioMenuItem fx:id="uniformMenuItem" mnemonicParsing="false" text="Uniform" toggleGroup="$drawingGroup" />
-                     <RadioMenuItem fx:id="staggeredMenuItem" mnemonicParsing="false" text="Staggered" toggleGroup="$drawingGroup" />
+                     <RadioMenuItem fx:id="rootedMenuItem" mnemonicParsing="false" text="Rooted" toggleGroup="$drawingGroup" />
                         </items>
                     </Menu>
                     <Menu mnemonicParsing="false" text="Highlighting">
@@ -111,11 +121,16 @@
                         </items>
                     </Menu>
                 </MenuBar>
-                <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">
-                    <Button fx:id="drawButton" mnemonicParsing="false" text="Draw" />
-                    <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" />
-                    <CheckBox fx:id="jitterCheckBox" mnemonicParsing="false" text="Jitter" />
-                </ToolBar>
+                <AnchorPane>
+                    <children>
+                        <ToolBar fx:id="toolBar" prefHeight="40.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <Button fx:id="drawButton" mnemonicParsing="false" text="Draw" />
+                            <Button fx:id="clearButton" mnemonicParsing="false" text="Clear" />
+                            <CheckBox fx:id="jitterCheckBox" mnemonicParsing="false" text="Jitter" />
+                        </ToolBar>
+                        <Slider fx:id="scaleSlider" blockIncrement="1.0" max="5.0" min="-5.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="10.0" />
+                    </children>
+                </AnchorPane>
             </VBox>
         </top>
         <bottom>

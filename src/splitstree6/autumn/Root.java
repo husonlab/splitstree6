@@ -67,8 +67,7 @@ public class Root extends Node {
 	 * delete the subtree below this root
 	 */
 	public void deleteSubTreeBelow() {
-		Set<Node> nodes = getAllNodesBelow();
-		for (Node v : nodes)
+		for (var v : getAllNodesBelow())
 			getOwner().deleteNode(v);
 	}
 
@@ -78,7 +77,7 @@ public class Root extends Node {
 	 * @return all nodes below
 	 */
 	public Set<Node> getAllNodesBelow() {
-		Set<Node> nodes = new HashSet<>();
+		var nodes = new HashSet<Node>();
 		getAllNodesBelowRec(this, nodes);
 		return nodes;
 	}
@@ -88,8 +87,7 @@ public class Root extends Node {
 	 *
 	 */
 	private void getAllNodesBelowRec(Node v, Set<Node> nodes) {
-		for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-			Node w = e.getTarget();
+		for (var w : v.children()) {
 			if (!nodes.contains(w)) {
 				nodes.add(w);
 				getAllNodesBelowRec(w, nodes);
@@ -142,7 +140,7 @@ public class Root extends Node {
 	 * @return root of copy
 	 */
 	public static Root createACopy(Graph graph, PhyloTree tree, TaxaBlock allTaxa) {
-		Root root = new Root(graph);
+		var root = new Root(graph);
 		copyRec(tree.getRoot(), root, allTaxa);
 		return root;
 	}
@@ -152,15 +150,15 @@ public class Root extends Node {
 	 *
 	 */
 	public static void copyRec(Node v1, Root v2, TaxaBlock allTaxa) {
-		BitSet taxa = new BitSet();
+		var taxa = new BitSet();
 		if (v1.getOutDegree() == 0) { // is at a leaf, grab the taxon name
-			int id = allTaxa.indexOf(v1.getOwner().getLabel(v1));
+			var id = allTaxa.indexOf(v1.getOwner().getLabel(v1));
 			taxa.set(id);
 		} else {
-			for (Edge e1 = v1.getFirstOutEdge(); e1 != null; e1 = v1.getNextOutEdge(e1)) {
-				Node w1 = e1.getTarget();
-				Root w2 = v2.newNode();
-				Edge f = w2.getOwner().newEdge(v2, w2);
+			for (var e1 : v1.outEdges()) {
+				var w1 = e1.getTarget();
+				var w2 = v2.newNode();
+				var f = w2.getOwner().newEdge(v2, w2);
 				f.setInfo(e1.getInfo());
 				copyRec(w1, w2, allTaxa);
 				taxa.or(w2.getTaxa());
@@ -184,7 +182,7 @@ public class Root extends Node {
 	 *
 	 */
 	public Root newNode(BitSet taxa) {
-		Root v = new Root(getOwner());
+		var v = new Root(getOwner());
 		v.setTaxa(taxa);
 		return v;
 	}
@@ -212,7 +210,7 @@ public class Root extends Node {
 	 * @return all leaves
 	 */
 	public List<Root> getAllLeaves() {
-        List<Root> result = new LinkedList<>();
+		var result = new ArrayList<Root>();
 		getAllLeavesRec(this, result);
 		return result;
 	}
@@ -222,8 +220,8 @@ public class Root extends Node {
 	 *
 	 */
 	private void getAllLeavesRec(Root v, List<Root> result) {
-		for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-			Root w = ((Root) e.getTarget());
+		for (var e : v.outEdges()) {
+			var w = ((Root) e.getTarget());
 			if (w.getOutDegree() == 0)
 				result.add(w);
 			else
@@ -237,9 +235,7 @@ public class Root extends Node {
 	 * @return string
 	 */
 	public String toString() {
-        StringBuilder buf = new StringBuilder();
-		buf.append("node indeg=").append(getInDegree()).append(" outdeg=").append(getOutDegree()).append(" taxa=").append(getTaxaString());
-		return buf.toString();
+		return "node indeg=" + getInDegree() + " outdeg=" + getOutDegree() + " taxa=" + getTaxaString();
 	}
 
 	/**
@@ -248,7 +244,7 @@ public class Root extends Node {
 	 * @return tree in bracket format
 	 */
 	public String toStringTreeSparse() {
-		StringBuffer buf = new StringBuffer();
+		var buf = new StringBuffer();
 		toStringTreeRec(buf, false, true, false);
 		return buf.toString();
 	}
@@ -259,7 +255,7 @@ public class Root extends Node {
 	 * @return tree in bracket format
 	 */
 	public String toStringFullTreeX() {
-		StringBuffer buf = new StringBuffer();
+		var buf = new StringBuffer();
 		toStringTreeRec(buf, true, false, true);
 		checkTreeRec(this, buf.toString());
         return buf + ";";
@@ -271,7 +267,7 @@ public class Root extends Node {
 	 * @return tree in bracket format
 	 */
 	public String toStringTree() {
-		StringBuffer buf = new StringBuffer();
+		var buf = new StringBuffer();
 		toStringTreeRec(buf, false, false, false);
 		checkTreeRec(this, buf.toString());
         return buf + ";";
@@ -282,7 +278,6 @@ public class Root extends Node {
 	 *
 	 */
 	private void toStringTreeRec(StringBuffer buf, boolean labelInternalNodes, boolean oneTaxonPerLeaf, boolean showX) {
-
 		if (getOutDegree() == 0) {
 			if (showX)
 				buf.append("x");
@@ -292,7 +287,7 @@ public class Root extends Node {
 				buf.append(getTaxaString());
 		} else {
 			buf.append("(");
-			for (Edge e = getFirstOutEdge(); e != null; e = getNextOutEdge(e)) {
+			for (var e : outEdges()) {
 				if (e != getFirstOutEdge()) {
 					buf.append(",");
 				}
@@ -313,8 +308,8 @@ public class Root extends Node {
 	 */
 	private void checkTreeRec(Root root, String string) {
 		if (root.getOutDegree() > 0) {
-			BitSet taxa = new BitSet();
-			BitSet removed = new BitSet();
+			var taxa = new BitSet();
+			var removed = new BitSet();
 			for (Edge e = root.getFirstOutEdge(); e != null; e = root.getNextOutEdge(e)) {
 				Root w = (Root) e.getTarget();
 				checkTreeRec(w, string);
@@ -339,7 +334,7 @@ public class Root extends Node {
 	 * @return network in bracket format
 	 */
 	public String toStringNetworkFull() {
-		StringBuffer buf = new StringBuffer();
+		var buf = new StringBuffer();
 		if (getOutDegree() == 0) {
 			buf.append("(").append(getTaxaString()).append(")");
 		} else {
@@ -354,7 +349,7 @@ public class Root extends Node {
 	 * @return network in bracket format
 	 */
 	public String toStringNetwork() {
-		StringBuffer buf = new StringBuffer();
+		var buf = new StringBuffer();
 		if (getOutDegree() == 0)
 			buf.append("(").append(getTaxaString()).append(")");
 		else {
@@ -384,7 +379,7 @@ public class Root extends Node {
 				buf.append("x").append(getTaxaString());
 		} else {
 			buf.append("(");
-			for (Edge e = getFirstOutEdge(); e != null; e = getNextOutEdge(e)) {
+			for (var e : outEdges()) {
 				if (e != getFirstOutEdge()) {
 					buf.append(",");
 				}
@@ -405,11 +400,11 @@ public class Root extends Node {
 	 * @return get taxa
 	 */
 	public String getTaxaString() {
-        StringBuilder buf = new StringBuilder();
-        BitSet both = new BitSet();
+		var buf = new StringBuilder();
+		var both = new BitSet();
 		both.or(getTaxa());
 		both.or(getRemovedTaxa());
-		for (int t = both.nextSetBit(0); t != -1; t = both.nextSetBit(t + 1)) {
+		for (var t = both.nextSetBit(0); t != -1; t = both.nextSetBit(t + 1)) {
 			if (getTaxa().get(t))
 				buf.append("+").append(t);
 			if (getRemovedTaxa().get(t))
@@ -437,39 +432,39 @@ public class Root extends Node {
 	 * recursively does the work
 	 */
 	private void reorderChildrenRec(Root v, boolean recurse) {
-        List<Edge> children = new LinkedList<>();
+		var children = new ArrayList<Edge>(v.getOutDegree());
 
-		for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-			Root w = (Root) e.getTarget();
+		for (var e : v.outEdges()) {
+			var w = (Root) e.getTarget();
 			if (recurse)
 				reorderChildrenRec(w, recurse);
 			children.add(e);
 		}
 
 		// if(!v.hasLexicographicChildren())
-        {
-            Edge[] array = children.toArray(new Edge[0]);
-            Arrays.sort(array, (e1, e2) -> {
-                Root v1 = (Root) e1.getTarget();
-                Root v2 = (Root) e2.getTarget();
+		{
+			var array = children.toArray(new Edge[0]);
+			Arrays.sort(array, (e1, e2) -> {
+				var v1 = (Root) e1.getTarget();
+				var v2 = (Root) e2.getTarget();
 
-                int t1 = v1.getTaxa().nextSetBit(0);
-                int t2 = v2.getTaxa().nextSetBit(0);
-                while (t1 != -1 && t2 != -1) {
-                    if (t1 < t2)
-                        return -1;
-                    else if (t1 > t2)
-                        return 1;
-                    t1 = v1.getTaxa().nextSetBit(t1 + 1);
-                    t2 = v2.getTaxa().nextSetBit(t2 + 1);
-                }
-                if (t1 == -1 && t2 != -1)
-                    return -1;
+				var t1 = v1.getTaxa().nextSetBit(0);
+				var t2 = v2.getTaxa().nextSetBit(0);
+				while (t1 != -1 && t2 != -1) {
+					if (t1 < t2)
+						return -1;
+					else if (t1 > t2)
+						return 1;
+					t1 = v1.getTaxa().nextSetBit(t1 + 1);
+					t2 = v2.getTaxa().nextSetBit(t2 + 1);
+				}
+				if (t1 == -1 && t2 != -1)
+					return -1;
                 if (t1 != -1 && t2 == -1)
                     return 1;
                 return 0;
             });
-            List<Edge> list = new LinkedList<>(Arrays.asList(array));
+			var list = new ArrayList<>(Arrays.asList(array));
 			if (v.getInDegree() > 0)
 				list.add(v.getFirstInEdge());
 			v.rearrangeAdjacentEdges(list);
@@ -480,12 +475,12 @@ public class Root extends Node {
 	 * reorder the network below this node so that all children are in lexicographic order
 	 */
 	public void reorderNetwork() {
-        Map<Node, Integer> order = new HashMap<>();
-        Single<Integer> postOrderNumber = new Single<>(1);
-        order.put(this, postOrderNumber.get());
-        computePostOrderNumberingRec(this, order, postOrderNumber);
-        reorderNetworkChildrenRec(this, order);
-    }
+		var order = new HashMap<Node, Integer>();
+		var postOrderNumber = new Single<>(1);
+		order.put(this, postOrderNumber.get());
+		computePostOrderNumberingRec(this, order, postOrderNumber);
+		reorderNetworkChildrenRec(this, order);
+	}
 
 	/**
 	 * computes a post-order numbering of all nodes, avoiding edges that are only contained in tree2
@@ -493,38 +488,38 @@ public class Root extends Node {
 	 * @return taxa below
 	 */
 	private BitSet computePostOrderNumberingRec(Root v, final Map<Node, Integer> order, Single<Integer> postOrderNumber) {
-		final BitSet taxaBelow = new BitSet();
+		final var taxaBelow = new BitSet();
 
 		if (v.getOutDegree() == 0) {
 			taxaBelow.or(v.getTaxa());
 		} else {
-            SortedSet<Pair<BitSet, Root>> child2TaxaBelow = new TreeSet<>((pair1, pair2) -> {
-                int t1 = pair1.getFirst().nextSetBit(0);
-                int t2 = pair2.getFirst().nextSetBit(0);
-                if (t1 < t2)
-                    return -1;
-                else if (t1 > t2)
-                    return 1;
+			var child2TaxaBelow = new TreeSet<Pair<BitSet, Root>>((pair1, pair2) -> {
+				var t1 = pair1.getFirst().nextSetBit(0);
+				var t2 = pair2.getFirst().nextSetBit(0);
+				if (t1 < t2)
+					return -1;
+				else if (t1 > t2)
+					return 1;
 
-                int id1 = pair1.getSecond().getId();
-                int id2 = pair2.getSecond().getId();
+				var id1 = pair1.getSecond().getId();
+				var id2 = pair2.getSecond().getId();
 
 				return Integer.compare(id1, id2);
-            });
+			});
 
 			// first visit the children:
-			for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-				Root w = (Root) e.getTarget();
+			for (var e : v.outEdges()) {
+				var w = (Root) e.getTarget();
 				if (w.getTaxa().cardinality() > 0) {
-					Integer treeId = (Integer) e.getInfo();
+					var treeId = (Integer) e.getInfo();
 					if (w.getInDegree() > 1 && treeId == null)
 						throw new RuntimeException("Node has two in-edges, one not labeled");
 					if (w.getInDegree() == 1 || treeId == 1) {
 						if (w.getInDegree() == 2 && treeId != null && treeId != 1)
 							throw new RuntimeException("Node has two in-edges, but chosen one is not labeled 1");
 
-						BitSet childTaxa = computePostOrderNumberingRec(w, order, postOrderNumber);
-                        child2TaxaBelow.add(new Pair<>(childTaxa, w));
+						var childTaxa = computePostOrderNumberingRec(w, order, postOrderNumber);
+						child2TaxaBelow.add(new Pair<>(childTaxa, w));
 
 					} else {
 						if (w.getInDegree() < 2)
@@ -534,7 +529,7 @@ public class Root extends Node {
 					}
 				}
 			}
-			for (Pair<BitSet, Root> pair : child2TaxaBelow) {
+			for (var pair : child2TaxaBelow) {
 				postOrderNumber.set(postOrderNumber.get() + 1);
 				order.put(pair.getSecond(), postOrderNumber.get());
 				taxaBelow.or(pair.getFirst());
@@ -551,33 +546,33 @@ public class Root extends Node {
 			throw new RuntimeException("reorderNetworkChildrenRec: Unlabeled node encountered: " + v);
 		}
 		if (v.getTaxa().cardinality() > 0) {
-            List<Edge> children = new LinkedList<>();
+			var children = new ArrayList<Edge>(v.getOutDegree());
 
-            for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-                Root w = (Root) e.getTarget();
-                Integer treeId = (Integer) e.getInfo();
-                if (w.getInDegree() == 1 || treeId == null || treeId != 2)
-                    reorderNetworkChildrenRec(w, order);
-                children.add(e);
-            }
+			for (var e : v.outEdges()) {
+				var w = (Root) e.getTarget();
+				var treeId = (Integer) e.getInfo();
+				if (w.getInDegree() == 1 || treeId == null || treeId != 2)
+					reorderNetworkChildrenRec(w, order);
+				children.add(e);
+			}
 
-            Edge[] array = children.toArray(new Edge[0]);
-            Arrays.sort(array, (e1, e2) -> {
-                Integer rank1 = order.get(e1.getTarget());
-                Integer rank2 = order.get(e2.getTarget());
+			var array = children.toArray(new Edge[0]);
+			Arrays.sort(array, (e1, e2) -> {
+				var rank1 = order.get(e1.getTarget());
+				var rank2 = order.get(e2.getTarget());
 
-                if (rank1 == null)  // dead node
-                    rank1 = Integer.MAX_VALUE;
-                if (rank2 == null)  // dead node
-                    rank2 = Integer.MAX_VALUE;
+				if (rank1 == null)  // dead node
+					rank1 = Integer.MAX_VALUE;
+				if (rank2 == null)  // dead node
+					rank2 = Integer.MAX_VALUE;
 
-                if (rank1 < rank2)
-                    return -1;
-                else if (rank1 > rank2)
+				if (rank1 < rank2)
+					return -1;
+				else if (rank1 > rank2)
 					return 1;
 				else return Integer.compare(e1.getId(), e2.getId());
             });
-            List<Edge> list = new LinkedList<>(Arrays.asList(array));
+			var list = new LinkedList<>(Arrays.asList(array));
 			if (v.getInDegree() > 0)
 				list.add(v.getFirstInEdge());
 			v.rearrangeAdjacentEdges(list);
@@ -594,8 +589,8 @@ public class Root extends Node {
 		if (getOutDegree() <= 1)
 			return true;
 		BitSet previous = null;
-		for (Edge e = getFirstOutEdge(); e != null; e = getNextOutEdge(e)) {
-			BitSet current = ((Root) e.getTarget()).getTaxa();
+		for (var e : outEdges()) {
+			var current = ((Root) e.getTarget()).getTaxa();
 			if (previous != null && Cluster.compare(previous, current) >= 0)
 				return false;
 			previous = current;
@@ -618,9 +613,9 @@ public class Root extends Node {
 		if (!v.hasLexicographicChildren())
 			throw new RuntimeException("checkTreeRec: children not lexicographic");
 		if (v.getOutDegree() > 0) {
-			BitSet childrenTaxa = new BitSet();
-			for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-				Root w = (Root) e.getTarget();
+			var childrenTaxa = new BitSet();
+			for (var e : v.outEdges()) {
+				var w = (Root) e.getTarget();
 				checkTreeRec(w);
 				if (!Cluster.contains(v.getTaxa(), w.getTaxa()))
 					throw new RuntimeException("checkTreeRec: children have taxa that parent does not");
@@ -649,10 +644,10 @@ public class Root extends Node {
 	 * @return sub tree or network below
 	 */
 	public Root copySubNetwork() {
-		Root root2 = new Root(new Graph());
+		var root2 = new Root(new Graph());
 		root2.setTaxa(getTaxa());
 		root2.setRemovedTaxa(getRemovedTaxa());
-        Map<Root, Root> old2new = new HashMap<>();
+		var old2new = new HashMap<Root, Root>();
 		old2new.put(this, root2);
 
 		copySubNetworkRec(this, root2, old2new);
@@ -664,9 +659,9 @@ public class Root extends Node {
 	 *
 	 */
 	private void copySubNetworkRec(Root v1, Root v2, Map<Root, Root> old2new) {
-		for (Edge e1 = v1.getFirstOutEdge(); e1 != null; e1 = v1.getNextOutEdge(e1)) {
-			Root w1 = (Root) e1.getTarget();
-			Root w2 = old2new.get(w1);
+		for (var e1 : v1.outEdges()) {
+			var w1 = (Root) e1.getTarget();
+			var w2 = old2new.get(w1);
 			if (w2 == null) {
 				w2 = v2.newNode();
 				w2.setTaxa(w1.getTaxa());
@@ -674,7 +669,7 @@ public class Root extends Node {
 				old2new.put(w1, w2);
 				copySubNetworkRec(w1, w2, old2new);
 			}
-			Edge f = v2.newEdge(v2, w2);
+			var f = v2.newEdge(v2, w2);
 			f.setInfo(e1.getInfo());
 		}
 	}
@@ -685,9 +680,9 @@ public class Root extends Node {
 	 * @return new root in given network
 	 */
 	public Root addNetwork(Root root1) {
-		Root root2 = newNode();
+		var root2 = newNode();
 		root2.setTaxa(root1.getTaxa());
-        Map<Root, Root> old2new = new HashMap<>();
+		var old2new = new HashMap<Root, Root>();
 		old2new.put(root1, root2);
 		copySubNetworkRec(root1, root2, old2new);
 		return root2;
@@ -699,9 +694,9 @@ public class Root extends Node {
 	 * @return true, if two children alive
 	 */
 	public boolean isBranching() {
-		boolean foundOne = false;
-		for (Edge e = getFirstOutEdge(); e != null; e = getNextOutEdge(e)) {
-			Root w = (Root) e.getTarget();
+		var foundOne = false;
+		for (var e : outEdges()) {
+			var w = (Root) e.getTarget();
 			if (w.getTaxa().cardinality() > 0) {
 				if (foundOne)
 					return true;

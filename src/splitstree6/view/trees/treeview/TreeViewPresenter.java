@@ -24,17 +24,14 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.scene.Group;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.Pane;
-import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
@@ -43,7 +40,6 @@ import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
-import jloda.util.Single;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.layout.tree.*;
@@ -71,24 +67,26 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 	private final FindToolBar findToolBar;
 
 	private final ObjectProperty<TreePane> treePane = new SimpleObjectProperty<>(this, "treePane");
-	private final ObjectProperty<PhyloTree> treeProperty = new SimpleObjectProperty<PhyloTree>(this, "tree");
+	private final ObjectProperty<PhyloTree> tree;
+
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
 	private final InvalidationListener updateListener;
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
-	public TreeViewPresenter(MainWindow mainWindow, TreeView treeView, ObjectProperty<Bounds> targetBounds,
-							 ObservableMap<jloda.graph.Node, Group> nodeShapeMap, ObservableMap<Integer, Shape> splitShapeMap) {
+	public TreeViewPresenter(MainWindow mainWindow, TreeView treeView, ObjectProperty<Bounds> targetBounds) {
 		this.mainWindow = mainWindow;
 		this.treeView = treeView;
 		this.controller = treeView.getController();
+		this.tree = treeView.treeProperty();
 
 		treeView.optionTreeProperty().addListener((v, o, n) -> {
 			var nTree = n.intValue();
 			if (nTree > 0 && nTree <= treeView.getTrees().size())
-				treeProperty.set(treeView.getTrees().get(nTree - 1));
+				tree.set(treeView.getTrees().get(nTree - 1));
 			else
-				treeProperty.set(null);
+				tree.set(null);
 		});
 
 		treeView.getTrees().addListener((InvalidationListener) e -> {
@@ -97,7 +95,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				treeView.setOptionTree(1);
 			if (treeView.getOptionTree() >= 1 && treeView.getOptionTree() <= treeView.getTrees().size()) {
 				controller.getTreeCBox().setValue(controller.getTreeCBox().getItems().get(treeView.getOptionTree() - 1));
-				treeProperty.set(treeView.getTrees().get(treeView.getOptionTree() - 1));
+				tree.set(treeView.getTrees().get(treeView.getOptionTree() - 1));
 			}
 		});
 
@@ -129,9 +127,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), treeView.getOptionTreeLabels().label(), labelProperty, TreeLabel.labels());
 			labelProperty.addListener((v, o, n) -> treeView.setOptionTreeLabels(TreeLabel.valueOfLabel(n)));
 		}
-		treeView.optionTreeLabelsProperty().addListener((v, o, n) -> TreeLabel.setLabel(treeProperty.get(), n, controller.getTreeNameLabel()));
-		treeProperty.addListener((v, o, n) -> TreeLabel.setLabel(n, treeView.getOptionTreeLabels(), controller.getTreeNameLabel()));
-		TreeLabel.setLabel(treeProperty.get(), treeView.getOptionTreeLabels(), controller.getTreeNameLabel());
+		treeView.optionTreeLabelsProperty().addListener((v, o, n) -> TreeLabel.setLabel(tree.get(), n, controller.getTreeNameLabel()));
+		tree.addListener((v, o, n) -> TreeLabel.setLabel(n, treeView.getOptionTreeLabels(), controller.getTreeNameLabel()));
+		TreeLabel.setLabel(tree.get(), treeView.getOptionTreeLabels(), controller.getTreeNameLabel());
 
 		var toScale = new SimpleBooleanProperty(this, "toScale", treeView.getOptionDiagram().isPhylogram());
 		var lockAspectRatio = new SimpleBooleanProperty(this, "lockAspectRatio");
@@ -166,6 +164,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
 		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
 		controller.getOrientationCBox().valueProperty().bindBidirectional(treeView.optionOrientationProperty());
+		controller.getOrientationCBox().disableProperty().bind(treeView.emptyProperty().or(changingOrientation));
 
 		controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(treeView.optionShowConfidenceProperty());
 
@@ -175,8 +174,10 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			final InvalidationListener scaleListener = e -> {
 				if (treePane.get() == null) {
 					controller.getScaleBar().factorXProperty().unbind();
+					changingOrientation.unbind();
 				} else {
 					controller.getScaleBar().factorXProperty().bind(treeView.getOptionOrientation().isWidthHeightSwitched() ? treePane.get().scaleYProperty() : treePane.get().scaleXProperty());
+					changingOrientation.bind(treePane.get().changingOrientationProperty());
 				}
 			};
 			treePane.addListener(scaleListener);
@@ -184,12 +185,17 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			scaleListener.invalidated(null);
 		}
 
-		var first = new Single<>(true);
+
+		tree.addListener((v, o, n) -> {
+			if (o != null) // not the first tree
+				TreeViewEdits.clearEdits(treeView.optionEditsProperty());
+		});
+
 
 		updateListener = e -> {
-			if (treeProperty.get() != null) {
-				RunAfterAWhile.apply(treeProperty.get().getName(), () -> Platform.runLater(() -> {
-					var tree = treeProperty.get();
+			if (tree.get() != null) {
+				RunAfterAWhile.apply(tree.get().getName(), () -> Platform.runLater(() -> {
+					var tree = this.tree.get();
 					if (tree.isReticulated()) {
 						tree = new PhyloTree(tree);
 						try {
@@ -203,19 +209,21 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						var height = bounds.getHeight();
 						if (lockAspectRatio.get())
 							width = height = Math.min(width, height);
-						var box = new Dimension2D(treeView.getOptionHorizontalZoomFactor() * width, treeView.getOptionVerticalZoomFactor() * height);
-
-						if (first.get())
-							first.set(false);
-						else
-							TreeViewEdits.clearEdits(treeView.optionEditsProperty());
+						var box = new Dimension2D(treeView.getOptionHorizontalZoomFactor() * width - 100, treeView.getOptionVerticalZoomFactor() * height - 150);
 
 						if (!treeView.emptyProperty().get()) {
 							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
 									treeView.getOptionDiagram(), treeView.getOptionAveraging(), treeView.optionOrientationProperty(), treeView.optionFontScaleFactorProperty(), null,
-									treeView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(), nodeShapeMap);
+									treeView.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(), treeView.getNodeShapeMap(), treeView.getEdgeShapeMap());
+							treeView.setEdgeSelectionModel(pane.getEdgeSelectionModel());
 							treePane.set(pane);
 							pane.setRunAfterUpdate(() -> {
+								if (treeView.getOptionEdits().length > 0) {
+									TreeEdits.applyEdits(treeView.getOptionEdits(), treeView.getEdgeShapeMap());
+									if (false)
+										Platform.runLater(() -> TreeEdits.clearEdits(treeView.optionEditsProperty()));
+								}
+
 								updateCounter.set(updateCounter.get() + 1);
 							});
 							pane.drawTree();
@@ -375,7 +383,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
-			var tree = treeProperty.get();
+			var tree = this.tree.get();
 			if (tree != null)
 				BasicFX.putTextOnClipBoard(tree.toBracketString(true) + ";\n");
 		});
@@ -417,7 +425,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getSelectNoneMenuItem().setOnAction(e -> {
 			mainWindow.getTaxonSelectionModel().clearSelection();
-			//treeView.getSplitSelectionModel().clearSelection();
+			treePane.get().getEdgeSelectionModel().clearSelection();
 		});
 		mainController.getSelectNoneMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
@@ -431,11 +439,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						.or(treeView.optionDiagramProperty().isEqualTo(TreeDiagramType.RectangularCladogram)));
 
 		mainController.getRotateLeftMenuItem().setOnAction(e -> treeView.setOptionOrientation(treeView.getOptionOrientation().getRotateLeft()));
-		mainController.getRotateLeftMenuItem().disableProperty().bind(treeView.emptyProperty());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(treeView.emptyProperty().or(changingOrientation));
 		mainController.getRotateRightMenuItem().setOnAction(e -> treeView.setOptionOrientation(treeView.getOptionOrientation().getRotateRight()));
-		mainController.getRotateRightMenuItem().disableProperty().bind(treeView.emptyProperty());
+		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(e -> treeView.setOptionOrientation(treeView.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(treeView.emptyProperty());
+		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(treeView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));

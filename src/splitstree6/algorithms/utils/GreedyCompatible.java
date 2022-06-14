@@ -23,7 +23,7 @@ import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.data.parts.BiPartition;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -47,7 +47,7 @@ public class GreedyCompatible {
 		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(a.getWeight(), b.getWeight()))) {
 			boolean ok = true;
 			for (ASplit bSplit : result) {
-				if (!Compatibility.areCompatible(split, bSplit)) {
+				if (!BiPartition.areCompatible(split, bSplit)) {
 					ok = false;
 					break;
 				}

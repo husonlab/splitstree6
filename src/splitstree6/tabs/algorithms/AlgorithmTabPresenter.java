@@ -66,6 +66,7 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		algorithmTab.setGraphic(label);
 
 		controller.getMainPane().disableProperty().bind(runningProperty);
+		controller.getMenuButton().disableProperty().bind(runningProperty);
 
 		//AutoCompleteComboBox.install(controller.getAlgorithmCBox());
 
@@ -78,15 +79,17 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		});
 		controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
 
-		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null)
+		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null) {
 			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithmNode().getAlgorithm());
+		}
 
 		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((v, o, n) -> {
-			controller.getAlgorithmCBox().setValue(n);
-			setupOptionControls(algorithmTab, controller, (Algorithm) n);
-			label.setText(n.getName());
+			if (n != null) {
+				controller.getAlgorithmCBox().setValue(n);
+				setupOptionControls(algorithmTab, controller, (Algorithm) n);
+				label.setText(n.getName());
+			}
 		});
-
 		controller.getMenuButton().disableProperty().bind(runningProperty);
 	}
 
@@ -106,10 +109,10 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 					hbox.setAlignment(Pos.CENTER_LEFT);
 					hbox.setSpacing(3);
 					hbox.prefWidthProperty().bind(controller.getMainPane().widthProperty());
-					controller.getMainPane().getChildren().add(hbox);
 					var toolTip = new Tooltip(option.getToolTipText());
 					label.setTooltip(toolTip);
 					control.setTooltip(toolTip);
+					controller.getMainPane().getChildren().add(hbox);
 				}
 			}
 		}
@@ -119,13 +122,14 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		ObservableList<Double> values = FXCollections.observableArrayList();
 		var max = new SimpleDoubleProperty(0);
 		InvalidationListener invalidationListener = e -> {
-			if (node.isValid()) {
+			if (node.isValid() && node.getPreferredParent() != null) {
 				var splits = (SplitsBlock) node.getPreferredParent().getDataBlock();
 				values.setAll(splits.getSplits().stream().map(ASplit::getWeight).collect(Collectors.toList()));
 				max.set(values.stream().mapToDouble(Double::doubleValue).max().orElse(1.0));
 			}
 		};
 		node.validProperty().addListener(invalidationListener);
+		node.getParents().addListener(invalidationListener);
 		invalidationListener.invalidated(null);
 
 		var slider = new SliderHistogramView(values, weightsSlider.optionWeightThresholdProperty(), new SimpleDoubleProperty(0), max);
@@ -136,5 +140,4 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 	@Override
 	public void setupMenuItems() {
 	}
-
 }

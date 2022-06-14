@@ -25,7 +25,6 @@ import jloda.util.Pair;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
-import java.util.BitSet;
 
 /**
  * pre process input trees
@@ -36,7 +35,6 @@ public class PreProcess {
 	 * update preprocessing to two trees
 	 */
 	static public Pair<Root, Root> apply(PhyloTree tree1, PhyloTree tree2, TaxaBlock allTaxa) throws IOException {
-
 		if (tree1.getRoot() == null || tree2.getRoot() == null) {
 			throw new IOException("Pre-processing failed, at least one of the trees is empty or unrooted");
 		}
@@ -62,13 +60,13 @@ public class PreProcess {
 			throw new IOException("Pre-processing failed, tree is empty or unrooted");
 		}
 
-		BitSet taxa = allTaxa.getTaxaSet();
+		var taxa = allTaxa.getTaxaSet();
 
-		BitSet taxa1 = AutumnUtilities.extractTaxa(1, tree1, allTaxa);
+		var taxa1 = AutumnUtilities.extractTaxa(1, tree1, allTaxa);
 		if (mustHaveSameTaxa && taxa.cardinality() > 0 && !Cluster.contains(taxa, taxa1))
 			throw new IOException("Pre-processing failed, trees has additional taxa");
 
-		Root root1 = Root.createACopy(new Graph(), tree1, allTaxa);
+		var root1 = Root.createACopy(new Graph(), tree1, allTaxa);
 		root1.reorderSubTree();
 		return root1;
 	}

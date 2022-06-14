@@ -41,7 +41,7 @@ public class LayoutAlgorithm {
      *
      * @param drawingMethod use weights or scale all edges so that leaves are equi-distance from root or have all edges the same length?
      */
-    public static void apply(PhyloTree tree, drawingMethod drawingMethod, int[] cycle, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
+    public static void apply(PhyloTree tree, DrawingMethod drawingMethod, int[] cycle, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
         nodePointMap.clear();
         if (cycle.length > 0) {
             final var taxon2pos = new int[cycle.length];
@@ -79,7 +79,7 @@ public class LayoutAlgorithm {
                     });
 
 
-                    if (drawingMethod == splitstree6.densitree.drawingMethod.CIRCULAR) {
+                    if (drawingMethod == DrawingMethod.CIRCULAR) {
                         var maxDepth = computeMaxDepth(tree);
                         try (var nodeRadiusMap = tree.newNodeDoubleArray()) {
                             tree.postorderTraversal(v -> {
@@ -91,7 +91,7 @@ public class LayoutAlgorithm {
                             });
                             tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
                         }
-                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.TOSCALE) {
+                    } else if (drawingMethod == DrawingMethod.TOSCALE) {
                         tree.preorderTraversal(v -> {
                             if (v.getInDegree() == 0) { // the root
                                 nodePointMap.put(v, new Point2D(0, 0));
@@ -101,7 +101,7 @@ public class LayoutAlgorithm {
                                 nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), tree.getWeight(e)));
                             }
                         });
-                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.UNIFORM){
+                    } else if (drawingMethod == DrawingMethod.UNIFORM) {
                         tree.preorderTraversal(v -> {
                             if (v.getInDegree() == 0) { // the root
                                 nodePointMap.put(v, new Point2D(0, 0));
@@ -111,27 +111,33 @@ public class LayoutAlgorithm {
                                 nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(p), nodeAngleMap.get(v), 1));
                             }
                         });
-                    } else if (drawingMethod == splitstree6.densitree.drawingMethod.STAGGERED){
+                    } else if (drawingMethod == DrawingMethod.ROOTED || drawingMethod == DrawingMethod.BLOCK) {
                         tree.postorderTraversal(v -> {
-                            if(tree.isLeaf(v)){
+                            if (tree.isLeaf(v)) {
                                 int y = 0;
-                                for(var j: cycle){
-                                    if(j>0 && tree.getTaxon2Node(j).equals(v)){
+                                for (var j : cycle) {
+                                    if (j > 0 && tree.getTaxon2Node(j).equals(v)) {
                                         y = j;
                                     }
                                 }
-                                nodePointMap.put(v, new Point2D(0,y*75));
+                                nodePointMap.put(v, new Point2D(0, y));
+                            } else {
+                                var y1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
+                                var y2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();
+
+                                nodePointMap.put(v, new Point2D(0, (y1 + y2) / 2));
                             }
-                            else{
-                                double y1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getY();
-                                double y2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getY();
+                        });
 
-                                double x1 = nodePointMap.get(v.getFirstOutEdge().getTarget()).getX();
-                                double x2 = nodePointMap.get(v.getLastOutEdge().getTarget()).getX();
+                        tree.preorderTraversal(v -> {
+                            var y = nodePointMap.get(v).getY();
+                            if (v.getInDegree() == 0) {
+                                nodePointMap.put(v, new Point2D(0, y));
 
-                                double xmin = Math.min(x1, x2);
-
-                                nodePointMap.put(v, new Point2D(xmin-100,(y1+y2)/2));
+                            } else {
+                                var e = v.getFirstInEdge();
+                                var x = nodePointMap.get(e.getSource()).getX() + tree.getWeight(e);
+                                nodePointMap.put(v, new Point2D(x, y));
                             }
                         });
                         nodeAngleMap.putAll(0.0);

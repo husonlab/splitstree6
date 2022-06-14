@@ -22,10 +22,7 @@ package splitstree6.view.trees.tanglegram;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
@@ -50,6 +47,8 @@ public class TanglegramTreePane extends Group {
 	private final InvalidationListener updater;
 	private Runnable runAfterUpdate;
 
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
+
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
@@ -60,7 +59,9 @@ public class TanglegramTreePane extends Group {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
 						var treePane = new TreePane(stage, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-								optionDiagram.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(TreeLabel.None), showInternalLabels, null, nodeShapeMap);
+								optionDiagram.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(TreeLabel.None),
+								showInternalLabels, null, nodeShapeMap, null);
+						changingOrientation.bind(treePane.changingOrientationProperty());
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();
 						getChildren().add(treePane);
@@ -81,5 +82,13 @@ public class TanglegramTreePane extends Group {
 
 	public void setRunAfterUpdate(Runnable runAfterUpdate) {
 		this.runAfterUpdate = runAfterUpdate;
+	}
+
+	public boolean isChangingOrientation() {
+		return changingOrientation.get();
+	}
+
+	public BooleanProperty changingOrientationProperty() {
+		return changingOrientation;
 	}
 }

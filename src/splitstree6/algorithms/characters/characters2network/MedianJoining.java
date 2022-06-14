@@ -21,12 +21,14 @@ package splitstree6.algorithms.characters.characters2network;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * run the median joining algorithm
@@ -36,10 +38,17 @@ public class MedianJoining extends Characters2Network {
 	private final IntegerProperty optionEpsilon = new SimpleIntegerProperty(this, "optionEpsilon", 0);
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock inputData, NetworkBlock outputData) throws IOException {
+	public List<String> listOptions() {
+		return List.of(optionEpsilon.getName());
+	}
+
+	@Override
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, NetworkBlock networkBlock) throws IOException {
 		var medianJoiningCalculator = new MedianJoiningCalculator();
 		medianJoiningCalculator.setOptionEpsilon(getOptionEpsilon());
-		medianJoiningCalculator.apply(progress, taxaBlock, inputData, outputData);
+		medianJoiningCalculator.apply(progress, taxaBlock, charactersBlock, networkBlock);
+		networkBlock.setInfoString("Median-joining network" + (getOptionEpsilon() > 0 ?
+				", epsilon=" + StringUtils.removeTrailingZerosAfterDot(getOptionEpsilon()) : ""));
 	}
 
 	/**

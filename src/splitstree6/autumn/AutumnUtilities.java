@@ -19,7 +19,6 @@
 
 package splitstree6.autumn;
 
-import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 
@@ -33,11 +32,11 @@ public class AutumnUtilities {
 	 * @return the bits of all taxa found in the tree
 	 */
 	public static BitSet extractTaxa(int i, PhyloTree tree, TaxaBlock allTaxa) throws IOException {
-		BitSet taxaBits = new BitSet();
-		for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
-			String name = tree.getLabel(v);
+		var taxaBits = new BitSet();
+		for (var v : tree.nodes()) {
+			var name = tree.getLabel(v);
 			if (name != null && name.length() > 0 && !PhyloTree.isBootstrapValue(name)) {
-				int index = allTaxa.indexOf(name);
+				var index = allTaxa.indexOf(name);
 				if (index == -1) {
 					allTaxa.addTaxonByName(name);
 					index = allTaxa.indexOf(name);

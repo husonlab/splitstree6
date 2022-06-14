@@ -52,6 +52,7 @@ public class OptionControlCreator {
 				control.setPrefColumnCount(6);
 				control.setTextFormatter(new TextFormatter<>(new IntegerStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
+				control.setTooltip(new Tooltip(control.getText() + ": integer"));
 				control.setOnAction(e -> {
 					if (NumberUtils.isInteger(control.getText()))
 						option.getProperty().setValue(NumberUtils.parseInt(control.getText()));
@@ -74,6 +75,7 @@ public class OptionControlCreator {
 				control.setPrefColumnCount(6);
 				control.setTextFormatter(new TextFormatter<>(new FloatStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
+				control.setTooltip(new Tooltip(control.getText() + ": float"));
 				control.setOnAction(e -> {
 					if (NumberUtils.isFloat(control.getText()))
 						option.getProperty().setValue(NumberUtils.parseFloat(control.getText()));
@@ -96,6 +98,7 @@ public class OptionControlCreator {
 				control.setPrefColumnCount(6);
 				control.setTextFormatter(new TextFormatter<>(new DoubleStringConverter()));
 				control.setText(option.getProperty().getValue().toString());
+				control.setTooltip(new Tooltip(control.getText() + ": double"));
 				control.setOnAction(e -> {
 					if (NumberUtils.isDouble(control.getText()))
 						option.getProperty().setValue(NumberUtils.parseDouble(control.getText()));
@@ -117,6 +120,7 @@ public class OptionControlCreator {
 				var control = new TextField(option.getProperty().getValue().toString());
 				control.setPrefColumnCount(12);
 				control.setOnAction(e -> option.getProperty().setValue(control.getText()));
+				control.setTooltip(new Tooltip(control.getText() + ": string"));
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setText(n == null ? "" : n.toString());
 					changeListeners.add(changeListener);
@@ -131,6 +135,7 @@ public class OptionControlCreator {
 			case Boolean -> {
 				var control = new CheckBox();
 				control.setSelected((Boolean) option.getProperty().getValue());
+				control.setTooltip(new Tooltip(control.getText()));
 				control.setOnAction(e -> option.getProperty().setValue(control.isSelected()));
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setSelected(n != null && (Boolean) n);
@@ -151,7 +156,9 @@ public class OptionControlCreator {
 				var control = new ChoiceBox<String>();
 				control.getItems().addAll(option.getLegalValues());
 				control.setValue(option.getProperty().getValue().toString());
-				control.valueProperty().addListener((v, o, n) -> option.getProperty().setValue(option.getEnumValueForName(n)));
+				control.valueProperty().addListener((v, o, n) -> {
+					option.getProperty().setValue(option.getEnumValueForName(n));
+				});
 				if (changeListeners != null) {
 					ChangeListener changeListener = (v, o, n) -> control.setValue(n.toString());
 					changeListeners.add(changeListener);

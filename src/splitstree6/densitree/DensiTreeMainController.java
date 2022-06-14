@@ -38,7 +38,13 @@ public class DensiTreeMainController {
 	private Canvas canvas;
 
 	@FXML
-	private Pane pane;
+	private Pane labelPane;
+
+	@FXML
+	private Pane highlightingPane;
+
+	@FXML
+	private Pane consensusPane;
 
 	@FXML
 	private MenuItem openMenuItem;
@@ -62,7 +68,10 @@ public class DensiTreeMainController {
 	private RadioMenuItem uniformMenuItem;
 
 	@FXML
-	private RadioMenuItem staggeredMenuItem;
+	private RadioMenuItem rootedMenuItem;
+
+	@FXML
+	private RadioMenuItem blockMenuItem;
 
 	@FXML
 	private ToggleGroup drawingGroup;
@@ -110,7 +119,11 @@ public class DensiTreeMainController {
 	private Label messageLabel;
 
 	@FXML
+	private Slider scaleSlider;
+
+	@FXML
 	private void initialize() {
+		stackPane.setStyle("-fx-background-color: white;");
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -125,8 +138,16 @@ public class DensiTreeMainController {
 		return canvas;
 	}
 
-	public Pane getPane() {
-		return pane;
+	public Pane getLabelPane() {
+		return labelPane;
+	}
+
+	public Pane getHighlightingPane() {
+		return highlightingPane;
+	}
+
+	public Pane getConsensusPane() {
+		return consensusPane;
 	}
 
 	public MenuItem getOpenMenuItem() {
@@ -157,7 +178,11 @@ public class DensiTreeMainController {
 		return uniformMenuItem;
 	}
 
-	public RadioMenuItem getStaggeredMenuItem(){return staggeredMenuItem;}
+	public RadioMenuItem getRootedMenuItem() {
+		return rootedMenuItem;
+	}
+
+	public RadioMenuItem getBlockMenuItem(){return blockMenuItem;}
 
 	public ToggleGroup getDrawingGroup() {
 		return drawingGroup;
@@ -219,5 +244,8 @@ public class DensiTreeMainController {
 		return messageLabel;
 	}
 
+	public Slider getScaleSlider() {
+		return scaleSlider;
+	}
 }
 

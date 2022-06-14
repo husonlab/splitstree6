@@ -24,9 +24,12 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.collections.SetChangeListener;
 import javafx.geometry.Bounds;
+import javafx.geometry.Orientation;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
@@ -35,6 +38,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
+import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.layout.splits.algorithms.EqualAngle;
@@ -44,6 +48,7 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.edges.EdgesFormat;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.taxlabel.TaxonLabelFormat;
 import splitstree6.view.format.taxmark.TaxonMark;
@@ -61,8 +66,6 @@ public class TreeView implements IView {
 
 	private final UndoManager undoManager = new UndoManager();
 
-	private final SelectionModel<Integer> splitSelectionModel = new SetSelectionModel<>();
-
 	private final TreeViewController controller;
 	private final TreeViewPresenter presenter;
 
@@ -76,6 +79,7 @@ public class TreeView implements IView {
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
 	private final IntegerProperty optionTree = new SimpleIntegerProperty(this, "optionTree", 0); // 1-based
+	private final ObjectProperty<PhyloTree> tree = new SimpleObjectProperty<>(this, "tree");
 
 	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
@@ -94,6 +98,10 @@ public class TreeView implements IView {
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
+
+	private final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
+	private final ObservableMap<jloda.graph.Edge, Shape> edgeShapeMap = FXCollections.observableHashMap();
+	private final SelectionModel<Edge> edgeSelectionModel = new SetSelectionModel<>();
 
 	// create properties:
 	{
@@ -116,11 +124,9 @@ public class TreeView implements IView {
 		var loader = new ExtendedFXMLLoader<TreeViewController>(TreeViewController.class);
 		controller = loader.getController();
 
-		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
-		final ObservableMap<Integer, Shape> splitShapeMap = FXCollections.observableHashMap();
 
 		// this is the target area for the tree page:
-		presenter = new TreeViewPresenter(mainWindow, this, targetBounds, nodeShapeMap, splitShapeMap);
+		presenter = new TreeViewPresenter(mainWindow, this, targetBounds);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();
@@ -141,7 +147,10 @@ public class TreeView implements IView {
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow));
+		var edgesFormatter = new EdgesFormat(undoManager, edgeSelectionModel, edgeShapeMap, optionEditsProperty());
+
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow),
+				new Separator(Orientation.HORIZONTAL), edgesFormatter);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
@@ -369,5 +378,36 @@ public class TreeView implements IView {
 
 	public void setReticulated(boolean reticulated) {
 		this.reticulated.set(reticulated);
+	}
+
+	public PhyloTree getTree() {
+		return tree.get();
+	}
+
+	public ObjectProperty<PhyloTree> treeProperty() {
+		return tree;
+	}
+
+	public ObservableMap<jloda.graph.Node, Group> getNodeShapeMap() {
+		return nodeShapeMap;
+	}
+
+	public ObservableMap<Edge, Shape> getEdgeShapeMap() {
+		return edgeShapeMap;
+	}
+
+	public SelectionModel<Edge> getEdgeSelectionModel() {
+		return edgeSelectionModel;
+	}
+
+	public void setEdgeSelectionModel(SelectionModel<Edge> edgeSelectionModel) {
+		this.edgeSelectionModel.clearSelection();
+		this.edgeSelectionModel.selectAll(edgeSelectionModel.getSelectedItems());
+		edgeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Edge>) e -> {
+			if (e.wasAdded())
+				this.edgeSelectionModel.select(e.getElementAdded());
+			if (e.wasRemoved())
+				this.edgeSelectionModel.clearSelection(e.getElementRemoved());
+		});
 	}
 }

@@ -52,7 +52,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 
 	public enum Ladderize {Off, Up, Down, Random}
 
-	private final ObjectProperty<RootBy> optionRootBy = new SimpleObjectProperty<>(this, "optionRootBy", RootBy.MidPoint);
+	private final ObjectProperty<RootBy> optionRootBy = new SimpleObjectProperty<>(this, "optionRootBy", RootBy.Off);
 
 	private final ObjectProperty<String[]> optionOutGroupTaxa = new SimpleObjectProperty<>(this, "optionOutGroupTaxa", new String[0]);
 
@@ -109,14 +109,14 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 			case MidPoint -> {
 				optionOutGroupTaxa.set(new String[0]);
 				for (PhyloTree orig : inputData.getTrees()) {
-					final PhyloTree tree = new PhyloTree();
+					final var tree = new PhyloTree();
 					tree.copy(orig);
 					if (tree.getRoot() == null) {
 						tree.setRoot(tree.getFirstNode());
 						tree.redirectEdgesAwayFromRoot();
 					}
 					// todo: ask about internal node labels
-					RerootingUtils.rerootByMidpoint(false, tree);
+					RerootingUtils.rerootByMidpoint(getOptionHasBranchSupportValues(), tree);
 					trees.add(tree);
 					outputData.setRooted(true);
 				}
@@ -222,7 +222,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isPartial() && !parent.isReticulated();
+		return !parent.isReticulated();
 	}
 
 	/**

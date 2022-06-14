@@ -26,6 +26,8 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.text.Font;
+import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
@@ -86,6 +88,8 @@ public class NetworkViewController {
 
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
+	private final CopyableLabel infoLabel = new CopyableLabel();
+
 	@FXML
 	private void initialize() {
 		zoomableScrollPane.setFitToWidth(true);
@@ -96,6 +100,14 @@ public class NetworkViewController {
 
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);
+
+
+		AnchorPane.setTopAnchor(infoLabel, 5.0);
+		AnchorPane.setLeftAnchor(infoLabel, 20.0);
+		innerAnchorPane.getChildren().add(infoLabel);
+		infoLabel.setFont(Font.font(infoLabel.getFont().getFamily(), 16));
+
+		DraggableLabel.makeDraggable(infoLabel);
 
 		settingsToggleButton.setSelected(true);
 		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
@@ -181,5 +193,9 @@ public class NetworkViewController {
 
 	public ZoomableScrollPane getScrollPane() {
 		return zoomableScrollPane;
+	}
+
+	public CopyableLabel getInfoLabel() {
+		return infoLabel;
 	}
 }

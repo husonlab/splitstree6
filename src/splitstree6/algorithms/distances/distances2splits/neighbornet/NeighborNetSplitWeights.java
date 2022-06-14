@@ -1,5 +1,6 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.parts.ASplit;
@@ -113,30 +114,32 @@ public class NeighborNetSplitWeights {
         return splitList;
     }
 
-    static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
-        int n = x.length-1;
-        NNLSFunctionObject f = new NNLSFunctionObject(n);
-        double fx_old = f.evalf(x,d);
-        boolean[][] activeSet = getZeroElements(x);
+        static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
-        for (int k = 1; k <= params.outerIterations; k++) {
-            boolean optimalForFace = searchFace(x, d, activeSet, f,params);
-            double fx = f.evalf(x,d);
-            if (optimalForFace || fx_old-fx<params.tolerance) {
-                if (params.greedy)
-                    return;
-                boolean finished = checkKKT(x, d, activeSet,params);
-                if (finished)
-                    return;
+            int n = x.length-1;
+            NNLSFunctionObject f = new NNLSFunctionObject(n);
+            double fx_old = f.evalf(x,d);
+            boolean[][] activeSet = getZeroElements(x);
+
+            for (int k = 1; k <= params.outerIterations; k++) {
+                boolean optimalForFace = searchFace(x, d, activeSet, f,params);
+                double fx = f.evalf(x,d);
+                if (optimalForFace || fx_old-fx<params.tolerance) {
+                    if (params.greedy)
+                        return;
+                    boolean finished = checkKKT(x, d, activeSet,params);
+                    if (finished)
+                        return;
+                }
+                fx_old = fx;
+                progress.checkForCancel();
             }
-            fx_old = fx;
-            progress.checkForCancel();
+            NotificationManager.showError("Neighbor-net algorithm failed to converge");
         }
-        System.err.println("NNLS algorithm failed to converge");
-    }
 
 
+       
     /**
      * Search a face of the nnls problem
      *

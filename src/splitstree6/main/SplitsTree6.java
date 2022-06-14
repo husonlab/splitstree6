@@ -69,7 +69,7 @@ public class SplitsTree6 extends Application {
 		//CheckForUpdate.programURL = "http://software-ab.informatik.uni-tuebingen.de/download/alora";
 		//CheckForUpdate.applicationId = "1691242391";
 
-		SplashScreen.setLabelAnchor(new Point2D(150, 14));
+		SplashScreen.setLabelAnchor(new Point2D(120, 14));
 		SplashScreen.setFitHeight(250);
 		SplashScreen.setVersionString(ProgramProperties.getProgramVersion());
 		SplashScreen.setImageResourceName("SplitsTree6-splash.png");
@@ -134,10 +134,9 @@ public class SplitsTree6 extends Application {
 			NotificationManager.setShowNotifications(true);
 
 			final MainWindow mainWindow = new MainWindow();
-
-			final WindowGeometry windowGeometry = new WindowGeometry(ProgramProperties.get("WindowGeometry", "50 50 800 800"));
-
-			mainWindow.show(stage, windowGeometry.getX(), windowGeometry.getY(), windowGeometry.getWidth(), windowGeometry.getHeight());
+			WindowGeometry.setToStage(stage);
+			mainWindow.show(stage, stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
+			WindowGeometry.listenToStage(stage);
 
 			MainWindowManager.getInstance().addMainWindow(mainWindow);
 

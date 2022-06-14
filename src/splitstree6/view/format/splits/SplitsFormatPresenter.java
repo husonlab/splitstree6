@@ -81,8 +81,8 @@ public class SplitsFormatPresenter {
 						var edits = new ArrayList<SplitNetworkEdits.Edit>();
 
 						for (var split : splitSelectionModel.getSelectedItems()) {
-							edits.add(new SplitNetworkEdits.Edit('w', split, width));
 							if (splitShapeMap.containsKey(split)) {
+								edits.add(new SplitNetworkEdits.Edit('w', split, width));
 								for (var shape : splitShapeMap.get(split)) {
 									var oldWidth = shape.getStrokeWidth();
 									if (n.doubleValue() != oldWidth) {
@@ -98,7 +98,6 @@ public class SplitsFormatPresenter {
 							undoList.add(editsProperty, oldEdits, newEdits);
 							undoManager.doAndAdd(undoList);
 						}
-
 						Platform.runLater(() -> controller.getWidthCBox().setValue(n));
 					}
 				}
@@ -112,9 +111,9 @@ public class SplitsFormatPresenter {
 				var edits = new ArrayList<SplitNetworkEdits.Edit>();
 
 				for (var split : splitSelectionModel.getSelectedItems()) {
-					edits.add(new SplitNetworkEdits.Edit('c', split, color));
-
 					if (splitShapeMap.containsKey(split)) {
+						edits.add(new SplitNetworkEdits.Edit('c', split, color));
+
 						for (var shape : splitShapeMap.get(split)) {
 							var oldColor = shape.getStroke();
 							if (!color.equals(oldColor)) {
@@ -137,7 +136,6 @@ public class SplitsFormatPresenter {
 					var oldEdits = editsProperty.get();
 					var newEdits = SplitNetworkEdits.addEdits(editsProperty.get(), edits);
 					undoList.add(editsProperty, oldEdits, newEdits);
-
 					undoManager.doAndAdd(undoList);
 				}
 			}

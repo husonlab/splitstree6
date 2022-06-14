@@ -22,10 +22,8 @@ package splitstree6.view.trees.treepages;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Node;
@@ -57,6 +55,8 @@ public class TreePageFactory implements Callback<Integer, Node> {
 	private final ObjectProperty<GridPane> gridPane = new SimpleObjectProperty<>();
 
 	private final InvalidationListener updater;
+
+	private final IntegerProperty numberChangingOrientation = new SimpleIntegerProperty(this, "numberChangingOrientation", 0);
 
 	private int page;
 
@@ -118,7 +118,9 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(mainWindow.getStage(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
-						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty(), null, null);
+						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty(), null,
+						null, null);
+				treePane.changingOrientationProperty().addListener((v, o, n) -> numberChangingOrientation.set(numberChangingOrientation.get() + (n ? 1 : -1)));
 				treePane.setRunAfterUpdate(() -> {
 					for (var treeViewPane : BasicFX.findRecursively(treePane, p -> p.getId() != null && p.getId().equals("treeView"))) {
 						treeViewPane.setScaleX(treeViewPane.getScaleX() * treePagesView.getOptionZoomFactor());
@@ -159,5 +161,9 @@ public class TreePageFactory implements Callback<Integer, Node> {
 		for (var treePane : BasicFX.getAllRecursively(gridPane.get(), TreePane.class)) {
 			treePane.updateLabelLayout(orientation);
 		}
+	}
+
+	public BooleanBinding changingOrientationBinding() {
+		return numberChangingOrientation.greaterThan(0);
 	}
 }

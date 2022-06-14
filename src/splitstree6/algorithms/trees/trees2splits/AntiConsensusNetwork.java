@@ -38,7 +38,7 @@ import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.data.parts.BiPartition;
 
 import java.io.IOException;
 import java.util.*;
@@ -450,7 +450,7 @@ public class AntiConsensusNetwork extends Trees2Splits {
 					final BitSet incompatibilities2 = split2incompatibilities.get(split2.getSmallerPart());
 					if (BitSetUtils.contains(incompatibilities1, incompatibilities2) &&
 						((incompatibilities1.cardinality() > incompatibilities2.cardinality())
-						 || (incompatibilities1.cardinality() == incompatibilities2.cardinality() && ASplit.compare(split1, split2) == -1)))
+						 || (incompatibilities1.cardinality() == incompatibilities2.cardinality() && BiPartition.compare(split1, split2) == -1)))
 						graph.newEdge(v, split2nodeMap.get(split2.getSmallerPart()));
 				}
 			}
@@ -485,7 +485,7 @@ public class AntiConsensusNetwork extends Trees2Splits {
 		int count = 0;
 		for (int s = 1; s <= referenceSplits.getNsplits(); s++) {
 			final ASplit other = referenceSplits.get(s);
-			if (other.size() > 1 && !Compatibility.areCompatible(split, other)) {
+			if (other.size() > 1 && !BiPartition.areCompatible(split, other)) {
 				count++;
 			}
 		}
@@ -503,7 +503,7 @@ public class AntiConsensusNetwork extends Trees2Splits {
 		double weight = 0;
 		for (int s = 1; s <= referenceSplits.getNsplits(); s++) {
 			final ASplit other = referenceSplits.get(s);
-			if (other.size() > 1 && !Compatibility.areCompatible(split, other)) {
+			if (other.size() > 1 && !BiPartition.areCompatible(split, other)) {
 				weight += other.getWeight();
 				incompatible.set(s);
 			}

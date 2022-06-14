@@ -103,6 +103,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			}
 			 */
 			updateCounter.set(updateCounter.get() + 1);
+			controller.getInfoLabel().setText(networkBlock.get().getInfoString());
 		});
 
 		controller.getScrollPane().setContent(networkPane);
@@ -156,7 +157,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		networkView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", networkView.optionZoomFactorProperty(), o, n));
 
 		Platform.runLater(this::setupMenuItems);
-
 	}
 
 	@Override

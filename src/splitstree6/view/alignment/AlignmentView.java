@@ -25,9 +25,11 @@ import javafx.beans.property.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.AService;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.window.NotificationManager;
 import jloda.util.BitSetUtils;
 import jloda.util.Single;
 import splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter;
@@ -52,6 +54,9 @@ import java.util.List;
  * Daniel Huson, 4.2022
  */
 public class AlignmentView implements IView {
+	public static final double DEFAULT_UNIT_WIDTH = 18;
+	public static final double DEFAULT_UNIT_HEIGHT = 24;
+
 	private final UndoManager undoManager = new UndoManager();
 
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
@@ -69,6 +74,8 @@ public class AlignmentView implements IView {
 	private final ObjectProperty<DataNode<TaxaBlock>> workingTaxaNode = new SimpleObjectProperty<>(this, "workingTaxaNode");
 	private final ObjectProperty<DataNode<CharactersBlock>> workingCharactersNode = new SimpleObjectProperty<>(this, "workingCharactersBlock");
 
+	private final ObjectProperty<char[]> consensusSequence = new SimpleObjectProperty<>(this, "consensusSequence");
+
 	private final BooleanProperty inputTaxaNodeValid = new SimpleBooleanProperty(this, "inputTaxaNodeValid", false);
 	private final BooleanProperty taxaFilterValid = new SimpleBooleanProperty(this, "taxaFilterValid", false);
 	private final BooleanProperty inputCharactersNodeValid = new SimpleBooleanProperty(this, "inputCharactersNodeValid", false);
@@ -85,8 +92,8 @@ public class AlignmentView implements IView {
 	private final BooleanProperty nucleotideData = new SimpleBooleanProperty(this, "nucleotideData");
 
 	private final ObjectProperty<ColorScheme> optionColorScheme = new SimpleObjectProperty<>(this, "optionColorScheme", ColorScheme.None);
-	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", 18);
-	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", 18);
+	private final DoubleProperty optionUnitWidth = new SimpleDoubleProperty(this, "optionUnitWidth", DEFAULT_UNIT_WIDTH);
+	private final DoubleProperty optionUnitHeight = new SimpleDoubleProperty(this, "optionUnitHeight", DEFAULT_UNIT_HEIGHT);
 
 	private final StringProperty name = new SimpleStringProperty(this, "name");
 
@@ -154,6 +161,8 @@ public class AlignmentView implements IView {
 				if (inputCharacters != null) {
 					setActiveSites(BitSetUtils.asBitSet(BitSetUtils.range(1, inputCharacters.getNchar() + 1)));
 					nucleotideData.set(inputCharacters.getDataType() == CharactersType.DNA || inputCharacters.getDataType() == CharactersType.RNA);
+					consensusSequence.set(null);
+					AService.run(inputCharacters::computeConsensusSequence, consensusSequence::set, e -> NotificationManager.showError("Consensus failed: " + e));
 				}
 			}
 			setSelectedSites(new BitSet());
@@ -630,5 +639,13 @@ public class AlignmentView implements IView {
 
 	public boolean isDisabled(Taxon taxon) {
 		return getWorkingTaxa() == null || getWorkingTaxa().indexOf(taxon) == -1;
+	}
+
+	public char[] getConsensusSequence() {
+		return consensusSequence.get();
+	}
+
+	public ObjectProperty<char[]> consensusSequenceProperty() {
+		return consensusSequence;
 	}
 }

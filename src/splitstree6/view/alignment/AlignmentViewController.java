@@ -200,14 +200,13 @@ public class AlignmentViewController {
         toolBar.getItems().add(pos, copyableSelectionLabel);
         toolBar.getItems().remove(selectionLabel);
 
-        hScrollBar.widthProperty().addListener((v, o, n) -> canvas.setWidth(n.doubleValue() - 16));
-        vScrollBar.heightProperty().addListener((v, o, n) -> canvas.setHeight(n.doubleValue()));
-
         splitPane.widthProperty().addListener((v, o, n) -> {
             if (n.doubleValue() > 0 && o.doubleValue() > 0) {
                 splitPane.setDividerPositions(splitPane.getDividerPositions()[0] / n.doubleValue() * o.doubleValue());
             }
         });
+
+        splitPane.setDividerPositions(0.15);
 
         // never want gray in the list of selected taxa, because we are using gray to indicate inactive items
         taxaListView.setStyle("-fx-selection-bar-non-focused: -fx-focus-color;");

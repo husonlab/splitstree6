@@ -65,7 +65,7 @@ public enum Compatibility {
 	static public boolean isCompatible(List<ASplit> splits) {
 		for (int i = 0; i < splits.size(); i++)
 			for (int j = i + 1; j < splits.size(); j++)
-				if (!areCompatible(splits.get(i), splits.get(j)))
+				if (!BiPartition.areCompatible(splits.get(i), splits.get(j)))
 					return false;
 		return true;
 	}
@@ -78,23 +78,9 @@ public enum Compatibility {
 	 */
 	static public boolean isCompatible(ASplit split, List<ASplit> splits) {
 		for (ASplit split1 : splits)
-			if (!areCompatible(split, split1))
+			if (!BiPartition.areCompatible(split, split1))
 				return false;
 		return true;
-	}
-
-	/**
-	 * determines whether two splits on the same taxa set are compatible
-	 *
-	 * @return true, if split1 and split2 are compatible
-	 */
-	public static boolean areCompatible(ASplit split1, ASplit split2) {
-		final BitSet A1 = split1.getA();
-		final BitSet B1 = split1.getB();
-		final BitSet A2 = split2.getA();
-		final BitSet B2 = split2.getB();
-
-		return !A1.intersects(A2) || !A1.intersects(B2) || !B1.intersects(A2) || !B1.intersects(B2);
 	}
 
 	/**
@@ -107,42 +93,12 @@ public enum Compatibility {
 		for (int i = 0; i < splits.size(); i++) {
 			for (int j = i + 1; j < splits.size(); j++) {
 				for (int k = j + 1; k < splits.size(); k++) {
-					if (!areWeaklyCompatible(splits.get(i), splits.get(j), splits.get(k)))
+					if (!BiPartition.areWeaklyCompatible(splits.get(i), splits.get(j), splits.get(k)))
 						return false;
 				}
 			}
 		}
 		return true;
-	}
-
-	/**
-	 * determines whether three splits on the same taxa set are weakly compatible
-	 *
-	 * @return true, if all three are weakly compatible
-	 */
-	public static boolean areWeaklyCompatible(ASplit split1, ASplit split2, ASplit split3) {
-		final BitSet A1 = split1.getA();
-		final BitSet B1 = split1.getB();
-		final BitSet A2 = split2.getA();
-		final BitSet B2 = split2.getB();
-		final BitSet A3 = split3.getA();
-		final BitSet B3 = split3.getB();
-
-		return !((intersects(A1, A2, A3) && intersects(A1, B2, B3) && intersects(B1, A2, B3) && intersects(B1, B2, A3))
-				 || (intersects(B1, B2, B3) && intersects(B1, A2, A3) && intersects(A1, B2, A3) && intersects(A1, A2, B3)));
-	}
-
-	/**
-	 * do the three  bitsets intersect?
-	 *
-	 * @return true, if non-empty   intersection
-	 */
-	private static boolean intersects(BitSet a, BitSet b, BitSet c) {
-		for (int i = a.nextSetBit(1); i >= 0; i = a.nextSetBit(i + 1)) {
-			if (b.get(i) && c.get(i))
-				return true;
-		}
-		return false;
 	}
 
 	/**
@@ -194,7 +150,7 @@ public enum Compatibility {
 			ASplit s1 = splits.get(i - 1);
 			for (int j = i + 1; j <= splits.size(); j++) {
 				ASplit s2 = splits.get(j - 1);
-				matrix[i][j] = matrix[j][i] = areCompatible(s1, s2);
+				matrix[i][j] = matrix[j][i] = BiPartition.areCompatible(s1, s2);
 			}
 		}
 		return matrix;

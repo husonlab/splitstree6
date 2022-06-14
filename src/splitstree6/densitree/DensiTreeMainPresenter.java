@@ -22,6 +22,8 @@ package splitstree6.densitree;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -42,21 +44,27 @@ import java.io.IOException;
  */
 public class DensiTreeMainPresenter {
 
+	private final DoubleProperty scalingFactor = new SimpleDoubleProperty(1);
+
 	public DensiTreeMainPresenter(Stage stage, DensiTreeMainController controller, Model model) {
 		stage.setMinWidth(400);
 		stage.setMinHeight(400);
-		controller.getPane().prefWidthProperty().bind(stage.widthProperty().subtract(100));
-		controller.getCanvas().widthProperty().bind(controller.getPane().widthProperty());
-		controller.getPane().prefHeightProperty().bind(stage.heightProperty().subtract(200));
-		controller.getCanvas().heightProperty().bind(controller.getPane().heightProperty());
+		controller.getLabelPane().prefWidthProperty().bind(stage.widthProperty().subtract(100));
+		controller.getHighlightingPane().prefWidthProperty().bind(stage.widthProperty().subtract(100));
+		controller.getConsensusPane().prefWidthProperty().bind(stage.widthProperty().subtract(100));
+		controller.getCanvas().widthProperty().bind(controller.getLabelPane().widthProperty());
+		controller.getLabelPane().prefHeightProperty().bind(stage.heightProperty().subtract(200));
+		controller.getHighlightingPane().prefHeightProperty().bind(stage.heightProperty().subtract(100));
+		controller.getConsensusPane().prefHeightProperty().bind(stage.heightProperty().subtract(100));
+		controller.getCanvas().heightProperty().bind(controller.getLabelPane().heightProperty());
 
 		if (false) {
 			BasicFX.reportChanges("stageWidth", stage.widthProperty());
 			BasicFX.reportChanges("stageHeight", stage.heightProperty());
 			BasicFX.reportChanges("canvasWidth", controller.getCanvas().widthProperty());
 			BasicFX.reportChanges("canvasHeight", controller.getCanvas().heightProperty());
-			BasicFX.reportChanges("paneWidth", controller.getPane().widthProperty());
-			BasicFX.reportChanges("paneHeight", controller.getPane().heightProperty());
+			BasicFX.reportChanges("paneWidth", controller.getLabelPane().widthProperty());
+			BasicFX.reportChanges("paneHeight", controller.getLabelPane().heightProperty());
 		}
 
 		controller.getDrawingGroup().selectToggle(controller.getCircularMenuItem());
@@ -148,45 +156,91 @@ public class DensiTreeMainPresenter {
 			}
 		});
 
+		controller.getScaleSlider().valueProperty().addListener((v, o, n) -> {
+			var value = n.doubleValue();
+			if (value >= 0) {
+				scalingFactor.set(Math.pow(2, value));
+			} else {
+				scalingFactor.set(1.0 / Math.pow(2, -value));
+			}
+		});
+
 
 		final InvalidationListener listener;
 
-		if (true) {
-			listener = observable -> DensiTree.draw(
-					new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
-							controller.getConsensusMenuItem().isSelected(), specTrees[0],
-							controller.getLabelsGroup().getSelectedToggle().toString(),
-							controller.getDrawingGroup().getSelectedToggle().toString()),
-					model, controller.getCanvas(), controller.getPane());
-		} else { // DHH: only draw once user has stopped using controls
-			listener = observable -> RunAfterAWhile.apply(controller, () ->
-					Platform.runLater(() -> DensiTree.draw(
+		if (false) {
+			listener = observable -> {
+				try {
+					DensiTree.draw(
 							new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
 									controller.getConsensusMenuItem().isSelected(), specTrees[0],
 									controller.getLabelsGroup().getSelectedToggle().toString(),
 									controller.getDrawingGroup().getSelectedToggle().toString()),
-							model, controller.getCanvas(), controller.getPane())));
+							model, controller.getCanvas(), controller.getLabelPane(), controller.getConsensusPane(), controller.getHighlightingPane(), scalingFactor);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			};
+		} else { // DHH: only draw once user has stopped using controls
+			listener = observable -> RunAfterAWhile.apply(controller, () ->
+					Platform.runLater(() -> {
+						try {
+							DensiTree.draw(
+									new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
+											controller.getConsensusMenuItem().isSelected(), specTrees[0],
+											controller.getLabelsGroup().getSelectedToggle().toString(),
+											controller.getDrawingGroup().getSelectedToggle().toString()),
+									model, controller.getCanvas(), controller.getLabelPane(), controller.getConsensusPane(), controller.getHighlightingPane(), scalingFactor);
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}));
 		}
+
+		final InvalidationListener consensusListener = observable -> {
+			try {
+				DensiTree.drawConsensus(model, controller.getConsensusPane(),
+						new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
+						controller.getConsensusMenuItem().isSelected(), specTrees[0],
+						controller.getLabelsGroup().getSelectedToggle().toString(),
+						controller.getDrawingGroup().getSelectedToggle().toString()), controller.getCanvas(), scalingFactor);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		};
+
+		final InvalidationListener highlightingListener = observable -> {
+				DensiTree.drawHighlightedTrees(model, controller.getHighlightingPane(),
+						new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
+								controller.getConsensusMenuItem().isSelected(), specTrees[0],
+								controller.getLabelsGroup().getSelectedToggle().toString(),
+								controller.getDrawingGroup().getSelectedToggle().toString()), controller.getCanvas(), scalingFactor);
+		};
 
 		controller.getStackPane().widthProperty().addListener(listener);
 		controller.getStackPane().heightProperty().addListener(listener);
 		controller.getJitterCheckBox().selectedProperty().addListener(listener);
-		controller.getConsensusMenuItem().selectedProperty().addListener(listener);
+		controller.getConsensusMenuItem().selectedProperty().addListener(consensusListener);
 		controller.getDrawingGroup().selectedToggleProperty().addListener(listener);
 		controller.getLabelsGroup().selectedToggleProperty().addListener(listener);
+		controller.getScaleSlider().valueProperty().addListener(listener);
 
 		controller.getDrawButton().setOnAction(e -> {
 			var parameters = new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
 					controller.getConsensusMenuItem().isSelected(), specTrees[0],
 					controller.getLabelsGroup().getSelectedToggle().toString(),
 					controller.getDrawingGroup().getSelectedToggle().toString());
-			DensiTree.draw(parameters, model, controller.getCanvas(), controller.getPane());
+			try {
+				DensiTree.draw(parameters, model, controller.getCanvas(), controller.getLabelPane(), controller.getConsensusPane(), controller.getHighlightingPane(), scalingFactor);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
 		});
 
 		controller.getDrawButton().disableProperty().bind(Bindings.isEmpty(model.getTreesBlock().getTrees()));
 
 		controller.getClearButton().setOnAction(e -> {
-			DensiTree.clear(controller.getCanvas(), controller.getPane());
+			DensiTree.clear(controller.getCanvas(), controller.getLabelPane(), controller.getConsensusPane(), controller.getHighlightingPane());
 		});
 	}
 }

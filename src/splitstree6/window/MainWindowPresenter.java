@@ -42,8 +42,8 @@ import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import jloda.fx.window.PresentationMode;
 import jloda.fx.window.SplashScreen;
-import jloda.fx.window.WindowGeometry;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
 import jloda.util.ProgramProperties;
@@ -55,6 +55,8 @@ import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
+import splitstree6.algorithms.distances.distances2network.PCoA;
+import splitstree6.algorithms.distances.distances2network.TSne;
 import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
@@ -64,6 +66,7 @@ import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
+import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2splits.BoostrapTreeSplits;
@@ -309,7 +312,6 @@ public class MainWindowPresenter {
 
 		controller.getCloseMenuItem().setOnAction(e -> {
 			if (SaveBeforeClosingDialog.apply(mainWindow) != SaveBeforeClosingDialog.Result.cancel) {
-				ProgramProperties.put("WindowGeometry", (new WindowGeometry(mainWindow.getStage())).toString());
 				if (MainWindowManager.getInstance().closeMainWindow(mainWindow))
 					mainWindow.getWorkflow().cancel();
 			}
@@ -385,6 +387,9 @@ public class MainWindowPresenter {
 		controller.getUseDarkThemeMenuItem().setSelected(MainWindowManager.isUseDarkTheme());
 		controller.getUseDarkThemeMenuItem().setDisable(false);
 
+		controller.getPresentationModeMenuItem().selectedProperty().bindBidirectional(PresentationMode.presentationModeProperty());
+		controller.getPresentationModeMenuItem().setDisable(false);
+
 		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
 
 		controller.getFilterTaxaMenuItem().setOnAction(e -> {
@@ -404,6 +409,9 @@ public class MainWindowPresenter {
 
 		controller.getFilterSplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new SplitsFilter()));
 		controller.getFilterSplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new SplitsFilter()));
+
+		controller.getSplitsSliderMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new WeightsSlider()));
+		controller.getSplitsSliderMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new WeightsSlider()));
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
@@ -506,9 +514,11 @@ public class MainWindowPresenter {
 
 		controller.getHaplotypeNetworkViewMenuItem().setOnAction(null);
 
-		controller.getPcoaMenuItem().setOnAction(null);
-		controller.getBrayCurtisMenuItem().setOnAction(null);
-		controller.getJsdMenuItem().setOnAction(null);
+		controller.getPcoaMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PCoA()));
+		controller.getPcoaMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PCoA()));
+
+		controller.getTsneMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TSne()));
+		controller.getTsneMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TSne()));
 
 		controller.getBootStrapTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTree()));
 		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));

@@ -64,7 +64,7 @@ public class ClusterReduction {
 		}
 
 		// run the algorithm
-		Pair<Root, Root> pair = apply(root1, root2, new Single<>());
+		var pair = apply(root1, root2, new Single<>());
 
 		if (pair != null) {
 			var results = new LinkedList<Root>();
@@ -78,8 +78,8 @@ public class ClusterReduction {
 				var newRoot1 = root1.copySubNetwork();
 				var newRoot2 = root2.copySubNetwork();
 
-				List<Root> merged1 = MergeNetworks.apply(List.of(newRoot1), List.of(pair.getFirst()));
-				List<Root> merged2 = MergeNetworks.apply(List.of(newRoot2), List.of(pair.getSecond()));
+				var merged1 = MergeNetworks.apply(List.of(newRoot1), List.of(pair.getFirst()));
+				var merged2 = MergeNetworks.apply(List.of(newRoot2), List.of(pair.getSecond()));
 				results.addAll(merged1);
 				results.addAll(merged2);
 			}

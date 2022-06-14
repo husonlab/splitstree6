@@ -26,7 +26,6 @@ import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
 import java.io.IOException;
@@ -62,7 +61,7 @@ public class ConsensusTreeSplits extends Trees2Splits {
 	/**
 	 * compute the consensus splits
 	 */
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, SplitsBlock child) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock child) throws IOException {
 		final ConsensusNetwork consensusNetwork = new ConsensusNetwork();
 		switch (getOptionConsensus()) {
 			default -> consensusNetwork.setOptionThresholdPercent(50);
@@ -72,10 +71,10 @@ public class ConsensusTreeSplits extends Trees2Splits {
 		}
 		final SplitsBlock consensusSplits = new SplitsBlock();
 		consensusNetwork.setOptionEdgeWeights(getOptionEdgeWeights());
-		consensusNetwork.compute(progress, taxaBlock, parent, consensusSplits);
+		consensusNetwork.compute(progress, taxaBlock, treesBlock, consensusSplits);
 
 		if (getOptionConsensus().equals(Consensus.Greedy)) {
-			final ArrayList<ASplit> list = new ArrayList<>(consensusSplits.getSplits());
+			final var list = new ArrayList<>(consensusSplits.getSplits());
 			list.sort((s1, s2) -> {
 				if (s1.getWeight() > s2.getWeight())
 					return -1;
@@ -84,7 +83,7 @@ public class ConsensusTreeSplits extends Trees2Splits {
 				else
 					return BitSetUtils.compare(s1.getA(), s2.getA());
 			});
-			for (ASplit split : list) {
+			for (var split : list) {
 				if (Compatibility.isCompatible(split, child.getSplits()))
 					child.getSplits().add(split);
 			}

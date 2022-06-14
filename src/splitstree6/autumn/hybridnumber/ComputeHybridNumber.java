@@ -107,7 +107,7 @@ public class ComputeHybridNumber {
 
         if (bestScore.get() == LARGE) { // no upper bound given, use cluster network
             System.err.print("Computing upper bound using cluster network: ");
-            int upperBound = Utilities.getNumberOfReticulationsInClusterNetwork(tree1, tree2, progressListener);
+            int upperBound = Utilities.getNumberOfReticulationsInClusterNetwork(tree1, tree2);
             System.err.println(upperBound);
             bestScore.set(upperBound);
         }

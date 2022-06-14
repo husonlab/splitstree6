@@ -21,8 +21,10 @@ package splitstree6.view.network;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
@@ -60,6 +62,7 @@ public class NetworkPane extends StackPane {
 	private final InvalidationListener layoutLabelsListener;
 	private final InvalidationListener redrawListener;
 
+	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
 	private final AService<Group> service;
 	private final NetworkLayout networkLayout = new NetworkLayout();
@@ -91,9 +94,8 @@ public class NetworkPane extends StackPane {
 		};
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
-		orientChangeListener = (v, o, n) -> {
-			splitstree6.layout.splits.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n, or -> networkLayout.getLabelLayout().layoutLabels(or));
-		};
+		orientChangeListener = (v, o, n) -> splitstree6.layout.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n,
+				or -> networkLayout.getLabelLayout().layoutLabels(or), changingOrientation);
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
 		layoutLabelsListener = e -> layoutLabels(orientation.get());
@@ -109,8 +111,7 @@ public class NetworkPane extends StackPane {
 				return new Group();
 
 			var result = networkLayout.apply(service.getProgressListener(), taxaBlock.get(), networkBlock.get(), diagram.get(),
-					getPrefWidth() - 4, getPrefHeight() - 16,
-					taxonLabelMap, nodeShapeMap, edgeShapeMap);
+					getPrefWidth() - 4, getPrefHeight() - 16, taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());
@@ -128,11 +129,9 @@ public class NetworkPane extends StackPane {
 			setMinWidth(getPrefWidth());
 			group.getChildren().setAll(service.getValue());
 
-			addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+			NetworkPane.this.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
 				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(() -> {
-						taxonSelectionModel.clearSelection();
-					});
+					Platform.runLater(taxonSelectionModel::clearSelection);
 				}
 				e.consume();
 			});
@@ -149,7 +148,6 @@ public class NetworkPane extends StackPane {
 
 	public void drawNetwork() {
 		service.restart();
-
 	}
 
 	public Runnable getRunAfterUpdate() {
@@ -177,5 +175,13 @@ public class NetworkPane extends StackPane {
 			}
 		});
 		ProgramExecutorService.submit(100, () -> Platform.runLater(() -> layoutLabels(orientation)));
+	}
+
+	public boolean isChangingOrientation() {
+		return changingOrientation.get();
+	}
+
+	public BooleanProperty changingOrientationProperty() {
+		return changingOrientation;
 	}
 }

@@ -10,8 +10,9 @@ module splitstreesix {
     requires org.apache.commons.collections4;
 	requires commons.math3;
     requires com.install4j.runtime;
+	requires tsne;
 
-    opens splitstree6.resources.css;
+	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
     opens splitstree6.resources.images;
 
@@ -26,7 +27,6 @@ module splitstreesix {
 	opens splitstree6.algorithms.distances.distances2network;
 	opens splitstree6.algorithms.distances.distances2view;
 	opens splitstree6.algorithms.distances.distances2splits;
-	opens splitstree6.algorithms.distances.distances2splits.legacy;
 	opens splitstree6.algorithms.distances.distances2trees;
 
 	opens splitstree6.algorithms.network.network2network;
@@ -111,12 +111,14 @@ module splitstreesix {
 	opens splitstree6.view.format.traits;
 	opens splitstree6.view.format.selecttraits;
 	opens splitstree6.view.format.sites;
+	opens splitstree6.view.format.edges;
 
 	//opens splitstree6.view.utils;
 	opens splitstree6.view.alignment;
 	opens splitstree6.view.trees;
 	opens splitstree6.layout.network;
 	opens splitstree6.dialog.exporting;
+	opens splitstree6.layout;
 
 
 }

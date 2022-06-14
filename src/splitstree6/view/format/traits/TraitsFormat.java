@@ -185,7 +185,6 @@ public class TraitsFormat extends Pane {
 
 				var graph = graphOptional.get();
 				for (var v : nodeShapeMap.keySet()) {
-
 					var group = nodeShapeMap.get(v);
 					if (group != null) {
 						group.getChildren().removeAll(BasicFX.getAllRecursively(group, PieChart.class));

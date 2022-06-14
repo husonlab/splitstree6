@@ -54,29 +54,29 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
 	 * @return taxa below
 	 */
 	private static BitSet computePostOrderNumberingRec(PhyloTree tree, Node v, TaxaBlock allTaxa, final Map<Node, Integer> order, Single<Integer> postOrderNumber) throws IOException {
-		final BitSet taxaBelow = new BitSet();
+		final var taxaBelow = new BitSet();
 
 		if (v.getOutDegree() == 0) {
 			taxaBelow.set(allTaxa.indexOf(tree.getLabel(v)));
 		} else {
-            SortedSet<Pair<BitSet, Node>> child2TaxaBelow = new TreeSet<>((pair1, pair2) -> {
-                int t1 = pair1.getFirst().nextSetBit(0);
-                int t2 = pair2.getFirst().nextSetBit(0);
-                if (t1 < t2)
-                    return -1;
-                else if (t1 > t2)
-                    return 1;
+			var child2TaxaBelow = new TreeSet<Pair<BitSet, Node>>((pair1, pair2) -> {
+				var t1 = pair1.getFirst().nextSetBit(0);
+				var t2 = pair2.getFirst().nextSetBit(0);
+				if (t1 < t2)
+					return -1;
+				else if (t1 > t2)
+					return 1;
 
-                int id1 = pair1.getSecond().getId();
-                int id2 = pair2.getSecond().getId();
+				int id1 = pair1.getSecond().getId();
+				int id2 = pair2.getSecond().getId();
 
 				return Integer.compare(id1, id2);
-            });
+			});
 
 			// first visit the children:
-			for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-				Node w = e.getTarget();
-				String treeId = tree.getLabel(e);
+			for (var e : v.outEdges()) {
+				var w = e.getTarget();
+				var treeId = tree.getLabel(e);
 				if (w.getInDegree() > 1 && treeId == null)
 					throw new IOException("Node has two in-edges, one not labeled");
 				if (w.getInDegree() == 1 || treeId.equals("1")) {
@@ -84,7 +84,7 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
 						throw new IOException("Node has two in-edges, but chosen one is not labeled 1");
 
 					BitSet childTaxa = computePostOrderNumberingRec(tree, w, allTaxa, order, postOrderNumber);
-                    child2TaxaBelow.add(new Pair<>(childTaxa, w));
+					child2TaxaBelow.add(new Pair<>(childTaxa, w));
 
 				} else {
 					if (w.getInDegree() < 2)
@@ -93,7 +93,7 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
 						throw new IOException("Node has two in edges, both labeled 2");
 				}
 			}
-			for (Pair<BitSet, Node> pair : child2TaxaBelow) {
+			for (var pair : child2TaxaBelow) {
 				postOrderNumber.set(postOrderNumber.get() + 1);
 				order.put(pair.getSecond(), postOrderNumber.get());
 				taxaBelow.or(pair.getFirst());
@@ -106,29 +106,29 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
 	 * recursively reorders the network using the post-order numbering computed above
 	 */
 	private static void reorderNetworkChildrenRec(PhyloTree tree, Node v, final Map<Node, Integer> order) {
-        List<Edge> children = new LinkedList<>();
+		var children = new ArrayList<Edge>();
 
-        for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-            Node w = e.getTarget();
-            String treeId = tree.getLabel(e);
-            if (w.getInDegree() == 1 || treeId == null || !treeId.equals("2"))
-                reorderNetworkChildrenRec(tree, w, order);
-            children.add(e);
-        }
+		for (var e : v.outEdges()) {
+			var w = e.getTarget();
+			var treeId = tree.getLabel(e);
+			if (w.getInDegree() == 1 || treeId == null || !treeId.equals("2"))
+				reorderNetworkChildrenRec(tree, w, order);
+			children.add(e);
+		}
 
-        Edge[] array = children.toArray(new Edge[0]);
-        Arrays.sort(array, (e1, e2) -> {
-            Integer rank1 = order.get(e1.getTarget());
-            Integer rank2 = order.get(e2.getTarget());
+		var array = children.toArray(new Edge[0]);
+		Arrays.sort(array, (e1, e2) -> {
+			var rank1 = order.get(e1.getTarget());
+			var rank2 = order.get(e2.getTarget());
 
-            if (rank1 == null)  // dead node
-                rank1 = Integer.MAX_VALUE;
-            if (rank2 == null)  // dead node
-                rank2 = Integer.MAX_VALUE;
+			if (rank1 == null)  // dead node
+				rank1 = Integer.MAX_VALUE;
+			if (rank2 == null)  // dead node
+				rank2 = Integer.MAX_VALUE;
 
-            if (rank1 < rank2)
-                return -1;
-            else if (rank1 > rank2)
+			if (rank1 < rank2)
+				return -1;
+			else if (rank1 > rank2)
 				return 1;
 			else return Integer.compare(e1.getId(), e2.getId());
         });

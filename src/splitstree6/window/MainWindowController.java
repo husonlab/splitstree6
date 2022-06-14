@@ -205,8 +205,12 @@ public class MainWindowController {
 
 	@FXML
 	private CheckMenuItem useDarkThemeMenuItem;
+
 	@FXML
 	private MenuItem useFullScreenMenuItem;
+
+	@FXML
+	private CheckMenuItem presentationModeMenuItem;
 
 	@FXML
 	private MenuItem filterTaxaMenuItem;
@@ -219,6 +223,9 @@ public class MainWindowController {
 
 	@FXML
 	private MenuItem filterSplitsMenuItem;
+
+	@FXML
+	private MenuItem splitsSliderMenuItem;
 
 	@FXML
 	private MenuItem traitsMenuItem;
@@ -331,6 +338,9 @@ public class MainWindowController {
 
 	@FXML
 	private MenuItem euclideanMenuItem;
+
+	@FXML
+	private MenuItem tsneMenuItem;
 
 	@FXML
 	private MenuItem bootStrapTreeMenuItem;
@@ -698,6 +708,10 @@ public class MainWindowController {
 		return useFullScreenMenuItem;
 	}
 
+	public CheckMenuItem getPresentationModeMenuItem() {
+		return presentationModeMenuItem;
+	}
+
 	public MenuItem getFilterTaxaMenuItem() {
 		return filterTaxaMenuItem;
 	}
@@ -712,6 +726,10 @@ public class MainWindowController {
 
 	public MenuItem getFilterSplitsMenuItem() {
 		return filterSplitsMenuItem;
+	}
+
+	public MenuItem getSplitsSliderMenuItem() {
+		return splitsSliderMenuItem;
 	}
 
 	public MenuItem getTraitsMenuItem() {
@@ -862,6 +880,10 @@ public class MainWindowController {
 
 	public MenuItem getEuclideanMenuItem() {
 		return euclideanMenuItem;
+	}
+
+	public MenuItem getTsneMenuItem() {
+		return tsneMenuItem;
 	}
 
 	public MenuItem getBootStrapTreeMenuItem() {
