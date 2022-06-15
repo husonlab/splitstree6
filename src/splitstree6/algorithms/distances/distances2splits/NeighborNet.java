@@ -40,7 +40,7 @@ import java.util.List;
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4}
+	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot}
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.FastMethod);
 
@@ -82,16 +82,21 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		params.tolerance =1e-6;
 		if (getOptionInferenceAlgorithm()==InferenceAlgorithm.FastMethod) {
 			params.greedy=true;
-			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.PROJ_GRAD;
+			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.GRADPROJECTION;
 			params.collapseMultiple = false;
 			int n = cycle.length - 1; //ntax
 			params.cgIterations = Math.min(Math.max(n,10),20);
 		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.CarefulMethod) {
 			params.greedy = false;
-			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.PROJ_GRAD;
+			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.GRADPROJECTION;
 			params.collapseMultiple = false;
 			int n = cycle.length - 1; //ntax
 			params.outerIterations = n*(n-1)/2;
+		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.ProjectedGradient) {
+			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.PROJECTEDGRAD;
+		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.BlockPivot) {
+				params.cgIterations = Math.max(cycle.length,10);
+				params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.BLOCKPIVOT;
 		} else {//ST4 version
 			params.greedy = false;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
@@ -122,22 +127,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		}
 	}
 
-	/**
-	 * Compute the average distance in the distances block, used to pick an appropriately scaled tolerance level.
-	 * @param dist  distances block
-	 * @return  average distance between taxa
-	 */
-	private double averageDistance(DistancesBlock dist) {
-		double total = 0.0;
-		for(int i=1;i<=dist.getNtax();i++) {
-			double rowSum = 0.0;
-
-			for (int j = 1; j < i; j++)
-				rowSum += dist.get(i, j);
-			total += rowSum;
-		}
-		return total / (dist.getNtax()*(dist.getNtax()-1)/2.0);
-	}
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, DistancesBlock parent) {

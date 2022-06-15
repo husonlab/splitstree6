@@ -6,6 +6,7 @@ import java.util.Arrays;
 
 public class NeighborNetSplitstree4 {
 
+    private static final double CG_EPSILON = 0.0001;
 
     static public void activeSetST4(double[][] xArray, double[][] distances, ProgressListener progress) throws CanceledException {
 
@@ -399,7 +400,7 @@ public class NeighborNetSplitstree4 {
         double rho = norm(r);
         double rho_old = 0;
 
-        double e_0 = 1e-7;
+        double e_0 = CG_EPSILON * Math.sqrt(norm(b)); //e_0 = 1e-7;
         int k = 0;
 
         while ((rho > e_0 * e_0) && (k < kmax)) {
