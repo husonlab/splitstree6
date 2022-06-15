@@ -76,8 +76,8 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		//Set up square array of distances
 		var d = new double[n + 1][n + 1];
 
-		applyForAllIandJ(1, n, true, (i, j) -> d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1]);
-		
+		applyForAllIandJ(service, 1, n, true, (i, j) -> d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1]);
+
 		var x = new double[n + 1][n + 1];
 
 		if (params.nnlsAlgorithm == NeighborNetSplitWeights.NNLSParams.ACTIVE_SET) {
@@ -200,7 +200,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var r = new double[n + 1][n + 1];
 		calcAx(x, r);
 
-		applyForAllIandJ(1, n, false, (i, j) -> r[i][j] = d[i][j] - r[i][j]);
+		applyForAllIandJ(service, 1, n, false, (i, j) -> r[i][j] = d[i][j] - r[i][j]);
 
 		var z = new double[n + 1][n + 1];
 		calcAtx(r, z);
@@ -214,7 +214,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		while (true) {
 			calcAx(p, w);
 			var alpha = ztz / sumArraySquared(w);
-			applyForAllIandJ(1, n,
+			applyForAllIandJ(service, 1, n,
 					false, (i, j) -> {
 						x[i][j] += alpha * p[i][j];
 						r[i][j] -= alpha * w[i][j];
@@ -231,7 +231,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 			if (ztz2 < tol || k >= maxIterations)
 				break;
 
-			applyForAllIandJ(1, n, false, (i, j) -> p[i][j] = z[i][j] + beta * p[i][j]);
+			applyForAllIandJ(service, 1, n, false, (i, j) -> p[i][j] = z[i][j] + beta * p[i][j]);
 			ztz = ztz2;
 			k++;
 		}
@@ -275,7 +275,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 			threshold = vals[numNeg - numToKeep];
 		//Make active all entries with weight strictly less than the threshold.
 
-		applyForAllIandJ(1, n, true, (i, j) -> {
+		applyForAllIandJ(service, 1, n, true, (i, j) -> {
 			if (!activeSet[i][j] && x[i][j] < threshold) {
 				activeSet[i][j] = true;
 				activeSet[j][i] = true;
@@ -299,7 +299,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 			var n = x.length - 1;
 			var fx = new DoubleAdder();
 
-			applyForAllIandJ(1, n, false, (i, j) -> {
+			applyForAllIandJ(service, 1, n, false, (i, j) -> {
 				var res_ij = Axt[i][j] - d[i][j];
 				fx.add(res_ij * res_ij);
 			});
@@ -307,12 +307,12 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		}
 
 		public double evalfprojected(double t, double[][] x0, double[][] x, double[][] d) throws InterruptedException {
-			applyForAllIandJ(1, x.length - 1, true, (i, j) -> xt[i][j] = xt[j][i] = max(x0[i][j] * (1 - t) + x[i][j] * t, 0.0));
+			applyForAllIandJ(service, 1, x.length - 1, true, (i, j) -> xt[i][j] = xt[j][i] = max(x0[i][j] * (1 - t) + x[i][j] * t, 0.0));
 			return evalf(xt, d);
 		}
 
 		public double evalfprojected(double[][] x, double[][] d) throws InterruptedException {
-			applyForAllIandJ(1, x.length - 1, false, (i, j) -> xt[i][j] = xt[j][i] = max(x[i][j], 0.0));
+			applyForAllIandJ(service, 1, x.length - 1, false, (i, j) -> xt[i][j] = xt[j][i] = max(x[i][j], 0.0));
 			return evalf(xt, d);
 		}
 
@@ -362,7 +362,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		}
 		var tmin = tmin0;
 
-		applyForAllIandJ(1, x.length - 1, true, (i, j) -> {
+		applyForAllIandJ(service, 1, x.length - 1, true, (i, j) -> {
 			double newx_ij = max((1 - tmin) * x0[i][j] + tmin * x[i][j], 0);
 			x[i][j] = x[j][i] = newx_ij;
 		});
@@ -381,14 +381,14 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		final var tmin = new DoubleAccumulator(Math::min, 1.0);
 		int n = x.length - 1;
 
-		applyForAllIandJ(1, n, false,
+		applyForAllIandJ(service, 1, n, false,
 				(i, j) -> {
 					if (x[i][j] < 0) {
 						tmin.accumulate(x0[i][j] / (x0[i][j] - x[i][j]));
 					}
 				});
 
-		applyForAllIandJ(1, n, true,
+		applyForAllIandJ(service, 1, n, true,
 				(i, j) -> {
 					var x_ij = (1.0 - tmin.doubleValue()) * x0[i][j] + tmin.doubleValue() * x[i][j];
 					if (x_ij < tolerance)
@@ -425,20 +425,15 @@ public class NeighborNetSplitWeights_MultiThreaded {
 			d[i + 2][i] = d[i][i + 2] = d[i][i + 1] + d[i + 1][i + 2] - 2 * x[i + 1][i + 2];
 		}
 
-		{
-			var latch = new CountDownLatch(n - 3);
-			for (var k0 = 3; k0 <= n - 1; k0++) {
-				final var k = k0;
-				service.submit(() -> {
-					for (var i = 1; i <= n - k; i++) {
-						var j = i + k;
-						d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
-					}
-					latch.countDown();
-				});
+		if (true) {
+			for (int k = 3; k <= n - 1; k++) {
+				for (int i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but not easy, due to order dependencies
+					int j = i + k;
+					d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
+				}
 			}
-			latch.await();
 		}
+
 		//       return d;
 	}
 
@@ -452,7 +447,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 	 * @param to   end index
 	 * @return \sum_{i=from}^to v(i)
 	 */
-	private double sumSubvector(double[] v, int from, int to) {
+	private static double sumSubvector(double[] v, int from, int to) {
 		var s = 0.0;
 		for (var i = from; i <= to; i++)
 			s += v[i];
@@ -471,41 +466,17 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var n = x.length - 1;
 		//double[][] p = new double[n+1][n+1];
 
-		{
-			var latch = new CountDownLatch(n - 1);
-			for (var i0 = 1; i0 <= n - 1; i0++) {
-				var i = i0;
-				service.submit(() -> {
-					p[i + 1][i] = p[i][i + 1] = sumSubvector(x[i], 1, n);
-					latch.countDown();
-				});
-			}
-			latch.await();
-		}
-		{
-			var latch = new CountDownLatch(n - 2);
-			for (var i0 = 1; i0 <= n - 2; i0++) {
-				var i = i0;
-				service.submit(() -> {
-					p[i + 2][i] = p[i][i + 2] = p[i][i + 1] + p[i + 1][i + 2] - 2 * x[i][i + 1];
-					latch.countDown();
-				});
-			}
-			latch.await();
+		for (int i = 1; i <= n - 1; i++)
+			p[i + 1][i] = p[i][i + 1] = sumSubvector(x[i], 1, n);
+
+		for (int i = 1; i <= n - 2; i++) {  //TODO This can be threaded
+			p[i + 2][i] = p[i][i + 2] = p[i][i + 1] + p[i + 1][i + 2] - 2 * x[i][i + 1];
 		}
 
-		{
-			var latch = new CountDownLatch(n - 3);
-			for (var k0 = 3; k0 <= n - 1; k0++) {
-				var k = k0;
-				service.submit(() -> {
-					for (var i = 1; i <= n - k; i++) {
-						p[i + k][i] = p[i][i + k] = p[i][i + k - 1] + p[i + 1][i + k] - p[i + 1][i + k - 1] - 2 * x[i][i + k - 1];
-					}
-					latch.countDown();
-				});
+		for (int k = 3; k <= n - 1; k++) {
+			for (int i = 1; i <= n - k; i++) { //TODO. This inner loop can be threaded
+				p[i + k][i] = p[i][i + k] = p[i][i + k - 1] + p[i + 1][i + k] - p[i + 1][i + k - 1] - 2 * x[i][i + k - 1];
 			}
-			latch.await();
 		}
 		//return p;
 	}
@@ -584,7 +555,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		if (params.nnlsAlgorithm == NeighborNetSplitWeights.NNLSParams.ACTIVE_SET) {
 			activeSet[min_i][min_j] = activeSet[min_i][min_j] = false;
 		} else {
-			applyForAllIandJ(1, n, true, (i, j) -> {
+			applyForAllIandJ(service, 1, n, true, (i, j) -> {
 				if (activeSet[i][j] && gradient[i][j] < -params.kktBound) {
 					activeSet[i][j] = activeSet[j][i] = false;
 				}
@@ -605,7 +576,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var n = x.length - 1;
 		var res = new double[n + 1][n + 1];
 		calcAx(x, res);
-		applyForAllIandJ(1, n, false, (i, j) -> res[i][j] -= d[i][j]);
+		applyForAllIandJ(service, 1, n, false, (i, j) -> res[i][j] -= d[i][j]);
 		calcAtx(res, gradient);
 	}
 
@@ -619,7 +590,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		while (true) {
 			evalGradient(x, d, grad);
 			System.err.println("\t" + f_old + "\t" + projGradNorm(x, d));
-			applyForAllIandJ(1, n, true, (i, j) -> x[i][j] = x[j][i] = max(x[i][j] - (1.0 / L) * grad[i][j], 0.0));
+			applyForAllIandJ(service, 1, n, true, (i, j) -> x[i][j] = x[j][i] = max(x[i][j] - (1.0 / L) * grad[i][j], 0.0));
 
 			var f_new = f.evalf(x, d);
 			if (f_old - f_new < params.tolerance) {
@@ -658,12 +629,12 @@ public class NeighborNetSplitWeights_MultiThreaded {
 			//noinspection SuspiciousNameCombination
 			evalGradient(y, d, grad);
 
-			applyForAllIandJ(1, n, true, (i, j) -> x[i][j] = x[j][i] = max(y[i][j] - (1.0 / L) * grad[i][j], 0.0));
+			applyForAllIandJ(service, 1, n, true, (i, j) -> x[i][j] = x[j][i] = max(y[i][j] - (1.0 / L) * grad[i][j], 0.0));
 
 			var f_new = f.evalf(x, d);
 			if (f_new > f_old) {
 				evalGradient(x_old, d, grad);
-				applyForAllIandJ(1, n, true,
+				applyForAllIandJ(service, 1, n, true,
 						(i, j) ->
 						{
 							x[i][j] = x[j][i] = max(x_old[i][j] - (1.0 / L) * grad[i][j], 0.0);
@@ -680,7 +651,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 				alpha = 0.5 * sqrt(a2 * a2 + 4 * a2) - a2;
 				var beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
 
-				applyForAllIandJ(1, n, true, (i, j) -> y[i][j] = y[j][i] = x[i][j] + beta * (x[i][j] - x_old[i][j]));
+				applyForAllIandJ(service, 1, n, true, (i, j) -> y[i][j] = y[j][i] = x[i][j] + beta * (x[i][j] - x_old[i][j]));
 			}
 			alpha_old = alpha;
 			f_old = f_new;
@@ -708,7 +679,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 
 		var sumOfSquares = new DoubleAccumulator((a, b) -> a + b * b, 0);
 
-		applyForAllIandJ(1, n, false,
+		applyForAllIandJ(service, 1, n, false,
 				(i, j) -> {
 					if (x[i][j] == 0)
 						grad[i][j] = min(grad[i][j], 0.0);
@@ -744,11 +715,11 @@ public class NeighborNetSplitWeights_MultiThreaded {
 			if (numBad < N) {
 				N = numBad;
 				p = 3;
-				applyForAllIandJ(1, n, true, (i, j) -> G[i][j] = G[j][i] = (G[i][j] ^ infeasible[i][j]));  //XOR. flip G if infeasible true.
+				applyForAllIandJ(service, 1, n, true, (i, j) -> G[i][j] = G[j][i] = (G[i][j] ^ infeasible[i][j]));  //XOR. flip G if infeasible true.
 			} else {
 				if (p > 0) {
 					p--;
-					applyForAllIandJ(1, n, true, (i, j) -> G[i][j] = G[j][i] = (G[i][j] ^ infeasible[i][j]));  //XOR. flip G if infeasible true.
+					applyForAllIandJ(service, 1, n, true, (i, j) -> G[i][j] = G[j][i] = (G[i][j] ^ infeasible[i][j]));  //XOR. flip G if infeasible true.
 				} else {
 
 					var done = false;
@@ -766,7 +737,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 			System.err.println("\t\tconverged = " + converged + "\t||grad|| after CG" + debugLS(x, d, G));
 			progress.checkForCancel();
 
-			applyForAllIandJ(1, n, true,
+			applyForAllIandJ(service, 1, n, true,
 					(i, j) -> {
 						if (abs(x[i][j]) < cutoff)
 							x[i][j] = x[j][i] = 0.0;
@@ -780,7 +751,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var count = new LongAdder();
 		var n = x.length - 1;
 
-		applyForAllIandJ(1, n, true,
+		applyForAllIandJ(service, 1, n, true,
 				(i, j) -> {
 					if ((!G[i][j] && x[i][j] < 0) || (G[i][j] && y[i][j] < 0)) {
 						count.increment();
@@ -806,7 +777,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 
 		var maxAbs = new DoubleAccumulator(Math::max, 0.0);
 
-		applyForAllIandJ(1, n, true,
+		applyForAllIandJ(service, 1, n, true,
 				(i, j) -> {
 					if (!G[i][j])
 						maxAbs.accumulate(Math.abs(grad[i][j]));
@@ -818,7 +789,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 	private double testIncremental(int n) throws InterruptedException {
 		var x = new double[n + 1][n + 1];
 
-		applyForAllIandJ(1, n, true,
+		applyForAllIandJ(service, 1, n, true,
 				(i, j) -> {
 					if (Math.random() < 0.2)
 						x[i][j] = x[j][i] = random();
@@ -834,7 +805,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var nfalseZero = new LongAdder();
 		var nneg = new LongAdder();
 
-		applyForAllIandJ(1, n, true,
+		applyForAllIandJ(service, 1, n, true,
 				(i, j) -> {
 					diff.accumulate(abs(x[i][j] - x2[i][j]));
 					if (x[i][j] < 0)
@@ -858,7 +829,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 	 * @param onlyForJLargerThanI if true, start with j=i+1, otherwise, start with j=minInclusive
 	 * @param calculation         the calculation to be performed
 	 */
-	private void applyForAllIandJ(int minInclusive, int maxInclusive, boolean onlyForJLargerThanI, BiConsumer<Integer, Integer> calculation) throws InterruptedException {
+	private void applyForAllIandJ(ExecutorService service, int minInclusive, int maxInclusive, boolean onlyForJLargerThanI, BiConsumer<Integer, Integer> calculation) throws InterruptedException {
 		var latch = new CountDownLatch(maxInclusive - minInclusive + 1);
 		for (var i0 = minInclusive; i0 <= maxInclusive; i0++) {
 			var i = i0;
@@ -868,7 +839,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 				}
 				latch.countDown();
 			});
-		}
-		latch.await();
+			}
+			latch.await();
 	}
 }
