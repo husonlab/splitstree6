@@ -2,7 +2,7 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import java.util.Arrays;
 
-import static java.lang.Math.*;
+import static java.lang.Math.min;
 
 /** A collection of utility routines for handling 2D symmetric arrays.
  * In all of these routines, rows and columns with index 0 are ignored (for consistency with Matlab)
@@ -141,14 +141,12 @@ public class SquareArrays {
      * @return double, sum of squares
      */
     static public double sumSquares(double[][] x) {
-        int n = x.length-1;
-        double si = 0.0, total=0.0;
+        int n = x.length - 1;
+        var total = 0.0;
         for(int i=1;i<=n;i++) {
-            si = 0.0;
             for(int j=i+1;j<=n;j++) {
-                si += x[i][j]*x[i][j];
+                total += x[i][j] * x[i][j];
             }
-            total+=si;
         }
         return 2.0*total;
     }

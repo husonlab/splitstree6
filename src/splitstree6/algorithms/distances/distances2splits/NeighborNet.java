@@ -26,6 +26,7 @@ import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights_MultiThreaded;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
@@ -73,11 +74,9 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		progress.setTasks("NNet", "split weight optimization");
 
-		final ArrayList<ASplit> splits;
-
 		final var start = System.currentTimeMillis();
 
-		NeighborNetSplitWeights.NNLSParams params = new NeighborNetSplitWeights.NNLSParams(taxaBlock.getNtax());
+		var params = new NeighborNetSplitWeights.NNLSParams(taxaBlock.getNtax());
 
 		params.tolerance =1e-6;
 		if (getOptionInferenceAlgorithm()==InferenceAlgorithm.FastMethod) {
@@ -101,13 +100,18 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.greedy = false;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
 			int n = cycle.length - 1;
-			params.outerIterations = n*(n-1)/2;
+			params.outerIterations = n * (n - 1) / 2;
 			params.collapseMultiple = true;
 			params.fractionNegativeToKeep = 0.4;
 			params.useInsertionAlgorithm = false;
 		}
 
-		splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
+		ArrayList<ASplit> splits;
+		if (true)
+			splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
+		else
+			splits = NeighborNetSplitWeights_MultiThreaded.compute(cycle, distancesBlock.getDistances(), params, progress);
+
 
 		progress.setTasks("NNet", "post-analysis");
 
