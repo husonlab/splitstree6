@@ -41,7 +41,6 @@ public class AlgorithmTabsManager {
 	public AlgorithmTabsManager(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 		Workflow workflow = mainWindow.getWorkflow();
-
 		tabPane = mainWindow.getController().getAlgorithmTabPane();
 
 		workflow.nodes().addListener((ListChangeListener<? super WorkflowNode>) e -> {

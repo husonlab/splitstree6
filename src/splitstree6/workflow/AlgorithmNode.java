@@ -63,24 +63,6 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 		return null;
 	}
 
-	/**
-	 * a filter requires a second taxon block
-	 *
-	 * @return second taxon block, containing a subset of taxa
-	 */
-	public TaxaBlock getSecondTaxaBlock() {
-		var foundFirst = false;
-		for (var parent : getParents()) {
-			if (parent instanceof DataNode dataNode && dataNode.getDataBlock() instanceof TaxaBlock taxaBlock) {
-				if (!foundFirst)
-					foundFirst = true;
-				else
-					return taxaBlock;
-			}
-		}
-		return null;
-	}
-
 	public S getSourceBlock() {
 		for (var parent : getParents()) {
 			if (parent instanceof DataNode dataNode
@@ -91,7 +73,6 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 		}
 		return null;
 	}
-
 
 	public DataNode<T> getTargetNode() {
 		for (var child : getChildren()) {
@@ -130,5 +111,12 @@ public class AlgorithmNode<S extends DataBlock, T extends DataBlock> extends jlo
 
 	public String toString() {
 		return getTitle();
+	}
+
+	@Override
+	public void restart() {
+		if (getAlgorithm().getNode() == null)
+			getAlgorithm().setNode(this);
+		super.restart();
 	}
 }

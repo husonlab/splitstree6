@@ -61,7 +61,7 @@ public class TreePagesView implements IView {
 	private final IntegerProperty optionRows = new SimpleIntegerProperty(this, "optionRows", ProgramProperties.get("TreePagesRows", 1));
 	private final IntegerProperty optionCols = new SimpleIntegerProperty(this, "optionCols", ProgramProperties.get("TreePagesCols", 1));
 
-	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
+	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeDiagramType.RectangularPhylogram);
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
 
@@ -79,7 +79,6 @@ public class TreePagesView implements IView {
 	{
 		ProgramProperties.track(optionRows, 1);
 		ProgramProperties.track(optionCols, 1);
-		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RectangularPhylogram);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);

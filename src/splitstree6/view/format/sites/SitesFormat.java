@@ -153,12 +153,13 @@ public class SitesFormat extends Group {
 									point = GeometryUtilsFX.translateByAngle(point, angle, gapBetweenHatches);
 									var left = GeometryUtilsFX.translateByAngle(point, angle + 90, 5);
 									var right = GeometryUtilsFX.translateByAngle(point, angle + 270, 5);
-									if (sitesStyle == SitesStyle.Hatches) {
+									{
 										var hatch = new Line(left.getX(), left.getY(), right.getX(), right.getY());
 										hatch.setStroke(Color.BLACK);
 										hatch.getStyleClass().add("graph-edge");
 										getChildren().add(hatch);
-									} else /* if(sitesStyle==SitesStyle.Labels) */ {
+									}
+									if (sitesStyle == SitesStyle.Labels) {
 										var text = new CopyableLabel(labels[i]);
 										text.setTranslateX(right.getX());
 										text.setTranslateY(right.getY());

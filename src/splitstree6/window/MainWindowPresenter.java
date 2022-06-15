@@ -506,7 +506,7 @@ public class MainWindowPresenter {
 		controller.getMinSpanningNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningNetwork()));
 		controller.getMinSpanningNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MinSpanningNetwork()));
 
-		controller.getHybridizationNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new AutumnAlgorithm()));
+		controller.getHybridizationNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new AutumnAlgorithm(), null, a -> ((ShowTrees) a).setOptionView(ShowTrees.ViewType.TreePages)));
 		controller.getHybridizationNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new AutumnAlgorithm()));
 
 		controller.getSplitsNetworkViewMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowSplits(), a -> ((ShowSplits) a).setOptionView(ShowSplits.ViewType.SplitsNetwork)));

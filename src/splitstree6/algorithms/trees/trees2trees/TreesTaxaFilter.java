@@ -37,9 +37,9 @@ public class TreesTaxaFilter extends DataTaxaFilter<TreesBlock, TreesBlock> {
 
 	@Override
 	public void filter(ProgressListener progress, TaxaBlock originalTaxaBlock, TaxaBlock modifiedTaxaBlock, TreesBlock inputData, TreesBlock outputData) throws IOException {
-		if (originalTaxaBlock.getTaxa().equals(modifiedTaxaBlock.getTaxa())) {
+		if (modifiedTaxaBlock == null || originalTaxaBlock.getTaxa().equals(modifiedTaxaBlock.getTaxa())) {
 			outputData.copy(inputData);
-			setShortDescription("using all " + modifiedTaxaBlock.size() + " taxa");
+			setShortDescription("using all " + originalTaxaBlock.size() + " taxa");
 		} else {
 			final int[] oldTaxonId2NewTaxonId = new int[originalTaxaBlock.getNtax() + 1];
 			for (int t = 1; t <= originalTaxaBlock.getNtax(); t++) {

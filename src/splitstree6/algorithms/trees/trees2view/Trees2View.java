@@ -19,11 +19,12 @@
 
 package splitstree6.algorithms.trees.trees2view;
 
+import splitstree6.data.IViewChoice;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.workflow.Algorithm;
 
-public abstract class Trees2View extends Algorithm<TreesBlock, ViewBlock> {
+public abstract class Trees2View extends Algorithm<TreesBlock, ViewBlock> implements IViewChoice {
 	public Trees2View() {
 		super(TreesBlock.class, ViewBlock.class);
 	}

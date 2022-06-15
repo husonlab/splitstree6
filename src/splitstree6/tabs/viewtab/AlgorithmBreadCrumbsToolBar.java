@@ -19,21 +19,24 @@
 
 package splitstree6.tabs.viewtab;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.ToolBar;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.workflow.WorkflowNode;
+import jloda.util.PluginClassLoader;
+import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
 
 import java.util.ArrayList;
@@ -58,8 +61,10 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
 	 */
     public AlgorithmBreadCrumbsToolBar(MainWindow mainWindow, WorkflowNode node) {
         invalidationListener = e -> {
+            stateChangeListeners.clear();
             final Workflow workflow = mainWindow.getWorkflow();
             getItems().clear();
+
             var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
             if (editorTab != null) {
                 getItems().add(makeInputTabBreadCrumb(mainWindow));
@@ -70,8 +75,11 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
             }
             if (workflow.getWorkingTaxaNode() != null) {
                 var algorithmNodes = getAlgorithmNodesPath(workflow, node);
+
                 for (var aNode : algorithmNodes) {
-                    getItems().add(makeBreadCrumb(mainWindow, aNode, stateChangeListeners));
+                    if (!(aNode.getAlgorithm() instanceof DataTaxaFilter)) {
+                        getItems().add(makeBreadCrumb(mainWindow, aNode, stateChangeListeners));
+                    }
                 }
             }
         };
@@ -79,7 +87,16 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
         mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
     }
 
-    public List<AlgorithmNode> getAlgorithmNodesPath(Workflow workflow, WorkflowNode node) {
+    public List<AlgorithmNode> getAlgorithmNodesPath(Workflow workflow, WorkflowNode node0) {
+        // todo: node is not necessarily present in the workflow (don't know why...), but there is an equivalent node with the same id
+        var node = workflow.nodeStream().filter(v -> v.getId() == node0.getId()).findAny().orElse(node0);
+        for (var v : workflow.nodes()) {
+            if (v.getId() == node.getId()) {
+                node = v;
+                break;
+            }
+        }
+
         var list = new LinkedList<AlgorithmNode>();
         while (node != null && workflow.isDerivedNode(node)) {
             if (node instanceof AlgorithmNode algorithmNode) {
@@ -94,6 +111,7 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
         final var button = new Button();
         button.setStyle(shape);
         button.textProperty().bind(algorithmNode.titleProperty());
+
         button.disableProperty().bind(algorithmNode.validProperty().not());
         final var tooltip = new Tooltip();
         tooltip.textProperty().bind(algorithmNode.shortDescriptionProperty());
@@ -101,6 +119,16 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
 
         final var imageView = ResourceManagerFX.getIconAsImageView(algorithmNode.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16);
         button.setGraphic(imageView);
+
+        final Runnable showTab = () -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
+
+        button.setOnAction(e -> showTab.run());
+
+        if (algorithmNode.getAlgorithm() instanceof ShowTrees showTrees) {
+            button.setOnContextMenuRequested(e -> createViewChoiceMenu(mainWindow.getWorkflow(), algorithmNode, showTrees).show(button, e.getScreenX(), e.getScreenY()));
+        } else if (mainWindow.getWorkflow().isDerivedNode(algorithmNode)) {
+            button.setOnContextMenuRequested(e -> createViewChoiceMenu(mainWindow.getWorkflow(), algorithmNode, showTab).show(button, e.getScreenX(), e.getScreenY()));
+        }
 
         final ChangeListener<Worker.State> stateChangeListener = (c, o, n) -> {
             switch (n) {
@@ -121,7 +149,6 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
         algorithmNode.getService().stateProperty().addListener(new WeakChangeListener<>(stateChangeListener));
         stateChangeListeners.add(stateChangeListener);
 
-        button.setOnAction((e) -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true));
         return button;
     }
 
@@ -138,4 +165,41 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
         });
         return button;
     }
+
+    public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode, ShowTrees showTrees) {
+        var menu = new ContextMenu();
+        for (var viewType : ShowTrees.ViewType.values()) {
+            var menuItem = new MenuItem(viewType.name());
+            menuItem.setOnAction(e -> {
+                if (!workflow.isRunning()) {
+                    showTrees.setOptionView(viewType);
+                    algorithmNode.restart();
+                }
+            });
+            menu.getItems().add(menuItem);
+        }
+        return menu;
+    }
+
+    public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode0, Runnable runlater) {
+        var menu = new ContextMenu();
+        for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+            if (algorithm.getFromClass() == algorithmNode0.getAlgorithm().getFromClass()
+                && algorithm.getToClass() == algorithmNode0.getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter)) {
+                var menuItem = new MenuItem(algorithm.getName());
+                menuItem.setOnAction(e -> {
+                    var algorithmNode = (AlgorithmNode) workflow.nodeStream().filter(v -> v.getId() == algorithmNode0.getId()).findAny().orElse(algorithmNode0);
+                    algorithmNode.setAlgorithm(algorithm);
+                    algorithmNode.setTitle(algorithm.getName());
+                    algorithmNode.restart();
+                    if (runlater != null)
+                        Platform.runLater(runlater);
+                });
+                menu.getItems().add(menuItem);
+                menuItem.setDisable(!algorithm.isApplicable(algorithmNode0.getTaxaBlock(), algorithmNode0.getSourceBlock()));
+            }
+        }
+        return menu;
+    }
+
 }

@@ -81,7 +81,7 @@ public class TreeView implements IView {
 	private final IntegerProperty optionTree = new SimpleIntegerProperty(this, "optionTree", 0); // 1-based
 	private final ObjectProperty<PhyloTree> tree = new SimpleObjectProperty<>(this, "tree");
 
-	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
+	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeDiagramType.RectangularPhylogram);
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
@@ -105,7 +105,6 @@ public class TreeView implements IView {
 
 	// create properties:
 	{
-		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RadialPhylogram);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);

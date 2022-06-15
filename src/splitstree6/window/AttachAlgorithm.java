@@ -53,7 +53,7 @@ public class AttachAlgorithm {
 	 * @param algorithm  object to show which type of algorithm is desired, this object is not used if algorithm found in workflow
 	 */
 	public static void apply(MainWindow mainWindow, Algorithm algorithm) {
-		apply(mainWindow, algorithm, null);
+		apply(mainWindow, algorithm, null, null);
 	}
 
 	/**
@@ -64,6 +64,17 @@ public class AttachAlgorithm {
 	 * @param algorithmSetupCallback - select options if algorithm found
 	 */
 	public static void apply(MainWindow mainWindow, Algorithm algorithm, Consumer<Algorithm> algorithmSetupCallback) {
+		apply(mainWindow, algorithm, algorithmSetupCallback, null);
+	}
+
+	/**
+	 * attaches an algorithm, first find, select or choose the node and then call the callback
+	 *
+	 * @param mainWindow             main window
+	 * @param algorithm              object to show which type of algorithm is desired, this object is not used if algorithm found in workflow
+	 * @param algorithmSetupCallback - select options if algorithm found
+	 */
+	public static void apply(MainWindow mainWindow, Algorithm algorithm, Consumer<Algorithm> algorithmSetupCallback, Consumer<Algorithm> targetSetupCallback) {
 		var workflow = mainWindow.getWorkflow();
 		var algorithmNode = AttachAlgorithm.findSelectOrCreateAlgorithmNode(mainWindow.getWorkflow(), algorithm);
 		if (algorithmNode != null) {
@@ -76,19 +87,25 @@ public class AttachAlgorithm {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				if (targetDataNode.getPreferredChild() == null) {
 					var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-					workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+					var targetAlgorithmNode = workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+					if (targetSetupCallback != null)
+						targetSetupCallback.accept(targetAlgorithmNode.getAlgorithm());
 				}
 			} else if (algorithm.getToClass() == TreesBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				if (targetDataNode.getPreferredChild() == null) {
 					var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-					workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+					var targetAlgorithmNode = workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+					if (targetSetupCallback != null)
+						targetSetupCallback.accept(targetAlgorithmNode.getAlgorithm());
 				}
 			} else if (algorithm.getToClass() == NetworkBlock.class) {
 				var targetDataNode = (DataNode) algorithmNode.getPreferredChild();
 				if (targetDataNode.getPreferredChild() == null) {
 					var targetDataNode2 = workflow.newDataNode(new ViewBlock());
-					workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+					var targetAlgorithmNode = workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+					if (targetSetupCallback != null)
+						targetSetupCallback.accept(targetAlgorithmNode.getAlgorithm());
 				}
 			}
 			if (algorithm.isApplicable(workflow.getWorkingTaxaBlock(), algorithmNode.getPreferredParent().getDataBlock()))

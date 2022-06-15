@@ -49,13 +49,13 @@ public class ViewBlock extends DataBlock {
 	@Override
 	public void setNode(DataNode node) {
 		super.setNode(node);
-		if (node.getOwner() != null) {
-			var mainWindow = ((Workflow) node.getOwner()).getMainWindow();
+		if (getNode().getOwner() != null) {
+			var mainWindow = ((Workflow) getNode().getOwner()).getMainWindow();
 			if (viewTab == null)
-				Platform.runLater(() -> viewTab = new ViewTab(mainWindow, node, false));
+				Platform.runLater(() -> viewTab = new ViewTab(mainWindow, getNode(), false));
 
 			invalidationListener = e -> {
-				if (node.getParents().size() == 0) { // have removed the node from the workflow
+				if (getNode().getParents().size() == 0) { // have removed the node from the workflow
 					if (viewTab != null)
 						mainWindow.removeTabFromMainTabPane(viewTab);
 				} else { // have added the node to the workflow, e.g. after undo delete
@@ -63,7 +63,7 @@ public class ViewBlock extends DataBlock {
 					if (view != null) {
 						if (viewTab != null)
 							mainWindow.removeTabFromMainTabPane(viewTab);
-						viewTab = new ViewTab(mainWindow, node, false);
+						viewTab = new ViewTab(mainWindow, getNode(), false);
 						mainWindow.addTabToMainTabPane(viewTab);
 						viewTab.setView(view);
 					}

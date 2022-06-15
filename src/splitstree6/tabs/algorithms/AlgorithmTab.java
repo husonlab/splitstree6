@@ -19,7 +19,9 @@
 
 package splitstree6.tabs.algorithms;
 
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import jloda.fx.undo.UndoManager;
@@ -30,7 +32,11 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataTaxaFilter;
 
+/**
+ * algorithm tab, Daniel Huson, 2021
+ */
 public class AlgorithmTab extends Tab implements IDisplayTab {
 	private final MainWindow mainWindow;
 	private final AlgorithmTabController controller;
@@ -38,10 +44,12 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 	private final UndoManager undoManager = new UndoManager();
 
 	private final AlgorithmNode algorithmNode;
+	private final ObjectProperty<Algorithm> algorithm = new SimpleObjectProperty<>(this, "algorithm");
 
 	public AlgorithmTab(MainWindow mainWindow, AlgorithmNode algorithmNode) {
 		this.mainWindow = mainWindow;
 		this.algorithmNode = algorithmNode;
+		this.algorithm.set(algorithmNode.getAlgorithm());
 
 		var loader = new ExtendedFXMLLoader<AlgorithmTabController>(AlgorithmTab.class);
 		controller = loader.getController();
@@ -51,17 +59,27 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 		presenter = new AlgorithmTabPresenter(mainWindow, this);
 
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (algorithm.getFromClass() == algorithmNode.getAlgorithm().getFromClass()
-				&& algorithm.getToClass() == algorithmNode.getAlgorithm().getToClass())
+			if (algorithm.getFromClass() == getAlgorithm().getFromClass()
+				&& algorithm.getToClass() == getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter))
 				controller.getAlgorithmCBox().getItems().add(algorithm);
 		}
-
-		controller.getAlgorithmCBox().setValue(algorithmNode.getAlgorithm());
+		controller.getAlgorithmCBox().setValue(getAlgorithm());
 	}
-
 
 	public AlgorithmNode getAlgorithmNode() {
 		return algorithmNode;
+	}
+
+	public Algorithm getAlgorithm() {
+		return algorithm.get();
+	}
+
+	public void setAlgorithm(Algorithm algorithm) {
+		this.algorithm.set(algorithm);
+	}
+
+	public ObjectProperty<Algorithm> algorithmProperty() {
+		return algorithm;
 	}
 
 	@Override

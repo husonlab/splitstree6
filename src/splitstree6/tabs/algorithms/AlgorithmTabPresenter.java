@@ -52,17 +52,17 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 
 	public AlgorithmTabPresenter(MainWindow mainWindow, AlgorithmTab algorithmTab) {
 		var controller = algorithmTab.getController();
-		var algorithmNode = algorithmTab.getAlgorithmNode();
 
 		var runningProperty = mainWindow.getWorkflow().runningProperty();
 
 		controller.getApplyButton().setOnAction(e -> {
-			algorithmNode.restart();
-			algorithmNode.setTitle(algorithmNode.getAlgorithm().getName());
+			algorithmTab.getAlgorithmNode().setAlgorithm(algorithmTab.getAlgorithm());
+			algorithmTab.getAlgorithmNode().restart();
+			algorithmTab.getAlgorithmNode().setTitle(algorithmTab.getAlgorithm().getName());
 		});
-		controller.getApplyButton().disableProperty().bind(runningProperty.or(algorithmNode.allParentsValidProperty().not()));
+		controller.getApplyButton().disableProperty().bind(runningProperty.or(algorithmTab.getAlgorithmNode().allParentsValidProperty().not()));
 
-		var label = new Label(algorithmTab.getAlgorithmNode().getAlgorithm().getName());
+		var label = new Label(algorithmTab.getAlgorithm().getName());
 		algorithmTab.setGraphic(label);
 
 		controller.getMainPane().disableProperty().bind(runningProperty);
@@ -72,18 +72,20 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 
 		controller.getAlgorithmCBox().valueProperty().addListener((v, o, n) -> {
 			var algorithm = (Algorithm) n;
-			algorithmTab.getAlgorithmNode().setAlgorithm(algorithm);
+			algorithmTab.setAlgorithm(algorithm);
 			var tooltip = (algorithm == null ? null
 					: new Tooltip(algorithm.getName() + (algorithm.getCitation() == null ? "" : "\n" + StringUtils.fold(algorithm.getCitation().replaceAll(".*;", ""), 80))));
 			controller.getAlgorithmCBox().setTooltip(tooltip);
 		});
 		controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
 
-		if (algorithmTab.getAlgorithmNode().getAlgorithm() != null) {
-			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithmNode().getAlgorithm());
+		if (algorithmTab.getAlgorithm() != null) {
+			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithm());
 		}
 
-		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((v, o, n) -> {
+		algorithmTab.getAlgorithmNode().algorithmProperty().addListener((c, o, n) -> algorithmTab.setAlgorithm((Algorithm) n));
+
+		algorithmTab.algorithmProperty().addListener((v, o, n) -> {
 			if (n != null) {
 				controller.getAlgorithmCBox().setValue(n);
 				setupOptionControls(algorithmTab, controller, (Algorithm) n);

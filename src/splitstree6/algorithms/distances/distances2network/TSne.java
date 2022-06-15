@@ -81,7 +81,9 @@ public class TSne extends Distances2Network {
 
 		var perplexity = (getOptionPerplexity() <= 0 ? Double.parseDouble(StringUtils.removeTrailingZerosAfterDot("%.1f", Math.sqrt(taxaBlock.getNtax()))) : getOptionPerplexity());
 
-		var config = TSneUtils.buildConfig(distancesBlock.getDistances(), 2, taxaBlock.getNtax(), perplexity, getOptionIterations());
+		//    public static TSneConfiguration buildConfig(double[][] xin, int outputDims, int initial_dims, double perplexity, int max_iter, boolean use_pca, double theta, boolean silent, boolean printError) {
+
+		var config = TSneUtils.buildConfig(distancesBlock.getDistances(), 2, taxaBlock.getNtax(), perplexity, getOptionIterations(), true, 0.5D, true, true);
 		var points = tSne.tsne(config);
 
 		networkBlock.setNetworkType(NetworkBlock.Type.Points);
