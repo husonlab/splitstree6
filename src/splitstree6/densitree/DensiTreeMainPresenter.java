@@ -108,7 +108,14 @@ public class DensiTreeMainPresenter {
 			dialog.setHeaderText("Enter the numbers of the trees you want to be highlighted, trees start at 1.\nE.g.: 1,2,3");
 			dialog.setContentText("Trees:");
 
-			dialog.showAndWait().ifPresent(trees -> specTrees[0] = trees);
+			dialog.showAndWait().ifPresent(trees -> {
+				specTrees[0] = trees;
+				DensiTree.drawHighlightedTrees(model, controller.getConsensusPane(),
+						new DensiTree.Parameters(controller.getJitterCheckBox().isSelected(),
+								controller.getConsensusMenuItem().isSelected(), specTrees[0],
+								controller.getLabelsGroup().getSelectedToggle().toString(),
+								controller.getDrawingGroup().getSelectedToggle().toString()), controller.getCanvas(), scalingFactor);
+			});
 		});
 
 		controller.getPrintMenuItem().setOnAction(e -> {

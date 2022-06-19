@@ -56,6 +56,9 @@ public class DensiTree {
 
     public static void draw(Parameters parameters, Model model, Canvas canvas, Pane labelPane, Pane consenusPane, Pane highlightingPane, ReadOnlyDoubleProperty scalingFactor) throws IOException {
         if (model.getTreesBlock().getNTrees() > 0) {
+
+            long start = System.currentTimeMillis();
+
             var gc = canvas.getGraphicsContext2D();
             gc.setFont(Font.font("Courier New", 11));
             gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
@@ -73,7 +76,6 @@ public class DensiTree {
 
             boolean jitter = parameters.jitter;
             boolean block = false;
-            boolean rooted = false;
             String labelMethod = parameters.labelMethod;
             DrawingMethod drawingMethod = DrawingMethod.CIRCULAR;
             if (parameters.drawingMethod.contains("toscale")) {
@@ -85,7 +87,6 @@ public class DensiTree {
                 block = true;
             } else if (parameters.drawingMethod.contains("rooted")) {
                 drawingMethod = DrawingMethod.ROOTED;
-                rooted = true;
             }
 
             int nTrees = model.getTreesBlock().size();
@@ -168,6 +169,8 @@ public class DensiTree {
 
 
             gc.setStroke(Color.BLACK);
+            System.out.println("Drawing");
+            System.out.println(System.currentTimeMillis()-start);
         }
     }
 
@@ -205,7 +208,7 @@ public class DensiTree {
                 var wPt = nodePointMap.get(w);
 
                 var line = new Line(vPt.getX(), vPt.getY(), wPt.getX(), wPt.getY());
-                line.setStroke(Color.BLUE);
+                line.setStroke(Color.FUCHSIA);
                 line.setStrokeWidth(0.5);
                 consensusPane.getChildren().add(line);
             }
@@ -215,7 +218,8 @@ public class DensiTree {
     }
 
     public static void drawHighlightedTrees(Model model, Pane highlightingPane, Parameters parameters, Canvas canvas, ReadOnlyDoubleProperty scalingFactor) {
-        if (parameters.highlight!= null &&parameters.highlight.matches("(\\d,)+")) {
+        String highlight = parameters.highlight + ",";
+        if (parameters.highlight!= null &&highlight.matches("(\\d,)+")) {
             var xmin = (int) (100 * scalingFactor.get());
             var ymin = (int) (100 * scalingFactor.get());
             var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
@@ -385,7 +389,7 @@ public class DensiTree {
                 for (int i = 0; i < labels.length; i++) {
                     if (tree.getLabel(w).equals(labels[i])) {
                         int finalI = i;
-                        Arrays.sort(coords2[finalI], (a, b) -> Double.compare(a[0], b[0]));
+                        Arrays.sort(coords2[finalI], Comparator.comparingDouble(a -> a[0]));
                         ChangeListener<Number> listener = (observableValue, oldValue, newValue) -> { // use a listener because we have to wait until both width and height have been set
                             if (oldValue.doubleValue() == 0 && newValue.doubleValue() > 0 && label.getWidth() > 0 && label.getHeight() > 0) {
                                 var angle = nodeAngleMap.get(w);
