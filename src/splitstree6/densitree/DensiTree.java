@@ -71,7 +71,7 @@ public class DensiTree {
 
             var xmin = (int) (100 * scalingFactor.get());
             var ymin = (int) (100 * scalingFactor.get());
-            var xmax = (int) ((canvas.getWidth() - 200) * scalingFactor.get());
+            var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
             var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
 
             boolean jitter = parameters.jitter;
@@ -170,7 +170,7 @@ public class DensiTree {
 
             gc.setStroke(Color.BLACK);
             System.out.println("Drawing");
-            System.out.println(System.currentTimeMillis()-start);
+            System.out.println(System.currentTimeMillis() - start);
         }
     }
 
@@ -219,7 +219,8 @@ public class DensiTree {
 
     public static void drawHighlightedTrees(Model model, Pane highlightingPane, Parameters parameters, Canvas canvas, ReadOnlyDoubleProperty scalingFactor) {
         String highlight = parameters.highlight + ",";
-        if (parameters.highlight!= null &&highlight.matches("(\\d,)+")) {
+        highlight = highlight.replaceAll("\\s", "");
+        if (parameters.highlight != null && highlight.matches("(\\d+,)+")) {
             var xmin = (int) (100 * scalingFactor.get());
             var ymin = (int) (100 * scalingFactor.get());
             var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
@@ -240,7 +241,7 @@ public class DensiTree {
 
             double[] comT1 = getCenterofMass(model, parameters, canvas, scalingFactor, 1);
 
-            String[] specTrees = parameters.highlight.split(",");
+            String[] specTrees = highlight.split(",");
             for (String specTree : specTrees) {
                 int treeNum = Integer.parseInt(specTree);
                 if (treeNum > 0 && treeNum <= nTrees) {
@@ -272,7 +273,7 @@ public class DensiTree {
         }
     }
 
-    public static double[] getCenterofMass(Model model, Parameters parameters, Canvas canvas, ReadOnlyDoubleProperty scalingFactor, int treeNum){
+    public static double[] getCenterofMass(Model model, Parameters parameters, Canvas canvas, ReadOnlyDoubleProperty scalingFactor, int treeNum) {
         var xmin = (int) (100 * scalingFactor.get());
         var ymin = (int) (100 * scalingFactor.get());
         var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());

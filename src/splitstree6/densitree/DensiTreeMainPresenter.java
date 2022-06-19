@@ -247,6 +247,7 @@ public class DensiTreeMainPresenter {
 		controller.getDrawButton().disableProperty().bind(Bindings.isEmpty(model.getTreesBlock().getTrees()));
 
 		controller.getClearButton().setOnAction(e -> {
+			specTrees[0] = null;
 			DensiTree.clear(controller.getCanvas(), controller.getLabelPane(), controller.getConsensusPane(), controller.getHighlightingPane());
 		});
 	}
