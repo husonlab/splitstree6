@@ -36,9 +36,9 @@ public class PlainTextWriter extends CharactersWriterBase {
 
 	@Override
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
-		w.write("Characters\n");
+		w.write("Chars");
 		for (int i = 1; i <= taxa.getNtax(); i++)
-			w.write(taxa.getLabel(i) + "\t");
+			w.write("\t" + taxa.getLabel(i));
 		w.write("\n");
 
 		for (int j = 1; j <= characters.getNchar(); j++) {

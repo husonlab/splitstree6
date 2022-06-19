@@ -387,10 +387,10 @@ public class MainWindowPresenter {
 		controller.getUseDarkThemeMenuItem().setSelected(MainWindowManager.isUseDarkTheme());
 		controller.getUseDarkThemeMenuItem().setDisable(false);
 
-		controller.getPresentationModeMenuItem().selectedProperty().bindBidirectional(PresentationMode.presentationModeProperty());
-		controller.getPresentationModeMenuItem().setDisable(false);
+		PresentationMode.setupPresentationModeMenuItem(mainWindow, controller.getPresentationModeMenuItem());
 
 		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
+		controller.getPresentationModeMenuItem().setDisable(false);
 
 		controller.getFilterTaxaMenuItem().setOnAction(e -> {
 			var nodes = workflow.getNodes(TaxaFilter.class);

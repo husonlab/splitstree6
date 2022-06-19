@@ -36,8 +36,7 @@ public class PlainTextWriter extends SplitsWriterBase {
 
 	@Override
 	public void write(Writer w, TaxaBlock taxa, SplitsBlock splits) throws IOException {
-		w.write("Splits\n");
-		w.write("\tWeights");
+		w.write("Splits\tWeights");
 
 		for (var i = 1; i <= taxa.getNtax(); i++)
 			w.write("\t" + taxa.getLabel(i));

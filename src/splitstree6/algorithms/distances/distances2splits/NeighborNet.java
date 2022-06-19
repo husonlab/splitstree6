@@ -107,7 +107,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		}
 
 		ArrayList<ASplit> splits;
-		if (true)
+		if (false)
 			splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
 		else
 			splits = NeighborNetSplitWeights_MultiThreaded.compute(cycle, distancesBlock.getDistances(), params, progress);

@@ -74,10 +74,10 @@ public class SplitsView implements IView {
 	private final ObjectProperty<SplitsBlock> splitsBlock = new SimpleObjectProperty<>(this, "splitsBlock");
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
-	private final ObjectProperty<SplitsDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
+	private final ObjectProperty<SplitsDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", SplitsDiagramType.Splits);
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 
-	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting");
+	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting", SplitsRooting.None);
 	private final DoubleProperty optionRootAngle = new SimpleDoubleProperty(this, "optionRootAngle");
 
 	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence", true);
@@ -98,8 +98,6 @@ public class SplitsView implements IView {
 	// setup properties:
 	{
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Splits);
-		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
-		ProgramProperties.track(optionRooting, SplitsRooting::valueOf, SplitsRooting.None);
 		ProgramProperties.track(optionRootAngle, 160.0);
 		ProgramProperties.track(optionOutlineFill, Color.SILVER);
 	}

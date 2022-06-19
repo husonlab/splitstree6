@@ -9,8 +9,7 @@ END; [SPLITSTREE6]
 [!
 Source: http://popart.otago.ac.nz/examplenex.shtml
 This is an example of a Nexus file, modified from a sample file distributed
-with DNASP. It should run in PopART. Any text appearing between square braces is
-a comment and will be ignored by the program.]
+with DNASP.]
 
 [
 Input:

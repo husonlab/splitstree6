@@ -65,7 +65,7 @@ public class DataNodeContextMenuPresenter {
 			controller.getAddNetworkMenu().getItems().setAll(createAddNetworkMenuItems(workflow, undoManager, dataNode));
 			controller.getAddNetworkMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddNetworkMenu().getItems())));
 
-			controller.getAddAlgorithmMenu().getItems().setAll(createAddAlgorithmMenuItems(workflow, undoManager, dataNode));
+			controller.getAddAlgorithmMenu().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, undoManager, dataNode));
 			controller.getAddAlgorithmMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddAlgorithmMenu().getItems())));
 		} else {
 			controller.getAddTreeMenu().setDisable(true);
@@ -113,7 +113,7 @@ public class DataNodeContextMenuPresenter {
 		return result;
 	}
 
-	private List<MenuItem> createAddAlgorithmMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
+	private List<MenuItem> createAddAlgorithmMenuItems(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode) {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
@@ -126,8 +126,8 @@ public class DataNodeContextMenuPresenter {
 		var result = new ArrayList<MenuItem>();
 		for (var pair : list) {
 			var menuItem = new MenuItem(pair.getKey());
-			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(workflow, dataNode, pair.getValue())));
-			menuItem.setDisable(!pair.getValue().isApplicable(workflow.getWorkingTaxaBlock(), dataNode.getDataBlock()));
+			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(mainWindow, dataNode, pair.getValue())));
+			menuItem.setDisable(!pair.getValue().isApplicable(mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock()));
 			result.add(menuItem);
 		}
 		return result;

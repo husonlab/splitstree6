@@ -1,7 +1,5 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
-import java.util.Random;
-
 import static java.lang.Math.*;
 
 public class IncrementalFitting {
@@ -44,22 +42,22 @@ public class IncrementalFitting {
         for (int k=3;k<=n;k++) {
 
             //DEBUG
-            double maxdiff = 0.0;
-            for(int i=1;i<k;i++)
-                for(int j=i+1;j<k;j++)
-                    maxdiff = max(maxdiff,abs(p[cycle[i]][cycle[j]]-d[cycle[i]][cycle[j]]));
-            System.err.println("k="+k+"\t diff = "+maxdiff);
-
-
+            if (false) {
+                double maxdiff = 0.0;
+                for (int i = 1; i < k; i++)
+                    for (int j = i + 1; j < k; j++)
+                        maxdiff = max(maxdiff, abs(p[cycle[i]][cycle[j]] - d[cycle[i]][cycle[j]]));
+                System.err.println("k=" + k + "\t diff = " + maxdiff);
+            }
 
             int sk = s[k];  //Taxon to re-insert
 
             //Determine taxa before and after sk in the ordering which have been already inserted
-            int u,v;
-            int r1=0; //Number of already-inserted taxa with index smaller than sk.
-            while(r1<k-1 && sk>cycle[r1+1])
+            int u, v;
+            int r1 = 0; //Number of already-inserted taxa with index smaller than sk.
+            while (r1 < k - 1 && sk > cycle[r1 + 1])
                 r1++;
-            if (r1==0) {
+            if (r1 == 0) {
                 u = cycle[k - 1];
                 v = cycle[1];
             } else if (r1<k-1) {

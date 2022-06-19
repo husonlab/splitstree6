@@ -20,6 +20,7 @@
 package splitstree6.dialog.exporting.data;
 
 import javafx.scene.Scene;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jloda.fx.util.ExtendedFXMLLoader;
 import splitstree6.main.Version;
@@ -43,6 +44,9 @@ public class ExportDialog {
 		stage.sizeToScene();
 		stage.setX(mainWindow.getStage().getX() + 100);
 		stage.setY(mainWindow.getStage().getY() + 100);
+
+		stage.initModality(Modality.WINDOW_MODAL);
+		stage.initOwner(mainWindow.getStage());
 
 		new ExportDialogPresenter(mainWindow, controller, stage, dataNode);
 	}

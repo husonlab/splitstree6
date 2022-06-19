@@ -68,7 +68,7 @@ public class TanglegramView implements IView {
 	private final ObjectProperty<TreeDiagramType> optionDiagram2 = new SimpleObjectProperty<>(this, "optionDiagram2", TreeDiagramType.RectangularPhylogram);
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging2 = new SimpleObjectProperty<>(this, "optionAveraging2");
 
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation1");
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 
 	private final BooleanProperty optionShowTreeNames = new SimpleBooleanProperty(this, "optionShowTreeNames");
 	private final BooleanProperty optionShowTreeInfo = new SimpleBooleanProperty(this, "optionShowTreeInfo");
@@ -84,7 +84,6 @@ public class TanglegramView implements IView {
 	{
 		ProgramProperties.track(optionAveraging1, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionAveraging2, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
-		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
 		ProgramProperties.track(optionShowTreeNames, true);
 		ProgramProperties.track(optionShowTreeInfo, true);
 		ProgramProperties.track(optionShowInternalLabels, true);

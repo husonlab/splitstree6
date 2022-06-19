@@ -68,6 +68,7 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 		for (int t = 2; t <= ntax; t++) {
 			nextSplits = new ArrayList<>(t); // restart current list of splits
 
+			// System.err.println("Processing: "+t);
 			// Does t vs previous set of taxa form a split?
 			{
 				final BitSet At = new BitSet();
@@ -75,6 +76,7 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 				final float wgt = getIsolationIndex(t, At, previousTaxa, distancesBlock);
 				if (wgt > 0) {
 					nextSplits.add(new ASplit((BitSet) At.clone(), t, wgt));
+					// System.err.println("Adding (step 3) " + nextSplits.get(nextSplits.size() - 1));
 				}
 			}
 
@@ -89,7 +91,7 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 					final double wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, A, B, distancesBlock));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) A.clone(), t, wgt));
-
+						// System.err.println("Adding (step 1) " +nextSplits.get(nextSplits.size()-1));
 					}
 					A.set(t, false);
 				}
@@ -100,6 +102,7 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 					final double wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, B, A, distancesBlock));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) B.clone(), t, wgt));
+						// System.err.println("Adding (step 2) " +nextSplits.get(nextSplits.size()-1));
 					}
 				}
 			}
