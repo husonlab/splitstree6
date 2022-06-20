@@ -69,10 +69,10 @@ public class DensiTree {
             highlightingPane.getChildren().clear();
 
 
-            var xmin = (int) (100 * scalingFactor.get());
-            var ymin = (int) (100 * scalingFactor.get());
-            var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
-            var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
+            var xmin = (int) (100 * (1/scalingFactor.get()));
+            var ymin = (int) (100 * (1/scalingFactor.get()));
+            var xmax = (int) ((canvas.getWidth() - xmin));
+            var ymax = (int) ((canvas.getHeight() - ymin));
 
             boolean jitter = parameters.jitter;
             boolean block = false;
@@ -176,10 +176,10 @@ public class DensiTree {
 
     public static void drawConsensus(Model model, Pane consensusPane, Parameters parameters, Canvas canvas, ReadOnlyDoubleProperty scalingFactor) throws IOException {
         if (parameters.consensus) {
-            var xmin = (int) (100 * scalingFactor.get());
-            var ymin = (int) (100 * scalingFactor.get());
-            var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
-            var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
+            var xmin = (int) (100 * (1/scalingFactor.get()));
+            var ymin = (int) (100 * (1/scalingFactor.get()));
+            var xmax = (int) ((canvas.getWidth() - xmin));
+            var ymax = (int) ((canvas.getHeight() - ymin));
 
             var drawingMethod = DrawingMethod.CIRCULAR;
             if (parameters.drawingMethod.contains("toscale")) {
@@ -221,10 +221,10 @@ public class DensiTree {
         String highlight = parameters.highlight + ",";
         highlight = highlight.replaceAll("\\s", "");
         if (parameters.highlight != null && highlight.matches("(\\d+,)+")) {
-            var xmin = (int) (100 * scalingFactor.get());
-            var ymin = (int) (100 * scalingFactor.get());
-            var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
-            var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
+            var xmin = (int) (100 * (1/scalingFactor.get()));
+            var ymin = (int) (100 * (1/scalingFactor.get()));
+            var xmax = (int) ((canvas.getWidth() - xmin));
+            var ymax = (int) ((canvas.getHeight() - ymin));
 
             var nTrees = model.getTreesBlock().size();
 
@@ -274,10 +274,10 @@ public class DensiTree {
     }
 
     public static double[] getCenterofMass(Model model, Parameters parameters, Canvas canvas, ReadOnlyDoubleProperty scalingFactor, int treeNum) {
-        var xmin = (int) (100 * scalingFactor.get());
-        var ymin = (int) (100 * scalingFactor.get());
-        var xmax = (int) ((canvas.getWidth() - 100) * scalingFactor.get());
-        var ymax = (int) ((canvas.getHeight() - 100) * scalingFactor.get());
+        var xmin = (int) (100 * (1/scalingFactor.get()));
+        var ymin = (int) (100 * (1/scalingFactor.get()));
+        var xmax = (int) ((canvas.getWidth() - xmin));
+        var ymax = (int) ((canvas.getHeight() - ymin));
 
         DrawingMethod drawingMethod = DrawingMethod.CIRCULAR;
         if (parameters.drawingMethod.contains("toscale")) {
