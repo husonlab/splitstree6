@@ -59,6 +59,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.view.trees.InteractionSetup;
+import splitstree6.window.MainWindow;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,9 +69,19 @@ import java.util.stream.Collectors;
  * Daniel Huson, 6.2022
  */
 public class DensiTreeDrawer {
+	private final MainWindow mainWindow;
 
-	public static void drawCircular(Stage stage, Bounds targetBounds, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, List<PhyloTree> phyloTrees, StackPane parent, TreeDiagramType diagramType, boolean jitter,
-									double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor) {
+	private final RadialLabelLayout radialLabelLayout;
+
+	public DensiTreeDrawer(MainWindow mainWindow) {
+		this.mainWindow = mainWindow;
+		this.radialLabelLayout = new RadialLabelLayout();
+	}
+
+	public void apply(Bounds targetBounds, List<PhyloTree> phyloTrees, StackPane parent, TreeDiagramType diagramType, boolean jitter,
+					  double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor) {
+		radialLabelLayout.getItems().clear();
+
 		RunAfterAWhile.apply(parent, () -> {
 			var oldCanvas = (Canvas) parent.getChildren().get(0);
 			oldCanvas.setOpacity(0.2);
@@ -107,21 +118,19 @@ public class DensiTreeDrawer {
 					canvas.getGraphicsContext2D().setStroke(Color.YELLOW);
 					canvas.getGraphicsContext2D().strokeRect(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
 				}
-
-				var radialLabelLayout = new RadialLabelLayout();
-				draw(taxaBlock, phyloTrees, diagramType, jitter, bounds, canvas, pane, radialLabelLayout);
+				apply(mainWindow.getWorkingTaxa(), phyloTrees, diagramType, jitter, bounds, canvas, pane, radialLabelLayout);
 				return new Result(canvas, pane, radialLabelLayout);
 			}, result -> {
 				parent.getChildren().set(0, result.canvas());
 				parent.getChildren().set(1, result.labelPane());
-				postprocessLabels(stage, taxaBlock, taxonSelectionModel, result.labelPane(), fontScaleFactor);
+				postprocessLabels(mainWindow.getStage(), mainWindow.getWorkingTaxa(), mainWindow.getTaxonSelectionModel(), result.labelPane(), fontScaleFactor);
 				RunAfterAWhile.apply(result, () -> Platform.runLater(() -> result.radialLabelLayout().layoutLabels()));
 			}, null);
 		});
 	}
 
-	private static void draw(TaxaBlock taxaBlock, List<PhyloTree> trees, TreeDiagramType diagramType, boolean jitter, Bounds bounds, Canvas canvas, Pane topPane,
-							 RadialLabelLayout radialLabelLayout) {
+	private static void apply(TaxaBlock taxaBlock, List<PhyloTree> trees, TreeDiagramType diagramType, boolean jitter, Bounds bounds, Canvas canvas, Pane topPane,
+							  RadialLabelLayout radialLabelLayout) {
 		var cycle = computeCycle(taxaBlock.getTaxaSet(), trees);
 		final var taxon2pos = new int[cycle.length];
 		for (var pos = 1; pos < cycle.length; pos++) {
@@ -130,10 +139,9 @@ public class DensiTreeDrawer {
 		var lastTaxon = cycle[cycle.length - 1];
 
 		var gc = canvas.getGraphicsContext2D();
-		gc.setStroke(MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK);
+		gc.setStroke((MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK).deriveColor(1, 1, 1, 0.1));
 
 		gc.setLineWidth(0.2);
-		gc.setGlobalAlpha(0.1);
 
 		var taxonCountXYAngle = new double[taxaBlock.getNtax() + 1][4];
 
@@ -149,10 +157,9 @@ public class DensiTreeDrawer {
 					 var nodeAngleMap = tree.newNodeDoubleArray()) {
 
 					if (diagramType.isRadialOrCircular()) {
-						drawCircular(tree, taxon2pos, taxaBlock.getNtax(), lastTaxon, nodePointMap, nodeAngleMap);
+						apply(tree, taxon2pos, taxaBlock.getNtax(), lastTaxon, nodePointMap, nodeAngleMap);
 						scaleToBounds(bounds, nodePointMap);
-						if (true)
-							center(bounds, nodePointMap);
+						center(bounds, nodePointMap);
 					} else {
 						drawTriangular(tree, taxon2pos, nodePointMap, nodeAngleMap);
 						scaleToBounds(bounds, nodePointMap);
@@ -183,22 +190,20 @@ public class DensiTreeDrawer {
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
 			var label = new RichTextLabel(taxaBlock.get(t).getDisplayLabelOrName());
 			label.setUserData(t);
-			var x = taxonCountXYAngle[t][1] / taxonCountXYAngle[t][0];
+			var x = taxonCountXYAngle[t][1] / taxonCountXYAngle[t][0] + (diagramType.isRadialOrCircular() ? 0 : (jitter ? 25 : 5));
 			var y = taxonCountXYAngle[t][2] / taxonCountXYAngle[t][0];
 			var angle = taxonCountXYAngle[t][3] / taxonCountXYAngle[t][0];
-			if (diagramType.isRadialOrCircular()) {
-				label.setTranslateX(x);
-				label.setTranslateY(y);
 
-				radialLabelLayout.addAvoidable(() -> x, () -> y, () -> 3.0, () -> 3.0);
-				radialLabelLayout.addItem(new SimpleDoubleProperty(x), new SimpleDoubleProperty(y), angle,
-						label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(label.getTranslateX() + a), a -> label.setTranslateY(label.getTranslateY() + a));
-			} else {
-				label.setTranslateX(x + (jitter ? 25 : 5));
-				label.setTranslateY(y);
-			}
+			label.setTranslateX(x);
+			label.setTranslateY(y);
+			//radialLabelLayout.addAvoidable(() -> x, () -> y, () -> 3.0, () -> 3.0);
+			radialLabelLayout.addItem(new SimpleDoubleProperty(x), new SimpleDoubleProperty(y), angle, label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(x + a), a -> label.setTranslateY(y + a));
 			topPane.getChildren().add(label);
 		}
+	}
+
+	public RadialLabelLayout getRadialLabelLayout() {
+		return radialLabelLayout;
 	}
 
 	public static void scaleToBounds(Bounds bounds, NodeArray<Point2D> nodePointMap) {
@@ -227,19 +232,12 @@ public class DensiTreeDrawer {
 
 		var offsetX = bounds.getCenterX() - x;
 		var offsetY = bounds.getCenterY() - y;
-		for (var k : nodePointMap.keySet()) {
-			nodePointMap.put(k, nodePointMap.get(k).add(offsetX, offsetY));
-		}
+		nodePointMap.replaceAll((k, v) -> v.add(offsetX, offsetY));
 	}
 
 	public static void jitter(double offsetX, double offsetY, NodeArray<Point2D> nodePointMap) {
 		var offset = new Point2D(offsetX, offsetY);
-		if (false)
-			nodePointMap.replaceAll((k, v) -> v.add(offset));
-		else
-			for (var k : nodePointMap.keySet()) {
-				nodePointMap.put(k, nodePointMap.get(k).add(offset));
-			}
+		nodePointMap.replaceAll((k, v) -> v.add(offset));
 	}
 
 	public static int[] computeCycle(BitSet taxa, List<PhyloTree> trees) {
@@ -254,7 +252,6 @@ public class DensiTreeDrawer {
 		}
 		return NeighborNetCycle.compute(taxa.cardinality(), distances.getDistances());
 	}
-
 
 	private static boolean nodeShapeOrLabelEntered = false;
 
@@ -285,6 +282,8 @@ public class DensiTreeDrawer {
 						taxonSelectionModel.clearSelection();
 					taxonSelectionModel.toggleSelection(taxon);
 				});
+
+				DraggableUtils.setupDragMouseTranslate(label);
 
 				InvalidationListener invalidationListener = e -> {
 					label.setText(taxon.getDisplayLabelOrName());
@@ -332,7 +331,7 @@ public class DensiTreeDrawer {
 		labelPane.setUserData(references); // avoid garbage collection
 	}
 
-	public static void drawCircular(PhyloTree tree, int[] taxon2pos, int numberOfTaxa, int lastTaxon, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
+	public static void apply(PhyloTree tree, int[] taxon2pos, int numberOfTaxa, int lastTaxon, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) {
 		var alpha = 360.0 / numberOfTaxa;
 
 		try (NodeArray<BitSet> taxaBelow = tree.newNodeArray()) {

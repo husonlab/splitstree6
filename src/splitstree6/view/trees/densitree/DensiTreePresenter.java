@@ -45,6 +45,8 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final DensiTreeView view;
 	private final DensiTreeViewController controller;
+	private final DensiTreeDrawer drawer;
+
 
 	private final FindToolBar findToolBar;
 
@@ -53,6 +55,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		this.mainWindow = mainWindow;
 		this.view = view;
 		this.controller = view.getController();
+		this.drawer = new DensiTreeDrawer(mainWindow);
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, TreeDiagramType::createNode));
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, TreeDiagramType::createNode));
@@ -84,7 +87,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 
 		controller.getJitterToggleButton().selectedProperty().bindBidirectional(view.optionJitterProperty());
 
-		InvalidationListener invalidationListener = e -> DensiTreeDrawer.drawCircular(mainWindow.getStage(), targetBounds.get(), mainWindow.getWorkingTaxa(), mainWindow.getTaxonSelectionModel(),
+		InvalidationListener invalidationListener = e -> drawer.apply(targetBounds.get(),
 				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
 				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty());
 
@@ -126,6 +129,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		});
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
+		setupMenuItems();
 	}
 
 	@Override
@@ -188,6 +192,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		mainController.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
 		mainController.getSelectInverseMenuItem().disableProperty().bind(view.emptyProperty());
 
-
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> drawer.getRadialLabelLayout().layoutLabels());
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());
 	}
 }

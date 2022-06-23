@@ -30,6 +30,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
 import jloda.phylo.PhyloTree;
+import jloda.util.ProgramProperties;
 import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -68,6 +69,12 @@ public class DensiTreeView implements IView {
 	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", true);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
+
+	{
+		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RadialPhylogram);
+		ProgramProperties.track(optionJitter, true);
+
+	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(),
