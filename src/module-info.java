@@ -18,6 +18,7 @@ module splitstreesix {
 
     opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
+	opens splitstree6.algorithms.characters.characters2distances.nucleotide;
 	opens splitstree6.algorithms.characters.characters2network;
 	opens splitstree6.algorithms.characters.characters2view;
 	opens splitstree6.algorithms.characters.characters2splits;
@@ -98,6 +99,7 @@ module splitstreesix {
 	opens splitstree6.view.trees.treepages;
 	opens splitstree6.view.trees.tanglegram;
 	opens splitstree6.view.trees.treeview;
+	opens splitstree6.view.trees.densitree;
 
 	opens splitstree6.view.network;
 

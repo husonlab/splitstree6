@@ -114,8 +114,8 @@ public class AverageDistances extends Trees2Distances {
 			}
 
 			var allCounts = new int[nTax + 1][nTax + 1];
-			for (var i = 0; i < allCounts.length; i++) {
-				for (var j = 0; j < allCounts.length; j++) {
+			for (var i = 1; i < allCounts.length; i++) {
+				for (var j = 1; j < allCounts.length; j++) {
 					var value = 0;
 					for (int[][] v : count) {
 						value += v[i][j];
@@ -125,8 +125,8 @@ public class AverageDistances extends Trees2Distances {
 			}
 
 			var allDistances = new double[nTax + 1][nTax + 1];
-			for (var i = 0; i < allDistances.length; i++) {
-				for (var j = 0; j < allDistances.length; j++) {
+			for (var i = 1; i < allDistances.length; i++) {
+				for (var j = 1; j < allDistances.length; j++) {
 					var value = 0;
 					for (double[][] v : distances) {
 						value += v[i][j];
@@ -138,11 +138,10 @@ public class AverageDistances extends Trees2Distances {
 			// divide by count
 			for (var i = 1; i <= nTax; i++) {
 				for (var j = 1; j <= nTax; j++) {
-
 					if (allDistances[i][j] > 0)
 						distancesBlock.set(i, j, allDistances[i][j] / allCounts[i][j]);
 					else
-						distancesBlock.set(i, j, 100); // shouldn't ever happen!
+						distancesBlock.set(i, j, 0); // shouldn't ever happen!
 				}
 			}
 		}
