@@ -35,34 +35,40 @@ import java.util.Comparator;
  * Daniel Huson, 12.2021
  */
 public class LayoutTreeTriangular {
+	/**
+	 * applies algorithm
+	 *
+	 * @param tree input tree
+	 * @return node coordinates
+	 */
 	public static NodeArray<Point2D> apply(PhyloTree tree) {
-		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
-		final NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray();
 
-		var root = tree.getRoot();
-		if (root != null) {
-			nodePointMap.put(root, new Point2D(0.0, 0.0));
-			// compute all y-coordinates:
-			{
-				var counter = new Counter(0);
-				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
-					if (tree.isLeaf(v) || tree.isLsaLeaf(v)) {
-						nodePointMap.put(v, new Point2D(0.0, (double) counter.incrementAndGet()));
-						firstLastLeafBelowMap.put(v, new Pair<>(v, v));
-					} else {
-						var firstLeafBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> firstLastLeafBelowMap.get(w).getFirst()).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))
-								.min(Comparator.comparing(Pair::getFirst)).orElseThrow(null).getSecond();
-						var lastLeafBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> firstLastLeafBelowMap.get(w).getSecond()).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))
-								.max(Comparator.comparing(Pair::getFirst)).orElseThrow(null).getSecond();
-						var y = 0.5 * (nodePointMap.get(firstLeafBelow).getY() + nodePointMap.get(lastLeafBelow).getY());
-						var x = -(Math.abs(nodePointMap.get(lastLeafBelow).getY() - nodePointMap.get(firstLeafBelow).getY()));
-						nodePointMap.put(v, new Point2D(x, y));
-						firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
-					}
-				});
+		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
+		try (NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray()) {
+			var root = tree.getRoot();
+			if (root != null) {
+				nodePointMap.put(root, new Point2D(0.0, 0.0));
+				// compute all y-coordinates:
+				{
+					var counter = new Counter(0);
+					LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+						if (tree.isLeaf(v) || tree.isLsaLeaf(v)) {
+							nodePointMap.put(v, new Point2D(0.0, (double) counter.incrementAndGet()));
+							firstLastLeafBelowMap.put(v, new Pair<>(v, v));
+						} else {
+							var firstLeafBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> firstLastLeafBelowMap.get(w).getFirst()).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))
+									.min(Comparator.comparing(Pair::getFirst)).orElseThrow(null).getSecond();
+							var lastLeafBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> firstLastLeafBelowMap.get(w).getSecond()).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))
+									.max(Comparator.comparing(Pair::getFirst)).orElseThrow(null).getSecond();
+							var y = 0.5 * (nodePointMap.get(firstLeafBelow).getY() + nodePointMap.get(lastLeafBelow).getY());
+							var x = -(Math.abs(nodePointMap.get(lastLeafBelow).getY() - nodePointMap.get(firstLeafBelow).getY()));
+							nodePointMap.put(v, new Point2D(x, y));
+							firstLastLeafBelowMap.put(v, new Pair<>(firstLeafBelow, lastLeafBelow));
+						}
+					});
+				}
 			}
 		}
 		return nodePointMap;
 	}
-
 }

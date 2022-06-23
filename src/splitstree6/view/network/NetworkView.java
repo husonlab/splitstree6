@@ -125,6 +125,9 @@ public class NetworkView implements IView {
 			sitesFormat.getEdgeShapeMap().putAll(edgeShapeMap);
 		});
 		presenter.updateCounterProperty().addListener(e -> sitesFormat.updateEdges());
+		networkBlockProperty().addListener((v, o, n) -> {
+			sitesFormat.setDisable(n == null || n.getGraph().getNumberOfEdges() == 0);
+		});
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, sitesFormat);
 

@@ -130,7 +130,7 @@ public class TanglegramViewController {
 
 	@FXML
 	private void initialize() {
-		// draw center first:
+		// draw applyCentering first:
 		var left = borderPane.getLeft();
 		var right = borderPane.getRight();
 		var bottom = borderPane.getBottom();

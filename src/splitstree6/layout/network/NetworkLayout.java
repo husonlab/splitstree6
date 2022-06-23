@@ -25,6 +25,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
@@ -41,6 +42,7 @@ import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.function.Function;
 
 import static splitstree6.layout.tree.LayoutUtils.computeFontHeightGraphWidthHeight;
@@ -70,10 +72,9 @@ public class NetworkLayout {
 		progress.setProgress(0);
 
 		try (NodeArray<Point2D> nodePointMap = graph.newNodeArray();
+			 var nodeAngleMap = graph.newNodeDoubleArray();
 			 NodeArray<Group> newNodeShapeMap = graph.newNodeArray();
-			 EdgeArray<Group> newEdgeShapeMap = graph.newEdgeArray();
-
-		) {
+			 EdgeArray<Group> newEdgeShapeMap = graph.newEdgeArray()) {
 			Function<Edge, Double> edgeWeightFunction;
 			if (diagram == DiagramType.Network) {
 				edgeWeightFunction = e -> Math.max(0.00001, graph.getWeight(e));
@@ -92,6 +93,18 @@ public class NetworkLayout {
 				FastMultiLayerMethodLayout.apply(options, graph, edgeWeightFunction, (v, p) -> nodePointMap.put(v, new Point2D(p.getX(), p.getY())));
 			}
 
+			if (graph.getNumberOfEdges() == 0) {
+				var center = computeCenter(nodePointMap.values());
+				for (var v : graph.nodes()) {
+					nodeAngleMap.put(v, GeometryUtilsFX.computeAngle(nodePointMap.get(v).subtract(center)));
+				}
+
+			} else {
+				for (var v : graph.nodes())
+					if (graph.getNumberOfTaxa(v) > 0)
+						nodeAngleMap.put(v, computeLabelAngle(v, nodePointMap));
+			}
+
 			var dimensions = computeFontHeightGraphWidthHeight(taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), graph, true, width, height);
 			var fontHeight = dimensions.fontHeight();
 			width = dimensions.width();
@@ -106,9 +119,23 @@ public class NetworkLayout {
 			for (var v : graph.nodes()) {
 				var point = nodePointMap.get(v);
 
+				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
+
 				var group = new Group();
 				group.setId("graph-node"); // the is used to rotate graph
-				{
+				if (false && graph.getNumberOfEdges() == 0) { // todo: allow user to use marks for nodes
+					Shape shape = null;
+					if (label != null) {
+						shape = RichTextLabel.getMark(label.getText());
+						if (shape != null)
+							label.setShowMarks(false);
+					}
+					if (shape == null) {
+						shape = new Circle(2);
+						shape.getStyleClass().add("graph-node");
+					}
+					group.getChildren().add(shape);
+				} else {
 					var shape = new Circle(v.getDegree() == 1 ? 3 : 2);
 					shape.getStyleClass().add("graph-node");
 					group.getChildren().add(shape);
@@ -118,7 +145,6 @@ public class NetworkLayout {
 
 				nodesGroup.getChildren().add(group);
 
-				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 
 				if (graph.getNumberOfTaxa(v) == 1) {
 					group.setUserData(taxaBlock.get(graph.getTaxon(v)));
@@ -142,7 +168,7 @@ public class NetworkLayout {
 					var translateXProperty = group.translateXProperty();
 					var translateYProperty = group.translateYProperty();
 
-					labelLayout.addItem(translateXProperty, translateYProperty, computeLabelAngle(v, nodePointMap), label.widthProperty(), label.heightProperty(),
+					labelLayout.addItem(translateXProperty, translateYProperty, nodeAngleMap.get(v), label.widthProperty(), label.heightProperty(),
 							xOffset -> {
 								label.setLayoutX(0);
 								label.translateXProperty().bind(translateXProperty.add(xOffset));
@@ -204,6 +230,15 @@ public class NetworkLayout {
 			}
 			return GeometryUtilsFX.modulo360(angles[bestI] + 0.5 * bestD);
 		}
+	}
+
+	private Point2D computeCenter(Collection<Point2D> points) {
+		if (points.size() > 0) {
+			var x = points.stream().mapToDouble(Point2D::getX).sum();
+			var y = points.stream().mapToDouble(Point2D::getY).sum();
+			return new Point2D(x / points.size(), y / points.size());
+		} else
+			return new Point2D(0, 0);
 	}
 
 	public RadialLabelLayout getLabelLayout() {

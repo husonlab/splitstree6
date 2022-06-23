@@ -73,11 +73,13 @@ public class AlignmentDrawer {
 
 			var lineStroke = MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK;
 			var textFill = !showColors && MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK;
+			var notActiveFill = (MainWindowManager.isUseDarkTheme() ? Color.web("0x6F6F6F") : Color.LIGHTGRAY);
 
 			var vOffset = vScrollBar.isVisible() ? (vScrollBar.getValue() * (canvasHeight - inputTaxa.getNtax() * boxHeight)) : 0;
 
 			var left = Math.max(1, (int) axis.getLowerBound() - 1);
 			var right = Math.min(inputCharacters.getNchar(), Math.ceil(axis.getUpperBound()));
+
 
 			service.setCallable(() -> {
 				var progress = service.getProgressListener();
@@ -89,10 +91,15 @@ public class AlignmentDrawer {
 				gc.setLineWidth(0.75);
 				gc.setStroke(lineStroke);
 
+				var colors = new Color[256];
+
 				progress.setMaximum(inputTaxa.getNtax());
 				progress.setProgress(0);
 				for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 					progress.incrementProgress();
+
+					var tNotActive = !activateTaxa.get(t);
+					var chars = inputCharacters.getMatrix()[t - 1];
 
 					var y = t * boxHeight + vOffset;
 					if (y < 0)
@@ -116,16 +123,18 @@ public class AlignmentDrawer {
 					}
 
 					for (var site = left; site <= right; site++) {
-						var ch = inputCharacters.get(t, site);
-						var consensusCharacter = (consensusSequence == null ? ' ' : consensusSequence[site]);
-
+						var ch = chars[site - 1];
 						var x = (site - axisLowerBound) * boxWidth + axisStartOffset;
-						if (!activateTaxa.get(t) || !activeSites.get(site)) {
+						if (tNotActive || !activeSites.get(site)) {
 							gc.setFill(Color.TRANSPARENT);
 							gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
-							gc.setFill(MainWindowManager.isUseDarkTheme() ? Color.web("0x6F6F6F") : Color.LIGHTGRAY);
+							gc.setFill(notActiveFill);
 						} else if (showColors) {
-							gc.setFill(colorScheme.apply(ch));
+							var color = colors[ch];
+							if (color == null) {
+								color = colors[ch] = colorScheme.apply(ch);
+							}
+							gc.setFill(color);
 							gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
 							gc.setFill(textFill);
 						} else {
@@ -142,7 +151,7 @@ public class AlignmentDrawer {
 						if (t == inputTaxa.getNtax()) {
 							gc.strokeLine(x, y, x + boxWidth, y);
 						}
-						if (site == inputCharacters.getNchar()) {
+						if (site == chars.length) {
 							gc.strokeLine(x + boxWidth, y - boxHeight, x + boxWidth, y);
 						}
 					}

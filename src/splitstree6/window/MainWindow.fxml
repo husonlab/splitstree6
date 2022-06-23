@@ -383,18 +383,18 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="splitsNetworkViewMenuItem" text="Splits Network View"/>
                         <MenuItem fx:id="haplotypeNetworkViewMenuItem" text="Haplotype Network View"/>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="pcoaMenuItem" text="PCoA"/>
-                        <MenuItem fx:id="tsneMenuItem" text="tSNE"/>
                     </Menu>
                     <Menu text="Analysis">
                         <MenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."/>
                         <MenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network..."/>
                         <MenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Esimate Invariable Sites..."/>
+                        <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites..."/>
                         <MenuItem fx:id="computePhylogeneticDiversityMenuItem" text="Compute Phylogenetic Diversity"/>
                         <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="pcoaMenuItem" text="PCoA"/>
+                        <MenuItem fx:id="tsneMenuItem" text="tSNE"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="showWorkflowMenuItem" text="Show Workflow"/>
                     </Menu>
