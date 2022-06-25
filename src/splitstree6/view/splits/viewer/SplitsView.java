@@ -19,6 +19,7 @@
 
 package splitstree6.view.splits.viewer;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -161,6 +162,8 @@ public class SplitsView implements IView {
 		optionOutlineFillProperty().addListener(e -> mainWindow.setDirty(true));
 
 		optionDiagramProperty().addListener(e -> mainWindow.updateMethodsTab());
+
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  splits: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), getSplitsBlock() == null ? 0 : getSplitsBlock().size()), mainWindow.workingTaxaProperty(), splitsBlockProperty()));
 	}
 
 	@Override

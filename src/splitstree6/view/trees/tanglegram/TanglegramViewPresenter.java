@@ -77,7 +77,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		tree1.addListener((v, o, n) -> {
 					controller.getTree1CBox().setValue(n == null ? null : n.getName());
-					setLabel(n, tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel());
+			Platform.runLater(() -> setLabel(n, tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree1NameLabel()));
 				}
 		);
 
@@ -91,7 +91,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		tree2.addListener((v, o, n) -> {
 			controller.getTree2CBox().setValue(n == null ? null : n.getName());
-			setLabel(n, tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel());
+			Platform.runLater(() -> setLabel(n, tanglegramView.isOptionShowTreeNames(), tanglegramView.isOptionShowTreeInfo(), controller.getTree2NameLabel()));
 		});
 
 		var orientation2Property = new SimpleObjectProperty<LayoutOrientation>();

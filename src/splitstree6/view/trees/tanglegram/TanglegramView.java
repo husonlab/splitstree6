@@ -129,6 +129,8 @@ public class TanglegramView implements IView {
 		empty.bind(Bindings.isEmpty(getTrees()));
 
 		controller.getFormatVBox().getChildren().addAll(new TaxonLabelFormat(mainWindow, undoManager), new TaxonMark(mainWindow, undoManager));
+
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
 	}
 
 	public void setViewTab(ViewTab viewTab) {

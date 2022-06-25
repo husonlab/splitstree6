@@ -23,10 +23,7 @@ import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
-import jloda.util.CanceledException;
-import jloda.util.IteratorUtils;
-import jloda.util.StringUtils;
+import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 
@@ -103,7 +100,8 @@ public class EmbeddingOptimizer {
 				}
 			}
 		}
-		if (false) {
+		if (DEBUG) {
+			System.err.println("idRho: " + idRho);
 			System.err.println("taxon2Id:");
 			for (var taxon : taxon2Id.keySet()) {
 				System.err.println(taxon + " " + taxon2Id.get(taxon));
@@ -118,7 +116,7 @@ public class EmbeddingOptimizer {
 		else
 			circularOrdering = computerCircularOrderingHardwiredMatrix(trees, taxon2Id, id2Taxon);
 
-		if (false)
+		if (DEBUG)
 			System.err.println("circularOrdering: " + StringUtils.toString(circularOrdering, " "));
 
 		if (!useFastAlignmentHeuristic && trees.length == 2) {
@@ -161,7 +159,6 @@ public class EmbeddingOptimizer {
 				currOrderingListNew.add(id2Taxon.get(bestOrdering[i]));
 			}
 
-
 			if (!currOrderingListNew.contains("rho****"))
 				currOrderingListNew.add(0, "rho****");
 
@@ -180,10 +177,10 @@ public class EmbeddingOptimizer {
 				//System.err.println("currOrderingListNew:" + currOrderingListNew.toString());
 				swapTourNew++;
 
-				for (int s = 0; s < 2; s++) {
+				for (var s = 0; s < 2; s++) {
 					//System.err.println("tree " +s);
 
-					for (Node node : trees[s].nodes()) {
+					for (var node : trees[s].nodes()) {
 						if (node.getInDegree() > 1) {
 							var tempP = copySubtreeWithoutReticulations(trees[s], node);
 							LSATree.computeNodeLSAChildrenMap(tempP);
@@ -196,7 +193,7 @@ public class EmbeddingOptimizer {
 
 					for (var a = 0; a < forests[s].size(); a++) {
 						OptimizeUtils.lsaOptimization(forests[s].get(a), currOrderingListNew, 0, null, null);
-						final List<String> tempOrd = new ArrayList<>();
+						final var tempOrd = new ArrayList<String>();
 						OptimizeUtils.getLsaOrderRec(forests[s].get(a), forests[s].get(a).getRoot(), tempOrd);
 
 						//todo : some trees have "?" as leaves (ex paper) solve this problem
@@ -304,7 +301,7 @@ public class EmbeddingOptimizer {
 																ind = alreadyInsertedSets.get(in).size(); //it ensure a<b<c<d as in the paper
 															}
 															if (sup == 2)
-																inde = alreadyInsertedForThisSet.size(); //uneusefull to continue
+																inde = alreadyInsertedForThisSet.size(); //unusefull to continue
 														}
 													}
 												}
@@ -340,17 +337,31 @@ public class EmbeddingOptimizer {
 					}
 					newOrder[s] = bestOrdForNow;
 					if (DEBUG) {
+						{
+							var set = new HashSet<>(newOrder[s]);
+							if (set.size() != newOrder[s].size()) {
+								var difference = new ArrayList<>(newOrder[s]);
+								for (var str : set)
+									difference.remove(str);
+								System.err.println("Duplicates in newOrder[" + s + "]: " + difference);
+							}
+						}
+						{
+							var set = new HashSet<>(currOrderingListNew);
+							if (set.size() != currOrderingListNew.size()) {
+								var difference = new ArrayList<>(currOrderingListNew);
+								for (var str : set)
+									difference.remove(str);
+								System.err.println("Duplicates in currOrderingListNew: " + difference);
+							}
+						}
+
 						if (newOrder[s].size() != currOrderingListNew.size()) {
 							System.err.println("\n\nERROR newOrder Partial\n\n");
-							System.err.println(" bestEnd  " + newOrder[s].toString());
-
-                            System.err.println(currOrderingListNew.size() + " currOrderingListNew  " + currOrderingListNew);
-							for (var str : currOrderingListNew) {
-								if (!newOrder[s].contains(str)) {
-									System.err.println(" missing  " + str);
-
-								}
-							}
+							System.err.println(newOrder[s].size() + " newOrder:            " + newOrder[s].toString());
+							System.err.println(currOrderingListNew.size() + " currOrderingListNew: " + currOrderingListNew);
+							System.err.println("In newOrder[s], not currOrderingListNew: " + CollectionUtils.difference(newOrder[s], currOrderingListNew));
+							System.err.println("In currOrderingListNew, not newOrder[s]: " + CollectionUtils.difference(currOrderingListNew, newOrder[s]));
 						}
 					}
 				}
@@ -384,15 +395,14 @@ public class EmbeddingOptimizer {
 			newOrder[1].remove(0);
 
 
-			if (false) {
+			if (DEBUG) {
 				System.err.println("first: " + StringUtils.toString(newOrder[0], " "));
 				System.err.println("second: " + StringUtils.toString(newOrder[1], " "));
 			}
 
 			if (true)
 				System.err.println("Smallest crossing number found: " + finalScore);
-			if (false) {
-
+			if (DEBUG) {
 				for (var i = 0; i < trees.length; i++) {
 					System.err.println("Order of the taxa in tree " + (i + 1) + ":");
 					System.err.println(newOrder[i]);

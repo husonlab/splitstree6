@@ -25,9 +25,11 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
+import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
+import jloda.fx.control.CopyableLabel;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.PluginClassLoader;
@@ -55,11 +57,14 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
 
     private final InvalidationListener invalidationListener;
 
+    private final CopyableLabel infoLabel = new CopyableLabel();
+
     /**
      * constructor
-     *
-	 */
+     */
     public AlgorithmBreadCrumbsToolBar(MainWindow mainWindow, WorkflowNode node) {
+        //infoLabel.setFont(Font.font("Courier new", 10));
+
         invalidationListener = e -> {
             stateChangeListeners.clear();
             final Workflow workflow = mainWindow.getWorkflow();
@@ -82,6 +87,7 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
                     }
                 }
             }
+            getItems().addAll(new Separator(Orientation.VERTICAL), new Label("  "), infoLabel);
         };
         //mainWindow.getWorkflow().nodes().addListener(new WeakInvalidationListener(invalidationListener));
         mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
@@ -105,6 +111,10 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
             node = node.getPreferredParent();
         }
         return list;
+    }
+
+    public CopyableLabel getInfoLabel() {
+        return infoLabel;
     }
 
     private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {

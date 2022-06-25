@@ -19,8 +19,10 @@
 
 package splitstree6.view.trees.tanglegram;
 
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import jloda.fx.util.AService;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
@@ -60,7 +62,7 @@ public class TanglegramEmbeddingOptimizer {
 		this.tree2.set(new PhyloTree(tree2));
 		// LSATree.computeNodeLSAChildrenMap(this.tree2.get());
 		service.setOnSucceeded(e -> resultConsumer.accept(service.getValue()));
-		service.restart();
+		RunAfterAWhile.apply(this, () -> Platform.runLater(service::restart));
 	}
 
 	public boolean isUseShortestPaths() {
