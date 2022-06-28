@@ -108,8 +108,6 @@
                             <RadioMenuItem fx:id="medianMenuItem" mnemonicParsing="false" text="Median" toggleGroup="$labelsGroup" />
                      <SeparatorMenuItem mnemonicParsing="false" />
                             <RadioMenuItem fx:id="kmeansMenuItem" mnemonicParsing="false" text="k-means Clustering" toggleGroup="$labelsGroup" />
-                     <SeparatorMenuItem mnemonicParsing="false" />
-                            <RadioMenuItem fx:id="radialMenuItem" mnemonicParsing="false" text="Radial" toggleGroup="$labelsGroup" />
                         </items>
                     </Menu>
                 </MenuBar>
