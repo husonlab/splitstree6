@@ -31,7 +31,6 @@ import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
-import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -67,6 +66,7 @@ public class DensiTreeView implements IView {
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
 	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", true);
+	private final BooleanProperty optionAntiConsensus = new SimpleBooleanProperty(this, "optionAntiConsensus", false);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
@@ -79,7 +79,7 @@ public class DensiTreeView implements IView {
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionJitter.getName());
+				optionFontScaleFactor.getName(), optionJitter.getName(), optionAntiConsensus.getName());
 	}
 
 	public DensiTreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -163,7 +163,8 @@ public class DensiTreeView implements IView {
 
 	@Override
 	public String getCitation() {
-		return EqualAngle.getCitation();
+		return "Bouckaert 2010; " +
+			   "Remco R. Bouckaert. DensiTree: making sense of sets of phylogenetic trees, Bioinformatics 26(1):1372–1373 (2010).";
 	}
 
 	public ViewTab getViewTab() {
@@ -271,4 +272,15 @@ public class DensiTreeView implements IView {
 		return optionJitter;
 	}
 
+	public boolean isOptionAntiConsensus() {
+		return optionAntiConsensus.get();
+	}
+
+	public BooleanProperty optionAntiConsensusProperty() {
+		return optionAntiConsensus;
+	}
+
+	public void setOptionAntiConsensus(boolean optionAntiConsensus) {
+		this.optionAntiConsensus.set(optionAntiConsensus);
+	}
 }

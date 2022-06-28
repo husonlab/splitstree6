@@ -36,6 +36,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
@@ -46,7 +47,9 @@ import jloda.fx.window.PresentationMode;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
+import jloda.util.NumberUtils;
 import jloda.util.ProgramProperties;
+import jloda.util.StringUtils;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
 import splitstree6.algorithms.characters.characters2distances.ProteinMLdist;
@@ -536,6 +539,21 @@ public class MainWindowPresenter {
 		controller.getShowWorkflowMenuItem().setOnAction(e -> controller.getMainTabPane().getSelectionModel().select(mainWindow.getTabByClass(WorkflowTab.class)));
 
 		controller.getShowMessageWindowMenuItem().setOnAction(e -> MessageWindow.getInstance().setVisible(true));
+
+		controller.getSetWindowSizeMenuItem().setOnAction(e -> {
+			var result = SetParameterDialog.apply(mainWindow.getStage(), "Enter size (width x height)",
+					"%.0f x %.0f".formatted(mainWindow.getStage().getWidth(), mainWindow.getStage().getHeight()));
+
+			if (result != null) {
+				var tokens = StringUtils.split(result, 'x');
+				if (tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1])) {
+					var width = Math.max(50, NumberUtils.parseDouble(tokens[0]));
+					var height = Math.max(50, NumberUtils.parseDouble(tokens[1]));
+					mainWindow.getStage().setWidth(width);
+					mainWindow.getStage().setHeight(height);
+				}
+			}
+		});
 
 		controller.getAboutMenuItem().setOnAction((e) -> SplashScreen.showSplash(Duration.ofMinutes(1)));
 

@@ -93,8 +93,8 @@ public class Dice extends Characters2Distances {
 	}
 
 	@Override
-	public boolean isApplicable(TaxaBlock taxaBlock, CharactersBlock parent) {
-		return parent.getDataType().equals(CharactersType.Standard);
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard;
 	}
 }
 

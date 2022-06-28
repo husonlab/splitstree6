@@ -87,8 +87,12 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 
 		controller.getJitterToggleButton().selectedProperty().bindBidirectional(view.optionJitterProperty());
 
+		controller.getAntiConsensusToggleBox().selectedProperty().bindBidirectional(view.optionAntiConsensusProperty());
+
+
 		InvalidationListener invalidationListener = e -> drawer.apply(targetBounds.get(),
 				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
+				view.isOptionAntiConsensus(),
 				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty());
 
 		targetBounds.addListener(invalidationListener);
@@ -100,6 +104,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));
 
 		view.optionJitterProperty().addListener(invalidationListener);
+		view.optionAntiConsensusProperty().addListener(invalidationListener);
 		view.getTrees().addListener(invalidationListener);
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(invalidationListener));
 

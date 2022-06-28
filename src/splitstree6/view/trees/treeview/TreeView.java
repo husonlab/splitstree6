@@ -42,7 +42,6 @@ import jloda.fx.util.PrintUtils;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
-import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -221,7 +220,7 @@ public class TreeView implements IView {
 
 	@Override
 	public String getCitation() {
-		return EqualAngle.getCitation();
+		return null;
 	}
 
 	public ViewTab getViewTab() {

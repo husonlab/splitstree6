@@ -146,7 +146,12 @@ public class TreesBlock extends DataBlock {
 
 	@Override
 	public void updateShortDescription() {
-		setShortDescription((getNTrees() == 1 ? "one tree" : String.format("%,d trees", getNTrees())) + (isPartial() ? ", partial" : "") + (isReticulated() ? ", network" : ""));
+		if (isReticulated()) {
+			setShortDescription((getNTrees() == 1 ? "one rooted network" : String.format("%,d rooted networks", getNTrees())) + (isPartial() ? ", partial" : ""));
+
+		} else {
+			setShortDescription((getNTrees() == 1 ? "one tree" : String.format("%,d trees", getNTrees())) + (isPartial() ? ", partial" : ""));
+		}
 	}
 
 	@Override

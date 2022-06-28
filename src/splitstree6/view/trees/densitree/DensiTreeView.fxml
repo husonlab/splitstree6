@@ -59,6 +59,13 @@
                     <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
                     <ToggleButton fx:id="jitterToggleButton" mnemonicParsing="false" text="Jitter"/>
+                    <ToggleButton fx:id="antiConsensusToggleBox" layoutX="111.0" layoutY="16.0" mnemonicParsing="false"
+                                  text="Anti-Consensus">
+                        <tooltip>
+                            <Tooltip text="Show only trees that disagree with the consensus tree"/>
+                        </tooltip>
+                    </ToggleButton>
+
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
 
                     <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"

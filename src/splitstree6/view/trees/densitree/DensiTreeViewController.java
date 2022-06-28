@@ -76,6 +76,9 @@ public class DensiTreeViewController {
 	private ToggleButton jitterToggleButton;
 
 	@FXML
+	private ToggleButton antiConsensusToggleBox;
+
+	@FXML
 	private AnchorPane outerAnchorPane;
 
 	@FXML
@@ -177,6 +180,10 @@ public class DensiTreeViewController {
 
 	public ToggleButton getJitterToggleButton() {
 		return jitterToggleButton;
+	}
+
+	public ToggleButton getAntiConsensusToggleBox() {
+		return antiConsensusToggleBox;
 	}
 
 	public AnchorPane getOuterAnchorPane() {

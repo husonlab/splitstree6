@@ -3,7 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<Accordion maxWidth="-Infinity" minHeight="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/17"
+<Accordion maxWidth="-Infinity" minHeight="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/16"
            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.traits.TraitsFormatController">
     <panes>
         <TitledPane fx:id="titledPane" minHeight="-Infinity" minWidth="-Infinity" text="Taxon Traits Pie Charts">

@@ -42,7 +42,6 @@ import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
-import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -225,7 +224,7 @@ public class SplitsView implements IView {
 
 	@Override
 	public String getCitation() {
-		return EqualAngle.getCitation();
+		return null;
 	}
 
 

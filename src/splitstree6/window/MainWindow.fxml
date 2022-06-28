@@ -400,6 +400,7 @@
                     </Menu>
                     <Menu fx:id="windowMenu" text="Window">
                         <MenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."/>
+                        <MenuItem fx:id="setWindowSizeMenuItem" text="Set Window Size..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                     </Menu>
                     <Menu fx:id="helpMenu" text="Help">

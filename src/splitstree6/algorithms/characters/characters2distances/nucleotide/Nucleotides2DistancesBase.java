@@ -249,4 +249,9 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 	public void setOptionSetSiteVarParams(SetParameters optionSetSiteVarParams) {
 		this.optionSetSiteVarParams.set(optionSetSiteVarParams);
 	}
+
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType().isNucleotides();
+	}
 }

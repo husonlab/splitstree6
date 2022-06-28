@@ -88,7 +88,7 @@ public class Jaccard extends Characters2Distances {
 	}
 
 	@Override
-	public boolean isApplicable(TaxaBlock taxa, CharactersBlock c) {
-		return c.getDataType().equals(CharactersType.Standard);
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard;
 	}
 }

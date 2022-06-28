@@ -29,6 +29,7 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
@@ -50,11 +51,11 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 		treeView.getSelectionModel().getSelectedItems().addListener((ListChangeListener<TreeItem<String>>) e -> {
 			while (e.next()) {
 				if (e.wasAdded()) {
-					workflow.getSelectionModel().selectAll(e.getAddedSubList().stream()
+					workflow.getSelectionModel().selectAll(e.getAddedSubList().stream().filter(Objects::nonNull)
 							.map(a -> ((WorkflowTreeItem) a).getWorkflowNode()).collect(Collectors.toList()));
 				}
 				if (e.wasRemoved()) {
-					workflow.getSelectionModel().clearSelection(e.getRemoved().stream()
+					workflow.getSelectionModel().clearSelection(e.getRemoved().stream().filter(Objects::nonNull)
 							.map(a -> ((WorkflowTreeItem) a).getWorkflowNode()).collect(Collectors.toList()));
 				}
 			}

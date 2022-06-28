@@ -113,6 +113,7 @@ public class DensiTreeDrawer {
 	}
 
 	public void apply(Bounds targetBounds, List<PhyloTree> phyloTrees, StackPane parent, TreeDiagramType diagramType, boolean jitter,
+					  boolean antiConsensus,
 					  double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor) {
 		radialLabelLayout.getItems().clear();
 
@@ -123,6 +124,10 @@ public class DensiTreeDrawer {
 			AService.run(() -> {
 				var canvas = new Canvas(targetBounds.getWidth(), targetBounds.getHeight());
 				var pane = new Pane();
+				pane.setOnMouseClicked(e -> {
+					if (!e.isShiftDown())
+						mainWindow.getTaxonSelectionModel().clearSelection();
+				});
 				pane.setMinSize(targetBounds.getWidth(), targetBounds.getHeight());
 				pane.setPrefSize(targetBounds.getWidth(), targetBounds.getHeight());
 				pane.setMaxSize(targetBounds.getWidth(), targetBounds.getHeight());
@@ -152,7 +157,7 @@ public class DensiTreeDrawer {
 					canvas.getGraphicsContext2D().setStroke(Color.YELLOW);
 					canvas.getGraphicsContext2D().strokeRect(bounds.getMinX(), bounds.getMinY(), bounds.getWidth(), bounds.getHeight());
 				}
-				apply(mainWindow.getWorkingTaxa(), phyloTrees, diagramType, jitter, bounds, canvas, pane, radialLabelLayout);
+				apply(mainWindow.getWorkingTaxa(), phyloTrees, diagramType, jitter, antiConsensus, bounds, canvas, pane, radialLabelLayout);
 				return new Result(canvas, pane, radialLabelLayout);
 			}, result -> {
 				parent.getChildren().set(0, result.canvas());
@@ -165,7 +170,7 @@ public class DensiTreeDrawer {
 		});
 	}
 
-	private void apply(TaxaBlock taxaBlock, List<PhyloTree> trees, TreeDiagramType diagramType, boolean jitter, Bounds bounds, Canvas canvas, Pane labelPane,
+	private void apply(TaxaBlock taxaBlock, List<PhyloTree> trees, TreeDiagramType diagramType, boolean jitter, boolean antiConsensus, Bounds bounds, Canvas canvas, Pane labelPane,
 					   RadialLabelLayout radialLabelLayout) {
 
 		var cycle = computeCycle(taxaBlock.getTaxaSet(), trees);
@@ -207,17 +212,16 @@ public class DensiTreeDrawer {
 								mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
 							}
 						});
+						a.consume();
 					});
 					line.setOnMouseEntered(a -> {
 						if (!a.isStillSincePress()) {
 							line.setStrokeWidth(5);
-							a.consume();
 						}
 					});
 					line.setOnMouseExited(a -> {
 						if (!a.isStillSincePress()) {
 							line.setStrokeWidth(1);
-							a.consume();
 						}
 					});
 				}
@@ -247,11 +251,17 @@ public class DensiTreeDrawer {
 		var gc = canvas.getGraphicsContext2D();
 		gc.setStroke((MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK).deriveColor(1, 1, 1, 0.1));
 
-		gc.setLineWidth(0.1);
+		gc.setLineWidth(0.3);
 
 		var random = new Random(666);
 
+		var consensusClusters = (antiConsensus ? extractClusters(consensusTree) : null);
+
 		for (var tree : trees) {
+			if (consensusClusters != null && areCompatible(extractClusters(tree), consensusClusters)) {
+				continue;
+			}
+
 			if (false)
 				gc.setStroke(Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble()));
 
@@ -284,6 +294,32 @@ public class DensiTreeDrawer {
 					gc.strokeLine(p.getX(), p.getY(), q.getX(), q.getY());
 				}
 			}
+		}
+	}
+
+	private boolean areCompatible(HashSet<BitSet> clusters1, HashSet<BitSet> clusters2) {
+		for (var a : clusters1) {
+			for (var b : clusters2) {
+				if (!(!a.intersects(b) || BitSetUtils.contains(a, b) || BitSetUtils.contains(b, a)))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	public static HashSet<BitSet> extractClusters(PhyloTree tree) {
+		try (NodeArray<BitSet> nodeClusterMap = tree.newNodeArray()) {
+			tree.postorderTraversal(v -> {
+				var cluster = new BitSet();
+				for (var t : tree.getTaxa(v))
+					cluster.set(t);
+				for (var w : v.children()) {
+					cluster.or(nodeClusterMap.get(w));
+				}
+				nodeClusterMap.put(v, cluster);
+
+			});
+			return new HashSet<>(nodeClusterMap.values());
 		}
 	}
 
@@ -327,21 +363,15 @@ public class DensiTreeDrawer {
 						if (!e.isShiftDown())
 							taxonSelectionModel.clearSelection();
 						taxonSelectionModel.toggleSelection(taxon);
-						e.consume();
 					}
+					e.consume();
 				};
 				label.setOnContextMenuRequested(m -> InteractionSetup.showContextMenu(stage, m, taxon, label));
 				label.setOnMouseClicked(mouseClickedHandler);
+
 				if (taxonSelectionModel.isSelected(taxon)) {
 					label.setEffect(SelectionEffectBlue.getInstance());
 				}
-
-				label.setOnMouseClicked(e -> {
-					if (!e.isShiftDown())
-						taxonSelectionModel.clearSelection();
-					taxonSelectionModel.toggleSelection(taxon);
-				});
-
 				DraggableUtils.setupDragMouseTranslate(label);
 
 				InvalidationListener invalidationListener = e -> {
