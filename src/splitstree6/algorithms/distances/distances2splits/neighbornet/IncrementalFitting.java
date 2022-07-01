@@ -88,7 +88,7 @@ public class IncrementalFitting {
             //We do this by funding gamma which minimizes ||M gamma - z ||
             //such that 0 \leq \gamma_i \leq b_i  for all i
 
-            //We have an initial feaibls guess at gamma0, and then use the linear time algorithm to solve
+            //We have an initial feasible guess at gamma0, and then use the linear time algorithm to solve
             // M gamma_1 = z. We then search along the curve { proj[(1-t) gamma_0 + t gamma_1]: t \in [0,1]} to
             //find the feasible point minizing ||M gamma - z ||. Here proj[ ] is the projection back into the
             //feasible region.
@@ -216,6 +216,17 @@ public class IncrementalFitting {
         return gamma;
     }
 
+    /**
+     * Fast multiplication of a vector by the specially structured matrix M.
+     *
+     * Let V(r) denote an rxr matrix with 1s on and below the diagonal and
+     * -1 everywhere else. Let U(r,s) denote the rxs matrix of ones. Then
+     * M = [V(r1) U(r1,r2); -U(r2,r1) V(r2)]
+     * @param r1 parameter of M
+     * @param r2 parameter of M
+     * @param g  vector of size r1+r2
+     * @return Mg
+     */
     static private double[] multiplyM(int r1, int r2, double[] g) {
         int m = r1+r2;
         double[] y = new double[m+1];
@@ -241,6 +252,46 @@ public class IncrementalFitting {
         }
         return y;
     }
+
+
+    /**
+     * Fast multiplication of a vector by the transpose of the specially structured matrix M.
+     *
+     * Let V(r) denote an rxr matrix with 1s on and below the diagonal and
+     * -1 everywhere else. Let U(r,s) denote the rxs matrix of ones. Then
+     * M = [V(r1) U(r1,r2); -U(r2,r1) V(r2)]
+     * @param r1 parameter of M
+     * @param r2 parameter of M
+     * @param g  vector of size r1+r2
+     * @return Mg
+     */
+    static private double[] multiplyMt(int r1, int r2, double[] g) {
+        int m = r1+r2;
+        double[] y = new double[m+1];
+        if (r1==0) {
+            r1=m; r2=0;
+        }
+
+        double y1 = g[1];
+        for(int j=2;j<=r1;j++)
+            y1+=g[j];
+        for(int j=r1+1;j<=m;j++)
+            y1-=g[j];
+        y[1]=y1;
+
+        for(int i=2;i<=r1;i++) {
+            y[i] = y[i-1]-2*g[i-1];
+        }
+        if (r2>0) {
+            y[r1+1] = -y[r1] + 2*g[r1+1];
+            for(int i=r1+2;i<=m;i++) {
+                y[i] = y[i-1] + 2*g[i];
+            }
+        }
+        return y;
+    }
+
+
 
     static private double[] goldenInsertion(double[] gamma0, double[] gamma1, double[] b, int r1, int r2, double[] z, double tol) {
 
