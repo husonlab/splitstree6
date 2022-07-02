@@ -115,7 +115,7 @@ public class NeighborNetSplitWeights {
 			}
 		}
 		System.err.println("countCalls: " + countCalls);
-		System.err.printf("timeCalls:  %.1f%n", timeCalls / 1000.0);
+		System.err.printf("timeCalls:  %.1f seconds%n", timeCalls / 1000.0);
 
 		return splitList;
 	}
