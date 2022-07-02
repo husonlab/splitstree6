@@ -15,7 +15,6 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Neig
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
 public class NeighborNetSplitWeights {
-
 	public static class NNLSParams {
 
 		public NNLSParams(int ntax) {
@@ -53,8 +52,7 @@ public class NeighborNetSplitWeights {
 	 * @throws CanceledException User pressed cancel in progress bar
 	 */
 	static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, NNLSParams params, ProgressListener progress) throws CanceledException {
-
-		int n = cycle.length - 1;  //Number of taxa
+		var n = cycle.length - 1;  //Number of taxa
 
 		testIncremental(n);
 
@@ -116,15 +114,14 @@ public class NeighborNetSplitWeights {
 
 
 	static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
-
-		int n = x.length - 1;
+		var n = x.length - 1;
 		NNLSFunctionObject f = new NNLSFunctionObject(n);
-		double fx_old = f.evalf(x, d);
-		boolean[][] activeSet = getZeroElements(x);
+		var fx_old = f.evalf(x, d);
+		var activeSet = getZeroElements(x);
 
-		for (int k = 1; k <= params.outerIterations; k++) {
-			boolean optimalForFace = searchFace(x, d, activeSet, f, params);
-			double fx = f.evalf(x, d);
+		for (var k = 1; k <= params.outerIterations; k++) {
+			var optimalForFace = searchFace(x, d, activeSet, f, params);
+			var fx = f.evalf(x, d);
 			if (optimalForFace || fx_old - fx < params.tolerance) {
 				if (params.greedy)
 					return;
@@ -158,11 +155,11 @@ public class NeighborNetSplitWeights {
 	 * @return boolean. True if method finishes with x as the approx minimizer of the current face.
 	 */
 	static private boolean searchFace(double[][] x, double[][] d, boolean[][] activeSet, NNLSFunctionObject f, NNLSParams params) {
-		int n = x.length - 1;
-		double[][] x0 = new double[n + 1][n + 1];
+		var n = x.length - 1;
+		var x0 = new double[n + 1][n + 1];
 		copyArray(x, x0);
 
-		boolean cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
+		var cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
 		if (params.collapseMultiple) {
 			filterMostNegative(x, activeSet, params.fractionNegativeToKeep);
 			maskElements(x, activeSet);
@@ -194,52 +191,51 @@ public class NeighborNetSplitWeights {
 	 * @return boolean  true if the method converged (didn't hit max number of iterations)
 	 */
 	static private boolean cgnr(double[][] x, double[][] d, boolean[][] activeSet, double tol, int maxIterations, NNLSFunctionObject f) {
-		int n = x.length - 1;
+		var n = x.length - 1;
 
-		double fx_orig = f.evalf(x, d);
-		double fxp = f.evalfprojected(x, d);
-		//System.err.println("\t\tEntering cgnr. fx = "+fx_orig+"\t"+fxp);
+		if (false)
+			System.err.println("\t\tEntering cgnr. fx = " + f.evalf(x, d) + "\t" + f.evalfprojected(x, d));
 
 
-		double[][] p = new double[n + 1][n + 1];
-		double[][] r = new double[n + 1][n + 1];
+		var p = new double[n + 1][n + 1];
+		var r = new double[n + 1][n + 1];
 		calcAx(x, r);
-		for (int i = 1; i <= n; i++)
-			for (int j = 1; j <= n; j++)
+		for (var i = 1; i <= n; i++)
+			for (var j = 1; j <= n; j++)
 				r[i][j] = d[i][j] - r[i][j];
-		double[][] z = new double[n + 1][n + 1];
+		var z = new double[n + 1][n + 1];
 		calcAtx(r, z);
-		double[][] w = new double[n + 1][n + 1];
+		var w = new double[n + 1][n + 1];
 		maskElements(z, activeSet);
 		copyArray(z, p);
 		double ztz = sumArraySquared(z);
 
-		int k = 1;
+		var k = 1;
 
 		while (true) {
 			calcAx(p, w);
-			double alpha = ztz / sumArraySquared(w);
+			var alpha = ztz / sumArraySquared(w);
 
-			for (int i = 1; i <= n; i++) {
-				for (int j = 1; j <= n; j++) {
+			for (var i = 1; i <= n; i++) {
+				for (var j = 1; j <= n; j++) {
 					x[i][j] += alpha * p[i][j];
 					r[i][j] -= alpha * w[i][j];
 				}
 			}
 
-			double fx = f.evalf(x, d);
-			fxp = f.evalfprojected(x, d);
-			//System.err.println("\t\t\t"+fx+"\t"+fxp);
+			if (false)
+				System.err.println("\t\t\t" + f.evalf(x, d) + "\t" + f.evalfprojected(x, d));
+
 			calcAtx(r, z);
 			maskElements(z, activeSet);
-			double ztz2 = sumArraySquared(z);
-			double beta = ztz2 / ztz;
+			var ztz2 = sumArraySquared(z);
+			var beta = ztz2 / ztz;
 
 			if (ztz2 < tol || k >= maxIterations)
 				break;
 
-			for (int i = 1; i <= n; i++) {
-				for (int j = 1; j <= n; j++) {
+			for (var i = 1; i <= n; i++) {
+				for (var j = 1; j <= n; j++) {
 					p[i][j] = z[i][j] + beta * p[i][j];
 				}
 			}
@@ -262,32 +258,32 @@ public class NeighborNetSplitWeights {
 	 * @param fractionNegativeToKeep double. Minimum fraction of the negative entries to keep.
 	 */
 	static private void filterMostNegative(double[][] x, boolean[][] activeSet, double fractionNegativeToKeep) {
-		int numNeg = 0;
-		int n = x.length - 1;
-		for (int i = 1; i <= n; i++)
-			for (int j = i + 1; j <= n; j++)
+		var numNeg = 0;
+		var n = x.length - 1;
+		for (var i = 1; i <= n; i++)
+			for (var j = i + 1; j <= n; j++)
 				if (!activeSet[i][j] && x[i][j] < 0)
 					numNeg++;
 		if (numNeg == 0)
 			return;
-		double[] vals = new double[numNeg];
-		int k = 0;
-		for (int i = 1; i <= n; i++)
-			for (int j = i + 1; j <= n; j++)
+		var vals = new double[numNeg];
+		var k = 0;
+		for (var i = 1; i <= n; i++)
+			for (var j = i + 1; j <= n; j++)
 				if (!activeSet[i][j] && x[i][j] < 0) {
 					vals[k] = x[i][j];
 					k++;
 				}
 		Arrays.sort(vals);
-		int numToKeep = (int) ceil(numNeg * fractionNegativeToKeep);
+		var numToKeep = (int) ceil(numNeg * fractionNegativeToKeep);
 		double threshold;
 		if (numToKeep == 0)
 			threshold = 0.0;
 		else
 			threshold = vals[numNeg - numToKeep];
 		//Make active all entries with weight strictly less than the threshold.
-		for (int i = 1; i <= n; i++)
-			for (int j = i + 1; j <= n; j++) {
+		for (var i = 1; i <= n; i++)
+			for (var j = i + 1; j <= n; j++) {
 				if (!activeSet[i][j] && x[i][j] < threshold) {
 					activeSet[i][j] = true;
 					activeSet[j][i] = true;
@@ -298,8 +294,8 @@ public class NeighborNetSplitWeights {
 
 	static private class NNLSFunctionObject {
 		//Utility class for evaluating ||Ax - b|| without additional allocation.
-		private double[][] xt;
-		private double[][] Axt;
+		private final double[][] xt;
+		private final double[][] Axt;
 
 		NNLSFunctionObject(int n) {
 			xt = new double[n + 1][n + 1];
@@ -308,12 +304,12 @@ public class NeighborNetSplitWeights {
 
 		public double evalf(double[][] x, double[][] d) {
 			calcAx(x, Axt);
-			int n = x.length - 1;
-			double fx = 0.0;
-			for (int i = 1; i <= n; i++) {
+			var n = x.length - 1;
+			var fx = 0.0;
+			for (var i = 1; i <= n; i++) {
 				double fx_i = 0.0;
-				for (int j = 1; j <= n; j++) {
-					double res_ij = Axt[i][j] - d[i][j];
+				for (var j = 1; j <= n; j++) {
+					var res_ij = Axt[i][j] - d[i][j];
 					fx_i += res_ij * res_ij;
 				}
 				fx += fx_i;
@@ -322,18 +318,18 @@ public class NeighborNetSplitWeights {
 		}
 
 		public double evalfprojected(double t, double[][] x0, double[][] x, double[][] d) {
-			int n = x.length - 1;
-			for (int i = 1; i <= n; i++)
-				for (int j = i + 1; j <= n; j++) {
+			var n = x.length - 1;
+			for (var i = 1; i <= n; i++)
+				for (var j = i + 1; j <= n; j++) {
 					xt[i][j] = xt[j][i] = max(x0[i][j] * (1 - t) + x[i][j] * t, 0.0);
 				}
 			return evalf(xt, d);
 		}
 
 		public double evalfprojected(double[][] x, double[][] d) {
-			int n = x.length - 1;
-			for (int i = 1; i <= n; i++)
-				for (int j = 1; j <= n; j++) {
+			var n = x.length - 1;
+			for (var i = 1; i <= n; i++)
+				for (var j = 1; j <= n; j++) {
 					xt[i][j] = xt[j][i] = max(x[i][j], 0.0);
 				}
 			return evalf(xt, d);
@@ -353,12 +349,15 @@ public class NeighborNetSplitWeights {
 
 	static private void goldenProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
 		//Minimize ||A \pi((1-t)x0 + tx) - d||  for t in [0,1]
-		double C = (3 - sqrt(5)) / 2.0;
-		double R = 1.0 - C;
+		var C = (3 - sqrt(5)) / 2.0;
+		var R = 1.0 - C;
 
-		double t0 = 0, t1 = C, t2 = C + C * (1 - C), t3 = 1.0;
-		double f1 = f.evalfprojected(t1, x0, x, d);
-		double f2 = f.evalfprojected(t2, x0, x, d);
+		var t0 = 0.0;
+		var t1 = C;
+		var t2 = C + C * (1 - C);
+		var t3 = 1.0;
+		var f1 = f.evalfprojected(t1, x0, x, d);
+		var f2 = f.evalfprojected(t2, x0, x, d);
 
 		while (abs(t3 - t0) > tolerance) {
 			if (f2 < f1) {
@@ -375,22 +374,22 @@ public class NeighborNetSplitWeights {
 				f1 = f.evalfprojected(t1, x0, x, d);
 			}
 		}
-		double tmin = t1;
+		var tmin = t1;
 		if (f2 < f1)
 			tmin = t2;
 		else if (t0 == 0) {  //Handle a special case so that if minimum is at the boundary t=0 then this is exactly what is returned
-			double f0 = f.evalfprojected(t0, x0, x, d);
+			var f0 = f.evalfprojected(t0, x0, x, d);
 			if (f0 < f1)
 				tmin = t0;
 		}
-		int n = x.length - 1;
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j <= n; j++) {
-				double newx_ij = max((1 - tmin) * x0[i][j] + tmin * x[i][j], 0);
+		var n = x.length - 1;
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
+				var newx_ij = max((1 - tmin) * x0[i][j] + tmin * x[i][j], 0);
 				x[i][j] = x[j][i] = newx_ij;
 			}
 		}
-		double fmin = f.evalf(x, d);
+		var fmin = f.evalf(x, d);
 	}
 
 
@@ -402,21 +401,21 @@ public class NeighborNetSplitWeights {
 	 * @param tolerance tolerance. Any entry of x less than tolerance is mapped to zero.
 	 */
 	static private void furthestFeasible(double[][] x, double[][] x0, double tolerance) {
-		double tmin = 1.0;
-		int n = x.length - 1;
+		var tmin = 1.0;
+		var n = x.length - 1;
 
-		for (int i = 1; i <= n; i++) {
-			for (int j = 1; j <= n; j++) {
+		for (var i = 1; i <= n; i++) {
+			for (var j = 1; j <= n; j++) {
 				if (x[i][j] < 0) {
-					double t_ij = x0[i][j] / (x0[i][j] - x[i][j]);
+					var t_ij = x0[i][j] / (x0[i][j] - x[i][j]);
 					tmin = min(tmin, t_ij);
 				}
 			}
 		}
 
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j <= n; j++) {
-				double x_ij = (1.0 - tmin) * x0[i][j] + tmin * x[i][j];
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
+				var x_ij = (1.0 - tmin) * x0[i][j] + tmin * x[i][j];
 				if (x_ij < tolerance)
 					x_ij = 0;
 				x[i][j] = x[j][i] = x_ij;
@@ -433,22 +432,21 @@ public class NeighborNetSplitWeights {
 	 * @param d square array, overwritten with circular metric corresponding to these split weights.
 	 */
 	static private void calcAx(double[][] x, double[][] d) {
-		int n = x.length - 1;
-//            double[][] d = new double[n+1][n+1];
+		var n = x.length - 1;
 
-		for (int i = 1; i <= (n - 1); i++)
+		for (var i = 1; i <= (n - 1); i++)
 			d[i + 1][i] = d[i][i + 1] = sumSubvector(x[i + 1], i + 1, n) + sumSubvector(x[i + 1], 1, i);
 
-		for (int i = 1; i <= (n - 2); i++)
+		for (var i = 1; i <= (n - 2); i++) {
 			d[i + 2][i] = d[i][i + 2] = d[i][i + 1] + d[i + 1][i + 2] - 2 * x[i + 1][i + 2];
+		}
 
-		for (int k = 3; k <= n - 1; k++) {
-			for (int i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded
-				int j = i + k;
+		for (var k = 3; k <= n - 1; k++) {
+			for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
+				var j = i + k;
 				d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
 			}
 		}
-		//       return d;
 	}
 
 	/**
@@ -462,8 +460,8 @@ public class NeighborNetSplitWeights {
 	 * @return \sum_{i=from}^to v(i)
 	 */
 	static private double sumSubvector(double[] v, int from, int to) {
-		double s = 0.0;
-		for (int i = from; i <= to; i++)
+		var s = 0.0;
+		for (var i = from; i <= to; i++)
 			s += v[i];
 		return s;
 	}
@@ -477,22 +475,21 @@ public class NeighborNetSplitWeights {
 	 */
 
 	static private void calcAtx(double[][] x, double[][] p) {
-		int n = x.length - 1;
+		var n = x.length - 1;
 		//double[][] p = new double[n+1][n+1];
 
-		for (int i = 1; i <= n - 1; i++)
+		for (var i = 1; i <= n - 1; i++)
 			p[i + 1][i] = p[i][i + 1] = sumSubvector(x[i], 1, n);
 
-		for (int i = 1; i <= n - 2; i++) {  //TODO This can be threaded
+		for (var i = 1; i <= n - 2; i++) {  //TODO This can be threaded, but is not worth it
 			p[i + 2][i] = p[i][i + 2] = p[i][i + 1] + p[i + 1][i + 2] - 2 * x[i][i + 1];
 		}
 
-		for (int k = 3; k <= n - 1; k++) {
-			for (int i = 1; i <= n - k; i++) { //TODO. This inner loop can be threaded
+		for (var k = 3; k <= n - 1; k++) {
+			for (var i = 1; i <= n - k; i++) { //TODO. This inner loop can be threaded, but is not worth it
 				p[i + k][i] = p[i][i + k] = p[i][i + k - 1] + p[i + 1][i + k] - p[i + 1][i + k - 1] - 2 * x[i][i + k - 1];
 			}
 		}
-		//return p;
 	}
 
 	/**
@@ -507,17 +504,17 @@ public class NeighborNetSplitWeights {
 	 * @return square array
 	 */
 	static private double[][] calcAinvx(double[][] d) {
-		int n = d.length - 1;
-		double[][] x = new double[n + 1][n + 1];
+		var n = d.length - 1;
+		var x = new double[n + 1][n + 1];
 		x[1][2] = x[2][1] = (d[1][n] + d[1][2] - d[2][n]) / 2.0;
-		for (int j = 2; j <= n - 1; j++) {
+		for (var j = 2; j <= n - 1; j++) {
 			x[1][j] = x[j][1] = (d[j - 1][n] + d[1][j] - d[1][j - 1] - d[j][n]) / 2.0;
 		}
 		x[1][n] = x[n][1] = (d[1][n] + d[n - 1][n] - d[1][n - 1]) / 2.0;
 
-		for (int i = 2; i <= (n - 1); i++) {
+		for (var i = 2; i <= (n - 1); i++) {
 			x[i][i + 1] = (d[i - 1][i] + d[i][i + 1] - d[i - 1][i + 1]) / 2.0;
-			for (int j = (i + 2); j <= n; j++)
+			for (var j = (i + 2); j <= n; j++)
 				x[i][j] = x[j][i] = (d[i - 1][j - 1] + d[i][j] - d[i][j - 1] - d[i - 1][j]) / 2.0;
 		}
 		return x;
@@ -535,14 +532,15 @@ public class NeighborNetSplitWeights {
 	 * @return boolean   true if kkt conditions are (approximately) satisfied.
 	 */
 	static private boolean checkKKT(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params) {
-		int n = x.length - 1;
-		double[][] gradient = new double[n + 1][n + 1];
+		var n = x.length - 1;
+		var gradient = new double[n + 1][n + 1];
 		evalGradient(x, d, gradient);
-		double mingrad = 0.0;
-		int min_i = 0, min_j = 0;
-		for (int i = 1; i <= n; i++)
-			for (int j = i + 1; j <= n; j++) {
-				double grad_ij = gradient[i][j];
+		var mingrad = 0.0;
+		var min_i = 0;
+		var min_j = 0;
+		for (var i = 1; i <= n; i++)
+			for (var j = i + 1; j <= n; j++) {
+				var grad_ij = gradient[i][j];
 				if (activeSet[i][j] && grad_ij < mingrad) {
 					mingrad = grad_ij;
 					min_i = i;
@@ -556,9 +554,9 @@ public class NeighborNetSplitWeights {
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
 			activeSet[min_i][min_j] = activeSet[min_i][min_j] = false;
 		} else {
-			for (int i = 1; i <= n; i++)
-				for (int j = i + 1; j <= n; j++) {
-					double grad_ij = gradient[i][j];
+			for (var i = 1; i <= n; i++)
+				for (var j = i + 1; j <= n; j++) {
+					var grad_ij = gradient[i][j];
 					if (activeSet[i][j] && grad_ij < -params.kktBound) {
 						activeSet[i][j] = activeSet[j][i] = false;
 					}
@@ -576,32 +574,32 @@ public class NeighborNetSplitWeights {
 	 * @param gradient square array, overwritten by the gradient.
 	 */
 	static private void evalGradient(double[][] x, double[][] d, double[][] gradient) {
-		int n = x.length - 1;
-		double[][] res = new double[n + 1][n + 1];
+		var n = x.length - 1;
+		var res = new double[n + 1][n + 1];
 		calcAx(x, res);
-		for (int i = 1; i <= n; i++)
-			for (int j = 1; j <= n; j++)
+		for (var i = 1; i <= n; i++)
+			for (var j = 1; j <= n; j++)
 				res[i][j] -= d[i][j];
 		calcAtx(res, gradient);
 	}
 
 	static private void projectedGradientDescent(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
-		int n = x.length - 1;
-		double L = estimateNorm(n);
-		NNLSFunctionObject f = new NNLSFunctionObject(n);
-		double f_old = f.evalf(x, d);
-		double[][] grad = new double[n + 1][n + 1];
+		var n = x.length - 1;
+		var L = estimateNorm(n);
+		var f = new NNLSFunctionObject(n);
+		var f_old = f.evalf(x, d);
+		var grad = new double[n + 1][n + 1];
 		System.err.print("ProjGrad=[");
 		while (true) {
 			evalGradient(x, d, grad);
 			System.err.println("\t" + f_old + "\t" + projGradNorm(x, d));
 
-			for (int i = 1; i <= n; i++) {
-				for (int j = i + 1; j <= n; j++) {
+			for (var i = 1; i <= n; i++) {
+				for (var j = i + 1; j <= n; j++) {
 					x[i][j] = x[j][i] = max(x[i][j] - (1.0 / L) * grad[i][j], 0.0);
 				}
 			}
-			double f_new = f.evalf(x, d);
+			var f_new = f.evalf(x, d);
 			if (f_old - f_new < params.tolerance) {
 				System.err.println("\t" + f_new + "\t" + projGradNorm(x, d) + "];");
 				break;
@@ -612,19 +610,18 @@ public class NeighborNetSplitWeights {
 	}
 
 	static private void acceleratedProjectedGradientDescent(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
-		int n = x.length - 1;
-		double L = estimateNorm(n);
-		NNLSFunctionObject f = new NNLSFunctionObject(n);
-		double f_old = f.evalf(x, d);
-		double[][] grad = new double[n + 1][n + 1];
-		int k = 1;
-		double alpha0 = 0.5;   //TODO: Find out what to use here - Nesterov
+		var n = x.length - 1;
+		var L = estimateNorm(n);
+		var f = new NNLSFunctionObject(n);
+		var f_old = f.evalf(x, d);
+		var grad = new double[n + 1][n + 1];
+		var alpha0 = 0.5;   //TODO: Find out what to use here - Nesterov
 
-		double alpha_old = alpha0;
+		var alpha_old = alpha0;
 		double alpha;
 
-		double[][] y = new double[n + 1][n + 1];
-		double[][] x_old = new double[n + 1][n + 1];
+		var y = new double[n + 1][n + 1];
+		var x_old = new double[n + 1][n + 1];
 
 		copyArray(x, y);
 
@@ -637,17 +634,17 @@ public class NeighborNetSplitWeights {
 
 			copyArray(x, x_old);
 			evalGradient(y, d, grad);
-			for (int i = 1; i <= n; i++) {
-				for (int j = i + 1; j <= n; j++) {
+			for (var i = 1; i <= n; i++) {
+				for (var j = i + 1; j <= n; j++) {
 					x[i][j] = x[j][i] = max(y[i][j] - (1.0 / L) * grad[i][j], 0.0);
 				}
 			}
 
-			double f_new = f.evalf(x, d);
+			var f_new = f.evalf(x, d);
 			if (f_new > f_old) {
 				evalGradient(x_old, d, grad);
-				for (int i = 1; i <= n; i++) {
-					for (int j = i + 1; j <= n; j++) {
+				for (var i = 1; i <= n; i++) {
+					for (var j = i + 1; j <= n; j++) {
 						x[i][j] = x[j][i] = max(x_old[i][j] - (1.0 / L) * grad[i][j], 0.0);
 						y[i][j] = y[j][i] = x[i][j];
 					}
@@ -659,11 +656,11 @@ public class NeighborNetSplitWeights {
 					System.err.println("\t" + f_new + "\t" + projGradNorm(x, d));
 				break;
 			} else {
-				double a2 = alpha_old * alpha_old;
+				var a2 = alpha_old * alpha_old;
 				alpha = 0.5 * sqrt(a2 * a2 + 4 * a2) - a2;
-				double beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
-				for (int i = 1; i <= n; i++) {
-					for (int j = i + 1; j <= n; j++) {
+				var beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
+				for (var i = 1; i <= n; i++) {
+					for (var j = i + 1; j <= n; j++) {
 						y[i][j] = y[j][i] = x[i][j] + beta * (x[i][j] - x_old[i][j]);
 					}
 				}
@@ -688,11 +685,11 @@ public class NeighborNetSplitWeights {
 
 
 	static private double projGradNorm(double[][] x, double[][] d) {
-		int n = x.length - 1;
-		double[][] grad = new double[n + 1][n + 1];
+		var n = x.length - 1;
+		var grad = new double[n + 1][n + 1];
 		evalGradient(x, d, grad);
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j <= n; j++) {
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
 				if (x[i][j] == 0)
 					grad[i][j] = min(grad[i][j], 0.0);
 			}
@@ -701,50 +698,49 @@ public class NeighborNetSplitWeights {
 	}
 
 	static private void blockPivot(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
-		int n = x.length - 1;
-		double cutoff = params.tolerance * 1e-3;
+		var n = x.length - 1;
+		var cutoff = params.tolerance * 1e-3;
 		//Initialise the active set from zero entries of x (note values in x are ignored)
-		boolean[][] G = new boolean[n + 1][n + 1];
+		var G = new boolean[n + 1][n + 1];
 		getZeroElements(x, G);
 
 		//gradient
-		double[][] y = new double[n + 1][n + 1];
+		var y = new double[n + 1][n + 1];
 
 		//Initial call
-		NNLSFunctionObject f = new NNLSFunctionObject(n);
-		boolean converged = cgnr(x, d, G, params.tolerance, params.cgIterations, f);
+		var f = new NNLSFunctionObject(n);
+		var converged = cgnr(x, d, G, params.tolerance, params.cgIterations, f);
 
 		System.err.println("\t\tconverged = " + converged + "\t||grad|| after CG" + debugLS(x, d, G));
 
 		evalGradient(x, d, y);
-		boolean[][] infeasible = new boolean[n + 1][n + 1];
+		var infeasible = new boolean[n + 1][n + 1];
 
-		int N = Integer.MAX_VALUE;
-		int p = 3;
+		var N = Integer.MAX_VALUE;
+		var p = 3;
 
 		while (true) {
 			int numBad = numInfeasible(x, y, G, infeasible);
 			if (numBad < N) {
 				N = numBad;
 				p = 3;
-				for (int i = 1; i <= n; i++) {
-					for (int j = i + 1; j <= n; j++) {
+				for (var i = 1; i <= n; i++) {
+					for (var j = i + 1; j <= n; j++) {
 						G[i][j] = G[j][i] = (G[i][j] ^ infeasible[i][j]);   //XOR. flip G if infeasible true.
 					}
 				}
 			} else {
 				if (p > 0) {
 					p--;
-					for (int i = 1; i <= n; i++) {
-						for (int j = i + 1; j <= n; j++) {
+					for (var i = 1; i <= n; i++) {
+						for (var j = i + 1; j <= n; j++) {
 							G[i][j] = G[j][i] = (G[i][j] ^ infeasible[i][j]);   //XOR. flip G if infeasible true.
 						}
 					}
 				} else {
-
-					boolean done = false;
-					for (int i = 1; i <= n && !done; i++) {
-						for (int j = i + 1; j <= n && !done; j++) {
+					var done = false;
+					for (var i = 1; i <= n && !done; i++) {
+						for (var j = i + 1; j <= n && !done; j++) {
 							if (infeasible[i][j]) {
 								G[i][j] = G[j][i] = !G[i][j];
 								done = true;
@@ -757,8 +753,8 @@ public class NeighborNetSplitWeights {
 			System.err.println("\t\tconverged = " + converged + "\t||grad|| after CG" + debugLS(x, d, G));
 			progress.checkForCancel();
 
-			for (int i = 1; i <= n; i++)
-				for (int j = i + 1; j <= n; j++) {
+			for (var i = 1; i <= n; i++)
+				for (var j = i + 1; j <= n; j++) {
 					if (abs(x[i][j]) < cutoff)
 						x[i][j] = x[j][i] = 0.0;
 					if (abs(x[i][j]) < cutoff)
@@ -768,11 +764,11 @@ public class NeighborNetSplitWeights {
 	}
 
 	static private int numInfeasible(double[][] x, double[][] y, boolean[][] G, boolean[][] infeasible) {
-		int count = 0;
-		int n = x.length - 1;
+		var count = 0;
+		var n = x.length - 1;
 
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j <= n; j++) {
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
 				if ((!G[i][j] && x[i][j] < 0) || (G[i][j] && y[i][j] < 0)) {
 					count++;
 					infeasible[i][j] = infeasible[j][i] = true;
@@ -791,12 +787,12 @@ public class NeighborNetSplitWeights {
 	 * @return
 	 */
 	private static double debugLS(double[][] x, double[][] d, boolean[][] G) {
-		int n = x.length - 1;
-		double[][] grad = new double[n + 1][n + 1];
+		var n = x.length - 1;
+		var grad = new double[n + 1][n + 1];
 		evalGradient(x, d, grad);
-		double maxAbs = 0.0;
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j <= n; j++) {
+		var maxAbs = 0.0;
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
 				if (!G[i][j])
 					maxAbs = max(abs(grad[i][j]), maxAbs);
 			}
@@ -805,23 +801,23 @@ public class NeighborNetSplitWeights {
 	}
 
 	static public double testIncremental(int n) {
-		double[][] x = new double[n + 1][n + 1];
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j <= n; j++) {
+		var x = new double[n + 1][n + 1];
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
 				if (Math.random() < 0.2)
 					x[i][j] = x[j][i] = random();
 			}
 		}
-		double[][] d = new double[n + 1][n + 1];
+		var d = new double[n + 1][n + 1];
 		calcAx(x, d);
-		double[][] x2 = new double[n + 1][n + 1];
+		var x2 = new double[n + 1][n + 1];
 		incrementalFitting(x2, d, 1e-10);
-		double diff = 0.0;
+		var diff = 0.0;
 		int nmissedZero = 0;
 		int nfalseZero = 0;
 		int nneg = 0;
-		for (int i = 1; i <= n; i++) {
-			for (int j = i + 1; j <= n; j++) {
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
 				diff = max(diff, abs(x[i][j] - x2[i][j]));
 				if (x[i][j] < 0)
 					nneg++;
@@ -833,7 +829,7 @@ public class NeighborNetSplitWeights {
 		}
 		System.err.println("Tested incremental fit on circular distance: err = " + diff);
 		if (diff > 0.1)
-			incrementalFitting(x2, d,1e-10);
+			incrementalFitting(x2, d, 1e-10);
 		return diff;
 	}
 }
