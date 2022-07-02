@@ -23,7 +23,6 @@ package splitstree6.view.trees.tanglegram.optimize;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeIntArray;
-import jloda.graph.NodeSet;
 import jloda.graph.algorithms.Dijkstra;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
@@ -250,27 +249,6 @@ public class OptimizeUtils {
                 }
         }
         return D;
-    }
-
-    /**
-     * calculates all descending nodes of v, including v.
-     */
-
-    public static NodeSet getDescendingNodes(PhyloTree tree, Node v) {
-        NodeSet nodes = new NodeSet(tree);
-        nodes.add(v);
-        getDescendingNodesRec(tree, v, nodes);
-        return nodes;
-    }
-
-    public static NodeSet getDescendingNodesRec(PhyloTree tree, Node v, NodeSet nodes) {
-        for (Edge f = v.getFirstOutEdge(); f != null; f = v.getNextOutEdge(f)) {
-            Node w = f.getTarget();
-            nodes.add(w);
-            NodeSet tmpSet = getDescendingNodesRec(tree, w, nodes);
-            nodes.addAll(tmpSet);
-        }
-        return nodes;
     }
 
     /**
@@ -505,7 +483,7 @@ public class OptimizeUtils {
 
             var priorityQueue = Dijkstra.newFullQueue(graph, dist);
 
-            while (priorityQueue.isEmpty() == false) {
+            while (!priorityQueue.isEmpty()) {
                 var size = priorityQueue.size();
                 var u = priorityQueue.first();
 

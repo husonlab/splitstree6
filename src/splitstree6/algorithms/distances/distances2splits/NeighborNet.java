@@ -26,16 +26,13 @@ import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights_MultiThreaded;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
@@ -106,11 +103,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.useInsertionAlgorithm = false;
 		}
 
-		ArrayList<ASplit> splits;
-		if (false)
-			splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
-		else
-			splits = NeighborNetSplitWeights_MultiThreaded.compute(cycle, distancesBlock.getDistances(), params, progress);
+		var splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
 
 
 		progress.setTasks("NNet", "post-analysis");
@@ -124,7 +117,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		splitsBlock.getSplits().addAll(splits);
 
-		if (!(progress instanceof ProgressSilent)) {
+		if (true || !(progress instanceof ProgressSilent)) {
+
 			var seconds = (System.currentTimeMillis() - start) / 1000.0;
 			if (seconds > 10)
 				System.err.printf("NNet time: %,.1fs%n", seconds);

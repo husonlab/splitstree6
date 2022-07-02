@@ -19,13 +19,13 @@
 
 package splitstree6.algorithms.utils;
 
-import jloda.fx.window.NotificationManager;
 import jloda.graph.Edge;
 import jloda.graph.EdgeArray;
 import jloda.graph.EdgeDoubleArray;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
+import jloda.util.IteratorUtils;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -42,8 +42,7 @@ public class RerootingUtils {
 	 */
 	public static void rerootByMidpoint(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree) {
 		if (tree.isReticulated()) {
-			NotificationManager.showWarning(tree.getName() + ": reticulated, re-root not implemented");
-			return;
+			System.err.println("Rerooting by midpoint in the presence of reticulations has not been debugged");
 		}
 
 		var list = computeRootingRecords(tree);
@@ -97,7 +96,8 @@ public class RerootingUtils {
 			}
 			var result = new ArrayList<RootingRecord>();
 			for (var e : tree.edges()) {
-				result.add(new RootingRecord(e, tree.getWeight(e), sourceMap.get(e), targetMap.get(e)));
+				if (!tree.isReticulateEdge(e))
+					result.add(new RootingRecord(e, tree.getWeight(e), sourceMap.get(e), targetMap.get(e)));
 			}
 			return result;
 		}
@@ -106,7 +106,7 @@ public class RerootingUtils {
 	private static double computeRootingRecordsRec(PhyloTree tree, Node v, Edge inEdge, EdgeDoubleArray sourceMap, EdgeDoubleArray targetMap) {
 		var maxDistance = 0.0;
 		for (var f : v.adjacentEdges()) {
-			if (f != inEdge) {
+			if (f != inEdge && tree.okToDescendDownThisEdgeInTraversal(f)) {
 				var map = (v == f.getSource() ? sourceMap : targetMap);
 				maxDistance = Math.max(maxDistance, map.computeIfAbsent(f, a -> computeRootingRecordsRec(tree, a.getOpposite(v), a, sourceMap, targetMap) + tree.getWeight(f)));
 			}
@@ -140,25 +140,28 @@ public class RerootingUtils {
 	 */
 	public static void rerootByOutGroup(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, BitSet outgroupTaxa) {
 		if (tree.isReticulated()) {
-			NotificationManager.showWarning(tree.getName() + ": reticulated, re-root not implemented");
-			return;
+			System.err.println("Rerooting by out-group in the presence of reticulations has not been debugged");
 		}
 
 		try (EdgeArray<BitSet> sourceMap = tree.newEdgeArray(); EdgeArray<BitSet> targetMap = tree.newEdgeArray()) {
 			for (var start : tree.nodeStream().filter(v -> v.getDegree() == 1).collect(Collectors.toList())) {
-				computeTaxaRec(tree, start, null, sourceMap, targetMap);
+				try (var visited = tree.newNodeSet()) {
+					computeTaxaRec(tree, start, sourceMap, targetMap);
+				}
 			}
 
 			Edge best = null;
 			BitSet bestSet = null;
 			for (var e : tree.edges()) {
-				var set = sourceMap.get(e);
-				if (BitSetUtils.intersection(set, outgroupTaxa).cardinality() < outgroupTaxa.cardinality())
-					set = targetMap.get(e);
-				if (BitSetUtils.contains(set, outgroupTaxa)) {
-					if (bestSet == null || set.cardinality() < bestSet.cardinality()) {
-						best = e;
-						bestSet = set;
+				if (!tree.isReticulateEdge(e)) {
+					var set = sourceMap.get(e);
+					if (BitSetUtils.intersection(set, outgroupTaxa).cardinality() < outgroupTaxa.cardinality())
+						set = targetMap.get(e);
+					if (BitSetUtils.contains(set, outgroupTaxa)) {
+						if (bestSet == null || set.cardinality() < bestSet.cardinality()) {
+							best = e;
+							bestSet = set;
+						}
 					}
 				}
 			}
@@ -173,15 +176,20 @@ public class RerootingUtils {
 		}
 	}
 
-	private static BitSet computeTaxaRec(PhyloTree tree, Node v, Edge inEdge, EdgeArray<BitSet> sourceMap, EdgeArray<BitSet> targetMap) {
+	private static BitSet computeTaxaRec(PhyloTree tree, Node v, EdgeArray<BitSet> sourceMap, EdgeArray<BitSet> targetMap) {
 		var taxa = new BitSet();
 		for (var f : v.adjacentEdges()) {
-			if (f != inEdge) {
-				var map = (v == f.getSource() ? sourceMap : targetMap);
-				if (f.getOpposite(v).isLeaf()) {
-					taxa.or(map.computeIfAbsent(f, a -> BitSetUtils.asBitSet(tree.getTaxa(a.getOpposite(v)))));
-				} else
-					taxa.or(map.computeIfAbsent(f, a -> computeTaxaRec(tree, a.getOpposite(v), a, sourceMap, targetMap)));
+			var w = f.getOpposite(v);
+			var map = (v == f.getSource() ? sourceMap : targetMap);
+			if (!map.containsKey(f)) {
+				var bits = new BitSet();
+				map.put(f, bits);
+				if (w.isLeaf()) {
+					bits.or(BitSetUtils.asBitSet(tree.getTaxa(w)));
+				} else {
+					bits.or(computeTaxaRec(tree, w, sourceMap, targetMap));
+				}
+				taxa.or(bits);
 			}
 		}
 		return taxa;
@@ -192,6 +200,17 @@ public class RerootingUtils {
 	 * reroot tree by node
 	 */
 	public static void rerootByNode(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Node v) {
+		v = getLastAncestorAboveAllReticulations(v);
+
+		if (v == tree.getRoot())
+			return;
+
+		if (tree.getRoot().getOutDegree() == 1 && tree.getNumberOfTaxa(tree.getRoot()) == 0) {
+			var root = tree.getRoot().getFirstOutEdge().getTarget();
+			tree.deleteNode(tree.getRoot());
+			tree.setRoot(root);
+		}
+
 		if (v == tree.getRoot())
 			return;
 
@@ -224,12 +243,46 @@ public class RerootingUtils {
 		else
 			edgeLabels = null;
 
-		// not under a special node, reroot in simple way
-		tree.setRoot(e, weight2source, weight2target, edgeLabels);
+		var v = getLastAncestorAboveAllReticulations(e.getSource());
 
-		tree.redirectEdgesAwayFromRoot();
+		if (v != e.getSource()) {
+			rerootByNode(internalNodeLabelsAreEdgeLabels, tree, v);
+		} else {
+			if (tree.getRoot().getOutDegree() == 1 && tree.getNumberOfTaxa(tree.getRoot()) == 0) {
+				var root = tree.getRoot().getFirstOutEdge().getTarget();
+				tree.deleteNode(tree.getRoot());
+				tree.setRoot(root);
+			}
 
-		if (internalNodeLabelsAreEdgeLabels)
-			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
+			// not under a special node, reroot in simple way
+			tree.setRoot(e, weight2source, weight2target, edgeLabels);
+
+			tree.redirectEdgesAwayFromRoot();
+
+			System.err.println("Rerooted:\n" + tree.toBracketString(true) + ";");
+
+			if (internalNodeLabelsAreEdgeLabels)
+				SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
+		}
+	}
+
+	/**
+	 * get lowest ancestor above all reticulate nodes
+	 *
+	 * @param v node
+	 * @return node or root
+	 */
+	private static Node getLastAncestorAboveAllReticulations(Node v) {
+		var path = new ArrayList<Node>();
+		for (var w = v; w != null; w = w.getParent()) {
+			path.add(w);
+		}
+		for (var w : IteratorUtils.reverseIterator(path)) {
+			if (w.getInDegree() <= 1)
+				v = w;
+			else if (w.getInDegree() > 1)
+				break;
+		}
+		return v;
 	}
 }

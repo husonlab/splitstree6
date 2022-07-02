@@ -222,7 +222,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isReticulated();
+		return true;
 	}
 
 	/**

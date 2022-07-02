@@ -54,9 +54,9 @@ public class LayoutUnoptimized {
             for (Node v = tree.getFirstNode(); v != null; v = tree.getNextNode(v)) {
                 List<Node> children = new LinkedList<>();
                 for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-                    if (!tree.isReticulatedEdge(e) || tree.getWeight(e) > 0) {
-                        children.add(e.getTarget());
-                    }
+                    if (!tree.isReticulateEdge(e) || tree.getWeight(e) > 0) {
+						children.add(e.getTarget());
+					}
 
                 }
                 tree.getLSAChildrenMap().put(v, children);

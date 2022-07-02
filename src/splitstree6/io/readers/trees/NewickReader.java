@@ -148,7 +148,7 @@ public class NewickReader extends TreesReader {
 						}
 					}
 
-					if (!treesBlock.isReticulated() && tree.edgeStream().anyMatch(tree::isReticulatedEdge)) {
+					if (!treesBlock.isReticulated() && tree.edgeStream().anyMatch(tree::isReticulateEdge)) {
 						treesBlock.setReticulated(true);
 					}
 

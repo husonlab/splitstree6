@@ -108,7 +108,7 @@ public class CreateEdgesRectangular {
 					lineTo1.setY(targetShape.getTranslateY());
 					addArrowHead(line, moveTo, lineTo1);
 				}
-			} else { // tree.isReticulatedEdge(e)
+			} else { // tree.isReticulateEdge(e)
 				line.getStyleClass().add("graph-special-edge");
 
 				var quadCurveTo = new QuadCurveTo();
@@ -133,7 +133,7 @@ public class CreateEdgesRectangular {
 		if (ProgramProperties.get("showlsa", false))
 			for (var v : tree.nodes()) {
 				for (var w : tree.lsaChildren(v)) {
-					if (w.inEdgesStream(false).anyMatch(tree::isReticulatedEdge)) {
+					if (w.inEdgesStream(false).anyMatch(tree::isReticulateEdge)) {
 						var sourceShape = nodeShapeMap.get(v);
 						var targetShape = nodeShapeMap.get(w);
 

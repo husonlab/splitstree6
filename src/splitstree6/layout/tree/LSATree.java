@@ -54,7 +54,7 @@ public class LSATree {
 			lsaTree.computeReticulation2LSA(tree, reticulation2LSA);
 
 			for (Node v : tree.nodes()) {
-				var children = v.outEdgesStream(false).filter(e -> !tree.isReticulatedEdge(e))
+				var children = v.outEdgesStream(false).filter(e -> !tree.isReticulateEdge(e))
 						.map(Edge::getTarget).collect(Collectors.toList());
 				tree.getLSAChildrenMap().put(v, children);
 			}
@@ -224,7 +224,7 @@ public class LSATree {
 				for (Edge f = v.getFirstOutEdge(); f != null; f = v.getNextOutEdge(f)) {
 					Node w = f.getTarget();
 					length += node2Dist.getDouble(w);
-					if (!tree.isReticulatedEdge(f))
+					if (!tree.isReticulateEdge(f))
 						length += tree.getWeight(f);
 				}
 				if (v.getOutDegree() > 0)

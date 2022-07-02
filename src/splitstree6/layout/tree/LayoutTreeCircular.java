@@ -63,7 +63,7 @@ public class LayoutTreeCircular {
 						var w = e.getSource();
 						var wRadius = nodeRadiusMap.get(w);
 						if (wRadius != null) {
-							if (tree.isReticulatedEdge(e)) {
+							if (tree.isReticulateEdge(e)) {
 								max = Math.max(max, wRadius + smallOffsetForReticulateEdge);
 							} else
 								max = Math.max(max, wRadius + tree.getWeight(e));

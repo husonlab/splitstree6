@@ -195,7 +195,7 @@ public abstract class Trees2Trees extends Algorithm<TreesBlock, TreesBlock> {
 					if (v.getInDegree() > 1) {
 						for (var e : v.inEdges()) {
 							outputTree.setWeight(e, 0.0);
-							outputTree.setReticulated(e, true);
+							outputTree.setReticulate(e, true);
 							outputData.setReticulated(true);
 						}
 					}

@@ -61,7 +61,7 @@ public class SplitsTree6 extends Application {
 		ProgramProperties.setProgramVersion(Version.SHORT_DESCRIPTION);
 
 		ProgramProperties.setProgramLicence("""
-				Copyright (C) 2022 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.
+				Copyright (C) 2022. This program comes with ABSOLUTELY NO WARRANTY.
 				This is free software, licensed under the terms of the GNU General Public License, Version 3.
 				Sources available at: https://github.com/husonlab/splitstree6
 				""");
@@ -69,7 +69,7 @@ public class SplitsTree6 extends Application {
 		//CheckForUpdate.programURL = "http://software-ab.informatik.uni-tuebingen.de/download/alora";
 		//CheckForUpdate.applicationId = "1691242391";
 
-		SplashScreen.setLabelAnchor(new Point2D(120, 14));
+		SplashScreen.setLabelAnchor(new Point2D(100, 14));
 		SplashScreen.setFitHeight(250);
 		SplashScreen.setVersionString(ProgramProperties.getProgramVersion());
 		SplashScreen.setImageResourceName("SplitsTree6-splash.png");
@@ -91,7 +91,7 @@ public class SplitsTree6 extends Application {
 
 	protected static void parseArguments(String[] args) throws CanceledException, UsageException {
 		final ArgsOptions options = new ArgsOptions(args, SplitsTree6.class, Version.NAME + " - Phylogenetic analysis using trees and networks");
-		options.setAuthors("Daniel H. Huson and David J. Bryant");
+		options.setAuthors("Daniel H. Huson and David Bryant");
 		options.setLicense(ProgramProperties.getProgramLicence());
 		options.setVersion(ProgramProperties.getProgramVersion());
 

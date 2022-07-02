@@ -22,6 +22,7 @@ package splitstree6.algorithms.trees.trees2trees;
 import javafx.beans.property.*;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.algorithms.RootedNetworkProperties;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
@@ -79,7 +80,7 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 				var isCopy = false;
 				if (getOptionMinEdgeLength() > 0) {
 					tree = new PhyloTree(tree);
-					if (tree.contractShortEdges(getOptionMinEdgeLength()))
+					if (RootedNetworkProperties.contractShortEdges(tree, getOptionMinEdgeLength()))
 						isCopy = true;
 					else
 						tree = parent.getTree(t); // nothing changed, use original
@@ -189,6 +190,5 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 		}
 		return changed;
 	}
-
 
 }

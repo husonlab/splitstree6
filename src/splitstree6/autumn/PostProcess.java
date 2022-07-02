@@ -48,7 +48,7 @@ public class PostProcess {
 			copyRec(original, tree.getRoot(), new HashMap<>(), allTaxa, showTaxonIds, tree);
 			for (var e : tree.edges()) {
 				if (e.getTarget().getInDegree() > 1) {
-					tree.setReticulated(e, true);
+					tree.setReticulate(e, true);
 					tree.setWeight(e, 0);
 				}
 			}
