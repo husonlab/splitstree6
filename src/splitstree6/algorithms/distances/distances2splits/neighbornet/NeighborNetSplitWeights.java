@@ -434,17 +434,76 @@ public class NeighborNetSplitWeights {
 	static private void calcAx(double[][] x, double[][] d) {
 		var n = x.length - 1;
 
-		for (var i = 1; i <= (n - 1); i++)
-			d[i + 1][i] = d[i][i + 1] = sumSubvector(x[i + 1], i + 1, n) + sumSubvector(x[i + 1], 1, i);
 
-		for (var i = 1; i <= (n - 2); i++) {
-			d[i + 2][i] = d[i][i + 2] = d[i][i + 1] + d[i + 1][i + 2] - 2 * x[i + 1][i + 2];
+		boolean oldway = true;
+
+		if (oldway) {
+			for (var i = 1; i <= (n - 1); i++)
+				d[i + 1][i] = d[i][i + 1] = sumSubvector(x[i + 1], i + 1, n) + sumSubvector(x[i + 1], 1, i);
+
+			for (var i = 1; i <= (n - 2); i++) {
+				d[i + 2][i] = d[i][i + 2] = d[i][i + 1] + d[i + 1][i + 2] - 2 * x[i + 1][i + 2];
+			}
+
+			for (var k = 3; k <= n - 1; k++) {
+				for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
+					var j = i + k;
+					d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
+				}
+			}
+		} else {
+			double[][] x2 = new double[n + 1][n + 1];
+			double[][] d2 = new double[n + 1][n + 1];
+
+			reshapeByGap(x, x2);
+			reshapeByGap(d, d2);
+
+			for (var i = 1; i <= (n - 1); i++) {
+				d2[i][1] = sumSubvector(x2[i + 1], 1, n - i - 1);
+				for (var j = 1; j <= i; j++)
+					d2[i][1] += x2[j][i + 1 - j];
+			}
+
+			for (var i = 1; i <= (n - 2); i++) {
+				d2[i][2] = d2[i][1] + d2[i + 1][1] - 2 * x2[i + 1][1];
+			}
+
+			for (var k = 3; k <= n - 1; k++) {
+				for (var i = 1; i <= n - k; i++) {
+					//var j = i + k;
+					d2[i][k] = d2[i][k - 1] + d2[i + 1][k-1] - d2[i + 1][k-2] - 2 * x2[i + 1][k-1];
+				}
+			}
+			reshapeByPair(d2,d);
 		}
+	}
 
-		for (var k = 3; k <= n - 1; k++) {
-			for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
-				var j = i + k;
-				d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
+	/**
+	 * Convert an array where entry [i][j] corresponds to pair (i,j) into an array
+	 * where [i][k] corresponds to pair (i,i+k);
+	 * @param x array of doubles
+	 * @param x2 array of doubles
+	 */
+	static private void reshapeByGap(double[][] x, double[][] x2) {
+		var n=x.length-1;
+		for(int k=1;k<=n-1;k++) {
+			for(int i=1;i<=n-k;i++) {
+				x2[i][k] = x2[k][i] = x[i][i+k];
+			}
+		}
+	}
+
+	/**
+	 * Convert an array where entry [i][k] corresponds to pair (i,i+k) into an array
+	 * where [i][k] corresponds to pair (i,k);
+	 * @param x array of doubles
+	 * @param x2 array of doubles
+	 */
+	static private void reshapeByPair(double[][] x, double[][] x2) {
+		var n = x.length-1;
+		for(int k=1;k<=n-1;k++) {
+			for(int i=1;i<=n-k;i++) {
+				x2[i][i+k] = x2[i+k][i] = x[i][k];
 			}
 		}
 	}
