@@ -15,6 +15,9 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Neig
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
 public class NeighborNetSplitWeights {
+	private static int countCalls = 0;
+	private static long timeCalls = 0L;
+
 	public static class NNLSParams {
 
 		public NNLSParams(int ntax) {
@@ -52,6 +55,8 @@ public class NeighborNetSplitWeights {
 	 * @throws CanceledException User pressed cancel in progress bar
 	 */
 	static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, NNLSParams params, ProgressListener progress) throws CanceledException {
+		countCalls = 0;
+		timeCalls = 0L;
 		var n = cycle.length - 1;  //Number of taxa
 
 		testIncremental(n);
@@ -109,6 +114,9 @@ public class NeighborNetSplitWeights {
 				}
 			}
 		}
+		System.err.println("countCalls: " + countCalls);
+		System.err.printf("timeCalls:  %.1f%n", timeCalls / 1000.0);
+
 		return splitList;
 	}
 
@@ -432,6 +440,8 @@ public class NeighborNetSplitWeights {
 	 * @param d square array, overwritten with circular metric corresponding to these split weights.
 	 */
 	static private void calcAx(double[][] x, double[][] d) {
+		countCalls++;
+		var startTime = System.currentTimeMillis();
 		var n = x.length - 1;
 
 
@@ -471,11 +481,13 @@ public class NeighborNetSplitWeights {
 			for (var k = 3; k <= n - 1; k++) {
 				for (var i = 1; i <= n - k; i++) {
 					//var j = i + k;
-					d2[i][k] = d2[i][k - 1] + d2[i + 1][k-1] - d2[i + 1][k-2] - 2 * x2[i + 1][k-1];
+					d2[i][k] = d2[i][k - 1] + d2[i + 1][k - 1] - d2[i + 1][k - 2] - 2 * x2[i + 1][k - 1];
 				}
 			}
-			reshapeByPair(d2,d);
+			reshapeByPair(d2, d);
 		}
+
+		timeCalls = System.currentTimeMillis() - startTime;
 	}
 
 	/**
