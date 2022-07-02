@@ -212,4 +212,10 @@ public class HammingDistancesAmbigStates extends Characters2Distances {
 	public void setOptionHandleAmbiguousStates(AmbiguousOptions optionHandleAmbiguousStates) {
 		this.optionHandleAmbiguousStates.setValue(optionHandleAmbiguousStates);
 	}
+
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType().isNucleotides();
+	}
+
 }

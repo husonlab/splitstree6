@@ -65,12 +65,17 @@ public class SplitDecomposition extends Distances2Splits {
 		for (var t = 2; t <= ntax; t++) {
 			nextSplits = new ArrayList<>(t); // restart current list of splits
 
+			// System.err.println("Processing: "+t);
+
 			// Does t vs previous set of taxa form a split?
 			{
 				final var At = new BitSet();
 				At.set(t);
 				final var wgt = getIsolationIndex(t, At, previousTaxa, distancesBlock);
-				nextSplits.add(new ASplit((BitSet) At.clone(), t, wgt));
+				if (wgt > 0) {
+					nextSplits.add(new ASplit((BitSet) At.clone(), t, wgt));
+					// System.err.println("Adding (step 3) " + nextSplits.get(nextSplits.size() - 1));
+				}
 			}
 
 			// consider all previously computed splits:
@@ -84,7 +89,7 @@ public class SplitDecomposition extends Distances2Splits {
 					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, A, B, distancesBlock));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) A.clone(), t, wgt));
-
+						// System.err.println("Adding (step 1) " +nextSplits.get(nextSplits.size()-1));
 					}
 					A.set(t, false);
 				}
@@ -95,6 +100,7 @@ public class SplitDecomposition extends Distances2Splits {
 					var wgt = Math.min(previousSplit.getWeight(), getIsolationIndex(t, B, A, distancesBlock));
 					if (wgt > 0) {
 						nextSplits.add(new ASplit((BitSet) B.clone(), t, wgt));
+						// System.err.println("Adding (step 2) " +nextSplits.get(nextSplits.size()-1));
 					}
 				}
 			}

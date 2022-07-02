@@ -373,6 +373,9 @@ public class MainWindowController {
 	private MenuItem showMessageWindowMenuItem;
 
 	@FXML
+	private MenuItem setWindowSizeMenuItem;
+
+	@FXML
 	private MenuItem checkForUpdatesMenuItem;
 
 	@FXML
@@ -924,6 +927,10 @@ public class MainWindowController {
 
 	public MenuItem getShowMessageWindowMenuItem() {
 		return showMessageWindowMenuItem;
+	}
+
+	public MenuItem getSetWindowSizeMenuItem() {
+		return setWindowSizeMenuItem;
 	}
 
 	public MenuItem getCheckForUpdatesMenuItem() {

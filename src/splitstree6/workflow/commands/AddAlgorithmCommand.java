@@ -19,6 +19,7 @@
 
 package splitstree6.workflow.commands;
 
+import javafx.application.Platform;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
@@ -28,10 +29,10 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
+import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
-import splitstree6.workflow.Workflow;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -44,17 +45,18 @@ import java.util.List;
  */
 public class AddAlgorithmCommand {
 
-	public static UndoableRedoableCommand create(Workflow workflow, DataNode<DistancesBlock> node, Algorithm algorithm) {
+	public static UndoableRedoableCommand create(MainWindow mainWindow, DataNode<DistancesBlock> node, Algorithm algorithm) {
 		final Collection<WorkflowNode> addedNodes = new ArrayList<>();
 		return UndoableRedoableCommand.create("add " + algorithm.getName(),
-				() -> workflow.deleteNodes(addedNodes),
+				() -> mainWindow.getWorkflow().deleteNodes(addedNodes),
 				() -> {
 					addedNodes.clear();
-					addedNodes.addAll(addAlgorithm(workflow, node, algorithm));
+					addedNodes.addAll(addAlgorithm(mainWindow, node, algorithm));
 				});
 	}
 
-	public static List<WorkflowNode> addAlgorithm(Workflow workflow, DataNode dataNode, Algorithm algorithm) {
+	public static List<WorkflowNode> addAlgorithm(MainWindow mainWindow, DataNode dataNode, Algorithm algorithm) {
+		var workflow = mainWindow.getWorkflow();
 		try {
 			if (workflow.isRunning())
 				throw new RuntimeException("Workflow is currently running");
@@ -82,6 +84,7 @@ public class AddAlgorithmCommand {
 				list.add(algorithmNode2);
 			}
 			algorithmNode.restart();
+			Platform.runLater(() -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true));
 			NotificationManager.showInformation("Attached algorithm: " + algorithm.getName());
 			return list;
 		} catch (Exception ex) {

@@ -197,6 +197,11 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 				throw new IOExceptionWithLineNumber("Unexpected in FORMAT: '" + StringUtils.toString(formatTokens, " ") + "'", np.lineno());
 		}
 
+		if (np.peekMatchIgnoreCase("options")) {
+			var tokens = np.getTokensRespectCase("options", ";");
+			System.err.println("Ignoring: OPTIONS " + StringUtils.toString(tokens, " ") + ";");
+		}
+
 		if (np.peekMatchIgnoreCase("CharWeights")) {
 			np.matchIgnoreCase("CharWeights");
 			var charWeights = new double[nchar + 1];

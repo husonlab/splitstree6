@@ -308,28 +308,26 @@ public class AlignmentView implements IView {
 	public String createSelectionString() {
 		var buf = new StringBuilder();
 		if (getInputTaxa() != null) {
-			buf.append("Taxa: ");
+			buf.append("taxa: ");
 			if (getActiveTaxa().cardinality() == getInputTaxa().getNtax()) {
 				buf.append("%,d".formatted(getInputTaxa().getNtax()));
 			} else {
 				buf.append("%,d (of %,d)".formatted(getActiveTaxa().cardinality(), getInputTaxa().getNtax()));
 			}
 			if (getSelectedTaxa().cardinality() > 0) {
-				buf.append(", selected: %,d".formatted(getSelectedTaxa().cardinality()));
+				buf.append(" (selected: %,d)".formatted(getSelectedTaxa().cardinality()));
 			}
-			buf.append(". ");
 		}
 		if (getInputCharacters() != null) {
-			buf.append("Sites: ");
+			buf.append(" sites: ");
 			if (getActiveSites().cardinality() == getInputCharacters().getNchar()) {
 				buf.append("%,d".formatted(getInputCharacters().getNchar()));
 			} else {
 				buf.append("%,d (of %,d)".formatted(getActiveSites().cardinality(), getInputCharacters().getNchar()));
 			}
 			if (getSelectedSites().cardinality() > 0) {
-				buf.append(", selected: %,d".formatted(getSelectedSites().cardinality()));
+				buf.append(" (selected: %,d)".formatted(getSelectedSites().cardinality()));
 			}
-			buf.append(".");
 		}
 		return buf.toString();
 	}

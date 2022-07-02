@@ -19,6 +19,7 @@
 
 package splitstree6.view.splits.viewer;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -41,7 +42,6 @@ import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
-import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -74,10 +74,10 @@ public class SplitsView implements IView {
 	private final ObjectProperty<SplitsBlock> splitsBlock = new SimpleObjectProperty<>(this, "splitsBlock");
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
-	private final ObjectProperty<SplitsDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
+	private final ObjectProperty<SplitsDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", SplitsDiagramType.Splits);
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 
-	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting");
+	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting", SplitsRooting.None);
 	private final DoubleProperty optionRootAngle = new SimpleDoubleProperty(this, "optionRootAngle");
 
 	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence", true);
@@ -98,8 +98,6 @@ public class SplitsView implements IView {
 	// setup properties:
 	{
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Splits);
-		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
-		ProgramProperties.track(optionRooting, SplitsRooting::valueOf, SplitsRooting.None);
 		ProgramProperties.track(optionRootAngle, 160.0);
 		ProgramProperties.track(optionOutlineFill, Color.SILVER);
 	}
@@ -163,6 +161,8 @@ public class SplitsView implements IView {
 		optionOutlineFillProperty().addListener(e -> mainWindow.setDirty(true));
 
 		optionDiagramProperty().addListener(e -> mainWindow.updateMethodsTab());
+
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  splits: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), getSplitsBlock() == null ? 0 : getSplitsBlock().size()), mainWindow.workingTaxaProperty(), splitsBlockProperty()));
 	}
 
 	@Override
@@ -224,7 +224,7 @@ public class SplitsView implements IView {
 
 	@Override
 	public String getCitation() {
-		return EqualAngle.getCitation();
+		return null;
 	}
 
 

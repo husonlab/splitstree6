@@ -35,7 +35,7 @@ public class LayoutTreeRadial {
 	public static NodeArray<Point2D> apply(PhyloTree tree) {
 		// compute angles:
 		try (var nodeAngleMap = tree.newNodeDoubleArray()) {
-			HeightAndAngles.computeAngles(tree, nodeAngleMap, HeightAndAngles.Averaging.LeafAverage);
+				HeightAndAngles.computeAngles(tree, nodeAngleMap, HeightAndAngles.Averaging.LeafAverage);
 
 			var percentOffset = 50.0;
 			var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);

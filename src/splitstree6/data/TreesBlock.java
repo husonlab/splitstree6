@@ -26,6 +26,8 @@ import splitstree6.algorithms.trees.trees2trees.TreesTaxaFilter;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
+import java.util.Collection;
+
 /**
  * trees data block
  * Daniel Huson, 2004, 2.2022
@@ -40,6 +42,10 @@ public class TreesBlock extends DataBlock {
 
 	public TreesBlock() {
 		trees = FXCollections.observableArrayList();
+	}
+
+	public TreesBlock(Collection<PhyloTree> trees) {
+		this.trees = FXCollections.observableArrayList(trees);
 	}
 
 	/**
@@ -140,7 +146,12 @@ public class TreesBlock extends DataBlock {
 
 	@Override
 	public void updateShortDescription() {
-		setShortDescription((getNTrees() == 1 ? "one tree" : String.format("%,d trees", getNTrees())) + (isPartial() ? ", partial" : "") + (isReticulated() ? ", network" : ""));
+		if (isReticulated()) {
+			setShortDescription((getNTrees() == 1 ? "one rooted network" : String.format("%,d rooted networks", getNTrees())) + (isPartial() ? ", partial" : ""));
+
+		} else {
+			setShortDescription((getNTrees() == 1 ? "one tree" : String.format("%,d trees", getNTrees())) + (isPartial() ? ", partial" : ""));
+		}
 	}
 
 	@Override

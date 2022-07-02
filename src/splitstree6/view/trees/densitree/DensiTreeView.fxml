@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ NetworkView.fxml Copyright (C) 2022 Daniel H. Huson
+  ~ DensiTreeView.fxml Copyright (C) 2022 Daniel H. Huson
   ~
   ~ (Some files contain contributions from other authors, who are then mentioned separately.)
   ~
@@ -19,14 +19,35 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.network.NetworkViewController">
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.view.trees.densitree.DensiTreeViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <center>
+            <AnchorPane fx:id="outerAnchorPane">
+                <children>
+                    <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
+                                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                AnchorPane.topAnchor="0.0">
+                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <children>
+                                <Canvas fx:id="mainCanvas" height="200.0" width="200.0" StackPane.alignment="CENTER"/>
+                                <Pane fx:id="mainPane" StackPane.alignment="CENTER"/>
+                            </children>
+                        </StackPane>
+                    </AnchorPane>
+                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
+                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
+                </children>
+            </AnchorPane>
+        </center>
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
@@ -37,40 +58,78 @@
                     </ComboBox>
                     <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
-                    <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
+                    <ToggleButton fx:id="jitterToggleButton" mnemonicParsing="false" text="Jitter"/>
+                    <ToggleButton fx:id="antiConsensusToggleBox" layoutX="111.0" layoutY="16.0" mnemonicParsing="false"
+                                  text="Anti-Consensus">
                         <tooltip>
-                            <Tooltip text="Choose orientation"/>
+                            <Tooltip text="Show only trees that disagree with the consensus tree"/>
                         </tooltip>
-                    </ComboBox>
+                    </ToggleButton>
+
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom In">
+
+                    <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Expand Vertically">
                         <font>
                             <Font size="10.0"/>
                         </font>
                         <graphic>
                             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandVertical16.gif"/>
                             </ImageView>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="Zoom out"/>
+                            <Tooltip text="Expand tree vertically"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom Out">
+
+                    <Button fx:id="contractVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Contract Vertically">
                         <font>
                             <Font size="10.0"/>
                         </font>
                         <graphic>
                             <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractVertical16.gif"/>
                             </ImageView>
                         </graphic>
                         <tooltip>
-                            <Tooltip text="Zoom in"/>
+                            <Tooltip text="Contract tree vertically"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="expandHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Expand Horizontally">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ExpandHorizontal16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Expand tree horizontally"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="contractHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                            text="Contract Horizontally">
+                        <font>
+                            <Font size="10.0"/>
+                        </font>
+                        <graphic>
+                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                                <Image smooth="false" url="@/jloda/resources/icons/ContractHorizontal16.gif"/>
+                            </ImageView>
+                        </graphic>
+                        <tooltip>
+                            <Tooltip text="Contract tree horizontally"/>
                         </tooltip>
                     </Button>
                     <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
@@ -96,20 +155,7 @@
                 </ToolBar>
             </VBox>
         </top>
-        <center>
-            <AnchorPane fx:id="outerAnchorPane">
-                <children>
-                    <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
-                                AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                AnchorPane.topAnchor="0.0">
-                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
-                    </AnchorPane>
-                    <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
-                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>
-                </children>
-            </AnchorPane>
-        </center>
+
     </BorderPane>
     <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="32.0"
           AnchorPane.topAnchor="0.0">

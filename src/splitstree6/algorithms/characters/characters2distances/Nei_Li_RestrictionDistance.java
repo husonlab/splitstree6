@@ -106,8 +106,8 @@ public class Nei_Li_RestrictionDistance extends Characters2Distances {
 	}
 
 	@Override
-	public boolean isApplicable(TaxaBlock taxa, CharactersBlock c) {
-		return c.getDataType().equals(CharactersType.Standard);
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard;
 	}
 
 	public double getOptionRestrictionSiteLength() {

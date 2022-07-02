@@ -127,8 +127,8 @@ public class ProteinMLdist extends Characters2Distances {
 	}
 
 	@Override
-	public boolean isApplicable(TaxaBlock taxa, CharactersBlock ch) {
-		return ch.getDataType() == CharactersType.Protein;
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Protein;
 	}
 
 	public ProteinModel selectModel(Model model) {

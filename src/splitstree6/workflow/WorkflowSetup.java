@@ -19,9 +19,10 @@
 
 package splitstree6.workflow;
 
-import javafx.beans.value.WeakChangeListener;
+import javafx.beans.value.ChangeListener;
 import javafx.concurrent.Worker;
 import jloda.fx.window.NotificationManager;
+import jloda.util.Single;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
@@ -43,7 +44,6 @@ import java.util.function.Consumer;
  * Daniel Huson, 10.2021
  */
 public class WorkflowSetup {
-
 	public static Workflow apply(String fileName, MainWindow mainWindow) {
 		var workflow = new Workflow(mainWindow);
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(mainWindow.getController().getBottomFlowPane()));
@@ -89,23 +89,26 @@ public class WorkflowSetup {
 			var dataNode = workflow.getWorkingDataNode();
 			workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), dataNode, workflow.newDataNode(new ViewBlock()));
 		}
-		/*
-		else if (clazz.equals(NetworkBlock.class)) {
-			workflow.setupInputAndWorkingNodes(sourceBlock,new NetworkLoader(),new TaxaBlock(), new NetworksBlock());
-		var sourceNode = workflow.newSourceNode(new SourceBlock());
-		workflow.newLoaderNode(new NetworkLoader(), sourceNode, workflow.getTopTaxaNode(), workflow.getTopDataNode());
-		workflow.newAlgorithmNode(new ShowNetworkConsole(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), workflow.newDataNode(new ViewBlock()));
-		// todo: replace by calculation of network
-		 */
+
 		System.err.println("Workflow: " + workflow.size());
 		if (workflow.size() > 0) {
-			if (exceptionHandler != null || runOnSuccess != null)
-				workflow.getLoaderNode().getService().stateProperty().addListener(new WeakChangeListener<>((v, o, n) -> {
-					if (n == Worker.State.FAILED && exceptionHandler != null)
+			if (exceptionHandler != null || runOnSuccess != null) {
+				var changeListener = new Single<ChangeListener<Worker.State>>();
+				changeListener.set((v, o, n) -> {
+					System.err.println(workflow.getLoaderNode() + ": state: " + n);
+					if (n == Worker.State.FAILED && exceptionHandler != null) {
 						exceptionHandler.accept(workflow.getLoaderNode().getService().getException());
-					if (n == Worker.State.SUCCEEDED && runOnSuccess != null)
+					}
+					if (n == Worker.State.SUCCEEDED && runOnSuccess != null) {
 						runOnSuccess.run();
-				}));
+					}
+					if (n == Worker.State.CANCELLED || n == Worker.State.FAILED || n == Worker.State.SUCCEEDED) {
+						workflow.getLoaderNode().getService().stateProperty().removeListener(changeListener.get());
+					}
+				});
+
+				workflow.getLoaderNode().getService().stateProperty().addListener(changeListener.get());
+			}
 			workflow.getSourceNode().setValid(true);
 			workflow.getInputDataLoaderNode().restart();
 		}

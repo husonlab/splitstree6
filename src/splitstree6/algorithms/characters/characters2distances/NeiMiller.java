@@ -202,7 +202,7 @@ public class NeiMiller extends Characters2Distances {
 	}
 
 	@Override
-	public boolean isApplicable(TaxaBlock taxa, CharactersBlock chars) {
-		return chars.getDataType().equals(CharactersType.Standard) && chars.getCharacterWeights() != null;
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard && datablock.getCharacterWeights() != null;
 	}
 }

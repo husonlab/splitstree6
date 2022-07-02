@@ -103,15 +103,9 @@ public class Upholt extends Characters2Distances {
 		progress.close();
 	}
 
-	/**
-	 * Determine whether Upholt distances can be computed with given data.
-	 *
-	 * @param taxa the taxa
-	 * @param c    the characters matrix
-	 * @return true, character block exists and has standard datatype.
-	 */
-	public boolean isApplicable(TaxaBlock taxa, CharactersBlock c) {
-		return c.getDataType() == CharactersType.Standard;
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard;
 	}
 
 	public double getOptionRestrictionSiteLength() {

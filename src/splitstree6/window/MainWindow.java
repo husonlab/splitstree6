@@ -36,7 +36,6 @@ import jloda.fx.util.MemoryUsage;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
-import jloda.fx.window.PresentationMode;
 import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
@@ -167,7 +166,6 @@ public class MainWindow implements IMainWindow {
 		name.addListener(invalidationListener);
 		dirty.addListener(invalidationListener);
 		invalidationListener.invalidated(null);
-		PresentationMode.ensurePresentationMode(stage);
 		stage.show();
 		Platform.runLater(() -> {
 			stage.setWidth(stage.getWidth() - 1);

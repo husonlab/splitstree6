@@ -125,6 +125,9 @@ public class NetworkView implements IView {
 			sitesFormat.getEdgeShapeMap().putAll(edgeShapeMap);
 		});
 		presenter.updateCounterProperty().addListener(e -> sitesFormat.updateEdges());
+		networkBlockProperty().addListener((v, o, n) -> {
+			sitesFormat.setDisable(n == null || n.getGraph().getNumberOfEdges() == 0);
+		});
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, sitesFormat);
 
@@ -137,6 +140,12 @@ public class NetworkView implements IView {
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
 
 		empty.bind(Bindings.createBooleanBinding(() -> getNetworkBlock() == null || getNetworkBlock().size() == 0, networkBlockProperty()));
+
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  nodes: %,d  edges: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(),
+						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfNodes(),
+						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfEdges()),
+				mainWindow.workingTaxaProperty(), networkBlockProperty()));
+
 	}
 
 	@Override

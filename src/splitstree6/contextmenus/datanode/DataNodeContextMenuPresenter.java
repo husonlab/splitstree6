@@ -36,6 +36,7 @@ import splitstree6.workflow.commands.AddTreePipelineCommand;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -65,7 +66,7 @@ public class DataNodeContextMenuPresenter {
 			controller.getAddNetworkMenu().getItems().setAll(createAddNetworkMenuItems(workflow, undoManager, dataNode));
 			controller.getAddNetworkMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddNetworkMenu().getItems())));
 
-			controller.getAddAlgorithmMenu().getItems().setAll(createAddAlgorithmMenuItems(workflow, undoManager, dataNode));
+			controller.getAddAlgorithmMenu().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, undoManager, dataNode));
 			controller.getAddAlgorithmMenu().disableProperty().bind(workflow.runningProperty().or(Bindings.isEmpty(controller.getAddAlgorithmMenu().getItems())));
 		} else {
 			controller.getAddTreeMenu().setDisable(true);
@@ -85,10 +86,14 @@ public class DataNodeContextMenuPresenter {
 		list.sort(Comparator.comparing(Pair::getKey));
 
 		var result = new ArrayList<MenuItem>();
+		var seen = new HashSet<String>();
 		for (var pair : list) {
-			var menuItem = new MenuItem(pair.getKey());
-			menuItem.setOnAction(e -> undoManager.doAndAdd(AddTreePipelineCommand.create(workflow, dataNode, pair.getValue())));
-			result.add(menuItem);
+			if (!seen.contains(pair.getKey())) {
+				seen.add(pair.getKey());
+				var menuItem = new MenuItem(pair.getKey());
+				menuItem.setOnAction(e -> undoManager.doAndAdd(AddTreePipelineCommand.create(workflow, dataNode, pair.getValue())));
+				result.add(menuItem);
+			}
 		}
 		return result;
 	}
@@ -97,9 +102,13 @@ public class DataNodeContextMenuPresenter {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
+		var seen = new HashSet<String>();
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
 			if (AddNetworkPipelineCommand.isApplicable(dataNode, algorithm)) {
-				list.add(new Pair<>(algorithm.getName(), algorithm));
+				if (!seen.contains(algorithm.getName())) {
+					seen.add(algorithm.getName());
+					list.add(new Pair<>(algorithm.getName(), algorithm));
+				}
 			}
 		}
 		list.sort(Comparator.comparing(Pair::getKey));
@@ -113,21 +122,25 @@ public class DataNodeContextMenuPresenter {
 		return result;
 	}
 
-	private List<MenuItem> createAddAlgorithmMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
+	private List<MenuItem> createAddAlgorithmMenuItems(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode) {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
+		var seen = new HashSet<String>();
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
 			if (AddAlgorithmCommand.isApplicable(dataNode, algorithm) && !(algorithm instanceof DataTaxaFilter))
-				list.add(new Pair<>(algorithm.getName(), algorithm));
+				if (!seen.contains(algorithm.getName())) {
+					seen.add(algorithm.getName());
+					list.add(new Pair<>(algorithm.getName(), algorithm));
+				}
 		}
 		list.sort(Comparator.comparing(Pair::getKey));
 
 		var result = new ArrayList<MenuItem>();
 		for (var pair : list) {
 			var menuItem = new MenuItem(pair.getKey());
-			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(workflow, dataNode, pair.getValue())));
-			menuItem.setDisable(!pair.getValue().isApplicable(workflow.getWorkingTaxaBlock(), dataNode.getDataBlock()));
+			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(mainWindow, dataNode, pair.getValue())));
+			menuItem.setDisable(!pair.getValue().isApplicable(mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock()));
 			result.add(menuItem);
 		}
 		return result;

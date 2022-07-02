@@ -192,7 +192,16 @@ public class TraitsFormat extends Pane {
 						if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
 							var taxonId = graph.getTaxon(v);
 
-							if (!isNoneTraitsActive()) {
+							if (isNoneTraitsActive()) {
+								var shapes = BasicFX.getAllRecursively(group, Shape.class);
+								if (shapes.size() == 1) {
+									var shape = shapes.iterator().next();
+									if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
+										shape.setScaleX(1);
+										shape.setScaleY(1);
+									}
+								}
+							} else {
 								var pieChart = new PieChart();
 								pieChart.setLabelsVisible(false);
 								pieChart.setLegendVisible(false);

@@ -228,11 +228,10 @@ public class InteractionSetup {
 			});
 			label.setOnMouseEntered(shape.getOnMouseEntered());
 			label.setOnMouseExited(shape.getOnMouseExited());
-
 		});
 	}
 
-	private void showContextMenu(Stage stage, ContextMenuEvent event, Taxon taxon, RichTextLabel label) {
+	public static void showContextMenu(Stage stage, ContextMenuEvent event, Taxon taxon, RichTextLabel label) {
 		var editLabelMenuItem = new MenuItem("Edit Label...");
 		editLabelMenuItem.setOnAction(e -> {
 			var editLabelDialog = new EditLabelDialog(stage, label);

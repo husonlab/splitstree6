@@ -53,19 +53,19 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 
 	protected final static boolean DEFAULT_USE_ML = false;
 
-	private final DoubleProperty optionGamma = new SimpleDoubleProperty(DEFAULT_GAMMA);
-	private final DoubleProperty optionPropInvariableSites = new SimpleDoubleProperty(DEFAULT_PROP_INVARIABLE_SITES);
+	private final DoubleProperty optionGamma = new SimpleDoubleProperty(this, "optionGamma", DEFAULT_GAMMA);
+	private final DoubleProperty optionPropInvariableSites = new SimpleDoubleProperty(this, "optionPropInvariableSites", DEFAULT_PROP_INVARIABLE_SITES);
 
-	private final ObjectProperty<double[]> optionBaseFrequencies = new SimpleObjectProperty<>(DEFAULT_BASE_FREQ);
+	private final ObjectProperty<double[]> optionBaseFrequencies = new SimpleObjectProperty<>(this, "optionBaseFrequencies", DEFAULT_BASE_FREQ);
 
-	private final DoubleProperty optionTsTvRatio = new SimpleDoubleProperty(DEFAULT_TSTV_RATIO);
-	private final DoubleProperty optionACvATRatio = new SimpleDoubleProperty(DEFAULT_AC_VS_AT);
-	private final ObjectProperty<double[][]> optionRateMatrix = new SimpleObjectProperty<>(DEFAULT_RATE_MATRIX);
+	private final DoubleProperty optionTsTvRatio = new SimpleDoubleProperty(this, "optionTsTvRatio", DEFAULT_TSTV_RATIO);
+	private final DoubleProperty optionACvATRatio = new SimpleDoubleProperty(this, "optionACvATRatio", DEFAULT_AC_VS_AT);
+	private final ObjectProperty<double[][]> optionRateMatrix = new SimpleObjectProperty<>(this, "optionRateMatrix", DEFAULT_RATE_MATRIX);
 
-	private final BooleanProperty optionUseML_Distances = new SimpleBooleanProperty(DEFAULT_USE_ML);
+	private final BooleanProperty optionUseML_Distances = new SimpleBooleanProperty(this, "optionUseML_Distances", DEFAULT_USE_ML);
 
-	private final ObjectProperty<SetParameters> optionSetBaseFrequencies = new SimpleObjectProperty<>(SetParameters.defaultValues);
-	private final ObjectProperty<SetParameters> optionSetSiteVarParams = new SimpleObjectProperty<>(SetParameters.defaultValues);
+	private final ObjectProperty<SetParameters> optionSetBaseFrequencies = new SimpleObjectProperty<>(this, "optionSetBaseFrequencies", SetParameters.defaultValues);
+	private final ObjectProperty<SetParameters> optionSetSiteVarParams = new SimpleObjectProperty<>(this, "optionSetSiteVarParams", SetParameters.defaultValues);
 
 	private ChangeListener<SetParameters> listenerSetBaseFrequencies = null;
 	private ChangeListener<SetParameters> listenerSetSiteVarParams = null;
@@ -248,5 +248,10 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 
 	public void setOptionSetSiteVarParams(SetParameters optionSetSiteVarParams) {
 		this.optionSetSiteVarParams.set(optionSetSiteVarParams);
+	}
+
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType().isNucleotides();
 	}
 }

@@ -149,8 +149,8 @@ public class GeneContentDistance extends Characters2Distances {
 	}
 
 	@Override
-	public boolean isApplicable(TaxaBlock taxaBlock, CharactersBlock parent) {
-		return parent.getDataType() == CharactersType.Standard && parent.getSymbols().contains("1");
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard && datablock.getSymbols().contains("1");
 	}
 
 	//GETTER AND SETTER

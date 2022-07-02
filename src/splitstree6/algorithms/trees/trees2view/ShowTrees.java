@@ -31,6 +31,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.io.nexus.TreesNexusOutput;
 import splitstree6.view.displaytext.DisplayTextView;
+import splitstree6.view.trees.densitree.DensiTreeView;
 import splitstree6.view.trees.tanglegram.TanglegramView;
 import splitstree6.view.trees.treepages.TreePagesView;
 import splitstree6.view.trees.treeview.TreeView;
@@ -131,7 +132,20 @@ public class ShowTrees extends Trees2View {
 				});
 
 			}
-			case DensiTree -> throw new IOException("Not implemented: " + getOptionView());
+			case DensiTree -> {
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					viewBlock.setView(new DensiTreeView(mainWindow, ViewType.DensiTree.name(), viewBlock.getViewTab()));
+				});
+
+				Platform.runLater(() -> {
+					if (viewBlock.getView() instanceof DensiTreeView view) {
+						view.getUndoManager().clear();
+						view.getTrees().setAll(inputData.getTrees());
+						view.setReticulated(inputData.isReticulated());
+					}
+				});
+			}
 			case Text -> {
 				Platform.runLater(() -> {
 					var mainWindow = getNode().getOwner().getMainWindow();
