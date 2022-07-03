@@ -51,16 +51,17 @@ public class EdgesFormatController {
 	@FXML
 	private TitledPane titledPane;
 
+	private final ToggleGroup labelByToggleGroup = new ToggleGroup();
+
 	@FXML
 	private void initialize() {
 		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
-		var toggleGroup = new ToggleGroup();
-		toggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByProbabilityMenuItem);
-		toggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
+		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByProbabilityMenuItem);
+		labelByToggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
 			if (n != null)
 				labelByMenuButton.setText(((RadioMenuItem) n).getText());
 		});
-		toggleGroup.selectToggle(labelByNoneMenuItem);
+		labelByToggleGroup.selectToggle(labelByNoneMenuItem);
 	}
 
 	public ComboBox<Number> getWidthCBox() {
@@ -93,5 +94,9 @@ public class EdgesFormatController {
 
 	public RadioMenuItem getLabelByWeightMenuItem() {
 		return labelByWeightMenuItem;
+	}
+
+	public ToggleGroup getLabelByToggleGroup() {
+		return labelByToggleGroup;
 	}
 }

@@ -51,4 +51,6 @@ public class EdgesFormat extends Group {
 	public EdgesFormatPresenter getPresenter() {
 		return presenter;
 	}
+
+
 }

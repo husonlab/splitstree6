@@ -149,6 +149,9 @@ public class TreeView implements IView {
 
 		var edgesFormatter = new EdgesFormat(undoManager, edgeSelectionModel, edgeShapeMap, optionEditsProperty());
 
+		treeProperty().addListener((v, o, n) -> {
+		});
+
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow),
 				new Separator(Orientation.HORIZONTAL), edgesFormatter);
 

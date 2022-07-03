@@ -31,11 +31,13 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Edge;
+import jloda.phylo.PhyloTree;
 import splitstree6.view.trees.treeview.TreeEdits;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * edge formatter presenter
@@ -46,8 +48,15 @@ public class EdgesFormatPresenter {
 
 	private boolean inUpdatingDefaults = false;
 
+	private final UndoManager undoManager;
+	private final EdgesFormatController controller;
+
+	private Consumer<EdgesFormat.LabelBy> updateLabelsConsumer;
+
 	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, SelectionModel<Edge> edgeSelectionModel,
 								Map<Edge, Shape> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
+		this.undoManager = undoManager;
+		this.controller = controller;
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
@@ -154,5 +163,22 @@ public class EdgesFormatPresenter {
 		//selectionModel.getSelectedItems().addListener(selectionListener);
 		edgeSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));
 		selectionListener.invalidated(null);
+	}
+
+	public void setUpdateLabelsConsumer(Consumer<EdgesFormat.LabelBy> updateLabelsConsumer) {
+		this.updateLabelsConsumer = updateLabelsConsumer;
+
+
+	}
+
+	public void updateMenus(PhyloTree tree) {
+		controller.getLabelByWeightMenuItem().setDisable(tree == null || !tree.hasEdgeWeights());
+		controller.getLabelByConfidenceMenuItem().setDisable(tree == null || !tree.hasEdgeConfidences());
+		controller.getLabelByProbabilityMenuItem().setDisable(tree == null || !tree.hasEdgeProbabilities());
+
+		if (controller.getLabelByWeightMenuItem().isSelected() && controller.getLabelByWeightMenuItem().isDisable()
+			|| controller.getLabelByConfidenceMenuItem().isSelected() && controller.getLabelByConfidenceMenuItem().isDisable()
+			|| controller.getLabelByProbabilityMenuItem().isSelected() && controller.getLabelByProbabilityMenuItem().isDisable())
+			Platform.runLater(() -> controller.getLabelByNoneMenuItem().setSelected(true));
 	}
 }
