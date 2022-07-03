@@ -38,48 +38,150 @@ import java.util.stream.Collectors;
  */
 public class RerootingUtils {
 	/**
-	 * reroot a tree by midpoint
+	 * reRoot a tree by midpoint
 	 */
-	public static void rerootByMidpoint(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree) {
-		if (tree.isReticulated()) {
-			System.err.println("Rerooting by midpoint in the presence of reticulations has not been debugged");
-		}
-
+	public static void reRootByMidpoint(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree) {
 		var list = computeRootingRecords(tree);
 		if (list.size() > 0) {
 			list.sort(RootingRecord.comparatorForMidpointRooting());
-			reroot(internalNodeLabelsAreEdgeLabels, tree, list.get(0), false);
+			reRoot(internalNodeLabelsAreEdgeLabels, tree, list.get(0), false);
 		}
 	}
 
+	/**
+	 * reRoot a tree by out group. Use tightest edge that separates all outgroup taxa
+	 */
+	public static void reRootByOutGroup(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, BitSet outgroupTaxa) {
+		try (EdgeArray<BitSet> sourceMap = tree.newEdgeArray(); EdgeArray<BitSet> targetMap = tree.newEdgeArray()) {
+			for (var start : tree.nodeStream().filter(v -> v.getDegree() == 1).collect(Collectors.toList())) {
+				try (var visited = tree.newNodeSet()) {
+					computeTaxaRec(tree, start, sourceMap, targetMap);
+				}
+			}
 
-	private static void reroot(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, RootingRecord rootingRecord, boolean forceOnEdge) {
+			Edge best = null;
+			BitSet bestSet = null;
+			for (var e : tree.edges()) {
+				if (!tree.isReticulateEdge(e)) {
+					var set = sourceMap.get(e);
+					if (BitSetUtils.intersection(set, outgroupTaxa).cardinality() < outgroupTaxa.cardinality())
+						set = targetMap.get(e);
+					if (BitSetUtils.contains(set, outgroupTaxa)) {
+						if (bestSet == null || set.cardinality() < bestSet.cardinality()) {
+							best = e;
+							bestSet = set;
+						}
+					}
+				}
+			}
+			if (best != null) {
+				for (var rootingRecord : computeRootingRecords(tree)) {
+					if (rootingRecord.edge() == best) {
+						reRoot(internalNodeLabelsAreEdgeLabels, tree, rootingRecord, true);
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * reRoot tree by node
+	 */
+	public static void reRootByNode(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Node v) {
+		v = getLastAncestorAboveAllReticulations(v);
+
+		if (v == tree.getRoot())
+			return;
+
+		if (tree.getRoot().getOutDegree() == 1 && tree.getNumberOfTaxa(tree.getRoot()) == 0) {
+			var root = tree.getRoot().getFirstOutEdge().getTarget();
+			tree.deleteNode(tree.getRoot());
+			tree.setRoot(root);
+		}
+
+		if (v == tree.getRoot())
+			return;
+
+		final var root = tree.getRoot();
+		if (root.getDegree() == 2 && tree.getLabel(root) == null) {
+			tree.delDivertex(root);
+		}
+
+		final EdgeArray<String> edgeLabels;
+		if (internalNodeLabelsAreEdgeLabels && !PhyloTree.SUPPORT_RICH_NEWICK)
+			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
+		else
+			edgeLabels = null;
+
+		tree.eraseRoot(edgeLabels);
+		tree.setRoot(v);
+		tree.redirectEdgesAwayFromRoot();
+
+		if (edgeLabels != null)
+			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
+	}
+
+	/**
+	 * reRoot tree by edge
+	 */
+	public static void reRootByEdge(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Edge e, double weight2source, double weight2target) {
+		final EdgeArray<String> edgeLabels;
+		if (internalNodeLabelsAreEdgeLabels && !PhyloTree.SUPPORT_RICH_NEWICK)
+			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
+		else
+			edgeLabels = null;
+
+		var v = getLastAncestorAboveAllReticulations(e.getSource());
+
+		if (v != e.getSource()) {
+			reRootByNode(internalNodeLabelsAreEdgeLabels, tree, v);
+		} else {
+			if (tree.getRoot().getOutDegree() == 1 && tree.getNumberOfTaxa(tree.getRoot()) == 0) {
+				var root = tree.getRoot().getFirstOutEdge().getTarget();
+				tree.deleteNode(tree.getRoot());
+				tree.setRoot(root);
+			}
+
+			// not under a special node, reRoot in simple way
+			tree.setRoot(e, weight2source, weight2target, edgeLabels);
+
+			tree.redirectEdgesAwayFromRoot();
+
+			System.err.println("Rerooted:\n" + tree.toBracketString(true) + ";");
+
+			if (edgeLabels != null)
+				SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
+		}
+	}
+
+	private static void reRoot(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, RootingRecord rootingRecord, boolean forceOnEdge) {
 		var half = 0.5 * rootingRecord.total();
 
 		if (rootingRecord.sourceToLeafMaxDistance() - rootingRecord.weight() >= half) {
 			if (forceOnEdge) {
 				var weight2source = 0.9 * rootingRecord.weight();
 				var weight2target = 0.1 * rootingRecord.weight();
-				rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+				reRootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
 			} else {
 				var root = rootingRecord.edge().getTarget(); // yes, target!
 				if (root != tree.getRoot())
-					rerootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
+					reRootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
 			}
 		} else if (rootingRecord.targetToLeafMaxDistance() - rootingRecord.weight() >= half) {
 			if (forceOnEdge) {
 				var weight2source = 0.1 * rootingRecord.weight();
 				var weight2target = 0.9 * rootingRecord.weight();
-				rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+				reRootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
 			} else {
 				var root = rootingRecord.edge().getSource(); // yes, source!
 				if (root != tree.getRoot())
-					rerootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
+					reRootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
 			}
 		} else {
 			var weight2source = half - (rootingRecord.targetToLeafMaxDistance() - rootingRecord.weight());
 			var weight2target = half - (rootingRecord.sourceToLeafMaxDistance() - rootingRecord.weight());
-			rerootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+			reRootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
 		}
 	}
 
@@ -135,46 +237,6 @@ public class RerootingUtils {
 		}
 	}
 
-	/**
-	 * reroot a tree by outgroup. Use tightest edge that separates all outgroup taxa
-	 */
-	public static void rerootByOutGroup(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, BitSet outgroupTaxa) {
-		if (tree.isReticulated()) {
-			System.err.println("Rerooting by out-group in the presence of reticulations has not been debugged");
-		}
-
-		try (EdgeArray<BitSet> sourceMap = tree.newEdgeArray(); EdgeArray<BitSet> targetMap = tree.newEdgeArray()) {
-			for (var start : tree.nodeStream().filter(v -> v.getDegree() == 1).collect(Collectors.toList())) {
-				try (var visited = tree.newNodeSet()) {
-					computeTaxaRec(tree, start, sourceMap, targetMap);
-				}
-			}
-
-			Edge best = null;
-			BitSet bestSet = null;
-			for (var e : tree.edges()) {
-				if (!tree.isReticulateEdge(e)) {
-					var set = sourceMap.get(e);
-					if (BitSetUtils.intersection(set, outgroupTaxa).cardinality() < outgroupTaxa.cardinality())
-						set = targetMap.get(e);
-					if (BitSetUtils.contains(set, outgroupTaxa)) {
-						if (bestSet == null || set.cardinality() < bestSet.cardinality()) {
-							best = e;
-							bestSet = set;
-						}
-					}
-				}
-			}
-			if (best != null) {
-				for (var rootingRecord : computeRootingRecords(tree)) {
-					if (rootingRecord.edge() == best) {
-						reroot(internalNodeLabelsAreEdgeLabels, tree, rootingRecord, true);
-						return;
-					}
-				}
-			}
-		}
-	}
 
 	private static BitSet computeTaxaRec(PhyloTree tree, Node v, EdgeArray<BitSet> sourceMap, EdgeArray<BitSet> targetMap) {
 		var taxa = new BitSet();
@@ -193,77 +255,6 @@ public class RerootingUtils {
 			}
 		}
 		return taxa;
-	}
-
-
-	/**
-	 * reroot tree by node
-	 */
-	public static void rerootByNode(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Node v) {
-		v = getLastAncestorAboveAllReticulations(v);
-
-		if (v == tree.getRoot())
-			return;
-
-		if (tree.getRoot().getOutDegree() == 1 && tree.getNumberOfTaxa(tree.getRoot()) == 0) {
-			var root = tree.getRoot().getFirstOutEdge().getTarget();
-			tree.deleteNode(tree.getRoot());
-			tree.setRoot(root);
-		}
-
-		if (v == tree.getRoot())
-			return;
-
-		final var root = tree.getRoot();
-		if (root.getDegree() == 2 && tree.getLabel(root) == null) {
-			tree.delDivertex(root);
-		}
-
-		final EdgeArray<String> edgeLabels;
-		if (internalNodeLabelsAreEdgeLabels)
-			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
-		else
-			edgeLabels = null;
-
-		tree.eraseRoot(edgeLabels);
-		tree.setRoot(v);
-		tree.redirectEdgesAwayFromRoot();
-
-		if (internalNodeLabelsAreEdgeLabels)
-			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
-	}
-
-	/**
-	 * reroot tree by edge
-	 */
-	public static void rerootByEdge(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Edge e, double weight2source, double weight2target) {
-		final EdgeArray<String> edgeLabels;
-		if (internalNodeLabelsAreEdgeLabels)
-			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
-		else
-			edgeLabels = null;
-
-		var v = getLastAncestorAboveAllReticulations(e.getSource());
-
-		if (v != e.getSource()) {
-			rerootByNode(internalNodeLabelsAreEdgeLabels, tree, v);
-		} else {
-			if (tree.getRoot().getOutDegree() == 1 && tree.getNumberOfTaxa(tree.getRoot()) == 0) {
-				var root = tree.getRoot().getFirstOutEdge().getTarget();
-				tree.deleteNode(tree.getRoot());
-				tree.setRoot(root);
-			}
-
-			// not under a special node, reroot in simple way
-			tree.setRoot(e, weight2source, weight2target, edgeLabels);
-
-			tree.redirectEdgesAwayFromRoot();
-
-			System.err.println("Rerooted:\n" + tree.toBracketString(true) + ";");
-
-			if (internalNodeLabelsAreEdgeLabels)
-				SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
-		}
 	}
 
 	/**

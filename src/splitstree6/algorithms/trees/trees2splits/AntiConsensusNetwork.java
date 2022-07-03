@@ -178,7 +178,7 @@ public class AntiConsensusNetwork extends Trees2Splits {
 			referenceTree = trees.getTree(1);
 			if (showTrees) {
 				System.err.println("Consensus tree:");
-				TreesUtilities.changeNumbersOnLeafNodesToLabels(taxaBlock, referenceTree);
+				changeNumbersOnLeafNodesToLabels(taxaBlock, referenceTree);
 				System.err.println(referenceTree.toBracketString(true) + ";");
 			}
 		}
@@ -636,9 +636,26 @@ public class AntiConsensusNetwork extends Trees2Splits {
 			Basic.caught(e); // can't happen
 		}
 		PhyloTree tree = trees.getTree(1);
-		TreesUtilities.changeNumbersOnLeafNodesToLabels(taxaBlock, tree);
+		changeNumbersOnLeafNodesToLabels(taxaBlock, tree);
 		return tree.toBracketString(true);
 	}
+
+	/**
+	 * change numerical leaf label to string
+	 */
+	private static void changeNumbersOnLeafNodesToLabels(final TaxaBlock taxaBlock, PhyloTree tree) {
+		for (var v = tree.getFirstNode(); v != null; v = v.getNext()) {
+			if (v.getOutDegree() == 0) {
+				final var label = tree.getLabel(v);
+				if (label != null) {
+					if (NumberUtils.isInteger(label)) {
+						tree.setLabel(v, taxaBlock.getLabel(NumberUtils.parseInt(label)));
+					}
+				}
+			}
+		}
+	}
+
 
 	public static Comparator<SIN> sinsComparator() {
 		return (a, b) -> {

@@ -29,10 +29,11 @@ import splitstree6.algorithms.utils.RerootingUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.HashMap;
 
 /**
  * greedy tree
@@ -48,16 +49,16 @@ public class GreedyTree extends Splits2Trees {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splits, TreesBlock trees) throws IOException {
 
 		progress.setTasks("Greedy Tree", "Extracting compatible splits...");
-		final Map<BitSet, Double> cluster2Weight = new HashMap<>();
-		for (ASplit split : splits.getSplits()) {
+		final var cluster2Weight = new HashMap<BitSet, Double>();
+		for (var split : splits.getSplits()) {
 			cluster2Weight.put(split.getPartNotContaining(1), split.getWeight());
 		}
 
 		final BitSet[] clusters;
 		{
-			final ArrayList<ASplit> compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits());
+			final var compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits());
 			clusters = new BitSet[compatibleSplits.size()];
-			for (int i = 0; i < compatibleSplits.size(); i++) {
+			for (var i = 0; i < compatibleSplits.size(); i++) {
 				clusters[i] = compatibleSplits.get(i).getPartNotContaining(1);
 			}
 		}
@@ -115,7 +116,7 @@ public class GreedyTree extends Splits2Trees {
 		PhyloGraphUtils.addLabels(taxaBlock, tree);
 
 		// todo: ask about internal node labels
-		RerootingUtils.rerootByMidpoint(false, tree);
+		RerootingUtils.reRootByMidpoint(false, tree);
 
 		trees.setRooted(true);
 		trees.setPartial(false);

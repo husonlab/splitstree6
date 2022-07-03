@@ -21,8 +21,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 <Accordion maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.edges.EdgesFormatController">
@@ -31,7 +30,11 @@
             <content>
                 <VBox maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0" spacing="5.0">
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="6.0">
-                        <Label text="Width"/>
+                        <Label text="Width">
+                            <HBox.margin>
+                                <Insets right="2.0"/>
+                            </HBox.margin>
+                        </Label>
                         <ComboBox fx:id="widthCBox" editable="true" prefWidth="100.0" visibleRowCount="14">
                             <tooltip>
                                 <Tooltip text="Line width"/>
@@ -44,7 +47,7 @@
                                 <Font size="12.0"/>
                             </font>
                             <HBox.margin>
-                                <Insets right="8.0"/>
+                                <Insets right="10.0"/>
                             </HBox.margin>
                         </Label>
                         <ColorPicker fx:id="colorPicker" editable="true">
@@ -52,6 +55,27 @@
                                 <Tooltip text="Line color"/>
                             </tooltip>
                         </ColorPicker>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="15.0" spacing="6.0">
+                        <children>
+                            <Label text="Labels">
+                                <HBox.margin>
+                                    <Insets/>
+                                </HBox.margin>
+                            </Label>
+                            <MenuButton fx:id="labelByMenuButton" mnemonicParsing="false" prefWidth="137.0"
+                                        text="MenuButton">
+                                <items>
+                                    <RadioMenuItem fx:id="labelByNoneMenuItem" mnemonicParsing="false" text="None"/>
+                                    <SeparatorMenuItem mnemonicParsing="false"/>
+                                    <RadioMenuItem fx:id="labelByWeightMenuItem" mnemonicParsing="false" text="Weight"/>
+                                    <RadioMenuItem fx:id="labelByConfidenceMenuItem" mnemonicParsing="false"
+                                                   text="Confidence"/>
+                                    <RadioMenuItem fx:id="labelByProbabilityMenuItem" mnemonicParsing="false"
+                                                   text="Probability"/>
+                                </items>
+                            </MenuButton>
+                        </children>
                     </HBox>
                     <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>

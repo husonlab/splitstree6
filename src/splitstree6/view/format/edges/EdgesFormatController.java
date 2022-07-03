@@ -20,9 +20,7 @@
 package splitstree6.view.format.edges;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.util.converter.FormatStringConverter;
 
 import java.text.NumberFormat;
@@ -33,6 +31,21 @@ public class EdgesFormatController {
 	private ComboBox<Number> widthCBox;
 
 	@FXML
+	private RadioMenuItem labelByConfidenceMenuItem;
+
+	@FXML
+	private MenuButton labelByMenuButton;
+
+	@FXML
+	private RadioMenuItem labelByNoneMenuItem;
+
+	@FXML
+	private RadioMenuItem labelByProbabilityMenuItem;
+
+	@FXML
+	private RadioMenuItem labelByWeightMenuItem;
+
+	@FXML
 	private ColorPicker colorPicker;
 
 	@FXML
@@ -41,6 +54,13 @@ public class EdgesFormatController {
 	@FXML
 	private void initialize() {
 		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
+		var toggleGroup = new ToggleGroup();
+		toggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByProbabilityMenuItem);
+		toggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
+			if (n != null)
+				labelByMenuButton.setText(((RadioMenuItem) n).getText());
+		});
+		toggleGroup.selectToggle(labelByNoneMenuItem);
 	}
 
 	public ComboBox<Number> getWidthCBox() {
@@ -53,5 +73,25 @@ public class EdgesFormatController {
 
 	public TitledPane getTitledPane() {
 		return titledPane;
+	}
+
+	public RadioMenuItem getLabelByConfidenceMenuItem() {
+		return labelByConfidenceMenuItem;
+	}
+
+	public MenuButton getLabelByMenuButton() {
+		return labelByMenuButton;
+	}
+
+	public RadioMenuItem getLabelByNoneMenuItem() {
+		return labelByNoneMenuItem;
+	}
+
+	public RadioMenuItem getLabelByProbabilityMenuItem() {
+		return labelByProbabilityMenuItem;
+	}
+
+	public RadioMenuItem getLabelByWeightMenuItem() {
+		return labelByWeightMenuItem;
 	}
 }

@@ -112,7 +112,7 @@ public class TreesUtilities {
 	/**
 	 * reinterpret an numerical label of an internal node as the confidence associated with the incoming edge
 	 */
-	public static void changeNumbersOnInternalNodesToEdgeConfidencies(PhyloTree tree) {
+	public static void changeNumbersOnInternalNodesToEdgeConfidences(PhyloTree tree) {
 		for (var v = tree.getFirstNode(); v != null; v = v.getNext()) {
 			if (v.getOutDegree() != 0 && v.getInDegree() == 1) {
 				var label = tree.getLabel(v);
@@ -146,23 +146,6 @@ public class TreesUtilities {
 		}
 		return hasNumbers;
 	}
-
-	/**
-	 * change numerical leaf label to string
-	 */
-	public static void changeNumbersOnLeafNodesToLabels(final TaxaBlock taxaBlock, PhyloTree tree) {
-		for (var v = tree.getFirstNode(); v != null; v = v.getNext()) {
-			if (v.getOutDegree() == 0) {
-				final var label = tree.getLabel(v);
-				if (label != null) {
-					if (NumberUtils.isInteger(label)) {
-						tree.setLabel(v, taxaBlock.getLabel(NumberUtils.parseInt(label)));
-					}
-				}
-			}
-		}
-	}
-
 
 	/**
 	 * compute all the splits in a tree

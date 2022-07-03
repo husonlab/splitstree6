@@ -34,10 +34,13 @@ import java.util.Map;
  * Daniel Huson, 5.2022
  */
 public class EdgesFormat extends Group {
+	public enum LabelBy {None, Weight, Confidence, Probability}
+
 	private final EdgesFormatController controller;
 	private final EdgesFormatPresenter presenter;
 
-	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, Shape> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
+	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, Shape> edgeShapeMap,
+					   ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<EdgesFormatController>(EdgesFormatController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());

@@ -110,12 +110,17 @@ public class BootstrapTree extends Trees2Trees {
 		}
 
 		for (var split : splitsBlock.getSplits()) {
-			var a = clusterNodeMap.get(split.getA());
-			if (a != null)
-				tree.setLabel(a, StringUtils.removeTrailingZerosAfterDot("%.1f", split.getConfidence()));
-			var b = clusterNodeMap.get(split.getB());
-			if (b != null)
-				tree.setLabel(b, StringUtils.removeTrailingZerosAfterDot("%.1f", split.getConfidence()));
+			var v = clusterNodeMap.getOrDefault(split.getA(), clusterNodeMap.get(split.getB()));
+
+			if (v != null) {
+				if (PhyloTree.SUPPORT_RICH_NEWICK) {
+					if (v.getInDegree() == 1) {
+						tree.setConfidence(v.getFirstInEdge(), split.getConfidence());
+					}
+				} else {
+					tree.setLabel(v, StringUtils.removeTrailingZerosAfterDot("%.1f", split.getConfidence()));
+				}
+			}
 		}
 	}
 

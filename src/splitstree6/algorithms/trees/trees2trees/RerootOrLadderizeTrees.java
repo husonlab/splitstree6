@@ -116,7 +116,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 						tree.redirectEdgesAwayFromRoot();
 					}
 					// todo: ask about internal node labels
-					RerootingUtils.rerootByMidpoint(getOptionHasBranchSupportValues(), tree);
+					RerootingUtils.reRootByMidpoint(getOptionHasBranchSupportValues(), tree);
 					trees.add(tree);
 					outputData.setRooted(true);
 				}
@@ -139,7 +139,7 @@ public class RerootOrLadderizeTrees extends Trees2Trees implements IFilter {
 							tree.redirectEdgesAwayFromRoot();
 						}
 						if (outGroupTaxonSet.cardinality() > 0)
-							RerootingUtils.rerootByOutGroup(getOptionHasBranchSupportValues(), tree, outGroupTaxonSet);
+							RerootingUtils.reRootByOutGroup(getOptionHasBranchSupportValues(), tree, outGroupTaxonSet);
 						trees.add(tree);
 					}
 				}

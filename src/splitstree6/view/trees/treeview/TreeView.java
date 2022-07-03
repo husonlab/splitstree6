@@ -91,6 +91,8 @@ public class TreeView implements IView {
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
+	private final ObjectProperty<EdgesFormat.LabelBy> optionEdgeLabelBy = new SimpleObjectProperty<>(this, "optionEdgeLabelBy", EdgesFormat.LabelBy.None);
+
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
 	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
 	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
@@ -113,7 +115,7 @@ public class TreeView implements IView {
 		return List.of(optionTree.getName(), optionDiagram.getName(), optionAveraging.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionEdits.getName(), optionShowConfidence.getName(),
-				optionTreeLabels.getName(),
+				optionTreeLabels.getName(), optionEdgeLabelBy.getName(),
 				optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
 	}
 
@@ -289,6 +291,18 @@ public class TreeView implements IView {
 
 	public void setOptionTreeLabels(TreeLabel optionTreeLabel) {
 		this.optionTreeLabels.set(optionTreeLabel);
+	}
+
+	public EdgesFormat.LabelBy getOptionEdgeLabelBy() {
+		return optionEdgeLabelBy.get();
+	}
+
+	public ObjectProperty<EdgesFormat.LabelBy> optionEdgeLabelByProperty() {
+		return optionEdgeLabelBy;
+	}
+
+	public void setOptionEdgeLabelBy(EdgesFormat.LabelBy optionEdgeLabelBy) {
+		this.optionEdgeLabelBy.set(optionEdgeLabelBy);
 	}
 
 	public String[] getOptionEdits() {

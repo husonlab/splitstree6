@@ -44,7 +44,6 @@ import java.util.Map;
 public class EdgesFormatPresenter {
 	private final InvalidationListener selectionListener;
 
-
 	private boolean inUpdatingDefaults = false;
 
 	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, SelectionModel<Edge> edgeSelectionModel,
@@ -123,6 +122,7 @@ public class EdgesFormatPresenter {
 				}
 			}
 		});
+
 
 		selectionListener = e -> {
 			inUpdatingDefaults = true;
