@@ -6,7 +6,9 @@ import jloda.util.progress.ProgressListener;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-import org.apache.commons.math3.optim.univariate.*;
+import org.apache.commons.math3.optim.univariate.BrentOptimizer;
+import org.apache.commons.math3.optim.univariate.SearchInterval;
+import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
 import java.util.ArrayList;
@@ -29,10 +31,10 @@ public class NeighborNetSplitWeights {
 			outerIterations = max(ntax, 10);
 		}
 
-		static public int GRADPROJECTION = 0;
-		static public int ACTIVE_SET = 1;
-		static public int PROJECTEDGRAD = 2;
-		static public int BLOCKPIVOT = 3;
+		static public final int GRADPROJECTION = 0;
+		static public final int ACTIVE_SET = 1;
+		static public final int PROJECTEDGRAD = 2;
+		static public final int BLOCKPIVOT = 3;
 
 		//static public int
 
@@ -61,10 +63,11 @@ public class NeighborNetSplitWeights {
 	static public ArrayList<ASplit> compute(int[] cycle, double[][] distances, NNLSParams params, ProgressListener progress) throws CanceledException {
 		countCalls = 0;
 		timeCalls = 0L;
+		var startTime = System.currentTimeMillis();
+
 		var n = cycle.length - 1;  //Number of taxa
 
 		//testIncremental(n);
-
 
 		//Handle cases for n<3 directly.
 		if (n == 1) {
@@ -118,16 +121,16 @@ public class NeighborNetSplitWeights {
 				}
 			}
 		}
+		System.err.printf("Total time: %.1f seconds%n", (System.currentTimeMillis() - startTime) / 1000.0);
 		System.err.println("countCalls: " + countCalls);
 		System.err.printf("timeCalls:  %.1f seconds%n", timeCalls / 1000.0);
 
 		return splitList;
 	}
 
-
 	static private void projectedConjugateGradient(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 		var n = x.length - 1;
-		NNLSFunctionObject f = new NNLSFunctionObject(n);
+		var f = new NNLSFunctionObject(n);
 		var fx_old = f.evalf(x, d);
 		var activeSet = getZeroElements(x);
 
@@ -182,15 +185,13 @@ public class NeighborNetSplitWeights {
 			if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION) {
 				//Use gradient projection to return the best projection of points on the line between x0 and x
 				brentProjection(x, x0, d, f, params.tolerance);
-			}
-			else
+			} else
 				furthestFeasible(x, x0, params.tolerance);
 			getZeroElements(x, activeSet);
 			return false;
 		} else
 			return cgConverged;
 	}
-
 
 	/**
 	 * Implementation of the CGNR algorithm in Saad, "Iterative Methods for Sparse Linear Systems", applied to the
@@ -208,7 +209,6 @@ public class NeighborNetSplitWeights {
 
 		if (false)
 			System.err.println("\t\tEntering cgnr. fx = " + f.evalf(x, d) + "\t" + f.evalfprojected(x, d));
-
 
 		var p = new double[n + 1][n + 1];
 		var r = new double[n + 1][n + 1];
@@ -304,12 +304,10 @@ public class NeighborNetSplitWeights {
 			}
 	}
 
-
 	static private class NNLSFunctionObject {
 		//Utility class for evaluating ||Ax - b|| without additional allocation.
 		private final double[][] xt;
 		private final double[][] Axt;
-		//public int evalCount; //fixme
 
 		NNLSFunctionObject(int n) {
 			xt = new double[n + 1][n + 1];
@@ -348,7 +346,6 @@ public class NeighborNetSplitWeights {
 				}
 			return evalf(xt, d);
 		}
-
 	}
 
 	/**
@@ -360,7 +357,6 @@ public class NeighborNetSplitWeights {
 	 * @param d         square array of distances
 	 * @param tolerance tolerance used for golden section search
 	 */
-
 	static private double goldenProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
 		//Minimize ||A \pi((1-t)x0 + tx) - d||  for t in [0,1]
 		var C = (3 - sqrt(5)) / 2.0;
@@ -404,7 +400,6 @@ public class NeighborNetSplitWeights {
 			}
 		}
 		return tmin;
-		//var fmin = f.evalf(x, d);
 	}
 
 	/**
@@ -417,15 +412,13 @@ public class NeighborNetSplitWeights {
 	 * @param tolerance tolerance used for golden section search
 	 */
 	static private double brentProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
-		final UnivariateFunction fn = new UnivariateFunction() {
-			public double value(double t) {
-				return f.evalfprojected(t,x0,x,d);
-			}
-		};
-		UnivariateOptimizer optimizer = new BrentOptimizer(1e-10, tolerance);
-		UnivariatePointValuePair result = optimizer.optimize(new MaxEval(10000), new UnivariateObjectiveFunction(fn),
+		final UnivariateFunction fn = t -> f.evalfprojected(t, x0, x, d);
+
+		var optimizer = new BrentOptimizer(1e-10, tolerance);
+		var result = optimizer.optimize(new MaxEval(10000), new UnivariateObjectiveFunction(fn),
 				GoalType.MINIMIZE, new SearchInterval(0, 1.0));
-		double tmin = result.getPoint();
+
+		var tmin = result.getPoint();
 		var n = x.length - 1;
 		for (var i = 1; i <= n; i++) {
 			for (var j = i + 1; j <= n; j++) {
@@ -437,15 +430,13 @@ public class NeighborNetSplitWeights {
 
 	}
 
-
-
-		/**
-         * Determines the point on the path from x0 to x that is furthest from x0 and still feasible.
-         *
-         * @param x         square array, final point
-         * @param x0        square array, initial point
-         * @param tolerance tolerance. Any entry of x less than tolerance is mapped to zero.
-         */
+	/**
+	 * Determines the point on the path from x0 to x that is furthest from x0 and still feasible.
+	 *
+	 * @param x         square array, final point
+	 * @param x0        square array, initial point
+	 * @param tolerance tolerance. Any entry of x less than tolerance is mapped to zero.
+	 */
 	static private void furthestFeasible(double[][] x, double[][] x0, double tolerance) {
 		var tmin = 1.0;
 		var n = x.length - 1;
@@ -469,7 +460,6 @@ public class NeighborNetSplitWeights {
 		}
 	}
 
-
 	/**
 	 * Computes circular distances from an array of split weights.
 	 *
@@ -482,109 +472,23 @@ public class NeighborNetSplitWeights {
 		var startTime = System.currentTimeMillis();
 		var n = x.length - 1;
 
+		for (var i = 1; i <= (n - 1); i++)
+			d[i + 1][i] = d[i][i + 1] = sumSubvector(x[i + 1], i + 1, n) + sumSubvector(x[i + 1], 1, i);
 
-
-		boolean oldway = false;
-
-		if (oldway) {
-			for (var i = 1; i <= (n - 1); i++)
-				d[i + 1][i] = d[i][i + 1] = sumSubvector(x[i + 1], i + 1, n) + sumSubvector(x[i + 1], 1, i);
-
-
-
-			for (var i = 1; i <= (n - 2); i++) {
-				d[i + 2][i] = d[i][i + 2] = d[i][i + 1] + d[i + 1][i + 2] - 2 * x[i + 1][i + 2];
-			}
-
-			startTime = System.currentTimeMillis();
-
-			for (var k = 3; k <= n - 1; k++) {
-				for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
-					var j = i + k;
-					d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
-				}
-			}
-
-			timeCalls += System.currentTimeMillis() - startTime;
-
-		} else {
-			double[][] x2 = new double[n + 1][n + 1];
-			double[][] d2 = new double[n + 1][n + 1];
-
-			reshapeByGap(x, x2);
-			reshapeByGap(d, d2);
-
-//			double[][] x3 = new double[n+1][n+1];   //TEST
-//			reshapeByPair(x2,x3);
-//			double diff = 0.0;
-//			for(int i=1;i<=n;i++) {
-//				for(int j=1;j<=n;j++) {
-//					diff+=(x[i][j]-x3[i][j])*(x[i][j]-x3[i][j]);
-//				}
-//			}
-
-
-
-
-
-			for (var i = 1; i <= (n - 1); i++) {
-				d2[i][1] = sumSubvector(x2[i + 1], 1, n - i - 1);
-				for (var j = 1; j <= i; j++)
-					d2[i][1] += x2[j][i + 1 - j];
-			}
-
-
-
-			for (var i = 1; i <= (n - 2); i++) {
-				d2[i][2] = d2[i][1] + d2[i + 1][1] - 2 * x2[i + 1][1];
-			}
-
-			startTime = System.currentTimeMillis(); //Don't count time to do conversion
-
-			for (var k = 3; k <= n - 1; k++) {
-				for (var i = 1; i <= n - k; i++) {
-					//var j = i + k;
-					d2[i][k] = d2[i][k - 1] + d2[i + 1][k - 1] - d2[i + 1][k - 2] - 2 * x2[i + 1][k - 1];
-				}
-			}
-
-			timeCalls += System.currentTimeMillis() - startTime;
-
-			reshapeByPair(d2, d);
+		for (var i = 1; i <= (n - 2); i++) {
+			d[i + 2][i] = d[i][i + 2] = d[i][i + 1] + d[i + 1][i + 2] - 2 * x[i + 1][i + 2];
 		}
 
+		startTime = System.currentTimeMillis();
 
-	}
-
-	/**
-	 * Convert an array where entry [i][j] corresponds to pair (i,j) into an array
-	 * where [i][k] corresponds to pair (i,i+k); Note only one triangle of y is filled
-	 * @param x array of doubles
-	 * @param y array of doubles
-	 */
-	static private void reshapeByGap(double[][] x, double[][] y) {
-		var n=x.length-1;
-		for(int k=1;k<=n-1;k++) {
-			for(int i=1;i<=n-k;i++) {
-				y[i][k] = x[i][i+k];
+		for (var k = 3; k <= n - 1; k++) {
+			for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
+				var j = i + k;
+				d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
 			}
 		}
-	}
 
-	/**
-	 * Convert an array where entry [i][k] corresponds to pair (i,i+k) into an array
-	 * where [i][k] corresponds to pair (i,k);
-	 * Both triangles of y are filled.
-	 * @param x array of doubles
-	 * @param y array of doubles
-	 */
-	static private void reshapeByPair(double[][] x, double[][] y) {
-		var n = x.length-1;
-		for(int k=1;k<=n-1;k++) {
-			for(int i=1;i<=n-k;i++) {
-				y[i][i+k] = y[i+k][i] = x[i][k];
-			}
-		}
+		timeCalls += System.currentTimeMillis() - startTime;
 	}
 
 	/**
@@ -593,8 +497,8 @@ public class NeighborNetSplitWeights {
 	 * Separating this out in case we can improve efficiency with threading.
 	 *
 	 * @param v    vector
-	 * @param from start index
-	 * @param to   end index
+	 * @param from start index  (inclusive)
+	 * @param to   end index  (inclusive)
 	 * @return \sum_{i=from}^to v(i)
 	 */
 	static private double sumSubvector(double[] v, int from, int to) {
@@ -604,14 +508,12 @@ public class NeighborNetSplitWeights {
 		return s;
 	}
 
-
 	/**
 	 * Compute Atx, when x and the result are represented as square arrays
 	 *
 	 * @param x square array
 	 * @param p square array. Overwritten with result
 	 */
-
 	static private void calcAtx(double[][] x, double[][] p) {
 		var n = x.length - 1;
 		//double[][] p = new double[n+1][n+1];
@@ -702,7 +604,6 @@ public class NeighborNetSplitWeights {
 		}
 		return false;
 	}
-
 
 	/**
 	 * Compute the gradient at x of 1/2 ||Ax - d||
