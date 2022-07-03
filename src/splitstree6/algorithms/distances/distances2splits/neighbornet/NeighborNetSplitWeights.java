@@ -3,6 +3,10 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.univariate.*;
 import splitstree6.data.parts.ASplit;
 
 import java.util.ArrayList;
@@ -59,7 +63,7 @@ public class NeighborNetSplitWeights {
 		timeCalls = 0L;
 		var n = cycle.length - 1;  //Number of taxa
 
-		testIncremental(n);
+		//testIncremental(n);
 
 
 		//Handle cases for n<3 directly.
@@ -175,9 +179,10 @@ public class NeighborNetSplitWeights {
 		}
 
 		if (minArray(x) < 0) {
-			if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION)
+			if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION) {
 				//Use gradient projection to return the best projection of points on the line between x0 and x
-				goldenProjection(x, x0, d, f, params.tolerance);
+				brentProjection(x, x0, d, f, params.tolerance);
+			}
 			else
 				furthestFeasible(x, x0, params.tolerance);
 			getZeroElements(x, activeSet);
@@ -304,6 +309,7 @@ public class NeighborNetSplitWeights {
 		//Utility class for evaluating ||Ax - b|| without additional allocation.
 		private final double[][] xt;
 		private final double[][] Axt;
+		//public int evalCount; //fixme
 
 		NNLSFunctionObject(int n) {
 			xt = new double[n + 1][n + 1];
@@ -355,7 +361,7 @@ public class NeighborNetSplitWeights {
 	 * @param tolerance tolerance used for golden section search
 	 */
 
-	static private void goldenProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
+	static private double goldenProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
 		//Minimize ||A \pi((1-t)x0 + tx) - d||  for t in [0,1]
 		var C = (3 - sqrt(5)) / 2.0;
 		var R = 1.0 - C;
@@ -397,17 +403,49 @@ public class NeighborNetSplitWeights {
 				x[i][j] = x[j][i] = newx_ij;
 			}
 		}
-		var fmin = f.evalf(x, d);
+		return tmin;
+		//var fmin = f.evalf(x, d);
+	}
+
+	/**
+	 * Minimizes ||Ax-b|| along the projection of the line segment between x0 and x, where the projection of a point
+	 * is the closest point in the non-negative quadrant.
+	 *
+	 * @param x         square array   final point, overwritten by optimal point
+	 * @param x0        square array  initial point
+	 * @param d         square array of distances
+	 * @param tolerance tolerance used for golden section search
+	 */
+	static private double brentProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
+		final UnivariateFunction fn = new UnivariateFunction() {
+			public double value(double t) {
+				return f.evalfprojected(t,x0,x,d);
+			}
+		};
+		UnivariateOptimizer optimizer = new BrentOptimizer(1e-10, tolerance);
+		UnivariatePointValuePair result = optimizer.optimize(new MaxEval(10000), new UnivariateObjectiveFunction(fn),
+				GoalType.MINIMIZE, new SearchInterval(0, 1.0));
+		double tmin = result.getPoint();
+		var n = x.length - 1;
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
+				var newx_ij = max((1 - tmin) * x0[i][j] + tmin * x[i][j], 0);
+				x[i][j] = x[j][i] = newx_ij;
+			}
+		}
+		return tmin;
+
 	}
 
 
-	/**
-	 * Determines the point on the path from x0 to x that is furthest from x0 and still feasible.
-	 *
-	 * @param x         square array, final point
-	 * @param x0        square array, initial point
-	 * @param tolerance tolerance. Any entry of x less than tolerance is mapped to zero.
-	 */
+
+		/**
+         * Determines the point on the path from x0 to x that is furthest from x0 and still feasible.
+         *
+         * @param x         square array, final point
+         * @param x0        square array, initial point
+         * @param tolerance tolerance. Any entry of x less than tolerance is mapped to zero.
+         */
 	static private void furthestFeasible(double[][] x, double[][] x0, double tolerance) {
 		var tmin = 1.0;
 		var n = x.length - 1;
@@ -445,15 +483,20 @@ public class NeighborNetSplitWeights {
 		var n = x.length - 1;
 
 
-		boolean oldway = true;
+
+		boolean oldway = false;
 
 		if (oldway) {
 			for (var i = 1; i <= (n - 1); i++)
 				d[i + 1][i] = d[i][i + 1] = sumSubvector(x[i + 1], i + 1, n) + sumSubvector(x[i + 1], 1, i);
 
+
+
 			for (var i = 1; i <= (n - 2); i++) {
 				d[i + 2][i] = d[i][i + 2] = d[i][i + 1] + d[i + 1][i + 2] - 2 * x[i + 1][i + 2];
 			}
+
+			startTime = System.currentTimeMillis();
 
 			for (var k = 3; k <= n - 1; k++) {
 				for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
@@ -461,6 +504,9 @@ public class NeighborNetSplitWeights {
 					d[j][i] = d[i][j] = d[i][j - 1] + d[i + 1][j] - d[i + 1][j - 1] - 2 * x[i + 1][j];
 				}
 			}
+
+			timeCalls += System.currentTimeMillis() - startTime;
+
 		} else {
 			double[][] x2 = new double[n + 1][n + 1];
 			double[][] d2 = new double[n + 1][n + 1];
@@ -468,15 +514,32 @@ public class NeighborNetSplitWeights {
 			reshapeByGap(x, x2);
 			reshapeByGap(d, d2);
 
+//			double[][] x3 = new double[n+1][n+1];   //TEST
+//			reshapeByPair(x2,x3);
+//			double diff = 0.0;
+//			for(int i=1;i<=n;i++) {
+//				for(int j=1;j<=n;j++) {
+//					diff+=(x[i][j]-x3[i][j])*(x[i][j]-x3[i][j]);
+//				}
+//			}
+
+
+
+
+
 			for (var i = 1; i <= (n - 1); i++) {
 				d2[i][1] = sumSubvector(x2[i + 1], 1, n - i - 1);
 				for (var j = 1; j <= i; j++)
 					d2[i][1] += x2[j][i + 1 - j];
 			}
 
+
+
 			for (var i = 1; i <= (n - 2); i++) {
 				d2[i][2] = d2[i][1] + d2[i + 1][1] - 2 * x2[i + 1][1];
 			}
+
+			startTime = System.currentTimeMillis(); //Don't count time to do conversion
 
 			for (var k = 3; k <= n - 1; k++) {
 				for (var i = 1; i <= n - k; i++) {
@@ -484,23 +547,26 @@ public class NeighborNetSplitWeights {
 					d2[i][k] = d2[i][k - 1] + d2[i + 1][k - 1] - d2[i + 1][k - 2] - 2 * x2[i + 1][k - 1];
 				}
 			}
+
+			timeCalls += System.currentTimeMillis() - startTime;
+
 			reshapeByPair(d2, d);
 		}
 
-		timeCalls = System.currentTimeMillis() - startTime;
+
 	}
 
 	/**
 	 * Convert an array where entry [i][j] corresponds to pair (i,j) into an array
-	 * where [i][k] corresponds to pair (i,i+k);
+	 * where [i][k] corresponds to pair (i,i+k); Note only one triangle of y is filled
 	 * @param x array of doubles
-	 * @param x2 array of doubles
+	 * @param y array of doubles
 	 */
-	static private void reshapeByGap(double[][] x, double[][] x2) {
+	static private void reshapeByGap(double[][] x, double[][] y) {
 		var n=x.length-1;
 		for(int k=1;k<=n-1;k++) {
 			for(int i=1;i<=n-k;i++) {
-				x2[i][k] = x2[k][i] = x[i][i+k];
+				y[i][k] = x[i][i+k];
 			}
 		}
 	}
@@ -508,14 +574,15 @@ public class NeighborNetSplitWeights {
 	/**
 	 * Convert an array where entry [i][k] corresponds to pair (i,i+k) into an array
 	 * where [i][k] corresponds to pair (i,k);
+	 * Both triangles of y are filled.
 	 * @param x array of doubles
-	 * @param x2 array of doubles
+	 * @param y array of doubles
 	 */
-	static private void reshapeByPair(double[][] x, double[][] x2) {
+	static private void reshapeByPair(double[][] x, double[][] y) {
 		var n = x.length-1;
 		for(int k=1;k<=n-1;k++) {
 			for(int i=1;i<=n-k;i++) {
-				x2[i][i+k] = x2[i+k][i] = x[i][k];
+				y[i][i+k] = y[i+k][i] = x[i][k];
 			}
 		}
 	}
