@@ -211,12 +211,12 @@ public class ConvexHull {
                             graph.setLabel(considerDup, "" + graph.getSplit(consider));
                             graph.setSplit(considerDup, graph.getSplit(consider));
                             graph.setWeight(considerDup, graph.getWeight(consider));
-                            graph.setAngle(considerDup, graph.getAngle(consider));
+                           //  graph.setAngle(considerDup, graph.getAngle(consider));
                             graph.deleteEdge(consider);
                         } else if (hulls.get(w) == 2) {  //node is in intersection
                             Node w1 = null;
 
-                            for (Edge toW1 : w.adjacentEdges()) {
+                            for (var toW1 : w.adjacentEdges()) {
                                 progress.checkForCancel();
                                 if (graph.getSplit(toW1) == j) {
                                     w1 = graph.getOpposite(w, toW1);
@@ -227,7 +227,6 @@ public class ConvexHull {
                             if (v1 != null && v1.getCommonEdge(w1) == null) {
                                 final var considerDup = graph.newEdge(v1, w1);
                                 graph.setLabel(considerDup, "" + graph.getSplit(consider));
-
                                 graph.setWeight(considerDup, graph.getWeight(consider));
                                 graph.setSplit(considerDup, graph.getSplit(consider));
                             }

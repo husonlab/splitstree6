@@ -80,10 +80,6 @@ public class EdgesFormatController {
 		return labelByConfidenceMenuItem;
 	}
 
-	public MenuButton getLabelByMenuButton() {
-		return labelByMenuButton;
-	}
-
 	public RadioMenuItem getLabelByNoneMenuItem() {
 		return labelByNoneMenuItem;
 	}

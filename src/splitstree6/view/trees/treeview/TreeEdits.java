@@ -21,6 +21,7 @@ package splitstree6.view.trees.treeview;
 
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableMap;
+import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
 import jloda.fx.util.BasicFX;
@@ -43,7 +44,7 @@ public class TreeEdits {
 	 * @param editsString  edits string
 	 * @param edgeShapeMap edge shape map
 	 */
-	public static void applyEdits(String[] editsString, ObservableMap<Edge, Shape> edgeShapeMap) {
+	public static void applyEdits(String[] editsString, ObservableMap<Edge, Group> edgeShapeMap) {
 		var tree = edgeShapeMap.keySet().stream().map(e -> (PhyloTree) e.getOwner()).findAny().orElse(null);
 		if (tree != null) {
 			for (var editString : editsString) {
@@ -51,8 +52,7 @@ public class TreeEdits {
 				if (edit != null) {
 					var edge = tree.edgeStream().filter(e -> e.getId() == edit.edgeId()).findAny().orElse(null);
 					if (edge != null) {
-						var shape = edgeShapeMap.get(edge);
-						if (shape != null) {
+						for (var shape : BasicFX.getAllRecursively(edgeShapeMap.get(edge), Shape.class)) {
 							switch (edit.code()) {
 								case 'c' -> {
 									if (BasicFX.isColor(edit.parameter())) {

@@ -31,7 +31,6 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.selection.SelectionModel;
@@ -82,7 +81,7 @@ public class TreePane extends StackPane {
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX,
-					ObservableMap<jloda.graph.Node, Group> nodeShapeMap, ObservableMap<Edge, Shape> edgeShapeMap) {
+					ObservableMap<jloda.graph.Node, Group> nodeShapeMap, ObservableMap<Edge, Group> edgeShapeMap) {
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);

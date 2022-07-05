@@ -25,6 +25,7 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.event.EventHandler;
+import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
@@ -67,7 +68,7 @@ public class InteractionSetup {
 	private final EventHandler<MouseEvent> mousePressedHandler;
 	private final EventHandler<MouseEvent> mouseDraggedHandler;
 
-	private final Map<Edge, Shape> edgeShapeMap;
+	private final Map<Edge, Group> edgeShapeMap;
 	private final SelectionModel<Edge> edgeSelectionModel;
 
 	private final InvalidationListener invalidationListener;
@@ -77,7 +78,7 @@ public class InteractionSetup {
 
 	private boolean inMouseClickedOnEdge = false;
 
-	public InteractionSetup(Stage stage, PhyloTree tree, TaxaBlock taxaBlock, Map<Edge, Shape> edgeShapeMap0, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
+	public InteractionSetup(Stage stage, PhyloTree tree, TaxaBlock taxaBlock, Map<Edge, Group> edgeShapeMap0, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel,
 							TreeDiagramType diagram, ObjectProperty<LayoutOrientation> orientation) {
 		this.stage = stage;
 		this.tree = tree;
@@ -247,7 +248,7 @@ public class InteractionSetup {
 		edgeShapeMap.clear();
 		return (edge, shape) -> {
 			shape.setPickOnBounds(false);
-			edgeShapeMap.put(edge, shape);
+			edgeShapeMap.put(edge, new Group(shape));
 
 			shape.setOnMouseEntered(e -> {
 				shape.setUserData(shape.getStrokeWidth());
@@ -301,7 +302,7 @@ public class InteractionSetup {
 		}
 	}
 
-	public Map<Edge, Shape> getEdgeShapeMap() {
+	public Map<Edge, Group> getEdgeShapeMap() {
 		return edgeShapeMap;
 	}
 }

@@ -20,12 +20,13 @@
 package splitstree6.view.format.edges;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableMap;
 import javafx.scene.Group;
-import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Edge;
+import jloda.phylo.PhyloTree;
 
 import java.util.Map;
 
@@ -34,12 +35,13 @@ import java.util.Map;
  * Daniel Huson, 5.2022
  */
 public class EdgesFormat extends Group {
+
 	public enum LabelBy {None, Weight, Confidence, Probability}
 
 	private final EdgesFormatController controller;
 	private final EdgesFormatPresenter presenter;
 
-	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, Shape> edgeShapeMap,
+	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, Group> edgeShapeMap,
 					   ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<EdgesFormatController>(EdgesFormatController.class);
 		controller = loader.getController();
@@ -50,6 +52,14 @@ public class EdgesFormat extends Group {
 
 	public EdgesFormatPresenter getPresenter() {
 		return presenter;
+	}
+
+
+	public void setEdgeLabels(LabelBy labelBy, PhyloTree tree, ObservableMap<Edge, Group> edgeShapeMap) {
+		for (var e : tree.edges()) {
+
+		}
+
 	}
 
 

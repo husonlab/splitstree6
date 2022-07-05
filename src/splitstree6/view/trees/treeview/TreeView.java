@@ -32,7 +32,6 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
@@ -102,7 +101,7 @@ public class TreeView implements IView {
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	private final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
-	private final ObservableMap<jloda.graph.Edge, Shape> edgeShapeMap = FXCollections.observableHashMap();
+	private final ObservableMap<jloda.graph.Edge, Group> edgeShapeMap = FXCollections.observableHashMap();
 	private final SelectionModel<Edge> edgeSelectionModel = new SetSelectionModel<>();
 
 	// create properties:
@@ -149,7 +148,10 @@ public class TreeView implements IView {
 
 		var edgesFormatter = new EdgesFormat(undoManager, edgeSelectionModel, edgeShapeMap, optionEditsProperty());
 
+		edgesFormatter.getPresenter().setUpdateLabelsConsumer(labelBy -> edgesFormatter.setEdgeLabels(labelBy, treeProperty().get(), edgeShapeMap));
+
 		treeProperty().addListener((v, o, n) -> {
+			edgesFormatter.getPresenter().updateMenus(n);
 		});
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow),
@@ -409,7 +411,7 @@ public class TreeView implements IView {
 		return nodeShapeMap;
 	}
 
-	public ObservableMap<Edge, Shape> getEdgeShapeMap() {
+	public ObservableMap<Edge, Group> getEdgeShapeMap() {
 		return edgeShapeMap;
 	}
 
