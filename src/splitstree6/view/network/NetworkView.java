@@ -25,7 +25,6 @@ import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.layout.AnchorPane;
 import jloda.fx.control.RichTextLabel;
@@ -36,6 +35,8 @@ import jloda.fx.util.PrintUtils;
 import jloda.util.ProgramProperties;
 import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
+import splitstree6.layout.tree.LabeledEdgeShape;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.sites.SitesFormat;
@@ -93,8 +94,8 @@ public class NetworkView implements IView {
 		controller = loader.getController();
 
 		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
-		final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
-		final ObservableMap<jloda.graph.Edge, Group> edgeShapeMap = FXCollections.observableHashMap();
+		final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
+		final ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap = FXCollections.observableHashMap();
 
 		presenter = new NetworkViewPresenter(mainWindow, this, targetBounds, networkBlock, taxonLabelMap, nodeShapeMap, edgeShapeMap);
 

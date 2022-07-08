@@ -24,16 +24,15 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
-import jloda.fx.util.BasicFX;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
+import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.view.trees.treeview.TreeEdits;
 
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class EdgesFormatPresenter {
 	private Consumer<EdgesFormat.LabelBy> updateLabelsConsumer;
 
 	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, SelectionModel<Edge> edgeSelectionModel,
-								Map<Edge, Group> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
+								Map<Edge, LabeledEdgeShape> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
 		this.undoManager = undoManager;
 		this.controller = controller;
 
@@ -78,7 +77,7 @@ public class EdgesFormatPresenter {
 						var edits = new ArrayList<TreeEdits.Edit>();
 
 						for (var edge : edgeSelectionModel.getSelectedItems()) {
-							for (var shape : BasicFX.getAllRecursively(edgeShapeMap.get(edge), Shape.class)) {
+							if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 								edits.add(new TreeEdits.Edit('w', edge.getId(), width));
 								var oldWidth = shape.getStrokeWidth();
 								undoList.add(shape.strokeWidthProperty(), oldWidth, width);
@@ -103,7 +102,7 @@ public class EdgesFormatPresenter {
 				var edits = new ArrayList<TreeEdits.Edit>();
 
 				for (var edge : edgeSelectionModel.getSelectedItems()) {
-					for (var shape : BasicFX.getAllRecursively(edgeShapeMap.get(edge), Shape.class)) {
+					if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 						var oldColor = shape.getStroke();
 						if (!color.equals(oldColor)) {
 							edits.add(new TreeEdits.Edit('c', edge.getId(), color));
@@ -141,7 +140,7 @@ public class EdgesFormatPresenter {
 				var widths = new HashSet<Double>();
 				var colors = new HashSet<Paint>();
 				for (var edge : edgeSelectionModel.getSelectedItems()) {
-					for (var shape : BasicFX.getAllRecursively(edgeShapeMap.get(edge), Shape.class)) {
+					if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 						if (shape.getUserData() instanceof Double width) // temporarily store width in user data when user is hovering over edge
 							widths.add(width);
 						else

@@ -20,37 +20,34 @@
 package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
-import javafx.scene.shape.*;
+import javafx.scene.shape.ArcTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
 
 /**
  * create edges for a circular layout
- * Daniel GHuHuson, 1.2022
+ * Daniel Huson, 1.2022
  */
 public class CreateEdgesCircular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, Point2D> nodePointMap, Map<Node, Double> nodeAngleMap,
-										  boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
-		var shapes = new ArrayList<Shape>();
+	public static void apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, Point2D> nodePointMap, Map<Node, Double> nodeAngleMap,
+							 Map<Edge, LabeledEdgeShape> edgeShapeMap) {
 
 		var origin = new Point2D(0, 0);
 
 		LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
 			for (var e : v.outEdges()) {
 				var w = e.getTarget();
-
-				// todo: need to implemented linked
 
 				var vPt = nodePointMap.get(v);
 				var wPt = nodePointMap.get(w);
@@ -86,14 +83,13 @@ public class CreateEdgesCircular {
 					if (tree.isTransferEdge(e))
 						addArrowHead(line, moveTo, lineTo);
 				}
-				shapes.add(line);
-				edgeCallback.accept(e, line);
+				var edgeShape = new LabeledEdgeShape(line);
+				edgeShapeMap.put(e, edgeShape);
 
 				if (tree.isLsaLeaf(w) && diagram == TreeDiagramType.CircularPhylogram) {
 					nodeAngleMap.put(w, GeometryUtilsFX.computeAngle(wPt));
 				}
 			}
 		});
-		return shapes;
 	}
 }

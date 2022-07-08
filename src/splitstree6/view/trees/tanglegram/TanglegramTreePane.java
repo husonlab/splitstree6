@@ -33,10 +33,7 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
-import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.layout.tree.TreeLabel;
+import splitstree6.layout.tree.*;
 import splitstree6.view.trees.treepages.TreePane;
 
 /**
@@ -52,7 +49,7 @@ public class TanglegramTreePane extends Group {
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
 							  ObjectProperty<PhyloTree> tree, ObjectProperty<Dimension2D> dimensions,
 							  ObjectProperty<TreeDiagramType> optionDiagram, ObjectProperty<HeightAndAngles.Averaging> optionAveraging, ObjectProperty<LayoutOrientation> optionOrientation,
-							  ReadOnlyDoubleProperty fontScaleFactor, ReadOnlyBooleanProperty showInternalLabels, ObservableMap<Node, Group> nodeShapeMap) {
+							  ReadOnlyDoubleProperty fontScaleFactor, ReadOnlyBooleanProperty showInternalLabels, ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
 
 		updater = e -> RunAfterAWhile.apply(this, () ->
 				Platform.runLater(() -> {
@@ -61,6 +58,7 @@ public class TanglegramTreePane extends Group {
 						var treePane = new TreePane(stage, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(TreeLabel.None),
 								showInternalLabels, null, nodeShapeMap, null);
+
 						changingOrientation.bind(treePane.changingOrientationProperty());
 						treePane.setRunAfterUpdate(getRunAfterUpdate());
 						treePane.drawTree();

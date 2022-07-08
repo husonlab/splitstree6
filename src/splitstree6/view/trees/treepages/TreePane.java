@@ -24,10 +24,10 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -58,6 +58,8 @@ public class TreePane extends StackPane {
 
 	private Pane pane;
 
+	private final InteractionSetup interactionSetup;
+
 	private final ChangeListener<Number> fontScaleChangeListener;
 
 	private final BooleanProperty showInternalLabels = new SimpleBooleanProperty();
@@ -81,7 +83,10 @@ public class TreePane extends StackPane {
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
 					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
 					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX,
-					ObservableMap<jloda.graph.Node, Group> nodeShapeMap, ObservableMap<Edge, Group> edgeShapeMap) {
+					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap0) {
+
+		ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap = edgeShapeMap0 != null ? edgeShapeMap0 : FXCollections.observableHashMap();
+
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);
@@ -89,7 +94,7 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		var interactionSetup = new InteractionSetup(stage, phyloTree, taxaBlock, edgeShapeMap, taxonSelectionModel, edgeSelectionModel, diagram, orientation);
+		interactionSetup = new InteractionSetup(stage, this, taxaBlock, diagram, orientation, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
 
 		fontScaleChangeListener = (v, o, n) -> {
 			if (result != null) {
@@ -133,13 +138,14 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
-					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true, nodeShapeMap);
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, edgeShapeMap, true, nodeShapeMap);
 		});
 
 		service.setOnSucceeded(a -> {
 			result = service.getValue();
 			var group = result.getAllAsGroup();
+
+			interactionSetup.initializeSelection(taxaBlock, taxonSelectionModel, edgeSelectionModel, nodeShapeMap);
 
 			if (result.internalLabels() != null)
 				result.internalLabels().visibleProperty().bind(this.showInternalLabels);
@@ -190,13 +196,6 @@ public class TreePane extends StackPane {
 				getChildren().setAll(new VBox(treeLabel, pane));
 			} else
 				getChildren().setAll(pane);
-
-			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(taxonSelectionModel::clearSelection);
-				}
-				e.consume();
-			});
 
 			if (getRunAfterUpdate() != null) {
 				Platform.runLater(() -> getRunAfterUpdate().run());

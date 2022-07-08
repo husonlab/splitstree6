@@ -27,6 +27,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
+import splitstree6.layout.tree.LabeledEdgeShape;
 
 import java.util.Map;
 
@@ -41,7 +42,7 @@ public class EdgesFormat extends Group {
 	private final EdgesFormatController controller;
 	private final EdgesFormatPresenter presenter;
 
-	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, Group> edgeShapeMap,
+	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, LabeledEdgeShape> edgeShapeMap,
 					   ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<EdgesFormatController>(EdgesFormatController.class);
 		controller = loader.getController();
@@ -55,7 +56,7 @@ public class EdgesFormat extends Group {
 	}
 
 
-	public void setEdgeLabels(LabelBy labelBy, PhyloTree tree, ObservableMap<Edge, Group> edgeShapeMap) {
+	public void setEdgeLabels(LabelBy labelBy, PhyloTree tree, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 		for (var e : tree.edges()) {
 
 		}

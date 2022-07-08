@@ -25,7 +25,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
-import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
@@ -38,6 +37,8 @@ import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.layout.tree.LabeledEdgeShape;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
 
@@ -60,7 +61,8 @@ public class NetworkLayout {
 		options = new FastMultiLayerMethodOptions();
 	}
 
-	public Group apply(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock networkBlock, DiagramType diagram, double width, double height, ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, Group> nodeShapeMap, ObservableMap<Edge, Group> edgeShapeMap) throws CanceledException {
+	public Group apply(ProgressListener progress, TaxaBlock taxaBlock, NetworkBlock networkBlock, DiagramType diagram, double width, double height, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
+					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) throws CanceledException {
 		labelLayout.clear();
 		Platform.runLater(nodeShapeMap::clear);
 		Platform.runLater(edgeShapeMap::clear);
@@ -73,8 +75,8 @@ public class NetworkLayout {
 
 		try (NodeArray<Point2D> nodePointMap = graph.newNodeArray();
 			 var nodeAngleMap = graph.newNodeDoubleArray();
-			 NodeArray<Group> newNodeShapeMap = graph.newNodeArray();
-			 EdgeArray<Group> newEdgeShapeMap = graph.newEdgeArray()) {
+			 NodeArray<LabeledNodeShape> newNodeShapeMap = graph.newNodeArray();
+			 EdgeArray<LabeledEdgeShape> newEdgeShapeMap = graph.newEdgeArray()) {
 			Function<Edge, Double> edgeWeightFunction;
 			if (diagram == DiagramType.Network) {
 				edgeWeightFunction = e -> Math.max(0.00001, graph.getWeight(e));
@@ -119,54 +121,41 @@ public class NetworkLayout {
 			for (var v : graph.nodes()) {
 				var point = nodePointMap.get(v);
 
+
+				var nodeShape = new LabeledNodeShape();
+				nodeShape.setTranslateX(point.getX());
+				nodeShape.setTranslateY(point.getY());
+
 				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
+				if (false && graph.getNumberOfEdges() == 0 && label != null) { // todo: allow user to use marks for nodes
+					nodeShape.setShape(RichTextLabel.getMark(label.getText()));
+				} else
+					nodeShape.setShape(new Circle(v.getDegree() == 1 ? 3 : 2));
 
-				var group = new Group();
-				group.setId("graph-node"); // the is used to rotate graph
-				if (false && graph.getNumberOfEdges() == 0) { // todo: allow user to use marks for nodes
-					Shape shape = null;
-					if (label != null) {
-						shape = RichTextLabel.getMark(label.getText());
-						if (shape != null)
-							label.setShowMarks(false);
-					}
-					if (shape == null) {
-						shape = new Circle(2);
-						shape.getStyleClass().add("graph-node");
-					}
-					group.getChildren().add(shape);
-				} else {
-					var shape = new Circle(v.getDegree() == 1 ? 3 : 2);
-					shape.getStyleClass().add("graph-node");
-					group.getChildren().add(shape);
-				}
-				group.setTranslateX(point.getX());
-				group.setTranslateY(point.getY());
-
-				nodesGroup.getChildren().add(group);
-
+				nodesGroup.getChildren().add(nodeShape);
 
 				if (graph.getNumberOfTaxa(v) == 1) {
-					group.setUserData(taxaBlock.get(graph.getTaxon(v)));
+					nodeShape.setUserData(taxaBlock.get(graph.getTaxon(v)));
 				}
-				newNodeShapeMap.put(v, group);
+				newNodeShapeMap.put(v, nodeShape);
 
 				if (label != null) {
+					nodeShape.setLabel(label);
+
 					if (graph.getNumberOfTaxa(v) == 1) {
 						taxonLabelMap.put(graph.getTaxon(v), label);
 					}
 
-					label.getStyleClass().add("graph-label");
 					label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-					label.setTranslateX(group.getTranslateX() + 10);
-					label.setTranslateY(group.getTranslateY() + 10);
-					label.setUserData(group);
+					label.setTranslateX(nodeShape.getTranslateX() + 10);
+					label.setTranslateY(nodeShape.getTranslateY() + 10);
+					label.setUserData(nodeShape);
 					nodeLabelsGroup.getChildren().add(label);
 
 					label.applyCss();
 
-					var translateXProperty = group.translateXProperty();
-					var translateYProperty = group.translateYProperty();
+					var translateXProperty = nodeShape.translateXProperty();
+					var translateYProperty = nodeShape.translateYProperty();
 
 					labelLayout.addItem(translateXProperty, translateYProperty, nodeAngleMap.get(v), label.widthProperty(), label.heightProperty(),
 							xOffset -> {
@@ -178,8 +167,9 @@ public class NetworkLayout {
 								label.translateYProperty().bind(translateYProperty.add(yOffset));
 							});
 
-					labelLayout.addAvoidable(() -> group.getTranslateX() - 0.5 * group.prefWidth(0), () -> group.getTranslateY() - 0.5 * group.prefHeight(0), () -> group.prefWidth(0), () -> group.prefHeight(0));
+					labelLayout.addAvoidable(() -> nodeShape.getTranslateX() - 0.5 * nodeShape.prefWidth(0), () -> nodeShape.getTranslateY() - 0.5 * nodeShape.prefHeight(0), () -> nodeShape.prefWidth(0), () -> nodeShape.prefHeight(0));
 				}
+
 				progress.incrementProgress();
 			}
 
@@ -194,10 +184,10 @@ public class NetworkLayout {
 				line.endXProperty().bind(newNodeShapeMap.get(e.getTarget()).translateXProperty());
 				line.endYProperty().bind(newNodeShapeMap.get(e.getTarget()).translateYProperty());
 
-				var group = new Group(line);
-				edgesGroup.getChildren().add(group);
+				var edgeShape = new LabeledEdgeShape(line);
+				edgesGroup.getChildren().add(edgeShape);
 
-				newEdgeShapeMap.put(e, group);
+				newEdgeShapeMap.put(e, edgeShape);
 
 				progress.incrementProgress();
 			}

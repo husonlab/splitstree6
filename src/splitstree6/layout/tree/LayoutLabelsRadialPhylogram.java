@@ -21,7 +21,6 @@ package splitstree6.layout.tree;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
-import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
@@ -39,16 +38,15 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 	/**
 	 * create labels for tree
 	 */
-	public LayoutLabelsRadialPhylogram(PhyloTree tree, Map<Node, ? extends javafx.scene.Node> nodeShapeMap, Map<Node, RichTextLabel> nodeLabelMap, Map<Node, Double> nodeAngleMap, double labelGap) {
+	public LayoutLabelsRadialPhylogram(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Node, Double> nodeAngleMap, double labelGap) {
 
 		labelLayout = new RadialLabelLayout();
 		labelLayout.setGap(labelGap);
 
 		for (var v : tree.nodes()) {
-			var label = nodeLabelMap.get(v);
-
+			var shape = nodeShapeMap.get(v);
+			var label = shape.getLabel();
 			if (label != null) {
-				var shape = nodeShapeMap.get(v);
 				var angle = nodeAngleMap.get(v);
 				if (angle == null) {
 					if (v.getParent() != null) {

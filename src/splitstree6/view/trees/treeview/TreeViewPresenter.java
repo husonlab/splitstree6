@@ -42,7 +42,10 @@ import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.layout.tree.*;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
@@ -51,6 +54,7 @@ import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -350,17 +354,16 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
 
+		controller.getTryButton().setOnAction(a -> {
+			var random = new Random(666);
+			for (var e : tree.get().edges()) {
+				tree.get().setLabel(e, String.format("%.1f", 10 * random.nextDouble()));
+				var label = view.getEdgeShapeMap().get(e).getLabel();
+			}
+			updateListener.invalidated(null);
 
-		if (false) { // code for testing ideas about drawing on a canvas
-			var drawOnCanvas = new DrawOnCanvas();
+		});
 
-			view.optionTreeProperty().addListener((v, o, n) -> {
-				if (n.intValue() >= 1 && n.intValue() <= view.getTrees().size()) {
-					drawOnCanvas.draw(mainWindow.getController().getBottomFlowPane(), view.getTrees().get(n.intValue() - 1), mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(),
-							t -> mainWindow.getWorkflow().getWorkingTaxaBlock().get(t).displayLabelProperty(), view.getOptionDiagram(), view.getOptionAveraging(), 850, 850, false);
-				}
-			});
-		}
 	}
 
 	public void setupMenuItems() {

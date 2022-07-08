@@ -29,7 +29,6 @@ import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
-import javafx.scene.Group;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
@@ -39,6 +38,7 @@ import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -81,7 +81,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 		);
 
-		final ObservableMap<Node, Group> nodeShapeMap1 = FXCollections.observableHashMap();
+		final ObservableMap<Node, LabeledNodeShape> nodeShapeMap1 = FXCollections.observableHashMap();
 		var tree1Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree1, treePaneDimensions,
 				tanglegramView.optionDiagram1Property(), tanglegramView.optionAveraging1Property(), tanglegramView.optionOrientationProperty(), tanglegramView.optionFontScaleFactorProperty(),
 				tanglegramView.optionShowInternalLabelsProperty(), nodeShapeMap1);
@@ -103,7 +103,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		});
 		orientation2Property.set(tanglegramView.getOptionOrientation() == Rotate0Deg ? FlipRotate0Deg : Rotate180Deg);
 
-		ObservableMap<Node, Group> nodeShapeMap2 = FXCollections.observableHashMap();
+		ObservableMap<Node, LabeledNodeShape> nodeShapeMap2 = FXCollections.observableHashMap();
 		var tree2Pane = new TanglegramTreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), mainWindow.getTaxonSelectionModel(), tree2, treePaneDimensions,
 				tanglegramView.optionDiagram2Property(), tanglegramView.optionAveraging2Property(), orientation2Property, tanglegramView.optionFontScaleFactorProperty(),
 				tanglegramView.optionShowInternalLabelsProperty(), nodeShapeMap2);

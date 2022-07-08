@@ -24,6 +24,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Node;
@@ -119,7 +120,7 @@ public class TreePageFactory implements Callback<Integer, Node> {
 				var treePane = new TreePane(mainWindow.getStage(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 						treePagesView.getOptionDiagram(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
 						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty(), null,
-						null, null);
+						FXCollections.observableHashMap(), FXCollections.observableHashMap());
 				treePane.changingOrientationProperty().addListener((v, o, n) -> numberChangingOrientation.set(numberChangingOrientation.get() + (n ? 1 : -1)));
 				treePane.setRunAfterUpdate(() -> {
 					for (var treeViewPane : BasicFX.findRecursively(treePane, p -> p.getId() != null && p.getId().equals("treeView"))) {

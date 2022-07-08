@@ -28,7 +28,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Shape;
@@ -46,11 +45,13 @@ import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitNetworkLayout;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * split network pane
@@ -80,7 +81,7 @@ public class SplitNetworkPane extends StackPane {
 							ReadOnlyObjectProperty<SplitsRooting> rooting, ReadOnlyDoubleProperty rootAngle, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 							ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
 							ObservableMap<Integer, RichTextLabel> taxonLabelMap,
-							ObservableMap<Node, Group> nodeShapeMap,
+							ObservableMap<Node, LabeledNodeShape> nodeLabeledShapeMap,
 							ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 							ObservableList<LoopView> loopViews) {
 		getStyleClass().add("viewer-background");
@@ -103,8 +104,8 @@ public class SplitNetworkPane extends StackPane {
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
 		orientChangeListener = (v, o, n) -> {
-			splitstree6.layout.LayoutUtils.applyOrientation(nodeShapeMap.values(), o, n,
-					or -> splitNetworkLayout.getLabelLayout().layoutLabels(or), changingOrientation);
+			var shapes = nodeLabeledShapeMap.values().stream().filter(LabeledNodeShape::hasShape).collect(Collectors.toList());
+			splitstree6.layout.LayoutUtils.applyOrientation(shapes, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or), changingOrientation);
 		};
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
 
@@ -122,7 +123,7 @@ public class SplitNetworkPane extends StackPane {
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock.get(), splitsBlock.get(), diagram.get(),
 					rooting.get(), rootAngle.get(), taxonSelectionModel, splitSelectionModel, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16,
-					taxonLabelMap, nodeShapeMap, splitShapeMap,
+					taxonLabelMap, nodeLabeledShapeMap, splitShapeMap,
 					loopViews);
 
 			result.setId("networkGroup");
@@ -142,16 +143,6 @@ public class SplitNetworkPane extends StackPane {
 			setMinHeight(getPrefHeight() - 12);
 			setMinWidth(getPrefWidth());
 			group.getChildren().setAll(service.getValue());
-
-			addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(() -> {
-						taxonSelectionModel.clearSelection();
-						splitSelectionModel.clearSelection();
-					});
-				}
-				e.consume();
-			});
 
 			Platform.runLater(() -> applyOrientation(orientation.get()));
 

@@ -19,17 +19,16 @@
 
 package splitstree6.layout.tree;
 
-import javafx.scene.Group;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.StrokeLineCap;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
 
@@ -39,12 +38,12 @@ import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
  */
 public class CreateEdgesStraight {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, ? extends Group> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
-		var shapes = new ArrayList<Shape>();
+	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, boolean linkNodesEdgesLabels, Map<Edge, LabeledEdgeShape> edgeShapeMap) {
 		for (var e : tree.edges()) {
 			var sourceShape = nodeShapeMap.get(e.getSource());
 			var targetShape = nodeShapeMap.get(e.getTarget());
 			var moveTo = new MoveTo();
+
 			if (linkNodesEdgesLabels) {
 				moveTo.xProperty().bind(sourceShape.translateXProperty());
 				moveTo.yProperty().bind(sourceShape.translateYProperty());
@@ -75,9 +74,8 @@ public class CreateEdgesStraight {
 			if (tree.isTransferEdge(e))
 				addArrowHead(line, moveTo, lineTo);
 
-			shapes.add(line);
-			edgeCallback.accept(e, line);
+			var edgeShape = new LabeledEdgeShape(line);
+			edgeShapeMap.put(e, edgeShape);
 		}
-		return shapes;
 	}
 }

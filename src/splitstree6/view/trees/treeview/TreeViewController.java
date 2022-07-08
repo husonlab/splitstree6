@@ -112,6 +112,9 @@ public class TreeViewController {
 	@FXML
 	private VBox formatVBox;
 
+	@FXML
+	private Button tryButton;
+
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();
@@ -258,5 +261,9 @@ public class TreeViewController {
 
 	public ToggleButton getFormatToggleButton() {
 		return formatToggleButton;
+	}
+
+	public Button getTryButton() {
+		return tryButton;
 	}
 }

@@ -38,6 +38,7 @@ import jloda.graph.Edge;
 import jloda.util.ProgramProperties;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
+import splitstree6.layout.tree.LabeledEdgeShape;
 
 /**
  * format sites for haplotype network
@@ -48,7 +49,7 @@ public class SitesFormat extends Group {
 	private final SitesFormatPresenter presenter;
 
 	private final ObjectProperty<NetworkBlock> networkBlock = new SimpleObjectProperty<>();
-	private final ObservableMap<Edge, Group> edgeShapeMap = FXCollections.observableHashMap();
+	private final ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap = FXCollections.observableHashMap();
 
 	private final ObjectProperty<SitesStyle> optionSitesStyle = new SimpleObjectProperty<>(this, "optionSitesStyle");
 
@@ -106,7 +107,7 @@ public class SitesFormat extends Group {
 		this.networkBlock.set(networkBlock);
 	}
 
-	public ObservableMap<Edge, Group> getEdgeShapeMap() {
+	public ObservableMap<Edge, LabeledEdgeShape> getEdgeShapeMap() {
 		return edgeShapeMap;
 	}
 

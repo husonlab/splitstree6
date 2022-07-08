@@ -24,7 +24,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
@@ -34,6 +33,7 @@ import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Node;
 import splitstree6.layout.splits.RotateSplit;
 import splitstree6.layout.splits.SplitsDiagramType;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.view.splits.viewer.SplitNetworkEdits;
 
 import java.util.ArrayList;
@@ -50,12 +50,12 @@ public class SplitsFormatPresenter {
 	final private SelectionModel<Integer> splitSelectionModel;
 	final private UndoManager undoManager;
 	final private ObjectProperty<String[]> editsProperty;
-	final private Map<Node, Group> nodeShapeMap;
+	final private Map<Node, LabeledNodeShape> nodeShapeMap;
 
 	private boolean inUpdatingDefaults = false;
 
 	public SplitsFormatPresenter(UndoManager undoManager, SplitsFormatController controller, SelectionModel<Integer> splitSelectionModel,
-								 Map<Node, Group> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
+								 Map<Node, LabeledNodeShape> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
 								 ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty) {
 
 		this.splitSelectionModel = splitSelectionModel;

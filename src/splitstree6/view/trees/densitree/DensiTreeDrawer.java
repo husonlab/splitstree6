@@ -366,7 +366,7 @@ public class DensiTreeDrawer {
 					}
 					e.consume();
 				};
-				label.setOnContextMenuRequested(m -> InteractionSetup.showContextMenu(stage, m, taxon, label));
+				label.setOnContextMenuRequested(InteractionSetup.createNodeContextMenuHandler(stage, label));
 				label.setOnMouseClicked(mouseClickedHandler);
 
 				if (taxonSelectionModel.isSelected(taxon)) {

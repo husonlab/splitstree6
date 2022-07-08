@@ -28,7 +28,6 @@ import javafx.collections.ObservableMap;
 import javafx.collections.SetChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Orientation;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.AnchorPane;
@@ -41,10 +40,7 @@ import jloda.fx.util.PrintUtils;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
-import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
-import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.layout.tree.TreeLabel;
+import splitstree6.layout.tree.*;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.edges.EdgesFormat;
@@ -100,8 +96,8 @@ public class TreeView implements IView {
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
-	private final ObservableMap<jloda.graph.Node, Group> nodeShapeMap = FXCollections.observableHashMap();
-	private final ObservableMap<jloda.graph.Edge, Group> edgeShapeMap = FXCollections.observableHashMap();
+	private final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
+	private final ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap = FXCollections.observableHashMap();
 	private final SelectionModel<Edge> edgeSelectionModel = new SetSelectionModel<>();
 
 	// create properties:
@@ -407,11 +403,11 @@ public class TreeView implements IView {
 		return tree;
 	}
 
-	public ObservableMap<jloda.graph.Node, Group> getNodeShapeMap() {
+	public ObservableMap<jloda.graph.Node, LabeledNodeShape> getNodeShapeMap() {
 		return nodeShapeMap;
 	}
 
-	public ObservableMap<Edge, Group> getEdgeShapeMap() {
+	public ObservableMap<Edge, LabeledEdgeShape> getEdgeShapeMap() {
 		return edgeShapeMap;
 	}
 

@@ -23,9 +23,7 @@ import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.util.TriConsumer;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -35,7 +33,6 @@ import jloda.util.IteratorUtils;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -47,22 +44,20 @@ public class ComputeTreeLayout {
 	/**
 	 * compute a tree embedding
 	 *
-	 * @param tree                 tree
-	 * @param nTaxa                number of taxa
-	 * @param taxonLabelMap        taxon-id to label map, 1-based
-	 * @param diagram              diagram type
-	 * @param width                target width
-	 * @param height               target height
-	 * @param nodeCallback         callback to set up additional node stuff
-	 * @param edgeCallback         callback to set up additional edges stuff
-	 * @param linkNodesEdgesLabels link coordinates nodes, edges and labels via listeners
-	 * @param alignLabels          align labels in rectangular and circular phylograms
+	 * @param tree          tree
+	 * @param nTaxa         number of taxa
+	 * @param taxonLabelMap taxon-id to label map, 1-based
+	 * @param diagram       diagram type
+	 * @param width         target width
+	 * @param height        target height
+	 * @param alignLabels   align labels in rectangular and circular phylograms
 	 * @return groups and layout consumer
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging,
-							   double width, double height, TriConsumer<Node, javafx.scene.Node, RichTextLabel> nodeCallback,
-							   BiConsumer<Edge, Shape> edgeCallback, boolean linkNodesEdgesLabels, boolean alignLabels,
-							   Map<Node, Group> nodeShapeMap) {
+							   double width, double height,
+							   Map<Edge, LabeledEdgeShape> edgeShapeMap,
+							   boolean alignLabels,
+							   Map<Node, LabeledNodeShape> nodeShapeMap) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
 
@@ -78,18 +73,7 @@ public class ComputeTreeLayout {
 
 		var dimensions = LayoutUtils.computeFontHeightGraphWidthHeight(nTaxa, taxonLabelMap, tree, diagram.isRadialOrCircular(), width, height);
 
-		final NodeArray<RichTextLabel> nodeLabelMap = tree.newNodeArray();
-
-		for (var v : tree.nodes()) {
-			var label = LayoutUtils.getLabel(taxonLabelMap, tree, v);
-			if (label != null) {
-				label.setScale(dimensions.fontHeight() / RichTextLabel.DEFAULT_FONT.getSize());
-				label.applyCss();
-				nodeLabelMap.put(v, label);
-			}
-		}
-
-		var labelGap = dimensions.fontHeight()  + 1;
+		var labelGap = dimensions.fontHeight() + 1;
 
 		final NodeDoubleArray nodeAngleMap = tree.newNodeDoubleArray();
 
@@ -113,23 +97,27 @@ public class ComputeTreeLayout {
 		var edgeGroup = new Group();
 
 		for (var v : tree.nodes()) {
-			var point = nodePointMap.get(v);
-			var shape = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
-			shape.getStyleClass().add("graph-node");
-			var group = new Group(shape);
-			group.setId("graph-node");
-			nodeShapeMap.put(v, group);
-			group.setTranslateX(point.getX());
-			group.setTranslateY(point.getY());
-			nodeGroup.getChildren().add(group);
 
-			var label = nodeLabelMap.get(v);
+			var shape = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
+			var label = LayoutUtils.getLabel(taxonLabelMap, tree, v);
+
+			var nodeShape = new LabeledNodeShape(label, shape);
+			nodeGroup.getChildren().add(nodeShape);
+
+			nodeShapeMap.put(v, nodeShape);
+
+			var point = nodePointMap.get(v);
+
+			nodeShape.setTranslateX(point.getX());
+			nodeShape.setTranslateY(point.getY());
+
 			if (label != null) {
-				nodeCallback.accept(v, group, label);
+				label.setScale(dimensions.fontHeight() / RichTextLabel.DEFAULT_FONT.getSize());
+				label.applyCss();
 				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
 				if (taxonId != null) {
 					taxonLabelsGroup.getChildren().add(label);
-					group.setUserData(taxonId);
+					nodeShape.setUserData(taxonId);
 				} else {
 					internalLabelsGroup.getChildren().add(label);
 					splitstree6.layout.LayoutUtils.installTranslateUsingLayout(label, () -> {
@@ -139,22 +127,22 @@ public class ComputeTreeLayout {
 		}
 
 		if (diagram == TreeDiagramType.CircularCladogram || diagram == TreeDiagramType.CircularPhylogram) {
-			edgeGroup.getChildren().addAll(CreateEdgesCircular.apply(diagram, tree, nodePointMap, nodeAngleMap, linkNodesEdgesLabels, edgeCallback));
+			CreateEdgesCircular.apply(diagram, tree, nodePointMap, nodeAngleMap, edgeShapeMap);
 		} else if (diagram == TreeDiagramType.TriangularCladogram || diagram == TreeDiagramType.RadialPhylogram || diagram == TreeDiagramType.RadialCladogram) {
-			edgeGroup.getChildren().addAll(CreateEdgesStraight.apply(diagram, tree, nodeShapeMap, linkNodesEdgesLabels || diagram == TreeDiagramType.RadialPhylogram, edgeCallback));
+			CreateEdgesStraight.apply(tree, nodeShapeMap, diagram == TreeDiagramType.RadialPhylogram, edgeShapeMap);
 		} else { // if (diagram == TreePane.TreeDiagramType.Rectangular) {
-			edgeGroup.getChildren().addAll(CreateEdgesRectangular.apply(diagram, tree, nodeShapeMap, linkNodesEdgesLabels, edgeCallback));
+			CreateEdgesRectangular.apply(tree, nodeShapeMap, edgeShapeMap);
 		}
+		edgeGroup.getChildren().addAll(edgeShapeMap.values());
 
 		var labelConnectorGroup = alignLabels ? new Group() : null;
 
 		LayoutLabelsRadialPhylogram layoutLabelsRadialPhylogram = null;
 
 		switch (diagram) {
-			case CircularPhylogram, CircularCladogram, RadialCladogram -> LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
-			case RadialPhylogram -> layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeLabelMap, nodeAngleMap, labelGap);
-			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, nodeLabelMap, labelGap, linkNodesEdgesLabels, labelConnectorGroup);
-
+			case CircularPhylogram, CircularCladogram, RadialCladogram -> LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeAngleMap, labelGap, labelConnectorGroup);
+			case RadialPhylogram -> layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeAngleMap, labelGap);
+			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, labelGap, labelConnectorGroup);
 		}
 		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, internalLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);
 	}
@@ -181,5 +169,6 @@ public class ComputeTreeLayout {
 			this(null, null, null, null, null, null, 1.0);
 		}
 	}
+
 }
 

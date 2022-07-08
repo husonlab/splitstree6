@@ -1,5 +1,5 @@
 /*
- *  MouseInteraction.java Copyright (C) 2022 Daniel H. Huson
+ *  InteractionSetup.java Copyright (C) 2022 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,14 +19,15 @@
 
 package splitstree6.view.network;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.label.EditLabelDialog;
@@ -37,15 +38,16 @@ import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.LabeledNodeShape;
 
 import java.util.Map;
 import java.util.function.Function;
 
 /**
- * network mouse interaction
+ * network mouse interaction setup
  * Daniel Huson, 4.2022
  */
-public class MouseInteraction {
+public class InteractionSetup {
 	private static boolean nodeShapeOrLabelEntered;
 	private static boolean edgeShapeEntered;
 	private static double mouseDownX;
@@ -60,16 +62,23 @@ public class MouseInteraction {
 	/**
 	 * constructor
 	 */
-	public MouseInteraction(Stage stage, UndoManager undoManager, SelectionModel<Taxon> taxonSelectionModel) {
+	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, SelectionModel<Taxon> taxonSelectionModel) {
 		this.stage = stage;
 		this.undoManager = undoManager;
 		this.taxonSelectionModel = taxonSelectionModel;
+
+		pane.setOnMouseClicked(e -> {
+			if (e.isStillSincePress() && !e.isShiftDown()) {
+				Platform.runLater(taxonSelectionModel::clearSelection);
+				e.consume();
+			}
+		});
 	}
 
 	/**
 	 * setup network mouse interaction
 	 */
-	public void setup(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, Group> nodeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
+	public void apply(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
 		for (var shape : nodeShapeMap.values()) {
 			DraggableUtils.setupDragMouseTranslate(shape);
 			shape.setOnMouseEntered(e -> {

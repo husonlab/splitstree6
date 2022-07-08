@@ -25,7 +25,6 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Orientation;
-import javafx.scene.Group;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
@@ -41,6 +40,7 @@ import jloda.util.ProgramProperties;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.window.MainWindow;
 
 /**
@@ -57,7 +57,7 @@ public class TraitsFormat extends Pane {
 	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
 	private final ChangeListener<Boolean> validListener;
 
-	private ObservableMap<jloda.graph.Node, Group> nodeShapeMap;
+	private ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap;
 	private Runnable runAfterUpdateNodes;
 	private final Legend legend;
 
@@ -148,10 +148,7 @@ public class TraitsFormat extends Pane {
 		this.optionTraitSize.set(optionTraitSize);
 	}
 
-	public void setNodeShapeMap(ObservableMap<jloda.graph.Node, Group> nodeShapeMap) {
-		this.nodeShapeMap = nodeShapeMap;
-		updateNodes();
-	}
+
 
 	public void setRunAfterUpdateNodes(Runnable runAfterUpdateNodes) {
 		this.runAfterUpdateNodes = runAfterUpdateNodes;
@@ -161,8 +158,12 @@ public class TraitsFormat extends Pane {
 		return runAfterUpdateNodes;
 	}
 
-	public ObservableMap<Node, Group> getNodeShapeMap() {
+	public ObservableMap<Node, LabeledNodeShape> getNodeShapeMap() {
 		return nodeShapeMap;
+	}
+
+	public void setNodeShapeMap(ObservableMap<Node, LabeledNodeShape> nodeShapeMap) {
+		this.nodeShapeMap = nodeShapeMap;
 	}
 
 	public void updateNodes() {
@@ -185,15 +186,15 @@ public class TraitsFormat extends Pane {
 
 				var graph = graphOptional.get();
 				for (var v : nodeShapeMap.keySet()) {
-					var group = nodeShapeMap.get(v);
-					if (group != null) {
-						group.getChildren().removeAll(BasicFX.getAllRecursively(group, PieChart.class));
+					var nodeShape = nodeShapeMap.get(v);
+					if (nodeShape != null) {
+						nodeShape.getChildren().removeAll(BasicFX.getAllRecursively(nodeShape, PieChart.class));
 
 						if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
 							var taxonId = graph.getTaxon(v);
 
 							if (isNoneTraitsActive()) {
-								var shapes = BasicFX.getAllRecursively(group, Shape.class);
+								var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
 								if (shapes.size() == 1) {
 									var shape = shapes.iterator().next();
 									if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
@@ -236,7 +237,7 @@ public class TraitsFormat extends Pane {
 									pieChart.setLayoutX(-0.5 * pieSize);
 									pieChart.setLayoutY(-0.5 * pieSize);
 
-									var shapes = BasicFX.getAllRecursively(group, Shape.class);
+									var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
 									if (shapes.size() == 1) {
 										var shape = shapes.iterator().next();
 										if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
@@ -245,7 +246,7 @@ public class TraitsFormat extends Pane {
 										}
 									}
 
-									group.getChildren().add(pieChart);
+									nodeShape.getChildren().add(pieChart);
 									ColorSchemeManager.setPieChartColors(pieChart, legend.getColorSchemeName());
 									pieChart.setStyle("-fx-padding: -10;"); // remove white space around pie
 
