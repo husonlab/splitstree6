@@ -222,9 +222,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(treePagesView.optionShowInternalLabelsProperty());
-		controller.getShowInternalLabelsToggleButton().disableProperty().bind(treePageView.emptyProperty());
-
 		controller.getZoomInButton().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
 		controller.getZoomOutButton().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));

@@ -30,6 +30,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.window.WindowGeometry;
+import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.ProgramProperties;
@@ -90,6 +91,7 @@ public class SplitsTree6 extends Application {
 	}
 
 	protected static void parseArguments(String[] args) throws CanceledException, UsageException {
+
 		final ArgsOptions options = new ArgsOptions(args, SplitsTree6.class, Version.NAME + " - Phylogenetic analysis using trees and networks");
 		options.setAuthors("Daniel H. Huson and David Bryant");
 		options.setLicense(ProgramProperties.getProgramLicence());
@@ -124,6 +126,11 @@ public class SplitsTree6 extends Application {
 			System.err.println(jloda.util.Version.getVersion(SplitsTree6.class, ProgramProperties.getProgramName()));
 			System.err.println("Java version: " + System.getProperty("java.version"));
 		}
+	}
+
+	@Override
+	public void init() throws Exception {
+		PhyloTree.SUPPORT_RICH_NEWICK = true;
 	}
 
 	@Override

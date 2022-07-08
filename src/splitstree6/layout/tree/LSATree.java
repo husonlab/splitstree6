@@ -22,7 +22,10 @@ package splitstree6.layout.tree;
 import jloda.graph.*;
 import jloda.phylo.PhyloTree;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -93,27 +96,28 @@ public class LSATree {
 		if (v.getInDegree() > 1) // this is a reticulate node, add paths to node and incoming edges
 		{
 			// create new paths for this node:
-			EdgeArray<BitSet> edge2PathSet = new EdgeArray<>(tree);
-			ret2Edge2PathSet.put(v, edge2PathSet);
-			BitSet pathsForR = new BitSet();
-			ret2PathSet.put(v, pathsForR);
-			//  assign a different path number to each in-edge:
-			int pathNum = 0;
-			for (Edge e = v.getFirstInEdge(); e != null; e = v.getNextInEdge(e)) {
-				pathNum++;
-				pathsForR.set(pathNum);
-				BitSet pathsForEdge = new BitSet();
-				pathsForEdge.set(pathNum);
-				edge2PathSet.put(e, pathsForEdge);
+			try (EdgeArray<BitSet> edge2PathSet = tree.newEdgeArray()) {
+				ret2Edge2PathSet.put(v, edge2PathSet);
+				BitSet pathsForR = new BitSet();
+				ret2PathSet.put(v, pathsForR);
+				//  assign a different path number to each in-edge:
+				var pathNum = 0;
+				for (var e : v.inEdges()) {
+					pathNum++;
+					pathsForR.set(pathNum);
+					BitSet pathsForEdge = new BitSet();
+					pathsForEdge.set(pathNum);
+					edge2PathSet.put(e, pathsForEdge);
+				}
 			}
 		}
 
-		Set<Node> reticulationsBelow = new HashSet<>(); // set of all reticulate nodes below v
+		var reticulationsBelow = new HashSet<Node>(); // set of all reticulate nodes below v
 		node2below.put(v, reticulationsBelow);
 
 		// visit all children and determine all reticulations below this node
-		for (Edge f = v.getFirstOutEdge(); f != null; f = v.getNextOutEdge(f)) {
-			Node w = f.getTarget();
+		for (var f : v.outEdges()) {
+			var w = f.getTarget();
 			if (node2below.get(w) == null) // if haven't processed child yet, do it:
 				computeReticulation2LSARec(tree, w);
 			reticulationsBelow.addAll(node2below.get(w));
@@ -123,18 +127,18 @@ public class LSATree {
 
 		// check whether this is the lsa for any of the reticulations below v
 		// look at all reticulations below v:
-		List<Node> toDelete = new LinkedList<>();
-		for (Node r : reticulationsBelow) {
+		var toDelete = new ArrayList<Node>();
+		for (var r : reticulationsBelow) {
 			// determine which paths from the reticulation lead to this node
 			var edge2PathSet = ret2Edge2PathSet.get(r);
 			var paths = new BitSet();
-			for (var f = v.getFirstOutEdge(); f != null; f = v.getNextOutEdge(f)) {
-				BitSet eSet = edge2PathSet.get(f);
+			for (var f : v.outEdges()) {
+				var eSet = edge2PathSet.get(f);
 				if (eSet != null)
 					paths.or(eSet);
 
 			}
-			BitSet alive = ret2PathSet.get(r);
+			var alive = ret2PathSet.get(r);
 			if (paths.equals(alive)) // if the set of paths equals all alive paths, v is lsa of r
 			{
 				reticulation2LSA.put(r, v);
@@ -142,19 +146,18 @@ public class LSATree {
 			}
 		}
 		// don't need to consider reticulations for which lsa has been found:
-		for (Node u : toDelete)
+		for (var u : toDelete)
 			reticulationsBelow.remove(u);
 
 		// all paths are pulled up the first in-edge"
 		if (v.getInDegree() >= 1) {
-			for (Node r : reticulationsBelow) {
+			for (var r : reticulationsBelow) {
 				// determine which paths from the reticulation lead to this node
-				EdgeArray<BitSet> edge2PathSet = ret2Edge2PathSet.get(r);
+				var edge2PathSet = ret2Edge2PathSet.get(r);
+				var newSet = new BitSet();
 
-				BitSet newSet = new BitSet();
-
-				for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-					BitSet pathSet = edge2PathSet.get(e);
+				for (var e : v.outEdges()) {
+					var pathSet = edge2PathSet.get(e);
 					if (pathSet != null)
 						newSet.or(pathSet);
 				}
@@ -163,14 +166,14 @@ public class LSATree {
 		}
 		// open new paths on all additional in-edges:
 		if (v.getInDegree() >= 2) {
-			for (Node r : reticulationsBelow) {
-				BitSet existingPathsForR = ret2PathSet.get(r);
+			for (var r : reticulationsBelow) {
+				var existingPathsForR = ret2PathSet.get(r);
+				var edge2PathSet = ret2Edge2PathSet.get(r);
 
-				EdgeArray<BitSet> edge2PathSet = ret2Edge2PathSet.get(r);
 				// start with the second in edge:
-				for (Edge e = v.getNextInEdge(v.getFirstInEdge()); e != null; e = v.getNextInEdge(e)) {
-					BitSet pathsForEdge = new BitSet();
-					int pathNum = existingPathsForR.nextClearBit(1);
+				for (var e : v.inEdges()) {
+					var pathsForEdge = new BitSet();
+					var pathNum = existingPathsForR.nextClearBit(1);
 					existingPathsForR.set(pathNum);
 					pathsForEdge.set(pathNum);
 					edge2PathSet.put(e, pathsForEdge);

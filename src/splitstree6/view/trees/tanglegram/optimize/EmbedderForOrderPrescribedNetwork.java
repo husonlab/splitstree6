@@ -24,7 +24,6 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
-import jloda.util.progress.ProgressSilent;
 
 import java.io.IOException;
 import java.util.*;
@@ -45,7 +44,7 @@ public class EmbedderForOrderPrescribedNetwork {
 			if (verbose)
 				System.err.println("Original network: " + tree.toBracketString(true) + ";");
 			// recompute the lsa layout
-			(new LayoutUnoptimized()).apply(tree, new ProgressSilent());
+			(new LayoutUnoptimized()).apply(tree);
 
 			// get ordering of labeled leaves
 			var orderedLabeledLeaves = computeOrderedLabeledLeaves(node2pos);

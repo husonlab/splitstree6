@@ -204,7 +204,8 @@ public class InteractionSetup {
 			tree.postorderTraversal(v -> {
 				var below = 0;
 				for (var t : tree.getTaxa(v)) {
-					if (taxonSelectionModel.isSelected(taxaBlock.get(t)))
+					var taxon = taxaBlock.get(t);
+					if (taxon != null && taxonSelectionModel.isSelected(taxon))
 						below++;
 				}
 				var hasChildWithNone = false;

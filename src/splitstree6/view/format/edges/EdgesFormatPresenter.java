@@ -52,12 +52,17 @@ public class EdgesFormatPresenter {
 	private final UndoManager undoManager;
 	private final EdgesFormatController controller;
 
-	private Consumer<EdgesFormat.LabelBy> updateLabelsConsumer;
+	private Consumer<LabelEdgesBy> updateLabelsConsumer;
 
-	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, SelectionModel<Edge> edgeSelectionModel,
+	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, ObjectProperty<LabelEdgesBy> optionLabelEdgesBy, SelectionModel<Edge> edgeSelectionModel,
 								Map<Edge, LabeledEdgeShape> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
 		this.undoManager = undoManager;
 		this.controller = controller;
+
+		controller.getLabelByNoneMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.None));
+		controller.getLabelByWeightMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Weight));
+		controller.getLabelByConfidenceMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Confidence));
+		controller.getLabelByProbabilityMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Probability));
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
@@ -162,7 +167,7 @@ public class EdgesFormatPresenter {
 		selectionListener.invalidated(null);
 	}
 
-	public void setUpdateLabelsConsumer(Consumer<EdgesFormat.LabelBy> updateLabelsConsumer) {
+	public void setUpdateLabelsConsumer(Consumer<LabelEdgesBy> updateLabelsConsumer) {
 		this.updateLabelsConsumer = updateLabelsConsumer;
 
 

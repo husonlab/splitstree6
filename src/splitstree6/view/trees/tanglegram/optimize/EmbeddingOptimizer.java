@@ -463,7 +463,7 @@ public class EmbeddingOptimizer {
 			}
 			computeTaxaBelowRec(tree.getRoot(), taxaBelow);
 			rotateTreeByTaxaBelow(tree, taxaBelow);
-			(new LayoutUnoptimized()).apply(tree, null);
+			(new LayoutUnoptimized()).apply(tree);
 		}
 	}
 

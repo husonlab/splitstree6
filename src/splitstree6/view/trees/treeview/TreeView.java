@@ -44,6 +44,7 @@ import splitstree6.layout.tree.*;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.edges.EdgesFormat;
+import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.taxlabel.TaxonLabelFormat;
 import splitstree6.view.format.taxmark.TaxonMark;
@@ -80,13 +81,12 @@ public class TreeView implements IView {
 	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
-	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence", true);
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0);
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
-	private final ObjectProperty<EdgesFormat.LabelBy> optionEdgeLabelBy = new SimpleObjectProperty<>(this, "optionEdgeLabelBy", EdgesFormat.LabelBy.None);
+	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
 
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
 	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
@@ -109,8 +109,8 @@ public class TreeView implements IView {
 	public List<String> listOptions() {
 		return List.of(optionTree.getName(), optionDiagram.getName(), optionAveraging.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionEdits.getName(), optionShowConfidence.getName(),
-				optionTreeLabels.getName(), optionEdgeLabelBy.getName(),
+				optionFontScaleFactor.getName(), optionEdits.getName(),
+				optionTreeLabels.getName(), optionLabelEdgesBy.getName(),
 				optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
 	}
 
@@ -143,8 +143,7 @@ public class TreeView implements IView {
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
 		var edgesFormatter = new EdgesFormat(undoManager, edgeSelectionModel, edgeShapeMap, optionEditsProperty());
-
-		edgesFormatter.getPresenter().setUpdateLabelsConsumer(labelBy -> edgesFormatter.setEdgeLabels(labelBy, treeProperty().get(), edgeShapeMap));
+		optionLabelEdgesBy.bind(edgesFormatter.optionLabelEdgesByProperty());
 
 		treeProperty().addListener((v, o, n) -> {
 			edgesFormatter.getPresenter().updateMenus(n);
@@ -294,16 +293,16 @@ public class TreeView implements IView {
 		this.optionTreeLabels.set(optionTreeLabel);
 	}
 
-	public EdgesFormat.LabelBy getOptionEdgeLabelBy() {
-		return optionEdgeLabelBy.get();
+	public LabelEdgesBy getOptionLabelEdgesBy() {
+		return optionLabelEdgesBy.get();
 	}
 
-	public ObjectProperty<EdgesFormat.LabelBy> optionEdgeLabelByProperty() {
-		return optionEdgeLabelBy;
+	public ObjectProperty<LabelEdgesBy> optionLabelEdgesByProperty() {
+		return optionLabelEdgesBy;
 	}
 
-	public void setOptionEdgeLabelBy(EdgesFormat.LabelBy optionEdgeLabelBy) {
-		this.optionEdgeLabelBy.set(optionEdgeLabelBy);
+	public void setOptionLabelEdgesBy(LabelEdgesBy optionLabelEdgesBy) {
+		this.optionLabelEdgesBy.set(optionLabelEdgesBy);
 	}
 
 	public String[] getOptionEdits() {
@@ -353,18 +352,6 @@ public class TreeView implements IView {
 
 	public void setOptionFontScaleFactor(double optionFontScaleFactor) {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
-	}
-
-	public boolean isOptionShowConfidence() {
-		return optionShowConfidence.get();
-	}
-
-	public BooleanProperty optionShowConfidenceProperty() {
-		return optionShowConfidence;
-	}
-
-	public void setOptionShowConfidence(boolean optionShowConfidence) {
-		this.optionShowConfidence.set(optionShowConfidence);
 	}
 
 	public Bounds getTargetBounds() {

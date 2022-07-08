@@ -34,7 +34,8 @@ import java.util.Map;
  */
 public class LayoutLabelsCircular {
 
-	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Node, Double> nodeAngleMap, double labelGap, Group labelConnectors) {
+	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Node, Double> nodeAngleMap,
+							 double labelGap, Group labelConnectors) {
 
 		var alignLabels = (labelConnectors != null);
 		final double maxRadius;

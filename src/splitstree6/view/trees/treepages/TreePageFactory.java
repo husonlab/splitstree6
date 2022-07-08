@@ -37,6 +37,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.window.MainWindow;
 
@@ -118,8 +119,8 @@ public class TreePageFactory implements Callback<Integer, Node> {
 			Pane pane;
 			if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0) {
 				var treePane = new TreePane(mainWindow.getStage(), taxaBlock, tree, taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
-						treePagesView.getOptionDiagram(), treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
-						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), treePagesView.optionShowInternalLabelsProperty(), null,
+						treePagesView.getOptionDiagram(), LabelEdgesBy.None, treePagesView.getOptionAveraging(), treePagesView.optionOrientationProperty(),
+						treePagesView.optionFontScaleFactorProperty(), treePagesView.optionTreeLabelsProperty(), null,
 						FXCollections.observableHashMap(), FXCollections.observableHashMap());
 				treePane.changingOrientationProperty().addListener((v, o, n) -> numberChangingOrientation.set(numberChangingOrientation.get() + (n ? 1 : -1)));
 				treePane.setRunAfterUpdate(() -> {

@@ -77,9 +77,6 @@ public class TreeViewController {
 	private ToggleButton showTreeNamesToggleButton;
 
 	@FXML
-	private ToggleButton showInternalLabelsToggleButton;
-
-	@FXML
 	private Button expandVerticallyButton;
 
 	@FXML
@@ -111,9 +108,6 @@ public class TreeViewController {
 
 	@FXML
 	private VBox formatVBox;
-
-	@FXML
-	private Button tryButton;
 
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
@@ -215,10 +209,6 @@ public class TreeViewController {
 		return showTreeNamesToggleButton;
 	}
 
-	public ToggleButton getShowInternalLabelsToggleButton() {
-		return showInternalLabelsToggleButton;
-	}
-
 	public Button getExpandVerticallyButton() {
 		return expandVerticallyButton;
 	}
@@ -261,9 +251,5 @@ public class TreeViewController {
 
 	public ToggleButton getFormatToggleButton() {
 		return formatToggleButton;
-	}
-
-	public Button getTryButton() {
-		return tryButton;
 	}
 }

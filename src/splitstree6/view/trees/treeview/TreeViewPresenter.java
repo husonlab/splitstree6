@@ -54,7 +54,6 @@ import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 /**
@@ -170,8 +169,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().valueProperty().bindBidirectional(view.optionOrientationProperty());
 		controller.getOrientationCBox().disableProperty().bind(view.emptyProperty().or(changingOrientation));
 
-		controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(view.optionShowConfidenceProperty());
-
 		controller.getScaleBar().visibleProperty().bind(toScale.and(showScaleBar));
 
 		{
@@ -217,8 +214,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 						if (!view.emptyProperty().get()) {
 							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
-									view.getOptionDiagram(), view.getOptionAveraging(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(), null,
-									view.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap());
+									view.getOptionDiagram(), view.getOptionLabelEdgesBy(), view.getOptionAveraging(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(), null,
+									controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap());
 							view.setEdgeSelectionModel(pane.getEdgeSelectionModel());
 							treePane.set(pane);
 							pane.setRunAfterUpdate(() -> {
@@ -273,6 +270,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		view.getTrees().addListener(updateListener);
 		view.optionTreeProperty().addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);
+		view.optionLabelEdgesByProperty().addListener(updateListener);
 
 		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
 		view.optionDiagramProperty().addListener((v, o, n) -> {
@@ -353,17 +351,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
-
-		controller.getTryButton().setOnAction(a -> {
-			var random = new Random(666);
-			for (var e : tree.get().edges()) {
-				tree.get().setLabel(e, String.format("%.1f", 10 * random.nextDouble()));
-				var label = view.getEdgeShapeMap().get(e).getLabel();
-			}
-			updateListener.invalidated(null);
-
-		});
-
 	}
 
 	public void setupMenuItems() {

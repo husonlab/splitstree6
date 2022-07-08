@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * computes an embedding of a tree
@@ -54,10 +55,7 @@ public class ComputeTreeLayout {
 	 * @return groups and layout consumer
 	 */
 	public static Result apply(PhyloTree tree, int nTaxa, Function<Integer, StringProperty> taxonLabelMap, TreeDiagramType diagram, HeightAndAngles.Averaging averaging,
-							   double width, double height,
-							   Map<Edge, LabeledEdgeShape> edgeShapeMap,
-							   boolean alignLabels,
-							   Map<Node, LabeledNodeShape> nodeShapeMap) {
+							   double width, double height, boolean alignLabels, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap) {
 		if (tree.getNumberOfNodes() == 0)
 			return new Result();
 
@@ -67,7 +65,7 @@ public class ComputeTreeLayout {
 			nodeShapeMap = new HashMap<>();
 
 		if (alignLabels && diagram != TreeDiagramType.RectangularPhylogram && diagram != TreeDiagramType.CircularPhylogram)
-			alignLabels = false; // can't or don't need to, or can't, align labels in all other cases
+			alignLabels = false; // can't or don't need to, align labels in all other cases
 
 		//parentPlacement = ParentPlacement.LeafAverage;
 
@@ -92,12 +90,12 @@ public class ComputeTreeLayout {
 		assert (Math.abs(nodePointMap.get(tree.getRoot()).getY()) < 0.000001);
 
 		var nodeGroup = new Group();
-		var internalLabelsGroup = new Group();
+		var otherLabelsGroup = new Group();
 		var taxonLabelsGroup = new Group();
 		var edgeGroup = new Group();
 
+		nodeShapeMap.clear();
 		for (var v : tree.nodes()) {
-
 			var shape = new Circle(tree.isLsaLeaf(v) || tree.getRoot() == v ? 1 : 0.5);
 			var label = LayoutUtils.getLabel(taxonLabelMap, tree, v);
 
@@ -119,7 +117,7 @@ public class ComputeTreeLayout {
 					taxonLabelsGroup.getChildren().add(label);
 					nodeShape.setUserData(taxonId);
 				} else {
-					internalLabelsGroup.getChildren().add(label);
+					otherLabelsGroup.getChildren().add(label);
 					splitstree6.layout.LayoutUtils.installTranslateUsingLayout(label, () -> {
 					});
 				}
@@ -135,6 +133,8 @@ public class ComputeTreeLayout {
 		}
 		edgeGroup.getChildren().addAll(edgeShapeMap.values());
 
+		otherLabelsGroup.getChildren().addAll(edgeShapeMap.values().stream().filter(LabeledEdgeShape::hasLabel).map(LabeledEdgeShape::getLabel).collect(Collectors.toList()));
+
 		var labelConnectorGroup = alignLabels ? new Group() : null;
 
 		LayoutLabelsRadialPhylogram layoutLabelsRadialPhylogram = null;
@@ -144,10 +144,10 @@ public class ComputeTreeLayout {
 			case RadialPhylogram -> layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeAngleMap, labelGap);
 			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, labelGap, labelConnectorGroup);
 		}
-		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, internalLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);
+		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, otherLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);
 	}
 
-	public record Result(Group labelConnectors, Group edges, Group nodes, Group internalLabels, Group taxonLabels,
+	public record Result(Group labelConnectors, Group edges, Group nodes, Group otherLabels, Group taxonLabels,
 						 Consumer<LayoutOrientation> layoutOrientationConsumer, double unitLengthX) {
 
 		public Group getAllAsGroup() {
@@ -158,8 +158,8 @@ public class ComputeTreeLayout {
 				group.getChildren().add(edges);
 			if (nodes != null)
 				group.getChildren().add(nodes);
-			if (internalLabels != null)
-				group.getChildren().add(internalLabels);
+			if (otherLabels != null)
+				group.getChildren().add(otherLabels);
 			if (taxonLabels != null)
 				group.getChildren().add(taxonLabels);
 			return group;

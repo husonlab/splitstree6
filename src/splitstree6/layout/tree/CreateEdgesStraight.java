@@ -24,6 +24,7 @@ import javafx.scene.shape.LineTo;
 import javafx.scene.shape.MoveTo;
 import javafx.scene.shape.Path;
 import javafx.scene.shape.StrokeLineCap;
+import jloda.fx.control.RichTextLabel;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
@@ -40,23 +41,21 @@ public class CreateEdgesStraight {
 
 	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, boolean linkNodesEdgesLabels, Map<Edge, LabeledEdgeShape> edgeShapeMap) {
 		for (var e : tree.edges()) {
+			var label = (tree.getLabel(e) != null ? new RichTextLabel(tree.getLabel(e)) : null);
+
 			var sourceShape = nodeShapeMap.get(e.getSource());
 			var targetShape = nodeShapeMap.get(e.getTarget());
 			var moveTo = new MoveTo();
+			var lineTo = new LineTo();
 
 			if (linkNodesEdgesLabels) {
 				moveTo.xProperty().bind(sourceShape.translateXProperty());
 				moveTo.yProperty().bind(sourceShape.translateYProperty());
-			} else {
-				moveTo.setX(sourceShape.getTranslateX());
-				moveTo.setY(sourceShape.getTranslateY());
-			}
-
-			var lineTo = new LineTo();
-			if (linkNodesEdgesLabels) {
 				lineTo.xProperty().bind(targetShape.translateXProperty());
 				lineTo.yProperty().bind(targetShape.translateYProperty());
 			} else {
+				moveTo.setX(sourceShape.getTranslateX());
+				moveTo.setY(sourceShape.getTranslateY());
 				lineTo.setX(targetShape.getTranslateX());
 				lineTo.setY(targetShape.getTranslateY());
 			}
@@ -74,8 +73,14 @@ public class CreateEdgesStraight {
 			if (tree.isTransferEdge(e))
 				addArrowHead(line, moveTo, lineTo);
 
-			var edgeShape = new LabeledEdgeShape(line);
-			edgeShapeMap.put(e, edgeShape);
+			if (label != null) {
+				if (!tree.isTreeEdge(e))
+					label.setTextFill(Color.DARKORANGE);
+				label.setTranslateX(0.5 * (sourceShape.getTranslateX() + targetShape.getTranslateX()));
+				label.setTranslateY(0.5 * (sourceShape.getTranslateY() + targetShape.getTranslateY()) - 15);
+			}
+
+			edgeShapeMap.put(e, new LabeledEdgeShape(label, line));
 		}
 	}
 }

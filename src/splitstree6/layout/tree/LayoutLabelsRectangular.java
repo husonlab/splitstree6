@@ -58,11 +58,10 @@ public class LayoutLabelsRectangular {
 									labelConnectors.getChildren().add(labelConnector);
 									label.setUserData(labelConnector);
 								}
-								label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
 							} else {
-								label.setTranslateX(shape.getTranslateX() - label.getWidth() - 0.5);
-								label.setTranslateY(shape.getTranslateY() - label.getHeight());
+								label.setTranslateX(shape.getTranslateX() + labelGap);
 							}
+						label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
 					}
 				};
 				label.widthProperty().addListener(invalidationListener);

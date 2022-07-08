@@ -23,6 +23,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.MouseDragToTranslate;
 
 import java.util.ArrayList;
 
@@ -43,7 +44,7 @@ public class LabeledEdgeShape extends Group {
 	}
 
 	public LabeledEdgeShape(RichTextLabel label, Shape shape) {
-		this.label = label;
+		setLabel(label);
 		if (shape != null) {
 			shape.setId("graph-edge"); // the is used to rotate graph
 			setShape(shape);
@@ -52,8 +53,9 @@ public class LabeledEdgeShape extends Group {
 
 	public void setLabel(RichTextLabel label) {
 		this.label = label;
-		if (label != null)
-			label.getStyleClass().add("graph-edge");
+		if (label != null) {
+			MouseDragToTranslate.setup(label);
+		}
 	}
 
 

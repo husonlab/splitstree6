@@ -20,13 +20,12 @@
 package splitstree6.view.format.edges;
 
 import javafx.beans.property.ObjectProperty;
-import javafx.collections.ObservableMap;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Group;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Edge;
-import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.LabeledEdgeShape;
 
 import java.util.Map;
@@ -37,10 +36,10 @@ import java.util.Map;
  */
 public class EdgesFormat extends Group {
 
-	public enum LabelBy {None, Weight, Confidence, Probability}
-
 	private final EdgesFormatController controller;
 	private final EdgesFormatPresenter presenter;
+
+	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
 
 	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, LabeledEdgeShape> edgeShapeMap,
 					   ObjectProperty<String[]> editsProperty) {
@@ -48,20 +47,14 @@ public class EdgesFormat extends Group {
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new EdgesFormatPresenter(undoManager, controller, edgeSelectionModel, edgeShapeMap, editsProperty);
+		presenter = new EdgesFormatPresenter(undoManager, controller, optionLabelEdgesBy, edgeSelectionModel, edgeShapeMap, editsProperty);
 	}
 
 	public EdgesFormatPresenter getPresenter() {
 		return presenter;
 	}
 
-
-	public void setEdgeLabels(LabelBy labelBy, PhyloTree tree, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
-		for (var e : tree.edges()) {
-
-		}
-
+	public ObjectProperty<LabelEdgesBy> optionLabelEdgesByProperty() {
+		return optionLabelEdgesBy;
 	}
-
-
 }

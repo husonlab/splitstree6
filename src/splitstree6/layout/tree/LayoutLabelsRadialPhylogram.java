@@ -38,7 +38,8 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 	/**
 	 * create labels for tree
 	 */
-	public LayoutLabelsRadialPhylogram(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Node, Double> nodeAngleMap, double labelGap) {
+	public LayoutLabelsRadialPhylogram(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap,
+									   Map<Node, Double> nodeAngleMap, double labelGap) {
 
 		labelLayout = new RadialLabelLayout();
 		labelLayout.setGap(labelGap);
@@ -62,31 +63,22 @@ public class LayoutLabelsRadialPhylogram implements Consumer<LayoutOrientation> 
 						angle = 0.0;
 				}
 
-				if (v.isLeaf()) {
-					label.setVisible(false);
-					label.setLayoutX(0);
-					label.setLayoutY(0);
-					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
-					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
+				label.setVisible(false);
+				label.setLayoutX(0);
+				label.setLayoutY(0);
+				label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
+				label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
 
-					labelLayout.addItem(shape.translateXProperty(), shape.translateYProperty(), angle, label.widthProperty(), label.heightProperty(),
-							xOffset -> {
-								label.setLayoutX(0);
-								label.translateXProperty().bind(shape.translateXProperty().add(xOffset));
-							},
-							yOffset -> {
-								label.setLayoutY(0);
-								label.translateYProperty().bind(shape.translateYProperty().add(yOffset));
-								label.setVisible(true);
-							});
-				} else {
-					label.setLayoutX(0);
-					label.setLayoutY(0);
-					label.translateXProperty().bind(shape.translateXProperty().subtract(label.widthProperty().multiply(0.5)));
-					label.translateYProperty().bind(shape.translateYProperty().subtract(label.heightProperty().multiply(0.5)));
-					labelLayout.addAvoidable(label::getTranslateX, label::getTranslateY, () -> label.getLayoutBounds().getWidth(), () -> label.getLayoutBounds().getHeight());
-
-				}
+				labelLayout.addItem(shape.translateXProperty(), shape.translateYProperty(), angle, label.widthProperty(), label.heightProperty(),
+						xOffset -> {
+							label.setLayoutX(0);
+							label.translateXProperty().bind(shape.translateXProperty().add(xOffset));
+						},
+						yOffset -> {
+							label.setLayoutY(0);
+							label.translateYProperty().bind(shape.translateYProperty().add(yOffset));
+							label.setVisible(true);
+						});
 				labelLayout.addAvoidable(() -> shape.getTranslateX() - 0.5 * shape.prefWidth(0), () -> shape.getTranslateY() - 0.5 * shape.prefHeight(0), () -> shape.prefWidth(0), () -> shape.prefHeight(0));
 			}
 		}
