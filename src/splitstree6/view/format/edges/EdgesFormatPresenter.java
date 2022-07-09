@@ -63,6 +63,16 @@ public class EdgesFormatPresenter {
 		controller.getLabelByWeightMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Weight));
 		controller.getLabelByConfidenceMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Confidence));
 		controller.getLabelByProbabilityMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Probability));
+		optionLabelEdgesBy.addListener((v, o, n) -> {
+			if (n != null) {
+				switch (n) {
+					case None -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByNoneMenuItem());
+					case Weight -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByWeightMenuItem());
+					case Confidence -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceMenuItem());
+					case Probability -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByProbabilityMenuItem());
+				}
+			}
+		});
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);

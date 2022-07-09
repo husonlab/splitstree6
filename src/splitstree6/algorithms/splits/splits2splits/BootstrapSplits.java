@@ -184,7 +184,7 @@ public class BootstrapSplits extends Splits2Splits {
 
 			if (getOptionHighDimensionFilter()) {
 				var dimensionsFilter = new DimensionFilter();
-				dimensionsFilter.apply(progress, 4, computedSplits, splitsBlock.getSplits());
+				DimensionFilter.apply(progress, 4, computedSplits, splitsBlock.getSplits());
 			} else
 				splitsBlock.getSplits().addAll(computedSplits);
 		}
@@ -223,9 +223,11 @@ public class BootstrapSplits extends Splits2Splits {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, SplitsBlock datablock) {
-		var workflow = (Workflow) datablock.getNode().getOwner();
+		var dataNode = datablock.getNode();
+		var workflow = (Workflow) dataNode.getOwner();
+		var preferredParent = dataNode.getPreferredParent();
 		var workingDataBlock = workflow.getWorkingDataNode().getDataBlock();
-		return workingDataBlock instanceof CharactersBlock;
+		return preferredParent != null && preferredParent.getAlgorithm().getToClass().equals(SplitsBlock.class) && workingDataBlock instanceof CharactersBlock;
 	}
 
 	public int getOptionReplicates() {

@@ -143,7 +143,8 @@ public class TreeView implements IView {
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
 		var edgesFormatter = new EdgesFormat(undoManager, edgeSelectionModel, edgeShapeMap, optionEditsProperty());
-		optionLabelEdgesBy.bind(edgesFormatter.optionLabelEdgesByProperty());
+		if (false) edgesFormatter.optionLabelEdgesByProperty().set(getOptionLabelEdgesBy());
+		optionLabelEdgesBy.bindBidirectional(edgesFormatter.optionLabelEdgesByProperty());
 
 		treeProperty().addListener((v, o, n) -> {
 			edgesFormatter.getPresenter().updateMenus(n);

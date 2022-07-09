@@ -39,7 +39,7 @@ import java.util.List;
  *
  * @author Daniel Huson, 2.2022
  */
-public class BoostrapTreeSplits extends Trees2Splits {
+public class BootstrapTreeSplits extends Trees2Splits {
 	private final IntegerProperty optionReplicates = new SimpleIntegerProperty(this, "optionReplicates", 100);
 	private final DoubleProperty optionMinPercent = new SimpleDoubleProperty(this, "optionMinPercent", 10.0);
 	private final BooleanProperty optionShowAllSplits = new SimpleBooleanProperty(this, "optionShowAllSplits", false);

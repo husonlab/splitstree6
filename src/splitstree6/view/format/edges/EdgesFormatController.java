@@ -61,7 +61,6 @@ public class EdgesFormatController {
 			if (n != null)
 				labelByMenuButton.setText(((RadioMenuItem) n).getText());
 		});
-		labelByToggleGroup.selectToggle(labelByNoneMenuItem);
 	}
 
 	public ComboBox<Number> getWidthCBox() {

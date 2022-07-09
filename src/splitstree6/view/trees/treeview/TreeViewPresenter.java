@@ -39,6 +39,7 @@ import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
+import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
@@ -48,6 +49,7 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
+import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
@@ -100,6 +102,20 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				controller.getTreeCBox().setValue(controller.getTreeCBox().getItems().get(view.getOptionTree() - 1));
 				tree.set(view.getTrees().get(view.getOptionTree() - 1));
 			}
+
+			Platform.runLater(() -> {
+				try {
+					if (tree.get().hasEdgeConfidences())
+						view.setOptionLabelEdgesBy(LabelEdgesBy.Confidence);
+					else if (tree.get().hasEdgeProbabilities())
+						view.setOptionLabelEdgesBy(LabelEdgesBy.Probability);
+					else
+						view.setOptionLabelEdgesBy(LabelEdgesBy.None);
+				} catch (Exception ex) {
+					Basic.caught(ex);
+				}
+			});
+
 		});
 
 		view.optionTreeProperty().addListener((v, o, n) -> {

@@ -38,35 +38,45 @@ import java.util.stream.Collectors;
  */
 public class RerootingUtils {
 	/**
-	 * reRoot a tree by midpoint
+	 * reroot a tree by midpoint
 	 */
-	public static void reRootByMidpoint(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree) {
+	public static void rerootByMidpoint(PhyloTree tree) {
 		var list = computeRootingRecords(tree);
 		if (list.size() > 0) {
 			list.sort(RootingRecord.comparatorForMidpointRooting());
-			reRoot(internalNodeLabelsAreEdgeLabels, tree, list.get(0), false);
+			reroot(tree, list.get(0), false);
 		}
 	}
 
 	/**
-	 * reRoot a tree by out group. Use tightest edge that separates all outgroup taxa
+	 * reroot a tree by out group. Use tightest edge that separates all outgroup taxa
 	 */
-	public static void reRootByOutGroup(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, BitSet outgroupTaxa) {
-		try (EdgeArray<BitSet> sourceMap = tree.newEdgeArray(); EdgeArray<BitSet> targetMap = tree.newEdgeArray()) {
-			for (var start : tree.nodeStream().filter(v -> v.getDegree() == 1).collect(Collectors.toList())) {
-				try (var visited = tree.newNodeSet()) {
-					computeTaxaRec(tree, start, sourceMap, targetMap);
+	public static void rerootByOutgroup(PhyloTree tree, BitSet outgroupTaxa) {
+		try (EdgeArray<BitSet> clusters = tree.newEdgeArray()) {
+			tree.postorderTraversal(v -> {
+				var bits = new BitSet();
+				bits.or(BitSetUtils.asBitSet(tree.getTaxa(v)));
+				for (var e : v.outEdges()) {
+					bits.or(clusters.get(e));
 				}
-			}
+				for (var e : v.inEdges()) {
+					clusters.put(e, bits);
+				}
+			});
+			var allTaxa = BitSetUtils.asBitSet(tree.getTaxa());
 
 			Edge best = null;
 			BitSet bestSet = null;
 			for (var e : tree.edges()) {
 				if (!tree.isReticulateEdge(e)) {
-					var set = sourceMap.get(e);
-					if (BitSetUtils.intersection(set, outgroupTaxa).cardinality() < outgroupTaxa.cardinality())
-						set = targetMap.get(e);
+					var set = clusters.get(e);
 					if (BitSetUtils.contains(set, outgroupTaxa)) {
+						if (bestSet == null || set.cardinality() < bestSet.cardinality()) {
+							best = e;
+							bestSet = set;
+						}
+					} else if (!set.intersects(outgroupTaxa)) {
+						set = BitSetUtils.minus(allTaxa, set);
 						if (bestSet == null || set.cardinality() < bestSet.cardinality()) {
 							best = e;
 							bestSet = set;
@@ -77,7 +87,7 @@ public class RerootingUtils {
 			if (best != null) {
 				for (var rootingRecord : computeRootingRecords(tree)) {
 					if (rootingRecord.edge() == best) {
-						reRoot(internalNodeLabelsAreEdgeLabels, tree, rootingRecord, true);
+						reroot(tree, rootingRecord, true);
 						return;
 					}
 				}
@@ -86,9 +96,9 @@ public class RerootingUtils {
 	}
 
 	/**
-	 * reRoot tree by node
+	 * reroot tree by node
 	 */
-	public static void reRootByNode(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Node v) {
+	public static void rerootByNode(PhyloTree tree, Node v) {
 		v = getLastAncestorAboveAllReticulations(v);
 
 		if (v == tree.getRoot())
@@ -108,34 +118,19 @@ public class RerootingUtils {
 			tree.delDivertex(root);
 		}
 
-		final EdgeArray<String> edgeLabels;
-		if (internalNodeLabelsAreEdgeLabels && !PhyloTree.SUPPORT_RICH_NEWICK)
-			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
-		else
-			edgeLabels = null;
-
-		tree.eraseRoot(edgeLabels);
+		tree.eraseRoot(null);
 		tree.setRoot(v);
 		tree.redirectEdgesAwayFromRoot();
-
-		if (edgeLabels != null)
-			SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
 	}
 
 	/**
-	 * reRoot tree by edge
+	 * reroot tree by edge
 	 */
-	public static void reRootByEdge(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, Edge e, double weight2source, double weight2target) {
-		final EdgeArray<String> edgeLabels;
-		if (internalNodeLabelsAreEdgeLabels && !PhyloTree.SUPPORT_RICH_NEWICK)
-			edgeLabels = SupportValueUtils.setEdgeLabelsFromInternalNodeLabels(tree);
-		else
-			edgeLabels = null;
-
+	public static void rerootByEdge(PhyloTree tree, Edge e, double weight2source, double weight2target) {
 		var v = getLastAncestorAboveAllReticulations(e.getSource());
 
 		if (v != e.getSource()) {
-			reRootByNode(internalNodeLabelsAreEdgeLabels, tree, v);
+			rerootByNode(tree, v);
 		} else {
 			if (tree.getRoot().getOutDegree() == 1 && tree.getNumberOfTaxa(tree.getRoot()) == 0) {
 				var root = tree.getRoot().getFirstOutEdge().getTarget();
@@ -143,45 +138,42 @@ public class RerootingUtils {
 				tree.setRoot(root);
 			}
 
-			// not under a special node, reRoot in simple way
-			tree.setRoot(e, weight2source, weight2target, edgeLabels);
+			// not under a special node, reroot in simple way
+			tree.setRoot(e, weight2source, weight2target, null);
 
 			tree.redirectEdgesAwayFromRoot();
 
 			System.err.println("Rerooted:\n" + tree.toBracketString(true) + ";");
-
-			if (edgeLabels != null)
-				SupportValueUtils.setInternalNodeLabelsFromEdgeLabels(tree, edgeLabels);
 		}
 	}
 
-	private static void reRoot(boolean internalNodeLabelsAreEdgeLabels, PhyloTree tree, RootingRecord rootingRecord, boolean forceOnEdge) {
+	private static void reroot(PhyloTree tree, RootingRecord rootingRecord, boolean forceOnEdge) {
 		var half = 0.5 * rootingRecord.total();
 
 		if (rootingRecord.sourceToLeafMaxDistance() - rootingRecord.weight() >= half) {
 			if (forceOnEdge) {
 				var weight2source = 0.9 * rootingRecord.weight();
 				var weight2target = 0.1 * rootingRecord.weight();
-				reRootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+				rerootByEdge(tree, rootingRecord.edge(), weight2source, weight2target);
 			} else {
 				var root = rootingRecord.edge().getTarget(); // yes, target!
 				if (root != tree.getRoot())
-					reRootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
+					rerootByNode(tree, root);
 			}
 		} else if (rootingRecord.targetToLeafMaxDistance() - rootingRecord.weight() >= half) {
 			if (forceOnEdge) {
 				var weight2source = 0.1 * rootingRecord.weight();
 				var weight2target = 0.9 * rootingRecord.weight();
-				reRootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+				rerootByEdge(tree, rootingRecord.edge(), weight2source, weight2target);
 			} else {
 				var root = rootingRecord.edge().getSource(); // yes, source!
 				if (root != tree.getRoot())
-					reRootByNode(internalNodeLabelsAreEdgeLabels, tree, root);
+					rerootByNode(tree, root);
 			}
 		} else {
 			var weight2source = half - (rootingRecord.targetToLeafMaxDistance() - rootingRecord.weight());
 			var weight2target = half - (rootingRecord.sourceToLeafMaxDistance() - rootingRecord.weight());
-			reRootByEdge(internalNodeLabelsAreEdgeLabels, tree, rootingRecord.edge(), weight2source, weight2target);
+			rerootByEdge(tree, rootingRecord.edge(), weight2source, weight2target);
 		}
 	}
 
@@ -216,47 +208,6 @@ public class RerootingUtils {
 		return maxDistance;
 	}
 
-	public static record RootingRecord(Edge edge, double weight, double sourceToLeafMaxDistance,
-									   double targetToLeafMaxDistance) {
-
-		public static Comparator<RootingRecord> comparatorForMidpointRooting() {
-			return (a, b) -> {
-				if (Math.abs(a.total() - b.total()) < 0.001)
-					return Double.compare(Math.max(a.sourceToLeafMaxDistance() - a.weight(), a.targetToLeafMaxDistance() - a.weight()), Math.max(b.sourceToLeafMaxDistance() - b.weight(), b.targetToLeafMaxDistance() - b.weight()));
-				else
-					return -Double.compare(a.total(), b.total());
-			};
-		}
-
-		public double total() {
-			return sourceToLeafMaxDistance + targetToLeafMaxDistance - weight;
-		}
-
-		public String toString() {
-			return "weight=%f sourceToLeaf=%f targetToLeaf=%f total=%f".formatted(weight, sourceToLeafMaxDistance, targetToLeafMaxDistance, total());
-		}
-	}
-
-
-	private static BitSet computeTaxaRec(PhyloTree tree, Node v, EdgeArray<BitSet> sourceMap, EdgeArray<BitSet> targetMap) {
-		var taxa = new BitSet();
-		for (var f : v.adjacentEdges()) {
-			var w = f.getOpposite(v);
-			var map = (v == f.getSource() ? sourceMap : targetMap);
-			if (!map.containsKey(f)) {
-				var bits = new BitSet();
-				map.put(f, bits);
-				if (w.isLeaf()) {
-					bits.or(BitSetUtils.asBitSet(tree.getTaxa(w)));
-				} else {
-					bits.or(computeTaxaRec(tree, w, sourceMap, targetMap));
-				}
-				taxa.or(bits);
-			}
-		}
-		return taxa;
-	}
-
 	/**
 	 * get lowest ancestor above all reticulate nodes
 	 *
@@ -275,5 +226,27 @@ public class RerootingUtils {
 				break;
 		}
 		return v;
+	}
+
+	public static record RootingRecord(Edge edge, double weight, double sourceToLeafMaxDistance,
+									   double targetToLeafMaxDistance) {
+
+		public static Comparator<RootingRecord> comparatorForMidpointRooting() {
+			return (a, b) -> {
+				if (Math.abs(a.total() - b.total()) < 0.001)
+					return Double.compare(Math.max(a.sourceToLeafMaxDistance() - a.weight(), a.targetToLeafMaxDistance() - a.weight()),
+							Math.max(b.sourceToLeafMaxDistance() - b.weight(), b.targetToLeafMaxDistance() - b.weight()));
+				else
+					return -Double.compare(a.total(), b.total());
+			};
+		}
+
+		public double total() {
+			return sourceToLeafMaxDistance + targetToLeafMaxDistance - weight;
+		}
+
+		public String toString() {
+			return "weight=%f sourceToLeaf=%f targetToLeaf=%f total=%f".formatted(weight, sourceToLeafMaxDistance, targetToLeafMaxDistance, total());
+		}
 	}
 }

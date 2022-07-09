@@ -116,7 +116,7 @@ public class GreedyTree extends Splits2Trees {
 		PhyloGraphUtils.addLabels(taxaBlock, tree);
 
 		// todo: ask about internal node labels
-		RerootingUtils.reRootByMidpoint(false, tree);
+		RerootingUtils.rerootByMidpoint(tree);
 
 		trees.setRooted(true);
 		trees.setPartial(false);
