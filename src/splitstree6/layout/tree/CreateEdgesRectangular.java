@@ -112,7 +112,7 @@ public class CreateEdgesRectangular {
 				if (label != null) {
 					label.setTextFill(Color.DARKORANGE);
 					label.setTranslateX(0.5 * (sourceShape.getTranslateX() + targetShape.getTranslateX()));
-					label.setTranslateY(targetShape.getTranslateY());
+					label.setTranslateY(targetShape.getTranslateY() + (sourceShape.getTranslateY() < targetShape.getTranslateY() ? -18 : +18));
 				}
 			}
 

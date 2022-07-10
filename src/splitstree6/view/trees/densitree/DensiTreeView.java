@@ -110,6 +110,8 @@ public class DensiTreeView implements IView {
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
+
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
 	}
 
 	@Override
@@ -163,8 +165,7 @@ public class DensiTreeView implements IView {
 
 	@Override
 	public String getCitation() {
-		return "Bouckaert 2010; " +
-			   "Remco R. Bouckaert. DensiTree: making sense of sets of phylogenetic trees, Bioinformatics 26(1):1372–1373 (2010).";
+		return "Bouckaert 2010; Remco R. Bouckaert. DensiTree: making sense of sets of phylogenetic trees, Bioinformatics 26(1):1372–1373 (2010).";
 	}
 
 	public ViewTab getViewTab() {

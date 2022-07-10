@@ -105,12 +105,14 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 			Platform.runLater(() -> {
 				try {
-					if (tree.get().hasEdgeConfidences())
-						view.setOptionLabelEdgesBy(LabelEdgesBy.Confidence);
-					else if (tree.get().hasEdgeProbabilities())
-						view.setOptionLabelEdgesBy(LabelEdgesBy.Probability);
-					else
-						view.setOptionLabelEdgesBy(LabelEdgesBy.None);
+					if (view.getOptionLabelEdgesBy() == LabelEdgesBy.None) {
+						var dirty = mainWindow.isDirty();
+						if (tree.get().hasEdgeConfidences())
+							view.setOptionLabelEdgesBy(LabelEdgesBy.Confidence);
+						else if (tree.get().hasEdgeProbabilities())
+							view.setOptionLabelEdgesBy(LabelEdgesBy.Probability);
+						mainWindow.setDirty(dirty);
+					}
 				} catch (Exception ex) {
 					Basic.caught(ex);
 				}
@@ -244,6 +246,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 								updateCounter.set(updateCounter.get() + 1);
 							});
 							pane.drawTree();
+
 							scrollPane.setContent(pane);
 						} else {
 							treePane.set(null);

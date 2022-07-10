@@ -396,6 +396,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 			var dataNode = newDataNode(viewBlock);
 			getInputDataFilterNode().getChildren().add(dataNode);
 			Platform.runLater(() -> {
+				var isDirty = mainWindow.isDirty();
 				var alignmentView = new AlignmentView(getMainWindow(), "Alignment", viewBlock.getViewTab());
 				viewBlock.setView(alignmentView);
 				viewBlock.setNode(dataNode);
@@ -404,6 +405,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 					mainWindow.getController().getMainTabPane().getTabs().add(previous);
 					Platform.runLater(() -> mainWindow.getController().getMainTabPane().getSelectionModel().select(previous));
 				}
+				mainWindow.setDirty(isDirty);
 			});
 		}
 	}

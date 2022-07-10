@@ -37,10 +37,12 @@ import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.util.AService;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Edge;
 import jloda.graph.Node;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloGraph;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
@@ -51,6 +53,9 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 
 import java.util.BitSet;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.concurrent.atomic.LongAdder;
 import java.util.stream.Collectors;
 
 /**
@@ -60,6 +65,8 @@ import java.util.stream.Collectors;
 public class InteractionSetup {
 	private final SetChangeListener<Taxon> taxonSelectionChangeListener;
 	private final SetChangeListener<Edge> edgeSelectionChangeListener;
+
+	private final AService<Collection<Edge>> computeEdgeSelectionService = new AService<>();
 
 	private double mouseDownX;
 	private double mouseDownY;
@@ -197,32 +204,47 @@ public class InteractionSetup {
 		}
 	}
 
+	/**
+	 * computes edge selection based on taxon selection
+	 */
 	private void updateEdgeSelection(PhyloTree tree, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Edge> edgeSelectionModel) {
 		edgeSelectionModel.clearSelection();
-		var nSelected = taxonSelectionModel.size();
-		try (var selectedBelow = tree.newNodeIntArray(); var edgesToSelect = tree.newEdgeSet()) {
-			tree.postorderTraversal(v -> {
-				var below = 0;
-				for (var t : tree.getTaxa(v)) {
-					var taxon = taxaBlock.get(t);
-					if (taxon != null && taxonSelectionModel.isSelected(taxon))
-						below++;
-				}
-				var hasChildWithNone = false;
-				for (var w : v.children()) {
-					var belowChild = selectedBelow.get(w);
-					if (belowChild == 0)
-						hasChildWithNone = true;
-					else
-						below += belowChild;
-				}
-				if (v.getInDegree() == 1 && below > 0 && (below < nSelected || !hasChildWithNone)) {
-					edgesToSelect.add(v.getFirstInEdge());
-				}
-				selectedBelow.set(v, below);
-			});
-			edgeSelectionModel.selectAll(edgesToSelect);
-		}
+
+		computeEdgeSelectionService.setCallable(() -> {
+			var nSelected = new LongAdder();
+			for (var t : tree.getTaxa()) {
+				var taxon = taxaBlock.get(t);
+				if (taxon != null && taxonSelectionModel.isSelected(taxon))
+					nSelected.increment();
+			}
+
+			var edgesToSelect = new HashSet<Edge>();
+			try (var selectedBelow = tree.newNodeIntArray()) {
+				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+					var below = 0;
+					for (var t : tree.getTaxa(v)) {
+						var taxon = taxaBlock.get(t);
+						if (taxon != null && taxonSelectionModel.isSelected(taxon))
+							below++;
+					}
+					var hasChildWithNone = false;
+					for (var w : v.children()) {
+						var belowChild = selectedBelow.getOrDefault(w, 0);
+						if (belowChild == 0)
+							hasChildWithNone = true;
+						else
+							below += belowChild;
+					}
+					if (v.getInDegree() == 1 && below > 0 && (below < nSelected.intValue() || !hasChildWithNone)) {
+						edgesToSelect.add(v.getFirstInEdge());
+					}
+					selectedBelow.set(v, below);
+				});
+			}
+			return edgesToSelect;
+		});
+		computeEdgeSelectionService.setOnSucceeded(e -> Platform.runLater(() -> edgeSelectionModel.selectAll(computeEdgeSelectionService.getValue())));
+		computeEdgeSelectionService.restart();
 	}
 
 	private EventHandler<MouseEvent> createMousePressedOnTaxonLabelHandler() {

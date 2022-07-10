@@ -119,7 +119,6 @@ public class TreeView implements IView {
 		var loader = new ExtendedFXMLLoader<TreeViewController>(TreeViewController.class);
 		controller = loader.getController();
 
-
 		// this is the target area for the tree page:
 		presenter = new TreeViewPresenter(mainWindow, this, targetBounds);
 
