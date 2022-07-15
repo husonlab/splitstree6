@@ -44,6 +44,6 @@ public class NexusReader extends CharactersReader {
 	}
 
 	public boolean acceptsFirstLine(String text) {
-		return StringUtils.getFirstLine(text).startsWith("#nexus");
+		return StringUtils.getFirstLine(text).toLowerCase().startsWith("#nexus");
 	}
 }

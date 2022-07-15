@@ -44,7 +44,7 @@ public class NexusReader extends TreesReader {
 	}
 
 	public boolean acceptsFirstLine(String text) {
-		return StringUtils.getFirstLine(text).startsWith("#nexus");
+		return StringUtils.getFirstLine(text).toLowerCase().startsWith("#nexus");
 	}
 
 }

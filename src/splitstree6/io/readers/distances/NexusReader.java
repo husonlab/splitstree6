@@ -19,6 +19,7 @@
 
 package splitstree6.io.readers.distances;
 
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.DistancesFormat;
@@ -47,6 +48,6 @@ public class NexusReader extends DistancesReader {
 	}
 
 	public boolean acceptsFirstLine(String text) {
-		return text.startsWith("#nexus");
+		return StringUtils.getFirstLine(text).toLowerCase().startsWith("#nexus");
 	}
 }
