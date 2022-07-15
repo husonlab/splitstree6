@@ -64,6 +64,15 @@ public class ImportManager {
 		return list;
 	}
 
+	public ArrayList<DataReaderBase> getReadersByText(String text) {
+		var list = new ArrayList<DataReaderBase>();
+		for (var reader : readers) {
+			if (reader.acceptsFirstLine(text))
+				list.add(reader);
+		}
+		return list;
+	}
+
 	public <S extends DataBlock> ArrayList<DataReaderBase<S>> getReaders(Class<S> clazz) {
 		var list = new ArrayList<DataReaderBase<S>>();
 		for (var reader : readers) {

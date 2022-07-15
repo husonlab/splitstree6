@@ -323,7 +323,7 @@ public class SplitsUtilities {
 		return Double.compare(maxA, maxB);
 	}
 
-	public static List<ASplit> createAllMissingTrivial(Collection<ASplit> splits, int ntax) {
+	public static List<ASplit> createAllMissingTrivial(Collection<ASplit> splits, int ntax, double weight) {
 		var present = new BitSet();
 		for (var split : splits) {
 			if (split.getA().cardinality() == 1) {
@@ -336,7 +336,7 @@ public class SplitsUtilities {
 		var result = new ArrayList<ASplit>(ntax - present.cardinality());
 		for (var t = present.nextClearBit(1); t <= ntax && t != -1; t = present.nextClearBit(t + 1)) {
 			var split = new ASplit(BitSetUtils.asBitSet(t), ntax);
-			split.setWeight(0);
+			split.setWeight(weight);
 			result.add(split);
 		}
 		return result;

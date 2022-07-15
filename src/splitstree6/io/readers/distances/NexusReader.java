@@ -45,4 +45,8 @@ public class NexusReader extends DistancesReader {
 	public boolean accepts(String file) {
 		return getToClass().equals(NexusImporter.determineInputData(file));
 	}
+
+	public boolean acceptsFirstLine(String text) {
+		return text.startsWith("#nexus");
+	}
 }

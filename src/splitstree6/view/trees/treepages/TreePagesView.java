@@ -113,7 +113,12 @@ public class TreePagesView implements IView {
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager));
 
-		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> {
+					if (mainWindow.getWorkingTaxa() == null)
+						return "";
+					else return "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size());
+				}
+				, mainWindow.workingTaxaProperty(), trees));
 	}
 
 	public void setViewTab(ViewTab viewTab) {

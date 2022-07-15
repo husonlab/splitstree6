@@ -41,6 +41,7 @@ public class CodeAreaSearcher implements ITextSearcher {
 	private final BooleanProperty globalFindable = new SimpleBooleanProperty(false);
 	private final BooleanProperty selectionReplaceable = new SimpleBooleanProperty(false);
 
+
 	private final String name;
 
 	/**
@@ -49,7 +50,7 @@ public class CodeAreaSearcher implements ITextSearcher {
 	public CodeAreaSearcher(String name, CodeArea codeArea) {
 		this.name = name;
 		this.codeArea = codeArea;
-		BooleanBinding emptyProperty = new BooleanBinding() {
+		var emptyProperty = new BooleanBinding() {
 			{
 				super.bind(codeArea.getContent().lengthProperty());
 			}
@@ -112,6 +113,7 @@ public class CodeAreaSearcher implements ITextSearcher {
 			var newText = inputText.replaceAll(regEx, replaceText);
 			codeArea.replaceSelection(newText);
 			codeArea.selectRange(selection.getStart(), selection.getStart() + newText.length());
+			codeArea.requestFollowCaret();
 			return true;
 		}
 		return false;
@@ -195,6 +197,7 @@ public class CodeAreaSearcher implements ITextSearcher {
 
 	private void selectMatched(Matcher matcher) {
 		codeArea.selectRange(matcher.start(), matcher.end());
+		codeArea.requestFollowCaret();
 	}
 
 	private boolean singleSearch(String regularExpression, boolean forward) throws PatternSyntaxException {

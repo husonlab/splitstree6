@@ -67,16 +67,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		findToolBar = new FindToolBar(null, new CodeAreaSearcher("Text", codeArea));
 		controller.getTopVBox().getChildren().add(findToolBar);
 
-		selectionEmpty = new BooleanBinding() {
-			{
-				super.bind(codeArea.selectionProperty());
-			}
-
-			@Override
-			protected boolean computeValue() {
-				return codeArea.getSelection().getLength() == 0;
-			}
-		};
+		selectionEmpty = Bindings.createBooleanBinding(() -> codeArea.getSelection().getLength() == 0, codeArea.selectionProperty());
 
 		codeArea.selectionProperty().addListener((c, o, n) -> {
 			if (n.getLength() > 0) {

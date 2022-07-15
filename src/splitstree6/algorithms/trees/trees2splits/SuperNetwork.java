@@ -220,7 +220,7 @@ public class SuperNetwork extends Trees2Splits {
 		}
 
 		// add all missing trivial splits
-		computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax()));
+		computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), 0.0));
 
 		if (getOptionEdgeWeights().equals(EdgeWeights.AverageRelative)) {
 			setWeightAverageReleativeLength(pSplitsOfTrees, supportSet, computedSplits);

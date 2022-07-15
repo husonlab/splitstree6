@@ -62,10 +62,9 @@ public class DisplayTextView implements IView {
 
 		presenter = new DisplayTextViewPresenter(mainWindow, this, editable);
 
-		controller.getCodeArea().lengthProperty().addListener((v, o, n) -> empty.set(n == 0));
-		controller.getCodeArea().setWrapText(true);
+		controller.getCodeArea().textProperty().addListener((v, o, n) -> empty.set(n.length() == 0));
 
-		controller.getCodeArea().getStyleClass().add("viewer-background");
+		controller.getCodeArea().setWrapText(true);
 
 		showLineNumbers.addListener((v, o, n) -> controller.getCodeArea().setParagraphGraphicFactory(n ? LineNumberFactory.get(controller.getCodeArea()) : null));
 		if (isShowLineNumbers())
@@ -116,7 +115,6 @@ public class DisplayTextView implements IView {
 			controller.getCodeArea().selectRange(start, end);
 		}
 	}
-
 
 	/**
 	 * select matching brackets

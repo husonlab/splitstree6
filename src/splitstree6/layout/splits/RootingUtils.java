@@ -42,10 +42,10 @@ public class RootingUtils {
 	/**
 	 * computes the midpoint root location
 	 *
-	 * @param alt         use alternative side
-	 * @param nTax        number of taxa
-	 * @param outGroup    out group taxa or empty, if performing simple midpoint rooting
-	 * @param useWeights  use split weights or otherwise give all splits weight 1
+	 * @param alt        use alternative side
+	 * @param nTax       number of taxa
+	 * @param outGroup   outgroup taxa or empty, if performing simple midpoint rooting
+	 * @param useWeights use split weights or otherwise give all splits weight 1
 	 * @return rooting split and both distances
 	 */
 	public static Triplet<Integer, Double, Double> computeRootLocation(boolean alt, int nTax, Set<Integer> outGroup,
@@ -130,7 +130,7 @@ public class RootingUtils {
 					return new Triplet<>(split2id.get(split), delta, weight - delta);
 				}
 				total += weight;
-			}
+				}
 		}
 		return new Triplet<>(1, 0.0, useWeights ? splitsBlock.get(1).getWeight() : 1);
 	}

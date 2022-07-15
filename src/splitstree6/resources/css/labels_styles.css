@@ -1,5 +1,5 @@
 /*
- * DataReaderBase.java Copyright (C) 2022 Daniel H. Huson
+ * labels_styles.css Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,28 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.utils;
+/* Editor styles */
 
-import jloda.util.progress.ProgressListener;
-import splitstree6.data.TaxaBlock;
-import splitstree6.workflow.DataBlock;
-
-import java.io.IOException;
-
-public abstract class DataReaderBase<T extends DataBlock> extends ReaderWriterBase {
-	protected final Class<T> toClass;
-
-	public DataReaderBase(Class<T> toClass) {
-		super(toClass.getSimpleName());
-		this.toClass = toClass;
-	}
-
-	public abstract void read(ProgressListener progress, String fileName, TaxaBlock taxaBlock, T dataBlock) throws IOException;
-
-	public Class<T> getToClass() {
-		return toClass;
-	}
-
-	abstract public boolean acceptsFirstLine(String text);
-
+.bold {
+    -fx-font-weight: bold;
 }

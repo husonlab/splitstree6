@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.FileLineIterator;
 import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
@@ -246,8 +247,12 @@ public class FastAReader extends CharactersReader {
 		if (!super.accepts(fileName))
 			return false;
 		else {
-			String line = FileUtils.getFirstLineFromFileIgnoreEmptyLines(new File(fileName), ";", 20);
-			return line != null && line.startsWith(">");
+			var line = FileUtils.getFirstLineFromFileIgnoreEmptyLines(new File(fileName), ";", 20);
+			return line != null && acceptsFirstLine(line);
 		}
+	}
+
+	public boolean acceptsFirstLine(String line) {
+		return StringUtils.getFirstLine(line).startsWith(">");
 	}
 }

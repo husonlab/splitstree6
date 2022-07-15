@@ -46,7 +46,8 @@ public class LayoutTreeRadial {
 			tree.preorderTraversal(v -> {
 				if (v.getInDegree() == 1) {
 					var e = v.getFirstInEdge();
-					nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(e.getSource()), nodeAngleMap.get(v), tree.getWeight(e)));
+					var weight = (e.getSource() == tree.getRoot() && !tree.getEdgeWeights().containsKey(e) ? 1.0 / e.getSource().getOutDegree() : tree.getWeight(e));
+					nodePointMap.put(v, GeometryUtilsFX.translateByAngle(nodePointMap.get(e.getSource()), nodeAngleMap.get(v), weight));
 				} else if (v.getInDegree() > 1) {
 					var radius = 0.0;
 					var angle = 0.0;

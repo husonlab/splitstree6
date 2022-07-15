@@ -72,7 +72,7 @@ public class WeightsSlider extends Splits2Splits implements IFilter {
 			active = true;
 
 		if (active) {
-			splits.addAll(SplitsUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax()));
+			splits.addAll(SplitsUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax(), 0.0));
 
 			child.getSplits().clear();
 			child.getSplits().addAll(splits);

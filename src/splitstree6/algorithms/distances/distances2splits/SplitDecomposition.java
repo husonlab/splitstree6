@@ -112,7 +112,7 @@ public class SplitDecomposition extends Distances2Splits {
 		}
 
 		// add all missing trivial
-		previousSplits.addAll(SplitsUtilities.createAllMissingTrivial(previousSplits, ntax));
+		previousSplits.addAll(SplitsUtilities.createAllMissingTrivial(previousSplits, ntax, 0.0));
 
 		// copy splits to splits
 		splitsBlock.getSplits().addAll(previousSplits);

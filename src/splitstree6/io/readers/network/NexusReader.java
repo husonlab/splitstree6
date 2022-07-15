@@ -19,6 +19,7 @@
 
 package splitstree6.io.readers.network;
 
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
@@ -40,5 +41,9 @@ public class NexusReader extends NetworkReader {
 	@Override
 	public boolean accepts(String file) {
 		return getToClass().equals(NexusImporter.determineInputData(file));
+	}
+
+	public boolean acceptsFirstLine(String text) {
+		return StringUtils.getFirstLine(text).startsWith("#nexus");
 	}
 }

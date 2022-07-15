@@ -210,4 +210,9 @@ public class NewickReader extends TreesReader {
 			return line != null && line.startsWith("(");
 		}
 	}
+
+	public boolean acceptsFirstLine(String text) {
+		var line = StringUtils.getFirstLine(text);
+		return line.startsWith("(");
+	}
 }

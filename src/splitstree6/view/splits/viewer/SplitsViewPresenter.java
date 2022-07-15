@@ -389,7 +389,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		Platform.runLater(() -> splitNetworkPane.layoutLabels(splitsView.getOptionOrientation()));
 	}
 
-
 	public ReadOnlyLongProperty updateCounterProperty() {
 		return updateCounter;
 	}

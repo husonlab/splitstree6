@@ -186,6 +186,18 @@ public class TaxaBlock extends DataBlock {
 		return unmodifiableTaxa;
 	}
 
+	/**
+	 * get list of all taxa
+	 *
+	 * @return taxa
+	 */
+	public Collection<Taxon> getTaxa(BitSet bits) {
+		var list = new ArrayList<Taxon>();
+		for (var t = bits.nextSetBit(0); t != -1; t = bits.nextSetBit(t + 1))
+			list.add(get(t));
+		return list;
+	}
+
 	public void addTaxaByNames(Collection<String> taxonNames) {
 		for (String name : taxonNames) {
 			if (!name2taxon.containsKey(name)) {

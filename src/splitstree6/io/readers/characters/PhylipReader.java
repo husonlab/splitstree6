@@ -214,10 +214,13 @@ public class PhylipReader extends CharactersReader {
 		if (!super.accepts(fileName))
 			return false;
 		var line = FileUtils.getFirstLineFromFile(new File(fileName));
-		if (line == null)
-			return false;
-		var tokens = line.trim().split("\\s+");
+		return line != null && acceptsFirstLine(line);
+	}
+
+	public boolean acceptsFirstLine(String text) {
+		var tokens = text.trim().split("\\s+");
 		return tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]);
 	}
+
 }
 

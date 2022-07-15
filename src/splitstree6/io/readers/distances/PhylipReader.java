@@ -19,10 +19,7 @@
 
 package splitstree6.io.readers.distances;
 
-import jloda.util.FileLineIterator;
-import jloda.util.FileUtils;
-import jloda.util.IOExceptionWithLineNumber;
-import jloda.util.NumberUtils;
+import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
@@ -116,11 +113,15 @@ public class PhylipReader extends DistancesReader {
 		if (!super.accepts(fileName))
 			return false;
 		else {
-			String line = FileUtils.getFirstLineFromFile(new File(fileName));
-			if (line == null) return false;
-
-			final StringTokenizer tokens = new StringTokenizer(line);
-			return tokens.countTokens() == 1 && NumberUtils.isInteger(tokens.nextToken());
+			var line = FileUtils.getFirstLineFromFile(new File(fileName));
+			return line != null && acceptsFirstLine(line);
 		}
 	}
+
+	public boolean acceptsFirstLine(String text) {
+		var line = StringUtils.getFirstLine(text);
+		final StringTokenizer tokens = new StringTokenizer(line);
+		return tokens.countTokens() == 1 && NumberUtils.isInteger(tokens.nextToken());
+	}
+
 }

@@ -22,11 +22,15 @@ package splitstree6.view.inputeditor;
 import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.util.ProgramProperties;
+import jloda.util.StringUtils;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
 import splitstree6.window.MainWindow;
@@ -41,6 +45,8 @@ import java.util.ArrayList;
 public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 	private final MainWindow mainWindow;
 	private final InputEditorView view;
+
+	private final StringProperty firstLine = new SimpleStringProperty(this, "firstLine", "");
 
 	private final ReadOnlyBooleanProperty TRUE = new SimpleBooleanProperty(true);
 
@@ -58,15 +64,13 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 		var codeArea = tabController.getCodeArea();
 		codeArea.setEditable(true);
 
-		codeArea.getStyleClass().add("text");
-
 		var list = new ArrayList<>(toolBarController.getFirstToolBar().getItems());
 		list.addAll(tabController.getToolBar().getItems());
 		list.addAll(toolBarController.getLastToolBar().getItems());
 		tabController.getToolBar().getItems().setAll(list);
 
 		toolBarController.getParseAndLoadButton().setOnAction(e -> view.parseAndLoad());
-		toolBarController.getParseAndLoadButton().disableProperty().bind(view.emptyProperty());
+		toolBarController.getParseAndLoadButton().disableProperty().bind(view.emptyProperty().or(toolBarController.getFormatLabel().textProperty().isEmpty()));
 
 		toolBarController.getOpenButton().setOnAction(e -> {
 			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
@@ -112,6 +116,23 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 		});
 
 		Platform.runLater(codeArea::requestFocus);
+
+		codeArea.textProperty().addListener((v, o, n) -> {
+			firstLine.set(StringUtils.getFirstLine(n));
+		});
+
+		firstLine.addListener((v, o, n) -> {
+			RunAfterAWhile.apply(toolBarController.getFormatLabel(), () -> Platform.runLater(() -> {
+				var readers = ImportManager.getInstance().getReadersByText(n);
+				if (readers.size() == 0)
+					toolBarController.getFormatLabel().setText(null);
+				else if (readers.size() == 1) {
+					toolBarController.getFormatLabel().setText(readers.get(0).getName());
+				} else {
+					toolBarController.getFormatLabel().setText(readers.get(0).getName() + " * ");
+				}
+			}));
+		});
 	}
 
 	public void setupMenuItems() {

@@ -22,6 +22,7 @@ package splitstree6.io.readers.characters;
 import jloda.util.FileLineIterator;
 import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
@@ -150,7 +151,12 @@ public class ClustalImporter extends CharactersReader {
 			return false;
 		else {
 			var line = FileUtils.getFirstLineFromFile(new File(fileName));
-			return line != null && line.toUpperCase().startsWith("CLUSTAL");
+			return line != null && acceptsFirstLine(line);
 		}
+	}
+
+	public boolean acceptsFirstLine(String text) {
+		var line = StringUtils.getFirstLine(text);
+		return line.startsWith("CLUSTAL");
 	}
 }
