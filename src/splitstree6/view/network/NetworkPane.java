@@ -30,7 +30,6 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import jloda.fx.control.RichTextLabel;
@@ -46,6 +45,8 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.network.NetworkLayout;
+import splitstree6.layout.tree.LabeledEdgeShape;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.window.MainWindow;
@@ -74,7 +75,7 @@ public class NetworkPane extends StackPane {
 	public NetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<NetworkBlock> networkBlock, SelectionModel<Taxon> taxonSelectionModel,
 					   ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
 					   ReadOnlyObjectProperty<DiagramType> diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
-					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, Group> nodeShapeMap, ObservableMap<Edge, Group> edgeShapeMap) {
+					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 		getStyleClass().add("viewer-background");
 		getChildren().setAll(group);
 
@@ -128,13 +129,6 @@ public class NetworkPane extends StackPane {
 			setMinHeight(getPrefHeight() - 12);
 			setMinWidth(getPrefWidth());
 			group.getChildren().setAll(service.getValue());
-
-			NetworkPane.this.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(taxonSelectionModel::clearSelection);
-				}
-				e.consume();
-			});
 
 			Platform.runLater(() -> applyOrientation(orientation.get()));
 

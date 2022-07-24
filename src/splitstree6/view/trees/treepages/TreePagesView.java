@@ -69,8 +69,6 @@ public class TreePagesView implements IView {
 
 	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
-	private final BooleanProperty optionShowInternalLabels = new SimpleBooleanProperty(this, "optionShowInternalLabels");
-
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
@@ -81,13 +79,12 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionCols, 1);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
-		ProgramProperties.track(optionShowInternalLabels, true);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRows.getName(), optionCols.getName(),
 				pageNumber.getName(), optionZoomFactor.getName(), optionFontScaleFactor.getName(),
-				optionTreeLabels.getName(), optionShowInternalLabels.getName());
+				optionTreeLabels.getName());
 	}
 
 	/**
@@ -116,7 +113,12 @@ public class TreePagesView implements IView {
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager));
 
-		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> {
+					if (mainWindow.getWorkingTaxa() == null)
+						return "";
+					else return "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size());
+				}
+				, mainWindow.workingTaxaProperty(), trees));
 	}
 
 	public void setViewTab(ViewTab viewTab) {
@@ -218,18 +220,6 @@ public class TreePagesView implements IView {
 
 	public void setOptionOrientation(LayoutOrientation optionOrientation) {
 		this.optionOrientation.set(optionOrientation);
-	}
-
-	public boolean isOptionShowInternalLabels() {
-		return optionShowInternalLabels.get();
-	}
-
-	public BooleanProperty optionShowInternalLabelsProperty() {
-		return optionShowInternalLabels;
-	}
-
-	public void setOptionShowInternalLabels(boolean optionShowInternalLabels) {
-		this.optionShowInternalLabels.set(optionShowInternalLabels);
 	}
 
 	public Pane getRoot() {

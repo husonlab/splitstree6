@@ -339,16 +339,19 @@ public class EqualAngle {
      *
 	 */
     public static double[] assignAnglesToSplits(int ntaxa, SplitsBlock splits, int[] cycle, double totalAngle) {
-        //We create the list of angles representing the positions on a circle.
-        var angles = new double[ntaxa + 1];
-        for (var t = 1; t <= ntaxa; t++) {
-            angles[t] = (totalAngle * (t - 1) / (double) ntaxa) + 270 - 0.5 * totalAngle;
-        }
+		//We create the list of angles representing the positions on a circle.
 
-        var split2angle = new double[splits.getNsplits() + 1];
+		//We create the list of angles representing the taxas on a circle.
+		var angles = new double[ntaxa + 1];
 
-        assignAnglesToSplits(ntaxa, angles, split2angle, splits, cycle);
-        return split2angle;
+		for (var t = 1; t <= ntaxa; t++) {
+			angles[t] = (totalAngle * (t - 1) / (double) ntaxa) + 270 - 0.5 * totalAngle;
+		}
+
+		var split2angle = new double[splits.getNsplits() + 1];
+
+		assignAnglesToSplits(ntaxa, angles, split2angle, splits, cycle);
+		return split2angle;
     }
 
 

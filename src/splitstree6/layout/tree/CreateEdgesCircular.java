@@ -20,38 +20,38 @@
 package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
-import javafx.scene.shape.*;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.ArcTo;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 import static splitstree6.layout.tree.CreateEdgesRectangular.addArrowHead;
 
 /**
  * create edges for a circular layout
- * Daniel GHuHuson, 1.2022
+ * Daniel Huson, 1.2022
  */
 public class CreateEdgesCircular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, Point2D> nodePointMap, Map<Node, Double> nodeAngleMap,
-										  boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
-		var shapes = new ArrayList<Shape>();
+	public static void apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, Point2D> nodePointMap, Map<Node, Double> nodeAngleMap,
+							 Map<Edge, LabeledEdgeShape> edgeShapeMap) {
 
 		var origin = new Point2D(0, 0);
 
 		LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> {
 			for (var e : v.outEdges()) {
+				var label = (tree.getLabel(e) != null ? new RichTextLabel(tree.getLabel(e)) : null);
+
 				var w = e.getTarget();
-
-				// todo: need to implemented linked
-
 				var vPt = nodePointMap.get(v);
 				var wPt = nodePointMap.get(w);
 
@@ -76,6 +76,12 @@ public class CreateEdgesCircular {
 						line.getElements().add(arcTo);
 					}
 
+					if (label != null) {
+						var corner = wPt.multiply(vPt.magnitude() / wPt.magnitude());
+						label.setTranslateX(0.5 * (corner.getX() + wPt.getX()));
+						label.setTranslateY(0.5 * (corner.getY() + wPt.getY()));
+					}
+
 					line.getElements().add(new LineTo(wPt.getX(), wPt.getY()));
 				} else {
 					line.getStyleClass().add("graph-special-edge");
@@ -85,15 +91,20 @@ public class CreateEdgesCircular {
 					line.getElements().addAll(moveTo, lineTo);
 					if (tree.isTransferEdge(e))
 						addArrowHead(line, moveTo, lineTo);
+
+					if (label != null) {
+						label.setTextFill(Color.DARKORANGE);
+						label.setTranslateX(0.5 * (moveTo.getX() + lineTo.getX()));
+						label.setTranslateY(0.5 * (moveTo.getY() + lineTo.getY()));
+					}
 				}
-				shapes.add(line);
-				edgeCallback.accept(e, line);
+
+				edgeShapeMap.put(e, new LabeledEdgeShape(label, line));
 
 				if (tree.isLsaLeaf(w) && diagram == TreeDiagramType.CircularPhylogram) {
 					nodeAngleMap.put(w, GeometryUtilsFX.computeAngle(wPt));
 				}
 			}
 		});
-		return shapes;
 	}
 }

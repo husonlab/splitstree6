@@ -240,7 +240,6 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-
                     </Menu>
                     <Menu text="View">
                         <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false" text="Use Dark Theme"/>

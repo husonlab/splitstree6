@@ -72,7 +72,7 @@ import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
-import splitstree6.algorithms.trees.trees2splits.BoostrapTreeSplits;
+import splitstree6.algorithms.trees.trees2splits.BootstrapTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork;
@@ -526,8 +526,8 @@ public class MainWindowPresenter {
 		controller.getBootStrapTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTree()));
 		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
 
-		controller.getBootstrapTreeAsNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BoostrapTreeSplits()));
-		controller.getBootstrapTreeAsNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BoostrapTreeSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
+		controller.getBootstrapTreeAsNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTreeSplits()));
+		controller.getBootstrapTreeAsNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTreeSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
 
 		controller.getBootStrapNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapSplits()));
 		controller.getBootStrapNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));

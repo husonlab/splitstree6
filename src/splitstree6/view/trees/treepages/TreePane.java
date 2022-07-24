@@ -27,11 +27,9 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.scene.Group;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.selection.SelectionModel;
@@ -42,9 +40,11 @@ import jloda.fx.util.ProgramExecutorService;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
+import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.*;
+import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.InteractionSetup;
 
 import java.util.function.Consumer;
@@ -59,10 +59,9 @@ public class TreePane extends StackPane {
 
 	private Pane pane;
 
-	private final ChangeListener<Number> fontScaleChangeListener;
+	private final InteractionSetup interactionSetup;
 
-	private final BooleanProperty showInternalLabels = new SimpleBooleanProperty();
-	private final ChangeListener<Boolean> internalLabelsListener;
+	private final ChangeListener<Number> fontScaleChangeListener;
 
 	private Consumer<LayoutOrientation> orientationConsumer;
 
@@ -80,9 +79,13 @@ public class TreePane extends StackPane {
 	 * single tree pane
 	 */
 	public TreePane(Stage stage, TaxaBlock taxaBlock, PhyloTree phyloTree, SelectionModel<Taxon> taxonSelectionModel, double boxWidth, double boxHeight,
-					TreeDiagramType diagram, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
-					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, ReadOnlyBooleanProperty showInternalLabels, DoubleProperty unitLengthX,
-					ObservableMap<jloda.graph.Node, Group> nodeShapeMap, ObservableMap<Edge, Shape> edgeShapeMap) {
+					TreeDiagramType diagram, LabelEdgesBy labelEdgesBy, HeightAndAngles.Averaging averaging, ObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty fontScaleFactor,
+					ReadOnlyObjectProperty<TreeLabel> showTreeLabels, DoubleProperty unitLengthX,
+					ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
+
+		nodeShapeMap.clear();
+		edgeShapeMap.clear();
+
 		setPrefWidth(boxWidth);
 		setPrefHeight(boxHeight);
 		setMinWidth(Pane.USE_PREF_SIZE);
@@ -90,7 +93,7 @@ public class TreePane extends StackPane {
 		setMaxWidth(Pane.USE_PREF_SIZE);
 		setMaxHeight(Pane.USE_PREF_SIZE);
 
-		var interactionSetup = new InteractionSetup(stage, phyloTree, taxaBlock, edgeShapeMap, taxonSelectionModel, edgeSelectionModel, diagram, orientation);
+		interactionSetup = new InteractionSetup(stage, this, taxaBlock, diagram, orientation, taxonSelectionModel, edgeSelectionModel, nodeShapeMap, edgeShapeMap);
 
 		fontScaleChangeListener = (v, o, n) -> {
 			if (result != null) {
@@ -99,12 +102,6 @@ public class TreePane extends StackPane {
 			}
 		};
 		fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
-
-		this.showInternalLabels.set(showInternalLabels.get());
-		internalLabelsListener = (v, o, n) -> {
-			this.showInternalLabels.set(n);
-		};
-		showInternalLabels.addListener(new WeakChangeListener<>(internalLabelsListener));
 
 		// compute the tree in a separate thread:
 		service = new AService<>();
@@ -134,16 +131,40 @@ public class TreePane extends StackPane {
 
 			Platform.runLater(() -> infoString.set(info));
 
-			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4,
-					interactionSetup.createNodeCallback(), interactionSetup.createEdgeCallback(), false, true, nodeShapeMap);
+			switch (labelEdgesBy) {
+				case None -> {
+					phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
+				}
+				case Weight -> {
+					if (phyloTree.hasEdgeWeights())
+						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeWeights().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getWeight(e)) : null));
+					else
+						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
+				}
+				case Confidence -> {
+					if (phyloTree.hasEdgeConfidences())
+						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeConfidences().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getConfidence(e)) : null));
+					else
+						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
+				}
+				case Probability -> {
+					if (phyloTree.hasEdgeProbabilities())
+						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeProbabilities().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getProbability(e)) : null));
+					else
+						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
+				}
+			}
+			if (false)
+				System.err.println(phyloTree.toBracketString(new PhyloTree.NewickOutputFormat(true, false, true, true, true)));
+
+			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap);
 		});
 
 		service.setOnSucceeded(a -> {
 			result = service.getValue();
 			var group = result.getAllAsGroup();
 
-			if (result.internalLabels() != null)
-				result.internalLabels().visibleProperty().bind(this.showInternalLabels);
+			interactionSetup.initializeSelection(taxaBlock, taxonSelectionModel, edgeSelectionModel, nodeShapeMap);
 
 			if (unitLengthX != null)
 				unitLengthX.set(result.unitLengthX());
@@ -191,13 +212,6 @@ public class TreePane extends StackPane {
 				getChildren().setAll(new VBox(treeLabel, pane));
 			} else
 				getChildren().setAll(pane);
-
-			pane.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-				if (e.isStillSincePress() && !e.isShiftDown()) {
-					Platform.runLater(taxonSelectionModel::clearSelection);
-				}
-				e.consume();
-			});
 
 			if (getRunAfterUpdate() != null) {
 				Platform.runLater(() -> getRunAfterUpdate().run());

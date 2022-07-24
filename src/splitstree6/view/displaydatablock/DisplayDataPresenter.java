@@ -104,7 +104,17 @@ public class DisplayDataPresenter {
 			if (exporter.get() != null) {
 				try (var w = new StringWriter()) {
 					var dataBlock = dataNode.getDataBlock();
-					exporter.get().write(w, taxaBlock, dataBlock);
+
+					if (exporter.get().getName().startsWith("Nexus") && !(dataNode.getDataBlock() instanceof TaxaBlock)) {
+						try (var sw = new StringWriter()) {
+							exporter.get().write(sw, taxaBlock, dataBlock);
+							var str = sw.toString();
+							if (!str.startsWith("#nexus"))
+								w.write("#nexus\n");
+							w.write(str);
+						}
+					} else
+						exporter.get().write(w, taxaBlock, dataBlock);
 					if (dataBlock instanceof TaxaBlock taxaBlock1) {
 						if (taxaBlock1.getTraitsBlock() != null) {
 							(new TraitsNexusOutput()).write(w, taxaBlock, taxaBlock1.getTraitsBlock());

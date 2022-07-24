@@ -49,7 +49,7 @@ public class TaxonMarkPresenter {
 
 				for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
-					var newLabel = "<mark shape=\"" + shape.name() + "\" fill=\"" + BasicFX.toStringCSS(fill) + "\" stroke=\"lightgray\">" + taxon.getDisplayLabelOrName();
+					var newLabel = "<mark getShape=\"" + shape.name() + "\" fill=\"" + BasicFX.toStringCSS(fill) + "\" stroke=\"lightgray\">" + taxon.getDisplayLabelOrName();
 					undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 				}
 				if (undoList.size() > 0)
@@ -112,7 +112,7 @@ public class TaxonMarkPresenter {
 
 			if (shape == null) // multiple shapes
 				controller.getShapeCBox().setValue(null);
-			else if (shape.isNotNull()) // one shape
+			else if (shape.isNotNull()) // one getShape
 				controller.getShapeCBox().setValue(shape.get());
 
 			emptySelection.set(mainWindow.getTaxonSelectionModel().size() == 0);

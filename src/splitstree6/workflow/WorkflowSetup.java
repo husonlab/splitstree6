@@ -103,7 +103,10 @@ public class WorkflowSetup {
 						runOnSuccess.run();
 					}
 					if (n == Worker.State.CANCELLED || n == Worker.State.FAILED || n == Worker.State.SUCCEEDED) {
-						workflow.getLoaderNode().getService().stateProperty().removeListener(changeListener.get());
+						try {
+							workflow.getLoaderNode().getService().stateProperty().removeListener(changeListener.get());
+						} catch (Exception ignored) {
+						}
 					}
 				});
 

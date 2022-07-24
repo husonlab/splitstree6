@@ -19,16 +19,12 @@
 
 package splitstree6.view.trees.tanglegram.optimize;
 
-import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeIntArray;
 import jloda.graph.NodeSet;
 import jloda.phylo.PhyloTree;
-import jloda.util.progress.ProgressListener;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.SortedSet;
+import java.util.ArrayList;
 import java.util.TreeSet;
 
 
@@ -39,9 +35,8 @@ import java.util.TreeSet;
 public class LayoutUnoptimized {
     /**
      * compute standard embedding
-     *
-	 */
-    public void apply(PhyloTree tree, ProgressListener progressListener) {
+     */
+    public void apply(PhyloTree tree) {
         if (tree.getRoot() == null || tree.getNumberReticulateEdges() == 0) {
             tree.getLSAChildrenMap().clear();
             return; // if this is a tree, don't need LSA guide tree
@@ -51,13 +46,12 @@ public class LayoutUnoptimized {
 
         if (isAllReticulationsAreTransfers(tree)) {
             tree.getLSAChildrenMap().clear();
-            for (Node v = tree.getFirstNode(); v != null; v = tree.getNextNode(v)) {
-                List<Node> children = new LinkedList<>();
-                for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-                    if (!tree.isReticulateEdge(e) || tree.getWeight(e) > 0) {
-						children.add(e.getTarget());
-					}
-
+            for (var v : tree.nodes()) {
+                var children = new ArrayList<Node>();
+                for (var e : v.outEdges()) {
+                    if (!tree.isReticulateEdge(e) || tree.isTransferAcceptorEdge(e)) {
+                        children.add(e.getTarget());
+                    }
                 }
                 tree.getLSAChildrenMap().put(v, children);
 
@@ -90,8 +84,7 @@ public class LayoutUnoptimized {
                     tree.setLabel(v, tree.getLabel(v) + "_o" + number);
             }
 
-            for (Edge e = v.getFirstOutEdge(); e != null; e = v.getNextOutEdge(e)) {
-                Node w = e.getTarget();
+            for(var w : v.children()) {
                 number = computePreOrderNumberingRec(tree, w, visited, ordering, number);
             }
         }
@@ -104,8 +97,8 @@ public class LayoutUnoptimized {
 	 */
     private void reorderLSAChildren(PhyloTree tree, final NodeIntArray ordering) {
         // System.err.println("------ v="+v);
-        for (Node v = tree.getFirstNode(); v != null; v = tree.getNextNode(v)) {
-            List<Node> children = tree.getLSAChildrenMap().get(v);
+        for (var v : tree.nodes()) {
+            var children = tree.getLSAChildrenMap().get(v);
             if (children != null) {
                 if (false) {
                     System.err.println("LSA children old for v=" + v.getId() + ":");
@@ -113,7 +106,7 @@ public class LayoutUnoptimized {
                         System.err.println(" " + u.getId() + " order: " + ordering.get(u));
                     }
                 }
-                SortedSet<Node> sorted = new TreeSet<>((v1, v2) -> {
+                var sorted = new TreeSet<Node>((v1, v2) -> {
                     if (ordering.getInt(v1) < ordering.getInt(v2))
                         return -1;
                     else if (ordering.getInt(v1) > ordering.getInt(v2))
@@ -124,8 +117,7 @@ public class LayoutUnoptimized {
                     return 0;
                 });
                 sorted.addAll(children);
-                List<Node> list = new LinkedList<>(sorted);
-                tree.getLSAChildrenMap().put(v, list);
+                tree.getLSAChildrenMap().put(v, new ArrayList<>(sorted));
                 if (false) {
                     System.err.println("LSA children new for v=" + v.getId() + ":");
                     for (Node u : children) {
@@ -142,23 +134,7 @@ public class LayoutUnoptimized {
      * @return true, if is reticulate network that only contains
      */
     public static boolean isAllReticulationsAreTransfers(PhyloTree tree) {
-        var hasTransferReticulation = false;
-        var hasNonTransferReticulation = false;
-
-        for (var v : tree.nodes()) {
-            if (v.getInDegree() > 1) {
-                var transfer = false;
-                for (var e : v.inEdges()) {
-                    if (tree.getWeight(e) != 0)
-                        transfer = true;
-                }
-                if (!transfer)
-                    hasNonTransferReticulation = true;
-                else
-                    hasTransferReticulation = true;
-            }
-        }
-        return hasTransferReticulation && !hasNonTransferReticulation;
+        return tree.edgeStream().noneMatch(e -> !tree.isTransferEdge(e) && !tree.isTransferAcceptorEdge(e));
     }
 }
 

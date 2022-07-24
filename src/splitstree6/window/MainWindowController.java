@@ -168,6 +168,9 @@ public class MainWindowController {
 	private MenuItem selectBracketsMenuItem;
 
 	@FXML
+	private MenuItem selectCentralSplitMenuItem;
+
+	@FXML
 	private MenuItem increaseFontSizeMenuItem;
 
 	@FXML

@@ -31,11 +31,14 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Edge;
+import jloda.phylo.PhyloTree;
+import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.view.trees.treeview.TreeEdits;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.function.Consumer;
 
 /**
  * edge formatter presenter
@@ -46,8 +49,30 @@ public class EdgesFormatPresenter {
 
 	private boolean inUpdatingDefaults = false;
 
-	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, SelectionModel<Edge> edgeSelectionModel,
-								Map<Edge, Shape> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
+	private final UndoManager undoManager;
+	private final EdgesFormatController controller;
+
+	private Consumer<LabelEdgesBy> updateLabelsConsumer;
+
+	public EdgesFormatPresenter(UndoManager undoManager, EdgesFormatController controller, ObjectProperty<LabelEdgesBy> optionLabelEdgesBy, SelectionModel<Edge> edgeSelectionModel,
+								Map<Edge, LabeledEdgeShape> edgeShapeMap, ObjectProperty<String[]> editsProperty) {
+		this.undoManager = undoManager;
+		this.controller = controller;
+
+		controller.getLabelByNoneMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.None));
+		controller.getLabelByWeightMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Weight));
+		controller.getLabelByConfidenceMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Confidence));
+		controller.getLabelByProbabilityMenuItem().selectedProperty().addListener(e -> optionLabelEdgesBy.set(LabelEdgesBy.Probability));
+		optionLabelEdgesBy.addListener((v, o, n) -> {
+			if (n != null) {
+				switch (n) {
+					case None -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByNoneMenuItem());
+					case Weight -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByWeightMenuItem());
+					case Confidence -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceMenuItem());
+					case Probability -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByProbabilityMenuItem());
+				}
+			}
+		});
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
@@ -67,13 +92,11 @@ public class EdgesFormatPresenter {
 						var edits = new ArrayList<TreeEdits.Edit>();
 
 						for (var edge : edgeSelectionModel.getSelectedItems()) {
-							var shape = edgeShapeMap.get(edge);
-							if (shape != null) {
+							if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 								edits.add(new TreeEdits.Edit('w', edge.getId(), width));
 								var oldWidth = shape.getStrokeWidth();
 								undoList.add(shape.strokeWidthProperty(), oldWidth, width);
 							}
-
 						}
 						if (undoList.size() > 0) {
 							var oldEdits = editsProperty.get();
@@ -94,8 +117,7 @@ public class EdgesFormatPresenter {
 				var edits = new ArrayList<TreeEdits.Edit>();
 
 				for (var edge : edgeSelectionModel.getSelectedItems()) {
-					var shape = edgeShapeMap.get(edge);
-					if (shape != null) {
+					if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 						var oldColor = shape.getStroke();
 						if (!color.equals(oldColor)) {
 							edits.add(new TreeEdits.Edit('c', edge.getId(), color));
@@ -133,8 +155,7 @@ public class EdgesFormatPresenter {
 				var widths = new HashSet<Double>();
 				var colors = new HashSet<Paint>();
 				for (var edge : edgeSelectionModel.getSelectedItems()) {
-					var shape = edgeShapeMap.get(edge);
-					if (shape != null) {
+					if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 						if (shape.getUserData() instanceof Double width) // temporarily store width in user data when user is hovering over edge
 							widths.add(width);
 						else
@@ -154,5 +175,23 @@ public class EdgesFormatPresenter {
 		//selectionModel.getSelectedItems().addListener(selectionListener);
 		edgeSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));
 		selectionListener.invalidated(null);
+	}
+
+	public void setUpdateLabelsConsumer(Consumer<LabelEdgesBy> updateLabelsConsumer) {
+		this.updateLabelsConsumer = updateLabelsConsumer;
+
+
+	}
+
+	public void updateMenus(PhyloTree tree) {
+		controller.getLabelByWeightMenuItem().setDisable(tree == null || !tree.hasEdgeWeights());
+		controller.getLabelByConfidenceMenuItem().setDisable(tree == null || !tree.hasEdgeConfidences());
+		controller.getLabelByProbabilityMenuItem().setDisable(tree == null || !tree.hasEdgeProbabilities());
+
+		if (controller.getLabelByWeightMenuItem().isSelected() && controller.getLabelByWeightMenuItem().isDisable()
+			|| controller.getLabelByConfidenceMenuItem().isSelected() && controller.getLabelByConfidenceMenuItem().isDisable()
+			|| controller.getLabelByProbabilityMenuItem().isSelected() && controller.getLabelByProbabilityMenuItem().isDisable()) {
+			Platform.runLater(() -> controller.getLabelByNoneMenuItem().setSelected(true));
+		}
 	}
 }

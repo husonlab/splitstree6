@@ -64,7 +64,7 @@
                                 </HBox.margin>
                             </Label>
                             <MenuButton fx:id="labelByMenuButton" mnemonicParsing="false" prefWidth="137.0"
-                                        text="MenuButton">
+                                        text="None">
                                 <items>
                                     <RadioMenuItem fx:id="labelByNoneMenuItem" mnemonicParsing="false" text="None"/>
                                     <SeparatorMenuItem mnemonicParsing="false"/>

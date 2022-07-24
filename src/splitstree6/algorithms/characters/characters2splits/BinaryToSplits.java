@@ -47,10 +47,11 @@ import java.util.List;
 public class BinaryToSplits extends Characters2Splits {
     private final DoubleProperty optionMinSplitWeight = new SimpleDoubleProperty(this, "optionMinSplitWeight", 0.0);
     private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
+    private final BooleanProperty optionAddAllTrivial = new SimpleBooleanProperty(this, "optionAddAllTrivial", false);
 
     @Override
     public List<String> listOptions() {
-        return List.of(optionMinSplitWeight.getName(), optionHighDimensionFilter.getName());
+        return List.of(optionMinSplitWeight.getName(), optionHighDimensionFilter.getName(), optionAddAllTrivial.getName());
     }
 
     /**
@@ -89,7 +90,7 @@ public class BinaryToSplits extends Characters2Splits {
         }
 
         // add all missing trivial
-        computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax()));
+        computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), isOptionAddAllTrivial() ? 1.0 : 0.0));
 
         if (isOptionHighDimensionFilter()) {
             DimensionFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
@@ -133,5 +134,17 @@ public class BinaryToSplits extends Characters2Splits {
 
     public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
         this.optionHighDimensionFilter.set(optionHighDimensionFilter);
+    }
+
+    public boolean isOptionAddAllTrivial() {
+        return optionAddAllTrivial.get();
+    }
+
+    public BooleanProperty optionAddAllTrivialProperty() {
+        return optionAddAllTrivial;
+    }
+
+    public void setOptionAddAllTrivial(boolean optionAddAllTrivial) {
+        this.optionAddAllTrivial.set(optionAddAllTrivial);
     }
 }

@@ -135,4 +135,8 @@ public class NexmlReader extends TreesReader {
 			return false;
 		}
 	}
+
+	public boolean acceptsFirstLine(String text) {
+		return text.startsWith("<nex:nexml") || text.startsWith("<?xml version=");
+	}
 }

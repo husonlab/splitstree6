@@ -362,7 +362,7 @@ public class AlignmentView implements IView {
 
 	@Override
 	public int size() {
-		return controller.getTaxaListView().getItems().size();
+		return getInputCharacters() == null ? 0 : getInputCharacters().getNchar();
 	}
 
 	@Override

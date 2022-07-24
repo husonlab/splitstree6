@@ -147,7 +147,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 				}
 			}
 		}
-		splitsBlock.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(splitsBlock.getSplits(), taxaBlock.getNtax()));
+		splitsBlock.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(splitsBlock.getSplits(), taxaBlock.getNtax(), 0.0));
 
 		System.err.println("Splits: " + zClosureSplits.getNsplits() + " -> " + splitsBlock.getNsplits());
 	}

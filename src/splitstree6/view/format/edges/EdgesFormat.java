@@ -20,12 +20,13 @@
 package splitstree6.view.format.edges;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Group;
-import javafx.scene.shape.Shape;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Edge;
+import splitstree6.layout.tree.LabeledEdgeShape;
 
 import java.util.Map;
 
@@ -34,21 +35,26 @@ import java.util.Map;
  * Daniel Huson, 5.2022
  */
 public class EdgesFormat extends Group {
-	public enum LabelBy {None, Weight, Confidence, Probability}
 
 	private final EdgesFormatController controller;
 	private final EdgesFormatPresenter presenter;
 
-	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, Shape> edgeShapeMap,
+	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
+
+	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, LabeledEdgeShape> edgeShapeMap,
 					   ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<EdgesFormatController>(EdgesFormatController.class);
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		presenter = new EdgesFormatPresenter(undoManager, controller, edgeSelectionModel, edgeShapeMap, editsProperty);
+		presenter = new EdgesFormatPresenter(undoManager, controller, optionLabelEdgesBy, edgeSelectionModel, edgeShapeMap, editsProperty);
 	}
 
 	public EdgesFormatPresenter getPresenter() {
 		return presenter;
+	}
+
+	public ObjectProperty<LabelEdgesBy> optionLabelEdgesByProperty() {
+		return optionLabelEdgesBy;
 	}
 }

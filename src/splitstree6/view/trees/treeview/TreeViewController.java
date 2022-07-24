@@ -77,9 +77,6 @@ public class TreeViewController {
 	private ToggleButton showTreeNamesToggleButton;
 
 	@FXML
-	private ToggleButton showInternalLabelsToggleButton;
-
-	@FXML
 	private Button expandVerticallyButton;
 
 	@FXML
@@ -210,10 +207,6 @@ public class TreeViewController {
 
 	public ToggleButton getShowTreeNamesToggleButton() {
 		return showTreeNamesToggleButton;
-	}
-
-	public ToggleButton getShowInternalLabelsToggleButton() {
-		return showInternalLabelsToggleButton;
 	}
 
 	public Button getExpandVerticallyButton() {

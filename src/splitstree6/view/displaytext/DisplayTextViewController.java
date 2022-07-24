@@ -27,8 +27,10 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import jloda.fx.util.ResourceManagerFX;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
+import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class DisplayTextViewController {
 
@@ -66,12 +68,26 @@ public class DisplayTextViewController {
 
 	private VirtualizedScrollPane<CodeArea> scrollPane;
 
+	private Highlighter highlighter;
+
 	@FXML
 	private void initialize() {
 		codeArea = new CodeArea();
+		codeArea.requestFollowCaret();
+
+		final var url = ResourceManagerFX.getCssURL("styles.css");
+		if (url != null) {
+			codeArea.getStylesheets().add(url.toExternalForm());
+		}
+
+		//codeArea.getStyleClass().add("text");
+		codeArea.getStyleClass().add("viewer-background");
+
 		codeArea.setPadding(new Insets(5, 2, 5, 2));
 		scrollPane = new VirtualizedScrollPane<>(codeArea);
 		borderPane.setCenter(scrollPane);
+
+		highlighter = new Highlighter(codeArea);
 	}
 
 	public AnchorPane getAnchorPane() {

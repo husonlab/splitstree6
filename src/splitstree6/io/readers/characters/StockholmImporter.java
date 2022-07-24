@@ -22,6 +22,7 @@ package splitstree6.io.readers.characters;
 import jloda.util.FileLineIterator;
 import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
@@ -96,27 +97,33 @@ public class StockholmImporter extends CharactersReader {
 		readMatrix(matrix, characters);
 	}
 
+	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) {
+        StringBuilder foundSymbols = new StringBuilder();
+        for (int i = 1; i <= characters.getNtax(); i++) {
+			for (int j = 1; j <= characters.getNchar(); j++) {
+				char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
+				if (foundSymbols.toString().indexOf(symbol) == -1) {
+					foundSymbols.append(symbol);
+				}
+				characters.set(i, j, matrix.get(i - 1).charAt(j - 1));
+			}
+		}
+		characters.setDataType(CharactersType.guessType(CharactersType.union(foundSymbols.toString())));
+	}
+
 	@Override
 	public boolean accepts(String fileName) {
 		if (!super.accepts(fileName))
 			return false;
 		else {
-			String line = FileUtils.getFirstLineFromFile(new File(fileName));
-			return line != null && line.replaceAll("\\s+", "").toUpperCase().startsWith("#STOCKHOLM");
+			var line = FileUtils.getFirstLineFromFile(new File(fileName));
+			return line != null && acceptsFirstLine(line);
 		}
 	}
 
-	private void readMatrix(ArrayList<String> matrix, CharactersBlock characters) {
-        StringBuilder foundSymbols = new StringBuilder();
-        for (int i = 1; i <= characters.getNtax(); i++) {
-            for (int j = 1; j <= characters.getNchar(); j++) {
-                char symbol = Character.toLowerCase(matrix.get(i - 1).charAt(j - 1));
-                if (foundSymbols.toString().indexOf(symbol) == -1) {
-                    foundSymbols.append(symbol);
-                }
-                characters.set(i, j, matrix.get(i - 1).charAt(j - 1));
-            }
-        }
-		characters.setDataType(CharactersType.guessType(CharactersType.union(foundSymbols.toString())));
+	public boolean acceptsFirstLine(String text) {
+		var line = StringUtils.getFirstLine(text);
+		return line.replaceAll("\\s+", "").toUpperCase().startsWith("#STOCKHOLM");
 	}
+
 }

@@ -1,5 +1,5 @@
 /*
- * MouseInteraction.java Copyright (C) 2022 Daniel H. Huson
+ * InteractionSetup.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,14 +19,15 @@
 
 package splitstree6.view.splits.viewer;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.event.EventHandler;
-import javafx.scene.Group;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
@@ -40,6 +41,7 @@ import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.BitSetUtils;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.LabeledNodeShape;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -50,7 +52,7 @@ import java.util.stream.Collectors;
  * split network mouse interaction
  * Daniel Huson, 3.2022
  */
-public class MouseInteraction {
+public class InteractionSetup {
 	private static boolean nodeShapeOrLabelEntered;
 	private static boolean edgeShapeEntered;
 	private static double mouseDownX;
@@ -64,20 +66,32 @@ public class MouseInteraction {
 	private InvalidationListener taxonSelectionInvalidationListener;
 	private InvalidationListener splitSelectionInvalidationListener;
 
+	private boolean inClickOnEdge = false;
+
 	/**
 	 * constructor
 	 */
-	public MouseInteraction(Stage stage, UndoManager undoManager, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel) {
+	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel) {
 		this.stage = stage;
 		this.undoManager = undoManager;
 		this.taxonSelectionModel = taxonSelectionModel;
 		this.splitSelectionModel = splitSelectionModel;
+
+		pane.setOnMouseClicked(e -> {
+			if (e.isStillSincePress() && !e.isShiftDown()) {
+				Platform.runLater(splitSelectionModel::clearSelection);
+				Platform.runLater(taxonSelectionModel::clearSelection);
+				e.consume();
+			}
+		});
+
 	}
 
 	/**
 	 * setup split network mouse interaction
 	 */
-	public void setup(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, Group> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapesMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap, Function<Integer, ASplit> idSplitMap) {
+	public void setup(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapesMap,
+					  Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap, Function<Integer, ASplit> idSplitMap) {
 		var graphOptional = nodeShapeMap.keySet().stream().map(v -> (PhyloSplitsGraph) v.getOwner()).findAny();
 
 		if (graphOptional.isPresent()) {
@@ -87,26 +101,26 @@ public class MouseInteraction {
 				try {
 					var label = taxonLabelMap.get(id);
 					var v = graph.getTaxon2Node(id);
-					var shape = nodeShapeMap.get(v);
+					var nodeShape = nodeShapeMap.get(v);
 					var taxon = idTaxonMap.apply(id);
-					if (taxon != null && shape != null) {
-						shape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
+					if (taxon != null && nodeShape != null) {
+						nodeShape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 						label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 
-						shape.setOnMouseEntered(e -> {
+						nodeShape.setOnMouseEntered(e -> {
 							if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
 								nodeShapeOrLabelEntered = true;
-								shape.setScaleX(1.2 * shape.getScaleX());
-								shape.setScaleY(1.2 * shape.getScaleY());
+								nodeShape.setScaleX(1.2 * nodeShape.getScaleX());
+								nodeShape.setScaleY(1.2 * nodeShape.getScaleY());
 								label.setScaleX(1.1 * label.getScaleX());
 								label.setScaleY(1.1 * label.getScaleY());
 								e.consume();
 							}
 						});
-						shape.setOnMouseExited(e -> {
+						nodeShape.setOnMouseExited(e -> {
 							if (nodeShapeOrLabelEntered) {
-								shape.setScaleX(shape.getScaleX() / 1.2);
-								shape.setScaleY(shape.getScaleY() / 1.2);
+								nodeShape.setScaleX(nodeShape.getScaleX() / 1.2);
+								nodeShape.setScaleY(nodeShape.getScaleY() / 1.2);
 								label.setScaleX(label.getScaleX() / 1.1);
 								label.setScaleY(label.getScaleY() / 1.1);
 								nodeShapeOrLabelEntered = false;
@@ -122,11 +136,11 @@ public class MouseInteraction {
 								e.consume();
 							}
 						};
-						shape.setOnMouseClicked(mouseClickedHandler);
+						nodeShape.setOnMouseClicked(mouseClickedHandler);
 						label.setOnMouseClicked(mouseClickedHandler);
 
-						label.setOnMouseEntered(shape.getOnMouseEntered());
-						label.setOnMouseExited(shape.getOnMouseExited());
+						label.setOnMouseEntered(nodeShape.getOnMouseEntered());
+						label.setOnMouseExited(nodeShape.getOnMouseExited());
 
 						label.setOnMousePressed(e -> {
 							if (taxonSelectionModel.isSelected(taxon)) {
@@ -179,35 +193,41 @@ public class MouseInteraction {
 
 					shape.setOnMouseClicked(e -> {
 						if (e.isStillSincePress() && idSplitMap.apply(splitId) != null) {
-							if (e.getClickCount() == 1) {
-								if (!e.isShiftDown())
-									splitSelectionModel.clearSelection();
-								splitSelectionModel.toggleSelection(splitId);
+							try {
+								inClickOnEdge = true;
+								if (e.getClickCount() == 1) {
+									if (!e.isShiftDown())
+										splitSelectionModel.clearSelection();
+									splitSelectionModel.toggleSelection(splitId);
 
-								var split = idSplitMap.apply(splitId);
-								var partA = split.getA();
-								var partB = split.getB();
-								var whichPart = ((partA.cardinality() < partB.cardinality()) == !e.isAltDown() ? partA : partB);
-								var taxa = BitSetUtils.asStream(whichPart).map(idTaxonMap).collect(Collectors.toList());
-								if (splitSelectionModel.isSelected(splitId)) {
-									taxonSelectionModel.clearSelection();
-									taxonSelectionModel.selectAll(taxa);
-								} else
-									taxonSelectionModel.clearSelection(taxa);
-							} else if (e.getClickCount() == 2) {
-								splitSelectionModel.select(splitId);
+									var split = idSplitMap.apply(splitId);
+									var partA = split.getA();
+									var partB = split.getB();
+									var whichPart = ((partA.cardinality() < partB.cardinality()) == !e.isAltDown() ? partA : partB);
+									var taxa = BitSetUtils.asStream(whichPart).map(idTaxonMap).collect(Collectors.toList());
+									if (splitSelectionModel.isSelected(splitId)) {
+										if (!e.isShiftDown())
+											taxonSelectionModel.clearSelection();
+										taxonSelectionModel.selectAll(taxa);
+									} else
+										taxonSelectionModel.clearSelection(taxa);
+								} else if (e.getClickCount() == 2) {
+									splitSelectionModel.select(splitId);
 
-								var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxonIdMap).collect(Collectors.toList()));
-								var start = graph.nodeStream().filter(z -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(z))).cardinality() > 0).findAny();
-								if (start.isPresent()) {
-									try (var visited = graph.newNodeSet()) {
-										GraphTraversals.traverseReachable(start.get(), f -> graph.getSplit(f) != splitId, visited::add);
-										for (var f : graph.edges()) {
-											if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
-												splitSelectionModel.select(graph.getSplit(f));
+									var selectedTaxonIds = BitSetUtils.asBitSet(taxonSelectionModel.getSelectedItems().stream().map(taxonIdMap).collect(Collectors.toList()));
+									var start = graph.nodeStream().filter(z -> BitSetUtils.intersection(selectedTaxonIds, BitSetUtils.asBitSet(graph.getTaxa(z))).cardinality() > 0).findAny();
+									if (start.isPresent()) {
+										try (var visited = graph.newNodeSet()) {
+											GraphTraversals.traverseReachable(start.get(), f -> graph.getSplit(f) != splitId, visited::add);
+											for (var f : graph.edges()) {
+												if (visited.contains(f.getSource()) && visited.contains(f.getTarget()))
+													splitSelectionModel.select(graph.getSplit(f));
+											}
 										}
 									}
 								}
+							} finally {
+								inClickOnEdge = false;
 							}
 							e.consume();
 						}

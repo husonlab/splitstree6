@@ -39,12 +39,17 @@ import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
+import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.layout.tree.*;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
+import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
@@ -97,6 +102,22 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				controller.getTreeCBox().setValue(controller.getTreeCBox().getItems().get(view.getOptionTree() - 1));
 				tree.set(view.getTrees().get(view.getOptionTree() - 1));
 			}
+
+			Platform.runLater(() -> {
+				try {
+					if (view.getOptionLabelEdgesBy() == LabelEdgesBy.None) {
+						var dirty = mainWindow.isDirty();
+						if (tree.get().hasEdgeConfidences())
+							view.setOptionLabelEdgesBy(LabelEdgesBy.Confidence);
+						else if (tree.get().hasEdgeProbabilities())
+							view.setOptionLabelEdgesBy(LabelEdgesBy.Probability);
+						mainWindow.setDirty(dirty);
+					}
+				} catch (Exception ex) {
+					Basic.caught(ex);
+				}
+			});
+
 		});
 
 		view.optionTreeProperty().addListener((v, o, n) -> {
@@ -166,8 +187,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().valueProperty().bindBidirectional(view.optionOrientationProperty());
 		controller.getOrientationCBox().disableProperty().bind(view.emptyProperty().or(changingOrientation));
 
-		controller.getShowInternalLabelsToggleButton().selectedProperty().bindBidirectional(view.optionShowConfidenceProperty());
-
 		controller.getScaleBar().visibleProperty().bind(toScale.and(showScaleBar));
 
 		{
@@ -213,8 +232,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 						if (!view.emptyProperty().get()) {
 							var pane = new TreePane(mainWindow.getStage(), mainWindow.getWorkflow().getWorkingTaxaBlock(), tree, mainWindow.getTaxonSelectionModel(), box.getWidth(), box.getHeight(),
-									view.getOptionDiagram(), view.getOptionAveraging(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(), null,
-									view.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap());
+									view.getOptionDiagram(), view.getOptionLabelEdgesBy(), view.getOptionAveraging(), view.optionOrientationProperty(), view.optionFontScaleFactorProperty(), null,
+									controller.getScaleBar().unitLengthXProperty(), view.getNodeShapeMap(), view.getEdgeShapeMap());
 							view.setEdgeSelectionModel(pane.getEdgeSelectionModel());
 							treePane.set(pane);
 							pane.setRunAfterUpdate(() -> {
@@ -227,6 +246,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 								updateCounter.set(updateCounter.get() + 1);
 							});
 							pane.drawTree();
+
 							scrollPane.setContent(pane);
 						} else {
 							treePane.set(null);
@@ -269,6 +289,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		view.getTrees().addListener(updateListener);
 		view.optionTreeProperty().addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);
+		view.optionLabelEdgesByProperty().addListener(updateListener);
 
 		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
 		view.optionDiagramProperty().addListener((v, o, n) -> {
@@ -349,18 +370,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
-
-
-		if (false) { // code for testing ideas about drawing on a canvas
-			var drawOnCanvas = new DrawOnCanvas();
-
-			view.optionTreeProperty().addListener((v, o, n) -> {
-				if (n.intValue() >= 1 && n.intValue() <= view.getTrees().size()) {
-					drawOnCanvas.draw(mainWindow.getController().getBottomFlowPane(), view.getTrees().get(n.intValue() - 1), mainWindow.getWorkflow().getWorkingTaxaBlock().getNtax(),
-							t -> mainWindow.getWorkflow().getWorkingTaxaBlock().get(t).displayLabelProperty(), view.getOptionDiagram(), view.getOptionAveraging(), 850, 850, false);
-				}
-			});
-		}
 	}
 
 	public void setupMenuItems() {

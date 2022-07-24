@@ -20,10 +20,8 @@
 package splitstree6.layout.tree;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
@@ -36,8 +34,8 @@ import java.util.Map;
  */
 public class LayoutLabelsCircular {
 
-	public static void apply(PhyloTree tree, Map<Node, ? extends javafx.scene.Node> nodeShapeMap, Map<Node, RichTextLabel> nodeLabelMap, Map<Node, Double> nodeAngleMap, double labelGap,
-							 boolean linkNodesEdgesLabels, Group labelConnectors) {
+	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Node, Double> nodeAngleMap,
+							 double labelGap, Group labelConnectors) {
 
 		var alignLabels = (labelConnectors != null);
 		final double maxRadius;
@@ -48,7 +46,7 @@ public class LayoutLabelsCircular {
 
 		for (var v : tree.nodes()) {
 			var shape = nodeShapeMap.get(v);
-			var label = nodeLabelMap.get(v);
+			var label = shape.getLabel();
 			if (label != null) {
 				InvalidationListener changeListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
@@ -69,21 +67,6 @@ public class LayoutLabelsCircular {
 						var add = v.isLeaf() ? (maxRadius > Double.MIN_VALUE ? maxRadius - GeometryUtilsFX.magnitude(shape.getTranslateX(), shape.getTranslateY()) : 0) : -10;
 
 						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, add + labelGap + 0.5 * label.getWidth());
-						if (linkNodesEdgesLabels) {
-							label.translateXProperty().bind(shape.translateXProperty().subtract(0.5 * label.getWidth()).add(offset.getX()));
-							label.translateYProperty().bind(shape.translateYProperty().subtract(0.5 * label.getHeight()).add(offset.getY()));
-
-							if (alignLabels && add > 1.1 * labelGap) {
-								// todo: this is untested
-								var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
-								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
-								labelConnectors.getChildren().add(new LabelConnector(
-										Bindings.createDoubleBinding(() -> shape.getTranslateX() + offset1.getX(), shape.translateXProperty()),
-										Bindings.createDoubleBinding(() -> shape.getTranslateY() + offset1.getY(), shape.translateYProperty()),
-										Bindings.createDoubleBinding(() -> shape.getTranslateX() + offset2.getX(), shape.translateXProperty()),
-										Bindings.createDoubleBinding(() -> shape.getTranslateY() + offset2.getY(), shape.translateYProperty())));
-							}
-						} else {
 							label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
 							label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY());
 
@@ -92,7 +75,6 @@ public class LayoutLabelsCircular {
 								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
 								labelConnectors.getChildren().add(new LabelConnector(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY()));
 							}
-						}
 						label.setAnchor(shape);
 						label.setRotate(angle);
 						label.ensureUpright();

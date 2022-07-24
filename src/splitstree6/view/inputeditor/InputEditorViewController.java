@@ -21,6 +21,7 @@ package splitstree6.view.inputeditor;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
 
 public class InputEditorViewController {
@@ -44,6 +45,9 @@ public class InputEditorViewController {
 
 	@FXML
 	public Button decreaseFontButton;
+
+	@FXML
+	private Label formatLabel;
 
 	public ToolBar getFirstToolBar() {
 		return firstToolBar;
@@ -71,5 +75,9 @@ public class InputEditorViewController {
 
 	public Button getDecreaseFontButton() {
 		return decreaseFontButton;
+	}
+
+	public Label getFormatLabel() {
+		return formatLabel;
 	}
 }

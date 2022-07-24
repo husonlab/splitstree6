@@ -28,6 +28,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Node;
 import splitstree6.layout.splits.SplitsDiagramType;
+import splitstree6.layout.tree.LabeledNodeShape;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class SplitsFormat extends Group {
 	private final SplitsFormatController controller;
 	private final SplitsFormatPresenter presenter;
 
-	public SplitsFormat(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, Group> nodeShapeMap,
+	public SplitsFormat(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, LabeledNodeShape> nodeShapeMap,
 						Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
 						ObjectProperty<Color> optionOutlineFill, ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<SplitsFormatController>(SplitsFormatController.class);

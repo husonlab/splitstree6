@@ -139,19 +139,15 @@ public class MainWindow implements IMainWindow {
 	}
 
 	@Override
-	public void show(Stage stage0, double screenX, double screenY, double width, double height) {
-		if (stage0 == null)
-			stage0 = new Stage();
-		this.stage = stage0;
+	public void show(Stage stage, double screenX, double screenY, double width, double height) {
+		this.stage = stage;
+		
 		stage.getIcons().addAll(ProgramProperties.getProgramIconsFX());
 
-		var scene = new Scene(root, width, height);
+		var scene = new Scene(root);
 
 		stage.setScene(scene);
-		stage.sizeToScene();
-		stage.setX(screenX);
-		stage.setY(screenY);
-
+		;
 		scene.getStylesheets().add("jloda/resources/css/white_pane.css");
 
 		stage.titleProperty().addListener(e -> MainWindowManager.getInstance().fireChanged());

@@ -89,7 +89,6 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 
 		controller.getAntiConsensusToggleBox().selectedProperty().bindBidirectional(view.optionAntiConsensusProperty());
 
-
 		InvalidationListener invalidationListener = e -> drawer.apply(targetBounds.get(),
 				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
 				view.isOptionAntiConsensus(),

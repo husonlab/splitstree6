@@ -38,4 +38,7 @@ public abstract class DataReaderBase<T extends DataBlock> extends ReaderWriterBa
 	public Class<T> getToClass() {
 		return toClass;
 	}
+
+	abstract public boolean acceptsFirstLine(String text);
+
 }

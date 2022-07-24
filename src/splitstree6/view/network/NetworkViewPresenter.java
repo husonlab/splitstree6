@@ -24,7 +24,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
-import javafx.scene.Group;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -35,6 +34,8 @@ import jloda.graph.Node;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
+import splitstree6.layout.tree.LabeledEdgeShape;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
@@ -56,15 +57,13 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 	private final NetworkPane networkPane;
 
-	private final MouseInteraction mouseInteraction;
+	private final InteractionSetup interactionSetup;
 
 	public NetworkViewPresenter(MainWindow mainWindow, NetworkView networkView, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
-								ObservableMap<Node, Group> nodeShapeMap, ObservableMap<jloda.graph.Edge, Group> edgeShapeMap) {
+								ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap) {
 		this.mainWindow = mainWindow;
 		this.networkView = networkView;
 		this.controller = networkView.getController();
-
-		mouseInteraction = new MouseInteraction(mainWindow.getStage(), networkView.getUndoManager(), mainWindow.getTaxonSelectionModel());
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
@@ -92,9 +91,12 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				networkView.optionZoomFactorProperty(), networkView.optionFontScaleFactorProperty(),
 				taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
+		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, networkView.getUndoManager(), mainWindow.getTaxonSelectionModel());
+
+
 		networkPane.setRunAfterUpdate(() -> {
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			mouseInteraction.setup(taxonLabelMap, nodeShapeMap, taxa::get, taxa::indexOf);
+			interactionSetup.apply(taxonLabelMap, nodeShapeMap, taxa::get, taxa::indexOf);
 
 			/*
 			if (networkView.getOptionEdits().length > 0) {

@@ -19,6 +19,7 @@
 
 package splitstree6.io.readers.trees;
 
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -41,4 +42,9 @@ public class NexusReader extends TreesReader {
 	public boolean accepts(String file) {
 		return getToClass().equals(NexusImporter.determineInputData(file));
 	}
+
+	public boolean acceptsFirstLine(String text) {
+		return StringUtils.getFirstLine(text).toLowerCase().startsWith("#nexus");
+	}
+
 }

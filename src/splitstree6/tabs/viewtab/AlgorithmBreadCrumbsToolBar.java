@@ -50,8 +50,8 @@ import java.util.List;
  * Daniel Huson, 1.2018
  */
 public class AlgorithmBreadCrumbsToolBar extends ToolBar {
-    private static final String shape = "-fx-shape: \"M 0 0 L 5 9 L 0 18 L 100 18 L 105 9 L 100 0 z\";-fx-font-size: 10;"; // arrow shape and font size
-    private static final String computingColor = "-fx-background-color: LIGHTBLUE;";
+    private static final String shape = "-fx-shape: \"M 0 0 L 5 9 L 0 18 L 100 18 L 105 9 L 100 0 z\";-fx-font-size: 10;"; // arrow getShape and font size
+	private static final String computingColor = "-fx-background-color: LIGHTBLUE;";
 
     private final ArrayList<ChangeListener<Worker.State>> stateChangeListeners = new ArrayList<>();
 

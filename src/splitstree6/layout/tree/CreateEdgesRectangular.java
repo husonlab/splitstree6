@@ -21,17 +21,17 @@ package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.scene.shape.QuadCurveTo;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.ProgramProperties;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Map;
-import java.util.function.BiConsumer;
 
 /**
  * draws edges in rectangular layout
@@ -39,23 +39,19 @@ import java.util.function.BiConsumer;
  */
 public class CreateEdgesRectangular {
 
-	public static Collection<Shape> apply(TreeDiagramType diagram, PhyloTree tree, Map<Node, ? extends javafx.scene.Node> nodeShapeMap, boolean linkNodesEdgesLabels, BiConsumer<Edge, Shape> edgeCallback) {
-		var shapes = new ArrayList<Shape>();
-
+	public static void apply(PhyloTree tree, Map<Node, LabeledNodeShape> nodeShapeMap, Map<Edge, LabeledEdgeShape> edgeShapeMap) {
 		for (var e : tree.edges()) {
+			var label = (tree.getLabel(e) != null ? new RichTextLabel(tree.getLabel(e)) : null);
+
 			var sourceShape = nodeShapeMap.get(e.getSource());
 			var targetShape = nodeShapeMap.get(e.getTarget());
 			var line = new Path();
 			line.setPickOnBounds(false);
 
 			var moveTo = new MoveTo();
-			if (linkNodesEdgesLabels) {
-				moveTo.xProperty().bind(sourceShape.translateXProperty());
-				moveTo.yProperty().bind(sourceShape.translateYProperty());
-			} else {
-				moveTo.setX(sourceShape.getTranslateX());
-				moveTo.setY(sourceShape.getTranslateY());
-			}
+			moveTo.setX(sourceShape.getTranslateX());
+			moveTo.setY(sourceShape.getTranslateY());
+
 			line.getElements().add(moveTo);
 
 			if (tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
@@ -63,91 +59,65 @@ public class CreateEdgesRectangular {
 
 				var lineTo1 = new LineTo();
 				line.getElements().add(lineTo1);
-				if (linkNodesEdgesLabels) {
-					lineTo1.xProperty().bind(sourceShape.translateXProperty());
-					lineTo1.yProperty().bind(targetShape.translateYProperty());
-				} else {
-					var dx = targetShape.getTranslateX() - sourceShape.getTranslateX();
-					var dy = targetShape.getTranslateY() - sourceShape.getTranslateY();
-					if (Math.abs(dx) <= 5 || Math.abs(dy) <= 5) {
-						lineTo1.setX(sourceShape.getTranslateX());
-						lineTo1.setY(targetShape.getTranslateY());
-					} else {
-						lineTo1.setX(sourceShape.getTranslateX());
-						lineTo1.setY(sourceShape.getTranslateY() + dy + (dy > 0 ? -4 : 4));
 
-						var quadTo = new QuadCurveTo();
-						line.getElements().add(quadTo);
-						quadTo.setControlX(sourceShape.getTranslateX());
-						quadTo.setControlY(targetShape.getTranslateY());
-						quadTo.setX(sourceShape.getTranslateX() + (dx > 0 ? +4 : -4));
-						quadTo.setY(targetShape.getTranslateY());
-					}
+				var dx = targetShape.getTranslateX() - sourceShape.getTranslateX();
+				var dy = targetShape.getTranslateY() - sourceShape.getTranslateY();
+
+				if (Math.abs(dx) <= 5 || Math.abs(dy) <= 5) {
+					lineTo1.setX(sourceShape.getTranslateX());
+					lineTo1.setY(targetShape.getTranslateY());
+				} else {
+					lineTo1.setX(sourceShape.getTranslateX());
+					lineTo1.setY(sourceShape.getTranslateY() + dy + (dy > 0 ? -4 : 4));
+
+					var quadTo = new QuadCurveTo();
+					line.getElements().add(quadTo);
+					quadTo.setControlX(sourceShape.getTranslateX());
+					quadTo.setControlY(targetShape.getTranslateY());
+					quadTo.setX(sourceShape.getTranslateX() + (dx > 0 ? +4 : -4));
+					quadTo.setY(targetShape.getTranslateY());
 				}
 
 				var lineTo2 = new LineTo();
 				line.getElements().add(lineTo2);
+				lineTo2.setX(targetShape.getTranslateX());
+				lineTo2.setY(targetShape.getTranslateY());
 
-				if (linkNodesEdgesLabels) {
-					lineTo2.xProperty().bind(targetShape.translateXProperty());
-					lineTo2.yProperty().bind(targetShape.translateYProperty());
-				} else {
-					lineTo2.setX(targetShape.getTranslateX());
-					lineTo2.setY(targetShape.getTranslateY());
+				if (label != null) {
+					label.setTranslateX(0.5 * (sourceShape.getTranslateX() + targetShape.getTranslateX()));
+					label.setTranslateY(targetShape.getTranslateY() - 18);
 				}
 			} else if (tree.isTransferEdge(e)) {
-				line.getStyleClass().add("graph-special-edge");
 				var lineTo1 = new LineTo();
 				line.getElements().add(lineTo1);
+				line.getStyleClass().add("graph-special-edge");
 
-				if (linkNodesEdgesLabels) {
-					lineTo1.xProperty().bind(targetShape.translateXProperty());
-					lineTo1.yProperty().bind(targetShape.translateYProperty());
-				} else {
-					lineTo1.setX(targetShape.getTranslateX());
-					lineTo1.setY(targetShape.getTranslateY());
-					addArrowHead(line, moveTo, lineTo1);
+				lineTo1.setX(targetShape.getTranslateX());
+				lineTo1.setY(targetShape.getTranslateY());
+				addArrowHead(line, moveTo, lineTo1);
+
+				if (label != null) {
+					label.setTextFill(Color.DARKORANGE);
+					label.setTranslateX(0.5 * (sourceShape.getTranslateX() + targetShape.getTranslateX()));
+					label.setTranslateY(0.5 * (sourceShape.getTranslateY() + targetShape.getTranslateY()) - 15);
 				}
 			} else { // tree.isReticulateEdge(e)
 				line.getStyleClass().add("graph-special-edge");
-
 				var quadCurveTo = new QuadCurveTo();
 				line.getElements().add(quadCurveTo);
-				if (linkNodesEdgesLabels) {
-					quadCurveTo.controlXProperty().bind(sourceShape.translateXProperty());
-					quadCurveTo.controlYProperty().bind(targetShape.translateYProperty());
-					quadCurveTo.xProperty().bind(targetShape.translateXProperty());
-					quadCurveTo.yProperty().bind(targetShape.translateYProperty());
-				} else {
-					quadCurveTo.setControlX(sourceShape.getTranslateX());
-					quadCurveTo.setControlY(targetShape.getTranslateY());
-					quadCurveTo.setX(targetShape.getTranslateX());
-					quadCurveTo.setY(targetShape.getTranslateY());
+				quadCurveTo.setControlX(sourceShape.getTranslateX());
+				quadCurveTo.setControlY(targetShape.getTranslateY());
+				quadCurveTo.setX(targetShape.getTranslateX());
+				quadCurveTo.setY(targetShape.getTranslateY());
+				if (label != null) {
+					label.setTextFill(Color.DARKORANGE);
+					label.setTranslateX(0.5 * (sourceShape.getTranslateX() + targetShape.getTranslateX()));
+					label.setTranslateY(targetShape.getTranslateY() + (sourceShape.getTranslateY() < targetShape.getTranslateY() ? -18 : +18));
 				}
 			}
-			shapes.add(line);
-			edgeCallback.accept(e, line);
+
+			edgeShapeMap.put(e, new LabeledEdgeShape(label, line));
 		}
-
-		// draw LSA edges
-		if (ProgramProperties.get("showlsa", false))
-			for (var v : tree.nodes()) {
-				for (var w : tree.lsaChildren(v)) {
-					if (w.inEdgesStream(false).anyMatch(tree::isReticulateEdge)) {
-						var sourceShape = nodeShapeMap.get(v);
-						var targetShape = nodeShapeMap.get(w);
-
-						var line = new Line();
-						line.setStartX(sourceShape.getTranslateX());
-						line.setStartY(sourceShape.getTranslateY());
-						line.setEndX(targetShape.getTranslateX());
-						line.setEndY(targetShape.getTranslateY());
-						line.setStroke(Color.DEEPPINK.deriveColor(1, 1, 1, 0.5));
-						shapes.add(line);
-					}
-				}
-			}
-		return shapes;
 	}
 
 	public static void addArrowHead(Path path, MoveTo moveto, LineTo lineTo) {

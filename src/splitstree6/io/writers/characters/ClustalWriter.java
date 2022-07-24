@@ -39,7 +39,7 @@ public class ClustalWriter extends CharactersWriterBase {
 	}
 
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
-		w.write("CLUSTAL multiple sequence alignment (written by SplitsTree 6)\n\n\n");
+		w.write("CLUSTAL multiple sequence alignment (written by SplitsTree6)\n\n\n");
 
 		final var ntax = taxa.getNtax();
 		final var nchar = characters.getNchar();

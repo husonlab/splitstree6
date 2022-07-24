@@ -28,6 +28,7 @@ import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
+import splitstree6.layout.tree.LabeledEdgeShape;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -41,9 +42,9 @@ public class TreeEdits {
 	 * update the recorded edits
 	 *
 	 * @param editsString  edits string
-	 * @param edgeShapeMap edge shape map
+	 * @param edgeShapeMap edge getShape map
 	 */
-	public static void applyEdits(String[] editsString, ObservableMap<Edge, Shape> edgeShapeMap) {
+	public static void applyEdits(String[] editsString, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {
 		var tree = edgeShapeMap.keySet().stream().map(e -> (PhyloTree) e.getOwner()).findAny().orElse(null);
 		if (tree != null) {
 			for (var editString : editsString) {
@@ -51,8 +52,7 @@ public class TreeEdits {
 				if (edit != null) {
 					var edge = tree.edgeStream().filter(e -> e.getId() == edit.edgeId()).findAny().orElse(null);
 					if (edge != null) {
-						var shape = edgeShapeMap.get(edge);
-						if (shape != null) {
+						if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 							switch (edit.code()) {
 								case 'c' -> {
 									if (BasicFX.isColor(edit.parameter())) {

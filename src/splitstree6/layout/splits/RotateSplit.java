@@ -20,11 +20,11 @@
 package splitstree6.layout.splits;
 
 import javafx.geometry.Point2D;
-import javafx.scene.Group;
 import jloda.fx.graph.GraphTraversals;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.Node;
 import jloda.phylo.PhyloSplitsGraph;
+import splitstree6.layout.tree.LabeledNodeShape;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,9 +40,9 @@ public class RotateSplit {
 	 *
 	 * @param splits       the splits
 	 * @param angle        the angle to rotate by in degrees
-	 * @param nodeShapeMap the node shape map, note that the translateX and translateY properties will be changed
+	 * @param nodeShapeMap the node getShape map, note that the translateX and translateY properties will be changed
 	 */
-	public static void apply(Collection<Integer> splits, double angle, Map<Node, Group> nodeShapeMap) {
+	public static void apply(Collection<Integer> splits, double angle, Map<Node, LabeledNodeShape> nodeShapeMap) {
 		for (var split : splits)
 			apply(split, angle, nodeShapeMap);
 	}
@@ -54,7 +54,7 @@ public class RotateSplit {
 	 * @param angle        the angle to rotate by in degrees
 	 * @param nodeShapeMap the node shape map, note that the translateX and translateY properties will be changed
 	 */
-	public static void apply(int split, double angle, Map<Node, Group> nodeShapeMap) {
+	public static void apply(int split, double angle, Map<Node, LabeledNodeShape> nodeShapeMap) {
 		var graphOptional = nodeShapeMap.keySet().stream().map(v -> (PhyloSplitsGraph) v.getOwner()).findAny();
 		if (graphOptional.isPresent()) {
 			var graph = graphOptional.get();

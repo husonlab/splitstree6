@@ -50,6 +50,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.layout.splits.algorithms.ConvexHull;
 import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.splits.algorithms.PhylogeneticOutline;
+import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
 
@@ -87,7 +88,7 @@ public class SplitNetworkLayout {
 					   SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
 					   ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength, double width, double height,
 					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, // todo: this should be input
-					   ObservableMap<Node, Group> nodeShapeMap,
+					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap,
 					   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
 					   ObservableList<LoopView> loopViews) throws IOException {
 		labelLayout.clear();
@@ -190,35 +191,31 @@ public class SplitNetworkLayout {
 			var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
 			var point = nodePointMap.get(v);
 
-			var group = new Group();
-			group.setId("graph-node"); // the is used to rotate graph
-			{
-				var shape = new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5);
-				shape.getStyleClass().add("graph-node");
-				group.getChildren().add(shape);
-			}
-			group.setTranslateX(point.getX());
-			group.setTranslateY(point.getY());
+			var labeledNode = new LabeledNodeShape(new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5));
+			labeledNode.setTranslateX(point.getX());
+			labeledNode.setTranslateY(point.getY());
 
-			nodesGroup.getChildren().add(group);
+			nodesGroup.getChildren().add(labeledNode);
 
 			var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 
 			if (graph.getNumberOfTaxa(v) == 1) {
-				group.setUserData(taxaBlock.get(graph.getTaxon(v)));
+				labeledNode.setUserData(taxaBlock.get(graph.getTaxon(v)));
 			}
-			nodeShapeMap.put(v, group);
+
+			nodeShapeMap.put(v, labeledNode);
 
 			if (label != null && !isRootNode) {
 				if (graph.getNumberOfTaxa(v) == 1) {
 					taxonLabelMap.put(graph.getTaxon(v), label);
 				}
 
-				label.getStyleClass().add("graph-label");
+				labeledNode.setLabel(label);
+
 				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
-				label.setTranslateX(group.getTranslateX() + 10);
-				label.setTranslateY(group.getTranslateY() + 10);
-				label.setUserData(group);
+				label.setTranslateX(labeledNode.getTranslateX() + 10);
+				label.setTranslateY(labeledNode.getTranslateY() + 10);
+				label.setUserData(labeledNode);
 				nodeLabelsGroup.getChildren().add(label);
 
 				label.applyCss();
@@ -227,8 +224,8 @@ public class SplitNetworkLayout {
 				if (rootSplit == 0 && v == graph.getTaxon2Node(1)) {
 					angle += 180;
 				}
-				var translateXProperty = group.translateXProperty();
-				var translateYProperty = group.translateYProperty();
+				var translateXProperty = labeledNode.translateXProperty();
+				var translateYProperty = labeledNode.translateYProperty();
 				labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
 						xOffset -> {
 							label.setLayoutX(0);
@@ -239,7 +236,7 @@ public class SplitNetworkLayout {
 							label.translateYProperty().bind(translateYProperty.add(yOffset));
 						});
 
-				labelLayout.addAvoidable(() -> group.getTranslateX() - 0.5 * group.prefWidth(0), () -> group.getTranslateY() - 0.5 * group.prefHeight(0), () -> group.prefWidth(0), () -> group.prefHeight(0));
+				labelLayout.addAvoidable(() -> labeledNode.getTranslateX() - 0.5 * labeledNode.prefWidth(0), () -> labeledNode.getTranslateY() - 0.5 * labeledNode.prefHeight(0), () -> labeledNode.prefWidth(0), () -> labeledNode.prefHeight(0));
 			}
 			progress.incrementProgress();
 		}
@@ -257,8 +254,10 @@ public class SplitNetworkLayout {
 			line.startYProperty().bind(nodeShapeMap.get(e.getSource()).translateYProperty());
 			line.endXProperty().bind(nodeShapeMap.get(e.getTarget()).translateXProperty());
 			line.endYProperty().bind(nodeShapeMap.get(e.getTarget()).translateYProperty());
+
 			if (graph.getSplit(e) == rootSplit) // is added  split
 				line.setStroke(Color.GRAY);
+
 			edgesGroup.getChildren().add(line);
 
 			var split = graph.getSplit(e);

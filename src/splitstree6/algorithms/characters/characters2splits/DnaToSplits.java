@@ -145,7 +145,7 @@ public class DnaToSplits extends Characters2Splits {
         }
 
         // add all missing trivial
-        computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax()));
+        computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), 0.0));
 
         if (isOptionHighDimensionFilter()) {
             DimensionFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
