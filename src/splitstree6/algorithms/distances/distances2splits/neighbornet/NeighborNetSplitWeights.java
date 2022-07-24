@@ -84,13 +84,13 @@ public class NeighborNetSplitWeights {
 			return splits;
 		}
 
-		//Set up square array of distances
+		//Set up square array of distances indexed 1..n in order of the cycle
 		var d = new double[n + 1][n + 1];
 		for (var i = 1; i <= n; i++)
 			for (var j = i + 1; j <= n; j++)
 				d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1];
 
-		var x = new double[n + 1][n + 1];
+		var x = new double[n + 1][n + 1]; //array of split weights
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
 			activeSetST4(x, d, progress);  //ST4 Algorithm
@@ -109,8 +109,8 @@ public class NeighborNetSplitWeights {
 			}
 		}
 
+		//Construct the corresponding set of weighted splits
 		final var splitList = new ArrayList<ASplit>();
-
 		var cutoff = params.tolerance / 10;
 		for (var i = 1; i <= n; i++) {
 			final var A = new BitSet();
@@ -121,9 +121,9 @@ public class NeighborNetSplitWeights {
 				}
 			}
 		}
-		System.err.printf("Total time: %.1f seconds%n", (System.currentTimeMillis() - startTime) / 1000.0);
+		System.err.printf("Total time: %.3f seconds%n", (System.currentTimeMillis() - startTime) / 1000.0);
 		System.err.println("countCalls: " + countCalls);
-		System.err.printf("timeCalls:  %.1f seconds%n", timeCalls / 1000.0);
+		System.err.printf("timeCalls:  %.3f seconds%n", timeCalls / 1000.0);
 
 		return splitList;
 	}
@@ -147,7 +147,7 @@ public class NeighborNetSplitWeights {
 			fx_old = fx;
 			progress.checkForCancel();
 		}
-		NotificationManager.showError("Neighbor-net algorithm failed to converge");
+		NotificationManager.showError("Neighbor-net projected CG algorithm failed to converge");
 	}
 
 
@@ -157,7 +157,8 @@ public class NeighborNetSplitWeights {
 	 * Minimizes ||Ax - d|| subject to the constraint that x_ij = 0 whenever activeSet[i][j] = true.
 	 * <p>
 	 * Uses at most n iterations of the conjugate gradient algorithm for normal equations (cf CGNR in Saad's book)
-	 * When that converges, or when all iterations are completed,
+	 * When that converges, or when all iterations are completed, and collapseMultiple is selected, then
+	 * a proportion of negative weight splits are added to the active set and CGNR starts up again.
 	 * (1) if projectedMin is true, considers points along the projection of the line segment connecting the
 	 * initial value of x and the result of the CG, where the 'projection' of a vector xt is just obtained
 	 * by setting xt[i][j]=0 whenever xt[i][j]<0, otherwise
@@ -348,59 +349,6 @@ public class NeighborNetSplitWeights {
 		}
 	}
 
-	/**
-	 * Minimizes ||Ax-b|| along the projection of the line segment between x0 and x, where the projection of a point
-	 * is the closest point in the non-negative quadrant.
-	 *
-	 * @param x         square array   final point, overwritten by optimal point
-	 * @param x0        square array  initial point
-	 * @param d         square array of distances
-	 * @param tolerance tolerance used for golden section search
-	 */
-	static private double goldenProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
-		//Minimize ||A \pi((1-t)x0 + tx) - d||  for t in [0,1]
-		var C = (3 - sqrt(5)) / 2.0;
-		var R = 1.0 - C;
-
-		var t0 = 0.0;
-		var t1 = C;
-		var t2 = C + C * (1 - C);
-		var t3 = 1.0;
-		var f1 = f.evalfprojected(t1, x0, x, d);
-		var f2 = f.evalfprojected(t2, x0, x, d);
-
-		while (abs(t3 - t0) > tolerance) {
-			if (f2 < f1) {
-				t0 = t1;
-				t1 = t2;
-				t2 = R * t1 + C * t3;
-				f1 = f2;
-				f2 = f.evalfprojected(t2, x0, x, d);
-			} else {
-				t3 = t2;
-				t2 = t1;
-				t1 = R * t2 + C * t0;
-				f2 = f1;
-				f1 = f.evalfprojected(t1, x0, x, d);
-			}
-		}
-		var tmin = t1;
-		if (f2 < f1)
-			tmin = t2;
-		else if (t0 == 0) {  //Handle a special case so that if minimum is at the boundary t=0 then this is exactly what is returned
-			var f0 = f.evalfprojected(t0, x0, x, d);
-			if (f0 < f1)
-				tmin = t0;
-		}
-		var n = x.length - 1;
-		for (var i = 1; i <= n; i++) {
-			for (var j = i + 1; j <= n; j++) {
-				var newx_ij = max((1 - tmin) * x0[i][j] + tmin * x[i][j], 0);
-				x[i][j] = x[j][i] = newx_ij;
-			}
-		}
-		return tmin;
-	}
 
 	/**
 	 * Minimizes ||Ax-b|| along the projection of the line segment between x0 and x, where the projection of a point
@@ -442,7 +390,7 @@ public class NeighborNetSplitWeights {
 		var n = x.length - 1;
 
 		for (var i = 1; i <= n; i++) {
-			for (var j = 1; j <= n; j++) {
+			for (var j = i+1; j <= n; j++) {
 				if (x[i][j] < 0) {
 					var t_ij = x0[i][j] / (x0[i][j] - x[i][j]);
 					tmin = min(tmin, t_ij);
@@ -564,6 +512,7 @@ public class NeighborNetSplitWeights {
 	 * checkKKT
 	 * <p>
 	 * Checks the KKT conditions, under the assumption that x is optimal for the current active set.
+	 * If not optimal, elements are removed from the activeSet.
 	 *
 	 * @param x         square array. point x
 	 * @param d         square array of distances, used to compute graient.
