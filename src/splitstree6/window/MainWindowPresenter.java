@@ -23,6 +23,7 @@ package splitstree6.window;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
@@ -230,19 +231,28 @@ public class MainWindowPresenter {
 
 		controller.getNewMenuItem().setOnAction(e -> MainWindowManager.getInstance().createAndShowWindow(false));
 
+		var loadingFile = new SimpleBooleanProperty(this, "loadingFile", false);
+
 		controller.getOpenButton().setOnAction(e -> {
-			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
-			final var fileChooser = new FileChooser();
+			var previousDir = new File(ProgramProperties.get("InputDir", ""));
+			var fileChooser = new FileChooser();
 			if (previousDir.isDirectory())
 				fileChooser.setInitialDirectory(previousDir);
 			fileChooser.setTitle("Open input file");
 			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
-			final var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
+			var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
 			if (selectedFile != null) {
-				FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
+				if (!loadingFile.get()) {
+					try {
+						loadingFile.set(true);
+						FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
+					} finally {
+						loadingFile.set(false);
+					}
+				}
 			}
 		});
-		controller.getOpenButton().disableProperty().bind(workflow.runningProperty());
+		controller.getOpenButton().disableProperty().bind(workflow.runningProperty().or(loadingFile));
 
 		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(workflow.runningProperty());

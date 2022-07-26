@@ -26,7 +26,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
-import splitstree6.layout.tree.TreeDiagramType;
+import jloda.fx.util.ResourceManagerFX;
 
 public class DensiTreeViewController {
 
@@ -47,9 +47,6 @@ public class DensiTreeViewController {
 
 	@FXML
 	private Button decreaseFontButton;
-
-	@FXML
-	private ComboBox<TreeDiagramType> diagramCBox;
 
 	@FXML
 	private Button expandHorizontallyButton;
@@ -73,12 +70,6 @@ public class DensiTreeViewController {
 	private AnchorPane innerAnchorPane;
 
 	@FXML
-	private ToggleButton jitterToggleButton;
-
-	@FXML
-	private ToggleButton antiConsensusToggleBox;
-
-	@FXML
 	private AnchorPane outerAnchorPane;
 
 	@FXML
@@ -97,8 +88,49 @@ public class DensiTreeViewController {
 	private Pane mainPane;
 
 	@FXML
+	private CheckMenuItem showConsensusTreeMenuItem;
+
+	@FXML
+	private RadioMenuItem trianglePhylogramToggleItem;
+
+	@FXML
+	private RadioMenuItem radialPhylogramToggleItem;
+
+	@FXML
+	private RadioMenuItem rectangularPhylogramToggleItem;
+
+	@FXML
+	private RadioMenuItem roundedPhylogramToggleItem;
+
+	@FXML
+	private MenuButton menuButton;
+
+	@FXML
+	private CheckMenuItem jitterMenuItem;
+
+	@FXML
+	private CheckMenuItem colorIncompatibleTreesMenuItem;
+
+	private final ToggleGroup toggleGroup = new ToggleGroup();
+
+	@FXML
 	private void initialize() {
 		centerPane.getStyleClass().add("viewer-background");
+
+		toggleGroup.getToggles().addAll(trianglePhylogramToggleItem, radialPhylogramToggleItem, rectangularPhylogramToggleItem, roundedPhylogramToggleItem);
+		trianglePhylogramToggleItem.selectedProperty().addListener((v, o, n) -> {
+			if (n) {
+				menuButton.setText(trianglePhylogramToggleItem.getText());
+				menuButton.setGraphic(ResourceManagerFX.getIconAsImageView("TriangularCladogram16.gif", 16));
+			}
+		});
+		radialPhylogramToggleItem.selectedProperty().addListener((v, o, n) -> {
+			if (n) {
+				menuButton.setText(radialPhylogramToggleItem.getText());
+				menuButton.setGraphic(ResourceManagerFX.getIconAsImageView("RadialPhylogram16.gif", 16));
+			}
+		});
+		toggleGroup.selectToggle(trianglePhylogramToggleItem);
 
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);
@@ -120,7 +152,6 @@ public class DensiTreeViewController {
 
 		DraggableLabel.makeDraggable(formatVBox);
 	}
-
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -144,10 +175,6 @@ public class DensiTreeViewController {
 
 	public Button getDecreaseFontButton() {
 		return decreaseFontButton;
-	}
-
-	public ComboBox<TreeDiagramType> getDiagramCBox() {
-		return diagramCBox;
 	}
 
 	public Button getExpandHorizontallyButton() {
@@ -178,14 +205,6 @@ public class DensiTreeViewController {
 		return innerAnchorPane;
 	}
 
-	public ToggleButton getJitterToggleButton() {
-		return jitterToggleButton;
-	}
-
-	public ToggleButton getAntiConsensusToggleBox() {
-		return antiConsensusToggleBox;
-	}
-
 	public AnchorPane getOuterAnchorPane() {
 		return outerAnchorPane;
 	}
@@ -208,5 +227,41 @@ public class DensiTreeViewController {
 
 	public Pane getMainPane() {
 		return mainPane;
+	}
+
+	public CheckMenuItem getShowConsensusTreeMenuItem() {
+		return showConsensusTreeMenuItem;
+	}
+
+	public RadioMenuItem getTrianglePhylogramToggleItem() {
+		return trianglePhylogramToggleItem;
+	}
+
+	public RadioMenuItem getRadialPhylogramToggleItem() {
+		return radialPhylogramToggleItem;
+	}
+
+	public RadioMenuItem getRectangularPhylogramToggleItem() {
+		return rectangularPhylogramToggleItem;
+	}
+
+	public RadioMenuItem getRoundedPhylogramToggleItem() {
+		return roundedPhylogramToggleItem;
+	}
+
+	public ToggleGroup getToggleGroup() {
+		return toggleGroup;
+	}
+
+	public MenuButton getMenuButton() {
+		return menuButton;
+	}
+
+	public CheckMenuItem getJitterMenuItem() {
+		return jitterMenuItem;
+	}
+
+	public CheckMenuItem getColorIncompatibleTreesMenuItem() {
+		return colorIncompatibleTreesMenuItem;
 	}
 }

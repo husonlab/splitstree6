@@ -23,6 +23,8 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
+import javafx.collections.SetChangeListener;
+import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
@@ -30,9 +32,11 @@ import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
+import splitstree6.data.parts.Taxon;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
@@ -59,6 +63,20 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 	private final InteractionSetup interactionSetup;
 
+	private final SetChangeListener<Taxon> selectionChangeListener;
+
+
+	/**
+	 * the network view presenter
+	 *
+	 * @param mainWindow
+	 * @param networkView
+	 * @param targetBounds
+	 * @param networkBlock
+	 * @param taxonLabelMap
+	 * @param nodeShapeMap
+	 * @param edgeShapeMap
+	 */
 	public NetworkViewPresenter(MainWindow mainWindow, NetworkView networkView, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 								ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap) {
 		this.mainWindow = mainWindow;
@@ -157,6 +175,20 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		networkView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", networkView.optionOrientationProperty(), o, n));
 		networkView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", networkView.optionFontScaleFactorProperty(), o, n));
 		networkView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", networkView.optionZoomFactorProperty(), o, n));
+
+		var object = new Object();
+		selectionChangeListener = e -> {
+			if (e.wasAdded()) {
+				RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(object, () -> {
+					var taxon = e.getElementAdded();
+					var v = networkBlock.get().getGraph().getTaxon2Node(mainWindow.getWorkingTaxa().indexOf(taxon));
+					var node = nodeShapeMap.get(v);
+					controller.getScrollPane().ensureVisible(node);
+				});
+			}
+		};
+		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
+
 
 		Platform.runLater(this::setupMenuItems);
 	}

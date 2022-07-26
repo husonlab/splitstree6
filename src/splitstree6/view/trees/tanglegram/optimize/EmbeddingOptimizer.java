@@ -61,8 +61,7 @@ public class EmbeddingOptimizer {
 	}
 
 	/**
-	 * update the embedding algorithm to a whole set of trees
-	 *
+	 * apply the embedding algorithm to a whole set of trees
 	 */
     public static void apply(PhyloTree[] trees, ProgressListener progressListener, boolean shortestPath, boolean useFastAlignmentHeuristic) throws CanceledException {
             progressListener.setTasks("Computing embedding", "optimizing");

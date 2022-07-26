@@ -51,22 +51,63 @@
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
-                    <ComboBox fx:id="diagramCBox">
-                        <tooltip>
-                            <Tooltip text="Choose diagram type"/>
-                        </tooltip>
-                    </ComboBox>
+                    <MenuButton fx:id="menuButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
+                                prefWidth="45.0" text="DensiTree">
+                        <items>
+                            <RadioMenuItem fx:id="trianglePhylogramToggleItem" mnemonicParsing="false"
+                                           text="TriangularPhylogram">
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <image>
+                                            <Image url="@/splitstree6/resources/icons/TriangularCladogram16.gif"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </RadioMenuItem>
+                            <RadioMenuItem fx:id="rectangularPhylogramToggleItem" mnemonicParsing="false"
+                                           text="RectangularPhylogram">
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <image>
+                                            <Image url="@/splitstree6/resources/icons/RectangularPhylogram16.gif"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </RadioMenuItem>
+                            <RadioMenuItem fx:id="roundedPhylogramToggleItem" mnemonicParsing="false"
+                                           text="RoundedPhylogram">
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <image>
+                                            <Image url="@/splitstree6/resources/icons/RoundedPhylogram16.gif"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </RadioMenuItem>
+                            <RadioMenuItem fx:id="radialPhylogramToggleItem" mnemonicParsing="false"
+                                           text="RadialPhylogram">
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <image>
+                                            <Image url="@/splitstree6/resources/icons/RadialPhylogram16.gif"/>
+                                        </image>
+                                    </ImageView>
+                                </graphic>
+                            </RadioMenuItem>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
+                            <CheckMenuItem fx:id="colorIncompatibleTreesMenuItem" mnemonicParsing="false"
+                                           text="Color Incompatible Edges"/>
+                            <CheckMenuItem fx:id="showConsensusTreeMenuItem" mnemonicParsing="false"
+                                           text="Show Consensus Tree"/>
+                            <CheckMenuItem fx:id="jitterMenuItem" mnemonicParsing="false" text="Jitter"/>
+                        </items>
+                    </MenuButton>
                     <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
-                    <ToggleButton fx:id="jitterToggleButton" mnemonicParsing="false" text="Jitter"/>
-                    <ToggleButton fx:id="antiConsensusToggleBox" layoutX="111.0" layoutY="16.0" mnemonicParsing="false"
-                                  text="Anti-Consensus">
-                        <tooltip>
-                            <Tooltip text="Show only trees that disagree with the consensus tree"/>
-                        </tooltip>
-                    </ToggleButton>
-
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
 
                     <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                             minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
