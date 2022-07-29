@@ -23,10 +23,7 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
-import javafx.collections.ObservableSet;
+import javafx.collections.*;
 import javafx.geometry.Bounds;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -49,6 +46,7 @@ import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.data.parts.Taxon;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
@@ -86,7 +84,20 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final SplitNetworkPane splitNetworkPane;
 
+	private final SetChangeListener<Taxon> selectionChangeListener;
 
+	/**
+	 * the splits view presenter
+	 *
+	 * @param mainWindow
+	 * @param splitsView
+	 * @param targetBounds
+	 * @param splitsBlock
+	 * @param taxonLabelMap
+	 * @param nodeLabeledShapeMap
+	 * @param splitShapeMap
+	 * @param loopViews
+	 */
 	public SplitsViewPresenter(MainWindow mainWindow, SplitsView splitsView, ObjectProperty<Bounds> targetBounds, ObjectProperty<SplitsBlock> splitsBlock,
 							   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeLabeledShapeMap,
 							   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
@@ -188,6 +199,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			paneHeight.set(n.getHeight() - 80);
 		});
 
+
 		splitNetworkPane = new SplitNetworkPane(mainWindow, mainWindow.workingTaxaProperty(), splitsBlock, mainWindow.getTaxonSelectionModel(),
 				splitsView.getSplitSelectionModel(), paneWidth, paneHeight, splitsView.optionDiagramProperty(), splitsView.optionOrientationProperty(),
 				splitsView.optionRootingProperty(), splitsView.optionRootAngleProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),
@@ -284,6 +296,18 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		splitsView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", splitsView.optionOrientationProperty(), o, n));
 		splitsView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", splitsView.optionFontScaleFactorProperty(), o, n));
 		splitsView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", splitsView.optionZoomFactorProperty(), o, n));
+
+		var object = new Object();
+		selectionChangeListener = e -> {
+			if (e.wasAdded()) {
+				RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(object, () -> {
+					var taxon = e.getElementAdded();
+					var node = taxonLabelMap.get(mainWindow.getWorkingTaxa().indexOf(taxon));
+					controller.getScrollPane().ensureVisible(node);
+				});
+			}
+		};
+		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
 		Platform.runLater(this::setupMenuItems);
 	}

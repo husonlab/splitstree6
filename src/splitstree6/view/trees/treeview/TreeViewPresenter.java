@@ -25,6 +25,8 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
+import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -43,6 +45,7 @@ import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
+import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
@@ -80,6 +83,15 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
+	private final SetChangeListener<Taxon> selectionChangeListener;
+
+	/**
+	 * the tree view presenter
+	 *
+	 * @param mainWindow
+	 * @param view
+	 * @param targetBounds
+	 */
 	public TreeViewPresenter(MainWindow mainWindow, TreeView view, ObjectProperty<Bounds> targetBounds) {
 		this.mainWindow = mainWindow;
 		this.view = view;
@@ -367,6 +379,20 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		view.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("vertical zoom", view.optionVerticalZoomFactorProperty(), o, n));
 		// treeView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("show tree names", treeView.optionShowTreeNamesProperty(), o, n));
 		// treeView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", treeView.optionShowTreeInfoProperty(), o, n));
+
+		var object = new Object();
+		selectionChangeListener = e -> {
+			if (e.wasAdded()) {
+				RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(object, () -> {
+					var taxon = e.getElementAdded();
+					var v = tree.get().getTaxon2Node(mainWindow.getWorkingTaxa().indexOf(taxon));
+					var node = view.getNodeShapeMap().get(v);
+					controller.getScrollPane().ensureVisible(node);
+				});
+			}
+
+		};
+		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);

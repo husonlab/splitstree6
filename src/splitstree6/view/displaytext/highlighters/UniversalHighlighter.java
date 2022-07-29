@@ -31,23 +31,28 @@ import java.util.regex.Pattern;
  * Daria Evseeva, 2019
  */
 public class UniversalHighlighter implements Highlighter.IHighlighter {
-    private static final String PAREN_PATTERN = "[()]";
-    private static final String BRACE_PATTERN = "[{}]";
-    private static final String COMMENT_PATTERN = "#[^\n]*";
-    private static final String FASTA_COMMENT_PATTERN = ";[^\n]*";
-    private static final String FASTA_PATTERN = ">[^\n]*";
-    private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
-    private static final String NUMBER_PATTERN = "-?\\d+(\\.\\d+)?(E-?\\d+)?(E\\+?\\d+)?(E?\\d+)?(e-?\\d+)?(e\\+?\\d+)?(e?\\d+)?";
+	private static final String PAREN_PATTERN = "[()]";
+	private static final String BRACE_PATTERN = "[{}]";
+	private static final String COMMENT_PATTERN = "(^|\\n)\\s*#[^\n]*";
+	private static final String HEADING_PATTERN = "(^|\\n)[\\pL\\s]*:(\n|$)";
+	private static final String FASTA_COMMENT_PATTERN = "(^|\\n);[^\n]*";
+	private static final String FASTA_PATTERN = "(^|\\n)>[^\n]*";
+	private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
+	private static final String NUMBER_PATTERN = "\\b-?\\d+(\\.\\d+)?(E-?\\d+)?(E\\+?\\d+)?(E?\\d+)?(e-?\\d+)?(e\\+?\\d+)?(e?\\d+)?";
+	private static final String URL_PATTERN = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]\\b";
 
-    private static final Pattern PATTERN = Pattern.compile(
-            "(?<PAREN>" + PAREN_PATTERN + ")"
-            + "|(?<BRACE>" + BRACE_PATTERN + ")"
-            + "|(?<STRING>" + STRING_PATTERN + ")"
-            + "|(?<FASTACOMMENT>" + FASTA_COMMENT_PATTERN + ")"
-            + "|(?<FASTA>" + FASTA_PATTERN + ")"
-            + "|(?<COMMENT>" + COMMENT_PATTERN + ")"
-            + "|(?<NUMBER>" + NUMBER_PATTERN + ")"
-    );
+	private static final Pattern PATTERN = Pattern.compile(
+			"(?<PAREN>" + PAREN_PATTERN + ")"
+			+ "|(?<BRACE>" + BRACE_PATTERN + ")"
+			+ "|(?<STRING>" + STRING_PATTERN + ")"
+			+ "|(?<FASTACOMMENT>" + FASTA_COMMENT_PATTERN + ")"
+			+ "|(?<FASTA>" + FASTA_PATTERN + ")"
+			+ "|(?<COMMENT>" + COMMENT_PATTERN + ")"
+			+ "|(?<NUMBER>" + NUMBER_PATTERN + ")"
+			+ "|(?<URL>" + URL_PATTERN + ")"
+			+ "|(?<HEADING>" + HEADING_PATTERN + ")"
+
+	);
 
     @Override
     public StyleSpans<Collection<String>> computeHighlighting(String text) {
@@ -57,16 +62,19 @@ public class UniversalHighlighter implements Highlighter.IHighlighter {
                 = new StyleSpansBuilder<>();
 
         while (matcher.find()) {
-            var styleClass = matcher.group("NUMBER") != null ? "number" :
-                    matcher.group("PAREN") != null ? "paren" :
-                            matcher.group("BRACE") != null ? "brace" :
-                                    matcher.group("STRING") != null ? "string" :
-                                            matcher.group("COMMENT") != null ? "comment" :
-                                                    matcher.group("FASTACOMMENT") != null ? "fasta-comment" :
-                                                            matcher.group("FASTA") != null ? "fasta" :
-                                                                    null; /* never happens */
-            assert styleClass != null;
-            spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
+			var styleClass =
+					matcher.group("URL") != null ? "url" :
+							matcher.group("NUMBER") != null ? "number" :
+									matcher.group("PAREN") != null ? "paren" :
+											matcher.group("BRACE") != null ? "brace" :
+													matcher.group("HEADING") != null ? "heading" :
+															matcher.group("STRING") != null ? "string" :
+																	matcher.group("COMMENT") != null ? "comment" :
+																			matcher.group("FASTACOMMENT") != null ? "fasta-comment" :
+																					matcher.group("FASTA") != null ? "fasta" :
+																							null; /* never happens */
+			assert styleClass != null;
+			spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
             spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
             lastKwEnd = matcher.end();
         }

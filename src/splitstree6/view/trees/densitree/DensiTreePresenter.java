@@ -25,6 +25,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Bounds;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -36,7 +37,6 @@ import jloda.util.StringUtils;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
-import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -57,15 +57,34 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		this.controller = view.getController();
 		this.drawer = new DensiTreeDrawer(mainWindow);
 
-		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, TreeDiagramType::createNode));
-		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, TreeDiagramType::createNode));
-		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.RadialPhylogram, TreeDiagramType.TriangularCladogram);
-		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
+		controller.getRadialPhylogramToggleItem().setUserData(TreeDiagramType.RadialPhylogram);
+		controller.getTrianglePhylogramToggleItem().setUserData(TreeDiagramType.TriangularCladogram);
+		controller.getRadialPhylogramToggleItem().setUserData(TreeDiagramType.RadialPhylogram);
+		controller.getRadialPhylogramToggleItem().setUserData(TreeDiagramType.RadialPhylogram);
+
+		controller.getToggleGroup().selectedToggleProperty().addListener((v, o, n) -> {
+			if (n instanceof RadioMenuItem radioMenuItem) {
+				view.setOptionDiagram(DensiTreeDiagramType.valueOf(radioMenuItem.getText()));
+				controller.getMenuButton().setGraphic(view.getOptionDiagram().createNode());
+			}
+		});
+		view.optionDiagramProperty().addListener((v, o, n) -> {
+			for (var toggle : controller.getToggleGroup().getToggles()) {
+				if (toggle instanceof RadioMenuItem radioMenuItem) {
+					if (radioMenuItem.getText().equals(n.name())) {
+						controller.getToggleGroup().selectToggle(toggle);
+						return;
+					}
+				}
+			}
+		});
 
 		view.optionDiagramProperty().addListener(e -> {
 			view.setOptionHorizontalZoomFactor(1.0 / 1.2);
 			view.setOptionVerticalZoomFactor(1.0 / 1.2);
 		});
+
+		controller.getShowConsensusTreeMenuItem().selectedProperty().bindBidirectional(view.optionShowConsensusTreeProperty());
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.2 * view.getOptionHorizontalZoomFactor()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getOptionDiagram().isRadialOrCircular(), view.optionDiagramProperty()));
@@ -85,14 +104,15 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getJitterToggleButton().selectedProperty().bindBidirectional(view.optionJitterProperty());
+		controller.getJitterMenuItem().selectedProperty().bindBidirectional(view.optionJitterProperty());
 
-		controller.getAntiConsensusToggleBox().selectedProperty().bindBidirectional(view.optionAntiConsensusProperty());
+		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionAntiConsensusProperty());
 
 		InvalidationListener invalidationListener = e -> drawer.apply(targetBounds.get(),
 				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
 				view.isOptionAntiConsensus(),
-				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty());
+				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
+				view.optionShowConsensusTreeProperty());
 
 		targetBounds.addListener(invalidationListener);
 		view.optionDiagramProperty().addListener(invalidationListener);

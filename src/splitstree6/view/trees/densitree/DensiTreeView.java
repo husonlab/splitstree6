@@ -32,7 +32,6 @@ import jloda.fx.util.PrintUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.ProgramProperties;
 import splitstree6.layout.tree.LayoutOrientation;
-import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.selecttraits.SelectTraits;
@@ -58,7 +57,7 @@ public class DensiTreeView implements IView {
 
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
-	private final ObjectProperty<TreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", TreeDiagramType.RadialPhylogram);
+	private final ObjectProperty<DensiTreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", DensiTreeDiagramType.TriangularPhylogram);
 
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0 / 1.2);
@@ -67,19 +66,21 @@ public class DensiTreeView implements IView {
 
 	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", true);
 	private final BooleanProperty optionAntiConsensus = new SimpleBooleanProperty(this, "optionAntiConsensus", false);
+	private final BooleanProperty optionShowConsensusTree = new SimpleBooleanProperty(this, "optionShowConsensusTree", true);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	{
-		ProgramProperties.track(optionDiagram, TreeDiagramType::valueOf, TreeDiagramType.RadialPhylogram);
+		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
 		ProgramProperties.track(optionJitter, true);
-
+		ProgramProperties.track(optionAntiConsensus, false);
+		ProgramProperties.track(optionShowConsensusTree, true);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionJitter.getName(), optionAntiConsensus.getName());
+				optionFontScaleFactor.getName(), optionJitter.getName(), optionAntiConsensus.getName(), optionShowConsensusTree.getName());
 	}
 
 	public DensiTreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -188,15 +189,15 @@ public class DensiTreeView implements IView {
 		this.optionOrientation.set(optionOrientation);
 	}
 
-	public TreeDiagramType getOptionDiagram() {
+	public DensiTreeDiagramType getOptionDiagram() {
 		return optionDiagram.get();
 	}
 
-	public ObjectProperty<TreeDiagramType> optionDiagramProperty() {
+	public ObjectProperty<DensiTreeDiagramType> optionDiagramProperty() {
 		return optionDiagram;
 	}
 
-	public void setOptionDiagram(TreeDiagramType optionDiagram) {
+	public void setOptionDiagram(DensiTreeDiagramType optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
 	}
 
@@ -283,5 +284,17 @@ public class DensiTreeView implements IView {
 
 	public void setOptionAntiConsensus(boolean optionAntiConsensus) {
 		this.optionAntiConsensus.set(optionAntiConsensus);
+	}
+
+	public boolean isOptionShowConsensusTree() {
+		return optionShowConsensusTree.get();
+	}
+
+	public BooleanProperty optionShowConsensusTreeProperty() {
+		return optionShowConsensusTree;
+	}
+
+	public void setOptionShowConsensusTree(boolean optionShowConsensusTree) {
+		this.optionShowConsensusTree.set(optionShowConsensusTree);
 	}
 }

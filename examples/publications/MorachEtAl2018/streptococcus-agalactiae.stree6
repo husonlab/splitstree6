@@ -1,5 +1,13 @@
 #nexus [SplitsTree6]
 
+[!Data from: Morach M, Stephan R, Schmitt S, Ewers C, Zschöck M, Reyes-Velez J, Gilli U,
+Del Pilar Crespo-Ortiz M, Crumlish M, Gunturu R, Daubenberger CA, Ip M, Regli W, Johler S.
+Population structure and virulence gene profiles of Streptococcus
+agalactiae collected from different hosts worldwide.
+Eur J Clin Microbiol Infect Dis. 2018 Mar;37(3):527-536. doi: 10.1007/s10096-017-3146-x.,
+Figure 2]
+
+
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=9 nAlgorithms=5;
 PROGRAM version='SplitsTree6 Community Edition';

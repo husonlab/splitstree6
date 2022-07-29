@@ -111,7 +111,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		var splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
 
-
 		progress.setTasks("NNet", "post-analysis");
 
 		if (Compatibility.isCompatible(splits))
@@ -123,11 +122,11 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		splitsBlock.getSplits().addAll(splits);
 
-		if (true || !(progress instanceof ProgressSilent)) {
+		if (!(progress instanceof ProgressSilent)) {
 
 			var seconds = (System.currentTimeMillis() - start) / 1000.0;
 			if (seconds > 10)
-				System.err.printf("NNet time: %,.1fs%n", seconds);
+				System.err.printf("NNet time (%s): %,.1fs%n", getOptionInferenceAlgorithm().name(), seconds);
 		}
 	}
 

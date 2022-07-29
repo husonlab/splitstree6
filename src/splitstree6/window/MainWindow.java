@@ -147,7 +147,6 @@ public class MainWindow implements IMainWindow {
 		var scene = new Scene(root);
 
 		stage.setScene(scene);
-		;
 		scene.getStylesheets().add("jloda/resources/css/white_pane.css");
 
 		stage.titleProperty().addListener(e -> MainWindowManager.getInstance().fireChanged());

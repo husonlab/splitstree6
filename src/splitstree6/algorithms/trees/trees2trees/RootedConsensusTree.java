@@ -36,7 +36,7 @@ import java.util.*;
  * Daniel Huson, 2.2018
  */
 public class RootedConsensusTree extends Trees2Trees {
-	public enum Consensus {Majority, Strict}
+	public enum Consensus {Majority, Strict, Greedy}
 
 	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
 
@@ -62,6 +62,7 @@ public class RootedConsensusTree extends Trees2Trees {
 			child.getTrees().addAll(parent.getTrees());
 		else {
 			var tree = computeRootedConsensusTree(parent.getTrees(), getOptionConsensus());
+			tree.setName(getOptionConsensus().name());
 			child.getTrees().add(tree);
 		}
 	}
@@ -72,6 +73,7 @@ public class RootedConsensusTree extends Trees2Trees {
 	}
 
 	public static PhyloTree computeRootedConsensusTree(Collection<PhyloTree> trees, Consensus consensus) {
+
 		var clusterCountWeightMap = new HashMap<BitSet, Pair<Integer, Double>>();
 		for (var tree : trees) {
 			try (NodeArray<BitSet> nodeClusterMap = tree.newNodeArray()) {
@@ -94,12 +96,37 @@ public class RootedConsensusTree extends Trees2Trees {
 			}
 		}
 		var clusterWeightList = new ArrayList<Pair<BitSet, Double>>();
-		var threshold = (consensus == Consensus.Strict ? trees.size() - 1 : 0.5 * trees.size());
-		for (var cluster : clusterCountWeightMap.keySet()) {
-			if (clusterCountWeightMap.get(cluster).getFirst() > threshold)
-				clusterWeightList.add(new Pair<>(cluster, clusterCountWeightMap.get(cluster).getSecond() / trees.size()));
+		if (consensus == Consensus.Greedy) {
+			var list = new ArrayList<Pair<Integer, BitSet>>();
+			for (var entry : clusterCountWeightMap.entrySet()) {
+				list.add(new Pair<>(entry.getValue().getFirst(), entry.getKey()));
+			}
+			list.sort((a, b) -> {
+				if (a.getFirst() > b.getFirst())
+					return -1;
+				else if (a.getFirst() < b.getFirst())
+					return 1;
+				else
+					return BitSetUtils.compare(a.getSecond(), b.getSecond());
+			});
+			var selected = new HashSet<BitSet>();
+			for (var pair : list) {
+				var cluster = pair.getSecond();
+				if (isCompatibleWithAll(cluster, selected)) {
+					selected.add(cluster);
+					clusterWeightList.add(new Pair<>(cluster, clusterCountWeightMap.get(cluster).getSecond() / trees.size()));
+				}
+			}
+		} else {
+			var threshold = (consensus == Consensus.Strict ? trees.size() - 1 : 0.5 * trees.size());
+
+			for (var cluster : clusterCountWeightMap.keySet()) {
+				if (clusterCountWeightMap.get(cluster).getFirst() > threshold)
+					clusterWeightList.add(new Pair<>(cluster, clusterCountWeightMap.get(cluster).getSecond() / trees.size()));
+			}
 		}
 		clusterWeightList.sort((a, b) -> -Integer.compare(a.getFirst().cardinality(), b.getFirst().cardinality()));
+
 		var taxa = BitSetUtils.asBitSet(trees.iterator().next().getTaxa());
 		var tree = new PhyloTree();
 		try (NodeArray<BitSet> nodeClusterMap = tree.newNodeArray()) {
@@ -140,6 +167,14 @@ public class RootedConsensusTree extends Trees2Trees {
 			}
 		}
 		return tree;
+	}
+
+	public static boolean isCompatibleWithAll(BitSet a, HashSet<BitSet> clusters) {
+		for (var b : clusters) {
+			if (!(!a.intersects(b) || BitSetUtils.contains(a, b) || BitSetUtils.contains(b, a)))
+				return false;
+		}
+		return true;
 	}
 
 	public Consensus getOptionConsensus() {

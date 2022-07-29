@@ -24,10 +24,12 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.NumberUtils;
+import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -297,5 +299,24 @@ public class TreesUtilities {
 		}
 
 		return inducedTree;
+	}
+
+	public static DistancesBlock computeDistances(PhyloTree tree, DistancesBlock distances, boolean useWeights) {
+		if (distances == null)
+			distances = new DistancesBlock();
+		var splits = new ArrayList<ASplit>();
+		var taxa = BitSetUtils.asBitSet(tree.getTaxa());
+		computeSplits(taxa, tree, splits);
+		distances.setNtax(BitSetUtils.max(taxa));
+		for (var split : splits) {
+			for (var i : BitSetUtils.members(split.getA())) {
+				for (var j : BitSetUtils.members(split.getB())) {
+					var dist = distances.get(i, j) + (useWeights ? split.getWeight() : 1.0);
+					distances.set(i, j, dist);
+					distances.set(j, i, dist);
+				}
+			}
+		}
+		return distances;
 	}
 }
