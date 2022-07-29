@@ -28,6 +28,8 @@ public class IncrementalFitting {
     static public void incrementalFitting(double[][] x, double[][] d, double tol) {
         int n = d.length - 1; //ntax
         double[][] p = new double[n+1][n+1];
+        double[][] grad = new double[n+1][n+1];
+        double[][] res = new double[n+1][n+1];
 
         int[] s = maxDivergenceOrder(d);
         int[] cycle = new int[n+1]; //Circular ordering for taxa already placed - in increasing order
@@ -135,6 +137,21 @@ public class IncrementalFitting {
             for(int j=1;j<=r2;j++)
                 cycle[k-j+1]=cycle[k-j];
             cycle[r1+1]=sk;
+
+//            //We perform a round of projected gradient - this is intended to address cumulative numerical error.
+//            //TODO: Make this more efficient (if it works that is)
+//            //Assumption: rows and cols of res not in cycle are zero
+//            for(int i=1;i<=k;i++) {
+//                var si = cycle[i];
+//                for(int j=i+1;j<=k;j++) {
+//                    var sj = cycle[j];
+//                        res[si][sj] = res[sj][si] = p[si][sj]-d[si][sj];
+//                }
+//            }
+//            NeighborNetSplitWeights.calcAtx(res,grad);
+
+
+
 
 
 

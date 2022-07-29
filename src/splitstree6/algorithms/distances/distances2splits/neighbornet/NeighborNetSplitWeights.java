@@ -35,6 +35,7 @@ public class NeighborNetSplitWeights {
 		static public final int ACTIVE_SET = 1;
 		static public final int PROJECTEDGRAD = 2;
 		static public final int BLOCKPIVOT = 3;
+		static public final int SBB = 4;
 
 		//static public int
 
@@ -104,8 +105,18 @@ public class NeighborNetSplitWeights {
 					acceleratedProjectedGradientDescent(x, d, params, progress);
 				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT)
 					blockPivot(x, d, params, progress);
-				else
+				else if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION)
 					projectedConjugateGradient(x, d, params, progress);
+				else {
+					//Debugging: fill x with ones.
+					for(var i=1;i<=n;i++)
+						for(var j=i+1;j<=n;j++) {
+							x[i][j] = x[j][i] = 1.0;
+						}
+					params.tolerance = 1e-5;
+					params.outerIterations = 10000;
+					subspaceBB(x, d, params, progress);
+				}
 			}
 		}
 
@@ -462,7 +473,7 @@ public class NeighborNetSplitWeights {
 	 * @param x square array
 	 * @param p square array. Overwritten with result
 	 */
-	static private void calcAtx(double[][] x, double[][] p) {
+	static public void calcAtx(double[][] x, double[][] p) {
 		var n = x.length - 1;
 		//double[][] p = new double[n+1][n+1];
 
@@ -751,6 +762,92 @@ public class NeighborNetSplitWeights {
 		}
 	}
 
+	/**
+	 * implements subspaceBB algorithm, as described by D. Kim, S. Sra, I. S. Dhillon.
+	 * "A non-monotonic method for large-scale non-negative least squares."
+	 * Optimization Methods and Software, Jan. 2012
+	 *
+	 * @param x
+	 * @param d
+	 * @param params
+	 * @param progress
+	 * @throws CanceledException
+	 */
+	static private void subspaceBB(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+
+		var n = x.length-1;
+		var iter = 0;
+		double[][] grad = new double[n+1][n+1];
+		evalGradient(x,d,grad);
+		double[][] oldGrad = new double[n+1][n+1];
+		copyArray(grad,oldGrad);
+		double[][] Ag = new double[n+1][n+1]; //Scratch matrix used by computeBBstep
+		double[][] Ag2 = new double[n+1][n+1]; //Scratch matrix used by computeBBstep
+
+		while (true) {
+			iter++;
+			if (iter > params.outerIterations || checkTerminationBB(x,grad,params))
+				break;
+			double step = computeBBStep(x,grad,oldGrad, iter, Ag, Ag2);
+			for(var i=1;i<=n;i++)
+				for(var j=i+1;j<=n;j++) {
+					x[i][j] -= step * grad[i][j];
+					x[j][i] = x[i][j];
+				}
+			copyArray(grad,oldGrad);
+			evalGradient(x,d,grad);
+		}
+
+	}
+
+	static private boolean checkTerminationBB(double[][] x, double[][] grad, NNLSParams params) {
+
+		var n=x.length-1;
+
+		//Evaluate the norm of the projected gradient
+		var norm_pg = 0.0;
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
+				var g_ij = grad[i][j];
+				if (x[i][j] > 0 || g_ij<0)
+					norm_pg += g_ij * g_ij;
+			}
+		}
+		System.err.println("\t"+sqrt(norm_pg));
+		if (sqrt(norm_pg)<params.tolerance)
+			return true;
+		return false;
+	}
+
+	static double computeBBStep(double[][] x, double[][] grad, double[][] oldGrad, int iter, double[][] Ag, double[][] Ag2) {
+		var n=x.length-1;
+		double step;
+
+		for(var i=1;i<=n;i++) {
+			for(var j=i+1;j<=n;j++) {
+				if (x[i][j]==0 && grad[i][j] > 0)
+					oldGrad[i][j]=oldGrad[j][i]=0;
+			}
+		}
+
+		calcAx(oldGrad,Ag);
+		if (iter%2==0)
+			step = sumSquares(oldGrad) / sumSquares(Ag);
+		else {
+			double numer = sumSquares(Ag);
+			calcAtx(Ag,Ag2);
+			for(var i=1;i<=n;i++) {
+				for(var j=i+1;j<=n;j++) {
+					if (x[i][j]==0 && grad[i][j] > 0)
+						Ag2[i][j]=Ag2[j][i]=0;
+				}
+			}
+			step = numer/sumSquares(Ag2);
+		}
+		return step;
+	}
+
+
 	static private int numInfeasible(double[][] x, double[][] y, boolean[][] G, boolean[][] infeasible) {
 		var count = 0;
 		var n = x.length - 1;
@@ -765,6 +862,10 @@ public class NeighborNetSplitWeights {
 		}
 		return count;
 	}
+
+
+
+
 
 	/**
 	 * Compute the l-infinity norm of the gradient restricted to G.

@@ -93,7 +93,13 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.BlockPivot) {
 				params.cgIterations = Math.max(cycle.length,10);
 				params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.BLOCKPIVOT;
-		} else {//ST4 version
+		}
+//		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.SBB) {
+//			params.tolerance = 1e-3;
+//			params.outerIterations = 1000;
+//			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.SBB;
+//		}
+		else {//ST4 version
 			params.greedy = false;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
 			int n = cycle.length - 1;
