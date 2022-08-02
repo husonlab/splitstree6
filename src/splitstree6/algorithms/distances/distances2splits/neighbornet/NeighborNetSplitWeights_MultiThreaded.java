@@ -93,7 +93,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var x = new double[n + 1][n + 1];
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-			activeSetST4(x, d, progress);  //ST4 Algorithm
+			activeSetST4(x, d, null, progress);  //ST4 Algorithm
 		} else {
 			x = calcAinvx(d); //Check if unconstrained solution is feasible.
 			if (minArray(x) >= -params.tolerance)

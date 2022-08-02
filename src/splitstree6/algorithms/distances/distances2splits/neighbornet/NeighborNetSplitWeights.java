@@ -11,6 +11,7 @@ import org.apache.commons.math3.optim.univariate.SearchInterval;
 import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -50,6 +51,9 @@ public class NeighborNetSplitWeights {
 		public double fractionNegativeToKeep = 0.4; //Propostion of negative splits to collapse (ST4 only)
 		public double kktBound = tolerance / 100;
 		public boolean printConvergenceData = false;
+
+		public String logfile = null;
+		public PrintWriter log = null;
 	}
 
 	/**
@@ -69,7 +73,7 @@ public class NeighborNetSplitWeights {
 
 		var n = cycle.length - 1;  //Number of taxa
 
-		testIncremental(20);
+		//testIncremental(20);
 
 		//Handle cases for n<3 directly.
 		if (n == 1) {
@@ -95,7 +99,7 @@ public class NeighborNetSplitWeights {
 		var x = new double[n + 1][n + 1]; //array of split weights
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-			activeSetST4(x, d, progress);  //ST4 Algorithm
+			activeSetST4(x, d, params.log, progress);  //ST4 Algorithm
 		} else {
 			x = calcAinvx(d); //Check if unconstrained solution is feasible.
 			if (minArray(x) >= -params.tolerance)

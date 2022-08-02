@@ -33,6 +33,10 @@ import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Compatibility;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
@@ -107,9 +111,26 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.collapseMultiple = true;
 			params.fractionNegativeToKeep = 0.4;
 			params.useInsertionAlgorithm = false;
+			params.logfile = "ST4Convergence.m";
+
+		}
+
+		if (params.logfile!=null) {
+			try {
+				params.log = new PrintWriter(params.logfile);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 
 		var splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
+
+		if (params.logfile!=null) {
+			params.log.flush();
+			params.log.close();
+		}
+
+
 
 		progress.setTasks("NNet", "post-analysis");
 
