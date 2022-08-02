@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import static java.lang.Math.*;
+import static java.lang.Math.random;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitstree4.activeSetST4;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
@@ -68,7 +69,7 @@ public class NeighborNetSplitWeights {
 
 		var n = cycle.length - 1;  //Number of taxa
 
-		//testIncremental(n);
+		testIncremental(20);
 
 		//Handle cases for n<3 directly.
 		if (n == 1) {
@@ -100,7 +101,7 @@ public class NeighborNetSplitWeights {
 			if (minArray(x) >= -params.tolerance)
 				makeNegElementsZero(x); //Fix roundoff
 			else {
-				incrementalFitting(x, d, params.tolerance / 100);
+				incrementalFitting(x, d, params.tolerance / 100,true);
 				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD)
 					acceleratedProjectedGradientDescent(x, d, params, progress);
 				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT)
@@ -316,7 +317,7 @@ public class NeighborNetSplitWeights {
 			}
 	}
 
-	static private class NNLSFunctionObject {
+	static public class NNLSFunctionObject {
 		//Utility class for evaluating ||Ax - b|| without additional allocation.
 		private final double[][] xt;
 		private final double[][] Axt;
@@ -370,7 +371,7 @@ public class NeighborNetSplitWeights {
 	 * @param d         square array of distances
 	 * @param tolerance tolerance used for golden section search
 	 */
-	static private double brentProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
+	static public double brentProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
 		final UnivariateFunction fn = t -> f.evalfprojected(t, x0, x, d);
 
 		var optimizer = new BrentOptimizer(1e-10, tolerance);
@@ -426,7 +427,7 @@ public class NeighborNetSplitWeights {
 	 *          split {i,i+1,...,j-1} | rest.
 	 * @param d square array, overwritten with circular metric corresponding to these split weights.
 	 */
-	static private void calcAx(double[][] x, double[][] d) {
+	static public void calcAx(double[][] x, double[][] d) {
 		countCalls++;
 		var startTime = System.currentTimeMillis();
 		var n = x.length - 1;
@@ -900,7 +901,7 @@ public class NeighborNetSplitWeights {
 		var d = new double[n + 1][n + 1];
 		calcAx(x, d);
 		var x2 = new double[n + 1][n + 1];
-		incrementalFitting(x2, d, 1e-10);
+		incrementalFitting(x2, d, 1e-10,true);
 		var diff = 0.0;
 		int nmissedZero = 0;
 		int nfalseZero = 0;
@@ -918,7 +919,68 @@ public class NeighborNetSplitWeights {
 		}
 		System.err.println("Tested incremental fit on circular distance: err = " + diff);
 		if (diff > 0.1)
-			incrementalFitting(x2, d, 1e-10);
+			incrementalFitting(x2, d, 1e-10,true);
 		return diff;
 	}
+
+	static public void testAllMethods(double[][] d) {
+
+        /*
+        We test all the different approaches so far, searching for parameter values and algorithm choices which give
+        the fastest convergence.
+
+        STARTING VALUE
+        S1: Unconstrained optimum, projected back.
+        S2: All ones
+        S3: Compute S1, but replace weights with random values chosen uniformly from [0,T] where T is the mean norm of
+             a weight produced by 1.
+        S4: Incremental addition. (which options?)
+
+        ITERATIVE METHODS
+        Measures of error / convergence tests
+            L_infinity norm for projected gradient.
+            ||Ax-d||^2 / n(n-1)/2
+            Difference between consecutive values of x
+
+        We produce plots  or error vs running time in all cases.
+
+        METHODS:
+            Legacy method
+
+            Active set + CGNR   (parameters ...   )   [moving to feasible only]
+                Collapsing multiple edges
+                Max iterations for CGNR
+                Tolerance for CGNR
+            Gradient Projection + CGNR  (parameters)  [moving and projecting]
+                Max iterations for CGNR
+                Tolerance for CGNR
+            Block pivot
+                Max iterations for CGNR
+                Tolerance for CGNR
+                Rounding off
+
+            Projected Gradient
+
+            Accelerated projected gradient
+                alpha parameter
+
+            Subspace BB
+
+
+
+
+
+
+
+         */
+
+
+
+	}
+
+
+
+
+
+
 }
