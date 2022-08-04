@@ -93,13 +93,13 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var x = new double[n + 1][n + 1];
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-			activeSetST4(x, d, progress);  //ST4 Algorithm
+			activeSetST4(x, d, null, progress);  //ST4 Algorithm
 		} else {
 			x = calcAinvx(d); //Check if unconstrained solution is feasible.
 			if (minArray(x) >= -params.tolerance)
 				makeNegElementsZero(x); //Fix roundoff
 			else {
-				incrementalFitting(x, d, params.tolerance / 100);
+				incrementalFitting(x, d, params.tolerance / 100,true);
 				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD)
 					acceleratedProjectedGradientDescent(x, d, params, progress);
 				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT)
@@ -1018,7 +1018,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		double[][] d = new double[n + 1][n + 1];
 		calcAx(x, d);
 		double[][] x2 = new double[n + 1][n + 1];
-		incrementalFitting(x2, d, 1e-10);
+		incrementalFitting(x2, d, 1e-10,false);
 		double diff = 0.0;
 		int nmissedZero = 0;
 		int nfalseZero = 0;
@@ -1036,7 +1036,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		}
 		System.err.println("Tested incremental fit on circular distance: err = " + diff);
 		if (diff > 0.1)
-			incrementalFitting(x2, d, 1e-10);
+			incrementalFitting(x2, d, 1e-10,false);
 		return diff;
 	}
 }

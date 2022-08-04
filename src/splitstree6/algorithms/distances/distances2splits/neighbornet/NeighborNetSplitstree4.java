@@ -2,13 +2,26 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+
+import java.io.PrintWriter;
 import java.util.Arrays;
 
 public class NeighborNetSplitstree4 {
 
     private static final double CG_EPSILON = 0.0001;
 
-    static public void activeSetST4(double[][] xArray, double[][] distances, ProgressListener progress) throws CanceledException {
+    /**
+     * Compute split weights using the same active set algorithm used in Splitstree4.
+     *
+     * @param xArray  square array, overwritten with split weights
+     * @param distances  square array of distances
+     * @param log  PrintWriter - if non-null then matlab code for convergence plots is output
+     * @param progress  Progress listener - graphical indication to user that something is happening and permits cancellation
+     *                  TODO: Need to give some progress information if possible.
+     * @throws CanceledException   Thrown if user presses cancel in the progress box.
+     */
+
+    static public void activeSetST4(double[][] xArray, double[][] distances, PrintWriter log, ProgressListener progress) throws CanceledException {
 
         int ntax = distances.length-1;
         int npairs = (ntax * (ntax - 1)) / 2;
@@ -28,6 +41,9 @@ public class NeighborNetSplitstree4 {
             return;
         }
 
+
+
+
         /* Allocate memory for the "utility" vectors */
         double[] r = new double[npairs];
         double[] w = new double[npairs];
@@ -42,8 +58,20 @@ public class NeighborNetSplitstree4 {
 
         /* Allocate and compute Atd */
         double[] Atd = new double[npairs];
-
         calculateAtx(ntax, d, Atd);
+
+        long startTime =  System.currentTimeMillis();
+        if (log!=null) {
+            log.println("% Active Set ST4");
+            log.println("% \t Proportion Removed = 0.4");
+            log.println("% \t Max CG iterations = "+npairs);
+            log.println("% Convergence for CG is ||res|| < "+CG_EPSILON * Math.sqrt(norm(Atd)));
+            log.println("% Outer convergence condition grad > 0.0001 ");
+            log.println("% time \t ||res|| \t ||proj grad||\n\n");
+            log.println("ConvergenceST4 = [");
+        }
+
+
 
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
@@ -83,6 +111,34 @@ public class NeighborNetSplitstree4 {
                     active[min_i] = true; /* Add the first constraint met to the active set */
                     x[min_i] = 0.0; /* This fixes problems with round-off errors */
                 }
+
+                if (log!=null) {
+                    //Calculate the residual and projected gradient
+                    double[] res = new double[npairs];
+                    double[] grad = new double[npairs];
+                    calculateAb(ntax,old_x,res);
+                    double fx = 0.0;
+                    for(var i=0;i<npairs;i++) {
+                        res[i] -= d[i];
+                        fx += res[i]*res[i];
+                    }
+                    fx *= 0.5;
+                    calculateAtx(ntax,res,grad);
+                    double pgx = 0.0;
+                    for(var i=0;i<npairs;i++) {
+                        double grad_i = grad[i];
+                        if (old_x[i]==0)
+                            grad_i = Math.min(grad_i,0.0);
+                        pgx += grad_i*grad_i;
+                    }
+                    long timestamp = System.currentTimeMillis() - startTime;
+                    log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx));
+
+
+                }
+
+
+
                 progress.checkForCancel();
             }
 
@@ -117,7 +173,8 @@ public class NeighborNetSplitstree4 {
         }
 
 
-
+        if (log!=null)
+            log.println("];");
         convertLegacyVec2Array(x,xArray);
 
     }

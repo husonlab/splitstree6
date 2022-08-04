@@ -1,5 +1,14 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.univariate.BrentOptimizer;
+import org.apache.commons.math3.optim.univariate.SearchInterval;
+import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
+
+import java.util.Arrays;
+
 import static java.lang.Math.*;
 
 public class IncrementalFitting {
@@ -25,12 +34,20 @@ public class IncrementalFitting {
      * @param x  Square array, overwritten with the solution
      * @param tol    Tolerance in split weight error. Used to determine convergence of the golden section method.
      */
-    static public void incrementalFitting(double[][] x, double[][] d, double tol) {
+    static public void incrementalFitting(double[][] x, double[][] d, double tol, boolean search) {
         int n = d.length - 1; //ntax
         double[][] p = new double[n+1][n+1];
 
+        double[][] grad = new double[n+1][n+1];
+        double[][] res = new double[n+1][n+1];
+
+
         int[] s = maxDivergenceOrder(d);
         int[] cycle = new int[n+1]; //Circular ordering for taxa already placed - in increasing order
+
+        //At any iteration k, the only non-zero splits correspond to x[s_i]x[s_j] for i,j \leq and the
+        //only non-zero distances are p[s_i][s_j].
+        //
 
         //First two taxa
         int s1=s[1], s2 = s[2];
@@ -136,10 +153,73 @@ public class IncrementalFitting {
                 cycle[k-j+1]=cycle[k-j];
             cycle[r1+1]=sk;
 
+            System.err.println("Adding taxon "+sk);
+            if (false && search) {
+                //We carry out one iteration  of a steepest descent search
+                for(int i=1;i<=k;i++) {
+                    var si = cycle[i];
+                    for(int j=i+1;j<=k;j++) {
+                        var sj = cycle[j];
+                        res[si][sj] = res[sj][si] = p[si][sj]-d[si][sj];
+                    }
+                }
+                NeighborNetSplitWeights.calcAtx(res,grad);
 
+                final int kk = k;
+                final UnivariateFunction fn = t->insertionObjectiveFunction(t,x,grad,d,kk,cycle);
 
+                var optimizer = new BrentOptimizer(1e-10, 0.6); //TODO Add tolerance parameter
+
+                var result = optimizer.optimize(new MaxEval(20), new UnivariateObjectiveFunction(fn),
+                        GoalType.MINIMIZE, new SearchInterval(0, 1.0));
+
+                var tmin = result.getPoint();
+                for(int i=1;i<=k;i++) {
+                    var si = cycle[i];
+                    for(int j=i+1;j<=k;j++) {
+                        var sj = cycle[j];
+                        x[si][sj] = x[sj][si] = x[si][sj]-tmin*grad[si][sj];
+                    }
+                }
+                NeighborNetSplitWeights.calcAx(x,res);
+                for(int i=1;i<=k;i++) {
+                    var si = cycle[i];
+                    for(int j=i+1;j<=k;j++) {
+                        var sj = cycle[j];
+                        p[si][sj] = p[sj][si] = res[si][sj];
+                    }
+                }
+            }
         }
     }
+
+    static double insertionObjectiveFunction(double t,double[][] x, double[][] grad, double[][] d, int k,int[] cycle) {
+        var n = x.length-1;
+        double[][] xt = new double[n+1][n+1];
+        double[][] Ax = new double[n+1][n+1];
+        for(var i=1;i<=k;i++) {
+            var si = cycle[i];
+            for(var j=i+1;j<=k;j++) {
+                var sj = cycle[j];
+                xt[si][sj] = xt[sj][si] = max(x[si][sj] - t*grad[si][sj],0.0);
+            }
+        }
+        NeighborNetSplitWeights.calcAx(xt,Ax);
+        var fx = 0.0;
+        for(var i=1;i<=k;i++) {
+            var si = cycle[i];
+            for(var j=i+1;j<=k;j++) {
+                var sj = cycle[j];
+                var res = Ax[si][sj] - d[si][sj];
+                fx += 2.0 * res*res;
+            }
+        }
+        System.err.println("\t\tt="+t+"\tfx = "+fx);
+        return fx;
+    }
+
+
+
 
     /**
      * Computes an ordering of the taxa with the goal that for every k, the first k taxa should be far away from each
@@ -299,9 +379,10 @@ public class IncrementalFitting {
             private final double[] gammax;
 
             public ObjectiveFunction() {
-                m=r1+r2;
-                gammax = new double[m+1];
+                m = r1 + r2;
+                gammax = new double[m + 1];
             }
+
             public double eval(double x) {
                 for (int i = 1; i <= m; i++)   //Project onto box
                     gammax[i] = min(max((1 - x) * gamma0[i] + x * gamma1[i], 0.0), b[i]);
@@ -315,57 +396,86 @@ public class IncrementalFitting {
 
         }
 
-
-        int m = r1+r2;
-        double maxdiff = 0.0;
-
-        for(int i=1;i<=m;i++) {
-            maxdiff = max(maxdiff,abs(gamma0[i]-gamma1[i]));
-        }
-        if (maxdiff == 0.0) {
-            double[] gamma = new double[m + 1];
-            System.arraycopy(gamma0, 1, gamma, 1, m);
-            return gamma;
-        }
-
-
-        double C = (3.0 - sqrt(5))/2.0;
-        double R = 1.0 - C;
+        int m = r1 + r2;
         ObjectiveFunction f = new ObjectiveFunction();
-        double x0 = 0, x1=C, x2 = C + C*(1-C), x3 = 1;
+        final UnivariateFunction fn = x -> f.eval(x);
 
-        double f1 = f.eval(x1);
-        double f2 = f.eval(x2);
+        var optimizer = new BrentOptimizer(1e-10, tol);
+        var result = optimizer.optimize(new MaxEval(100), new UnivariateObjectiveFunction(fn),
+                GoalType.MINIMIZE, new SearchInterval(0, 1.0));
 
-        while(abs(x3-x0)>tol/maxdiff) {
-            if (f2<f1) {
-                x0 = x1;
-                x1 = x2;
-                x2 = R*x1 + C*x3;
-                f1 = f2;
-                f2 = f.eval(x2);
-            } else {
-                x3=x2;
-                x2 = x1;
-                x1 = R*x2 + C*x0;
-                f2=f1;
-                f1 = f.eval(x1);
-            }
-        }
-
-        double x=x2;
-        if (f1<f2)
-            x = x1;
-
-        double[] gamma = new double[m+1];
+        var x = result.getPoint();
+        double[] gamma = new double[m + 1];
         for (int i = 1; i <= m; i++) { //Project onto box {
             double g_i = (1 - x) * gamma0[i] + x * gamma1[i];
             g_i = min(max(g_i, 0.0), b[i]);
             gamma[i] = g_i;
         }
-
         return gamma;
     }
+//
+//
+//        var n = x.length - 1;
+//        for (var i = 1; i <= n; i++) {
+//            for (var j = i + 1; j <= n; j++) {
+//                var newx_ij = max((1 - tmin) * x0[i][j] + tmin * x[i][j], 0);
+//                x[i][j] = x[j][i] = newx_ij;
+//            }
+//        }
+//        return tmin;
+//
+//
+//        int m = r1+r2;
+//        double maxdiff = 0.0;
+//
+//        for(int i=1;i<=m;i++) {
+//            maxdiff = max(maxdiff,abs(gamma0[i]-gamma1[i]));
+//        }
+//        if (maxdiff == 0.0) {
+//            double[] gamma = new double[m + 1];
+//            System.arraycopy(gamma0, 1, gamma, 1, m);
+//            return gamma;
+//        }
+//
+//
+//        double C = (3.0 - sqrt(5))/2.0;
+//        double R = 1.0 - C;
+//        ObjectiveFunction f = new ObjectiveFunction();
+//        double x0 = 0, x1=C, x2 = C + C*(1-C), x3 = 1;
+//
+//        double f1 = f.eval(x1);
+//        double f2 = f.eval(x2);
+//
+//        while(abs(x3-x0)>tol/maxdiff) {
+//            if (f2<f1) {
+//                x0 = x1;
+//                x1 = x2;
+//                x2 = R*x1 + C*x3;
+//                f1 = f2;
+//                f2 = f.eval(x2);
+//            } else {
+//                x3=x2;
+//                x2 = x1;
+//                x1 = R*x2 + C*x0;
+//                f2=f1;
+//                f1 = f.eval(x1);
+//            }
+//        }
+//
+//        double x=x2;
+//        if (f1<f2)
+//            x = x1;
+//
+//        double[] gamma = new double[m+1];
+//        for (int i = 1; i <= m; i++) { //Project onto box {
+//            double g_i = (1 - x) * gamma0[i] + x * gamma1[i];
+//            g_i = min(max(g_i, 0.0), b[i]);
+//            gamma[i] = g_i;
+//        }
+//
+//        return gamma;
+//    }
+
 
 
 

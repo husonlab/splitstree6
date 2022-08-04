@@ -11,11 +11,13 @@ import org.apache.commons.math3.optim.univariate.SearchInterval;
 import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 
 import static java.lang.Math.*;
+import static java.lang.Math.random;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitstree4.activeSetST4;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
@@ -35,6 +37,7 @@ public class NeighborNetSplitWeights {
 		static public final int ACTIVE_SET = 1;
 		static public final int PROJECTEDGRAD = 2;
 		static public final int BLOCKPIVOT = 3;
+		static public final int SBB = 4;
 
 		//static public int
 
@@ -48,6 +51,9 @@ public class NeighborNetSplitWeights {
 		public double fractionNegativeToKeep = 0.4; //Propostion of negative splits to collapse (ST4 only)
 		public double kktBound = tolerance / 100;
 		public boolean printConvergenceData = false;
+
+		public String logfile = null;
+		public PrintWriter log = null;
 	}
 
 	/**
@@ -67,7 +73,7 @@ public class NeighborNetSplitWeights {
 
 		var n = cycle.length - 1;  //Number of taxa
 
-		//testIncremental(n);
+		//testIncremental(20);
 
 		//Handle cases for n<3 directly.
 		if (n == 1) {
@@ -93,19 +99,29 @@ public class NeighborNetSplitWeights {
 		var x = new double[n + 1][n + 1]; //array of split weights
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-			activeSetST4(x, d, progress);  //ST4 Algorithm
+			activeSetST4(x, d, params.log, progress);  //ST4 Algorithm
 		} else {
 			x = calcAinvx(d); //Check if unconstrained solution is feasible.
 			if (minArray(x) >= -params.tolerance)
 				makeNegElementsZero(x); //Fix roundoff
 			else {
-				incrementalFitting(x, d, params.tolerance / 100);
+				incrementalFitting(x, d, params.tolerance / 100,true);
 				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD)
 					acceleratedProjectedGradientDescent(x, d, params, progress);
 				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT)
 					blockPivot(x, d, params, progress);
-				else
+				else if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION)
 					projectedConjugateGradient(x, d, params, progress);
+				else {
+					//Debugging: fill x with ones.
+					for(var i=1;i<=n;i++)
+						for(var j=i+1;j<=n;j++) {
+							x[i][j] = x[j][i] = 1.0;
+						}
+					params.tolerance = 1e-5;
+					params.outerIterations = 10000;
+					subspaceBB(x, d, params, progress);
+				}
 			}
 		}
 
@@ -305,7 +321,7 @@ public class NeighborNetSplitWeights {
 			}
 	}
 
-	static private class NNLSFunctionObject {
+	static public class NNLSFunctionObject {
 		//Utility class for evaluating ||Ax - b|| without additional allocation.
 		private final double[][] xt;
 		private final double[][] Axt;
@@ -359,7 +375,7 @@ public class NeighborNetSplitWeights {
 	 * @param d         square array of distances
 	 * @param tolerance tolerance used for golden section search
 	 */
-	static private double brentProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
+	static public double brentProjection(double[][] x, double[][] x0, double[][] d, NNLSFunctionObject f, double tolerance) {
 		final UnivariateFunction fn = t -> f.evalfprojected(t, x0, x, d);
 
 		var optimizer = new BrentOptimizer(1e-10, tolerance);
@@ -415,7 +431,7 @@ public class NeighborNetSplitWeights {
 	 *          split {i,i+1,...,j-1} | rest.
 	 * @param d square array, overwritten with circular metric corresponding to these split weights.
 	 */
-	static private void calcAx(double[][] x, double[][] d) {
+	static public void calcAx(double[][] x, double[][] d) {
 		countCalls++;
 		var startTime = System.currentTimeMillis();
 		var n = x.length - 1;
@@ -462,7 +478,7 @@ public class NeighborNetSplitWeights {
 	 * @param x square array
 	 * @param p square array. Overwritten with result
 	 */
-	static private void calcAtx(double[][] x, double[][] p) {
+	static public void calcAtx(double[][] x, double[][] p) {
 		var n = x.length - 1;
 		//double[][] p = new double[n+1][n+1];
 
@@ -751,6 +767,92 @@ public class NeighborNetSplitWeights {
 		}
 	}
 
+	/**
+	 * implements subspaceBB algorithm, as described by D. Kim, S. Sra, I. S. Dhillon.
+	 * "A non-monotonic method for large-scale non-negative least squares."
+	 * Optimization Methods and Software, Jan. 2012
+	 *
+	 * @param x
+	 * @param d
+	 * @param params
+	 * @param progress
+	 * @throws CanceledException
+	 */
+	static private void subspaceBB(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+
+		var n = x.length-1;
+		var iter = 0;
+		double[][] grad = new double[n+1][n+1];
+		evalGradient(x,d,grad);
+		double[][] oldGrad = new double[n+1][n+1];
+		copyArray(grad,oldGrad);
+		double[][] Ag = new double[n+1][n+1]; //Scratch matrix used by computeBBstep
+		double[][] Ag2 = new double[n+1][n+1]; //Scratch matrix used by computeBBstep
+
+		while (true) {
+			iter++;
+			if (iter > params.outerIterations || checkTerminationBB(x,grad,params))
+				break;
+			double step = computeBBStep(x,grad,oldGrad, iter, Ag, Ag2);
+			for(var i=1;i<=n;i++)
+				for(var j=i+1;j<=n;j++) {
+					x[i][j] -= step * grad[i][j];
+					x[j][i] = x[i][j];
+				}
+			copyArray(grad,oldGrad);
+			evalGradient(x,d,grad);
+		}
+
+	}
+
+	static private boolean checkTerminationBB(double[][] x, double[][] grad, NNLSParams params) {
+
+		var n=x.length-1;
+
+		//Evaluate the norm of the projected gradient
+		var norm_pg = 0.0;
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
+				var g_ij = grad[i][j];
+				if (x[i][j] > 0 || g_ij<0)
+					norm_pg += g_ij * g_ij;
+			}
+		}
+		System.err.println("\t"+sqrt(norm_pg));
+		if (sqrt(norm_pg)<params.tolerance)
+			return true;
+		return false;
+	}
+
+	static double computeBBStep(double[][] x, double[][] grad, double[][] oldGrad, int iter, double[][] Ag, double[][] Ag2) {
+		var n=x.length-1;
+		double step;
+
+		for(var i=1;i<=n;i++) {
+			for(var j=i+1;j<=n;j++) {
+				if (x[i][j]==0 && grad[i][j] > 0)
+					oldGrad[i][j]=oldGrad[j][i]=0;
+			}
+		}
+
+		calcAx(oldGrad,Ag);
+		if (iter%2==0)
+			step = sumSquares(oldGrad) / sumSquares(Ag);
+		else {
+			double numer = sumSquares(Ag);
+			calcAtx(Ag,Ag2);
+			for(var i=1;i<=n;i++) {
+				for(var j=i+1;j<=n;j++) {
+					if (x[i][j]==0 && grad[i][j] > 0)
+						Ag2[i][j]=Ag2[j][i]=0;
+				}
+			}
+			step = numer/sumSquares(Ag2);
+		}
+		return step;
+	}
+
+
 	static private int numInfeasible(double[][] x, double[][] y, boolean[][] G, boolean[][] infeasible) {
 		var count = 0;
 		var n = x.length - 1;
@@ -765,6 +867,10 @@ public class NeighborNetSplitWeights {
 		}
 		return count;
 	}
+
+
+
+
 
 	/**
 	 * Compute the l-infinity norm of the gradient restricted to G.
@@ -799,7 +905,7 @@ public class NeighborNetSplitWeights {
 		var d = new double[n + 1][n + 1];
 		calcAx(x, d);
 		var x2 = new double[n + 1][n + 1];
-		incrementalFitting(x2, d, 1e-10);
+		incrementalFitting(x2, d, 1e-10,true);
 		var diff = 0.0;
 		int nmissedZero = 0;
 		int nfalseZero = 0;
@@ -817,7 +923,68 @@ public class NeighborNetSplitWeights {
 		}
 		System.err.println("Tested incremental fit on circular distance: err = " + diff);
 		if (diff > 0.1)
-			incrementalFitting(x2, d, 1e-10);
+			incrementalFitting(x2, d, 1e-10,true);
 		return diff;
 	}
+
+	static public void testAllMethods(double[][] d) {
+
+        /*
+        We test all the different approaches so far, searching for parameter values and algorithm choices which give
+        the fastest convergence.
+
+        STARTING VALUE
+        S1: Unconstrained optimum, projected back.
+        S2: All ones
+        S3: Compute S1, but replace weights with random values chosen uniformly from [0,T] where T is the mean norm of
+             a weight produced by 1.
+        S4: Incremental addition. (which options?)
+
+        ITERATIVE METHODS
+        Measures of error / convergence tests
+            L_infinity norm for projected gradient.
+            ||Ax-d||^2 / n(n-1)/2
+            Difference between consecutive values of x
+
+        We produce plots  or error vs running time in all cases.
+
+        METHODS:
+            Legacy method
+
+            Active set + CGNR   (parameters ...   )   [moving to feasible only]
+                Collapsing multiple edges
+                Max iterations for CGNR
+                Tolerance for CGNR
+            Gradient Projection + CGNR  (parameters)  [moving and projecting]
+                Max iterations for CGNR
+                Tolerance for CGNR
+            Block pivot
+                Max iterations for CGNR
+                Tolerance for CGNR
+                Rounding off
+
+            Projected Gradient
+
+            Accelerated projected gradient
+                alpha parameter
+
+            Subspace BB
+
+
+
+
+
+
+
+         */
+
+
+
+	}
+
+
+
+
+
+
 }
