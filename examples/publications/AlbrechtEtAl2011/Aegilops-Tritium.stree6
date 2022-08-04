@@ -11,14 +11,14 @@ Methods:
 Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 10 taxa and 2 trees.
 The Show Trees method was used (default options) so as to obtain a Tree View visualization (Dress & Huson 2004).
-The Autumn Algorithm method (Huson, and Linz 2018) was used (default options) so as to obtain 3 trees, network.
+The Autumn Algorithm method (Huson and Linz 2018) was used (default options) so as to obtain 3 trees, network.
 The Show Trees method was used (View=TreePages) so as to obtain a Tree Pages visualization (Huson et al 2012).
 
 References:
 Dress & Huson 2004: A.W.M. Dress and D.H. Huson, Constructing splits graphs, IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.
 Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
 Huson et al 2012: D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.
-Huson, and Linz 2018: D.H. Huson an S. Linz. Autumn Algorithm—Computation of Hybridization Networks for Realistic Phylogenetic Trees. IEEE/ACM Transactions on Computational Biology and Bioinformatics: 15:398-420, 2018.
+Huson and Linz 2018: D.H. Huson and S. Linz. Autumn Algorithm—Computation of Hybridization Networks for Realistic Phylogenetic Trees. IEEE/ACM Transactions on Computational Biology and Bioinformatics: 15:398-420, 2018.
 ]
 
 BEGIN TAXA;

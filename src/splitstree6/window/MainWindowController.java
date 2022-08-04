@@ -285,7 +285,7 @@ public class MainWindowController {
 	private MenuItem minSpanningTreeMenuItem;
 
 	@FXML
-	private MenuItem rerootTreesMenuItem;
+	private MenuItem rerootOrReorderTreesMenuItem;
 
 	@FXML
 	private MenuItem viewTreePagesMenuItem;
@@ -810,8 +810,8 @@ public class MainWindowController {
 		return minSpanningTreeMenuItem;
 	}
 
-	public MenuItem getRerootTreesMenuItem() {
-		return rerootTreesMenuItem;
+	public MenuItem getRerootOrReorderTreesMenuItem() {
+		return rerootOrReorderTreesMenuItem;
 	}
 
 	public MenuItem getViewTreePagesMenuItem() {

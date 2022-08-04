@@ -1,0 +1,16 @@
+Traits	Group	Subgroup
+nabak	south-west	south
+mesem	south-west	south
+timbe	south-west	west
+komba	south-west	west
+selepet	south-west	west
+ono	north-central	north
+kube	north-central	central
+tobo	north-central	central
+borong	north-central	central
+burum	north-central	central
+mindik	north-central	central
+kate	east	east
+mape	east	east
+dedua	east	east
+

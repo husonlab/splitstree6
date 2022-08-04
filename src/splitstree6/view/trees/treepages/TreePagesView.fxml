@@ -24,7 +24,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
-<AnchorPane fx:id="anchorPane" prefWidth="700.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane fx:id="anchorPane" prefWidth="700.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.treepages.TreePagesViewController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                 AnchorPane.topAnchor="0.0">
@@ -106,9 +106,9 @@
                                     <Tooltip text="Zoom out"/>
                                 </tooltip>
                             </Button>
-                            <Button fx:id="increaseFontButton" maxHeight="20.0"
-                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="A+">
+                            <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                                    prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    text="A+">
                                 <font>
                                     <Font size="11.0"/>
                                 </font>
@@ -116,9 +116,9 @@
                                     <Tooltip text="Increase font size"/>
                                 </tooltip>
                             </Button>
-                            <Button fx:id="decreaseFontButton" maxHeight="20.0"
-                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="A-">
+                            <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                                    prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    text="A-">
                                 <font>
                                     <Font size="11.0"/>
                                 </font>
@@ -142,8 +142,8 @@
                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                         <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
                     </Pane>
-                    <VBox fx:id="formatVBox" prefHeight="30.0" prefWidth="200.0" styleClass="context-menu"
-                          AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="2.0"/>
+                    <VBox fx:id="formatVBox" prefWidth="200.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"
+                          AnchorPane.topAnchor="2.0"/>
                 </children>
             </AnchorPane>
         </center>

@@ -359,7 +359,7 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="minSpanningTreeMenuItem" text="Minimum Spanning Tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="rerootTreesMenuItem" text="Reroot Or Ladderize Trees"/>
+                        <MenuItem fx:id="rerootOrReorderTreesMenuItem" text="Reroot Or Reorder Trees"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
                         <MenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>

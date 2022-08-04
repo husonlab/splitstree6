@@ -1,0 +1,14 @@
+Borong	<c "0x334db3ff">Borong
+Burum	<c "0xcc3333ff">Burum
+Dedua	<c "0x334db3ff">Dedua
+Kate	<c "0x334db3ff">Kate
+Komba	<c "0xcc3333ff">Komba
+Kube	<c "0x334db3ff">Kube
+Mape	<c "0x334db3ff">Mape
+Mesem	<c "0xcc3333ff">Mesem
+Mindik	<c "0xcc3333ff">Mindik
+Nabak	<c "0xcc3333ff">Nabak
+Ono	<c "0xcc3333ff">Ono
+Selepet	<c "0xcc3333ff">Selepet
+Timbe	<c "0xcc3333ff">Timbe
+Tobo	<c "0xcc3333ff">Tobo

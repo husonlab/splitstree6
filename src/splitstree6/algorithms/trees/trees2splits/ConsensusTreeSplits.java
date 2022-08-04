@@ -20,6 +20,7 @@
 package splitstree6.algorithms.trees.trees2splits;
 
 import javafx.beans.property.SimpleObjectProperty;
+import jloda.graph.algorithms.PQTree;
 import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
@@ -38,7 +39,7 @@ import java.util.List;
  * Daniel Huson, 2.2018
  */
 public class ConsensusTreeSplits extends Trees2Splits {
-	public enum Consensus {Strict, Majority, Greedy} // todo: add loose?
+	public enum Consensus {Strict, Majority, Greedy, GreedyPlanar} // todo: add loose?
 
 	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
 	private final SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
@@ -67,10 +68,11 @@ public class ConsensusTreeSplits extends Trees2Splits {
 			default -> consensusNetwork.setOptionThresholdPercent(50);
 			case Majority -> consensusNetwork.setOptionThresholdPercent(50);
 			case Strict -> consensusNetwork.setOptionThresholdPercent(99.999999); // todo: implement without use of splits
-			case Greedy -> consensusNetwork.setOptionThresholdPercent(0);
+			case Greedy, GreedyPlanar -> consensusNetwork.setOptionThresholdPercent(0);
 		}
 		final SplitsBlock consensusSplits = new SplitsBlock();
 		consensusNetwork.setOptionEdgeWeights(getOptionEdgeWeights());
+		consensusNetwork.setOptionHighDimensionFilter(false);
 		consensusNetwork.compute(progress, taxaBlock, treesBlock, consensusSplits);
 
 		if (getOptionConsensus().equals(Consensus.Greedy)) {
@@ -87,13 +89,34 @@ public class ConsensusTreeSplits extends Trees2Splits {
 				if (Compatibility.isCompatible(split, child.getSplits()))
 					child.getSplits().add(split);
 			}
+
+			child.setCompatibility(Compatibility.compatible);
+			child.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
+		} else if (getOptionConsensus().equals(Consensus.GreedyPlanar)) {
+			final var list = new ArrayList<>(consensusSplits.getSplits());
+			list.sort((s1, s2) -> {
+				if (s1.getWeight() > s2.getWeight())
+					return -1;
+				else if (s1.getWeight() < s2.getWeight())
+					return 1;
+				else
+					return BitSetUtils.compare(s1.getA(), s2.getA());
+			});
+			var pqTree = new PQTree(taxaBlock.getTaxaSet());
+			for (var split : list) {
+				var set = split.getPartNotContaining(1);
+				if (pqTree.accept(set)) {
+					child.getSplits().add(split);
+				}
+			}
+			child.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), child.getSplits()));
+			child.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
 		} else {
 			child.getSplits().clear();
 			child.getSplits().addAll(consensusSplits.getSplits());
+			child.setCompatibility(Compatibility.compatible);
+			child.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
 		}
-
-		child.setCompatibility(Compatibility.compatible);
-		child.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
 	}
 
 	@Override

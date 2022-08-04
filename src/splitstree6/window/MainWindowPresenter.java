@@ -479,8 +479,8 @@ public class MainWindowPresenter {
 		controller.getMinSpanningTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningTree()));
 		controller.getMinSpanningTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MinSpanningTree()));
 
-		controller.getRerootTreesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RerootOrLadderizeTrees()));
-		controller.getRerootTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RerootOrLadderizeTrees()));
+		controller.getRerootOrReorderTreesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RerootOrReorderTrees()));
+		controller.getRerootOrReorderTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RerootOrReorderTrees()));
 
 		controller.getViewSingleTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.TreeView))));
