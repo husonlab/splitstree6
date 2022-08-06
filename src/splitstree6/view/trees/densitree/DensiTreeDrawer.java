@@ -399,6 +399,7 @@ public class DensiTreeDrawer {
 	}
 
 	public static int[] computeCycle(PhyloTree consensusTree, Collection<PhyloTree> trees) {
+		// todo: copy consenus here as well
 		var pqTree = new PQTree();
 		try (NodeArray<BitSet> below = consensusTree.newNodeArray()) {
 			consensusTree.postorderTraversal(v -> {
