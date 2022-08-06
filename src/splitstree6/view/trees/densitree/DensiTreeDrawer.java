@@ -46,14 +46,15 @@ import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
+import jloda.graph.algorithms.PQTree;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
-import jloda.util.*;
+import jloda.util.BitSetUtils;
+import jloda.util.CanceledException;
+import jloda.util.IteratorUtils;
+import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
-import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2trees.RootedConsensusTree;
-import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
@@ -61,7 +62,6 @@ import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.view.trees.InteractionSetup;
 import splitstree6.window.MainWindow;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -173,7 +173,7 @@ public class DensiTreeDrawer {
 		consensusTree = RootedConsensusTree.computeRootedConsensusTree(trees, RootedConsensusTree.Consensus.Greedy);
 
 		//var cycle = computeCycle(consensusTree);
-		var cycle = computeCycle(taxaBlock, trees);
+		var cycle = computeCycle(consensusTree, trees);
 		final var taxon2pos = new int[cycle.length];
 		for (var pos = 1; pos < cycle.length; pos++) {
 			taxon2pos[cycle[pos]] = pos;
@@ -398,88 +398,55 @@ public class DensiTreeDrawer {
 		return cycle.stream().mapToInt(t -> t).toArray();
 	}
 
-	public static int[] computeCycle(TaxaBlock taxaBlock0, Collection<PhyloTree> trees) {
-		if (true) {
-			var taxonPosMap = new HashMap<Integer, Integer>();
-			for (var tree : trees) {
-				var posInTree = new Counter();
+	public static int[] computeCycle(PhyloTree consensusTree, Collection<PhyloTree> trees) {
+		var pqTree = new PQTree();
+		try (NodeArray<BitSet> below = consensusTree.newNodeArray()) {
+			consensusTree.postorderTraversal(v -> {
+				if (v.isLeaf()) {
+					below.put(v, BitSetUtils.asBitSet(consensusTree.getTaxa(v)));
+				} else {
+					var bitset = new BitSet();
+					for (var w : v.children()) {
+						bitset.or(below.get(w));
+					}
+					below.put(v, bitset);
+					if (v != consensusTree.getRoot()) {
+						pqTree.accept(bitset);
+					}
+				}
+			});
+		}
+
+		var clusterWeightMap = new HashMap<BitSet, Double>();
+		for (var tree : trees) {
+			try (NodeArray<BitSet> below = consensusTree.newNodeArray()) {
 				tree.postorderTraversal(v -> {
-					for (var t : tree.getTaxa(v)) {
-						taxonPosMap.put(t, taxonPosMap.getOrDefault(t, 0) + (int) posInTree.getAndIncrement());
+					if (v.isLeaf()) {
+						below.put(v, BitSetUtils.asBitSet(tree.getTaxa(v)));
+					} else {
+						var bitset = new BitSet();
+						for (var w : v.children()) {
+							bitset.or(below.get(w));
+						}
+						below.put(v, bitset);
+						clusterWeightMap.put(bitset, clusterWeightMap.getOrDefault(bitset, 0.0) + 1);
 					}
 				});
 			}
-			var posTaxonList = new ArrayList<Pair<Integer, Integer>>();
-			posTaxonList.add(new Pair<>(0, 0));
-			for (var t : taxonPosMap.keySet()) {
-				posTaxonList.add(new Pair<>(taxonPosMap.get(t), t));
-			}
-			posTaxonList.sort(Comparator.comparing(Pair::getFirst));
-			return posTaxonList.stream().mapToInt(Pair::getSecond).toArray();
-		} else {
-			var consensusNetworkAlgorithm = new ConsensusNetwork();
-			consensusNetworkAlgorithm.setOptionThresholdPercent(30);
-			consensusNetworkAlgorithm.setOptionEdgeWeights(ConsensusNetwork.EdgeWeights.Mean);
-			var splits = new SplitsBlock();
-			var taxaBlock = new TaxaBlock(taxaBlock0);
-			var treesBlock = new TreesBlock();
-			taxaBlock.addTaxonByName("rho");
-			var tRho = taxaBlock.getNtax();
-
-			var firstTaxonCountMap = new HashMap<Integer, Integer>();
-
-			for (var tree0 : trees) {
-				var tree = new PhyloTree(tree0);
-				var rho = tree.newNode();
-				tree.addTaxon(rho, tRho);
-				var e = tree.newEdge(tree.getRoot(), rho);
-				tree.setWeight(e, 1);
-				treesBlock.getTrees().add(tree);
-
-				{
-					var v = tree.getRoot();
-					while (v.getOutDegree() > 0) {
-						v = v.getFirstOutEdge().getTarget();
-					}
-					var t = tree.getTaxon(v);
-					firstTaxonCountMap.put(t, firstTaxonCountMap.getOrDefault(t, 0) + 1);
-				}
-			}
-			try {
-				consensusNetworkAlgorithm.compute(new ProgressSilent(), taxaBlock, treesBlock, splits);
-			} catch (IOException ignored) {
-			}
-			var cycle0 = splits.getCycle();
-			var cycle = new int[cycle0.length - 1];
-			var pos0 = 1;
-			while (cycle0[pos0] != tRho)
-				pos0++;
-			for (var pos = 1; pos < cycle.length; pos++) {
-				pos0++;
-				if (pos0 == cycle0.length)
-					pos0 = 1;
-				cycle[pos] = cycle0[pos0];
-			}
-
-			var first = 1;
-			var firstCount = 0;
-			{
-				for (var t : firstTaxonCountMap.keySet()) {
-					if (firstTaxonCountMap.get(t) > firstCount) {
-						first = t;
-						firstCount = firstTaxonCountMap.get(t);
-					}
-				}
-			}
-			if (cycle[cycle.length - 1] == first) { // reverse
-				var tmp = new int[cycle.length];
-				for (var i = 1; i < cycle.length; i++)
-					tmp[tmp.length - i] = cycle[i];
-				cycle = tmp;
-			}
-
-			return cycle;
 		}
+		var list = new ArrayList<Pair<Double, BitSet>>();
+		for (var entry : clusterWeightMap.entrySet()) {
+			list.add(new Pair<>(entry.getValue(), entry.getKey()));
+		}
+		list.sort((a, b) -> -Double.compare(a.getFirst(), b.getFirst()));
+		for (var pair : list) {
+			pqTree.accept(pair.getSecond());
+		}
+
+		var cycle = new ArrayList<Integer>();
+		cycle.add(0);
+		cycle.addAll(pqTree.extractAnOrdering());
+		return cycle.stream().mapToInt(a -> a).toArray();
 	}
 
 	private static Point2D computeCenter(Collection<Point2D> points) {

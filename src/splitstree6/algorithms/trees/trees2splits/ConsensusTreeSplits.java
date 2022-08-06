@@ -102,7 +102,7 @@ public class ConsensusTreeSplits extends Trees2Splits {
 				else
 					return BitSetUtils.compare(s1.getA(), s2.getA());
 			});
-			var pqTree = new PQTree(taxaBlock.getTaxaSet());
+			var pqTree = new PQTree();
 			for (var split : list) {
 				var set = split.getPartNotContaining(1);
 				if (pqTree.accept(set)) {
