@@ -58,6 +58,7 @@ public class DensiTreeView implements IView {
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
 	private final ObjectProperty<DensiTreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", DensiTreeDiagramType.TriangularPhylogram);
+	private final BooleanProperty optionShowConsensus = new SimpleBooleanProperty(this, "optionShowConsensus", true);
 
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0 / 1.2);
@@ -66,21 +67,20 @@ public class DensiTreeView implements IView {
 
 	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", true);
 	private final BooleanProperty optionAntiConsensus = new SimpleBooleanProperty(this, "optionAntiConsensus", false);
-	private final BooleanProperty optionShowConsensusTree = new SimpleBooleanProperty(this, "optionShowConsensusTree", true);
-
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
+
 
 	{
 		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
+		ProgramProperties.track(optionShowConsensus, true);
 		ProgramProperties.track(optionJitter, true);
 		ProgramProperties.track(optionAntiConsensus, false);
-		ProgramProperties.track(optionShowConsensusTree, true);
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(),
+		return List.of(optionDiagram.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionJitter.getName(), optionAntiConsensus.getName(), optionShowConsensusTree.getName());
+				optionFontScaleFactor.getName(), optionJitter.getName(), optionAntiConsensus.getName());
 	}
 
 	public DensiTreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -201,6 +201,18 @@ public class DensiTreeView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
+	public boolean isOptionShowConsensus() {
+		return optionShowConsensus.get();
+	}
+
+	public BooleanProperty optionShowConsensusProperty() {
+		return optionShowConsensus;
+	}
+
+	public void setOptionShowConsensus(boolean optionShowConsensus) {
+		this.optionShowConsensus.set(optionShowConsensus);
+	}
+
 	public double getOptionHorizontalZoomFactor() {
 		return optionHorizontalZoomFactor.get();
 	}
@@ -284,17 +296,5 @@ public class DensiTreeView implements IView {
 
 	public void setOptionAntiConsensus(boolean optionAntiConsensus) {
 		this.optionAntiConsensus.set(optionAntiConsensus);
-	}
-
-	public boolean isOptionShowConsensusTree() {
-		return optionShowConsensusTree.get();
-	}
-
-	public BooleanProperty optionShowConsensusTreeProperty() {
-		return optionShowConsensusTree;
-	}
-
-	public void setOptionShowConsensusTree(boolean optionShowConsensusTree) {
-		this.optionShowConsensusTree.set(optionShowConsensusTree);
 	}
 }

@@ -66,7 +66,7 @@ public class LeastSquares {
 
 		var AtWd = getAtWd(splits, dist);
 
-		//Now computeCycle the active set method to compute the optimal weights
+		//Now computeConsensusAndCycle the active set method to compute the optimal weights
 		//todo
 		// ActiveSet Aset = new ActiveSet(Amat, AtWd, constrain);
 

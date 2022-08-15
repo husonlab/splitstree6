@@ -49,12 +49,13 @@ import jloda.graph.NodeDoubleArray;
 import jloda.graph.algorithms.PQTree;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.trees.trees2trees.RootedConsensusTree;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
@@ -76,7 +77,8 @@ public class DensiTreeDrawer {
 
 	private final RadialLabelLayout radialLabelLayout;
 
-	private PhyloTree consensusTree;
+	private final PhyloTree consensusTree = new PhyloTree();
+
 	private final InvalidationListener invalidationListener;
 
 	private final AService<Result> service;
@@ -88,7 +90,7 @@ public class DensiTreeDrawer {
 		service = new AService<>(mainWindow.getController().getBottomFlowPane());
 
 		invalidationListener = e -> {
-			if (consensusTree != null) {
+			if (consensusTree.getRoot() != null) {
 				consensusTree.postorderTraversal(consensusTree.getRoot(), v -> {
 					if (v.getInDegree() > 0) {
 						var selected = false;
@@ -118,7 +120,7 @@ public class DensiTreeDrawer {
 
 	public void apply(Bounds targetBounds, List<PhyloTree> phyloTrees, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
 					  boolean antiConsensus, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
-					  ReadOnlyBooleanProperty showConsensusTree) {
+					  ReadOnlyBooleanProperty showConsensus) {
 		radialLabelLayout.getItems().clear();
 
 		RunAfterAWhile.applyInFXThread(parent, () -> {
@@ -152,7 +154,8 @@ public class DensiTreeDrawer {
 				var treesBlock = new TreesBlock();
 				treesBlock.getTrees().addAll(phyloTrees);
 
-				apply(service.getProgressListener(), mainWindow.getWorkingTaxa(), phyloTrees, diagramType, jitter, antiConsensus, bounds, canvas, pane, radialLabelLayout, showConsensusTree);
+				apply(service.getProgressListener(), mainWindow.getWorkingTaxa(), phyloTrees, diagramType, jitter, antiConsensus, bounds, canvas, pane,
+						radialLabelLayout, showConsensus);
 				return new Result(canvas, pane, radialLabelLayout);
 			});
 			service.setOnSucceeded(e -> {
@@ -167,13 +170,18 @@ public class DensiTreeDrawer {
 		});
 	}
 
-	private void apply(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> trees, DensiTreeDiagramType diagramType, boolean jitter, boolean antiConsensus, Bounds bounds,
-					   Canvas canvas, Pane labelPane, RadialLabelLayout radialLabelLayout, ReadOnlyBooleanProperty showConsensusTree) throws CanceledException {
+	public RadialLabelLayout getRadialLabelLayout() {
+		return radialLabelLayout;
+	}
 
-		consensusTree = RootedConsensusTree.computeRootedConsensusTree(trees, RootedConsensusTree.Consensus.Greedy);
+	private void apply(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> trees, DensiTreeDiagramType diagramType,
+					   boolean jitter, boolean colorNonConsensusEdges, Bounds bounds,
+					   Canvas canvas, Pane labelPane, RadialLabelLayout radialLabelLayout,
+					   ReadOnlyBooleanProperty showConsensus) throws CanceledException {
 
-		//var cycle = computeCycle(consensusTree);
-		var cycle = computeCycle(consensusTree, trees);
+		consensusTree.clear();
+
+		var cycle = computeConsensusAndCycle(consensusTree, trees);
 		final var taxon2pos = new int[cycle.length];
 		for (var pos = 1; pos < cycle.length; pos++) {
 			taxon2pos[cycle[pos]] = pos;
@@ -201,7 +209,6 @@ public class DensiTreeDrawer {
 					circle.setTranslateY(nodePointMap.get(consensusTree.getRoot()).getY());
 					edgesGroup.getChildren().add(circle);
 				}
-
 
 				for (var e : consensusTree.edges()) {
 					var p = nodePointMap.get(e.getSource());
@@ -243,10 +250,15 @@ public class DensiTreeDrawer {
 					edgesGroup.setVisible(n);
 				};
 				edgesGroup.setUserData(showConsensusListener); // keep it alive
-				showConsensusTree.addListener(new WeakChangeListener<>(showConsensusListener));
-				edgesGroup.setVisible(showConsensusTree.get());
+				showConsensus.addListener(new WeakChangeListener<>(showConsensusListener));
+				edgesGroup.setVisible(showConsensus.get());
 
 				var labelGroup = new Group();
+
+				double maxLeafX = Double.MIN_VALUE;
+				if (!diagramType.isRadialOrCircular()) {
+					maxLeafX = IteratorUtils.asStream(consensusTree.leaves()).mapToDouble(v -> nodePointMap.get(v).getX()).max().orElse(maxLeafX);
+				}
 
 				var fontSize = Math.min(14, labelPane.getPrefHeight() / (1.5 * taxaBlock.getNtax() + 1));
 				for (var v : consensusTree.leaves()) {
@@ -260,8 +272,10 @@ public class DensiTreeDrawer {
 					label.setTranslateX(point.getX());
 					label.setTranslateY(point.getY());
 					//radialLabelLayout.addAvoidable(() -> x, () -> y, () -> 3.0, () -> 3.0);
-					radialLabelLayout.addItem(new SimpleDoubleProperty(point.getX()), new SimpleDoubleProperty(point.getY()), angle,
-							label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(point.getX() + a), a -> label.setTranslateY(point.getY() + a));
+					var x = (maxLeafX > Double.MIN_VALUE ? maxLeafX + 3 : point.getX());
+
+					radialLabelLayout.addItem(new SimpleDoubleProperty(x), new SimpleDoubleProperty(point.getY()), angle,
+							label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(x + a), a -> label.setTranslateY(point.getY() + a));
 					labelGroup.getChildren().add(label);
 				}
 				labelPane.getChildren().addAll(edgesGroup, labelGroup);
@@ -275,9 +289,9 @@ public class DensiTreeDrawer {
 
 		var random = new Random(666);
 
-		var consensusClusters = (antiConsensus ? new HashSet<>(extractClusters(consensusTree).values()) : null);
+		var consensusClusters = (colorNonConsensusEdges ? new HashSet<>(TreesUtilities.extractClusters(consensusTree).values()) : null);
 
-		var rounds = (antiConsensus ? 2 : 1);
+		var rounds = (colorNonConsensusEdges ? 2 : 1);
 
 		progress.setTasks("DensiTree", "Drawing");
 		progress.setMaximum(trees.size());
@@ -285,10 +299,7 @@ public class DensiTreeDrawer {
 
 		for (var i = 0; i < rounds; i++) {
 			for (var tree : trees) {
-				var treeClusters = (antiConsensus ? extractClusters(tree) : null);
-
-				if (false)
-					gc.setStroke(Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble()));
+				var treeClusters = (colorNonConsensusEdges ? TreesUtilities.extractClusters(tree) : null);
 
 				try (NodeArray<Point2D> nodePointMap = tree.newNodeArray()) {
 					if (diagramType.isRadialOrCircular()) {
@@ -308,7 +319,7 @@ public class DensiTreeDrawer {
 						LayoutUtils.translate(consensusCenter.subtract(center).getX(), consensusCenter.subtract(center).getY(), nodePointMap);
 					}
 
-					if (jitter) {
+					if (jitter) { // todo: fix this so both black and red jittered together
 						var distance = 2 * Math.pow(2 * random.nextGaussian(), 2);
 						var angle = 360 * random.nextDouble();
 						var direction = GeometryUtilsFX.translateByAngle(0, 0, angle, distance);
@@ -363,86 +374,47 @@ public class DensiTreeDrawer {
 		progress.reportTaskCompleted();
 	}
 
-	public static Map<Node, BitSet> extractClusters(PhyloTree tree) {
-		NodeArray<BitSet> nodeClusterMap = tree.newNodeArray();
-		tree.postorderTraversal(v -> {
-			var cluster = new BitSet();
-			for (var t : tree.getTaxa(v))
-				cluster.set(t);
-			for (var w : v.children()) {
-				cluster.or(nodeClusterMap.get(w));
-			}
-			nodeClusterMap.put(v, cluster);
-
-		});
-		return nodeClusterMap;
-	}
-
-	public RadialLabelLayout getRadialLabelLayout() {
-		return radialLabelLayout;
-	}
-
-	public static int[] computeCycle(PhyloTree tree) {
-		var cycle = new ArrayList<Integer>();
-		cycle.add(0);
-
-		var seen = new BitSet();
-		tree.postorderTraversal(v -> {
-			for (var t : tree.getTaxa(v)) {
-				if (!seen.get(t)) {
-					cycle.add(t);
-					seen.set(t);
-				}
-			}
-		});
-		return cycle.stream().mapToInt(t -> t).toArray();
-	}
-
-	public static int[] computeCycle(PhyloTree consensusTree, Collection<PhyloTree> trees) {
-		// todo: copy consenus here as well
+	private static int[] computeConsensusAndCycle(PhyloTree consensusTree, Collection<PhyloTree> trees) {
 		var pqTree = new PQTree();
-		try (NodeArray<BitSet> below = consensusTree.newNodeArray()) {
-			consensusTree.postorderTraversal(v -> {
-				if (v.isLeaf()) {
-					below.put(v, BitSetUtils.asBitSet(consensusTree.getTaxa(v)));
-				} else {
-					var bitset = new BitSet();
-					for (var w : v.children()) {
-						bitset.or(below.get(w));
-					}
-					below.put(v, bitset);
-					if (v != consensusTree.getRoot()) {
-						pqTree.accept(bitset);
-					}
-				}
-			});
-		}
 
-		var clusterWeightMap = new HashMap<BitSet, Double>();
+		var clusterCountWeightMap = new HashMap<BitSet, CountWeight>();
 		for (var tree : trees) {
-			try (NodeArray<BitSet> below = consensusTree.newNodeArray()) {
+			try (NodeArray<BitSet> below = tree.newNodeArray()) {
 				tree.postorderTraversal(v -> {
+					BitSet cluster;
 					if (v.isLeaf()) {
-						below.put(v, BitSetUtils.asBitSet(tree.getTaxa(v)));
+						cluster = BitSetUtils.asBitSet(tree.getTaxa(v));
 					} else {
-						var bitset = new BitSet();
+						cluster = new BitSet();
 						for (var w : v.children()) {
-							bitset.or(below.get(w));
+							cluster.or(below.get(w));
 						}
-						below.put(v, bitset);
-						clusterWeightMap.put(bitset, clusterWeightMap.getOrDefault(bitset, 0.0) + 1);
 					}
+					below.put(v, cluster);
+					var clusterCountWeight = clusterCountWeightMap.getOrDefault(cluster, new CountWeight(0, 0.0));
+					var weight = (v.getFirstInEdge() != null ? tree.getWeight(v.getFirstInEdge()) : 0);
+					clusterCountWeightMap.put(cluster, new CountWeight(clusterCountWeight.count() + 1, clusterCountWeight.weight() + weight));
 				});
 			}
 		}
-		var list = new ArrayList<Pair<Double, BitSet>>();
-		for (var entry : clusterWeightMap.entrySet()) {
-			list.add(new Pair<>(entry.getValue(), entry.getKey()));
+		var list = new ArrayList<CountWeightCluster>();
+		for (var entry : clusterCountWeightMap.entrySet()) {
+			var cw = entry.getValue();
+			list.add(new CountWeightCluster(cw.count(), cw.weight(), entry.getKey()));
 		}
-		list.sort((a, b) -> -Double.compare(a.getFirst(), b.getFirst()));
-		for (var pair : list) {
-			pqTree.accept(pair.getSecond());
+		list.sort((a, b) -> -Integer.compare(a.count(), b.count()));
+
+		var consensusClusterWeightMap = new HashMap<BitSet, Double>();
+
+		for (var cwc : list) {
+			pqTree.accept(cwc.cluster());
+			if (cwc.count() > 0.5 * trees.size() || isCompatibleWithAll(cwc.cluster(), consensusClusterWeightMap.keySet())) {
+				consensusClusterWeightMap.put(cwc.cluster(), cwc.count() > 0 ? cwc.weight() / cwc.count() : 0.0);
+			}
 		}
+
+		// create consensus tree:
+		ClusterPoppingAlgorithm.apply(consensusClusterWeightMap.keySet(), c -> (c == null ? 0.0 : consensusClusterWeightMap.getOrDefault(c, 0.0)), consensusTree);
 
 		var cycle = new ArrayList<Integer>();
 		cycle.add(0);
@@ -632,6 +604,12 @@ public class DensiTreeDrawer {
 	}
 
 	private static record Result(Canvas canvas, Pane labelPane, RadialLabelLayout radialLabelLayout) {
+	}
+
+	private static record CountWeight(int count, double weight) {
+	}
+
+	private static record CountWeightCluster(int count, double weight, BitSet cluster) {
 	}
 }
 

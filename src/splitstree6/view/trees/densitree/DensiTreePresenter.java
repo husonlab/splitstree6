@@ -34,7 +34,6 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.StringUtils;
-import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.window.MainWindow;
@@ -57,34 +56,36 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		this.controller = view.getController();
 		this.drawer = new DensiTreeDrawer(mainWindow);
 
-		controller.getRadialPhylogramToggleItem().setUserData(TreeDiagramType.RadialPhylogram);
-		controller.getTrianglePhylogramToggleItem().setUserData(TreeDiagramType.TriangularCladogram);
-		controller.getRadialPhylogramToggleItem().setUserData(TreeDiagramType.RadialPhylogram);
-		controller.getRadialPhylogramToggleItem().setUserData(TreeDiagramType.RadialPhylogram);
-
-		controller.getToggleGroup().selectedToggleProperty().addListener((v, o, n) -> {
+		controller.getDiagramToggleGroup().selectedToggleProperty().addListener((v, o, n) -> {
 			if (n instanceof RadioMenuItem radioMenuItem) {
 				view.setOptionDiagram(DensiTreeDiagramType.valueOf(radioMenuItem.getText()));
 				controller.getMenuButton().setGraphic(view.getOptionDiagram().createNode());
 			}
 		});
 		view.optionDiagramProperty().addListener((v, o, n) -> {
-			for (var toggle : controller.getToggleGroup().getToggles()) {
+			for (var toggle : controller.getDiagramToggleGroup().getToggles()) {
 				if (toggle instanceof RadioMenuItem radioMenuItem) {
 					if (radioMenuItem.getText().equals(n.name())) {
-						controller.getToggleGroup().selectToggle(toggle);
+						controller.getDiagramToggleGroup().selectToggle(toggle);
 						return;
 					}
 				}
 			}
 		});
+		for (var toggle : controller.getDiagramToggleGroup().getToggles()) {
+			if (toggle instanceof RadioMenuItem radioMenuItem) {
+				if (radioMenuItem.getText().equals(view.getOptionDiagram().name())) {
+					controller.getDiagramToggleGroup().selectToggle(toggle);
+				}
+			}
+		}
 
 		view.optionDiagramProperty().addListener(e -> {
 			view.setOptionHorizontalZoomFactor(1.0 / 1.2);
 			view.setOptionVerticalZoomFactor(1.0 / 1.2);
 		});
 
-		controller.getShowConsensusTreeMenuItem().selectedProperty().bindBidirectional(view.optionShowConsensusTreeProperty());
+		controller.getShowConsensusMenuItem().selectedProperty().bindBidirectional(view.optionShowConsensusProperty());
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.2 * view.getOptionHorizontalZoomFactor()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getOptionDiagram().isRadialOrCircular(), view.optionDiagramProperty()));
@@ -112,7 +113,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
 				view.isOptionAntiConsensus(),
 				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
-				view.optionShowConsensusTreeProperty());
+				view.optionShowConsensusProperty());
 
 		targetBounds.addListener(invalidationListener);
 		view.optionDiagramProperty().addListener(invalidationListener);

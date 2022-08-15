@@ -28,8 +28,7 @@ import splitstree6.data.DistancesBlock;
  */
 public class FixUndefinedDistances {
 	/**
-	 * computeCycle
-	 *
+	 * computeConsensusAndCycle
 	 */
 	public static void apply(int ntax, double maxDist, DistancesBlock distancesBlock) {
 		int numUndefined = 0;
