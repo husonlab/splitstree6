@@ -21,7 +21,6 @@ package splitstree6.densitree;
 
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressPercentage;
-import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
 import splitstree6.algorithms.trees.trees2trees.ConsensusTree;
 import splitstree6.data.TreesBlock;
 
@@ -37,7 +36,7 @@ public class MajorityConsensus {
 	 */
 	public static PhyloTree apply(Model model) throws IOException {
 		var consensus = new ConsensusTree();
-		consensus.setOptionConsensus(ConsensusTreeSplits.Consensus.Majority);
+		consensus.setOptionConsensus(ConsensusTree.Consensus.Majority);
 		if (!consensus.isApplicable(model.getTaxaBlock(), model.getTreesBlock()))
 			throw new IOException("Majority consensus: not applicable");
 		var result = new TreesBlock();

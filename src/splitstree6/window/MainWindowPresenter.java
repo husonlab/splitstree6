@@ -71,11 +71,10 @@ import splitstree6.algorithms.distances.distances2trees.UPGMA;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
-import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2splits.BootstrapTreeSplits;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
-import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
+import splitstree6.algorithms.trees.trees2splits.ConsensusSplits;
 import splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork;
 import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
@@ -473,7 +472,7 @@ public class MainWindowPresenter {
 		controller.getSelectTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1)));
 		controller.getSelectTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TreeSelector()));
 
-		controller.getConsensusTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTreeSplits.Consensus.Majority)));
+		controller.getConsensusTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTree.Consensus.Majority)));
 		controller.getConsensusTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusTree()));
 
 		controller.getMinSpanningTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningTree()));
@@ -510,6 +509,9 @@ public class MainWindowPresenter {
 		controller.getConsensusNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusNetwork()));
 		controller.getConsensusNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusNetwork()));
 
+		controller.getConsensusSplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusSplits()));
+		controller.getConsensusSplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusSplits()));
+
 		controller.getFilteredSuperNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new FilteredSuperNetwork()));
 		controller.getFilteredSuperNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new FilteredSuperNetwork()));
 
@@ -521,11 +523,6 @@ public class MainWindowPresenter {
 
 		controller.getHybridizationNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new AutumnAlgorithm(), null, a -> ((ShowTrees) a).setOptionView(ShowTrees.ViewType.TreePages)));
 		controller.getHybridizationNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new AutumnAlgorithm()));
-
-		controller.getSplitsNetworkViewMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowSplits(), a -> ((ShowSplits) a).setOptionView(ShowSplits.ViewType.SplitsNetwork)));
-		controller.getSplitsNetworkViewMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowSplits()));
-
-		controller.getHaplotypeNetworkViewMenuItem().setOnAction(null);
 
 		controller.getPcoaMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PCoA()));
 		controller.getPcoaMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PCoA()));

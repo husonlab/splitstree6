@@ -113,8 +113,8 @@ public class AntiConsensusNetwork extends Trees2Splits {
 					throw new IOException("Can't use majority consensus as reference tree because some input trees have incomplete taxa");
 				} else {
 					progress.setTasks("Anti-consensus", "Determining majority consensus splits");
-					final ConsensusTreeSplits consensusTreeSplits = new ConsensusTreeSplits();
-					consensusTreeSplits.setOptionConsensus(ConsensusTreeSplits.Consensus.Majority); // todo: implement and use loose consensus
+					final ConsensusSplits consensusTreeSplits = new ConsensusSplits();
+					consensusTreeSplits.setOptionConsensus(ConsensusSplits.Consensus.Majority); // todo: implement and use loose consensus
 					consensusTreeSplits.setOptionEdgeWeights(ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
 					consensusTreeSplits.compute(progress, taxaBlock, treesBlock, referenceSplits);
 					firstTreeToUse = 1;

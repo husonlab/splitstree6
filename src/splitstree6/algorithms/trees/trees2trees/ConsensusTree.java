@@ -23,7 +23,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
 import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
-import splitstree6.algorithms.trees.trees2splits.ConsensusTreeSplits;
+import splitstree6.algorithms.trees.trees2splits.ConsensusSplits;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -36,8 +36,9 @@ import java.util.List;
  * Daniel Huson, 2.2018
  */
 public class ConsensusTree extends Trees2Trees {
+	public enum Consensus {Majority, Greedy, Strict}
 
-	private final SimpleObjectProperty<ConsensusTreeSplits.Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", ConsensusTreeSplits.Consensus.Majority);
+	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
 	private final SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
 
 	@Override
@@ -60,8 +61,8 @@ public class ConsensusTree extends Trees2Trees {
 		if (parent.getNTrees() <= 1)
 			child.getTrees().addAll(parent.getTrees());
 		else {
-			final ConsensusTreeSplits consensusTreeSplits = new ConsensusTreeSplits();
-			consensusTreeSplits.setOptionConsensus(getOptionConsensus());
+			final ConsensusSplits consensusTreeSplits = new ConsensusSplits();
+			consensusTreeSplits.setOptionConsensus(getOptionConsensus().name());
 			consensusTreeSplits.setOptionEdgeWeights(getOptionEdgeWeights());
 			final SplitsBlock splitsBlock = new SplitsBlock();
 			consensusTreeSplits.compute(progress, taxaBlock, parent, splitsBlock);
@@ -75,15 +76,15 @@ public class ConsensusTree extends Trees2Trees {
 		return !parent.isPartial() && !parent.isReticulated();
 	}
 
-	public ConsensusTreeSplits.Consensus getOptionConsensus() {
+	public Consensus getOptionConsensus() {
 		return optionConsensus.get();
 	}
 
-	public SimpleObjectProperty<ConsensusTreeSplits.Consensus> optionConsensusProperty() {
+	public SimpleObjectProperty<Consensus> optionConsensusProperty() {
 		return optionConsensus;
 	}
 
-	public void setOptionConsensus(ConsensusTreeSplits.Consensus optionConsensus) {
+	public void setOptionConsensus(Consensus optionConsensus) {
 		this.optionConsensus.set(optionConsensus);
 	}
 

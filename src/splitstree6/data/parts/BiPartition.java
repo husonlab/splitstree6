@@ -185,7 +185,6 @@ public class BiPartition implements Comparable<BiPartition> {
 		return getPartContaining(a) != getPartContaining(b);
 	}
 
-
 	@Override
 	public int hashCode() {
 		return Objects.hash(A, B);
@@ -207,6 +206,5 @@ public class BiPartition implements Comparable<BiPartition> {
 		if (result == 0)
 			result = BitSetUtils.compare(B, B);
 		return result;
-
 	}
 }
