@@ -22,6 +22,8 @@ package splitstree6.algorithms.trees.trees2splits;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.graph.algorithms.PQTree;
 import jloda.util.BitSetUtils;
+import jloda.util.CollectionUtils;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
@@ -31,7 +33,9 @@ import splitstree6.data.parts.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
+import java.util.Random;
 
 /**
  * implements consensus tree splits
@@ -106,6 +110,7 @@ public class ConsensusSplits extends Trees2Splits {
 					else
 						return BitSetUtils.compare(s1.getA(), s2.getA());
 				});
+
 				var pqTree = new PQTree();
 				for (var split : list) {
 					var set = split.getPartNotContaining(1);
@@ -120,9 +125,52 @@ public class ConsensusSplits extends Trees2Splits {
 					for (var split : splitsBlock.splits()) {
 						if (!Compatibility.isCyclic(taxaBlock.getNtax(), List.of(split), splitsBlock.getCycle())) {
 							System.err.println("Internal error: greedyPlanar: is not circular: " + split);
-							System.err.println("pqTree says: " + pqTree.check(split.getPartNotContaining(1)));
+							var cluster = split.getPartNotContaining(1);
+							System.err.println("Set: " + StringUtils.toString(cluster));
+							System.err.println("pqTree says: " + pqTree.check(cluster));
 						}
 					}
+				}
+
+				if (false) {
+					progress.setSubtask("testing pqtree");
+					progress.setMaximum(1000);
+					progress.setProgress(0);
+					var random = new Random(666);
+					for (var run = 0; run < 1000; run++) {
+						var pqTree1 = new PQTree();
+						var accepted = new ArrayList<BitSet>();
+						var randomized = CollectionUtils.randomize(list, random);
+						for (var split : randomized) {
+							if (pqTree1.accept(split.getPartNotContaining(1))) {
+								accepted.add(split.getPartNotContaining(1));
+							}
+						}
+						BitSet bad = null;
+						for (var cluster : accepted) {
+							if (!pqTree1.check(cluster)) {
+								System.err.println("Not accepted: " + StringUtils.toString(cluster));
+								bad = cluster;
+								break;
+							}
+						}
+						if (bad != null) {
+							var pqtree2 = new PQTree();
+							pqtree2.verbose = true;
+							for (var split : randomized) {
+								var cluster = split.getPartNotContaining(1);
+								if (cluster.equals(bad))
+									System.err.println("Bad: " + StringUtils.toString(cluster));
+								pqtree2.accept(cluster);
+								if (!pqtree2.check(bad))
+									System.err.println("Not accepted: " + StringUtils.toString(bad));
+								progress.checkForCancel();
+							}
+
+						}
+						progress.incrementProgress();
+					}
+					progress.reportTaskCompleted();
 				}
 			}
 			case GreedyWeaklyCompatible -> {

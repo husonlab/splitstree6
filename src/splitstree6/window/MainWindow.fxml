@@ -372,8 +372,8 @@
                         <MenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"/>
                         <MenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
                         <MenuItem fx:id="consensusSplitsMenuItem" text="Consensus Splits"/>
+                        <MenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
                         <MenuItem fx:id="filteredSuperNetworkMenuItem" text="Filtered Super Network"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>
