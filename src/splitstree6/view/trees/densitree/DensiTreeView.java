@@ -65,22 +65,22 @@ public class DensiTreeView implements IView {
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0 / 1.2);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
-	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", true);
-	private final BooleanProperty optionAntiConsensus = new SimpleBooleanProperty(this, "optionAntiConsensus", false);
+	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", false);
+	private final BooleanProperty optionColorAntiConsensus = new SimpleBooleanProperty(this, "optionColorAntiConsensus", true);
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 
 	{
-		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
+		//ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
 		ProgramProperties.track(optionShowConsensus, true);
-		ProgramProperties.track(optionJitter, true);
-		ProgramProperties.track(optionAntiConsensus, false);
+		//ProgramProperties.track(optionJitter, true);
+		ProgramProperties.track(optionColorAntiConsensus, false);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionJitter.getName(), optionAntiConsensus.getName());
+				optionFontScaleFactor.getName(), optionJitter.getName(), optionColorAntiConsensus.getName());
 	}
 
 	public DensiTreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -286,15 +286,15 @@ public class DensiTreeView implements IView {
 		return optionJitter;
 	}
 
-	public boolean isOptionAntiConsensus() {
-		return optionAntiConsensus.get();
+	public boolean getOptionColorAntiConsensus() {
+		return optionColorAntiConsensus.get();
 	}
 
-	public BooleanProperty optionAntiConsensusProperty() {
-		return optionAntiConsensus;
+	public BooleanProperty optionColorAntiConsensusProperty() {
+		return optionColorAntiConsensus;
 	}
 
-	public void setOptionAntiConsensus(boolean optionAntiConsensus) {
-		this.optionAntiConsensus.set(optionAntiConsensus);
+	public void setOptionColorAntiConsensus(boolean optionColorAntiConsensus) {
+		this.optionColorAntiConsensus.set(optionColorAntiConsensus);
 	}
 }

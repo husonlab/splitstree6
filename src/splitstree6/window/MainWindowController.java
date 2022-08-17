@@ -312,6 +312,9 @@ public class MainWindowController {
 	private MenuItem consensusNetworkMenuItem;
 
 	@FXML
+	private MenuItem consensusOutlineMenuItem;
+
+	@FXML
 	private MenuItem consensusSplitsMenuItem;
 
 	@FXML
@@ -840,6 +843,10 @@ public class MainWindowController {
 
 	public MenuItem getConsensusNetworkMenuItem() {
 		return consensusNetworkMenuItem;
+	}
+
+	public MenuItem getConsensusOutlineMenuItem() {
+		return consensusOutlineMenuItem;
 	}
 
 	public MenuItem getConsensusSplitsMenuItem() {

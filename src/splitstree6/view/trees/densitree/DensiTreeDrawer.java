@@ -100,16 +100,16 @@ public class DensiTreeDrawer {
 						} else {
 							selected = true;
 							for (var f : v.outEdges()) {
-								if (f.getData() instanceof Line line) {
-									if (line.getEffect() == null) {
+								if (f.getData() instanceof Shape shape) {
+									if (shape.getEffect() == null) {
 										selected = false;
 										break;
 									}
 								}
 							}
 						}
-						if (v.getFirstInEdge().getData() instanceof Line line) {
-							line.setEffect(selected ? SelectionEffectBlue.getInstance() : null);
+						if (v.getFirstInEdge().getData() instanceof Shape shape) {
+							shape.setEffect(selected ? SelectionEffectBlue.getInstance() : null);
 						}
 					}
 				});
@@ -181,7 +181,7 @@ public class DensiTreeDrawer {
 
 		consensusTree.clear();
 
-		var cycle = computeConsensusAndCycle(consensusTree, trees);
+		var cycle = computeConsensusAndCycle(taxaBlock, consensusTree, trees);
 		final var taxon2pos = new int[cycle.length];
 		for (var pos = 1; pos < cycle.length; pos++) {
 			taxon2pos[cycle[pos]] = pos;
@@ -214,15 +214,15 @@ public class DensiTreeDrawer {
 					var p = nodePointMap.get(e.getSource());
 					var q = nodePointMap.get(e.getTarget());
 
-					var line = switch (diagramType) {
+					var shape = switch (diagramType) {
 						case TriangularPhylogram, RadialPhylogram -> new Line(p.getX(), p.getY(), q.getX(), q.getY());
 						case RectangularPhylogram -> new Polyline(p.getX(), p.getY(), p.getX(), q.getY(), q.getX(), q.getY());
 						case RoundedPhylogram -> new Path(new MoveTo(p.getX(), p.getY()), new QuadCurveTo(p.getX(), q.getY(), q.getX(), q.getY()));
 					};
-					e.setData(line);
-					line.getStyleClass().add("graph-special-edge");
-					edgesGroup.getChildren().add(line);
-					line.setOnMouseClicked(a -> {
+					e.setData(shape);
+					shape.getStyleClass().add("graph-special-edge");
+					edgesGroup.getChildren().add(shape);
+					shape.setOnMouseClicked(a -> {
 						if (!a.isShiftDown())
 							mainWindow.getTaxonSelectionModel().clearSelection();
 
@@ -234,14 +234,14 @@ public class DensiTreeDrawer {
 						});
 						a.consume();
 					});
-					line.setOnMouseEntered(a -> {
+					shape.setOnMouseEntered(a -> {
 						if (!a.isStillSincePress()) {
-							line.setStrokeWidth(5);
+							shape.setStrokeWidth(5);
 						}
 					});
-					line.setOnMouseExited(a -> {
+					shape.setOnMouseExited(a -> {
 						if (!a.isStillSincePress()) {
-							line.setStrokeWidth(1);
+							shape.setStrokeWidth(1);
 						}
 					});
 				}
@@ -374,7 +374,7 @@ public class DensiTreeDrawer {
 		progress.reportTaskCompleted();
 	}
 
-	private static int[] computeConsensusAndCycle(PhyloTree consensusTree, Collection<PhyloTree> trees) {
+	private static int[] computeConsensusAndCycle(TaxaBlock taxaBlock, PhyloTree consensusTree, Collection<PhyloTree> trees) {
 		var pqTree = new PQTree();
 
 		var clusterCountWeightMap = new HashMap<BitSet, CountWeight>();
@@ -407,8 +407,8 @@ public class DensiTreeDrawer {
 		var consensusClusterWeightMap = new HashMap<BitSet, Double>();
 
 		for (var cwc : list) {
-			pqTree.accept(cwc.cluster());
 			if (cwc.count() > 0.5 * trees.size() || isCompatibleWithAll(cwc.cluster(), consensusClusterWeightMap.keySet())) {
+				pqTree.accept(cwc.cluster());
 				consensusClusterWeightMap.put(cwc.cluster(), cwc.count() > 0 ? cwc.weight() / cwc.count() : 0.0);
 			}
 		}
@@ -418,7 +418,9 @@ public class DensiTreeDrawer {
 
 		var cycle = new ArrayList<Integer>();
 		cycle.add(0);
-		cycle.addAll(pqTree.extractAnOrdering());
+		var ordering = pqTree.extractAnOrdering();
+		cycle.addAll(ordering);
+		cycle.addAll(BitSetUtils.asList(BitSetUtils.minus(taxaBlock.getTaxaSet(), BitSetUtils.asBitSet(ordering))));
 		return cycle.stream().mapToInt(a -> a).toArray();
 	}
 

@@ -107,11 +107,11 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 
 		controller.getJitterMenuItem().selectedProperty().bindBidirectional(view.optionJitterProperty());
 
-		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionAntiConsensusProperty());
+		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionColorAntiConsensusProperty());
 
 		InvalidationListener invalidationListener = e -> drawer.apply(targetBounds.get(),
 				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
-				view.isOptionAntiConsensus(),
+				view.getOptionColorAntiConsensus(),
 				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
 				view.optionShowConsensusProperty());
 
@@ -124,7 +124,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));
 
 		view.optionJitterProperty().addListener(invalidationListener);
-		view.optionAntiConsensusProperty().addListener(invalidationListener);
+		view.optionColorAntiConsensusProperty().addListener(invalidationListener);
 		view.getTrees().addListener(invalidationListener);
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(invalidationListener));
 
