@@ -104,6 +104,9 @@ public class DensiTreeViewController {
 	private MenuButton menuButton;
 
 	@FXML
+	private CheckMenuItem showTreesMenuItem;
+
+	@FXML
 	private CheckMenuItem showConsensusMenuItem;
 
 	@FXML
@@ -133,7 +136,6 @@ public class DensiTreeViewController {
 			}
 		});
 		diagramToggleGroup.selectToggle(trianglePhylogramToggleItem);
-
 
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);
@@ -232,21 +234,8 @@ public class DensiTreeViewController {
 		return mainPane;
 	}
 
-
-	public RadioMenuItem getTrianglePhylogramToggleItem() {
-		return trianglePhylogramToggleItem;
-	}
-
-	public RadioMenuItem getRadialPhylogramToggleItem() {
-		return radialPhylogramToggleItem;
-	}
-
-	public RadioMenuItem getRectangularPhylogramToggleItem() {
-		return rectangularPhylogramToggleItem;
-	}
-
-	public RadioMenuItem getRoundedPhylogramToggleItem() {
-		return roundedPhylogramToggleItem;
+	public CheckMenuItem getShowTreesMenuItem() {
+		return showTreesMenuItem;
 	}
 
 	public CheckMenuItem getShowConsensusMenuItem() {

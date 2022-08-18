@@ -85,6 +85,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 			view.setOptionVerticalZoomFactor(1.0 / 1.2);
 		});
 
+		controller.getShowTreesMenuItem().selectedProperty().bindBidirectional(view.optionShowTreesProperty());
 		controller.getShowConsensusMenuItem().selectedProperty().bindBidirectional(view.optionShowConsensusProperty());
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.2 * view.getOptionHorizontalZoomFactor()));
@@ -107,12 +108,13 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 
 		controller.getJitterMenuItem().selectedProperty().bindBidirectional(view.optionJitterProperty());
 
-		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionColorAntiConsensusProperty());
+		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionColorIncompatibleEdgesProperty());
 
 		InvalidationListener invalidationListener = e -> drawer.apply(targetBounds.get(),
 				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
-				view.getOptionColorAntiConsensus(),
+				view.getOptionColorIncompatibleEdges(),
 				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
+				view.optionShowTreesProperty(),
 				view.optionShowConsensusProperty());
 
 		targetBounds.addListener(invalidationListener);
@@ -124,7 +126,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));
 
 		view.optionJitterProperty().addListener(invalidationListener);
-		view.optionColorAntiConsensusProperty().addListener(invalidationListener);
+		view.optionColorIncompatibleEdgesProperty().addListener(invalidationListener);
 		view.getTrees().addListener(invalidationListener);
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(invalidationListener));
 
