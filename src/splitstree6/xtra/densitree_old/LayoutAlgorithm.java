@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
@@ -35,6 +35,7 @@ import java.util.stream.Collectors;
  * compute a radial layout for a given tree using a given cycle
  * Daniel Huson, 12.2021
  */
+@Deprecated
 public class LayoutAlgorithm {
     /**
      * compute coordinates for all nodes

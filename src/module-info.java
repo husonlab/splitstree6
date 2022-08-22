@@ -89,7 +89,7 @@ module splitstreesix {
 	opens splitstree6.tabs.algorithms;
 	opens splitstree6.tabs.algorithms.taxafilter;
 
-	opens splitstree6.densitree;
+	opens splitstree6.xtra.densitree_old;
 
 	opens splitstree6.layout.splits;
 	opens splitstree6.layout.tree;

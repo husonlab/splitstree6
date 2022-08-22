@@ -116,7 +116,7 @@ public class DensiTreeDrawer {
 	}
 
 	public void apply(Bounds targetBounds, List<PhyloTree> phyloTrees, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
-					  boolean antiConsensus, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
+					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, ReadOnlyBooleanProperty showConsensus) {
 		radialLabelLayout.getItems().clear();
 
@@ -155,8 +155,8 @@ public class DensiTreeDrawer {
 				var treesBlock = new TreesBlock();
 				treesBlock.getTrees().addAll(phyloTrees);
 
-				computeTreesAndConsensus(service.getProgressListener(), mainWindow.getWorkingTaxa(), phyloTrees, diagramType, jitter, antiConsensus, bounds, canvas, pane,
-						radialLabelLayout, showConsensus);
+				computeTreesAndConsensus(service.getProgressListener(), mainWindow.getWorkingTaxa(), phyloTrees, diagramType,
+						jitter, colorIncompatibleEdges, bounds, canvas, pane, radialLabelLayout, showConsensus);
 				return new Result(canvas, pane, radialLabelLayout);
 			});
 			service.setOnSucceeded(e -> {
@@ -175,9 +175,9 @@ public class DensiTreeDrawer {
 		return radialLabelLayout;
 	}
 
-	private void computeTreesAndConsensus(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> trees, DensiTreeDiagramType diagramType,
-										  boolean jitter, boolean colorNonConsensusEdges, Bounds bounds,
-										  Canvas canvas, Pane labelPane, RadialLabelLayout radialLabelLayout,
+	private void computeTreesAndConsensus(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> trees,
+										  DensiTreeDiagramType diagramType, boolean jitter, boolean colorNonConsensusEdges,
+										  Bounds bounds, Canvas canvas, Pane labelPane, RadialLabelLayout radialLabelLayout,
 										  ReadOnlyBooleanProperty showConsensus) throws CanceledException {
 
 		consensusTree.clear();
@@ -379,18 +379,17 @@ public class DensiTreeDrawer {
 	private static int[] computeConsensusAndCycle(TaxaBlock taxaBlock, PhyloTree consensusTree, Collection<PhyloTree> trees) {
 		var clusterCountWeightMap = new HashMap<BitSet, CountWeight>();
 		for (var tree : trees) {
-			try (NodeArray<BitSet> below = tree.newNodeArray()) {
+			try (NodeArray<BitSet> clusterMap = tree.newNodeArray()) {
 				tree.postorderTraversal(v -> {
-					BitSet cluster;
+					var cluster = new BitSet();
 					if (v.isLeaf()) {
-						cluster = BitSetUtils.asBitSet(tree.getTaxa(v));
+						cluster.set(tree.getTaxon(v));
 					} else {
-						cluster = new BitSet();
 						for (var w : v.children()) {
-							cluster.or(below.get(w));
+							cluster.or(clusterMap.get(w));
 						}
 					}
-					below.put(v, cluster);
+					clusterMap.put(v, cluster);
 					var clusterCountWeight = clusterCountWeightMap.getOrDefault(cluster, new CountWeight(0, 0.0));
 					var weight = (v.getFirstInEdge() != null ? tree.getWeight(v.getFirstInEdge()) : 0);
 					clusterCountWeightMap.put(cluster, new CountWeight(clusterCountWeight.count() + 1, clusterCountWeight.weight() + weight));
@@ -406,17 +405,22 @@ public class DensiTreeDrawer {
 
 		var consensusClusterWeightMap = new HashMap<BitSet, Double>();
 
-		var pqTree = new PQTree();
+		var pqTree = new PQTree(taxaBlock.getTaxaSet());
 		for (var cwc : list) {
 			if (cwc.count() > 0.5 * trees.size() || isCompatibleWithAll(cwc.cluster(), consensusClusterWeightMap.keySet())) {
-				if (pqTree.accept(cwc.cluster()))  // todo: figure out why this is necessary...
+				if (pqTree.accept(cwc.cluster())) {
 					consensusClusterWeightMap.put(cwc.cluster(), cwc.count() > 0 ? cwc.weight() / cwc.count() : 0.0);
+				} else { // figure out why this can happen
+					System.err.println("Looks like a bug in the PQ-tree code, please contact me (Daniel Huson) about this");
+					pqTree.verbose = true;
+					pqTree.accept(cwc.cluster());
+					pqTree.verbose = false;
+				}
 			}
 		}
 
 		// create consensus tree:
 		ClusterPoppingAlgorithm.apply(consensusClusterWeightMap.keySet(), c -> (c == null ? 0.0 : consensusClusterWeightMap.getOrDefault(c, 0.0)), consensusTree);
-
 		var cycle = new ArrayList<Integer>();
 		cycle.add(0);
 		var ordering = pqTree.extractAnOrdering();

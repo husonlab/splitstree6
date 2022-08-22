@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import javafx.application.Application;
 import javafx.beans.InvalidationListener;
@@ -39,6 +39,7 @@ import jloda.util.progress.ProgressSilent;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.readers.trees.NewickReader;
 
+@Deprecated
 public class LayoutTester extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {

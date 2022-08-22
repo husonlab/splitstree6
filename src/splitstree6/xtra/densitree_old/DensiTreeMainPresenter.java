@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
@@ -42,6 +42,7 @@ import java.io.IOException;
 /**
  * the presenter
  */
+@Deprecated
 public class DensiTreeMainPresenter {
 
     private final DoubleProperty scalingFactor = new SimpleDoubleProperty(1);

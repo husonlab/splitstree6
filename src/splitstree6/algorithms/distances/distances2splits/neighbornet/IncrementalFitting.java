@@ -7,8 +7,6 @@ import org.apache.commons.math3.optim.univariate.BrentOptimizer;
 import org.apache.commons.math3.optim.univariate.SearchInterval;
 import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 
-import java.util.Arrays;
-
 import static java.lang.Math.*;
 
 public class IncrementalFitting {
@@ -144,26 +142,27 @@ public class IncrementalFitting {
                 int sj = cycle[j];
                 p[sk][sj] = p[sj][sk] = p[u][sj] + Mgamma[j];
                 x[sk][sj] = x[sj][sk] = gamma[j];
-                x[v][sj] = max(x[v][sj] - gamma[j],0);
+                x[v][sj] = max(x[v][sj] - gamma[j], 0);
                 x[sj][v] = x[v][sj];
             }
 
             //Insert sk into the cycle
-            for(int j=1;j<=r2;j++)
-                cycle[k-j+1]=cycle[k-j];
-            cycle[r1+1]=sk;
+            for (int j = 1; j <= r2; j++)
+                cycle[k - j + 1] = cycle[k - j];
+            cycle[r1 + 1] = sk;
 
-            System.err.println("Adding taxon "+sk);
+            if (NeighborNetSplitWeights.verbose)
+                System.err.println("Adding taxon " + sk);
             if (false && search) {
                 //We carry out one iteration  of a steepest descent search
-                for(int i=1;i<=k;i++) {
+                for (int i = 1; i <= k; i++) {
                     var si = cycle[i];
-                    for(int j=i+1;j<=k;j++) {
+                    for (int j = i + 1; j <= k; j++) {
                         var sj = cycle[j];
-                        res[si][sj] = res[sj][si] = p[si][sj]-d[si][sj];
+                        res[si][sj] = res[sj][si] = p[si][sj] - d[si][sj];
                     }
                 }
-                NeighborNetSplitWeights.calcAtx(res,grad);
+                NeighborNetSplitWeights.calcAtx(res, grad);
 
                 final int kk = k;
                 final UnivariateFunction fn = t->insertionObjectiveFunction(t,x,grad,d,kk,cycle);

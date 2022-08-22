@@ -142,8 +142,8 @@ public class RerootingUtils {
 			tree.setRoot(e, weight2source, weight2target, null);
 
 			tree.redirectEdgesAwayFromRoot();
-
-			System.err.println("Rerooted:\n" + tree.toBracketString(true) + ";");
+			if (false)
+				System.err.println("Rerooted:\n" + tree.toBracketString(true) + ";");
 		}
 	}
 

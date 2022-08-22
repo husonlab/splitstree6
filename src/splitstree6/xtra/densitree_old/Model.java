@@ -17,11 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
+@Deprecated
 public class Model {
 	private final TaxaBlock taxaBlock = new TaxaBlock();
 	private final TreesBlock treesBlock = new TreesBlock();

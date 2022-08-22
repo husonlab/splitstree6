@@ -17,13 +17,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
+@Deprecated
 public class DensiTreeMainController {
 	@FXML
 	private AnchorPane anchorPane;

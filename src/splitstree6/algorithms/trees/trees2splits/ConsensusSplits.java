@@ -111,7 +111,7 @@ public class ConsensusSplits extends Trees2Splits {
 						return BitSetUtils.compare(s1.getA(), s2.getA());
 				});
 
-				var pqTree = new PQTree();
+				var pqTree = new PQTree(taxaBlock.getTaxaSet());
 				for (var split : list) {
 					var set = split.getPartNotContaining(1);
 					if (pqTree.accept(set)) {
@@ -124,6 +124,7 @@ public class ConsensusSplits extends Trees2Splits {
 				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.cyclic) {
 					for (var split : splitsBlock.splits()) {
 						if (!Compatibility.isCyclic(taxaBlock.getNtax(), List.of(split), splitsBlock.getCycle())) {
+							System.err.println("Looks like a bug in the PQ-tree code, please contact me (Daniel Huson) about this");
 							System.err.println("Internal error: greedyPlanar: is not circular: " + split);
 							var cluster = split.getPartNotContaining(1);
 							System.err.println("Set: " + StringUtils.toString(cluster));
@@ -138,7 +139,7 @@ public class ConsensusSplits extends Trees2Splits {
 					progress.setProgress(0);
 					var random = new Random(666);
 					for (var run = 0; run < 1000; run++) {
-						var pqTree1 = new PQTree();
+						var pqTree1 = new PQTree(taxaBlock.getTaxaSet());
 						var accepted = new ArrayList<BitSet>();
 						var randomized = CollectionUtils.randomize(list, random);
 						for (var split : randomized) {
@@ -155,18 +156,17 @@ public class ConsensusSplits extends Trees2Splits {
 							}
 						}
 						if (bad != null) {
-							var pqtree2 = new PQTree();
+							var pqtree2 = new PQTree(taxaBlock.getTaxaSet());
 							pqtree2.verbose = true;
 							for (var split : randomized) {
 								var cluster = split.getPartNotContaining(1);
 								if (cluster.equals(bad))
-									System.err.println("Bad: " + StringUtils.toString(cluster));
+									System.err.println("Bad: " + StringUtils.toString(bad));
 								pqtree2.accept(cluster);
 								if (!pqtree2.check(bad))
 									System.err.println("Not accepted: " + StringUtils.toString(bad));
 								progress.checkForCancel();
 							}
-
 						}
 						progress.incrementProgress();
 					}

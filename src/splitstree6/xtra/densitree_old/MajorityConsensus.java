@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressPercentage;
@@ -30,6 +30,7 @@ import java.io.IOException;
  * computes the majority consensus tree
  * Daniel Huson, 3.2022
  */
+@Deprecated
 public class MajorityConsensus {
 	/**
 	 * computes the majority consensus tree

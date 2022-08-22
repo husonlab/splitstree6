@@ -49,9 +49,9 @@ public class GreedyTree extends Splits2Trees {
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splits, TreesBlock trees) throws IOException {
 
 		progress.setTasks("Greedy Tree", "Extracting compatible splits...");
-		final var cluster2Weight = new HashMap<BitSet, Double>();
+		final var clusterWeightConfidenceMap = new HashMap<BitSet, WeightConfidence>();
 		for (var split : splits.getSplits()) {
-			cluster2Weight.put(split.getPartNotContaining(1), split.getWeight());
+			clusterWeightConfidenceMap.put(split.getPartNotContaining(1), new WeightConfidence(split.getWeight(), split.getConfidence()));
 		}
 
 		final BitSet[] clusters;
@@ -90,7 +90,10 @@ public class GreedyTree extends Splits2Trees {
 			}
 			final var u = tree.newNode();
 			final var f = tree.newEdge(v, u);
-			tree.setWeight(f, cluster2Weight.get(cluster));
+			var weightConfidence = clusterWeightConfidenceMap.get(cluster);
+			tree.setWeight(f, weightConfidence.weight());
+			if (weightConfidence.confidence() != -1)
+				tree.setConfidence(f, weightConfidence.confidence());
 			node2taxa.put(u, cluster);
 		}
 
@@ -124,4 +127,6 @@ public class GreedyTree extends Splits2Trees {
 		progress.close();
 	}
 
+	private static record WeightConfidence(double weight, double confidence) {
+	}
 }

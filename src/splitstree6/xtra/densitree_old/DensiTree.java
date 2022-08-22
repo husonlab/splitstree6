@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.value.ChangeListener;
@@ -43,6 +43,7 @@ import java.util.*;
 /**
  * draw the densi-tree
  */
+@Deprecated
 public class DensiTree {
 
     public static void clear(Canvas canvas, Pane labelPane, Pane consensusPane, Pane highlightingPane) {

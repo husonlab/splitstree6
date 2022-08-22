@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -34,6 +34,7 @@ import splitstree6.main.Version;
 
 import java.io.File;
 
+@Deprecated
 public class DensiTreeMain extends Application {
 
 	public static void main(String[] args) {
@@ -101,15 +102,15 @@ public class DensiTreeMain extends Application {
 	}
 
 	@Override
-    public void start(Stage stage) {
-        var model = new Model();
+	public void start(Stage stage) {
+		var model = new Model();
 
-        var loader = new ExtendedFXMLLoader<DensiTreeMainController>(DensiTreeMainController.class);
-        var controller = loader.getController();
-        new DensiTreeMainPresenter(stage, controller, model);
-        stage.setScene(new Scene(loader.getRoot()));
-        stage.sizeToScene();
+		var loader = new ExtendedFXMLLoader<DensiTreeMainController>(DensiTreeMainController.class);
+		var controller = loader.getController();
+		new DensiTreeMainPresenter(stage, controller, model);
+		stage.setScene(new Scene(loader.getRoot()));
+		stage.sizeToScene();
 
-        stage.show();
-    }
+		stage.show();
+	}
 }

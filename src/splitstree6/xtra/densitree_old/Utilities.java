@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.densitree;
+package splitstree6.xtra.densitree_old;
 
 import javafx.stage.FileChooser;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
@@ -31,6 +31,7 @@ import splitstree6.io.readers.trees.NewickReader;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+@Deprecated
 public class Utilities {
 
 	public static FileChooser.ExtensionFilter getExtensionFilter() {
