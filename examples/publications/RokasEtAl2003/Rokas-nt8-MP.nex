@@ -1,0 +1,158 @@
+#nexus
+
+[!
+Rokas, A., Williams, B., King, N. et al. Genome-scale approaches to resolving incongruence in molecular phylogenies.
+Nature 425, 798–804 (2003). https://doi.org/10.1038/nature02053
+]
+
+BEGIN TAXA;
+DIMENSIONS ntax=8;
+TAXLABELS
+	[1] 'S._cerevisiae'
+	[2] 'S._paradoxus'
+	[3] 'S._mikatae'
+	[4] 'S._kudriavzevii'
+	[5] 'S._bayanus'
+	[6] 'S._castelli'
+	[7] 'S._kluyveri'
+	[8] 'C._albicans'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+[Number of trees: 129]
+PROPERTIES partialTrees=no rooted=yes;
+[TREES]
+		[1] tree 'tree-1'=[&R] (S._cerevisiae:82,S._paradoxus:62,(S._mikatae:98,(S._kudriavzevii:88,(S._bayanus:104,(S._castelli:193,(S._kluyveri:269,C._albicans:380):153):221):92):88):84);
+		[2] tree 'tree-2'=[&R] (S._cerevisiae:64,S._paradoxus:43,(S._mikatae:67,(S._kudriavzevii:53,(S._bayanus:68,(S._castelli:133,(S._kluyveri:215,C._albicans:417):146):179):71):65):54);
+		[3] tree 'tree-3'=[&R] (S._cerevisiae:70,S._paradoxus:52,((S._mikatae:60,(S._castelli:128,(S._kluyveri:195,C._albicans:257):129):184):50,(S._kudriavzevii:93,S._bayanus:112):42):54);
+		[4] tree 'tree-4'=[&R] (S._cerevisiae:71,S._paradoxus:51,(S._mikatae:70,((S._kudriavzevii:100,S._bayanus:105):44,(S._castelli:126,(S._kluyveri:201,C._albicans:251):131):156):66):54);
+		[5] tree 'tree-5'=[&R] (S._cerevisiae:47,S._paradoxus:35,(S._mikatae:47,(S._kudriavzevii:34,(S._bayanus:50,(S._castelli:76,(S._kluyveri:128,C._albicans:199):85):120):50):43):34);
+		[6] tree 'tree-6'=[&R] (S._cerevisiae:27,S._paradoxus:23,((S._mikatae:15,((S._castelli:120,C._albicans:138):48,S._kluyveri:88):85):23,(S._kudriavzevii:40,S._bayanus:24):15):27);
+		[7] tree 'tree-7'=[&R] (S._cerevisiae:32,S._paradoxus:44,((S._mikatae:46,(S._castelli:137,(S._kluyveri:166,C._albicans:230):81):166):44,(S._kudriavzevii:61,S._bayanus:76):17):45);
+		[8] tree 'tree-8'=[&R] (S._cerevisiae:28,S._paradoxus:48,((S._mikatae:77,S._kudriavzevii:62):21,(S._bayanus:46,((S._castelli:158,C._albicans:228):89,S._kluyveri:139):165):44):40);
+		[9] tree 'tree-9'=[&R] (S._cerevisiae:28,S._paradoxus:13,((S._mikatae:25,(S._castelli:58,(S._kluyveri:81,C._albicans:124):64):73):14,(S._kudriavzevii:20,S._bayanus:37):21):22);
+		[10] tree 'tree-10'=[&R] (S._cerevisiae:61,S._paradoxus:63,((S._mikatae:61,(S._castelli:157,(S._kluyveri:203,C._albicans:310):127):173):28,(S._kudriavzevii:82,S._bayanus:106):37):61);
+		[11] tree 'tree-11'=[&R] (S._cerevisiae:43,S._paradoxus:28,(S._mikatae:37,((S._kudriavzevii:53,S._bayanus:57):23,(S._castelli:87,(S._kluyveri:83,C._albicans:165):79):83):34):42);
+		[12] tree 'tree-12'=[&R] (S._cerevisiae:44,S._paradoxus:25,(S._mikatae:37,(S._kudriavzevii:45,(S._bayanus:37,(S._castelli:83,(S._kluyveri:129,C._albicans:164):64):102):33):36):30);
+		[13] tree 'tree-13'=[&R] (S._cerevisiae:43,S._paradoxus:25,(S._mikatae:40,((S._kudriavzevii:48,((S._castelli:107,C._albicans:174):49,S._kluyveri:110):103):24,S._bayanus:45):34):27);
+		[14] tree 'tree-14'=[&R] (S._cerevisiae:89,(S._paradoxus:65,(S._mikatae:108,(S._kudriavzevii:136,S._bayanus:154):62):79):57,((S._castelli:331,C._albicans:498):168,S._kluyveri:297):356);
+		[15] tree 'tree-15'=[&R] (S._cerevisiae:69,S._paradoxus:54,((S._mikatae:77,(S._castelli:150,(S._kluyveri:220,C._albicans:362):131):189):45,(S._kudriavzevii:86,S._bayanus:112):40):71);
+		[16] tree 'tree-16'=[&R] (S._cerevisiae:96,S._paradoxus:57,(S._mikatae:95,(S._kudriavzevii:92,(S._bayanus:78,((S._castelli:203,C._albicans:426):130,S._kluyveri:335):207):85):75):69);
+		[17] tree 'tree-17'=[&R] (S._cerevisiae:46,S._paradoxus:38,(S._mikatae:52,(S._kudriavzevii:52,(S._bayanus:44,(S._castelli:98,(S._kluyveri:137,C._albicans:167):88):126):44):39):33);
+		[18] tree 'tree-18'=[&R] (S._cerevisiae:18,(S._paradoxus:14,(S._mikatae:21,(S._kudriavzevii:27,S._bayanus:32):18):15):14,((S._castelli:62,C._albicans:146):56,S._kluyveri:45):79);
+		[19] tree 'tree-19'=[&R] (S._cerevisiae:25,S._paradoxus:17,(S._mikatae:23,(S._kudriavzevii:18,(S._bayanus:18,((S._castelli:60,C._albicans:148):52,S._kluyveri:49):76):25):23):13);
+		[20] tree 'tree-20'=[&R] (S._cerevisiae:102,S._paradoxus:64,(S._mikatae:88,(S._kudriavzevii:89,(S._bayanus:78,((S._castelli:240,C._albicans:377):151,S._kluyveri:334):218):92):101):63);
+		[21] tree 'tree-21'=[&R] (S._cerevisiae:93,S._paradoxus:67,(S._mikatae:81,(S._kudriavzevii:94,(S._bayanus:89,((S._castelli:252,C._albicans:471):140,S._kluyveri:266):241):91):88):52);
+		[22] tree 'tree-22'=[&R] (S._cerevisiae:102,S._paradoxus:74,(S._mikatae:86,(S._kudriavzevii:78,(S._bayanus:89,(S._castelli:146,(S._kluyveri:217,C._albicans:245):97):150):63):85):61);
+		[23] tree 'tree-23'=[&R] (S._cerevisiae:63,S._paradoxus:49,(S._mikatae:62,(S._kudriavzevii:70,(S._bayanus:78,(S._castelli:113,(S._kluyveri:174,C._albicans:307):106):163):63):66):57);
+		[24] tree 'tree-24'=[&R] (S._cerevisiae:25,S._paradoxus:27,(S._mikatae:27,((S._kudriavzevii:36,S._bayanus:43):13,((S._castelli:58,S._kluyveri:90):37,C._albicans:129):64):18):23);
+		[25] tree 'tree-25'=[&R] (S._cerevisiae:54,S._paradoxus:49,(S._mikatae:60,((S._kudriavzevii:81,S._bayanus:88):29,(S._castelli:196,(S._kluyveri:188,C._albicans:379):126):166):66):53);
+		[26] tree 'tree-26'=[&R] (S._cerevisiae:138,S._paradoxus:79,(S._mikatae:131,(S._kudriavzevii:119,(S._bayanus:122,(S._castelli:250,(S._kluyveri:340,C._albicans:571):216):289):113):103):102);
+		[27] tree 'tree-27'=[&R] (S._cerevisiae:44,S._paradoxus:14,(S._mikatae:42,(S._kudriavzevii:36,(S._bayanus:44,((S._castelli:114,C._albicans:152):71,S._kluyveri:97):128):40):36):31);
+		[28] tree 'tree-28'=[&R] (S._cerevisiae:39,S._paradoxus:45,(S._mikatae:47,(S._kudriavzevii:63,(S._bayanus:57,(S._castelli:116,(S._kluyveri:169,C._albicans:214):103):123):37):51):46);
+		[29] tree 'tree-29'=[&R] (S._cerevisiae:16,S._paradoxus:12,(S._mikatae:13,((S._kudriavzevii:25,S._bayanus:46):16,((S._castelli:53,C._albicans:132):41,S._kluyveri:64):58):28):28);
+		[30] tree 'tree-30'=[&R] (S._cerevisiae:45,S._paradoxus:26,(S._mikatae:47,(S._kudriavzevii:56,(S._bayanus:56,((S._castelli:132,C._albicans:241):79,S._kluyveri:118):129):54):50):32);
+		[31] tree 'tree-31'=[&R] (S._cerevisiae:63,S._paradoxus:49,(S._mikatae:72,(S._kudriavzevii:54,(S._bayanus:62,(S._castelli:121,(S._kluyveri:218,C._albicans:324):151):131):60):57):44);
+		[32] tree 'tree-32'=[&R] (S._cerevisiae:44,S._paradoxus:21,(S._mikatae:37,(S._kudriavzevii:30,(S._bayanus:43,(S._castelli:78,(S._kluyveri:121,C._albicans:190):88):99):45):38):31);
+		[33] tree 'tree-33'=[&R] (S._cerevisiae:13,S._paradoxus:17,(S._mikatae:26,((S._kudriavzevii:21,(S._castelli:44,(S._kluyveri:65,C._albicans:121):32):43):12,S._bayanus:28):20):18);
+		[34] tree 'tree-34'=[&R] (S._cerevisiae:110,S._paradoxus:67,(S._mikatae:107,(S._kudriavzevii:81,(S._bayanus:118,(S._castelli:228,(S._kluyveri:300,C._albicans:641):217):310):85):93):80);
+		[35] tree 'tree-35'=[&R] (S._cerevisiae:35,S._paradoxus:21,(S._mikatae:39,(S._kudriavzevii:45,(S._bayanus:38,((S._castelli:83,C._albicans:173):68,S._kluyveri:138):109):45):42):37);
+		[36] tree 'tree-36'=[&R] (S._cerevisiae:56,S._paradoxus:42,(S._mikatae:56,(S._kudriavzevii:69,(S._bayanus:47,(S._castelli:159,(S._kluyveri:204,C._albicans:391):148):181):55):60):57);
+		[37] tree 'tree-37'=[&R] (S._cerevisiae:13,(S._paradoxus:16,(S._kudriavzevii:28,S._bayanus:37):21):10,(S._mikatae:22,((S._castelli:50,S._kluyveri:91):38,C._albicans:100):58):20);
+		[38] tree 'tree-38'=[&R] (S._cerevisiae:24,S._paradoxus:10,((S._mikatae:16,((S._castelli:48,S._kluyveri:46):24,C._albicans:73):50):10,(S._kudriavzevii:24,S._bayanus:33):12):12);
+		[39] tree 'tree-39'=[&R] (S._cerevisiae:25,S._paradoxus:15,((S._mikatae:21,((S._castelli:88,C._albicans:110):60,S._kluyveri:65):100):17,(S._kudriavzevii:43,S._bayanus:42):31):27);
+		[40] tree 'tree-40'=[&R] (S._cerevisiae:51,S._paradoxus:26,(S._mikatae:39,(S._kudriavzevii:56,(S._bayanus:50,(S._castelli:118,(S._kluyveri:188,C._albicans:168):88):154):53):42):47);
+		[41] tree 'tree-41'=[&R] (S._cerevisiae:51,S._paradoxus:26,(S._mikatae:39,(S._kudriavzevii:58,(S._bayanus:46,((S._castelli:151,C._albicans:178):82,S._kluyveri:151):154):55):42):47);
+		[42] tree 'tree-42'=[&R] (S._cerevisiae:82,S._paradoxus:53,(S._mikatae:56,((S._kudriavzevii:98,S._bayanus:124):40,(S._castelli:108,(S._kluyveri:236,C._albicans:254):120):125):80):58);
+		[43] tree 'tree-43'=[&R] (S._cerevisiae:82,S._paradoxus:53,(S._mikatae:58,((S._kudriavzevii:99,S._bayanus:123):42,((S._castelli:165,C._albicans:259):100,S._kluyveri:194):131):71):57);
+		[44] tree 'tree-44'=[&R] (S._cerevisiae:54,S._paradoxus:45,((S._mikatae:83,S._kudriavzevii:75):28,(S._bayanus:65,((S._castelli:162,C._albicans:199):86,S._kluyveri:152):184):57):63);
+		[45] tree 'tree-45'=[&R] (S._cerevisiae:61,S._paradoxus:37,(S._mikatae:63,(S._kudriavzevii:55,(S._bayanus:66,((S._castelli:162,C._albicans:199):86,S._kluyveri:152):183):78):47):64);
+		[46] tree 'tree-46'=[&R] (S._cerevisiae:47,S._paradoxus:33,(S._mikatae:39,((S._kudriavzevii:63,S._bayanus:69):28,(S._castelli:105,(S._kluyveri:148,C._albicans:197):70):115):36):44);
+		[47] tree 'tree-47'=[&R] (S._cerevisiae:32,(S._paradoxus:27,((S._castelli:85,C._albicans:166):59,S._kluyveri:88):100):17,(S._mikatae:40,(S._kudriavzevii:48,S._bayanus:60):24):37);
+		[48] tree 'tree-48'=[&R] (S._cerevisiae:33,S._paradoxus:35,((S._mikatae:27,((S._castelli:92,C._albicans:159):55,S._kluyveri:92):99):26,(S._kudriavzevii:52,S._bayanus:56):18):39);
+		[49] tree 'tree-49'=[&R] (S._cerevisiae:95,S._paradoxus:67,((S._mikatae:71,(S._bayanus:108,(S._castelli:161,(S._kluyveri:257,C._albicans:426):144):198):102):70,S._kudriavzevii:83):61);
+		[50] tree 'tree-50'=[&R] (S._cerevisiae:36,S._paradoxus:25,(S._mikatae:45,(S._kudriavzevii:41,(S._bayanus:44,(S._castelli:37,(S._kluyveri:86,C._albicans:190):50):63):32):37):29);
+		[51] tree 'tree-51'=[&R] (S._cerevisiae:31,S._paradoxus:19,(S._mikatae:31,(S._kudriavzevii:40,(S._bayanus:38,(S._castelli:90,(S._kluyveri:93,C._albicans:169):51):92):22):29):22);
+		[52] tree 'tree-52'=[&R] (S._cerevisiae:38,S._paradoxus:19,(S._mikatae:26,(S._kudriavzevii:24,(S._bayanus:34,(S._castelli:56,(S._kluyveri:88,C._albicans:212):68):66):24):21):28);
+		[53] tree 'tree-53'=[&R] (S._cerevisiae:122,S._paradoxus:94,(S._mikatae:137,(S._kudriavzevii:146,(S._bayanus:135,((S._castelli:282,C._albicans:528):157,S._kluyveri:262):258):119):127):111);
+		[54] tree 'tree-54'=[&R] (S._cerevisiae:58,S._paradoxus:48,((S._mikatae:42,((S._castelli:148,C._albicans:229):92,S._kluyveri:165):153):41,(S._kudriavzevii:75,S._bayanus:97):20):45);
+		[55] tree 'tree-55'=[&R] (S._cerevisiae:59,S._paradoxus:47,(((S._mikatae:51,((S._castelli:149,C._albicans:228):92,S._kluyveri:165):144):56,S._kudriavzevii:61):32,S._bayanus:84):45);
+		[56] tree 'tree-56'=[&R] (S._cerevisiae:56,S._paradoxus:34,(S._mikatae:55,((S._kudriavzevii:76,S._bayanus:60):20,(S._castelli:69,(S._kluyveri:144,C._albicans:313):85):114):41):37);
+		[57] tree 'tree-57'=[&R] (S._cerevisiae:60,S._paradoxus:36,(S._mikatae:59,(S._kudriavzevii:54,(S._bayanus:57,(S._castelli:149,(S._kluyveri:189,C._albicans:218):105):145):73):42):39);
+		[58] tree 'tree-58'=[&R] (S._cerevisiae:42,S._paradoxus:36,(S._mikatae:58,((S._kudriavzevii:81,S._bayanus:103):41,((S._castelli:149,C._albicans:197):70,S._kluyveri:116):106):48):51);
+		[59] tree 'tree-59'=[&R] (S._cerevisiae:54,S._paradoxus:33,((S._mikatae:64,(S._kudriavzevii:89,S._bayanus:116):58):43,(S._castelli:138,(S._kluyveri:221,C._albicans:265):119):183):61);
+		[60] tree 'tree-60'=[&R] (S._cerevisiae:82,S._paradoxus:71,(S._mikatae:80,((S._kudriavzevii:95,((S._castelli:390,C._albicans:426):210,S._kluyveri:210):320):70,S._bayanus:83):80):90);
+		[61] tree 'tree-61'=[&R] (S._cerevisiae:45,S._paradoxus:42,(S._mikatae:62,((S._kudriavzevii:66,S._bayanus:75):31,((S._castelli:147,C._albicans:290):86,S._kluyveri:121):128):57):38);
+		[62] tree 'tree-62'=[&R] (S._cerevisiae:14,S._paradoxus:19,((S._mikatae:16,((S._castelli:68,S._kluyveri:67):30,C._albicans:70):64):19,(S._kudriavzevii:35,S._bayanus:28):10):18);
+		[63] tree 'tree-63'=[&R] (S._cerevisiae:47,S._paradoxus:36,(S._mikatae:69,(S._kudriavzevii:57,(S._bayanus:61,((S._castelli:180,C._albicans:303):103,S._kluyveri:153):199):47):48):36);
+		[64] tree 'tree-64'=[&R] (S._cerevisiae:37,S._paradoxus:27,(S._mikatae:38,(S._kudriavzevii:50,(S._bayanus:38,((S._castelli:74,C._albicans:207):65,S._kluyveri:135):88):42):41):32);
+		[65] tree 'tree-65'=[&R] (S._cerevisiae:66,S._paradoxus:59,(S._mikatae:85,(S._kudriavzevii:76,(S._bayanus:86,((S._castelli:209,C._albicans:356):132,S._kluyveri:190):212):79):67):59);
+		[66] tree 'tree-66'=[&R] (S._cerevisiae:82,S._paradoxus:62,(S._mikatae:83,(S._kudriavzevii:75,(S._bayanus:108,((S._castelli:286,C._albicans:397):162,S._kluyveri:197):289):106):67):68);
+		[67] tree 'tree-67'=[&R] (S._cerevisiae:65,(((S._bayanus:68,(S._castelli:155,(S._kluyveri:222,C._albicans:258):118):218):65,S._kudriavzevii:63):79,S._mikatae:64):61,S._paradoxus:53);
+		[68] tree 'tree-68'=[&R] (S._cerevisiae:112,S._paradoxus:80,(S._mikatae:116,(S._kudriavzevii:138,(S._bayanus:97,(S._castelli:267,(S._kluyveri:353,C._albicans:603):244):319):109):110):101);
+		[69] tree 'tree-69'=[&R] (S._cerevisiae:35,S._paradoxus:21,(S._mikatae:43,(S._kudriavzevii:30,(S._bayanus:38,(S._castelli:84,(S._kluyveri:107,C._albicans:174):62):97):34):22):35);
+		[70] tree 'tree-70'=[&R] (S._cerevisiae:33,S._paradoxus:27,(S._mikatae:31,((S._kudriavzevii:46,S._bayanus:40):19,((S._castelli:104,C._albicans:132):43,S._kluyveri:69):76):32):36);
+		[71] tree 'tree-71'=[&R] (S._cerevisiae:50,S._paradoxus:37,(S._mikatae:51,(S._kudriavzevii:50,(S._bayanus:59,(S._castelli:118,(S._kluyveri:137,C._albicans:271):95):121):58):39):40);
+		[72] tree 'tree-72'=[&R] (S._cerevisiae:87,S._paradoxus:45,(S._mikatae:54,(S._kudriavzevii:78,(S._bayanus:69,(S._castelli:103,(S._kluyveri:149,C._albicans:241):81):103):67):55):57);
+		[73] tree 'tree-73'=[&R] (S._cerevisiae:66,S._paradoxus:44,(S._mikatae:49,((S._kudriavzevii:77,S._bayanus:68):31,(S._castelli:117,(S._kluyveri:153,C._albicans:294):98):140):48):48);
+		[74] tree 'tree-74'=[&R] (S._cerevisiae:71,S._paradoxus:40,((S._mikatae:45,((S._castelli:155,S._kluyveri:168):86,C._albicans:253):162):28,(S._kudriavzevii:71,S._bayanus:74):28):52);
+		[75] tree 'tree-75'=[&R] (S._cerevisiae:58,S._paradoxus:58,((S._mikatae:68,(S._kudriavzevii:80,S._bayanus:124):61):45,(S._castelli:141,(S._kluyveri:172,C._albicans:303):102):147):72);
+		[76] tree 'tree-76'=[&R] (S._cerevisiae:58,(S._paradoxus:48,(S._mikatae:64,(S._kudriavzevii:79,S._bayanus:125):65):66):31,(S._castelli:144,(S._kluyveri:176,C._albicans:299):99):177);
+		[77] tree 'tree-77'=[&R] (S._cerevisiae:27,S._paradoxus:31,((S._mikatae:25,(S._castelli:80,(S._kluyveri:96,C._albicans:124):50):87):18,(S._kudriavzevii:40,S._bayanus:46):14):31);
+		[78] tree 'tree-78'=[&R] (S._cerevisiae:28,S._paradoxus:30,((S._mikatae:22,((S._castelli:95,S._kluyveri:100):46,C._albicans:109):89):19,(S._kudriavzevii:38,S._bayanus:48):16):29);
+		[79] tree 'tree-79'=[&R] (S._cerevisiae:62,S._paradoxus:51,(S._mikatae:94,(S._kudriavzevii:93,(S._bayanus:97,(S._castelli:189,(S._kluyveri:240,C._albicans:502):149):264):65):76):66);
+		[80] tree 'tree-80'=[&R] (S._cerevisiae:21,S._paradoxus:23,(S._mikatae:28,(S._kudriavzevii:33,(S._bayanus:20,(S._castelli:85,(S._kluyveri:123,C._albicans:149):49):75):32):25):30);
+		[81] tree 'tree-81'=[&R] (S._cerevisiae:100,S._paradoxus:70,(S._mikatae:87,(S._kudriavzevii:97,(S._bayanus:128,(S._castelli:286,(S._kluyveri:362,C._albicans:666):234):292):101):100):80);
+		[82] tree 'tree-82'=[&R] (S._cerevisiae:44,S._paradoxus:44,((S._mikatae:49,(S._kudriavzevii:79,S._bayanus:92):46):31,(S._castelli:115,(S._kluyveri:161,C._albicans:318):102):172):64);
+		[83] tree 'tree-83'=[&R] (S._cerevisiae:57,S._paradoxus:60,(S._mikatae:70,(S._kudriavzevii:72,(S._bayanus:80,(S._castelli:194,(S._kluyveri:181,C._albicans:241):121):186):81):56):60);
+		[84] tree 'tree-84'=[&R] (S._cerevisiae:58,S._paradoxus:59,((S._mikatae:90,S._kudriavzevii:102):20,(S._bayanus:78,(S._castelli:192,(S._kluyveri:181,C._albicans:241):123):188):67):60);
+		[85] tree 'tree-85'=[&R] (S._cerevisiae:43,S._paradoxus:19,(S._mikatae:42,(S._kudriavzevii:39,(S._bayanus:44,((S._castelli:85,S._kluyveri:161):67,C._albicans:150):84):35):38):30);
+		[86] tree 'tree-86'=[&R] (S._cerevisiae:97,S._paradoxus:90,(S._mikatae:100,(S._kudriavzevii:107,(S._bayanus:101,((S._castelli:295,C._albicans:564):178,S._kluyveri:236):263):102):79):91);
+		[87] tree 'tree-87'=[&R] (S._cerevisiae:48,S._paradoxus:32,((S._mikatae:41,(S._castelli:113,(S._kluyveri:160,C._albicans:226):73):155):32,(S._kudriavzevii:48,S._bayanus:120):41):50);
+		[88] tree 'tree-88'=[&R] (S._cerevisiae:48,S._paradoxus:32,(S._mikatae:44,((S._kudriavzevii:47,S._bayanus:121):36,((S._castelli:135,C._albicans:226):81,S._kluyveri:130):138):53):48);
+		[89] tree 'tree-89'=[&R] (S._cerevisiae:48,S._paradoxus:32,((S._mikatae:42,((S._castelli:137,C._albicans:224):71,S._kluyveri:140):156):31,(S._kudriavzevii:48,S._bayanus:120):42):48);
+		[90] tree 'tree-90'=[&R] (S._cerevisiae:43,(S._paradoxus:32,(S._mikatae:50,(S._kudriavzevii:69,S._bayanus:62):30):36):34,((S._castelli:143,S._kluyveri:158):89,C._albicans:225):176);
+		[91] tree 'tree-91'=[&R] (S._cerevisiae:50,S._paradoxus:38,((S._mikatae:42,(S._castelli:120,(S._kluyveri:154,C._albicans:259):82):177):37,(S._kudriavzevii:66,S._bayanus:65):18):39);
+		[92] tree 'tree-92'=[&R] (S._cerevisiae:39,S._paradoxus:35,(S._mikatae:44,(S._kudriavzevii:53,(S._bayanus:64,(S._castelli:113,(S._kluyveri:155,C._albicans:231):93):129):61):39):45);
+		[93] tree 'tree-93'=[&R] (S._cerevisiae:65,S._paradoxus:61,((S._mikatae:93,S._kudriavzevii:119):22,(S._bayanus:80,(S._castelli:151,(S._kluyveri:237,C._albicans:334):178):212):57):70);
+		[94] tree 'tree-94'=[&R] (S._cerevisiae:41,S._paradoxus:30,(S._mikatae:32,((S._kudriavzevii:58,S._bayanus:50):23,(S._castelli:83,(S._kluyveri:117,C._albicans:159):53):97):31):27);
+		[95] tree 'tree-95'=[&R] (S._cerevisiae:41,S._paradoxus:30,((S._mikatae:30,(S._castelli:75,(S._kluyveri:114,C._albicans:162):61):113):18,(S._kudriavzevii:55,S._bayanus:53):22):27);
+		[96] tree 'tree-96'=[&R] (S._cerevisiae:81,S._paradoxus:70,(S._mikatae:94,(S._kudriavzevii:115,(S._bayanus:102,(S._castelli:219,(S._kluyveri:279,C._albicans:387):136):241):82):100):88);
+		[97] tree 'tree-97'=[&R] (S._cerevisiae:77,S._paradoxus:62,(S._mikatae:78,(S._kudriavzevii:77,(S._bayanus:90,(S._castelli:129,(S._kluyveri:196,C._albicans:457):99):159):67):52):64);
+		[98] tree 'tree-98'=[&R] (S._cerevisiae:34,S._paradoxus:28,(S._mikatae:30,((S._kudriavzevii:53,S._bayanus:69):24,(S._castelli:73,(S._kluyveri:124,C._albicans:234):67):106):29):30);
+		[99] tree 'tree-99'=[&R] (S._cerevisiae:86,S._paradoxus:56,(S._mikatae:85,(S._kudriavzevii:99,(S._bayanus:80,((S._castelli:241,C._albicans:440):137,S._kluyveri:242):237):87):68):71);
+		[100] tree 'tree-100'=[&R] (S._cerevisiae:86,S._paradoxus:56,((S._mikatae:70,((S._castelli:245,C._albicans:436):134,S._kluyveri:245):250):49,(S._kudriavzevii:119,S._bayanus:127):39):73);
+		[101] tree 'tree-101'=[&R] (S._cerevisiae:84,S._paradoxus:50,(S._mikatae:78,(S._kudriavzevii:74,(S._bayanus:77,(S._castelli:183,(S._kluyveri:227,C._albicans:463):152):226):68):74):61);
+		[102] tree 'tree-102'=[&R] (S._cerevisiae:74,S._paradoxus:41,(S._mikatae:77,((S._kudriavzevii:90,S._bayanus:80):38,(S._castelli:136,(S._kluyveri:205,C._albicans:330):107):138):65):49);
+		[103] tree 'tree-103'=[&R] (S._cerevisiae:44,S._paradoxus:30,(S._mikatae:44,(S._kudriavzevii:55,(S._bayanus:65,(S._castelli:152,(S._kluyveri:192,C._albicans:225):106):142):59):48):46);
+		[104] tree 'tree-104'=[&R] (S._cerevisiae:50,S._paradoxus:37,(S._mikatae:45,((S._kudriavzevii:51,S._bayanus:88):24,((S._castelli:144,S._kluyveri:136):63,C._albicans:256):113):44):54);
+		[105] tree 'tree-105'=[&R] (S._cerevisiae:71,S._paradoxus:37,(S._mikatae:63,(S._kudriavzevii:43,(S._bayanus:55,(S._castelli:138,(S._kluyveri:173,C._albicans:232):103):155):66):53):53);
+		[106] tree 'tree-106'=[&R] (S._cerevisiae:42,S._paradoxus:28,(S._mikatae:53,(S._kudriavzevii:43,(S._bayanus:56,(S._castelli:110,(S._kluyveri:177,C._albicans:300):106):135):50):34):41);
+		[107] tree 'tree-107'=[&R] (S._cerevisiae:145,S._paradoxus:112,(S._mikatae:140,(S._kudriavzevii:144,(S._bayanus:141,(S._castelli:236,(S._kluyveri:303,C._albicans:439):204):276):118):107):110);
+		[108] tree 'tree-108'=[&R] (S._cerevisiae:71,S._paradoxus:52,(S._mikatae:45,(S._kudriavzevii:47,(S._bayanus:54,(S._castelli:116,(S._kluyveri:213,C._albicans:394):164):143):58):50):53);
+		[109] tree 'tree-109'=[&R] (S._cerevisiae:74,S._paradoxus:74,(S._mikatae:94,(S._kudriavzevii:72,(S._bayanus:81,(S._castelli:148,(S._kluyveri:201,C._albicans:372):130):205):77):68):52);
+		[110] tree 'tree-110'=[&R] (S._cerevisiae:31,S._paradoxus:40,(S._mikatae:49,(S._kudriavzevii:35,(S._bayanus:46,((S._castelli:120,S._kluyveri:132):60,C._albicans:185):106):43):40):34);
+		[111] tree 'tree-111'=[&R] (S._cerevisiae:33,S._paradoxus:39,((S._mikatae:42,((S._castelli:117,S._kluyveri:135):65,C._albicans:180):104):26,(S._kudriavzevii:41,S._bayanus:72):26):41);
+		[112] tree 'tree-112'=[&R] (S._cerevisiae:43,S._paradoxus:25,((S._mikatae:36,(S._castelli:85,(S._kluyveri:138,C._albicans:185):70):163):25,(S._kudriavzevii:46,S._bayanus:85):37):43);
+		[113] tree 'tree-113'=[&R] (S._cerevisiae:44,S._paradoxus:24,(S._mikatae:43,(S._kudriavzevii:52,(S._bayanus:44,(S._castelli:146,(S._kluyveri:152,C._albicans:315):110):137):56):41):37);
+		[114] tree 'tree-114'=[&R] (S._cerevisiae:27,S._paradoxus:22,(S._mikatae:35,(S._kudriavzevii:28,(S._bayanus:32,(S._castelli:72,(S._kluyveri:110,C._albicans:197):64):110):40):31):27);
+		[115] tree 'tree-115'=[&R] (S._cerevisiae:44,S._paradoxus:32,((S._mikatae:21,(S._castelli:70,(S._kluyveri:125,C._albicans:169):58):96):23,(S._kudriavzevii:44,S._bayanus:62):22):20);
+		[116] tree 'tree-116'=[&R] (S._cerevisiae:45,S._paradoxus:31,((S._mikatae:20,((S._castelli:87,S._kluyveri:128):44,C._albicans:163):97):24,(S._kudriavzevii:45,S._bayanus:61):22):19);
+		[117] tree 'tree-117'=[&R] (S._cerevisiae:24,S._paradoxus:21,(S._mikatae:33,((S._kudriavzevii:45,S._bayanus:44):18,(S._castelli:65,(S._kluyveri:92,C._albicans:163):71):82):26):29);
+		[118] tree 'tree-118'=[&R] (S._cerevisiae:27,S._paradoxus:18,(S._mikatae:32,(S._kudriavzevii:32,(S._bayanus:32,(S._castelli:65,(S._kluyveri:89,C._albicans:166):71):96):29):30):26);
+		[119] tree 'tree-119'=[&R] (S._cerevisiae:68,S._paradoxus:40,(S._mikatae:56,(S._kudriavzevii:55,(S._bayanus:40,((S._castelli:147,C._albicans:296):88,S._kluyveri:140):164):58):45):47);
+		[120] tree 'tree-120'=[&R] (S._cerevisiae:49,S._paradoxus:29,(S._mikatae:57,(S._kudriavzevii:55,(S._bayanus:45,((S._castelli:149,C._albicans:187):82,S._kluyveri:120):133):52):53):57);
+		[121] tree 'tree-121'=[&R] (S._cerevisiae:47,S._paradoxus:31,((S._mikatae:45,(S._castelli:124,(S._kluyveri:152,C._albicans:180):82):129):40,(S._kudriavzevii:68,S._bayanus:76):36):58);
+		[122] tree 'tree-122'=[&R] (S._cerevisiae:35,S._paradoxus:15,(S._mikatae:30,(S._kudriavzevii:37,(S._bayanus:35,(S._castelli:84,(S._kluyveri:112,C._albicans:158):68):120):37):34):23);
+		[123] tree 'tree-123'=[&R] (S._cerevisiae:56,S._paradoxus:52,(S._mikatae:63,(S._kudriavzevii:67,(S._bayanus:64,(S._castelli:159,(S._kluyveri:221,C._albicans:357):166):223):69):64):46);
+		[124] tree 'tree-124'=[&R] (S._cerevisiae:58,S._paradoxus:50,(S._mikatae:46,(S._kudriavzevii:48,(S._bayanus:52,((S._castelli:159,C._albicans:239):83,S._kluyveri:115):150):48):47):44);
+		[125] tree 'tree-125'=[&R] (S._cerevisiae:103,S._paradoxus:80,(S._mikatae:116,(S._kudriavzevii:116,(S._bayanus:137,(S._castelli:220,(S._kluyveri:290,C._albicans:602):196):278):100):116):99);
+		[126] tree 'tree-126'=[&R] (S._cerevisiae:45,S._paradoxus:33,(S._mikatae:48,((S._kudriavzevii:61,S._bayanus:61):27,(S._castelli:95,(S._kluyveri:162,C._albicans:197):75):90):52):37);
+		[127] tree 'tree-127'=[&R] (S._cerevisiae:46,S._paradoxus:32,(S._mikatae:53,(S._kudriavzevii:46,(S._bayanus:38,((S._castelli:133,C._albicans:200):69,S._kluyveri:127):117):41):45):36);
+		[128] tree 'tree-128'=[&R] (S._cerevisiae:76,S._paradoxus:65,(S._mikatae:91,(S._kudriavzevii:94,(S._bayanus:90,(S._castelli:188,(S._kluyveri:226,C._albicans:423):142):195):88):73):79);
+		[129] tree 'tree-129'=[&R] (S._cerevisiae:51,S._paradoxus:47,(S._mikatae:50,(S._kudriavzevii:50,(S._bayanus:67,(S._castelli:136,(S._kluyveri:182,C._albicans:253):92):191):66):53):51);
+END; [TREES]
+
