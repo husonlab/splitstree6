@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * Daniel Huson, 12.2021
  */
 public class LayoutUtils {
-	public static final double MAX_FONT_SIZE = 24;
+	public static final double MAX_FONT_SIZE = RichTextLabel.DEFAULT_FONT.getSize();
 
 	public static FontHeightGraphWidthHeight computeFontHeightGraphWidthHeight(int nTaxa, Function<Integer, StringProperty> taxonLabelMap, PhyloGraph graph, boolean radial, double width, double height) {
 		double fontHeight;
