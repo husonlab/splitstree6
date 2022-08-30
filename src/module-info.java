@@ -14,15 +14,18 @@ module splitstreesix {
 
 	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
-    opens splitstree6.resources.images;
+	opens splitstree6.resources.images;
 
-    opens splitstree6.algorithms.characters.characters2characters;
+	opens splitstree6.algorithms.characters.characters2characters;
 	opens splitstree6.algorithms.characters.characters2distances;
 	opens splitstree6.algorithms.characters.characters2distances.nucleotide;
 	opens splitstree6.algorithms.characters.characters2network;
 	opens splitstree6.algorithms.characters.characters2view;
 	opens splitstree6.algorithms.characters.characters2splits;
 	opens splitstree6.algorithms.characters.characters2trees;
+
+	opens splitstree6.algorithms.genomes.genomes2genomes;
+	opens splitstree6.algorithms.genomes.genome2distances;
 
 	opens splitstree6.algorithms.distances.distances2distances;
 	opens splitstree6.algorithms.distances.distances2network;
@@ -55,6 +58,7 @@ module splitstreesix {
 
 
 	opens splitstree6.io.readers.characters;
+	opens splitstree6.io.readers.genomes;
 	opens splitstree6.io.readers.distances;
 	opens splitstree6.io.readers.splits;
 	// opens splitstree6.io.readers.taxa;
@@ -63,6 +67,7 @@ module splitstreesix {
 	opens splitstree6.io.readers.view;
 
 	opens splitstree6.io.writers.characters;
+	opens splitstree6.io.writers.genomes;
 	opens splitstree6.io.writers.distances;
 	opens splitstree6.io.writers.splits;
 	opens splitstree6.io.writers.trees;
