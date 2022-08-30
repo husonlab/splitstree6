@@ -34,15 +34,14 @@ public class WorkflowTreeView extends AnchorPane implements IDisplayTab {
 	private final WorkflowTreeViewController controller;
 	private final WorkflowTreeViewPresenter presenter;
 
-	private final UndoManager undoManager = new UndoManager();
-	private final MainWindow mainWindow;
+	private final UndoManager undoManager;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
 	/**
 	 * constructor
 	 */
 	public WorkflowTreeView(MainWindow mainWindow) {
-		this.mainWindow = mainWindow;
+		this.undoManager = mainWindow.getWorkflowTab().getUndoManager();
 
 		var extendedFXMLLoader = new ExtendedFXMLLoader<WorkflowTreeViewController>(this.getClass());
 		controller = extendedFXMLLoader.getController();

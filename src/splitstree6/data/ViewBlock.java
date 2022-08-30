@@ -25,6 +25,8 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.WeakChangeListener;
 import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.options.OptionIO;
@@ -45,6 +47,15 @@ public class ViewBlock extends DataBlock {
 	private InvalidationListener invalidationListener;
 
 	private ViewTab viewTab;
+
+	private final ChangeListener<Boolean> validListener;
+
+	{
+		validListener = (v, o, n) -> {
+			if (n && getView() != null)
+				getView().getUndoManager().clear();
+		};
+	}
 
 	@Override
 	public void setNode(DataNode node) {
@@ -70,6 +81,7 @@ public class ViewBlock extends DataBlock {
 				}
 			};
 			node.getParents().addListener(new WeakInvalidationListener(invalidationListener));
+			node.validProperty().addListener(new WeakChangeListener<>(validListener));
 		}
 	}
 

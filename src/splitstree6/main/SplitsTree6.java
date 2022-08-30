@@ -44,6 +44,7 @@ import java.util.ArrayList;
 
 public class SplitsTree6 extends Application {
 	private static final ArrayList<String> inputFiles = new ArrayList<>();
+	public static boolean expertMode = false;
 
 	/**
 	 * main
@@ -110,6 +111,8 @@ public class SplitsTree6 extends Application {
 		final var silentMode = options.getOption("-S", "silentMode", "Silent mode", false);
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Maximum number of threads to use in a parallel algorithm (0=all available)", 0));
 		ProgramProperties.setConfirmQuit(options.getOption("-q", "confirmQuit", "Confirm quit on exit", ProgramProperties.isConfirmQuit()));
+
+		expertMode = options.getOption("-X", "extras", "This is for internal use only", false);
 
 		options.done();
 

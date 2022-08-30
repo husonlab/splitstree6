@@ -39,6 +39,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.stage.Stage;
+import jloda.fx.control.ProgressPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.*;
@@ -50,10 +51,8 @@ import jloda.graph.algorithms.PQTree;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
-import jloda.util.BitSetUtils;
-import jloda.util.CollectionUtils;
-import jloda.util.IteratorUtils;
-import jloda.util.Pair;
+import jloda.util.*;
+import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
@@ -79,9 +78,7 @@ public class DensiTreeDrawer {
 
 	private final InvalidationListener invalidationListener;
 
-	private final AService<Result> service;
-
-	private final AService<Boolean> redrawService;
+	private final AService<Boolean> service;
 
 	public DensiTreeDrawer(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
@@ -116,21 +113,31 @@ public class DensiTreeDrawer {
 			}
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(invalidationListener));
-
-		redrawService = new AService<Boolean>(mainWindow.getController().getBottomFlowPane());
 	}
 
-	public void apply(Bounds targetBounds, List<PhyloTree> phyloTrees, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
+	public void apply(Bounds targetBounds, List<PhyloTree> trees, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, ReadOnlyBooleanProperty showConsensus) {
 		radialLabelLayout.getItems().clear();
 
 		RunAfterAWhile.applyInFXThread(parent, () -> {
-			var oldCanvas = (Canvas) parent.getChildren().get(0);
-			oldCanvas.setOpacity(0.2);
-			var canvas = new Canvas(targetBounds.getWidth(), targetBounds.getHeight());
-			ChangeListener<Boolean> listener = (v, o, n) -> canvas.setVisible(n);
-			canvas.setUserData(listener);
+			parent.getChildren().clear();
+
+			var canvas0 = new Canvas(targetBounds.getWidth(), targetBounds.getHeight());
+			var canvas1 = (colorIncompatibleEdges ? new Canvas(targetBounds.getWidth(), targetBounds.getHeight()) : null);
+
+			ChangeListener<Boolean> listener = (v, o, n) -> {
+				canvas0.setVisible(n);
+				if (canvas1 != null)
+					canvas0.setVisible(n);
+			};
+			parent.getChildren().add(canvas0);
+			canvas0.setUserData(listener);
+			if (canvas1 != null) {
+				parent.getChildren().add(canvas1);
+				canvas1.setUserData(listener);
+			}
+
 			showTrees.addListener(new WeakChangeListener<>(listener));
 
 			var pane = new Pane();
@@ -138,8 +145,7 @@ public class DensiTreeDrawer {
 				if (!e.isShiftDown())
 					mainWindow.getTaxonSelectionModel().clearSelection();
 			});
-			parent.getChildren().set(0, canvas);
-			parent.getChildren().set(1, pane);
+			parent.getChildren().add(pane);
 
 			pane.setMinSize(targetBounds.getWidth(), targetBounds.getHeight());
 			pane.setPrefSize(targetBounds.getWidth(), targetBounds.getHeight());
@@ -155,67 +161,88 @@ public class DensiTreeDrawer {
 
 			var bounds = new BoundingBox(minX, minY, width + (diagramType.isRadialOrCircular() ? 0 : -200), height);
 
+			service.setCallable(() -> {
+				var progress = service.getProgressListener();
+				progress.setTasks("Drawing", "Trees");
+				progress.setMaximum(trees.size());
+				progress.setProgress(0);
+				if (progress instanceof ProgressPane progressPane)
+					progressPane.setVisible(true);
 
-			redrawService.setCallable(() -> {
 				final NodeArray<Point2D> consensusNodePointMap = consensusTree.newNodeArray();
 				var nodeAngleMap = consensusTree.newNodeDoubleArray();
-				{
-					var cycle = computeConsensusAndCycle(mainWindow.getWorkingTaxa(), consensusTree, phyloTrees);
-					final var taxon2pos = new int[cycle.length];
-					for (var pos = 1; pos < cycle.length; pos++) {
-						taxon2pos[cycle[pos]] = pos;
-					}
-					var lastTaxon = cycle[cycle.length - 1];
 
-					Point2D consensusScale;
-					if (diagramType.isRadialOrCircular()) {
-						computeRadialLayout(consensusTree, taxon2pos, mainWindow.getWorkingTaxa().getNtax(), lastTaxon, consensusNodePointMap, nodeAngleMap);
-						consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
-					} else {
-						computeTriangularLayout(consensusTree, taxon2pos, consensusNodePointMap);
-						consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
-					}
-					var consensusCenter = computeCenter(consensusNodePointMap.values());
-					Platform.runLater(() -> {
-						drawConsensus(mainWindow, consensusTree, consensusNodePointMap, nodeAngleMap, diagramType, radialLabelLayout, showConsensus, pane);
-					});
-
-					var random = new Random(666);
-
-					var progress = redrawService.getProgressListener();
-					progress.setTasks("Drawing", "Trees");
-					if (colorIncompatibleEdges) {
-						progress.setMaximum(2L * phyloTrees.size());
-						progress.setProgress(0);
-						var consensusClusters = TreesUtilities.extractClusters(consensusTree);
-						for (var i = 0; i <= 1; i++) {
-							var round = i;
-							for (var tree : phyloTrees) {
-								final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, taxon2pos, lastTaxon, consensusCenter, consensusScale, diagramType);
-								Platform.runLater(() -> {
-									drawTree(tree, nodePointMap, consensusClusters.values(), diagramType, round, jitter, random, canvas);
-									ProgramExecutorService.submit(nodePointMap::close);
-								});
-								progress.incrementProgress();
-							}
-						}
-					} else {
-						progress.setMaximum(phyloTrees.size());
-						progress.setProgress(0);
-						for (var tree : phyloTrees) {
-							final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, taxon2pos, lastTaxon, consensusCenter, consensusScale, diagramType);
-							Platform.runLater(() -> {
-								drawTree(tree, nodePointMap, null, diagramType, 2, jitter, random, canvas);
-								ProgramExecutorService.submit(nodePointMap::close);
-							});
-							progress.incrementProgress();
-						}
-					}
-					progress.reportTaskCompleted();
+				var cycle = computeConsensusAndCycle(mainWindow.getWorkingTaxa(), consensusTree, trees);
+				final var taxon2pos = new int[cycle.length];
+				for (var pos = 1; pos < cycle.length; pos++) {
+					taxon2pos[cycle[pos]] = pos;
 				}
+				var lastTaxon = cycle[cycle.length - 1];
+
+				Point2D consensusScale;
+				if (diagramType.isRadialOrCircular()) {
+					computeRadialLayout(consensusTree, taxon2pos, mainWindow.getWorkingTaxa().getNtax(), lastTaxon, consensusNodePointMap, nodeAngleMap);
+					consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
+				} else {
+					computeTriangularLayout(consensusTree, taxon2pos, consensusNodePointMap);
+					consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
+				}
+				var consensusCenter = computeCenter(consensusNodePointMap.values());
+				Platform.runLater(() -> {
+					drawConsensus(mainWindow, consensusTree, consensusNodePointMap, nodeAngleMap, diagramType, getRadialLabelLayout(), showConsensus, pane);
+				});
+
+				var random = new Random(666);
+				var start = System.currentTimeMillis();
+
+				if (colorIncompatibleEdges) {
+					for (PhyloTree tree : trees) {
+						var consensusClusters = TreesUtilities.extractClusters(consensusTree).values();
+						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, taxon2pos, lastTaxon, consensusCenter, consensusScale,
+								diagramType, jitter, random);
+						Platform.runLater(() -> {
+							try {
+								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 0, canvas0);
+								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 1, canvas1);
+								progress.incrementProgress();
+							} catch (CanceledException ignored) {
+							}
+							ProgramExecutorService.submit(nodePointMap::close);
+						});
+						progress.checkForCancel();
+						if (System.currentTimeMillis() - start > 200) {
+							Thread.sleep(20);
+							start = System.currentTimeMillis();
+						}
+					}
+				} else {
+					for (PhyloTree tree : trees) {
+						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, taxon2pos, lastTaxon, consensusCenter, consensusScale,
+								diagramType, jitter, random);
+						Platform.runLater(() -> {
+							try {
+								drawTree(progress, tree, nodePointMap, null, diagramType, 2, canvas0);
+								progress.incrementProgress();
+							} catch (CanceledException ignored) {
+							}
+							ProgramExecutorService.submit(nodePointMap::close);
+						});
+						progress.checkForCancel();
+						if (System.currentTimeMillis() - start > 200) {
+							Thread.sleep(20);
+							start = System.currentTimeMillis();
+						}
+					}
+				}
+				progress.reportTaskCompleted();
 				return true;
 			});
-			redrawService.restart();
+			service.setOnSucceeded(e -> {
+				postprocessLabels(mainWindow.getStage(), mainWindow.getWorkingTaxa(), mainWindow.getTaxonSelectionModel(), pane, fontScaleFactor);
+				Platform.runLater(() -> invalidationListener.invalidated(null));
+				RunAfterAWhile.applyInFXThread(getRadialLabelLayout(), () -> getRadialLabelLayout().layoutLabels());
+			});
+			service.restart();
 		});
 	}
 
@@ -309,7 +336,8 @@ public class DensiTreeDrawer {
 	}
 
 	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, int[] taxon2pos, int lastTaxon,
-															 Point2D consensusCenter, Point2D consensusScale, DensiTreeDiagramType diagramType) {
+															 Point2D consensusCenter, Point2D consensusScale, DensiTreeDiagramType diagramType,
+															 boolean jitter, Random random) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
 		if (diagramType.isRadialOrCircular()) {
@@ -328,24 +356,23 @@ public class DensiTreeDrawer {
 			var center = computeCenter(nodePointMap.values());
 			LayoutUtils.translate(consensusCenter.subtract(center).getX(), consensusCenter.subtract(center).getY(), nodePointMap);
 		}
-		return nodePointMap;
-	}
 
-	private static void drawTree(PhyloTree tree, NodeArray<Point2D> nodePointMap, Collection<BitSet> consensusClusters,
-								 DensiTreeDiagramType diagramType, int round, boolean jitter, Random random, Canvas canvas) {
-
-		var gc = canvas.getGraphicsContext2D();
-
-		gc.setLineWidth(0.25);
-
-		var treeClusters = (round < 2 ? TreesUtilities.extractClusters(tree) : null);
-
-		if (jitter) { // todo: fix this so both black and red jittered together
+		if (jitter) {
 			var distance = 2 * Math.pow(2 * random.nextGaussian(), 2);
 			var angle = 360 * random.nextDouble();
 			var direction = GeometryUtilsFX.translateByAngle(0, 0, angle, distance);
 			LayoutUtils.translate(direction.getX(), direction.getY(), nodePointMap);
 		}
+		return nodePointMap;
+	}
+
+	private static void drawTree(ProgressListener progress, PhyloTree tree, NodeArray<Point2D> nodePointMap, Collection<BitSet> consensusClusters,
+								 DensiTreeDiagramType diagramType, int round, Canvas canvas) throws CanceledException {
+		var gc = canvas.getGraphicsContext2D();
+
+		gc.setLineWidth(0.25);
+
+		var treeClusters = (round < 2 ? TreesUtilities.extractClusters(tree) : null);
 
 		var black = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK).deriveColor(1, 1, 1, 0.05);
 		var red = Color.DARKRED.deriveColor(1, 1, 1, 0.05);
@@ -386,6 +413,7 @@ public class DensiTreeDrawer {
 						gc.stroke();
 					}
 				}
+				progress.checkForCancel();
 			}
 		}
 	}
