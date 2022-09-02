@@ -64,7 +64,7 @@ public class IncrementalFitting {
                 for (int i = 1; i < k; i++)
                     for (int j = i + 1; j < k; j++)
                         maxdiff = max(maxdiff, abs(p[cycle[i]][cycle[j]] - d[cycle[i]][cycle[j]]));
-                System.err.println("k=" + k + "\t diff = " + maxdiff);
+                //System.err.println("k=" + k + "\t diff = " + maxdiff);
             }
 
             int sk = s[k];  //Taxon to re-insert
@@ -153,7 +153,7 @@ public class IncrementalFitting {
                 cycle[k-j+1]=cycle[k-j];
             cycle[r1+1]=sk;
 
-            System.err.println("Adding taxon "+sk);
+            //System.err.println("Adding taxon "+sk);
             if (false && search) {
                 //We carry out one iteration  of a steepest descent search
                 for(int i=1;i<=k;i++) {
@@ -214,7 +214,7 @@ public class IncrementalFitting {
                 fx += 2.0 * res*res;
             }
         }
-        System.err.println("\t\tt="+t+"\tfx = "+fx);
+        //System.err.println("\t\tt="+t+"\tfx = "+fx);
         return fx;
     }
 

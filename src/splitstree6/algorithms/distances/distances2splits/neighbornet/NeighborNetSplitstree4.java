@@ -122,7 +122,6 @@ public class NeighborNetSplitstree4 {
                         res[i] -= d[i];
                         fx += res[i]*res[i];
                     }
-                    fx *= 0.5;
                     calculateAtx(ntax,res,grad);
                     double pgx = 0.0;
                     for(var i=0;i<npairs;i++) {

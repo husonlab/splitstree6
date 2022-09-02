@@ -42,7 +42,7 @@ import java.util.List;
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot}
+	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,SBB}
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.FastMethod);
 
@@ -86,23 +86,28 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.collapseMultiple = false;
 			int n = cycle.length - 1; //ntax
 			params.cgIterations = Math.min(Math.max(n,10),20);
+			params.logfile = "GradientProjectionFast.m";
 		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.CarefulMethod) {
 			params.greedy = false;
 			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.GRADPROJECTION;
 			params.collapseMultiple = false;
 			int n = cycle.length - 1; //ntax
 			params.outerIterations = n*(n-1)/2;
+			params.logfile = "GradientProjectionCareful.m";
 		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.ProjectedGradient) {
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.PROJECTEDGRAD;
+			params.logfile = "ProjectedGradient.m";
 		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.BlockPivot) {
 				params.cgIterations = Math.max(cycle.length,10);
 				params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.BLOCKPIVOT;
+				params.logfile = "blockPivot.m";
 		}
-//		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.SBB) {
-//			params.tolerance = 1e-3;
-//			params.outerIterations = 1000;
-//			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.SBB;
-//		}
+		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.SBB) {
+			params.tolerance = 1e-3;
+			params.outerIterations = 1000;
+			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.SBB;
+			params.logfile = "subspaceBB.m";
+		}
 		else {//ST4 version
 			params.greedy = false;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
@@ -112,10 +117,9 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.fractionNegativeToKeep = 0.4;
 			params.useInsertionAlgorithm = false;
 			params.logfile = "ST4Convergence.m";
-
 		}
 
-		if (params.logfile!=null) {
+		if (false && params.logfile!=null) {
 			try {
 				params.log = new PrintWriter(params.logfile);
 			} catch (FileNotFoundException e) {
@@ -125,7 +129,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		var splits = NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
 
-		if (params.logfile!=null) {
+		if (params.log!=null) {
 			params.log.flush();
 			params.log.close();
 		}
