@@ -65,7 +65,7 @@ public class StandardStateLabeler extends StateLabeler {
 		}
 	}
 
-	//TODO: The following don't computeCycle to microsat or protein+token
+	//TODO: The following don't computeConsensusAndCycle to microsat or protein+token
 
 	/**
 	 * Check if a site has states stored for it

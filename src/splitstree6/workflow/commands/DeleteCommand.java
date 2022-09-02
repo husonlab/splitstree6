@@ -19,12 +19,12 @@
 
 package splitstree6.workflow.commands;
 
-import javafx.util.Pair;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.workflow.Workflow;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
 
 /**
  * delete an algorithm node and all dependent nodes
@@ -32,29 +32,14 @@ import java.util.*;
  */
 public class DeleteCommand {
 	public static UndoableRedoableCommand create(Workflow workflow, WorkflowNode node) {
-		final Collection<WorkflowNode> nodes = workflow.getAllDescendants(node, true);
-		Collection<Pair<WorkflowNode, WorkflowNode>> parentChildPairs = getParentChildPairs(nodes);
+		final var nodes = workflow.getAllDescendants(node, true);
 
 		return UndoableRedoableCommand.create("delete nodes",
-                () -> workflow.addNodes(nodes, parentChildPairs),
-                () -> {
-                    var reverse = new ArrayList<>(nodes);
-                    Collections.reverse(reverse);
-                    workflow.deleteNodes(reverse);
-                });
-	}
-
-	public static Set<Pair<WorkflowNode, WorkflowNode>> getParentChildPairs(Collection<WorkflowNode> nodes) {
-		var set = new HashSet<Pair<WorkflowNode, WorkflowNode>>();
-
-		for (var node : nodes) {
-			for (var parent : node.getParents()) {
-				set.add(new Pair<>(parent, node));
-			}
-			for (var child : node.getChildren()) {
-				set.add(new Pair<>(node, child));
-			}
-		}
-		return set;
+				() -> workflow.addNodes(nodes),
+				() -> {
+					var reverse = new ArrayList<>(nodes);
+					Collections.reverse(reverse);
+					workflow.deleteNodes(reverse);
+				});
 	}
 }

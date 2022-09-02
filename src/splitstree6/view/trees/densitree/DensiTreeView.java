@@ -19,6 +19,7 @@
 
 package splitstree6.view.trees.densitree;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
@@ -43,6 +44,8 @@ import splitstree6.window.MainWindow;
 import java.util.List;
 
 public class DensiTreeView implements IView {
+	private static boolean startup = true;
+
 	private final UndoManager undoManager = new UndoManager();
 
 	private final DensiTreeViewController controller;
@@ -59,28 +62,40 @@ public class DensiTreeView implements IView {
 
 	private final ObjectProperty<DensiTreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", DensiTreeDiagramType.TriangularPhylogram);
 
+	private final BooleanProperty optionShowTrees = new SimpleBooleanProperty(this, "optionShowTrees", true);
+
+	private final BooleanProperty optionShowConsensus = new SimpleBooleanProperty(this, "optionShowConsensus", true);
+
 	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0 / 1.2);
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0 / 1.2);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
-	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", true);
-	private final BooleanProperty optionAntiConsensus = new SimpleBooleanProperty(this, "optionAntiConsensus", false);
-	private final BooleanProperty optionShowConsensusTree = new SimpleBooleanProperty(this, "optionShowConsensusTree", true);
+	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", false);
+	private final BooleanProperty optionColorIncompatibleEdges = new SimpleBooleanProperty(this, "optionColorIncompatibleEdges", true);
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	{
 		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
-		ProgramProperties.track(optionJitter, true);
-		ProgramProperties.track(optionAntiConsensus, false);
-		ProgramProperties.track(optionShowConsensusTree, true);
+		ProgramProperties.track(optionShowTrees, true);
+		ProgramProperties.track(optionShowConsensus, true);
+		ProgramProperties.track(optionJitter, false);
+		ProgramProperties.track(optionColorIncompatibleEdges, false);
+		if (startup) {
+			startup = false;
+			optionDiagram.set(DensiTreeDiagramType.TriangularPhylogram);
+			optionShowTrees.set(true);
+			optionShowConsensus.set(true);
+			optionJitter.set(false);
+			optionColorIncompatibleEdges.set(true);
+		}
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(),
+		return List.of(optionDiagram.getName(), optionShowTrees.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionJitter.getName(), optionAntiConsensus.getName(), optionShowConsensusTree.getName());
+				optionFontScaleFactor.getName(), optionJitter.getName(), optionColorIncompatibleEdges.getName());
 	}
 
 	public DensiTreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -111,6 +126,17 @@ public class DensiTreeView implements IView {
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
+
+		// one of the two should always be selected:
+		optionShowTrees.addListener((v, o, n) -> {
+			if (!n && !optionShowConsensus.get())
+				Platform.runLater(() -> optionShowConsensus.set(true));
+		});
+		optionShowConsensus.addListener((v, o, n) -> {
+			if (!n && !optionShowTrees.get())
+				Platform.runLater(() -> optionShowTrees.set(true));
+		});
+
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
 	}
@@ -201,6 +227,30 @@ public class DensiTreeView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
+	public boolean isOptionShowTrees() {
+		return optionShowTrees.get();
+	}
+
+	public BooleanProperty optionShowTreesProperty() {
+		return optionShowTrees;
+	}
+
+	public void setOptionShowTrees(boolean optionShowTrees) {
+		this.optionShowTrees.set(optionShowTrees);
+	}
+
+	public boolean isOptionShowConsensus() {
+		return optionShowConsensus.get();
+	}
+
+	public BooleanProperty optionShowConsensusProperty() {
+		return optionShowConsensus;
+	}
+
+	public void setOptionShowConsensus(boolean optionShowConsensus) {
+		this.optionShowConsensus.set(optionShowConsensus);
+	}
+
 	public double getOptionHorizontalZoomFactor() {
 		return optionHorizontalZoomFactor.get();
 	}
@@ -274,27 +324,15 @@ public class DensiTreeView implements IView {
 		return optionJitter;
 	}
 
-	public boolean isOptionAntiConsensus() {
-		return optionAntiConsensus.get();
+	public boolean getOptionColorIncompatibleEdges() {
+		return optionColorIncompatibleEdges.get();
 	}
 
-	public BooleanProperty optionAntiConsensusProperty() {
-		return optionAntiConsensus;
+	public BooleanProperty optionColorIncompatibleEdgesProperty() {
+		return optionColorIncompatibleEdges;
 	}
 
-	public void setOptionAntiConsensus(boolean optionAntiConsensus) {
-		this.optionAntiConsensus.set(optionAntiConsensus);
-	}
-
-	public boolean isOptionShowConsensusTree() {
-		return optionShowConsensusTree.get();
-	}
-
-	public BooleanProperty optionShowConsensusTreeProperty() {
-		return optionShowConsensusTree;
-	}
-
-	public void setOptionShowConsensusTree(boolean optionShowConsensusTree) {
-		this.optionShowConsensusTree.set(optionShowConsensusTree);
+	public void setOptionColorIncompatibleEdges(boolean optionColorIncompatibleEdges) {
+		this.optionColorIncompatibleEdges.set(optionColorIncompatibleEdges);
 	}
 }

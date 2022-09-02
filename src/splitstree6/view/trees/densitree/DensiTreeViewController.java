@@ -87,8 +87,6 @@ public class DensiTreeViewController {
 	@FXML
 	private Pane mainPane;
 
-	@FXML
-	private CheckMenuItem showConsensusTreeMenuItem;
 
 	@FXML
 	private RadioMenuItem trianglePhylogramToggleItem;
@@ -106,18 +104,25 @@ public class DensiTreeViewController {
 	private MenuButton menuButton;
 
 	@FXML
+	private CheckMenuItem showTreesMenuItem;
+
+	@FXML
+	private CheckMenuItem showConsensusMenuItem;
+
+	@FXML
 	private CheckMenuItem jitterMenuItem;
 
 	@FXML
 	private CheckMenuItem colorIncompatibleTreesMenuItem;
 
-	private final ToggleGroup toggleGroup = new ToggleGroup();
+	private final ToggleGroup diagramToggleGroup = new ToggleGroup();
 
 	@FXML
 	private void initialize() {
 		centerPane.getStyleClass().add("viewer-background");
 
-		toggleGroup.getToggles().addAll(trianglePhylogramToggleItem, radialPhylogramToggleItem, rectangularPhylogramToggleItem, roundedPhylogramToggleItem);
+		diagramToggleGroup.getToggles().addAll(trianglePhylogramToggleItem, radialPhylogramToggleItem, rectangularPhylogramToggleItem, roundedPhylogramToggleItem);
+
 		trianglePhylogramToggleItem.selectedProperty().addListener((v, o, n) -> {
 			if (n) {
 				menuButton.setText(trianglePhylogramToggleItem.getText());
@@ -130,7 +135,7 @@ public class DensiTreeViewController {
 				menuButton.setGraphic(ResourceManagerFX.getIconAsImageView("RadialPhylogram16.gif", 16));
 			}
 		});
-		toggleGroup.selectToggle(trianglePhylogramToggleItem);
+		diagramToggleGroup.selectToggle(trianglePhylogramToggleItem);
 
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);
@@ -229,28 +234,16 @@ public class DensiTreeViewController {
 		return mainPane;
 	}
 
-	public CheckMenuItem getShowConsensusTreeMenuItem() {
-		return showConsensusTreeMenuItem;
+	public CheckMenuItem getShowTreesMenuItem() {
+		return showTreesMenuItem;
 	}
 
-	public RadioMenuItem getTrianglePhylogramToggleItem() {
-		return trianglePhylogramToggleItem;
+	public CheckMenuItem getShowConsensusMenuItem() {
+		return showConsensusMenuItem;
 	}
 
-	public RadioMenuItem getRadialPhylogramToggleItem() {
-		return radialPhylogramToggleItem;
-	}
-
-	public RadioMenuItem getRectangularPhylogramToggleItem() {
-		return rectangularPhylogramToggleItem;
-	}
-
-	public RadioMenuItem getRoundedPhylogramToggleItem() {
-		return roundedPhylogramToggleItem;
-	}
-
-	public ToggleGroup getToggleGroup() {
-		return toggleGroup;
+	public ToggleGroup getDiagramToggleGroup() {
+		return diagramToggleGroup;
 	}
 
 	public MenuButton getMenuButton() {

@@ -102,6 +102,22 @@ public enum Compatibility {
 	}
 
 	/**
+	 * Determines whether a given split is weakly compatible will the given ones
+	 *
+	 * @param splits the splits object
+	 * @return true, if the given splits are weakly compatible
+	 */
+	static public boolean isWeaklyCompatible(ASplit split, List<ASplit> splits) {
+		for (int i = 0; i < splits.size(); i++) {
+			for (int j = i + 1; j < splits.size(); j++) {
+				if (!BiPartition.areWeaklyCompatible(splits.get(i), splits.get(j), split))
+					return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Determines whether a given splits system is cyclic
 	 *
 	 * @param splits the splits object

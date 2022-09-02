@@ -71,7 +71,7 @@ public class LabeledNodeShape extends Group {
 	}
 
 	public Iterable<Node> all() {
-		var list = new ArrayList<Node>(getChildren());
+		var list = new ArrayList<>(getChildren());
 		if (label != null)
 			list.add(label);
 		return list;

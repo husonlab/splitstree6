@@ -409,9 +409,9 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	}
 
 	/**
-	 * computeCycle the model and fill the distance
+	 * computeConsensusAndCycle the model and fill the distance
 	 *
-	 * @param progress   used to display the progress
+	 * @param progress used to display the progress
 	 */
 	public void apply(ProgressListener progress, CharactersBlock characters, DistancesBlock distances, boolean useML) throws SplitsException, CanceledException {
 		final int ntax = characters.getNtax();

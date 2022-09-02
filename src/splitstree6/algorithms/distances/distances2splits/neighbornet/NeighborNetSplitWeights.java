@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.BitSet;
 
 import static java.lang.Math.*;
-import static java.lang.Math.random;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitstree4.activeSetST4;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
@@ -26,6 +25,8 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Squa
 public class NeighborNetSplitWeights {
 	private static int countCalls = 0;
 	private static long timeCalls = 0L;
+
+	public static boolean verbose = false;
 
 	public static class NNLSParams {
 
@@ -138,9 +139,11 @@ public class NeighborNetSplitWeights {
 				}
 			}
 		}
-		System.err.printf("Total time: %.3f seconds%n", (System.currentTimeMillis() - startTime) / 1000.0);
-		System.err.println("countCalls: " + countCalls);
-		System.err.printf("timeCalls:  %.3f seconds%n", timeCalls / 1000.0);
+		if (verbose) {
+			System.err.printf("Total time: %.3f seconds%n", (System.currentTimeMillis() - startTime) / 1000.0);
+			System.err.println("countCalls: " + countCalls);
+			System.err.printf("timeCalls:  %.3f seconds%n", timeCalls / 1000.0);
+		}
 
 		return splitList;
 	}

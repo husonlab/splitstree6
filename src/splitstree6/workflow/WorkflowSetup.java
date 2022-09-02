@@ -25,9 +25,11 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.Single;
 import splitstree6.algorithms.characters.characters2distances.HammingDistances;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
+import splitstree6.algorithms.genomes.genome2distances.Mash;
 import splitstree6.algorithms.network.network2view.ShowNetwork;
 import splitstree6.algorithms.source.source2characters.CharactersLoader;
 import splitstree6.algorithms.source.source2distances.DistancesLoader;
+import splitstree6.algorithms.source.source2genomes.GenomesLoader;
 import splitstree6.algorithms.source.source2network.NetworkLoader;
 import splitstree6.algorithms.source.source2splits.SplitsLoader;
 import splitstree6.algorithms.source.source2trees.TreesLoader;
@@ -65,6 +67,14 @@ public class WorkflowSetup {
 			workflow.ensureAlignmentView();
 			var distancesNode = workflow.newDataNode(new DistancesBlock());
 			workflow.newAlgorithmNode(new HammingDistances(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
+			var splitsNode = workflow.newDataNode(new SplitsBlock());
+			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
+			var viewerNode = workflow.newDataNode(new ViewBlock());
+			workflow.newAlgorithmNode(new ShowSplits(), workflow.getWorkingTaxaNode(), splitsNode, viewerNode);
+		} else if (clazz.equals(GenomesBlock.class)) {
+			workflow.setupInputAndWorkingNodes(sourceBlock, new GenomesLoader(), new TaxaBlock(), new GenomesBlock());
+			var distancesNode = workflow.newDataNode(new DistancesBlock());
+			workflow.newAlgorithmNode(new Mash(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
 			var splitsNode = workflow.newDataNode(new SplitsBlock());
 			workflow.newAlgorithmNode(new NeighborNet(), workflow.getWorkingTaxaNode(), distancesNode, splitsNode);
 			var viewerNode = workflow.newDataNode(new ViewBlock());

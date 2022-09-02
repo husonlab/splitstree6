@@ -99,15 +99,14 @@
                                 </graphic>
                             </RadioMenuItem>
                             <SeparatorMenuItem mnemonicParsing="false"/>
+                            <CheckMenuItem fx:id="showTreesMenuItem" mnemonicParsing="false" text="Show All Trees"/>
+                            <CheckMenuItem fx:id="showConsensusMenuItem" mnemonicParsing="false" text="Show Consensus"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
                             <CheckMenuItem fx:id="colorIncompatibleTreesMenuItem" mnemonicParsing="false"
                                            text="Color Incompatible Edges"/>
-                            <CheckMenuItem fx:id="showConsensusTreeMenuItem" mnemonicParsing="false"
-                                           text="Show Consensus Tree"/>
                             <CheckMenuItem fx:id="jitterMenuItem" mnemonicParsing="false" text="Jitter"/>
                         </items>
                     </MenuButton>
-                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
 
                     <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
                             minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"

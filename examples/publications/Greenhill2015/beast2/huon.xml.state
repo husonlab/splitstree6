@@ -1,0 +1,22 @@
+<itsabeastystatewerein version='2.0' sample='10000000'>
+<statenode id='Tree.t:Huon-languages'>(((((0:2.0067950271444466,(5:0.4606850483057179,13:0.4606850483057179)24:1.5461099788387287)21:0.07009869122056056,(1:0.5696083271691341,8:0.5696083271691341)23:1.507285391195873)16:0.43928781401691896,(2:1.884660526452199,(3:0.22739610719634953,6:0.22739610719634953)22:1.6572644192558494)25:0.6315210059297272)20:0.035734870614791525,10:2.5519164029967176)14:0.12319620878090909,(((4:0.7332957574491379,11:0.7332957574491379)18:0.449395906393242,12:1.18269166384238)15:0.9702270220629567,(7:0.5632289294741738,9:0.5632289294741738)17:1.589689756431163)19:0.5221939258722901)26:0.0</statenode>
+<statenode id='proportionInvariant.s:Huon-languages'>proportionInvariant.s:Huon-languages[1 1] (0.0,1.0): 0.0 </statenode>
+<statenode id='mutationRate.s:Huon-languages'>mutationRate.s:Huon-languages[1 1] (0.0,Infinity): 1.0 </statenode>
+<statenode id='gammaShape.s:Huon-languages'>gammaShape.s:Huon-languages[1 1] (0.001,1000.0): 7.41213354211345 </statenode>
+<statenode id='birthRate.t:Huon-languages'>birthRate.t:Huon-languages[1 1] (-Infinity,Infinity): 0.7077012127131306 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"FixMeanMutationRatesOperator","p":7576.955616063738,"accept":258675,"reject":0,"acceptFC":257916,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"proportionInvariantScaler.s:Huon-languages","p":0.4587791838065219,"accept":0,"reject":12778,"acceptFC":0,"rejectFC":12742,"rejectIv":12778,"rejectOp":12778},
+{"id":"gammaShapeScaler.s:Huon-languages","p":0.3390761788012828,"accept":3436,"reject":9600,"acceptFC":3424,"rejectFC":9575,"rejectIv":0,"rejectOp":0},
+{"id":"YuleBirthRateScaler.t:Huon-languages","p":0.29131194951817363,"accept":109700,"reject":279458,"acceptFC":108843,"rejectFC":279204,"rejectIv":0,"rejectOp":0},
+{"id":"YuleModelTreeScaler.t:Huon-languages","p":0.7468346164374069,"accept":80500,"reject":307547,"acceptFC":80401,"rejectFC":306518,"rejectIv":0,"rejectOp":0},
+{"id":"YuleModelTreeRootScaler.t:Huon-languages","p":0.7287305314161184,"accept":36435,"reject":352195,"acceptFC":36379,"rejectFC":351121,"rejectIv":129147,"rejectOp":129147},
+{"id":"YuleModelUniformOperator.t:Huon-languages","p":"NaN","accept":904178,"reject":2982812,"acceptFC":901529,"rejectFC":2974180,"rejectIv":0,"rejectOp":0},
+{"id":"YuleModelSubtreeSlide.t:Huon-languages","p":0.5692512683542068,"accept":387352,"reject":1556244,"acceptFC":386642,"rejectFC":1551154,"rejectIv":275536,"rejectOp":275536},
+{"id":"YuleModelNarrow.t:Huon-languages","p":"NaN","accept":243346,"reject":1699034,"acceptFC":242563,"rejectFC":1693977,"rejectIv":0,"rejectOp":0},
+{"id":"YuleModelWide.t:Huon-languages","p":"NaN","accept":2373,"reject":385364,"acceptFC":2365,"rejectFC":384189,"rejectIv":201710,"rejectOp":201710},
+{"id":"YuleModelWilsonBalding.t:Huon-languages","p":"NaN","accept":2192,"reject":386782,"acceptFC":2184,"rejectFC":385671,"rejectIv":91930,"rejectOp":91930}
+]}
+-->

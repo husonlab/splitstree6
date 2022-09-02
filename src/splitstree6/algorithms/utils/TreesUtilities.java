@@ -21,6 +21,7 @@ package splitstree6.algorithms.utils;
 
 import jloda.graph.Edge;
 import jloda.graph.Node;
+import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.NumberUtils;
@@ -29,10 +30,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.LinkedList;
+import java.util.*;
 
 /**
  * some computations on trees
@@ -318,5 +316,20 @@ public class TreesUtilities {
 			}
 		}
 		return distances;
+	}
+
+	public static Map<Node, BitSet> extractClusters(PhyloTree tree) {
+		NodeArray<BitSet> nodeClusterMap = tree.newNodeArray();
+		tree.postorderTraversal(v -> {
+			var cluster = new BitSet();
+			for (var t : tree.getTaxa(v))
+				cluster.set(t);
+			for (var w : v.children()) {
+				cluster.or(nodeClusterMap.get(w));
+			}
+			nodeClusterMap.put(v, cluster);
+
+		});
+		return nodeClusterMap;
 	}
 }

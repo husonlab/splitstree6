@@ -123,8 +123,7 @@ public class SplitNetworkPane extends StackPane {
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock.get(), splitsBlock.get(), diagram.get(),
 					rooting.get(), rootAngle.get(), taxonSelectionModel, splitSelectionModel, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16,
-					taxonLabelMap, nodeLabeledShapeMap, splitShapeMap,
-					loopViews);
+					taxonLabelMap, nodeLabeledShapeMap, splitShapeMap, loopViews);
 
 			result.setId("networkGroup");
 			LayoutUtils.applyLabelScaleFactor(result, labelScaleFactor.get());

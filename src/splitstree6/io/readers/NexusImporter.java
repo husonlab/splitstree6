@@ -88,13 +88,17 @@ public class NexusImporter {
 				}
 				comments.setIfCurrentValueIsNull(np.popComments());
 
-				if (dataBlock instanceof DistancesBlock distancesBlock) {
-					var parser = new DistancesNexusInput();
-					taxLabels = parser.parse(np, taxaBlock, distancesBlock);
-					comments.setIfCurrentValueIsNull(np.popComments());
-				} else if (dataBlock instanceof CharactersBlock charactersBlock) {
+				if (dataBlock instanceof CharactersBlock charactersBlock) {
 					var parser = new CharactersNexusInput();
 					taxLabels = parser.parse(np, taxaBlock, charactersBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				} else if (dataBlock instanceof GenomesBlock genomesBlock) {
+					var parser = new GenomesNexusInput();
+					taxLabels = parser.parse(np, taxaBlock, genomesBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				} else if (dataBlock instanceof DistancesBlock distancesBlock) {
+					var parser = new DistancesNexusInput();
+					taxLabels = parser.parse(np, taxaBlock, distancesBlock);
 					comments.setIfCurrentValueIsNull(np.popComments());
 				} else if (dataBlock instanceof SplitsBlock splitsBlock) {
 					var parser = new SplitsNexusInput();
@@ -154,10 +158,12 @@ public class NexusImporter {
 				}
 			}
 
-			if (np.isAtBeginOfBlock("DISTANCES")) {
-				return DistancesBlock.class;
-			} else if (np.isAtBeginOfBlock("CHARACTERS") || np.isAtBeginOfBlock("DATA")) {
+			if (np.isAtBeginOfBlock("CHARACTERS") || np.isAtBeginOfBlock("DATA")) {
 				return CharactersBlock.class;
+			} else if (np.isAtBeginOfBlock("GENOMES")) {
+				return GenomesBlock.class;
+			} else if (np.isAtBeginOfBlock("DISTANCES")) {
+				return DistancesBlock.class;
 			} else if (np.isAtBeginOfBlock("SPLITS")) {
 				return SplitsBlock.class;
 			} else if (np.isAtBeginOfBlock("TREES")) {

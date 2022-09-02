@@ -312,6 +312,12 @@ public class MainWindowController {
 	private MenuItem consensusNetworkMenuItem;
 
 	@FXML
+	private MenuItem consensusOutlineMenuItem;
+
+	@FXML
+	private MenuItem consensusSplitsMenuItem;
+
+	@FXML
 	private MenuItem filteredSuperNetworkMenuItem;
 
 	@FXML
@@ -322,13 +328,6 @@ public class MainWindowController {
 
 	@FXML
 	private MenuItem hybridizationNetworkMenuItem;
-
-	@FXML
-	private MenuItem splitsNetworkViewMenuItem;
-
-
-	@FXML
-	private MenuItem haplotypeNetworkViewMenuItem;
 
 	@FXML
 	private MenuItem pcoaMenuItem;
@@ -846,6 +845,14 @@ public class MainWindowController {
 		return consensusNetworkMenuItem;
 	}
 
+	public MenuItem getConsensusOutlineMenuItem() {
+		return consensusOutlineMenuItem;
+	}
+
+	public MenuItem getConsensusSplitsMenuItem() {
+		return consensusSplitsMenuItem;
+	}
+
 	public MenuItem getFilteredSuperNetworkMenuItem() {
 		return filteredSuperNetworkMenuItem;
 	}
@@ -862,14 +869,6 @@ public class MainWindowController {
 
 	public MenuItem getHybridizationNetworkMenuItem() {
 		return hybridizationNetworkMenuItem;
-	}
-
-	public MenuItem getSplitsNetworkViewMenuItem() {
-		return splitsNetworkViewMenuItem;
-	}
-
-	public MenuItem getHaplotypeNetworkViewMenuItem() {
-		return haplotypeNetworkViewMenuItem;
 	}
 
 	public MenuItem getPcoaMenuItem() {

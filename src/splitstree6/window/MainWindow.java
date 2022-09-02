@@ -307,4 +307,8 @@ public class MainWindow implements IMainWindow {
 	public void updateMethodsTab() {
 		methodsTab.replaceText(workflow.isValid() ? ExtractMethodsText.getInstance().apply(workflow) : "");
 	}
+
+	public WorkflowTab getWorkflowTab() {
+		return workflowTab;
+	}
 }

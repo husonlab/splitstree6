@@ -199,7 +199,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			paneHeight.set(n.getHeight() - 80);
 		});
 
-
 		splitNetworkPane = new SplitNetworkPane(mainWindow, mainWindow.workingTaxaProperty(), splitsBlock, mainWindow.getTaxonSelectionModel(),
 				splitsView.getSplitSelectionModel(), paneWidth, paneHeight, splitsView.optionDiagramProperty(), splitsView.optionOrientationProperty(),
 				splitsView.optionRootingProperty(), splitsView.optionRootAngleProperty(), splitsView.optionZoomFactorProperty(), splitsView.optionFontScaleFactorProperty(),

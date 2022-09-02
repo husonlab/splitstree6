@@ -174,7 +174,7 @@ public class SplitNetworkLayout {
 		if (rootSplit > 0) // want the root to be placed on the left by default
 			rotate90(graph, nodePointMap);
 
-		var dimensions = computeFontHeightGraphWidthHeight(taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), graph, true, width, height);
+		var dimensions = computeFontHeightGraphWidthHeight(taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), graph, false, width, height);
 		var fontHeight = dimensions.fontHeight();
 		width = dimensions.width();
 		height = dimensions.height();
