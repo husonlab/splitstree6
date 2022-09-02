@@ -34,13 +34,13 @@ public class SplitsTree6NexusOutput {
 	/**
 	 * writes the splitstree6 block in nexus format
 	 */
-	public void write(Writer w, SplitsTree6Block splitsTree5Block) throws IOException {
+	public void write(Writer w, SplitsTree6Block splitsTreeBlock) throws IOException {
 		w.write("\nBEGIN " + SplitsTree6Block.BLOCK_NAME + ";\n");
-		w.write("DIMENSIONS nDataNodes=" + splitsTree5Block.getOptionNumberOfDataNodes()
-				+ " nAlgorithms=" + splitsTree5Block.getOptionNumberOfAlgorithms() + ";\n");
-		w.write("PROGRAM version='" + splitsTree5Block.getOptionVersion() + "';\n");
-		w.write(String.format("WORKFLOW creationDate='%s'; [%s]\n", splitsTree5Block.getOptionCreationDate(),
-				new Date(splitsTree5Block.getOptionCreationDate())));
+		w.write("DIMENSIONS nDataNodes=" + splitsTreeBlock.getOptionNumberOfDataNodes()
+				+ " nAlgorithms=" + splitsTreeBlock.getOptionNumberOfAlgorithms() + ";\n");
+		w.write("PROGRAM version='" + splitsTreeBlock.getOptionVersion() + "';\n");
+		w.write(String.format("WORKFLOW creationDate='%s'; [%s]\n", splitsTreeBlock.getOptionCreationDate(),
+				new Date(splitsTreeBlock.getOptionCreationDate())));
 		w.write("END; [" + SplitsTree6Block.BLOCK_NAME + "]\n");
 	}
 }

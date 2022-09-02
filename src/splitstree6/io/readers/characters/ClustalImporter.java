@@ -113,7 +113,7 @@ public class ClustalImporter extends CharactersReader {
 		nchar = taxa2seq.get(taxa2seq.keySet().iterator().next()).length();
 		for (String s : taxa2seq.keySet()) {
 			if (nchar != taxa2seq.get(s).length())
-				throw new IOException("Sequence has wrong length: " + s);
+				throw new IOException("SequenceType has wrong length: " + s);
 			else
 				nchar = taxa2seq.get(s).length();
 		}

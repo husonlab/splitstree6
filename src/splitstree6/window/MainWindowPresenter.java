@@ -79,6 +79,7 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
+import splitstree6.dialog.analyzegenomes.AnalyzeGenomesDialog;
 import splitstree6.dialog.exporting.ExportTaxonDisplayLabels;
 import splitstree6.dialog.exporting.ExportTaxonTraits;
 import splitstree6.dialog.importing.ImportMultipleTrees;
@@ -268,9 +269,8 @@ public class MainWindowPresenter {
 		controller.getInputEditorMenuItem().setOnAction(e -> showInputEditor());
 		controller.getInputEditorMenuItem().disableProperty().bind(workflow.runningProperty());
 
-		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> {
-		});
-		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
+		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> (new AnalyzeGenomesDialog(mainWindow.getStage())).show());
+		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(controller.getOpenMenuItem().disableProperty());
 
 		controller.getSaveButton().setOnAction(e -> {
 			if (mainWindow.isHasSplitsTree6File())

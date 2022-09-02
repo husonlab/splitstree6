@@ -1,16 +1,18 @@
 module splitstreesix {
     requires transitive jloda;
     requires transitive javafx.controls;
-    requires transitive javafx.graphics;
-    requires transitive javafx.fxml;
-    requires javafx.base;
+	requires transitive javafx.graphics;
+	requires transitive javafx.fxml;
+	requires javafx.base;
 
-    requires Jama;
-    requires richtextfx.fat;
-    requires org.apache.commons.collections4;
+	requires Jama;
+	requires richtextfx.fat;
+	requires org.apache.commons.collections4;
 	requires commons.math3;
-    requires com.install4j.runtime;
+	requires com.install4j.runtime;
 	requires tsne;
+	requires java.sql;
+	requires org.xerial.sqlitejdbc;
 
 	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
@@ -78,6 +80,7 @@ module splitstreesix {
 	opens splitstree6.window;
 
 	opens splitstree6.dialog.exporting.data;
+	opens splitstree6.dialog.analyzegenomes;
 
 	opens splitstree6.workflowtree;
 

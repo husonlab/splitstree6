@@ -139,12 +139,12 @@ public class PhylipReader extends CharactersReader {
 				for (int i = 0; i < sequences.size(); i++) {
 					var seq = sequences.get(i);
 					if (seq.length() != nChar)
-						throw new IOException(String.format("Sequence %d: expected %d characters, found: %d", (i + 1), nChar, seq.length()));
+						throw new IOException(String.format("SequenceType %d: expected %d characters, found: %d", (i + 1), nChar, seq.length()));
 
 					for (int j = 0; j < seq.length(); j++) {
 						var ch = seq.charAt(j);
 						if (Character.isWhitespace(ch))
-							throw new IOException(String.format("Sequence %d contains whitespace: %100s", (i + 1), seq));
+							throw new IOException(String.format("SequenceType %d contains whitespace: %100s", (i + 1), seq));
 						characters.set(i + 1, j + 1, seq.charAt(j));
 					}
 				}
