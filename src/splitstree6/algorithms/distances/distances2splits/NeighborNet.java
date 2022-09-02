@@ -19,7 +19,9 @@
 
 package splitstree6.algorithms.distances.distances2splits;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
@@ -46,12 +48,15 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.FastMethod);
 
+	private final BooleanProperty optionOutputConvergenceData = new SimpleBooleanProperty(this, "optionOutputConvergenceData", false);
+
+
 	//private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", false);
 
 	//private final BooleanProperty optionUseDual = new SimpleBooleanProperty(this, "optionUseDual", true);
 
 	public List<String> listOptions() {
-		return List.of(optionInferenceAlgorithm.getName());
+		return List.of(optionInferenceAlgorithm.getName(), optionOutputConvergenceData.getName());
 	}
 
 	@Override
@@ -119,7 +124,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.logfile = "ST4Convergence.m";
 		}
 
-		if (false && params.logfile!=null) {
+		if (getOptionOutputConvergenceData() && params.logfile!=null) {
 			try {
 				params.log = new PrintWriter(params.logfile);
 			} catch (FileNotFoundException e) {
@@ -172,4 +177,18 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public void setOptionInferenceAlgorithm(InferenceAlgorithm optionInferenceAlgorithm) {
 		this.optionInferenceAlgorithm.set(optionInferenceAlgorithm);
 	}
+
+	public boolean getOptionOutputConvergenceData() {
+		return optionOutputConvergenceData().get();
+	}
+
+	public BooleanProperty optionOutputConvergenceData() {
+		return optionOutputConvergenceData;
+	}
+
+	public void setOptionOutputConvergenceData(boolean outputConvergenceData) {
+		this.optionOutputConvergenceData.set(outputConvergenceData);
+	}
+
+
 }

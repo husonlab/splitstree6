@@ -65,8 +65,8 @@ public class NeighborNetSplitstree4 {
             log.println("% Active Set ST4");
             log.println("% \t Proportion Removed = 0.4");
             log.println("% \t Max CG iterations = "+npairs);
-            log.println("% Convergence for CG is ||res|| < "+CG_EPSILON * Math.sqrt(norm(Atd)));
-            log.println("% Outer convergence condition grad > 0.0001 ");
+            log.println("% Convergence for CG is ||A'(Ax_{active}-d)|| < "+CG_EPSILON * Math.sqrt(norm(Atd)));
+            log.println("% Outer convergence condition grad > -0.0001 ");
             log.println("% time \t ||res|| \t ||proj grad||\n\n");
             log.println("ConvergenceST4 = [");
         }
@@ -124,14 +124,18 @@ public class NeighborNetSplitstree4 {
                     }
                     calculateAtx(ntax,res,grad);
                     double pgx = 0.0;
+                    double res2 = 0.0;
+
                     for(var i=0;i<npairs;i++) {
                         double grad_i = grad[i];
                         if (old_x[i]==0)
                             grad_i = Math.min(grad_i,0.0);
+                        else
+                            res2 += grad_i*grad_i;
                         pgx += grad_i*grad_i;
                     }
                     long timestamp = System.currentTimeMillis() - startTime;
-                    log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx));
+                    log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + Math.sqrt(res2));
 
 
                 }
@@ -140,6 +144,38 @@ public class NeighborNetSplitstree4 {
 
                 progress.checkForCancel();
             }
+
+
+            if (log!=null) {
+                //Calculate the residual and projected gradient
+                double[] res = new double[npairs];
+                double[] grad = new double[npairs];
+                calculateAb(ntax,x,res);
+                double fx = 0.0;
+                for(var i=0;i<npairs;i++) {
+                    res[i] -= d[i];
+                    fx += res[i]*res[i];
+                }
+                calculateAtx(ntax,res,grad);
+                double pgx = 0.0;
+                double res2 = 0.0;
+
+                for(var i=0;i<npairs;i++) {
+                    double grad_i = grad[i];
+                    if (old_x[i]==0)
+                        grad_i = Math.min(grad_i,0.0);
+                    else
+                        res2 += grad_i*grad_i;
+                    pgx += grad_i*grad_i;
+                }
+                long timestamp = System.currentTimeMillis() - startTime;
+                log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + Math.sqrt(res2)+"\t*");
+
+
+            }
+
+
+
 
             /* Find i,j that minimizes the gradient over all i,j in the active set. Note that grad = (AtAb-Atd)  */
             calculateAb(ntax, x, y);

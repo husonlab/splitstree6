@@ -166,10 +166,9 @@ public class NeighborNetSplitWeights {
 			params.log.println("% active and projected C");
 			params.log.println("% cg iterations: "+params.cgIterations);
 			params.log.println("% cutoff "+params.tolerance * 1e-3);
-			params.log.println("% cg iterations "+ params.cgIterations);
 			params.log.println("% cg tolerance ||res|| < " + Math.sqrt(params.tolerance));
 			params.log.println("% Line search tolerance " + params.tolerance);
-			params.log.println("ConvergenceBlockPivot = [");
+			params.log.println("ConvergenceProjectedCG = [");
 		}
 
 
