@@ -173,6 +173,9 @@ public class AlignmentViewController {
     @FXML
     private Group canvasGroup;
 
+    @FXML
+    private Group imageGroup;
+
     private final NumberAxis axis = new NumberAxis();
 
     private final Pane rightTopPane = new Pane();
@@ -407,5 +410,9 @@ public class AlignmentViewController {
 
     public Group getCanvasGroup() {
         return canvasGroup;
+    }
+
+    public Group getImageGroup() {
+        return imageGroup;
     }
 }

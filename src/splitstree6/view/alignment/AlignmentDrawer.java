@@ -26,12 +26,14 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.ScrollBar;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import jloda.fx.util.AService;
-import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import splitstree6.data.CharactersBlock;
@@ -44,13 +46,13 @@ import java.util.BitSet;
  * Daniel Huson, 4.2022
  */
 public class AlignmentDrawer {
-	private final Group canvasGroup;
 	private final ObjectProperty<Canvas> canvas = new SimpleObjectProperty<>(this, "canvas");
+	private final Group imageGroup;
 
-	private final AService<Canvas> service;
+	private final AService<WritableImage> service;
 
-	public AlignmentDrawer(Group canvasGroup, Pane bottomPane) {
-		this.canvasGroup = canvasGroup;
+	public AlignmentDrawer(Group imageGroup, Group canvasGroup, Pane bottomPane) {
+		this.imageGroup = imageGroup;
 		canvas.set((Canvas) canvasGroup.getChildren().get(0));
 		canvas.addListener((c, o, n) -> canvasGroup.getChildren().setAll(n));
 		service = new AService<>(bottomPane);
@@ -62,6 +64,7 @@ public class AlignmentDrawer {
 	public void updateCanvas(double canvasWidth, double canvasHeight, TaxaBlock inputTaxa, CharactersBlock inputCharacters,
 							 char[] consensusSequence, ColorScheme colorScheme,
 							 double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activateTaxa, BitSet activeSites) {
+
 
 		if (inputTaxa != null && inputCharacters != null) {
 			var axisLowerBound = axis.getLowerBound();
@@ -80,16 +83,12 @@ public class AlignmentDrawer {
 			var left = Math.max(1, (int) axis.getLowerBound() - 1);
 			var right = Math.min(inputCharacters.getNchar(), Math.ceil(axis.getUpperBound()));
 
+			imageGroup.getChildren().clear();
 
 			service.setCallable(() -> {
+				var image = new WritableImage((int) canvasWidth, (int) canvasHeight);
 				var progress = service.getProgressListener();
 				progress.setTasks("Drawing", "alignment");
-
-				var canvas = new Canvas(canvasWidth, canvasHeight);
-				var gc = canvas.getGraphicsContext2D();
-				gc.setFont(Font.font("monospaced", fontSize));
-				gc.setLineWidth(0.75);
-				gc.setStroke(lineStroke);
 
 				var colors = new Color[256];
 
@@ -104,67 +103,88 @@ public class AlignmentDrawer {
 					var y = t * boxHeight + vOffset;
 					if (y < 0)
 						continue;
-					if (y > canvas.getHeight() + boxHeight)
+					if (y > image.getHeight() + boxHeight)
 						break;
 
 					if (boxWidth <= 0.2 || boxHeight <= 0.2) { // if too small to see, draw one gray box and leave
 						var xleft = (left - axisLowerBound) * boxWidth + axisStartOffset;
 						var xright = (right - axisLowerBound) * boxWidth + axisStartOffset;
-						gc.setFill(Color.LIGHTGRAY);
 
 						var totalHeight = boxHeight;
 						for (var s = t; s <= inputTaxa.getNtax(); s++) {
-							if (y + totalHeight > canvas.getHeight() + boxHeight)
+							if (y + totalHeight > image.getHeight() + boxHeight)
 								break;
 							totalHeight += boxHeight;
 						}
-						gc.fillRect(xleft, y - boxHeight, xright - xleft, totalHeight);
+						BasicFX.fillRectangle(image, xleft, y - boxHeight, xright - xleft, totalHeight, Color.LIGHTGRAY);
 						break;
 					}
 
 					for (var site = left; site <= right; site++) {
 						var ch = chars[site - 1];
 						var x = (site - axisLowerBound) * boxWidth + axisStartOffset;
-						if (tNotActive || !activeSites.get(site)) {
-							gc.setFill(Color.TRANSPARENT);
-							gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
-							gc.setFill(notActiveFill);
-						} else if (showColors) {
+						if (showColors) {
 							var color = colors[ch];
 							if (color == null) {
 								color = colors[ch] = colorScheme.apply(ch);
 							}
-							gc.setFill(color);
-							gc.fillRect(x, y - boxHeight, boxWidth, boxHeight);
-							gc.setFill(textFill);
-						} else {
-							gc.setFill(textFill);
-						}
-
-						if (fontSize >= 2) {
-							gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.5 * boxHeight);
+							BasicFX.fillRectangle(image, x, y - boxHeight, boxWidth, boxHeight, color);
 						}
 
 						if (site == 1) {
-							gc.strokeLine(x, y - boxHeight, x, y);
+							BasicFX.fillRectangle(image, x, y - boxHeight, 1, boxHeight, Color.DARKGRAY);
 						}
 						if (t == inputTaxa.getNtax()) {
-							gc.strokeLine(x, y, x + boxWidth, y);
+							BasicFX.fillRectangle(image, x, y, boxWidth, 1, Color.DARKGRAY);
 						}
 						if (site == chars.length) {
-							gc.strokeLine(x + boxWidth, y - boxHeight, x + boxWidth, y);
+							BasicFX.fillRectangle(image, x + boxWidth, y - boxHeight, 1, boxHeight, Color.DARKGRAY);
 						}
 					}
 				}
-				return canvas;
-			});
-			service.setOnRunning(e -> {
-				var oldCanvas = getCanvas();
-				RunAfterAWhile.apply(new Object(), () -> oldCanvas.setOpacity(0.5));
+				return image;
 			});
 			service.setOnFailed(e -> NotificationManager.showError("Draw alignment failed: " + service.getException()));
-			service.setOnSucceeded(e -> setCanvas(service.getValue()));
+			service.setOnSucceeded(e -> {
+				imageGroup.getChildren().setAll(new ImageView(service.getValue()));
+			});
 			service.restart();
+
+			{
+				var canvas = getCanvas();
+				var gc = canvas.getGraphicsContext2D();
+				gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+				canvas.setWidth((int) canvasWidth);
+				canvas.setHeight((int) canvasHeight);
+
+				if (fontSize > 2) {
+					gc.setFont(Font.font("monospaced", fontSize));
+					gc.setLineWidth(0.75);
+					gc.setStroke(lineStroke);
+
+					for (var t = 1; t <= inputTaxa.getNtax(); t++) {
+						var tNotActive = !activateTaxa.get(t);
+						var chars = inputCharacters.getMatrix()[t - 1];
+
+						var y = t * boxHeight + vOffset;
+						if (y < 0)
+							continue;
+						if (y > canvas.getHeight() + boxHeight)
+							break;
+
+						for (var site = left; site <= right; site++) {
+							var ch = chars[site - 1];
+							var x = (site - axisLowerBound) * boxWidth + axisStartOffset;
+							if (tNotActive || !activeSites.get(site)) {
+								gc.setFill(notActiveFill);
+							} else
+								gc.setFill(textFill);
+							gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.5 * boxHeight);
+						}
+					}
+				}
+			}
+
 		}
 	}
 
@@ -247,5 +267,9 @@ public class AlignmentDrawer {
 				}
 			}
 		}
+	}
+
+	public void close() {
+		service.cancel();
 	}
 }

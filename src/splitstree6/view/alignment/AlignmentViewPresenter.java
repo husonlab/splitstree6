@@ -117,16 +117,20 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		var canvasHeight = new SimpleDoubleProperty();
 		canvasHeight.bind(controller.getvScrollBar().heightProperty());
 
-		var alignmentDrawer = new AlignmentDrawer(controller.getCanvasGroup(), mainWindowController.getBottomFlowPane());
+		var alignmentDrawer = new AlignmentDrawer(controller.getImageGroup(), controller.getCanvasGroup(), mainWindowController.getBottomFlowPane());
 
 		updateCanvasListener = e -> {
-			alignmentDrawer.updateCanvas(canvasWidth.get(), canvasHeight.get(), view.getInputTaxa(),
-					view.getInputCharacters(), view.getConsensusSequence(),
+			var width = canvasWidth.get();
+			var height = canvasHeight.get();
+
+			AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), width,
+					view.getOptionUnitWidth(), view.getInputCharacters() != null ? view.getInputCharacters().getNchar() : 0, view);
+
+			alignmentDrawer.updateCanvas(width, height, view.getInputTaxa(), view.getInputCharacters(), view.getConsensusSequence(),
 					view.getOptionColorScheme(), view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(),
 					view.getActiveTaxa(), view.getActiveSites());
 
-			AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), canvasWidth.get(),
-					view.getOptionUnitWidth(), view.getInputCharacters() != null ? view.getInputCharacters().getNchar() : 0, view);
+
 			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), view.getInputCharacters(),
 					view.getActiveSites(), view.getSelectedSites());
 
@@ -138,8 +142,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
 					view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedSites());
 
-			alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
-					view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedTaxa());
+			if (false)
+				alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
+						view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedTaxa());
 
 			controller.getSelectionLabel().setText(view.createSelectionString());
 		};

@@ -201,6 +201,7 @@
                                                             <content>
                                                                 <StackPane fx:id="stackPane">
                                                                     <children>
+                                                                        <Group fx:id="imageGroup"/>
                                                                         <Group fx:id="canvasGroup">
                                                                             <children>
                                                                                 <Canvas fx:id="canvas" height="200.0"
