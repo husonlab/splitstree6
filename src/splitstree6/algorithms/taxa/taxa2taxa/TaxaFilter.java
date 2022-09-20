@@ -26,7 +26,6 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TraitsBlock;
 
 import java.util.*;
 
@@ -55,14 +54,31 @@ public class TaxaFilter extends Taxa2Taxa implements IFilter {
 		}
 
 		final var parentTraits = inputTaxaBlock.getTraitsBlock();
-		final TraitsBlock childTraits = outputTaxaBlock.getTraitsBlock();
+		final var childTraits = outputTaxaBlock.getTraitsBlock();
 
-		if (parentTraits != null && childTraits != null && childTraits.getNode() != null) {
-			Platform.runLater(() -> {
-				childTraits.getNode().setValid(false);
-				childTraits.copySubset(inputTaxaBlock, parentTraits, outputTaxaBlock.getTaxa());
-				childTraits.getNode().setValid(true);
-			});
+		if (parentTraits != null && childTraits != null) {
+			if (childTraits.getNode() != null) {
+				Platform.runLater(() -> {
+					childTraits.getNode().setValid(false);
+					childTraits.setInducedTraits(inputTaxaBlock, parentTraits, outputTaxaBlock);
+					childTraits.getNode().setValid(true);
+				});
+			} else
+				childTraits.setInducedTraits(inputTaxaBlock, parentTraits, outputTaxaBlock);
+		}
+
+		final var parentSets = inputTaxaBlock.getSetsBlock();
+		final var childSets = outputTaxaBlock.getSetsBlock();
+
+		if (parentSets != null && childSets != null) {
+			if (childSets.getNode() != null) {
+				Platform.runLater(() -> {
+					childSets.getNode().setValid(false);
+					childSets.setInducedSets(inputTaxaBlock, parentSets, outputTaxaBlock);
+					childSets.getNode().setValid(true);
+				});
+			} else
+				childSets.setInducedSets(inputTaxaBlock, parentSets, outputTaxaBlock);
 		}
 	}
 

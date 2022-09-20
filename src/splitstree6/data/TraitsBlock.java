@@ -20,20 +20,19 @@
 package splitstree6.data;
 
 import jloda.util.IteratorUtils;
-import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.DataBlock;
+import splitstree6.workflow.DataNode;
 import splitstree6.workflow.DataTaxaFilter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 /**
  * traits block
  * daniel Huson, 2.2018
  */
 public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
+	public static final String BLOCK_NAME = "TRAITS";
+
 	private double[][] matrix = {};  // computation is done on values
 	private String[][] matrixOfLabels = null; // values have labels
 	private String[] labels = {};
@@ -46,6 +45,11 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	 */
 	public TraitsBlock() {
 		format = new TraitsNexusFormat();
+	}
+
+	public TraitsBlock(TaxaBlock srcTaxa, TraitsBlock srcTraits) {
+		this();
+		setInducedTraits(srcTaxa, srcTraits, srcTaxa);
 	}
 
 	public void setDimensions(int ntax, int ntraits) {
@@ -193,23 +197,23 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return IteratorUtils.count(numericalTraits());
 	}
 
-
-	public void copySubset(TaxaBlock srcTaxa, TraitsBlock srcTraits, Collection<Taxon> enabledTaxa) {
-		labels = srcTraits.labels;
-		traitLongitude = srcTraits.traitLongitude;
-		traitLatitude = srcTraits.traitLatitude;
-		matrix = new double[enabledTaxa.size()][srcTraits.getNTraits()];
+	public void setInducedTraits(TaxaBlock srcTaxa, TraitsBlock srcTraits, TaxaBlock targetTaxa) {
+		clear();
+		labels = Arrays.copyOf(srcTraits.labels, srcTraits.getNTraits());
+		traitLongitude = (srcTraits.traitLongitude == null ? null : Arrays.copyOf(srcTraits.traitLongitude, srcTraits.getNTraits()));
+		traitLatitude = (srcTraits.traitLatitude == null ? null : Arrays.copyOf(srcTraits.traitLatitude, srcTraits.getNTraits()));
+		matrix = new double[targetTaxa.size()][srcTraits.getNTraits()];
 		matrixOfLabels = null; // will be set in setTraitValueLabel if required
-		int tarTaxonIdx = 1;
-		for (Taxon taxon : enabledTaxa) {
-			final int srcTaxonIdx = srcTaxa.indexOf(taxon);
-			for (int traitIdx = 1; traitIdx <= srcTraits.getNTraits(); traitIdx++) {
-				setTraitValue(tarTaxonIdx, traitIdx, srcTraits.getTraitValue(srcTaxonIdx, traitIdx));
+		for (var tarId = 1; tarId <= targetTaxa.getNtax(); tarId++) {
+			var taxon = targetTaxa.get(tarId);
+			final int srcId = srcTaxa.indexOf(taxon);
+			for (int traitId = 1; traitId <= srcTraits.getNTraits(); traitId++) {
+				setTraitValue(tarId, traitId, srcTraits.getTraitValue(srcId, traitId));
 				if (srcTraits.matrixOfLabels != null) {
-					setTraitValueLabel(tarTaxonIdx, traitIdx, srcTraits.getTraitValueLabel(srcTaxonIdx, traitIdx));
+					setTraitValueLabel(tarId, traitId, srcTraits.getTraitValueLabel(srcId, traitId));
 				}
 			}
-			tarTaxonIdx++;
+			tarId++;
 		}
 	}
 
@@ -231,7 +235,6 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		this.format = format;
 	}
 
-	public static final String BLOCK_NAME = "TRAITS";
 
 	@Override
 	public void updateShortDescription() {
@@ -243,6 +246,10 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		return BLOCK_NAME;
 	}
 
+	@Override
+	public void setNode(DataNode node) {
+		super.setNode(node);
+	}
 
 	public double getMax(String traitLabel) {
 		var traitId = getTraitId(traitLabel);

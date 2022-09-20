@@ -31,6 +31,7 @@ import javafx.scene.layout.HBox;
 import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
+import splitstree6.io.nexus.SetsNexusOutput;
 import splitstree6.io.nexus.TraitsNexusOutput;
 import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.writers.ExportManager;
@@ -118,6 +119,11 @@ public class DisplayDataPresenter {
 					if (dataBlock instanceof TaxaBlock taxaBlock1) {
 						if (taxaBlock1.getTraitsBlock() != null) {
 							(new TraitsNexusOutput()).write(w, taxaBlock, taxaBlock1.getTraitsBlock());
+						}
+					}
+					if (dataBlock instanceof TaxaBlock taxaBlock1) {
+						if (taxaBlock1.getSetsBlock() != null) {
+							(new SetsNexusOutput()).write(w, taxaBlock, taxaBlock1.getSetsBlock());
 						}
 					}
 					displayData.replaceText(w.toString());

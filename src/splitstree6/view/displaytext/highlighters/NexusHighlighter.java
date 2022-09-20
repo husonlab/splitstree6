@@ -42,11 +42,11 @@ public class NexusHighlighter implements Highlighter.IHighlighter {
 
     private static final String[] INNER_KEYWORDS = new String[]{
             "TRANSLATE", "VERTICES", "VLABELS", "EDGES", "ELABELS",
-            "displaylabels", "taxlabels"
+            "displaylabels", "taxlabels", "taxset", "charset"
     };
 
     private static final String[] BLOCKS = new String[]{
-            "data", "taxa", "characters", "distances", "trees",
+            "data", "taxa", "characters", "distances", "trees", "sets",
             "splits", "network", "traits", "analysis", "viewer",
             "splitstree6", "traits"
     };

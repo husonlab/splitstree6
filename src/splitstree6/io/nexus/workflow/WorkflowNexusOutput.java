@@ -86,6 +86,11 @@ public class WorkflowNexusOutput {
 			nexusExporter.export(w, workflow.getInputTaxaBlock(), workflow.getInputTaxaBlock().getTraitsBlock());
 		}
 
+		if (workflow.getInputTaxaBlock().getSetsBlock() != null && workflow.getInputTaxaBlock().getSetsBlock().size() > 0) {
+			nexusExporter.setTitle("Input Sets");
+			nexusExporter.export(w, workflow.getInputTaxaBlock(), workflow.getInputTaxaBlock().getSetsBlock());
+		}
+
 		setupExporter(workflow.getInputTaxaFilterNode(), nexusExporter);
 		nexusExporter.export(w, workflow.getInputTaxaFilterNode().getAlgorithm());
 
@@ -96,6 +101,12 @@ public class WorkflowNexusOutput {
 			nexusExporter.setTitle("Working Traits");
 			nexusExporter.export(w, workflow.getWorkingTaxaBlock(), workflow.getWorkingTaxaBlock().getTraitsBlock());
 		}
+
+		if (workflow.getWorkingTaxaBlock().getSetsBlock() != null && workflow.getWorkingTaxaBlock().getSetsBlock().size() > 0) {
+			nexusExporter.setTitle("Working Sets");
+			nexusExporter.export(w, workflow.getWorkingTaxaBlock(), workflow.getWorkingTaxaBlock().getSetsBlock());
+		}
+
 
 		setupExporter(workflow.getInputDataNode(), nexusExporter);
 		nexusExporter.export(w, workflow.getInputTaxaBlock(), workflow.getInputDataNode().getDataBlock());

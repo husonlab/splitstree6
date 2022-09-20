@@ -114,7 +114,8 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		networkPane.setRunAfterUpdate(() -> {
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			interactionSetup.apply(taxonLabelMap, nodeShapeMap, taxa::get, taxa::indexOf);
+			interactionSetup.apply(taxonLabelMap, nodeShapeMap,
+					t -> (t >= 1 && t <= taxa.getNtax() ? taxa.get(t) : null), taxa::indexOf);
 
 			/*
 			if (networkView.getOptionEdits().length > 0) {

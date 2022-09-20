@@ -174,11 +174,26 @@ public class NexusExporter {
 				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
 		}
-		final TraitsNexusOutput output = new TraitsNexusOutput();
+		final var output = new TraitsNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
-			final TraitsBlock newBlock = new TraitsBlock();
+			final var newBlock = new TraitsBlock();
 			newBlock.setFormat(block.getFormat());
+			output.write(w, new TaxaBlock(), newBlock);
+		} else
+			output.write(w, taxa, block);
+	}
+
+	public void export(Writer w, TaxaBlock taxa, SetsBlock block) throws IOException {
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
+			new TaxaNexusOutput().write(w, taxa);
+		}
+		final var output = new SetsNexusOutput();
+		output.setTitleAndLink(getTitle(), getLink());
+		if (asWorkflowOnly) {
+			final var newBlock = new SetsBlock();
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
 			output.write(w, taxa, block);
@@ -227,10 +242,10 @@ public class NexusExporter {
 			export(w, taxaBlock, networkBlock);
 		else if (dataBlock instanceof ViewBlock viewBlock)
 			export(w, taxaBlock, viewBlock);
-		else if (dataBlock instanceof TraitsBlock)
-			export(w, taxaBlock, (TraitsBlock) dataBlock);
-			//else if (dataBlock instanceof ViewerBlock)
-			//    export(w, taxaBlock, (ViewerBlock) dataBlock);
+		else if (dataBlock instanceof TraitsBlock traitsBlock)
+			export(w, taxaBlock, traitsBlock);
+		else if (dataBlock instanceof SetsBlock setsBlock)
+			export(w, taxaBlock, setsBlock);
 		else
 			throw new IOException("Export " + Basic.getShortName(dataBlock.getClass()) + ": not implemented");
 	}

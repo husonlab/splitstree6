@@ -107,71 +107,73 @@ public class InteractionSetup {
 			for (var id : taxonLabelMap.keySet()) {
 				try {
 					var label = taxonLabelMap.get(id);
-					var v = graph.getTaxon2Node(id);
-					var shape = nodeShapeMap.get(v);
-					var taxon = idTaxonMap.apply(id);
-					if (taxon != null && shape != null) {
-						shape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
-						label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
+					if (label != null) {
+						var v = graph.getTaxon2Node(id);
+						var shape = nodeShapeMap.get(v);
+						var taxon = idTaxonMap.apply(id);
+						if (taxon != null && shape != null) {
+							shape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
+							label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 
-						shape.setOnMouseEntered(e -> {
-							if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
-								nodeShapeOrLabelEntered = true;
-								shape.setScaleX(1.2 * shape.getScaleX());
-								shape.setScaleY(1.2 * shape.getScaleY());
-								label.setScaleX(1.1 * label.getScaleX());
-								label.setScaleY(1.1 * label.getScaleY());
-								e.consume();
-							}
-						});
-						shape.setOnMouseExited(e -> {
-							if (nodeShapeOrLabelEntered) {
-								shape.setScaleX(shape.getScaleX() / 1.2);
-								shape.setScaleY(shape.getScaleY() / 1.2);
-								label.setScaleX(label.getScaleX() / 1.1);
-								label.setScaleY(label.getScaleY() / 1.1);
-								nodeShapeOrLabelEntered = false;
-								e.consume();
-							}
-						});
-
-						final EventHandler<MouseEvent> mouseClickedHandler = e -> {
-							if (e.isStillSincePress()) {
-								if (!e.isShiftDown())
-									taxonSelectionModel.clearSelection();
-								taxonSelectionModel.toggleSelection(taxon);
-								e.consume();
-							}
-						};
-						shape.setOnMouseClicked(mouseClickedHandler);
-						label.setOnMouseClicked(mouseClickedHandler);
-
-						label.setOnMouseEntered(shape.getOnMouseEntered());
-						label.setOnMouseExited(shape.getOnMouseExited());
-
-						label.setOnMousePressed(e -> {
-							if (taxonSelectionModel.isSelected(taxon)) {
-								mouseDownX = e.getScreenX();
-								mouseDownY = e.getScreenY();
-								e.consume();
-							}
-						});
-
-						label.setOnMouseDragged(e -> {
-							if (taxonSelectionModel.isSelected(taxon)) {
-								for (var wTaxon : taxonSelectionModel.getSelectedItems()) {
-									var wLabel = taxonLabelMap.get(taxonIdMap.apply(wTaxon));
-
-									var dx = e.getScreenX() - mouseDownX;
-									var dy = e.getScreenY() - mouseDownY;
-									wLabel.setLayoutX(wLabel.getLayoutX() + dx);
-									wLabel.setLayoutY(wLabel.getLayoutY() + dy);
+							shape.setOnMouseEntered(e -> {
+								if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
+									nodeShapeOrLabelEntered = true;
+									shape.setScaleX(1.2 * shape.getScaleX());
+									shape.setScaleY(1.2 * shape.getScaleY());
+									label.setScaleX(1.1 * label.getScaleX());
+									label.setScaleY(1.1 * label.getScaleY());
+									e.consume();
 								}
-								mouseDownX = e.getScreenX();
-								mouseDownY = e.getScreenY();
-								e.consume();
-							}
-						});
+							});
+							shape.setOnMouseExited(e -> {
+								if (nodeShapeOrLabelEntered) {
+									shape.setScaleX(shape.getScaleX() / 1.2);
+									shape.setScaleY(shape.getScaleY() / 1.2);
+									label.setScaleX(label.getScaleX() / 1.1);
+									label.setScaleY(label.getScaleY() / 1.1);
+									nodeShapeOrLabelEntered = false;
+									e.consume();
+								}
+							});
+
+							final EventHandler<MouseEvent> mouseClickedHandler = e -> {
+								if (e.isStillSincePress()) {
+									if (!e.isShiftDown())
+										taxonSelectionModel.clearSelection();
+									taxonSelectionModel.toggleSelection(taxon);
+									e.consume();
+								}
+							};
+							shape.setOnMouseClicked(mouseClickedHandler);
+							label.setOnMouseClicked(mouseClickedHandler);
+
+							label.setOnMouseEntered(shape.getOnMouseEntered());
+							label.setOnMouseExited(shape.getOnMouseExited());
+
+							label.setOnMousePressed(e -> {
+								if (taxonSelectionModel.isSelected(taxon)) {
+									mouseDownX = e.getScreenX();
+									mouseDownY = e.getScreenY();
+									e.consume();
+								}
+							});
+
+							label.setOnMouseDragged(e -> {
+								if (taxonSelectionModel.isSelected(taxon)) {
+									for (var wTaxon : taxonSelectionModel.getSelectedItems()) {
+										var wLabel = taxonLabelMap.get(taxonIdMap.apply(wTaxon));
+
+										var dx = e.getScreenX() - mouseDownX;
+										var dy = e.getScreenY() - mouseDownY;
+										wLabel.setLayoutX(wLabel.getLayoutX() + dx);
+										wLabel.setLayoutY(wLabel.getLayoutY() + dy);
+									}
+									mouseDownX = e.getScreenX();
+									mouseDownY = e.getScreenY();
+									e.consume();
+								}
+							});
+						}
 					}
 				} catch (Exception ignored) {
 				}

@@ -71,7 +71,7 @@ public class SplitsTree6 extends Application {
 		//CheckForUpdate.programURL = "http://software-ab.informatik.uni-tuebingen.de/download/alora";
 		//CheckForUpdate.applicationId = "1691242391";
 
-		SplashScreen.setLabelAnchor(new Point2D(100, 14));
+		SplashScreen.setLabelAnchor(new Point2D(40, 14));
 		SplashScreen.setFitHeight(250);
 		SplashScreen.setVersionString(ProgramProperties.getProgramVersion());
 		SplashScreen.setImageResourceName("SplitsTree6-splash.png");

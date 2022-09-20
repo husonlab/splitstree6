@@ -52,14 +52,20 @@ public class NexusDataBlockInput {
 				return dataBlock;
 			}
             else if (np.peekMatchBeginBlock(TraitsBlock.BLOCK_NAME)) {
-                final TraitsNexusInput input = new TraitsNexusInput();
-                final TraitsBlock dataBlock = new TraitsBlock();
-                input.parse(np, taxa, dataBlock);
-                title = input.getTitle();
-                link = input.getLink();
-                return dataBlock;
-            }
-			else if (np.peekMatchBeginBlock(CharactersBlock.BLOCK_NAME)) {
+				final var input = new TraitsNexusInput();
+				final var dataBlock = new TraitsBlock();
+				input.parse(np, taxa, dataBlock);
+				title = input.getTitle();
+				link = input.getLink();
+				return dataBlock;
+			} else if (np.peekMatchBeginBlock(SetsBlock.BLOCK_NAME)) {
+				final var input = new SetsNexusInput();
+				final var dataBlock = new SetsBlock();
+				input.parse(np, taxa, dataBlock);
+				title = input.getTitle();
+				link = input.getLink();
+				return dataBlock;
+			} else if (np.peekMatchBeginBlock(CharactersBlock.BLOCK_NAME)) {
 				final var input = new CharactersNexusInput();
 				final var dataBlock = new CharactersBlock();
 				input.parse(np, taxa, dataBlock);
@@ -67,8 +73,7 @@ public class NexusDataBlockInput {
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
-			}
-            else if (np.peekMatchBeginBlock(GenomesBlock.BLOCK_NAME)) {
+			} else if (np.peekMatchBeginBlock(GenomesBlock.BLOCK_NAME)) {
 				final var input = new GenomesNexusInput();
 				final var dataBlock = new GenomesBlock();
 				input.parse(np, taxa, dataBlock);

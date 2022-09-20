@@ -197,13 +197,15 @@ public class AlignmentView implements IView {
 					inTaxaSelection.set(true);
 					var inputTaxa = getInputTaxa();
 					var workingTaxa = getWorkingTaxa();
-					for (var t = 1; t <= inputTaxa.getNtax(); t++) {
-						var taxon = inputTaxa.get(t);
-						if (workingTaxa.indexOf(taxon) != -1) {
-							if (n.get(t))
-								mainWindow.getTaxonSelectionModel().select(taxon);
-							else
-								mainWindow.getTaxonSelectionModel().clearSelection(taxon);
+					if (inputTaxa != null && workingTaxa != null) {
+						for (var t = 1; t <= inputTaxa.getNtax(); t++) {
+							var taxon = inputTaxa.get(t);
+							if (workingTaxa.indexOf(taxon) != -1) {
+								if (n.get(t))
+									mainWindow.getTaxonSelectionModel().select(taxon);
+								else
+									mainWindow.getTaxonSelectionModel().clearSelection(taxon);
+							}
 						}
 					}
 				} finally {

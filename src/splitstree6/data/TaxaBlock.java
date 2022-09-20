@@ -49,6 +49,8 @@ public class TaxaBlock extends DataBlock {
 	private final StringProperty comments = new SimpleStringProperty(this, "comments");
 
 	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>(this, "traitsBlock");
+	private final ObjectProperty<SetsBlock> setsBlock = new SimpleObjectProperty<>(this, "setsBlock");
+
 
 	/**
 	 * constructor
@@ -79,7 +81,8 @@ public class TaxaBlock extends DataBlock {
 		name2taxon.clear();
 		name2taxon.putAll(that.name2taxon);
 		comments.set(that.getComments());
-		setTraitsBlock(that.traitsBlock.get());
+		setTraitsBlock(that.getTraitsBlock() == null ? null : new TraitsBlock(that, that.getTraitsBlock()));
+		setSetsBlock(that.getSetsBlock() == null ? null : new SetsBlock(that, that.getSetsBlock()));
 	}
 
 	public Object clone() {
@@ -325,6 +328,18 @@ public class TaxaBlock extends DataBlock {
 		this.traitsBlock.set(traitsBlock);
 	}
 
+
+	public SetsBlock getSetsBlock() {
+		return setsBlock.get();
+	}
+
+	public ObjectProperty<SetsBlock> setsBlockProperty() {
+		return setsBlock;
+	}
+
+	public void setSetsBlock(SetsBlock setsBlock) {
+		this.setsBlock.set(setsBlock);
+	}
 
 	/**
 	 * returns true, if any taxon has an info string associated with it

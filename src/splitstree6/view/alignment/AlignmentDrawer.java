@@ -65,8 +65,7 @@ public class AlignmentDrawer {
 							 char[] consensusSequence, ColorScheme colorScheme,
 							 double boxHeight, ScrollBar vScrollBar, NumberAxis axis, BitSet activateTaxa, BitSet activeSites) {
 
-
-		if (inputTaxa != null && inputCharacters != null) {
+		if (inputTaxa != null && inputCharacters != null && canvasWidth > 0 && canvasHeight > 0) {
 			var axisLowerBound = axis.getLowerBound();
 			var axisStartOffset = 7;
 			var boxWidth = (axis.getWidth()) / (axis.getUpperBound() - axisLowerBound);

@@ -62,10 +62,17 @@ public class NexusImporter {
 					}
 					if (np.isAtBeginOfBlock("TRAITS")) {
 						var parser = new TraitsNexusInput();
-						var traitsBlock = new TraitsBlock();
-						parser.parse(np, taxaBlock, traitsBlock);
+						var block = new TraitsBlock();
+						parser.parse(np, taxaBlock, block);
 						comments.setIfCurrentValueIsNull(np.popComments());
-						taxaBlock.setTraitsBlock(traitsBlock);
+						taxaBlock.setTraitsBlock(block);
+					}
+					if (np.isAtBeginOfBlock("SETS")) {
+						var parser = new SetsNexusInput();
+						var block = new SetsBlock();
+						parser.parse(np, taxaBlock, block);
+						comments.setIfCurrentValueIsNull(np.popComments());
+						taxaBlock.setSetsBlock(block);
 					}
 				} else if (np.isAtBeginOfBlock("TAXA")) {
 					{
@@ -75,10 +82,17 @@ public class NexusImporter {
 					}
 					if (np.isAtBeginOfBlock("TRAITS")) {
 						var parser = new TraitsNexusInput();
-						var traitsBlock = new TraitsBlock();
-						parser.parse(np, taxaBlock, traitsBlock);
+						var block = new TraitsBlock();
+						parser.parse(np, taxaBlock, block);
 						comments.setIfCurrentValueIsNull(np.popComments());
-						taxaBlock.setTraitsBlock(traitsBlock);
+						taxaBlock.setTraitsBlock(block);
+					}
+					if (np.isAtBeginOfBlock("SETS")) {
+						var parser = new SetsNexusInput();
+						var block = new SetsBlock();
+						parser.parse(np, taxaBlock, block);
+						comments.setIfCurrentValueIsNull(np.popComments());
+						taxaBlock.setSetsBlock(block);
 					}
 				}
 
@@ -123,12 +137,19 @@ public class NexusImporter {
 					else
 						throw new IOException("Can't infer taxon names");
 				}
-				if (np.isAtBeginOfBlock("TRAITS")) {
+				if (np.isAtBeginOfBlock(TraitsBlock.BLOCK_NAME)) {
 					var parser = new TraitsNexusInput();
-					var traitsBlock = new TraitsBlock();
-					parser.parse(np, taxaBlock, traitsBlock);
-					taxaBlock.setTraitsBlock(traitsBlock);
+					var block = new TraitsBlock();
+					parser.parse(np, taxaBlock, block);
+					taxaBlock.setTraitsBlock(block);
 					comments.setIfCurrentValueIsNull(np.popComments());
+				}
+				if (np.isAtBeginOfBlock(SetsBlock.BLOCK_NAME)) {
+					var parser = new SetsNexusInput();
+					var block = new SetsBlock();
+					parser.parse(np, taxaBlock, block);
+					comments.setIfCurrentValueIsNull(np.popComments());
+					taxaBlock.setSetsBlock(block);
 				}
 			} finally {
 				taxaBlock.setComments(comments.get());
@@ -148,12 +169,12 @@ public class NexusImporter {
 				while (np.isAtBeginOfBlock("ALGORITHM") || np.isAtBeginOfBlock("TAXA")) {
 					np.skipBlock();
 				}
-				if (np.isAtBeginOfBlock("TRAITS")) {
+				if (np.isAtBeginOfBlock("TRAITS") || np.isAtBeginOfBlock("SETS")) {
 					np.skipBlock();
 				}
 			} else if (np.isAtBeginOfBlock("TAXA")) {
 				np.skipBlock();
-				if (np.isAtBeginOfBlock("TRAITS")) {
+				if (np.isAtBeginOfBlock("TRAITS") || np.isAtBeginOfBlock("SETS")) {
 					np.skipBlock();
 				}
 			}

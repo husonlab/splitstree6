@@ -58,7 +58,6 @@ module splitstreesix {
 	opens splitstree6.algorithms.trees.trees2splits;
 	opens splitstree6.algorithms.trees.trees2trees;
 
-
 	opens splitstree6.io.readers.characters;
 	opens splitstree6.io.readers.genomes;
 	opens splitstree6.io.readers.distances;

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="9.0.7" transformSequenceNumber="9">
+<install4j version="10.0.3" transformSequenceNumber="10">
   <directoryPresets config="../../javafx-jmods" />
   <application name="SplitsTree6" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTree6" publisher="Daniel Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_alpha" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
@@ -14,16 +14,10 @@
       </macSearchedJars>
     </codeSigning>
     <jreBundles jdkProviderId="Liberica" release="18/18.0.2.1+1">
-      <modules>
-        <module name="javafx.base" />
-        <module name="javafx.controls" />
-        <module name="javafx.fxml" />
-        <module name="javafx.graphics" />
-        <module name="java.sql" />
-      </modules>
+      <modules />
     </jreBundles>
   </application>
-  <files preserveSymlinks="false">
+  <files>
     <mountPoints>
       <mountPoint id="1691242167" location="jars" />
       <mountPoint id="1691243203" location="jars2" />
@@ -72,12 +66,11 @@
       <executable name="SplitsTree6" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
         <versionInfo include="true" fileDescription="SplitsTree6 analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2022 ${compiler:sys.publisher}" internalName="SplitsTree6" />
       </executable>
-      <java mainClass="splitstreesix/splitstree6.main.SplitsTree6" mainMode="module" vmParameters="-server -Duser.language=en -Duser.region=US --add-modules=splitstreesix ${compiler:renderingVMOption}">
+      <java mainClass="splitstreesix/splitstree6.main.SplitsTree6" mainMode="module" vmParameters="-server -Duser.language=en -Duser.region=US ${compiler:renderingVMOption}">
         <modulePath>
           <directory location="jars" failOnError="false" />
         </modulePath>
       </java>
-      <macStaticAssociationActions mode="selected" />
       <iconImageFiles>
         <file path="../src/splitstree6/resources/icons/SplitsTree6-16.png" />
         <file path="../src/splitstree6/resources/icons/SplitsTree6-32.png" />
@@ -1122,12 +1115,12 @@ return true;</property>
       </variables>
     </unixInstaller>
     <macosFolder name="Mac OS X Folder" id="1691242165" installDir="SplitsTree6" overridePrincipalLanguage="true" architecture="universal" compressDmg="true" signLaunchers="true" />
-    <windows name="Windows64bit" id="1691242288" installDir="SplitsTree6" overridePrincipalLanguage="true">
+    <windows name="Windows64bit" id="1691242288" installDir="SplitsTree6" overridePrincipalLanguage="true" architecture="64">
       <overriddenPrincipalLanguage id="409" />
     </windows>
   </mediaSets>
   <buildIds buildAll="false">
     <mediaSet refId="1691242165" />
   </buildIds>
-  <buildOptions verbose="true" disableSigning="true" disableNotarization="true" />
+  <buildOptions disableSigning="true" disableNotarization="true" />
 </install4j>

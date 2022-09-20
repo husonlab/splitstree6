@@ -42,6 +42,11 @@ TAXLABELS
 ;
 END; [Taxa]
 
+begin sets;
+taxset Atlantic=1-22;
+taxset Pacific=23-36;
+end;
+
 BEGIN Characters;
 DIMENSIONS nchar=60;
 FORMAT

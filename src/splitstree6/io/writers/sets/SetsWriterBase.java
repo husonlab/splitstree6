@@ -1,5 +1,5 @@
 /*
- * Version.java Copyright (C) 2022 Daniel H. Huson
+ * TriatsWriterBase.java Copyright (C) 2022 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,15 +17,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.main;
+package splitstree6.io.writers.sets;
 
-/**
- * The version string
- * Daniel Huson, 6.2017
- */
-public class Version {
-	static public final String NAME = "SplitsTree6";
-	static public final String SHORT_DESCRIPTION = "SplitsTree6 (version 0.3.6-alpha, built 16 Sep 2022)";
-	static public final String VERSION = "6.0.0_alpha";
+import splitstree6.data.SetsBlock;
+import splitstree6.io.utils.DataBlockWriter;
 
+public abstract class SetsWriterBase extends DataBlockWriter<SetsBlock> {
+	public SetsWriterBase() {
+		super(SetsBlock.class);
+	}
 }
