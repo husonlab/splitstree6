@@ -6,6 +6,9 @@ import jloda.util.progress.ProgressListener;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
+import static java.lang.Math.abs;
+import static jloda.util.NumberUtils.max;
+
 public class NeighborNetSplitstree4 {
 
     private static final double CG_EPSILON = 0.0001;
@@ -65,19 +68,20 @@ public class NeighborNetSplitstree4 {
             log.println("% Active Set ST4");
             log.println("% \t Proportion Removed = 0.4");
             log.println("% \t Max CG iterations = "+npairs);
-            log.println("% Convergence for CG is ||A'(Ax_{active}-d)|| < "+CG_EPSILON * Math.sqrt(norm(Atd)));
+            log.println("% Convergence for CG is ||A'(Ax_{active}-d)|| < "+CG_EPSILON * Math.sqrt(sumSquares(Atd)));
             log.println("% Outer convergence condition grad > -0.0001 ");
             log.println("% time \t ||res|| \t ||proj grad||\n\n");
             log.println("ConvergenceST4 = [");
         }
 
+        CGparams params = new CGparams();
 
 
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
             while (true) /* Inner loop: find the next feasible optimum */ {
                 if (!first_pass)  /* The first time through we use the unconstrained branch lengths */
-                    circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x);
+                    circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x,params);
                 first_pass = false;
 
                 int[] entriesToContract = worstIndices(x, 0.6);
@@ -86,7 +90,7 @@ public class NeighborNetSplitstree4 {
                         x[index] = 0.0;
                         active[index] = true;
                     }
-                    circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x); /* Re-optimise, so that the current x is always optimal */
+                    circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x, params); /* Re-optimise, so that the current x is always optimal */
                 }
 
                 //Move from old_x towards the optimal x as far as possible while remaining feasible.
@@ -185,24 +189,35 @@ public class NeighborNetSplitstree4 {
              * all i,j in the active set.
              */
             int min_i = -1;
-            double min_grad = 1.0;
-            double max_abs_grad = 0.0;
+            double min_grad = 1.0; //Minimum value of the projected gradient
+            double pgradSumSquares = 0.0; //Norm of the projected gradient.
+
             for (int i = 0; i < npairs; i++) {
                 r[i] -= Atd[i];
-                //r[i] *= 2.0;
+                double grad_ij = r[i];
                 if (active[i]) {
-                    double grad_ij = r[i];
+
                     if ((min_i == -1) || (grad_ij < min_grad)) {
                         min_i = i;
                         min_grad = grad_ij;
                     }
+                    if (grad_ij < 0.0)
+                        pgradSumSquares += grad_ij*grad_ij;
                 }
                 else
-                    max_abs_grad = Math.max(max_abs_grad,Math.abs(r[i]));
+                    pgradSumSquares+=grad_ij*grad_ij;
             }
 
-            if ((min_i == -1) || (min_grad > -0.0001))
-                break; /* We have arrived at the constrained optimum */
+
+            if (params.useGradientNorm) {
+                if ((min_i == -1) || pgradSumSquares<params.epsilon * params.epsilon)
+                    break;
+            }
+            else {
+                double gradbound = -.0001;
+                if ((min_i == -1) || (min_grad > gradbound))
+                    break; /* We have arrived at the constrained optimum */
+            }
             active[min_i] = false;
             progress.checkForCancel();
         }
@@ -460,6 +475,18 @@ public class NeighborNetSplitstree4 {
         return result;
     }
 
+    static private class CGparams {
+        public boolean useGradientNorm;
+        public double epsilon;
+        public CGparams() {
+            useGradientNorm = false;
+            epsilon = 1e-7;
+        }
+    }
+
+
+
+
     /**
      * Conjugate gradient algorithm solving A^tWA x = b (where b = AtWd)
      * such that all x[i][j] for which active[i][j] = true are set to zero.
@@ -477,7 +504,7 @@ public class NeighborNetSplitstree4 {
      * @param x      the x matrix
      */
     static private void circularConjugateGrads(int ntax, int npairs, double[] r, double[] w, double[] p, double[] y,
-                                               double[] b, boolean[] active, double[] x) {
+                                               double[] b, boolean[] active, double[] x, CGparams params) {
         int kmax = ntax * (ntax - 1) / 2; /* Maximum number of iterations of the cg algorithm (probably too many) */
 
         calculateAb(ntax, x, y);
@@ -489,13 +516,22 @@ public class NeighborNetSplitstree4 {
             else
                 r[k] = 0.0;
 
-        double rho = norm(r);
+        double rho;
+        double bound;
+        if (!params.useGradientNorm) {
+            double e_0 = CG_EPSILON * Math.sqrt(sumSquares(b)); //e_0 = 1e-7;
+            bound = e_0*e_0;
+        } else {
+            bound = params.epsilon * params.epsilon;
+        }
+
+        rho = sumSquares(r);
         double rho_old = 0;
 
-        double e_0 = CG_EPSILON * Math.sqrt(norm(b)); //e_0 = 1e-7;
         int k = 0;
 
-        while ((rho > e_0 * e_0) && (k < kmax)) {
+
+        while ((rho > bound) && (k < kmax)) {
 
             k = k + 1;
             if (k == 1) {
@@ -526,7 +562,7 @@ public class NeighborNetSplitstree4 {
                 r[i] -= alpha * w[i];
             }
             rho_old = rho;
-            rho = norm(r);
+            rho = sumSquares(r);
         }
     }
 
@@ -536,7 +572,7 @@ public class NeighborNetSplitstree4 {
      * @param x the matrix
      * @return sum of squares of the lower triangle
      */
-    static private double norm(double[] x) {
+    static private double sumSquares(double[] x) {
         double ss = 0.0;
         double xk;
         for (double aX : x) {
