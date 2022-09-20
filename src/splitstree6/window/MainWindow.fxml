@@ -240,6 +240,9 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <Menu fx:id="selectSetsMenu" text="Sets">
+                        </Menu>
                     </Menu>
                     <Menu text="View">
                         <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false" text="Use Dark Theme"/>

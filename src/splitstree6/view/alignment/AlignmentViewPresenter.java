@@ -28,10 +28,7 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
@@ -48,7 +45,9 @@ import splitstree6.workflow.Workflow;
 
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * alignment view presenter
@@ -456,6 +455,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
 		Platform.runLater(() -> updateCanvasListener.invalidated(null));
+
+		mainWindow.getWorkflow().runningProperty().addListener(e -> updateCharSetSelection(mainWindow, view, controller.getSetsMenu().getItems()));
 	}
 
 	public static void updateTaxaCellFactory(ListView<Taxon> listView, double unitHeight, Predicate<Taxon> isDisabled) {
@@ -536,5 +537,24 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		mainWindowController.getSelectInverseMenuItem().disableProperty().bind(mainWindowController.getSelectNoneMenuItem().disableProperty());
+	}
+
+
+	public static void updateCharSetSelection(MainWindow mainWindow, AlignmentView view, List<MenuItem> items) {
+		items.removeAll(items.stream().filter(t -> t.getText() != null && t.getText().startsWith("CharSet")).collect(Collectors.toList()));
+
+		var taxaBlock = mainWindow.getWorkflow().getInputTaxaBlock();
+		if (taxaBlock != null && taxaBlock.getSetsBlock() != null && taxaBlock.getSetsBlock().getCharSets().size() > 0) {
+			for (var set : taxaBlock.getSetsBlock().getCharSets()) {
+				var menuItem = new MenuItem("CharSet " + set.getName());
+				menuItem.setOnAction(e -> {
+					var bits = BitSetUtils.copy(set);
+					bits.or(view.getSelectedSites());
+					view.setSelectedSites(bits);
+				});
+				menuItem.disableProperty().bind(mainWindow.emptyProperty());
+				items.add(menuItem);
+			}
+		}
 	}
 }

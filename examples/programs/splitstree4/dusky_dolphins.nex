@@ -45,6 +45,8 @@ END; [Taxa]
 begin sets;
 taxset Atlantic=1-22;
 taxset Pacific=23-36;
+charset all=1-60;
+charset first10=1-10;
 end;
 
 BEGIN Characters;

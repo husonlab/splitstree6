@@ -29,6 +29,7 @@ import jloda.fx.control.CopyableLabel;
 import splitstree6.data.parts.Taxon;
 
 public class AlignmentViewController {
+
     @FXML
     private MenuButton filterMenu;
 
@@ -77,10 +78,11 @@ public class AlignmentViewController {
     @FXML
     private MenuItem selectNoneMenuItem;
 
+    @FXML
+    public Menu setsMenu;
 
     @FXML
     private ToggleButton findToggleButton;
-
 
     @FXML
     private ScrollBar hScrollBar;
@@ -253,6 +255,10 @@ public class AlignmentViewController {
 
     public MenuItem getSelectCodon2MenuItem() {
         return selectCodon2MenuItem;
+    }
+
+    public Menu getSetsMenu() {
+        return setsMenu;
     }
 
     public MenuItem getSelectSynapomorphiesMenuItem() {

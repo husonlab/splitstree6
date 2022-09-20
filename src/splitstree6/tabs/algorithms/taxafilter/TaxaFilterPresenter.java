@@ -38,6 +38,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.window.MainWindow;
+import splitstree6.window.MainWindowPresenter;
 import splitstree6.workflow.AlgorithmNode;
 
 /**
@@ -208,11 +209,12 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		taxaEditorNode.validProperty().addListener(new WeakInvalidationListener(activeChangedListener));
 		activeChangedListener.invalidated(null);
 
-		setupEditMenuButton(tab.getController().getMenuButton(), controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu());
+		var setsMenu = setupEditMenuButton(tab.getController().getMenuButton(), controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu());
 
+		mainWindow.getWorkflow().runningProperty().addListener(e -> MainWindowPresenter.updateTaxSetSelection(mainWindow, setsMenu.getItems()));
 	}
 
-	public static void setupEditMenuButton(MenuButton menuButton, ContextMenu... sourceMenus) {
+	public static Menu setupEditMenuButton(MenuButton menuButton, ContextMenu... sourceMenus) {
 		for (var contextMenu : sourceMenus) {
 			if (menuButton.getItems().size() > 0)
 				menuButton.getItems().add(new SeparatorMenuItem());
@@ -233,7 +235,10 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 				}
 			}
 		}
+		var menu = new Menu("Select");
+		menuButton.getItems().addAll(new SeparatorMenuItem(), menu);
 		menuButton.setVisible(true);
+		return menu;
 	}
 
 	private boolean updatingActive = false;
@@ -313,4 +318,5 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		if (newLayoutTableColumnWidth > displayCol.getWidth())
 			displayCol.setPrefWidth(newLayoutTableColumnWidth);
 	}
+
 }

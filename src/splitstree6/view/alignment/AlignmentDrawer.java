@@ -122,10 +122,16 @@ public class AlignmentDrawer {
 					for (var site = left; site <= right; site++) {
 						var ch = chars[site - 1];
 						var x = (site - axisLowerBound) * boxWidth + axisStartOffset;
+
 						if (showColors) {
-							var color = colors[ch];
-							if (color == null) {
-								color = colors[ch] = colorScheme.apply(ch);
+							Color color;
+							if (tNotActive || !activeSites.get(site))
+								color = notActiveFill;
+							else {
+								color = colors[ch];
+								if (color == null) {
+									color = colors[ch] = colorScheme.apply(ch);
+								}
 							}
 							BasicFX.fillRectangle(image, x, y - boxHeight, boxWidth, boxHeight, color);
 						}
@@ -175,7 +181,7 @@ public class AlignmentDrawer {
 							var ch = chars[site - 1];
 							var x = (site - axisLowerBound) * boxWidth + axisStartOffset;
 							if (tNotActive || !activeSites.get(site)) {
-								gc.setFill(notActiveFill);
+								gc.setFill(notActiveFill.darker());
 							} else
 								gc.setFill(textFill);
 							gc.fillText(String.valueOf(ch), x + 0.5 * (boxWidth - fontSize), y - 0.5 * boxHeight);

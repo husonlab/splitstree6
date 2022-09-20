@@ -47,10 +47,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.fx.window.PresentationMode;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.workflow.WorkflowNode;
-import jloda.util.Basic;
-import jloda.util.NumberUtils;
-import jloda.util.ProgramProperties;
-import jloda.util.StringUtils;
+import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
 import splitstree6.algorithms.characters.characters2distances.ProteinMLdist;
@@ -89,6 +86,7 @@ import splitstree6.io.FileLoader;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.main.CheckForUpdate;
 import splitstree6.tabs.IDisplayTab;
+import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
@@ -99,6 +97,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 public class MainWindowPresenter {
 	private final MainWindow mainWindow;
@@ -221,6 +220,24 @@ public class MainWindowPresenter {
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
 				m -> m.getText().equals("Edit"),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
+	}
+
+	public static void updateTaxSetSelection(MainWindow mainWindow, List<MenuItem> items) {
+		items.removeAll(items.stream().filter(t -> t.getText() != null && t.getText().startsWith("TaxSet")).collect(Collectors.toList()));
+
+		var taxaBlock = mainWindow.getWorkflow().getInputTaxaBlock();
+		if (taxaBlock != null && taxaBlock.getSetsBlock() != null && taxaBlock.getSetsBlock().getTaxSets().size() > 0) {
+			for (var set : taxaBlock.getSetsBlock().getTaxSets()) {
+				var menuItem = new MenuItem("TaxSet " + set.getName());
+				menuItem.setOnAction(e -> {
+					for (var t : BitSetUtils.members(set)) {
+						mainWindow.getTaxonSelectionModel().select(taxaBlock.get(t));
+					}
+				});
+				menuItem.disableProperty().bind(mainWindow.emptyProperty());
+				items.add(menuItem);
+			}
+		}
 	}
 
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
@@ -373,6 +390,10 @@ public class MainWindowPresenter {
 			}
 		});
 		controller.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()).or(mainWindow.emptyProperty()));
+
+		mainWindow.getWorkflow().runningProperty().addListener(e -> updateTaxSetSelection(mainWindow, controller.getSelectSetsMenu().getItems()));
+		updateTaxSetSelection(mainWindow, controller.getSelectSetsMenu().getItems());
+		controller.getSelectSetsMenu().disableProperty().bind(new SimpleBooleanProperty((focusedDisplayTab.get() instanceof DisplayTextTab) || ((focusedDisplayTab.get() instanceof WorkflowTab))));
 
 		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
 		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
