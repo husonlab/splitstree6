@@ -39,14 +39,14 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			BEGIN NETWORK;
 			    [TITLE {title};]
 				[LINK {type} = {title};]
-				[DIMENSIONS [NNODES=number-of-nodes] [NEDGES=number-of-edges];]
-					[NETWORK={HaplotypeNetwork|Points|Other};]
+				[DIMENSIONS [NVertices=number-of-nodes] [NEdges=number-of-edges];]
+					[TYPE {HaplotypeNetwork|Points|Other};]
 				[FORMAT
 				;]
 				[PROPERTIES
 					[info =' information string to be shown with plot']
 				;]
-				NODES
+				VERTICES
 					ID=number [LABEL=label] [x=number] [y=number] [key=value ...],
 					...
 					ID=number [LABEL=label] [x=number] [y=number] [key=value ...]
@@ -86,14 +86,16 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			} else {
 				np.matchIgnoreCase("nTax=" + taxaBlock.getNtax());
 			}
-			np.matchIgnoreCase("nVertices=");
+			np.matchAnyTokenIgnoreCase("nVertices nNodes"); // nNodes deprecated
+			np.matchIgnoreCase("=");
 			nNodes = np.getInt(0, Integer.MAX_VALUE);
 			np.matchIgnoreCase("nEdges=");
 			nEdges = np.getInt(0, Integer.MAX_VALUE);
 			np.matchIgnoreCase(";");
 			return readSplitsTree4(np, nNodes, nEdges, taxaBlock, networkBlock);
 		} else {
-			np.matchIgnoreCase("nNodes=");
+			np.matchAnyTokenIgnoreCase("nVertices nNodes");  // nNodes deprecated
+			np.matchIgnoreCase("=");
 			nNodes = np.getInt(0, Integer.MAX_VALUE);
 			np.matchIgnoreCase("nEdges=");
 			nEdges = np.getInt(0, Integer.MAX_VALUE);
@@ -102,7 +104,9 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 
 
 		if (np.peekMatchIgnoreCase("TYPE")) {
-			np.matchIgnoreCase("TYPE=");
+			np.matchIgnoreCase("TYPE");
+			if (np.peekMatchIgnoreCase("="))
+				np.matchIgnoreCase("="); // backward compatibility
 			var typeString = np.getWordRespectCase().toUpperCase();
 			var type = StringUtils.valueOfIgnoreCase(NetworkBlock.Type.class, typeString);
 			if (type == null)
@@ -113,7 +117,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 
 		if (np.peekMatchIgnoreCase("FORMAT")) {
 			np.matchIgnoreCase("FORMAT");
-			np.matchIgnoreCase(":");
+			np.matchIgnoreCase(";");
 		}
 
 		if (np.peekMatchIgnoreCase("PROPERTIES")) {
@@ -129,7 +133,8 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 
 		final var id2node = new TreeMap<Integer, Node>();
 
-		np.matchIgnoreCase("NODES");
+		np.matchAnyTokenIgnoreCase("VERTICES NODES"); // nodes deprecated
+
 		{
 			var first = true;
 			for (var i = 0; i < nNodes; i++) {

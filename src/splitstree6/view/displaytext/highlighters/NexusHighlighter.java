@@ -37,11 +37,11 @@ public class NexusHighlighter implements Highlighter.IHighlighter {
             "begin", "end", "endblock",
             "dimensions", "matrix",
             "format", "title", "matrix",
-            "properties", "cycle", "draw"
+            "properties", "cycle", "draw", "options", "properties", "type"
     };
 
     private static final String[] INNER_KEYWORDS = new String[]{
-            "TRANSLATE", "VERTICES", "VLABELS", "EDGES", "ELABELS",
+            "translate", "vertices", "vlabels", "edges", "elabels",
             "displaylabels", "taxlabels", "taxset", "charset"
     };
 

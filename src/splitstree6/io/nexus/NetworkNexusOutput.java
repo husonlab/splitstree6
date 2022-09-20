@@ -42,20 +42,20 @@ public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<Netw
 	public void write(Writer w, TaxaBlock taxaBlock, NetworkBlock networkBlock) throws IOException {
 		w.write("\nBEGIN NETWORK;\n");
 		writeTitleAndLink(w);
-		w.write("DIMENSIONS nNodes=" + networkBlock.getNumberOfNodes() + " nEdges=" + networkBlock.getNumberOfEdges() + ";\n");
+		w.write("DIMENSIONS nVertices=" + networkBlock.getNumberOfNodes() + " nEdges=" + networkBlock.getNumberOfEdges() + ";\n");
 
-		w.write("\tTYPE=" + networkBlock.getNetworkType() + ";\n");
+		w.write("TYPE " + networkBlock.getNetworkType() + ";\n");
 
 		final PhyloGraph graph = networkBlock.getGraph();
 		// format?
 
 		// properties?
 		if (networkBlock.getInfoString() != null && !networkBlock.getInfoString().isBlank()) {
-			w.write("\tPROPERTIES info ='" + StringUtils.fold(networkBlock.getInfoString().trim(), 256) + "';\n");
+			w.write("PROPERTIES info ='" + StringUtils.fold(networkBlock.getInfoString().trim(), 256) + "';\n");
 		}
 
 		{
-			w.write("NODES\n");
+			w.write("VERTICES\n");
 			boolean first = true;
 			for (Node v : graph.nodes()) {
 				if (first)
