@@ -79,6 +79,15 @@ public class AlignmentViewController {
     private MenuItem selectNoneMenuItem;
 
     @FXML
+    private MenuItem invertSelectionMenuItem;
+
+    @FXML
+    private MenuItem selectCompatibleMenuItem;
+
+    @FXML
+    private MenuItem selectIncompatibleMenuItem;
+
+    @FXML
     public Menu setsMenu;
 
     @FXML
@@ -287,6 +296,18 @@ public class AlignmentViewController {
 
     public MenuItem getSelectNoneMenuItem() {
         return selectNoneMenuItem;
+    }
+
+    public MenuItem getInvertSelectionMenuItem() {
+        return invertSelectionMenuItem;
+    }
+
+    public MenuItem getSelectCompatibleMenuItem() {
+        return selectCompatibleMenuItem;
+    }
+
+    public MenuItem getSelectIncompatibleMenuItem() {
+        return selectIncompatibleMenuItem;
     }
 
     public ToggleButton getFindToggleButton() {

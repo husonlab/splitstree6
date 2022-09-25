@@ -22,6 +22,7 @@ package splitstree6.view.splits.viewer;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.geometry.Bounds;
@@ -44,6 +45,8 @@ import jloda.fx.util.RunAfterAWhile;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
+import splitstree6.algorithms.utils.CharactersUtilities;
+import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
@@ -229,6 +232,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			updateCounter.set(updateCounter.get() + 1);
 		});
 
+
 		controller.getOrientationCBox().disableProperty().bind(splitsView.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
 
 		controller.getScrollPane().setContent(splitNetworkPane);
@@ -367,6 +371,23 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			IteratorUtils.asList(BitSetUtils.range(1, splitsView.getSplitsBlock().getNsplits() + 1)).forEach(s -> splitsView.getSplitSelectionModel().setSelected(s, !selectedSplits.contains(s)));
 		});
 		mainController.getSelectInverseMenuItem().disableProperty().bind(splitsView.emptyProperty());
+
+		mainController.getSelectCompatibleSitesMenuItem().setOnAction(e -> {
+			if (mainWindow.getWorkflow().getWorkingDataBlock() instanceof CharactersBlock charactersBlock) {
+				var compatible = CharactersUtilities.computeAllCompatible(charactersBlock, splitsView.getSplitsBlock(), splitsView.getSplitSelectionModel().getSelectedItems());
+				System.err.printf("Compatible sites (%,d): %s%n", compatible.cardinality(), StringUtils.toString(compatible));
+				if (compatible.cardinality() > 0) {
+					var alignmentViewer = mainWindow.getAlignmentViewer();
+					if (alignmentViewer != null) {
+						alignmentViewer.getSelectedSites().clear();
+						alignmentViewer.setSelectedSites(compatible);
+					}
+				}
+			}
+		});
+		mainController.getSelectCompatibleSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(
+				() -> !(mainWindow.getWorkflow().getWorkingDataBlock() instanceof CharactersBlock && splitsView.getSplitSelectionModel().size() > 0),
+				mainWindow.getWorkflow().validProperty(), splitsView.getSplitSelectionModel().getSelectedItems()));
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(splitsView.emptyProperty());

@@ -256,6 +256,10 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		return dataNodesStream().filter(v -> v.getDataBlock() instanceof ViewBlock viewBlock && viewBlock.getView() instanceof AlignmentView).findFirst().orElse(null);
 	}
 
+	public Object getInputDataBlock() {
+		return getInputDataNode() == null ? null : getInputDataNode().getDataBlock();
+	}
+
 	public Object getWorkingDataBlock() {
 		return getWorkingDataNode() == null ? null : getWorkingDataNode().getDataBlock();
 	}

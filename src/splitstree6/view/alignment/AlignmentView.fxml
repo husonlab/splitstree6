@@ -38,6 +38,13 @@
                             <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" text="Select All"/>
                             <MenuItem fx:id="selectNoneMenuItem" mnemonicParsing="false" text="Select None"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
+                            <MenuItem fx:id="invertSelectionMenuItem" mnemonicParsing="false" text="Invert Selection"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
+                            <MenuItem fx:id="selectCompatibleMenuItem" mnemonicParsing="false"
+                                      text="Select Compatible"/>
+                            <MenuItem fx:id="selectIncompatibleMenuItem" mnemonicParsing="false"
+                                      text="Select Incompatible"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
                             <MenuItem fx:id="selectConstantMenuItem" mnemonicParsing="false" text="Constant Sites"/>
                             <MenuItem fx:id="selectGapMenuItem" mnemonicParsing="false" text="Gap Sites"/>
                             <MenuItem fx:id="selectMissingMenuItem" mnemonicParsing="false" text="Missing Sites"/>

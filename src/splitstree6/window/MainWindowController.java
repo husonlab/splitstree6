@@ -168,6 +168,9 @@ public class MainWindowController {
 	private MenuItem selectBracketsMenuItem;
 
 	@FXML
+	private MenuItem selectCompatibleSitesMenuItem;
+
+	@FXML
 	public Menu selectSetsMenu;
 
 	@FXML
@@ -655,6 +658,10 @@ public class MainWindowController {
 
 	public MenuItem getSelectBracketsMenuItem() {
 		return selectBracketsMenuItem;
+	}
+
+	public MenuItem getSelectCompatibleSitesMenuItem() {
+		return selectCompatibleSitesMenuItem;
 	}
 
 	public Menu getSelectSetsMenu() {

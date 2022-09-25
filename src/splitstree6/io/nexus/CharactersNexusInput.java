@@ -220,7 +220,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 			switch (charactersBlock.getDataType()) {
                 case Protein -> charactersBlock.setStateLabeler(new ProteinStateLabeler());
                 case Microsat -> charactersBlock.setStateLabeler(new MicrostatStateLabeler());
-                case Unknown -> charactersBlock.setStateLabeler(new StandardStateLabeler(nchar, charactersBlock.getMissingCharacter(), format.getOptionMatchCharacter(), charactersBlock.getGapCharacter()));
+				default -> charactersBlock.setStateLabeler(new StandardStateLabeler(nchar, charactersBlock.getMissingCharacter(), format.getOptionMatchCharacter(), charactersBlock.getGapCharacter()));
             }
 
 			charactersBlock.setCharLabeler(new HashMap<>());

@@ -97,31 +97,37 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 		}
 
 		// Writes the CharStateLabels only if set
-		if (characters.getStateLabeler() != null && characters.getCharLabeler() != null) {
+		if ((characters.getCharLabeler() != null) || (characters.getStateLabeler() != null)) {
+			var first = true;
 			w.write("CHARSTATELABELS\n");
-			boolean first = true;
 			for (int i = 1; i <= characters.getNchar(); i++) {
-				if (characters.getCharLabeler().containsKey(i)) {
-					if (!first)
+				var hasCharLabel = (characters.getCharLabeler() != null) && characters.getCharLabeler().containsKey(i);
+				var hasStateLabel = ((characters.getStateLabeler() != null) && characters.getStateLabeler().hasStates(i));
+
+				if (hasCharLabel || hasStateLabel) {
+					if (first)
+						first = false;
+					else
 						w.write(",\n");
+
 					w.write("\t" + i + " ");
-					String label = characters.getCharLabeler().get(i);
-					if (label != null) {
-						w.write("" + StringUtils.quoteIfNecessary(label) + "");
-						if (first)
-							first = false;
+
+					if (hasCharLabel) {
+						var label = characters.getCharLabeler().get(i);
+						if (label != null) {
+							w.write(StringUtils.quoteIfNecessary(label));
+						}
 					}
-					if (characters.getStateLabeler().hasStates(i)) {
+
+					if (hasStateLabel) {
 						w.write("/");
 						for (String str : characters.getStateLabeler().getStates(i)) {
 							w.write(" " + StringUtils.quoteIfNecessary(str));
 						}
-						if (first)
-							first = false;
 					}
 				}
 			}
-			w.write(";\n");
+			w.write("\n;\n");
 		}
 
 		w.write("MATRIX\n");

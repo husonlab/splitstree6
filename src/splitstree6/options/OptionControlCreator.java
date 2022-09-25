@@ -118,7 +118,7 @@ public class OptionControlCreator {
 			}
 			case String -> {
 				var control = new TextField(option.getProperty().getValue().toString());
-				control.setPrefColumnCount(12);
+				control.setPrefColumnCount(35);
 				control.setOnAction(e -> option.getProperty().setValue(control.getText()));
 				control.setTooltip(new Tooltip(control.getText() + ": string"));
 				if (changeListeners != null) {

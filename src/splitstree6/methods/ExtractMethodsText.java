@@ -22,6 +22,7 @@ package splitstree6.methods;
 import jloda.util.Pair;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.IFilter;
+import splitstree6.data.CharactersBlock;
 import splitstree6.main.Version;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -32,8 +33,6 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
 
-import static java.lang.String.format;
-
 /**
  * generates the methods text for a given Workflow
  * Daniel Huson, June 2017
@@ -41,14 +40,17 @@ import static java.lang.String.format;
 public class ExtractMethodsText {
 	private static ExtractMethodsText instance;
 
-	public static final String preambleTemplate = "Analysis was performed using SplitsTree6 %s%s.%n";
-	public static final String inputDataTemplate = "The original input consisted of %s and %s.%n";
-	public static final String taxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.%n";
-	public static final String taxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s.%n";
-	public static final String methodWithOutputTemplate = "The %s method%s was used%s so as to obtain %s%s.%n";
-	public static final String methodTemplate = "The %s method%s was used%s.%n";
+	public static final String PreambleTemplate = "Analysis was performed using SplitsTree6 %s%s.%n";
+	public static final String InputDataTemplate = "The original input consisted of %s and %s.%n";
+	public static final String InputCharactersTemplate = "The original input had %,d characters.%n";
+	public static final String RemovedCharactersTemplate = "After removal of %s characters, the input had %s characters.%n";
 
-	public static final String filterTemplate = "A %s%s was applied so as to be %s.%n";
+	public static final String TaxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.%n";
+	public static final String TaxonFilterTemplate = "After removal of %d taxa, the input consisted of %s and %s.%n";
+	public static final String MethodWithOutputTemplate = "The %s method%s was used%s so as to obtain %s%s.%n";
+	public static final String MethodTemplate = "The %s method%s was used%s.%n";
+
+	public static final String FilterTemplate = "A %s%s was applied so as to be %s.%n";
 
 	/**
 	 * constructor
@@ -84,23 +86,33 @@ public class ExtractMethodsText {
 
 		buf.append("Methods:\n");
 
-		buf.append(format(preambleTemplate, Version.VERSION, ExtractCitations.getSplitsTreeKeysString()));
+		buf.append(PreambleTemplate.formatted(Version.VERSION, ExtractCitations.getSplitsTreeKeysString()));
 
 		final Set<Pair<String, String>> allKeysAndPapers = new TreeSet<>(ExtractCitations.getSplitsTreeKeysAndPapers());
 
 		final Set<String> set = new HashSet<>(); // use this to avoid duplicate lines
 
-		buf.append(format(inputDataTemplate, workflow.getInputTaxaNode().getDataBlock().getShortDescription(), workflow.getInputDataNode().getDataBlock().getShortDescription()));
+		buf.append(InputDataTemplate.formatted(workflow.getInputTaxaNode().getDataBlock().getShortDescription(), workflow.getInputDataNode().getDataBlock().getShortDescription()));
 
 		var topTaxaBlock = workflow.getInputTaxaBlock();
 		var workingTaxaBlock = workflow.getWorkingTaxaBlock();
 		if (workingTaxaBlock != null && workingTaxaBlock.getNtax() < topTaxaBlock.getNtax()) {
 			int removed = (topTaxaBlock.getNtax() - workingTaxaBlock.getNtax());
 			if (removed == 1)
-				buf.append(format(taxonFilterTemplateOne, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
+				buf.append(TaxonFilterTemplateOne.formatted(workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
 			else
-				buf.append(format(taxonFilterTemplate, removed, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
+				buf.append(TaxonFilterTemplate.formatted(removed, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
 		}
+
+		if (workflow.getInputDataBlock() instanceof CharactersBlock inputCharacters) {
+			if (workflow.getWorkingDataBlock() instanceof CharactersBlock workingCharacters) {
+				if (inputCharacters.getNchar() > workingCharacters.getNchar()) {
+					buf.append(RemovedCharactersTemplate.formatted(inputCharacters.getNchar() - workingCharacters.getNchar(), workingCharacters.getNchar()));
+
+				}
+			}
+		}
+
 		final var root = workflow.getWorkingDataNode();
 		if (root.isValid()) {
 			final var visited = new HashSet<DataNode>();
@@ -120,7 +132,7 @@ public class ExtractMethodsText {
 										if (filter.isActive()) {
 											var name = StringUtils.fromCamelCase(algorithm.getName());
 											var optionsReport = ExtractOptionsText.apply(algorithm);
-											var line = format(filterTemplate, name, (optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""), algorithm.getShortDescription());
+											var line = FilterTemplate.formatted(name, (optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""), algorithm.getShortDescription());
 											if (!set.contains(line)) {
 												buf.append(line);
 												set.add(line);
@@ -146,12 +158,12 @@ public class ExtractMethodsText {
 														allKeysAndPapers.addAll(dataKeysAndPapers);
 													}
 												}
-												line = format(methodWithOutputTemplate, name, keys,
+												line = MethodWithOutputTemplate.formatted(name, keys,
 														(optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""),
 														targetBlock.getShortDescription(), (targetKey.isBlank() ? "" : targetKey));
 
 											} else {
-												line = format(methodTemplate, name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "");
+												line = MethodTemplate.formatted(name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "");
 											}
 											if (!set.contains(line)) {
 												buf.append(line);
@@ -172,7 +184,7 @@ public class ExtractMethodsText {
 				buf.append("References:\n");
 
 				for (Pair<String, String> pair : allKeysAndPapers) {
-					buf.append(format("%s: %s\n", pair.getFirst(), pair.getSecond()));
+					buf.append("%s: %s\n".formatted(pair.getFirst(), pair.getSecond()));
 				}
 			}
 		} else

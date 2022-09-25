@@ -41,11 +41,13 @@ import jloda.util.FileUtils;
 import jloda.util.ProgramProperties;
 import jloda.util.Single;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.ViewBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.workflow.WorkflowTab;
+import splitstree6.view.alignment.AlignmentView;
 import splitstree6.workflow.Workflow;
 import splitstree6.workflowtree.WorkflowTreeView;
 
@@ -310,5 +312,13 @@ public class MainWindow implements IMainWindow {
 
 	public WorkflowTab getWorkflowTab() {
 		return workflowTab;
+	}
+
+	public AlignmentView getAlignmentViewer() {
+		var alignmentViewNode = getWorkflow().getAlignmentViewNode();
+		if (alignmentViewNode != null && alignmentViewNode.getDataBlock() instanceof ViewBlock viewBlock) {
+			return (AlignmentView) viewBlock.getView();
+		} else
+			return null;
 	}
 }

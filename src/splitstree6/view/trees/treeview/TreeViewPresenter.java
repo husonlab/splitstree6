@@ -271,7 +271,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 									if (false)
 										Platform.runLater(() -> TreeEdits.clearEdits(view.optionEditsProperty()));
 								}
-
 								updateCounter.set(updateCounter.get() + 1);
 							});
 							pane.drawTree();

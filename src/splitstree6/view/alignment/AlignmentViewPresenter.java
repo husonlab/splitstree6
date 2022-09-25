@@ -32,10 +32,9 @@ import javafx.scene.control.*;
 import javafx.scene.text.Font;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
-import jloda.util.Basic;
-import jloda.util.BitSetUtils;
-import jloda.util.NumberUtils;
-import jloda.util.Single;
+import jloda.util.*;
+import splitstree6.algorithms.utils.CharactersUtilities;
+import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -260,6 +259,33 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		controller.getSelectNoneMenuItem().setOnAction(e -> view.setSelectedSites(new BitSet()));
 		controller.getSelectNoneMenuItem().disableProperty().bind(view.inputCharactersNodeValidProperty().not().or(Bindings.createBooleanBinding(() -> view.getSelectedSites().cardinality() == 0, view.selectedSitesProperty())));
+
+		controller.getInvertSelectionMenuItem().setOnAction(e -> view.setSelectedSites(BitSetUtils.getComplement(view.getSelectedSites(), 1, alignmentView.getInputCharacters().getNchar() + 1)));
+		controller.getInvertSelectionMenuItem().disableProperty().bind(alignmentView.emptyProperty());
+
+		controller.getSelectCompatibleMenuItem().setOnAction(e -> {
+			var split = new ASplit(alignmentView.getSelectedTaxa(), alignmentView.getInputTaxa().getNtax());
+			var compatible = CharactersUtilities.computeAllCompatible(alignmentView.getInputCharacters(), split);
+			System.err.printf("Compatible sites (%,d): %s%n ", compatible.cardinality(), StringUtils.toString(compatible));
+			alignmentView.getSelectedSites().clear();
+			if (compatible.cardinality() > 0) {
+				Platform.runLater(() -> alignmentView.setSelectedSites(compatible));
+			}
+		});
+		controller.getSelectCompatibleMenuItem().disableProperty().bind(alignmentView.emptyProperty()
+				.or(Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().cardinality() == 0 || alignmentView.getSelectedTaxa().cardinality() == alignmentView.getInputTaxa().getNtax(), alignmentView.selectedTaxaProperty())));
+
+		controller.getSelectIncompatibleMenuItem().setOnAction(e -> {
+			var split = new ASplit(alignmentView.getSelectedTaxa(), alignmentView.getInputTaxa().getNtax());
+			var compatible = CharactersUtilities.computeAllCompatible(alignmentView.getInputCharacters(), split);
+			var incompatible = BitSetUtils.getComplement(compatible, 1, alignmentView.getInputCharacters().getNchar() + 1);
+			System.err.printf("Incompatible sites (%,d): %s%n ", compatible.cardinality(), StringUtils.toString(incompatible));
+			alignmentView.getSelectedSites().clear();
+			if (incompatible.cardinality() > 0) {
+				Platform.runLater(() -> alignmentView.setSelectedSites(incompatible));
+			}
+		});
+		controller.getSelectIncompatibleMenuItem().disableProperty().bind(controller.getSelectCompatibleMenuItem().disableProperty());
 
 		controller.getSelectCodon0MenuItem().setOnAction(e -> {
 			var inputCharacters = view.getInputCharacters();
@@ -536,9 +562,14 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				}
 			}
 		});
-		mainWindowController.getSelectInverseMenuItem().disableProperty().bind(mainWindowController.getSelectNoneMenuItem().disableProperty());
-	}
 
+		mainWindowController.getSelectInverseMenuItem().disableProperty().bind(mainWindowController.getSelectNoneMenuItem().disableProperty());
+
+		mainWindowController.getSelectCompatibleSitesMenuItem().setOnAction(controller.getSelectCompatibleMenuItem().getOnAction());
+
+		mainWindowController.getSelectCompatibleSitesMenuItem().disableProperty().bind(controller.getSelectCompatibleMenuItem().disableProperty());
+
+	}
 
 	public static void updateCharSetSelection(MainWindow mainWindow, AlignmentView view, List<MenuItem> items) {
 		items.removeAll(items.stream().filter(t -> t.getText() != null && t.getText().startsWith("CharSet")).collect(Collectors.toList()));

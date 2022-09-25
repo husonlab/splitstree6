@@ -240,6 +240,8 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
+                        <MenuItem fx:id="selectCompatibleSitesMenuItem" text="Compatible Sites">
+                        </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu fx:id="selectSetsMenu" text="Sets">
                         </Menu>

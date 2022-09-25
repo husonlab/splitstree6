@@ -107,7 +107,7 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				if (control != null) {
 					var label = new Label(StringUtils.fromCamelCase(option.getName()));
 					label.setMinWidth(120);
-					var hbox = new HBox(label, control);
+					var hbox = new HBox(label, control, new Label("  "));
 					hbox.setAlignment(Pos.CENTER_LEFT);
 					hbox.setSpacing(3);
 					hbox.prefWidthProperty().bind(controller.getMainPane().widthProperty());
