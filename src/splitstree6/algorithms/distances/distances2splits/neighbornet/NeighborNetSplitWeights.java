@@ -12,6 +12,7 @@ import org.apache.commons.math3.optim.univariate.SearchInterval;
 import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
+import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,12 +48,15 @@ public class NeighborNetSplitWeights {
 		public double tolerance = 1e-6; //Approximate tolerance in split weights
 		public boolean greedy = false;
 		public boolean useInsertionAlgorithm = true; //Use taxon insertion algorithm for the initial split weights
+		public boolean useGradientNorm = false; //Use new projected gradient norm stopping condition
 		public int cgIterations; //Max number of iterations on the calls to conjugate gradients.
 		public int outerIterations; //Max number of iterations through the outer loop
 		public boolean collapseMultiple = false; //Collapse multiple negative splits (ST4 only)
-		public double fractionNegativeToKeep = 0.4; //Propostion of negative splits to collapse (ST4 only)
+		public double fractionNegativeToCollapse = 0.6; //Propostion of negative splits to collapse (ST4 only)
 		public double kktBound = tolerance / 100;
 		public boolean printConvergenceData = false;
+
+		public double pgbound = 1e-4; //Bound on the projective gradient norm
 
 		public String logfile = null;
 		public PrintWriter log = null;
@@ -101,7 +105,7 @@ public class NeighborNetSplitWeights {
 		var x = new double[n + 1][n + 1]; //array of split weights
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-			activeSetST4(x, d, params.log, progress);  //ST4 Algorithm
+			activeSetST4(x, d, params.log, params,progress);  //ST4 Algorithm
 		} else {
 			x = calcAinvx(d); //Check if unconstrained solution is feasible.
 			if (minArray(x) >= -params.tolerance)
@@ -161,7 +165,7 @@ public class NeighborNetSplitWeights {
 			else
 				params.log.println("% Active set algorithm");
 			if (params.collapseMultiple) {
-				params.log.println("% Collapse Multiple: fraction to keep"+params.fractionNegativeToKeep);
+				params.log.println("% Collapse Multiple: fraction to collapse"+params.fractionNegativeToCollapse);
 			}
 			params.log.println("% active and projected C");
 			params.log.println("% cg iterations: "+params.cgIterations);
@@ -228,7 +232,7 @@ public class NeighborNetSplitWeights {
 
 		var cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
 		if (params.collapseMultiple) {
-			filterMostNegative(x, activeSet, params.fractionNegativeToKeep);
+			filterMostNegative(x, activeSet, params.fractionNegativeToCollapse);
 			maskElements(x, activeSet);
 			cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
 		}
@@ -319,7 +323,7 @@ public class NeighborNetSplitWeights {
 	 * @param activeSet              activeset. Entries with most negative values are added to this
 	 * @param fractionNegativeToKeep double. Minimum fraction of the negative entries to keep.
 	 */
-	static private void filterMostNegative(double[][] x, boolean[][] activeSet, double fractionNegativeToKeep) {
+	static private void filterMostNegative(double[][] x, boolean[][] activeSet, double fractionNegativeToCollapse) {
 		var numNeg = 0;
 		var n = x.length - 1;
 		for (var i = 1; i <= n; i++)
@@ -337,7 +341,7 @@ public class NeighborNetSplitWeights {
 					k++;
 				}
 		Arrays.sort(vals);
-		var numToKeep = (int) ceil(numNeg * fractionNegativeToKeep);
+		var numToKeep = (int) ceil(numNeg * (1.0-fractionNegativeToCollapse));
 		double threshold;
 		if (numToKeep == 0)
 			threshold = 0.0;
@@ -1049,6 +1053,88 @@ public class NeighborNetSplitWeights {
 			startTime = System.currentTimeMillis();
 		}
 	}
+
+	/************
+	 * What follows is code for carrying out the analysis of difference algorithms and parameter values for split weight
+	 * computation. This will not be available in a public version (except maybe as an easter egg hidden somewhere).
+	 *
+	 * The aim is to be able to repeat a lot of analyses exactly for the given dataset, and produce automatic output as
+	 * much as possible. For convenience, I'm producing this output for MATLAB (just because I'e been working with
+	 * it more recently, and because MATLAB was used to prototype these algorithms.
+	 */
+
+	static public ArrayList<ASplit>  evaluateConvergenceAlgorithms(int[] cycle, double[][] distances, ProgressListener progress) throws CanceledException {
+		int n = cycle.length-1;
+/*
+Legacy Splitstree4 Algorithm (with modifications)
+ */
+		var params = new NeighborNetSplitWeights.NNLSParams(n);
+		params.greedy=false;
+		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+		params.outerIterations = n*(n-1)/2;
+		params.collapseMultiple = true;
+		params.fractionNegativeToCollapse = 0.6;
+		params.useInsertionAlgorithm = false;
+		params.useGradientNorm = true;
+
+		params.logfile = "ST4Convergence.m";
+		params.pgbound = 1e-5;
+
+		params.log = setupLogfile(params.logfile);
+		var splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+
+		if (params.log!=null) {
+			params.log.flush();
+			params.log.close();
+		}
+/*---------------------------------------------------- */
+
+		params = new NeighborNetSplitWeights.NNLSParams(n);
+		params.greedy=false;
+		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+		params.outerIterations = n*(n-1)/2;
+		params.collapseMultiple = false;
+		params.fractionNegativeToCollapse = 0.0;
+		params.useInsertionAlgorithm = false;
+		params.logfile = "ST4ConvergenceDontCollapse.m";
+		params.pgbound = 1e-5;
+
+		params.log = setupLogfile(params.logfile);
+		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+
+		if (params.log!=null) {
+			params.log.flush();
+			params.log.close();
+		}
+
+		/*---------------------------------------------------- */
+
+
+		return splits;
+
+	}
+
+
+	/**
+	 * Open a file for log output
+	 * @param logfile filename
+	 * @return PrintWrite log file.
+	 */
+	static private PrintWriter setupLogfile(String logfile) {
+		PrintWriter log = null;
+		if (logfile!=null) {
+			try {
+				log = new PrintWriter(logfile);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
+		}
+		return log;
+	}
+
+
+
+
 
 
 	static public void testAllMethods(double[][] d) {

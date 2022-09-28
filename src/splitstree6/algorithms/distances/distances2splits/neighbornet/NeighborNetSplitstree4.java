@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import static java.lang.Math.abs;
 import static jloda.util.NumberUtils.max;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
+
 
 public class NeighborNetSplitstree4 {
 
@@ -24,10 +26,11 @@ public class NeighborNetSplitstree4 {
      * @throws CanceledException   Thrown if user presses cancel in the progress box.
      */
 
-    static public void activeSetST4(double[][] xArray, double[][] distances, PrintWriter log, ProgressListener progress) throws CanceledException {
+    static public void activeSetST4(double[][] xArray, double[][] distances, PrintWriter log, NNLSParams nnlsParams, ProgressListener progress) throws CanceledException {
 
         int ntax = distances.length-1;
         int npairs = (ntax * (ntax - 1)) / 2;
+
 
         //Copy distance array into a 1dim vector
         double[] d = new double[npairs];
@@ -75,7 +78,7 @@ public class NeighborNetSplitstree4 {
         }
 
         CGparams params = new CGparams();
-
+        params.useGradientNorm = nnlsParams.useGradientNorm;
 
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
@@ -84,7 +87,7 @@ public class NeighborNetSplitstree4 {
                     circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x,params);
                 first_pass = false;
 
-                int[] entriesToContract = worstIndices(x, 0.6);
+                int[] entriesToContract = worstIndices(x, 1.0-nnlsParams.fractionNegativeToCollapse);
                 if (entriesToContract != null) {
                     for (int index : entriesToContract) {
                         x[index] = 0.0;
@@ -95,13 +98,13 @@ public class NeighborNetSplitstree4 {
 
                 //Move from old_x towards the optimal x as far as possible while remaining feasible.
                 int min_i = -1;
-                double min_xi = -1.0;
+                double min_lambda = -1.0;
                 for (int i = 0; i < npairs; i++) {
                     if (x[i] < 0.0) {
-                        double xi = (old_x[i]) / (old_x[i] - x[i]);
-                        if ((min_i == -1) || (xi < min_xi)) {
+                        double lambda = (old_x[i]) / (old_x[i] - x[i]);
+                        if ((min_i == -1) || (lambda < min_lambda)) {
                             min_i = i;
-                            min_xi = xi;
+                            min_lambda = lambda;
                         }
                     }
                 }
@@ -111,9 +114,9 @@ public class NeighborNetSplitstree4 {
                 else {
                     for (int i = 0; i < npairs; i++) /* Move to the last feasible solution on the path from old_x to x */
                         if (!active[i])
-                            old_x[i] += min_xi * (x[i] - old_x[i]);
+                            old_x[i] = min_lambda * x[i] + (1-min_lambda)*old_x[i];
                     active[min_i] = true; /* Add the first constraint met to the active set */
-                    x[min_i] = 0.0; /* This fixes problems with round-off errors */
+                    old_x[min_i] = 0.0; /* This fixes problems with round-off errors */
                 }
 
                 if (log!=null) {
@@ -128,18 +131,19 @@ public class NeighborNetSplitstree4 {
                     }
                     calculateAtx(ntax,res,grad);
                     double pgx = 0.0;
-                    double res2 = 0.0;
+                    int count_nonzero = 0;
 
                     for(var i=0;i<npairs;i++) {
                         double grad_i = grad[i];
                         if (old_x[i]==0)
                             grad_i = Math.min(grad_i,0.0);
                         else
-                            res2 += grad_i*grad_i;
+                            count_nonzero++;
                         pgx += grad_i*grad_i;
                     }
                     long timestamp = System.currentTimeMillis() - startTime;
-                    log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + Math.sqrt(res2));
+                    log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero+"\t0");
+                    System.out.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero+"\t0");
 
 
                 }
@@ -162,18 +166,18 @@ public class NeighborNetSplitstree4 {
                 }
                 calculateAtx(ntax,res,grad);
                 double pgx = 0.0;
-                double res2 = 0.0;
-
+                int count_nonzero = 0;
                 for(var i=0;i<npairs;i++) {
                     double grad_i = grad[i];
-                    if (old_x[i]==0)
+                    if (x[i]==0)
                         grad_i = Math.min(grad_i,0.0);
                     else
-                        res2 += grad_i*grad_i;
+                        count_nonzero++;
                     pgx += grad_i*grad_i;
                 }
                 long timestamp = System.currentTimeMillis() - startTime;
-                log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + Math.sqrt(res2)+"\t*");
+                log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero +"\t1");
+                System.out.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero+"\t0");
 
 
             }
@@ -209,8 +213,8 @@ public class NeighborNetSplitstree4 {
             }
 
 
-            if (params.useGradientNorm) {
-                if ((min_i == -1) || pgradSumSquares<params.epsilon * params.epsilon)
+            if (nnlsParams.useGradientNorm) {
+                if ((min_i == -1) || pgradSumSquares<nnlsParams.pgbound * nnlsParams.pgbound)
                     break;
             }
             else {
@@ -219,6 +223,8 @@ public class NeighborNetSplitstree4 {
                     break; /* We have arrived at the constrained optimum */
             }
             active[min_i] = false;
+            for(int i=0;i<npairs;i++)
+                old_x[i] =x[i];
             progress.checkForCancel();
         }
 
@@ -532,6 +538,8 @@ public class NeighborNetSplitstree4 {
 
 
         while ((rho > bound) && (k < kmax)) {
+            if (params.useGradientNorm)
+                System.out.println("CG rho = "+rho);
 
             k = k + 1;
             if (k == 1) {

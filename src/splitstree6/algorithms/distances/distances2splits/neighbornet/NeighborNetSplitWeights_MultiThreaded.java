@@ -17,6 +17,7 @@ import static java.lang.Math.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitstree4.activeSetST4;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
 
 public class NeighborNetSplitWeights_MultiThreaded {
 	static ExecutorService service = Executors.newFixedThreadPool(16); // todo: fixme
@@ -24,7 +25,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 
 	static long timeCalls = 0L;
 
-	public static class NNLSParams {
+/*	public static class NNLSParams {
 
 		public NNLSParams(int ntax) {
 			cgIterations = min(max(ntax, 10), 25);
@@ -42,13 +43,16 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		public double tolerance = 1e-6; //Approximate tolerance in split weights
 		public boolean greedy = false;
 		public boolean useInsertionAlgorithm = true; //Use taxon insertion algorithm for the initial split weights
+		public boolean useGradientNorm = false; //Use stopping condition based on norm of projected gradient
 		public int cgIterations; //Max number of iterations on the calls to conjugate gradients.
 		public int outerIterations; //Max number of iterations through the outer loop
 		public boolean collapseMultiple = false; //Collapse multiple negative splits (ST4 only)
 		public double fractionNegativeToKeep = 0.4; //Propostion of negative splits to collapse (ST4 only)
 		public double kktBound = tolerance / 100;
 		public boolean printConvergenceData = false;
-	}
+		public double pgbound = 1e-4; //Bound on the projective gradient norm
+
+	}*/
 
 	/**
 	 * Estimate the split weights using non-negative least squares
@@ -93,7 +97,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		var x = new double[n + 1][n + 1];
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
-			activeSetST4(x, d, null, progress);  //ST4 Algorithm
+			activeSetST4(x, d, null, params, progress);  //ST4 Algorithm
 		} else {
 			x = calcAinvx(d); //Check if unconstrained solution is feasible.
 			if (minArray(x) >= -params.tolerance)
@@ -177,7 +181,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 
 		boolean cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
 		if (params.collapseMultiple) {
-			filterMostNegative(x, activeSet, params.fractionNegativeToKeep);
+			filterMostNegative(x, activeSet, 1.0 - params.fractionNegativeToCollapse);
 			maskElements(x, activeSet);
 			cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
 		}
