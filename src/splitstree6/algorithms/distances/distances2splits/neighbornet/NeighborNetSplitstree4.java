@@ -79,6 +79,7 @@ public class NeighborNetSplitstree4 {
 
         CGparams params = new CGparams();
         params.useGradientNorm = nnlsParams.useGradientNorm;
+        params.epsilon = nnlsParams.pgbound;
 
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
@@ -538,8 +539,8 @@ public class NeighborNetSplitstree4 {
 
 
         while ((rho > bound) && (k < kmax)) {
-            if (params.useGradientNorm)
-                System.out.println("CG rho = "+rho);
+            //if (params.useGradientNorm)
+             //   System.out.println("CG rho = "+rho);
 
             k = k + 1;
             if (k == 1) {

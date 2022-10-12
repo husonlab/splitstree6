@@ -56,6 +56,7 @@ public class NeighborNetSplitWeights {
 		public double kktBound = tolerance / 100;
 		public boolean printConvergenceData = false;
 
+		public double relativeErrorBound = 0.01; //Approx bound on relative numerical error in split weights
 		public double pgbound = 1e-4; //Bound on the projective gradient norm
 
 		public String logfile = null;
@@ -321,7 +322,7 @@ public class NeighborNetSplitWeights {
 	 *
 	 * @param x                      square array of doubles
 	 * @param activeSet              activeset. Entries with most negative values are added to this
-	 * @param fractionNegativeToKeep double. Minimum fraction of the negative entries to keep.
+	 * @param fractionNegativeToCollapse  double. Minimum fraction of the negative entries to collapse to 0.
 	 */
 	static private void filterMostNegative(double[][] x, boolean[][] activeSet, double fractionNegativeToCollapse) {
 		var numNeg = 0;
@@ -769,6 +770,22 @@ public class NeighborNetSplitWeights {
 		return sqrt(sumSquares(grad));
 	}
 
+	/**
+	 * Computes an approximate bound on the projected gradient norm which would
+	 * give the specified relativeError on the split weights.
+	 * @param d distancers
+	 * @return
+	 */
+	static private double estimateProjGradBound(double relativeError, double[][] d) {
+		int n = d.length-1;
+		double[][] atd = new double[n+1][n+1];
+		calcAtx(d,atd);
+		//Bound is epsilon * ||A'd|| / ( ||A'A|| ||(A'A)^{-1}|| )
+		return relativeError*sqrt(sumSquares(atd))/(2*estimateNorm(n));
+	}
+
+
+
 	static private void blockPivot(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 		var n = x.length - 1;
 		var cutoff = params.tolerance * 1e-3;
@@ -1078,7 +1095,7 @@ Legacy Splitstree4 Algorithm (with modifications)
 		params.useGradientNorm = true;
 
 		params.logfile = "ST4Convergence.m";
-		params.pgbound = 1e-5;
+		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
 
 		params.log = setupLogfile(params.logfile);
 		var splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
@@ -1097,7 +1114,7 @@ Legacy Splitstree4 Algorithm (with modifications)
 		params.fractionNegativeToCollapse = 0.0;
 		params.useInsertionAlgorithm = false;
 		params.logfile = "ST4ConvergenceDontCollapse.m";
-		params.pgbound = 1e-5;
+		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
 
 		params.log = setupLogfile(params.logfile);
 		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
