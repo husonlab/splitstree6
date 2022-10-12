@@ -42,7 +42,6 @@ public class ExtractMethodsText {
 
 	public static final String PreambleTemplate = "Analysis was performed using SplitsTree6 %s%s.%n";
 	public static final String InputDataTemplate = "The original input consisted of %s and %s.%n";
-	public static final String InputCharactersTemplate = "The original input had %,d characters.%n";
 	public static final String RemovedCharactersTemplate = "After removal of %s characters, the input had %s characters.%n";
 
 	public static final String TaxonFilterTemplateOne = "After removal of one taxon, the input consisted of %s and %s.%n";

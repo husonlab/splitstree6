@@ -55,7 +55,6 @@ public class AlgorithmNexusInput extends NexusIOBase {
 
 	/**
 	 * parse and create an algorithm
-	 *
 	 */
 	public Algorithm parse(NexusStreamParser np) throws IOException {
 		np.matchBeginBlock("ALGORITHM");

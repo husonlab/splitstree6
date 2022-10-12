@@ -237,7 +237,6 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		return dataNodesStream().filter(v -> v.getTitle().equals(INPUT_TAXA)).findFirst().orElse(null);
 	}
 
-
 	public DataNode<? extends DataBlock> getInputDataNode() {
 		return dataNodesStream().filter(v -> v.getTitle().startsWith(INPUT_PREFIX)).filter(v -> !v.getTitle().equals(INPUT_SOURCE))
 				.filter(v -> !v.getTitle().equals(INPUT_TAXA)).findFirst().orElse(null);
@@ -250,7 +249,6 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	public DataNode<? extends DataBlock> getWorkingDataNode() {
 		return dataNodesStream().filter(v -> v.getTitle().startsWith(WORKING_PREFIX)).filter(v -> !v.getTitle().equals(WORKING_TAXA)).findFirst().orElse(null);
 	}
-
 
 	public DataNode<? extends DataBlock> getAlignmentViewNode() {
 		return dataNodesStream().filter(v -> v.getDataBlock() instanceof ViewBlock viewBlock && viewBlock.getView() instanceof AlignmentView).findFirst().orElse(null);

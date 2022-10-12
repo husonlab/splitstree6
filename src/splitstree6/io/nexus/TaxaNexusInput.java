@@ -52,12 +52,12 @@ public class TaxaNexusInput extends NexusIOBase {
 	}
 
 	/**
-     * parse a taxa block
-     */
-    public void parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
-        taxaBlock.clear();
-      if (np.peekMatchIgnoreCase("#nexus"))
-		  np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
+	 * parse a taxa block
+	 */
+	public void parse(NexusStreamParser np, TaxaBlock taxaBlock) throws IOException {
+		taxaBlock.clear();
+		if (np.peekMatchIgnoreCase("#nexus"))
+			np.matchIgnoreCase("#nexus"); // skip header line if it is the first line
 
 		np.matchBeginBlock("TAXA");
 		parseTitleAndLink(np);
