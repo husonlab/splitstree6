@@ -20,10 +20,10 @@
 package splitstree6.dialog.exporting;
 
 import javafx.stage.FileChooser;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
-import jloda.util.ProgramProperties;
 import splitstree6.window.MainWindow;
 
 import java.io.File;

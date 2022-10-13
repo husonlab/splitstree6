@@ -21,8 +21,8 @@ package splitstree6.io.writers.trees;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import jloda.fx.util.ProgramProperties;
 import jloda.util.Pair;
-import jloda.util.ProgramProperties;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.TreesFormat;

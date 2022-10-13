@@ -30,9 +30,9 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.StageStyle;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.Print;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
-import jloda.util.ProgramProperties;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 

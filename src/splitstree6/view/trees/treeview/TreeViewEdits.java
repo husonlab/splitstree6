@@ -23,8 +23,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableMap;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
+import jloda.fx.util.ColorUtilsFX;
 import jloda.graph.Node;
-import jloda.swing.util.ColorUtilsFX;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 

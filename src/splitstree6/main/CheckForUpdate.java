@@ -22,9 +22,9 @@ package splitstree6.main;
 import com.install4j.api.launcher.ApplicationLauncher;
 import com.install4j.api.update.ApplicationDisplayMode;
 import com.install4j.api.update.UpdateChecker;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
-import jloda.util.ProgramProperties;
 
 import java.util.concurrent.Executors;
 

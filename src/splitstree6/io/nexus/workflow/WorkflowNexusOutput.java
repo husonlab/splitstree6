@@ -19,10 +19,10 @@
 
 package splitstree6.io.nexus.workflow;
 
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Pair;
-import jloda.util.ProgramProperties;
 import splitstree6.data.SplitsTree6Block;
 import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.nexus.SplitsTree6NexusOutput;

@@ -19,7 +19,7 @@
 
 package splitstree6.data;
 
-import jloda.util.ProgramProperties;
+import jloda.fx.util.ProgramProperties;
 import splitstree6.io.nexus.INexusFormat;
 
 /**

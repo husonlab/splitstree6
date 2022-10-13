@@ -36,7 +36,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
-import jloda.util.ProgramProperties;
+import jloda.fx.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;

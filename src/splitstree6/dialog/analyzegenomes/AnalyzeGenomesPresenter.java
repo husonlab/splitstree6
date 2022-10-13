@@ -38,7 +38,10 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.*;
 import jloda.fx.window.NotificationManager;
 import jloda.seq.FastAFileIterator;
-import jloda.util.*;
+import jloda.util.FileUtils;
+import jloda.util.IFastAIterator;
+import jloda.util.NumberUtils;
+import jloda.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;

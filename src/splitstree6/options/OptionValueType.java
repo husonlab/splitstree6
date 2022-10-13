@@ -19,7 +19,7 @@
 
 package splitstree6.options;
 
-import jloda.swing.util.ColorUtilsFX;
+import jloda.fx.util.ColorUtilsFX;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;

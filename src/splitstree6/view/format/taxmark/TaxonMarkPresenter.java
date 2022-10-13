@@ -29,8 +29,8 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.shapes.NodeShape;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
-import jloda.swing.util.ColorUtilsFX;
-import jloda.util.ProgramProperties;
+import jloda.fx.util.ColorUtilsFX;
+import jloda.fx.util.ProgramProperties;
 import jloda.util.Single;
 import splitstree6.window.MainWindow;
 
