@@ -23,8 +23,8 @@ import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableMap;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
-import jloda.fx.util.BasicFX;
 import jloda.graph.Node;
+import jloda.swing.util.ColorUtilsFX;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.layout.splits.RotateSplit;
@@ -53,7 +53,7 @@ public class SplitNetworkEdits {
 			if (edit != null) {
 				switch (edit.code()) {
 					case 'c' -> {
-						if (BasicFX.isColor(edit.parameter()) && splitShapeMap.containsKey(edit.split())) {
+						if (ColorUtilsFX.isColor(edit.parameter()) && splitShapeMap.containsKey(edit.split())) {
 							var color = Color.web(edit.parameter());
 							for (var shape : splitShapeMap.get(edit.split())) {
 								shape.getStyleClass().remove("graph-edge");
