@@ -33,7 +33,6 @@ import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.util.*;
-import jloda.util.ProgramProperties;
 import splitstree6.io.readers.trees.NewickReader;
 
 import java.io.File;

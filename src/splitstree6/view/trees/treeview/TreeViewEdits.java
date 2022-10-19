@@ -23,7 +23,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.collections.ObservableMap;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
-import jloda.fx.util.BasicFX;
+import jloda.fx.util.ColorUtilsFX;
 import jloda.graph.Node;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -51,7 +51,7 @@ public class TreeViewEdits {
 			if (edit != null) {
 				switch (edit.code()) {
 					case 'c' -> {
-						if (BasicFX.isColor(edit.parameter()) && splitShapeMap.containsKey(edit.split())) {
+						if (ColorUtilsFX.isColor(edit.parameter()) && splitShapeMap.containsKey(edit.split())) {
 							var color = Color.web(edit.parameter());
 							for (var shape : splitShapeMap.get(edit.split())) {
 								shape.getStyleClass().remove("graph-edge");

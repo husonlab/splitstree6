@@ -19,7 +19,7 @@
 
 package splitstree6.options;
 
-import jloda.fx.util.BasicFX;
+import jloda.fx.util.ColorUtilsFX;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -79,7 +79,7 @@ public enum OptionValueType {
             case Boolean -> NumberUtils.isBoolean(text);
             case String -> text.length() > 0;
 			case stringArray -> text.length() > 0;
-			case Color -> BasicFX.isColor(text);
+			case Color -> ColorUtilsFX.isColor(text);
 			default -> false;
         };
     }

@@ -29,8 +29,8 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.shapes.NodeShape;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
-import jloda.fx.util.BasicFX;
-import jloda.util.ProgramProperties;
+import jloda.fx.util.ColorUtilsFX;
+import jloda.fx.util.ProgramProperties;
 import jloda.util.Single;
 import splitstree6.window.MainWindow;
 
@@ -49,7 +49,7 @@ public class TaxonMarkPresenter {
 
 				for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
-					var newLabel = "<mark getShape=\"" + shape.name() + "\" fill=\"" + BasicFX.toStringCSS(fill) + "\" stroke=\"lightgray\">" + taxon.getDisplayLabelOrName();
+					var newLabel = "<mark getShape=\"" + shape.name() + "\" fill=\"" + ColorUtilsFX.toStringCSS(fill) + "\" stroke=\"lightgray\">" + taxon.getDisplayLabelOrName();
 					undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 				}
 				if (undoList.size() > 0)

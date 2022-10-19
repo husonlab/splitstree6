@@ -24,7 +24,7 @@ import javafx.beans.property.*;
 import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.util.ProgramProperties;
+import jloda.fx.util.ProgramProperties;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
 import splitstree6.tabs.viewtab.ViewTab;
