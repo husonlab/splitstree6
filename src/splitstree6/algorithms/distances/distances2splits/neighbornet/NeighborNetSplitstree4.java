@@ -6,9 +6,12 @@ import jloda.util.progress.ProgressListener;
 import java.io.PrintWriter;
 import java.util.Arrays;
 
-import static java.lang.Math.abs;
-import static jloda.util.NumberUtils.max;
+import static java.lang.Math.sqrt;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
+
+
+//TODO: There is something odd which is allowing entries in old_x to be positive even though active is true.
+//Need to figure out how to fix this.
 
 
 public class NeighborNetSplitstree4 {
@@ -39,8 +42,12 @@ public class NeighborNetSplitstree4 {
         double[] x = new double[npairs];
         runUnconstrained(ntax, d, x);
         boolean all_positive = true;
-        for (int k = 0; k < npairs && all_positive; k++)
-            all_positive =  (x[k] >= 0.0);
+        for (int k = 0; k < npairs && all_positive; k++) {
+            if (x[k] < 0) {
+                all_positive = false;
+                x[k] = 0;
+            }
+        }
 
         if (all_positive) {
             convertLegacyVec2Array(x,xArray);
@@ -56,7 +63,11 @@ public class NeighborNetSplitstree4 {
         double[] p = new double[npairs];
         double[] y = new double[npairs];
         double[] old_x = new double[npairs];
+
+
         Arrays.fill(old_x, 1.0);
+
+        double deltax; // distance between current x and previous
 
         /* Initialise active - originally no variables are active (held to 0.0) */
         boolean[] active = new boolean[npairs];
@@ -69,13 +80,15 @@ public class NeighborNetSplitstree4 {
         long startTime =  System.currentTimeMillis();
         if (log!=null) {
             log.println("% Active Set ST4");
-            log.println("% \t Proportion Removed = 0.4");
+            log.println("% \t Fraction to collapse = "+nnlsParams.fractionNegativeToCollapse);
             log.println("% \t Max CG iterations = "+npairs);
-            log.println("% Convergence for CG is ||A'(Ax_{active}-d)|| < "+CG_EPSILON * Math.sqrt(sumSquares(Atd)));
+            log.println("% Convergence for CG is ||A'(Ax_{active}-d)|| < "+CG_EPSILON * sqrt(sumSquares(Atd)));
             log.println("% Outer convergence condition grad > -0.0001 ");
-            log.println("% time \t ||res|| \t ||proj grad||\n\n");
-            log.println("ConvergenceST4 = [");
+            log.println("% Using insertion heuristic = "+nnlsParams.useInsertionAlgorithm);
+            log.println("% time \t ||res|| \t ||proj grad|| \t ||Delta x|| \t Num nonzero \t fractionToCollapse\n\n");
+            log.println(nnlsParams.logArrayName +" = [");
         }
+
 
         CGparams params = new CGparams();
         params.useGradientNorm = nnlsParams.useGradientNorm;
@@ -110,12 +123,25 @@ public class NeighborNetSplitstree4 {
                     }
                 }
 
-                if (min_i == -1) /* This is a feasible solution - go to the next stage to check if its also optimal */
+                deltax = 0.0;
+
+                if (min_i == -1) {/* This is a feasible solution - go to the next stage to check if its also optimal */
+                    if (log!=null) {
+                        for(int i=0;i<npairs;i++) {
+                            deltax += (old_x[i] - x[i])*(old_x[i] - x[i]);
+                        }
+                        deltax = sqrt(deltax);
+                    }
                     break;
+                }
                 else {
                     for (int i = 0; i < npairs; i++) /* Move to the last feasible solution on the path from old_x to x */
-                        if (!active[i])
-                            old_x[i] = min_lambda * x[i] + (1-min_lambda)*old_x[i];
+                        if (!active[i]) {
+                            double deltaxi= min_lambda*(old_x[i]-x[i]);
+                            deltax += deltaxi*deltaxi;
+                            old_x[i] = min_lambda * x[i] + (1 - min_lambda) * old_x[i];
+                        }
+                    deltax = sqrt(deltax);
                     active[min_i] = true; /* Add the first constraint met to the active set */
                     old_x[min_i] = 0.0; /* This fixes problems with round-off errors */
                 }
@@ -143,8 +169,9 @@ public class NeighborNetSplitstree4 {
                         pgx += grad_i*grad_i;
                     }
                     long timestamp = System.currentTimeMillis() - startTime;
-                    log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero+"\t0");
-                    System.out.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero+"\t0");
+                    String output ="\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero+"\t"+nnlsParams.fractionNegativeToCollapse+"\t0";
+                    log.println(output);
+                    System.out.println(output);
 
 
                 }
@@ -177,8 +204,9 @@ public class NeighborNetSplitstree4 {
                     pgx += grad_i*grad_i;
                 }
                 long timestamp = System.currentTimeMillis() - startTime;
-                log.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero +"\t1");
-                System.out.println("\t"+timestamp+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx) + "\t" + count_nonzero+"\t0");
+                String output = "\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero +"\t"+nnlsParams.fractionNegativeToCollapse+"\t1";
+                log.println(output);
+                System.out.println(output);
 
 
             }
@@ -194,7 +222,7 @@ public class NeighborNetSplitstree4 {
              * all i,j in the active set.
              */
             int min_i = -1;
-            double min_grad = 1.0; //Minimum value of the projected gradient
+            double min_grad = 0.0; //Minimum value of the projected gradient
             double pgradSumSquares = 0.0; //Norm of the projected gradient.
 
             for (int i = 0; i < npairs; i++) {
@@ -202,7 +230,7 @@ public class NeighborNetSplitstree4 {
                 double grad_ij = r[i];
                 if (active[i]) {
 
-                    if ((min_i == -1) || (grad_ij < min_grad)) {
+                    if  (grad_ij < min_grad) {
                         min_i = i;
                         min_grad = grad_ij;
                     }
@@ -224,8 +252,7 @@ public class NeighborNetSplitstree4 {
                     break; /* We have arrived at the constrained optimum */
             }
             active[min_i] = false;
-            for(int i=0;i<npairs;i++)
-                old_x[i] =x[i];
+            System.arraycopy(x, 0, old_x, 0, npairs);
             progress.checkForCancel();
         }
 
@@ -415,8 +442,8 @@ public class NeighborNetSplitstree4 {
         for (int k = 3; k <= n - 1; k++) {
             index = k - 1;
             for (int i = 0; i <= n - k - 1; i++) {
-                //int j = i + k;
-                //d[i][j] = d[i][j - 1] + d[i+1][j] - d[i+1][j - 1] - 2.0 * b[i][j - 1];
+                //If  j = i + k;
+                //then d[i][j] = d[i][j - 1] + d[i+1][j] - d[i+1][j - 1] - 2.0 * b[i][j - 1];
                 d[index] = d[index - 1] + d[index + (n - i - 2)] - d[index + (n - i - 2) - 1] - 2.0 * b[index - 1];
                 index += 1 + (n - i - 2);
             }
@@ -526,7 +553,7 @@ public class NeighborNetSplitstree4 {
         double rho;
         double bound;
         if (!params.useGradientNorm) {
-            double e_0 = CG_EPSILON * Math.sqrt(sumSquares(b)); //e_0 = 1e-7;
+            double e_0 = CG_EPSILON * sqrt(sumSquares(b)); //e_0 = 1e-7;
             bound = e_0*e_0;
         } else {
             bound = params.epsilon * params.epsilon;
@@ -539,16 +566,12 @@ public class NeighborNetSplitstree4 {
 
 
         while ((rho > bound) && (k < kmax)) {
-            //if (params.useGradientNorm)
-             //   System.out.println("CG rho = "+rho);
-
             k = k + 1;
             if (k == 1) {
                 System.arraycopy(r, 0, p, 0, npairs);
 
             } else {
                 double beta = rho / rho_old;
-                //System.out.println("bbeta = " + beta);
                 for (int i = 0; i < npairs; i++)
                     p[i] = r[i] + beta * p[i];
 

@@ -12,7 +12,9 @@ import org.apache.commons.math3.optim.univariate.SearchInterval;
 import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -60,6 +62,7 @@ public class NeighborNetSplitWeights {
 		public double pgbound = 1e-4; //Bound on the projective gradient norm
 
 		public String logfile = null;
+		public String logArrayName = "convergenceData";
 		public PrintWriter log = null;
 	}
 
@@ -1095,16 +1098,60 @@ Legacy Splitstree4 Algorithm (with modifications)
 		params.useGradientNorm = true;
 
 		params.logfile = "ST4Convergence.m";
+		params.logArrayName = "ST4_60";
 		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
 
-		params.log = setupLogfile(params.logfile);
+		params.log = setupLogfile(params.logfile,false);
 		var splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
 
 		if (params.log!=null) {
 			params.log.flush();
 			params.log.close();
 		}
-/*---------------------------------------------------- */
+
+		/*---------------------------------------------------- */
+
+		params = new NeighborNetSplitWeights.NNLSParams(n);
+		params.greedy=false;
+		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+		params.outerIterations = n*(n-1)/2;
+		params.collapseMultiple = false;
+		params.fractionNegativeToCollapse = 0.2;
+		params.useInsertionAlgorithm = false;
+		params.logfile = "ST4Convergence.m";
+		params.logArrayName = "ST4_20";
+		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
+
+		params.log = setupLogfile(params.logfile,true);
+		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+
+		if (params.log!=null) {
+			params.log.flush();
+			params.log.close();
+		}
+		/*---------------------------------------------------- */
+
+		params = new NeighborNetSplitWeights.NNLSParams(n);
+		params.greedy=false;
+		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+		params.outerIterations = n*(n-1)/2;
+		params.collapseMultiple = false;
+		params.fractionNegativeToCollapse = 0.1;
+		params.useInsertionAlgorithm = false;
+		params.logfile = "ST4Convergence.m";
+		params.logArrayName = "ST4_10";
+		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
+
+		params.log = setupLogfile(params.logfile,true);
+		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+
+		if (params.log!=null) {
+			params.log.flush();
+			params.log.close();
+		}
+
+
+		/*---------------------------------------------------- */
 
 		params = new NeighborNetSplitWeights.NNLSParams(n);
 		params.greedy=false;
@@ -1113,10 +1160,11 @@ Legacy Splitstree4 Algorithm (with modifications)
 		params.collapseMultiple = false;
 		params.fractionNegativeToCollapse = 0.0;
 		params.useInsertionAlgorithm = false;
-		params.logfile = "ST4ConvergenceDontCollapse.m";
+		params.logfile = "ST4Convergence.m";
+		params.logArrayName = "ST4_00";
 		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
 
-		params.log = setupLogfile(params.logfile);
+		params.log = setupLogfile(params.logfile,true);
 		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
 
 		if (params.log!=null) {
@@ -1124,7 +1172,11 @@ Legacy Splitstree4 Algorithm (with modifications)
 			params.log.close();
 		}
 
+
+
 		/*---------------------------------------------------- */
+
+
 
 
 		return splits;
@@ -1137,11 +1189,17 @@ Legacy Splitstree4 Algorithm (with modifications)
 	 * @param logfile filename
 	 * @return PrintWrite log file.
 	 */
-	static private PrintWriter setupLogfile(String logfile) {
+	static private PrintWriter setupLogfile(String logfile, boolean append) {
 		PrintWriter log = null;
 		if (logfile!=null) {
 			try {
-				log = new PrintWriter(logfile);
+				File f = new File(logfile);
+				if (append &&  f.exists() && !f.isDirectory() ) {
+					log = new PrintWriter(new FileOutputStream(new File(logfile), true));
+				}
+				else {
+					log = new PrintWriter(logfile);
+				}
 			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
