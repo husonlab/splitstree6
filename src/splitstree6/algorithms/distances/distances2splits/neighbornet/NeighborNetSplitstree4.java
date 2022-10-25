@@ -5,6 +5,7 @@ import jloda.util.progress.ProgressListener;
 
 import java.io.PrintWriter;
 import java.util.Arrays;
+import java.util.Comparator;
 
 import static java.lang.Math.sqrt;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
@@ -45,7 +46,6 @@ public class NeighborNetSplitstree4 {
         for (int k = 0; k < npairs && all_positive; k++) {
             if (x[k] < 0) {
                 all_positive = false;
-                x[k] = 0;
             }
         }
 
@@ -72,6 +72,8 @@ public class NeighborNetSplitstree4 {
         /* Initialise active - originally no variables are active (held to 0.0) */
         boolean[] active = new boolean[npairs];
         Arrays.fill(active, false);
+        int nactive = 0;
+
 
         /* Allocate and compute Atd */
         double[] Atd = new double[npairs];
@@ -91,28 +93,34 @@ public class NeighborNetSplitstree4 {
 
 
         CGparams params = new CGparams();
-        params.useGradientNorm = nnlsParams.useGradientNorm;
+        params.useGradientNorm = false;
         params.epsilon = nnlsParams.pgbound;
+
 
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
             while (true) /* Inner loop: find the next feasible optimum */ {
-                if (!first_pass)  /* The first time through we use the unconstrained branch lengths */
-                    circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x,params);
+                if (!first_pass)  /* The first time through we use the unconstrained branch lengths */ {
+                    params.epsilon = nnlsParams.pgbound;
+                    circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x, params);
+                }
                 first_pass = false;
 
-                int[] entriesToContract = worstIndices(x, 1.0-nnlsParams.fractionNegativeToCollapse);
+                int[] entriesToContract = worstIndices(x, nnlsParams.fractionNegativeToCollapse);
                 if (entriesToContract != null) {
                     for (int index : entriesToContract) {
-                        x[index] = 0.0;
+                        old_x[index] = 0.0;
                         active[index] = true;
+                        nactive++;
                     }
+                    params.epsilon = nnlsParams.pgbound;
+
                     circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x, params); /* Re-optimise, so that the current x is always optimal */
                 }
 
                 //Move from old_x towards the optimal x as far as possible while remaining feasible.
                 int min_i = -1;
-                double min_lambda = -1.0;
+                double min_lambda = 1.0;
                 for (int i = 0; i < npairs; i++) {
                     if (x[i] < 0.0) {
                         double lambda = (old_x[i]) / (old_x[i] - x[i]);
@@ -143,6 +151,7 @@ public class NeighborNetSplitstree4 {
                         }
                     deltax = sqrt(deltax);
                     active[min_i] = true; /* Add the first constraint met to the active set */
+                    nactive++;
                     old_x[min_i] = 0.0; /* This fixes problems with round-off errors */
                 }
 
@@ -169,11 +178,9 @@ public class NeighborNetSplitstree4 {
                         pgx += grad_i*grad_i;
                     }
                     long timestamp = System.currentTimeMillis() - startTime;
-                    String output ="\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero+"\t"+nnlsParams.fractionNegativeToCollapse+"\t0";
+                    String output ="\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero+"\t"+(npairs - nactive)+"\t"+nnlsParams.fractionNegativeToCollapse+"\t0";
                     log.println(output);
                     System.out.println(output);
-
-
                 }
 
 
@@ -204,7 +211,7 @@ public class NeighborNetSplitstree4 {
                     pgx += grad_i*grad_i;
                 }
                 long timestamp = System.currentTimeMillis() - startTime;
-                String output = "\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero +"\t"+nnlsParams.fractionNegativeToCollapse+"\t1";
+                String output = "\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero +"\t"+(npairs - nactive)+"\t"+nnlsParams.fractionNegativeToCollapse+"\t1";
                 log.println(output);
                 System.out.println(output);
 
@@ -225,6 +232,8 @@ public class NeighborNetSplitstree4 {
             double min_grad = 0.0; //Minimum value of the projected gradient
             double pgradSumSquares = 0.0; //Norm of the projected gradient.
 
+            //TODO better calculation of grad??
+
             for (int i = 0; i < npairs; i++) {
                 r[i] -= Atd[i];
                 double grad_ij = r[i];
@@ -237,13 +246,13 @@ public class NeighborNetSplitstree4 {
                     if (grad_ij < 0.0)
                         pgradSumSquares += grad_ij*grad_ij;
                 }
-                else
-                    pgradSumSquares+=grad_ij*grad_ij;
+
             }
 
 
             if (nnlsParams.useGradientNorm) {
-                if ((min_i == -1) || pgradSumSquares<nnlsParams.pgbound * nnlsParams.pgbound)
+                double epsilon = nactive / (double) npairs * nnlsParams.pgbound;
+                if ((min_i == -1) || pgradSumSquares<epsilon*epsilon)
                     break;
             }
             else {
@@ -252,6 +261,7 @@ public class NeighborNetSplitstree4 {
                     break; /* We have arrived at the constrained optimum */
             }
             active[min_i] = false;
+            nactive--;
             System.arraycopy(x, 0, old_x, 0, npairs);
             progress.checkForCancel();
         }
@@ -450,6 +460,28 @@ public class NeighborNetSplitstree4 {
         }
     }
 
+
+    /**
+     * Utility class for sorting array values but keeping track of the indices
+     */
+    static private class Pair implements Comparable<Pair> {
+        public final int index;
+        public final double value;
+
+        public Pair(int index, double value) {
+            this.index = index;
+            this.value = value;
+        }
+
+        @Override
+        public int compareTo(Pair other) {
+            //multiplied to -1 as the author need descending sort order
+            return Double.valueOf(this.value).compareTo(other.value);
+        }
+    }
+
+
+
     /**
      * Returns the array indices for the smallest propKept proportion of negative values in x.
      * In the case of ties, priority is given to the earliest entries.
@@ -461,49 +493,65 @@ public class NeighborNetSplitstree4 {
      */
     static private int[] worstIndices(double[] x, double propKept) {
 
+        boolean USE_SIMPLE_VERSION = true; //Use a simpler version of this. Keep this as a flag for archival reasons.
 
-        if (propKept == 0)
+
+        if (propKept == 0.0)
             return null;
 
         int n = x.length;
-
-        int numNeg = 0;
+        int numNeg=0;
         for (double aX1 : x)
             if (aX1 < 0.0)
                 numNeg++;
-
         if (numNeg == 0)
             return null;
-
-        //Make a copy of negative values in x.
-        double[] xcopy = new double[numNeg];
-        int j = 0;
-        for (double aX : x)
-            if (aX < 0.0)
-                xcopy[j++] = aX;
-
-        //Sort the copy
-        Arrays.sort(xcopy);
-
-        //Find the cut-off value. All values greater than this should
-        //be returned, as well as some (or perhaps all) of the values
-        //equal to this.
-        int nkept = (int) Math.ceil(propKept * numNeg);  //Ranges from 1 to n
-        double cutoff = xcopy[nkept - 1];
-
-        //we now fill the result vector. Values < cutoff are filled
-        //in from the front. Values == cutoff are filled in the back.
-        //Values filled in from the back can be overwritten by values
-        //filled in from the front, but not vice versa.
+        int nkept = (int) Math.ceil(propKept * numNeg);
         int[] result = new int[nkept];
-        int front = 0, back = nkept - 1;
 
-        for (int i = 0; i < n; i++) {
-            if (x[i] < cutoff)
-                result[front++] = i; //Definitely in the top entries.
-            else if (x[i] == cutoff) {
-                if (back >= front)
-                    result[back--] = i;
+
+        if (USE_SIMPLE_VERSION) {
+            Pair[] array_to_sort = new Pair[numNeg];
+            int j=0;
+            for(int i=0;i<n;i++) {
+                if (x[i] < 0.0) {
+                    array_to_sort[j++] = new Pair(i, x[i]);
+                }
+            }
+            Arrays.sort(array_to_sort);
+
+            for(int i=0;i<nkept;i++)
+                result[i] = array_to_sort[i].index;
+        }
+        else {
+            //Make a copy of negative values in x.
+            double[] xcopy = new double[numNeg];
+            int j = 0;
+            for (double aX : x)
+                if (aX < 0.0)
+                    xcopy[j++] = aX;
+
+            //Sort the copy
+            Arrays.sort(xcopy);
+
+            //Find the cut-off value. All values greater than this should
+            //be returned, as well as some (or perhaps all) of the values
+            //equal to this.
+            double cutoff = xcopy[nkept - 1];
+
+            //we now fill the result vector. Values < cutoff are filled
+            //in from the front. Values == cutoff are filled in the back.
+            //Values filled in from the back can be overwritten by values
+            //filled in from the front, but not vice versa.
+            int front = 0, back = nkept - 1;
+
+            for (int i = 0; i < n; i++) {
+                if (x[i] < cutoff)
+                    result[front++] = i; //Definitely in the top entries.
+                else if (x[i] == cutoff) {
+                    if (back >= front)
+                        result[back--] = i;
+                }
             }
         }
         return result;
@@ -519,10 +567,18 @@ public class NeighborNetSplitstree4 {
     }
 
 
+    boolean checkActiveAreZero(boolean[] active, double[] x) {
+        int n=active.length;
+        for(int i=0;i<n;i++)
+            if (active[i] && x[i]!=0.0)
+                return false;
+        return true;
+    }
+
 
 
     /**
-     * Conjugate gradient algorithm solving A^tWA x = b (where b = AtWd)
+     * Conjugate gradient algorithm solving A^tA x = b (where b = Atd)
      * such that all x[i][j] for which active[i][j] = true are set to zero.
      * We assume that x[i][j] is zero for all active i,j, and use the given
      * values for x as our starting vector.
@@ -540,6 +596,10 @@ public class NeighborNetSplitstree4 {
     static private void circularConjugateGrads(int ntax, int npairs, double[] r, double[] w, double[] p, double[] y,
                                                double[] b, boolean[] active, double[] x, CGparams params) {
         int kmax = ntax * (ntax - 1) / 2; /* Maximum number of iterations of the cg algorithm (probably too many) */
+
+        for(int k=0;k<npairs;k++)   //Need to zero active entries of x.
+            if (active[k])
+                x[k]=0.0;
 
         calculateAb(ntax, x, y);
         calculateAtx(ntax, y, r); /*r = AtAx */
@@ -567,8 +627,35 @@ public class NeighborNetSplitstree4 {
 
         while ((rho > bound) && (k < kmax)) {
             k = k + 1;
+
+            //EVALUATE THE FUNCTION TO CHECK MONOTONIC DECREASE
+
+            double[] res1 = new double[npairs];
+            double[] res2 = new double[npairs];
+            calculateAb(ntax,x,res1);
+            calculateAtx(ntax,res1,res2);
+            double fx = 0.0;
+            for(int i=0;i<npairs;i++) {
+                if (!active[i])
+                    fx += (res2[i]-b[i])*(res2[i]-b[i]);
+            }
+           // System.out.println("\tCG:k="+k+"\tfx = "+fx+"\trho="+rho);
+
+
+
             if (k == 1) {
                 System.arraycopy(r, 0, p, 0, npairs);
+            }
+            else if (false && rho>rho_old) {
+                calculateAb(ntax, x, y);
+                calculateAtx(ntax, y, r);
+                for (int i = 0; i < npairs; i++)
+                    if (!active[i])
+                        r[i] = b[i] - r[i];
+                    else
+                        r[i] = 0.0;
+                System.arraycopy(r, 0, p, 0, npairs);
+                rho = sumSquares(r);
 
             } else {
                 double beta = rho / rho_old;

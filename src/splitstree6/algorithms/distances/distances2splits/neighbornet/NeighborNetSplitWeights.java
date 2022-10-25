@@ -58,7 +58,7 @@ public class NeighborNetSplitWeights {
 		public double kktBound = tolerance / 100;
 		public boolean printConvergenceData = false;
 
-		public double relativeErrorBound = 0.01; //Approx bound on relative numerical error in split weights
+		public double relativeErrorBound = 0.1; //Approx bound on relative numerical error in split weights
 		public double pgbound = 1e-4; //Bound on the projective gradient norm
 
 		public String logfile = null;
@@ -784,7 +784,7 @@ public class NeighborNetSplitWeights {
 		double[][] atd = new double[n+1][n+1];
 		calcAtx(d,atd);
 		//Bound is epsilon * ||A'd|| / ( ||A'A|| ||(A'A)^{-1}|| )
-		return relativeError*sqrt(sumSquares(atd))/(2*estimateNorm(n));
+		return relativeError*sqrt(sumSquares(atd))/ (2*estimateNorm(n));
 	}
 
 
