@@ -36,7 +36,6 @@ import java.util.Map;
  */
 public class EdgesFormat extends Group {
 
-	private final EdgesFormatController controller;
 	private final EdgesFormatPresenter presenter;
 
 	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
@@ -44,7 +43,7 @@ public class EdgesFormat extends Group {
 	public EdgesFormat(UndoManager undoManager, SelectionModel<Edge> edgeSelectionModel, Map<Edge, LabeledEdgeShape> edgeShapeMap,
 					   ObjectProperty<String[]> editsProperty) {
 		var loader = new ExtendedFXMLLoader<EdgesFormatController>(EdgesFormatController.class);
-		controller = loader.getController();
+		EdgesFormatController controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
 		presenter = new EdgesFormatPresenter(undoManager, controller, optionLabelEdgesBy, edgeSelectionModel, edgeShapeMap, editsProperty);

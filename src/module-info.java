@@ -115,6 +115,7 @@ module splitstreesix {
 	opens splitstree6.view.inputeditor;
 
 	opens splitstree6.view.format.taxmark;
+	opens splitstree6.view.format.densitree;
 	opens splitstree6.view.format.taxlabel;
 	opens splitstree6.view.format.splits;
 	opens splitstree6.view.format.traits;

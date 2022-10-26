@@ -114,7 +114,12 @@ public class InteractionSetup {
 						}
 					}
 
-					RunAfterAWhile.apply(this, () -> Platform.runLater(() -> updateEdgeSelection(tree, taxaBlock, taxonSelectionModel, edgeSelectionModel)));
+					RunAfterAWhile.apply(this, () -> Platform.runLater(() -> {
+						if (taxaBlock.getNtax() > 0)
+							updateEdgeSelection(tree, taxaBlock, taxonSelectionModel, edgeSelectionModel);
+						else
+							edgeSelectionModel.clearSelection();
+					}));
 				}
 			}
 		};

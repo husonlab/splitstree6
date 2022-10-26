@@ -1,0 +1,105 @@
+<!--
+  ~  EdgesFormat.fxml Copyright (C) 2022 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  EdgesFormat.fxml Copyright (C) 2022 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+<Accordion maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.densitree.EdgesFormatController">
+    <panes>
+        <TitledPane fx:id="titledPane" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0" text="Edges">
+            <content>
+                <VBox maxHeight="-Infinity" minHeight="-Infinity" spacing="5.0">
+                    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="6.0">
+                        <Label text="Width">
+                            <HBox.margin>
+                                <Insets right="2.0"/>
+                            </HBox.margin>
+                            <font>
+                                <Font size="12.0"/>
+                            </font>
+                        </Label>
+                        <ComboBox fx:id="widthCBox" editable="true" prefWidth="100.0" visibleRowCount="14">
+                            <tooltip>
+                                <Tooltip text="Line width"/>
+                            </tooltip>
+                        </ComboBox>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0">
+                        <Label text="Color">
+                            <font>
+                                <Font size="12.0"/>
+                            </font>
+                            <HBox.margin>
+                                <Insets right="10.0"/>
+                            </HBox.margin>
+                        </Label>
+                        <ColorPicker fx:id="colorPicker" editable="true">
+                            <tooltip>
+                                <Tooltip text="Line color for compatible edges"/>
+                            </tooltip>
+                        </ColorPicker>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="46.0">
+                        <children>
+                            <Label text="Other">
+                                <font>
+                                    <Font size="12.0"/>
+                                </font>
+                                <HBox.margin>
+                                    <Insets right="10.0"/>
+                                </HBox.margin>
+                            </Label>
+                            <ColorPicker fx:id="otherColorPicker" editable="true">
+                                <tooltip>
+                                    <Tooltip text="Line color for incompatible edges"/>
+                                </tooltip>
+                            </ColorPicker>
+                        </children>
+                    </HBox>
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </padding>
+                </VBox>
+            </content>
+        </TitledPane>
+    </panes>
+</Accordion>

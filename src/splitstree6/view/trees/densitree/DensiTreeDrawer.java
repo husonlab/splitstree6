@@ -43,7 +43,6 @@ import jloda.fx.control.ProgressPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.*;
-import jloda.fx.window.MainWindowManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
@@ -117,7 +116,8 @@ public class DensiTreeDrawer {
 
 	public void apply(Bounds targetBounds, List<PhyloTree> trees, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
-					  ReadOnlyBooleanProperty showTrees, ReadOnlyBooleanProperty showConsensus) {
+					  ReadOnlyBooleanProperty showTrees, ReadOnlyBooleanProperty showConsensus,
+					  double lineWidth, Color edgeColor, Color otherColor) {
 		radialLabelLayout.getItems().clear();
 
 		RunAfterAWhile.applyInFXThread(parent, () -> {
@@ -202,8 +202,8 @@ public class DensiTreeDrawer {
 								diagramType, jitter, random);
 						Platform.runLater(() -> {
 							try {
-								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 0, canvas0);
-								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 1, canvas1);
+								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 0, canvas0, lineWidth, edgeColor, otherColor);
+								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 1, canvas1, lineWidth, otherColor, otherColor);
 								progress.incrementProgress();
 							} catch (CanceledException ignored) {
 							}
@@ -221,7 +221,7 @@ public class DensiTreeDrawer {
 								diagramType, jitter, random);
 						Platform.runLater(() -> {
 							try {
-								drawTree(progress, tree, nodePointMap, null, diagramType, 2, canvas0);
+								drawTree(progress, tree, nodePointMap, null, diagramType, 2, canvas0, lineWidth, edgeColor, otherColor);
 								progress.incrementProgress();
 							} catch (CanceledException ignored) {
 							}
@@ -367,17 +367,14 @@ public class DensiTreeDrawer {
 	}
 
 	private static void drawTree(ProgressListener progress, PhyloTree tree, NodeArray<Point2D> nodePointMap, Collection<BitSet> consensusClusters,
-								 DensiTreeDiagramType diagramType, int round, Canvas canvas) throws CanceledException {
+								 DensiTreeDiagramType diagramType, int round, Canvas canvas, double lineWidth, Color edgeColor, Color otherColor) throws CanceledException {
 		var gc = canvas.getGraphicsContext2D();
 
-		gc.setLineWidth(0.25);
+		gc.setLineWidth(lineWidth);
 
 		var treeClusters = (round < 2 ? TreesUtilities.extractClusters(tree) : null);
 
-		var black = (MainWindowManager.isUseDarkTheme() ? Color.WHITE : Color.BLACK).deriveColor(1, 1, 1, 0.05);
-		var red = Color.DARKRED.deriveColor(1, 1, 1, 0.05);
-
-		gc.setStroke(black);
+		gc.setStroke(edgeColor);
 
 		for (var v : tree.nodes()) {
 			var useColor = false;
@@ -391,9 +388,9 @@ public class DensiTreeDrawer {
 					if (!useColor)
 						useColor = !isCompatibleWithAll(treeClusters.get(e.getTarget()), consensusClusters);
 					if (useColor)
-						gc.setStroke(red);
+						gc.setStroke(otherColor);
 					else
-						gc.setStroke(black);
+						gc.setStroke(edgeColor);
 					if (round == 0 && useColor || round == 1 && !useColor)
 						continue;
 				}

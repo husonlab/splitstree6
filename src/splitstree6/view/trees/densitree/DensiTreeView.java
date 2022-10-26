@@ -27,14 +27,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
+import javafx.scene.paint.Color;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
+import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
+import splitstree6.view.format.densitree.EdgesFormat;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.taxlabel.TaxonLabelFormat;
 import splitstree6.view.format.taxmark.TaxonMark;
@@ -44,6 +47,9 @@ import splitstree6.window.MainWindow;
 import java.util.List;
 
 public class DensiTreeView implements IView {
+	public static final Color DEFAULT_LIGHTMODE_EDGE_COLOR = Color.BLACK.deriveColor(1, 1, 1, 0.05);
+	public static final Color DEFAULT_DARKMODE_EDGE_COLOR = Color.WHITE.deriveColor(1, 1, 1, 0.05);
+
 	private static boolean startup = true;
 
 	private final UndoManager undoManager = new UndoManager();
@@ -76,6 +82,10 @@ public class DensiTreeView implements IView {
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
+	private final DoubleProperty optionStrokeWidth = new SimpleDoubleProperty(this, "optionStrokeWidth");
+	private final ObjectProperty<Color> optionEdgeColor = new SimpleObjectProperty<>(this, "optionEdgeColor");
+	private final ObjectProperty<Color> optionOtherColor = new SimpleObjectProperty<>(this, "optionOtherColor");
+
 	{
 		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
 		ProgramProperties.track(optionShowTrees, true);
@@ -90,6 +100,10 @@ public class DensiTreeView implements IView {
 			optionJitter.set(false);
 			optionColorIncompatibleEdges.set(true);
 		}
+
+		ProgramProperties.track(optionStrokeWidth, 0.5);
+		ProgramProperties.track(optionEdgeColor, MainWindowManager.isUseDarkTheme() ? DEFAULT_DARKMODE_EDGE_COLOR : DEFAULT_LIGHTMODE_EDGE_COLOR);
+		ProgramProperties.track(optionOtherColor, Color.DARKRED.deriveColor(1, 1, 1, 0.05));
 	}
 
 	public List<String> listOptions() {
@@ -118,7 +132,7 @@ public class DensiTreeView implements IView {
 
 		var taxLabelFormatter = new TaxonLabelFormat(mainWindow, undoManager);
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), new SelectTraits(mainWindow));
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), new SelectTraits(mainWindow), new EdgesFormat(this));
 
 		trees.addListener((InvalidationListener) e -> {
 			empty.set(trees.size() == 0);
@@ -334,5 +348,41 @@ public class DensiTreeView implements IView {
 
 	public void setOptionColorIncompatibleEdges(boolean optionColorIncompatibleEdges) {
 		this.optionColorIncompatibleEdges.set(optionColorIncompatibleEdges);
+	}
+
+	public double getOptionStrokeWidth() {
+		return optionStrokeWidth.get();
+	}
+
+	public DoubleProperty optionStrokeWidthProperty() {
+		return optionStrokeWidth;
+	}
+
+	public void setOptionStrokeWidth(double optionStrokeWidth) {
+		this.optionStrokeWidth.set(optionStrokeWidth);
+	}
+
+	public Color getOptionEdgeColor() {
+		return optionEdgeColor.get();
+	}
+
+	public ObjectProperty<Color> optionEdgeColorProperty() {
+		return optionEdgeColor;
+	}
+
+	public void setOptionEdgeColor(Color optionEdgeColor) {
+		this.optionEdgeColor.set(optionEdgeColor);
+	}
+
+	public Color getOptionOtherColor() {
+		return optionOtherColor.get();
+	}
+
+	public ObjectProperty<Color> optionOtherColorProperty() {
+		return optionOtherColor;
+	}
+
+	public void setOptionOtherColor(Color optionOtherColor) {
+		this.optionOtherColor.set(optionOtherColor);
 	}
 }

@@ -115,12 +115,15 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 				view.getOptionColorIncompatibleEdges(),
 				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
 				view.optionShowTreesProperty(),
-				view.optionShowConsensusProperty());
+				view.optionShowConsensusProperty(), view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
 
 		targetBounds.addListener(invalidationListener);
 		view.optionDiagramProperty().addListener(invalidationListener);
 		view.optionHorizontalZoomFactorProperty().addListener(invalidationListener);
 		view.optionVerticalZoomFactorProperty().addListener(invalidationListener);
+		view.optionStrokeWidthProperty().addListener(invalidationListener);
+		view.optionEdgeColorProperty().addListener(invalidationListener);
+		view.optionOtherColorProperty().addListener(invalidationListener);
 
 		controller.getDecreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1 / 1.1 * view.getOptionFontScaleFactor()));
 		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));
@@ -157,6 +160,14 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
 		setupMenuItems();
+
+		MainWindowManager.useDarkThemeProperty().addListener((v, o, n) -> {
+			if (n && view.getOptionEdgeColor().equals(DensiTreeView.DEFAULT_LIGHTMODE_EDGE_COLOR))
+				view.setOptionEdgeColor(DensiTreeView.DEFAULT_DARKMODE_EDGE_COLOR);
+			else if (!n && view.getOptionEdgeColor().equals(DensiTreeView.DEFAULT_DARKMODE_EDGE_COLOR))
+				view.setOptionEdgeColor(DensiTreeView.DEFAULT_LIGHTMODE_EDGE_COLOR);
+
+		});
 	}
 
 	@Override

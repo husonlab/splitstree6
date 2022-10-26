@@ -212,7 +212,22 @@ public class NexusExporter {
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
 			output.write(w, taxa, block);
+	}
 
+	public void export(Writer w, TaxaBlock taxa, GenomesBlock block) throws IOException {
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
+			new TaxaNexusOutput().write(w, taxa);
+		}
+		final GenomesNexusOutput output = new GenomesNexusOutput();
+		output.setTitleAndLink(getTitle(), getLink());
+		if (asWorkflowOnly) {
+			final GenomesBlock newBlock = new GenomesBlock();
+			//newBlock.setFormat(block.getFormat());
+			output.write(w, new TaxaBlock(), newBlock);
+		} else
+			output.write(w, taxa, block);
 	}
 
 	/**
@@ -246,7 +261,8 @@ public class NexusExporter {
 			export(w, taxaBlock, traitsBlock);
 		else if (dataBlock instanceof SetsBlock setsBlock)
 			export(w, taxaBlock, setsBlock);
-		else
+		else if (dataBlock instanceof GenomesBlock genomesBlock)
+			export(w, taxaBlock, genomesBlock);
 			throw new IOException("Export " + Basic.getShortName(dataBlock.getClass()) + ": not implemented");
 	}
 
