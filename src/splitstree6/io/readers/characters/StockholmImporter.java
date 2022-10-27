@@ -20,7 +20,6 @@
 package splitstree6.io.readers.characters;
 
 import jloda.util.FileLineIterator;
-import jloda.util.FileUtils;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
@@ -28,7 +27,6 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
@@ -116,8 +114,7 @@ public class StockholmImporter extends CharactersReader {
 		if (!super.accepts(fileName))
 			return false;
 		else {
-			var line = FileUtils.getFirstLineFromFile(new File(fileName));
-			return line != null && acceptsFirstLine(line);
+			return acceptsFile(fileName);
 		}
 	}
 

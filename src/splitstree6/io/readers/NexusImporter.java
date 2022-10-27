@@ -40,122 +40,129 @@ public class NexusImporter {
 	 */
 	public static <D extends DataBlock> void parse(String fileName, TaxaBlock taxaBlock, D dataBlock) throws IOException {
 		try (var np = new NexusStreamParser(FileUtils.getReaderPossiblyZIPorGZIP(fileName))) {
-			np.matchIgnoreCase("#nexus");
+			parse(np, taxaBlock, dataBlock);
+		}
+	}
 
-			List<String> taxLabels;
-			var comments = new Single<String>(null);
+	/**
+	 * parse the first datablock in a nexus file
+	 */
+	public static <D extends DataBlock> void parse(NexusStreamParser np, TaxaBlock taxaBlock, D dataBlock) throws IOException {
+		np.matchIgnoreCase("#nexus");
 
-			try {
-				np.setCollectAllCommentsWithExclamationMark(true);
-				np.setEchoCommentsWithExclamationMark(true);
-				if (np.isAtBeginOfBlock("SplitsTree6") || np.isAtBeginOfBlock("SplitsTree5")) {
-					np.skipBlock();
-					comments.setIfCurrentValueIsNull(np.popComments());
-					{
-						var parser = new TaxaNexusInput();
-						parser.parse(np, taxaBlock);
-						comments.setIfCurrentValueIsNull(np.popComments());
-					}
-					while (np.isAtBeginOfBlock("ALGORITHM") || np.isAtBeginOfBlock("TAXA")) {
-						np.skipBlock();
-						comments.setIfCurrentValueIsNull(np.popComments());
-					}
-					if (np.isAtBeginOfBlock("TRAITS")) {
-						var parser = new TraitsNexusInput();
-						var block = new TraitsBlock();
-						parser.parse(np, taxaBlock, block);
-						comments.setIfCurrentValueIsNull(np.popComments());
-						taxaBlock.setTraitsBlock(block);
-					}
-					if (np.isAtBeginOfBlock("SETS")) {
-						var parser = new SetsNexusInput();
-						var block = new SetsBlock();
-						parser.parse(np, taxaBlock, block);
-						comments.setIfCurrentValueIsNull(np.popComments());
-						taxaBlock.setSetsBlock(block);
-					}
-				} else if (np.isAtBeginOfBlock("TAXA")) {
-					{
-						var parser = new TaxaNexusInput();
-						parser.parse(np, taxaBlock);
-						comments.setIfCurrentValueIsNull(np.popComments());
-					}
-					if (np.isAtBeginOfBlock("TRAITS")) {
-						var parser = new TraitsNexusInput();
-						var block = new TraitsBlock();
-						parser.parse(np, taxaBlock, block);
-						comments.setIfCurrentValueIsNull(np.popComments());
-						taxaBlock.setTraitsBlock(block);
-					}
-					if (np.isAtBeginOfBlock("SETS")) {
-						var parser = new SetsNexusInput();
-						var block = new SetsBlock();
-						parser.parse(np, taxaBlock, block);
-						comments.setIfCurrentValueIsNull(np.popComments());
-						taxaBlock.setSetsBlock(block);
-					}
-				}
+		List<String> taxLabels;
+		var comments = new Single<String>(null);
 
-				while (!np.isAtBeginOfBlock(dataBlock.getBlockName()) && !(dataBlock instanceof CharactersBlock && np.isAtBeginOfBlock("data"))) {
-					np.skipBlock();
-					comments.setIfCurrentValueIsNull(np.popComments());
-				}
+		try {
+			np.setCollectAllCommentsWithExclamationMark(true);
+			np.setEchoCommentsWithExclamationMark(true);
+			if (np.isAtBeginOfBlock("SplitsTree6") || np.isAtBeginOfBlock("SplitsTree5")) {
+				np.skipBlock();
 				comments.setIfCurrentValueIsNull(np.popComments());
-
-				if (dataBlock instanceof CharactersBlock charactersBlock) {
-					var parser = new CharactersNexusInput();
-					taxLabels = parser.parse(np, taxaBlock, charactersBlock);
+				{
+					var parser = new TaxaNexusInput();
+					parser.parse(np, taxaBlock);
 					comments.setIfCurrentValueIsNull(np.popComments());
-				} else if (dataBlock instanceof GenomesBlock genomesBlock) {
-					var parser = new GenomesNexusInput();
-					taxLabels = parser.parse(np, taxaBlock, genomesBlock);
-					comments.setIfCurrentValueIsNull(np.popComments());
-				} else if (dataBlock instanceof DistancesBlock distancesBlock) {
-					var parser = new DistancesNexusInput();
-					taxLabels = parser.parse(np, taxaBlock, distancesBlock);
-					comments.setIfCurrentValueIsNull(np.popComments());
-				} else if (dataBlock instanceof SplitsBlock splitsBlock) {
-					var parser = new SplitsNexusInput();
-					taxLabels = parser.parse(np, taxaBlock, splitsBlock);
-					comments.setIfCurrentValueIsNull(np.popComments());
-				} else if (dataBlock instanceof TreesBlock treesBlock) {
-					var parser = new TreesNexusInput();
-					taxLabels = parser.parse(np, taxaBlock, treesBlock);
-					comments.setIfCurrentValueIsNull(np.popComments());
-				} else if (dataBlock instanceof NetworkBlock networkBlock) {
-					var parser = new NetworkNexusInput();
-					taxLabels = parser.parse(np, taxaBlock, networkBlock);
-					comments.setIfCurrentValueIsNull(np.popComments());
-				} else {
-					throw new IOException("Not implemented: import '" + dataBlock.getName());
 				}
-
-
-				if (taxaBlock.getNtax() == 0 || taxaBlock.size() == 0) {
-					if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || taxLabels.size() > 0 && taxaBlock.getNtax() == 0))
-						taxaBlock.addTaxaByNames(taxLabels);
-					else
-						throw new IOException("Can't infer taxon names");
+				while (np.isAtBeginOfBlock("ALGORITHM") || np.isAtBeginOfBlock("TAXA")) {
+					np.skipBlock();
+					comments.setIfCurrentValueIsNull(np.popComments());
 				}
-				if (np.isAtBeginOfBlock(TraitsBlock.BLOCK_NAME)) {
+				if (np.isAtBeginOfBlock("TRAITS")) {
 					var parser = new TraitsNexusInput();
 					var block = new TraitsBlock();
 					parser.parse(np, taxaBlock, block);
-					taxaBlock.setTraitsBlock(block);
 					comments.setIfCurrentValueIsNull(np.popComments());
+					taxaBlock.setTraitsBlock(block);
 				}
-				if (np.isAtBeginOfBlock(SetsBlock.BLOCK_NAME)) {
+				if (np.isAtBeginOfBlock("SETS")) {
 					var parser = new SetsNexusInput();
 					var block = new SetsBlock();
 					parser.parse(np, taxaBlock, block);
 					comments.setIfCurrentValueIsNull(np.popComments());
 					taxaBlock.setSetsBlock(block);
 				}
-			} finally {
-				taxaBlock.setComments(comments.get());
-				np.setCollectAllCommentsWithExclamationMark(false);
-				np.setEchoCommentsWithExclamationMark(false);
+			} else if (np.isAtBeginOfBlock("TAXA")) {
+				{
+					var parser = new TaxaNexusInput();
+					parser.parse(np, taxaBlock);
+					comments.setIfCurrentValueIsNull(np.popComments());
+				}
+				if (np.isAtBeginOfBlock("TRAITS")) {
+					var parser = new TraitsNexusInput();
+					var block = new TraitsBlock();
+					parser.parse(np, taxaBlock, block);
+					comments.setIfCurrentValueIsNull(np.popComments());
+					taxaBlock.setTraitsBlock(block);
+				}
+				if (np.isAtBeginOfBlock("SETS")) {
+					var parser = new SetsNexusInput();
+					var block = new SetsBlock();
+					parser.parse(np, taxaBlock, block);
+					comments.setIfCurrentValueIsNull(np.popComments());
+					taxaBlock.setSetsBlock(block);
+				}
 			}
+
+			while (!np.isAtBeginOfBlock(dataBlock.getBlockName()) && !(dataBlock instanceof CharactersBlock && np.isAtBeginOfBlock("data"))) {
+				np.skipBlock();
+				comments.setIfCurrentValueIsNull(np.popComments());
+			}
+			comments.setIfCurrentValueIsNull(np.popComments());
+
+			if (dataBlock instanceof CharactersBlock charactersBlock) {
+				var parser = new CharactersNexusInput();
+				taxLabels = parser.parse(np, taxaBlock, charactersBlock);
+				comments.setIfCurrentValueIsNull(np.popComments());
+			} else if (dataBlock instanceof GenomesBlock genomesBlock) {
+				var parser = new GenomesNexusInput();
+				taxLabels = parser.parse(np, taxaBlock, genomesBlock);
+				comments.setIfCurrentValueIsNull(np.popComments());
+			} else if (dataBlock instanceof DistancesBlock distancesBlock) {
+				var parser = new DistancesNexusInput();
+				taxLabels = parser.parse(np, taxaBlock, distancesBlock);
+				comments.setIfCurrentValueIsNull(np.popComments());
+			} else if (dataBlock instanceof SplitsBlock splitsBlock) {
+				var parser = new SplitsNexusInput();
+				taxLabels = parser.parse(np, taxaBlock, splitsBlock);
+				comments.setIfCurrentValueIsNull(np.popComments());
+			} else if (dataBlock instanceof TreesBlock treesBlock) {
+				var parser = new TreesNexusInput();
+				taxLabels = parser.parse(np, taxaBlock, treesBlock);
+				comments.setIfCurrentValueIsNull(np.popComments());
+			} else if (dataBlock instanceof NetworkBlock networkBlock) {
+				var parser = new NetworkNexusInput();
+				taxLabels = parser.parse(np, taxaBlock, networkBlock);
+				comments.setIfCurrentValueIsNull(np.popComments());
+			} else {
+				throw new IOException("Not implemented: import '" + dataBlock.getName());
+			}
+
+
+			if (taxaBlock.getNtax() == 0 || taxaBlock.size() == 0) {
+				if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || taxLabels.size() > 0 && taxaBlock.getNtax() == 0))
+					taxaBlock.addTaxaByNames(taxLabels);
+				else
+					throw new IOException("Can't infer taxon names");
+			}
+			if (np.isAtBeginOfBlock(TraitsBlock.BLOCK_NAME)) {
+				var parser = new TraitsNexusInput();
+				var block = new TraitsBlock();
+				parser.parse(np, taxaBlock, block);
+				taxaBlock.setTraitsBlock(block);
+				comments.setIfCurrentValueIsNull(np.popComments());
+			}
+			if (np.isAtBeginOfBlock(SetsBlock.BLOCK_NAME)) {
+				var parser = new SetsNexusInput();
+				var block = new SetsBlock();
+				parser.parse(np, taxaBlock, block);
+				comments.setIfCurrentValueIsNull(np.popComments());
+				taxaBlock.setSetsBlock(block);
+			}
+		} finally {
+			taxaBlock.setComments(comments.get());
+			np.setCollectAllCommentsWithExclamationMark(false);
+			np.setEchoCommentsWithExclamationMark(false);
 		}
 	}
 

@@ -36,10 +36,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,17 +79,11 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		progress.setMaximum(-1);
 		final var cycle = NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock.getDistances());
 
-
-
-
-
-
 		progress.setTasks("NNet", "split weight optimization");
 
 		final var start = System.currentTimeMillis();
 
 		var params = new NeighborNetSplitWeights.NNLSParams(taxaBlock.getNtax());
-
 
         //TODO: Streamline these options once we identify the optimal strategies.
 		params.tolerance =1e-6;
@@ -130,7 +120,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.fractionNegativeToCollapse = 0.6;
 			params.useInsertionAlgorithm = false;
 		}
-
 
 		ArrayList<ASplit> splits;
 		if (!RUN_CONVERGENCE_TESTS)

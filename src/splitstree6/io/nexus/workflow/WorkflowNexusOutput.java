@@ -22,6 +22,7 @@ package splitstree6.io.nexus.workflow;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
+import jloda.util.FileUtils;
 import jloda.util.Pair;
 import splitstree6.data.SplitsTree6Block;
 import splitstree6.io.nexus.NexusExporter;
@@ -33,7 +34,9 @@ import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.LinkedList;
 
 /**
@@ -44,14 +47,17 @@ public class WorkflowNexusOutput {
 	/**
 	 * save the workflow in nexus format
 	 *
-	 * @param file     file or stdout
+	 * @param fileName or stdout
 	 */
-	public void save(Workflow workflow, final File file, boolean asWorkflowOnly) throws IOException {
-		if (file.getParentFile() != null && file.getParentFile().isDirectory())
-			ProgramProperties.put("SaveDir", file.getParent());
-		try (Writer w = new BufferedWriter(file.getName().equals("stdout") ? new OutputStreamWriter(System.out) : new FileWriter(file))) {
-			final int count = save(workflow, w, asWorkflowOnly);
-			NotificationManager.showInformation("Saved " + count + " blocks to file: " + file.getPath());
+	public void save(Workflow workflow, final String fileName, boolean asWorkflowOnly) throws IOException {
+		if (!fileName.equals("stdout")) {
+			var file = new File(fileName);
+			if (file.getParentFile() != null && file.getParentFile().isDirectory())
+				ProgramProperties.put("SaveDir", file.getParent());
+		}
+		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(fileName)) {
+			final var count = save(workflow, w, asWorkflowOnly);
+			NotificationManager.showInformation("Saved " + count + " blocks to: " + fileName);
 		}
 	}
 
@@ -73,9 +79,9 @@ public class WorkflowNexusOutput {
 		(new SplitsTree6NexusOutput()).write(w, splitsTree6Block);
 
 		if (workflow.getInputTaxaBlock() != null)
-			TaxaNexusOutput.writeComments(w, workflow.getWorkingTaxaBlock());
+			TaxaNexusOutput.writeComments(w, workflow.getInputTaxaBlock());
 
-		if (!asWorkflowOnly)
+		if (!asWorkflowOnly && workflow.getInputTaxaBlock().getNtax() > 0)
 			w.write("\n[\n" + ExtractMethodsText.getInstance().apply(workflow).replaceAll("\\[", "(").replaceAll("]", ")") + "]\n");
 
 		setupExporter(workflow.getInputTaxaNode(), nexusExporter);
@@ -106,7 +112,6 @@ public class WorkflowNexusOutput {
 			nexusExporter.setTitle("Working Sets");
 			nexusExporter.export(w, workflow.getWorkingTaxaBlock(), workflow.getWorkingTaxaBlock().getSetsBlock());
 		}
-
 
 		setupExporter(workflow.getInputDataNode(), nexusExporter);
 		nexusExporter.export(w, workflow.getInputTaxaBlock(), workflow.getInputDataNode().getDataBlock());

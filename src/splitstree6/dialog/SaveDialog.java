@@ -66,7 +66,7 @@ public class SaveDialog {
 			ProgramProperties.put("SaveDir", file.getParent());
 
 		try {
-			new WorkflowNexusOutput().save(mainWindow.getWorkflow(), file, asWorkflowOnly);
+			new WorkflowNexusOutput().save(mainWindow.getWorkflow(), file.getPath(), asWorkflowOnly);
 			if (!asWorkflowOnly) {
 				mainWindow.setFileName(file.getPath());
 				mainWindow.setDirty(false);

@@ -19,10 +19,12 @@
 
 package splitstree6.io.utils;
 
+import jloda.util.FileUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.workflow.DataBlock;
 
+import java.io.File;
 import java.io.IOException;
 
 public abstract class DataReaderBase<T extends DataBlock> extends ReaderWriterBase {
@@ -40,5 +42,10 @@ public abstract class DataReaderBase<T extends DataBlock> extends ReaderWriterBa
 	}
 
 	abstract public boolean acceptsFirstLine(String text);
+
+	public boolean acceptsFile(String fileName) {
+		var line = FileUtils.getFirstLineFromFile(new File(fileName));
+		return line != null && acceptsFirstLine(line);
+	}
 
 }

@@ -37,6 +37,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
@@ -101,6 +102,7 @@ import java.util.stream.Collectors;
 
 public class MainWindowPresenter {
 	private final MainWindow mainWindow;
+	private Stage stage;
 	private final MainWindowController controller;
 	private final ObjectProperty<IDisplayTab> focusedDisplayTab = new SimpleObjectProperty<>();
 
@@ -134,32 +136,6 @@ public class MainWindowPresenter {
 			}
 		};
 
-		mainWindow.getStage().getScene().focusOwnerProperty().addListener((v, o, n) -> {
-			try {
-				if (o != null)
-					o.removeEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
-				var displayTab = getContainingDisplayTab(n);
-				if (displayTab != null) {
-					n.addEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
-
-					focusedDisplayTab.set(displayTab);
-					disableAllMenuItems(controller);
-					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
-					if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null)
-						focusedDisplayTab.get().getPresenter().setupMenuItems();
-					enableAllMenuItemsWithDefinedAction(controller);
-				}
-			} catch (Exception ex) {
-				Basic.caught(ex);
-			}
-		});
-
-		mainWindow.getStage().focusedProperty().addListener((v, o, n) -> {
-			if (!n && mainWindow.getTaxonSelectionModel().getSelectedItems().size() > 0) {
-				MainWindowManager.getPreviousSelection().clear();
-				mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(Taxon::getName).filter(s -> !s.isBlank()).forEach(s -> MainWindowManager.getPreviousSelection().add(s));
-			}
-		});
 
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
@@ -222,6 +198,45 @@ public class MainWindowPresenter {
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
 	}
 
+	public void setStage(Stage stage) {
+		this.stage = stage;
+
+		stage.getScene().focusOwnerProperty().addListener((v, o, n) -> {
+			try {
+				if (o != null)
+					o.removeEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
+				var displayTab = getContainingDisplayTab(n);
+				if (displayTab != null) {
+					n.addEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
+
+					focusedDisplayTab.set(displayTab);
+					disableAllMenuItems(controller);
+					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
+					if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null)
+						focusedDisplayTab.get().getPresenter().setupMenuItems();
+					enableAllMenuItemsWithDefinedAction(controller);
+				}
+			} catch (Exception ex) {
+				Basic.caught(ex);
+			}
+		});
+
+		stage.focusedProperty().addListener((v, o, n) -> {
+			if (!n && mainWindow.getTaxonSelectionModel().getSelectedItems().size() > 0) {
+				MainWindowManager.getPreviousSelection().clear();
+				mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(Taxon::getName).filter(s -> !s.isBlank()).forEach(s -> MainWindowManager.getPreviousSelection().add(s));
+			}
+		});
+
+		stage.setOnCloseRequest(e -> {
+			controller.getCloseMenuItem().getOnAction().handle(null);
+			e.consume();
+		});
+
+
+		BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
+	}
+
 	public static void updateTaxSetSelection(MainWindow mainWindow, List<MenuItem> items) {
 		items.removeAll(items.stream().filter(t -> t.getText() != null && t.getText().startsWith("TaxSet")).collect(Collectors.toList()));
 
@@ -254,7 +269,7 @@ public class MainWindowPresenter {
 				fileChooser.setInitialDirectory(previousDir);
 			fileChooser.setTitle("Open input file");
 			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
-			var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
+			var selectedFile = fileChooser.showOpenDialog(stage);
 			if (selectedFile != null) {
 				if (!loadingFile.get()) {
 					try {
@@ -286,7 +301,7 @@ public class MainWindowPresenter {
 		controller.getInputEditorMenuItem().setOnAction(e -> showInputEditor());
 		controller.getInputEditorMenuItem().disableProperty().bind(workflow.runningProperty());
 
-		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> (new AnalyzeGenomesDialog(mainWindow.getStage())).show());
+		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> (new AnalyzeGenomesDialog(stage)).show());
 		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(controller.getOpenMenuItem().disableProperty());
 
 		controller.getSaveButton().setOnAction(e -> {
@@ -311,11 +326,11 @@ public class MainWindowPresenter {
 		controller.getExportWorkflowMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, true));
 		controller.getExportWorkflowMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
 
-		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(mainWindow.getStage()));
+		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(stage));
 		controller.getPageSetupMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		if (focusedDisplayTab.get() != null) {
-			controller.getPrintButton().setOnAction(e -> Print.print(mainWindow.getStage(), focusedDisplayTab.get().getImageNode()));
+			controller.getPrintButton().setOnAction(e -> Print.print(stage, focusedDisplayTab.get().getImageNode()));
 			controller.getPrintButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(focusedDisplayTab.isNull()));
 		}
 		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
@@ -329,11 +344,6 @@ public class MainWindowPresenter {
 				if (SaveBeforeClosingDialog.apply(aWindow) == SaveBeforeClosingDialog.Result.cancel || !MainWindowManager.getInstance().closeMainWindow(aWindow))
 					break;
 			}
-		});
-
-		mainWindow.getStage().setOnCloseRequest(e -> {
-			controller.getCloseMenuItem().getOnAction().handle(null);
-			e.consume();
 		});
 
 		controller.getCloseMenuItem().setOnAction(e -> {
@@ -419,7 +429,6 @@ public class MainWindowPresenter {
 
 		PresentationMode.setupPresentationModeMenuItem(mainWindow, controller.getPresentationModeMenuItem());
 
-		BasicFX.setupFullScreenMenuSupport(mainWindow.getStage(), controller.getUseFullScreenMenuItem());
 		controller.getPresentationModeMenuItem().setDisable(false);
 
 		controller.getFilterTaxaMenuItem().setOnAction(e -> {
@@ -569,16 +578,16 @@ public class MainWindowPresenter {
 		controller.getShowMessageWindowMenuItem().setOnAction(e -> MessageWindow.getInstance().setVisible(true));
 
 		controller.getSetWindowSizeMenuItem().setOnAction(e -> {
-			var result = SetParameterDialog.apply(mainWindow.getStage(), "Enter size (width x height)",
-					"%.0f x %.0f".formatted(mainWindow.getStage().getWidth(), mainWindow.getStage().getHeight()));
+			var result = SetParameterDialog.apply(stage, "Enter size (width x height)",
+					"%.0f x %.0f".formatted(stage.getWidth(), stage.getHeight()));
 
 			if (result != null) {
 				var tokens = StringUtils.split(result, 'x');
 				if (tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1])) {
 					var width = Math.max(50, NumberUtils.parseDouble(tokens[0]));
 					var height = Math.max(50, NumberUtils.parseDouble(tokens[1]));
-					mainWindow.getStage().setWidth(width);
-					mainWindow.getStage().setHeight(height);
+					stage.setWidth(width);
+					stage.setHeight(height);
 				}
 			}
 		});

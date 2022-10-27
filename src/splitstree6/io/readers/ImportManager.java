@@ -20,16 +20,17 @@
 package splitstree6.io.readers;
 
 import javafx.stage.FileChooser;
+import jloda.util.Basic;
 import jloda.util.PluginClassLoader;
 import splitstree6.io.utils.DataReaderBase;
+import splitstree6.io.utils.DataType;
+import splitstree6.io.utils.IDataReaderNoAutoDetect;
 import splitstree6.workflow.DataBlock;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashSet;
+import java.util.*;
 
 public class ImportManager {
+	public static final String UNKNOWN_FORMAT = "Unknown";
 	private static ImportManager instance;
 
 	private final ArrayList<DataReaderBase> readers = new ArrayList<>();
@@ -63,6 +64,51 @@ public class ImportManager {
 		}
 		return list;
 	}
+
+	public DataReaderBase getReader(String fileName) {
+		var readers = getReaders(fileName);
+		return readers.size() > 0 ? readers.get(0) : null;
+	}
+
+	public Collection<? extends String> getAllFileFormats() {
+		final Set<String> set = new TreeSet<>();
+		for (var reader : readers) {
+			set.add(getFileFormat(reader));
+		}
+		final ArrayList<String> result = new ArrayList<>();
+		result.add(UNKNOWN_FORMAT);
+		result.addAll(set);
+		return result;
+	}
+
+	private static String getFileFormat(DataReaderBase reader) {
+		var name = Basic.getShortName(reader.getClass());
+		if (name.endsWith("Reader"))
+			return name.substring(0, name.length() - "Reader".length());
+		else if (name.endsWith("Importer"))
+			return name.substring(0, name.length() - 8);
+		else
+			return name;
+	}
+
+	public String getFileFormat(String fileName) {
+		String fileFormat = null;
+
+		for (var importer : readers) {
+			if (!(importer instanceof IDataReaderNoAutoDetect) && importer.acceptsFile(fileName)) {
+				String format = getFileFormat(importer);
+				if (fileFormat == null)
+					fileFormat = format;
+				else if (!fileFormat.equals(format))
+					return UNKNOWN_FORMAT;
+			}
+		}
+		if (fileFormat == null)
+			return UNKNOWN_FORMAT;
+		else
+			return fileFormat;
+	}
+
 
 	public ArrayList<DataReaderBase> getReadersByText(String text) {
 		var list = new ArrayList<DataReaderBase>();
@@ -98,4 +144,18 @@ public class ImportManager {
 		list.add(0, new FileChooser.ExtensionFilter("All (*.*)", "*.*"));
 		return list;
 	}
+
+	/**
+	 * gets the importer by type and file format
+	 *
+	 * @return importer or null
+	 */
+	public DataReaderBase getImporterByDataTypeAndFileFormat(DataType dataType, String fileFormat) {
+		for (var importer : readers) {
+			if (DataType.getDataType(importer).equals(dataType) && getFileFormat(importer).equals(fileFormat))
+				return importer;
+		}
+		return null;
+	}
+
 }

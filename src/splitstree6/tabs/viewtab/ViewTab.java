@@ -76,7 +76,8 @@ public class ViewTab extends Tab implements IDisplayTab {
 				setContent(null);
 				undoManager = null;
 			}
-			mainWindow.getPresenter().updateUndoRedo();
+			if (mainWindow.getPresenter() != null)
+				mainWindow.getPresenter().updateUndoRedo();
 		});
 		mainWindow.addTabToMainTabPane(this);
 	}

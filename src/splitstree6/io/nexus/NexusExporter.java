@@ -263,6 +263,7 @@ public class NexusExporter {
 			export(w, taxaBlock, setsBlock);
 		else if (dataBlock instanceof GenomesBlock genomesBlock)
 			export(w, taxaBlock, genomesBlock);
+		else
 			throw new IOException("Export " + Basic.getShortName(dataBlock.getClass()) + ": not implemented");
 	}
 

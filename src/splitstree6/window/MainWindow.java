@@ -79,7 +79,7 @@ public class MainWindow implements IMainWindow {
 	private Stage stage;
 
 	public MainWindow() {
-			Platform.setImplicitExit(false);
+		Platform.setImplicitExit(false);
 
 		final ExtendedFXMLLoader<MainWindowController> loader = new ExtendedFXMLLoader<>(this.getClass());
 		root = loader.getRoot();
@@ -128,6 +128,8 @@ public class MainWindow implements IMainWindow {
 
 		fileName.addListener((v, o, n) -> name.set(n == null || n.isBlank() ? "Untitled" : FileUtils.replaceFileSuffix(FileUtils.getFileNameWithoutPath(n), "")));
 		name.set("Untitled");
+
+		presenter = new MainWindowPresenter(this);
 	}
 
 	@Override
@@ -139,6 +141,7 @@ public class MainWindow implements IMainWindow {
 	public IMainWindow createNew() {
 		return new MainWindow();
 	}
+
 
 	@Override
 	public void show(Stage stage, double screenX, double screenY, double width, double height) {
@@ -153,7 +156,7 @@ public class MainWindow implements IMainWindow {
 
 		stage.titleProperty().addListener(e -> MainWindowManager.getInstance().fireChanged());
 
-		presenter = new MainWindowPresenter(this);
+		presenter.setStage(stage);
 
 		getController().getMainTabPane().getTabs().addAll(workflowTab);
 
@@ -320,5 +323,9 @@ public class MainWindow implements IMainWindow {
 			return (AlignmentView) viewBlock.getView();
 		} else
 			return null;
+	}
+
+	public void setPresenter(MainWindowPresenter presenter) {
+		this.presenter = presenter;
 	}
 }

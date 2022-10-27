@@ -390,7 +390,7 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 	 * if the input data is a characters block, use this to setup the alignment viewer
 	 */
 	public void ensureAlignmentView() {
-		if (getInputDataFilterNode() != null && getInputDataFilterNode().getAlgorithm() instanceof CharactersTaxaFilter) {
+		if (mainWindow != null && getInputDataFilterNode() != null && getInputDataFilterNode().getAlgorithm() instanceof CharactersTaxaFilter) {
 			var tabs = mainWindow.getController().getMainTabPane().getTabs().size();
 			var previous = tabs > 0 ? mainWindow.getController().getMainTabPane().getTabs().get(tabs - 1) : null;
 			var viewBlock = new ViewBlock();
@@ -409,6 +409,37 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 				}
 				mainWindow.setDirty(isDirty);
 			});
+		}
+	}
+
+	/**
+	 * finds a data node by title
+	 *
+	 * @return node by title
+	 */
+	public DataNode findDataNode(String title) {
+		for (var node : dataNodes()) {
+			if (node instanceof DataNode dataNode) {
+				if (dataNode.getTitle() != null && dataNode.getTitle().equals(title))
+					return dataNode;
+			}
+		}
+		// fall back: use type as name:
+		for (var node : dataNodes()) {
+			if (node instanceof DataNode dataNode) {
+				if (dataNode.getName() != null && dataNode.getName().equals(title))
+					return dataNode;
+			}
+		}
+		return null;
+	}
+
+	public void clearData() {
+		if (getInputTaxaBlock() != null)
+			getInputTaxaBlock().setComments(null);
+		for (var dataNode : dataNodes()) {
+			dataNode.getDataBlock().clear();
+			dataNode.getDataBlock().updateShortDescription();
 		}
 	}
 }

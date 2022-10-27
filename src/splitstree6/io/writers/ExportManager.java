@@ -28,7 +28,10 @@ import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.utils.ReaderWriterBase;
 import splitstree6.workflow.DataBlock;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -94,11 +97,19 @@ public class ExportManager {
 		return null;
 	}
 
+	public DataBlockWriter getExporterByName(String exporterName) {
+		for (var exporter : exporters) {
+			if (exporterName.equals(exporter.getName()))
+				return exporter;
+		}
+		return null;
+	}
+
 	/**
 	 * write a datablock using the named exporter
 	 */
 	public void exportFile(String fileName, TaxaBlock taxaBlock, DataBlock dataBlock, String exporterName) throws IOException {
-		try (BufferedWriter w = new BufferedWriter(fileName.equals("stdout") ? new OutputStreamWriter(System.out) : new FileWriter(fileName))) {
+		try (var w = new BufferedWriter(FileUtils.getOutputWriterPossiblyZIPorGZIP(fileName))) {
 			write(taxaBlock, dataBlock, exporterName, w);
 		}
 		RecentFilesManager.getInstance().insertRecentFile(fileName);

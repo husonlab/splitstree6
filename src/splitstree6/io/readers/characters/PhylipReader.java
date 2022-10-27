@@ -20,7 +20,6 @@
 package splitstree6.io.readers.characters;
 
 import jloda.util.FileLineIterator;
-import jloda.util.FileUtils;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
@@ -28,7 +27,6 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -213,8 +211,7 @@ public class PhylipReader extends CharactersReader {
 	public boolean accepts(String fileName) {
 		if (!super.accepts(fileName))
 			return false;
-		var line = FileUtils.getFirstLineFromFile(new File(fileName));
-		return line != null && acceptsFirstLine(line);
+		return acceptsFile(fileName);
 	}
 
 	public boolean acceptsFirstLine(String text) {
