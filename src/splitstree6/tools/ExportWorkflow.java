@@ -89,9 +89,9 @@ public class ExportWorkflow extends Application {
     private void run(String[] args, Stage primaryStage) throws Exception {
         ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitstree6/resources");
 
-        final var options = new ArgsOptions(args, ExportWorkflow.class, "Runs a SplitsTree5 workflow on input data");
+        final var options = new ArgsOptions(args, ExportWorkflow.class, "Exports data from a SplitsTree6 workflow");
         options.setVersion(ProgramProperties.getProgramVersion());
-        options.setLicense("Copyright (C) 2021 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
+        options.setLicense("Copyright (C) 2022 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
         options.setAuthors("Daniel H. Huson");
 
         options.comment("Input Output:");

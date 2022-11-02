@@ -95,9 +95,9 @@ RunWorkflow extends Application {
     private void run(String[] args) throws Exception {
         ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitsTree6/resources");
 
-        final ArgsOptions options = new ArgsOptions(args, RunWorkflow.class, "Exports data from a SplitsTree6 workflow");
+        final ArgsOptions options = new ArgsOptions(args, RunWorkflow.class, "Runs a SplitsTree6 workflow on input data");
         options.setVersion(ProgramProperties.getProgramVersion());
-        options.setLicense("Copyright (C) 2021 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
+        options.setLicense("Copyright (C) 2022 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
         options.setAuthors("Daniel H. Huson");
 
         options.comment("Input Output:");
@@ -106,7 +106,7 @@ RunWorkflow extends Application {
         final var inputFormat = options.getOption("-f", "format", "Input format", ImportManager.getInstance().getAllFileFormats(), ImportManager.UNKNOWN_FORMAT);
         var outputFiles = options.getOption("-o", "output", "Output file(s) (or directory or stdout)", new String[]{"stdout"});
 
-        final var nodeName = options.getOption("-n", "node", "Title of node to be exported", "");
+        final var nodeName = options.getOption("-n", "node", "Title of node to be exported (if none given, will save whole file)", "");
         final var exportFormat = options.getOption("-e", "exporter", "Name of exporter to use", ExportManager.getInstance().getExporterNames(), "");
 
         options.comment(ArgsOptions.OTHER);
