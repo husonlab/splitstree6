@@ -49,7 +49,7 @@ public class TaxonMarkPresenter {
 
 				for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 					var oldLabel = taxon.getDisplayLabelOrName();
-					var newLabel = "<mark getShape=\"" + shape.name() + "\" fill=\"" + ColorUtilsFX.toStringCSS(fill) + "\" stroke=\"lightgray\">" + taxon.getDisplayLabelOrName();
+					var newLabel = "<mark shape=\"" + shape.name() + "\" fill=\"" + ColorUtilsFX.toStringCSS(fill) + "\" stroke=\"lightgray\">" + taxon.getDisplayLabelOrName();
 					undoList.add(() -> taxon.setDisplayLabel(oldLabel), () -> taxon.setDisplayLabel(newLabel));
 				}
 				if (undoList.size() > 0)

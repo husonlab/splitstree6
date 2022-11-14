@@ -67,15 +67,15 @@ public class PhylipReader extends DistancesReader {
 						else if (tokens.length == numberOfTaxa + 1)
 							triangle = Triangle.Both;
 						else
-							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong getShape");
+							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 					}
 
 					if (row > numberOfTaxa)
-						throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong getShape");
+						throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 
 					if (triangle == Triangle.Both) {
 						if (tokens.length != numberOfTaxa + 1)
-							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong getShape");
+							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 						taxa.addTaxaByNames(Collections.singleton(tokens[0]));
 						for (int col = 1; col < tokens.length; col++) {
 							final double value = NumberUtils.parseDouble(tokens[col]);
@@ -83,7 +83,7 @@ public class PhylipReader extends DistancesReader {
 						}
 					} else if (triangle == Triangle.Upper) {
 						if (tokens.length != numberOfTaxa + 1 - row)
-							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong getShape");
+							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 						taxa.addTaxaByNames(Collections.singleton(tokens[0]));
 						for (int i = 1; i < tokens.length; i++) {
 							final int col = row + i;
@@ -93,7 +93,7 @@ public class PhylipReader extends DistancesReader {
 						}
 					} else if (triangle == Triangle.Lower) {
 						if (tokens.length != row)
-							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong getShape");
+							throw new IOExceptionWithLineNumber(it.getLineNumber(), "Matrix has wrong shape");
 						taxa.addTaxaByNames(Collections.singleton(tokens[0]));
 						for (int col = 1; col < tokens.length; col++) {
 							final double value = NumberUtils.parseDouble(tokens[col]);

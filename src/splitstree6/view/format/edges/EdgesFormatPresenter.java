@@ -155,7 +155,7 @@ public class EdgesFormatPresenter {
 				var widths = new HashSet<Double>();
 				var colors = new HashSet<Paint>();
 				for (var edge : edgeSelectionModel.getSelectedItems()) {
-					if (edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
+					if (edgeShapeMap.get(edge) != null && edgeShapeMap.get(edge).getShape() instanceof Shape shape) {
 						if (shape.getUserData() instanceof Double width) // temporarily store width in user data when user is hovering over edge
 							widths.add(width);
 						else
