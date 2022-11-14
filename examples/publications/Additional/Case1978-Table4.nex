@@ -1,0 +1,21 @@
+#nexus
+[!Susan M. Case,
+Biochemical Systematics of Members of the Genus Rana Native to Western North America,
+Systematic Zoology, Vol. 27, No. 3 (Sep., 1978), pp. 299-311
+Table 4, immunological distances
+]
+BEGIN DISTANCES;
+DIMENSIONS ntax=9;
+FORMAT labels=left diagonal triangle=Both;
+MATRIX
+[1] 'R. aruora'        0 10 13 12 22 97 89 86 57
+[2] 'R. boylii'        10 0 7 7 9 72 67 65 50
+[3] 'R. cascadae'      13 7 0 7 11 79 66 54 40
+[4] 'R. muscosa'       12 7 7 0 15 67 49 48 45
+[5] 'R. pertiosa'      22 9 11 15 0 60 55 54 48
+[6] 'R. tarahumarae'   97 72 79 67 60 0 48 59 107
+[7] 'R. pipiens'       89 67 66 49 55 48 0 54 83
+[8] 'R. catesbeiana'   86 65 54 48 54 59 54 0 85
+[9] 'R. temporaria'    57 50 40 45 48 107 83 85 0
+;
+END; [DISTANCES]

@@ -1,0 +1,20 @@
+#nexus
+[Saitou N, Nei M.
+The neighbor-joining method: a new method for reconstructing phylogenetic trees.
+Mol Biol Evol. 1987 Jul;4(4):406-25.
+Table 1.]
+
+BEGIN DISTANCES;
+DIMENSIONS ntax=8;
+FORMAT labels=left diagonal triangle=Both;
+MATRIX
+[1] 't1'   0 7 8 11 13 16 13 17
+[2] 't2'   7 0 5 8 10 13 10 14
+[3] 't3'   8 5 0 5 7 10 7 11
+[4] 't4'   11 8 5 0 8 11 8 12
+[5] 't5'   13 10 7 8 0 5 6 10
+[6] 't6'   16 13 10 11 5 0 9 13
+[7] 't7'   13 10 7 8 6 9 0 8
+[8] 't8'   17 14 11 12 10 13 8 0
+;
+END; [DISTANCES]
