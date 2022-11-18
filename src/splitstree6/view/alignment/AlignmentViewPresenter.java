@@ -29,6 +29,8 @@ import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Font;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
@@ -62,15 +64,15 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 	private boolean colorSchemeSet = false;
 
-	public AlignmentViewPresenter(MainWindow mainWindow, AlignmentView view) {
-		this.alignmentView = view;
+	public AlignmentViewPresenter(MainWindow mainWindow, AlignmentView alignmentView) {
+		this.alignmentView = alignmentView;
 		this.workflow = mainWindow.getWorkflow();
 
-		controller = view.getController();
+		controller = alignmentView.getController();
 		mainWindowController = mainWindow.getController();
 
 		controller.getColorSchemeCBox().getItems().addAll(ColorScheme.values());
-		controller.getColorSchemeCBox().valueProperty().bindBidirectional(view.optionColorSchemeProperty());
+		controller.getColorSchemeCBox().valueProperty().bindBidirectional(alignmentView.optionColorSchemeProperty());
 
 		controller.getTaxaListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -102,13 +104,13 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		InvalidationListener updateTaxaListener = e -> {
 			controller.getTaxaListView().getItems().clear();
-			if (view.getInputTaxa() != null) {
-				for (var taxon : view.getInputTaxa().getTaxa()) {
+			if (alignmentView.getInputTaxa() != null) {
+				for (var taxon : alignmentView.getInputTaxa().getTaxa()) {
 					controller.getTaxaListView().getItems().add(taxon);
 				}
 			}
 		};
-		view.inputTaxaNodeValidProperty().addListener(updateTaxaListener);
+		alignmentView.inputTaxaNodeValidProperty().addListener(updateTaxaListener);
 
 		var canvasWidth = new SimpleDoubleProperty();
 		canvasWidth.bind(controller.gethScrollBar().widthProperty());
@@ -122,53 +124,53 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			var height = canvasHeight.get();
 
 			AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), width,
-					view.getOptionUnitWidth(), view.getInputCharacters() != null ? view.getInputCharacters().getNchar() : 0, view);
+					alignmentView.getOptionUnitWidth(), alignmentView.getInputCharacters() != null ? alignmentView.getInputCharacters().getNchar() : 0, alignmentView);
 
-			alignmentDrawer.updateCanvas(width, height, view.getInputTaxa(), view.getInputCharacters(), view.getConsensusSequence(),
-					view.getOptionColorScheme(), view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(),
-					view.getActiveTaxa(), view.getActiveSites());
+			alignmentDrawer.updateCanvas(width, height, alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getConsensusSequence(),
+					alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(),
+					alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
 
 
-			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), view.getInputCharacters(),
-					view.getActiveSites(), view.getSelectedSites());
+			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(),
+					alignmentView.getActiveSites(), alignmentView.getSelectedSites());
 
-			updateTaxaCellFactory(controller.getTaxaListView(), view.getOptionUnitHeight(), view::isDisabled);
+			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
 
-			alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
-					view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedTaxa());
+			alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 
-			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
-					view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedSites());
+			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
 
 			if (false)
-				alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
-						view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedTaxa());
+				alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+						alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 
-			controller.getSelectionLabel().setText(view.createSelectionString());
+			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 		};
 
 		canvasWidth.addListener(updateCanvasListener);
 		canvasHeight.addListener(updateCanvasListener);
 
-		view.optionUnitWidthProperty().addListener(updateCanvasListener);
-		view.optionUnitHeightProperty().addListener(updateCanvasListener);
+		alignmentView.optionUnitWidthProperty().addListener(updateCanvasListener);
+		alignmentView.optionUnitHeightProperty().addListener(updateCanvasListener);
 
-		view.activeSitesProperty().addListener(updateCanvasListener);
-		view.activeTaxaProperty().addListener(updateCanvasListener);
+		alignmentView.activeSitesProperty().addListener(updateCanvasListener);
+		alignmentView.activeTaxaProperty().addListener(updateCanvasListener);
 
-		view.selectedSitesProperty().addListener(e -> {
-			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
-					view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedSites());
-			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), view.getInputCharacters(), view.getActiveSites(), view.getSelectedSites());
-			controller.getSelectionLabel().setText(view.createSelectionString());
+		alignmentView.selectedSitesProperty().addListener(e -> {
+			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
+					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
+			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(), alignmentView.getActiveSites(), alignmentView.getSelectedSites());
+			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 		});
 
-		view.selectedTaxaProperty().addListener((v, o, n) -> {
+		alignmentView.selectedTaxaProperty().addListener((v, o, n) -> {
 			if (!inSelectionUpdate.get()) {
 				try {
 					inSelectionUpdate.set(true);
 					controller.getTaxaListView().getSelectionModel().clearSelection();
-					var inputTaxa = view.getInputTaxa();
+					var inputTaxa = alignmentView.getInputTaxa();
 					if (inputTaxa != null) {
 
 						for (var taxon : controller.getTaxaListView().getItems()) {
@@ -176,33 +178,33 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 							if (t != -1 && n.get(t))
 								controller.getTaxaListView().getSelectionModel().select(taxon);
 						}
-						alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), inputTaxa, view.getInputCharacters(),
-								view.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), view.getSelectedTaxa());
+						alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), inputTaxa, alignmentView.getInputCharacters(),
+								alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 					}
-					controller.getSelectionLabel().setText(view.createSelectionString());
+					controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 				} finally {
 					inSelectionUpdate.set(false);
 				}
 			}
 		});
 
-		view.inputCharactersNodeValidProperty().addListener((v, o, n) -> {
+		alignmentView.inputCharactersNodeValidProperty().addListener((v, o, n) -> {
 			if (n) {
-				var inputCharacters = view.getInputCharacters();
+				var inputCharacters = alignmentView.getInputCharacters();
 				if (inputCharacters != null) {
 					if (inputCharacters.getDataType() == CharactersType.Protein) {
-						if (!colorSchemeSet || view.getOptionColorScheme() == ColorScheme.Nucleotide) {
-							view.setOptionColorScheme(ColorScheme.Diamond11);
+						if (!colorSchemeSet || alignmentView.getOptionColorScheme() == ColorScheme.Nucleotide) {
+							alignmentView.setOptionColorScheme(ColorScheme.Diamond11);
 						}
 						colorSchemeSet = true;
 					} else if ((inputCharacters.getDataType() == CharactersType.DNA || inputCharacters.getDataType() == CharactersType.RNA)) {
-						if (!colorSchemeSet || view.getOptionColorScheme() != ColorScheme.Nucleotide && view.getOptionColorScheme() != ColorScheme.Random && view.getOptionColorScheme() != ColorScheme.None) {
-							view.setOptionColorScheme(ColorScheme.Nucleotide);
+						if (!colorSchemeSet || alignmentView.getOptionColorScheme() != ColorScheme.Nucleotide && alignmentView.getOptionColorScheme() != ColorScheme.Random && alignmentView.getOptionColorScheme() != ColorScheme.None) {
+							alignmentView.setOptionColorScheme(ColorScheme.Nucleotide);
 						}
 						colorSchemeSet = true;
 					} else if (inputCharacters.getDataType() == CharactersType.Standard) {
-						if (!colorSchemeSet || view.getOptionColorScheme() != ColorScheme.Nucleotide && view.getOptionColorScheme() != ColorScheme.Random && view.getOptionColorScheme() != ColorScheme.None) {
-							view.setOptionColorScheme(ColorScheme.Binary);
+						if (!colorSchemeSet || alignmentView.getOptionColorScheme() != ColorScheme.Nucleotide && alignmentView.getOptionColorScheme() != ColorScheme.Random && alignmentView.getOptionColorScheme() != ColorScheme.None) {
+							alignmentView.setOptionColorScheme(ColorScheme.Binary);
 						}
 						colorSchemeSet = true;
 					}
@@ -210,10 +212,10 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		view.optionColorSchemeProperty().addListener(updateCanvasListener);
-		view.optionColorSchemeProperty().addListener((v, o, n) -> view.getUndoManager().add("color scheme", view.optionColorSchemeProperty(), o, n));
-		view.optionUnitWidthProperty().addListener((v, o, n) -> view.getUndoManager().add("column width", view.optionUnitWidthProperty(), o, n));
-		view.optionUnitHeightProperty().addListener((v, o, n) -> view.getUndoManager().add("row height", view.optionUnitHeightProperty(), o, n));
+		alignmentView.optionColorSchemeProperty().addListener(updateCanvasListener);
+		alignmentView.optionColorSchemeProperty().addListener((v, o, n) -> alignmentView.getUndoManager().add("color scheme", alignmentView.optionColorSchemeProperty(), o, n));
+		alignmentView.optionUnitWidthProperty().addListener((v, o, n) -> alignmentView.getUndoManager().add("column width", alignmentView.optionUnitWidthProperty(), o, n));
+		alignmentView.optionUnitHeightProperty().addListener((v, o, n) -> alignmentView.getUndoManager().add("row height", alignmentView.optionUnitHeightProperty(), o, n));
 
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updateCanvasListener));
 
@@ -227,237 +229,237 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		controller.getvScrollBar().valueProperty().addListener(updateCanvasListener);
 
-		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionUnitWidth(1.2 * view.getOptionUnitWidth()));
-		controller.getExpandHorizontallyButton().disableProperty().bind(view.optionUnitWidthProperty().greaterThan(64));
+		controller.getExpandHorizontallyButton().setOnAction(e -> alignmentView.setOptionUnitWidth(1.2 * alignmentView.getOptionUnitWidth()));
+		controller.getExpandHorizontallyButton().disableProperty().bind(alignmentView.optionUnitWidthProperty().greaterThan(64));
 
-		controller.getContractHorizontallyButton().setOnAction(e -> view.setOptionUnitWidth(1 / 1.2 * view.getOptionUnitWidth()));
-		controller.getContractHorizontallyButton().disableProperty().bind(view.optionUnitWidthProperty().lessThan(0.01));
+		controller.getContractHorizontallyButton().setOnAction(e -> alignmentView.setOptionUnitWidth(1 / 1.2 * alignmentView.getOptionUnitWidth()));
+		controller.getContractHorizontallyButton().disableProperty().bind(alignmentView.optionUnitWidthProperty().lessThan(0.01));
 
-		controller.getExpandVerticallyButton().setOnAction(e -> view.setOptionUnitHeight(1.2 * view.getOptionUnitHeight()));
-		controller.getExpandVerticallyButton().disableProperty().bind(view.optionUnitHeightProperty().greaterThan(64));
+		controller.getExpandVerticallyButton().setOnAction(e -> alignmentView.setOptionUnitHeight(1.2 * alignmentView.getOptionUnitHeight()));
+		controller.getExpandVerticallyButton().disableProperty().bind(alignmentView.optionUnitHeightProperty().greaterThan(64));
 
-		controller.getContractVerticallyButton().setOnAction(e -> view.setOptionUnitHeight(1 / 1.2 * view.getOptionUnitHeight()));
-		controller.getContractVerticallyButton().disableProperty().bind(view.optionUnitHeightProperty().lessThan(0.01));
+		controller.getContractVerticallyButton().setOnAction(e -> alignmentView.setOptionUnitHeight(1 / 1.2 * alignmentView.getOptionUnitHeight()));
+		controller.getContractVerticallyButton().disableProperty().bind(alignmentView.optionUnitHeightProperty().lessThan(0.01));
 
 		controller.getZoomToFitButton().setOnAction(e -> {
-			if (view.getInputCharacters().getNchar() * view.getOptionUnitWidth() > canvasWidth.get()
-				|| view.getInputCharacters().getNtax() * view.getOptionUnitHeight() > canvasHeight.get()) {
+			if (alignmentView.getInputCharacters().getNchar() * alignmentView.getOptionUnitWidth() > canvasWidth.get()
+				|| alignmentView.getInputCharacters().getNtax() * alignmentView.getOptionUnitHeight() > canvasHeight.get()) {
 				controller.getvScrollBar().setValue(controller.getvScrollBar().getMin());
 				controller.gethScrollBar().setValue(controller.gethScrollBar().getMin());
-				view.setOptionUnitWidth(Math.min(AlignmentView.DEFAULT_UNIT_WIDTH, canvasWidth.get() / view.getInputCharacters().getNchar()));
-				view.setOptionUnitHeight(Math.min(AlignmentView.DEFAULT_UNIT_HEIGHT, canvasHeight.get() / view.getInputCharacters().getNtax()));
+				alignmentView.setOptionUnitWidth(Math.min(AlignmentView.DEFAULT_UNIT_WIDTH, canvasWidth.get() / alignmentView.getInputCharacters().getNchar()));
+				alignmentView.setOptionUnitHeight(Math.min(AlignmentView.DEFAULT_UNIT_HEIGHT, canvasHeight.get() / alignmentView.getInputCharacters().getNtax()));
 			} else {
-				view.setOptionUnitWidth(AlignmentView.DEFAULT_UNIT_WIDTH);
-				view.setOptionUnitHeight(AlignmentView.DEFAULT_UNIT_HEIGHT);
+				alignmentView.setOptionUnitWidth(AlignmentView.DEFAULT_UNIT_WIDTH);
+				alignmentView.setOptionUnitHeight(AlignmentView.DEFAULT_UNIT_HEIGHT);
 			}
 		});
-		controller.getZoomToFitButton().disableProperty().bind(view.inputCharactersNodeValidProperty().not());
+		controller.getZoomToFitButton().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not());
 
 		controller.getSelectAllMenuItem().setOnAction(e ->
-				view.setSelectedSites(BitSetUtils.asBitSet(BitSetUtils.range(1, view.getInputCharacters().getNchar() + 1))));
-		controller.getSelectAllMenuItem().disableProperty().bind(view.inputCharactersNodeValidProperty().not());
+				alignmentView.setSelectedSites(BitSetUtils.asBitSet(BitSetUtils.range(1, alignmentView.getInputCharacters().getNchar() + 1))));
+		controller.getSelectAllMenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not());
 
-		controller.getSelectNoneMenuItem().setOnAction(e -> view.setSelectedSites(new BitSet()));
-		controller.getSelectNoneMenuItem().disableProperty().bind(view.inputCharactersNodeValidProperty().not().or(Bindings.createBooleanBinding(() -> view.getSelectedSites().cardinality() == 0, view.selectedSitesProperty())));
+		controller.getSelectNoneMenuItem().setOnAction(e -> alignmentView.setSelectedSites(new BitSet()));
+		controller.getSelectNoneMenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not().or(Bindings.createBooleanBinding(() -> alignmentView.getSelectedSites().cardinality() == 0, alignmentView.selectedSitesProperty())));
 
-		controller.getInvertSelectionMenuItem().setOnAction(e -> view.setSelectedSites(BitSetUtils.getComplement(view.getSelectedSites(), 1, alignmentView.getInputCharacters().getNchar() + 1)));
-		controller.getInvertSelectionMenuItem().disableProperty().bind(alignmentView.emptyProperty());
+		controller.getInvertSelectionMenuItem().setOnAction(e -> alignmentView.setSelectedSites(BitSetUtils.getComplement(alignmentView.getSelectedSites(), 1, this.alignmentView.getInputCharacters().getNchar() + 1)));
+		controller.getInvertSelectionMenuItem().disableProperty().bind(this.alignmentView.emptyProperty());
 
 		controller.getSelectCompatibleMenuItem().setOnAction(e -> {
-			var split = new ASplit(alignmentView.getSelectedTaxa(), alignmentView.getInputTaxa().getNtax());
-			var compatible = CharactersUtilities.computeAllCompatible(alignmentView.getInputCharacters(), split);
+			var split = new ASplit(this.alignmentView.getSelectedTaxa(), this.alignmentView.getInputTaxa().getNtax());
+			var compatible = CharactersUtilities.computeAllCompatible(this.alignmentView.getInputCharacters(), split);
 			System.err.printf("Compatible sites (%,d): %s%n ", compatible.cardinality(), StringUtils.toString(compatible));
-			alignmentView.getSelectedSites().clear();
+			this.alignmentView.getSelectedSites().clear();
 			if (compatible.cardinality() > 0) {
-				Platform.runLater(() -> alignmentView.setSelectedSites(compatible));
+				Platform.runLater(() -> this.alignmentView.setSelectedSites(compatible));
 			}
 		});
-		controller.getSelectCompatibleMenuItem().disableProperty().bind(alignmentView.emptyProperty()
-				.or(Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().cardinality() == 0 || alignmentView.getSelectedTaxa().cardinality() == alignmentView.getInputTaxa().getNtax(), alignmentView.selectedTaxaProperty())));
+		controller.getSelectCompatibleMenuItem().disableProperty().bind(this.alignmentView.emptyProperty()
+				.or(Bindings.createBooleanBinding(() -> this.alignmentView.getSelectedTaxa().cardinality() == 0 || this.alignmentView.getSelectedTaxa().cardinality() == this.alignmentView.getInputTaxa().getNtax(), this.alignmentView.selectedTaxaProperty())));
 
 		controller.getSelectIncompatibleMenuItem().setOnAction(e -> {
-			var split = new ASplit(alignmentView.getSelectedTaxa(), alignmentView.getInputTaxa().getNtax());
-			var compatible = CharactersUtilities.computeAllCompatible(alignmentView.getInputCharacters(), split);
-			var incompatible = BitSetUtils.getComplement(compatible, 1, alignmentView.getInputCharacters().getNchar() + 1);
+			var split = new ASplit(this.alignmentView.getSelectedTaxa(), this.alignmentView.getInputTaxa().getNtax());
+			var compatible = CharactersUtilities.computeAllCompatible(this.alignmentView.getInputCharacters(), split);
+			var incompatible = BitSetUtils.getComplement(compatible, 1, this.alignmentView.getInputCharacters().getNchar() + 1);
 			System.err.printf("Incompatible sites (%,d): %s%n ", compatible.cardinality(), StringUtils.toString(incompatible));
-			alignmentView.getSelectedSites().clear();
+			this.alignmentView.getSelectedSites().clear();
 			if (incompatible.cardinality() > 0) {
-				Platform.runLater(() -> alignmentView.setSelectedSites(incompatible));
+				Platform.runLater(() -> this.alignmentView.setSelectedSites(incompatible));
 			}
 		});
 		controller.getSelectIncompatibleMenuItem().disableProperty().bind(controller.getSelectCompatibleMenuItem().disableProperty());
 
 		controller.getSelectCodon0MenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
 				var bits = new BitSet();
 				for (var s = 1; s <= inputCharacters.getNchar(); s += 3)
 					bits.set(s);
-				bits.or(view.getSelectedSites());
-				view.setSelectedSites(bits);
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
 			}
 		});
-		controller.getSelectCodon0MenuItem().disableProperty().bind(view.inputCharactersNodeValidProperty().not().or(view.nucleotideDataProperty().not()));
+		controller.getSelectCodon0MenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not().or(alignmentView.nucleotideDataProperty().not()));
 
 		controller.getSelectCodon1MenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
 				var bits = new BitSet();
 				for (var s = 2; s <= inputCharacters.getNchar(); s += 3)
 					bits.set(s);
-				bits.or(view.getSelectedSites());
-				view.setSelectedSites(bits);
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
 			}
 		});
-		controller.getSelectCodon1MenuItem().disableProperty().bind(view.inputCharactersNodeValidProperty().not().or(view.nucleotideDataProperty().not()));
+		controller.getSelectCodon1MenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not().or(alignmentView.nucleotideDataProperty().not()));
 
 		controller.getSelectCodon2MenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
 				var bits = new BitSet();
 				for (var s = 3; s <= inputCharacters.getNchar(); s += 3)
 					bits.set(s);
-				bits.or(view.getSelectedSites());
-				view.setSelectedSites(bits);
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
 			}
 		});
-		controller.getSelectCodon2MenuItem().disableProperty().bind(view.inputCharactersNodeValidProperty().not().or(view.nucleotideDataProperty().not()));
+		controller.getSelectCodon2MenuItem().disableProperty().bind(alignmentView.inputCharactersNodeValidProperty().not().or(alignmentView.nucleotideDataProperty().not()));
 
 		controller.getSelectSynapomorphiesMenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			var bits = new BitSet();
 			for (var s = 1; s <= inputCharacters.getNchar(); s++) {
-				if (inputCharacters.isSynapomorphy(s, view.getSelectedTaxa()))
+				if (inputCharacters.isSynapomorphy(s, alignmentView.getSelectedTaxa()))
 					bits.set(s);
 			}
-			bits.or(view.getSelectedSites());
-			view.setSelectedSites(bits);
+			bits.or(alignmentView.getSelectedSites());
+			alignmentView.setSelectedSites(bits);
 		});
-		controller.getSelectSynapomorphiesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSelectedTaxa().cardinality() == 0, view.selectedTaxaProperty()));
+		controller.getSelectSynapomorphiesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().cardinality() == 0, alignmentView.selectedTaxaProperty()));
 
 		controller.getSelectConstantMenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
 				var bits = new BitSet();
 				for (var s = 1; s <= inputCharacters.getNchar(); s++) {
 					if (inputCharacters.isConstantSite(s))
 						bits.set(s);
 				}
-				bits.or(view.getSelectedSites());
-				view.setSelectedSites(bits);
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
 			}
 		});
-		controller.getSelectConstantMenuItem().disableProperty().bind(view.emptyProperty());
+		controller.getSelectConstantMenuItem().disableProperty().bind(alignmentView.emptyProperty());
 
 		controller.getSelectMissingMenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
 				var bits = new BitSet();
 				for (var s = 1; s <= inputCharacters.getNchar(); s++) {
 					if (inputCharacters.isMissingSite(s))
 						bits.set(s);
 				}
-				bits.or(view.getSelectedSites());
-				view.setSelectedSites(bits);
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
 			}
 		});
-		controller.getSelectMissingMenuItem().disableProperty().bind(view.emptyProperty());
+		controller.getSelectMissingMenuItem().disableProperty().bind(alignmentView.emptyProperty());
 
 		controller.getSelectGapMenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
 				var bits = new BitSet();
 				for (var s = 1; s <= inputCharacters.getNchar(); s++) {
 					if (inputCharacters.isGapSite(s))
 						bits.set(s);
 				}
-				bits.or(view.getSelectedSites());
-				view.setSelectedSites(bits);
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
 			}
 		});
-		controller.getSelectGapMenuItem().disableProperty().bind(view.emptyProperty());
+		controller.getSelectGapMenuItem().disableProperty().bind(alignmentView.emptyProperty());
 
 		controller.getSelectAllNonInformativeMenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
 				var bits = new BitSet();
 				for (var s = 1; s <= inputCharacters.getNchar(); s++) {
 					if (inputCharacters.isNonParsimonyInformative(s))
 						bits.set(s);
 				}
-				bits.or(view.getSelectedSites());
-				view.setSelectedSites(bits);
+				bits.or(alignmentView.getSelectedSites());
+				alignmentView.setSelectedSites(bits);
 			}
 		});
-		controller.getSelectAllNonInformativeMenuItem().disableProperty().bind(view.emptyProperty());
+		controller.getSelectAllNonInformativeMenuItem().disableProperty().bind(alignmentView.emptyProperty());
 
 		controller.getEnableAllTaxaMenuItem().setOnAction(e -> {
-			var inputTaxa = view.getInputTaxa();
+			var inputTaxa = alignmentView.getInputTaxa();
 			if (inputTaxa != null) {
-				var oldBits = view.getActiveTaxa();
+				var oldBits = alignmentView.getActiveTaxa();
 				var newBits = BitSetUtils.asBitSet(NumberUtils.range(1, inputTaxa.getNtax() + 1));
 				if (!oldBits.equals(newBits))
-					view.getUndoManager().doAndAdd("enable all taxa", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
+					alignmentView.getUndoManager().doAndAdd("enable all taxa", () -> alignmentView.setActiveTaxa(oldBits), () -> alignmentView.setActiveTaxa(newBits));
 			}
 		});
-		controller.getEnableAllTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getInputTaxa() == null || view.getActiveTaxa().cardinality() == view.getInputTaxa().getNtax(), view.activeTaxaProperty()));
+		controller.getEnableAllTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> alignmentView.getInputTaxa() == null || alignmentView.getActiveTaxa().cardinality() == alignmentView.getInputTaxa().getNtax(), alignmentView.activeTaxaProperty()));
 
 		controller.getEnableSelectedTaxaOnlyMenuItem().setOnAction(e -> {
-			var oldBits = view.getActiveTaxa();
-			var newBits = view.getSelectedTaxa();
+			var oldBits = alignmentView.getActiveTaxa();
+			var newBits = alignmentView.getSelectedTaxa();
 			if (!oldBits.equals(newBits))
-				view.getUndoManager().doAndAdd("enable selected taxa only", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
+				alignmentView.getUndoManager().doAndAdd("enable selected taxa only", () -> alignmentView.setActiveTaxa(oldBits), () -> alignmentView.setActiveTaxa(newBits));
 		});
-		controller.getEnableSelectedTaxaOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSelectedTaxa().cardinality() == 0, view.selectedTaxaProperty()));
+		controller.getEnableSelectedTaxaOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().cardinality() == 0, alignmentView.selectedTaxaProperty()));
 
 		controller.getEnableSelectedTaxaMenuItem().setOnAction(e -> {
-			var oldBits = view.getActiveTaxa();
-			var newBits = BitSetUtils.union(view.getActiveTaxa(), view.getSelectedTaxa());
+			var oldBits = alignmentView.getActiveTaxa();
+			var newBits = BitSetUtils.union(alignmentView.getActiveTaxa(), alignmentView.getSelectedTaxa());
 			if (!oldBits.equals(newBits))
-				view.getUndoManager().doAndAdd("enable selected taxa", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
+				alignmentView.getUndoManager().doAndAdd("enable selected taxa", () -> alignmentView.setActiveTaxa(oldBits), () -> alignmentView.setActiveTaxa(newBits));
 		});
-		controller.getEnableSelectedTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(view.getSelectedTaxa(), view.getActiveTaxa()).cardinality() == 0, view.selectedTaxaProperty(), view.activeTaxaProperty()));
+		controller.getEnableSelectedTaxaMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(alignmentView.getSelectedTaxa(), alignmentView.getActiveTaxa()).cardinality() == 0, alignmentView.selectedTaxaProperty(), alignmentView.activeTaxaProperty()));
 
 		controller.getDisableSelectedTaxaMenuItem().setOnAction(e -> {
-			var oldBits = view.getActiveTaxa();
-			var newBits = BitSetUtils.minus(view.getActiveTaxa(), view.getSelectedTaxa());
+			var oldBits = alignmentView.getActiveTaxa();
+			var newBits = BitSetUtils.minus(alignmentView.getActiveTaxa(), alignmentView.getSelectedTaxa());
 			if (!oldBits.equals(newBits))
-				view.getUndoManager().doAndAdd("disable selected taxa", () -> view.setActiveTaxa(oldBits), () -> view.setActiveTaxa(newBits));
+				alignmentView.getUndoManager().doAndAdd("disable selected taxa", () -> alignmentView.setActiveTaxa(oldBits), () -> alignmentView.setActiveTaxa(newBits));
 		});
 		controller.getDisableSelectedTaxaMenuItem().disableProperty().bind(controller.getEnableSelectedTaxaOnlyMenuItem().disableProperty());
 
 		controller.getEnableAllSitesMenuItem().setOnAction(e -> {
-			var inputCharacters = view.getInputCharacters();
+			var inputCharacters = alignmentView.getInputCharacters();
 			if (inputCharacters != null) {
-				var oldBits = view.getActiveSites();
+				var oldBits = alignmentView.getActiveSites();
 				var newBits = BitSetUtils.asBitSet(NumberUtils.range(1, inputCharacters.getNchar() + 1));
 				if (!oldBits.equals(newBits))
-					view.getUndoManager().doAndAdd("enable all sites", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
+					alignmentView.getUndoManager().doAndAdd("enable all sites", () -> alignmentView.setActiveSites(oldBits), () -> alignmentView.setActiveSites(newBits));
 			}
 		});
-		controller.getEnableAllSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getInputCharacters() == null || view.getActiveSites().cardinality() == view.getInputCharacters().getNchar(), view.inputCharactersNodeValidProperty(), view.activeSitesProperty()));
+		controller.getEnableAllSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> alignmentView.getInputCharacters() == null || alignmentView.getActiveSites().cardinality() == alignmentView.getInputCharacters().getNchar(), alignmentView.inputCharactersNodeValidProperty(), alignmentView.activeSitesProperty()));
 
 		controller.getEnableSelectedSitesOnlyMenuItem().setOnAction(e -> {
-			var oldBits = view.getActiveSites();
-			var newBits = view.getSelectedSites();
+			var oldBits = alignmentView.getActiveSites();
+			var newBits = alignmentView.getSelectedSites();
 			if (!oldBits.equals(newBits))
-				view.getUndoManager().doAndAdd("enable selected sites only", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
+				alignmentView.getUndoManager().doAndAdd("enable selected sites only", () -> alignmentView.setActiveSites(oldBits), () -> alignmentView.setActiveSites(newBits));
 		});
-		controller.getEnableSelectedSitesOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getSelectedSites().cardinality() == 0, view.selectedSitesProperty()));
+		controller.getEnableSelectedSitesOnlyMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> alignmentView.getSelectedSites().cardinality() == 0, alignmentView.selectedSitesProperty()));
 
 		controller.getEnableSelectedSitesMenuItem().setOnAction(e -> {
-			var oldBits = view.getActiveSites();
-			var newBits = BitSetUtils.union(view.getActiveSites(), view.getActiveSites());
+			var oldBits = alignmentView.getActiveSites();
+			var newBits = BitSetUtils.union(alignmentView.getActiveSites(), alignmentView.getActiveSites());
 			if (!oldBits.equals(newBits))
-				view.getUndoManager().doAndAdd("enable selected sites", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
+				alignmentView.getUndoManager().doAndAdd("enable selected sites", () -> alignmentView.setActiveSites(oldBits), () -> alignmentView.setActiveSites(newBits));
 		});
-		controller.getEnableSelectedSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(view.getSelectedSites(), view.getActiveSites()).cardinality() == 0, view.selectedSitesProperty(), view.activeSitesProperty()));
+		controller.getEnableSelectedSitesMenuItem().disableProperty().bind(Bindings.createBooleanBinding(() -> BitSetUtils.minus(alignmentView.getSelectedSites(), alignmentView.getActiveSites()).cardinality() == 0, alignmentView.selectedSitesProperty(), alignmentView.activeSitesProperty()));
 
 		controller.getDisableSelectedSitesMenuItem().setOnAction(e -> {
-			var oldBits = view.getActiveSites();
-			var newBits = BitSetUtils.minus(view.getActiveSites(), view.getSelectedSites());
+			var oldBits = alignmentView.getActiveSites();
+			var newBits = BitSetUtils.minus(alignmentView.getActiveSites(), alignmentView.getSelectedSites());
 			if (!oldBits.equals(newBits))
-				view.getUndoManager().doAndAdd("disable selected sites", () -> view.setActiveSites(oldBits), () -> view.setActiveSites(newBits));
+				alignmentView.getUndoManager().doAndAdd("disable selected sites", () -> alignmentView.setActiveSites(oldBits), () -> alignmentView.setActiveSites(newBits));
 		});
 		controller.getDisableSelectedSitesMenuItem().disableProperty().bind(controller.getEnableSelectedSitesOnlyMenuItem().disableProperty());
 
@@ -482,7 +484,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
 		Platform.runLater(() -> updateCanvasListener.invalidated(null));
 
-		mainWindow.getWorkflow().runningProperty().addListener(e -> updateCharSetSelection(mainWindow, view, controller.getSetsMenu().getItems()));
+		mainWindow.getWorkflow().runningProperty().addListener(e -> updateCharSetSelection(mainWindow, alignmentView, controller.getSetsMenu().getItems()));
 	}
 
 	public static void updateTaxaCellFactory(ListView<Taxon> listView, double unitHeight, Predicate<Taxon> isDisabled) {
@@ -525,6 +527,29 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		mainWindowController.getZoomOutMenuItem().disableProperty().bind(controller.getContractVerticallyButton().disableProperty());
 		mainWindowController.getZoomInHorizontalMenuItem().setOnAction(controller.getExpandHorizontallyButton().getOnAction());
 		mainWindowController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
+
+		mainWindowController.getCopyMenuItem().setOnAction(a -> {
+			var buf = new StringBuilder();
+			for (var t = 1; t <= alignmentView.getInputTaxa().getNtax(); t++) {
+				if (alignmentView.getSelectedTaxa().isEmpty() || alignmentView.getSelectedTaxa().get(t)) {
+					buf.append(">").append(alignmentView.getInputTaxa().get(t).getName()).append("\n");
+					for (var s = 1; s <= alignmentView.getInputCharacters().getNchar(); s++) {
+						if (alignmentView.getSelectedSites().isEmpty() || alignmentView.getSelectedSites().get(s)) {
+							buf.append(alignmentView.getInputCharacters().get(t, s));
+						}
+					}
+					buf.append("\n");
+				}
+			}
+			var clipboardContent = new ClipboardContent();
+			clipboardContent.putString(buf.toString());
+			Clipboard.getSystemClipboard().setContent(clipboardContent);
+		});
+		mainWindowController.getCopyMenuItem().disableProperty().bind(
+				Bindings.createBooleanBinding(() -> alignmentView.getSelectedTaxa().isEmpty() && alignmentView.getSelectedSites().isEmpty(), alignmentView.selectedTaxaProperty(), alignmentView.selectedSitesProperty()));
+
+		mainWindowController.getPasteMenuItem().setDisable(true);
+		mainWindowController.getCutMenuItem().setDisable(true);
 
 		mainWindowController.getSelectAllMenuItem().setOnAction(e -> {
 			var inputTaxa = alignmentView.getInputTaxa();
