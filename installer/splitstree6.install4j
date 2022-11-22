@@ -31,12 +31,6 @@
         </exclude>
       </dirEntry>
       <fileEntry mountPoint="1691242167" file="../antbuild/splitstree6.jar" />
-      <fileEntry mountPoint="1691242167" file="../antbuild/jloda.jar" />
-      <dirEntry mountPoint="1691242167" file="../../jloda/jars" subDirectory="jars">
-        <exclude>
-          <entry location=".DS_Store" />
-        </exclude>
-      </dirEntry>
       <fileEntry mountPoint="1691243203" file="../jars/i4jruntime.jar" />
       <dirEntry mountPoint="1691242153" file="../examples" subDirectory="examples" />
       <fileEntry mountPoint="675425072" file="./License.txt" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />

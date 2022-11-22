@@ -109,7 +109,7 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	}
 
 	public boolean isApplicable(TaxaBlock taxaBlock, DataNode<DataBlock> dataNode) {
-		return dataNode != null && getFromClass().isAssignableFrom(dataNode.getDataBlock().getClass()) && isApplicable(taxaBlock, (S) dataNode.getDataBlock());
+		return taxaBlock != null && dataNode != null && getFromClass().isAssignableFrom(dataNode.getDataBlock().getClass()) && isApplicable(taxaBlock, (S) dataNode.getDataBlock());
 	}
 
 	public void clear() {
