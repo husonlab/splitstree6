@@ -41,6 +41,7 @@ import splitstree6.workflow.DataNode;
 public class ViewTab extends Tab implements IDisplayTab {
 	private UndoManager undoManager;
 	private final MainWindow mainWindow;
+	private final DataNode dataNode;
 	private final BooleanProperty empty = new SimpleBooleanProperty(true);
 
 	private final ObjectProperty<Bounds> layoutBounds = new SimpleObjectProperty<>(new BoundingBox(0, 0, 0, 0));
@@ -54,6 +55,7 @@ public class ViewTab extends Tab implements IDisplayTab {
 	 */
 	public ViewTab(MainWindow mainWindow, DataNode dataNode, boolean closable) {
 		this.mainWindow = mainWindow;
+		this.dataNode = dataNode;
 		setText("ViewTab");
 		setClosable(closable);
 		setOnCloseRequest(v -> mainWindow.removeTabFromMainTabPane(this));
@@ -140,6 +142,11 @@ public class ViewTab extends Tab implements IDisplayTab {
 		return algorithmBreadCrumbsToolBar;
 	}
 
-	public void clear() {}
+	public void clear() {
+	}
+
+	public DataNode getDataNode() {
+		return dataNode;
+	}
 }
 

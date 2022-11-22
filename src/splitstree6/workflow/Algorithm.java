@@ -108,6 +108,10 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 		return taxa.size() > 0 && datablock.size() > 0;
 	}
 
+	public boolean isApplicable(TaxaBlock taxaBlock, DataNode<DataBlock> dataNode) {
+		return dataNode != null && getFromClass().isAssignableFrom(dataNode.getDataBlock().getClass()) && isApplicable(taxaBlock, (S) dataNode.getDataBlock());
+	}
+
 	public void clear() {
 	}
 
@@ -149,5 +153,15 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 
 	public void setNode(AlgorithmNode node) {
 		this.node = node;
+	}
+
+	@Override
+	public int hashCode() {
+		return getClass().getSimpleName().hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return obj instanceof Algorithm && getClass().getSimpleName().equals(obj.getClass().getSimpleName());
 	}
 }

@@ -19,8 +19,9 @@
 
 package splitstree6.algorithms.characters.characters2distances;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
@@ -36,56 +37,50 @@ import java.util.List;
  */
 
 public class GeneContentDistance extends Characters2Distances {
-	public final static String DESCRIPTION = "Compute distances based on shared genes (Snel Bork et al 1999, Huson and Steel 2003)";
+	public enum Method {MLE, SharedGenes}
 
-	private final BooleanProperty optionUseMLDistancesDistance = new SimpleBooleanProperty(this, "optionUseMLDistancesDistance", false);
+	private final ObjectProperty<Method> optionMethod = new SimpleObjectProperty<>(this, "optionMethod", Method.MLE);
 
 	@Override
 	public String getCitation() {
-		return "Huson and Steel 2004; D.H. Huson  and  M. Steel. Phylogenetic  trees  based  on  gene  content. Bioinformatics, 20(13):2044–9, 2004.";
+		return (getOptionMethod() == Method.MLE ?
+				"Huson and Steel 2004; D.H. Huson  and  M. Steel. Phylogenetic  trees  based  on  gene  content. Bioinformatics, 20(13):2044–9, 2004." :
+				"Snel et al 1997; B. Snel, P. Bork and MA Huynen. Genome phylogeny based on gene content, Nature Genetics, 21:108-110, 1997.");
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionUseMLDistancesDistance.getName());
+		return List.of(optionMethod.getName());
 	}
 
 	@Override
 	public String getToolTip(String optionName) {
-		if (optionName.equals("UseMLDistance"))
-			return "Use maximum likelihood distance estimation";
+		if (optionName.equals("optionMethod"))
+			return "Choose Maximum likelihood distance estimation (Huson and Steel 2004, eq. 4), or shared genes distance (Snel et al, 1997)";
 		else
 			return optionName;
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) {
-
-		System.err.println("Not tested under construction");
-        /*@todo: test this class
-
-        todo: doesn't work for useMLDistance! also in ST4
-         */
-		final BitSet[] genes = computeGenes(charactersBlock);
-		if (!optionUseMLDistancesDistance.getValue())
-			computeSnelBorkDistance(distancesBlock, taxaBlock.getNtax(), genes);
+		final var geneSets = computeGeneSets(charactersBlock);
+		if (getOptionMethod().equals(Method.SharedGenes))
+			computeSharedGenes(distancesBlock, taxaBlock.getNtax(), geneSets);
 		else
-			computeMLDistance(distancesBlock, taxaBlock.getNtax(), genes);
+			computeMLE(distancesBlock, taxaBlock.getNtax(), geneSets);
 	}
 
 	/**
 	 * computes the SnelBork et al distance
-	 *
 	 */
-	private static void computeSnelBorkDistance(DistancesBlock dist, int ntax, BitSet[] genes) {
-
+	private static void computeSharedGenes(DistancesBlock dist, int ntax, BitSet[] geneSets) {
 		dist.setNtax(ntax);
-		for (int i = 1; i <= ntax; i++) {
+		for (var i = 1; i <= ntax; i++) {
 			dist.set(i, i, 0.0);
-			for (int j = i + 1; j <= ntax; j++) {
-				BitSet intersection = ((BitSet) (genes[i]).clone());
-				intersection.and(genes[j]);
-				dist.set(j, i, (float) (1.0 - ((float) intersection.cardinality() / (float) Math.min(genes[i].cardinality(), genes[j].cardinality()))));
-				dist.set(i, j, dist.get(j, i));
+			for (var j = i + 1; j <= ntax; j++) {
+				var d = 1.0 - ((double) BitSetUtils.intersection(geneSets[i], geneSets[j]).cardinality()
+							   / (double) Math.min(geneSets[i].cardinality(), geneSets[j].cardinality()));
+				dist.set(i, j, d);
+				dist.set(j, i, d);
 			}
 		}
 	}
@@ -93,37 +88,31 @@ public class GeneContentDistance extends Characters2Distances {
 	/**
 	 * computes the maximum likelihood estimator distance Huson and Steel 2003
 	 */
-	private static void computeMLDistance(DistancesBlock dist, int ntax, BitSet[] genes) {
+	private static void computeMLE(DistancesBlock dist, int ntax, BitSet[] genes) {
 		dist.setNtax(ntax);
-		// dtermine average importgenomes size:
-		double m = 0;
-		for (int i = 1; i <= ntax; i++) {
+
+		// determine average genomes size:
+		var m = 0.0;
+		for (var i = 1; i <= ntax; i++) {
 			m += genes[i].cardinality();
 		}
 		m /= ntax;
 
-		final double[] ai = new double[ntax + 1];
-		final double[][] aij = new double[ntax + 1][ntax + 1];
-		for (int i = 1; i <= ntax; i++) {
-			ai[i] = ((double) genes[i].cardinality()) / m;
-		}
-		for (int i = 1; i <= ntax; i++) {
-			for (int j = i + 1; j <= ntax; j++) {
-				BitSet intersection = ((BitSet) (genes[i]).clone());
-				intersection.and(genes[j]);
-				aij[i][j] = aij[j][i] = ((double) intersection.cardinality()) / m;
-			}
+		final var alpha = new double[ntax + 1];
+		for (var i = 1; i <= ntax; i++) {
+			alpha[i] = ((double) genes[i].cardinality()) / m;
 		}
 
 		for (int i = 1; i <= ntax; i++) {
 			dist.set(i, i, 0.0);
-			for (int j = i + 1; j <= ntax; j++) {
-				double b = 1.0 + aij[i][j] - ai[i] - ai[j];
 
-				dist.set(j, i, (float) -Math.log(0.5 * (b + Math.sqrt(b * b + 4.0 * aij[i][j] * aij[i][j]))));
-				if (dist.get(j, i) < 0)
-					dist.set(j, i, 0.0);
-				dist.set(i, j, dist.get(j, i));
+			for (var j = i + 1; j <= ntax; j++) {
+				var alphaIJ = ((double) BitSetUtils.intersection(genes[i], genes[j]).cardinality()) / m;
+				var beta = 1.0 + alphaIJ - alpha[i] - alpha[j];
+				var arg = 0.5 * (beta + Math.sqrt(beta * beta + 4.0 * alphaIJ * alphaIJ));
+				var d = (arg < 0.0000001 ? 1.0 : -Math.log(arg));
+				dist.set(i, j, d);
+				dist.set(j, i, d);
 			}
 		}
 	}
@@ -132,20 +121,20 @@ public class GeneContentDistance extends Characters2Distances {
 	/**
 	 * computes gene sets from strings
 	 *
-	 * @param characters object wich holds the sequences
+	 * @param characters sequences
 	 * @return sets of genes
 	 */
-	static private BitSet[] computeGenes(CharactersBlock characters) {
-		final BitSet[] genes = new BitSet[characters.getNtax() + 1];
+	static private BitSet[] computeGeneSets(CharactersBlock characters) {
+		final var geneSets = new BitSet[characters.getNtax() + 1];
 
-		for (int s = 1; s <= characters.getNtax(); s++) {
-			genes[s] = new BitSet();
+		for (var s = 1; s <= characters.getNtax(); s++) {
+			geneSets[s] = new BitSet();
 			for (int i = 1; i <= characters.getNchar(); i++) {
 				if (characters.get(s, i) == '1')
-					genes[s].set(i);
+					geneSets[s].set(i);
 			}
 		}
-		return genes;
+		return geneSets;
 	}
 
 	@Override
@@ -155,15 +144,15 @@ public class GeneContentDistance extends Characters2Distances {
 
 	//GETTER AND SETTER
 
-	public boolean getOptionUseMLDistancesDistance() {
-		return optionUseMLDistancesDistance.getValue();
+	public Method getOptionMethod() {
+		return optionMethod.get();
 	}
 
-	public BooleanProperty optionUseMLDistancesDistanceProperty() {
-		return optionUseMLDistancesDistance;
+	public ObjectProperty<Method> optionMethodProperty() {
+		return optionMethod;
 	}
 
-	public void setOptionUseMLDistancesDistance(boolean useMLDistance) {
-		this.optionUseMLDistancesDistance.set(useMLDistance);
+	public void setOptionMethod(Method method) {
+		this.optionMethod.set(method);
 	}
 }

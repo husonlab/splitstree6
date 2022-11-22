@@ -338,71 +338,71 @@
                         <MenuItem fx:id="traitsMenuItem" text="Edit Traits..."/>
                     </Menu>
                     <Menu text="Distances">
-                        <MenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"/>
-                        <MenuItem fx:id="logDetMenuItem" text="Log Det"/>
+                        <CheckMenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"/>
+                        <CheckMenuItem fx:id="logDetMenuItem" text="Log Det"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="hky85MenuItem" text="HKY 85"/>
-                        <MenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"/>
-                        <MenuItem fx:id="k2pMenuItem" text="K2P"/>
-                        <MenuItem fx:id="k3stMenuItem" text="K3ST"/>
-                        <MenuItem fx:id="f81MenuItem" text="F81"/>
-                        <MenuItem fx:id="f84MenuItem" text="F84"/>
+                        <CheckMenuItem fx:id="hky85MenuItem" text="HKY 85"/>
+                        <CheckMenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"/>
+                        <CheckMenuItem fx:id="k2pMenuItem" text="K2P"/>
+                        <CheckMenuItem fx:id="k3stMenuItem" text="K3ST"/>
+                        <CheckMenuItem fx:id="f81MenuItem" text="F81"/>
+                        <CheckMenuItem fx:id="f84MenuItem" text="F84"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"/>
+                        <CheckMenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="geneContentDistanceMenuItem" text="Gene Content Distance"/>
+                        <CheckMenuItem fx:id="geneContentDistanceMenuItem" text="Gene Content Distance"/>
                     </Menu>
                     <Menu text="Tree">
-                        <MenuItem fx:id="njMenuItem" text="NJ"/>
-                        <MenuItem fx:id="bioNJMenuItem" text="BioNJ"/>
-                        <MenuItem fx:id="upgmaMenuItem" text="UPGMA"/>
+                        <CheckMenuItem fx:id="njMenuItem" text="NJ"/>
+                        <CheckMenuItem fx:id="bioNJMenuItem" text="BioNJ"/>
+                        <CheckMenuItem fx:id="upgmaMenuItem" text="UPGMA"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="bunemanTreeMenuItem" text="Buneman Tree"/>
+                        <CheckMenuItem fx:id="bunemanTreeMenuItem" text="Buneman Tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
-                        <MenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
+                        <CheckMenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
+                        <CheckMenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="minSpanningTreeMenuItem" text="Minimum Spanning Tree"/>
+                        <CheckMenuItem fx:id="minSpanningTreeMenuItem" text="Minimum Spanning Tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="rerootOrReorderTreesMenuItem" text="Reroot Or Reorder Trees"/>
+                        <CheckMenuItem fx:id="rerootOrReorderTreesMenuItem" text="Reroot Or Reorder Trees"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
-                        <MenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>
+                        <CheckMenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
+                        <CheckMenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="viewTanglegramMenuItem" text="Show Tanglegram"/>
-                        <MenuItem fx:id="viewDensiTreeMenuItem" text="Show DensiTree"/>
+                        <CheckMenuItem fx:id="viewTanglegramMenuItem" text="Show Tanglegram"/>
+                        <CheckMenuItem fx:id="viewDensiTreeMenuItem" text="Show DensiTree"/>
                     </Menu>
                     <Menu text="Network">
-                        <MenuItem fx:id="neighborNetMenuItem" text="Neighbor Net"/>
-                        <MenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"/>
-                        <MenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"/>
+                        <CheckMenuItem fx:id="neighborNetMenuItem" text="Neighbor Net"/>
+                        <CheckMenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"/>
+                        <CheckMenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="consensusOutlineMenuItem" text="Consensus Outline"/>
-                        <MenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
-                        <MenuItem fx:id="consensusSplitsMenuItem" text="Consensus Splits"/>
-                        <MenuItem fx:id="filteredSuperNetworkMenuItem" text="Filtered Super Network"/>
+                        <CheckMenuItem fx:id="consensusOutlineMenuItem" text="Consensus Outline"/>
+                        <CheckMenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
+                        <CheckMenuItem fx:id="consensusSplitsMenuItem" text="Consensus Splits"/>
+                        <CheckMenuItem fx:id="filteredSuperNetworkMenuItem" text="Filtered Super Network"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>
-                        <MenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"/>
+                        <CheckMenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>
+                        <CheckMenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"/>
+                        <CheckMenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"/>
                     </Menu>
                     <Menu text="Analysis">
-                        <MenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."/>
-                        <MenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network..."/>
-                        <MenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network..."/>
+                        <CheckMenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."/>
+                        <CheckMenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network..."/>
+                        <CheckMenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites..."/>
                         <MenuItem fx:id="computePhylogeneticDiversityMenuItem" text="Compute Phylogenetic Diversity"/>
                         <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="pcoaMenuItem" text="PCoA"/>
-                        <MenuItem fx:id="tsneMenuItem" text="tSNE"/>
+                        <CheckMenuItem fx:id="pcoaMenuItem" text="PCoA"/>
+                        <CheckMenuItem fx:id="tsneMenuItem" text="tSNE"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="showWorkflowMenuItem" text="Show Workflow"/>
                     </Menu>
                     <Menu fx:id="windowMenu" text="Window">
-                        <MenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."/>
+                        <CheckMenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."/>
                         <MenuItem fx:id="setWindowSizeMenuItem" text="Set Window Size..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                     </Menu>

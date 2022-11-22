@@ -120,7 +120,7 @@ public class NeiMiller extends Characters2Distances {
 						sij_k[i][j][k] = (2 * mij_k[i][j][k]) / bot;
 					else {
 						if (!warned_sij) {
-							System.err.println("nei_miller: denominator zero in equation (2)");
+							System.err.println("Nei_Miller: denominator zero in equation (2)");
 							warned_sij = true;
 						}
 						sij_k[i][j][k] = 100000;
@@ -142,7 +142,7 @@ public class NeiMiller extends Characters2Distances {
 					if (class_value[k] == 0) {
 						dhij_k[i][j][k] = 100000;
 						if (!warned_dhij) {
-							System.err.println("nei_miller: denominator zero in equation (3)");
+							System.err.println("Nei_Miller: denominator zero in equation (3)");
 							warned_dhij = true;
 						}
 					} else

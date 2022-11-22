@@ -19,10 +19,10 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.*?>
 <Accordion maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.densitree.EdgesFormatController">
     <panes>
@@ -38,11 +38,28 @@
                                 <Font size="12.0"/>
                             </font>
                         </Label>
-                        <ComboBox fx:id="widthCBox" editable="true" prefWidth="100.0" visibleRowCount="14">
+                        <ComboBox fx:id="widthCBox" editable="true" prefWidth="125.0" visibleRowCount="14">
                             <tooltip>
                                 <Tooltip text="Line width"/>
                             </tooltip>
                         </ComboBox>
+                        <Button fx:id="resetWidthButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
+                                maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
+                                prefHeight="24.0" prefWidth="24.0"
+                                style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
+                            <HBox.margin>
+                                <Insets/>
+                            </HBox.margin>
+                            <font>
+                                <Font size="10.0"/>
+                            </font>
+                            <opaqueInsets>
+                                <Insets/>
+                            </opaqueInsets>
+                            <tooltip>
+                                <Tooltip text="Default setting"/>
+                            </tooltip>
+                        </Button>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0">
                         <Label text="Color">
@@ -53,11 +70,28 @@
                                 <Insets right="10.0"/>
                             </HBox.margin>
                         </Label>
-                        <ColorPicker fx:id="colorPicker" editable="true">
+                        <ColorPicker fx:id="colorPicker" editable="true" prefWidth="125.0">
                             <tooltip>
                                 <Tooltip text="Line color for compatible edges"/>
                             </tooltip>
                         </ColorPicker>
+                        <Button fx:id="resetColorButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
+                                maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
+                                prefHeight="24.0" prefWidth="24.0"
+                                style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
+                            <font>
+                                <Font size="10.0"/>
+                            </font>
+                            <opaqueInsets>
+                                <Insets/>
+                            </opaqueInsets>
+                            <HBox.margin>
+                                <Insets left="7.0"/>
+                            </HBox.margin>
+                            <tooltip>
+                                <Tooltip text="Default setting"/>
+                            </tooltip>
+                        </Button>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="46.0">
                         <children>
@@ -69,15 +103,32 @@
                                     <Insets right="10.0"/>
                                 </HBox.margin>
                             </Label>
-                            <ColorPicker fx:id="otherColorPicker" editable="true">
+                            <ColorPicker fx:id="otherColorPicker" editable="true" prefWidth="125.0">
                                 <tooltip>
                                     <Tooltip text="Line color for incompatible edges"/>
                                 </tooltip>
                             </ColorPicker>
+                            <Button fx:id="resetOtherColorButton" ellipsisString="" graphicTextGap="0.0"
+                                    maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                                    minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0"
+                                    style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
+                                <font>
+                                    <Font size="10.0"/>
+                                </font>
+                                <opaqueInsets>
+                                    <Insets/>
+                                </opaqueInsets>
+                                <HBox.margin>
+                                    <Insets left="7.0"/>
+                                </HBox.margin>
+                                <tooltip>
+                                    <Tooltip text="Default setting"/>
+                                </tooltip>
+                            </Button>
                         </children>
                     </HBox>
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="5.0" left="2.0" right="2.0" top="5.0"/>
                     </padding>
                 </VBox>
             </content>

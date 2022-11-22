@@ -19,7 +19,10 @@
 
 package splitstree6.view.format.densitree;
 
+import jloda.fx.window.MainWindowManager;
 import splitstree6.view.trees.densitree.DensiTreeView;
+
+import static splitstree6.view.trees.densitree.DensiTreeView.*;
 
 public class EdgesFormatPresenter {
 	public EdgesFormatPresenter(DensiTreeView view, EdgesFormatController controller) {
@@ -51,5 +54,18 @@ public class EdgesFormatPresenter {
 		});
 		view.optionOtherColorProperty().addListener((v, o, n) -> controller.getOtherColorPicker().setValue(n));
 
+		controller.getResetColorButton().setOnAction(a -> {
+			var newColor = MainWindowManager.isUseDarkTheme() ? DEFAULT_DARKMODE_EDGE_COLOR : DEFAULT_LIGHTMODE_EDGE_COLOR;
+			undoManager.doAndAdd("Color", view.optionEdgeColorProperty(), view.getOptionEdgeColor(), newColor);
+		});
+		controller.getResetColorButton().disableProperty().bind(
+				(MainWindowManager.useDarkThemeProperty().and(view.optionEdgeColorProperty().isEqualTo(DEFAULT_DARKMODE_EDGE_COLOR)))
+						.or(MainWindowManager.useDarkThemeProperty().not().and(view.optionEdgeColorProperty().isEqualTo(DEFAULT_LIGHTMODE_EDGE_COLOR))));
+
+		controller.getResetOtherColorButton().setOnAction(a -> undoManager.doAndAdd("Other color", view.optionOtherColorProperty(), view.getOptionOtherColor(), DEFAULT_OTHER_COLOR));
+		controller.getResetOtherColorButton().disableProperty().bind(view.optionOtherColorProperty().isEqualTo(DEFAULT_OTHER_COLOR));
+
+		controller.getResetWidthButton().setOnAction(a -> undoManager.doAndAdd("Width", view.optionStrokeWidthProperty(), view.getOptionStrokeWidth(), DEFAULT_STROKE_WIDTH));
+		controller.getResetWidthButton().disableProperty().bind(view.optionStrokeWidthProperty().isEqualTo(DEFAULT_STROKE_WIDTH, 0.01));
 	}
 }

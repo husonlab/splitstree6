@@ -115,6 +115,9 @@ public class LogDet extends Characters2Distances {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
+		if (getOptionPropInvariableSites() < 0.0 || getOptionPropInvariableSites() >= 1.0)
+			throw new IOException("Proportion invariable sites: illegal value: " + getOptionPropInvariableSites());
+
 		final var ntax = charactersBlock.getNtax();
 		progress.setTasks("logDet distance", "Calculating");
 		progress.setMaximum(ntax);
@@ -208,10 +211,11 @@ public class LogDet extends Characters2Distances {
 
 					/* Incorporate proportion of invariable sites */
 					var pinv = getOptionPropInvariableSites();
-					if (pinv > 0.0)
-						for (var i = 0; i < r; i++)
+					if (pinv > 0.0 && pinv < 1.0) {
+						for (var i = 0; i < r; i++) {
 							F[i][i] -= pinv * Pi[i];
-
+						}
+					}
 					final var Fmatrix = new Matrix(F);
 					var Feigs = Fmatrix.eig().getRealEigenvalues();
 					var x = 0.0;

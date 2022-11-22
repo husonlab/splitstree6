@@ -19,20 +19,21 @@
   ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.geometry.Insets?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.*?>
-<Accordion minHeight="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
+<Accordion maxWidth="-Infinity" minWidth="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
            xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="splitstree6.view.format.taxlabel.TaxonLabelFormatController">
     <panes>
-        <TitledPane fx:id="titledPane" prefWidth="200.0" text="Taxon Labels">
+        <TitledPane fx:id="titledPane" maxHeight="-Infinity" minHeight="-Infinity" prefWidth="200.0"
+                    text="Taxon Labels">
             <content>
                 <VBox fx:id="vBox" prefWidth="200.0" spacing="5.0">
                     <padding>
-                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                        <Insets bottom="5.0" left="2.0" right="2.0" top="5.0"/>
                     </padding>
                     <HBox alignment="CENTER_LEFT" spacing="4.0">
                         <Label text="Font"/>
@@ -102,13 +103,19 @@
                                 <Color opacity="0.0"/>
                             </value>
                         </ColorPicker>
-                        <Button fx:id="clearColorButton" mnemonicParsing="false" text="x">
+                        <Button fx:id="clearColorButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
+                                maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
+                                prefHeight="24.0" prefWidth="24.0"
+                                style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
+                            <HBox.margin>
+                                <Insets left="5.0"/>
+                            </HBox.margin>
                             <font>
                                 <Font size="10.0"/>
                             </font>
-                            <tooltip>
-                                <Tooltip text="Clear color"/>
-                            </tooltip>
+                            <opaqueInsets>
+                                <Insets/>
+                            </opaqueInsets>
                         </Button>
                     </HBox>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="99.0" spacing="4.0">
@@ -126,13 +133,19 @@
                                     <Color opacity="0.0"/>
                                 </value>
                             </ColorPicker>
-                            <Button fx:id="clearBackgroundButton" mnemonicParsing="false" text="x">
+                            <Button fx:id="clearBackgroundButton" ellipsisString="" graphicTextGap="0.0"
+                                    maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                                    minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0"
+                                    style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
+                                <HBox.margin>
+                                    <Insets left="5.0"/>
+                                </HBox.margin>
                                 <font>
                                     <Font size="10.0"/>
                                 </font>
-                                <tooltip>
-                                    <Tooltip text="Clear background color"/>
-                                </tooltip>
+                                <opaqueInsets>
+                                    <Insets/>
+                                </opaqueInsets>
                             </Button>
                         </children>
                     </HBox>

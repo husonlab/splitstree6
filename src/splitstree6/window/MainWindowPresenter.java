@@ -21,6 +21,7 @@ package splitstree6.window;
 
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -92,12 +93,13 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
+import splitstree6.workflow.Algorithm;
+import splitstree6.workflow.DataBlock;
 
 import java.io.File;
 import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Stack;
+import java.util.*;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class MainWindowPresenter {
@@ -111,6 +113,8 @@ public class MainWindowPresenter {
 	private final SplitPanePresenter splitPanePresenter;
 
 	private final EventHandler<KeyEvent> keyEventEventHandler;
+
+	private final HashMap<Algorithm, CheckMenuItem> algorithmCheckMenuItemMap = new HashMap<>();
 
 	public MainWindowPresenter(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
@@ -454,59 +458,26 @@ public class MainWindowPresenter {
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
-		controller.getUncorrectedPMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new Uncorrected_P()));
-		controller.getUncorrectedPMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new Uncorrected_P()));
+		setupAlgorithmMenuItem(controller.getUncorrectedPMenuItem(), new Uncorrected_P());
+		setupAlgorithmMenuItem(controller.getLogDetMenuItem(), new LogDet());
+		setupAlgorithmMenuItem(controller.getHky85MenuItem(), new HKY85());
+		setupAlgorithmMenuItem(controller.getJukesCantorMenuItem(), new JukesCantor());
 
-		controller.getLogDetMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new LogDet()));
-		controller.getLogDetMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new LogDet()));
+		setupAlgorithmMenuItem(controller.getK2pMenuItem(), new K2P());
+		setupAlgorithmMenuItem(controller.getK3stMenuItem(), new K3ST());
+		setupAlgorithmMenuItem(controller.getF81MenuItem(), new F81());
+		setupAlgorithmMenuItem(controller.getF84MenuItem(), new F84());
+		setupAlgorithmMenuItem(controller.getProteinMLDistanceMenuItem(), new ProteinMLdist());
+		setupAlgorithmMenuItem(controller.getGeneContentDistanceMenuItem(), new GeneContentDistance());
+		setupAlgorithmMenuItem(controller.getNjMenuItem(), new NeighborJoining());
+		setupAlgorithmMenuItem(controller.getBioNJMenuItem(), new BioNJ());
+		setupAlgorithmMenuItem(controller.getUpgmaMenuItem(), new UPGMA());
 
-		controller.getHky85MenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new HKY85()));
-		controller.getHky85MenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new HKY85()));
-
-		controller.getJukesCantorMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new JukesCantor()));
-		controller.getJukesCantorMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new JukesCantor()));
-
-		controller.getK2pMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new K2P()));
-		controller.getK2pMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new K2P()));
-
-		controller.getK3stMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new K3ST()));
-		controller.getK3stMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new K3ST()));
-
-		controller.getF81MenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new F81()));
-		controller.getF81MenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new F81()));
-
-		controller.getF84MenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new F84()));
-		controller.getF84MenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new F84()));
-
-		controller.getProteinMLDistanceMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ProteinMLdist()));
-		controller.getProteinMLDistanceMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ProteinMLdist()));
-
-		controller.getGeneContentDistanceMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new GeneContentDistance()));
-		controller.getGeneContentDistanceMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new GeneContentDistance()));
-
-		controller.getNjMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new NeighborJoining()));
-		controller.getNjMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new NeighborJoining()));
-
-		controller.getBioNJMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BioNJ()));
-		controller.getBioNJMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BioNJ()));
-
-		controller.getUpgmaMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new UPGMA()));
-		controller.getUpgmaMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new UPGMA()));
-
-		controller.getBunemanTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BunemanTree()));
-		controller.getBunemanTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BunemanTree()));
-
-		controller.getSelectTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1)));
-		controller.getSelectTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TreeSelector()));
-
-		controller.getConsensusTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTree.Consensus.Majority)));
-		controller.getConsensusTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusTree()));
-
-		controller.getMinSpanningTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningTree()));
-		controller.getMinSpanningTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MinSpanningTree()));
-
-		controller.getRerootOrReorderTreesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RerootOrReorderTrees()));
-		controller.getRerootOrReorderTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RerootOrReorderTrees()));
+		setupAlgorithmMenuItem(controller.getBunemanTreeMenuItem(), new BunemanTree());
+		setupAlgorithmMenuItem(controller.getSelectTreeMenuItem(), new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1));
+		setupAlgorithmMenuItem(controller.getConsensusTreeMenuItem(), new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTree.Consensus.Majority));
+		setupAlgorithmMenuItem(controller.getMinSpanningTreeMenuItem(), new MinSpanningTree());
+		setupAlgorithmMenuItem(controller.getRerootOrReorderTreesMenuItem(), new RerootOrReorderTrees());
 
 		controller.getViewSingleTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(),
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.TreeView))));
@@ -524,50 +495,27 @@ public class MainWindowPresenter {
 				a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.DensiTree))));
 		controller.getViewDensiTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
 
-		controller.getNeighborNetMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new NeighborNet()));
-		controller.getNeighborNetMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new NeighborNet()));
+		setupTreeViewMenuItem(controller.getViewSingleTreeMenuItem(), ShowTrees.ViewType.TreeView);
+		setupTreeViewMenuItem(controller.getViewTreePagesMenuItem(), ShowTrees.ViewType.TreePages);
+		setupTreeViewMenuItem(controller.getViewTanglegramMenuItem(), ShowTrees.ViewType.Tanglegram);
+		setupTreeViewMenuItem(controller.getViewDensiTreeMenuItem(), ShowTrees.ViewType.DensiTree);
 
-		controller.getSplitDecompositionMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new SplitDecomposition()));
-		controller.getSplitDecompositionMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new SplitDecomposition()));
+		setupAlgorithmMenuItem(controller.getNeighborNetMenuItem(), new NeighborNet());
+		setupAlgorithmMenuItem(controller.getSplitDecompositionMenuItem(), new SplitDecomposition());
+		setupAlgorithmMenuItem(controller.getParsimonySplitsMenuItem(), new ParsimonySplits());
+		setupAlgorithmMenuItem(controller.getConsensusNetworkMenuItem(), new ConsensusNetwork());
+		setupAlgorithmMenuItem(controller.getConsensusOutlineMenuItem(), new ConsensusOutline());
+		setupAlgorithmMenuItem(controller.getConsensusSplitsMenuItem(), new ConsensusSplits());
+		setupAlgorithmMenuItem(controller.getFilteredSuperNetworkMenuItem(), new FilteredSuperNetwork());
+		setupAlgorithmMenuItem(controller.getMedianJoiningMenuItem(), new MedianJoining());
 
-		controller.getParsimonySplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ParsimonySplits()));
-		controller.getParsimonySplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ParsimonySplits()));
-
-		controller.getConsensusNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusNetwork()));
-		controller.getConsensusNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusNetwork()));
-
-		controller.getConsensusOutlineMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusOutline()));
-		controller.getConsensusOutlineMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusOutline()));
-
-		controller.getConsensusSplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ConsensusSplits()));
-		controller.getConsensusSplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ConsensusSplits()));
-
-		controller.getFilteredSuperNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new FilteredSuperNetwork()));
-		controller.getFilteredSuperNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new FilteredSuperNetwork()));
-
-		controller.getMedianJoiningMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MedianJoining()));
-		controller.getMedianJoiningMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MedianJoining()));
-
-		controller.getMinSpanningNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new MinSpanningNetwork()));
-		controller.getMinSpanningNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new MinSpanningNetwork()));
-
-		controller.getHybridizationNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new AutumnAlgorithm(), null, a -> ((ShowTrees) a).setOptionView(ShowTrees.ViewType.TreePages)));
-		controller.getHybridizationNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new AutumnAlgorithm()));
-
-		controller.getPcoaMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PCoA()));
-		controller.getPcoaMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PCoA()));
-
-		controller.getTsneMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TSne()));
-		controller.getTsneMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TSne()));
-
-		controller.getBootStrapTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTree()));
-		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
-
-		controller.getBootstrapTreeAsNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTreeSplits()));
-		controller.getBootstrapTreeAsNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTreeSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
-
-		controller.getBootStrapNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapSplits()));
-		controller.getBootStrapNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapSplits(), () -> workflow.getWorkingDataBlock() instanceof CharactersBlock));
+		setupAlgorithmMenuItem(controller.getMinSpanningNetworkMenuItem(), new MinSpanningNetwork());
+		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new AutumnAlgorithm());
+		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCoA());
+		setupAlgorithmMenuItem(controller.getTsneMenuItem(), new TSne());
+		setupAlgorithmMenuItem(controller.getBootStrapTreeMenuItem(), new BootstrapTree());
+		setupAlgorithmMenuItem(controller.getBootstrapTreeAsNetworkMenuItem(), new BootstrapTreeSplits());
+		setupAlgorithmMenuItem(controller.getBootStrapNetworkMenuItem(), new BootstrapSplits());
 
 		controller.getEstimateInvariableSitesMenuItem().setOnAction(null);
 		controller.getComputePhylogeneticDiversityMenuItem().setOnAction(null);
@@ -575,7 +523,8 @@ public class MainWindowPresenter {
 
 		controller.getShowWorkflowMenuItem().setOnAction(e -> controller.getMainTabPane().getSelectionModel().select(mainWindow.getTabByClass(WorkflowTab.class)));
 
-		controller.getShowMessageWindowMenuItem().setOnAction(e -> MessageWindow.getInstance().setVisible(true));
+		controller.getShowMessageWindowMenuItem().setOnAction(e -> MessageWindow.getInstance().setVisible(!MessageWindow.getInstance().isVisible()));
+		MessageWindow.visibleProperty().addListener((v, o, n) -> controller.getShowMessageWindowMenuItem().setSelected(n));
 
 		controller.getSetWindowSizeMenuItem().setOnAction(e -> {
 			var result = SetParameterDialog.apply(stage, "Enter size (width x height)",
@@ -596,6 +545,16 @@ public class MainWindowPresenter {
 
 		controller.getCheckForUpdatesMenuItem().setOnAction(e -> CheckForUpdate.apply());
 		controller.getCheckForUpdatesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not().or(MainWindowManager.getInstance().sizeProperty().greaterThan(1)));
+
+		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(a -> {
+			updateEnableStateAlgorithms();
+		});
+
+		workflow.runningProperty().addListener((v, o, n) -> {
+			if (!n)
+				updateEnableStateAlgorithms();
+		});
+
 	}
 
 	public void showInputEditor() {
@@ -684,5 +643,56 @@ public class MainWindowPresenter {
 			controller.getRedoMenuItem().disableProperty().unbind();
 			controller.getRedoMenuItem().setDisable(true);
 		}
+	}
+
+	private void setupAlgorithmMenuItem(CheckMenuItem menuItem, Algorithm<? extends DataBlock, ? extends DataBlock> algorithm) {
+		setupAlgorithmMenuItem(menuItem, algorithm, null);
+	}
+
+	private void setupAlgorithmMenuItem(CheckMenuItem menuItem, Algorithm<? extends DataBlock, ? extends DataBlock> algorithm, Consumer<Algorithm> algorithmSetupCallback) {
+		menuItem.setOnAction(e -> AttachAlgorithm.apply(mainWindow, algorithm, algorithmSetupCallback));
+		algorithmCheckMenuItemMap.put(algorithm, menuItem);
+	}
+
+	public void updateEnableStateAlgorithms() {
+		if (!mainWindow.getWorkflow().isRunning() && mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof ViewTab tab) {
+			var dataNode = tab.getDataNode();
+			var selected = new HashSet<Algorithm>();
+			var applicable = new HashSet<>();
+			while (dataNode != null) {
+				var algorithmNode = dataNode.getPreferredParent();
+				if (algorithmNode != null) {
+					var algorithm = algorithmNode.getAlgorithm();
+					selected.add(algorithm);
+					dataNode = algorithmNode.getPreferredParent();
+					for (var otherAlgorithm : algorithmCheckMenuItemMap.keySet()) {
+						if (dataNode != null && otherAlgorithm.isApplicable(mainWindow.getWorkingTaxa(), dataNode))
+							applicable.add(otherAlgorithm);
+					}
+				} else
+					break;
+			}
+			for (var entry : algorithmCheckMenuItemMap.entrySet()) {
+				entry.getValue().setSelected(selected.contains(entry.getKey()));
+				entry.getValue().setDisable(!applicable.contains(entry.getKey()));
+			}
+		}
+	}
+
+	private void setupTreeViewMenuItem(CheckMenuItem menuItem, ShowTrees.ViewType viewType) {
+		// 		setupAlgorithmMenuItem(controller.getViewSingleTreeMenuItem(), new ShowTrees(), a -> ((ShowTrees) a).setOptionView((ShowTrees.ViewType.TreeView)));
+		menuItem.setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShowTrees(), a -> ((ShowTrees) a).setOptionView(viewType)));
+		menuItem.disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShowTrees()));
+		InvalidationListener listener = e -> {
+			if (mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof ViewTab tab) {
+				var dataNode = tab.getDataNode();
+				if (dataNode != null) {
+					var algorithmNode = dataNode.getPreferredParent();
+					menuItem.setSelected(algorithmNode != null && algorithmNode.getAlgorithm() instanceof ShowTrees showTrees && showTrees.getOptionView() == viewType);
+				}
+			}
+		};
+		mainWindow.getController().getMainTabPane().getSelectionModel().selectedItemProperty().addListener(listener);
+		mainWindow.getWorkflow().runningProperty().addListener(listener);
 	}
 }

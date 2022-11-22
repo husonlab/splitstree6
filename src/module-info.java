@@ -1,6 +1,6 @@
 module splitstreesix {
-    requires transitive jloda;
-    requires transitive javafx.controls;
+    requires jloda2;
+	requires transitive javafx.controls;
 	requires transitive javafx.graphics;
 	requires transitive javafx.fxml;
 	requires javafx.base;
@@ -13,6 +13,7 @@ module splitstreesix {
 	requires tsne;
 	requires java.sql;
 	requires org.xerial.sqlitejdbc;
+	requires java.desktop;
 
 	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;

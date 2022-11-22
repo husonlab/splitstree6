@@ -237,124 +237,115 @@ public class MainWindowController {
 	private MenuItem traitsMenuItem;
 
 	@FXML
-	private MenuItem uncorrectedPMenuItem;
+	private CheckMenuItem uncorrectedPMenuItem;
 
 	@FXML
-	private MenuItem logDetMenuItem;
+	private CheckMenuItem logDetMenuItem;
 
 	@FXML
-	private MenuItem hky85MenuItem;
+	private CheckMenuItem hky85MenuItem;
 
 	@FXML
-	private MenuItem jukesCantorMenuItem;
+	private CheckMenuItem jukesCantorMenuItem;
 
 	@FXML
-	private MenuItem k2pMenuItem;
+	private CheckMenuItem k2pMenuItem;
 
 	@FXML
-	private MenuItem k3stMenuItem;
+	private CheckMenuItem k3stMenuItem;
 
 	@FXML
-	private MenuItem f81MenuItem;
+	private CheckMenuItem f81MenuItem;
 
 	@FXML
-	private MenuItem f84MenuItem;
+	private CheckMenuItem f84MenuItem;
 
 	@FXML
-	private MenuItem proteinMLDistanceMenuItem;
+	private CheckMenuItem proteinMLDistanceMenuItem;
 
 	@FXML
-	private MenuItem geneContentDistanceMenuItem;
+	private CheckMenuItem geneContentDistanceMenuItem;
 
 	@FXML
-	private MenuItem njMenuItem;
+	private CheckMenuItem njMenuItem;
 
 	@FXML
-	private MenuItem bioNJMenuItem;
+	private CheckMenuItem bioNJMenuItem;
 
 	@FXML
-	private MenuItem upgmaMenuItem;
+	private CheckMenuItem upgmaMenuItem;
 
 	@FXML
-	private MenuItem bunemanTreeMenuItem;
+	private CheckMenuItem bunemanTreeMenuItem;
 
 	@FXML
-	private MenuItem selectTreeMenuItem;
+	private CheckMenuItem selectTreeMenuItem;
 
 	@FXML
-	private MenuItem consensusTreeMenuItem;
+	private CheckMenuItem consensusTreeMenuItem;
 
 	@FXML
-	private MenuItem minSpanningTreeMenuItem;
+	private CheckMenuItem minSpanningTreeMenuItem;
 
 	@FXML
-	private MenuItem rerootOrReorderTreesMenuItem;
+	private CheckMenuItem rerootOrReorderTreesMenuItem;
 
 	@FXML
-	private MenuItem viewTreePagesMenuItem;
+	private CheckMenuItem viewTreePagesMenuItem;
 
 	@FXML
-	private MenuItem viewSingleTreeMenuItem;
+	private CheckMenuItem viewSingleTreeMenuItem;
 
 	@FXML
-	private MenuItem viewTanglegramMenuItem;
+	private CheckMenuItem viewTanglegramMenuItem;
 
 	@FXML
-	private MenuItem viewDensiTreeMenuItem;
+	private CheckMenuItem viewDensiTreeMenuItem;
 
 	@FXML
-	private MenuItem neighborNetMenuItem;
+	private CheckMenuItem neighborNetMenuItem;
 
 	@FXML
-	private MenuItem splitDecompositionMenuItem;
+	private CheckMenuItem splitDecompositionMenuItem;
 
 	@FXML
-	private MenuItem parsimonySplitsMenuItem;
+	private CheckMenuItem parsimonySplitsMenuItem;
 
 	@FXML
-	private MenuItem consensusNetworkMenuItem;
+	private CheckMenuItem consensusNetworkMenuItem;
 
 	@FXML
-	private MenuItem consensusOutlineMenuItem;
+	private CheckMenuItem consensusOutlineMenuItem;
 
 	@FXML
-	private MenuItem consensusSplitsMenuItem;
+	private CheckMenuItem consensusSplitsMenuItem;
 
 	@FXML
-	private MenuItem filteredSuperNetworkMenuItem;
+	private CheckMenuItem filteredSuperNetworkMenuItem;
 
 	@FXML
-	private MenuItem medianJoiningMenuItem;
+	private CheckMenuItem medianJoiningMenuItem;
 
 	@FXML
-	private MenuItem minSpanningNetworkMenuItem;
+	private CheckMenuItem minSpanningNetworkMenuItem;
 
 	@FXML
-	private MenuItem hybridizationNetworkMenuItem;
+	private CheckMenuItem hybridizationNetworkMenuItem;
 
 	@FXML
-	private MenuItem pcoaMenuItem;
+	private CheckMenuItem pcoaMenuItem;
 
 	@FXML
-	private MenuItem brayCurtisMenuItem;
+	private CheckMenuItem tsneMenuItem;
 
 	@FXML
-	private MenuItem jsdMenuItem;
+	private CheckMenuItem bootStrapTreeMenuItem;
 
 	@FXML
-	private MenuItem euclideanMenuItem;
+	private CheckMenuItem bootstrapTreeAsNetworkMenuItem;
 
 	@FXML
-	private MenuItem tsneMenuItem;
-
-	@FXML
-	private MenuItem bootStrapTreeMenuItem;
-
-	@FXML
-	private MenuItem bootstrapTreeAsNetworkMenuItem;
-
-	@FXML
-	private MenuItem bootStrapNetworkMenuItem;
+	private CheckMenuItem bootStrapNetworkMenuItem;
 
 	@FXML
 	private MenuItem estimateInvariableSitesMenuItem;
@@ -375,7 +366,7 @@ public class MainWindowController {
 	private Menu helpMenu;
 
 	@FXML
-	private MenuItem showMessageWindowMenuItem;
+	private CheckMenuItem showMessageWindowMenuItem;
 
 	@FXML
 	private MenuItem setWindowSizeMenuItem;
@@ -752,165 +743,151 @@ public class MainWindowController {
 		return traitsMenuItem;
 	}
 
-	public MenuItem getUncorrectedPMenuItem() {
+	public CheckMenuItem getUncorrectedPMenuItem() {
 		return uncorrectedPMenuItem;
 	}
 
-	public MenuItem getLogDetMenuItem() {
+	public CheckMenuItem getLogDetMenuItem() {
 		return logDetMenuItem;
 	}
 
-	public MenuItem getHky85MenuItem() {
+	public CheckMenuItem getHky85MenuItem() {
 		return hky85MenuItem;
 	}
 
-	public MenuItem getJukesCantorMenuItem() {
+	public CheckMenuItem getJukesCantorMenuItem() {
 		return jukesCantorMenuItem;
 	}
 
-	public MenuItem getK2pMenuItem() {
+	public CheckMenuItem getK2pMenuItem() {
 		return k2pMenuItem;
 	}
 
-	public MenuItem getK3stMenuItem() {
+	public CheckMenuItem getK3stMenuItem() {
 		return k3stMenuItem;
 	}
 
-	public MenuItem getF81MenuItem() {
+	public CheckMenuItem getF81MenuItem() {
 		return f81MenuItem;
 	}
 
-	public MenuItem getF84MenuItem() {
+	public CheckMenuItem getF84MenuItem() {
 		return f84MenuItem;
 	}
 
-	public MenuItem getProteinMLDistanceMenuItem() {
+	public CheckMenuItem getProteinMLDistanceMenuItem() {
 		return proteinMLDistanceMenuItem;
 	}
 
-	public MenuItem getGeneContentDistanceMenuItem() {
+	public CheckMenuItem getGeneContentDistanceMenuItem() {
 		return geneContentDistanceMenuItem;
 	}
 
-	public MenuItem getNjMenuItem() {
+	public CheckMenuItem getNjMenuItem() {
 		return njMenuItem;
 	}
 
-	public MenuItem getBioNJMenuItem() {
+	public CheckMenuItem getBioNJMenuItem() {
 		return bioNJMenuItem;
 	}
 
-	public MenuItem getUpgmaMenuItem() {
+	public CheckMenuItem getUpgmaMenuItem() {
 		return upgmaMenuItem;
 	}
 
-	public MenuItem getBunemanTreeMenuItem() {
+	public CheckMenuItem getBunemanTreeMenuItem() {
 		return bunemanTreeMenuItem;
 	}
 
-	public MenuItem getSelectTreeMenuItem() {
+	public CheckMenuItem getSelectTreeMenuItem() {
 		return selectTreeMenuItem;
 	}
 
-	public MenuItem getConsensusTreeMenuItem() {
+	public CheckMenuItem getConsensusTreeMenuItem() {
 		return consensusTreeMenuItem;
 	}
 
-	public MenuItem getMinSpanningTreeMenuItem() {
+	public CheckMenuItem getMinSpanningTreeMenuItem() {
 		return minSpanningTreeMenuItem;
 	}
 
-	public MenuItem getRerootOrReorderTreesMenuItem() {
+	public CheckMenuItem getRerootOrReorderTreesMenuItem() {
 		return rerootOrReorderTreesMenuItem;
 	}
 
-	public MenuItem getViewTreePagesMenuItem() {
+	public CheckMenuItem getViewTreePagesMenuItem() {
 		return viewTreePagesMenuItem;
 	}
 
-	public MenuItem getViewSingleTreeMenuItem() {
+	public CheckMenuItem getViewSingleTreeMenuItem() {
 		return viewSingleTreeMenuItem;
 	}
 
-	public MenuItem getViewTanglegramMenuItem() {
+	public CheckMenuItem getViewTanglegramMenuItem() {
 		return viewTanglegramMenuItem;
 	}
 
-	public MenuItem getViewDensiTreeMenuItem() {
+	public CheckMenuItem getViewDensiTreeMenuItem() {
 		return viewDensiTreeMenuItem;
 	}
 
-	public MenuItem getNeighborNetMenuItem() {
+	public CheckMenuItem getNeighborNetMenuItem() {
 		return neighborNetMenuItem;
 	}
 
-	public MenuItem getSplitDecompositionMenuItem() {
+	public CheckMenuItem getSplitDecompositionMenuItem() {
 		return splitDecompositionMenuItem;
 	}
 
-	public MenuItem getParsimonySplitsMenuItem() {
+	public CheckMenuItem getParsimonySplitsMenuItem() {
 		return parsimonySplitsMenuItem;
 	}
 
-	public MenuItem getConsensusNetworkMenuItem() {
+	public CheckMenuItem getConsensusNetworkMenuItem() {
 		return consensusNetworkMenuItem;
 	}
 
-	public MenuItem getConsensusOutlineMenuItem() {
+	public CheckMenuItem getConsensusOutlineMenuItem() {
 		return consensusOutlineMenuItem;
 	}
 
-	public MenuItem getConsensusSplitsMenuItem() {
+	public CheckMenuItem getConsensusSplitsMenuItem() {
 		return consensusSplitsMenuItem;
 	}
 
-	public MenuItem getFilteredSuperNetworkMenuItem() {
+	public CheckMenuItem getFilteredSuperNetworkMenuItem() {
 		return filteredSuperNetworkMenuItem;
 	}
 
-
-	public MenuItem getMedianJoiningMenuItem() {
+	public CheckMenuItem getMedianJoiningMenuItem() {
 		return medianJoiningMenuItem;
 	}
 
-	public MenuItem getMinSpanningNetworkMenuItem() {
+	public CheckMenuItem getMinSpanningNetworkMenuItem() {
 		return minSpanningNetworkMenuItem;
 	}
 
-
-	public MenuItem getHybridizationNetworkMenuItem() {
+	public CheckMenuItem getHybridizationNetworkMenuItem() {
 		return hybridizationNetworkMenuItem;
 	}
 
-	public MenuItem getPcoaMenuItem() {
+	public CheckMenuItem getPcoaMenuItem() {
 		return pcoaMenuItem;
 	}
 
-	public MenuItem getBrayCurtisMenuItem() {
-		return brayCurtisMenuItem;
-	}
-
-	public MenuItem getJsdMenuItem() {
-		return jsdMenuItem;
-	}
-
-	public MenuItem getEuclideanMenuItem() {
-		return euclideanMenuItem;
-	}
-
-	public MenuItem getTsneMenuItem() {
+	public CheckMenuItem getTsneMenuItem() {
 		return tsneMenuItem;
 	}
 
-	public MenuItem getBootStrapTreeMenuItem() {
+	public CheckMenuItem getBootStrapTreeMenuItem() {
 		return bootStrapTreeMenuItem;
 	}
 
-	public MenuItem getBootstrapTreeAsNetworkMenuItem() {
+	public CheckMenuItem getBootstrapTreeAsNetworkMenuItem() {
 		return bootstrapTreeAsNetworkMenuItem;
 	}
 
-	public MenuItem getBootStrapNetworkMenuItem() {
+	public CheckMenuItem getBootStrapNetworkMenuItem() {
 		return bootStrapNetworkMenuItem;
 	}
 
@@ -938,7 +915,7 @@ public class MainWindowController {
 		return helpMenu;
 	}
 
-	public MenuItem getShowMessageWindowMenuItem() {
+	public CheckMenuItem getShowMessageWindowMenuItem() {
 		return showMessageWindowMenuItem;
 	}
 

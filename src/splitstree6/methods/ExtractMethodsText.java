@@ -207,8 +207,7 @@ public class ExtractMethodsText {
 			for (int i = 0; i < tokens.length; i += 2) {
 				if (i > 0)
 					buf.append(", ");
-				else
-					buf.append(tokens[i]);
+				buf.append(tokens[i]);
 			}
 			buf.append(")");
 			return buf.toString();

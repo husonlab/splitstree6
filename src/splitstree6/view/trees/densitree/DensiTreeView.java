@@ -49,6 +49,8 @@ import java.util.List;
 public class DensiTreeView implements IView {
 	public static final Color DEFAULT_LIGHTMODE_EDGE_COLOR = Color.BLACK.deriveColor(1, 1, 1, 0.05);
 	public static final Color DEFAULT_DARKMODE_EDGE_COLOR = Color.WHITE.deriveColor(1, 1, 1, 0.05);
+	public static final Color DEFAULT_OTHER_COLOR = Color.DARKRED.deriveColor(1, 1, 1, 0.05);
+	public static final double DEFAULT_STROKE_WIDTH = 0.5;
 
 	private static boolean startup = true;
 
@@ -101,9 +103,9 @@ public class DensiTreeView implements IView {
 			optionColorIncompatibleEdges.set(true);
 		}
 
-		ProgramProperties.track(optionStrokeWidth, 0.5);
+		ProgramProperties.track(optionStrokeWidth, DEFAULT_STROKE_WIDTH);
 		ProgramProperties.track(optionEdgeColor, MainWindowManager.isUseDarkTheme() ? DEFAULT_DARKMODE_EDGE_COLOR : DEFAULT_LIGHTMODE_EDGE_COLOR);
-		ProgramProperties.track(optionOtherColor, Color.DARKRED.deriveColor(1, 1, 1, 0.05));
+		ProgramProperties.track(optionOtherColor, DEFAULT_DARKMODE_EDGE_COLOR);
 	}
 
 	public List<String> listOptions() {
