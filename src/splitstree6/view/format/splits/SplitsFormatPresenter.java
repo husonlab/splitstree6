@@ -22,6 +22,7 @@ package splitstree6.view.format.splits;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.paint.Color;
@@ -35,6 +36,7 @@ import splitstree6.layout.splits.RotateSplit;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.view.splits.viewer.SplitNetworkEdits;
+import splitstree6.view.splits.viewer.SplitsView;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -104,10 +106,10 @@ public class SplitsFormatPresenter {
 			}
 		});
 
-		controller.getColorPicker().setOnAction(e -> {
+		controller.getLineColorPicker().setOnAction(e -> {
 			if (!inUpdatingDefaults) {
 				var undoList = new UndoableRedoableCommandList("line color");
-				var color = controller.getColorPicker().getValue();
+				var color = controller.getLineColorPicker().getValue();
 				var edits = new ArrayList<SplitNetworkEdits.Edit>();
 
 				for (var split : splitSelectionModel.getSelectedItems()) {
@@ -145,7 +147,7 @@ public class SplitsFormatPresenter {
 			inUpdatingDefaults = true;
 			try {
 				controller.getWidthCBox().setDisable(splitSelectionModel.size() == 0);
-				controller.getColorPicker().setDisable(splitSelectionModel.size() == 0);
+				controller.getLineColorPicker().setDisable(splitSelectionModel.size() == 0);
 
 				var widths = new HashSet<Double>();
 				var colors = new HashSet<Paint>();
@@ -163,7 +165,7 @@ public class SplitsFormatPresenter {
 				var width = (widths.size() == 1 ? widths.iterator().next() : null);
 				controller.getWidthCBox().setValue(width);
 				strokeWidth.setValue(null);
-				controller.getColorPicker().setValue(colors.size() == 1 ? (Color) colors.iterator().next() : null);
+				controller.getLineColorPicker().setValue(colors.size() == 1 ? (Color) colors.iterator().next() : null);
 			} finally {
 				inUpdatingDefaults = false;
 			}
@@ -179,8 +181,23 @@ public class SplitsFormatPresenter {
 		});
 		controller.getRotateRightButton().disableProperty().bind(splitSelectionModel.sizeProperty().isEqualTo(0));
 
-		controller.getOutlineColorPicker().valueProperty().bindBidirectional(outlineFill);
-		controller.getOutlineColorPicker().disableProperty().bind(optionDiagram.isNotEqualTo(SplitsDiagramType.Outline));
+		controller.getOutlineFillColorPicker().valueProperty().bindBidirectional(outlineFill);
+		controller.getOutlineFillColorPicker().disableProperty().bind(optionDiagram.isNotEqualTo(SplitsDiagramType.Outline));
+
+		controller.getResetWidthButton().setOnAction(a -> controller.getWidthCBox().setValue(1.0));
+		controller.getResetWidthButton().disableProperty().bind(Bindings.isEmpty(splitSelectionModel.getSelectedItems()).or(controller.getWidthCBox().valueProperty().isEqualTo(1.0)));
+
+		controller.getResetOutlineFillColorButton().setOnAction(e -> {
+			controller.getOutlineFillColorPicker().setValue(SplitsView.OUTLINE_FILL_COLOR);
+		});
+		controller.getResetOutlineFillColorButton().disableProperty().bind(controller.getOutlineFillColorPicker().disableProperty().or(controller.getOutlineFillColorPicker().valueProperty().isEqualTo(SplitsView.OUTLINE_FILL_COLOR)));
+
+
+		controller.getResetLineColorButton().setOnAction(e -> {
+			controller.getLineColorPicker().setValue(null);
+		});
+		controller.getResetLineColorButton().disableProperty().bind(Bindings.isEmpty(splitSelectionModel.getSelectedItems()).or(controller.getLineColorPicker().valueProperty().isNull()));
+
 
 		//selectionModel.getSelectedItems().addListener(selectionListener);
 		splitSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(selectionListener));

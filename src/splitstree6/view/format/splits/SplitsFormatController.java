@@ -20,10 +20,7 @@
 package splitstree6.view.format.splits;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TitledPane;
+import javafx.scene.control.*;
 import javafx.util.converter.FormatStringConverter;
 
 import java.text.NumberFormat;
@@ -31,10 +28,13 @@ import java.text.NumberFormat;
 public class SplitsFormatController {
 
 	@FXML
+	private Label outlineFillLabel;
+
+	@FXML
 	private ComboBox<Number> widthCBox;
 
 	@FXML
-	private ColorPicker colorPicker;
+	private ColorPicker lineColorPicker;
 
 	@FXML
 	private Button rotateLeftButton;
@@ -43,7 +43,16 @@ public class SplitsFormatController {
 	private Button rotateRightButton;
 
 	@FXML
-	private ColorPicker outlineColorPicker;
+	private ColorPicker outlineFillColorPicker;
+
+	@FXML
+	private Button resetLineColorButton;
+
+	@FXML
+	private Button resetOutlineFillColorButton;
+
+	@FXML
+	private Button resetWidthButton;
 
 	@FXML
 	private TitledPane titledPane;
@@ -51,14 +60,16 @@ public class SplitsFormatController {
 	@FXML
 	private void initialize() {
 		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
+		outlineFillLabel.disableProperty().bind(outlineFillColorPicker.disableProperty());
 	}
+
 
 	public ComboBox<Number> getWidthCBox() {
 		return widthCBox;
 	}
 
-	public ColorPicker getColorPicker() {
-		return colorPicker;
+	public ColorPicker getLineColorPicker() {
+		return lineColorPicker;
 	}
 
 	public Button getRotateLeftButton() {
@@ -69,11 +80,23 @@ public class SplitsFormatController {
 		return rotateRightButton;
 	}
 
-	public ColorPicker getOutlineColorPicker() {
-		return outlineColorPicker;
+	public ColorPicker getOutlineFillColorPicker() {
+		return outlineFillColorPicker;
 	}
 
 	public TitledPane getTitledPane() {
 		return titledPane;
+	}
+
+	public Button getResetLineColorButton() {
+		return resetLineColorButton;
+	}
+
+	public Button getResetOutlineFillColorButton() {
+		return resetOutlineFillColorButton;
+	}
+
+	public Button getResetWidthButton() {
+		return resetWidthButton;
 	}
 }

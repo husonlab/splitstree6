@@ -257,6 +257,8 @@ public class SplitNetworkLayout {
 
 			if (graph.getSplit(e) == rootSplit) // is added  split
 				line.setStroke(Color.GRAY);
+			else
+				line.setStroke(null);
 
 			edgesGroup.getChildren().add(line);
 

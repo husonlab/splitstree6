@@ -71,12 +71,13 @@
                                 <Insets right="8.0"/>
                             </HBox.margin>
                         </Label>
-                        <ColorPicker fx:id="colorPicker" editable="true" prefWidth="125.0">
+                        <ColorPicker fx:id="lineColorPicker" editable="true" prefWidth="125.0">
                             <tooltip>
                                 <Tooltip text="Line color"/>
                             </tooltip>
                         </ColorPicker>
-                        <Button fx:id="resetColorButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
+                        <Button fx:id="resetLineColorButton" ellipsisString="" graphicTextGap="0.0"
+                                maxHeight="-Infinity"
                                 maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
                                 prefHeight="24.0" prefWidth="24.0"
                                 style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
@@ -96,7 +97,7 @@
                     </HBox>
                     <Separator prefWidth="200.0"/>
                     <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="68.0">
-                        <Label text="Fill">
+                        <Label fx:id="outlineFillLabel" text="Fill">
                             <font>
                                 <Font size="12.0"/>
                             </font>
@@ -104,7 +105,7 @@
                                 <Insets right="20.0"/>
                             </HBox.margin>
                         </Label>
-                        <ColorPicker fx:id="outlineColorPicker" prefWidth="125.0">
+                        <ColorPicker fx:id="outlineFillColorPicker" prefWidth="125.0">
                             <tooltip>
                                 <Tooltip text="Fill color for phylogenetic outlines"/>
                             </tooltip>
@@ -112,7 +113,8 @@
                                 <Color red="0.7529411911964417" green="0.7529411911964417" blue="0.7529411911964417"/>
                             </value>
                         </ColorPicker>
-                        <Button fx:id="resetFillButton" ellipsisString="" graphicTextGap="0.0" maxHeight="-Infinity"
+                        <Button fx:id="resetOutlineFillColorButton" ellipsisString="" graphicTextGap="0.0"
+                                maxHeight="-Infinity"
                                 maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
                                 prefHeight="24.0" prefWidth="24.0"
                                 style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">

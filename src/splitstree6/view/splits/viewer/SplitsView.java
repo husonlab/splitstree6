@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SplitsView implements IView {
+	public static final Color OUTLINE_FILL_COLOR = Color.SILVER;
 
 	private final UndoManager undoManager = new UndoManager();
 
@@ -99,7 +100,7 @@ public class SplitsView implements IView {
 	{
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Splits);
 		ProgramProperties.track(optionRootAngle, 160.0);
-		ProgramProperties.track(optionOutlineFill, Color.SILVER);
+		ProgramProperties.track(optionOutlineFill, OUTLINE_FILL_COLOR);
 	}
 
 	public List<String> listOptions() {
