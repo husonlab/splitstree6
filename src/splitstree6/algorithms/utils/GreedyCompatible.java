@@ -27,6 +27,7 @@ import splitstree6.data.parts.BiPartition;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.function.Function;
 
 /**
  * greedily compute compatible splits
@@ -34,17 +35,17 @@ import java.util.Collection;
  */
 public class GreedyCompatible {
 	/**
-	 * greedily computes compatible splits
+	 * computes compatible splits, greedily maximizing the score
 	 *
 	 * @return compatible splits
 	 */
-	public static ArrayList<ASplit> apply(ProgressListener progress, final Collection<ASplit> splits) throws CanceledException {
+	public static ArrayList<ASplit> apply(ProgressListener progress, final Collection<ASplit> splits, Function<ASplit, Double> score) throws CanceledException {
 		progress.setSubtask("Greedy compatible");
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
 
 		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
-		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(a.getWeight(), b.getWeight()))) {
+		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(score.apply(a), score.apply(b)))) {
 			boolean ok = true;
 			for (ASplit bSplit : result) {
 				if (!BiPartition.areCompatible(split, bSplit)) {

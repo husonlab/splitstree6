@@ -25,6 +25,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.util.StringConverter;
 import jloda.fx.control.CopyableLabel;
 import splitstree6.data.parts.Taxon;
 
@@ -94,7 +95,7 @@ public class AlignmentViewController {
     private ToggleButton findToggleButton;
 
     @FXML
-    private ScrollBar hScrollBar;
+    private ScrollBar horizontalScrollBar;
 
     @FXML
     private AnchorPane innerAnchorPane;
@@ -145,7 +146,7 @@ public class AlignmentViewController {
     private Pane selectionPane;
 
     @FXML
-    private ScrollBar vScrollBar;
+    private ScrollBar verticalScrollBar;
 
 
     @FXML
@@ -201,6 +202,17 @@ public class AlignmentViewController {
         axis.setUpperBound(1);
         axis.setAutoRanging(false);
         axis.setTickUnit(100);
+        axis.setTickLabelFormatter(new StringConverter<>() {
+            @Override
+            public String toString(Number number) {
+                return "%,d".formatted(number.intValue());
+            }
+
+            @Override
+            public Number fromString(String string) {
+                return Double.valueOf(string);
+            }
+        });
 
         rightTopPane.setMouseTransparent(true);
         rightTopPane.prefWidthProperty().bind(rightTopStackPane.widthProperty());
@@ -315,8 +327,8 @@ public class AlignmentViewController {
     }
 
 
-    public ScrollBar gethScrollBar() {
-        return hScrollBar;
+    public ScrollBar getHorizontalScrollBar() {
+        return horizontalScrollBar;
     }
 
     public AnchorPane getInnerAnchorPane() {
@@ -355,8 +367,8 @@ public class AlignmentViewController {
         return vBox;
     }
 
-    public ScrollBar getvScrollBar() {
-        return vScrollBar;
+    public ScrollBar getVerticalScrollBar() {
+        return verticalScrollBar;
     }
 
     public NumberAxis getAxis() {

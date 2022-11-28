@@ -55,7 +55,7 @@ public class ConsensusOutline extends Trees2Splits implements IToCircularSplits 
 	 */
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
 		var consensusSplits = new ConsensusSplits();
-		consensusSplits.setOptionConsensus(ConsensusSplits.Consensus.GreedyPlanar);
+		consensusSplits.setOptionConsensus(ConsensusSplits.Consensus.GreedyCircular);
 		consensusSplits.setOptionEdgeWeights(getOptionEdgeWeights());
 		consensusSplits.compute(progress, taxaBlock, treesBlock, splitsBlock);
 	}

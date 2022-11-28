@@ -37,24 +37,26 @@ import static splitstree6.view.alignment.AlignmentDrawer.SELECTION_STROKE;
  */
 public class AxisAndScrollBarUpdate {
 
-	public static void update(NumberAxis axis, ScrollBar scrollBar, double canvasWidth, double boxWidth, int nChar, AlignmentView alignmentView) {
+	public static void update(NumberAxis axis, ScrollBar hScrollBar, double canvasWidth, double boxWidth, int nChar, AlignmentView alignmentView) {
 		if (nChar < 1) {
-			scrollBar.setVisible(false);
+			hScrollBar.setVisible(false);
 			axis.setVisible(false);
 		} else {
-			scrollBar.setVisible(true);
+			hScrollBar.setVisible(true);
 			axis.setVisible(true);
 
 			var numberOnCanvas = (canvasWidth - 10) / boxWidth;
-			scrollBar.setMin(1);
-			scrollBar.setMax(nChar - numberOnCanvas + 1);
-			scrollBar.setVisibleAmount(numberOnCanvas);
+			hScrollBar.setMin(1);
+			hScrollBar.setMax(nChar - numberOnCanvas + 1);
+			hScrollBar.setVisibleAmount(numberOnCanvas);
 			if (numberOnCanvas >= nChar) {
-				scrollBar.setValue(0);
+				hScrollBar.setValue(0);
 			}
 
-			axis.setLowerBound(Math.max(1, Math.floor(scrollBar.getValue())));
-			axis.setUpperBound(Math.round(scrollBar.getValue() + numberOnCanvas));
+			hScrollBar.setBlockIncrement(numberOnCanvas);
+
+			axis.setLowerBound(Math.max(1, Math.floor(hScrollBar.getValue())));
+			axis.setUpperBound(Math.round(hScrollBar.getValue() + numberOnCanvas));
 
 			axis.setOnMouseClicked(event -> {
 				var pointInScene = new Point2D(event.getSceneX(), event.getSceneY());

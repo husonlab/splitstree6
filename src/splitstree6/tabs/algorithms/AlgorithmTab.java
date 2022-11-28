@@ -49,6 +49,7 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 	public AlgorithmTab(MainWindow mainWindow, AlgorithmNode algorithmNode) {
 		this.mainWindow = mainWindow;
 		this.algorithmNode = algorithmNode;
+
 		this.algorithm.set(algorithmNode.getAlgorithm());
 
 		var loader = new ExtendedFXMLLoader<AlgorithmTabController>(AlgorithmTab.class);

@@ -114,7 +114,7 @@ public class MainWindowPresenter {
 
 	private final EventHandler<KeyEvent> keyEventEventHandler;
 
-	private final HashMap<Algorithm, CheckMenuItem> algorithmCheckMenuItemMap = new HashMap<>();
+	private final HashMap<String, Pair<Algorithm, CheckMenuItem>> nameAlgorithmMenuItemMap = new HashMap<>();
 
 	public MainWindowPresenter(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
@@ -651,30 +651,34 @@ public class MainWindowPresenter {
 
 	private void setupAlgorithmMenuItem(CheckMenuItem menuItem, Algorithm<? extends DataBlock, ? extends DataBlock> algorithm, Consumer<Algorithm> algorithmSetupCallback) {
 		menuItem.setOnAction(e -> AttachAlgorithm.apply(mainWindow, algorithm, algorithmSetupCallback));
-		algorithmCheckMenuItemMap.put(algorithm, menuItem);
+		nameAlgorithmMenuItemMap.put(algorithm.getName(), new Pair<>(algorithm, menuItem));
 	}
 
 	public void updateEnableStateAlgorithms() {
 		if (!mainWindow.getWorkflow().isRunning() && mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof ViewTab tab) {
 			var dataNode = tab.getDataNode();
-			var selected = new HashSet<Algorithm>();
-			var applicable = new HashSet<>();
+			var selected = new HashSet<String>();
+			var applicable = new HashSet<String>();
 			while (dataNode != null) {
 				var algorithmNode = dataNode.getPreferredParent();
 				if (algorithmNode != null) {
 					var algorithm = algorithmNode.getAlgorithm();
-					selected.add(algorithm);
+					selected.add(algorithm.getName());
 					dataNode = algorithmNode.getPreferredParent();
-					for (var otherAlgorithm : algorithmCheckMenuItemMap.keySet()) {
+					for (var otherEntry : nameAlgorithmMenuItemMap.entrySet()) {
+						var otherName = otherEntry.getKey();
+						var otherAlgorithm = otherEntry.getValue().getFirst();
 						if (dataNode != null && otherAlgorithm.isApplicable(mainWindow.getWorkingTaxa(), dataNode))
-							applicable.add(otherAlgorithm);
+							applicable.add(otherName);
 					}
 				} else
 					break;
 			}
-			for (var entry : algorithmCheckMenuItemMap.entrySet()) {
-				entry.getValue().setSelected(selected.contains(entry.getKey()));
-				entry.getValue().setDisable(!applicable.contains(entry.getKey()));
+			for (var entry : nameAlgorithmMenuItemMap.entrySet()) {
+				var name = entry.getKey();
+				var menuItem = entry.getValue().getSecond();
+				menuItem.setSelected(selected.contains(name));
+				menuItem.setDisable(!applicable.contains(name));
 			}
 		}
 	}

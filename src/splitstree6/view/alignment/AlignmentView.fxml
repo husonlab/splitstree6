@@ -166,8 +166,7 @@
                             <Tooltip text="Contract horizontally"/>
                         </tooltip>
                     </Button>
-
-                    <Separator layoutX="223.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                    <Separator layoutX="401.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
                     <Label fx:id="selectionLabel" text="Selected"/>
                 </ToolBar>
@@ -238,10 +237,11 @@
                                                         </StackPane>
                                                     </top>
                                                     <bottom>
-                                                        <ScrollBar fx:id="hScrollBar" BorderPane.alignment="CENTER"/>
+                                                        <ScrollBar fx:id="horizontalScrollBar"
+                                                                   BorderPane.alignment="CENTER"/>
                                                     </bottom>
                                                     <right>
-                                                        <ScrollBar fx:id="vScrollBar" orientation="VERTICAL"
+                                                        <ScrollBar fx:id="verticalScrollBar" orientation="VERTICAL"
                                                                    BorderPane.alignment="CENTER"/>
                                                     </right>
                                                 </BorderPane>

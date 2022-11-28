@@ -154,14 +154,4 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	public void setNode(AlgorithmNode node) {
 		this.node = node;
 	}
-
-	@Override
-	public int hashCode() {
-		return getClass().getSimpleName().hashCode();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return obj instanceof Algorithm && getClass().getSimpleName().equals(obj.getClass().getSimpleName());
-	}
 }

@@ -29,6 +29,7 @@ import splitstree6.algorithms.utils.RerootingUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.data.parts.ASplit;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -56,7 +57,7 @@ public class GreedyTree extends Splits2Trees {
 
 		final BitSet[] clusters;
 		{
-			final var compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits());
+			final var compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits(), ASplit::getWeight);
 			clusters = new BitSet[compatibleSplits.size()];
 			for (var i = 0; i < compatibleSplits.size(); i++) {
 				clusters[i] = compatibleSplits.get(i).getPartNotContaining(1);

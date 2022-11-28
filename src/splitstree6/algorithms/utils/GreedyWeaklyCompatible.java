@@ -27,6 +27,7 @@ import splitstree6.data.parts.BiPartition;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * greedy compute weakly compatible splits
@@ -35,17 +36,17 @@ import java.util.List;
 public class GreedyWeaklyCompatible {
 
 	/**
-	 * computes greedily compatible splits
+	 * computes weakly compatible splits, greedily maximizing the score
 	 *
 	 * @return compatible splits
 	 */
-	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits) throws CanceledException {
+	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits, Function<ASplit, Double> score) throws CanceledException {
 		progress.setSubtask("Greedy weakly compatible");
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
 
 		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
-		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(a.getWeight(), b.getWeight()))) {
+		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(score.apply(a), score.apply(b)))) {
 			boolean ok = true;
 			for (int t = 0; ok && t < result.size(); t++) {
 				for (int q = t + 1; ok && q < result.size(); q++) {

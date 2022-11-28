@@ -43,16 +43,18 @@ public class Highlighter {
 		type = Type.Universal;
 
 		codeArea.textProperty().addListener((v, p, n) -> RunAfterAWhile.applyInFXThread(this, () -> {
-			var line = StringUtils.getFirstLine(codeArea.getText()).toLowerCase();
-			if (line.startsWith("#nexus"))
-				setType(Type.Nexus);
-			else if (line.startsWith("<nex:nexml") || line.startsWith("<?xml version="))
-				setType(Type.XML);
-			else
-				setType(Type.Universal);
-			// style everything once changes to text have stopped
-			if (codeArea.getLength() < 10000000)
-				codeArea.setStyleSpans(0, getHighlighter().computeHighlighting(codeArea.getText()));
+			if (codeArea.getLength() < 100000) {
+				var line = StringUtils.getFirstLine(codeArea.getText()).toLowerCase();
+				if (line.startsWith("#nexus"))
+					setType(Type.Nexus);
+				else if (line.startsWith("<nex:nexml") || line.startsWith("<?xml version="))
+					setType(Type.XML);
+				else
+					setType(Type.Universal);
+				// style everything once changes to text have stopped
+				if (codeArea.getLength() < 10000000)
+					codeArea.setStyleSpans(0, getHighlighter().computeHighlighting(codeArea.getText()));
+			}
 		}));
 	}
 

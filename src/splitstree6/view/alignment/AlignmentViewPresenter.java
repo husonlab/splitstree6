@@ -113,9 +113,9 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		alignmentView.inputTaxaNodeValidProperty().addListener(updateTaxaListener);
 
 		var canvasWidth = new SimpleDoubleProperty();
-		canvasWidth.bind(controller.gethScrollBar().widthProperty());
+		canvasWidth.bind(controller.getHorizontalScrollBar().widthProperty());
 		var canvasHeight = new SimpleDoubleProperty();
-		canvasHeight.bind(controller.getvScrollBar().heightProperty());
+		canvasHeight.bind(controller.getVerticalScrollBar().heightProperty());
 
 		var alignmentDrawer = new AlignmentDrawer(controller.getImageGroup(), controller.getCanvasGroup(), mainWindowController.getBottomFlowPane());
 
@@ -123,11 +123,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			var width = canvasWidth.get();
 			var height = canvasHeight.get();
 
-			AxisAndScrollBarUpdate.update(controller.getAxis(), controller.gethScrollBar(), width,
+			AxisAndScrollBarUpdate.update(controller.getAxis(), controller.getHorizontalScrollBar(), width,
 					alignmentView.getOptionUnitWidth(), alignmentView.getInputCharacters() != null ? alignmentView.getInputCharacters().getNchar() : 0, alignmentView);
 
 			alignmentDrawer.updateCanvas(width, height, alignmentView.getInputTaxa(), alignmentView.getInputCharacters(), alignmentView.getConsensusSequence(),
-					alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(),
+					alignmentView.getOptionColorScheme(), alignmentView.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(),
 					alignmentView.getActiveTaxa(), alignmentView.getActiveSites());
 
 
@@ -137,16 +137,28 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			updateTaxaCellFactory(controller.getTaxaListView(), alignmentView.getOptionUnitHeight(), alignmentView::isDisabled);
 
 			alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
+					alignmentView.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 
 			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
+					alignmentView.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
 
 			if (false)
 				alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
-						alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
+						alignmentView.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 
 			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
+
+			// update block increment for vertical scroll bar:
+			{
+				var listViewVerticalScrollBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.VERTICAL);
+				if (listViewVerticalScrollBar != null) {
+					var countVisible = controller.getTaxaListView().getHeight() / controller.getTaxaListView().getFixedCellSize();
+					if (countVisible < alignmentView.getInputTaxa().getNtax()) {
+						controller.getVerticalScrollBar().setBlockIncrement(countVisible / (alignmentView.getInputTaxa().getNtax() - countVisible));
+					} else
+						controller.getVerticalScrollBar().setBlockIncrement(1.0);
+				}
+			}
 		};
 
 		canvasWidth.addListener(updateCanvasListener);
@@ -160,7 +172,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		alignmentView.selectedSitesProperty().addListener(e -> {
 			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), alignmentView.getInputTaxa(), alignmentView.getInputCharacters(),
-					alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
+					alignmentView.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), alignmentView.getSelectedSites());
 			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), alignmentView.getInputCharacters(), alignmentView.getActiveSites(), alignmentView.getSelectedSites());
 			controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 		});
@@ -179,7 +191,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 								controller.getTaxaListView().getSelectionModel().select(taxon);
 						}
 						alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), inputTaxa, alignmentView.getInputCharacters(),
-								alignmentView.getOptionUnitHeight(), controller.getvScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
+								alignmentView.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());
 					}
 					controller.getSelectionLabel().setText(alignmentView.createSelectionString());
 				} finally {
@@ -219,15 +231,15 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(updateCanvasListener));
 
-		controller.gethScrollBar().valueProperty().addListener(updateCanvasListener);
+		controller.getHorizontalScrollBar().valueProperty().addListener(updateCanvasListener);
 
-		controller.gethScrollBar().valueProperty().addListener((v, o, n) -> {
-			var diff = n.doubleValue() - o.doubleValue();
+		controller.getHorizontalScrollBar().valueProperty().addListener((v, o, n) -> {
+			var diff = n.doubleValue() - controller.getAxis().getLowerBound();
 			controller.getAxis().setLowerBound(controller.getAxis().getLowerBound() + diff);
 			controller.getAxis().setUpperBound(controller.getAxis().getUpperBound() + diff);
 		});
 
-		controller.getvScrollBar().valueProperty().addListener(updateCanvasListener);
+		controller.getVerticalScrollBar().valueProperty().addListener(updateCanvasListener);
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> alignmentView.setOptionUnitWidth(1.2 * alignmentView.getOptionUnitWidth()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(alignmentView.optionUnitWidthProperty().greaterThan(64));
@@ -244,8 +256,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomToFitButton().setOnAction(e -> {
 			if (alignmentView.getInputCharacters().getNchar() * alignmentView.getOptionUnitWidth() > canvasWidth.get()
 				|| alignmentView.getInputCharacters().getNtax() * alignmentView.getOptionUnitHeight() > canvasHeight.get()) {
-				controller.getvScrollBar().setValue(controller.getvScrollBar().getMin());
-				controller.gethScrollBar().setValue(controller.gethScrollBar().getMin());
+				controller.getVerticalScrollBar().setValue(controller.getVerticalScrollBar().getMin());
+				controller.getHorizontalScrollBar().setValue(controller.getHorizontalScrollBar().getMin());
 				alignmentView.setOptionUnitWidth(Math.min(AlignmentView.DEFAULT_UNIT_WIDTH, canvasWidth.get() / alignmentView.getInputCharacters().getNchar()));
 				alignmentView.setOptionUnitHeight(Math.min(AlignmentView.DEFAULT_UNIT_HEIGHT, canvasHeight.get() / alignmentView.getInputCharacters().getNtax()));
 			} else {
@@ -473,11 +485,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 			var taxonVBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.VERTICAL);
 			if (taxonVBar != null) {
-				controller.getvScrollBar().visibleProperty().bind(taxonVBar.visibleProperty());
-				controller.getvScrollBar().minProperty().bind(taxonVBar.minProperty());
-				controller.getvScrollBar().maxProperty().bind(taxonVBar.maxProperty());
-				controller.getvScrollBar().visibleAmountProperty().bind(taxonVBar.visibleAmountProperty());
-				taxonVBar.valueProperty().bindBidirectional(controller.getvScrollBar().valueProperty());
+				controller.getVerticalScrollBar().visibleProperty().bind(taxonVBar.visibleProperty());
+				controller.getVerticalScrollBar().minProperty().bind(taxonVBar.minProperty());
+				controller.getVerticalScrollBar().maxProperty().bind(taxonVBar.maxProperty());
+				controller.getVerticalScrollBar().visibleAmountProperty().bind(taxonVBar.visibleAmountProperty());
+				taxonVBar.valueProperty().bindBidirectional(controller.getVerticalScrollBar().valueProperty());
 			}
 		});
 

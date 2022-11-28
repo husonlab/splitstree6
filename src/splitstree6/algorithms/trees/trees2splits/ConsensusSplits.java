@@ -20,22 +20,19 @@
 package splitstree6.algorithms.trees.trees2splits;
 
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.graph.algorithms.PQTree;
-import jloda.util.BitSetUtils;
-import jloda.util.CollectionUtils;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.GreedyCircular;
+import splitstree6.algorithms.utils.GreedyCompatible;
+import splitstree6.algorithms.utils.GreedyWeaklyCompatible;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
-import java.util.Random;
 
 /**
  * implements consensus tree splits
@@ -43,7 +40,7 @@ import java.util.Random;
  * Daniel Huson, 2.2018
  */
 public class ConsensusSplits extends Trees2Splits {
-	public enum Consensus {Majority, Strict, GreedyCompatible, GreedyPlanar, GreedyWeaklyCompatible} // todo: add loose?
+	public enum Consensus {Majority, Strict, GreedyCompatible, GreedyCircular, GreedyWeaklyCompatible} // todo: add loose?
 
 	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
 	private final SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
@@ -72,7 +69,7 @@ public class ConsensusSplits extends Trees2Splits {
 			default -> consensusNetwork.setOptionThresholdPercent(50);
 			case Majority -> consensusNetwork.setOptionThresholdPercent(50);
 			case Strict -> consensusNetwork.setOptionThresholdPercent(99.999999); // todo: implement without use of splits
-			case GreedyCompatible, GreedyPlanar, GreedyWeaklyCompatible -> consensusNetwork.setOptionThresholdPercent(0);
+			case GreedyCompatible, GreedyCircular, GreedyWeaklyCompatible -> consensusNetwork.setOptionThresholdPercent(0);
 		}
 
 		final SplitsBlock consensusSplits = new SplitsBlock();
@@ -84,109 +81,17 @@ public class ConsensusSplits extends Trees2Splits {
 
 		switch (getOptionConsensus()) {
 			case GreedyCompatible -> {
-				final var list = new ArrayList<>(consensusSplits.getSplits());
-				list.sort((s1, s2) -> {
-					if (s1.getConfidence() > s2.getConfidence())
-						return -1;
-					else if (s1.getConfidence() < s2.getConfidence())
-						return 1;
-					else
-						return BitSetUtils.compare(s1.getA(), s2.getA());
-				});
-				for (var split : list) {
-					if (Compatibility.isCompatible(split, splitsBlock.getSplits()))
-						splitsBlock.getSplits().add(split);
-				}
+				splitsBlock.getSplits().addAll(GreedyCompatible.apply(progress, consensusSplits.getSplits(), ASplit::getConfidence));
 				splitsBlock.setCompatibility(Compatibility.compatible);
 				splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 			}
-			case GreedyPlanar -> {
-				final var list = new ArrayList<>(consensusSplits.getSplits());
-				list.sort((s1, s2) -> {
-					if (s1.getConfidence() > s2.getConfidence())
-						return -1;
-					else if (s1.getConfidence() < s2.getConfidence())
-						return 1;
-					else
-						return BitSetUtils.compare(s1.getA(), s2.getA());
-				});
-
-				var pqTree = new PQTree(taxaBlock.getTaxaSet());
-				for (var split : list) {
-					var set = split.getPartNotContaining(1);
-					if (pqTree.accept(set)) {
-						splitsBlock.getSplits().add(split);
-					}
-				}
+			case GreedyCircular -> {
+				splitsBlock.getSplits().addAll(GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), consensusSplits.getSplits(), ASplit::getConfidence));
 				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
 				splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
-
-				if (splitsBlock.getCompatibility() != Compatibility.compatible && splitsBlock.getCompatibility() != Compatibility.cyclic) {
-					for (var split : splitsBlock.splits()) {
-						if (!Compatibility.isCyclic(taxaBlock.getNtax(), List.of(split), splitsBlock.getCycle())) {
-							System.err.println("Looks like a bug in the PQ-tree code, please contact me (Daniel Huson) about this");
-							System.err.println("Internal error: greedyPlanar: is not circular: " + split);
-							var cluster = split.getPartNotContaining(1);
-							System.err.println("Set: " + StringUtils.toString(cluster));
-							System.err.println("pqTree says: " + pqTree.check(cluster));
-						}
-					}
-				}
-
-				if (false) {
-					progress.setSubtask("testing pqtree");
-					progress.setMaximum(1000);
-					progress.setProgress(0);
-					var random = new Random(666);
-					for (var run = 0; run < 1000; run++) {
-						var pqTree1 = new PQTree(taxaBlock.getTaxaSet());
-						var accepted = new ArrayList<BitSet>();
-						var randomized = CollectionUtils.randomize(list, random);
-						for (var split : randomized) {
-							if (pqTree1.accept(split.getPartNotContaining(1))) {
-								accepted.add(split.getPartNotContaining(1));
-							}
-						}
-						BitSet bad = null;
-						for (var cluster : accepted) {
-							if (!pqTree1.check(cluster)) {
-								System.err.println("Not accepted: " + StringUtils.toString(cluster));
-								bad = cluster;
-								break;
-							}
-						}
-						if (bad != null) {
-							var pqtree2 = new PQTree(taxaBlock.getTaxaSet());
-							pqtree2.verbose = true;
-							for (var split : randomized) {
-								var cluster = split.getPartNotContaining(1);
-								if (cluster.equals(bad))
-									System.err.println("Bad: " + StringUtils.toString(bad));
-								pqtree2.accept(cluster);
-								if (!pqtree2.check(bad))
-									System.err.println("Not accepted: " + StringUtils.toString(bad));
-								progress.checkForCancel();
-							}
-						}
-						progress.incrementProgress();
-					}
-					progress.reportTaskCompleted();
-				}
 			}
 			case GreedyWeaklyCompatible -> {
-				final var list = new ArrayList<>(consensusSplits.getSplits());
-				list.sort((s1, s2) -> {
-					if (s1.getConfidence() > s2.getConfidence())
-						return -1;
-					else if (s1.getConfidence() < s2.getConfidence())
-						return 1;
-					else
-						return BitSetUtils.compare(s1.getA(), s2.getA());
-				});
-				for (var split : list) {
-					if (Compatibility.isWeaklyCompatible(split, splitsBlock.getSplits()))
-						splitsBlock.getSplits().add(split);
-				}
+				splitsBlock.getSplits().addAll(GreedyWeaklyCompatible.apply(progress, consensusSplits.getSplits(), ASplit::getConfidence));
 				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
 				splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 			}

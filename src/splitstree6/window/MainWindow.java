@@ -46,6 +46,7 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.methods.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
+import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
 import splitstree6.workflow.Workflow;
@@ -87,7 +88,8 @@ public class MainWindow implements IMainWindow {
 
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(controller.getBottomFlowPane()));
 
-		empty.bind(Bindings.isEmpty(workflow.nodes()));
+		empty.bind(Bindings.isEmpty(workflow.nodes())
+				.and(Bindings.createBooleanBinding(() -> getTabByClass(InputEditorTab.class) == null, controller.getMainTabPane().getTabs())));
 
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
@@ -175,7 +177,7 @@ public class MainWindow implements IMainWindow {
 
 	@Override
 	public boolean isEmpty() {
-		return workflow.size() == 0;
+		return empty.get();
 	}
 
 	@Override

@@ -41,35 +41,35 @@ public class ClosestTree {
 		progress.setSubtask("Closest tree");
 		progress.setMaximum(100);
 
-		final boolean[][] AdjMatrix = Compatibility.getCompatibilityMatrix(splits);
-		final double[] vertexWeights = new double[splits.size() + 1];
-		for (int i = 1; i <= splits.size(); i++) {
+		final var AdjMatrix = Compatibility.getCompatibilityMatrix(splits);
+		final var vertexWeights = new double[splits.size() + 1];
+		for (var i = 1; i <= splits.size(); i++) {
 			vertexWeights[i] = splits.get(i - 1).getWeight();
 		}
 
 		if (cycle == null)
 			cycle = SplitsUtilities.computeCycle(ntax, splits);
 
-		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
+		final var result = new ArrayList<ASplit>(splits.size());
 		if (Compatibility.isCyclic(ntax, splits, cycle)) {
 			result.addAll(CircularMaxClique.getMaxClique(ntax, splits, vertexWeights, cycle));
 		} else {
-			MaxWeightClique maxClique = new MaxWeightClique(AdjMatrix, vertexWeights);
-			boolean[] clique = maxClique.getMaxClique();
-			for (int i = 1; i <= splits.size(); i++) {
+			var maxClique = new MaxWeightClique(AdjMatrix, vertexWeights);
+			var clique = maxClique.getMaxClique();
+			for (var i = 1; i <= splits.size(); i++) {
 				if (clique[i])
 					result.add(splits.get(i - 1).clone());
 			}
 		}
 
-		double totalSquaredWeight = 0.0;
-		for (ASplit split : splits) {
+		var totalSquaredWeight = 0.0;
+		for (var split : splits) {
 			totalSquaredWeight += split.getWeight() * split.getWeight();
 		}
-		for (ASplit split : result) {
+		for (var split : result) {
 			totalSquaredWeight -= split.getWeight() * split.getWeight();
 		}
-		double diff = Math.sqrt(totalSquaredWeight);
+		var diff = Math.sqrt(totalSquaredWeight);
 		System.err.println("Distance to closest tree = " + diff);
 		progress.setProgress(100);
 

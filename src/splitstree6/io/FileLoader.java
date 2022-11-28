@@ -19,6 +19,8 @@
 
 package splitstree6.io;
 
+import javafx.application.Platform;
+import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
@@ -77,6 +79,7 @@ public class FileLoader {
 					System.err.println("Import dialog: not implemented");
 				}
 			}
+			ProgramExecutorService.submit(200, () -> Platform.runLater(() -> newWindow.getStage().toFront()));
 		}
 	}
 }
