@@ -54,7 +54,7 @@ public class DensiTreeMain extends Application {
 				Sources available at: https://github.com/husonlab/splitstree6
 				""");
 
-		//CheckForUpdate.programURL = "http://software-ab.informatik.uni-tuebingen.de/download/alora";
+		//CheckForUpdate.programURL = "https://software-ab.cs.uni-tuebingen.de/download/alora";
 		//CheckForUpdate.applicationId = "1691242391";
 
 

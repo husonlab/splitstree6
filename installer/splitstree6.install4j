@@ -74,7 +74,7 @@
       </iconImageFiles>
     </launcher>
   </launchers>
-  <installerGui autoUpdateDescriptorUrl="http://software-ab.informatik.uni-tuebingen.de/download/splitstree6/updates.xml">
+  <installerGui autoUpdateDescriptorUrl="https://software-ab.cs.uni-tuebingen.de/download/splitstree6/updates.xml">
     <applications>
       <application id="installer" beanClass="com.install4j.runtime.beans.applications.InstallerApplication" launchInNewProcess="false">
         <serializedBean>

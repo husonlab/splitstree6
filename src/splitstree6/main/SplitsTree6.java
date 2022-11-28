@@ -68,7 +68,7 @@ public class SplitsTree6 extends Application {
 				Sources available at: https://github.com/husonlab/splitstree6
 				""");
 
-		//CheckForUpdate.programURL = "http://software-ab.informatik.uni-tuebingen.de/download/alora";
+		//CheckForUpdate.programURL = "https://software-ab.cs.uni-tuebingen.de/download/alora";
 		//CheckForUpdate.applicationId = "1691242391";
 
 		SplashScreen.setLabelAnchor(new Point2D(40, 14));
