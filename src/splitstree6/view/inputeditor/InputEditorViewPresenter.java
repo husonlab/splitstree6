@@ -111,8 +111,10 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 		});
 
 		codeArea.focusedProperty().addListener((c, o, n) -> {
-			if (n)
+			if (n) {
+				mainWindow.getController().getPasteMenuItem().disableProperty().unbind();
 				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
+			}
 		});
 
 		Platform.runLater(codeArea::requestFocus);
