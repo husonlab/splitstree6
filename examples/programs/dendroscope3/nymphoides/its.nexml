@@ -1,0 +1,446 @@
+<?xml version="1.0" encoding="UTF-8"?><nex:nexml xmlns:nex="http://www.nexml.org/2009" xmlns="http://www.nexml.org/2009" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:xsd="http://www.w3.org/2001/XMLSchema#" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" generator="org.nexml.model.impl.DocumentImpl" version="0.9" xmlns:default_node_format="" xmlns:format="">
+  <otus id="otus1981"/>
+  <trees id="trees1982" otus="otus1981">
+    <tree about="#tree1983" id="tree1983" label="[1]ITS" xmlns:collapsed="" xmlns:default_edge_format="" xmlns:drawer="" xmlns:embellished="" xmlns:radiallabels="" xmlns:root="" xmlns:sparselabels="" xmlns:toscale="" xmlns:trans="" xsi:type="nex:FloatTree">
+      <meta content="angle:0.0 scaleX:41.70356 scaleY:19.047987 flipH:0 flipV:0 leftMargin:481 rightMargin:481 topMargin:427 bottomMargin:427;" datatype="xsd:string" id="meta2279" property="trans" xsi:type="nex:LiteralMeta"/>
+      <meta content="" datatype="xsd:string" id="meta2278" property="collapsed" xsi:type="nex:LiteralMeta"/>
+      <meta content="false" datatype="xsd:boolean" id="meta2277" property="radiallabels" xsi:type="nex:LiteralMeta"/>
+      <meta content="false" datatype="xsd:boolean" id="meta2276" property="sparselabels" xsi:type="nex:LiteralMeta"/>
+      <meta content="false" datatype="xsd:boolean" id="meta2275" property="toscale" xsi:type="nex:LiteralMeta"/>
+      <meta content="RectangularCladogram" datatype="xsd:string" id="meta2274" property="drawer" xsi:type="nex:LiteralMeta"/>
+      <meta content="true" datatype="xsd:boolean" id="meta2273" property="embellished" xsi:type="nex:LiteralMeta"/>
+      <meta content="node1986" datatype="xsd:string" id="meta2272" property="root" xsi:type="nex:LiteralMeta"/>
+      <meta content=" fg=0 0 0 w=1 sh=1 dr=1 lc=0 0 0 lk=null ft='Times New Roman-PLAIN-18' lx=0 ly=0 ll=11 lv=1;" datatype="xsd:string" id="meta1985" property="default_edge_format" xsi:type="nex:LiteralMeta"/>
+      <meta content=" nh=2 nw=2 fg=0 0 0 bg=255 255 255 w=1 sh=0 fx=1 lc=0 0 0 lk=null ft='Times New Roman-PLAIN-18' lx=0 ly=0 ll=3 lv=1;" datatype="xsd:string" id="meta1984" property="default_node_format" xsi:type="nex:LiteralMeta"/>
+      <node about="#node1986" id="node1986">
+        <meta content=" x=-11.0 y=33.57129;" datatype="xsd:string" id="meta1987" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node1988" id="node1988">
+        <meta content=" x=-10.0 y=28.126953 ll=7;" datatype="xsd:string" id="meta1989" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node1990" id="node1990">
+        <meta content=" x=-9.0 y=23.253906 ll=7;" datatype="xsd:string" id="meta1991" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node1992" id="node1992">
+        <meta content=" x=-8.0 y=21.007812 ll=7;" datatype="xsd:string" id="meta1993" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node1994" id="node1994">
+        <meta content=" x=-7.0 y=18.015625 ll=7;" datatype="xsd:string" id="meta1995" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node1996" id="node1996">
+        <meta content=" x=-6.0 y=13.03125 ll=7;" datatype="xsd:string" id="meta1997" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node1998" id="node1998">
+        <meta content=" x=-5.0 y=9.0625 ll=7;" datatype="xsd:string" id="meta1999" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2000" id="node2000">
+        <meta content=" x=-3.0 y=3.375 ll=7;" datatype="xsd:string" id="meta2001" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2002" id="node2002">
+        <meta content=" x=-2.0 y=2.25 ll=7;" datatype="xsd:string" id="meta2003" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2004" id="node2004">
+        <meta content=" x=-1.0 y=1.5 ll=7;" datatype="xsd:string" id="meta2005" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2006" id="node2006" label="Nymphoides fallax">
+        <meta content=" x=0.0 y=1.0 ll=7;" datatype="xsd:string" id="meta2007" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2008" id="node2008" label="N. humboldtiana">
+        <meta content=" x=0.0 y=2.0 ll=7;" datatype="xsd:string" id="meta2009" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2014" id="node2014" label="N. rautanenii">
+        <meta content=" x=0.0 y=3.0 ll=7;" datatype="xsd:string" id="meta2015" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2020" id="node2020">
+        <meta content=" x=-1.0 y=4.5 ll=7;" datatype="xsd:string" id="meta2021" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2022" id="node2022" label="N. brevipedicellata">
+        <meta content=" x=0.0 y=4.0 ll=7;" datatype="xsd:string" id="meta2023" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2024" id="node2024" label="N. thunbergiana">
+        <meta content=" x=0.0 y=5.0 ll=7;" datatype="xsd:string" id="meta2025" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2034" id="node2034">
+        <meta content=" x=-4.0 y=9.4375 ll=7;" datatype="xsd:string" id="meta2035" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2036" id="node2036">
+        <meta content=" x=-3.0 y=7.875 ll=7;" datatype="xsd:string" id="meta2037" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2038" id="node2038">
+        <meta content=" x=-1.0 y=6.5 ll=7;" datatype="xsd:string" id="meta2039" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2040" id="node2040" label="Nymphoides sp. 1">
+        <meta content=" x=0.0 y=6.0 ll=7;" datatype="xsd:string" id="meta2041" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2042" id="node2042" label="Nymphoides sp. 2">
+        <meta content=" x=0.0 y=7.0 ll=7;" datatype="xsd:string" id="meta2043" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2048" id="node2048">
+        <meta content=" x=-2.0 y=9.25 ll=7;" datatype="xsd:string" id="meta2049" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2050" id="node2050">
+        <meta content=" x=-1.0 y=8.5 ll=7;" datatype="xsd:string" id="meta2051" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2052" id="node2052" label="N. parvifolia">
+        <meta content=" x=0.0 y=8.0 ll=7;" datatype="xsd:string" id="meta2053" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2054" id="node2054" label="N. quadrilopa">
+        <meta content=" x=0.0 y=9.0 ll=7;" datatype="xsd:string" id="meta2055" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2060" id="node2060" label="N. furculifolia">
+        <meta content=" x=0.0 y=10.0 ll=7;" datatype="xsd:string" id="meta2061" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2070" id="node2070" label="N. indica">
+        <meta content=" x=0.0 y=11.0 ll=7;" datatype="xsd:string" id="meta2071" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2076" id="node2076" label="N. coreana">
+        <meta content=" x=0.0 y=12.0 ll=7;" datatype="xsd:string" id="meta2077" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2078" id="node2078" label="N. cristata">
+        <meta content=" x=0.0 y=13.0 ll=7;" datatype="xsd:string" id="meta2079" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2080" id="node2080">
+        <meta content=" x=-2.0 y=14.75 ll=7;" datatype="xsd:string" id="meta2081" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2082" id="node2082" label="N. ezannoi">
+        <meta content=" x=0.0 y=14.0 ll=7;" datatype="xsd:string" id="meta2083" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2084" id="node2084">
+        <meta content=" x=-1.0 y=15.5 ll=7;" datatype="xsd:string" id="meta2085" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2086" id="node2086" label="N. aquatica">
+        <meta content=" x=0.0 y=15.0 ll=7;" datatype="xsd:string" id="meta2087" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2088" id="node2088" label="N. cordata">
+        <meta content=" x=0.0 y=16.0 ll=7;" datatype="xsd:string" id="meta2089" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2108" id="node2108" label="N. minima">
+        <meta content=" x=0.0 y=17.0 ll=7;" datatype="xsd:string" id="meta2109" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2114" id="node2114">
+        <meta content=" x=-1.0 y=18.5 ll=7;" datatype="xsd:string" id="meta2115" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2116" id="node2116" label="N. beaglensis">
+        <meta content=" x=0.0 y=18.0 ll=7;" datatype="xsd:string" id="meta2117" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2118" id="node2118" label="N. disperma">
+        <meta content=" x=0.0 y=19.0 ll=7;" datatype="xsd:string" id="meta2119" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2124" id="node2124">
+        <meta content=" x=-1.0 y=21.0 ll=7;" datatype="xsd:string" id="meta2125" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2126" id="node2126" label="N. planosperma">
+        <meta content=" x=0.0 y=20.0 ll=7;" datatype="xsd:string" id="meta2127" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2128" id="node2128" label="N. simulans">
+        <meta content=" x=0.0 y=21.0 ll=7;" datatype="xsd:string" id="meta2129" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2130" id="node2130" label="N. spongiosa">
+        <meta content=" x=0.0 y=22.0 ll=7;" datatype="xsd:string" id="meta2131" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2138" id="node2138" label="N. subacuta">
+        <meta content=" x=0.0 y=23.0 ll=7;" datatype="xsd:string" id="meta2139" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2148" id="node2148" label="N. spinulosperma">
+        <meta content=" x=0.0 y=24.0 ll=7;" datatype="xsd:string" id="meta2149" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2154" id="node2154">
+        <meta content=" x=-1.0 y=25.5 ll=7;" datatype="xsd:string" id="meta2155" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2156" id="node2156" label="N. aurantiaca">
+        <meta content=" x=0.0 y=25.0 ll=7;" datatype="xsd:string" id="meta2157" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2158" id="node2158" label="N. cambodiana">
+        <meta content=" x=0.0 y=26.0 ll=7;" datatype="xsd:string" id="meta2159" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2168" id="node2168">
+        <meta content=" x=-4.0 y=30.875 ll=7;" datatype="xsd:string" id="meta2169" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2170" id="node2170">
+        <meta content=" x=-3.0 y=29.75 ll=7;" datatype="xsd:string" id="meta2171" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2172" id="node2172">
+        <meta content=" x=-2.0 y=28.5 ll=7;" datatype="xsd:string" id="meta2173" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2174" id="node2174">
+        <meta content=" x=-1.0 y=27.5 ll=7;" datatype="xsd:string" id="meta2175" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2176" id="node2176" label="N. montana">
+        <meta content=" x=0.0 y=27.0 ll=7;" datatype="xsd:string" id="meta2177" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2178" id="node2178" label="N. geminata">
+        <meta content=" x=0.0 y=28.0 ll=7;" datatype="xsd:string" id="meta2179" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2184" id="node2184">
+        <meta content=" x=-1.0 y=29.5 ll=7;" datatype="xsd:string" id="meta2185" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2186" id="node2186" label="N. elliptica">
+        <meta content=" x=0.0 y=29.0 ll=7;" datatype="xsd:string" id="meta2187" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2188" id="node2188" label="N. triangularis">
+        <meta content=" x=0.0 y=30.0 ll=7;" datatype="xsd:string" id="meta2189" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2198" id="node2198" label="N. exiliflora">
+        <meta content=" x=0.0 y=31.0 ll=7;" datatype="xsd:string" id="meta2199" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2204" id="node2204" label="N. peltata">
+        <meta content=" x=0.0 y=32.0 ll=7;" datatype="xsd:string" id="meta2205" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2210" id="node2210" label="N. crenata">
+        <meta content=" x=0.0 y=33.0 ll=7;" datatype="xsd:string" id="meta2211" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2218" id="node2218">
+        <meta content=" x=-6.0 y=39.015625 ll=7;" datatype="xsd:string" id="meta2219" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2220" id="node2220">
+        <meta content=" x=-5.0 y=38.03125 ll=7;" datatype="xsd:string" id="meta2221" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2222" id="node2222">
+        <meta content=" x=-4.0 y=37.0625 ll=7;" datatype="xsd:string" id="meta2223" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2224" id="node2224">
+        <meta content=" x=-3.0 y=36.125 ll=7;" datatype="xsd:string" id="meta2225" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2226" id="node2226">
+        <meta content=" x=-2.0 y=35.25 ll=7;" datatype="xsd:string" id="meta2227" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2228" id="node2228">
+        <meta content=" x=-1.0 y=34.5 ll=7;" datatype="xsd:string" id="meta2229" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2230" id="node2230" label="Liparophyllum capitatum">
+        <meta content=" x=0.0 y=34.0 ll=7;" datatype="xsd:string" id="meta2231" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2232" id="node2232" label="L. exiguum">
+        <meta content=" x=0.0 y=35.0 ll=7;" datatype="xsd:string" id="meta2233" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2238" id="node2238" label="L. congestiflorum">
+        <meta content=" x=0.0 y=36.0 ll=7;" datatype="xsd:string" id="meta2239" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2244" id="node2244" label="L. latifolium">
+        <meta content=" x=0.0 y=37.0 ll=7;" datatype="xsd:string" id="meta2245" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2250" id="node2250" label="L. exaltatum">
+        <meta content=" x=0.0 y=38.0 ll=7;" datatype="xsd:string" id="meta2251" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2256" id="node2256" label="L. gunnii">
+        <meta content=" x=0.0 y=39.0 ll=7;" datatype="xsd:string" id="meta2257" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <node about="#node2262" id="node2262" label="L. lasiosperum">
+        <meta content=" x=0.0 y=40.0 ll=7;" datatype="xsd:string" id="meta2263" property="format" xsi:type="nex:LiteralMeta"/>
+      </node>
+      <edge about="#edge2010" id="edge2010" length="1.0" source="node2004" target="node2006">
+        <meta content=" ip= &lt; -1.0 1.0&gt; dr=1;" datatype="xsd:string" id="meta2011" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2012" id="edge2012" length="1.0" source="node2004" target="node2008">
+        <meta content=" ip= &lt; -1.0 2.0&gt; dr=1;" datatype="xsd:string" id="meta2013" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2016" id="edge2016" length="1.0" source="node2002" target="node2004">
+        <meta content=" ip= &lt; -2.0 1.5&gt; dr=1;" datatype="xsd:string" id="meta2017" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2018" id="edge2018" length="1.0" source="node2002" target="node2014">
+        <meta content=" ip= &lt; -2.0 3.0&gt; dr=1;" datatype="xsd:string" id="meta2019" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2026" id="edge2026" length="1.0" source="node2020" target="node2022">
+        <meta content=" ip= &lt; -1.0 4.0&gt; dr=1;" datatype="xsd:string" id="meta2027" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2028" id="edge2028" length="1.0" source="node2020" target="node2024">
+        <meta content=" ip= &lt; -1.0 5.0&gt; dr=1;" datatype="xsd:string" id="meta2029" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2030" id="edge2030" length="1.0" source="node2000" target="node2002">
+        <meta content=" ip= &lt; -3.0 2.25&gt; dr=1;" datatype="xsd:string" id="meta2031" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2032" id="edge2032" length="1.0" source="node2000" target="node2020">
+        <meta content=" ip= &lt; -3.0 4.5&gt; dr=1;" datatype="xsd:string" id="meta2033" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2044" id="edge2044" length="1.0" source="node2038" target="node2040">
+        <meta content=" ip= &lt; -1.0 6.0&gt; dr=1;" datatype="xsd:string" id="meta2045" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2046" id="edge2046" length="1.0" source="node2038" target="node2042">
+        <meta content=" ip= &lt; -1.0 7.0&gt; dr=1;" datatype="xsd:string" id="meta2047" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2056" id="edge2056" length="1.0" source="node2050" target="node2052">
+        <meta content=" ip= &lt; -1.0 8.0&gt; dr=1;" datatype="xsd:string" id="meta2057" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2058" id="edge2058" length="1.0" source="node2050" target="node2054">
+        <meta content=" ip= &lt; -1.0 9.0&gt; dr=1;" datatype="xsd:string" id="meta2059" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2062" id="edge2062" length="1.0" source="node2048" target="node2050">
+        <meta content=" ip= &lt; -2.0 8.5&gt; dr=1;" datatype="xsd:string" id="meta2063" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2064" id="edge2064" length="1.0" source="node2048" target="node2060">
+        <meta content=" ip= &lt; -2.0 10.0&gt; dr=1;" datatype="xsd:string" id="meta2065" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2066" id="edge2066" length="1.0" source="node2036" target="node2038">
+        <meta content=" ip= &lt; -3.0 6.5&gt; dr=1;" datatype="xsd:string" id="meta2067" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2068" id="edge2068" length="1.0" source="node2036" target="node2048">
+        <meta content=" ip= &lt; -3.0 9.25&gt; dr=1;" datatype="xsd:string" id="meta2069" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2072" id="edge2072" length="1.0" source="node2034" target="node2036">
+        <meta content=" ip= &lt; -4.0 7.875&gt; dr=1;" datatype="xsd:string" id="meta2073" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2074" id="edge2074" length="1.0" source="node2034" target="node2070">
+        <meta content=" ip= &lt; -4.0 11.0&gt; dr=1;" datatype="xsd:string" id="meta2075" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2090" id="edge2090" length="1.0" source="node2084" target="node2086">
+        <meta content=" ip= &lt; -1.0 15.0&gt; dr=1;" datatype="xsd:string" id="meta2091" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2092" id="edge2092" length="1.0" source="node2084" target="node2088">
+        <meta content=" ip= &lt; -1.0 16.0&gt; dr=1;" datatype="xsd:string" id="meta2093" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2094" id="edge2094" length="1.0" source="node2080" target="node2082">
+        <meta content=" ip= &lt; -2.0 14.0&gt; dr=1;" datatype="xsd:string" id="meta2095" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2096" id="edge2096" length="1.0" source="node2080" target="node2084">
+        <meta content=" ip= &lt; -2.0 15.5&gt; dr=1;" datatype="xsd:string" id="meta2097" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2098" id="edge2098" length="1.0" source="node1998" target="node2000">
+        <meta content=" ip= &lt; -5.0 3.375&gt; dr=1;" datatype="xsd:string" id="meta2099" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2100" id="edge2100" length="1.0" source="node1998" target="node2034">
+        <meta content=" ip= &lt; -5.0 9.4375&gt; dr=1;" datatype="xsd:string" id="meta2101" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2102" id="edge2102" length="1.0" source="node1998" target="node2076">
+        <meta content=" ip= &lt; -5.0 12.0&gt; dr=1;" datatype="xsd:string" id="meta2103" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2104" id="edge2104" length="1.0" source="node1998" target="node2078">
+        <meta content=" ip= &lt; -5.0 13.0&gt; dr=1;" datatype="xsd:string" id="meta2105" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2106" id="edge2106" length="1.0" source="node1998" target="node2080">
+        <meta content=" ip= &lt; -5.0 14.75&gt; dr=1;" datatype="xsd:string" id="meta2107" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2110" id="edge2110" length="1.0" source="node1996" target="node1998">
+        <meta content=" ip= &lt; -6.0 9.0625&gt; dr=1;" datatype="xsd:string" id="meta2111" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2112" id="edge2112" length="1.0" source="node1996" target="node2108">
+        <meta content=" ip= &lt; -6.0 17.0&gt; dr=1;" datatype="xsd:string" id="meta2113" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2120" id="edge2120" length="1.0" source="node2114" target="node2116">
+        <meta content=" ip= &lt; -1.0 18.0&gt; dr=1;" datatype="xsd:string" id="meta2121" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2122" id="edge2122" length="1.0" source="node2114" target="node2118">
+        <meta content=" ip= &lt; -1.0 19.0&gt; dr=1;" datatype="xsd:string" id="meta2123" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2132" id="edge2132" length="1.0" source="node2124" target="node2126">
+        <meta content=" ip= &lt; -1.0 20.0&gt; dr=1;" datatype="xsd:string" id="meta2133" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2134" id="edge2134" length="1.0" source="node2124" target="node2128">
+        <meta content=" ip= &lt; -1.0 21.0&gt; dr=1;" datatype="xsd:string" id="meta2135" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2136" id="edge2136" length="1.0" source="node2124" target="node2130">
+        <meta content=" ip= &lt; -1.0 22.0&gt; dr=1;" datatype="xsd:string" id="meta2137" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2140" id="edge2140" length="1.0" source="node1994" target="node1996">
+        <meta content=" ip= &lt; -7.0 13.03125&gt; dr=1;" datatype="xsd:string" id="meta2141" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2142" id="edge2142" length="1.0" source="node1994" target="node2114">
+        <meta content=" ip= &lt; -7.0 18.5&gt; dr=1;" datatype="xsd:string" id="meta2143" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2144" id="edge2144" length="1.0" source="node1994" target="node2124">
+        <meta content=" ip= &lt; -7.0 21.0&gt; dr=1;" datatype="xsd:string" id="meta2145" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2146" id="edge2146" length="1.0" source="node1994" target="node2138">
+        <meta content=" ip= &lt; -7.0 23.0&gt; dr=1;" datatype="xsd:string" id="meta2147" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2150" id="edge2150" length="1.0" source="node1992" target="node1994">
+        <meta content=" ip= &lt; -8.0 18.015625&gt; dr=1;" datatype="xsd:string" id="meta2151" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2152" id="edge2152" length="1.0" source="node1992" target="node2148">
+        <meta content=" ip= &lt; -8.0 24.0&gt; dr=1;" datatype="xsd:string" id="meta2153" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2160" id="edge2160" length="1.0" source="node2154" target="node2156">
+        <meta content=" ip= &lt; -1.0 25.0&gt; dr=1;" datatype="xsd:string" id="meta2161" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2162" id="edge2162" length="1.0" source="node2154" target="node2158">
+        <meta content=" ip= &lt; -1.0 26.0&gt; dr=1;" datatype="xsd:string" id="meta2163" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2164" id="edge2164" length="1.0" source="node1990" target="node1992">
+        <meta content=" ip= &lt; -9.0 21.007812&gt; dr=1;" datatype="xsd:string" id="meta2165" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2166" id="edge2166" length="1.0" source="node1990" target="node2154">
+        <meta content=" ip= &lt; -9.0 25.5&gt; dr=1;" datatype="xsd:string" id="meta2167" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2180" id="edge2180" length="1.0" source="node2174" target="node2176">
+        <meta content=" ip= &lt; -1.0 27.0&gt; dr=1;" datatype="xsd:string" id="meta2181" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2182" id="edge2182" length="1.0" source="node2174" target="node2178">
+        <meta content=" ip= &lt; -1.0 28.0&gt; dr=1;" datatype="xsd:string" id="meta2183" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2190" id="edge2190" length="1.0" source="node2184" target="node2186">
+        <meta content=" ip= &lt; -1.0 29.0&gt; dr=1;" datatype="xsd:string" id="meta2191" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2192" id="edge2192" length="1.0" source="node2184" target="node2188">
+        <meta content=" ip= &lt; -1.0 30.0&gt; dr=1;" datatype="xsd:string" id="meta2193" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2194" id="edge2194" length="1.0" source="node2172" target="node2174">
+        <meta content=" ip= &lt; -2.0 27.5&gt; dr=1;" datatype="xsd:string" id="meta2195" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2196" id="edge2196" length="1.0" source="node2172" target="node2184">
+        <meta content=" ip= &lt; -2.0 29.5&gt; dr=1;" datatype="xsd:string" id="meta2197" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2200" id="edge2200" length="1.0" source="node2170" target="node2172">
+        <meta content=" ip= &lt; -3.0 28.5&gt; dr=1;" datatype="xsd:string" id="meta2201" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2202" id="edge2202" length="1.0" source="node2170" target="node2198">
+        <meta content=" ip= &lt; -3.0 31.0&gt; dr=1;" datatype="xsd:string" id="meta2203" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2206" id="edge2206" length="1.0" source="node2168" target="node2170">
+        <meta content=" ip= &lt; -4.0 29.75&gt; dr=1;" datatype="xsd:string" id="meta2207" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2208" id="edge2208" length="1.0" source="node2168" target="node2204">
+        <meta content=" ip= &lt; -4.0 32.0&gt; dr=1;" datatype="xsd:string" id="meta2209" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2212" id="edge2212" length="1.0" source="node1988" target="node1990">
+        <meta content=" ip= &lt; -10.0 23.253906&gt; dr=1;" datatype="xsd:string" id="meta2213" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2214" id="edge2214" length="1.0" source="node1988" target="node2168">
+        <meta content=" ip= &lt; -10.0 30.875&gt; dr=1;" datatype="xsd:string" id="meta2215" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2216" id="edge2216" length="1.0" source="node1988" target="node2210">
+        <meta content=" ip= &lt; -10.0 33.0&gt; dr=1;" datatype="xsd:string" id="meta2217" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2234" id="edge2234" length="1.0" source="node2228" target="node2230">
+        <meta content=" ip= &lt; -1.0 34.0&gt; dr=1;" datatype="xsd:string" id="meta2235" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2236" id="edge2236" length="1.0" source="node2228" target="node2232">
+        <meta content=" ip= &lt; -1.0 35.0&gt; dr=1;" datatype="xsd:string" id="meta2237" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2240" id="edge2240" length="1.0" source="node2226" target="node2228">
+        <meta content=" ip= &lt; -2.0 34.5&gt; dr=1;" datatype="xsd:string" id="meta2241" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2242" id="edge2242" length="1.0" source="node2226" target="node2238">
+        <meta content=" ip= &lt; -2.0 36.0&gt; dr=1;" datatype="xsd:string" id="meta2243" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2246" id="edge2246" length="1.0" source="node2224" target="node2226">
+        <meta content=" ip= &lt; -3.0 35.25&gt; dr=1;" datatype="xsd:string" id="meta2247" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2248" id="edge2248" length="1.0" source="node2224" target="node2244">
+        <meta content=" ip= &lt; -3.0 37.0&gt; dr=1;" datatype="xsd:string" id="meta2249" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2252" id="edge2252" length="1.0" source="node2222" target="node2224">
+        <meta content=" ip= &lt; -4.0 36.125&gt; dr=1;" datatype="xsd:string" id="meta2253" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2254" id="edge2254" length="1.0" source="node2222" target="node2250">
+        <meta content=" ip= &lt; -4.0 38.0&gt; dr=1;" datatype="xsd:string" id="meta2255" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2258" id="edge2258" length="1.0" source="node2220" target="node2222">
+        <meta content=" ip= &lt; -5.0 37.0625&gt; dr=1;" datatype="xsd:string" id="meta2259" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2260" id="edge2260" length="1.0" source="node2220" target="node2256">
+        <meta content=" ip= &lt; -5.0 39.0&gt; dr=1;" datatype="xsd:string" id="meta2261" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2264" id="edge2264" length="1.0" source="node2218" target="node2220">
+        <meta content=" ip= &lt; -6.0 38.03125&gt; dr=1;" datatype="xsd:string" id="meta2265" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2266" id="edge2266" length="1.0" source="node2218" target="node2262">
+        <meta content=" ip= &lt; -6.0 40.0&gt; dr=1;" datatype="xsd:string" id="meta2267" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2268" id="edge2268" length="0.5" source="node1986" target="node1988">
+        <meta content=" ip= &lt; -11.0 28.126953&gt; dr=1;" datatype="xsd:string" id="meta2269" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+      <edge about="#edge2270" id="edge2270" length="0.5" source="node1986" target="node2218">
+        <meta content=" ip= &lt; -11.0 39.015625&gt; dr=1;" datatype="xsd:string" id="meta2271" property="format" xsi:type="nex:LiteralMeta"/>
+      </edge>
+    </tree>
+  </trees>
+</nex:nexml>

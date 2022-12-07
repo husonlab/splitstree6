@@ -232,7 +232,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			updateCounter.set(updateCounter.get() + 1);
 		});
 
-
 		controller.getOrientationCBox().disableProperty().bind(splitsView.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
 
 		controller.getScrollPane().setContent(splitNetworkPane);

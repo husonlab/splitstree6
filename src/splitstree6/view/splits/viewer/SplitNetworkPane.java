@@ -202,4 +202,8 @@ public class SplitNetworkPane extends StackPane {
 			}));
 		}
 	}
+
+	public Group getGroup() {
+		return group;
+	}
 }

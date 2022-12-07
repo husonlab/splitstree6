@@ -1,0 +1,135 @@
+#DENDROSCOPE
+{TREE '[1]Tree2'
+(((((((('Lamprologus cailipterus':1.0,'Noalamprologus wauthioni':1.0,'Noalamprologus fascratus ':1.0):1.0,(('Altolamprologus sp. shell':1.0,'Altolamprologus compressiceps':1.0):1.0,'Altolamprologus calvus':1.0):1.0):1.0,'Lamprologus ocellatus':1.0):1.0,((((('Lepidiolamprologus meeli':1.0,'Lepidiolamprologus hecqui':1.0):1.0,'Lepidiolamprologus boulengeri':1.0):1.0,('Lepidiolamprologus sp. meeli-boulengeri':1.0,'Lepidiolamprologus attenuatus':1.0):1.0):1.0,'Lepidiolamprologus profundicola':1.0):1.0,'Lepidiolamprologus elongatus':1.0):1.0):1.0,('Neolamprologus caudopunctatus':1.0,'Lamprologus lemairii':1.0):1.0,'Lamprologus meleagris':1.0,'Neolamprologus leloupi':1.0):1.0,((('Hybrid 1.1 Hybrid 2.1 Hybrid 2.2':1.0,'Neolamprologus brevis':1.0):1.0,'Lamprologus speciosus':1.0):1.0,('Hybrid 1.2':1.0,'Neolamprologus calliurus':1.0):1.0):1.0,'Neolamprologus multifasciatus':1.0):1.0,((('Lamprologus signatus':1.0,'Lamprologus laparogramma':1.0):1.0,'Lamprologus kungweensis':1.0):1.0,'Lamprologus omatipinnis':1.0):1.0,'Neolamprologus similis':1.0):0.475,(('Julidochromis ornatus':1.0,'Telmatochromis vittatus':1.0):1.0,'Variabilichromis moorii':1.0):0.025);
+}
+{GRAPHVIEW
+nnodes=58 nedges=57
+nodes
+1: nh=2 nw=2 fg=0 0 0 bg=255 255 255 w=1 sh=0 x=-10.0 y=27.567383 fx=1 lc=0 0 0 lk=null ft='Times New Roman-PLAIN-18' lx=0 ly=0 ll=3 lv=1;
+2: x=-9.0 y=23.884766 ll=7;
+3: x=-8.0 y=18.769531;
+4: x=-7.0 y=13.5390625;
+5: x=-6.0 y=9.078125;
+6: x=-4.0 y=5.3125;
+7: x=-3.0 y=3.625;
+8: x=-1.0 y=2.0;
+9: x=0.0 y=1.0 lb='Lamprologus cailipterus';
+10: x=0.0 y=2.0 lb='Noalamprologus wauthioni';
+11: x=0.0 y=3.0 lb='Noalamprologus fascratus ';
+12: x=-2.0 y=5.25;
+13: x=-1.0 y=4.5;
+14: x=0.0 y=4.0 lb='Altolamprologus sp. shell';
+15: x=0.0 y=5.0 lb='Altolamprologus compressiceps';
+16: x=0.0 y=6.0 lb='Altolamprologus calvus';
+17: x=0.0 y=7.0 lb='Lamprologus ocellatus';
+18: x=-5.0 y=12.84375;
+19: x=-4.0 y=11.6875;
+20: x=-3.0 y=10.375;
+21: x=-2.0 y=9.25;
+22: x=-1.0 y=8.5;
+23: x=0.0 y=8.0 lb='Lepidiolamprologus meeli';
+24: x=0.0 y=9.0 lb='Lepidiolamprologus hecqui';
+25: x=0.0 y=10.0 lb='Lepidiolamprologus boulengeri';
+26: x=-1.0 y=11.5;
+27: x=0.0 y=11.0 lb='Lepidiolamprologus sp. meeli-boulengeri';
+28: x=0.0 y=12.0 lb='Lepidiolamprologus attenuatus';
+29: x=0.0 y=13.0 lb='Lepidiolamprologus profundicola';
+30: x=0.0 y=14.0 lb='Lepidiolamprologus elongatus';
+31: x=-1.0 y=15.5;
+32: x=0.0 y=15.0 lb='Neolamprologus caudopunctatus';
+33: x=0.0 y=16.0 lb='Lamprologus lemairii';
+34: x=0.0 y=17.0 lb='Lamprologus meleagris';
+35: x=0.0 y=18.0 lb='Neolamprologus leloupi';
+36: x=-3.0 y=21.375;
+37: x=-2.0 y=20.25;
+38: x=-1.0 y=19.5;
+39: x=0.0 y=19.0 lb='Hybrid 1.1 Hybrid 2.1 Hybrid 2.2';
+40: x=0.0 y=20.0 lb='Neolamprologus brevis';
+41: x=0.0 y=21.0 lb='Lamprologus speciosus';
+42: x=-1.0 y=22.5;
+43: x=0.0 y=22.0 lb='Hybrid 1.2';
+44: x=0.0 y=23.0 lb='Neolamprologus calliurus';
+45: x=0.0 y=24.0 lb='Neolamprologus multifasciatus';
+46: x=-3.0 y=27.125;
+47: x=-2.0 y=26.25;
+48: x=-1.0 y=25.5;
+49: x=0.0 y=25.0 lb='Lamprologus signatus';
+50: x=0.0 y=26.0 lb='Lamprologus laparogramma';
+51: x=0.0 y=27.0 lb='Lamprologus kungweensis';
+52: x=0.0 y=28.0 lb='Lamprologus omatipinnis';
+53: x=0.0 y=29.0 lb='Neolamprologus similis';
+54: x=-2.0 y=31.25;
+55: x=-1.0 y=30.5;
+56: x=0.0 y=30.0 lb='Julidochromis ornatus';
+57: x=0.0 y=31.0 lb='Telmatochromis vittatus';
+58: x=0.0 y=32.0 lb='Variabilichromis moorii';
+edges
+8: fg=0 0 0 w=1 sh=1 ip= < -1.0 1.0> dr=1 lc=0 0 0 lk=null ft='Times New Roman-PLAIN-15' lx=0 ly=0 ll=11 lv=1;
+9: ip= < -1.0 2.0> dr=1;
+10: ip= < -1.0 3.0> dr=1;
+13: ip= < -1.0 4.0> dr=1;
+14: ip= < -1.0 5.0> dr=1;
+12: ip= < -2.0 4.5> dr=1;
+15: ip= < -2.0 6.0> dr=1;
+7: ip= < -3.0 2.0> dr=1;
+11: ip= < -3.0 5.25> dr=1;
+6: ip= < -4.0 3.625> dr=1;
+16: ip= < -4.0 7.0> dr=1;
+22: ip= < -1.0 8.0> dr=1;
+23: ip= < -1.0 9.0> dr=1;
+21: ip= < -2.0 8.5> dr=1;
+24: ip= < -2.0 10.0> dr=1;
+26: ip= < -1.0 11.0> dr=1;
+27: ip= < -1.0 12.0> dr=1;
+20: ip= < -3.0 9.25> dr=1;
+25: ip= < -3.0 11.5> dr=1;
+19: ip= < -4.0 10.375> dr=1;
+28: ip= < -4.0 13.0> dr=1;
+18: ip= < -5.0 11.6875> dr=1;
+29: ip= < -5.0 14.0> dr=1;
+5: ip= < -6.0 5.3125> dr=1;
+17: ip= < -6.0 12.84375> dr=1;
+31: ip= < -1.0 15.0> dr=1;
+32: ip= < -1.0 16.0> dr=1;
+4: ip= < -7.0 9.078125> dr=1;
+30: ip= < -7.0 15.5> dr=1;
+33: ip= < -7.0 17.0> dr=1;
+34: ip= < -7.0 18.0> dr=1;
+38: ip= < -1.0 19.0> dr=1;
+39: ip= < -1.0 20.0> dr=1;
+37: ip= < -2.0 19.5> dr=1;
+40: ip= < -2.0 21.0> dr=1;
+42: ip= < -1.0 22.0> dr=1;
+43: ip= < -1.0 23.0> dr=1;
+36: ip= < -3.0 20.25> dr=1;
+41: ip= < -3.0 22.5> dr=1;
+3: ip= < -8.0 13.5390625> dr=1;
+35: ip= < -8.0 21.375> dr=1;
+44: ip= < -8.0 24.0> dr=1;
+48: ip= < -1.0 25.0> dr=1;
+49: ip= < -1.0 26.0> dr=1;
+47: ip= < -2.0 25.5> dr=1;
+50: ip= < -2.0 27.0> dr=1;
+46: ip= < -3.0 26.25> dr=1;
+51: ip= < -3.0 28.0> dr=1;
+2: ip= < -9.0 18.769531> dr=1;
+45: ip= < -9.0 27.125> dr=1;
+52: ip= < -9.0 29.0> dr=1;
+55: ip= < -1.0 30.0> dr=1;
+56: ip= < -1.0 31.0> dr=1;
+54: ip= < -2.0 30.5> dr=1;
+57: ip= < -2.0 32.0> dr=1;
+1: ip= < -10.0 23.884766> dr=1;
+53: ip= < -10.0 31.25> dr=1;
+}
+{DENDRO
+root=1
+drawer=RectangularCladogram
+toscale=false
+radiallabels=false
+collapsed=0
+trans=angle:0.0 scaleX:29.8 scaleY:19.419355 flipH:0 flipV:0 leftMargin:299 rightMargin:299 topMargin:401 bottomMargin:401;
+}
+{TREE 'Tree1'
+((((('Lepidiolamprologus meeli':1.0,'Lepidiolamprologus sp. meeli-boulengeri':1.0):1.0,('Lepidiolamprologus sp. nov.':1.0,'Lepidiolamprologus profundicola':1.0):1.0,'Lepidiolamprologus hecqui':1.0,'Lepidiolamprologus elongatus':1.0,'Lepidiolamprologus attenuatus':1.0):1.0,'Lamprologus lemainii':1.0):1.0,(('Neolamprologus wauthioni':1.0,'Lamprologus speciosus':1.0):1.0,'Lamprologus meleagris':1.0,'Lamprologus ocellatus':1.0):1.0,(('Altolamprologus sp. shell':1.0,'Altolamprologus compressiceps':1.0):1.0,'Altolamprologus calvus':1.0):1.0,('Neolamprologus leloupi':1.0,'Neolamprologus caudopunctatus':1.0):1.0,('Lamprologus signatus':1.0,'Lamprologus omatipinnis':1.0):1.0,'Lamprologus callipterus':1.0,'Neolamprologus fasciatus':1.0,'Neolamprologus multifasciatus':1.0,'Neolamprologus similis':1.0):1.0,('Neolamprologus calliurus':1.0,'Neolamprologus brevis':1.0):1.0,'Julidochromis ornatus':1.0,'Telmatochromis vittatus':1.0,'Variabilichromis moorii':0.5);
+}

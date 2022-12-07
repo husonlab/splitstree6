@@ -1,0 +1,230 @@
+#nexus [SplitsTree6]
+
+[!
+Authors: Tippery, Nicholas P.; Les, Donald H.
+Source: Systematic Botany, Volume 36, Number 4, October-December 2011, pp. 1101-1113(13)
+Publisher: American Society of Plant Taxonomists
+DOI: https://doi.org/10.1600/036364411X605092
+]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=6 nAlgorithms=4;
+PROGRAM version='SplitsTree6 (version 0.4.3-alpha, built 28 Nov 2022)';
+WORKFLOW creationDate='1669816652333'; [Wed Nov 30 14:57:32 CET 2022]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 40 taxa and 2 trees.
+The Show Trees method was used (View=Tanglegram) so as to obtain a Tanglegram visualization (Scornavacca et al, 2011).
+
+References:
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+Scornavacca et al, 2011: Celine Scornavacca, Franziska Zickmann and Daniel H. Huson. Tanglegrams for rooted phylogenetic trees and networks. Bioinformatics, 27(13):i248–i256, 2011
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=40;
+TAXLABELS
+	[1] 'N. geminata'
+	[2] 'L. lasiosperum'
+	[3] 'Liparophyllum capitatum'
+	[4] 'N. ezannoi'
+	[5] 'N. indica'
+	[6] 'N. cordata'
+	[7] 'N. disperma'
+	[8] 'L. exaltatum'
+	[9] 'N. elliptica'
+	[10] 'N. aurantiaca'
+	[11] 'L. exiguum'
+	[12] 'N. subacuta'
+	[13] 'N. exiliflora'
+	[14] 'N. crenata'
+	[15] 'N. quadrilopa'
+	[16] 'N. spongiosa'
+	[17] 'N. rautanenii'
+	[18] 'Nymphoides fallax'
+	[19] 'N. aquatica'
+	[20] 'N. beaglensis'
+	[21] 'N. simulans'
+	[22] 'N. triangularis'
+	[23] 'N. humboldtiana'
+	[24] 'L. latifolium'
+	[25] 'N. parvifolia'
+	[26] 'L. congestiflorum'
+	[27] 'N. montana'
+	[28] 'N. spinulosperma'
+	[29] 'N. coreana'
+	[30] 'N. cristata'
+	[31] 'N. cambodiana'
+	[32] 'N. thunbergiana'
+	[33] 'N. planosperma'
+	[34] 'N. minima'
+	[35] 'L. gunnii'
+	[36] 'N. brevipedicellata'
+	[37] 'N. peltata'
+	[38] 'Nymphoides sp. 1'
+	[39] 'N. furculifolia'
+	[40] 'Nymphoides sp. 2'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=40;
+TAXLABELS
+	[1] 'N. geminata'
+	[2] 'L. lasiosperum'
+	[3] 'Liparophyllum capitatum'
+	[4] 'N. ezannoi'
+	[5] 'N. indica'
+	[6] 'N. cordata'
+	[7] 'N. disperma'
+	[8] 'L. exaltatum'
+	[9] 'N. elliptica'
+	[10] 'N. aurantiaca'
+	[11] 'L. exiguum'
+	[12] 'N. subacuta'
+	[13] 'N. exiliflora'
+	[14] 'N. crenata'
+	[15] 'N. quadrilopa'
+	[16] 'N. spongiosa'
+	[17] 'N. rautanenii'
+	[18] 'Nymphoides fallax'
+	[19] 'N. aquatica'
+	[20] 'N. beaglensis'
+	[21] 'N. simulans'
+	[22] 'N. triangularis'
+	[23] 'N. humboldtiana'
+	[24] 'L. latifolium'
+	[25] 'N. parvifolia'
+	[26] 'L. congestiflorum'
+	[27] 'N. montana'
+	[28] 'N. spinulosperma'
+	[29] 'N. coreana'
+	[30] 'N. cristata'
+	[31] 'N. cambodiana'
+	[32] 'N. thunbergiana'
+	[33] 'N. planosperma'
+	[34] 'N. minima'
+	[35] 'L. gunnii'
+	[36] 'N. brevipedicellata'
+	[37] 'N. peltata'
+	[38] 'Nymphoides sp. 1'
+	[39] 'N. furculifolia'
+	[40] 'Nymphoides sp. 2'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes;
+[TREES]
+		[1] tree 'matK_trnK'=[&R] ((((((((''Nymphoides fallax'',''N. humboldtiana''),''N. indica'',''N. coreana'',''N. ezannoi''),(''N. aquatica'',''N. cordata''),''N. rautanenii'',''N. brevipedicellata'',''N. thunbergiana'',''N. cristata''),((''Nymphoides sp. 1'',''Nymphoides sp. 2'',''N. parvifolia'',''N. quadrilopa''),''N. furculifolia'')),''N. minima''),''N. beaglensis'',(''N. disperma'',''N. spinulosperma'',''N. montana'')),(''N. peltata'',(''N. planosperma'',''N. simulans'',''N. spongiosa''),(''N. subacuta'',''N. elliptica''),(''N. aurantiaca'',''N. cambodiana''),''N. triangularis''),''N. geminata'',''N. exiliflora'',''N. crenata''):0.5,(''L. gunnii'',(((''Liparophyllum capitatum'',''L. exiguum''),''L. congestiflorum''),''L. latifolium''),''L. lasiosperum'',''L. exaltatum''):0.5);
+		[2] tree 'ITS'=[&R] ((((((((((''Nymphoides fallax'',''N. humboldtiana''),''N. rautanenii''),(''N. brevipedicellata'',''N. thunbergiana'')),(((''Nymphoides sp. 1'',''Nymphoides sp. 2''),((''N. parvifolia'',''N. quadrilopa''),''N. furculifolia'')),''N. indica''),''N. coreana'',''N. cristata'',(''N. ezannoi'',(''N. aquatica'',''N. cordata''))),''N. minima''),(''N. beaglensis'',''N. disperma''),(''N. planosperma'',''N. simulans'',''N. spongiosa''),''N. subacuta''),''N. spinulosperma''),(''N. aurantiaca'',''N. cambodiana'')),((((''N. montana'',''N. geminata''),(''N. elliptica'',''N. triangularis'')),''N. exiliflora''),''N. peltata''),''N. crenata''):0.5,((((((''Liparophyllum capitatum'',''L. exiguum''),''L. congestiflorum''),''L. latifolium''),''L. exaltatum''),''L. gunnii''),''L. lasiosperum''):0.5);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 2]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'N. geminata',
+	2 'L. lasiosperum',
+	3 'Liparophyllum capitatum',
+	4 'N. ezannoi',
+	5 'N. indica',
+	6 'N. cordata',
+	7 'N. disperma',
+	8 'L. exaltatum',
+	9 'N. elliptica',
+	10 'N. aurantiaca',
+	11 'L. exiguum',
+	12 'N. subacuta',
+	13 'N. exiliflora',
+	14 'N. crenata',
+	15 'N. quadrilopa',
+	16 'N. spongiosa',
+	17 'N. rautanenii',
+	18 'Nymphoides fallax',
+	19 'N. aquatica',
+	20 'N. beaglensis',
+	21 'N. simulans',
+	22 'N. triangularis',
+	23 'N. humboldtiana',
+	24 'L. latifolium',
+	25 'N. parvifolia',
+	26 'L. congestiflorum',
+	27 'N. montana',
+	28 'N. spinulosperma',
+	29 'N. coreana',
+	30 'N. cristata',
+	31 'N. cambodiana',
+	32 'N. thunbergiana',
+	33 'N. planosperma',
+	34 'N. minima',
+	35 'L. gunnii',
+	36 'N. brevipedicellata',
+	37 'N. peltata',
+	38 'Nymphoides sp. 1',
+	39 'N. furculifolia',
+	40 'Nymphoides sp. 2',
+;
+[TREES]
+		[1] tree 'matK_trnK'=[&R] ((((((((18,23),5,29,4),(19,6),17,36,32,30),((38,40,25,15),39)),34),20,(7,28,27)),(37,(33,21,16),(12,9),(10,31),22),1,13,14):0.5,(35,(((3,11),26),24),2,8):0.5);
+		[2] tree 'ITS'=[&R] ((((((((((18,23),17),(36,32)),(((38,40),((25,15),39)),5),29,30,(4,(19,6))),34),(20,7),(33,21,16),12),28),(10,31)),((((27,1),(9,22)),13),37),14):0.5,((((((3,11),26),24),8),35),2):0.5);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'Tanglegram';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'Tanglegram';
+LINK ALGORITHM = 'Show Trees';
+NAME 'Tanglegram';
+INPUT 'TREES';
+OPTIONS
+	Tree1 = 1,
+	Diagram1 = 'RectangularPhylogram',
+	Averaging1 = 'ChildAverage',
+	Tree2 = 2,
+	Diagram2 = 'RectangularPhylogram',
+	Averaging2 = 'ChildAverage',
+	Orientation = 'Rotate0Deg',
+	HorizontalZoomFactor = 1,
+	VerticalZoomFactor = 1,
+	FontScaleFactor = 1,
+	ShowTreeNames = 'true',
+	ShowTreeInfo = 'true',
+	ShowInternalLabels = 'false';
+END; [VIEW]
