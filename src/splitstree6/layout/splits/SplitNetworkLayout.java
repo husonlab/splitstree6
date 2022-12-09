@@ -212,7 +212,7 @@ public class SplitNetworkLayout {
 
 				labeledNode.setLabel(label);
 
-				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
+				label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
 				label.setTranslateX(labeledNode.getTranslateX() + 10);
 				label.setTranslateY(labeledNode.getTranslateY() + 10);
 				label.setUserData(labeledNode);

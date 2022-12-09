@@ -146,7 +146,7 @@ public class NetworkLayout {
 						taxonLabelMap.put(graph.getTaxon(v), label);
 					}
 
-					label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
+					label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
 					label.setTranslateX(nodeShape.getTranslateX() + 10);
 					label.setTranslateY(nodeShape.getTranslateY() + 10);
 					label.setUserData(nodeShape);

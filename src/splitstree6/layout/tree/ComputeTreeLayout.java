@@ -122,7 +122,7 @@ public class ComputeTreeLayout {
 			nodeShape.setTranslateY(point.getY());
 
 			if (label != null) {
-				label.setScale(dimensions.fontHeight() / RichTextLabel.DEFAULT_FONT.getSize());
+				label.setScale(dimensions.fontHeight() / RichTextLabel.getDefaultFont().getSize());
 				label.applyCss();
 				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
 				if (taxonId != null) {

@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
  * Daniel Huson, 12.2021
  */
 public class LayoutUtils {
-	public static final double MAX_FONT_SIZE = RichTextLabel.DEFAULT_FONT.getSize();
+	public static final double MAX_FONT_SIZE = RichTextLabel.getDefaultFont().getSize();
 
 	public static FontHeightGraphWidthHeight computeFontHeightGraphWidthHeight(int nTaxa, Function<Integer, StringProperty> taxonLabelMap, PhyloGraph graph, boolean radial, double width, double height) {
 		double fontHeight;
@@ -58,7 +58,7 @@ public class LayoutUtils {
 		for (var v : graph.nodes()) {
 			var label = getLabel(taxonLabelMap, graph, v);
 			if (label != null) {
-				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
+				label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
 				label.applyCss();
 				nodeLabelMap.put(v, label);
 
@@ -73,7 +73,7 @@ public class LayoutUtils {
 			fontHeight = Math.min(MAX_FONT_SIZE, fontHeight * 0.25 * width / (maxLabelWidth + fontHeight));
 			maxLabelWidth = 0;
 			for (var label : nodeLabelMap.values()) {
-				label.setScale(fontHeight / RichTextLabel.DEFAULT_FONT.getSize());
+				label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
 				maxLabelWidth = Math.max(maxLabelWidth, label.getRawText().length() * 0.7 * fontHeight);
 			}
 		}
