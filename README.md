@@ -1,1 +1,22 @@
-# splitstree6
+# SplitsTree Community Edition
+
+## History
+Our previous program,  SplitsTree4, was designed for computing phylogenetic trees and networks from distances or aligned sequences. It was written in the early 2000's by Daniel Huson and Dave Bryant. While the program is still widely used and cited, it was designed for small datasets and the user interface, implemented using the Java Swing library, now feels minimalistic and dated. Moreover, SplitsTree4 was not designed as an open source program.
+
+While SplitsTree4 was designed for unrooted phylogenetic trees and networks, another previous program Dendroscope3 was designed for working with rooted trees and networks. This program, too, was designed for much smaller datasets than people work with today. 
+
+## SplitsTree CE
+SplitsTree CE (Community Edition) is designed as an open source project that provides a wide range of algorithms and processes for computing and working with both unrooted and rooted phylogenetic trees and networks. Much work has been invested in accommodating much larger datasets (more taxa, longer sequences, more trees, improved algorithms) than its predecessor programs, SplitsTree4 and Dendroscope3, and its user interface is based on the JavaFX library, giving it a modern look and feel.
+
+One main aim of this program is to make it easy to compute both trees and networks, hopefully encouraging researchers to use phylogenetic networks when appropriate. A second aim is to bring together the calculation of both unrooted and rooted trees and networks into one program. Moreover, the program explicitly supports the import and export of data in many different formats, making it easy to use the program in collaboration with other programs.
+
+## Explicit representations of workflows
+A key novel feature of SplitsTree CE, introduced in 2018, is that all data, algorithms and parameters are explicitly modeled as a "workflow", that is, a graph that represents the provenance of a result. While a casual user will interact with the program via menu items and other controls, an advanced user can directly edit and interact with the workflow so as to setup an analysis that goes beyond the basic analyses offered by the program. Another novel feature of the program is that the workflow is analyzed so as to produce a textual representation of the analysis, together with all relevant citations, thus providing the framework for a "methods section" of a corresponding paper.
+
+Any workflow can be saved to a file and then applied to other datasets either using SplitsTree CE or using an accompanying command-line workflow runner program.
+
+<img width="800" alt="image" src="https://user-images.githubusercontent.com/6740594/210215775-aa422f30-bf40-4286-883d-854ca152b7fd.png">
+
+
+
+
