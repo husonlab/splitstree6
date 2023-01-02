@@ -2,6 +2,7 @@
 
 ## History
 Our previous program,  SplitsTree4, was designed for computing phylogenetic trees and networks from distances or aligned sequences. It was written in the early 2000's by Daniel Huson and Dave Bryant. While the program is still widely used and cited, it was designed for small datasets and the user interface, implemented using the Java Swing library, now feels minimalistic and dated. Moreover, SplitsTree4 was not designed as an open source program.
+(SplitsTree5 was our first attempt to rewrite SplitsTree4, however, some unfortunate early design decisions lead to code that was difficult to extend and so we have abandoned the development of Splitstree5. We consider it an evolutionary dead end).
 
 While SplitsTree4 was designed for unrooted phylogenetic trees and networks, another previous program Dendroscope3 was designed for working with rooted trees and networks. This program, too, was designed for much smaller datasets than people work with today. 
 
@@ -17,6 +18,9 @@ Any workflow can be saved to a file and then applied to other datasets either us
 
 <img width="800" alt="image" src="https://user-images.githubusercontent.com/6740594/210215775-aa422f30-bf40-4286-883d-854ca152b7fd.png">
 
+## Under development
+
+SplitsTree6 is currently under rapid development. We are currently calling this an "beta" release, which means that we are making this available for testing and feedback. We plan to wrapup programming and to submit a publication by the end of March 2023. 
 
 
 
