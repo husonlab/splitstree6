@@ -1,4 +1,5 @@
-# SplitsTree Community Edition
+# <img width="32" alt="image" src="https://user-images.githubusercontent.com/6740594/210514648-dac226c7-b12b-40f0-b0fa-9803cc2e6916.png"> SplitsTree Community Edition 
+
 
 ## History
 Our previous program,  SplitsTree4, was designed for computing phylogenetic trees and networks from distances or aligned sequences. It was written in the early 2000's by Daniel Huson and Dave Bryant and described in [(Huson and Bryant, 2006)](https://academic.oup.com/mbe/article/23/2/254/1118872). While the program is still widely used and cited, it was designed for small datasets and the user interface, implemented using the Java Swing library, now feels minimalistic and dated. Moreover, SplitsTree4 was not designed as an open source program.
