@@ -98,6 +98,9 @@ public class MainWindowController {
 	private MenuItem importMultipleTreeFilesMenuItem;
 
 	@FXML
+	private MenuItem importTreeNamesMenuItem;
+
+	@FXML
 	private MenuItem GroupIdenticalHaplotypesFilesMenuItem;
 
 	@FXML
@@ -512,6 +515,10 @@ public class MainWindowController {
 
 	public MenuItem getImportMultipleTreeFilesMenuItem() {
 		return importMultipleTreeFilesMenuItem;
+	}
+
+	public MenuItem getImportTreeNamesMenuItem() {
+		return importTreeNamesMenuItem;
 	}
 
 	public MenuItem getReplaceDataMenuItem() {

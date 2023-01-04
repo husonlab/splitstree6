@@ -89,4 +89,11 @@ public class TextTabsManager {
 			}
 		});
 	}
+
+	public void updateDataNodeTabIfShowing(DataNode node) {
+		if (nodeTabMap.containsKey(node)) {
+			var tab = nodeTabMap.get(node);
+			Platform.runLater(() -> ((DisplayData) tab.getView()).getDisplayDataController().getApplyButton().getOnAction().handle(null));
+		}
+	}
 }

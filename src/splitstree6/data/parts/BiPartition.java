@@ -96,7 +96,7 @@ public class BiPartition implements Comparable<BiPartition> {
 	}
 
 	/**
-	 * gets the smaller part. In the case of a tie, return the set that contains 1
+	 * gets the smaller part. In the case of a tie, returns the set that contains the smallest element
 	 *
 	 * @return smaller part
 	 */
@@ -105,7 +105,7 @@ public class BiPartition implements Comparable<BiPartition> {
 			return A;
 		else if (A.cardinality() > B.cardinality())
 			return B;
-		else if (A.get(1))
+		if (A.nextSetBit(1) < B.nextSetBit(1))
 			return A;
 		else
 			return B;

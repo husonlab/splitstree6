@@ -101,6 +101,9 @@ public class DensiTreeViewController {
 	private RadioMenuItem roundedPhylogramToggleItem;
 
 	@FXML
+	private CheckMenuItem rerootAndRescaleChekMenuItem;
+
+	@FXML
 	private MenuButton menuButton;
 
 	@FXML
@@ -256,5 +259,9 @@ public class DensiTreeViewController {
 
 	public CheckMenuItem getColorIncompatibleTreesMenuItem() {
 		return colorIncompatibleTreesMenuItem;
+	}
+
+	public CheckMenuItem getRerootAndRescaleChekMenuItem() {
+		return rerootAndRescaleChekMenuItem;
 	}
 }

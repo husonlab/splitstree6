@@ -29,12 +29,8 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
 import jloda.util.IteratorUtils;
-import splitstree6.view.trees.treeview.TreeViewPresenter;
-import splitstree6.xtra.CoordinatesForRootedNetworkIO;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -87,14 +83,6 @@ public class ComputeTreeLayout {
 			case RadialCladogram, CircularCladogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, false, averaging);
 			case CircularPhylogram -> LayoutTreeCircular.apply(tree, nodeAngleMap, true, averaging);
 		};
-
-		if (TreeViewPresenter.useCommand) {
-			try {
-				CoordinatesForRootedNetworkIO.run(TreeViewPresenter.commandLine, tree, nodePointMap, nodeAngleMap);
-			} catch (IOException e) {
-				Basic.caught(e);
-			}
-		}
 
 		var unitLengthX = LayoutUtils.normalize(dimensions.width(), dimensions.height(), nodePointMap, diagram.isRadialOrCircular());
 

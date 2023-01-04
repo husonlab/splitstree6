@@ -29,6 +29,7 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
+import splitstree6.data.parts.Compatibility;
 
 import java.util.*;
 
@@ -332,4 +333,85 @@ public class TreesUtilities {
 		});
 		return nodeClusterMap;
 	}
+
+	public static PhyloTree computeTreeFromCompatibleSplits(TaxaBlock taxaBlock, List<ASplit> splits) {
+		if (!Compatibility.isCompatible(splits))
+			throw new RuntimeException("Internal error: Splits are not compatible");
+		final var clusterWeightConfidenceMap = new HashMap<BitSet, WeightConfidence>();
+		for (var split : splits) {
+			clusterWeightConfidenceMap.put(split.getPartNotContaining(1), new WeightConfidence(split.getWeight(), split.getConfidence()));
+		}
+
+		final BitSet[] clusters;
+		{
+			clusters = new BitSet[splits.size()];
+			var i = 0;
+			for (var split : splits) {
+				clusters[i++] = split.getPartNotContaining(1);
+
+			}
+		}
+		Arrays.sort(clusters, (a, b) -> Integer.compare(b.cardinality(), a.cardinality()));
+
+		final var allTaxa = taxaBlock.getTaxaSet();
+		var tree = new PhyloTree();
+		tree.setRoot(tree.newNode());
+
+		try (NodeArray<BitSet> node2taxa = tree.newNodeArray()) {
+			node2taxa.put(tree.getRoot(), allTaxa);
+			// create tree:
+			for (var cluster : clusters) {
+				var v = tree.getRoot();
+				while (BitSetUtils.contains(node2taxa.get(v), cluster)) {
+					var isBelow = false;
+					for (var e : v.outEdges()) {
+						final var w = e.getTarget();
+						if (BitSetUtils.contains(node2taxa.get(w), cluster)) {
+							v = w;
+							isBelow = true;
+							break;
+						}
+					}
+					if (!isBelow)
+						break;
+				}
+				final var u = tree.newNode();
+				final var f = tree.newEdge(v, u);
+				var weightConfidence = clusterWeightConfidenceMap.get(cluster);
+				tree.setWeight(f, weightConfidence.weight());
+				if (weightConfidence.confidence() != -1)
+					tree.setConfidence(f, weightConfidence.confidence());
+				node2taxa.put(u, cluster);
+			}
+
+			// add all labels:
+
+			for (var t : BitSetUtils.members(allTaxa)) {
+				var v = tree.getRoot();
+				while (node2taxa.get(v).get(t)) {
+					var isBelow = false;
+					for (var e : v.outEdges()) {
+						final var w = e.getTarget();
+						if (node2taxa.get(w).get(t)) {
+							v = w;
+							isBelow = true;
+							break;
+						}
+					}
+					if (!isBelow)
+						break;
+				}
+				tree.addTaxon(v, t);
+			}
+		}
+		PhyloGraphUtils.addLabels(taxaBlock, tree);
+
+		// todo: ask about internal node labels
+		RerootingUtils.rerootByMidpoint(tree);
+		return tree;
+	}
+
+	private static record WeightConfidence(double weight, double confidence) {
+	}
+
 }

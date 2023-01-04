@@ -114,11 +114,13 @@ public class DensiTreeDrawer {
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(invalidationListener));
 	}
 
-	public void apply(Bounds targetBounds, List<PhyloTree> trees, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
+	public void apply(Bounds targetBounds, List<PhyloTree> trees0, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, ReadOnlyBooleanProperty showConsensus,
 					  double lineWidth, Color edgeColor, Color otherColor) {
 		radialLabelLayout.getItems().clear();
+
+		var trees = trees0.stream().filter(t -> !t.getName().equals("STATE_0")).collect(Collectors.toList());
 
 		RunAfterAWhile.applyInFXThread(parent, () -> {
 			parent.getChildren().clear();
@@ -190,11 +192,12 @@ public class DensiTreeDrawer {
 				var consensusCenter = computeCenter(consensusNodePointMap.values());
 				Platform.runLater(() -> {
 					drawConsensus(mainWindow, consensusTree, consensusNodePointMap, nodeAngleMap, diagramType, getRadialLabelLayout(), showConsensus, pane);
+					ProgramExecutorService.submit(consensusNodePointMap::close);
+					ProgramExecutorService.submit(nodeAngleMap::close);
 				});
 
 				var random = new Random(666);
 				var start = System.currentTimeMillis();
-
 				if (colorIncompatibleEdges) {
 					for (PhyloTree tree : trees) {
 						var consensusClusters = TreesUtilities.extractClusters(consensusTree).values();
@@ -221,7 +224,12 @@ public class DensiTreeDrawer {
 								diagramType, jitter, random);
 						Platform.runLater(() -> {
 							try {
-								drawTree(progress, tree, nodePointMap, null, diagramType, 2, canvas0, lineWidth, edgeColor, otherColor);
+								if (false) { // todo: make random colors an option?
+									var randomColor = Color.color(random.nextDouble(), random.nextDouble(), random.nextDouble());
+									drawTree(progress, tree, nodePointMap, null, diagramType, 2, canvas0, lineWidth, randomColor, otherColor);
+								} else {
+									drawTree(progress, tree, nodePointMap, null, diagramType, 2, canvas0, lineWidth, edgeColor, otherColor);
+								}
 								progress.incrementProgress();
 							} catch (CanceledException ignored) {
 							}
@@ -397,6 +405,8 @@ public class DensiTreeDrawer {
 
 				var p = nodePointMap.get(e.getSource());
 				var q = nodePointMap.get(e.getTarget());
+
+
 				switch (diagramType) {
 					case TriangularPhylogram, RadialPhylogram -> gc.strokeLine(p.getX(), p.getY(), q.getX(), q.getY());
 					case RectangularPhylogram -> {
@@ -445,17 +455,26 @@ public class DensiTreeDrawer {
 		var consensusClusterWeightMap = new HashMap<BitSet, Double>();
 
 		var pqTree = new PQTree(taxaBlock.getTaxaSet());
+
+		// compute consensus clusters and add to PQ-tree
 		for (var cwc : list) {
 			if (cwc.count() > 0.5 * trees.size() || isCompatibleWithAll(cwc.cluster(), consensusClusterWeightMap.keySet())) {
-				if (pqTree.accept(cwc.cluster())) {
-					consensusClusterWeightMap.put(cwc.cluster(), cwc.count() > 0 ? cwc.weight() / cwc.count() : 0.0);
-				} else { // figure out why this can happen
+				consensusClusterWeightMap.put(cwc.cluster(), cwc.count() > 0 ? cwc.weight() / cwc.count() : 0.0);
+				if (!pqTree.accept(cwc.cluster())) { // figure out why this can happen
 					System.err.println("Looks like a bug in the PQ-tree code, please contact the author (Daniel Huson) about this");
 					pqTree.verbose = true;
 					pqTree.accept(cwc.cluster());
 					pqTree.verbose = false;
 				}
 			}
+		}
+		// add additional clusters to PQ-tree for better layout
+		var count = 0;
+		for (var cwc : list) {
+			if (count++ == 1000)
+				break;
+			if (!consensusClusterWeightMap.containsKey(cwc.cluster()))
+				pqTree.accept(cwc.cluster());
 		}
 
 		// create consensus tree:
@@ -471,9 +490,14 @@ public class DensiTreeDrawer {
 	private static Point2D computeCenter(Collection<Point2D> points) {
 		if (points.size() == 0)
 			return new Point2D(0, 0);
-		else
+		else if (true) {
 			return new Point2D(points.stream().mapToDouble(Point2D::getX).sum() / points.size(),
 					points.stream().mapToDouble(Point2D::getY).sum() / points.size());
+		} else {
+			var xMid = 0.5 * (points.stream().mapToDouble(Point2D::getX).max().orElse(0.0) + points.stream().mapToDouble(Point2D::getX).min().orElse(0.0));
+			var yMid = 0.5 * (points.stream().mapToDouble(Point2D::getY).max().orElse(0.0) + points.stream().mapToDouble(Point2D::getY).min().orElse(0.0));
+			return new Point2D(xMid, yMid);
+		}
 	}
 
 	private static boolean nodeShapeOrLabelEntered = false;
@@ -614,6 +638,11 @@ public class DensiTreeDrawer {
 	}
 
 	public static void computeTriangularLayout(PhyloTree tree, int[] taxon2pos, NodeArray<Point2D> nodePointMap) {
+		if (false) {
+			computeTriangularTopologyLayout(tree, taxon2pos, nodePointMap);
+			return;
+		}
+
 		try (NodeArray<Pair<Node, Node>> firstLastLeafBelowMap = tree.newNodeArray()) {
 			var root = tree.getRoot();
 			if (root != null) {
@@ -647,9 +676,6 @@ public class DensiTreeDrawer {
 				}
 			}
 		}
-	}
-
-	private static record Result(Canvas canvas, Pane labelPane, RadialLabelLayout radialLabelLayout) {
 	}
 
 	private static record CountWeight(int count, double weight) {

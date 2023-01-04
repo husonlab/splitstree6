@@ -75,6 +75,7 @@ import splitstree6.algorithms.trees.trees2splits.*;
 import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
@@ -84,6 +85,7 @@ import splitstree6.dialog.exporting.ExportTaxonTraits;
 import splitstree6.dialog.importing.ImportMultipleTrees;
 import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
 import splitstree6.dialog.importing.ImportTaxonTraits;
+import splitstree6.dialog.importing.ImportTreeNames;
 import splitstree6.io.FileLoader;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.main.CheckForUpdate;
@@ -298,6 +300,10 @@ public class MainWindowPresenter {
 
 		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> ImportMultipleTrees.apply(mainWindow));
 		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not());
+
+		controller.getImportTreeNamesMenuItem().setOnAction(e -> ImportTreeNames.apply(mainWindow));
+		controller.getImportTreeNamesMenuItem().disableProperty().bind(workflow.runningProperty().or(
+				Bindings.createBooleanBinding(() -> !(mainWindow.getWorkflow().getInputDataBlock() instanceof TreesBlock), mainWindow.getWorkflow().runningProperty())));
 
 		controller.getReplaceDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
 		controller.getReplaceDataMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));

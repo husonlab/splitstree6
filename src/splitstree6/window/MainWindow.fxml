@@ -66,8 +66,11 @@
                                           text="Taxon Traits..."/>
                                 <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
                                           text="Taxon Display Labels..."/>
+                                <SeparatorMenuItem/>
                                 <MenuItem fx:id="importMultipleTreeFilesMenuItem" mnemonicParsing="false"
                                           text="Trees from Multiple Files..."/>
+                                <MenuItem fx:id="importTreeNamesMenuItem" mnemonicParsing="false"
+                                          text="Tree Names..."/>
                             </items>
                         </Menu>
                         <SeparatorMenuItem mnemonicParsing="false"/>

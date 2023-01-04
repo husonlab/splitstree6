@@ -55,7 +55,7 @@ public enum TreeLabel {
 
 	public static void setLabel(PhyloTree tree, TreeLabel treeLabel, TextInputControl label) {
 		if (tree != null && (treeLabel == Name || treeLabel == Details)) {
-			label.setText(tree.getName() + (treeLabel == Details ? " : " + RootedNetworkProperties.computeInfoString(tree) : ""));
+			label.setText((tree.getName() != null ? tree.getName() : "") + (treeLabel == Details ? " : " + RootedNetworkProperties.computeInfoString(tree) : ""));
 		} else
 			label.setText("");
 	}

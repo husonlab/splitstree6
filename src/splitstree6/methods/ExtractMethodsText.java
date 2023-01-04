@@ -40,7 +40,7 @@ import java.util.TreeSet;
 public class ExtractMethodsText {
 	private static ExtractMethodsText instance;
 
-	public static final String PreambleTemplate = "Analysis was performed using SplitsTree6 %s%s.%n";
+	public static final String PreambleTemplate = "Analysis was performed using SplitsTree CE %s%s.%n";
 	public static final String InputDataTemplate = "The original input consisted of %s and %s.%n";
 	public static final String RemovedCharactersTemplate = "After removal of %s characters, the input had %s characters.%n";
 

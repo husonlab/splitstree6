@@ -99,6 +99,9 @@
                                 </graphic>
                             </RadioMenuItem>
                             <SeparatorMenuItem mnemonicParsing="false"/>
+                            <CheckMenuItem fx:id="rerootAndRescaleChekMenuItem" mnemonicParsing="false"
+                                           text="Reroot and Rescale"/>
+                            <SeparatorMenuItem mnemonicParsing="false"/>
                             <CheckMenuItem fx:id="showTreesMenuItem" mnemonicParsing="false" text="Show All Trees"/>
                             <CheckMenuItem fx:id="showConsensusMenuItem" mnemonicParsing="false" text="Show Consensus"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>

@@ -19,22 +19,15 @@
 
 package splitstree6.algorithms.splits.splits2trees;
 
-import jloda.graph.NodeArray;
-import jloda.phylo.PhyloTree;
-import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.GreedyCompatible;
-import splitstree6.algorithms.utils.PhyloGraphUtils;
-import splitstree6.algorithms.utils.RerootingUtils;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.HashMap;
 
 /**
  * greedy tree
@@ -48,86 +41,13 @@ public class GreedyTree extends Splits2Trees {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splits, TreesBlock trees) throws IOException {
-
 		progress.setTasks("Greedy Tree", "Extracting compatible splits...");
-		final var clusterWeightConfidenceMap = new HashMap<BitSet, WeightConfidence>();
-		for (var split : splits.getSplits()) {
-			clusterWeightConfidenceMap.put(split.getPartNotContaining(1), new WeightConfidence(split.getWeight(), split.getConfidence()));
-		}
 
-		final BitSet[] clusters;
-		{
-			final var compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits(), ASplit::getWeight);
-			clusters = new BitSet[compatibleSplits.size()];
-			for (var i = 0; i < compatibleSplits.size(); i++) {
-				clusters[i] = compatibleSplits.get(i).getPartNotContaining(1);
-			}
-		}
-		Arrays.sort(clusters, (a, b) -> Integer.compare(b.cardinality(), a.cardinality()));
-
-		final var allTaxa = taxaBlock.getTaxaSet();
-
-		final var tree = new PhyloTree();
-		tree.setRoot(tree.newNode());
-
-		final var node2taxa = new NodeArray<BitSet>(tree);
-		node2taxa.put(tree.getRoot(), allTaxa);
-
-		// create tree:
-		for (var cluster : clusters) {
-			var v = tree.getRoot();
-			while (BitSetUtils.contains(node2taxa.get(v), cluster)) {
-				var isBelow = false;
-				for (var e : v.outEdges()) {
-					final var w = e.getTarget();
-					if (BitSetUtils.contains(node2taxa.get(w), cluster)) {
-						v = w;
-						isBelow = true;
-						break;
-					}
-				}
-				if (!isBelow)
-					break;
-			}
-			final var u = tree.newNode();
-			final var f = tree.newEdge(v, u);
-			var weightConfidence = clusterWeightConfidenceMap.get(cluster);
-			tree.setWeight(f, weightConfidence.weight());
-			if (weightConfidence.confidence() != -1)
-				tree.setConfidence(f, weightConfidence.confidence());
-			node2taxa.put(u, cluster);
-		}
-
-		// add all labels:
-
-		for (var t : BitSetUtils.members(allTaxa)) {
-			var v = tree.getRoot();
-			while (node2taxa.get(v).get(t)) {
-				var isBelow = false;
-				for (var e : v.outEdges()) {
-					final var w = e.getTarget();
-					if (node2taxa.get(w).get(t)) {
-						v = w;
-						isBelow = true;
-						break;
-					}
-				}
-				if (!isBelow)
-					break;
-			}
-			tree.addTaxon(v, t);
-		}
-		PhyloGraphUtils.addLabels(taxaBlock, tree);
-
-		// todo: ask about internal node labels
-		RerootingUtils.rerootByMidpoint(tree);
-
+		final var compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits(), ASplit::getWeight);
+		var tree = TreesUtilities.computeTreeFromCompatibleSplits(taxaBlock, compatibleSplits);
+		trees.getTrees().setAll(tree);
 		trees.setRooted(true);
 		trees.setPartial(false);
-		trees.getTrees().setAll(tree);
-		progress.close();
-	}
-
-	private static record WeightConfidence(double weight, double confidence) {
+		progress.reportTaskCompleted();
 	}
 }

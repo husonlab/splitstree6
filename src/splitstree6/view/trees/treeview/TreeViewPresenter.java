@@ -30,10 +30,6 @@ import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.geometry.Orientation;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Separator;
-import javafx.scene.control.TextField;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -54,7 +50,6 @@ import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
-import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edges.LabelEdgesBy;
@@ -71,9 +66,6 @@ import java.util.stream.Collectors;
  * Daniel Huson 3.2022
  */
 public class TreeViewPresenter implements IDisplayTabPresenter {
-	public static String[] commandLine = null;
-	public static boolean useCommand = false;
-
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
 
 	private final MainWindow mainWindow;
@@ -106,14 +98,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		this.controller = view.getController();
 		this.tree = view.treeProperty();
 
-		if (SplitsTree6.expertMode) {
-			var useCommandCBox = new CheckBox("Call");
-			useCommandCBox.selectedProperty().addListener((v, o, n) -> useCommand = n);
-			var commandTextField = new TextField();
-			commandTextField.textProperty().addListener((v, o, n) -> commandLine = n.split("\\s+"));
-			commandTextField.setText("cp /tmp/test-1 /tmp/test-2");
-			controller.getToolBar().getItems().addAll(new Separator(Orientation.VERTICAL), useCommandCBox, commandTextField);
-		}
 
 		view.optionTreeProperty().addListener((v, o, n) -> {
 			var nTree = n.intValue();

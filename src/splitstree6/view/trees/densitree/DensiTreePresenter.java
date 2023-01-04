@@ -85,6 +85,10 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 			view.setOptionVerticalZoomFactor(1.0 / 1.2);
 		});
 
+		view.optionRerootAndRescaleProperty().bindBidirectional(controller.getRerootAndRescaleChekMenuItem().selectedProperty());
+		// todo: RerootAndRescaleTrees.java needs to be finished
+		controller.getRerootAndRescaleChekMenuItem().setDisable(true);
+
 		controller.getShowTreesMenuItem().selectedProperty().bindBidirectional(view.optionShowTreesProperty());
 		controller.getShowConsensusMenuItem().selectedProperty().bindBidirectional(view.optionShowConsensusProperty());
 
@@ -110,12 +114,15 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 
 		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionColorIncompatibleEdgesProperty());
 
-		InvalidationListener invalidationListener = e -> drawer.apply(targetBounds.get(),
-				view.getTrees(), controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
-				view.getOptionColorIncompatibleEdges(),
-				view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
-				view.optionShowTreesProperty(),
-				view.optionShowConsensusProperty(), view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+		InvalidationListener invalidationListener = e -> {
+			var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
+			drawer.apply(targetBounds.get(),
+					trees, controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
+					view.getOptionColorIncompatibleEdges(),
+					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
+					view.optionShowTreesProperty(),
+					view.optionShowConsensusProperty(), view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+		};
 
 		targetBounds.addListener(invalidationListener);
 		view.optionDiagramProperty().addListener(invalidationListener);
@@ -128,6 +135,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1 / 1.1 * view.getOptionFontScaleFactor()));
 		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));
 
+		view.optionRerootAndRescaleProperty().addListener(invalidationListener);
 		view.optionJitterProperty().addListener(invalidationListener);
 		view.optionColorIncompatibleEdgesProperty().addListener(invalidationListener);
 		view.getTrees().addListener(invalidationListener);

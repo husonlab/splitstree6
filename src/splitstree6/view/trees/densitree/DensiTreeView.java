@@ -70,6 +70,8 @@ public class DensiTreeView implements IView {
 
 	private final ObjectProperty<DensiTreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", DensiTreeDiagramType.TriangularPhylogram);
 
+	private final BooleanProperty optionRerootAndRescale = new SimpleBooleanProperty(this, "optionRerootAndRescale");
+
 	private final BooleanProperty optionShowTrees = new SimpleBooleanProperty(this, "optionShowTrees", true);
 
 	private final BooleanProperty optionShowConsensus = new SimpleBooleanProperty(this, "optionShowConsensus", true);
@@ -90,6 +92,7 @@ public class DensiTreeView implements IView {
 
 	{
 		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
+		ProgramProperties.track(optionRerootAndRescale, false);
 		ProgramProperties.track(optionShowTrees, true);
 		ProgramProperties.track(optionShowConsensus, true);
 		ProgramProperties.track(optionJitter, false);
@@ -97,6 +100,7 @@ public class DensiTreeView implements IView {
 		if (startup) {
 			startup = false;
 			optionDiagram.set(DensiTreeDiagramType.TriangularPhylogram);
+			optionRerootAndRescale.set(false);
 			optionShowTrees.set(true);
 			optionShowConsensus.set(true);
 			optionJitter.set(false);
@@ -109,7 +113,7 @@ public class DensiTreeView implements IView {
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionShowTrees.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
+		return List.of(optionDiagram.getName(), optionRerootAndRescale.getName(), optionShowTrees.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionJitter.getName(), optionColorIncompatibleEdges.getName());
 	}
@@ -152,7 +156,6 @@ public class DensiTreeView implements IView {
 			if (!n && !optionShowTrees.get())
 				Platform.runLater(() -> optionShowTrees.set(true));
 		});
-
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
 	}
@@ -241,6 +244,18 @@ public class DensiTreeView implements IView {
 
 	public void setOptionDiagram(DensiTreeDiagramType optionDiagram) {
 		this.optionDiagram.set(optionDiagram);
+	}
+
+	public boolean isOptionRerootAndRescale() {
+		return optionRerootAndRescale.get();
+	}
+
+	public BooleanProperty optionRerootAndRescaleProperty() {
+		return optionRerootAndRescale;
+	}
+
+	public void setOptionRerootAndRescale(boolean optionRerootAndRescale) {
+		this.optionRerootAndRescale.set(optionRerootAndRescale);
 	}
 
 	public boolean isOptionShowTrees() {
