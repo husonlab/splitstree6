@@ -55,6 +55,7 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.view.trees.InteractionSetup;
 import splitstree6.window.MainWindow;
@@ -114,13 +115,15 @@ public class DensiTreeDrawer {
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakInvalidationListener(invalidationListener));
 	}
 
-	public void apply(Bounds targetBounds, List<PhyloTree> trees0, StackPane parent, DensiTreeDiagramType diagramType, boolean jitter,
+	public void apply(Bounds targetBounds, List<PhyloTree> trees0, StackPane parent, DensiTreeDiagramType diagramType, HeightAndAngles.Averaging averaging,
+					  boolean vFlip,
+					  boolean jitter,
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
-					  ReadOnlyBooleanProperty showTrees, ReadOnlyBooleanProperty showConsensus,
+					  ReadOnlyBooleanProperty showTrees, boolean hideFirst10PercentTrees, ReadOnlyBooleanProperty showConsensus,
 					  double lineWidth, Color edgeColor, Color otherColor) {
 		radialLabelLayout.getItems().clear();
 
-		var trees = trees0.stream().filter(t -> !t.getName().equals("STATE_0")).collect(Collectors.toList());
+		var trees = new ArrayList<>(hideFirst10PercentTrees ? new ArrayList<>(trees0).subList(trees0.size() / 10, trees0.size()) : trees0);
 
 		RunAfterAWhile.applyInFXThread(parent, () -> {
 			parent.getChildren().clear();
@@ -186,7 +189,9 @@ public class DensiTreeDrawer {
 					computeRadialLayout(consensusTree, taxon2pos, mainWindow.getWorkingTaxa().getNtax(), lastTaxon, consensusNodePointMap, nodeAngleMap);
 					consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
 				} else {
-					computeTriangularLayout(consensusTree, taxon2pos, consensusNodePointMap);
+					computeTriangularLayout(consensusTree, averaging, taxon2pos, consensusNodePointMap);
+					if (vFlip)
+						consensusNodePointMap.entrySet().forEach(e -> e.setValue(new Point2D(e.getValue().getX(), -e.getValue().getY())));
 					consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
 				}
 				var consensusCenter = computeCenter(consensusNodePointMap.values());
@@ -201,8 +206,8 @@ public class DensiTreeDrawer {
 				if (colorIncompatibleEdges) {
 					for (PhyloTree tree : trees) {
 						var consensusClusters = TreesUtilities.extractClusters(consensusTree).values();
-						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, taxon2pos, lastTaxon, consensusCenter, consensusScale,
-								diagramType, jitter, random);
+						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, averaging, vFlip, taxon2pos, lastTaxon,
+								consensusCenter, consensusScale, diagramType, jitter, random);
 						Platform.runLater(() -> {
 							try {
 								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 0, canvas0, lineWidth, edgeColor, otherColor);
@@ -220,8 +225,8 @@ public class DensiTreeDrawer {
 					}
 				} else {
 					for (PhyloTree tree : trees) {
-						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, taxon2pos, lastTaxon, consensusCenter, consensusScale,
-								diagramType, jitter, random);
+						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, averaging, vFlip, taxon2pos, lastTaxon,
+								consensusCenter, consensusScale, diagramType, jitter, random);
 						Platform.runLater(() -> {
 							try {
 								if (false) { // todo: make random colors an option?
@@ -343,7 +348,7 @@ public class DensiTreeDrawer {
 		labelPane.getChildren().addAll(edgesGroup, labelGroup);
 	}
 
-	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, int[] taxon2pos, int lastTaxon,
+	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, HeightAndAngles.Averaging averaging, boolean vFlip, int[] taxon2pos, int lastTaxon,
 															 Point2D consensusCenter, Point2D consensusScale, DensiTreeDiagramType diagramType,
 															 boolean jitter, Random random) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
@@ -358,7 +363,9 @@ public class DensiTreeDrawer {
 			LayoutUtils.translate(consensusCenter.subtract(center).getX(), consensusCenter.subtract(center).getY(), nodePointMap);
 
 		} else {
-			computeTriangularLayout(tree, taxon2pos, nodePointMap);
+			computeTriangularLayout(tree, averaging, taxon2pos, nodePointMap);
+			if (vFlip)
+				nodePointMap.entrySet().forEach(e -> e.setValue(new Point2D(e.getValue().getX(), -e.getValue().getY())));
 			// scale and center based on consensus tree:
 			LayoutUtils.scale(consensusScale.getX(), consensusScale.getY(), nodePointMap);
 			var center = computeCenter(nodePointMap.values());
@@ -406,7 +413,6 @@ public class DensiTreeDrawer {
 				var p = nodePointMap.get(e.getSource());
 				var q = nodePointMap.get(e.getTarget());
 
-
 				switch (diagramType) {
 					case TriangularPhylogram, RadialPhylogram -> gc.strokeLine(p.getX(), p.getY(), q.getX(), q.getY());
 					case RectangularPhylogram -> {
@@ -439,9 +445,10 @@ public class DensiTreeDrawer {
 						}
 					}
 					clusterMap.put(v, cluster);
-					var clusterCountWeight = clusterCountWeightMap.getOrDefault(cluster, new CountWeight(0, 0.0));
-					var weight = (v.getFirstInEdge() != null ? tree.getWeight(v.getFirstInEdge()) : 0);
-					clusterCountWeightMap.put(cluster, new CountWeight(clusterCountWeight.count() + 1, clusterCountWeight.weight() + weight));
+					var clusterCountWeight = clusterCountWeightMap.computeIfAbsent(cluster, k -> new CountWeight(0, 0.0));
+					if (v.getInDegree() > 0) {
+						clusterCountWeightMap.put(cluster, new CountWeight(clusterCountWeight.count() + 1, clusterCountWeight.weight() + tree.getWeight(v.getFirstInEdge())));
+					}
 				});
 			}
 		}
@@ -490,11 +497,10 @@ public class DensiTreeDrawer {
 	private static Point2D computeCenter(Collection<Point2D> points) {
 		if (points.size() == 0)
 			return new Point2D(0, 0);
-		else if (true) {
-			return new Point2D(points.stream().mapToDouble(Point2D::getX).sum() / points.size(),
-					points.stream().mapToDouble(Point2D::getY).sum() / points.size());
-		} else {
-			var xMid = 0.5 * (points.stream().mapToDouble(Point2D::getX).max().orElse(0.0) + points.stream().mapToDouble(Point2D::getX).min().orElse(0.0));
+		else {
+			var xMid = points.stream().mapToDouble(Point2D::getX).sum() / points.size();
+			// var xMid = 0.5 * (points.stream().mapToDouble(Point2D::getX).max().orElse(0.0) + points.stream().mapToDouble(Point2D::getX).min().orElse(0.0));
+			//var yMid=points.stream().mapToDouble(Point2D::getY).sum() / points.size())
 			var yMid = 0.5 * (points.stream().mapToDouble(Point2D::getY).max().orElse(0.0) + points.stream().mapToDouble(Point2D::getY).min().orElse(0.0));
 			return new Point2D(xMid, yMid);
 		}
@@ -637,7 +643,7 @@ public class DensiTreeDrawer {
 		}
 	}
 
-	public static void computeTriangularLayout(PhyloTree tree, int[] taxon2pos, NodeArray<Point2D> nodePointMap) {
+	public static void computeTriangularLayout(PhyloTree tree, HeightAndAngles.Averaging averaging, int[] taxon2pos, NodeArray<Point2D> nodePointMap) {
 		if (false) {
 			computeTriangularTopologyLayout(tree, taxon2pos, nodePointMap);
 			return;
@@ -658,7 +664,24 @@ public class DensiTreeDrawer {
 				});
 
 				// compute all y-coordinates:
-				{
+				if (averaging == HeightAndAngles.Averaging.ChildAverage) {
+					{
+						LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+							if (tree.isLeaf(v) || tree.isLsaLeaf(v)) {
+								nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), taxon2pos[tree.getTaxon(v)]));
+								firstLastLeafBelowMap.put(v, new Pair<>(v, v));
+							} else {
+								var firstChildBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))
+										.min(Comparator.comparing(Pair::getFirst)).orElseThrow(null).getSecond();
+								var lastChildBelow = IteratorUtils.asStream(tree.lsaChildren(v)).map(w -> new Pair<>(nodePointMap.get(w).getY(), w))
+										.max(Comparator.comparing(Pair::getFirst)).orElseThrow(null).getSecond();
+								var y = 0.5 * (nodePointMap.get(firstChildBelow).getY() + nodePointMap.get(lastChildBelow).getY());
+								nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), y));
+								firstLastLeafBelowMap.put(v, new Pair<>(firstChildBelow, lastChildBelow));
+							}
+						});
+					}
+				} else {
 					LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
 						if (tree.isLeaf(v) || tree.isLsaLeaf(v)) {
 							nodePointMap.put(v, new Point2D(nodePointMap.get(v).getX(), taxon2pos[tree.getTaxon(v)]));

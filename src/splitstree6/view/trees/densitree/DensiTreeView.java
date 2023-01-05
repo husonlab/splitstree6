@@ -34,6 +34,7 @@ import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
+import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
@@ -68,15 +69,18 @@ public class DensiTreeView implements IView {
 
 	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
 
-	private final ObjectProperty<DensiTreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram", DensiTreeDiagramType.TriangularPhylogram);
+	private final ObjectProperty<DensiTreeDiagramType> optionDiagram = new SimpleObjectProperty<>(this, "optionDiagram");
+
+	private final ObjectProperty<HeightAndAngles.Averaging> optionAveraging = new SimpleObjectProperty<>(this, "optionAveraging");
 
 	private final BooleanProperty optionRerootAndRescale = new SimpleBooleanProperty(this, "optionRerootAndRescale");
 
 	private final BooleanProperty optionShowTrees = new SimpleBooleanProperty(this, "optionShowTrees", true);
+	private final BooleanProperty optionHideFirst10PercentTrees = new SimpleBooleanProperty(this, "optionHideFirst10PercentTrees", true);
 
 	private final BooleanProperty optionShowConsensus = new SimpleBooleanProperty(this, "optionShowConsensus", true);
 
-	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation", LayoutOrientation.Rotate0Deg);
+	private final ObjectProperty<LayoutOrientation> optionOrientation = new SimpleObjectProperty<>(this, "optionOrientation");
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0 / 1.2);
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0 / 1.2);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
@@ -92,16 +96,22 @@ public class DensiTreeView implements IView {
 
 	{
 		ProgramProperties.track(optionDiagram, DensiTreeDiagramType::valueOf, DensiTreeDiagramType.TriangularPhylogram);
+		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
+		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionRerootAndRescale, false);
 		ProgramProperties.track(optionShowTrees, true);
+		ProgramProperties.track(optionHideFirst10PercentTrees, true);
 		ProgramProperties.track(optionShowConsensus, true);
 		ProgramProperties.track(optionJitter, false);
 		ProgramProperties.track(optionColorIncompatibleEdges, false);
 		if (startup) {
 			startup = false;
 			optionDiagram.set(DensiTreeDiagramType.TriangularPhylogram);
+			optionOrientation.set(LayoutOrientation.Rotate0Deg);
+			optionAveraging.set(HeightAndAngles.Averaging.ChildAverage);
 			optionRerootAndRescale.set(false);
 			optionShowTrees.set(true);
+			optionHideFirst10PercentTrees.set(true);
 			optionShowConsensus.set(true);
 			optionJitter.set(false);
 			optionColorIncompatibleEdges.set(true);
@@ -113,7 +123,7 @@ public class DensiTreeView implements IView {
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionRerootAndRescale.getName(), optionShowTrees.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
+		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionAveraging.getName(), optionRerootAndRescale.getName(), optionShowTrees.getName(), optionHideFirst10PercentTrees.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionJitter.getName(), optionColorIncompatibleEdges.getName());
 	}
@@ -145,7 +155,10 @@ public class DensiTreeView implements IView {
 		});
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
-		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
+
+		optionDiagram.addListener(e -> mainWindow.setDirty(true));
+		optionOrientation.addListener(e -> mainWindow.setDirty(true));
+		optionAveraging.addListener(e -> mainWindow.setDirty(true));
 
 		// one of the two should always be selected:
 		optionShowTrees.addListener((v, o, n) -> {
@@ -154,6 +167,10 @@ public class DensiTreeView implements IView {
 		});
 		optionShowConsensus.addListener((v, o, n) -> {
 			if (!n && !optionShowTrees.get())
+				Platform.runLater(() -> optionShowTrees.set(true));
+		});
+		optionHideFirst10PercentTrees.addListener((v, o, n) -> {
+			if (n)
 				Platform.runLater(() -> optionShowTrees.set(true));
 		});
 
@@ -246,6 +263,19 @@ public class DensiTreeView implements IView {
 		this.optionDiagram.set(optionDiagram);
 	}
 
+
+	public HeightAndAngles.Averaging getOptionAveraging() {
+		return optionAveraging.get();
+	}
+
+	public ObjectProperty<HeightAndAngles.Averaging> optionAveragingProperty() {
+		return optionAveraging;
+	}
+
+	public void setOptionAveraging(HeightAndAngles.Averaging optionAveraging) {
+		this.optionAveraging.set(optionAveraging);
+	}
+
 	public boolean isOptionRerootAndRescale() {
 		return optionRerootAndRescale.get();
 	}
@@ -268,6 +298,18 @@ public class DensiTreeView implements IView {
 
 	public void setOptionShowTrees(boolean optionShowTrees) {
 		this.optionShowTrees.set(optionShowTrees);
+	}
+
+	public boolean isOptionHideFirst10PercentTrees() {
+		return optionHideFirst10PercentTrees.get();
+	}
+
+	public BooleanProperty optionHideFirst10PercentTreesProperty() {
+		return optionHideFirst10PercentTrees;
+	}
+
+	public void setOptionHideFirst10PercentTrees(boolean optionHideFirst10PercentTrees) {
+		this.optionHideFirst10PercentTrees.set(optionHideFirst10PercentTrees);
 	}
 
 	public boolean isOptionShowConsensus() {

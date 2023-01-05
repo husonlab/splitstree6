@@ -24,6 +24,8 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.input.Clipboard;
@@ -34,18 +36,23 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.StringUtils;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
+import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
+
+import static splitstree6.layout.tree.LayoutOrientation.FlipRotate180Deg;
+import static splitstree6.layout.tree.LayoutOrientation.Rotate0Deg;
 
 public class DensiTreePresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final DensiTreeView view;
 	private final DensiTreeViewController controller;
 	private final DensiTreeDrawer drawer;
-
 
 	private final FindToolBar findToolBar;
 
@@ -90,6 +97,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getRerootAndRescaleChekMenuItem().setDisable(true);
 
 		controller.getShowTreesMenuItem().selectedProperty().bindBidirectional(view.optionShowTreesProperty());
+		controller.getHideFirst10PercentMenuItem().selectedProperty().bindBidirectional(view.optionHideFirst10PercentTreesProperty());
 		controller.getShowConsensusMenuItem().selectedProperty().bindBidirectional(view.optionShowConsensusProperty());
 
 		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.2 * view.getOptionHorizontalZoomFactor()));
@@ -117,11 +125,13 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		InvalidationListener invalidationListener = e -> {
 			var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
 			drawer.apply(targetBounds.get(),
-					trees, controller.getCenterPane(), view.getOptionDiagram(), view.isOptionJitter(),
+					trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
+					view.getOptionOrientation() != Rotate0Deg,
+					view.isOptionJitter(),
 					view.getOptionColorIncompatibleEdges(),
 					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
-					view.optionShowTreesProperty(),
-					view.optionShowConsensusProperty(), view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+					view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
+					view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
 		};
 
 		targetBounds.addListener(invalidationListener);
@@ -135,7 +145,8 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1 / 1.1 * view.getOptionFontScaleFactor()));
 		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));
 
-		view.optionRerootAndRescaleProperty().addListener(invalidationListener);
+		view.optionHideFirst10PercentTreesProperty().addListener(invalidationListener);
+		view.optionHorizontalZoomFactorProperty().addListener(invalidationListener);
 		view.optionJitterProperty().addListener(invalidationListener);
 		view.optionColorIncompatibleEdgesProperty().addListener(invalidationListener);
 		view.getTrees().addListener(invalidationListener);
@@ -166,6 +177,29 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 			}
 		});
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
+
+		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
+		view.optionDiagramProperty().addListener((v, o, n) -> {
+			disabledAveraging.clear();
+			if (n == DensiTreeDiagramType.RadialPhylogram) {
+				disabledAveraging.add(HeightAndAngles.Averaging.ChildAverage);
+			}
+		});
+		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, HeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, HeightAndAngles.Averaging::createLabel));
+		controller.getAveragingCBox().getItems().addAll(HeightAndAngles.Averaging.values());
+		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
+		view.optionAveragingProperty().addListener(invalidationListener);
+
+
+		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createLabel));
+		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
+		controller.getOrientationCBox().getItems().addAll(Rotate0Deg, FlipRotate180Deg);
+		controller.getOrientationCBox().setValue(view.getOptionOrientation());
+		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> view.optionOrientationProperty().set(n));
+		controller.getOrientationCBox().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getOptionDiagram() == DensiTreeDiagramType.RadialPhylogram, view.optionDiagramProperty()));
+		view.optionOrientationProperty().addListener(invalidationListener);
+
 
 		setupMenuItems();
 

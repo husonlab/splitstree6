@@ -27,6 +27,8 @@ import javafx.scene.layout.*;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ResourceManagerFX;
+import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LayoutOrientation;
 
 public class DensiTreeViewController {
 
@@ -110,6 +112,9 @@ public class DensiTreeViewController {
 	private CheckMenuItem showTreesMenuItem;
 
 	@FXML
+	private CheckMenuItem hideFirst10PercentMenuItem;
+
+	@FXML
 	private CheckMenuItem showConsensusMenuItem;
 
 	@FXML
@@ -117,6 +122,13 @@ public class DensiTreeViewController {
 
 	@FXML
 	private CheckMenuItem colorIncompatibleTreesMenuItem;
+
+	@FXML
+	private ComboBox<LayoutOrientation> orientationCBox;
+
+	@FXML
+	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
+
 
 	private final ToggleGroup diagramToggleGroup = new ToggleGroup();
 
@@ -241,6 +253,10 @@ public class DensiTreeViewController {
 		return showTreesMenuItem;
 	}
 
+	public CheckMenuItem getHideFirst10PercentMenuItem() {
+		return hideFirst10PercentMenuItem;
+	}
+
 	public CheckMenuItem getShowConsensusMenuItem() {
 		return showConsensusMenuItem;
 	}
@@ -263,5 +279,13 @@ public class DensiTreeViewController {
 
 	public CheckMenuItem getRerootAndRescaleChekMenuItem() {
 		return rerootAndRescaleChekMenuItem;
+	}
+
+	public ComboBox<LayoutOrientation> getOrientationCBox() {
+		return orientationCBox;
+	}
+
+	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
+		return averagingCBox;
 	}
 }
