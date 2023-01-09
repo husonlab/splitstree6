@@ -33,6 +33,7 @@ import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataTaxaFilter;
+import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 /**
  * algorithm tab, Daniel Huson, 2021
@@ -60,9 +61,11 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 		presenter = new AlgorithmTabPresenter(mainWindow, this);
 
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (algorithm.getFromClass() == getAlgorithm().getFromClass()
-				&& algorithm.getToClass() == getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter))
-				controller.getAlgorithmCBox().getItems().add(algorithm);
+			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
+				if (algorithm.getFromClass() == getAlgorithm().getFromClass()
+					&& algorithm.getToClass() == getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter))
+					controller.getAlgorithmCBox().getItems().add(algorithm);
+			}
 		}
 		controller.getAlgorithmCBox().setValue(getAlgorithm());
 	}

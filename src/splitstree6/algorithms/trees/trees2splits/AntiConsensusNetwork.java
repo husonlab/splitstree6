@@ -39,6 +39,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.BiPartition;
+import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.io.IOException;
 import java.util.*;
@@ -50,7 +51,7 @@ import java.util.concurrent.ExecutorService;
  *
  * @author Daniel Huson, July 2018
  */
-public class AntiConsensusNetwork extends Trees2Splits {
+public class AntiConsensusNetwork extends Trees2Splits implements DoNotLoadThisAlgorithm {
 	public enum Reference {MajorityConsensus, FirstInputTree, LastInputTree}
 
 	private final ObjectProperty<Reference> optionReferenceTree = new SimpleObjectProperty<>(Reference.MajorityConsensus);
