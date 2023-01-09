@@ -1,5 +1,5 @@
 /*
- * Mash.java Copyright (C) 2022 Daniel H. Huson
+ * Mash.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -57,7 +57,7 @@ public class Mash {
 	private void run(String[] args) throws Exception {
 		final ArgsOptions options = new ArgsOptions(args, this, "Computes Mash sketches, Jaccard index and distances");
 		options.setVersion(ProgramProperties.getProgramVersion());
-		options.setLicense("Copyright (C) 2022 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
+		options.setLicense("Copyright (C) 2023 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
 		options.setAuthors("Daniel H. Huson");
 
 		var command = options.getCommand(ArgsOptions.createCommand("sketch", "Compute sketches"),

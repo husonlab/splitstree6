@@ -1,5 +1,5 @@
 /*
- * TryPrinting.java Copyright (C) 2022 Daniel H. Huson
+ * TryPrinting.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *

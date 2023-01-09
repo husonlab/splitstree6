@@ -1,5 +1,5 @@
 /*
- * ExportWorkflow.java Copyright (C) 2022 Daniel H. Huson
+ * ExportWorkflow.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -90,9 +90,9 @@ public class ExportWorkflow extends Application {
         ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitstree6/resources");
 
         final var options = new ArgsOptions(args, ExportWorkflow.class, "Exports data from a SplitsTree6 workflow");
-        options.setVersion(ProgramProperties.getProgramVersion());
-        options.setLicense("Copyright (C) 2022 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
-        options.setAuthors("Daniel H. Huson");
+		options.setVersion(ProgramProperties.getProgramVersion());
+		options.setLicense("Copyright (C) 2023 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
+		options.setAuthors("Daniel H. Huson");
 
         options.comment("Input Output:");
         final var inputWorkflowFile = new File(options.getOptionMandatory("-w", "workflow", "File containing SplitsTree5 workflow", ""));
