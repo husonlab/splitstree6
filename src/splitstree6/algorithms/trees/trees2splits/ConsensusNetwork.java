@@ -59,7 +59,7 @@ public class ConsensusNetwork extends Trees2Splits {
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionThresholdPercent.getName(), optionEdgeWeights.getName(), optionHighDimensionFilter.getName());
+		return List.of(optionEdgeWeights.getName(), optionThresholdPercent.getName(), optionHighDimensionFilter.getName());
 	}
 
 	@Override
