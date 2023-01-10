@@ -48,6 +48,7 @@ public class NeighborNetSplitWeights {
 
 		public int nnlsAlgorithm = GRADPROJECTION;
 		public double tolerance = 1e-6; //Approximate tolerance in split weights
+		public boolean useRetroCGbound = true; //Use the old-fashioned stopping criterion for Conjugate Gradients
 		public boolean greedy = false;
 		public boolean useInsertionAlgorithm = true; //Use taxon insertion algorithm for the initial split weights
 		public boolean useGradientNorm = false; //Use new projected gradient norm stopping condition
@@ -57,6 +58,7 @@ public class NeighborNetSplitWeights {
 		public double fractionNegativeToCollapse = 0.6; //Propostion of negative splits to collapse (ST4 only)
 		public double kktBound = tolerance / 100;
 		public boolean printConvergenceData = false;
+		public int faceSearch = GRADPROJECTION;
 
 		public double relativeErrorBound = 0.1; //Approx bound on relative numerical error in split weights
 		public double pgbound = 1e-4; //Bound on the projective gradient norm
@@ -64,6 +66,7 @@ public class NeighborNetSplitWeights {
 		public String logfile = null;
 		public String logArrayName = "convergenceData";
 		public PrintWriter log = null;
+		public long startTime;
 	}
 
 	/**
@@ -107,15 +110,19 @@ public class NeighborNetSplitWeights {
 				d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1];
 
 		var x = new double[n + 1][n + 1]; //array of split weights
+		params.startTime = System.currentTimeMillis(); //Start time of calculation (for profiling)
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
 			activeSetST4(x, d, params.log, params,progress);  //ST4 Algorithm
 		} else {
-			x = calcAinvx(d); //Check if unconstrained solution is feasible.
+			calcAinvx(d,x); //Compute unconstrained solution
 			if (minArray(x) >= -params.tolerance)
 				makeNegElementsZero(x); //Fix roundoff
 			else {
-				incrementalFitting(x, d, params.tolerance / 100,true);
+				if (params.useInsertionAlgorithm)
+					incrementalFitting(x, d, params.tolerance / 100,true);
+				else
+					fill(x,1.0);
 				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD)
 					acceleratedProjectedGradientDescent(x, d, params, progress);
 				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT)
@@ -162,7 +169,7 @@ public class NeighborNetSplitWeights {
 		var fx_old = f.evalf(x, d);
 		var activeSet = getZeroElements(x);
 
-		MethodTime timer = new MethodTime();
+		MethodTime timer = new MethodTime(params.startTime);
 		if (params.log!=null) {
 			if (params.nnlsAlgorithm==NNLSParams.GRADPROJECTION)
 				params.log.println("% GradientProjection algorithm");
@@ -176,7 +183,7 @@ public class NeighborNetSplitWeights {
 			params.log.println("% cutoff "+params.tolerance * 1e-3);
 			params.log.println("% cg tolerance ||res|| < " + Math.sqrt(params.tolerance));
 			params.log.println("% Line search tolerance " + params.tolerance);
-			params.log.println("ConvergenceProjectedCG = [");
+			params.log.println(params.logArrayName+" = [");
 		}
 
 
@@ -184,13 +191,24 @@ public class NeighborNetSplitWeights {
 		for (var k = 1; k <= params.outerIterations; k++) {
 			var optimalForFace = searchFace(x, d, activeSet, f, params);
 			var fx = f.evalf(x, d);
-			if (optimalForFace || fx_old - fx < params.tolerance) {
-				if (params.greedy)
+			if (optimalForFace) {
+				if (params.greedy) {
+					double fxlog = residualNorm(x,d);
+					double pgx = projGradNorm(x,d);
+					params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fxlog)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
+					params.log.println("];");
 					return;
-				boolean finished = checkKKT(x, d, activeSet, params);
+				}
+				//boolean finished = projGradNorm(x,d) < params.pgbound;
+				boolean finished = checkKKT(x,d,activeSet,params);
 				if (finished) {
-					if (params.log!=null)
+					if (params.log!=null) {
+						double fxlog = residualNorm(x,d);
+						double pgx = projGradNorm(x,d);
+						params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fxlog)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
 						params.log.println("];");
+
+					}
 					return;
 				}
 			}
@@ -200,13 +218,17 @@ public class NeighborNetSplitWeights {
 			if (params.log!=null) {
 				double fxlog = residualNorm(x,d);
 				double pgx = projGradNorm(x,d);
-				params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fxlog)+"\t"+Math.sqrt(pgx));
+				params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fxlog)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
+				System.err.println("\t"+timer.get()+"\t"+Math.sqrt(fxlog)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
 			}
 
 
 
 		}
+		if (params.log!=null)
+			params.log.println("];");
 		NotificationManager.showError("Neighbor-net projected CG algorithm failed to converge");
+
 	}
 
 
@@ -232,17 +254,27 @@ public class NeighborNetSplitWeights {
 	static private boolean searchFace(double[][] x, double[][] d, boolean[][] activeSet, NNLSFunctionObject f, NNLSParams params) {
 		var n = x.length - 1;
 		var x0 = new double[n + 1][n + 1];
+		boolean cgConverged = true;
 		copyArray(x, x0);
 
-		var cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
+		if (isEmpty(activeSet))
+			calcAinvx(d,x);
+		else
+			cgConverged = cgnr(x, d, activeSet, params, f);
+
 		if (params.collapseMultiple) {
+			int before = countTrueEntries(activeSet);
 			filterMostNegative(x, activeSet, params.fractionNegativeToCollapse);
+			int after = countTrueEntries(activeSet);
+
+			System.err.println("Collapsed from "+before+" entries to "+after+" entries");
+
 			maskElements(x, activeSet);
-			cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
+			cgConverged = cgnr(x, d, activeSet, params, f);
 		}
 
 		if (minArray(x) < 0) {
-			if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION) {
+			if (params.faceSearch == NNLSParams.GRADPROJECTION) {
 				//Use gradient projection to return the best projection of points on the line between x0 and x
 				brentProjection(x, x0, d, f, params.tolerance);
 			} else
@@ -264,11 +296,18 @@ public class NeighborNetSplitWeights {
 	 * @param maxIterations maximum number of iterations
 	 * @return boolean  true if the method converged (didn't hit max number of iterations)
 	 */
-	static private boolean cgnr(double[][] x, double[][] d, boolean[][] activeSet, double tol, int maxIterations, NNLSFunctionObject f) {
+	static private boolean cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params, NNLSFunctionObject f) {
 		var n = x.length - 1;
+		var tol = params.tolerance;
+		var  maxIterations = params.cgIterations;
+		final double CG_EPSILON = 0.0001;
 
 		if (false)
 			System.err.println("\t\tEntering cgnr. fx = " + f.evalf(x, d) + "\t" + f.evalfprojected(x, d));
+
+
+
+
 
 		var p = new double[n + 1][n + 1];
 		var r = new double[n + 1][n + 1];
@@ -277,6 +316,11 @@ public class NeighborNetSplitWeights {
 			for (var j = 1; j <= n; j++)
 				r[i][j] = d[i][j] - r[i][j];
 		var z = new double[n + 1][n + 1];
+		if (params.useRetroCGbound) {
+			calcAtx(x,z);
+			tol = CG_EPSILON*CG_EPSILON*sumSquares(z);
+		}
+
 		calcAtx(r, z);
 		var w = new double[n + 1][n + 1];
 		maskElements(z, activeSet);
@@ -545,11 +589,11 @@ public class NeighborNetSplitWeights {
 	 * elements will be negative.
 	 *
 	 * @param d square array
+	 * @param x square array, replaced nby A^{-1}d.
 	 * @return square array
 	 */
-	static private double[][] calcAinvx(double[][] d) {
+	static private void calcAinvx(double[][] d, double[][] x) {
 		var n = d.length - 1;
-		var x = new double[n + 1][n + 1];
 		x[1][2] = x[2][1] = (d[1][n] + d[1][2] - d[2][n]) / 2.0;
 		for (var j = 2; j <= n - 1; j++) {
 			x[1][j] = x[j][1] = (d[j - 1][n] + d[1][j] - d[1][j - 1] - d[j][n]) / 2.0;
@@ -561,7 +605,6 @@ public class NeighborNetSplitWeights {
 			for (var j = (i + 2); j <= n; j++)
 				x[i][j] = x[j][i] = (d[i - 1][j - 1] + d[i][j] - d[i][j - 1] - d[i - 1][j]) / 2.0;
 		}
-		return x;
 	}
 
 	/**
@@ -581,15 +624,20 @@ public class NeighborNetSplitWeights {
 		var gradient = new double[n + 1][n + 1];
 		evalGradient(x, d, gradient);
 		var mingrad = 0.0;
+		var maxgrad2 = 0.0;
 		var min_i = 0;
 		var min_j = 0;
 		for (var i = 1; i <= n; i++)
 			for (var j = i + 1; j <= n; j++) {
 				var grad_ij = gradient[i][j];
-				if (activeSet[i][j] && grad_ij < mingrad) {
-					mingrad = grad_ij;
-					min_i = i;
-					min_j = j;
+				if (activeSet[i][j]) {
+					if (grad_ij < mingrad) {
+						mingrad = grad_ij;
+						min_i = i;
+						min_j = j;
+					}
+				} else {
+					maxgrad2 = max(maxgrad2,grad_ij*grad_ij);
 				}
 			}
 		if (mingrad >= -params.kktBound)
@@ -655,6 +703,13 @@ public class NeighborNetSplitWeights {
 
 	static private void acceleratedProjectedGradientDescent(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 		var n = x.length - 1;
+
+		//TEMPORARY: SET x to be all ones.
+		for(int i=1;i<=n;i++) {
+			for(int j=i+1;j<=n;j++)
+				x[i][j] = 1.0;
+		}
+
 		var L = estimateNorm(n);
 		var f = new NNLSFunctionObject(n);
 		var f_old = f.evalf(x, d);
@@ -664,19 +719,26 @@ public class NeighborNetSplitWeights {
 		var alpha_old = alpha0;
 		double alpha;
 
-		MethodTime timer = new MethodTime();
+
+
+
+
+
+
+
+		MethodTime timer = new MethodTime(params.startTime);
 		if (params.log!=null) {
 			params.log.println("% accelerated Projected Gradient Descent");
 			params.log.println("% \t alpha0 = 0.5");
 			params.log.println("% time \t ||res|| \t ||proj grad||\n\n");
-			params.log.println("ConvergenceAPG = [");
+			params.log.println(params.logArrayName + " = [");
 		}
 
 
-		var y = new double[n + 1][n + 1];
+		var y_old = new double[n + 1][n + 1];
 		var x_old = new double[n + 1][n + 1];
 
-		copyArray(x, y);
+		copyArray(x, y_old);
 
 		if (params.printConvergenceData)
 			System.err.print("AccProjGrad=[");
@@ -686,10 +748,10 @@ public class NeighborNetSplitWeights {
 
 
 			copyArray(x, x_old);
-			evalGradient(y, d, grad);
+			evalGradient(y_old, d, grad);
 			for (var i = 1; i <= n; i++) {
 				for (var j = i + 1; j <= n; j++) {
-					x[i][j] = x[j][i] = max(y[i][j] - (1.0 / L) * grad[i][j], 0.0);
+					x[i][j] = x[j][i] = max(y_old[i][j] - (1.0 / L) * grad[i][j], 0.0);
 				}
 			}
 
@@ -699,12 +761,14 @@ public class NeighborNetSplitWeights {
 				for (var i = 1; i <= n; i++) {
 					for (var j = i + 1; j <= n; j++) {
 						x[i][j] = x[j][i] = max(x_old[i][j] - (1.0 / L) * grad[i][j], 0.0);
-						y[i][j] = y[j][i] = x[i][j];
+						y_old[i][j] = y_old[j][i] = x[i][j];
 					}
 				}
 				f_new = f.evalf(x, d);
 				alpha = alpha0;
-			} else if (f_old - f_new < params.tolerance) {
+				//} else if (f_old - f_new < params.tolerance) {
+				//	break;
+			} else if (projGradNorm(x,d)<params.pgbound) {
 				break;
 			} else {
 				var a2 = alpha_old * alpha_old;
@@ -712,7 +776,7 @@ public class NeighborNetSplitWeights {
 				var beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
 				for (var i = 1; i <= n; i++) {
 					for (var j = i + 1; j <= n; j++) {
-						y[i][j] = y[j][i] = x[i][j] + beta * (x[i][j] - x_old[i][j]);
+						y_old[i][j] = y_old[j][i] = x[i][j] + beta * (x[i][j] - x_old[i][j]);
 					}
 				}
 			}
@@ -722,7 +786,7 @@ public class NeighborNetSplitWeights {
 			if (params.log!=null) {
 				double fx = residualNorm(x,d);
 				double pgx = projGradNorm(x,d);
-				params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx));
+				params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
 			}
 
 
@@ -774,6 +838,25 @@ public class NeighborNetSplitWeights {
 	}
 
 	/**
+	 * Count the number of non-zero entries in the array x (one triangle only)
+	 * @param x double array
+	 * @return int,number of non-zero entries x[i][j] with i<j.
+	 */
+	static private int numNonzeroEntries(double[][] x) {
+		var count=0;
+		var n=x.length-1;
+		for (var i = 1; i <= n; i++) {
+			for (var j = i + 1; j <= n; j++) {
+				if (x[i][j] > 0)
+					count++;
+			}
+		}
+		return count;
+	}
+
+
+
+	/**
 	 * Computes an approximate bound on the projected gradient norm which would
 	 * give the specified relativeError on the split weights.
 	 * @param d distancers
@@ -784,7 +867,8 @@ public class NeighborNetSplitWeights {
 		double[][] atd = new double[n+1][n+1];
 		calcAtx(d,atd);
 		//Bound is epsilon * ||A'd|| / ( ||A'A|| ||(A'A)^{-1}|| )
-		return relativeError*sqrt(sumSquares(atd))/ (2*estimateNorm(n));
+		//return relativeError*sqrt(sumSquares(atd))/ (2*estimateNorm(n));
+		return relativeError*sqrt(sumSquares(atd)/estimateNorm(n));
 	}
 
 
@@ -799,18 +883,18 @@ public class NeighborNetSplitWeights {
 		//gradient
 		var y = new double[n + 1][n + 1];
 
-		MethodTime timer = new MethodTime();
+		MethodTime timer = new MethodTime(params.startTime);
 		if (params.log!=null) {
 			params.log.println("% blockPivot");
 			params.log.println("% cg iterations: "+params.cgIterations);
 			params.log.println("% cutoff "+params.tolerance * 1e-3);
-			params.log.println("ConvergenceBlockPivot = [");
+			params.log.println(params.logArrayName+ " = [");
 		}
 
 
 		//Initial call
 		var f = new NNLSFunctionObject(n);
-		var converged = cgnr(x, d, G, params.tolerance, params.cgIterations, f);
+		var converged = cgnr(x, d, G, params, f);
 
 
 		evalGradient(x, d, y);
@@ -819,10 +903,12 @@ public class NeighborNetSplitWeights {
 		var N = Integer.MAX_VALUE;
 		var p = 3;
 		boolean done = false;
+		int iter = 0;
 
 		while (!done) {
+			iter++;
 			int numBad = numInfeasible(x, y, G, infeasible);
-			if (numBad == 0)
+			if (numBad == 0 || iter>=params.outerIterations)
 				done = true;
 			else if (numBad < N) {
 				N = numBad;
@@ -852,7 +938,7 @@ public class NeighborNetSplitWeights {
 					}
 				}
 			}
-			converged = cgnr(x, d, G, params.tolerance, params.cgIterations, f);
+			converged = cgnr(x, d, G, params, f);
 			evalGradient(x,d,y);
 			progress.checkForCancel();
 
@@ -868,7 +954,7 @@ public class NeighborNetSplitWeights {
 			if (params.log!=null) {
 				double fx = residualNorm(x,d);
 				double pgx = projGradNorm(x,d);
-				params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx));
+				params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fx)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
 			}
 
 		}
@@ -1066,6 +1152,9 @@ public class NeighborNetSplitWeights {
 		public MethodTime() {
 			reset();
 		}
+		public MethodTime(long startTime) {
+			this.startTime = startTime;
+		}
 		public long get() {
 			return System.currentTimeMillis() - startTime;
 		}
@@ -1085,100 +1174,212 @@ public class NeighborNetSplitWeights {
 
 	static public ArrayList<ASplit>  evaluateConvergenceAlgorithms(int[] cycle, double[][] distances, ProgressListener progress) throws CanceledException {
 		int n = cycle.length-1;
-/*
-Legacy Splitstree4 Algorithm (with modifications)
- */
 		var params = new NeighborNetSplitWeights.NNLSParams(n);
-		params.greedy=false;
-		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
-		params.outerIterations = n*(n-1)/2;
-		params.collapseMultiple = true;
-		params.fractionNegativeToCollapse = 0.6;
-		params.useInsertionAlgorithm = false;
-		params.useGradientNorm = true;
+		ArrayList<ASplit> splitsComputed = null;
+		ArrayList<ASplit> splits = null;
 
-		params.logfile = "ST4Convergence.m";
-		params.logArrayName = "ST4_60";
-		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
+		boolean evalST4 = true; //Evaluate Splitstree4 Active Set algorithm
+		boolean evalAPG = false;  //Evaluate the accelerated projective gradient algorithm
 
-		params.log = setupLogfile(params.logfile,false);
-		var splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+		boolean evalProjectedCG = true;
+		boolean evalBlockPivot = false;
 
-		if (params.log!=null) {
-			params.log.flush();
-			params.log.close();
+
+		if (evalST4) {
+
+		/*
+		Legacy Splitstree4 Algorithm (with modifications)
+ 		*/
+			params = new NeighborNetSplitWeights.NNLSParams(n);
+			params.greedy = false;
+			params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+			params.outerIterations = n * (n - 1) / 2;
+			params.collapseMultiple = true;
+			params.fractionNegativeToCollapse = 0.6;
+			params.useInsertionAlgorithm = false;
+			params.useGradientNorm = false;
+
+			params.logfile = "ST4Convergence.m";
+			params.logArrayName = "ST4_60";
+			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+
+			params.log = setupLogfile(params.logfile, false);
+			splits= NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+
+			if (params.log != null) {
+				params.log.flush();
+				params.log.close();
+			}
+
+
+
+			/*---------------------------------------------------- */
+
+//			params = new NeighborNetSplitWeights.NNLSParams(n);
+//			params.greedy = false;
+//			params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+//			params.outerIterations = n * (n - 1) / 2;
+//			params.collapseMultiple = false;
+//			params.fractionNegativeToCollapse = 0.2;
+//			params.useInsertionAlgorithm = false;
+//			params.logfile = "ST4Convergence.m";
+//			params.logArrayName = "ST4_20";
+//			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+//
+//			params.log = setupLogfile(params.logfile, true);
+//			splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+//
+//			if (params.log != null) {
+//				params.log.flush();
+//				params.log.close();
+//			}
+//			/*---------------------------------------------------- */
+//
+//			params = new NeighborNetSplitWeights.NNLSParams(n);
+//			params.greedy = false;
+//			params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+//			params.outerIterations = n * (n - 1) / 2;
+//			params.collapseMultiple = false;
+//			params.fractionNegativeToCollapse = 0.1;
+//			params.useInsertionAlgorithm = false;
+//			params.logfile = "ST4Convergence.m";
+//			params.logArrayName = "ST4_10";
+//			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+//
+//			params.log = setupLogfile(params.logfile, true);
+//			splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+//
+//			if (params.log != null) {
+//				params.log.flush();
+//				params.log.close();
+//			}
+//
+//
+//			/*---------------------------------------------------- */
+//
+//			params = new NeighborNetSplitWeights.NNLSParams(n);
+//			params.greedy = false;
+//			params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
+//			params.outerIterations = n * (n - 1) / 2;
+//			params.collapseMultiple = false;
+//			params.fractionNegativeToCollapse = 0.0;
+//			params.useInsertionAlgorithm = false;
+//			params.logfile = "ST4Convergence.m";
+//			params.logArrayName = "ST4_00";
+//			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+//
+//			params.log = setupLogfile(params.logfile, true);
+//			splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+//
+//			if (params.log != null) {
+//				params.log.flush();
+//				params.log.close();
+//			}
+
+
+
+			/*---------------------------------------------------- */
+
 		}
 
-		/*---------------------------------------------------- */
+		if (evalAPG) {
 
-		params = new NeighborNetSplitWeights.NNLSParams(n);
-		params.greedy=false;
-		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
-		params.outerIterations = n*(n-1)/2;
-		params.collapseMultiple = false;
-		params.fractionNegativeToCollapse = 0.2;
-		params.useInsertionAlgorithm = false;
-		params.logfile = "ST4Convergence.m";
-		params.logArrayName = "ST4_20";
-		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
+			params = new NeighborNetSplitWeights.NNLSParams(n);
+			params.nnlsAlgorithm = NNLSParams.PROJECTEDGRAD;
 
-		params.log = setupLogfile(params.logfile,true);
-		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+			params.logfile = "APGConvergence.m";
+			params.logArrayName = "APG";
+			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+			params.printConvergenceData = false;
 
-		if (params.log!=null) {
-			params.log.flush();
-			params.log.close();
-		}
-		/*---------------------------------------------------- */
+			params.log = setupLogfile(params.logfile, false);
+			splitsComputed = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
 
-		params = new NeighborNetSplitWeights.NNLSParams(n);
-		params.greedy=false;
-		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
-		params.outerIterations = n*(n-1)/2;
-		params.collapseMultiple = false;
-		params.fractionNegativeToCollapse = 0.1;
-		params.useInsertionAlgorithm = false;
-		params.logfile = "ST4Convergence.m";
-		params.logArrayName = "ST4_10";
-		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
-
-		params.log = setupLogfile(params.logfile,true);
-		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
-
-		if (params.log!=null) {
-			params.log.flush();
-			params.log.close();
+			if (params.log != null) {
+				params.log.flush();
+				params.log.close();
+			}
 		}
 
+		if (evalProjectedCG)  {
 
-		/*---------------------------------------------------- */
+			/*******/
 
-		params = new NeighborNetSplitWeights.NNLSParams(n);
-		params.greedy=false;
-		params.nnlsAlgorithm = NNLSParams.ACTIVE_SET;
-		params.outerIterations = n*(n-1)/2;
-		params.collapseMultiple = false;
-		params.fractionNegativeToCollapse = 0.0;
-		params.useInsertionAlgorithm = false;
-		params.logfile = "ST4Convergence.m";
-		params.logArrayName = "ST4_00";
-		params.pgbound = estimateProjGradBound(params.relativeErrorBound,distances);
 
-		params.log = setupLogfile(params.logfile,true);
-		splits = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
 
-		if (params.log!=null) {
-			params.log.flush();
-			params.log.close();
+			params = new NeighborNetSplitWeights.NNLSParams(n);
+			params.greedy = false;
+			params.nnlsAlgorithm = NNLSParams.GRADPROJECTION;
+			params.faceSearch = NNLSParams.ACTIVE_SET;
+
+			params.outerIterations = n * (n - 1) / 2;
+			params.collapseMultiple = true;
+			params.fractionNegativeToCollapse = 0.6;
+			params.useInsertionAlgorithm = false;
+			params.useGradientNorm = true;
+			params.logfile = "ProjectedCGConvergence.m";
+			params.logArrayName = "PCG_25";
+			params.cgIterations = n * (n - 1) / 2;
+			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+			params.kktBound = 1e-2;
+
+			params.log = setupLogfile(params.logfile, false);
+			splitsComputed = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+
+			if (params.log != null) {
+				params.log.flush();
+				params.log.close();
+			}
+
+//			params = new NeighborNetSplitWeights.NNLSParams(n);
+//			params.greedy = true;
+//			params.nnlsAlgorithm = NNLSParams.GRADPROJECTION;
+//			params.outerIterations = n * (n - 1) / 2;
+//			params.collapseMultiple = true;
+//			params.fractionNegativeToCollapse = 0.8;
+//			params.useInsertionAlgorithm = true;
+//			params.useGradientNorm = true;
+//
+//			params.logfile = "ProjectedCGConvergence.m";
+//			params.logArrayName = "PCG_25_8";
+//			params.cgIterations = 25;
+//			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+//
+//			params.log = setupLogfile(params.logfile, true);
+//			splitsComputed = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
+//
+//			if (params.log != null) {
+//				params.log.flush();
+//				params.log.close();
+//			}
+
+
 		}
 
+		if (evalBlockPivot) {
+			params = new NeighborNetSplitWeights.NNLSParams(n);
+			params.greedy = false;
+			params.nnlsAlgorithm = NNLSParams.BLOCKPIVOT;
 
+			params.outerIterations = 1000;
+			params.collapseMultiple = true;
+			params.fractionNegativeToCollapse = 0.6;
+			params.useInsertionAlgorithm = true;
+			params.useGradientNorm = true;
 
-		/*---------------------------------------------------- */
+			params.logfile = "BlockPivotConvergence.m";
+			params.logArrayName = "BPivot";
+			params.pgbound = estimateProjGradBound(params.relativeErrorBound, distances);
+			params.tolerance = 0.01; //Used for Brents Method.
 
+			params.log = setupLogfile(params.logfile, false);
+			splitsComputed = NeighborNetSplitWeights.compute(cycle, distances, params, progress);
 
-
-
+			if (params.log != null) {
+				params.log.flush();
+				params.log.close();
+			}
+		}
 		return splits;
 
 	}
@@ -1211,61 +1412,6 @@ Legacy Splitstree4 Algorithm (with modifications)
 
 
 
-
-	static public void testAllMethods(double[][] d) {
-
-        /*
-        We test all the different approaches so far, searching for parameter values and algorithm choices which give
-        the fastest convergence.
-
-        STARTING VALUE
-        S1: Unconstrained optimum, projected back.
-        S2: All ones
-        S3: Compute S1, but replace weights with random values chosen uniformly from [0,T] where T is the mean norm of
-             a weight produced by 1.
-        S4: Incremental addition. (which options?)
-
-        ITERATIVE METHODS
-        Measures of error / convergence tests
-            L_infinity norm for projected gradient.
-            ||Ax-d||^2 / n(n-1)/2
-            Difference between consecutive values of x
-
-        We produce plots  or error vs running time in all cases.
-
-        METHODS:
-            Legacy method
-
-            Active set + CGNR   (parameters ...   )   [moving to feasible only]
-                Collapsing multiple edges
-                Max iterations for CGNR
-                Tolerance for CGNR
-            Gradient Projection + CGNR  (parameters)  [moving and projecting]
-                Max iterations for CGNR
-                Tolerance for CGNR
-            Block pivot
-                Max iterations for CGNR
-                Tolerance for CGNR
-                Rounding off
-
-            Projected Gradient
-
-            Accelerated projected gradient
-                alpha parameter
-
-            Subspace BB
-
-
-
-
-
-
-
-         */
-
-
-
-	}
 
 
 

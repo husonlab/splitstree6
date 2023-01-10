@@ -11,15 +11,16 @@ import static java.lang.Math.min;
 public class SquareArrays {
 
     /**
-     * Construct an array of all ones.
+     * Fill the array with the same values
      * @param n size
-     * @return square array of ones.
+     * @return square array of val (with zero on the diagonal).
      */
-    static public double[][] ones(int n) {
-        double[][] X = new double[n+1][n+1];
-        for(int i=1;i<=n;i++)
-            Arrays.fill(X[i],1,n+1,1.0);
-        return X;
+    static public void fill(double[][] x, double val) {
+        int n=x.length-1;
+        for(int i=1;i<=n;i++) {
+            Arrays.fill(x[i], 1, n, val);
+            x[i][i] = 0;
+        }
     }
 
     /**
@@ -78,12 +79,18 @@ public class SquareArrays {
     /**
      * Make all negative entries zero.
      * @param x square array
+     * @return minimum value in the array before modification
      */
-    static void makeNegElementsZero(double[][] x) {
+    static double makeNegElementsZero(double[][] x) {
         int n = x.length - 1;
+        double minVal = Double.MAX_VALUE;
+
         for (int i = 1; i <= n; i++)
-            for (int j = i + 1; j <= n; j++)
+            for (int j = i + 1; j <= n; j++) {
+                minVal = min(minVal,x[i][j]);
                 x[i][j] = x[j][i] = Math.max(x[i][j], 0);
+            }
+
     }
 
     /**
@@ -151,7 +158,20 @@ public class SquareArrays {
         return 2.0*total;
     }
 
-
+    /**
+     * Count the number of true entries in the top triangle of the array
+     * @param A square boolean array
+     * @return number of true entries in upper triangle (excluding diagonal).
+     */
+    static public int countTrueEntries(boolean[][] A) {
+        int n=A.length-1;
+        int count = 0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                if (A[i][j])
+                    count++;
+        return count;
+}
 
 
 }

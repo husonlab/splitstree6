@@ -683,6 +683,7 @@ public class NeighborNetSplitstree4 {
             rho_old = rho;
             rho = sumSquares(r);
         }
+        System.err.println("k = "+k+"\tkmax = "+kmax);
     }
 
     /**
