@@ -7,6 +7,7 @@ import splitstree6.data.parts.ASplit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.Random;
 
 import static jloda.util.NumberUtils.max;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
@@ -357,8 +358,57 @@ public class NeighborNetSplitWeightsClean {
     }
 
 
+    /**************************************************************************
+     * TEST CODE
+     **************************************************************************/
 
+    public static void testSplitWeightCode(String[] args) {
+        testCGNR();
+    }
 
+    private static void testCGNR() {
+        //Test CGNR
+        int n=20;
+        double p=0.2;
+        boolean[][] active = new boolean[n+1][n+1];
+        double[][] x = new double[n+1][n+1];
+        double[][] x2 = new double[n+1][n+1];
 
+        double[][] y = new double[n+1][n+1];
 
+        //Generate a random active set and corresponding split weight vector
+        for (int i=1;i<=n;i++) {
+            for (int j=i+1;j<=n;j++) {
+                if (Math.random()<p) {
+                    active[i][j] = active[j][i] = false;
+                    x[i][j] = x[j][i] = Math.random();
+                } else {
+                    active[i][j] = active[j][i] = true;
+                }
+            }
+        }
+        calcAx(x,y);
+
+        //Call CGNR
+        NNLSParams params = new NNLSParams();
+        params.cgnrIterations = n*n;
+        params.cgnrTolerance = 1e-8;
+        boolean converged = cgnr(x2,y,active,params);
+
+        //Compute and print results
+        System.err.println("Tested CGNR");
+        double[][] grad= new double[n+1][n+1];
+        evalGradient(x2,y,grad);
+
+        double norm2 = 0.0;
+        double grad2 = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                norm2 += (x[i][j] - x2[i][j]) * (x[i][j] - x2[i][j]);
+                grad2 += grad[i][j]*grad[i][j];
+            }
+        System.err.println("Converged = "+converged);
+        System.err.println("Diff squared= "+ norm2);
+        System.err.println("Grad squared= "+ grad);
+    }
 }
