@@ -79,9 +79,8 @@ public class SquareArrays {
     /**
      * Make all negative entries zero.
      * @param x square array
-     * @return minimum value in the array before modification
      */
-    static double makeNegElementsZero(double[][] x) {
+    static void makeNegElementsZero(double[][] x) {
         int n = x.length - 1;
         double minVal = Double.MAX_VALUE;
 
@@ -90,7 +89,6 @@ public class SquareArrays {
                 minVal = min(minVal,x[i][j]);
                 x[i][j] = x[j][i] = Math.max(x[i][j], 0);
             }
-
     }
 
     /**
