@@ -1,5 +1,5 @@
 /*
- * AlgorithmBreadCrumbsToolBar.java Copyright (C) 2022 Daniel H. Huson
+ * AlgorithmBreadCrumbsToolBar.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -40,6 +40,7 @@ import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
+import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -194,22 +195,23 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
     public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode0, Runnable runlater) {
         var menu = new ContextMenu();
         for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-            if (algorithm.getFromClass() == algorithmNode0.getAlgorithm().getFromClass()
-                && algorithm.getToClass() == algorithmNode0.getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter)) {
-                var menuItem = new MenuItem(algorithm.getName());
-                menuItem.setOnAction(e -> {
-                    var algorithmNode = (AlgorithmNode) workflow.nodeStream().filter(v -> v.getId() == algorithmNode0.getId()).findAny().orElse(algorithmNode0);
-                    algorithmNode.setAlgorithm(algorithm);
-                    algorithmNode.setTitle(algorithm.getName());
-                    algorithmNode.restart();
-                    if (runlater != null)
-                        Platform.runLater(runlater);
-                });
-                menu.getItems().add(menuItem);
-                menuItem.setDisable(!algorithm.isApplicable(algorithmNode0.getTaxaBlock(), algorithmNode0.getSourceBlock()));
+            if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
+                if (algorithm.getFromClass() == algorithmNode0.getAlgorithm().getFromClass()
+                    && algorithm.getToClass() == algorithmNode0.getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter)) {
+                    var menuItem = new MenuItem(algorithm.getName());
+                    menuItem.setOnAction(e -> {
+                        var algorithmNode = (AlgorithmNode) workflow.nodeStream().filter(v -> v.getId() == algorithmNode0.getId()).findAny().orElse(algorithmNode0);
+                        algorithmNode.setAlgorithm(algorithm);
+                        algorithmNode.setTitle(algorithm.getName());
+                        algorithmNode.restart();
+                        if (runlater != null)
+                            Platform.runLater(runlater);
+                    });
+                    menu.getItems().add(menuItem);
+                    menuItem.setDisable(!algorithm.isApplicable(algorithmNode0.getTaxaBlock(), algorithmNode0.getSourceBlock()));
+                }
             }
         }
         return menu;
     }
-
 }

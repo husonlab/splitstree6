@@ -1,5 +1,5 @@
 /*
- * Version.java Copyright (C) 2022 Daniel H. Huson
+ * Version.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -25,7 +25,7 @@ package splitstree6.main;
  */
 public class Version {
 	static public final String NAME = "SplitsTree CE";
-	static public final String SHORT_DESCRIPTION = "SplitsTree CE (version 6.0.1-beta, built 4 Jan 2023)";
+	static public final String SHORT_DESCRIPTION = "SplitsTree CE (version 6.0.2-beta, built 9 Jan 2023)";
 	static public final String VERSION = "6.0.0_alpha";
 
 }

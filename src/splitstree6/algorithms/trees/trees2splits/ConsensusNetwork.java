@@ -1,5 +1,5 @@
 /*
- * ConsensusNetwork.java Copyright (C) 2022 Daniel H. Huson
+ * ConsensusNetwork.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -59,7 +59,7 @@ public class ConsensusNetwork extends Trees2Splits {
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionThresholdPercent.getName(), optionEdgeWeights.getName(), optionHighDimensionFilter.getName());
+		return List.of(optionEdgeWeights.getName(), optionThresholdPercent.getName(), optionHighDimensionFilter.getName());
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * RunWorkflow.java Copyright (C) 2022 Daniel H. Huson
+ * RunWorkflow.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -96,9 +96,9 @@ RunWorkflow extends Application {
         ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitsTree6/resources");
 
         final ArgsOptions options = new ArgsOptions(args, RunWorkflow.class, "Runs a SplitsTree6 workflow on input data");
-        options.setVersion(ProgramProperties.getProgramVersion());
-        options.setLicense("Copyright (C) 2022 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
-        options.setAuthors("Daniel H. Huson");
+		options.setVersion(ProgramProperties.getProgramVersion());
+		options.setLicense("Copyright (C) 2023 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
+		options.setAuthors("Daniel H. Huson");
 
         options.comment("Input Output:");
         final var inputWorkflowFile = new File(options.getOptionMandatory("-w", "workflow", "File containing SplitsTree6 workflow", ""));

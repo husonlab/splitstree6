@@ -58,7 +58,7 @@
   <launchers>
     <launcher name="SplitsTree6" id="1691242142" menuName="SplitsTree6">
       <executable name="SplitsTree6" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="SplitsTree6 analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2022 ${compiler:sys.publisher}" internalName="SplitsTree6" />
+        <versionInfo include="true" fileDescription="SplitsTree6 analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2023 ${compiler:sys.publisher}" internalName="SplitsTree6" />
       </executable>
       <java mainClass="splitstreesix/splitstree6.main.SplitsTree6" mainMode="module" vmParameters="-server -Duser.language=en -Duser.region=US ${compiler:renderingVMOption}">
         <modulePath>

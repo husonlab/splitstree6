@@ -1,5 +1,5 @@
 /*
- * CredibilityNetwork.java Copyright (C) 2022 Daniel H. Huson
+ * CredibilityNetwork.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -32,6 +32,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -46,7 +47,7 @@ import java.util.List;
  * @author Daniel Huson and David Bryant
  */
 
-public class CredibilityNetwork extends Trees2Splits {
+public class CredibilityNetwork extends Trees2Splits implements DoNotLoadThisAlgorithm {
 
 	private final DoubleProperty optionLevel = new SimpleDoubleProperty(this, "optionLevel", .95);
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);

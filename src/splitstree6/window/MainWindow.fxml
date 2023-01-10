@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~ MainWindow.fxml Copyright (C) 2022 Daniel H. Huson
+  ~ MainWindow.fxml Copyright (C) 2023 Daniel H. Huson
   ~
   ~ (Some files contain contributions from other authors, who are then mentioned separately.)
   ~
@@ -380,9 +380,9 @@
                         <CheckMenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"/>
                         <CheckMenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="consensusOutlineMenuItem" text="Consensus Outline"/>
-                        <CheckMenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
                         <CheckMenuItem fx:id="consensusSplitsMenuItem" text="Consensus Splits"/>
+                        <CheckMenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
+                        <CheckMenuItem fx:id="consensusOutlineMenuItem" text="Consensus Outline"/>
                         <CheckMenuItem fx:id="filteredSuperNetworkMenuItem" text="Filtered Super Network"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>

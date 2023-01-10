@@ -1,5 +1,5 @@
 /*
- * DataNodeContextMenuPresenter.java Copyright (C) 2022 Daniel H. Huson
+ * DataNodeContextMenuPresenter.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -33,6 +33,7 @@ import splitstree6.workflow.Workflow;
 import splitstree6.workflow.commands.AddAlgorithmCommand;
 import splitstree6.workflow.commands.AddNetworkPipelineCommand;
 import splitstree6.workflow.commands.AddTreePipelineCommand;
+import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -80,8 +81,10 @@ public class DataNodeContextMenuPresenter {
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (AddTreePipelineCommand.isApplicable(dataNode, algorithm))
-				list.add(new Pair<>(algorithm.getName(), algorithm));
+			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
+				if (AddTreePipelineCommand.isApplicable(dataNode, algorithm))
+					list.add(new Pair<>(algorithm.getName(), algorithm));
+			}
 		}
 		list.sort(Comparator.comparing(Pair::getKey));
 
@@ -104,10 +107,12 @@ public class DataNodeContextMenuPresenter {
 		var list = new ArrayList<Pair<String, Algorithm>>();
 		var seen = new HashSet<String>();
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (AddNetworkPipelineCommand.isApplicable(dataNode, algorithm)) {
-				if (!seen.contains(algorithm.getName())) {
-					seen.add(algorithm.getName());
-					list.add(new Pair<>(algorithm.getName(), algorithm));
+			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
+				if (AddNetworkPipelineCommand.isApplicable(dataNode, algorithm)) {
+					if (!seen.contains(algorithm.getName())) {
+						seen.add(algorithm.getName());
+						list.add(new Pair<>(algorithm.getName(), algorithm));
+					}
 				}
 			}
 		}
@@ -128,11 +133,13 @@ public class DataNodeContextMenuPresenter {
 		var list = new ArrayList<Pair<String, Algorithm>>();
 		var seen = new HashSet<String>();
 		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (AddAlgorithmCommand.isApplicable(dataNode, algorithm) && !(algorithm instanceof DataTaxaFilter))
-				if (!seen.contains(algorithm.getName())) {
-					seen.add(algorithm.getName());
-					list.add(new Pair<>(algorithm.getName(), algorithm));
-				}
+			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
+				if (AddAlgorithmCommand.isApplicable(dataNode, algorithm) && !(algorithm instanceof DataTaxaFilter))
+					if (!seen.contains(algorithm.getName())) {
+						seen.add(algorithm.getName());
+						list.add(new Pair<>(algorithm.getName(), algorithm));
+					}
+			}
 		}
 		list.sort(Comparator.comparing(Pair::getKey));
 

@@ -1,5 +1,5 @@
 /*
- *  IViewChoice.java Copyright (C) 2023 Daniel H. Huson
+ *  DoNotLoadThisAlgorithm.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,11 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.data;
+package splitstree6.workflow.interfaces;
 
-/**
- * interface for algorithm nodes that provide a view choice
- * Daniel Huson, 6.2022
- */
-public interface IViewChoice {
+public interface DoNotLoadThisAlgorithm {
 }
