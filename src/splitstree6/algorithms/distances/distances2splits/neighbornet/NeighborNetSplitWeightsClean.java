@@ -23,6 +23,7 @@ public class NeighborNetSplitWeightsClean {
      * Parameter files describing the method choice and options
      */
     public static class NNLSParams {
+
         public enum MethodTypes {ACTIVESET,BLOCKPIVOT,GRADPROJECTION,APGD,IPG}
         public MethodTypes method = MethodTypes.ACTIVESET;
 
@@ -30,7 +31,9 @@ public class NeighborNetSplitWeightsClean {
 
         public int cgnrIterations; //Max number of iterations in CGNR
         public double cgnrTolerance; //Stopping condition for CGNR - bound on norm gradient squared.
-        public double rho; //Proportion of pairs to add to active set in Active Set Method.
+        public boolean cgnrPrintResiduals = false; //Output residual sum of squares during algorithm
+        public boolean activeSetPrintResiduals = false; //Output project gradient sum squares during algorithm
+        public double ActiveSetrho; //Proportion of pairs to add to active set in Active Set Method.
     };
 
     /**
@@ -106,9 +109,12 @@ public class NeighborNetSplitWeightsClean {
      * @param activeSet     square array of boolean: specifying active (zero) set.
      * @param params        parameters - uses params.cgnrIterations for max number of iterations
      *                      and params.tolerance for bound on gradient at convergence
-     * @return boolean  true if the method converged (didn't hit max number of iterations)
+     * @return int          number of iterations
      */
-    static private boolean cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params) {
+    static private int cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params) {
+        //TODO add progress listener support.
+
+
         var n = x.length - 1;
 
         var p = new double[n + 1][n + 1];
@@ -151,10 +157,13 @@ public class NeighborNetSplitWeightsClean {
                 }
             }
             ztz = ztz2;
+
+            if (params.cgnrPrintResiduals)
+                System.err.println("\t"+k+"\t"+ztz);
+
             k++;
         }
-        boolean converged = (k < params.cgnrIterations);
-        return converged;
+        return k;
     }
 
 
@@ -170,20 +179,32 @@ public class NeighborNetSplitWeightsClean {
      * @throws CanceledException  User cancels calculation.
      */
     static private void activeSetMethod(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+
+        //TODO add progress listener support.
+
         var n = x.length-1;
         boolean[][] activeSet = new boolean[n+1][n+1];
         double[][] xstar = new double[n+1][n+1];
         double[][] grad = new double[n+1][n+1];
         copyArray(x,xstar);
+        int k = 0;
 
-        for (int k=1; true; k++) {
+        while(true) {
             while(true) {
-                boolean converged = cgnr(xstar, d, activeSet, params);
-                if (converged && (minArray(xstar) >= 0))
+                int numIterations = cgnr(xstar, d, activeSet, params);
+                k++;
+                if (numIterations<params.cgnrIterations && (minArray(xstar) >= 0))
                     break;
-                feasibleMove(xstar,x,activeSet,params);
+                feasibleMove(x,xstar,activeSet,params);
+
+                if (params.activeSetPrintResiduals)
+                    System.err.println("\t"+k+"\t"+evalProjectedGradientSquared(x,d) + "\t"+cardinality(activeSet));
+
             }
             copyArray(xstar,x);
+            if (params.activeSetPrintResiduals)
+                System.err.println("\t"+k+"\t"+evalProjectedGradientSquared(x,d)+"\t"+cardinality(activeSet));
+
             evalGradient(x,d,grad);
             int imin=0,jmin=0;
             var gradmin = 0.0;
@@ -197,8 +218,9 @@ public class NeighborNetSplitWeightsClean {
             }
             if (gradmin<0)
                 activeSet[imin][jmin] = false;
-            else
+            else {
                 break;
+            }
         }
 
     }
@@ -297,6 +319,23 @@ public class NeighborNetSplitWeightsClean {
 
 
     /**
+     * cardinality
+     *
+     * Returns number of entries in lower triangular of matrix which are set true.
+     * @param s boolean square matrix
+     * @return number of entries
+     */
+    static private int cardinality(boolean[][] s) {
+        int n=s.length-1;
+        int count = 0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                if (s[i][j])
+                    count++;
+        return count;
+    }
+
+    /**
      * Compute the gradient at x of 1/2 ||Ax - d||
      *
      * @param x        square array
@@ -312,6 +351,29 @@ public class NeighborNetSplitWeightsClean {
                 res[i][j] -= d[i][j];
         calcAtx(res, gradient);
     }
+
+    /**
+     * Computes the square of the norm of the projected gradient. This is inefficient and should
+     * probably only be used for development and debugging.
+     * @param x  square array
+     * @param d square array
+     * @return square of the norm of the projected gradient
+     */
+    static private double evalProjectedGradientSquared(double[][] x, double[][] d) {
+        int n=x.length-1;
+        double[][] grad = new double[n+1][n+1];
+        evalGradient(x,d,grad);
+        double pg = 0.0;
+        for(int i=1;i<=n;i++) {
+            for(int j=i+1;j<=n;j++) {
+                if (x[i][j] > 0.0 || grad[i][j] < 0.0)
+                    pg += grad[i][j]*grad[i][j];
+            }
+        }
+        return pg;
+    }
+
+
 
     static private void feasibleMove(double[][] x, double[][] xstar, boolean[][] activeSet, NNLSParams params) {
         var n = xstar.length - 1;
@@ -334,25 +396,19 @@ public class NeighborNetSplitWeightsClean {
 
         Arrays.sort(tvec,0,countNegative);
 
-        double t = tvec[0];
-        for(int i=1;i<=n;i++) {
-            for(int j=i+1;j<=n;j++) {
-                x[i][j] = (1-t)*x[i][j] + t*xstar[i][j];
-            }
-        }
-
-        int numToMakeActive = Math.max(1, (int) Math.ceil(countNegative * params.rho));
+        int numToMakeActive = Math.max(1, (int) Math.ceil(countNegative * params.ActiveSetrho));
         double cutoff = tvec[numToMakeActive - 1];
+        double t = tvec[0];
+
 
         for (int i = 1; i <= n; i++) {
             for (int j = i + 1; j <= n; j++) {
-                if (xstar[i][j] < 0 && x[i][j] <= (x[i][j] - xstar[i][j]) * cutoff) {
+                if (numToMakeActive > 0 && xstar[i][j] < 0 && x[i][j] <= (x[i][j] - xstar[i][j]) * cutoff) {
                     activeSet[i][j] = activeSet[j][i] = true;
+                    x[i][j] = x[j][i] = 0.0;
                     numToMakeActive--;
-                    if (numToMakeActive == 0)
-                        return;
-                }
-
+                } else
+                    x[i][j] = (1 - t) * x[i][j] + t * xstar[i][j];
             }
         }
     }
@@ -362,13 +418,14 @@ public class NeighborNetSplitWeightsClean {
      * TEST CODE
      **************************************************************************/
 
-    public static void testSplitWeightCode(String[] args) {
-        testCGNR();
+    public static void main(String[] args) {
+        //testCGNR();
+        testActiveSet();
     }
 
     private static void testCGNR() {
         //Test CGNR
-        int n=20;
+        int n=500;
         double p=0.2;
         boolean[][] active = new boolean[n+1][n+1];
         double[][] x = new double[n+1][n+1];
@@ -393,7 +450,8 @@ public class NeighborNetSplitWeightsClean {
         NNLSParams params = new NNLSParams();
         params.cgnrIterations = n*n;
         params.cgnrTolerance = 1e-8;
-        boolean converged = cgnr(x2,y,active,params);
+        params.cgnrPrintResiduals = true;
+        int numIterations = cgnr(x2,y,active,params);
 
         //Compute and print results
         System.err.println("Tested CGNR");
@@ -407,8 +465,73 @@ public class NeighborNetSplitWeightsClean {
                 norm2 += (x[i][j] - x2[i][j]) * (x[i][j] - x2[i][j]);
                 grad2 += grad[i][j]*grad[i][j];
             }
-        System.err.println("Converged = "+converged);
+        System.err.println("Num Iterations = "+numIterations);
+        System.err.println("Max Iterations = "+params.cgnrIterations);
         System.err.println("Diff squared= "+ norm2);
-        System.err.println("Grad squared= "+ grad);
+        System.err.println("Grad squared= "+ grad2);
     }
+
+    private static void testActiveSet() {
+        int n=100;
+        double p=0.2;
+        Random generator = new Random();
+
+        boolean[][] active = new boolean[n+1][n+1];
+        double[][] x = new double[n+1][n+1];
+        double[][] x2 = new double[n+1][n+1];
+
+        double[][] y = new double[n+1][n+1];
+        double sigma = 0.0;
+
+        //Generate a random active set and corresponding split weight vector
+        for (int i=1;i<=n;i++) {
+            for (int j=i+1;j<=n;j++) {
+                if (Math.random()<p) {
+                    active[i][j] = active[j][i] = false;
+                    x[i][j] = x[j][i] = generator.nextDouble();
+                } else {
+                    active[i][j] = active[j][i] = true;
+                }
+                x2[i][j] = x2[j][i] = 1.0;
+            }
+        }
+        calcAx(x,y);
+
+        //Add noise to the observed distances
+        for(int i=1;i<=n;i++) {
+            for(int j=i+1;j<=n;j++) {
+                y[j][i] = y[i][j] = y[i][j] + generator.nextGaussian()*sigma;
+            }
+        }
+
+        //Call Active Set
+        NNLSParams params = new NNLSParams();
+        params.cgnrIterations = n*n;
+        params.cgnrTolerance = 1e-8;
+        params.cgnrPrintResiduals = false;
+        params.activeSetPrintResiduals = true;
+        params.ActiveSetrho = 0.6;
+        try {
+            activeSetMethod(x2,y,params,null);
+        } catch (CanceledException e) {
+            e.printStackTrace();
+        }
+
+
+        //Compute and print results
+        System.err.println("Tested Active Set");
+        double[][] grad= new double[n+1][n+1];
+        double pg = evalProjectedGradientSquared(x2,y);
+
+        double norm2 = 0.0;
+        double grad2 = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                norm2 += (x[i][j] - x2[i][j]) * (x[i][j] - x2[i][j]);
+            }
+        System.err.println("Diff squared= "+ norm2);
+        System.err.println("ProjGrad squared= "+ pg);
+    }
+
+
 }
