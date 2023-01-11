@@ -28,6 +28,7 @@ import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
 import jloda.util.Table;
 import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataLoader;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.Workflow;
 
@@ -181,7 +182,8 @@ public class WorkflowTabLayout {
 				}
 			} else if (node instanceof AlgorithmNode algorithmNode) {
 				if (workflow.isInputDataLoader(algorithmNode)) {
-					System.err.println("Skipped: " + algorithmNode.getTitle());
+					if (!(algorithmNode.getAlgorithm() instanceof DataLoader))
+						System.err.println("Skipped: " + algorithmNode.getTitle());
 					// ignore
 				} else if (workflow.isInputDataFilter(algorithmNode)) {
 					var item = workflowTab.newAlgorithmItem(algorithmNode);

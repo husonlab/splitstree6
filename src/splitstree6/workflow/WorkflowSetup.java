@@ -105,7 +105,8 @@ public class WorkflowSetup {
 			if (exceptionHandler != null || runOnSuccess != null) {
 				var changeListener = new Single<ChangeListener<Worker.State>>();
 				changeListener.set((v, o, n) -> {
-					System.err.println(workflow.getLoaderNode() + ": state: " + n);
+					if (false)
+						System.err.println(workflow.getLoaderNode() + ": state: " + n);
 					if (n == Worker.State.FAILED && exceptionHandler != null) {
 						exceptionHandler.accept(workflow.getLoaderNode().getService().getException());
 					}

@@ -116,8 +116,7 @@ public class DensiTreeDrawer {
 	}
 
 	public void apply(Bounds targetBounds, List<PhyloTree> trees0, StackPane parent, DensiTreeDiagramType diagramType, HeightAndAngles.Averaging averaging,
-					  boolean vFlip,
-					  boolean jitter,
+					  boolean vFlip, boolean jitter,
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, boolean hideFirst10PercentTrees, ReadOnlyBooleanProperty showConsensus,
 					  double lineWidth, Color edgeColor, Color otherColor) {
@@ -134,7 +133,7 @@ public class DensiTreeDrawer {
 			ChangeListener<Boolean> listener = (v, o, n) -> {
 				canvas0.setVisible(n);
 				if (canvas1 != null)
-					canvas0.setVisible(n);
+					canvas1.setVisible(n);
 			};
 			parent.getChildren().add(canvas0);
 			canvas0.setUserData(listener);
@@ -177,7 +176,7 @@ public class DensiTreeDrawer {
 				final NodeArray<Point2D> consensusNodePointMap = consensusTree.newNodeArray();
 				var nodeAngleMap = consensusTree.newNodeDoubleArray();
 
-				var cycle = computeConsensusAndCycle(mainWindow.getWorkingTaxa(), consensusTree, trees);
+				var cycle = computeConsensusAndCycle(mainWindow.getWorkingTaxa(), trees, consensusTree);
 				final var taxon2pos = new int[cycle.length];
 				for (var pos = 1; pos < cycle.length; pos++) {
 					taxon2pos[cycle[pos]] = pos;
@@ -431,9 +430,19 @@ public class DensiTreeDrawer {
 		}
 	}
 
-	private static int[] computeConsensusAndCycle(TaxaBlock taxaBlock, PhyloTree consensusTree, Collection<PhyloTree> trees) {
+	/**
+	 * compute the greed consensus tree and the cycle to use for layout
+	 *
+	 * @param taxaBlock     input taxa
+	 * @param trees         input trees
+	 * @param consensusTree output consensus tree
+	 * @return cycle
+	 */
+	private static int[] computeConsensusAndCycle(TaxaBlock taxaBlock, Collection<PhyloTree> trees, PhyloTree consensusTree) {
+
 		var clusterCountWeightMap = new HashMap<BitSet, CountWeight>();
 		for (var tree : trees) {
+			var taxa = BitSetUtils.asBitSet(tree.getTaxa());
 			try (NodeArray<BitSet> clusterMap = tree.newNodeArray()) {
 				tree.postorderTraversal(v -> {
 					var cluster = new BitSet();
@@ -444,6 +453,7 @@ public class DensiTreeDrawer {
 							cluster.or(clusterMap.get(w));
 						}
 					}
+					//cluster = smallerSide(taxa, cluster);
 					clusterMap.put(v, cluster);
 					var clusterCountWeight = clusterCountWeightMap.computeIfAbsent(cluster, k -> new CountWeight(0, 0.0));
 					if (v.getInDegree() > 0) {
@@ -452,6 +462,7 @@ public class DensiTreeDrawer {
 				});
 			}
 		}
+
 		var list = new ArrayList<CountWeightCluster>();
 		for (var entry : clusterCountWeightMap.entrySet()) {
 			var cw = entry.getValue();
@@ -459,14 +470,14 @@ public class DensiTreeDrawer {
 		}
 		list.sort((a, b) -> -Integer.compare(a.count(), b.count()));
 
-		var consensusClusterWeightMap = new HashMap<BitSet, Double>();
+		var consensusClusters = new HashSet<BitSet>();
 
 		var pqTree = new PQTree(taxaBlock.getTaxaSet());
 
 		// compute consensus clusters and add to PQ-tree
 		for (var cwc : list) {
-			if (cwc.count() > 0.5 * trees.size() || isCompatibleWithAll(cwc.cluster(), consensusClusterWeightMap.keySet())) {
-				consensusClusterWeightMap.put(cwc.cluster(), cwc.count() > 0 ? cwc.weight() / cwc.count() : 0.0);
+			if (cwc.count() > 0.5 * trees.size() || isCompatibleWithAll(cwc.cluster(), consensusClusters)) {
+				consensusClusters.add(cwc.cluster());
 				if (!pqTree.accept(cwc.cluster())) { // figure out why this can happen
 					System.err.println("Looks like a bug in the PQ-tree code, please contact the author (Daniel Huson) about this");
 					pqTree.verbose = true;
@@ -480,12 +491,41 @@ public class DensiTreeDrawer {
 		for (var cwc : list) {
 			if (count++ == 1000)
 				break;
-			if (!consensusClusterWeightMap.containsKey(cwc.cluster()))
+			if (!consensusClusters.contains(cwc.cluster()))
 				pqTree.accept(cwc.cluster());
 		}
 
+		var clusterWeightMap = new HashMap<BitSet, Double>();
+		{
+			// determine all trees that have same clusters as consensus:
+			var treesWithConsensusTopology = new ArrayList<PhyloTree>();
+			for (var tree : trees) {
+				var nodeClusterMap = TreesUtilities.extractClusters(tree);
+				if (consensusClusters.equals(new HashSet<>(nodeClusterMap.values()))) {
+					treesWithConsensusTopology.add(tree);
+				}
+			}
+
+			// compute weights, if trees with consensus clusters exist, use them, otherwise use all
+			var countTrees = 0;
+			for (var tree : treesWithConsensusTopology.size() > 0 ? treesWithConsensusTopology : trees) {
+				var nodeClusterMap = TreesUtilities.extractClusters(tree);
+				countTrees++;
+				for (var entry : nodeClusterMap.entrySet()) {
+					var v = entry.getKey();
+					var cluster = entry.getValue();
+					clusterWeightMap.put(cluster, clusterWeightMap.getOrDefault(cluster, 0.0) + (v.getInDegree() > 0 ? tree.getWeight(v.getFirstInEdge()) : 0));
+				}
+			}
+			if (countTrees > 0) {
+				for (var cluster : clusterWeightMap.keySet()) {
+					clusterWeightMap.put(cluster, clusterWeightMap.get(cluster) / countTrees);
+				}
+			}
+		}
+
 		// create consensus tree:
-		ClusterPoppingAlgorithm.apply(consensusClusterWeightMap.keySet(), c -> (c == null ? 0.0 : consensusClusterWeightMap.getOrDefault(c, 0.0)), consensusTree);
+		ClusterPoppingAlgorithm.apply(consensusClusters, c -> (c == null ? 0.0 : clusterWeightMap.getOrDefault(c, 0.0)), consensusTree);
 		var cycle = new ArrayList<Integer>();
 		cycle.add(0);
 		var ordering = pqTree.extractAnOrdering();
@@ -494,6 +534,34 @@ public class DensiTreeDrawer {
 		return cycle.stream().mapToInt(a -> a).toArray();
 	}
 
+	private static BitSet smallerSide(BitSet treeTaxa, BitSet cluster) {
+		var complement = BitSetUtils.minus(treeTaxa, cluster);
+		if (cluster.cardinality() < complement.cardinality()
+			|| (cluster.cardinality() == complement.cardinality() && cluster.nextSetBit(1) < complement.nextSetBit(1)))
+			return cluster;
+		else
+			return complement;
+	}
+
+	private static NodeDoubleArray computeDistancesFromRoot(PhyloTree tree) {
+		var distancesFromRoot = tree.newNodeDoubleArray();
+		tree.preorderTraversal(v -> {
+			if (v.getInDegree() == 0)
+				distancesFromRoot.put(v, 0.0);
+			else {
+				var e = v.getFirstInEdge();
+				distancesFromRoot.put(v, distancesFromRoot.get(e.getSource()) + tree.getWeight(e));
+			}
+		});
+		return distancesFromRoot;
+	}
+
+	/**
+	 * compute the center
+	 *
+	 * @param points collection of points
+	 * @return center point
+	 */
 	private static Point2D computeCenter(Collection<Point2D> points) {
 		if (points.size() == 0)
 			return new Point2D(0, 0);
@@ -508,6 +576,15 @@ public class DensiTreeDrawer {
 
 	private static boolean nodeShapeOrLabelEntered = false;
 
+	/**
+	 * post process taxon labels so that they can be interacted with
+	 *
+	 * @param stage
+	 * @param taxaBlock
+	 * @param taxonSelectionModel
+	 * @param labelPane
+	 * @param fontScaleFactor
+	 */
 	private static void postprocessLabels(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, Pane labelPane, ReadOnlyDoubleProperty fontScaleFactor) {
 		var references = new ArrayList<>();
 

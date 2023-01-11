@@ -22,9 +22,11 @@ package splitstree6.algorithms.utils;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
+import jloda.util.progress.ProgressSilent;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.BiPartition;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Function;
@@ -44,10 +46,10 @@ public class GreedyCompatible {
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
 
-		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
-		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(score.apply(a), score.apply(b)))) {
-			boolean ok = true;
-			for (ASplit bSplit : result) {
+		final var result = new ArrayList<ASplit>(splits.size());
+		for (var split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(score.apply(a), score.apply(b)))) {
+			var ok = true;
+			for (var bSplit : result) {
 				if (!BiPartition.areCompatible(split, bSplit)) {
 					ok = false;
 					break;
@@ -59,5 +61,18 @@ public class GreedyCompatible {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * computes compatible splits, greedily maximizing the score
+	 *
+	 * @return compatible splits
+	 */
+	public static ArrayList<ASplit> apply(final Collection<ASplit> splits, Function<ASplit, Double> score) {
+		try {
+			return apply(new ProgressSilent(), splits, score);
+		} catch (IOException ignored) { // can't happen
+			return new ArrayList<>();
+		}
 	}
 }

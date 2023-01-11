@@ -42,6 +42,10 @@ import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
 
+/**
+ * the main SplitsTree CE program
+ * Daniel Huson, 2020
+ */
 public class SplitsTree6 extends Application {
 	private static final ArrayList<String> inputFiles = new ArrayList<>();
 
