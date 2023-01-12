@@ -1,0 +1,109 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=9 nAlgorithms=6;
+PROGRAM version='SplitsTree CE (version 6.0.3-beta, built 11 Jan 2023)';
+WORKFLOW creationDate='1673457179632'; [Wed Jan 11 18:12:59 CET 2023]
+END; [SPLITSTREE6]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=0;
+TAXLABELS
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=0;
+TAXLABELS
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN CHARACTERS;
+TITLE 'Input Characters';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=0 nchar=0;
+FORMAT
+	datatype='Unknown' missing=? gap=- labels=left transpose=no interleave=yes;
+MATRIX
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK CHARACTERS = 'Input Characters';
+NAME 'Characters Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN CHARACTERS;
+TITLE 'Working Characters';
+LINK ALGORITHM = 'Input Data Filter';
+DIMENSIONS ntax=0 nchar=0;
+FORMAT
+	datatype='Unknown' missing=? gap=- labels=left transpose=no interleave=yes;
+MATRIX
+;
+END; [CHARACTERS]
+
+BEGIN ALGORITHM;
+TITLE 'Hamming Distances';
+LINK CHARACTERS = 'Working Characters';
+NAME 'Hamming Distances';
+OPTIONS
+	Normalize = 'true';
+END; [ALGORITHM]
+
+BEGIN DISTANCES;
+TITLE 'Distances';
+LINK ALGORITHM = 'Hamming Distances';
+DIMENSIONS ntax=0;
+FORMAT labels=left diagonal triangle=Both;
+MATRIX
+;
+END; [DISTANCES]
+
+BEGIN ALGORITHM;
+TITLE 'Neighbor Joining';
+LINK DISTANCES = 'Distances';
+NAME 'Neighbor Joining';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Trees';
+LINK ALGORITHM = 'Neighbor Joining';
+TRANSLATE
+;
+[TREES]
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreeView';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreeView';
+LINK ALGORITHM = 'Show Trees';
+NAME 'View';
+INPUT 'TREES';
+END; [VIEW]

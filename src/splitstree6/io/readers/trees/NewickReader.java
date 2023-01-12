@@ -95,7 +95,7 @@ public class NewickReader extends TreesReader {
 						throw new IOExceptionWithLineNumber(lineno, "Leaf labels must not be numbers");
 					}
 
-					final var labelList = listNodeLabels(tree, true);
+					final var labelList = getNodeLabels(tree, true);
 					final var labelSet = new HashSet<>(labelList);
 					final var multiLabeled = (labelSet.size() < labelList.size());
 
@@ -185,17 +185,15 @@ public class NewickReader extends TreesReader {
 	 * @param ignoreInternalNumericalLabels if set, will ignore number labels on internal nodes
 	 * @return list
 	 */
-	public List<String> listNodeLabels(PhyloTree tree, boolean ignoreInternalNumericalLabels) {
+	public static List<String> getNodeLabels(PhyloTree tree, boolean ignoreInternalNumericalLabels) {
 		final var list = new ArrayList<String>();
 		var queue = new LinkedList<Node>();
 		queue.add(tree.getRoot());
 		while (queue.size() > 0) {
 			var w = queue.pop();
 			var label = tree.getLabel(w);
-			if (w.isLeaf()) {
-				if (label != null && (w.isLeaf() || !(ignoreInternalNumericalLabels && NumberUtils.isDouble(label))))
-					list.add(label);
-			}
+			if (label != null && (w.isLeaf() || !(ignoreInternalNumericalLabels && NumberUtils.isDouble(label))))
+				list.add(label);
 			for (var e : w.outEdges()) {
 				if (tree.okToDescendDownThisEdgeInTraversal(e))
 					queue.add(e.getTarget());
