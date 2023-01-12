@@ -1,5 +1,11 @@
 #nexus [SplitsTree6]
 
+[!
+Benjamin Albrecht, Celine Scornavacca, Alberto Cenci, Daniel H. Huson,
+Fast computation of minimum hybridization networks,
+Bioinformatics, Volume 28, Issue 2, 15 January 2012, Pages 191–197, https://doi.org/10.1093/bioinformatics/btr618
+]
+
 BEGIN SPLITSTREE6;
 DIMENSIONS nDataNodes=8 nAlgorithms=6;
 PROGRAM version='SplitsTree6 (version 0.0.12-alpha, built 30 May 2022)';

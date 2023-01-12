@@ -33,6 +33,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.StringUtils;
@@ -232,6 +233,14 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+
+		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
+			var tree = this.drawer.getConsensusTree();
+			if (tree != null)
+				BasicFX.putTextOnClipBoard(tree.toBracketString(true) + ";\n");
+		});
+		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty().or(controller.getShowConsensusMenuItem().selectedProperty().not()));
+
 
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());

@@ -1,0 +1,5 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Bouckaert R., Vaughan T.G., Barido-Sottani J., Duchêne S., Fourment M., Gavryushkina A., et al. (2019)
+BEAST 2.5: An advanced software platform for Bayesian evolutionary analysis.
+PLoS Computational Biology, 15(4), e1006650.

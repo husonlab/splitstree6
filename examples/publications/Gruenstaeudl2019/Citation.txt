@@ -1,0 +1,4 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Gruenstaeudl, M. Why the monophyly of Nymphaeaceae currently remains indeterminate: an assessment based on gene-wise plastid phylogenomics.
+Plant Syst Evol 305, 827–836 (2019). https://doi.org/10.1007/s00606-019-01610-5

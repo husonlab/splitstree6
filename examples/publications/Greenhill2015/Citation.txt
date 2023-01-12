@@ -1,0 +1,4 @@
+Data in this directory is from the following paper (please cite it as source):
+
+SJ Greenhill, TransNewGuinea.org: An Online Database of New Guinea Languages, PLoSOne 2015,
+https://doi.org/10.1371/journal.pone.0141563

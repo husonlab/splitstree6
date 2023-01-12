@@ -1,0 +1,4 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Fitch WM, Margoliash E. Construction of phylogenetic trees.
+Science. 1967 Jan 20;155(3760):279-84. doi: 10.1126/science.155.3760.279.

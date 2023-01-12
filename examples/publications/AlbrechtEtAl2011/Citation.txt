@@ -1,0 +1,5 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Benjamin Albrecht, Celine Scornavacca, Alberto Cenci, Daniel H. Huson,
+Fast computation of minimum hybridization networks,
+Bioinformatics, Volume 28, Issue 2, 15 January 2012, Pages 191–197, https://doi.org/10.1093/bioinformatics/btr618
