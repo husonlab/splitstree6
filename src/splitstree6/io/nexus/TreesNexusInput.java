@@ -177,6 +177,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 
 			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
 			final var tree = new PhyloTree();
+			tree.allowMultiLabeledNodes = false;
 			tree.parseBracketNotation(buf.toString(), true);
 
 			if (translator != null)

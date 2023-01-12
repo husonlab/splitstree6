@@ -512,7 +512,7 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getConsensusNetworkMenuItem(), new ConsensusNetwork());
 		setupAlgorithmMenuItem(controller.getConsensusOutlineMenuItem(), new ConsensusOutline());
 		setupAlgorithmMenuItem(controller.getConsensusSplitsMenuItem(), new ConsensusSplits());
-		setupAlgorithmMenuItem(controller.getFilteredSuperNetworkMenuItem(), new FilteredSuperNetwork());
+		setupAlgorithmMenuItem(controller.getSuperNetworkMenuItem(), new SuperNetwork());
 		setupAlgorithmMenuItem(controller.getMedianJoiningMenuItem(), new MedianJoining());
 
 		setupAlgorithmMenuItem(controller.getMinSpanningNetworkMenuItem(), new MinSpanningNetwork());

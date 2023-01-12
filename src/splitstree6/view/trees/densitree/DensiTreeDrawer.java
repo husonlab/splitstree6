@@ -468,7 +468,15 @@ public class DensiTreeDrawer {
 			var cw = entry.getValue();
 			list.add(new CountWeightCluster(cw.count(), cw.weight(), entry.getKey()));
 		}
-		list.sort((a, b) -> -Integer.compare(a.count(), b.count()));
+		list.sort((a, b) ->
+		{
+			if (a.count() > b.count)
+				return -1;
+			else if (a.count < b.count)
+				return 1;
+			else
+				return Integer.compare(a.cluster().cardinality(), b.cluster().cardinality());
+		});
 
 		var consensusClusters = new HashSet<BitSet>();
 
@@ -532,28 +540,6 @@ public class DensiTreeDrawer {
 		cycle.addAll(ordering);
 		cycle.addAll(CollectionUtils.difference(BitSetUtils.asSet(taxaBlock.getTaxaSet()), ordering));
 		return cycle.stream().mapToInt(a -> a).toArray();
-	}
-
-	private static BitSet smallerSide(BitSet treeTaxa, BitSet cluster) {
-		var complement = BitSetUtils.minus(treeTaxa, cluster);
-		if (cluster.cardinality() < complement.cardinality()
-			|| (cluster.cardinality() == complement.cardinality() && cluster.nextSetBit(1) < complement.nextSetBit(1)))
-			return cluster;
-		else
-			return complement;
-	}
-
-	private static NodeDoubleArray computeDistancesFromRoot(PhyloTree tree) {
-		var distancesFromRoot = tree.newNodeDoubleArray();
-		tree.preorderTraversal(v -> {
-			if (v.getInDegree() == 0)
-				distancesFromRoot.put(v, 0.0);
-			else {
-				var e = v.getFirstInEdge();
-				distancesFromRoot.put(v, distancesFromRoot.get(e.getSource()) + tree.getWeight(e));
-			}
-		});
-		return distancesFromRoot;
 	}
 
 	/**

@@ -51,12 +51,12 @@ import java.util.concurrent.CountDownLatch;
  * runs a workflow on one or more input files
  * Daniel Huson, 9.2018
  */
-public class
-RunWorkflow extends Application {
+public class RunWorkflow extends Application {
     private static String[] args;
 
     @Override
     public void init() {
+        Basic.setDebugMode(false);
         ProgramProperties.setProgramName("RunWorkflow");
         ProgramProperties.setProgramVersion(Version.SHORT_DESCRIPTION);
         NotificationManager.setEchoToConsole(false);
@@ -88,7 +88,7 @@ RunWorkflow extends Application {
                 if (!ex.getMessage().startsWith("Help"))
                     Basic.caught(ex);
             }
-            Platform.exit();
+            System.exit(0);
         });
     }
 
@@ -131,7 +131,7 @@ RunWorkflow extends Application {
             throw new IOException("File not found or unreadable: " + inputWorkflowFile);
 
         if ((nodeName.length() == 0) != (exportFormat.length() == 0))
-            throw new IOException("Must specify both node name and exporter, or none");
+            throw new IOException("Must specify both node name (using -n or --node) and exporter (using -e or --exporter), or none");
 
         final boolean exportCompleteWorkflow = (nodeName.length() == 0);
 
@@ -144,7 +144,7 @@ RunWorkflow extends Application {
                 for (int i = 0; i < inputList.size(); i++) {
                     inputFiles[i] = inputList.get(i).getPath();
                 }
-                System.err.println("Number of input files found: " + outputFiles.length);
+                System.err.println("Number of input files found: " + inputFiles.length);
             }
         }
 
@@ -239,7 +239,7 @@ RunWorkflow extends Application {
                 //workflow.getWorkingDataNode().setValid(false);
                 workflow.validProperty().addListener(listener);
                 try {
-                    workflow.getInputTaxaFilterNode().restart();
+                    Platform.runLater(() -> workflow.getInputTaxaFilterNode().restart());
                     // wait for end of update:
                     latch.await();
                 } finally {

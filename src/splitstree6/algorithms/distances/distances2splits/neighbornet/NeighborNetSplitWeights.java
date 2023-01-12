@@ -1,6 +1,5 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
-import jloda.fx.util.Print;
 import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
@@ -193,10 +192,12 @@ public class NeighborNetSplitWeights {
 			var fx = f.evalf(x, d);
 			if (optimalForFace) {
 				if (params.greedy) {
-					double fxlog = residualNorm(x,d);
-					double pgx = projGradNorm(x,d);
-					params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fxlog)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
-					params.log.println("];");
+					double fxlog = residualNorm(x, d);
+					double pgx = projGradNorm(x, d);
+					if (params.log != null) {
+						params.log.println("\t" + timer.get() + "\t" + Math.sqrt(fxlog) + "\t" + Math.sqrt(pgx) + "\t" + numNonzeroEntries(x));
+						params.log.println("];");
+					}
 					return;
 				}
 				//boolean finished = projGradNorm(x,d) < params.pgbound;

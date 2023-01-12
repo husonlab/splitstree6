@@ -78,6 +78,7 @@ public class ViewBlock extends DataBlock {
 						mainWindow.addTabToMainTabPane(viewTab);
 						viewTab.setView(view);
 					}
+					setInputBlockName(getNode().getParents().get(0).getName());
 				}
 			};
 			node.getParents().addListener(new WeakInvalidationListener(invalidationListener));

@@ -324,7 +324,7 @@ public class MainWindowController {
 	private CheckMenuItem consensusSplitsMenuItem;
 
 	@FXML
-	private CheckMenuItem filteredSuperNetworkMenuItem;
+	private CheckMenuItem superNetworkMenuItem;
 
 	@FXML
 	private CheckMenuItem medianJoiningMenuItem;
@@ -862,8 +862,8 @@ public class MainWindowController {
 		return consensusSplitsMenuItem;
 	}
 
-	public CheckMenuItem getFilteredSuperNetworkMenuItem() {
-		return filteredSuperNetworkMenuItem;
+	public CheckMenuItem getSuperNetworkMenuItem() {
+		return superNetworkMenuItem;
 	}
 
 	public CheckMenuItem getMedianJoiningMenuItem() {

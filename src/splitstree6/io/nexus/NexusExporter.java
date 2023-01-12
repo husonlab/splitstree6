@@ -209,6 +209,7 @@ public class NexusExporter {
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
 			final var newBlock = new ViewBlock();
+			newBlock.setInputBlockName(block.getInputBlockName());
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
 			output.write(w, taxa, block);

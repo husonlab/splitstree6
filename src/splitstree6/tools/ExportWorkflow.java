@@ -51,6 +51,7 @@ public class ExportWorkflow extends Application {
 
     @Override
     public void init() {
+        Basic.setDebugMode(false);
         ProgramProperties.setProgramName("ExportWorkflow");
         ProgramProperties.setProgramVersion(Version.SHORT_DESCRIPTION);
         NotificationManager.setEchoToConsole(false);
