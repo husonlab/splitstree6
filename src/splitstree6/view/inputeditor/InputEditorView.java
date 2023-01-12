@@ -106,11 +106,9 @@ public class InputEditorView extends DisplayTextView implements IView {
 				end = text.length();
 			if (start + col < end)
 				start = start + col;
-			getController().getScrollPane().requestFocus();
-			getController().getCodeArea().position(start, 0);
-			getController().getCodeArea().requestFollowCaret();
-			getController().getCodeArea().position(start, 0);
 			getController().getCodeArea().selectRange(start, end);
+			getController().getCodeArea().requestFollowCaret();
+			getController().getCodeArea().requestFocus();
 		}
 	}
 
