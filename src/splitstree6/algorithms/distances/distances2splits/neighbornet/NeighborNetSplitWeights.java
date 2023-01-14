@@ -33,6 +33,8 @@ public class NeighborNetSplitWeights {
 
 	public static class NNLSParams {
 
+		public boolean plotGraphs = false;    //SET this to true to generate residual vs time graphs for the paper.
+
 		public NNLSParams(int ntax) {
 			cgIterations = min(max(ntax, 10), 25);
 			outerIterations = max(ntax, 10);
@@ -108,6 +110,10 @@ public class NeighborNetSplitWeights {
 		for (var i = 1; i <= n; i++)
 			for (var j = i + 1; j <= n; j++)
 				d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1];
+
+		if (params.plotGraphs)
+			NeighborNetTest.ActiveSetGraphs(d);
+
 
 		var x = new double[n + 1][n + 1]; //array of split weights
 		params.startTime = System.currentTimeMillis(); //Start time of calculation (for profiling)
@@ -192,7 +198,7 @@ public class NeighborNetSplitWeights {
 			var optimalForFace = searchFace(x, d, activeSet, f, params);
 			var fx = f.evalf(x, d);
 			if (optimalForFace) {
-				if (params.greedy) {
+				if (params.greedy && params.log!=null) {
 					double fxlog = residualNorm(x,d);
 					double pgx = projGradNorm(x,d);
 					params.log.println("\t"+timer.get()+"\t"+Math.sqrt(fxlog)+"\t"+Math.sqrt(pgx)+"\t"+numNonzeroEntries(x));
@@ -292,8 +298,6 @@ public class NeighborNetSplitWeights {
 	 * @param x             Initial value, overwritten with final value
 	 * @param d             square array of distances
 	 * @param activeSet     square array of boolean: specifying active set.
-	 * @param tol           tolerance for the squared norm of the residual
-	 * @param maxIterations maximum number of iterations
 	 * @return boolean  true if the method converged (didn't hit max number of iterations)
 	 */
 	static private boolean cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params, NNLSFunctionObject f) {

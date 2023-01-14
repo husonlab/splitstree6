@@ -4,14 +4,15 @@ import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.parts.ASplit;
 
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Random;
+import java.util.Comparator;
 
-import static jloda.util.NumberUtils.max;
+import static java.lang.Math.min;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.sumArraySquared;
 
 //TODO Make the arrays upper triangular
 
@@ -25,6 +26,8 @@ public class NeighborNetSplitWeightsClean {
     public static class NNLSParams {
 
         public enum MethodTypes {ACTIVESET,BLOCKPIVOT,GRADPROJECTION,APGD,IPG}
+
+
         public MethodTypes method = MethodTypes.ACTIVESET;
 
         public double cutoff; //Only include split weights greater than this amount
@@ -33,8 +36,14 @@ public class NeighborNetSplitWeightsClean {
         public double cgnrTolerance; //Stopping condition for CGNR - bound on norm gradient squared.
         public boolean cgnrPrintResiduals = false; //Output residual sum of squares during algorithm
         public boolean activeSetPrintResiduals = false; //Output project gradient sum squares during algorithm
-        public double ActiveSetrho; //Proportion of pairs to add to active set in Active Set Method.
-    };
+        public double activeSetRho; //Proportion of pairs to add to active set in Active Set Method.
+        public double activeSetProjGradBound; //Bound on projected gradient. This should be more than the CGNR bound
+        public int activeSetMaxIterations=100000; //Max iterations before active set gives up.
+
+        public PrintWriter log;
+
+        public double[][] finalx; //Value previously calculated, used just for debugging.
+    }
 
     /**
      * Estimate the split weights using non-negative least squares
@@ -70,6 +79,7 @@ public class NeighborNetSplitWeightsClean {
             for (var j = i + 1; j <= n; j++)
                 d[i][j] = distances[cycle[i] - 1][cycle[j] - 1];
         var x = new double[n + 1][n + 1]; //array of split weights
+        //noinspection SuspiciousNameCombination
         calcAinvx(d,x); //Compute unconstrained solution
         var minVal = minArray(x);
         if (minVal < 0) {
@@ -79,6 +89,8 @@ public class NeighborNetSplitWeightsClean {
                 }
             }
         }
+
+        progress.checkForCancel();
 
         //Construct the corresponding set of weighted splits
         final var splitList = new ArrayList<ASplit>();
@@ -94,9 +106,9 @@ public class NeighborNetSplitWeightsClean {
         return splitList;
     }
 
-    /**************************************************************************
-     * METHOD IMPLEMENTATIONS
-     **************************************************************************/
+    //*************************************************************************
+    // METHOD IMPLEMENTATIONS
+    //  **************************************************************************/
 
     /**
      * cgnr
@@ -111,7 +123,7 @@ public class NeighborNetSplitWeightsClean {
      *                      and params.tolerance for bound on gradient at convergence
      * @return int          number of iterations
      */
-    static private int cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params) {
+    static public int cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params, ProgressListener progress) throws CanceledException {
         //TODO add progress listener support.
 
 
@@ -159,9 +171,11 @@ public class NeighborNetSplitWeightsClean {
             ztz = ztz2;
 
             if (params.cgnrPrintResiduals)
-                System.err.println("\t"+k+"\t"+ztz);
+                params.log.println("\t"+k+"\t"+ztz);
 
             k++;
+            if (progress!=null && (k%n)==0)
+                progress.checkForCancel();
         }
         return k;
     }
@@ -178,360 +192,178 @@ public class NeighborNetSplitWeightsClean {
      * @param progress pointer to progress bar.
      * @throws CanceledException  User cancels calculation.
      */
-    static private void activeSetMethod(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+    static public void activeSetMethod(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
         //TODO add progress listener support.
 
+        long startTime = System.currentTimeMillis();
+
         var n = x.length-1;
         boolean[][] activeSet = new boolean[n+1][n+1];
+        getZeroElements(x,activeSet);
+
         double[][] xstar = new double[n+1][n+1];
         double[][] grad = new double[n+1][n+1];
-        copyArray(x,xstar);
+
         int k = 0;
 
         while(true) {
             while(true) {
-                int numIterations = cgnr(xstar, d, activeSet, params);
+                copyArray(x,xstar);
+                int numIterations = cgnr(xstar, d, activeSet, params,progress);
                 k++;
-                if (numIterations<params.cgnrIterations && (minArray(xstar) >= 0))
-                    break;
-                feasibleMove(x,xstar,activeSet,params);
+                if (progress!=null)
+                    progress.checkForCancel();
 
-                if (params.activeSetPrintResiduals)
-                    System.err.println("\t"+k+"\t"+evalProjectedGradientSquared(x,d) + "\t"+cardinality(activeSet));
+                boolean xstarFeasible = feasibleMove(x,xstar,activeSet,params);
+
+                if (xstarFeasible && numIterations<params.cgnrIterations)
+                    break;
+
+                if (k> params.activeSetMaxIterations) {
+                    System.err.println("Active Set Method didn't converge"); //TODO: Daniel - what is the best way to do this?
+                    return;
+                }
+
+                if (params.activeSetPrintResiduals) {
+                    params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + cardinality(activeSet));
+                    if (params.finalx!=null)
+                        params.log.print("\t"+diff(x,params.finalx));
+                    params.log.println();
+                }
 
             }
             copyArray(xstar,x);
-            if (params.activeSetPrintResiduals)
-                System.err.println("\t"+k+"\t"+evalProjectedGradientSquared(x,d)+"\t"+cardinality(activeSet));
+            if (params.activeSetPrintResiduals) {
+                params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + cardinality(activeSet));
+                if (params.finalx!=null)
+                    params.log.print("\t"+diff(x,params.finalx));
+                params.log.println();
+            }
+
 
             evalGradient(x,d,grad);
             int imin=0,jmin=0;
             var gradmin = 0.0;
+            double projGrad = 0.0;
+
             for(int i=1;i<=n;i++) {
                 for(int j=i+1;j<=n;j++) {
-                    if (activeSet[i][j] && grad[i][j]<gradmin) {
-                        gradmin = grad[i][j];
+                    double g_ij = grad[i][j];
+                    boolean active = activeSet[i][j];
+                    if (active)
+                        g_ij = min(g_ij,0.0);
+                    if (active && g_ij<gradmin) {
+                        gradmin = g_ij;
                         imin = i; jmin=j;
                     }
+                    projGrad += g_ij*g_ij;
                 }
             }
-            if (gradmin<0)
-                activeSet[imin][jmin] = false;
-            else {
+            if (gradmin>= 0 || projGrad < params.activeSetProjGradBound)
                 break;
-            }
+            activeSet[imin][jmin] = false;
         }
 
     }
 
 
-        /**************************************************************************
-         * UTILITY ROUTINES (Consider moving)
-         **************************************************************************/
+
 
     /**
-     * Computes circular distances from an array of split weights.
+     * Move the point x towards point xstar, while still maintaining feasibility.
      *
-     * @param x split weights. Symmetric array. For i<j, x(i,j)  is the weight of the
-     *          split {i,i+1,...,j-1} | rest.
-     * @param y square array, overwritten with circular metric corresponding to these split weights.
+     * If xstar is feasible, then returns true. Otherwise, the activeset will change and a proportion
+     * params.activeSetrho of the infeasible entries in xstar will be added to the active set.
+     * @param x square matrix --- feasible initial point
+     * @param xstar   square matrix ---  target point, will generally be infeasible
+     * @param activeSet    current active set. assumed that xstar will satisfy the active set, and x will be moved
+     *                     to a point satisfying the active set
+     * @param params    uses parameter activeSetRho, which is the proportion of infeasible entries of xstar which will
+     *                  be added to the active set.
+     * @return      true if xstar is feasible, false otherwise
      */
-    static public void calcAx(double[][] x, double[][] y) {
-        var n = x.length - 1;
-
-        for (var i = 1; i <= (n - 1); i++) {
-            var s = 0.0;
-            for(var j=i+1;j<=n;j++)
-                s+=x[i+1][j];
-            for(var j=1;j<=i;j++)
-                s+=x[j][i+1];
-            y[i + 1][i] = y[i][i + 1] = s;
-        }
-
-        for (var i = 1; i <= (n - 2); i++) {
-            y[i + 2][i] = y[i][i + 2] = y[i][i + 1] + y[i + 1][i + 2] - 2 * x[i + 1][i + 2];
-        }
-
-        for (var k = 3; k <= n - 1; k++) {
-            for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
-                var j = i + k;
-                y[j][i] = y[i][j] = y[i][j - 1] + y[i + 1][j] - y[i + 1][j - 1] - 2 * x[i + 1][j];
-            }
-        }
-    }
-
-    /**
-     * Compute Atx, when x and the result are represented as square arrays
-     *
-     * @param x square array
-     * @param p square array. Overwritten with result
-     */
-    static public void calcAtx(double[][] x, double[][] p) {
-        var n = x.length - 1;
-        //double[][] p = new double[n+1][n+1];
-
-        for (var i = 1; i <= n - 1; i++) {
-            var s = 0.0;
-            for (var j=1;j<i;j++)
-                s+=x[j][i];
-            for(var j=i+1;j<=n;j++)
-                s+=x[i][j];
-            p[i + 1][i] = p[i][i + 1] = s;
-        }
-
-        for (var i = 1; i <= n - 2; i++) {  //TODO This can be threaded, but is not worth it
-            p[i + 2][i] = p[i][i + 2] = p[i][i + 1] + p[i + 1][i + 2] - 2 * x[i][i + 1];
-        }
-
-        for (var k = 3; k <= n - 1; k++) {
-            for (var i = 1; i <= n - k; i++) { //TODO. This inner loop can be threaded, but is not worth it
-                p[i + k][i] = p[i][i + k] = p[i][i + k - 1] + p[i + 1][i + k] - p[i + 1][i + k - 1] - 2 * x[i][i + k - 1];
-            }
-        }
-    }
-
-    /**
-     * calcAinvx
-     * <p>
-     * Computes A^{-1}(x).
-     * <p>
-     * When x is circular, result will be corresponding weights. If x is not circular, some
-     * elements will be negative.
-     *
-     * @param x square array
-     * @param y square array, overwritten by A^{-1}x.
-     */
-    static private void calcAinvx(double[][] x, double[][] y) {
-        var n = x.length - 1;
-        y[1][2] = y[2][1] = (x[1][n] + x[1][2] - x[2][n]) / 2.0;
-        for (var j = 2; j <= n - 1; j++) {
-            y[1][j] = y[j][1] = (x[j - 1][n] + x[1][j] - x[1][j - 1] - x[j][n]) / 2.0;
-        }
-        y[1][n] = y[n][1] = (x[1][n] + x[n - 1][n] - x[1][n - 1]) / 2.0;
-
-        for (var i = 2; i <= (n - 1); i++) {
-            y[i][i + 1] = (x[i - 1][i] + x[i][i + 1] - x[i - 1][i + 1]) / 2.0;
-            for (var j = (i + 2); j <= n; j++)
-                y[i][j] = y[j][i] = (x[i - 1][j - 1] + x[i][j] - x[i][j - 1] - x[i - 1][j]) / 2.0;
-        }
-    }
-
-
-    /**
-     * cardinality
-     *
-     * Returns number of entries in lower triangular of matrix which are set true.
-     * @param s boolean square matrix
-     * @return number of entries
-     */
-    static private int cardinality(boolean[][] s) {
-        int n=s.length-1;
-        int count = 0;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++)
-                if (s[i][j])
-                    count++;
-        return count;
-    }
-
-    /**
-     * Compute the gradient at x of 1/2 ||Ax - d||
-     *
-     * @param x        square array
-     * @param d        square array
-     * @param gradient square array, overwritten by the gradient.
-     */
-    static private void evalGradient(double[][] x, double[][] d, double[][] gradient) {
-        var n = x.length - 1;
-        var res = new double[n + 1][n + 1];
-        calcAx(x, res);
-        for (var i = 1; i <= n; i++)
-            for (var j = 1; j <= n; j++)
-                res[i][j] -= d[i][j];
-        calcAtx(res, gradient);
-    }
-
-    /**
-     * Computes the square of the norm of the projected gradient. This is inefficient and should
-     * probably only be used for development and debugging.
-     * @param x  square array
-     * @param d square array
-     * @return square of the norm of the projected gradient
-     */
-    static private double evalProjectedGradientSquared(double[][] x, double[][] d) {
-        int n=x.length-1;
-        double[][] grad = new double[n+1][n+1];
-        evalGradient(x,d,grad);
-        double pg = 0.0;
-        for(int i=1;i<=n;i++) {
-            for(int j=i+1;j<=n;j++) {
-                if (x[i][j] > 0.0 || grad[i][j] < 0.0)
-                    pg += grad[i][j]*grad[i][j];
-            }
-        }
-        return pg;
-    }
-
-
-
-    static private void feasibleMove(double[][] x, double[][] xstar, boolean[][] activeSet, NNLSParams params) {
+    static private boolean feasibleMove(double[][] x, double[][] xstar, boolean[][] activeSet, NNLSParams params) {
         var n = xstar.length - 1;
 
-        double[] tvec = new double[n * (n - 1) / 2];
-        int countNegative = 0;
+        //First check if xstar is feasible, and return true if it is after moving x to xstar
+        if (minArray(xstar) >= 0.0) {
+            copyArray(xstar,x);
+            return true;
+        }
 
+        //xstar is infeasible.
+        //Store values in a structure for sorting
+        SortedPairs sortedPairs = new SortedPairs(n);
         for (int i = 1; i <= n; i++)
-            for (int j = i + 1; j <= n; j++) {
-                if (xstar[i][j] < 0) {
-                    tvec[countNegative] = x[i][j] / (x[i][j] - xstar[i][j]);
-                    countNegative++;
-                }
-            }
+            for (int j = i + 1; j <= n; j++)
+                if (xstar[i][j] < 0)
+                    sortedPairs.insert(i,j,x[i][j] / (x[i][j] - xstar[i][j]));
 
-        if (countNegative == 0) {
-            copyArray(x, xstar);
-            return;
+        sortedPairs.sort();
+        SortedPairs.Entry firstEntry = sortedPairs.get(0);
+        if (firstEntry==null) {  //Should never get here
+            copyArray(xstar,x);
+            return true;
+        }
+        double t = firstEntry.val; //max val of t before first constraint met.
+
+        //A proportion rho of the indices for which xstar is negative is added to the active set.
+        int numToMakeActive = Math.max(1, (int) Math.ceil(sortedPairs.nentries * params.activeSetRho));
+        int index = 0;
+        SortedPairs.Entry entry = sortedPairs.get(index);
+        while(index<numToMakeActive&& entry!=null) {
+            int i=entry.i; int j = entry.j;
+            activeSet[i][j] = activeSet[j][i] = true;
+            x[i][j] = x[j][i] = 0.0;
+            index++;
+            entry = sortedPairs.get(index);
         }
 
-        Arrays.sort(tvec,0,countNegative);
-
-        int numToMakeActive = Math.max(1, (int) Math.ceil(countNegative * params.ActiveSetrho));
-        double cutoff = tvec[numToMakeActive - 1];
-        double t = tvec[0];
-
-
-        for (int i = 1; i <= n; i++) {
-            for (int j = i + 1; j <= n; j++) {
-                if (numToMakeActive > 0 && xstar[i][j] < 0 && x[i][j] <= (x[i][j] - xstar[i][j]) * cutoff) {
-                    activeSet[i][j] = activeSet[j][i] = true;
-                    x[i][j] = x[j][i] = 0.0;
-                    numToMakeActive--;
-                } else
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                if (!activeSet[i][j]) {
                     x[i][j] = (1 - t) * x[i][j] + t * xstar[i][j];
-            }
-        }
-    }
-
-
-    /**************************************************************************
-     * TEST CODE
-     **************************************************************************/
-
-    public static void main(String[] args) {
-        //testCGNR();
-        testActiveSet();
-    }
-
-    private static void testCGNR() {
-        //Test CGNR
-        int n=500;
-        double p=0.2;
-        boolean[][] active = new boolean[n+1][n+1];
-        double[][] x = new double[n+1][n+1];
-        double[][] x2 = new double[n+1][n+1];
-
-        double[][] y = new double[n+1][n+1];
-
-        //Generate a random active set and corresponding split weight vector
-        for (int i=1;i<=n;i++) {
-            for (int j=i+1;j<=n;j++) {
-                if (Math.random()<p) {
-                    active[i][j] = active[j][i] = false;
-                    x[i][j] = x[j][i] = Math.random();
-                } else {
-                    active[i][j] = active[j][i] = true;
                 }
             }
-        }
-        calcAx(x,y);
-
-        //Call CGNR
-        NNLSParams params = new NNLSParams();
-        params.cgnrIterations = n*n;
-        params.cgnrTolerance = 1e-8;
-        params.cgnrPrintResiduals = true;
-        int numIterations = cgnr(x2,y,active,params);
-
-        //Compute and print results
-        System.err.println("Tested CGNR");
-        double[][] grad= new double[n+1][n+1];
-        evalGradient(x2,y,grad);
-
-        double norm2 = 0.0;
-        double grad2 = 0.0;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++) {
-                norm2 += (x[i][j] - x2[i][j]) * (x[i][j] - x2[i][j]);
-                grad2 += grad[i][j]*grad[i][j];
-            }
-        System.err.println("Num Iterations = "+numIterations);
-        System.err.println("Max Iterations = "+params.cgnrIterations);
-        System.err.println("Diff squared= "+ norm2);
-        System.err.println("Grad squared= "+ grad2);
+        return false;
     }
 
-    private static void testActiveSet() {
-        int n=100;
-        double p=0.2;
-        Random generator = new Random();
-
-        boolean[][] active = new boolean[n+1][n+1];
-        double[][] x = new double[n+1][n+1];
-        double[][] x2 = new double[n+1][n+1];
-
-        double[][] y = new double[n+1][n+1];
-        double sigma = 0.0;
-
-        //Generate a random active set and corresponding split weight vector
-        for (int i=1;i<=n;i++) {
-            for (int j=i+1;j<=n;j++) {
-                if (Math.random()<p) {
-                    active[i][j] = active[j][i] = false;
-                    x[i][j] = x[j][i] = generator.nextDouble();
-                } else {
-                    active[i][j] = active[j][i] = true;
-                }
-                x2[i][j] = x2[j][i] = 1.0;
+    /**
+     * Utility class to sort indices
+     */
+    private static class SortedPairs {
+        public static class Entry {
+            public Entry(int i, int j, double val) {
+                this.i=i; this.j = j; this.val = val;
             }
-        }
-        calcAx(x,y);
-
-        //Add noise to the observed distances
-        for(int i=1;i<=n;i++) {
-            for(int j=i+1;j<=n;j++) {
-                y[j][i] = y[i][j] = y[i][j] + generator.nextGaussian()*sigma;
-            }
+            double val;
+            int i;
+            int j;
         }
 
-        //Call Active Set
-        NNLSParams params = new NNLSParams();
-        params.cgnrIterations = n*n;
-        params.cgnrTolerance = 1e-8;
-        params.cgnrPrintResiduals = false;
-        params.activeSetPrintResiduals = true;
-        params.ActiveSetrho = 0.6;
-        try {
-            activeSetMethod(x2,y,params,null);
-        } catch (CanceledException e) {
-            e.printStackTrace();
+        public int nentries;
+        private final Entry[] entries;
+
+        public SortedPairs(int n) {
+            nentries = 0;
+            entries = new Entry[n*(n-1)/2];
+        }
+        public void insert(int i, int j, double val) {
+            entries[nentries] = new Entry(i, j, val);
+            nentries++;
+        }
+        public void sort() {
+            Arrays.sort(entries, 0,nentries, Comparator.comparingDouble(o -> o.val));
         }
 
+        public Entry get(int index) {
+            if (index<0 || index>=nentries)
+                return null;
+            else
+                return entries[index];
+        }
 
-        //Compute and print results
-        System.err.println("Tested Active Set");
-        double[][] grad= new double[n+1][n+1];
-        double pg = evalProjectedGradientSquared(x2,y);
-
-        double norm2 = 0.0;
-        double grad2 = 0.0;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++) {
-                norm2 += (x[i][j] - x2[i][j]) * (x[i][j] - x2[i][j]);
-            }
-        System.err.println("Diff squared= "+ norm2);
-        System.err.println("ProjGrad squared= "+ pg);
     }
-
 
 }

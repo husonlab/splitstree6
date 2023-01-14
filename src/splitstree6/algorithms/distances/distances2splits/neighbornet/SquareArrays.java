@@ -12,8 +12,8 @@ public class SquareArrays {
 
     /**
      * Fill the array with the same values
-     * @param n size
-     * @return square array of val (with zero on the diagonal).
+     * @param x square array, overwritten
+     * @param val   value used to fill x.
      */
     static public void fill(double[][] x, double val) {
         int n=x.length-1;
@@ -45,17 +45,17 @@ public class SquareArrays {
      */
     static public boolean isEmpty(boolean[][] A) {
         int n = A.length-1;
-        boolean allFalse = true;
-        for(int i=1;i<=n && allFalse;i++)
-            for(int j=i+1;j<=n && allFalse;j++)
-                allFalse = allFalse && !A[i][j];
-        return allFalse;
+        for(int i=1;i<=n ;i++)
+            for(int j=i+1;j<=n;j++)
+                if(A[i][j])
+                    return false;
+        return true;
     }
 
     /**
      * Fill a boolean array indicating the elements of an array which are identically zero.
      * @param x square array of doubles
-     * @return square array of boolean, with A[i][j] = (x[i][j]==0);
+     * @param A overwrites square array of boolean, with A[i][j] = (x[i][j]==0);
      */
     static void getZeroElements(double[][] x, boolean[][] A) {
         int n= x.length-1;
@@ -120,7 +120,7 @@ public class SquareArrays {
         double minx = 0.0;
         int n=x.length-1;
         for(int i=1;i<=n;i++)
-            for(int j=1;j<=n;j++)
+            for(int j=i+1;j<=n;j++)
                 minx = min(minx,x[i][j]);
         return minx;
     }
@@ -171,5 +171,20 @@ public class SquareArrays {
         return count;
 }
 
+    /**
+     * Return the sum of squared differences between two arrays of the same size (using
+     * lower triangular parts only)
+     * @param x square array
+     * @param y  square array
+     * @return  sum_{i<j} (x[i][j] - y[i][j])^2
+     */
+    static public double diff(double[][] x, double[][] y) {
+        int n=x.length-1;
+        double d = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                d+=(x[i][j] - y[i][j])*(x[i][j] - y[i][j]);
+        return d;
+    }
 
 }
