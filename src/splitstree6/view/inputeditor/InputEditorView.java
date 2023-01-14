@@ -90,9 +90,9 @@ public class InputEditorView extends DisplayTextView implements IView {
 			col--; // because col is 1-based
 
 		lineNumber = Math.max(1, lineNumber);
-		final String text = getController().getCodeArea().getText();
-		int start = 0;
-		for (int i = 1; i < lineNumber; i++) {
+		final var text = getController().getCodeArea().getText();
+		var start = 0;
+		for (var i = 1; i < lineNumber; i++) {
 			start = text.indexOf('\n', start + 1);
 			if (start == -1) {
 				System.err.println("No such line number: " + lineNumber);
@@ -101,13 +101,14 @@ public class InputEditorView extends DisplayTextView implements IView {
 		}
 		start++;
 		if (start < text.length()) {
-			int end = text.indexOf('\n', start);
+			var end = text.indexOf('\n', start);
 			if (end == -1)
 				end = text.length();
 			if (start + col < end)
 				start = start + col;
-			getController().getScrollPane().requestFocus();
 			getController().getCodeArea().selectRange(start, end);
+			getController().getCodeArea().requestFollowCaret();
+			getController().getCodeArea().requestFocus();
 		}
 	}
 
@@ -150,7 +151,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 					getController().getCodeArea().requestFocus();
 					gotoLine(exceptionWithLineNumber.getLineNumber(), 0);
 				}
-				NotificationManager.showError("Parse failed: " + ex.getMessage());
+				//NotificationManager.showError("Parse failed: " + ex.getMessage());
 				mainWindow.setFileName(name);
 
 			};

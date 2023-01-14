@@ -1,0 +1,5 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Wolf, Eva and Gaquerel, Emmanuel and Scharmann, Mathias and Yant, Levi and Koch, Marcus A and Kliebenstein, Daniel J and Wittkopp, Patricia J and Lovell, John T,
+Evolutionary footprints of a cold relic in a rapidly warming world,
+eLife 2021;10:e71572 DOI: 10.7554/eLife.71572.

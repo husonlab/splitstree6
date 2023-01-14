@@ -1,7 +1,10 @@
 #nexus
 
-[!Citation: John D. McVay, Duncan Hauser, Andrew L. Hipp, and Paul S. Manos. Phylogenomics reveals a complex evolutionary history
- of lobed-leaf white oaks in western North America. Genome. 60(9): 733-742. https://doi.org/10.1139/gen-2016-0206]
+[!
+John D. McVay, Duncan Hauser, Andrew L. Hipp, and Paul S. Manos.
+Phylogenomics reveals a complex evolutionary history of lobed-leaf white oaks in western North America.
+Genome. 60(9): 733-742. https://doi.org/10.1139/gen-2016-0206
+]
 BEGIN Taxa;
 DIMENSIONS ntax=136;
 TAXLABELS

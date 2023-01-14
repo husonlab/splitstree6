@@ -1,0 +1,39 @@
+#!/bin/bash
+# Runs a workflow on given input files
+#
+# Copyright (C) 2021 Daniel H. Huson
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+if [ $# == 0 ]
+then
+	options="-h"
+else
+	options=$*
+fi
+
+bin_dir=$(dirname "$0")       # may be relative path
+bin_dir=$(cd "$bin_dir" && pwd)    # ensure absolute path
+jars_dir="$bin_dir/../jars"
+jars2_dir="$bin_dir/../jars2"
+
+jre_dir=${installer:sys.preferredJre}
+
+java=$jre_dir/bin/java
+vmOptions=$(grep "^-" $bin_dir/../SplitsTreeCE.vmoptions)
+jfx_dir="$bin_dir/../openjfx/${compiler:sys.platform}/lib"
+modulepath="$jars_dir:$jars2_dir:$jfx_dir"
+
+java_flags="-server -Duser.language=en -Duser.region=US $vmOptions"
+
+$java $java_flags --module-path=$modulepath --add-modules=splitstreesix splitstree6.tools.RunWorkflow  $options

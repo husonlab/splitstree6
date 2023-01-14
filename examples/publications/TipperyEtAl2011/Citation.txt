@@ -1,0 +1,4 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Nicholas P. Tippery, Donald H. Les, Phylogenetic Relationships and Morphological Evolution in Nymphoides (Menyanthaceae),
+Systematic Botany, 36(4), 1101-1113, (1 October 2011)]

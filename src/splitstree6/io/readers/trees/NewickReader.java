@@ -81,8 +81,11 @@ public class NewickReader extends TreesReader {
 					} else
 						treeLine = line;
 					final var tree = new PhyloTree();
+					tree.allowMultiLabeledNodes = false;
 					try {
 						tree.parseBracketNotation(treeLine, true);
+						if (tree.isInputHasMultiLabels())
+							throw new IOException("Tree contains multiple copies of the same label");
 						//System.err.println(tree.toBracketString(false));
 					} catch (IOException ex) {
 						throw new IOExceptionWithLineNumber(lineno, ex);

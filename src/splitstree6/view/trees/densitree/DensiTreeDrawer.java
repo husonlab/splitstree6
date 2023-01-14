@@ -312,9 +312,7 @@ public class DensiTreeDrawer {
 			});
 		}
 		// implement show/hide consensus tree:
-		ChangeListener<Boolean> showConsensusListener = (v, o, n) -> {
-			edgesGroup.setVisible(n);
-		};
+		ChangeListener<Boolean> showConsensusListener = (v, o, n) -> edgesGroup.setVisible(n);
 		edgesGroup.setUserData(showConsensusListener); // keep it alive
 		showConsensus.addListener(new WeakChangeListener<>(showConsensusListener));
 		edgesGroup.setVisible(showConsensus.get());
@@ -439,10 +437,9 @@ public class DensiTreeDrawer {
 	 * @return cycle
 	 */
 	private static int[] computeConsensusAndCycle(TaxaBlock taxaBlock, Collection<PhyloTree> trees, PhyloTree consensusTree) {
-
-		var clusterCountWeightMap = new HashMap<BitSet, CountWeight>();
+		// count all clusters:
+		var clusterCountMap = new HashMap<BitSet, Integer>();
 		for (var tree : trees) {
-			var taxa = BitSetUtils.asBitSet(tree.getTaxa());
 			try (NodeArray<BitSet> clusterMap = tree.newNodeArray()) {
 				tree.postorderTraversal(v -> {
 					var cluster = new BitSet();
@@ -455,46 +452,54 @@ public class DensiTreeDrawer {
 					}
 					//cluster = smallerSide(taxa, cluster);
 					clusterMap.put(v, cluster);
-					var clusterCountWeight = clusterCountWeightMap.computeIfAbsent(cluster, k -> new CountWeight(0, 0.0));
+					var count = clusterCountMap.computeIfAbsent(cluster, k -> 0);
 					if (v.getInDegree() > 0) {
-						clusterCountWeightMap.put(cluster, new CountWeight(clusterCountWeight.count() + 1, clusterCountWeight.weight() + tree.getWeight(v.getFirstInEdge())));
+						clusterCountMap.put(cluster, count + 1);
 					}
 				});
 			}
 		}
 
-		var list = new ArrayList<CountWeightCluster>();
-		for (var entry : clusterCountWeightMap.entrySet()) {
-			var cw = entry.getValue();
-			list.add(new CountWeightCluster(cw.count(), cw.weight(), entry.getKey()));
-		}
-		list.sort((a, b) -> -Integer.compare(a.count(), b.count()));
+		// sort clusters by decreasing counts:
+		var list = new ArrayList<>(clusterCountMap.entrySet());
+		list.sort((a, b) -> {
+			if (a.getValue() > b.getValue())
+				return -1;
+			else if (a.getValue() < b.getValue())
+				return 1;
+			else
+				return Integer.compare(a.getKey().cardinality(), b.getKey().cardinality());
+		});
 
 		var consensusClusters = new HashSet<BitSet>();
 
 		var pqTree = new PQTree(taxaBlock.getTaxaSet());
 
 		// compute consensus clusters and add to PQ-tree
-		for (var cwc : list) {
-			if (cwc.count() > 0.5 * trees.size() || isCompatibleWithAll(cwc.cluster(), consensusClusters)) {
-				consensusClusters.add(cwc.cluster());
-				if (!pqTree.accept(cwc.cluster())) { // figure out why this can happen
+		for (var entry : list) {
+			var cluster = entry.getKey();
+			var count = entry.getValue();
+			if (count > 0.5 * trees.size() || isCompatibleWithAll(cluster, consensusClusters)) {
+				consensusClusters.add(cluster);
+				if (!pqTree.accept(cluster)) { // figure out why this can happen
 					System.err.println("Looks like a bug in the PQ-tree code, please contact the author (Daniel Huson) about this");
 					pqTree.verbose = true;
-					pqTree.accept(cwc.cluster());
+					pqTree.accept(cluster);
 					pqTree.verbose = false;
 				}
 			}
 		}
 		// add additional clusters to PQ-tree for better layout
 		var count = 0;
-		for (var cwc : list) {
+		for (var entry : list) {
 			if (count++ == 1000)
 				break;
-			if (!consensusClusters.contains(cwc.cluster()))
-				pqTree.accept(cwc.cluster());
+			var cluster = entry.getKey();
+			if (!consensusClusters.contains(cluster))
+				pqTree.accept(cluster);
 		}
 
+		// compute weights for consensus clusters
 		var clusterWeightMap = new HashMap<BitSet, Double>();
 		{
 			// determine all trees that have same clusters as consensus:
@@ -528,32 +533,12 @@ public class DensiTreeDrawer {
 		ClusterPoppingAlgorithm.apply(consensusClusters, c -> (c == null ? 0.0 : clusterWeightMap.getOrDefault(c, 0.0)), consensusTree);
 		var cycle = new ArrayList<Integer>();
 		cycle.add(0);
+
+		// extract circular ordering from pqTree:
 		var ordering = pqTree.extractAnOrdering();
 		cycle.addAll(ordering);
 		cycle.addAll(CollectionUtils.difference(BitSetUtils.asSet(taxaBlock.getTaxaSet()), ordering));
 		return cycle.stream().mapToInt(a -> a).toArray();
-	}
-
-	private static BitSet smallerSide(BitSet treeTaxa, BitSet cluster) {
-		var complement = BitSetUtils.minus(treeTaxa, cluster);
-		if (cluster.cardinality() < complement.cardinality()
-			|| (cluster.cardinality() == complement.cardinality() && cluster.nextSetBit(1) < complement.nextSetBit(1)))
-			return cluster;
-		else
-			return complement;
-	}
-
-	private static NodeDoubleArray computeDistancesFromRoot(PhyloTree tree) {
-		var distancesFromRoot = tree.newNodeDoubleArray();
-		tree.preorderTraversal(v -> {
-			if (v.getInDegree() == 0)
-				distancesFromRoot.put(v, 0.0);
-			else {
-				var e = v.getFirstInEdge();
-				distancesFromRoot.put(v, distancesFromRoot.get(e.getSource()) + tree.getWeight(e));
-			}
-		});
-		return distancesFromRoot;
 	}
 
 	/**
@@ -578,12 +563,6 @@ public class DensiTreeDrawer {
 
 	/**
 	 * post process taxon labels so that they can be interacted with
-	 *
-	 * @param stage
-	 * @param taxaBlock
-	 * @param taxonSelectionModel
-	 * @param labelPane
-	 * @param fontScaleFactor
 	 */
 	private static void postprocessLabels(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, Pane labelPane, ReadOnlyDoubleProperty fontScaleFactor) {
 		var references = new ArrayList<>();
@@ -609,15 +588,11 @@ public class DensiTreeDrawer {
 				}
 				DraggableUtils.setupDragMouseTranslate(label);
 
-				InvalidationListener invalidationListener = e -> {
-					label.setText(taxon.getDisplayLabelOrName());
-				};
+				InvalidationListener invalidationListener = e -> label.setText(taxon.getDisplayLabelOrName());
 				taxon.displayLabelProperty().addListener(new WeakInvalidationListener(invalidationListener));
 				references.add(invalidationListener); // avoid garbage collection
 
-				ChangeListener<Number> fontScaleChangeListener = (v, o, n) -> {
-					label.setFontSize(label.getFontSize() / o.doubleValue() * n.doubleValue());
-				};
+				ChangeListener<Number> fontScaleChangeListener = (v, o, n) -> label.setFontSize(label.getFontSize() / o.doubleValue() * n.doubleValue());
 				fontScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 				references.add(fontScaleChangeListener);
 
@@ -778,10 +753,8 @@ public class DensiTreeDrawer {
 		}
 	}
 
-	private static record CountWeight(int count, double weight) {
-	}
-
-	private static record CountWeightCluster(int count, double weight, BitSet cluster) {
+	public PhyloTree getConsensusTree() {
+		return consensusTree;
 	}
 }
 

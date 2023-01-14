@@ -153,7 +153,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				var listViewVerticalScrollBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.VERTICAL);
 				if (listViewVerticalScrollBar != null) {
 					var countVisible = controller.getTaxaListView().getHeight() / controller.getTaxaListView().getFixedCellSize();
-					if (countVisible < alignmentView.getInputTaxa().getNtax()) {
+					if (alignmentView.getInputTaxa() != null && countVisible < alignmentView.getInputTaxa().getNtax()) {
 						controller.getVerticalScrollBar().setBlockIncrement(countVisible / (alignmentView.getInputTaxa().getNtax() - countVisible));
 					} else
 						controller.getVerticalScrollBar().setBlockIncrement(1.0);

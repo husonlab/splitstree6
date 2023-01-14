@@ -21,6 +21,7 @@ package splitstree6.io.writers.distances;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 
@@ -40,10 +41,10 @@ public class PhylipWriter extends DistancesWriterBase {
 
 	@Override
 	public void write(Writer w, TaxaBlock taxa, DistancesBlock distances) throws IOException {
-		int ntax = taxa.getNtax();
+		var ntax = taxa.getNtax();
 
-		int maxLabelLength = taxa.getLabel(1).length();
-		for (int i = 2; i <= ntax; i++) {
+		var maxLabelLength = taxa.getLabel(1).length();
+		for (var i = 2; i <= ntax; i++) {
 			if (taxa.getLabel(i).length() > maxLabelLength)
 				maxLabelLength = taxa.getLabel(i).length();
 		}
@@ -52,28 +53,28 @@ public class PhylipWriter extends DistancesWriterBase {
 
 		if (!isOptionTriangular()) {
 			System.err.println("standard");
-			for (int i = 1; i <= distances.getDistances().length; i++) {
-				StringBuilder sequence = new StringBuilder();
+			for (var i = 1; i <= distances.getDistances().length; i++) {
+				var buf = new StringBuilder();
 				for (int j = 1; j <= distances.getDistances()[i - 1].length; j++) {
-					sequence.append(String.format("%.5f ", distances.get(i, j)));
+					buf.append(StringUtils.removeTrailingZerosAfterDot("%.5f ", distances.get(i, j)));
 				}
 				if (taxa.getLabel(i).length() >= 10)
 					w.write(taxa.getLabel(i).substring(0, 10));
 				else {
 					w.write(taxa.getLabel(i));
-					for (int k = 0; k < 10 - taxa.getLabel(i).length(); k++) {
+					for (var k = 0; k < 10 - taxa.getLabel(i).length(); k++) {
 						w.write(" ");
 					}
 				}
-				w.write("\t" + sequence + "\n");
+				w.write("\t" + buf + "\n");
 			}
 		} else {
 			System.err.println("triangular");
 			w.write(taxa.getLabel(1) + "\n");
-			for (int i = 2; i <= distances.getDistances().length; i++) {
-				StringBuilder sequence = new StringBuilder();
-				for (int j = 1; j <= i - 1; j++) {
-					sequence.append(String.format("%.5f ", distances.get(i, j)));
+			for (var i = 2; i <= distances.getDistances().length; i++) {
+				var buf = new StringBuilder();
+				for (var j = 1; j <= i - 1; j++) {
+					buf.append(StringUtils.removeTrailingZerosAfterDot("%.5f ", distances.get(i, j)));
 				}
 				if (taxa.getLabel(i).length() >= 10)
 					w.write(taxa.getLabel(i).substring(0, 10));
@@ -83,7 +84,7 @@ public class PhylipWriter extends DistancesWriterBase {
 						w.write(" ");
 					}
 				}
-				w.write("\t" + sequence + "\n");
+				w.write("\t" + buf + "\n");
 			}
 		}
 	}

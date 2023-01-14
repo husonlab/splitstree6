@@ -1,7 +1,9 @@
 #NEXUS
 
 [!
-Citation: Welker, F., Collins, M., Thomas, J. et al. Ancient proteins resolve the evolutionary history of Darwin’s South American ungulates. Nature 522, 81–84 (2015). https://doi.org/10.1038/nature14249]
+Welker, F., Collins, M., Thomas, J. et al. Ancient proteins resolve the evolutionary history of Darwin’s South American ungulates.
+Nature 522, 81–84 (2015). https://doi.org/10.1038/nature14249
+]
 
 Begin DATA;
 	Dimensions ntax=77 nchar=2028;

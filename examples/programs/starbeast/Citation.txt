@@ -1,0 +1,6 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Joëlle Barido-Sottani, Veronika Bošková, Louis du Plessis, Denise Kühnert, Carsten Magnus, Venelin Mitov, Nicola F. Müller, Jūlija Pečerska,
+David A. Rasmussen, Chi Zhang, Alexei J. Drummond, Tracy A. Heath, Oliver G. Pybus, Timothy G. Vaughan, Tanja Stadler (2018).
+Taming the BEAST – A community teaching material resource for BEAST 2.
+Systematic Biology, 67(1), 170–-174. doi: 10.1093/sysbio/syx060

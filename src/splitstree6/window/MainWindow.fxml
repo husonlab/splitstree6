@@ -383,7 +383,7 @@
                         <CheckMenuItem fx:id="consensusSplitsMenuItem" text="Consensus Splits"/>
                         <CheckMenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
                         <CheckMenuItem fx:id="consensusOutlineMenuItem" text="Consensus Outline"/>
-                        <CheckMenuItem fx:id="filteredSuperNetworkMenuItem" text="Filtered Super Network"/>
+                        <CheckMenuItem fx:id="superNetworkMenuItem" text="Super Network"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>
                         <CheckMenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"/>

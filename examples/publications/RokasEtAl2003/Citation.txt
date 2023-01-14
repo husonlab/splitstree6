@@ -1,0 +1,4 @@
+Data in this directory is from the following paper (please cite it as source):
+
+Rokas, A., Williams, B., King, N. et al. Genome-scale approaches to resolving incongruence in molecular phylogenies.
+Nature 425, 798–804 (2003). https://doi.org/10.1038/nature02053
