@@ -25,6 +25,7 @@ import jloda.util.Pair;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.nexus.NetworkNexusOutput;
+import splitstree6.io.writers.IHasPrependTaxa;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -33,7 +34,7 @@ import java.io.Writer;
  * write block in Nexus format
  * Daniel Huson, 11.2021
  */
-public class NexusWriter extends NetworkWriterBase {
+public class NexusWriter extends NetworkWriterBase implements IHasPrependTaxa {
 	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(this, "optionPrependTaxa", false);
 	private String title;
 	private Pair<String, String> link;
@@ -46,7 +47,8 @@ public class NexusWriter extends NetworkWriterBase {
 	@Override
 	public void write(Writer w, TaxaBlock taxa, NetworkBlock block) throws IOException {
 		if (isOptionPrependTaxa())
-			new splitstree6.io.writers.taxa.NexusWriter().write(w, taxa, taxa);
+			new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+
 		final var output = new NetworkNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {

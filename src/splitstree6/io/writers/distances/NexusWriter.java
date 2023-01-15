@@ -28,6 +28,7 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.DistancesFormat;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.nexus.DistancesNexusOutput;
+import splitstree6.io.writers.IHasPrependTaxa;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -39,7 +40,7 @@ import static splitstree6.data.DistancesFormat.Triangle.Both;
  * write block in Nexus format
  * Daniel Huson, 11.2021
  */
-public class NexusWriter extends DistancesWriterBase {
+public class NexusWriter extends DistancesWriterBase implements IHasPrependTaxa {
 	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(this, "optionPrependTaxa", false);
 	private String title;
 	private Pair<String, String> link;
@@ -66,7 +67,8 @@ public class NexusWriter extends DistancesWriterBase {
 			distances.getFormat().setOptionTriangle(getOptionTriangle());
 
 			if (isOptionPrependTaxa())
-				new splitstree6.io.writers.taxa.NexusWriter().write(w, taxa, taxa);
+				new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+
 			final var output = new DistancesNexusOutput();
 			output.setTitleAndLink(getTitle(), getLink());
 			if (asWorkflowOnly) {

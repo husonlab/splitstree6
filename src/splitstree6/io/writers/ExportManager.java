@@ -119,9 +119,13 @@ public class ExportManager {
 	/**
 	 * write a datablock using the named exporter
 	 */
-	public void write(TaxaBlock taxaBlock, DataBlock dataBlock, String exporterName, Writer w) throws IOException {
+	public void write(TaxaBlock taxaBlock, DataBlock dataBlock, String exporterName0, Writer w) throws IOException {
+		var prependTaxa = exporterName0.equals("NexusWithTaxa");
+		var exporterName = (exporterName0.equals("NexusWithTaxa") ? "Nexus" : exporterName0);
 		var exporter = getExporterByName(dataBlock.getClass(), exporterName);
 		if (exporter != null) {
+			if (prependTaxa && exporter instanceof IHasPrependTaxa nexusWriter)
+				nexusWriter.optionPrependTaxaProperty().set(true);
 			if (dataBlock.getClass() == exporter.getFromClass())
 				exporter.write(w, taxaBlock, dataBlock);
 			else

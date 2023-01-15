@@ -28,6 +28,7 @@ import splitstree6.data.CharactersBlock;
 import splitstree6.data.CharactersFormat;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.nexus.CharactersNexusOutput;
+import splitstree6.io.writers.IHasPrependTaxa;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -37,7 +38,7 @@ import java.util.List;
  * write block in Nexus format
  * Daniel Huson, 11.2021
  */
-public class NexusWriter extends CharactersWriterBase {
+public class NexusWriter extends CharactersWriterBase implements IHasPrependTaxa {
 	private final BooleanProperty optionPrependTaxa = new SimpleBooleanProperty(this, "optionPrependTaxa", false);
 	private String title;
 	private Pair<String, String> link;
@@ -72,7 +73,8 @@ public class NexusWriter extends CharactersWriterBase {
 			characters.getFormat().setOptionTokens(isOptionTokens());
 
 			if (isOptionPrependTaxa())
-				new splitstree6.io.writers.taxa.NexusWriter().write(w, taxa, taxa);
+				new splitstree6.io.writers.taxa.NexusWriter(true).write(w, taxa, taxa);
+
 			final var output = new CharactersNexusOutput();
 			output.setTitleAndLink(getTitle(), getLink());
 			if (asWorkflowOnly) {

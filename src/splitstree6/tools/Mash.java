@@ -57,7 +57,7 @@ public class Mash {
 	private void run(String[] args) throws Exception {
 		final ArgsOptions options = new ArgsOptions(args, this, "Computes Mash sketches, Jaccard index and distances");
 		options.setVersion(ProgramProperties.getProgramVersion());
-		options.setLicense("Copyright (C) 2023 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
+		options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
 		options.setAuthors("Daniel H. Huson");
 
 		var command = options.getCommand(ArgsOptions.createCommand("sketch", "Compute sketches"),

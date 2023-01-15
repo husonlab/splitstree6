@@ -68,7 +68,7 @@ public class ConsensusOutline extends Trees2Splits implements IToCircularSplits 
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isPartial() && !parent.isReticulated();
+		return !parent.isPartial();
 	}
 
 	public ConsensusNetwork.EdgeWeights getOptionEdgeWeights() {

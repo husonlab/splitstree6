@@ -115,7 +115,7 @@ public class ConsensusSplits extends Trees2Splits {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isPartial() && !parent.isReticulated();
+		return !parent.isPartial();
 	}
 
 	public Consensus getOptionConsensus() {

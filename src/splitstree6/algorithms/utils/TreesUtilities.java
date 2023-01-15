@@ -19,7 +19,6 @@
 
 package splitstree6.algorithms.utils;
 
-import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
@@ -29,6 +28,7 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
+import splitstree6.data.parts.BiPartition;
 import splitstree6.data.parts.Compatibility;
 
 import java.util.*;
@@ -157,68 +157,27 @@ public class TreesUtilities {
 		if (taxaInTree == null)
 			taxaInTree = getTaxa(tree);
 
-		if (tree.getRoot() == null) {
-			// choose an arbitrary leaf
-			for (var v : tree.nodes()) {
-				if (tree.hasTaxa(v) && v.getDegree() == 1) {
-					System.err.println("Internal error: tree not rooted, but should be");
-					tree.setRoot(v);
-					break;
+		if (tree.getRoot() == null)
+			throw new RuntimeException("Tree is empty or no root");
+		else {
+			var biPartitionSplitMap = new HashMap<BiPartition, ASplit>();
+			for (var entry : getHardwiredClusters(tree).entrySet()) {
+				var v = entry.getKey();
+				var cluster = entry.getValue();
+				if (v != tree.getRoot()) {
+					var complement = BitSetUtils.minus(taxaInTree, cluster);
+					if (cluster.cardinality() > 0 && complement.cardinality() > 0) {
+						var weight = tree.getWeight(v.getFirstInEdge());
+						var biPartition = new BiPartition(cluster, complement);
+						var split = biPartitionSplitMap.computeIfAbsent(biPartition, k -> new ASplit(cluster, complement, 0));
+						split.setWeight(split.getWeight() + weight); // this ensures that complementary clusters get mpped to same split
+					}
 				}
 			}
+			splits.clear();
+			splits.addAll(biPartitionSplitMap.values());
 		}
-
-		if (tree.getRoot() != null) // otherwise empty tree
-			tree2splitsRec(tree.getRoot(), null, tree, taxaInTree, splits);
 		return taxaInTree;
-	}
-
-	/**
-	 * recursively extract all splits
-	 */
-	private static BitSet tree2splitsRec(final Node v, final Edge e, final PhyloTree tree, final BitSet taxaInTree, final Collection<ASplit> splits) {
-		final var vAndBelowTaxa = BitSetUtils.asBitSet(tree.getTaxa(v));
-
-		for (var f : v.adjacentEdges()) {
-			if (f != e) {
-				final var w = tree.getOpposite(v, f);
-				final var wAndBelowTaxa = tree2splitsRec(w, f, tree, taxaInTree, splits);
-
-				// take care at root of tree,
-				// if root has degree 2, then root will give rise to only
-				//  one split, with weight that equals
-				// the sum of the two weights.. make sure we only produce
-				// one split by using the edge that has lower id
-				var ok = true;
-				var weight = tree.getWeight(f);
-				var confidence = tree.getConfidence(f);
-				var root = tree.getRoot();
-				if (root != null && (f.getSource() == root || f.getTarget() == root) && root.getDegree() == 2 && !tree.hasTaxa(v)) {
-					// get the other  edge adjacent to root:
-					final Edge g;
-					if (root.getFirstAdjacentEdge() != f)
-						g = root.getFirstAdjacentEdge();
-					else
-						g = root.getLastAdjacentEdge();
-					if (f.getId() < g.getId()) {
-						weight = tree.getWeight(f) + tree.getWeight(g);
-						confidence = 0.5 * (tree.getConfidence(f) + tree.getConfidence(g));
-					} else
-						ok = false;
-				}
-
-				if (ok) {
-					final var B = new BitSet();
-					B.or(taxaInTree);
-					B.andNot(wAndBelowTaxa);
-					final var newSplit = new ASplit(wAndBelowTaxa, B, weight, confidence);
-					newSplit.setConfidence((float) confidence);
-					splits.add(newSplit);
-				}
-				vAndBelowTaxa.or(wAndBelowTaxa);
-			}
-		}
-		return vAndBelowTaxa;
 	}
 
 	/**
@@ -409,6 +368,42 @@ public class TreesUtilities {
 		// todo: ask about internal node labels
 		RerootingUtils.rerootByMidpoint(tree);
 		return tree;
+	}
+
+	/**
+	 * computes a mapping of tree nodes to represented hardwired cluster. Does not contain the cluster at the root
+	 *
+	 * @param tree input tree, may contain reticulations
+	 * @return mapping of tree nodes to corresponding hardwired clusters
+	 */
+	public static NodeArray<BitSet> getHardwiredClusters(PhyloTree tree) {
+		NodeArray<BitSet> nodeClusterMap = tree.newNodeArray();
+		var stack = new Stack<Node>();
+		stack.push(tree.getRoot());
+		while (stack.size() > 0) {
+			var v = stack.peek();
+			if (nodeClusterMap.containsKey(v))
+				stack.pop();
+			else {
+				var hasUnprocessedChild = false;
+				for (var w : v.children()) {
+					if (!nodeClusterMap.containsKey(w)) {
+						stack.push(w);
+						hasUnprocessedChild = true;
+					}
+				}
+				if (!hasUnprocessedChild) {
+					stack.pop();
+					var cluster = BitSetUtils.asBitSet(tree.getTaxa(v));
+					for (var w : v.children()) {
+						cluster.or(nodeClusterMap.get(w));
+					}
+					nodeClusterMap.put(v, cluster);
+				}
+			}
+		}
+		tree.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
+		return nodeClusterMap;
 	}
 
 	private static record WeightConfidence(double weight, double confidence) {

@@ -35,8 +35,11 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.MainWindowManager;
+import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
+import splitstree6.data.TreesBlock;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -124,15 +127,18 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionColorIncompatibleEdgesProperty());
 
 		InvalidationListener invalidationListener = e -> {
-			var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
-			drawer.apply(targetBounds.get(),
-					trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
-					view.getOptionOrientation() != Rotate0Deg,
-					view.isOptionJitter(),
-					view.getOptionColorIncompatibleEdges(),
-					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
-					view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
-					view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+			if (view.getViewTab().getDataNode().getDataBlock() instanceof TreesBlock treesBlock && !treesBlock.isReticulated()) {
+				var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
+				drawer.apply(targetBounds.get(),
+						trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
+						view.getOptionOrientation() != Rotate0Deg,
+						view.isOptionJitter(),
+						view.getOptionColorIncompatibleEdges(),
+						view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
+						view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
+						view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+			} else
+				RunAfterAWhile.applyInFXThread(drawer, () -> NotificationManager.showError("Trees are reticulated, cant' use DensiTree visualization"));
 		};
 
 		targetBounds.addListener(invalidationListener);

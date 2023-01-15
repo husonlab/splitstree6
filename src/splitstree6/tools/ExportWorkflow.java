@@ -91,9 +91,9 @@ public class ExportWorkflow extends Application {
         ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitstree6/resources");
 
         final var options = new ArgsOptions(args, ExportWorkflow.class, "Exports data from a SplitsTree6 workflow");
-		options.setVersion(ProgramProperties.getProgramVersion());
-		options.setLicense("Copyright (C) 2023 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
-		options.setAuthors("Daniel H. Huson");
+        options.setVersion(ProgramProperties.getProgramVersion());
+        options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
+        options.setAuthors("Daniel H. Huson and David Bryant");
 
         options.comment("Input Output:");
         final var inputWorkflowFile = new File(options.getOptionMandatory("-w", "workflow", "File containing SplitsTree5 workflow", ""));

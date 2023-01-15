@@ -42,6 +42,11 @@ public class NexusWriter extends TaxaWriterBase {
 		setFileExtensions("nxs", "nex", "nexus");
 	}
 
+	public NexusWriter(boolean prependNexus) {
+		this();
+		optionPrependNexus.set(prependNexus);
+	}
+
 	@Override
 	public void write(Writer w, TaxaBlock ignored, TaxaBlock taxaBlock) throws IOException {
 		if (isOptionPrependNexus()) {

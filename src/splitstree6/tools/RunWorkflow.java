@@ -28,10 +28,7 @@ import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.NotificationManager;
-import jloda.util.Basic;
-import jloda.util.FileUtils;
-import jloda.util.IteratorUtils;
-import jloda.util.PeakMemoryUsageMonitor;
+import jloda.util.*;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.nexus.workflow.WorkflowNexusOutput;
@@ -45,6 +42,7 @@ import splitstree6.workflow.WorkflowDataLoader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
 /**
@@ -96,9 +94,9 @@ public class RunWorkflow extends Application {
         ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitsTree6/resources");
 
         final ArgsOptions options = new ArgsOptions(args, RunWorkflow.class, "Runs a SplitsTree6 workflow on input data");
-		options.setVersion(ProgramProperties.getProgramVersion());
-		options.setLicense("Copyright (C) 2023 Daniel H. Huson. This program comes with ABSOLUTELY NO WARRANTY.");
-		options.setAuthors("Daniel H. Huson");
+        options.setVersion(ProgramProperties.getProgramVersion());
+        options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
+        options.setAuthors("Daniel H. Huson and David Bryant");
 
         options.comment("Input Output:");
         final var inputWorkflowFile = new File(options.getOptionMandatory("-w", "workflow", "File containing SplitsTree6 workflow", ""));
@@ -107,7 +105,8 @@ public class RunWorkflow extends Application {
         var outputFiles = options.getOption("-o", "output", "Output file(s) (or directory or stdout)", new String[]{"stdout"});
 
         final var nodeName = options.getOption("-n", "node", "Title of node to be exported (if none given, will save whole file)", "");
-        final var exportFormat = options.getOption("-e", "exporter", "Name of exporter to use", ExportManager.getInstance().getExporterNames(), "");
+        final var exportFormat = options.getOption("-e", "exporter", "Name of exporter to use",
+                CollectionUtils.concatenate(ExportManager.getInstance().getExporterNames(), List.of("NexusWithTaxa")), "");
 
         options.comment(ArgsOptions.OTHER);
         final var inputFileExtension = options.getOption("-x", "inputExt", "File extension for input files (when providing directory for input)", "");
