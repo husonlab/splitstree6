@@ -79,14 +79,14 @@ public class ComboBoxUtils {
 		};
 	}
 
-	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeMap) {
-		return p -> createButtonCell(disabled, itemNodeMap, false);
+	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeFunction) {
+		return p -> createButtonCell(disabled, itemNodeFunction, false);
 	}
 
 	/**
 	 * creates the callback method for diagram combo box
 	 */
-	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeMap, boolean flip) {
-		return p -> createButtonCell(disabled, itemNodeMap, flip);
+	public static <T> Callback<ListView<T>, ListCell<T>> createCellFactory(ObservableSet<T> disabled, Function<T, Node> itemNodeFunction, boolean flip) {
+		return p -> createButtonCell(disabled, itemNodeFunction, flip);
 	}
 }
