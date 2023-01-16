@@ -282,9 +282,6 @@ public class MainWindowController {
 	private CheckMenuItem bunemanTreeMenuItem;
 
 	@FXML
-	private CheckMenuItem selectTreeMenuItem;
-
-	@FXML
 	private CheckMenuItem consensusTreeMenuItem;
 
 	@FXML
@@ -804,10 +801,6 @@ public class MainWindowController {
 
 	public CheckMenuItem getBunemanTreeMenuItem() {
 		return bunemanTreeMenuItem;
-	}
-
-	public CheckMenuItem getSelectTreeMenuItem() {
-		return selectTreeMenuItem;
 	}
 
 	public CheckMenuItem getConsensusTreeMenuItem() {

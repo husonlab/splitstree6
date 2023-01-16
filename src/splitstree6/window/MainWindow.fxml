@@ -362,7 +362,6 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="bunemanTreeMenuItem" text="Buneman Tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="selectTreeMenuItem" text="Select Tree"/>
                         <CheckMenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="minSpanningTreeMenuItem" text="Minimum Spanning Tree"/>

@@ -72,7 +72,10 @@ import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2splits.*;
-import splitstree6.algorithms.trees.trees2trees.*;
+import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
+import splitstree6.algorithms.trees.trees2trees.BootstrapTree;
+import splitstree6.algorithms.trees.trees2trees.ConsensusTree;
+import splitstree6.algorithms.trees.trees2trees.RerootOrReorderTrees;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TreesBlock;
@@ -480,7 +483,6 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getUpgmaMenuItem(), new UPGMA());
 
 		setupAlgorithmMenuItem(controller.getBunemanTreeMenuItem(), new BunemanTree());
-		setupAlgorithmMenuItem(controller.getSelectTreeMenuItem(), new TreeSelector(), a -> ((TreeSelector) a).setOptionWhich(1));
 		setupAlgorithmMenuItem(controller.getConsensusTreeMenuItem(), new ConsensusTree(), a -> ((ConsensusTree) a).setOptionConsensus(ConsensusTree.Consensus.Majority));
 		setupAlgorithmMenuItem(controller.getMinSpanningTreeMenuItem(), new MinSpanningTree());
 		setupAlgorithmMenuItem(controller.getRerootOrReorderTreesMenuItem(), new RerootOrReorderTrees());
@@ -552,9 +554,7 @@ public class MainWindowPresenter {
 		controller.getCheckForUpdatesMenuItem().setOnAction(e -> CheckForUpdate.apply());
 		controller.getCheckForUpdatesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not().or(MainWindowManager.getInstance().sizeProperty().greaterThan(1)));
 
-		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(a -> {
-			updateEnableStateAlgorithms();
-		});
+		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(a -> updateEnableStateAlgorithms());
 
 		workflow.runningProperty().addListener((v, o, n) -> {
 			if (!n)

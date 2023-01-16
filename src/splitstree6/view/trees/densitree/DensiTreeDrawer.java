@@ -194,7 +194,6 @@ public class DensiTreeDrawer {
 
 				var treeScaleAndAlignment = new TreeScaleAndAlignment(rightAdjust ? TreeScaleAndAlignment.AlignTo.Max : TreeScaleAndAlignment.AlignTo.Center, bounds, consensusNodePointMap);
 
-
 				Platform.runLater(() -> {
 					drawConsensus(mainWindow, consensusTree, consensusNodePointMap, nodeAngleMap, diagramType, getRadialLabelLayout(), showConsensus, pane);
 					ProgramExecutorService.submit(consensusNodePointMap::close);
@@ -337,7 +336,7 @@ public class DensiTreeDrawer {
 			label.setTranslateX(point.getX());
 			label.setTranslateY(point.getY());
 			//radialLabelLayout.addAvoidable(() -> x, () -> y, () -> 3.0, () -> 3.0);
-			var x = (maxLeafX > Double.MIN_VALUE ? maxLeafX + 10 : point.getX());
+			var x = (maxLeafX > Double.MIN_VALUE ? maxLeafX + 3 : point.getX());
 
 			radialLabelLayout.addItem(new SimpleDoubleProperty(x), new SimpleDoubleProperty(point.getY()), angle,
 					label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(x + a), a -> label.setTranslateY(point.getY() + a));

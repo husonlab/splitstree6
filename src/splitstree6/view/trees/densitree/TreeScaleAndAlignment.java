@@ -31,16 +31,11 @@ import java.util.Map;
  * Daniel Huson, 1.2023
  */
 public class TreeScaleAndAlignment {
-
 	public enum AlignTo {Center, Max}
-
-	;
 
 	private final AlignTo alignTo;
 	private final double hRef;
-
 	private final double vRef;
-
 	private final Point2D scale;
 
 	/**

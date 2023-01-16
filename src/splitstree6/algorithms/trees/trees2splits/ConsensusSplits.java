@@ -131,6 +131,8 @@ public class ConsensusSplits extends Trees2Splits {
 	}
 
 	public void setOptionConsensus(String optionConsensus) {
+		if (optionConsensus.equals("Greedy"))
+			optionConsensus = "GreedyCompatible";
 		this.optionConsensus.set(Consensus.valueOf(optionConsensus));
 	}
 
