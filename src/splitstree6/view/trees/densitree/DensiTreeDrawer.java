@@ -80,6 +80,7 @@ public class DensiTreeDrawer {
 
 	private final AService<Boolean> service;
 
+
 	public DensiTreeDrawer(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 		this.radialLabelLayout = new RadialLabelLayout();
@@ -116,7 +117,7 @@ public class DensiTreeDrawer {
 	}
 
 	public void apply(Bounds targetBounds, List<PhyloTree> trees0, StackPane parent, DensiTreeDiagramType diagramType, HeightAndAngles.Averaging averaging,
-					  boolean vFlip, boolean jitter,
+					  boolean vFlip, boolean jitter, boolean rightAdjust,
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, boolean hideFirst10PercentTrees, ReadOnlyBooleanProperty showConsensus,
 					  double lineWidth, Color edgeColor, Color otherColor) {
@@ -183,17 +184,17 @@ public class DensiTreeDrawer {
 				}
 				var lastTaxon = cycle[cycle.length - 1];
 
-				Point2D consensusScale;
 				if (diagramType.isRadialOrCircular()) {
 					computeRadialLayout(consensusTree, taxon2pos, mainWindow.getWorkingTaxa().getNtax(), lastTaxon, consensusNodePointMap, nodeAngleMap);
-					consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
 				} else {
 					computeTriangularLayout(consensusTree, averaging, taxon2pos, consensusNodePointMap);
 					if (vFlip)
 						consensusNodePointMap.entrySet().forEach(e -> e.setValue(new Point2D(e.getValue().getX(), -e.getValue().getY())));
-					consensusScale = LayoutUtils.scaleToBounds(bounds, consensusNodePointMap);
 				}
-				var consensusCenter = computeCenter(consensusNodePointMap.values());
+
+				var treeScaleAndAlignment = new TreeScaleAndAlignment(rightAdjust ? TreeScaleAndAlignment.AlignTo.Max : TreeScaleAndAlignment.AlignTo.Center, bounds, consensusNodePointMap);
+
+
 				Platform.runLater(() -> {
 					drawConsensus(mainWindow, consensusTree, consensusNodePointMap, nodeAngleMap, diagramType, getRadialLabelLayout(), showConsensus, pane);
 					ProgramExecutorService.submit(consensusNodePointMap::close);
@@ -206,7 +207,7 @@ public class DensiTreeDrawer {
 					for (PhyloTree tree : trees) {
 						var consensusClusters = TreesUtilities.extractClusters(consensusTree).values();
 						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, averaging, vFlip, taxon2pos, lastTaxon,
-								consensusCenter, consensusScale, diagramType, jitter, random);
+								treeScaleAndAlignment, diagramType, jitter, random);
 						Platform.runLater(() -> {
 							try {
 								drawTree(progress, tree, nodePointMap, consensusClusters, diagramType, 0, canvas0, lineWidth, edgeColor, otherColor);
@@ -225,7 +226,7 @@ public class DensiTreeDrawer {
 				} else {
 					for (PhyloTree tree : trees) {
 						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, averaging, vFlip, taxon2pos, lastTaxon,
-								consensusCenter, consensusScale, diagramType, jitter, random);
+								treeScaleAndAlignment, diagramType, jitter, random);
 						Platform.runLater(() -> {
 							try {
 								if (false) { // todo: make random colors an option?
@@ -336,7 +337,7 @@ public class DensiTreeDrawer {
 			label.setTranslateX(point.getX());
 			label.setTranslateY(point.getY());
 			//radialLabelLayout.addAvoidable(() -> x, () -> y, () -> 3.0, () -> 3.0);
-			var x = (maxLeafX > Double.MIN_VALUE ? maxLeafX + 3 : point.getX());
+			var x = (maxLeafX > Double.MIN_VALUE ? maxLeafX + 10 : point.getX());
 
 			radialLabelLayout.addItem(new SimpleDoubleProperty(x), new SimpleDoubleProperty(point.getY()), angle,
 					label.widthProperty(), label.heightProperty(), a -> label.setTranslateX(x + a), a -> label.setTranslateY(point.getY() + a));
@@ -346,7 +347,7 @@ public class DensiTreeDrawer {
 	}
 
 	private static NodeArray<Point2D> computeTreeCoordinates(TaxaBlock taxaBlock, PhyloTree tree, HeightAndAngles.Averaging averaging, boolean vFlip, int[] taxon2pos, int lastTaxon,
-															 Point2D consensusCenter, Point2D consensusScale, DensiTreeDiagramType diagramType,
+															 TreeScaleAndAlignment treeScaleAndAlignment, DensiTreeDiagramType diagramType,
 															 boolean jitter, Random random) {
 		final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 
@@ -355,25 +356,21 @@ public class DensiTreeDrawer {
 				computeRadialLayout(tree, taxon2pos, taxaBlock.getNtax(), lastTaxon, nodePointMap, nodeAngleMap);
 			}
 			// scale and center based on consensus tree:
-			LayoutUtils.scale(consensusScale.getX(), consensusScale.getY(), nodePointMap);
-			var center = computeCenter(nodePointMap.values());
-			LayoutUtils.translate(consensusCenter.subtract(center).getX(), consensusCenter.subtract(center).getY(), nodePointMap);
+			treeScaleAndAlignment.apply(nodePointMap);
 
 		} else {
 			computeTriangularLayout(tree, averaging, taxon2pos, nodePointMap);
 			if (vFlip)
 				nodePointMap.entrySet().forEach(e -> e.setValue(new Point2D(e.getValue().getX(), -e.getValue().getY())));
 			// scale and center based on consensus tree:
-			LayoutUtils.scale(consensusScale.getX(), consensusScale.getY(), nodePointMap);
-			var center = computeCenter(nodePointMap.values());
-			LayoutUtils.translate(consensusCenter.subtract(center).getX(), consensusCenter.subtract(center).getY(), nodePointMap);
+			treeScaleAndAlignment.apply(nodePointMap);
 		}
 
 		if (jitter) {
 			var distance = 2 * Math.pow(2 * random.nextGaussian(), 2);
 			var angle = 360 * random.nextDouble();
 			var direction = GeometryUtilsFX.translateByAngle(0, 0, angle, distance);
-			LayoutUtils.translate(direction.getX(), direction.getY(), nodePointMap);
+			TreeScaleAndAlignment.translate(direction.getX(), direction.getY(), nodePointMap);
 		}
 		return nodePointMap;
 	}
@@ -440,23 +437,11 @@ public class DensiTreeDrawer {
 		// count all clusters:
 		var clusterCountMap = new HashMap<BitSet, Integer>();
 		for (var tree : trees) {
-			try (NodeArray<BitSet> clusterMap = tree.newNodeArray()) {
-				tree.postorderTraversal(v -> {
-					var cluster = new BitSet();
-					if (v.isLeaf()) {
-						cluster.set(tree.getTaxon(v));
-					} else {
-						for (var w : v.children()) {
-							cluster.or(clusterMap.get(w));
-						}
-					}
-					//cluster = smallerSide(taxa, cluster);
-					clusterMap.put(v, cluster);
+			try (var nodeClusterMap = TreesUtilities.extractClusters(tree)) {
+				for (var cluster : nodeClusterMap.values()) {
 					var count = clusterCountMap.computeIfAbsent(cluster, k -> 0);
-					if (v.getInDegree() > 0) {
-						clusterCountMap.put(cluster, count + 1);
-					}
-				});
+					clusterCountMap.put(cluster, count + 1);
+				}
 			}
 		}
 
@@ -478,8 +463,7 @@ public class DensiTreeDrawer {
 		// compute consensus clusters and add to PQ-tree
 		for (var entry : list) {
 			var cluster = entry.getKey();
-			var count = entry.getValue();
-			if (count > 0.5 * trees.size() || isCompatibleWithAll(cluster, consensusClusters)) {
+			if (isCompatibleWithAll(cluster, consensusClusters)) {
 				consensusClusters.add(cluster);
 				if (!pqTree.accept(cluster)) { // figure out why this can happen
 					System.err.println("Looks like a bug in the PQ-tree code, please contact the author (Daniel Huson) about this");
@@ -539,24 +523,6 @@ public class DensiTreeDrawer {
 		cycle.addAll(ordering);
 		cycle.addAll(CollectionUtils.difference(BitSetUtils.asSet(taxaBlock.getTaxaSet()), ordering));
 		return cycle.stream().mapToInt(a -> a).toArray();
-	}
-
-	/**
-	 * compute the center
-	 *
-	 * @param points collection of points
-	 * @return center point
-	 */
-	private static Point2D computeCenter(Collection<Point2D> points) {
-		if (points.size() == 0)
-			return new Point2D(0, 0);
-		else {
-			var xMid = points.stream().mapToDouble(Point2D::getX).sum() / points.size();
-			// var xMid = 0.5 * (points.stream().mapToDouble(Point2D::getX).max().orElse(0.0) + points.stream().mapToDouble(Point2D::getX).min().orElse(0.0));
-			//var yMid=points.stream().mapToDouble(Point2D::getY).sum() / points.size())
-			var yMid = 0.5 * (points.stream().mapToDouble(Point2D::getY).max().orElse(0.0) + points.stream().mapToDouble(Point2D::getY).min().orElse(0.0));
-			return new Point2D(xMid, yMid);
-		}
 	}
 
 	private static boolean nodeShapeOrLabelEntered = false;

@@ -131,14 +131,13 @@ public class RerootAndRescaleTrees {
 				}
 			}
 
-			if (true) {
+			if (false) {
 				var reduce = new ArrayList<PhyloTree>();
 				for (var i = 0; i < 4; i++)
 					reduce.add(fullTrees.get(i));
 				fullTrees.clear();
 				fullTrees.addAll(reduce);
 			}
-
 
 			if (outGroup != null) {
 				for (var tree : fullTrees) {
@@ -153,9 +152,11 @@ public class RerootAndRescaleTrees {
 						tree.setWeight(e, 100 * tree.getWeight(e) / maxDistanceToLeaves1);
 					}
 				}
-				System.err.printf(tree.getName() + " total length: %.5f%n", getTotalPairwiseDistances(allTaxa, tree));
-				System.err.printf(tree.getName() + " average leaf dist: %.5f%n", getAverageDistanceToLeaves(tree));
-				System.err.printf(tree.getName() + " max leaf dist: %.5f%n", getMaxDistanceToLeaves(tree));
+				if (false) {
+					System.err.printf(tree.getName() + " total length: %.5f%n", getTotalPairwiseDistances(allTaxa, tree));
+					System.err.printf(tree.getName() + " average leaf dist: %.5f%n", getAverageDistanceToLeaves(tree));
+					System.err.printf(tree.getName() + " max leaf dist: %.5f%n", getMaxDistanceToLeaves(tree));
+				}
 			}
 
 

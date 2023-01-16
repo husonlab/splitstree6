@@ -161,7 +161,7 @@ public class TreesUtilities {
 			throw new RuntimeException("Tree is empty or no root");
 		else {
 			var biPartitionSplitMap = new HashMap<BiPartition, ASplit>();
-			for (var entry : getHardwiredClusters(tree).entrySet()) {
+			for (var entry : extractClusters(tree).entrySet()) {
 				var v = entry.getKey();
 				var cluster = entry.getValue();
 				if (v != tree.getRoot()) {
@@ -278,21 +278,6 @@ public class TreesUtilities {
 		return distances;
 	}
 
-	public static Map<Node, BitSet> extractClusters(PhyloTree tree) {
-		NodeArray<BitSet> nodeClusterMap = tree.newNodeArray();
-		tree.postorderTraversal(v -> {
-			var cluster = new BitSet();
-			for (var t : tree.getTaxa(v))
-				cluster.set(t);
-			for (var w : v.children()) {
-				cluster.or(nodeClusterMap.get(w));
-			}
-			nodeClusterMap.put(v, cluster);
-
-		});
-		return nodeClusterMap;
-	}
-
 	public static PhyloTree computeTreeFromCompatibleSplits(TaxaBlock taxaBlock, List<ASplit> splits) {
 		if (!Compatibility.isCompatible(splits))
 			throw new RuntimeException("Internal error: Splits are not compatible");
@@ -376,7 +361,7 @@ public class TreesUtilities {
 	 * @param tree input tree, may contain reticulations
 	 * @return mapping of tree nodes to corresponding hardwired clusters
 	 */
-	public static NodeArray<BitSet> getHardwiredClusters(PhyloTree tree) {
+	public static NodeArray<BitSet> extractClusters(PhyloTree tree) {
 		NodeArray<BitSet> nodeClusterMap = tree.newNodeArray();
 		var stack = new Stack<Node>();
 		stack.push(tree.getRoot());

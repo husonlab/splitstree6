@@ -35,11 +35,9 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
-import splitstree6.data.TreesBlock;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -97,8 +95,12 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		});
 
 		view.optionRerootAndRescaleProperty().bindBidirectional(controller.getRerootAndRescaleChekMenuItem().selectedProperty());
+		view.optionRerootAndRescaleProperty().addListener((v, o, n) -> {
+			if (n)
+				NotificationManager.showWarning("Option reroot and rescale under development");
+		});
 		// todo: RerootAndRescaleTrees.java needs to be finished
-		controller.getRerootAndRescaleChekMenuItem().setDisable(true);
+		//controller.getRerootAndRescaleChekMenuItem().setDisable(true);
 
 		controller.getShowTreesMenuItem().selectedProperty().bindBidirectional(view.optionShowTreesProperty());
 		controller.getHideFirst10PercentMenuItem().selectedProperty().bindBidirectional(view.optionHideFirst10PercentTreesProperty());
@@ -127,18 +129,15 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getColorIncompatibleTreesMenuItem().selectedProperty().bindBidirectional(view.optionColorIncompatibleEdgesProperty());
 
 		InvalidationListener invalidationListener = e -> {
-			if (view.getViewTab().getDataNode().getDataBlock() instanceof TreesBlock treesBlock && !treesBlock.isReticulated()) {
-				var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
-				drawer.apply(targetBounds.get(),
-						trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
-						view.getOptionOrientation() != Rotate0Deg,
-						view.isOptionJitter(),
-						view.getOptionColorIncompatibleEdges(),
-						view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
-						view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
-						view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
-			} else
-				RunAfterAWhile.applyInFXThread(drawer, () -> NotificationManager.showError("Trees are reticulated, cant' use DensiTree visualization"));
+			var trees = view.isOptionRerootAndRescale() ? RerootAndRescaleTrees.apply(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getTrees()) : view.getTrees();
+			drawer.apply(targetBounds.get(),
+					trees, controller.getCenterPane(), view.getOptionDiagram(), view.getOptionAveraging(),
+					view.getOptionOrientation() != Rotate0Deg,
+					view.isOptionJitter(), view.isOptionRerootAndRescale(),
+					view.getOptionColorIncompatibleEdges(),
+					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
+					view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
+					view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
 		};
 
 		targetBounds.addListener(invalidationListener);
@@ -148,6 +147,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		view.optionStrokeWidthProperty().addListener(invalidationListener);
 		view.optionEdgeColorProperty().addListener(invalidationListener);
 		view.optionOtherColorProperty().addListener(invalidationListener);
+		view.optionRerootAndRescaleProperty().addListener(invalidationListener);
 
 		controller.getDecreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1 / 1.1 * view.getOptionFontScaleFactor()));
 		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));

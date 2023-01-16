@@ -190,7 +190,7 @@ public class RerootingUtils {
 			}
 			var result = new ArrayList<RootingRecord>();
 			for (var e : tree.edges()) {
-				if (!tree.isReticulateEdge(e))
+				if (!tree.isReticulateEdge(e) && sourceMap.containsKey(e) && targetMap.containsKey(e))
 					result.add(new RootingRecord(e, tree.getWeight(e), sourceMap.get(e), targetMap.get(e)));
 			}
 			return result;

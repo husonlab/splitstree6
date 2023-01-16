@@ -170,9 +170,11 @@ public class RootedConsensusTree extends Trees2Trees {
 	}
 
 	public static boolean isCompatibleWithAll(BitSet a, Collection<BitSet> clusters) {
-		for (var b : clusters) {
-			if (!(!a.intersects(b) || BitSetUtils.contains(a, b) || BitSetUtils.contains(b, a)))
-				return false;
+		if (a != null) {
+			for (var b : clusters) {
+				if (!(!a.intersects(b) || BitSetUtils.contains(a, b) || BitSetUtils.contains(b, a)))
+					return false;
+			}
 		}
 		return true;
 	}
