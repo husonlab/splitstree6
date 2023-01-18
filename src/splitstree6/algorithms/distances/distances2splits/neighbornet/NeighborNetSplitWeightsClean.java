@@ -10,9 +10,10 @@ import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Comparator;
 
+
 import static java.lang.Math.min;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
+//import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
 //TODO Make the arrays upper triangular
 
@@ -31,14 +32,19 @@ public class NeighborNetSplitWeightsClean {
         public MethodTypes method = MethodTypes.ACTIVESET;
 
         public double cutoff; //Only include split weights greater than this amount
+        public double projGradBound; //Stop if projected gradient is less than this. This should be larger than the CGNR bound
 
         public int cgnrIterations; //Max number of iterations in CGNR
         public double cgnrTolerance; //Stopping condition for CGNR - bound on norm gradient squared.
         public boolean cgnrPrintResiduals = false; //Output residual sum of squares during algorithm
+
         public boolean activeSetPrintResiduals = false; //Output project gradient sum squares during algorithm
         public double activeSetRho; //Proportion of pairs to add to active set in Active Set Method.
-        public double activeSetProjGradBound; //Bound on projected gradient. This should be more than the CGNR bound
         public int activeSetMaxIterations=100000; //Max iterations before active set gives up.
+
+        public double blockPivotCutoff;
+        public int blockPivotMaxIterations;
+        public boolean blockPivotPrintResiduals = false;
 
         public PrintWriter log;
 
@@ -79,8 +85,7 @@ public class NeighborNetSplitWeightsClean {
             for (var j = i + 1; j <= n; j++)
                 d[i][j] = distances[cycle[i] - 1][cycle[j] - 1];
         var x = new double[n + 1][n + 1]; //array of split weights
-        //noinspection SuspiciousNameCombination
-        calcAinvx(d,x); //Compute unconstrained solution
+        calcAinv_y(d,x); //Compute unconstrained solution
         var minVal = minArray(x);
         if (minVal < 0) {
             switch (params.method) {
@@ -116,7 +121,7 @@ public class NeighborNetSplitWeightsClean {
      * Implementation of the CGNR algorithm in Saad, "Iterative Methods for Sparse Linear Systems", applied to the
      * problem of minimizing ||Ax - d|| such that x_{ij} = 0 for all ij in the activeSet.
      *
-     * @param x             Initial value, overwritten with final value
+     * @param x             Initial value, overwritten with final value. Initially, we set x[i][j] = 0 for all [i][j] in the active set.
      * @param d             square array of distances
      * @param activeSet     square array of boolean: specifying active (zero) set.
      * @param params        parameters - uses params.cgnrIterations for max number of iterations
@@ -133,10 +138,11 @@ public class NeighborNetSplitWeightsClean {
         var r = new double[n + 1][n + 1];
         var z = new double[n + 1][n + 1];
         var w = new double[n + 1][n + 1];
+        zeroNegativeEntries(x);
 
         calcAx(x, r);
         for (var i = 1; i <= n; i++)
-            for (var j = 1; j <= n; j++)
+            for (var j = i+1; j <= n; j++)
                 r[i][j] = d[i][j] - r[i][j];
 
         calcAtx(r, z);
@@ -150,7 +156,7 @@ public class NeighborNetSplitWeightsClean {
             var alpha = ztz / sumArraySquared(w);
 
             for (var i = 1; i <= n; i++) {
-                for (var j = 1; j <= n; j++) {
+                for (var j = i+1; j <= n; j++) {
                     x[i][j] += alpha * p[i][j];
                     r[i][j] -= alpha * w[i][j];
                 }
@@ -164,7 +170,7 @@ public class NeighborNetSplitWeightsClean {
                 break;
 
             for (var i = 1; i <= n; i++) {
-                for (var j = 1; j <= n; j++) {
+                for (var j = i+1; j <= n; j++) {
                     p[i][j] = z[i][j] + beta * p[i][j];
                 }
             }
@@ -200,7 +206,7 @@ public class NeighborNetSplitWeightsClean {
 
         var n = x.length-1;
         boolean[][] activeSet = new boolean[n+1][n+1];
-        getZeroElements(x,activeSet);
+        getActiveEntries(x,activeSet);
 
         double[][] xstar = new double[n+1][n+1];
         double[][] grad = new double[n+1][n+1];
@@ -215,7 +221,7 @@ public class NeighborNetSplitWeightsClean {
                 if (progress!=null)
                     progress.checkForCancel();
 
-                boolean xstarFeasible = feasibleMove(x,xstar,activeSet,params);
+                boolean xstarFeasible = feasibleMoveActiveSet(x,xstar,activeSet,params);
 
                 if (xstarFeasible && numIterations<params.cgnrIterations)
                     break;
@@ -260,7 +266,7 @@ public class NeighborNetSplitWeightsClean {
                     projGrad += g_ij*g_ij;
                 }
             }
-            if (gradmin>= 0 || projGrad < params.activeSetProjGradBound)
+            if (gradmin>= 0 || projGrad < params.projGradBound)
                 break;
             activeSet[imin][jmin] = false;
         }
@@ -283,7 +289,7 @@ public class NeighborNetSplitWeightsClean {
      *                  be added to the active set.
      * @return      true if xstar is feasible, false otherwise
      */
-    static private boolean feasibleMove(double[][] x, double[][] xstar, boolean[][] activeSet, NNLSParams params) {
+    static private boolean feasibleMoveActiveSet(double[][] x, double[][] xstar, boolean[][] activeSet, NNLSParams params) {
         var n = xstar.length - 1;
 
         //First check if xstar is feasible, and return true if it is after moving x to xstar
@@ -314,8 +320,8 @@ public class NeighborNetSplitWeightsClean {
         SortedPairs.Entry entry = sortedPairs.get(index);
         while(index<numToMakeActive&& entry!=null) {
             int i=entry.i; int j = entry.j;
-            activeSet[i][j] = activeSet[j][i] = true;
-            x[i][j] = x[j][i] = 0.0;
+            activeSet[i][j] =  true;
+            x[i][j] =  0.0;
             index++;
             entry = sortedPairs.get(index);
         }
@@ -365,5 +371,119 @@ public class NeighborNetSplitWeightsClean {
         }
 
     }
+
+
+    /**
+     * Implementation of the Block Pivot method tsnnls, as described in
+     *          Cantarella, Jason, and Michael Piatek. "Tsnnls: A solver for large sparse least squares problems with non-negative variables."
+     *          arXiv preprint cs/0408029 (2004).
+     *
+     *
+     * @param x  Square array, can be used to warm start
+     * @param d   square array of distances
+     * @param params parameters for the method
+     * @param progress   progressListener
+     * @throws CanceledException  exception thrown if user presses cancel
+     */
+    static public void blockPivot(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+        var n = x.length - 1;
+        var G = new boolean[n + 1][n + 1];
+        var x2 = new double[n+1][n+1];
+
+        long startTime = System.currentTimeMillis();
+
+        var N = Integer.MAX_VALUE;
+        var p = 3;
+        boolean done = false;
+        int iter = 0;
+
+        getActiveEntries(x, G);
+        cgnr(x, d, G, params, progress);
+
+        //gradient
+        var y = new double[n + 1][n + 1];
+        evalGradient(x, d, y);
+
+        if (params.blockPivotPrintResiduals) {
+            params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x,d)+ "\t" + cardinality(G) + "\t0");
+            if (params.finalx!=null)
+                params.log.print("\t"+diff(x2,params.finalx));
+            params.log.println();
+        }
+
+        threshold(x,params.blockPivotCutoff);
+        threshold(y,params.blockPivotCutoff);
+        var infeasible = new boolean[n + 1][n + 1];
+
+        while (!done) {
+            iter++;
+
+            //Determine and count infeasible entries: active entries with negative gradient or inactive entries with negative value
+            int numInfeasible = 0;
+            int switched = 0;
+
+            for (var i = 1; i <= n; i++) {
+                for (var j = i + 1; j <= n; j++) {
+                    if ((!G[i][j] && x[i][j] < 0) || (G[i][j] && y[i][j] < 0)) {
+                        numInfeasible++;
+                        infeasible[i][j] =  true;
+                    }
+                    else
+                        infeasible[i][j] =  false;
+                }
+            }
+
+            if (numInfeasible == 0 || iter>=params.blockPivotMaxIterations)
+                done = true;
+            else if (numInfeasible < N) {
+                N = numInfeasible;
+                p = 3;
+                xor(G,infeasible);
+                switched = numInfeasible;
+            } else {
+                if (p > 0) {
+                    p--;
+                    xor(G,infeasible);
+                    switched = numInfeasible;
+                } else {
+                    var foundInfeasible = false;
+                    for (var i = 1; i <= n && !foundInfeasible; i++) {
+                        for (var j = i + 1; j <= n && !foundInfeasible; j++) {
+                            if (infeasible[i][j]) {
+                                G[i][j] =  !G[i][j];
+                                foundInfeasible = true;
+                            }
+                        }
+                    }
+                    switched = -1;
+                }
+            }
+            cgnr(x, d, G, params, progress);
+            evalGradient(x,d,y);
+            if (progress!=null)
+                progress.checkForCancel();
+
+            //Check if zeroing negative entries in x gives small enough projected gradient
+            copyArray(x,x2);
+            zeroNegativeEntries(x2);
+            double pg = evalProjectedGradientSquared(x2, d);
+            if (pg<params.projGradBound) {
+                copyArray(x2,x);
+                return;
+            }
+            if (params.blockPivotPrintResiduals) {
+                params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+pg+ "\t" + cardinality(G)+"\t"+switched);
+                if (params.finalx!=null)
+                    params.log.print("\t"+diff(x2,params.finalx));
+                params.log.println();
+            }
+
+            threshold(x,params.blockPivotCutoff);
+            threshold(y,params.blockPivotCutoff);
+        }
+    }
+
+
+
 
 }

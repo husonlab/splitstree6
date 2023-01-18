@@ -1,6 +1,5 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
-import jloda.fx.util.Print;
 import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
@@ -112,7 +111,7 @@ public class NeighborNetSplitWeights {
 				d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1];
 
 		if (params.plotGraphs)
-			NeighborNetTest.ActiveSetGraphs(d);
+			NeighborNetTest.printGraphs(d);
 
 
 		var x = new double[n + 1][n + 1]; //array of split weights
@@ -131,8 +130,19 @@ public class NeighborNetSplitWeights {
 					fill(x,1.0);
 				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD)
 					acceleratedProjectedGradientDescent(x, d, params, progress);
-				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT)
-					blockPivot(x, d, params, progress);
+				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT) {
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.cgnrTolerance = 1e-10;
+					params2.cgnrIterations = n*n/2;
+					params2.cgnrPrintResiduals = false;
+					params2.blockPivotPrintResiduals = false;
+					params2.projGradBound = 10.0*params2.cgnrTolerance;
+					params2.blockPivotCutoff=1e-10;
+					params2.blockPivotMaxIterations = 100000;
+					//params2.log = setupLogfile("TestBlockPivot.m",false);
+					NeighborNetSplitWeightsClean.blockPivot(x, d, params2, progress);
+					//params2.log.close();
+				}
 				else if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION)
 					projectedConjugateGradient(x, d, params, progress);
 				else {
