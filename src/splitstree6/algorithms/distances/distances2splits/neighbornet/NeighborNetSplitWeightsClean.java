@@ -1,7 +1,14 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.univariate.BrentOptimizer;
+import org.apache.commons.math3.optim.univariate.SearchInterval;
+import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
 import java.io.PrintWriter;
@@ -11,8 +18,10 @@ import java.util.BitSet;
 import java.util.Comparator;
 
 
+import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
+
 //import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
 //TODO Make the arrays upper triangular
@@ -25,6 +34,9 @@ public class NeighborNetSplitWeightsClean {
      * Parameter files describing the method choice and options
      */
     public static class NNLSParams {
+
+
+
 
         public enum MethodTypes {ACTIVESET,BLOCKPIVOT,GRADPROJECTION,APGD,IPG}
 
@@ -45,6 +57,10 @@ public class NeighborNetSplitWeightsClean {
         public double blockPivotCutoff;
         public int blockPivotMaxIterations;
         public boolean blockPivotPrintResiduals = false;
+
+        public int gradientProjectionMaxIterations;
+        public double gradientProjectionTol; //Tolerance for line search
+
 
         public PrintWriter log;
 
@@ -104,7 +120,7 @@ public class NeighborNetSplitWeightsClean {
             for (var j = i + 1; j <= n; j++) {
                 A.set(cycle[j - 1]);
                 if (x[i][j] > params.cutoff || A.cardinality() == 1 || A.cardinality() == n - 1) { // positive weight or trivial split
-                    splitList.add(new ASplit(A, n, Math.max(0, x[i][j])));
+                    splitList.add(new ASplit(A, n, max(0, x[i][j])));
                 }
             }
         }
@@ -315,7 +331,7 @@ public class NeighborNetSplitWeightsClean {
         double t = firstEntry.val; //max val of t before first constraint met.
 
         //A proportion rho of the indices for which xstar is negative is added to the active set.
-        int numToMakeActive = Math.max(1, (int) Math.ceil(sortedPairs.nentries * params.activeSetRho));
+        int numToMakeActive = max(1, (int) Math.ceil(sortedPairs.nentries * params.activeSetRho));
         int index = 0;
         SortedPairs.Entry entry = sortedPairs.get(index);
         while(index<numToMakeActive&& entry!=null) {
@@ -484,6 +500,72 @@ public class NeighborNetSplitWeightsClean {
     }
 
 
+    static private void gradientProjection(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+        var n = x.length - 1;
+        double[][] xstar = new double[n + 1][n + 1];
+        double[][] p = new double[n + 1][n + 1];
+        var activeSet = new boolean[n + 1][n + 1];
 
+
+        for (var k = 1; k <= params.gradientProjectionMaxIterations; k++) {
+
+            //Search direction
+            evalGradient(x, d, p);
+            for(int i=1;i<=n;i++)
+                for(int j=i+1;j<=n;j++)
+                    p[i][j] = -p[i][j];
+            projectedLineSearch(x,p,d,params);
+
+            //LOCAL SEARCH
+            copyArray(x, xstar);
+            cgnr(xstar, d, activeSet, params, progress); //Just a few iterations of CG
+            for (int i = 1; i <= n; i++)
+                for (int j = i + 1; j <= n; j++)
+                    p[i][j] = xstar[i][j] - x[i][j];
+
+            projectedLineSearch(x, p, d,params);
+
+            if (evalProjectedGradientSquared(x, d) < params.projGradBound)
+                return;
+        }
+    }
+
+    private static void projectedLineSearch(double[][] x, double[][] p, double[][] d, NNLSParams params) {
+//Projected line search
+        int n=x.length-1;
+        final UnivariateFunction fn = t -> evalProjectedFunction(t, x, p, d);
+        var optimizer = new BrentOptimizer(params.gradientProjectionTol, params.gradientProjectionTol);
+        var result = optimizer.optimize(new MaxEval(100), new UnivariateObjectiveFunction(fn),
+                GoalType.MINIMIZE, new SearchInterval(0, 1.0));
+        var tmin = result.getPoint();
+
+        for (int i = 1; i <= n; i++)
+            for (int j = i + 1; j <= n; j++)
+                x[i][j] = max(x[i][j] + tmin * p[i][j],0.0);
+    }
+
+
+
+    static private double evalProjectedFunction(double t, double[][] x, double[][] p, double[][] d) {
+    //TODO See if this can be made more efficient by allocating the arrays once.
+        int n = x.length-1;
+
+        double[][] xt = new double[n+1][n+1];
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                xt[i][j] = max(x[i][j] + t * p[i][j],0.0);
+            }
+
+        double[][] Axt = new double[n+1][n+1];
+        calcAx(xt,Axt);
+        double qt = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                double val = Axt[i][j] - d[i][j];
+                qt += val * val;
+            }
+        return qt;
+    }
+    
 
 }
