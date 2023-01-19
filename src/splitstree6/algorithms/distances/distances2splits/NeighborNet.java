@@ -45,7 +45,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {GradientProjection,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,IPG,SBB}
+	public enum InferenceAlgorithm {GradientProjection,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,IPG}
 
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.GradientProjection);
 
@@ -110,11 +110,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.tolerance = 1e-3;
 			params.outerIterations = 1000;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.IPG;
-		}
-		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.SBB) {
-			params.tolerance = 1e-3;
-			params.outerIterations = 1000;
-			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.SBB;
 		}
 		else {//ST4 version
 			params.greedy = false;

@@ -170,6 +170,8 @@ public class NeighborNetSplitWeights {
 					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
 					params2.projGradBound = 1e-8;
 					params2.IPGprintResiduals = true;
+					params2.IPGmaxIterations=100000;
+					params2.IPGthreshold = 1e-7;
 					params2.IPGtau = 0.8;
 					params2.log = setupLogfile("ST_IPG.m",false);
 					NeighborNetSplitWeightsClean.IPG(x,d,params2,progress);

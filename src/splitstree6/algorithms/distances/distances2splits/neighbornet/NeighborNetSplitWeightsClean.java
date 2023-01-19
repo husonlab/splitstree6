@@ -58,6 +58,7 @@ public class NeighborNetSplitWeightsClean {
         public int IPGmaxIterations;
         public boolean IPGprintResiduals;
         public double IPGtau;
+        public double IPGthreshold;
 
 
         public PrintWriter log;
@@ -694,43 +695,48 @@ public class NeighborNetSplitWeightsClean {
         var y = new double[n+1][n+1];
         var z = new double[n+1][n+1];
         var p = new double[n+1][n+1];
+        var xmapped = new double[n+1][n+1];
 
 
 
-        for(k=1;k<=params.IPGmaxIterations;k++)
-            k++;
-        evalGradient(x, d, g);
-        calcAx(x,y);
-        calcAtx(y,z);  //z = A'Ax
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++)
-                p[i][j] = -x[i][j] / z[i][j] * g[i][j];
+        for(k=1;k<=params.IPGmaxIterations;k++) {
+            evalGradient(x, d, g);
+            calcAx(x, y);
+            calcAtx(y, z);  //z = A'Ax
+            for (int i = 1; i <= n; i++)
+                for (int j = i + 1; j <= n; j++)
+                    p[i][j] = -x[i][j] / z[i][j] * g[i][j];
 
-        double alphahat = Double.MAX_VALUE;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++)
-                if (p[i][j] < 0)
-                    alphahat = min(alphahat,-x[i][j]/p[i][j]);
+            double alphahat = Double.MAX_VALUE;
+            for (int i = 1; i <= n; i++)
+                for (int j = i + 1; j <= n; j++)
+                    if (p[i][j] < 0)
+                        alphahat = min(alphahat, -x[i][j] / p[i][j]);
 
-        calcAx(p,y);
-        double ptg = 0.0, ptAtAp = 0.0;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++) {
-                ptg += p[i][j] * g[i][j];
-                ptAtAp += y[i][j] * y[i][j];
+            calcAx(p, y);
+            double ptg = 0.0, ptAtAp = 0.0;
+            for (int i = 1; i <= n; i++)
+                for (int j = i + 1; j <= n; j++) {
+                    ptg += p[i][j] * g[i][j];
+                    ptAtAp += y[i][j] * y[i][j];
+                }
+            double alphastar = -ptg / ptAtAp;
+            double alpha = min(params.IPGtau * alphahat, alphastar);
+            for (int i = 1; i <= n; i++)
+                for (int j = i + 1; j <= n; j++) {
+                    x[i][j] += alpha * p[i][j];
+                }
+
+            copyArray(x,xmapped);
+            threshold(xmapped,params.IPGthreshold);
+            double pg = evalProjectedGradientSquared(xmapped, d);
+            if (params.IPGprintResiduals)
+                params.log.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg);
+            if (pg < params.projGradBound) {
+                copyArray(xmapped,x);
+                return;
             }
-        double alphastar = -ptg/ptAtAp;
-        double alpha = min(params.IPGtau*alphahat,alphastar);
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++) {
-                x[i][j] += alpha*p[i][j];
-            }
-
-        double pg = evalProjectedGradientSquared(x,d);
-        if (params.IPGprintResiduals)
-            params.log.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg);
-        if (pg< params.projGradBound)
-            return;
+        }
 
     }
 
