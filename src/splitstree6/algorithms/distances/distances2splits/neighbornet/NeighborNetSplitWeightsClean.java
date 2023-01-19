@@ -1,26 +1,16 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
-import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
-import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.optim.MaxEval;
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
-import org.apache.commons.math3.optim.univariate.BrentOptimizer;
-import org.apache.commons.math3.optim.univariate.SearchInterval;
-import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
 import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.BitSet;
-import java.util.Comparator;
+import java.util.*;
 
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.copyArray;
 
 //import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
@@ -34,7 +24,6 @@ public class NeighborNetSplitWeightsClean {
      * Parameter files describing the method choice and options
      */
     public static class NNLSParams {
-
 
 
 
@@ -60,6 +49,15 @@ public class NeighborNetSplitWeightsClean {
 
         public int gradientProjectionMaxIterations;
         public double gradientProjectionTol; //Tolerance for line search
+        public boolean gradientProjectionPrintResiduals;
+
+        public double APGDalpha;
+        public boolean APGBprintResiduals;
+        public int APGDmaxIterations;
+
+        public int IPGmaxIterations;
+        public boolean IPGprintResiduals;
+        public double IPGtau;
 
 
         public PrintWriter log;
@@ -499,9 +497,11 @@ public class NeighborNetSplitWeightsClean {
         }
     }
 
-
-    static private void gradientProjection(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+    //TODO: Javadoc
+    static public void gradientProjection(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
         var n = x.length - 1;
+        long startTime = System.currentTimeMillis();
+
         double[][] xstar = new double[n + 1][n + 1];
         double[][] p = new double[n + 1][n + 1];
         var activeSet = new boolean[n + 1][n + 1];
@@ -515,7 +515,9 @@ public class NeighborNetSplitWeightsClean {
                 for(int j=i+1;j<=n;j++)
                     p[i][j] = -p[i][j];
             projectedLineSearch(x,p,d,params);
+            getActiveEntries(x,activeSet);
 
+            progress.checkForCancel();
             //LOCAL SEARCH
             copyArray(x, xstar);
             cgnr(xstar, d, activeSet, params, progress); //Just a few iterations of CG
@@ -524,20 +526,75 @@ public class NeighborNetSplitWeightsClean {
                     p[i][j] = xstar[i][j] - x[i][j];
 
             projectedLineSearch(x, p, d,params);
+            double pg = evalProjectedGradientSquared(x, d);
+            if (params.gradientProjectionPrintResiduals) {
+                params.log.println(k+"\t"+(System.currentTimeMillis()-startTime) + "\t"+pg+"\t"+cardinality(activeSet));
+            }
 
-            if (evalProjectedGradientSquared(x, d) < params.projGradBound)
+            progress.checkForCancel();
+            if (pg< params.projGradBound)
                 return;
         }
     }
 
+    //TODO: Javadoc
     private static void projectedLineSearch(double[][] x, double[][] p, double[][] d, NNLSParams params) {
-//Projected line search
+        //Projected line search, following Nocedal, pg 486-488, though the fact we can rapidly compute Ax means we don't fuss
+        //around with updating (hopefully will help with accumulating error
         int n=x.length-1;
-        final UnivariateFunction fn = t -> evalProjectedFunction(t, x, p, d);
-        var optimizer = new BrentOptimizer(params.gradientProjectionTol, params.gradientProjectionTol);
-        var result = optimizer.optimize(new MaxEval(100), new UnivariateObjectiveFunction(fn),
-                GoalType.MINIMIZE, new SearchInterval(0, 1.0));
-        var tmin = result.getPoint();
+
+        double tmin=0;
+
+        TreeSet<Double> tvals = new TreeSet<Double>();
+
+        for (int i = 1; i <= n; i++)
+            for (int j = i + 1; j <= n; j++)
+                if (p[i][j] < 0)
+                    tvals.add(-x[i][j] / p[i][j]);
+
+        double[][] xk = new double[n+1][n+1];
+        double[][] pk = new double[n+1][n+1];
+        double[][] Ap = new double[n+1][n+1];
+        double[][] Ax = new double[n+1][n+1];
+
+        double left,right = 0.0;
+
+        Iterator tval = tvals.iterator();
+        while(true) {
+            left = right;
+            if (tvals.isEmpty())
+                right = Double.MAX_VALUE;
+            else
+                right = ((Double)tval.next()).doubleValue();
+
+            for(int i=1;i<=n;i++)
+                for(int j=i+1;j<=n;j++) {
+                    xk[i][j] = max(x[i][j] + left*p[i][j],0.0);
+                    if (xk[i][j] > 0)
+                        pk[i][j] = p[i][j];
+                    else
+                        pk[i][j] = 0.0;
+                }
+            calcAx(pk,Ap);
+            calcAx(xk,Ax);
+            double pAtAp = 0.0;
+            double pAtr = 0.0;
+            for(int i=1;i<=n;i++)
+                for(int j=i+1;j<=n;j++) {
+                    double APij = Ap[i][j];
+                    pAtAp += APij*APij;
+                    pAtr += APij * (Ax[i][j] - d[i][j]);
+                }
+            double step = - pAtr/pAtAp;
+
+            if (step<0) {
+                tmin = left;
+                break;
+            } else if (step < (right-left)) {
+                tmin = left + step;
+                break;
+            }
+        }
 
         for (int i = 1; i <= n; i++)
             for (int j = i + 1; j <= n; j++)
@@ -545,27 +602,137 @@ public class NeighborNetSplitWeightsClean {
     }
 
 
+    static public void APGD(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+        var n = x.length - 1;
 
-    static private double evalProjectedFunction(double t, double[][] x, double[][] p, double[][] d) {
-    //TODO See if this can be made more efficient by allocating the arrays once.
-        int n = x.length-1;
+        zeroNegativeEntries(x);
+        long startTime = System.currentTimeMillis();
 
-        double[][] xt = new double[n+1][n+1];
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++) {
-                xt[i][j] = max(x[i][j] + t * p[i][j],0.0);
+        var L = estimateMatrixNorm(n);
+
+        double alpha0 = params.APGDalpha;   //TODO: Find out what to use here - Nesterov
+        double alpha_old = alpha0;
+        double alpha;
+
+
+        var y = new double[n + 1][n + 1];
+        var x_old = new double[n + 1][n + 1];
+        var g = new double[n+1][n+1];
+        copyArray(x, y);
+        copyArray(x, x_old);
+        int k=0;
+
+        while (true) {
+            k++;
+            evalGradient(y, d, g);
+            for (var i = 1; i <= n; i++) {
+                for (var j = i + 1; j <= n; j++) {
+                    x[i][j] = max(y[i][j] - (1.0 / L) * g[i][j], 0.0);
+                }
             }
+            double a2 = alpha_old * alpha_old;
+            alpha = 0.5 * sqrt(a2 * a2 + 4 * a2) - a2;
+            double beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
+            for (int i = 1; i <= n; i++)
+                for (int j = i + 1; j <= n; j++) {
+                    y[i][j] = (1 + beta) * x[i][j] - beta * x_old[i][j];
+                }
 
-        double[][] Axt = new double[n+1][n+1];
-        calcAx(xt,Axt);
-        double qt = 0.0;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++) {
-                double val = Axt[i][j] - d[i][j];
-                qt += val * val;
+            //Check if a restart is necessary
+            double gx = 0.0;
+            for (int i = 1; i <= n; i++)
+                for (int j = i + 1; j <= n; j++)
+                    gx += g[i][j] * (x[i][j] - x_old[i][j]);
+            if (gx > 0) {
+                evalGradient(y, d, g);
+                for (var i = 1; i <= n; i++) {
+                    for (var j = i + 1; j <= n; j++) {
+                        x[i][j] = max(x[i][j] - (1.0 / L) * g[i][j], 0.0);
+                    }
+                }
+                copyArray(x, y);
+                alpha = alpha_old;
             }
-        return qt;
+            progress.checkForCancel();
+            double pg = evalProjectedGradientSquared(y, d);
+            if (params.APGBprintResiduals)
+                params.log.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg);
+            if (k > params.APGDmaxIterations || pg < params.projGradBound) {
+                copyArray(y, x);
+                return;
+            }
+        }
     }
-    
 
-}
+    /**
+     * Rough estimate of the 2-norm of A'A, which I got in MATLAB by computing the norms and fitting a 4 degree polynomial.
+     *
+     * @param n number of taxa
+     * @return estimate of ||A'A||_2
+     */
+    static private double estimateMatrixNorm(int n) {
+        return (((0.041063124831008 * n + 0.000073540331934) * n + 0.065260125117342) * n + 0.027499142031727) * n - 0.038454953524879;
+    }
+
+    static public void IPG(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+        var n = x.length - 1;
+        long startTime = System.currentTimeMillis();
+
+
+        //Initial x needs to be strictly positive.
+        zeroNegativeEntries(x);
+        double dsum = 0.0;
+        for(int i=1;i<n;i++)
+            for(int j=i+1;j<=n;j++)
+                dsum += d[i][j];
+        for(int i=1;i<n;i++)
+            for(int j=i+1;j<=n;j++)
+                x[i][j] += dsum/(n*n*n);
+
+        int k=0;
+        var g = new double[n+1][n+1];
+        var y = new double[n+1][n+1];
+        var z = new double[n+1][n+1];
+        var p = new double[n+1][n+1];
+
+
+
+        for(k=1;k<=params.IPGmaxIterations;k++)
+            k++;
+        evalGradient(x, d, g);
+        calcAx(x,y);
+        calcAtx(y,z);  //z = A'Ax
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                p[i][j] = -x[i][j] / z[i][j] * g[i][j];
+
+        double alphahat = Double.MAX_VALUE;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                if (p[i][j] < 0)
+                    alphahat = min(alphahat,-x[i][j]/p[i][j]);
+
+        calcAx(p,y);
+        double ptg = 0.0, ptAtAp = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                ptg += p[i][j] * g[i][j];
+                ptAtAp += y[i][j] * y[i][j];
+            }
+        double alphastar = -ptg/ptAtAp;
+        double alpha = min(params.IPGtau*alphahat,alphastar);
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                x[i][j] += alpha*p[i][j];
+            }
+
+        double pg = evalProjectedGradientSquared(x,d);
+        if (params.IPGprintResiduals)
+            params.log.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg);
+        if (pg< params.projGradBound)
+            return;
+
+    }
+
+};
+

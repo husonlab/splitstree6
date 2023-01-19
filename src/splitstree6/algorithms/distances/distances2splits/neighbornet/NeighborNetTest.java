@@ -22,9 +22,10 @@ public class NeighborNetTest {
         if (!runThese) {
             testCGNR();
             testActiveSet();
+            testBlockPivot();
         }
         if (runThese) {
-            testBlockPivot();
+            testGradientProjection();
         }
     }
 
@@ -32,9 +33,10 @@ public class NeighborNetTest {
     public static void printGraphs(double[][] d) {
         if (!runThese) {
             activeSetGraphs(d);
+            blockPivotGraphs(d);
         }
         if (runThese) {
-            blockPivotGraphs(d);
+            gradientProjectionGraphs(d);
         }
     }
 
@@ -325,6 +327,93 @@ public class NeighborNetTest {
         params.log.close();
     }
 
+    private static void testGradientProjection() {
+        int n=100;
+        double p=0.2;
+
+        double[][] x = new double[n+1][n+1];
+        double[][] xinitial = new double[n+1][n+1];
+        double[][] x2 = new double[n+1][n+1];
+
+        double[][] y = new double[n+1][n+1];
+        double sigma = 0.05;
+
+        //Initial is unconstrained solution, with negative entries set to 0.
+        randomData(x,y,p,sigma);
+        calcAinv_y(y,xinitial);
+        zeroNegativeEntries(x);
+
+        //Call Active Set
+        NeighborNetSplitWeightsClean.NNLSParams params = new NeighborNetSplitWeightsClean.NNLSParams();
+        params.cgnrIterations = n*n/2;
+        params.cgnrTolerance = 1e-8;
+        params.cgnrPrintResiduals = false;
+        params.gradientProjectionTol = params.cgnrTolerance;
+        params.gradientProjectionMaxIterations = 100000;
+        params.gradientProjectionPrintResiduals = false;
+        params.log = setupLogfile("TestGradientProjection.m",false);
+
+        //First run through to max iterations, in order to get an estimate of the optimal x.
+        params.projGradBound = 0.0;
+
+        copyArray(xinitial,x2);
+        try {
+            blockPivot(x2,y,params,null);
+        } catch (CanceledException e) {
+            e.printStackTrace();
+        }
+        params.finalx = new double[n+1][n+1];
+        params.gradientProjectionPrintResiduals = true;
+        params.projGradBound = 2e-8;
+
+        copyArray(x2,params.finalx);
+        copyArray(xinitial,x2);
+        try {
+            gradientProjection(x2,y,params,null);
+        } catch (CanceledException e) {
+            e.printStackTrace();
+        }
+        params.log.close();
+    }
+
+    public static void gradientProjectionGraphs(double[][] d) {
+        int n=d.length-1;
+        NeighborNetSplitWeightsClean.NNLSParams params = new NeighborNetSplitWeightsClean.NNLSParams();
+        params.cgnrTolerance = 1e-8;
+        params.cgnrPrintResiduals = false;
+        params.gradientProjectionPrintResiduals = true;
+        params.projGradBound = 10.0*params.cgnrTolerance;
+        params.log = setupLogfile("BlockPivotGraphs.m",false);
+
+        params.log.println("%Projected Gradient Traces for the Block Pivot Method");
+        params.log.println("%First dimension CGNR iterations \nCGNR=[10,100,1000,"+(n*n/2)+"];");
+        params.log.println("%Second dimension, CUTOFF \nCutoff = [1e-6,1e-8,1e-10,1e-12];");
+        params.log.println("% Then columns are k, time, projected gradient");
+        params.log.println("gradientProjectionData = cells(4,1);");
+        int[] CGNRiter = {10,100,1000,n*(n-1)/2};
+        double[] Cutoff = {1e-6,1e-8,1e-10,1e-12};
+
+        double[][] xinitial = new double[n+1][n+1];
+        for (int c = 0;c<=3;c++) {
+            for (int cutoff = 0;cutoff<=3;cutoff++) {
+                params.cgnrIterations = CGNRiter[c];
+                params.gradientProjectionTol = Cutoff[cutoff];
+                params.log.println("gradientProjectionData{"+(c+1)+","+(cutoff+1)+"}=[");
+                calcAinv_y(d,xinitial);
+                zeroNegativeEntries(xinitial);
+                try {
+                    gradientProjection(xinitial,d,params,null);
+                } catch (CanceledException e) {
+                    e.printStackTrace();
+                }
+                params.log.println("];\n\n\n");
+                params.log.close();
+                params.log = setupLogfile("GradientProjectionGraphs.m",true);
+            }
+        }
+
+        params.log.close();
+    }
 
 
 

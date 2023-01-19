@@ -32,7 +32,7 @@ public class NeighborNetSplitWeights {
 
 	public static class NNLSParams {
 
-		public boolean plotGraphs = false;    //SET this to true to generate residual vs time graphs for the paper.
+		public final boolean plotGraphs = false;    //SET this to true to generate residual vs time graphs for the paper.
 
 		public NNLSParams(int ntax) {
 			cgIterations = min(max(ntax, 10), 25);
@@ -43,7 +43,8 @@ public class NeighborNetSplitWeights {
 		static public final int ACTIVE_SET = 1;
 		static public final int PROJECTEDGRAD = 2;
 		static public final int BLOCKPIVOT = 3;
-		static public final int SBB = 4;
+		public static final int IPG = 4;
+		static public final int SBB = 5;
 
 		//static public int
 
@@ -128,11 +129,19 @@ public class NeighborNetSplitWeights {
 					incrementalFitting(x, d, params.tolerance / 100,true);
 				else
 					fill(x,1.0);
-				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD)
-					acceleratedProjectedGradientDescent(x, d, params, progress);
+				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD) {
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.APGDalpha = 0.5;
+					params2.projGradBound = 1e-8;
+					params2.APGDmaxIterations = 100000;
+					params2.APGBprintResiduals = true;
+					params2.log = setupLogfile("STapgd.m",false);
+					NeighborNetSplitWeightsClean.APGD(x,d,params2,progress);
+					params2.log.close();
+				}
 				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT) {
 					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
-					params2.cgnrTolerance = 1e-10;
+					params2.cgnrTolerance = 1e-8;
 					params2.cgnrIterations = n*n/2;
 					params2.cgnrPrintResiduals = false;
 					params2.blockPivotPrintResiduals = false;
@@ -143,8 +152,29 @@ public class NeighborNetSplitWeights {
 					NeighborNetSplitWeightsClean.blockPivot(x, d, params2, progress);
 					//params2.log.close();
 				}
-				else if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION)
-					projectedConjugateGradient(x, d, params, progress);
+				else if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION) {
+					//projectedConjugateGradient(x, d, params, progress);
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.cgnrTolerance = 1e-8;
+					params2.cgnrIterations = 10;
+					params2.cgnrPrintResiduals = false;
+					params2.gradientProjectionPrintResiduals = true;
+					params2.gradientProjectionMaxIterations = 100;
+					params2.gradientProjectionTol = 1e-8;
+					params2.log = setupLogfile("STGradientProjection.m",false);
+					NeighborNetSplitWeightsClean.gradientProjection(x,d,params2,progress);
+					params2.log.close();
+				}
+				else if (params.nnlsAlgorithm == NNLSParams.IPG) {
+					//projectedConjugateGradient(x, d, params, progress);
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.projGradBound = 1e-8;
+					params2.IPGprintResiduals = true;
+					params2.IPGtau = 0.8;
+					params2.log = setupLogfile("ST_IPG.m",false);
+					NeighborNetSplitWeightsClean.IPG(x,d,params2,progress);
+					params2.log.close();
+				}
 				else {
 					//Debugging: fill x with ones.
 					for(var i=1;i<=n;i++)

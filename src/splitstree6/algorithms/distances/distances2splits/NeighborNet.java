@@ -45,9 +45,9 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {FastMethod,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,SBB}
+	public enum InferenceAlgorithm {GradientProjection,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,IPG,SBB}
 
-	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.FastMethod);
+	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.GradientProjection);
 
 	private final BooleanProperty optionOutputConvergenceData = new SimpleBooleanProperty(this, "optionOutputConvergenceData", false);
 
@@ -87,7 +87,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
         //TODO: Streamline these options once we identify the optimal strategies.
 		params.tolerance =1e-6;
-		if (getOptionInferenceAlgorithm()==InferenceAlgorithm.FastMethod) {
+		if (getOptionInferenceAlgorithm()==InferenceAlgorithm.GradientProjection) {
 			params.greedy=true;
 			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.GRADPROJECTION;
 			params.collapseMultiple = false;
@@ -105,6 +105,11 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.BlockPivot) {
 				params.cgIterations = Math.max(cycle.length,10);
 				params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.BLOCKPIVOT;
+		}
+		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.IPG) {
+			params.tolerance = 1e-3;
+			params.outerIterations = 1000;
+			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.IPG;
 		}
 		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.SBB) {
 			params.tolerance = 1e-3;
