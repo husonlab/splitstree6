@@ -282,5 +282,20 @@ public class NeighborNetUtilities {
         return df;
     }
 
+    /**
+     * Count the number of non-zero entries.
+     * @param x square array
+     * @return Number of non-zero entries in the upper triangle of x.
+     */
+    static public int numberNonzero(double[][] x) {
+        int n=x.length-1;
+        int count=0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                if (x[i][j]!=0.0)
+                    count++;
+            }
+        return count;
+    }
     
 }

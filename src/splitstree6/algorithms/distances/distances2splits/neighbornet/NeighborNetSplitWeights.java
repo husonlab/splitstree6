@@ -44,7 +44,7 @@ public class NeighborNetSplitWeights {
 		static public final int PROJECTEDGRAD = 2;
 		static public final int BLOCKPIVOT = 3;
 		public static final int IPG = 4;
-		static public final int SBB = 5;
+		public static final int SIMULATIONS = 5;
 
 		//static public int
 
@@ -69,6 +69,8 @@ public class NeighborNetSplitWeights {
 		public String logArrayName = "convergenceData";
 		public PrintWriter log = null;
 		public long startTime;
+
+		public static String simFilename = "";
 	}
 
 	/**
@@ -111,12 +113,13 @@ public class NeighborNetSplitWeights {
 			for (var j = i + 1; j <= n; j++)
 				d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1];
 
-		if (params.plotGraphs)
-			NeighborNetTest.printGraphs(d);
-
 
 		var x = new double[n + 1][n + 1]; //array of split weights
 		params.startTime = System.currentTimeMillis(); //Start time of calculation (for profiling)
+
+		if (params.nnlsAlgorithm == NNLSParams.SIMULATIONS) {
+			NeighborNetTest.printGraphs(d,NNLSParams.simFilename);
+		}
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
 			activeSetST4(x, d, params.log, params,progress);  //ST4 Algorithm
@@ -133,8 +136,8 @@ public class NeighborNetSplitWeights {
 					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
 					params2.APGDalpha = 0.5;
 					params2.projGradBound = 1e-8;
-					params2.APGDmaxIterations = 100000;
-					params2.APGBprintResiduals = true;
+					params2.maxIterations = 100000;
+					params2.printResiduals = true;
 					params2.log = setupLogfile("STapgd.m",false);
 					NeighborNetSplitWeightsClean.APGD(x,d,params2,progress);
 					params2.log.close();
@@ -144,10 +147,10 @@ public class NeighborNetSplitWeights {
 					params2.cgnrTolerance = 1e-8;
 					params2.cgnrIterations = n*n/2;
 					params2.cgnrPrintResiduals = false;
-					params2.blockPivotPrintResiduals = false;
+					params2.printResiduals = false;
 					params2.projGradBound = 10.0*params2.cgnrTolerance;
 					params2.blockPivotCutoff=1e-10;
-					params2.blockPivotMaxIterations = 100000;
+					params2.maxIterations = 100000;
 					//params2.log = setupLogfile("TestBlockPivot.m",false);
 					NeighborNetSplitWeightsClean.blockPivot(x, d, params2, progress);
 					//params2.log.close();
@@ -158,8 +161,8 @@ public class NeighborNetSplitWeights {
 					params2.cgnrTolerance = 1e-8;
 					params2.cgnrIterations = 10;
 					params2.cgnrPrintResiduals = false;
-					params2.gradientProjectionPrintResiduals = true;
-					params2.gradientProjectionMaxIterations = 100;
+					params2.printResiduals = true;
+					params2.maxIterations = 100000;
 					params2.gradientProjectionTol = 1e-8;
 					params2.log = setupLogfile("STGradientProjection.m",false);
 					NeighborNetSplitWeightsClean.gradientProjection(x,d,params2,progress);
@@ -169,8 +172,8 @@ public class NeighborNetSplitWeights {
 					//projectedConjugateGradient(x, d, params, progress);
 					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
 					params2.projGradBound = 1e-8;
-					params2.IPGprintResiduals = true;
-					params2.IPGmaxIterations=100000;
+					params2.printResiduals = true;
+					params2.maxIterations=100000;
 					params2.IPGthreshold = 1e-7;
 					params2.IPGtau = 0.8;
 					params2.log = setupLogfile("ST_IPG.m",false);

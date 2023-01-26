@@ -19,10 +19,10 @@
 
 package splitstree6.algorithms.distances.distances2splits;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
@@ -41,24 +41,22 @@ import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
-	private final boolean RUN_CONVERGENCE_TESTS = false;
-
-
 	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {GradientProjection,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,IPG}
-
+	public enum InferenceAlgorithm {GradientProjection,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,IPG,RunSimulations}
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.GradientProjection);
+	private final StringProperty optionGraphPrefix = new SimpleStringProperty(this, "");
 
-	private final BooleanProperty optionOutputConvergenceData = new SimpleBooleanProperty(this, "optionOutputConvergenceData", false);
+	public List<String> listOptions() {
+		return List.of(optionInferenceAlgorithm.getName(), optionGraphPrefix.getName());
+	}
+
+	//private final BooleanProperty optionOutputConvergenceData = new SimpleBooleanProperty(this, "optionOutputConvergenceData", false);
 
 
 	//private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", false);
 
 	//private final BooleanProperty optionUseDual = new SimpleBooleanProperty(this, "optionUseDual", true);
 
-	public List<String> listOptions() {
-		return List.of(optionInferenceAlgorithm.getName(), optionOutputConvergenceData.getName());
-	}
 
 	@Override
 	public String getCitation() {
@@ -111,6 +109,10 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.outerIterations = 1000;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.IPG;
 		}
+		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.RunSimulations) {
+			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.SIMULATIONS;
+			params.simFilename = getOptionGraphPrefix();
+		}
 		else {//ST4 version
 			params.greedy = false;
 			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
@@ -122,10 +124,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		}
 
 		ArrayList<ASplit> splits;
-		if (!RUN_CONVERGENCE_TESTS)
-			splits= NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
-		else
-			splits= NeighborNetSplitWeights.evaluateConvergenceAlgorithms(cycle,distancesBlock.getDistances(),progress);
+		splits= NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
 
 		progress.setTasks("NNet", "post-analysis");
 
@@ -164,17 +163,18 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		this.optionInferenceAlgorithm.set(optionInferenceAlgorithm);
 	}
 
-	public boolean getOptionOutputConvergenceData() {
-		return optionOutputConvergenceData().get();
+	public String getOptionGraphPrefix() {
+		return optionGraphPrefix.get();
 	}
 
-	public BooleanProperty optionOutputConvergenceData() {
-		return optionOutputConvergenceData;
+	public StringProperty optionGraphPrefixProperty() {
+		return optionGraphPrefix;
 	}
 
-	public void setOptionOutputConvergenceData(boolean outputConvergenceData) {
-		this.optionOutputConvergenceData.set(outputConvergenceData);
+	public void setOptionGraphPrefix(String optionGraphPrefix) {
+		this.optionGraphPrefix.set(optionGraphPrefix);
 	}
+
 
 
 

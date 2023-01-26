@@ -25,45 +25,29 @@ public class NeighborNetSplitWeightsClean {
      */
     public static class NNLSParams {
 
-
-
         public enum MethodTypes {ACTIVESET,BLOCKPIVOT,GRADPROJECTION,APGD,IPG}
-
-
         public MethodTypes method = MethodTypes.ACTIVESET;
 
         public double cutoff; //Only include split weights greater than this amount
         public double projGradBound; //Stop if projected gradient is less than this. This should be larger than the CGNR bound
+        public boolean printResiduals;
+        public int maxIterations;
 
         public int cgnrIterations; //Max number of iterations in CGNR
         public double cgnrTolerance; //Stopping condition for CGNR - bound on norm gradient squared.
-        public boolean cgnrPrintResiduals = false; //Output residual sum of squares during algorithm
+        public boolean cgnrPrintResiduals = false;
 
-        public boolean activeSetPrintResiduals = false; //Output project gradient sum squares during algorithm
+
         public double activeSetRho; //Proportion of pairs to add to active set in Active Set Method.
-        public int activeSetMaxIterations=100000; //Max iterations before active set gives up.
-
         public double blockPivotCutoff;
-        public int blockPivotMaxIterations;
-        public boolean blockPivotPrintResiduals = false;
-
-        public int gradientProjectionMaxIterations;
         public double gradientProjectionTol; //Tolerance for line search
-        public boolean gradientProjectionPrintResiduals;
-
         public double APGDalpha;
-        public boolean APGBprintResiduals;
-        public int APGDmaxIterations;
-
-        public int IPGmaxIterations;
-        public boolean IPGprintResiduals;
         public double IPGtau;
         public double IPGthreshold;
 
 
         public PrintWriter log;
-
-        public double[][] finalx; //Value previously calculated, used just for debugging.
+        public double[][] finalx; //Target value, used just for debugging.
     }
 
     /**
@@ -110,7 +94,8 @@ public class NeighborNetSplitWeightsClean {
             }
         }
 
-        progress.checkForCancel();
+        if (progress!=null)
+            progress.checkForCancel();
 
         //Construct the corresponding set of weighted splits
         final var splitList = new ArrayList<ASplit>();
@@ -191,7 +176,7 @@ public class NeighborNetSplitWeightsClean {
             }
             ztz = ztz2;
 
-            if (params.cgnrPrintResiduals)
+            if (params.printResiduals)
                 params.log.println("\t"+k+"\t"+ztz);
 
             k++;
@@ -241,13 +226,12 @@ public class NeighborNetSplitWeightsClean {
                 if (xstarFeasible && numIterations<params.cgnrIterations)
                     break;
 
-                if (k> params.activeSetMaxIterations) {
-                    System.err.println("Active Set Method didn't converge"); //TODO: Daniel - what is the best way to do this?
+                if (k> params.maxIterations) {
                     return;
                 }
 
-                if (params.activeSetPrintResiduals) {
-                    params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + cardinality(activeSet));
+                if (params.printResiduals) {
+                    params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + (n*(n-1)/2-cardinality(activeSet)));
                     if (params.finalx!=null)
                         params.log.print("\t"+diff(x,params.finalx));
                     params.log.println();
@@ -255,8 +239,8 @@ public class NeighborNetSplitWeightsClean {
 
             }
             copyArray(xstar,x);
-            if (params.activeSetPrintResiduals) {
-                params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + cardinality(activeSet));
+            if (params.printResiduals) {
+                params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + (n*(n-1)/2-cardinality(activeSet)));
                 if (params.finalx!=null)
                     params.log.print("\t"+diff(x,params.finalx));
                 params.log.println();
@@ -419,8 +403,8 @@ public class NeighborNetSplitWeightsClean {
         var y = new double[n + 1][n + 1];
         evalGradient(x, d, y);
 
-        if (params.blockPivotPrintResiduals) {
-            params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x,d)+ "\t" + cardinality(G) + "\t0");
+        if (params.printResiduals) {
+            params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x,d)+ "\t" + (n*(n-1)/2-cardinality(G)) + "\t0");
             if (params.finalx!=null)
                 params.log.print("\t"+diff(x2,params.finalx));
             params.log.println();
@@ -448,7 +432,7 @@ public class NeighborNetSplitWeightsClean {
                 }
             }
 
-            if (numInfeasible == 0 || iter>=params.blockPivotMaxIterations)
+            if (numInfeasible == 0 || iter>=params.maxIterations)
                 done = true;
             else if (numInfeasible < N) {
                 N = numInfeasible;
@@ -486,8 +470,8 @@ public class NeighborNetSplitWeightsClean {
                 copyArray(x2,x);
                 return;
             }
-            if (params.blockPivotPrintResiduals) {
-                params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+pg+ "\t" + cardinality(G)+"\t"+switched);
+            if (params.printResiduals) {
+                params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+pg+ "\t" + (n*(n-1)/2-cardinality(G))+"\t"+switched);
                 if (params.finalx!=null)
                     params.log.print("\t"+diff(x2,params.finalx));
                 params.log.println();
@@ -508,17 +492,19 @@ public class NeighborNetSplitWeightsClean {
         var activeSet = new boolean[n + 1][n + 1];
 
 
-        for (var k = 1; k <= params.gradientProjectionMaxIterations; k++) {
+        for (var k = 1; k <= params.maxIterations; k++) {
 
             //Search direction
             evalGradient(x, d, p);
             for(int i=1;i<=n;i++)
                 for(int j=i+1;j<=n;j++)
                     p[i][j] = -p[i][j];
-            projectedLineSearch(x,p,d,params);
+
+            projectedLineSearch(x,p,d);
             getActiveEntries(x,activeSet);
 
-            progress.checkForCancel();
+            if(progress!=null)
+                progress.checkForCancel();
             //LOCAL SEARCH
             copyArray(x, xstar);
             cgnr(xstar, d, activeSet, params, progress); //Just a few iterations of CG
@@ -526,27 +512,27 @@ public class NeighborNetSplitWeightsClean {
                 for (int j = i + 1; j <= n; j++)
                     p[i][j] = xstar[i][j] - x[i][j];
 
-            projectedLineSearch(x, p, d,params);
+            projectedLineSearch(x, p, d);
             double pg = evalProjectedGradientSquared(x, d);
-            if (params.gradientProjectionPrintResiduals) {
-                params.log.println(k+"\t"+(System.currentTimeMillis()-startTime) + "\t"+pg+"\t"+cardinality(activeSet));
+            if (params.printResiduals) {
+                params.log.println(k+"\t"+(System.currentTimeMillis()-startTime) + "\t"+pg+"\t"+(n*(n-1)/2-cardinality(activeSet)));
             }
 
-            progress.checkForCancel();
+            if (progress!=null)
+                progress.checkForCancel();
             if (pg< params.projGradBound)
                 return;
         }
     }
 
     //TODO: Javadoc
-    private static void projectedLineSearch(double[][] x, double[][] p, double[][] d, NNLSParams params) {
+    private static void projectedLineSearch(double[][] x, double[][] p, double[][] d) {
         //Projected line search, following Nocedal, pg 486-488, though the fact we can rapidly compute Ax means we don't fuss
         //around with updating (hopefully will help with accumulating error
         int n=x.length-1;
+        double tmin;
 
-        double tmin=0;
-
-        TreeSet<Double> tvals = new TreeSet<Double>();
+        TreeSet<Double> tvals = new TreeSet<>();
 
         for (int i = 1; i <= n; i++)
             for (int j = i + 1; j <= n; j++)
@@ -560,13 +546,13 @@ public class NeighborNetSplitWeightsClean {
 
         double left,right = 0.0;
 
-        Iterator tval = tvals.iterator();
+        Iterator<Double> tval = tvals.iterator();
         while(true) {
             left = right;
-            if (tvals.isEmpty())
+            if (!tval.hasNext())
                 right = Double.MAX_VALUE;
             else
-                right = ((Double)tval.next()).doubleValue();
+                right = tval.next();
 
             for(int i=1;i<=n;i++)
                 for(int j=i+1;j<=n;j++) {
@@ -580,6 +566,7 @@ public class NeighborNetSplitWeightsClean {
             calcAx(xk,Ax);
             double pAtAp = 0.0;
             double pAtr = 0.0;
+
             for(int i=1;i<=n;i++)
                 for(int j=i+1;j<=n;j++) {
                     double APij = Ap[i][j];
@@ -595,11 +582,13 @@ public class NeighborNetSplitWeightsClean {
                 tmin = left + step;
                 break;
             }
+
         }
 
         for (int i = 1; i <= n; i++)
             for (int j = i + 1; j <= n; j++)
                 x[i][j] = max(x[i][j] + tmin * p[i][j],0.0);
+
     }
 
 
@@ -611,8 +600,7 @@ public class NeighborNetSplitWeightsClean {
 
         var L = estimateMatrixNorm(n);
 
-        double alpha0 = params.APGDalpha;   //TODO: Find out what to use here - Nesterov
-        double alpha_old = alpha0;
+        double alpha_old = params.APGDalpha;  //This is alpha0
         double alpha;
 
 
@@ -652,16 +640,18 @@ public class NeighborNetSplitWeightsClean {
                     }
                 }
                 copyArray(x, y);
-                alpha = alpha_old;
+                alpha = params.APGDalpha;
             }
-            progress.checkForCancel();
+            if (progress!=null)
+                progress.checkForCancel();
             double pg = evalProjectedGradientSquared(y, d);
-            if (params.APGBprintResiduals)
-                params.log.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg);
-            if (k > params.APGDmaxIterations || pg < params.projGradBound) {
+            if (params.printResiduals)
+                params.log.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg+"\t"+numberNonzero(y));
+            if (k > params.maxIterations || pg < params.projGradBound) {
                 copyArray(y, x);
                 return;
             }
+            alpha_old = alpha;
         }
     }
 
@@ -690,7 +680,7 @@ public class NeighborNetSplitWeightsClean {
             for(int j=i+1;j<=n;j++)
                 x[i][j] += dsum/(n*n*n);
 
-        int k=0;
+        int k;
         var g = new double[n+1][n+1];
         var y = new double[n+1][n+1];
         var z = new double[n+1][n+1];
@@ -699,7 +689,7 @@ public class NeighborNetSplitWeightsClean {
 
 
 
-        for(k=1;k<=params.IPGmaxIterations;k++) {
+        for(k=1;k<=params.maxIterations;k++) {
             evalGradient(x, d, g);
             calcAx(x, y);
             calcAtx(y, z);  //z = A'Ax
@@ -730,15 +720,17 @@ public class NeighborNetSplitWeightsClean {
             copyArray(x,xmapped);
             threshold(xmapped,params.IPGthreshold);
             double pg = evalProjectedGradientSquared(xmapped, d);
-            if (params.IPGprintResiduals)
-                params.log.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg);
+            if (params.printResiduals)
+                params.log.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg+"\t"+numberNonzero(xmapped));
             if (pg < params.projGradBound) {
                 copyArray(xmapped,x);
                 return;
             }
+            if (progress!=null)
+                progress.checkForCancel();
         }
 
     }
 
-};
+}
 
