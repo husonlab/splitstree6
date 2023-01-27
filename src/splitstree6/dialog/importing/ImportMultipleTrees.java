@@ -20,6 +20,7 @@
 package splitstree6.dialog.importing;
 
 import javafx.stage.FileChooser;
+import jloda.fx.util.AllFileFilter;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.NotificationManager;
@@ -53,9 +54,8 @@ public class ImportMultipleTrees {
 		if (previousDir.isDirectory()) {
 			fileChooser.setInitialDirectory(previousDir.getParentFile());
 		}
-		fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance());
 		var newickExtensionFilter = new NewickReader().getExtensionFilter();
-		fileChooser.getExtensionFilters().addAll(newickExtensionFilter);
+		fileChooser.getExtensionFilters().addAll(TextFileFilter.getInstance(), newickExtensionFilter, AllFileFilter.getInstance());
 		fileChooser.setSelectedExtensionFilter(newickExtensionFilter);
 		var files = fileChooser.showOpenMultipleDialog(mainWindow.getStage());
 		if (files != null && files.size() > 0) {

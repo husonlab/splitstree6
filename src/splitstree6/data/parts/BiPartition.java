@@ -202,9 +202,9 @@ public class BiPartition implements Comparable<BiPartition> {
 	}
 
 	public int compareTo(BiPartition other) {
-		var result = BitSetUtils.compare(A, A);
+		var result = BitSetUtils.compare(A, other.A);
 		if (result == 0)
-			result = BitSetUtils.compare(B, B);
+			result = BitSetUtils.compare(B, other.B);
 		return result;
 	}
 }

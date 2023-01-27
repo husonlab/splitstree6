@@ -51,8 +51,18 @@ public class GreedyCircular {
 
 		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
 
+		var sorted = IteratorUtils.sorted(splits, (a, b) -> {
+			var compare = -Double.compare(weight.apply(a), weight.apply(b));
+			if (compare == 0)
+				compare = -Integer.compare(a.size(), b.size());
+			if (compare == 0)
+				compare = a.compareTo(b);
+			return compare;
+		});
+
 		var pqTree = new PQTree(taxaSet);
-		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(weight.apply(a), weight.apply(b)))) {
+
+		for (ASplit split : sorted) {
 			var set = split.getPartNotContaining(1);
 			if (pqTree.accept(set)) {
 				result.add(split);

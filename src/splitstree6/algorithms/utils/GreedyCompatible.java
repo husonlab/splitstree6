@@ -41,13 +41,23 @@ public class GreedyCompatible {
 	 *
 	 * @return compatible splits
 	 */
-	public static ArrayList<ASplit> apply(ProgressListener progress, final Collection<ASplit> splits, Function<ASplit, Double> score) throws CanceledException {
+	public static ArrayList<ASplit> apply(ProgressListener progress, final Collection<ASplit> splits, Function<ASplit, Double> weight) throws CanceledException {
 		progress.setSubtask("Greedy compatible");
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
 
+		var sorted = IteratorUtils.sorted(splits, (a, b) -> {
+			var compare = -Double.compare(weight.apply(a), weight.apply(b));
+			if (compare == 0)
+				compare = -Integer.compare(a.size(), b.size());
+			if (compare == 0)
+				compare = a.compareTo(b);
+			return compare;
+		});
+
 		final var result = new ArrayList<ASplit>(splits.size());
-		for (var split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(score.apply(a), score.apply(b)))) {
+
+		for (var split : sorted) {
 			var ok = true;
 			for (var bSplit : result) {
 				if (!BiPartition.areCompatible(split, bSplit)) {

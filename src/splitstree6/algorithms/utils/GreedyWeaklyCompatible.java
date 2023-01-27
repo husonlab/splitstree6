@@ -40,13 +40,22 @@ public class GreedyWeaklyCompatible {
 	 *
 	 * @return compatible splits
 	 */
-	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits, Function<ASplit, Double> score) throws CanceledException {
+	public static ArrayList<ASplit> apply(ProgressListener progress, final List<ASplit> splits, Function<ASplit, Double> weight) throws CanceledException {
 		progress.setSubtask("Greedy weakly compatible");
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
 
+		var sorted = IteratorUtils.sorted(splits, (a, b) -> {
+			var compare = -Double.compare(weight.apply(a), weight.apply(b));
+			if (compare == 0)
+				compare = -Integer.compare(a.size(), b.size());
+			if (compare == 0)
+				compare = a.compareTo(b);
+			return compare;
+		});
+
 		final ArrayList<ASplit> result = new ArrayList<>(splits.size());
-		for (ASplit split : IteratorUtils.sorted(splits, (a, b) -> -Double.compare(score.apply(a), score.apply(b)))) {
+		for (ASplit split : sorted) {
 			boolean ok = true;
 			for (int t = 0; ok && t < result.size(); t++) {
 				for (int q = t + 1; ok && q < result.size(); q++) {
