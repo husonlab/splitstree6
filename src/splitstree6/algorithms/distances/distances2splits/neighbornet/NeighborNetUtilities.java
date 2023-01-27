@@ -1,5 +1,8 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import static java.lang.Math.abs;
+import static java.lang.Math.min;
+
 public class NeighborNetUtilities {
 
     /**
@@ -18,7 +21,7 @@ public class NeighborNetUtilities {
                 s+=x[i+1][j];
             for(var j=1;j<=i;j++)
                 s+=x[j][i+1];
-            y[i + 1][i] = y[i][i + 1] = s;
+            y[i][i + 1] = s;
         }
 
         for (var i = 1; i <= (n - 2); i++) {
@@ -28,7 +31,7 @@ public class NeighborNetUtilities {
         for (var k = 3; k <= n - 1; k++) {
             for (var i = 1; i <= n - k; i++) {  //TODO. This loop can be threaded, but it is not worth it
                 var j = i + k;
-                y[j][i] = y[i][j] = y[i][j - 1] + y[i + 1][j] - y[i + 1][j - 1] - 2 * x[i + 1][j];
+                y[i][j] = y[i][j - 1] + y[i + 1][j] - y[i + 1][j - 1] - 2 * x[i + 1][j];
             }
         }
     }
@@ -37,11 +40,11 @@ public class NeighborNetUtilities {
      * Compute Atx, when x and the result are represented as square arrays
      *
      * @param x square array
-     * @param p square array. Overwritten with result
+     * @param y square array. Overwritten with result
      */
-    static public void calcAtx(double[][] x, double[][] p) {
+    static public void calcAtx(double[][] x, double[][] y) {
         var n = x.length - 1;
-        //double[][] p = new double[n+1][n+1];
+        //double[][] y = new double[n+1][n+1];
 
         for (var i = 1; i <= n - 1; i++) {
             var s = 0.0;
@@ -49,43 +52,43 @@ public class NeighborNetUtilities {
                 s+=x[j][i];
             for(var j=i+1;j<=n;j++)
                 s+=x[i][j];
-            p[i + 1][i] = p[i][i + 1] = s;
+            y[i][i + 1] = s;
         }
 
         for (var i = 1; i <= n - 2; i++) {  //TODO This can be threaded, but is not worth it
-            p[i + 2][i] = p[i][i + 2] = p[i][i + 1] + p[i + 1][i + 2] - 2 * x[i][i + 1];
+            y[i][i + 2] = y[i][i + 1] + y[i + 1][i + 2] - 2 * x[i][i + 1];
         }
 
         for (var k = 3; k <= n - 1; k++) {
             for (var i = 1; i <= n - k; i++) { //TODO. This inner loop can be threaded, but is not worth it
-                p[i + k][i] = p[i][i + k] = p[i][i + k - 1] + p[i + 1][i + k] - p[i + 1][i + k - 1] - 2 * x[i][i + k - 1];
+                y[i][i + k] = y[i][i + k - 1] + y[i + 1][i + k] - y[i + 1][i + k - 1] - 2 * x[i][i + k - 1];
             }
         }
     }
 
     /**
-     * calcAinvx
+     * calcAinv_y
      * <p>
-     * Computes A^{-1}(x).
+     * Computes A^{-1}(y).
      * <p>
-     * When x is circular, result will be corresponding weights. If x is not circular, some
+     * When y is circular, result will be corresponding weights. If y is not circular, some
      * elements will be negative.
      *
-     * @param x square array
-     * @param y square array, overwritten by A^{-1}x.
+     * @param y square array
+     * @param x square array, overwritten by A^{-1}y.
      */
-    static public void calcAinvx(double[][] x, double[][] y) {
-        var n = x.length - 1;
-        y[1][2] = y[2][1] = (x[1][n] + x[1][2] - x[2][n]) / 2.0;
+    static public void calcAinv_y(double[][] y, double[][] x) {
+        var n = y.length - 1;
+        x[1][2] = (y[1][n] + y[1][2] - y[2][n]) / 2.0;
         for (var j = 2; j <= n - 1; j++) {
-            y[1][j] = y[j][1] = (x[j - 1][n] + x[1][j] - x[1][j - 1] - x[j][n]) / 2.0;
+            x[1][j] = (y[j - 1][n] + y[1][j] - y[1][j - 1] - y[j][n]) / 2.0;
         }
-        y[1][n] = y[n][1] = (x[1][n] + x[n - 1][n] - x[1][n - 1]) / 2.0;
+        x[1][n] =  (y[1][n] + y[n - 1][n] - y[1][n - 1]) / 2.0;
 
         for (var i = 2; i <= (n - 1); i++) {
-            y[i][i + 1] = (x[i - 1][i] + x[i][i + 1] - x[i - 1][i + 1]) / 2.0;
+            x[i][i + 1] = (y[i - 1][i] + y[i][i + 1] - y[i - 1][i + 1]) / 2.0;
             for (var j = (i + 2); j <= n; j++)
-                y[i][j] = y[j][i] = (x[i - 1][j - 1] + x[i][j] - x[i][j - 1] - x[i - 1][j]) / 2.0;
+                x[i][j] =  (y[i - 1][j - 1] + y[i][j] - y[i][j - 1] - y[i - 1][j]) / 2.0;
         }
     }
 
@@ -108,6 +111,19 @@ public class NeighborNetUtilities {
     }
 
     /**
+     * Replace X with X XOR Y. Equivalently, swap entries of X for which Y is true.
+     * @param X boolean square array
+     * @param Y  boolean square array
+     */
+    static public void xor(boolean[][] X, boolean[][] Y) {
+        int n = X.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                X[i][j] = (X[i][j]^Y[i][j]);
+    }
+
+
+    /**
      * Compute the gradient at x of 1/2 ||Ax - d||
      *
      * @param x        square array
@@ -119,7 +135,7 @@ public class NeighborNetUtilities {
         var res = new double[n + 1][n + 1];
         calcAx(x, res);
         for (var i = 1; i <= n; i++)
-            for (var j = 1; j <= n; j++)
+            for (var j = i+1; j <= n; j++) 
                 res[i][j] -= d[i][j];
         calcAtx(res, gradient);
     }
@@ -138,11 +154,148 @@ public class NeighborNetUtilities {
         double pg = 0.0;
         for(int i=1;i<=n;i++) {
             for(int j=i+1;j<=n;j++) {
-                if (x[i][j] > 0.0 || grad[i][j] < 0.0)
-                    pg += grad[i][j]*grad[i][j];
+                double grad_ij = grad[i][j];
+                if (x[i][j] > 0.0 || grad_ij < 0.0)
+                    pg += grad_ij*grad_ij;
             }
         }
         return pg;
     }
 
+
+    /**
+     * Fill a boolean array indicating the elements of an array which are not positive
+     * @param x square array of doubles. Negative entries replaced by zeros.
+     * @param A overwrites square array of boolean, with A[i][j] = (x[i][j] <=0);
+     */
+    static void getActiveEntries(double[][] x, boolean[][] A) {
+        int n= x.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                if (x[i][j] <= 0.0) {
+                    if (A!=null)
+                        A[i][j] =  true;
+                    x[i][j] = 0.0;
+                } else if (A!=null)
+                    A[i][j] =  false;
+            }
+    }
+
+    /**
+     * Replaces negative entries of a square matrix with zeros
+     * @param x square array
+     */
+    static void zeroNegativeEntries(double[][] x) {
+        getActiveEntries(x, null);
+    }
+
+    /**
+     * Set a subset of elements of an array to zero
+     * @param r  square array of double  (ignore 0 indexed rows and columns)
+     * @param A   square array of boolean (ditto)
+     *
+     * set r[i][j] = 0 whenever A[i][j] is true.
+     */
+    static public void maskElements(double[][] r, boolean[][] A) {
+        int n=r.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                if (A[i][j])
+                    r[i][j]=0;
+    }
+
+
+    /**
+     * Replace values in v with absolute value less than val with zeros.
+     * @param v  square array, overwritten
+     * @param val   cutoff value.
+     */
+    static void threshold(double[][] v, double val) {
+        int n = v.length-1;
+        for(var i=1;i<=n;i++)
+            for(var j=i+1;j<=n;j++)
+                if (abs(v[i][j])<val)
+                    v[i][j] = 0.0;
+    }
+
+    /**
+     * Find the minimum value of an entry in a square array
+     * @param x square array of double
+     * @return  double min_ij  x_ij
+     */
+    static public double minArray(double[][] x) {
+        double minx = 0.0;
+        int n=x.length-1;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                minx = min(minx,x[i][j]);
+        return minx;
+    }
+
+    /**
+     * Copy elements from one square array to another of the same size.
+     * @param from square array
+     * @param to square array (assumed to be allocated already)
+     */
+    static public void copyArray(double[][] from, double[][] to) {
+        int n=from.length-1;
+        for(int i=1;i<=n;i++) {
+            System.arraycopy(from[i],i+1,to[i],i+1,n-i);
+        }
+    }
+
+    /**
+     * Sum the squares of entries of an array
+     * @param x Square array of doubles
+     * @return double sum of the squares of entries in x
+     */
+    static public double sumArraySquared(double[][] x) {
+        double total = 0.0;
+        int n=x.length-1;
+        double si;
+        for(int i=1;i<=n;i++) {
+            si=0.0;
+            for (int j = 1; j <= n; j++) {
+                double x_ij = x[i][j];
+                si += x_ij * x_ij;
+            }
+            total+=si;
+        }
+        return total;
+    }
+
+    /**
+     * Return the sum of squared differences between two arrays of the same size (using
+     * lower triangular parts only)
+     * @param x square array
+     * @param y  square array
+     * @return  sum_{i<j} (x[i][j] - y[i][j])^2
+     */
+    static public double diff(double[][] x, double[][] y) {
+        int n=x.length-1;
+        double df = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                double res_ij = (x[i][j] - y[i][j]);
+                df +=res_ij*res_ij;
+            }
+        return df;
+    }
+
+    /**
+     * Count the number of non-zero entries.
+     * @param x square array
+     * @return Number of non-zero entries in the upper triangle of x.
+     */
+    static public int numberNonzero(double[][] x) {
+        int n=x.length-1;
+        int count=0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++) {
+                if (x[i][j]!=0.0)
+                    count++;
+            }
+        return count;
+    }
+    
 }

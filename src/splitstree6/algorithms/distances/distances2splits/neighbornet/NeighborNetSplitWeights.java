@@ -1,6 +1,5 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
-import jloda.fx.util.Print;
 import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
@@ -33,7 +32,7 @@ public class NeighborNetSplitWeights {
 
 	public static class NNLSParams {
 
-		public boolean plotGraphs = false;    //SET this to true to generate residual vs time graphs for the paper.
+		public final boolean plotGraphs = false;    //SET this to true to generate residual vs time graphs for the paper.
 
 		public NNLSParams(int ntax) {
 			cgIterations = min(max(ntax, 10), 25);
@@ -44,7 +43,8 @@ public class NeighborNetSplitWeights {
 		static public final int ACTIVE_SET = 1;
 		static public final int PROJECTEDGRAD = 2;
 		static public final int BLOCKPIVOT = 3;
-		static public final int SBB = 4;
+		public static final int IPG = 4;
+		public static final int SIMULATIONS = 5;
 
 		//static public int
 
@@ -69,6 +69,8 @@ public class NeighborNetSplitWeights {
 		public String logArrayName = "convergenceData";
 		public PrintWriter log = null;
 		public long startTime;
+
+		public static String simFilename = "";
 	}
 
 	/**
@@ -111,12 +113,13 @@ public class NeighborNetSplitWeights {
 			for (var j = i + 1; j <= n; j++)
 				d[i][j] = d[j][i] = distances[cycle[i] - 1][cycle[j] - 1];
 
-		if (params.plotGraphs)
-			NeighborNetTest.ActiveSetGraphs(d);
-
 
 		var x = new double[n + 1][n + 1]; //array of split weights
 		params.startTime = System.currentTimeMillis(); //Start time of calculation (for profiling)
+
+		if (params.nnlsAlgorithm == NNLSParams.SIMULATIONS) {
+			NeighborNetTest.printGraphs(d,NNLSParams.simFilename);
+		}
 
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
 			activeSetST4(x, d, params.log, params,progress);  //ST4 Algorithm
@@ -129,12 +132,54 @@ public class NeighborNetSplitWeights {
 					incrementalFitting(x, d, params.tolerance / 100,true);
 				else
 					fill(x,1.0);
-				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD)
-					acceleratedProjectedGradientDescent(x, d, params, progress);
-				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT)
-					blockPivot(x, d, params, progress);
-				else if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION)
-					projectedConjugateGradient(x, d, params, progress);
+				if (params.nnlsAlgorithm == NNLSParams.PROJECTEDGRAD) {
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.APGDalpha = 0.5;
+					params2.projGradBound = 1e-8;
+					params2.maxIterations = 100000;
+					params2.printResiduals = true;
+					params2.log = setupLogfile("STapgd.m",false);
+					NeighborNetSplitWeightsClean.APGD(x,d,params2,progress);
+					params2.log.close();
+				}
+				else if (params.nnlsAlgorithm == NNLSParams.BLOCKPIVOT) {
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.cgnrTolerance = 1e-8;
+					params2.cgnrIterations = n*n/2;
+					params2.cgnrPrintResiduals = false;
+					params2.printResiduals = false;
+					params2.projGradBound = 10.0*params2.cgnrTolerance;
+					params2.blockPivotCutoff=1e-10;
+					params2.maxIterations = 100000;
+					//params2.log = setupLogfile("TestBlockPivot.m",false);
+					NeighborNetSplitWeightsClean.blockPivot(x, d, params2, progress);
+					//params2.log.close();
+				}
+				else if (params.nnlsAlgorithm == NNLSParams.GRADPROJECTION) {
+					//projectedConjugateGradient(x, d, params, progress);
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.cgnrTolerance = 1e-8;
+					params2.cgnrIterations = 10;
+					params2.cgnrPrintResiduals = false;
+					params2.printResiduals = true;
+					params2.maxIterations = 100000;
+					params2.gradientProjectionTol = 1e-8;
+					params2.log = setupLogfile("STGradientProjection.m",false);
+					NeighborNetSplitWeightsClean.gradientProjection(x,d,params2,progress);
+					params2.log.close();
+				}
+				else if (params.nnlsAlgorithm == NNLSParams.IPG) {
+					//projectedConjugateGradient(x, d, params, progress);
+					var params2 = new NeighborNetSplitWeightsClean.NNLSParams();
+					params2.projGradBound = 1e-8;
+					params2.printResiduals = true;
+					params2.maxIterations=100000;
+					params2.IPGthreshold = 1e-7;
+					params2.IPGtau = 0.8;
+					params2.log = setupLogfile("ST_IPG.m",false);
+					NeighborNetSplitWeightsClean.IPG(x,d,params2,progress);
+					params2.log.close();
+				}
 				else {
 					//Debugging: fill x with ones.
 					for(var i=1;i<=n;i++)
