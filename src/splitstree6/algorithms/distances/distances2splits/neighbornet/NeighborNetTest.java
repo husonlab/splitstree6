@@ -1,7 +1,7 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.util.CanceledException;
-import splitstree6.algorithms.distances.distances2splits.NeighborNet;
+
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -69,11 +69,13 @@ public class NeighborNetTest {
         if (!runThese) {
             activeSetGraphs(d,params,filename);
             blockPivotGraphs(d,params,filename);
+
+            gradientProjectionGraphs(d,params,filename);
+
+            IPG_Graphs(d,params,filename);
         }
         if (runThese) {
-            gradientProjectionGraphs(d,params,filename);
             APGD_Graphs(d,params,filename);
-            IPG_Graphs(d,params,filename);
         }
     }
 
@@ -274,11 +276,11 @@ public class NeighborNetTest {
         int n=d.length-1;
 
         params.log = setupLogfile(filename+"ActiveSetGraphs.m",false);
-        params.log.println("%Projected Gradient Traces for the Active Set Method");
+        params.log.println("%Active set Traces for the Active Set Method");
         params.log.println("%First dimension CGNR iterations \nCGNR=[10,100,1000,"+(n*n/2)+"];");
         params.log.println("%Second dimension rho \nRHOS=[0,0.2,0.4,0.6];");
         params.log.println("% Then columns are k, time, projected gradient, number of variables");
-        params.log.println("activeSetData = cells(4,4);");
+        params.log.println("activeSetData = cell(4,4);");
         int[] CGNRiter = {10,100,1000,n*(n-1)/2};
         double[] rhos = {0,0.2,0.4,0.6};
 
@@ -313,7 +315,7 @@ public class NeighborNetTest {
         params.log.println("%First dimension CGNR iterations \nCGNR=[10,100,1000,"+(n*n/2)+"];");
         params.log.println("%Second dimension, CUTOFF \nCutoff = [1e-6,1e-8,1e-10,1e-12];");
         params.log.println("% Then columns are k, time, projected gradient, number of variables");
-        params.log.println("activeSetData = cells(4,1);");
+        params.log.println("blockPivotData = cell(4,1);");
         int[] CGNRiter = {10,100,1000,n*(n-1)/2};
         double[] Cutoff = {1e-6,1e-8,1e-10,1e-12};
 
@@ -340,12 +342,12 @@ public class NeighborNetTest {
 
     public static void gradientProjectionGraphs(double[][] d, NNLSParams params, String filename) {
         int n=d.length-1;
-        params.log = setupLogfile(filename+"gradientProjection.m",false);
+        params.log = setupLogfile(filename+"GradientProjectionGraphs.m",false);
 
         params.log.println("%Projected Gradient Traces for the Gradient Descent Method");
         params.log.println("%First dimension CGNR iterations \nCGNR=[10,100,1000,"+(n*n/2)+"];");
         params.log.println("% Then columns are k, time, projected gradient, num vars");
-        params.log.println("gradientProjectionData = cells(4,1);");
+        params.log.println("gradientProjectionData = cell(4,1);");
         int[] CGNRiter = {10,100,1000,n*(n-1)/2};
 
         double[][] xinitial = new double[n+1][n+1];
@@ -370,16 +372,18 @@ public class NeighborNetTest {
     public static void APGD_Graphs(double[][] d, NNLSParams params, String filename) {
         int n=d.length-1;
 
+        params.maxIterations = 100*params.maxIterations;
+
         params.log = setupLogfile(filename+"APGD_Graphs.m",false);
 
         params.log.println("%Projected Gradient Traces for the APGD");
-        params.log.println("%First dimension, alpha0 \nALPHA0=[0.1,0.5,0.9];");
+        params.log.println("%First dimension, alpha0 \nALPHA0=[0.1,0.5,0.9,1.0];");
         params.log.println("% Then columns are k, time, projected gradient, number of variables");
-        params.log.println("activeSetData = cells(3,1);");
-        double[] alpha0 = {0.1,0.5,0.9};
+        params.log.println("apgd_Data = cell(4,1);");
+        double[] alpha0 = {0.1,0.5,0.9,1.0};
 
         double[][] xinitial = new double[n+1][n+1];
-        for (int c = 0;c<=2;c++) {
+        for (int c = 0;c<=3;c++) {
                 params.APGDalpha = alpha0[c];
                 params.log.println("apgd_Data{"+(c+1)+"}=[");
                 calcAinv_y(d,xinitial);
@@ -394,6 +398,7 @@ public class NeighborNetTest {
                 params.log = setupLogfile(filename+"APGD_Graphs.m",true);
         }
         params.log.close();
+        params.maxIterations = params.maxIterations/100;
     }
 
     public static void IPG_Graphs(double[][] d, NNLSParams params, String filename) {
@@ -405,7 +410,7 @@ public class NeighborNetTest {
         params.log.println("%First dimension, tau \nTAU=[0.1,0.5,0.9];");
         params.log.println("%Second dimenion, threshold \nTHRESH = [1e-6,1e-8,1e-10];");
         params.log.println("% Then columns are k, time, projected gradient, number of variables");
-        params.log.println("activeSetData = cells(3,3);");
+        params.log.println("activeSetData = cell(3,3);");
         double[] alpha0 = {0.1,0.5,0.9};
         double[] thresh = {1e-6,1e-8,1e-10};
 

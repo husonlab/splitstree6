@@ -161,12 +161,12 @@ public class NeighborNetSplitWeights {
 					params2.cgnrTolerance = 1e-8;
 					params2.cgnrIterations = 10;
 					params2.cgnrPrintResiduals = false;
-					params2.printResiduals = true;
+					params2.printResiduals = false;
 					params2.maxIterations = 100000;
 					params2.gradientProjectionTol = 1e-8;
-					params2.log = setupLogfile("STGradientProjection.m",false);
+					//params2.log = setupLogfile("STGradientProjection.m",false);
 					NeighborNetSplitWeightsClean.gradientProjection(x,d,params2,progress);
-					params2.log.close();
+					//params2.log.close();
 				}
 				else if (params.nnlsAlgorithm == NNLSParams.IPG) {
 					//projectedConjugateGradient(x, d, params, progress);

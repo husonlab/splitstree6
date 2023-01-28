@@ -131,6 +131,9 @@ public class NeighborNetSplitWeightsClean {
     static public int cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params, ProgressListener progress) throws CanceledException {
         //TODO add progress listener support.
 
+        if (params.cgnrPrintResiduals && params.log==null)
+            System.err.println("Error with initialising log file");
+
 
         var n = x.length - 1;
 
@@ -176,7 +179,7 @@ public class NeighborNetSplitWeightsClean {
             }
             ztz = ztz2;
 
-            if (params.printResiduals)
+            if (params.cgnrPrintResiduals)
                 params.log.println("\t"+k+"\t"+ztz);
 
             k++;
@@ -612,36 +615,33 @@ public class NeighborNetSplitWeightsClean {
         int k=0;
 
         while (true) {
-            k++;
             evalGradient(y, d, g);
             for (var i = 1; i <= n; i++) {
                 for (var j = i + 1; j <= n; j++) {
                     x[i][j] = max(y[i][j] - (1.0 / L) * g[i][j], 0.0);
                 }
             }
-            double a2 = alpha_old * alpha_old;
-            alpha = 0.5 * sqrt(a2 * a2 + 4 * a2) - a2;
-            double beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
-            for (int i = 1; i <= n; i++)
-                for (int j = i + 1; j <= n; j++) {
-                    y[i][j] = (1 + beta) * x[i][j] - beta * x_old[i][j];
-                }
 
             //Check if a restart is necessary
             double gx = 0.0;
             for (int i = 1; i <= n; i++)
                 for (int j = i + 1; j <= n; j++)
                     gx += g[i][j] * (x[i][j] - x_old[i][j]);
-            if (gx > 0) {
-                evalGradient(y, d, g);
-                for (var i = 1; i <= n; i++) {
-                    for (var j = i + 1; j <= n; j++) {
-                        x[i][j] = max(x[i][j] - (1.0 / L) * g[i][j], 0.0);
+
+            if (gx<=0) {
+                double a2 = alpha_old * alpha_old;
+                alpha = 0.5 * (-a2 + alpha_old * sqrt(a2 + 4));
+                double beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
+                for (int i = 1; i <= n; i++)
+                    for (int j = i + 1; j <= n; j++) {
+                        y[i][j] = (1 + beta) * x[i][j] - beta * x_old[i][j];
                     }
-                }
+            }
+            else {
                 copyArray(x, y);
                 alpha = params.APGDalpha;
             }
+
             if (progress!=null)
                 progress.checkForCancel();
             double pg = evalProjectedGradientSquared(y, d);
@@ -652,6 +652,7 @@ public class NeighborNetSplitWeightsClean {
                 return;
             }
             alpha_old = alpha;
+            k++;
         }
     }
 
