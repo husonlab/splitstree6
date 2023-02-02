@@ -297,5 +297,21 @@ public class NeighborNetUtilities {
             }
         return count;
     }
-    
+
+    /**
+     * Compute the residual ||Ax-d||^2
+     * @param x square array
+     * @param d square array
+     * @return  sum of squared residual
+     */
+    static public double evalResidual(double[][] x, double[][] d) {
+        int n=x.length-1;
+        double[][] Ax = new double[n+1][n+1];
+        calcAx(x,Ax);
+        double ss = 0.0;
+        for(int i=1;i<=n;i++)
+            for(int j=i+1;j<=n;j++)
+                ss += Ax[i][j] - d[i][j];
+        return ss;
+    }
 }

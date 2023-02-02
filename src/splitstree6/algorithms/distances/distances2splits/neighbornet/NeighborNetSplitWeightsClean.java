@@ -180,7 +180,7 @@ public class NeighborNetSplitWeightsClean {
             ztz = ztz2;
 
             if (params.cgnrPrintResiduals)
-                params.log.println("\t"+k+"\t"+ztz);
+                System.err.println("\t"+k+"\t"+ztz);
 
             k++;
             if (progress!=null && (k%n)==0)
@@ -226,13 +226,6 @@ public class NeighborNetSplitWeightsClean {
 
                 boolean xstarFeasible = feasibleMoveActiveSet(x,xstar,activeSet,params);
 
-                if (xstarFeasible && numIterations<params.cgnrIterations)
-                    break;
-
-                if (k> params.maxIterations) {
-                    return;
-                }
-
                 if (params.printResiduals) {
                     params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + (n*(n-1)/2-cardinality(activeSet)));
                     if (params.finalx!=null)
@@ -240,37 +233,35 @@ public class NeighborNetSplitWeightsClean {
                     params.log.println();
                 }
 
+                if (xstarFeasible && numIterations<params.cgnrIterations)
+                    break;
+                if (k> params.maxIterations)
+                    return;
             }
             copyArray(xstar,x);
-            if (params.printResiduals) {
-                params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + (n*(n-1)/2-cardinality(activeSet)));
-                if (params.finalx!=null)
-                    params.log.print("\t"+diff(x,params.finalx));
-                params.log.println();
-            }
+            double pg = evalProjectedGradientSquared(x,d);
+            if (pg<params.projGradBound)
+                return;
+
+            //At this point x is feasible, but not necessarily a solution to the equality constrained problem.
+            //Determine if there is an active constraint which can be removed.
 
 
             evalGradient(x,d,grad);
             int imin=0,jmin=0;
             var gradmin = 0.0;
-            double projGrad = 0.0;
 
             for(int i=1;i<=n;i++) {
                 for(int j=i+1;j<=n;j++) {
                     double g_ij = grad[i][j];
-                    boolean active = activeSet[i][j];
-                    if (active)
-                        g_ij = min(g_ij,0.0);
-                    if (active && g_ij<gradmin) {
+                    if (activeSet[i][j] && g_ij<gradmin) {
                         gradmin = g_ij;
                         imin = i; jmin=j;
                     }
-                    projGrad += g_ij*g_ij;
                 }
             }
-            if (gradmin>= 0 || projGrad < params.projGradBound)
-                break;
-            activeSet[imin][jmin] = false;
+            if (gradmin < 0.0)
+                activeSet[imin][jmin] = false;
         }
 
     }
@@ -603,58 +594,71 @@ public class NeighborNetSplitWeightsClean {
 
         var L = estimateMatrixNorm(n);
 
-        double alpha_old = params.APGDalpha;  //This is alpha0
-        double alpha;
+        double alpha_old;
+        double alpha = params.APGDalpha;
+        ;
 
 
         var y = new double[n + 1][n + 1];
+        var g = new double[n + 1][n + 1];
         var x_old = new double[n + 1][n + 1];
-        var g = new double[n+1][n+1];
+
         copyArray(x, y);
-        copyArray(x, x_old);
-        int k=0;
+        int k = 0;
+        var error_old = evalResidual(x, d);
 
         while (true) {
+            //Store previous variables
+            copyArray(x, x_old);
+            alpha_old = alpha;
+
+            //Compute acceleration parameters
+            double a2 = alpha * alpha;
+            alpha = 0.5 * (-a2 + alpha * sqrt(a2 + 4));
+            double beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
+
+            //Update
             evalGradient(y, d, g);
             for (var i = 1; i <= n; i++) {
                 for (var j = i + 1; j <= n; j++) {
                     x[i][j] = max(y[i][j] - (1.0 / L) * g[i][j], 0.0);
                 }
             }
-
-            //Check if a restart is necessary
-            double gx = 0.0;
-            for (int i = 1; i <= n; i++)
-                for (int j = i + 1; j <= n; j++)
-                    gx += g[i][j] * (x[i][j] - x_old[i][j]);
-
-            if (gx<=0) {
-                double a2 = alpha_old * alpha_old;
-                alpha = 0.5 * (-a2 + alpha_old * sqrt(a2 + 4));
-                double beta = alpha_old * (1 - alpha_old) / (a2 + alpha);
-                for (int i = 1; i <= n; i++)
-                    for (int j = i + 1; j <= n; j++) {
-                        y[i][j] = (1 + beta) * x[i][j] - beta * x_old[i][j];
-                    }
+            for (int i = 1; i <= n; i++) {
+                for (int j = i + 1; j <= n; j++) {
+                    y[i][j] = (1 + beta) * x[i][j] - beta * x_old[i][j];
+                }
             }
-            else {
+
+            //Compute error
+            //TODO could shave time here by updating dynamically
+            var error = evalResidual(x, d);
+            if (k > 0 && (error > error_old)) {
+                //Restart - just do a gradient update
+                evalGradient(x_old, d, g);
+                for (var i = 1; i <= n; i++) {
+                    for (var j = i + 1; j <= n; j++) {
+                        x[i][j] = max(x_old[i][j] - (1.0 / L) * g[i][j], 0.0);
+                    }
+                }
                 copyArray(x, y);
                 alpha = params.APGDalpha;
             }
 
+            double pg = evalProjectedGradientSquared(x,d);
+            if (params.printResiduals && k%10==0) {
+                params.log.println("\t"+k+"\t"+(System.currentTimeMillis()-startTime) + "\t"+pg + "\t"+(numberNonzero(x)));
+            }
+            if (pg<params.projGradBound || k >= params.maxIterations)
+                return;
             if (progress!=null)
                 progress.checkForCancel();
-            double pg = evalProjectedGradientSquared(y, d);
-            if (params.printResiduals)
-                params.log.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg+"\t"+numberNonzero(y));
-            if (k > params.maxIterations || pg < params.projGradBound) {
-                copyArray(y, x);
-                return;
-            }
-            alpha_old = alpha;
             k++;
         }
     }
+
+
+
 
     /**
      * Rough estimate of the 2-norm of A'A, which I got in MATLAB by computing the norms and fitting a 4 degree polynomial.
