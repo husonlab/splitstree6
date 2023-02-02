@@ -32,6 +32,7 @@ public class NeighborNetSplitWeightsClean {
         public double projGradBound; //Stop if projected gradient is less than this. This should be larger than the CGNR bound
         public boolean printResiduals;
         public int maxIterations;
+        public long maxTime = Long.MAX_VALUE; //Stop if the method has taken more than this many milliseconds
 
         public int cgnrIterations; //Max number of iterations in CGNR
         public double cgnrTolerance; //Stopping condition for CGNR - bound on norm gradient squared.
@@ -235,7 +236,7 @@ public class NeighborNetSplitWeightsClean {
 
                 if (xstarFeasible && numIterations<params.cgnrIterations)
                     break;
-                if (k> params.maxIterations)
+                if (k> params.maxIterations || (startTime-System.currentTimeMillis())>params.maxTime)
                     return;
             }
             copyArray(xstar,x);
@@ -516,6 +517,8 @@ public class NeighborNetSplitWeightsClean {
                 progress.checkForCancel();
             if (pg< params.projGradBound)
                 return;
+            if ((startTime-System.currentTimeMillis())>params.maxTime)
+                return;
         }
     }
 
@@ -649,7 +652,7 @@ public class NeighborNetSplitWeightsClean {
             if (params.printResiduals && k%10==0) {
                 params.log.println("\t"+k+"\t"+(System.currentTimeMillis()-startTime) + "\t"+pg + "\t"+(numberNonzero(x)));
             }
-            if (pg<params.projGradBound || k >= params.maxIterations)
+            if (pg<params.projGradBound || k >= params.maxIterations || (startTime-System.currentTimeMillis())>params.maxTime)
                 return;
             if (progress!=null)
                 progress.checkForCancel();
@@ -727,7 +730,7 @@ public class NeighborNetSplitWeightsClean {
             double pg = evalProjectedGradientSquared(xmapped, d);
             if (params.printResiduals)
                 params.log.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg+"\t"+numberNonzero(xmapped));
-            if (pg < params.projGradBound) {
+            if (pg < params.projGradBound || (startTime-System.currentTimeMillis())>params.maxTime) {
                 copyArray(xmapped,x);
                 return;
             }

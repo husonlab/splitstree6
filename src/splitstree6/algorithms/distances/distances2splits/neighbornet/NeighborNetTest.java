@@ -62,14 +62,17 @@ public class NeighborNetTest {
         params.maxIterations = 5000;
         params.cgnrIterations = n*(n-1)/2;
         params.cgnrTolerance = 1e-8;
+        params.maxTime = 1000*5*60; //Max of 5 minutes per attempt
 
         if (runThese) {
-            gradientProjectionGraphs(d,params,filename);
+            int maxInt = params.maxIterations;
+            params.maxIterations = 20000;
+            APGD_Graphs(d,params,filename);
+            params.maxIterations = maxInt;
         }
         if (!runThese) {
             activeSetGraphs(d,params,filename);
-            APGD_Graphs(d,params,filename);
-
+            gradientProjectionGraphs(d,params,filename);
 
             IPG_Graphs(d,params,filename);
         }
@@ -341,18 +344,20 @@ public class NeighborNetTest {
 
     public static void gradientProjectionGraphs(double[][] d, NNLSParams params, String filename) {
         int n=d.length-1;
-        params.log = setupLogfile(filename+"GradientProjectionGraphs.m",false);
+        params.log = setupLogfile(filename+"GradientProjectionGraphs2.m",false);//*
 
         params.log.println("%Projected Gradient Traces for the Gradient Descent Method");
-        params.log.println("%First dimension CGNR iterations \nCGNR=[10,100,1000,"+(n*n/2)+"];");
+        params.log.println("%First dimension CGNR iterations \nCGNR=[10,100,"+n+",1000,"+(n*n/2)+"];");
         params.log.println("% Then columns are k, time, projected gradient, num vars");
-        params.log.println("gradientProjectionData = cell(4,1);");
-        int[] CGNRiter = {10,100,1000,n*(n-1)/2};
+       // int[] CGNRiter = {10,100,n,1000,n*(n-1)/2}; //*
+        int[] CGNRiter = {n}; //*
+
+        params.log.println("gradientProjectionData2 = cell("+CGNRiter.length+",1);");
 
         double[][] xinitial = new double[n+1][n+1];
-        for (int c = 0;c<=3;c++) {
+        for (int c = 0;c<CGNRiter.length;c++) {
             params.cgnrIterations = CGNRiter[c];
-            params.log.println("gradientProjectionData{"+(c+1)+"}=[");
+            params.log.println("gradientProjectionData2{"+(c+1)+"}=["); //*
             calcAinv_y(d,xinitial);
             zeroNegativeEntries(xinitial);
             try {
@@ -371,7 +376,6 @@ public class NeighborNetTest {
     public static void APGD_Graphs(double[][] d, NNLSParams params, String filename) {
         int n=d.length-1;
 
-        params.maxIterations = 100*params.maxIterations;
 
         params.log = setupLogfile(filename+"APGD_Graphs.m",false);
 
@@ -397,7 +401,6 @@ public class NeighborNetTest {
             params.log = setupLogfile(filename+"APGD_Graphs.m",true);
         }
         params.log.close();
-        params.maxIterations = params.maxIterations/100;
     }
 
     public static void IPG_Graphs(double[][] d, NNLSParams params, String filename) {
