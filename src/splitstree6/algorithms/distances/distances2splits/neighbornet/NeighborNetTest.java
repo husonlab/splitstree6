@@ -66,7 +66,7 @@ public class NeighborNetTest {
 
         if (runThese) {
             int maxInt = params.maxIterations;
-            params.maxIterations = 20000;
+            params.maxIterations = Integer.MAX_VALUE;
             APGD_Graphs(d,params,filename);
             params.maxIterations = maxInt;
         }
