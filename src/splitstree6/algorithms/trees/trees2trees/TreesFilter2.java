@@ -29,6 +29,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * additional tree filtering
@@ -39,11 +40,12 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 	private final IntegerProperty optionMinNumberOfTaxa = new SimpleIntegerProperty(this, "optionMinNumberOfTaxa", 1);
 	private final DoubleProperty optionMinTotalTreeLength = new SimpleDoubleProperty(this, "optionMinNumberOfTaxa", 0);
 	private final DoubleProperty optionMinEdgeLength = new SimpleDoubleProperty(this, "optionMinEdgeLength", 0);
+	private final DoubleProperty optionMinConfidence = new SimpleDoubleProperty(this, "optionMinConfidence", 0);
 	private final BooleanProperty optionUniformEdgeLengths = new SimpleBooleanProperty(this, "optionUniformEdgeLengths", false);
 
 
 	public List<String> listOptions() {
-		return List.of(optionRequireAllTaxa.getName(), optionMinNumberOfTaxa.getName(), optionMinTotalTreeLength.getName(), optionMinEdgeLength.getName(), optionUniformEdgeLengths.getName());
+		return List.of(optionRequireAllTaxa.getName(), optionMinNumberOfTaxa.getName(), optionMinTotalTreeLength.getName(), optionMinEdgeLength.getName(), optionMinConfidence.getName(), optionUniformEdgeLengths.getName());
 	}
 
 	@Override
@@ -53,6 +55,7 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 			case "optionMinNumberOfTaxa" -> "Keep only trees that have at least this number of taxa";
 			case "optionMinTotalTreeLength" -> "Keep only trees that have at least this total length";
 			case "optionMinEdgeLength" -> "Keep only edges that have this minimum length";
+			case "optionMinConfidence" -> "Keep only edges that have this minimum confidence value";
 			case "optionUniformEdgeLengths" -> "Change all edge weights to 1";
 			default -> optionName;
 		};
@@ -78,9 +81,9 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 						continue;
 				}
 				var isCopy = false;
-				if (getOptionMinEdgeLength() > 0) {
+				if (getOptionMinEdgeLength() > 0 || getOptionMinConfidence() > 0) {
 					tree = new PhyloTree(tree);
-					if (RootedNetworkProperties.contractShortEdges(tree, getOptionMinEdgeLength()))
+					if (contractShortOLowConfidenceEdgesKeepLeafEdges(tree, getOptionMinEdgeLength(), getOptionMinConfidence()))
 						isCopy = true;
 					else
 						tree = parent.getTree(t); // nothing changed, use original
@@ -99,6 +102,25 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 			}
 			child.setPartial(isPartial);
 		}
+
+		if (false) {
+			// see whether length and support may have been confused, and if so, correct:
+			for (var tree : child.getTrees()) {
+				var avWeight = tree.edgeStream().filter(e -> !e.getTarget().isLeaf()).mapToDouble(tree::getWeight).average().orElse(0);
+				var maxWeight = tree.edgeStream().filter(e -> !e.getTarget().isLeaf()).mapToDouble(tree::getWeight).max().orElse(0);
+				var avConfidence = tree.edgeStream().filter(e -> !e.getTarget().isLeaf()).mapToDouble(tree::getConfidence).average().orElse(0);
+				var maxConfidence = tree.edgeStream().filter(e -> !e.getTarget().isLeaf()).mapToDouble(tree::getConfidence).max().orElse(0);
+
+				if (maxConfidence < avWeight && avWeight <= 100) {
+					System.err.println("Fixing tree: " + tree.getName());
+					tree.edgeStream().filter(e -> !e.getTarget().isLeaf()).forEach(e -> {
+						var tmp = tree.getWeight(e);
+						tree.setWeight(e, tree.getConfidence(e));
+						tree.setConfidence(e, tmp);
+					});
+				}
+			}
+		}
 		child.setRooted(parent.isRooted());
 
 		if (child.getNTrees() == parent.getNTrees())
@@ -113,7 +135,7 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 
 	@Override
 	public boolean isActive() {
-		return isOptionRequireAllTaxa() || getOptionMinNumberOfTaxa() > 1 || getOptionMinEdgeLength() > 0 || isOptionUniformEdgeLengths();
+		return isOptionRequireAllTaxa() || getOptionMinNumberOfTaxa() > 1 || getOptionMinEdgeLength() > 0 || getOptionMinConfidence() > 0 || isOptionUniformEdgeLengths();
 	}
 
 	public boolean isOptionRequireAllTaxa() {
@@ -152,7 +174,6 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 		this.optionMinTotalTreeLength.set(optionMinTotalTreeLength);
 	}
 
-
 	public double getOptionMinEdgeLength() {
 		return optionMinEdgeLength.get();
 	}
@@ -163,6 +184,18 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 
 	public void setOptionMinEdgeLength(double optionMinEdgeLength) {
 		this.optionMinEdgeLength.set(optionMinEdgeLength);
+	}
+
+	public double getOptionMinConfidence() {
+		return optionMinConfidence.get();
+	}
+
+	public DoubleProperty optionMinConfidenceProperty() {
+		return optionMinConfidence;
+	}
+
+	public void setOptionMinConfidence(double optionMinConfidence) {
+		this.optionMinConfidence.set(optionMinConfidence);
 	}
 
 	public boolean isOptionUniformEdgeLengths() {
@@ -190,5 +223,15 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 		}
 		return changed;
 	}
+
+	/**
+	 * contracts all edges below min length
+	 *
+	 * @return true, if anything contracted
+	 */
+	public static boolean contractShortOLowConfidenceEdgesKeepLeafEdges(PhyloTree tree, double minLength, double minConfidence) {
+		return RootedNetworkProperties.contractEdges(tree, tree.edgeStream().filter(e -> !e.getTarget().isLeaf() && (tree.getWeight(e) < minLength || tree.getConfidence(e) < minConfidence)).collect(Collectors.toSet()), null);
+	}
+
 
 }

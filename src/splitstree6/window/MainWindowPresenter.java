@@ -98,6 +98,7 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
+import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 
@@ -272,20 +273,26 @@ public class MainWindowPresenter {
 		var loadingFile = new SimpleBooleanProperty(this, "loadingFile", false);
 
 		controller.getOpenButton().setOnAction(e -> {
-			var previousDir = new File(ProgramProperties.get("InputDir", ""));
-			var fileChooser = new FileChooser();
-			if (previousDir.isDirectory())
-				fileChooser.setInitialDirectory(previousDir);
-			fileChooser.setTitle("Open input file");
-			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
-			var selectedFile = fileChooser.showOpenDialog(stage);
-			if (selectedFile != null) {
-				if (!loadingFile.get()) {
-					try {
-						loadingFile.set(true);
-						FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
-					} finally {
-						loadingFile.set(false);
+			if (mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof InputEditorTab inputEditorTab
+				&& inputEditorTab.getView() instanceof InputEditorView inputEditorView) {
+				// this shouldn't be necessary, but is...
+				inputEditorView.getInputEditorViewController().getOpenButton().fire();
+			} else {
+				var previousDir = new File(ProgramProperties.get("InputDir", ""));
+				var fileChooser = new FileChooser();
+				if (previousDir.isDirectory())
+					fileChooser.setInitialDirectory(previousDir);
+				fileChooser.setTitle("Open input file");
+				fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
+				var selectedFile = fileChooser.showOpenDialog(stage);
+				if (selectedFile != null) {
+					if (!loadingFile.get()) {
+						try {
+							loadingFile.set(true);
+							FileLoader.apply(false, mainWindow, selectedFile.getPath(), ex -> NotificationManager.showError("Open file failed: " + ex));
+						} finally {
+							loadingFile.set(false);
+						}
 					}
 				}
 			}

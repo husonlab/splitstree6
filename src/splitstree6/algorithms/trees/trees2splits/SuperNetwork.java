@@ -54,7 +54,7 @@ public class SuperNetwork extends Trees2Splits {
 	private final IntegerProperty optionNumberOfRuns = new SimpleIntegerProperty(this, "optionNumberOfRuns", 1);
 	private final BooleanProperty optionApplyRefineHeuristic = new SimpleBooleanProperty(this, "optionApplyRefineHeuristic", false);
 	private final IntegerProperty optionSeed = new SimpleIntegerProperty(this, "optionSeed", 0);
-	private final SimpleObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(EdgeWeights.TreeSizeWeightedMean);
+	private final SimpleObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.TreeSizeWeightedMean);
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	@Override

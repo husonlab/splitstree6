@@ -86,6 +86,7 @@ public class DisplayTextViewController {
 		codeArea.setPadding(new Insets(5, 2, 5, 2));
 		scrollPane = new VirtualizedScrollPane<>(codeArea);
 		borderPane.setCenter(scrollPane);
+		codeArea.prefWidthProperty().bind(borderPane.widthProperty());
 
 		highlighter = new Highlighter(codeArea);
 	}
