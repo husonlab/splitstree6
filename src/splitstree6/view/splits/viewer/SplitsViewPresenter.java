@@ -38,16 +38,16 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.ProgramExecutorService;
-import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.util.*;
+import jloda.fx.window.NotificationManager;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.utils.CharactersUtilities;
+import splitstree6.analysis.PhylogeneticDiversity;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
+import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.splits.LoopView;
@@ -412,6 +412,17 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getFlip()));
 		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
+
+
+		mainController.getComputePhylogeneticDiversityMenuItem().setOnAction(a -> {
+			var taxa = BitSetUtils.asBitSet(mainWindow.getTaxonSelectionModel().getSelectedItems().stream().mapToInt(t -> mainWindow.getWorkingTaxa().indexOf(t)).toArray());
+			AService.run(() -> PhylogeneticDiversity.apply(splitsView.getSplitsBlock(), taxa),
+					diversity -> {
+						var total = splitsView.getSplitsBlock().getSplits().stream().mapToDouble(ASplit::getWeight).sum();
+						NotificationManager.showInformation("Phylogenetic divesity: %.8f (%.1f%%)".formatted(diversity, 100.0 * (diversity / total)));
+					}, null, mainController.getBottomFlowPane());
+		});
+		mainController.getComputePhylogeneticDiversityMenuItem().disableProperty().bind(splitsView.emptyProperty().or(Bindings.isEmpty(mainWindow.getTaxonSelectionModel().getSelectedItems())));
 	}
 
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {

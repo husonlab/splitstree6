@@ -21,6 +21,8 @@ package splitstree6.analysis;
 
 import jloda.phylo.PhyloTree;
 import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.parts.ASplit;
 
 import java.util.BitSet;
 
@@ -29,6 +31,13 @@ import java.util.BitSet;
  * Daniel Huson, 2.2023
  */
 public class PhylogeneticDiversity {
+	/**
+	 * computes the phylogenetic diversity
+	 *
+	 * @param tree a rooted tree or network
+	 * @param taxa the selected taxa
+	 * @return phylogenetic diversity
+	 */
 	public static double apply(PhyloTree tree, BitSet taxa) {
 		if (taxa.cardinality() == 0) {
 			return 0.0;
@@ -37,5 +46,17 @@ public class PhylogeneticDiversity {
 				return tree.edgeStream().filter(e -> nodeClusterMap.get(e.getTarget()).intersects(taxa)).mapToDouble(tree::getWeight).sum();
 			}
 		}
+	}
+
+	/**
+	 * compute the phylogenetic diversity of a set of taxa for a given set of splits
+	 *
+	 * @param splits the splits
+	 * @param taxa   the taxa
+	 * @return phylogenetic diversity
+	 */
+	public static double apply(SplitsBlock splits, BitSet taxa) {
+		return splits.getSplits().stream().filter(s -> s.getA().intersects(taxa) && s.getB().intersects(taxa))
+				.mapToDouble(ASplit::getWeight).sum();
 	}
 }
