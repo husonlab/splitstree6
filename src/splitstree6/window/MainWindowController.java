@@ -354,6 +354,9 @@ public class MainWindowController {
 	private MenuItem computePhylogeneticDiversityMenuItem;
 
 	@FXML
+	private MenuItem computeEvolutionaryDistinctivenessMenuItem;
+
+	@FXML
 	private MenuItem computeDeltaScoreMenuItem;
 
 	@FXML
@@ -897,6 +900,10 @@ public class MainWindowController {
 
 	public MenuItem getComputePhylogeneticDiversityMenuItem() {
 		return computePhylogeneticDiversityMenuItem;
+	}
+
+	public MenuItem getComputeEvolutionaryDistinctivenessMenuItem() {
+		return computeEvolutionaryDistinctivenessMenuItem;
 	}
 
 	public MenuItem getComputeDeltaScoreMenuItem() {

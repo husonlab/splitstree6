@@ -32,10 +32,14 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Font;
+import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
+import jloda.fx.window.NotificationManager;
 import jloda.util.*;
+import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.utils.CharactersUtilities;
+import splitstree6.analysis.CaptureRecapture;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
@@ -606,6 +610,13 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		mainWindowController.getSelectCompatibleSitesMenuItem().disableProperty().bind(controller.getSelectCompatibleMenuItem().disableProperty());
 
+		mainWindowController.getEstimateInvariableSitesMenuItem().setOnAction(e ->
+				AService.run(() -> (new CaptureRecapture()).estimatePropInvariableSites(new ProgressSilent(), alignmentView.getWorkingCharacters()),
+						r -> {
+							System.err.println(CaptureRecapture.DESCRIPTION);
+							NotificationManager.showInformation("Estimated invariable sites: %.1f%%".formatted(100.0 * r));
+						}, null, mainWindowController.getBottomFlowPane()));
+		mainWindowController.getEstimateInvariableSitesMenuItem().disableProperty().bind(alignmentView.emptyProperty());
 	}
 
 	public static void updateCharSetSelection(MainWindow mainWindow, AlignmentView view, List<MenuItem> items) {

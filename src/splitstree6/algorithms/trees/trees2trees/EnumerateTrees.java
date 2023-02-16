@@ -28,6 +28,7 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
+import jloda.util.SetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
@@ -160,7 +161,7 @@ public class EnumerateTrees extends Trees2Trees {
 	public static boolean haveRootedSprDistanceOne(TaxaBlock taxa, PhyloTree tree1, PhyloTree tree2) {
 		if (true) {
 			var clusters1 = TreesUtilities.extractClusters(tree1).values();
-			var clusters2 = TreesUtilities.extractClusters(tree2).values();
+			var clusters2 = new HashSet<>(TreesUtilities.extractClusters(tree2).values());
 
 			if (allCompatible(clusters1, clusters2))
 				return false; // rSPR distance is 0
@@ -168,7 +169,7 @@ public class EnumerateTrees extends Trees2Trees {
 			var clusters1sorted = new ArrayList<>(clusters1);
 			clusters1sorted.sort(Comparator.comparingInt(BitSet::cardinality));
 
-			for (var cluster : clusters1sorted) {
+			for (var cluster : SetUtils.intersection(clusters1sorted, clusters2)) {
 				var inC1 = clusters1.stream().filter(c -> BitSetUtils.contains(cluster, c)).toList();
 				var inC2 = clusters2.stream().filter(c -> BitSetUtils.contains(cluster, c)).toList();
 				if (!allCompatible(inC1, inC2))

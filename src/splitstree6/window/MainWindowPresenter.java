@@ -534,6 +534,7 @@ public class MainWindowPresenter {
 
 		controller.getEstimateInvariableSitesMenuItem().setOnAction(null);
 		controller.getComputePhylogeneticDiversityMenuItem().setOnAction(null);
+		controller.getComputeEvolutionaryDistinctivenessMenuItem().setOnAction(null);
 		controller.getComputeDeltaScoreMenuItem().setOnAction(null);
 
 		controller.getShowWorkflowMenuItem().setOnAction(e -> controller.getMainTabPane().getSelectionModel().select(mainWindow.getTabByClass(WorkflowTab.class)));
