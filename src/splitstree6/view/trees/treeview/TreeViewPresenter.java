@@ -36,20 +36,18 @@ import javafx.scene.input.DataFormat;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.window.NotificationManager;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
-import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.analysis.ComputeEvolutionaryDistinctiveness;
-import splitstree6.analysis.PhylogeneticDiversity;
+import splitstree6.algorithms.trees.trees2text.FairProportion;
+import splitstree6.algorithms.trees.trees2text.RootedPhylogeneticDiversity;
+import splitstree6.algorithms.trees.trees2text.UnrootedShapleyValues;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
@@ -61,6 +59,7 @@ import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.window.AttachAlgorithm;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -487,19 +486,16 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 
-		mainController.getComputePhylogeneticDiversityMenuItem().setOnAction(a -> {
-			var taxa = BitSetUtils.asBitSet(mainWindow.getTaxonSelectionModel().getSelectedItems().stream().mapToInt(t -> mainWindow.getWorkingTaxa().indexOf(t)).toArray());
-			AService.run(() -> PhylogeneticDiversity.apply(tree.get(), taxa),
-					diversity -> {
-						var total = tree.get().edgeStream().mapToDouble(e -> tree.get().getWeight(e)).sum();
-						NotificationManager.showInformation("Phylogenetic divesity: %.8f (%.1f%%)".formatted(diversity, 100.0 * (diversity / total)));
-					}, null, mainController.getBottomFlowPane());
-		});
-		mainController.getComputePhylogeneticDiversityMenuItem().disableProperty().bind(tree.isNull().or(Bindings.isEmpty(mainWindow.getTaxonSelectionModel().getSelectedItems())).or(Bindings.createBooleanBinding(() -> view.getOptionDiagram().isRadialOrCircular(), view.optionDiagramProperty())));
+		mainController.getComputePhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RootedPhylogeneticDiversity()));
+		mainController.getComputePhylogeneticDiversityMenuItem().disableProperty().bind(tree.isNull().or(Bindings.isEmpty(mainWindow.getTaxonSelectionModel().getSelectedItems())));
 
-		mainController.getComputeEvolutionaryDistinctivenessMenuItem().setOnAction(e ->
-				System.out.println(ComputeEvolutionaryDistinctiveness.report(mainWindow.getWorkingTaxa(), view.getTree(), true)));
-		mainController.getComputeEvolutionaryDistinctivenessMenuItem().disableProperty().bind(tree.isNull().or(Bindings.createBooleanBinding(() -> view.getOptionDiagram().isRadialOrCircular(), view.optionDiagramProperty())));
+		mainController.getComputeFairProportionMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new FairProportion()));
+		mainController.getComputeFairProportionMenuItem().setDisable(false);
+		mainController.getComputeFairProportionMenuItem().disableProperty().bind(view.emptyProperty());
+
+		mainController.getComputeUnrootedShapleyMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new UnrootedShapleyValues()));
+		mainController.getComputeUnrootedShapleyMenuItem().setDisable(false);
+		mainController.getComputeUnrootedShapleyMenuItem().disableProperty().bind(view.emptyProperty());
 
 	}
 

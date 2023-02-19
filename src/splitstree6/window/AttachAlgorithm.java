@@ -137,7 +137,8 @@ public class AttachAlgorithm {
 	 */
 	public static AlgorithmNode findSelectOrCreateAlgorithmNode(Workflow workflow, Algorithm algorithm) {
 		var algorithmNodes = (ArrayList<AlgorithmNode>) workflow.algorithmNodesStream()
-				.filter(n -> workflow.isDerivedNode(n) && n.getAlgorithm().getFromClass() == algorithm.getFromClass() && n.getAlgorithm().getToClass() == algorithm.getToClass()).collect(Collectors.toCollection(ArrayList::new));
+				.filter(n -> workflow.isDerivedNode(n)).filter(n -> n.getAlgorithm().getFromClass() == algorithm.getFromClass())
+				.filter(n -> n.getAlgorithm().getToClass() == algorithm.getToClass()).collect(Collectors.toCollection(ArrayList::new));
 
 		if (algorithmNodes.size() == 1) {
 			var algorithmNode = algorithmNodes.get(0);

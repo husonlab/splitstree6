@@ -354,7 +354,10 @@ public class MainWindowController {
 	private MenuItem computePhylogeneticDiversityMenuItem;
 
 	@FXML
-	private MenuItem computeEvolutionaryDistinctivenessMenuItem;
+	private MenuItem computeUnrootedShapleyMenuItem;
+
+	@FXML
+	private MenuItem computeFairProportionMenuItem;
 
 	@FXML
 	private MenuItem computeDeltaScoreMenuItem;
@@ -902,8 +905,12 @@ public class MainWindowController {
 		return computePhylogeneticDiversityMenuItem;
 	}
 
-	public MenuItem getComputeEvolutionaryDistinctivenessMenuItem() {
-		return computeEvolutionaryDistinctivenessMenuItem;
+	public MenuItem getComputeUnrootedShapleyMenuItem() {
+		return computeUnrootedShapleyMenuItem;
+	}
+
+	public MenuItem getComputeFairProportionMenuItem() {
+		return computeFairProportionMenuItem;
 	}
 
 	public MenuItem getComputeDeltaScoreMenuItem() {

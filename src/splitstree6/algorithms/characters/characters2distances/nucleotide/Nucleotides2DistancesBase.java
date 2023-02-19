@@ -26,7 +26,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.characters.characters2distances.Characters2Distances;
-import splitstree6.analysis.CaptureRecapture;
+import splitstree6.algorithms.characters.characters2text.EstimateInvariableSites;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
@@ -100,12 +100,12 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 				}
                 case fromChars -> {
                     final AService<Double> service = new AService<>(() -> {
-                        // todo: want this to run in foot pane
-                        try (ProgressPercentage progress = new ProgressPercentage(CaptureRecapture.DESCRIPTION)) {
-                            final CaptureRecapture captureRecapture = new CaptureRecapture();
-                            return captureRecapture.estimatePropInvariableSites(progress, parent);
-                        }
-                    });
+						// todo: want this to run in foot pane
+						try (ProgressPercentage progress = new ProgressPercentage("Estimate invariable sites")) {
+							final var estimateInvariableSites = new EstimateInvariableSites();
+							return estimateInvariableSites.estimatePropInvariableSites(progress, parent);
+						}
+					});
 					service.setOnSucceeded((e) -> setOptionPropInvariableSites(service.getValue()));
 					service.setOnFailed((e) -> NotificationManager.showError("Calculation of proportion of invariable sites failed: " + service.getException().getMessage()));
 					service.start();

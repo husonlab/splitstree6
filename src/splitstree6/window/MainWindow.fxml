@@ -396,8 +396,10 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites"/>
                         <MenuItem fx:id="computePhylogeneticDiversityMenuItem" text="Compute Phylogenetic Diversity"/>
-                        <MenuItem fx:id="computeEvolutionaryDistinctivenessMenuItem"
-                                  text="Compute Evolutionary Distinctiveness"/>
+                        <MenuItem fx:id="computeFairProportionMenuItem"
+                                  text="Compute Rooted Fair Proportion"/>
+                        <MenuItem fx:id="computeUnrootedShapleyMenuItem"
+                                  text="Compute Unrooted Shapley Values"/>
                         <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="pcoaMenuItem" text="PCoA"/>

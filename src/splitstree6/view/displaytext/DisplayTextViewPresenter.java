@@ -29,11 +29,14 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.StageStyle;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.Print;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
+import splitstree6.data.TextBlock;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.tabs.viewtab.AlgorithmBreadCrumbsToolBar;
 import splitstree6.window.MainWindow;
 
 import java.util.Optional;
@@ -118,6 +121,14 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().disableProperty().bind(tab.fontSizeProperty().lessThan(6));
 
 		codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
+
+		tab.viewTabProperty().addListener((v, o, n) -> {
+			if (n != null && n.getAlgorithmBreadCrumbsToolBar() != null
+				&& BasicFX.getAllRecursively(controller.getTopVBox(), AlgorithmBreadCrumbsToolBar.class).size() == 0
+				&& (n.getAlgorithmBreadCrumbsToolBar().getItems().size() > 0 || n.getDataNode().getDataBlock() instanceof TextBlock)) {
+				controller.getTopVBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
+			}
+		});
 	}
 
 	public void setupMenuItems() {

@@ -60,7 +60,7 @@ public class TreeScaleAndAlignment {
 	}
 
 	/**
-	 * apply scaling and alignment to provided points
+	 * compute scaling and alignment to provided points
 	 *
 	 * @param nodePointMap node points map for tree to draw
 	 */

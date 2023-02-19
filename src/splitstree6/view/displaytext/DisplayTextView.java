@@ -31,6 +31,8 @@ import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
+import java.util.List;
+
 public class DisplayTextView implements IView {
 	private final DisplayTextViewController controller;
 	private final DisplayTextViewPresenter presenter;
@@ -45,10 +47,18 @@ public class DisplayTextView implements IView {
 
 	private final DoubleProperty fontSize = new SimpleDoubleProperty(this, "fontSize");
 
+	private final StringProperty optionText = new SimpleStringProperty(this, "optionText", "");
+
+	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
+
 	{
 		ProgramProperties.track(showLineNumbers, false);
 		ProgramProperties.track(wrapText, true);
 		ProgramProperties.track(fontSize, 12.0);
+	}
+
+	public List<String> listOptions() {
+		return List.of(optionText.getName());
 	}
 
 	/**
@@ -62,7 +72,10 @@ public class DisplayTextView implements IView {
 
 		presenter = new DisplayTextViewPresenter(mainWindow, this, editable);
 
-		controller.getCodeArea().textProperty().addListener((v, o, n) -> empty.set(n.length() == 0));
+		controller.getCodeArea().textProperty().addListener(e -> empty.set(controller.getCodeArea().getLength() == 0));
+
+		controller.getCodeArea().textProperty().addListener(e -> optionText.set(controller.getCodeArea().getText()));
+		optionText.addListener(e -> controller.getCodeArea().replaceText(optionText.get()));
 
 		controller.getCodeArea().setWrapText(true);
 
@@ -81,6 +94,15 @@ public class DisplayTextView implements IView {
 
 	@Override
 	public void setViewTab(ViewTab viewTab) {
+		this.viewTab.set(viewTab);
+	}
+
+	public ViewTab getViewTab() {
+		return viewTab.get();
+	}
+
+	public ObjectProperty<ViewTab> viewTabProperty() {
+		return viewTab;
 	}
 
 	/**
@@ -233,6 +255,18 @@ public class DisplayTextView implements IView {
 	@Override
 	public String getCitation() {
 		return null;
+	}
+
+	public String getOptionText() {
+		return optionText.get();
+	}
+
+	public StringProperty optionTextProperty() {
+		return optionText;
+	}
+
+	public void setOptionText(String text) {
+		optionText.set(text);
 	}
 }
 

@@ -60,7 +60,7 @@ public class ViewTab extends Tab implements IDisplayTab {
 		setClosable(closable);
 		setOnCloseRequest(v -> mainWindow.removeTabFromMainTabPane(this));
 
-		algorithmBreadCrumbsToolBar = dataNode == null ? null : new AlgorithmBreadCrumbsToolBar(mainWindow, dataNode);
+		algorithmBreadCrumbsToolBar = (dataNode == null ? null : new AlgorithmBreadCrumbsToolBar(mainWindow, dataNode));
 
 		tabPaneProperty().addListener((v, o, n) -> {
 			if (n == null)

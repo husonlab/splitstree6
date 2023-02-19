@@ -25,6 +25,7 @@ import splitstree6.io.readers.distances.DistancesReader;
 import splitstree6.io.readers.genomes.GenomesReader;
 import splitstree6.io.readers.network.NetworkReader;
 import splitstree6.io.readers.splits.SplitsReader;
+import splitstree6.io.readers.text.TextReader;
 import splitstree6.io.readers.trees.TreesReader;
 import splitstree6.io.readers.view.ViewReader;
 
@@ -33,7 +34,7 @@ import splitstree6.io.readers.view.ViewReader;
  * Daniel Huson, 10.2022
  */
 public enum DataType {
-	Genomes, Characters, Distances, Trees, Splits, Network, View, Unknown;
+	Genomes, Characters, Distances, Trees, Splits, Network, View, Text, Unknown;
 
 	public static DataType getDataType(String fileName) {
 		return getDataType(ImportManager.getInstance().getReader(fileName));
@@ -55,6 +56,8 @@ public enum DataType {
 			return DataType.Network;
 		} else if (reader instanceof ViewReader) {
 			return DataType.View;
+		} else if (reader instanceof TextReader) {
+			return DataType.Text;
 		} else
 			return DataType.Unknown;
 	}

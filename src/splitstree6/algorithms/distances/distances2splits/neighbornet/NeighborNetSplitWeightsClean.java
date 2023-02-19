@@ -7,7 +7,6 @@ import splitstree6.data.parts.ASplit;
 import java.io.PrintWriter;
 import java.util.*;
 
-
 import static java.lang.Math.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.copyArray;

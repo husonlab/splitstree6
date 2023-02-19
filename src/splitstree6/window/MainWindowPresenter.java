@@ -57,6 +57,7 @@ import splitstree6.algorithms.characters.characters2distances.Uncorrected_P;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
+import splitstree6.algorithms.characters.characters2text.EstimateInvariableSites;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.distances.distances2network.PCoA;
 import splitstree6.algorithms.distances.distances2network.TSne;
@@ -532,9 +533,13 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getBootstrapTreeAsNetworkMenuItem(), new BootstrapTreeSplits());
 		setupAlgorithmMenuItem(controller.getBootStrapNetworkMenuItem(), new BootstrapSplits());
 
-		controller.getEstimateInvariableSitesMenuItem().setOnAction(null);
+
+		controller.getEstimateInvariableSitesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new EstimateInvariableSites()));
+		controller.getEstimateInvariableSitesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new EstimateInvariableSites()));
+
 		controller.getComputePhylogeneticDiversityMenuItem().setOnAction(null);
-		controller.getComputeEvolutionaryDistinctivenessMenuItem().setOnAction(null);
+		controller.getComputeFairProportionMenuItem().setOnAction(null);
+		controller.getComputeUnrootedShapleyMenuItem().setOnAction(null);
 		controller.getComputeDeltaScoreMenuItem().setOnAction(null);
 
 		controller.getShowWorkflowMenuItem().setOnAction(e -> controller.getMainTabPane().getSelectionModel().select(mainWindow.getTabByClass(WorkflowTab.class)));

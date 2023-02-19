@@ -132,7 +132,10 @@ public class OptionIO {
 							first = false;
 						else
 							w.write(",\n");
-						w.write("\t" + option.getName() + " = " + valueString);
+						if (option.getName().equals("Text")) {
+							w.write(option.getName() + " =\n" + valueString);
+						} else
+							w.write("\t" + option.getName() + " = " + valueString);
 					}
 				}
 				w.write(";\n");

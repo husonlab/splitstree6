@@ -5,7 +5,6 @@ import jloda.util.progress.ProgressListener;
 
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.Comparator;
 
 import static java.lang.Math.sqrt;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;

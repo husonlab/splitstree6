@@ -1,5 +1,5 @@
 /*
- * CaptureRecapture.java Copyright (C) 2023 Daniel H. Huson
+ * EstimateInvariableSites.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,33 +17,44 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.analysis;
+package splitstree6.algorithms.characters.characters2text;
 
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import jloda.fx.util.ProgramProperties;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.TaxaBlock;
+import splitstree6.data.parts.Taxon;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Random;
 
 /**
  * Estimates the proportion of invariant sites using capture-recapture
  * Daniel Huson, 2005
  */
-public class CaptureRecapture {
-	public static final String DESCRIPTION = "Estimation of invariant sites using capture-recapture method (Lockhart, Huson, Steel, 2000)";
-	int optionTaxaCutoff = 20; // Cut off before we switch to sampling
+public class EstimateInvariableSites extends AnalyzeCharactersBase {
+	private final IntegerProperty optionFullTaxaCutoff = new SimpleIntegerProperty(this, "optionFullTaxaCutoff");
 
-	/**
-	 * gets a description of the method
-	 *
-	 * @return description
-	 */
-	public String getDescription() {
-		return DESCRIPTION;
+	{
+		ProgramProperties.track(optionFullTaxaCutoff, 20);
 	}
 
+	@Override
+	public String getCitation() {
+		return "Steel, Huson and Lockhart 2000; " +
+			   "MA Steel, DH Huson, and PJ Lockhart. Invariable site models and their use in phylogeny reconstruction. Sys. Biol. 49(2):225-232, 2000";
+	}
+
+	@Override
+	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
+		var proportion = estimatePropInvariableSites(progress, charactersBlock);
+		return "Invariable sites: %,d of %,d (%.1f%%)%n".formatted(Math.round(charactersBlock.getNchar() * proportion), charactersBlock.getNchar(), 100 * proportion);
+	}
 
 	/**
 	 * Chooses a random (small) subset of size elements in [1...n]
@@ -51,10 +62,10 @@ public class CaptureRecapture {
 	 * @return array of size with numbers from [1...n]
 	 */
 	private static int[] randomSubset(int size, int n, Random random) {
-		final int[] s = new int[size];
-		for (int i = 0; i < size; i++) {
-			int x = random.nextInt(n - i) + 1; //random integer from 1 to n-i
-			for (int j = 0; j < i; j++) {      //Make sure that its unique
+		var s = new int[size];
+		for (var i = 0; i < size; i++) {
+			var x = random.nextInt(n - i) + 1; //random integer from 1 to n-i
+			for (var j = 0; j < i; j++) {      //Make sure that its unique
 				if (x >= s[j])
 					x++;
 			}
@@ -72,8 +83,8 @@ public class CaptureRecapture {
 	 * @return true iff all not missing, not gaps, and site not masked
 	 */
 	private static boolean goodSite(CharactersBlock block, int[] q, int m) {
-		for (int aQ : q) {
-			char ch = block.get(aQ, m);
+		for (var aQ : q) {
+			var ch = block.get(aQ, m);
 			if (ch == block.getMissingCharacter())
 				return false;
 			if (ch == block.getGapCharacter())
@@ -89,8 +100,8 @@ public class CaptureRecapture {
 	 */
 
 	private static double vscore(int[] q, CharactersBlock block) {
-		final int nsites = block.getNchar();
-		int ngood = 0; //Number of sites without gaps in all four
+		final var nsites = block.getNchar();
+		var ngood = 0; //Number of sites without gaps in all four
 
 		int f_ij_kl = 0, f_ik_jl = 0, f_il_jk = 0, f_ij = 0, f_ik = 0, f_il = 0, f_jk = 0, f_jl = 0, f_kl = 0;
 
@@ -157,7 +168,7 @@ public class CaptureRecapture {
 		double vsum = 0.0;
 		int count = 0;
 
-		if (nchar > optionTaxaCutoff) {
+		if (nchar > getOptionFullTaxaCutoff()) {
 			//Sampling          - we do a minimum of 1000, and stop once |sd| is less than 0.05 |mean|
 			progress.setMaximum(2000);
 			progress.setProgress(0);
@@ -215,12 +226,15 @@ public class CaptureRecapture {
 		return vsum / count;
 	}
 
-	public int getOptionTaxaCutoff() {
-		return optionTaxaCutoff;
+	public int getOptionFullTaxaCutoff() {
+		return optionFullTaxaCutoff.get();
 	}
 
-	public void setOptionTaxaCutoff(int optionTaxaCutoff) {
-		this.optionTaxaCutoff = optionTaxaCutoff;
+	public IntegerProperty optionFullTaxaCutoffProperty() {
+		return optionFullTaxaCutoff;
 	}
 
+	public void setOptionFullTaxaCutoff(int optionFullTaxaCutoff) {
+		this.optionFullTaxaCutoff.set(optionFullTaxaCutoff);
+	}
 }

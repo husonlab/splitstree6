@@ -15,9 +15,9 @@ import java.util.concurrent.Executors;
 
 import static java.lang.Math.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitstree4.activeSetST4;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
 
 public class NeighborNetSplitWeights_MultiThreaded {
 	static ExecutorService service = Executors.newFixedThreadPool(16); // todo: fixme

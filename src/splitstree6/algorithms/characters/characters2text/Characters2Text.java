@@ -1,5 +1,5 @@
 /*
- * TextReader.java Copyright (C) 2023 Daniel H. Huson
+ * Splits2View.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.readers.view;
+package splitstree6.algorithms.characters.characters2text;
 
-import splitstree6.data.ViewBlock;
-import splitstree6.io.utils.DataReaderBase;
+import splitstree6.data.CharactersBlock;
+import splitstree6.data.IViewChoice;
+import splitstree6.data.TextBlock;
+import splitstree6.workflow.Algorithm;
 
-public abstract class ViewReader extends DataReaderBase<ViewBlock> {
-	public ViewReader() {
-		super(ViewBlock.class);
+public abstract class Characters2Text extends Algorithm<CharactersBlock, TextBlock> implements IViewChoice {
+	public Characters2Text() {
+		super(CharactersBlock.class, TextBlock.class);
 	}
 }

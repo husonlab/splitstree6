@@ -134,10 +134,14 @@ public class NexusImporter {
 				var parser = new NetworkNexusInput();
 				taxLabels = parser.parse(np, taxaBlock, networkBlock);
 				comments.setIfCurrentValueIsNull(np.popComments());
+			} else if (dataBlock instanceof TextBlock textBlock) {
+				var parser = new TextNexusInput();
+				parser.parse(np, taxaBlock, textBlock);
+				comments.setIfCurrentValueIsNull(np.popComments());
+				taxLabels = null;
 			} else {
 				throw new IOException("Not implemented: import '" + dataBlock.getName());
 			}
-
 
 			if (taxaBlock.getNtax() == 0 || taxaBlock.size() == 0) {
 				if (taxLabels != null && (taxLabels.size() == taxaBlock.getNtax() || taxLabels.size() > 0 && taxaBlock.getNtax() == 0))
@@ -198,6 +202,8 @@ public class NexusImporter {
 				return TreesBlock.class;
 			} else if (np.isAtBeginOfBlock("NETWORK")) {
 				return NetworkBlock.class;
+			} else if (np.isAtBeginOfBlock("TEXT")) {
+				return TextBlock.class;
 			}
 		} catch (IOException ignored) {
 		}
