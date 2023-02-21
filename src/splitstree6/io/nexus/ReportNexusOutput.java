@@ -20,26 +20,26 @@
 package splitstree6.io.nexus;
 
 
+import splitstree6.data.ReportBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TextBlock;
 
 import java.io.IOException;
 import java.io.Writer;
 
 /**
- * text nexus output
+ * report nexus output
  * Daniel Huson, 2.2023
  */
-public class TextNexusOutput extends NexusIOBase implements INexusOutput<TextBlock> {
+public class ReportNexusOutput extends NexusIOBase implements INexusOutput<ReportBlock> {
 	/**
 	 * write a block in nexus format
 	 */
 	@Override
-	public void write(Writer w, TaxaBlock taxaBlock, TextBlock textBlock) throws IOException {
-		w.write("\nBEGIN TEXT;\n");
+	public void write(Writer w, TaxaBlock taxaBlock, ReportBlock reportBlock) throws IOException {
+		w.write("\nBEGIN REPORT;\n");
 		writeTitleAndLink(w);
 		w.write("TEXT\n");
-		for (var line : textBlock.getLines()) {
+		for (var line : reportBlock.getLines()) {
 			var index = line.indexOf(';');
 			if (index > 0 && index < line.length() - 1)
 				w.write("\t'%s'%n".formatted(line));
@@ -47,6 +47,6 @@ public class TextNexusOutput extends NexusIOBase implements INexusOutput<TextBlo
 				w.write("\t" + line + "\n");
 		}
 		w.write(";\n");
-		w.write("END; [TEXT]\n");
+		w.write("END; [REPORT]\n");
 	}
 }

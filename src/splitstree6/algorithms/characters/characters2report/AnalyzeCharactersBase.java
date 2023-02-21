@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.characters.characters2text;
+package splitstree6.algorithms.characters.characters2report;
 
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.ReportBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TextBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -37,7 +37,7 @@ import java.util.List;
  * perform an analysis on Characters that returns a text to be displayed
  * Daniel Huson, 2.2023
  */
-abstract public class AnalyzeCharactersBase extends Characters2Text {
+abstract public class AnalyzeCharactersBase extends Characters2Report {
 
 	private final ChangeListener<Boolean> validListener;
 
@@ -50,9 +50,9 @@ abstract public class AnalyzeCharactersBase extends Characters2Text {
 		super();
 
 		validListener = (v, o, n) -> {
-			if (getNode() != null && getNode().getPreferredChild() != null && ((DataNode) getNode().getPreferredChild()).getDataBlock() instanceof TextBlock textBlock) {
-				if (textBlock.getView() != null)
-					textBlock.getView().getRoot().setDisable(!n);
+			if (getNode() != null && getNode().getPreferredChild() != null && ((DataNode) getNode().getPreferredChild()).getDataBlock() instanceof ReportBlock reportBlock) {
+				if (reportBlock.getView() != null)
+					reportBlock.getView().getRoot().setDisable(!n);
 			}
 		};
 	}
@@ -78,23 +78,23 @@ abstract public class AnalyzeCharactersBase extends Characters2Text {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, TextBlock textBlock) throws CanceledException {
-		textBlock.setInputBlockName(CharactersBlock.BLOCK_NAME);
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, ReportBlock reportBlock) throws CanceledException {
+		reportBlock.setInputBlockName(CharactersBlock.BLOCK_NAME);
 
 		Platform.runLater(() -> {
-			textBlock.getViewTab().setText(getName());
-			textBlock.getView().getUndoManager().clear();
+			reportBlock.getViewTab().setText(getName());
+			reportBlock.getView().getUndoManager().clear();
 		});
 
 		var mainWindow = getNode().getOwner().getMainWindow();
 		var text = runAnalysis(progress, taxaBlock, charactersBlock, mainWindow.getTaxonSelectionModel().getSelectedItems());
 
 		Platform.runLater(() -> {
-			textBlock.getViewTab().setText(getName());
-			textBlock.setText(text);
-			textBlock.getView().replaceText(text);
+			reportBlock.getViewTab().setText(getName());
+			reportBlock.setText(text);
+			reportBlock.getView().replaceText(text);
 		});
-		textBlock.updateShortDescription();
+		reportBlock.updateShortDescription();
 	}
 
 	@Override

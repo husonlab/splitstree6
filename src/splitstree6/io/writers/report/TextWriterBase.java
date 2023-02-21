@@ -1,5 +1,5 @@
 /*
- *  PlainTextWriter.java Copyright (C) 2023 Daniel H. Huson
+ *  TextWriterBase.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,28 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.text;
+package splitstree6.io.writers.report;
 
-import splitstree6.data.TaxaBlock;
-import splitstree6.data.TextBlock;
+import splitstree6.data.ReportBlock;
+import splitstree6.io.utils.DataBlockWriter;
 
-import java.io.IOException;
-import java.io.Writer;
-
-/**
- * write as text
- * Daniel Huson, 4.2022
- */
-public class PlainTextWriter extends TextWriterBase {
-	public PlainTextWriter() {
-		setFileExtensions("txt", "text");
-	}
-
-	@Override
-	public void write(Writer w, TaxaBlock taxa, TextBlock block) throws IOException {
-		for (var line : block.getLines()) {
-			w.write(line + "\n");
-		}
-		w.flush();
+public abstract class TextWriterBase extends DataBlockWriter<ReportBlock> {
+	public TextWriterBase() {
+		super(ReportBlock.class);
 	}
 }

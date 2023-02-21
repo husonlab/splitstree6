@@ -17,12 +17,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.readers.text;
+package splitstree6.io.readers.report;
 
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.data.ReportBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TextBlock;
 import splitstree6.io.readers.NexusImporter;
 
 import java.io.IOException;
@@ -34,7 +34,7 @@ public class NexusReader extends TextReader {
 	}
 
 	@Override
-	public void read(ProgressListener progress, String fileName, TaxaBlock taxaBlock, TextBlock dataBlock) throws IOException {
+	public void read(ProgressListener progress, String fileName, TaxaBlock taxaBlock, ReportBlock dataBlock) throws IOException {
 		NexusImporter.parse(fileName, taxaBlock, dataBlock);
 	}
 

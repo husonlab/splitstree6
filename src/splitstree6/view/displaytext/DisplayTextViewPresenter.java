@@ -34,7 +34,6 @@ import jloda.fx.util.Print;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
-import splitstree6.data.TextBlock;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.AlgorithmBreadCrumbsToolBar;
 import splitstree6.window.MainWindow;
@@ -125,7 +124,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		tab.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null && n.getAlgorithmBreadCrumbsToolBar() != null
 				&& BasicFX.getAllRecursively(controller.getTopVBox(), AlgorithmBreadCrumbsToolBar.class).size() == 0
-				&& (n.getAlgorithmBreadCrumbsToolBar().getItems().size() > 0 || n.getDataNode().getDataBlock() instanceof TextBlock)) {
+				&& !tab.getViewTab().isClosable()) {
 				controller.getTopVBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
 			}
 		});

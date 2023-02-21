@@ -37,7 +37,7 @@ public class NexusHighlighter implements Highlighter.IHighlighter {
             "begin", "end", "endblock",
             "dimensions", "matrix",
             "format", "title", "matrix",
-            "properties", "cycle", "draw", "options", "properties", "type"
+            "properties", "cycle", "draw", "options", "properties", "type", "tect"
     };
 
     private static final String[] INNER_KEYWORDS = new String[]{
@@ -47,7 +47,7 @@ public class NexusHighlighter implements Highlighter.IHighlighter {
 
     private static final String[] BLOCKS = new String[]{
             "data", "taxa", "characters", "distances", "trees", "sets",
-            "splits", "network", "traits", "analysis", "viewer",
+            "splits", "network", "traits", "analysis", "viewer", "report",
             "splitstree6", "traits"
     };
 

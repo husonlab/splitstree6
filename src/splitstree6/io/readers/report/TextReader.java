@@ -1,5 +1,5 @@
 /*
- *  TextWriterBase.java Copyright (C) 2023 Daniel H. Huson
+ *  TextReader.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,13 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.text;
+package splitstree6.io.readers.report;
 
-import splitstree6.data.TextBlock;
-import splitstree6.io.utils.DataBlockWriter;
+import splitstree6.data.ReportBlock;
+import splitstree6.io.utils.DataReaderBase;
 
-public abstract class TextWriterBase extends DataBlockWriter<TextBlock> {
-	public TextWriterBase() {
-		super(TextBlock.class);
+public abstract class TextReader extends DataReaderBase<ReportBlock> {
+	public TextReader() {
+		super(ReportBlock.class);
 	}
 }

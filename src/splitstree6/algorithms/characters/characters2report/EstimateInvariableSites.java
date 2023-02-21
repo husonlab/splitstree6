@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.characters.characters2text;
+package splitstree6.algorithms.characters.characters2report;
 
 
 import javafx.beans.property.IntegerProperty;

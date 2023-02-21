@@ -20,9 +20,9 @@
 package splitstree6.io.nexus;
 
 import jloda.util.parse.NexusStreamParser;
+import splitstree6.data.ReportBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TextBlock;
-import splitstree6.io.writers.text.PlainTextWriter;
+import splitstree6.io.writers.report.PlainTextWriter;
 
 import java.io.IOException;
 import java.io.OutputStreamWriter;
@@ -30,12 +30,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 /**
- * text block nexus input
+ * report block nexus input
  * Daniel Huson, 2.2023
  */
-public class TextNexusInput extends NexusIOBase {
+public class ReportNexusInput extends NexusIOBase {
 	public static final String SYNTAX = """
-			BEGIN TEXT;
+			BEGIN REPORT;
 				[TITLE title;]
 				[LINK {type} = {title};]
 				TEXT
@@ -51,12 +51,12 @@ public class TextNexusInput extends NexusIOBase {
 	/**
 	 * parse a text block
 	 */
-	public void parse(NexusStreamParser np, TaxaBlock taxaBlock, TextBlock textBlock) throws IOException {
-		np.matchBeginBlock("TEXT");
+	public void parse(NexusStreamParser np, TaxaBlock taxaBlock, ReportBlock reportBlock) throws IOException {
+		np.matchBeginBlock("REPORT");
 		parseTitleAndLink(np);
 
 		np.matchIgnoreCase("TEXT");
-		textBlock.clear();
+		reportBlock.clear();
 		var lineNo = np.lineno();
 		var lineBuilder = new StringBuilder();
 		while (!np.peekMatchIgnoreCase(";")) {
@@ -67,18 +67,18 @@ public class TextNexusInput extends NexusIOBase {
 			lineBuilder.append(token);
 
 			if (np.lineno() > lineNo) {
-				textBlock.addLine(lineBuilder.toString());
+				reportBlock.addLine(lineBuilder.toString());
 				lineBuilder.setLength(0);
 			}
 		}
 		if (lineBuilder.length() > 0)
-			textBlock.addLine(lineBuilder.toString());
+			reportBlock.addLine(lineBuilder.toString());
 		np.matchIgnoreCase(";");
 		np.matchEndBlock();
 	}
 
 	public static void main(String[] args) throws IOException {
-		var textBlock = new TextBlock();
+		var textBlock = new ReportBlock();
 		textBlock.addLine("first line 0.1");
 		textBlock.addLine("second	gogogo");
 		textBlock.addLine("third 99;1");
@@ -89,15 +89,15 @@ public class TextNexusInput extends NexusIOBase {
 
 		var w1 = new StringWriter();
 		{
-			(new TextNexusOutput()).write(w1, null, textBlock);
+			(new ReportNexusOutput()).write(w1, null, textBlock);
 
 			System.err.println("first as nexus:");
 			System.err.println(w1);
 		}
 
-		var textBlock2 = new TextBlock();
+		var textBlock2 = new ReportBlock();
 		try (var np = new NexusStreamParser(new StringReader(w1.toString()))) {
-			(new TextNexusInput()).parse(np, null, textBlock2);
+			(new ReportNexusInput()).parse(np, null, textBlock2);
 		}
 
 		System.err.println("second:");
@@ -105,7 +105,7 @@ public class TextNexusInput extends NexusIOBase {
 
 		{
 			var w2 = new StringWriter();
-			(new TextNexusOutput()).write(w2, null, textBlock2);
+			(new ReportNexusOutput()).write(w2, null, textBlock2);
 
 			System.err.println("second as nexus:");
 			System.err.println(w2);

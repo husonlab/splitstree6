@@ -1,5 +1,5 @@
 /*
- *  TextBlock.java Copyright (C) 2023 Daniel H. Huson
+ *  ReportBlock.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -37,11 +37,11 @@ import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
 
 /**
- * text block for textual output
+ * report block for textual output
  * Daniel Huson, 2.2023
  */
-public class TextBlock extends DataBlock {
-	public static final String BLOCK_NAME = "Text";
+public class ReportBlock extends DataBlock {
+	public static final String BLOCK_NAME = "Report";
 
 	private final StringProperty inputBlockName = new SimpleStringProperty();
 	private final ObservableList<String> lines = FXCollections.observableArrayList();

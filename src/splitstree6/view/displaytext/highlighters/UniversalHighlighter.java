@@ -38,7 +38,7 @@ public class UniversalHighlighter implements Highlighter.IHighlighter {
 	private static final String FASTA_COMMENT_PATTERN = "(^|\\n);[^\n]*";
 	private static final String FASTA_PATTERN = "(^|\\n)>[^\n]*";
 	private static final String STRING_PATTERN = "\"([^\"\\\\]|\\\\.)*\"";
-	private static final String NUMBER_PATTERN = "\\b-?\\d+(\\.\\d+)?(E-?\\d+)?(E\\+?\\d+)?(E?\\d+)?(e-?\\d+)?(e\\+?\\d+)?(e?\\d+)?";
+	private static final String NUMBER_PATTERN = "\\b-?\\d+(\\.\\d+)?(E-?\\d+)?(E\\+?\\d+)?(E?\\d+)?(e-?\\d+)?(e\\+?\\d+)?(e?\\d+)?|%";
 	private static final String URL_PATTERN = "\\b(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]\\b";
 
 	private static final Pattern PATTERN = Pattern.compile(

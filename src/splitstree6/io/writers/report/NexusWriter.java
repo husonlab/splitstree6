@@ -17,14 +17,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.writers.text;
+package splitstree6.io.writers.report;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.Pair;
+import splitstree6.data.ReportBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TextBlock;
-import splitstree6.io.nexus.TextNexusOutput;
+import splitstree6.io.nexus.ReportNexusOutput;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -44,13 +44,13 @@ public class NexusWriter extends TextWriterBase {
 	}
 
 	@Override
-	public void write(Writer w, TaxaBlock taxaBlock, TextBlock block) throws IOException {
+	public void write(Writer w, TaxaBlock taxaBlock, ReportBlock block) throws IOException {
 		if (isOptionPrependNexus())
 			w.write("#nexus\n");
-		var output = new TextNexusOutput();
+		var output = new ReportNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly)
-			output.write(w, new TaxaBlock(), new TextBlock());
+			output.write(w, new TaxaBlock(), new ReportBlock());
 		else
 			output.write(w, taxaBlock, block);
 		w.flush();

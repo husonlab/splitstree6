@@ -17,15 +17,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2text;
+package splitstree6.algorithms.characters.characters2report;
 
+import splitstree6.data.CharactersBlock;
 import splitstree6.data.IViewChoice;
-import splitstree6.data.TextBlock;
-import splitstree6.data.TreesBlock;
+import splitstree6.data.ReportBlock;
 import splitstree6.workflow.Algorithm;
 
-public abstract class Trees2Text extends Algorithm<TreesBlock, TextBlock> implements IViewChoice {
-	public Trees2Text() {
-		super(TreesBlock.class, TextBlock.class);
+public abstract class Characters2Report extends Algorithm<CharactersBlock, ReportBlock> implements IViewChoice {
+	public Characters2Report() {
+		super(CharactersBlock.class, ReportBlock.class);
 	}
 }

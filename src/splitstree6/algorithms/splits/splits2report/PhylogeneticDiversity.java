@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.splits.splits2text;
+package splitstree6.algorithms.splits.splits2report;
 
 import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
@@ -33,7 +33,7 @@ import java.util.Collection;
  * compute shapley values
  * Daniel Huson, 2.2023
  */
-public class PhylogeneticDiversity extends AnalyzeSplitsBase {
+public class PhylogeneticDiversity extends Splits2ReportBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splitsBlock, Collection<Taxon> selectedTaxa) {
 		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());

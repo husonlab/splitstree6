@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2text;
+package splitstree6.algorithms.trees.trees2report;
 
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
@@ -37,7 +37,7 @@ import java.util.Collection;
  * compute fair proporition values on trees
  * Daniel Huson, 2.2023
  */
-public class FairProportion extends AnalyzeTreesBase {
+public class FairProportion extends Trees2ReportBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
 		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());

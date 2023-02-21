@@ -24,8 +24,8 @@ import splitstree6.io.readers.characters.CharactersReader;
 import splitstree6.io.readers.distances.DistancesReader;
 import splitstree6.io.readers.genomes.GenomesReader;
 import splitstree6.io.readers.network.NetworkReader;
+import splitstree6.io.readers.report.TextReader;
 import splitstree6.io.readers.splits.SplitsReader;
-import splitstree6.io.readers.text.TextReader;
 import splitstree6.io.readers.trees.TreesReader;
 import splitstree6.io.readers.view.ViewReader;
 

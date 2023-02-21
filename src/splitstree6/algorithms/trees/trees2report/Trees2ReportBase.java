@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2text;
+package splitstree6.algorithms.trees.trees2report;
 
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -28,10 +28,12 @@ import javafx.beans.value.ChangeListener;
 import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import splitstree6.data.IViewChoice;
+import splitstree6.data.ReportBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.TextBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 
@@ -40,10 +42,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * perform an analysis on trees the returns a text to be displayed
+ * perform an analysis on trees and then provides a report
  * Daniel Huson, 2.2023
  */
-abstract public class AnalyzeTreesBase extends Trees2Text {
+abstract public class Trees2ReportBase extends Algorithm<TreesBlock, ReportBlock> implements IViewChoice {
+
 	public enum ApplyTo {OneTree, AllTrees}
 
 	private final ObjectProperty<ApplyTo> optionApplyTo = new SimpleObjectProperty<>(this, "optionApplyTo", ApplyTo.OneTree);
@@ -56,13 +59,13 @@ abstract public class AnalyzeTreesBase extends Trees2Text {
 		return List.of(optionApplyTo.getName(), optionWhichTree.getName());
 	}
 
-	public AnalyzeTreesBase() {
-		super();
+	public Trees2ReportBase() {
+		super(TreesBlock.class, ReportBlock.class);
 
 		validListener = (v, o, n) -> {
-			if (getNode() != null && getNode().getPreferredChild() != null && ((DataNode) getNode().getPreferredChild()).getDataBlock() instanceof TextBlock textBlock) {
-				if (textBlock.getView() != null)
-					textBlock.getView().getRoot().setDisable(!n);
+			if (getNode() != null && getNode().getPreferredChild() != null && ((DataNode) getNode().getPreferredChild()).getDataBlock() instanceof ReportBlock reportBlock) {
+				if (reportBlock.getView() != null)
+					reportBlock.getView().getRoot().setDisable(!n);
 			}
 		};
 	}
@@ -88,12 +91,12 @@ abstract public class AnalyzeTreesBase extends Trees2Text {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TextBlock textBlock) throws CanceledException {
-		textBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, ReportBlock reportBlock) throws CanceledException {
+		reportBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
 
 		Platform.runLater(() -> {
-			textBlock.getViewTab().setText(getName());
-			textBlock.getView().getUndoManager().clear();
+			reportBlock.getViewTab().setText(getName());
+			reportBlock.getView().getUndoManager().clear();
 		});
 
 		var mainWindow = getNode().getOwner().getMainWindow();
@@ -107,11 +110,11 @@ abstract public class AnalyzeTreesBase extends Trees2Text {
 		var text = runAnalysis(progress, taxaBlock, treesBlock, mainWindow.getTaxonSelectionModel().getSelectedItems());
 
 		Platform.runLater(() -> {
-			textBlock.getViewTab().setText(getName());
-			textBlock.setText(text);
-			textBlock.getView().replaceText(text);
+			reportBlock.getViewTab().setText(getName());
+			reportBlock.setText(text);
+			reportBlock.getView().replaceText(text);
 		});
-		textBlock.updateShortDescription();
+		reportBlock.updateShortDescription();
 	}
 
 

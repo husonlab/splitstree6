@@ -17,12 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2text;
+package splitstree6.algorithms.trees.trees2report;
 
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.splits.splits2text.ShapleyValues;
+import splitstree6.algorithms.splits.splits2report.ShapleyValues;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -37,7 +37,7 @@ import java.util.Collection;
  * compute fair proportion values on trees
  * Daniel Huson, 2.2023
  */
-public class UnrootedShapleyValues extends AnalyzeTreesBase {
+public class UnrootedShapleyValues extends Trees2ReportBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
 		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());

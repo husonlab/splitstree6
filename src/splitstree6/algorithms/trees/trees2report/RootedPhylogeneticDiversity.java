@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.trees.trees2text;
+package splitstree6.algorithms.trees.trees2report;
 
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
@@ -34,7 +34,7 @@ import java.util.Collection;
  * compute phylogenetic diversity
  * Daniel Huson, 2.2023
  */
-public class RootedPhylogeneticDiversity extends AnalyzeTreesBase {
+public class RootedPhylogeneticDiversity extends Trees2ReportBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
 		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());

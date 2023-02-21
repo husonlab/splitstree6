@@ -59,8 +59,6 @@
 }
 
 .number {
-    -fx-fill: green;
-    -fx-font-weight: bold;
 }
 
 .url {

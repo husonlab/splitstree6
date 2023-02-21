@@ -134,9 +134,9 @@ public class NexusImporter {
 				var parser = new NetworkNexusInput();
 				taxLabels = parser.parse(np, taxaBlock, networkBlock);
 				comments.setIfCurrentValueIsNull(np.popComments());
-			} else if (dataBlock instanceof TextBlock textBlock) {
-				var parser = new TextNexusInput();
-				parser.parse(np, taxaBlock, textBlock);
+			} else if (dataBlock instanceof ReportBlock reportBlock) {
+				var parser = new ReportNexusInput();
+				parser.parse(np, taxaBlock, reportBlock);
 				comments.setIfCurrentValueIsNull(np.popComments());
 				taxLabels = null;
 			} else {
@@ -203,7 +203,7 @@ public class NexusImporter {
 			} else if (np.isAtBeginOfBlock("NETWORK")) {
 				return NetworkBlock.class;
 			} else if (np.isAtBeginOfBlock("TEXT")) {
-				return TextBlock.class;
+				return ReportBlock.class;
 			}
 		} catch (IOException ignored) {
 		}

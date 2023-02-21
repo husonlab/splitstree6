@@ -26,7 +26,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.characters.characters2distances.Characters2Distances;
-import splitstree6.algorithms.characters.characters2text.EstimateInvariableSites;
+import splitstree6.algorithms.characters.characters2report.EstimateInvariableSites;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;

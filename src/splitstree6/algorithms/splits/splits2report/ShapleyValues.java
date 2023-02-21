@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.splits.splits2text;
+package splitstree6.algorithms.splits.splits2report;
 
 import jloda.fx.util.ProgramExecutorService;
 import jloda.util.BitSetUtils;
@@ -34,7 +34,7 @@ import java.util.*;
  * compute shapley values
  * Daniel Huson, 2.2023
  */
-public class ShapleyValues extends AnalyzeSplitsBase {
+public class ShapleyValues extends Splits2ReportBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splitsBlock, Collection<Taxon> selectedTaxa) {
 		return report(taxaBlock, splitsBlock.getSplits());
