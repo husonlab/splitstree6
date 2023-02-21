@@ -45,9 +45,6 @@ import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.trees.trees2text.FairProportion;
-import splitstree6.algorithms.trees.trees2text.RootedPhylogeneticDiversity;
-import splitstree6.algorithms.trees.trees2text.UnrootedShapleyValues;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
@@ -59,7 +56,6 @@ import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
-import splitstree6.window.AttachAlgorithm;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -485,18 +481,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
-
-		mainController.getComputePhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RootedPhylogeneticDiversity()));
-		mainController.getComputePhylogeneticDiversityMenuItem().disableProperty().bind(tree.isNull().or(Bindings.isEmpty(mainWindow.getTaxonSelectionModel().getSelectedItems())));
-
-		mainController.getComputeFairProportionMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new FairProportion()));
-		mainController.getComputeFairProportionMenuItem().setDisable(false);
-		mainController.getComputeFairProportionMenuItem().disableProperty().bind(view.emptyProperty());
-
-		mainController.getComputeUnrootedShapleyMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new UnrootedShapleyValues()));
-		mainController.getComputeUnrootedShapleyMenuItem().setDisable(false);
-		mainController.getComputeUnrootedShapleyMenuItem().disableProperty().bind(view.emptyProperty());
-
 	}
 
 	public void updateLabelLayout() {

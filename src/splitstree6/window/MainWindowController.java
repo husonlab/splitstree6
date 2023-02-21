@@ -351,16 +351,22 @@ public class MainWindowController {
 	private MenuItem estimateInvariableSitesMenuItem;
 
 	@FXML
-	private MenuItem computePhylogeneticDiversityMenuItem;
-
-	@FXML
-	private MenuItem computeUnrootedShapleyMenuItem;
-
-	@FXML
-	private MenuItem computeFairProportionMenuItem;
-
-	@FXML
 	private MenuItem computeDeltaScoreMenuItem;
+
+	@FXML
+	private MenuItem computeRootedTreeFairProportionMenuItem;
+
+	@FXML
+	private MenuItem computeRootedTreePhylogeneticDiversityMenuItem;
+
+	@FXML
+	private MenuItem computeSplitsPhylogeneticDiversityMenuItem;
+
+	@FXML
+	private MenuItem computeSplitsShapleyValuesMenuItem;
+
+	@FXML
+	private MenuItem computeUnrootedTreeShapleyMenuItem;
 
 	@FXML
 	private MenuItem showWorkflowMenuItem;
@@ -901,20 +907,28 @@ public class MainWindowController {
 		return estimateInvariableSitesMenuItem;
 	}
 
-	public MenuItem getComputePhylogeneticDiversityMenuItem() {
-		return computePhylogeneticDiversityMenuItem;
-	}
-
-	public MenuItem getComputeUnrootedShapleyMenuItem() {
-		return computeUnrootedShapleyMenuItem;
-	}
-
-	public MenuItem getComputeFairProportionMenuItem() {
-		return computeFairProportionMenuItem;
-	}
-
 	public MenuItem getComputeDeltaScoreMenuItem() {
 		return computeDeltaScoreMenuItem;
+	}
+
+	public MenuItem getComputeRootedTreeFairProportionMenuItem() {
+		return computeRootedTreeFairProportionMenuItem;
+	}
+
+	public MenuItem getComputeRootedTreePhylogeneticDiversityMenuItem() {
+		return computeRootedTreePhylogeneticDiversityMenuItem;
+	}
+
+	public MenuItem getComputeSplitsPhylogeneticDiversityMenuItem() {
+		return computeSplitsPhylogeneticDiversityMenuItem;
+	}
+
+	public MenuItem getComputeSplitsShapleyValuesMenuItem() {
+		return computeSplitsShapleyValuesMenuItem;
+	}
+
+	public MenuItem getComputeUnrootedTreeShapleyMenuItem() {
+		return computeUnrootedTreeShapleyMenuItem;
 	}
 
 	public MenuItem getShowWorkflowMenuItem() {

@@ -45,8 +45,6 @@ import jloda.fx.util.RunAfterAWhile;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
-import splitstree6.algorithms.splits.splits2text.PhylogeneticDiversity;
-import splitstree6.algorithms.splits.splits2text.ShapleyValues;
 import splitstree6.algorithms.utils.CharactersUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
@@ -60,7 +58,6 @@ import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
-import splitstree6.window.AttachAlgorithm;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -415,12 +412,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(e -> splitsView.setOptionOrientation(splitsView.getOptionOrientation().getFlip()));
 		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
-
-		mainController.getComputeUnrootedShapleyMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShapleyValues()));
-		mainController.getComputeUnrootedShapleyMenuItem().disableProperty().bind(splitsView.emptyProperty());
-
-		mainController.getComputePhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PhylogeneticDiversity()));
-		mainController.getComputePhylogeneticDiversityMenuItem().disableProperty().bind(splitsView.emptyProperty().or(Bindings.isEmpty(mainWindow.getTaxonSelectionModel().getSelectedItems())));
 	}
 
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {
