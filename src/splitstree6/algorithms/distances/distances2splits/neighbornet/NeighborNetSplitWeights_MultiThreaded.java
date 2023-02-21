@@ -17,7 +17,7 @@ import static java.lang.Math.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.IncrementalFitting.incrementalFitting;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitstree4.activeSetST4;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
+//import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean.NNLSParams;
 
 public class NeighborNetSplitWeights_MultiThreaded {
 	static ExecutorService service = Executors.newFixedThreadPool(16); // todo: fixme
@@ -25,7 +25,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 
 	static long timeCalls = 0L;
 
-/*	public static class NNLSParams {
+	public static class NNLSParams {
 
 		public NNLSParams(int ntax) {
 			cgIterations = min(max(ntax, 10), 25);
@@ -52,7 +52,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 		public boolean printConvergenceData = false;
 		public double pgbound = 1e-4; //Bound on the projective gradient norm
 
-	}*/
+	}
 
 	/**
 	 * Estimate the split weights using non-negative least squares
@@ -96,6 +96,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 
 		var x = new double[n + 1][n + 1];
 
+		/*
 		if (params.nnlsAlgorithm == NNLSParams.ACTIVE_SET) {
 			activeSetST4(x, d, null, params, progress);  //ST4 Algorithm
 		} else {
@@ -111,7 +112,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 				else
 					projectedConjugateGradient(x, d, params, progress);
 			}
-		}
+		} */
 
 		final var splitList = new ArrayList<ASplit>();
 
@@ -181,7 +182,7 @@ public class NeighborNetSplitWeights_MultiThreaded {
 
 		boolean cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
 		if (params.collapseMultiple) {
-			filterMostNegative(x, activeSet, 1.0 - params.fractionNegativeToCollapse);
+			filterMostNegative(x, activeSet, 1.0 - params.fractionNegativeToKeep);
 			maskElements(x, activeSet);
 			cgConverged = cgnr(x, d, activeSet, params.tolerance, params.cgIterations, f);
 		}

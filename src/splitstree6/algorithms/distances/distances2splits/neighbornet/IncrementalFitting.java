@@ -151,8 +151,6 @@ public class IncrementalFitting {
                 cycle[k - j + 1] = cycle[k - j];
             cycle[r1 + 1] = sk;
 
-            if (NeighborNetSplitWeights.verbose)
-                System.err.println("Adding taxon " + sk);
             if (false && search) {
                 //We carry out one iteration  of a steepest descent search
                 for (int i = 1; i <= k; i++) {
@@ -162,7 +160,7 @@ public class IncrementalFitting {
                         res[si][sj] = res[sj][si] = p[si][sj] - d[si][sj];
                     }
                 }
-                NeighborNetSplitWeights.calcAtx(res, grad);
+                NeighborNetUtilities.calcAtx(res, grad);
 
                 final int kk = k;
                 final UnivariateFunction fn = t->insertionObjectiveFunction(t,x,grad,d,kk,cycle);
@@ -180,7 +178,7 @@ public class IncrementalFitting {
                         x[si][sj] = x[sj][si] = x[si][sj]-tmin*grad[si][sj];
                     }
                 }
-                NeighborNetSplitWeights.calcAx(x,res);
+                NeighborNetUtilities.calcAx(x,res);
                 for(int i=1;i<=k;i++) {
                     var si = cycle[i];
                     for(int j=i+1;j<=k;j++) {
@@ -203,7 +201,7 @@ public class IncrementalFitting {
                 xt[si][sj] = xt[sj][si] = max(x[si][sj] - t*grad[si][sj],0.0);
             }
         }
-        NeighborNetSplitWeights.calcAx(xt,Ax);
+        NeighborNetUtilities.calcAx(xt,Ax);
         var fx = 0.0;
         for(var i=1;i<=k;i++) {
             var si = cycle[i];
