@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 
 import static java.lang.Math.sqrt;
-import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights.NNLSParams;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean.NNLSParams;
 
 
 //TODO: There is something odd which is allowing entries in old_x to be positive even though active is true.
@@ -79,40 +79,30 @@ public class NeighborNetSplitstree4 {
         calculateAtx(ntax, d, Atd);
 
         long startTime =  System.currentTimeMillis();
-        if (log!=null) {
-            log.println("% Active Set ST4");
-            log.println("% \t Fraction to collapse = "+nnlsParams.fractionNegativeToCollapse);
-            log.println("% \t Max CG iterations = "+npairs);
-            log.println("% Convergence for CG is ||A'(Ax_{active}-d)|| < "+CG_EPSILON * sqrt(sumSquares(Atd)));
-            log.println("% Outer convergence condition grad > -0.0001 ");
-            log.println("% Using insertion heuristic = "+nnlsParams.useInsertionAlgorithm);
-            log.println("% time \t ||res|| \t ||proj grad|| \t ||Delta x|| \t Num nonzero \t fractionToCollapse\n\n");
-            log.println(nnlsParams.logArrayName +" = [");
-        }
 
 
         CGparams params = new CGparams();
         params.useGradientNorm = false;
-        params.epsilon = nnlsParams.pgbound;
+        params.epsilon = nnlsParams.ST4pgbound;
 
 
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
             while (true) /* Inner loop: find the next feasible optimum */ {
                 if (!first_pass)  /* The first time through we use the unconstrained branch lengths */ {
-                    params.epsilon = nnlsParams.pgbound;
+                    params.epsilon = nnlsParams.ST4pgbound;
                     circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x, params);
                 }
                 first_pass = false;
 
-                int[] entriesToContract = worstIndices(x, nnlsParams.fractionNegativeToCollapse);
+                int[] entriesToContract = worstIndices(x, nnlsParams.activeSetRho);
                 if (entriesToContract != null) {
                     for (int index : entriesToContract) {
                         old_x[index] = 0.0;
                         active[index] = true;
                         nactive++;
                     }
-                    params.epsilon = nnlsParams.pgbound;
+                    params.epsilon = nnlsParams.ST4pgbound;
 
                     circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x, params); /* Re-optimise, so that the current x is always optimal */
                 }
@@ -176,10 +166,6 @@ public class NeighborNetSplitstree4 {
                             count_nonzero++;
                         pgx += grad_i*grad_i;
                     }
-                    long timestamp = System.currentTimeMillis() - startTime;
-                    String output ="\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero+"\t"+(npairs - nactive)+"\t"+nnlsParams.fractionNegativeToCollapse+"\t0";
-                    log.println(output);
-                    System.out.println(output);
                 }
 
 
@@ -209,10 +195,7 @@ public class NeighborNetSplitstree4 {
                         count_nonzero++;
                     pgx += grad_i*grad_i;
                 }
-                long timestamp = System.currentTimeMillis() - startTime;
-                String output = "\t"+timestamp+"\t"+ sqrt(fx)+"\t"+ sqrt(pgx) + "\t" + deltax + "\t"+count_nonzero +"\t"+(npairs - nactive)+"\t"+nnlsParams.fractionNegativeToCollapse+"\t1";
-                log.println(output);
-                System.out.println(output);
+
 
 
             }
@@ -249,8 +232,8 @@ public class NeighborNetSplitstree4 {
             }
 
 
-            if (nnlsParams.useGradientNorm) {
-                double epsilon = nactive / (double) npairs * nnlsParams.pgbound;
+            if (nnlsParams.ST4useGradientNorm) {
+                double epsilon = nactive / (double) npairs * nnlsParams.ST4pgbound;
                 if ((min_i == -1) || pgradSumSquares<epsilon*epsilon)
                     break;
             }

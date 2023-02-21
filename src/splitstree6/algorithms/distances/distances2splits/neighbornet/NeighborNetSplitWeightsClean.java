@@ -24,30 +24,32 @@ public class NeighborNetSplitWeightsClean {
      */
     public static class NNLSParams {
 
-        public enum MethodTypes {ACTIVESET,BLOCKPIVOT,GRADPROJECTION,APGD,IPG}
-        public MethodTypes method = MethodTypes.ACTIVESET;
+        public enum MethodTypes {GRADPROJECTION,ACTIVESET,APGD,IPG}
+        public MethodTypes method = MethodTypes.GRADPROJECTION;
 
-        public double cutoff; //Only include split weights greater than this amount
-        public double projGradBound; //Stop if projected gradient is less than this. This should be larger than the CGNR bound
-        public boolean printResiduals;
-        public int maxIterations;
+        public double cutoff; //Post processing: Only include split weights greater than this amount
+
+        //Stopping conditions - main method
+        public double projGradBound = 1e-8; //Stop if squared projected gradient is less than this. This should be larger than the CGNR bound
+        public int maxIterations = Integer.MAX_VALUE;
         public long maxTime = Long.MAX_VALUE; //Stop if the method has taken more than this many milliseconds
 
+        //Stopping conditions - CGNR
         public int cgnrIterations; //Max number of iterations in CGNR
-        public double cgnrTolerance; //Stopping condition for CGNR - bound on norm gradient squared.
+        public double cgnrTolerance = projGradBound/2; //Stopping condition for CGNR - bound on norm gradient squared.
+
+        //Debugging
+        public boolean printResiduals = false;
         public boolean cgnrPrintResiduals = false;
+        public PrintWriter log;
 
-
-        public double activeSetRho; //Proportion of pairs to add to active set in Active Set Method.
-        public double blockPivotCutoff;
-        public double gradientProjectionTol; //Tolerance for line search
+        //Legacy options
+        public double activeSetRho;
         public double APGDalpha;
         public double IPGtau;
         public double IPGthreshold;
-
-
-        public PrintWriter log;
-        public double[][] finalx; //Target value, used just for debugging.
+        public double ST4pgbound;
+        public boolean ST4useGradientNorm;
     }
 
     /**
@@ -87,12 +89,28 @@ public class NeighborNetSplitWeightsClean {
         calcAinv_y(d,x); //Compute unconstrained solution
         var minVal = minArray(x);
         if (minVal < 0) {
-            switch (params.method) {
-                case ACTIVESET -> {
-
+            zeroNegativeEntries(x);
+            switch(params.method) {
+                case GRADPROJECTION -> {
+                    params.cgnrIterations = max(50,n);
+                    gradientProjection(x,d,params,progress);
                 }
+                case ACTIVESET -> {
+                    params.cgnrIterations = max(50,n);
+                    params.activeSetRho = 0.6;
+                    activeSetMethod(x,d,params,progress);
+                }
+                case APGD -> {
+                    params.APGDalpha = 1.0;
+                    APGD(x,d,params,progress);
+                }
+//                case IPG -> {
+//                    IPG(x,d,params,progress);
+//                }
+
             }
         }
+        //TODO: Catch the cancel here so that the incomplete solution can still be used.
 
         if (progress!=null)
             progress.checkForCancel();
@@ -228,8 +246,6 @@ public class NeighborNetSplitWeightsClean {
 
                 if (params.printResiduals) {
                     params.log.print("\t" + k + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x, d) + "\t" + (n*(n-1)/2-cardinality(activeSet)));
-                    if (params.finalx!=null)
-                        params.log.print("\t"+diff(x,params.finalx));
                     params.log.println();
                 }
 
@@ -366,115 +382,7 @@ public class NeighborNetSplitWeightsClean {
     }
 
 
-    /**
-     * Implementation of the Block Pivot method tsnnls, as described in
-     *          Cantarella, Jason, and Michael Piatek. "Tsnnls: A solver for large sparse least squares problems with non-negative variables."
-     *          arXiv preprint cs/0408029 (2004).
-     *
-     *
-     * @param x  Square array, can be used to warm start
-     * @param d   square array of distances
-     * @param params parameters for the method
-     * @param progress   progressListener
-     * @throws CanceledException  exception thrown if user presses cancel
-     */
-    static public void blockPivot(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
-        var n = x.length - 1;
-        var G = new boolean[n + 1][n + 1];
-        var x2 = new double[n+1][n+1];
 
-        long startTime = System.currentTimeMillis();
-
-        var N = Integer.MAX_VALUE;
-        var p = 3;
-        boolean done = false;
-        int iter = 0;
-
-        getActiveEntries(x, G);
-        cgnr(x, d, G, params, progress);
-
-        //gradient
-        var y = new double[n + 1][n + 1];
-        evalGradient(x, d, y);
-
-        if (params.printResiduals) {
-            params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+evalProjectedGradientSquared(x,d)+ "\t" + (n*(n-1)/2-cardinality(G)) + "\t0");
-            if (params.finalx!=null)
-                params.log.print("\t"+diff(x2,params.finalx));
-            params.log.println();
-        }
-
-        threshold(x,params.blockPivotCutoff);
-        threshold(y,params.blockPivotCutoff);
-        var infeasible = new boolean[n + 1][n + 1];
-
-        while (!done) {
-            iter++;
-
-            //Determine and count infeasible entries: active entries with negative gradient or inactive entries with negative value
-            int numInfeasible = 0;
-            int switched = 0;
-
-            for (var i = 1; i <= n; i++) {
-                for (var j = i + 1; j <= n; j++) {
-                    if ((!G[i][j] && x[i][j] < 0) || (G[i][j] && y[i][j] < 0)) {
-                        numInfeasible++;
-                        infeasible[i][j] =  true;
-                    }
-                    else
-                        infeasible[i][j] =  false;
-                }
-            }
-
-            if (numInfeasible == 0 || iter>=params.maxIterations)
-                done = true;
-            else if (numInfeasible < N) {
-                N = numInfeasible;
-                p = 3;
-                xor(G,infeasible);
-                switched = numInfeasible;
-            } else {
-                if (p > 0) {
-                    p--;
-                    xor(G,infeasible);
-                    switched = numInfeasible;
-                } else {
-                    var foundInfeasible = false;
-                    for (var i = 1; i <= n && !foundInfeasible; i++) {
-                        for (var j = i + 1; j <= n && !foundInfeasible; j++) {
-                            if (infeasible[i][j]) {
-                                G[i][j] =  !G[i][j];
-                                foundInfeasible = true;
-                            }
-                        }
-                    }
-                    switched = -1;
-                }
-            }
-            cgnr(x, d, G, params, progress);
-            evalGradient(x,d,y);
-            if (progress!=null)
-                progress.checkForCancel();
-
-            //Check if zeroing negative entries in x gives small enough projected gradient
-            copyArray(x,x2);
-            zeroNegativeEntries(x2);
-            double pg = evalProjectedGradientSquared(x2, d);
-            if (pg<params.projGradBound) {
-                copyArray(x2,x);
-                return;
-            }
-            if (params.printResiduals) {
-                params.log.print("\t" + iter + "\t" + (System.currentTimeMillis()-startTime)+"\t"+pg+ "\t" + (n*(n-1)/2-cardinality(G))+"\t"+switched);
-                if (params.finalx!=null)
-                    params.log.print("\t"+diff(x2,params.finalx));
-                params.log.println();
-            }
-
-            threshold(x,params.blockPivotCutoff);
-            threshold(y,params.blockPivotCutoff);
-        }
-    }
 
     //TODO: Javadoc
     static public void gradientProjection(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {

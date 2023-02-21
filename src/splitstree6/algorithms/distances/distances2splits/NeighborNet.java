@@ -19,15 +19,12 @@
 
 package splitstree6.algorithms.distances.distances2splits;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeights;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.DistancesBlock;
@@ -41,22 +38,13 @@ import java.util.List;
 
 public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
-	//public enum InferenceAlgorithm {ActiveSet, BlockPivot}
-	public enum InferenceAlgorithm {GradientProjection,CarefulMethod,LegacySplitstree4,ProjectedGradient,BlockPivot,IPG,RunSimulations}
+	public enum InferenceAlgorithm {GradientProjection,ActiveSet,APGD}
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.GradientProjection);
-	private final StringProperty optionGraphPrefix = new SimpleStringProperty(this, "");
+	private final DoubleProperty optionThreshold = new SimpleDoubleProperty(this,"threshold",1e-8);
 
 	public List<String> listOptions() {
-		return List.of(optionInferenceAlgorithm.getName(), optionGraphPrefix.getName());
+		return List.of(optionInferenceAlgorithm.getName(), optionThreshold.getName());
 	}
-
-	//private final BooleanProperty optionOutputConvergenceData = new SimpleBooleanProperty(this, "optionOutputConvergenceData", false);
-
-
-	//private final BooleanProperty optionUsePreconditioner = new SimpleBooleanProperty(this, "optionUsePreconditioner", false);
-
-	//private final BooleanProperty optionUseDual = new SimpleBooleanProperty(this, "optionUseDual", true);
-
 
 	@Override
 	public String getCitation() {
@@ -64,6 +52,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			   "D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. " +
 			   "Molecular Biology and Evolution, 21(2):255– 265, 2004.";
 	}
+//TODO: cite the Frontiers paper here as well.
 
 	/**
 	 * run the neighbor net algorithm
@@ -71,60 +60,33 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws CanceledException {
 
-		if (SplitsUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
-			return; //TODO: Incorporate this into later code.
-
 		progress.setMaximum(-1);
+		long start = System.currentTimeMillis();
+
+
 		final var cycle = NeighborNetCycle.compute(progress, distancesBlock.size(), distancesBlock.getDistances());
 
 		progress.setTasks("NNet", "split weight optimization");
 
-		final var start = System.currentTimeMillis();
 
-		var params = new NeighborNetSplitWeights.NNLSParams(taxaBlock.getNtax());
 
-        //TODO: Streamline these options once we identify the optimal strategies.
-		params.tolerance =1e-6;
-		if (getOptionInferenceAlgorithm()==InferenceAlgorithm.GradientProjection) {
-			params.greedy=true;
-			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.GRADPROJECTION;
-			params.collapseMultiple = false;
-			int n = cycle.length - 1; //ntax
-			params.cgIterations = Math.min(Math.max(n,10),20);
-		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.CarefulMethod) {
-			params.greedy = false;
-			params.nnlsAlgorithm= NeighborNetSplitWeights.NNLSParams.GRADPROJECTION;
-			params.collapseMultiple = false;
-			int n = cycle.length - 1; //ntax
-			params.outerIterations = n*(n-1)/2;
-		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.ProjectedGradient) {
-			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.PROJECTEDGRAD;
-			params.logfile = "ProjectedGradient.m";
-		} else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.BlockPivot) {
-				params.cgIterations = Math.max(cycle.length,10);
-				params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.BLOCKPIVOT;
-		}
-		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.IPG) {
-			params.tolerance = 1e-3;
-			params.outerIterations = 1000;
-			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.IPG;
-		}
-		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.RunSimulations) {
-			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.SIMULATIONS;
-			params.simFilename = getOptionGraphPrefix();
-		}
-		else {//ST4 version
-			params.greedy = false;
-			params.nnlsAlgorithm = NeighborNetSplitWeights.NNLSParams.ACTIVE_SET;
-			int n = cycle.length - 1;
-			params.outerIterations = n * (n - 1) / 2;
-			params.collapseMultiple = true;
-			params.fractionNegativeToCollapse = 0.6;
-			params.useInsertionAlgorithm = false;
-		}
+		var params = new NeighborNetSplitWeightsClean.NNLSParams();
+		params.projGradBound = getOptionThreshold();
+		params.cgnrTolerance = params.projGradBound/2.0;
+
+		//{GradientProjection,ActiveSet,APGD,IPG}
+
+		if (getOptionInferenceAlgorithm()==InferenceAlgorithm.ActiveSet)
+			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.ACTIVESET;
+		else if (getOptionInferenceAlgorithm()==InferenceAlgorithm.APGD)
+			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.APGD;
+		else
+			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.GRADPROJECTION; //DEFAULT
+
+
 
 		ArrayList<ASplit> splits;
-		splits= NeighborNetSplitWeights.compute(cycle, distancesBlock.getDistances(), params, progress);
+		splits= NeighborNetSplitWeightsClean.compute(cycle, distancesBlock.getDistances(), params, progress);
 
 		progress.setTasks("NNet", "post-analysis");
 
@@ -163,19 +125,17 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		this.optionInferenceAlgorithm.set(optionInferenceAlgorithm);
 	}
 
-	public String getOptionGraphPrefix() {
-		return optionGraphPrefix.get();
+	public double getOptionThreshold() {
+		return optionThreshold.get();
 	}
 
-	public StringProperty optionGraphPrefixProperty() {
-		return optionGraphPrefix;
+	public DoubleProperty optionThreshold() {
+		return optionThreshold;
 	}
 
-	public void setOptionGraphPrefix(String optionGraphPrefix) {
-		this.optionGraphPrefix.set(optionGraphPrefix);
+	public void setOptionThreshold(double threshold) {
+		this.optionThreshold.set(threshold);
 	}
-
-
 
 
 
