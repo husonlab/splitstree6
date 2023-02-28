@@ -37,7 +37,7 @@ import java.util.Collection;
  * Daniel HUson, 2.2023
  */
 public class NeighborNetCycle extends Distances2ReportBase {
-	@Override
+
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, Collection<Taxon> ignored) throws IOException {
 		var graph = new Graph();
 		var nTax = taxaBlock.getNtax();
@@ -132,8 +132,8 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		var q = components.get(0).second();
 		graph.newEdge(nodeMap[p], nodeMap[q]);
 
-		return "'" + StringUtils.toString(extractOrdering(graph, nodeMap).stream()
-				.map(t -> "%d %s".formatted(t, taxaBlock.get(t))).toList(), ", ") + "'";
+		return StringUtils.toString(extractOrdering(graph, nodeMap).stream()
+				.map(t -> "%d %s".formatted(t, taxaBlock.get(t))).toList(), ", ");
 	}
 
 	private Pair<Integer, Integer> selectClosestPair(ArrayList<Component> components, double[][] D) {
