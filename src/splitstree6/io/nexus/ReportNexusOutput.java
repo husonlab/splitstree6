@@ -40,11 +40,7 @@ public class ReportNexusOutput extends NexusIOBase implements INexusOutput<Repor
 		writeTitleAndLink(w);
 		w.write("TEXT\n");
 		for (var line : reportBlock.getLines()) {
-			var index = line.indexOf(';');
-			if (index > 0 && index < line.length() - 1)
-				w.write("\t'%s'%n".formatted(line));
-			else
-				w.write("\t" + line + "\n");
+			w.write("\t'" + line.replaceAll("'", "\\\\'") + "'\n");
 		}
 		w.write(";\n");
 		w.write("END; [REPORT]\n");

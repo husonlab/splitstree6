@@ -70,6 +70,8 @@ public class ReportBlock extends DataBlock {
 					viewTab = new ViewTab(mainWindow, getNode(), false);
 					var displayTextView = new DisplayTextView(mainWindow, getName(), false);
 					viewTab.setView(displayTextView);
+					viewTab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16));
+
 					displayTextView.setViewTab(getViewTab());
 					displayTextView.setOptionText(StringUtils.toString(getLines(), "\n"));
 					mainWindow.addTabToMainTabPane(viewTab);
@@ -83,20 +85,19 @@ public class ReportBlock extends DataBlock {
 				} else { // have added the node to the workflow, e.g. after undo delete
 					var view = (viewTab != null ? viewTab.getView() : null);
 					if (view != null) {
-						if (viewTab != null)
+						if (viewTab != null) {
 							mainWindow.removeTabFromMainTabPane(viewTab);
+						}
 						viewTab = new ViewTab(mainWindow, getNode(), false);
 						mainWindow.addTabToMainTabPane(viewTab);
 						viewTab.setView(view);
+						viewTab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16));
 					}
 					setInputBlockName(getNode().getParents().get(0).getName());
 				}
 			};
 			node.getParents().addListener(new WeakInvalidationListener(invalidationListener));
 			node.validProperty().addListener(new WeakChangeListener<>(validListener));
-
-
-			Platform.runLater(() -> viewTab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16)));
 		}
 	}
 
