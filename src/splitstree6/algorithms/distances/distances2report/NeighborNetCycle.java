@@ -22,7 +22,6 @@ package splitstree6.algorithms.distances.distances2report;
 import jloda.fx.graph.GraphTraversals;
 import jloda.graph.Graph;
 import jloda.graph.Node;
-import jloda.util.BitSetUtils;
 import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
@@ -42,15 +41,15 @@ public class NeighborNetCycle extends Distances2ReportBase {
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, Collection<Taxon> ignored) throws IOException {
 		var graph = new Graph();
 		var nTax = taxaBlock.getNtax();
-		var nodeMap = new Node[nTax + 1];
-		var components = new ArrayList<Component>();
+		var nodeMap = new Node[nTax + 1]; // taxa are 1-based
+		var components = new ArrayList<Component>(); // components are 0-based
 
-		for (var t : BitSetUtils.members(taxaBlock.getTaxaSet())) {
+		for (var t = 1; t <= nTax; t++) {
 			nodeMap[t] = graph.newNode(t);
 			components.add(new Component(t));
 		}
 
-		var D = new double[taxaBlock.getNtax() + 1][taxaBlock.getNtax() + 1];
+		var D = new double[nTax + 1][nTax + 1]; // copy distances because we will update them
 		for (var i = 1; i <= nTax; i++) {
 			for (var j = 1; j <= nTax; j++) {
 				D[i][j] = block.get(i, j);
@@ -59,8 +58,8 @@ public class NeighborNetCycle extends Distances2ReportBase {
 
 		while (components.size() >= 2) {
 			var selected = selectClosestComponents(components, D);
-			int ip = selected.getFirst();
-			int iq = selected.getSecond();
+			int ip = selected.getFirst(); // index of selected component P
+			int iq = selected.getSecond(); // index of selected component Q
 			var P = components.get(ip);
 			var Q = components.get(iq);
 
@@ -87,7 +86,7 @@ public class NeighborNetCycle extends Distances2ReportBase {
 						if (i != ip && i != iq) {
 							for (var r : components.get(i).values()) {
 								D[p][r] = D[r][p] = (2.0 * D[p][r] + D[q][r]) / 3.0;
-								D[qb][r] = D[r][qb] = (2.0 * D[q][r] + D[qb][r]) / 3.0;
+								D[qb][r] = D[r][qb] = (2.0 * D[qb][r] + D[q][r]) / 3.0;
 							}
 						}
 					}
@@ -155,18 +154,18 @@ public class NeighborNetCycle extends Distances2ReportBase {
 			var R = computeR(components, D);
 			var best = Double.MAX_VALUE;
 			Pair<Integer, Integer> pair = null;
-			for (var i = 0; i < components.size(); i++) {
-				var P = components.get(i);
+			for (var ip = 0; ip < components.size(); ip++) {
+				var P = components.get(ip);
 				//System.err.println("R[{"+StringUtils.toString(P)+"}]="+R[i]);
 
-				for (var j = i + 1; j < components.size(); j++) {
-					var Q = components.get(j);
-					var distance = (components.size() - 2) * averageD(D, P, Q) - (R[i] + R[j]);
+				for (var iq = ip + 1; iq < components.size(); iq++) {
+					var Q = components.get(iq);
+					var distance = (components.size() - 2) * averageD(D, P, Q) - (R[ip] + R[iq]);
 
 					// System.err.println("D[{"+StringUtils.toString(P)+"}][{"+StringUtils.toString(Q)+"}]="+R[i]);
 
 					if (distance < best) {
-						pair = new Pair<>(i, j);
+						pair = new Pair<>(ip, iq);
 						best = distance;
 					}
 				}
@@ -183,14 +182,14 @@ public class NeighborNetCycle extends Distances2ReportBase {
 
 	private double[] computeR(ArrayList<Component> components, double[][] D) {
 		var R = new double[components.size()];
-		for (var i = 0; i < components.size(); i++) {
+		for (var ip = 0; ip < components.size(); ip++) {
 			var sum = 0.0;
-			for (var j = 0; j < components.size(); j++) {
-				if (i != j) {
-					sum += averageD(D, components.get(i), components.get(j));
+			for (var iq = 0; iq < components.size(); iq++) {
+				if (ip != iq) {
+					sum += averageD(D, components.get(ip), components.get(iq));
 				}
 			}
-			R[i] = sum;
+			R[ip] = sum;
 		}
 		return R;
 	}
@@ -215,15 +214,17 @@ public class NeighborNetCycle extends Distances2ReportBase {
 
 	private int selectClosest1vs2(int ip, int iq, double[][] D, ArrayList<Component> components) {
 		var P = components.get(ip);
+		assert P.size() == 1;
 		var p = P.first();
 
 		var Q = components.get(iq);
+		assert Q.size() == 2;
 		var q1 = Q.first();
 		var q2 = Q.second();
 
 		var pR = D[q1][p] + D[q2][p];
 		var q1R = D[q1][q2] + D[q1][p];
-		var q2R = D[q1][q2] + D[q1][p];
+		var q2R = D[q1][q2] + D[q2][p];
 
 		for (var i = 0; i < components.size(); i++) {
 			if (i != iq && i != ip) {
