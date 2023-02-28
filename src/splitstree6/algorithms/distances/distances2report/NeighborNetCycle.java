@@ -19,10 +19,10 @@
 
 package splitstree6.algorithms.distances.distances2report;
 
-import jloda.fx.graph.GraphTraversals;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.util.Pair;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
@@ -57,9 +57,9 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		}
 
 		while (components.size() >= 2) {
-			var selected = selectClosestComponents(components, D);
-			int ip = selected.getFirst(); // index of selected component P
-			int iq = selected.getSecond(); // index of selected component Q
+			var pair = selectClosestPair(components, D);
+			int ip = pair.getFirst(); // index of selected component P
+			int iq = pair.getSecond(); // index of selected component Q
 			var P = components.get(ip);
 			var Q = components.get(iq);
 
@@ -79,18 +79,18 @@ public class NeighborNetCycle extends Distances2ReportBase {
 				var p = P.first();
 				var q = selectClosest1vs2(ip, iq, D, components);
 				var qb = Q.other(q); // \bar q in text
+
 				// update distances:
-				{
-					D[p][qb] = D[qb][p] = (D[p][qb] + D[q][qb] + D[p][q]) / 3.0;
-					for (var i = 0; i < components.size(); i++) {
-						if (i != ip && i != iq) {
-							for (var r : components.get(i).values()) {
-								D[p][r] = D[r][p] = (2.0 * D[p][r] + D[q][r]) / 3.0;
-								D[qb][r] = D[r][qb] = (2.0 * D[qb][r] + D[q][r]) / 3.0;
-							}
+				D[p][qb] = D[qb][p] = (D[p][qb] + D[q][qb] + D[p][q]) / 3.0;
+				for (var i = 0; i < components.size(); i++) {
+					if (i != ip && i != iq) {
+						for (var r : components.get(i).values()) {
+							D[p][r] = D[r][p] = (2.0 * D[p][r] + D[q][r]) / 3.0;
+							D[qb][r] = D[r][qb] = (2.0 * D[qb][r] + D[q][r]) / 3.0;
 						}
 					}
 				}
+
 				// update graph and components:
 				graph.newEdge(nodeMap[p], nodeMap[q]);
 
@@ -127,27 +127,16 @@ public class NeighborNetCycle extends Distances2ReportBase {
 				throw new IOException("Internal error: |P|=%d and |Q|=%d".formatted(P.size(), Q.size()));
 		}
 
+		// close cycle:
 		var p = components.get(0).first();
 		var q = components.get(0).second();
 		graph.newEdge(nodeMap[p], nodeMap[q]);
 
-		var ordering = new ArrayList<Integer>();
-		GraphTraversals.traverseReachable(nodeMap[1], e -> true, v -> ordering.add((int) v.getInfo()));
-
-		var buf = new StringBuilder();
-		var first = true;
-		for (var t : ordering) {
-			if (first)
-				first = false;
-			else
-				buf.append(", ");
-			buf.append("%d %s".formatted(t, taxaBlock.get(t)));
-		}
-		return buf.toString();
-
+		return "'" + StringUtils.toString(extractOrdering(graph, nodeMap).stream()
+				.map(t -> "%d %s".formatted(t, taxaBlock.get(t))).toList(), ", ") + "'";
 	}
 
-	private Pair<Integer, Integer> selectClosestComponents(ArrayList<Component> components, double[][] D) {
+	private Pair<Integer, Integer> selectClosestPair(ArrayList<Component> components, double[][] D) {
 		if (components.size() == 2) {
 			return new Pair<>(0, 1);
 		} else {
@@ -300,6 +289,27 @@ public class NeighborNetCycle extends Distances2ReportBase {
 				rank = i;
 		}
 		return rank;
+	}
+
+	private ArrayList<Integer> extractOrdering(Graph graph, Node[] nodeMap) {
+		var order = new ArrayList<Integer>();
+
+		try (var seen = graph.newNodeSet()) {
+			var v = nodeMap[1];
+			while (true) {
+				order.add((int) v.getInfo());
+				seen.add(v);
+				if (seen.size() == graph.getNumberOfNodes())
+					break;
+				for (var w : v.adjacentNodes()) {
+					if (!seen.contains(w)) {
+						v = w;
+						break;
+					}
+				}
+			}
+		}
+		return order;
 	}
 
 	private static record Component(int first, int second) {
