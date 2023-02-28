@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.image.ImageView;
 import jloda.fx.util.ResourceManagerFX;
 import splitstree6.contextmenus.datanode.DataNodeContextMenu;
+import splitstree6.data.ReportBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
@@ -46,8 +47,10 @@ public class DataItemPresenter<D extends DataBlock> {
 		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node)));
 
 		controller.getEditButton().setOnAction(e -> {
-			if (dataItem.getWorkflowNode().getDataBlock() instanceof ViewBlock viewBlock) {
-				viewBlock.getViewTab().getTabPane().getSelectionModel().select(viewBlock.getViewTab());
+			if (dataItem.getWorkflowNode().getDataBlock() instanceof ViewBlock block) {
+				block.getViewTab().getTabPane().getSelectionModel().select(block.getViewTab());
+			} else if (dataItem.getWorkflowNode().getDataBlock() instanceof ReportBlock block) {
+				block.getViewTab().getTabPane().getSelectionModel().select(block.getViewTab());
 			} else {
 				mainWindow.getTextTabsManager().showDataNodeTab(node, true);
 			}

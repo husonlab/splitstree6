@@ -19,6 +19,7 @@
 
 package splitstree6.io.nexus;
 
+import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.ReportBlock;
 import splitstree6.data.TaxaBlock;
@@ -75,6 +76,8 @@ public class ReportNexusInput extends NexusIOBase {
 			reportBlock.addLine(lineBuilder.toString());
 		np.matchIgnoreCase(";");
 		np.matchEndBlock();
+
+		reportBlock.setText(StringUtils.toString(reportBlock.getLines(), "\n"));
 	}
 
 	public static void main(String[] args) throws IOException {

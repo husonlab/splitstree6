@@ -120,6 +120,14 @@ public class NexusDataBlockInput {
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
+			} else if (np.peekMatchBeginBlock(ReportBlock.BLOCK_NAME)) {
+				final var input = new ReportNexusInput();
+				final var dataBlock = new ReportBlock();
+				input.parse(np, taxa, dataBlock);
+				dataBlock.updateShortDescription();
+				title = input.getTitle();
+				link = input.getLink();
+				return dataBlock;
 			}
 		} catch (Exception ex) {
 			throw new IOExceptionWithLineNumber("Input failed: " + Basic.getShortName(ex.getClass()) + ": " + ex.getMessage(), np.lineno());

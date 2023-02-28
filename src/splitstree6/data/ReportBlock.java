@@ -29,6 +29,7 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import jloda.fx.util.ResourceManagerFX;
+import jloda.util.StringUtils;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.workflow.DataBlock;
@@ -64,11 +65,16 @@ public class ReportBlock extends DataBlock {
 		if (getNode().getOwner() != null) {
 			var mainWindow = ((Workflow) getNode().getOwner()).getMainWindow();
 
-			viewTab = new ViewTab(mainWindow, getNode(), false);
-			mainWindow.addTabToMainTabPane(viewTab);
-
-			viewTab.setView(new DisplayTextView(mainWindow, getName(), false));
-			viewTab.getView().setViewTab(getViewTab());
+			if (viewTab == null) {
+				Platform.runLater(() -> {
+					viewTab = new ViewTab(mainWindow, getNode(), false);
+					var displayTextView = new DisplayTextView(mainWindow, getName(), false);
+					viewTab.setView(displayTextView);
+					displayTextView.setViewTab(getViewTab());
+					displayTextView.setOptionText(StringUtils.toString(getLines(), "\n"));
+					mainWindow.addTabToMainTabPane(viewTab);
+				});
+			}
 
 			invalidationListener = e -> {
 				if (getNode().getParents().size() == 0) { // have removed the node from the workflow
@@ -88,6 +94,7 @@ public class ReportBlock extends DataBlock {
 			};
 			node.getParents().addListener(new WeakInvalidationListener(invalidationListener));
 			node.validProperty().addListener(new WeakChangeListener<>(validListener));
+
 
 			Platform.runLater(() -> viewTab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16)));
 		}

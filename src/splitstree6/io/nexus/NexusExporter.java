@@ -48,7 +48,7 @@ public class NexusExporter {
 			if (!asWorkflowOnly)
 				TaxaNexusOutput.writeComments(w, taxa);
 		}
-		final TaxaNexusOutput output = new TaxaNexusOutput();
+		final var output = new TaxaNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly)
 			output.write(w, new TaxaBlock());
@@ -76,10 +76,10 @@ public class NexusExporter {
 				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
 		}
-		final CharactersNexusOutput output = new CharactersNexusOutput();
+		final var output = new CharactersNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
-			final CharactersBlock newBlock = new CharactersBlock();
+			final var newBlock = new CharactersBlock();
 			newBlock.setDataType(block.getDataType());
 			newBlock.setFormat(block.getFormat());
 			output.write(w, new TaxaBlock(), new CharactersBlock());
@@ -110,10 +110,10 @@ public class NexusExporter {
 				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
 		}
-		final DistancesNexusOutput output = new DistancesNexusOutput();
+		final var output = new DistancesNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
-			final DistancesBlock newBlock = new DistancesBlock();
+			final var newBlock = new DistancesBlock();
 			newBlock.setFormat(distances.getFormat());
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
@@ -126,10 +126,10 @@ public class NexusExporter {
 				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
 		}
-		final NetworkNexusOutput output = new NetworkNexusOutput();
+		final var output = new NetworkNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
-			final NetworkBlock newBlock = new NetworkBlock();
+			final var newBlock = new NetworkBlock();
 			//newBlock.setFormat(block.getFormat());
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
@@ -142,10 +142,10 @@ public class NexusExporter {
 				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
 		}
-		final SplitsNexusOutput output = new SplitsNexusOutput();
+		final var output = new SplitsNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
-			final SplitsBlock newBlock = new SplitsBlock();
+			final var newBlock = new SplitsBlock();
 			newBlock.setFormat(block.getFormat());
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
@@ -158,10 +158,10 @@ public class NexusExporter {
 				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
 		}
-		final TreesNexusOutput output = new TreesNexusOutput();
+		final var output = new TreesNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
-			final TreesBlock newBlock = new TreesBlock();
+			final var newBlock = new TreesBlock();
 			newBlock.setFormat(block.getFormat());
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
@@ -221,21 +221,38 @@ public class NexusExporter {
 				TaxaNexusOutput.writeComments(w, taxa);
 			new TaxaNexusOutput().write(w, taxa);
 		}
-		final GenomesNexusOutput output = new GenomesNexusOutput();
+		final var output = new GenomesNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		if (asWorkflowOnly) {
-			final GenomesBlock newBlock = new GenomesBlock();
+			final var newBlock = new GenomesBlock();
 			//newBlock.setFormat(block.getFormat());
 			output.write(w, new TaxaBlock(), newBlock);
 		} else
 			output.write(w, taxa, block);
 	}
 
+	public void export(Writer w, TaxaBlock taxa, ReportBlock block) throws IOException {
+		if (prependTaxa) {
+			if (!asWorkflowOnly)
+				TaxaNexusOutput.writeComments(w, taxa);
+			new TaxaNexusOutput().write(w, taxa);
+		}
+		final var output = new ReportNexusOutput();
+		output.setTitleAndLink(getTitle(), getLink());
+		if (asWorkflowOnly) {
+			final var newBlock = new ReportBlock();
+			//newBlock.setFormat(block.getFormat());
+			output.write(w, new TaxaBlock(), newBlock);
+		} else
+			output.write(w, taxa, block);
+	}
+
+
 	/**
 	 * save an algorithms block
 	 */
 	public void export(Writer w, Algorithm algorithm) throws IOException {
-		final AlgorithmNexusOutput output = new AlgorithmNexusOutput();
+		final var output = new AlgorithmNexusOutput();
 		output.setTitleAndLink(getTitle(), getLink());
 		output.write(w, algorithm);
 	}
@@ -264,6 +281,8 @@ public class NexusExporter {
 			export(w, taxaBlock, setsBlock);
 		else if (dataBlock instanceof GenomesBlock genomesBlock)
 			export(w, taxaBlock, genomesBlock);
+		else if (dataBlock instanceof ReportBlock reportBlock)
+			export(w, taxaBlock, reportBlock);
 		else
 			throw new IOException("Export " + Basic.getShortName(dataBlock.getClass()) + ": not implemented");
 	}
