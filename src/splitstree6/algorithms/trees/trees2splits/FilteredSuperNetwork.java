@@ -77,7 +77,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 		final BitSet[] tree2taxa = new BitSet[treesBlock.getNTrees() + 1];
 		for (int t = 1; t <= treesBlock.getNTrees(); t++) {
 			tree2taxa[t] = TreesUtilities.getTaxa(treesBlock.getTree(t));
-			//System.err.println("number of taxa in tree " + t + ":" + tree2taxa[t].cardinality());
+			//System.err.println("number of taxa in tree " + t + ":" + tree2taxa[t].size());
 			progress.setProgress(t);
 		}
 

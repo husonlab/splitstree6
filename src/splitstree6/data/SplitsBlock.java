@@ -202,7 +202,7 @@ public class SplitsBlock extends DataBlock {
 				set.set(i);
 			}
 			if (set.cardinality() != cycle.length) {
-				System.err.println("Internal error: setCycle() failed: wrong cardinality");
+				System.err.println("Internal error: setCycle() failed: wrong size");
 				cycle = null;
 			} else {
 				if (normalize)

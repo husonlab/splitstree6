@@ -152,7 +152,7 @@ public class EqualAngle {
      * @return non-trivial splits
      */
     private static ArrayList<Integer> getNonTrivialSplitsOrdered(SplitsBlock splits) {
-        final var interiorSplits = new TreeSet<Pair<Integer, Integer>>(new Pair<>()); // first component is cardinality, second is id
+        final var interiorSplits = new TreeSet<Pair<Integer, Integer>>(new Pair<>()); // first component is size, second is id
 
         for (var s = 1; s <= splits.getNsplits(); s++) {
             final var split = splits.get(s);

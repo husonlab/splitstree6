@@ -135,7 +135,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 		for (int i = toDelete.nextClearBit(0); i != -1 && i < srcSplits.size(); i = toDelete.nextClearBit(i + 1))
 			targetSplits.add(srcSplits.get(i));
 
-		//System.err.println("Splits removed: " + toDelete.cardinality());
+		//System.err.println("Splits removed: " + toDelete.size());
 		if (toDelete.cardinality() > 0)
 			NotificationManager.showInformation("High dimension filter removed " + toDelete.cardinality() + " splits");
 	}

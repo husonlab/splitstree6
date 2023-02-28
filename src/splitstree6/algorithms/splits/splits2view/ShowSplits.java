@@ -24,19 +24,14 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.io.nexus.SplitsNexusOutput;
-import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.splits.viewer.SplitsView;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -44,7 +39,7 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class ShowSplits extends Splits2View {
-	public enum ViewType {SplitsNetwork, Text}
+	public enum ViewType {SplitsNetwork}
 
 	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.SplitsNetwork);
 	private final ChangeListener<Boolean> validListener;
@@ -96,25 +91,6 @@ public class ShowSplits extends Splits2View {
 						view.getUndoManager().clear();
 						view.setSplitsBlock(null); // this is neccessary to trigger update
 						view.setSplitsBlock(inputData);
-					}
-				});
-			}
-			case Text -> {
-				if (!(viewBlock.getView() instanceof DisplayTextView)) {
-					Platform.runLater(() -> {
-						var mainWindow = getNode().getOwner().getMainWindow();
-						viewBlock.setView(new DisplayTextView(mainWindow, "Splits Text", false));
-					});
-				}
-				Platform.runLater(() -> {
-					if (viewBlock.getView() instanceof DisplayTextView view) {
-						view.getUndoManager().clear();
-						try (var w = new StringWriter()) {
-							(new SplitsNexusOutput()).write(w, taxaBlock, inputData);
-							view.replaceText(w.toString());
-						} catch (IOException ex) {
-							NotificationManager.showError("Internal error: " + ex);
-						}
 					}
 				});
 			}

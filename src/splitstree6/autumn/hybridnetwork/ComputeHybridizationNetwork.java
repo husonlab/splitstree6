@@ -395,7 +395,7 @@ public class ComputeHybridizationNetwork {
         for (var leaf2remove : leaves1) {
             var taxa2remove = leaf2remove.getTaxa();
             if (taxa2remove.cardinality() != 1)
-                throw new IOException(depth + "Leaf taxa cardinality: " + taxa2remove.cardinality());
+                throw new IOException(depth + "Leaf taxa size: " + taxa2remove.cardinality());
 
             var hybridTaxon = taxa2remove.nextSetBit(0);
 

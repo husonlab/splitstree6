@@ -24,13 +24,10 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import jloda.fx.util.ResourceManagerFX;
-import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.io.nexus.TreesNexusOutput;
-import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.trees.densitree.DensiTreeView;
 import splitstree6.view.trees.tanglegram.TanglegramView;
 import splitstree6.view.trees.treepages.TreePagesView;
@@ -39,7 +36,6 @@ import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.List;
 
 /**
@@ -47,7 +43,7 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class ShowTrees extends Trees2View {
-	public enum ViewType {TreeView, TreePages, Tanglegram, DensiTree, Text}
+	public enum ViewType {TreeView, TreePages, Tanglegram, DensiTree}
 
 	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.TreeView);
 	private final ChangeListener<Boolean> validListener;
@@ -143,25 +139,6 @@ public class ShowTrees extends Trees2View {
 						view.getUndoManager().clear();
 						view.getTrees().setAll(inputData.getTrees());
 						view.setReticulated(inputData.isReticulated());
-					}
-				});
-			}
-			case Text -> {
-				Platform.runLater(() -> {
-					var mainWindow = getNode().getOwner().getMainWindow();
-					var view = new DisplayTextView(mainWindow, "Trees Text", false);
-					viewBlock.setView(view);
-				});
-
-				Platform.runLater(() -> {
-					if (viewBlock.getView() instanceof DisplayTextView view) {
-						view.getUndoManager().clear();
-						try (var w = new StringWriter()) {
-							(new TreesNexusOutput()).write(w, taxaBlock, inputData);
-							view.replaceText(w.toString());
-						} catch (IOException ex) {
-							NotificationManager.showError("Internal error: " + ex);
-						}
 					}
 				});
 			}

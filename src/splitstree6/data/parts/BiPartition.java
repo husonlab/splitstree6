@@ -35,7 +35,7 @@ public class BiPartition implements Comparable<BiPartition> {
 
 	public BiPartition(BitSet A, BitSet B) {
 		if (A.cardinality() == 0 || B.cardinality() == 0)
-			System.err.println("Internal error: A.cardinality()=" + A.cardinality() + ", B.cardinality()=" + B.cardinality());
+			System.err.println("Internal error: A.size()=" + A.cardinality() + ", B.size()=" + B.cardinality());
 		if (A.nextSetBit(1) < B.nextSetBit(1)) {
 			this.A = BitSetUtils.copy(A);
 			this.B = BitSetUtils.copy(B);

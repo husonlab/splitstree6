@@ -94,12 +94,13 @@ public class NeighborNetUtilities {
 
 
     /**
-     * cardinality
-     *
-     * Returns number of entries in lower triangular of matrix which are set true.
-     * @param s boolean square matrix
-     * @return number of entries
-     */
+	 * size
+	 * <p>
+	 * Returns number of entries in lower triangular of matrix which are set true.
+	 *
+	 * @param s boolean square matrix
+	 * @return number of entries
+	 */
     static public int cardinality(boolean[][] s) {
         int n=s.length-1;
         int count = 0;

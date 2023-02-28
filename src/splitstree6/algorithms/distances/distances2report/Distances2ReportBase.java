@@ -31,6 +31,7 @@ import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -66,7 +67,7 @@ abstract public class Distances2ReportBase extends Algorithm<DistancesBlock, Rep
 	 * @param selectedTaxa selected taxa, if required
 	 * @return text to present
 	 */
-	abstract String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, Collection<Taxon> selectedTaxa);
+	abstract String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, Collection<Taxon> selectedTaxa) throws IOException;
 
 	@Override
 	public void setNode(AlgorithmNode node) {
@@ -79,7 +80,7 @@ abstract public class Distances2ReportBase extends Algorithm<DistancesBlock, Rep
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, ReportBlock reportBlock) {
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, ReportBlock reportBlock) throws IOException {
 		reportBlock.setInputBlockName(SplitsBlock.BLOCK_NAME);
 
 		Platform.runLater(() -> {

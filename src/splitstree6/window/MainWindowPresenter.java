@@ -61,6 +61,7 @@ import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.distances.distances2network.PCoA;
 import splitstree6.algorithms.distances.distances2network.TSne;
+import splitstree6.algorithms.distances.distances2report.DeltaScore;
 import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
 import splitstree6.algorithms.distances.distances2splits.SplitDecomposition;
@@ -538,7 +539,8 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getBootstrapTreeAsNetworkMenuItem(), new BootstrapTreeSplits());
 		setupAlgorithmMenuItem(controller.getBootStrapNetworkMenuItem(), new BootstrapSplits());
 
-		controller.getComputeDeltaScoreMenuItem().setOnAction(null);
+		controller.getComputeDeltaScoreMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new DeltaScore()));
+		controller.getComputeDeltaScoreMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new DeltaScore()));
 
 		controller.getEstimateInvariableSitesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new EstimateInvariableSites()));
 		controller.getEstimateInvariableSitesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new EstimateInvariableSites()));

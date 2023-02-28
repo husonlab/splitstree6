@@ -68,7 +68,7 @@ public class HasseDiagram {
 					if (Cluster.contains(cluster, subCluster) && !Cluster.contains(covered, subCluster)) {
 						tree.newEdge(nodes[i], nodes[j]);
 						covered.or(subCluster);
-						// if (covered.cardinality() == cardinality[i]) break;
+						// if (covered.size() == size[i]) break;
 					}
 				}
 			}

@@ -94,7 +94,7 @@ public class NeighborNetCycle {
      * handle the maximum number of nodes
      *
      * @param dist Distance block 0-based
-     * @return a working matrix of appropriate cardinality 1-based
+     * @return a working matrix of appropriate size 1-based
      */
     private static double[][] setupMatrix(int nTax, double[][] dist) {
         int max_num_nodes = 3 * nTax - 5;
