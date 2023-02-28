@@ -79,7 +79,7 @@ public class NeighborNetCycle extends Distances2ReportBase {
 			} else if (P.size() == 1 && Q.size() == 2) {
 				var p = P.first();
 				var q = selectClosest1vs2(ip, iq, D, components);
-				var qb = Q.other(q);
+				var qb = Q.other(q); // \bar q in text
 				// update distances:
 				{
 					D[p][qb] = D[qb][p] = (D[p][qb] + D[q][qb] + D[p][q]) / 3.0;
@@ -97,17 +97,18 @@ public class NeighborNetCycle extends Distances2ReportBase {
 
 				components.remove(Math.max(ip, iq)); // remove later one first, otherwise indices will shift
 				components.remove(Math.min(ip, iq));
-
 				var newComponent = new Component(p, qb);
 				components.add(newComponent);
 				System.err.println("second case -> " + newComponent);
 			} else if (P.size() == 2 && Q.size() == 2) {
 				var pq = selectClosest2vs2(ip, iq, D, components);
 				int p = pq.getFirst();
-				int pb = P.other(p);
+				int pb = P.other(p); // \bar p in text
 				int q = pq.getSecond();
-				int qb = Q.other(q);
+				int qb = Q.other(q); // \bar q in text
+
 				D[pb][qb] = D[qb][pb] = (D[pb][p] + D[pb][q] + D[pb][qb] + D[p][q] + D[p][qb] + D[q][qb]) / 6.0;
+
 				for (var i = 0; i < components.size(); i++) {
 					if (i != ip && i != iq) {
 						for (var r : components.get(i).values()) {
@@ -120,7 +121,6 @@ public class NeighborNetCycle extends Distances2ReportBase {
 
 				components.remove(Math.max(ip, iq)); // remove later one first, otherwise indices will shift
 				components.remove(Math.min(ip, iq));
-
 				var newComponent = new Component(pb, qb);
 				components.add(newComponent);
 				System.err.println("third case -> " + newComponent);
