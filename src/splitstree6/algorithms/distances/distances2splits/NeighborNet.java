@@ -57,9 +57,9 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public String getCitation() {
 		return "Bryant & Moulton 2004; " +
 			   "D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. " +
-			   "Molecular Biology and Evolution, 21(2):255– 265, 2004.";
+			   "Molecular Biology and Evolution, 21(2):255– 265, 2004.;" +
+			   "Bryant & Huson 2023;D. Bryant and D.H. Huson, NeighborNet- algorithms and implementation, in preparation.";
 	}
-//TODO: cite the Frontiers paper here as well.
 
 	/**
 	 * run the neighbor net algorithm
