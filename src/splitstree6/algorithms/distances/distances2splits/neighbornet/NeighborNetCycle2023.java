@@ -1,5 +1,5 @@
 /*
- *  NeighborNetCycle.java Copyright (C) 2023 Daniel H. Huson
+ *  NeighborNetCycle2023.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,30 +17,36 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.algorithms.distances.distances2report;
+package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.util.Pair;
-import jloda.util.StringUtils;
-import jloda.util.progress.ProgressListener;
 import splitstree6.data.DistancesBlock;
-import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.Taxon;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 
 /**
  * computes the circular ordering for a set of splits
- * Daniel HUson, 2.2023
+ * This is the algorithm described in Bryant and Huson, 2023
+ * David Bryant and Daniel Huson, 2.2023
  */
-public class NeighborNetCycle extends Distances2ReportBase {
+public class NeighborNetCycle2023 {
+	private static boolean verbose = false;
 
-	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock block, Collection<Taxon> ignored) throws IOException {
+	/**
+	 * computes the circular ordering
+	 *
+	 * @param distancesBlock input distances
+	 * @return 1-based cycle
+	 */
+	public static int[] computeOrdering(DistancesBlock distancesBlock) {
+		var nTax = distancesBlock.getNtax();
+
+		if (nTax <= 3)
+			return createArrayUpwardCount(nTax);
+
 		var graph = new Graph();
-		var nTax = taxaBlock.getNtax();
 		var nodeMap = new Node[nTax + 1]; // taxa are 1-based
 		var components = new ArrayList<Component>(); // components are 0-based
 
@@ -52,7 +58,7 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		var D = new double[nTax + 1][nTax + 1]; // copy distances because we will update them
 		for (var i = 1; i <= nTax; i++) {
 			for (var j = 1; j <= nTax; j++) {
-				D[i][j] = block.get(i, j);
+				D[i][j] = distancesBlock.get(i, j);
 			}
 		}
 
@@ -63,18 +69,19 @@ public class NeighborNetCycle extends Distances2ReportBase {
 			var P = components.get(ip);
 			var Q = components.get(iq);
 
-			System.err.println("Selected: P={" + P + "} Q={" + P + "}");
+			if (verbose)
+				System.err.println("Selected: P={" + P + "} Q={" + Q + "}");
 
 			if (P.size() == 1 && Q.size() == 1) {
 				var p = P.first();
 				var q = Q.first();
 				graph.newEdge(nodeMap[p], nodeMap[q]);
 
-				components.remove(Math.max(ip, iq)); // remove later one first, otherwise indices will shift
-				components.remove(Math.min(ip, iq));
 				var newComponent = new Component(p, q);
-				components.add(newComponent);
-				System.err.println("first case -> " + newComponent);
+				components.set(ip, newComponent);
+				components.remove(iq);
+				if (verbose)
+					System.err.println("first case -> {" + newComponent + "}");
 			} else if (P.size() == 1 && Q.size() == 2) {
 				var p = P.first();
 				var q = selectClosest1vs2(ip, iq, D, components);
@@ -94,11 +101,11 @@ public class NeighborNetCycle extends Distances2ReportBase {
 				// update graph and components:
 				graph.newEdge(nodeMap[p], nodeMap[q]);
 
-				components.remove(Math.max(ip, iq)); // remove later one first, otherwise indices will shift
-				components.remove(Math.min(ip, iq));
 				var newComponent = new Component(p, qb);
-				components.add(newComponent);
-				System.err.println("second case -> " + newComponent);
+				components.set(ip, newComponent);
+				components.remove(iq);
+				if (verbose)
+					System.err.println("second case -> {" + newComponent + "}");
 			} else if (P.size() == 2 && Q.size() == 2) {
 				var pq = selectClosest2vs2(ip, iq, D, components);
 				int p = pq.getFirst();
@@ -118,13 +125,13 @@ public class NeighborNetCycle extends Distances2ReportBase {
 				}
 				graph.newEdge(nodeMap[p], nodeMap[q]);
 
-				components.remove(Math.max(ip, iq)); // remove later one first, otherwise indices will shift
-				components.remove(Math.min(ip, iq));
 				var newComponent = new Component(pb, qb);
-				components.add(newComponent);
-				System.err.println("third case -> " + newComponent);
+				components.set(ip, newComponent);
+				components.remove(iq);
+				if (verbose)
+					System.err.println("third case -> {" + newComponent + "}");
 			} else
-				throw new IOException("Internal error: |P|=%d and |Q|=%d".formatted(P.size(), Q.size()));
+				throw new RuntimeException("Internal error: |P|=%d and |Q|=%d".formatted(P.size(), Q.size()));
 		}
 
 		// close cycle:
@@ -132,11 +139,10 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		var q = components.get(0).second();
 		graph.newEdge(nodeMap[p], nodeMap[q]);
 
-		return StringUtils.toString(extractOrdering(graph, nodeMap).stream()
-				.map(t -> "%d %s".formatted(t, taxaBlock.get(t))).toList(), ", ");
+		return extractOrdering(graph, nodeMap);
 	}
 
-	private Pair<Integer, Integer> selectClosestPair(ArrayList<Component> components, double[][] D) {
+	private static Pair<Integer, Integer> selectClosestPair(ArrayList<Component> components, double[][] D) {
 		if (components.size() == 2) {
 			return new Pair<>(0, 1);
 		} else {
@@ -149,13 +155,13 @@ public class NeighborNetCycle extends Distances2ReportBase {
 
 				for (var iq = ip + 1; iq < components.size(); iq++) {
 					var Q = components.get(iq);
-					var distance = (components.size() - 2) * averageD(D, P, Q) - (R[ip] + R[iq]);
+					var adjustedD = (components.size() - 2) * averageD(D, P, Q) - R[ip] - R[iq];
 
-					// System.err.println("D[{"+StringUtils.toString(P)+"}][{"+StringUtils.toString(Q)+"}]="+R[i]);
+					// System.err.println("["+P+"]["+Q+"]="+adjustedD);
 
-					if (distance < best) {
+					if (adjustedD < best) {
 						pair = new Pair<>(ip, iq);
-						best = distance;
+						best = adjustedD;
 					}
 				}
 			}
@@ -169,7 +175,7 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		}
 	}
 
-	private double[] computeR(ArrayList<Component> components, double[][] D) {
+	private static double[] computeR(ArrayList<Component> components, double[][] D) {
 		var R = new double[components.size()];
 		for (var ip = 0; ip < components.size(); ip++) {
 			var sum = 0.0;
@@ -183,7 +189,7 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		return R;
 	}
 
-	private double averageD(double[][] D, Component P, Component Q) {
+	private static double averageD(double[][] D, Component P, Component Q) {
 		var sum = 0.0;
 		for (var p : P.values()) {
 			for (var q : Q.values()) {
@@ -193,7 +199,7 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		return sum / (P.size() * Q.size());
 	}
 
-	private double averageD(double[][] D, int p, Component Q) {
+	private static double averageD(double[][] D, int p, Component Q) {
 		var sum = 0.0;
 		for (var q : Q.values()) {
 			sum += D[p][q];
@@ -201,7 +207,7 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		return sum / Q.size();
 	}
 
-	private int selectClosest1vs2(int ip, int iq, double[][] D, ArrayList<Component> components) {
+	private static int selectClosest1vs2(int ip, int iq, double[][] D, ArrayList<Component> components) {
 		var P = components.get(ip);
 		assert P.size() == 1;
 		var p = P.first();
@@ -238,12 +244,14 @@ public class NeighborNetCycle extends Distances2ReportBase {
 			return q2;
 	}
 
-	private Pair<Integer, Integer> selectClosest2vs2(int ip, int iq, double[][] D, ArrayList<Component> components) {
+	private static Pair<Integer, Integer> selectClosest2vs2(int ip, int iq, double[][] D, ArrayList<Component> components) {
 		var P = components.get(ip);
+		assert P.size() == 2;
 		var p1 = P.first();
 		var p2 = P.second();
 
 		var Q = components.get(iq);
+		assert Q.size() == 2;
 		var q1 = Q.first();
 		var q2 = Q.second();
 
@@ -291,8 +299,9 @@ public class NeighborNetCycle extends Distances2ReportBase {
 		return rank;
 	}
 
-	private ArrayList<Integer> extractOrdering(Graph graph, Node[] nodeMap) {
+	private static int[] extractOrdering(Graph graph, Node[] nodeMap) {
 		var order = new ArrayList<Integer>();
+		order.add(0); // cycle is 1-based
 
 		try (var seen = graph.newNodeSet()) {
 			var v = nodeMap[1];
@@ -309,20 +318,33 @@ public class NeighborNetCycle extends Distances2ReportBase {
 				}
 			}
 		}
-		return order;
+		return order.stream().mapToInt(t -> t).toArray();
+	}
+
+	/**
+	 * create an array of length n+1 and fill it with the numbers 0,..,n
+	 *
+	 * @param n last entry
+	 * @return array containing values 0..n
+	 */
+	public static int[] createArrayUpwardCount(int n) {
+		var array = new int[n + 1];
+		for (var i = 0; i < n; i++)
+			array[i] = i;
+		return array;
 	}
 
 	private static record Component(int first, int second) {
 		public Component(int first) {
-			this(first, 0);
+			this(first, -1);
 		}
 
 		public boolean singleton() {
-			return second == 0;
+			return second == -1;
 		}
 
 		public int size() {
-			return second == 0 ? 1 : 2;
+			return second == -1 ? 1 : 2;
 		}
 
 		public int[] values() {

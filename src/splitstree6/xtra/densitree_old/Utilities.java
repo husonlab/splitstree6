@@ -20,7 +20,7 @@
 package splitstree6.xtra.densitree_old;
 
 import javafx.stage.FileChooser;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.DistancesBlock;
@@ -49,7 +49,7 @@ public class Utilities {
 			TreesUtilities.computeSplits(taxa, tree, splits);
 			SplitsUtilities.splitsToDistances(splits, true, distances);
 		}
-		return NeighborNetCycle.compute(taxa.cardinality(), distances.getDistances());
+		return NeighborNetCycleSplitsTree4.compute(taxa.cardinality(), distances.getDistances());
 	}
 
 }

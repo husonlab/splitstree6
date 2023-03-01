@@ -25,7 +25,7 @@ import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
 
 import java.io.IOException;
 import java.util.*;
@@ -660,7 +660,7 @@ public class EmbeddingOptimizer {
 			// get the order using NN
 
 			var ntax = taxon2ID.size();
-			var ordering = NeighborNetCycle.compute(ntax, distMat);
+			var ordering = NeighborNetCycleSplitsTree4.compute(ntax, distMat);
 			if (trees.length == 2) {
 				// we restrict the ordering to the common taxa. If solution zero exist, we will find it
 				if (taxaNotInTrees[0] != null && taxaNotInTrees[1] != null) {
@@ -744,7 +744,7 @@ public class EmbeddingOptimizer {
 			// get the order using NN
 
 			var ntax = taxon2ID.size();
-			return NeighborNetCycle.compute(ntax, distMat);
+			return NeighborNetCycleSplitsTree4.compute(ntax, distMat);
 		} else {
 			var ordering = new int[taxon2ID.size()];
 			var i = 0;

@@ -23,7 +23,7 @@ import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle;
+import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
@@ -116,7 +116,7 @@ public class SplitsUtilities {
 				final var pso = Basic.hideSystemOut();
 				final var pse = Basic.hideSystemErr();
 				try {
-					return NeighborNetCycle.compute(ntax, splitsToDistances(ntax, splits, false).getDistances());
+					return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, false).getDistances());
 				} finally {
 					Basic.restoreSystemErr(pse);
 					Basic.restoreSystemOut(pso);
