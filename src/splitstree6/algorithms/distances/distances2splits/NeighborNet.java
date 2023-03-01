@@ -47,7 +47,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public enum CircularOrderingAlgorithm {SplitsTree4, BryantHuson2023}
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.GradientProjection);
 	private final DoubleProperty optionThreshold = new SimpleDoubleProperty(this, "threshold", 1e-8);
-	private final ObjectProperty<CircularOrderingAlgorithm> optionCircularOrdering = new SimpleObjectProperty<>(this, "optionCircularOrdering", CircularOrderingAlgorithm.BryantHuson2023);
+	private final ObjectProperty<CircularOrderingAlgorithm> optionCircularOrdering = new SimpleObjectProperty<>(this, "optionCircularOrdering", CircularOrderingAlgorithm.SplitsTree4);
 
 	public List<String> listOptions() {
 		return List.of(optionInferenceAlgorithm.getName(), optionThreshold.getName(), optionCircularOrdering.getName());
