@@ -101,6 +101,7 @@ The program provides a number of methods for computing unrooted networks.
 
 ### Other calculations on alignments
 - Estimate the number of invariable sites (Steel, Huson and Lockhart 2000)
+- Phi Test (Bruen, Philippe & Bryant 2005)
 
 ## Other calculations on distances
 
