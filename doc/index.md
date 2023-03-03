@@ -112,12 +112,11 @@ The program provides a number of methods for computing unrooted networks.
 
 ## Ecological and diversity indices
 
-- Splits phylogenetic diversity
-- Splits Shapley values
-- Unrooted tree phylogenetic diversity
-- Rooted tree (or network) phylogenetic diversity
-- Rooted tree (or network) fair proportion
-- Rooted tree (or network) Shapley values
+- Splits phylogenetic diversity (Volkmann et al 2014)
+- Splits Shapley values (Volkmann et al 2014)
+- Rooted tree (or network) phylogenetic diversity (Faith 1992)
+- Rooted tree (or network) fair proportion (D Redding 2004)
+- Unrooted tree Shapley values (Haake et al 2008)
 
 ## Input and output
 
