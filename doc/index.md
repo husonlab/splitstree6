@@ -125,11 +125,13 @@ The program supports the following input formats:
 - Several flavors of Nexus
 - Newick, rich Newick and extended Newick
 - FastA, Clustal, MSF, Phylip, Stockholm
-- Nexml
+- Several flavors of Nexml
 - SplitsTree5 files (.stree5), *not* Dendroscope3 (.dendro) files
 
 Data can be viewed or exported in all these formats. To view or export data, context-click on the corresponding
 node in the side bar and select "Show text..." or "Export..."
+
+- When the user saves their analysis, the workflow graph is written to a file in a private flavor of the Nexus format (.stree6 extension). When the file is reopened, the program will display the saved results.
 
 ## The workflow graph
 
@@ -142,7 +144,29 @@ While most users will not interact with the workflow graph directly, one can eas
 
 Whenever the data analysis is updated, the state of affected nodes in the workflow graph is updated and the program then updates the textual description of the analysis presented in the "Methods Tab". This gives a summary of data statistics (such as number of taxa, number of trees or alignment length) and reports which algorithms have been applied (together with any non-default parameters) and provides all relevant citations.
 
+## Fast calculation phylogenetic context for draft microbial genomes
+
 ## Commandline execution of workflows
+
+During interactive analysis of data, the program creates a workflow graph. This graph is usually populated with data
+and saved to  a file (.stree6 extension). Alternatively, the user can export the workflow using the File->Export->Worflow...
+menu item. This saves the workflow without any data. This workflow can then be applied to other input data 
+in a script, say, using a commandline program called workflow-run.
+This program can be found in the tools directory of the  Linux and MacOS versions of SplitsTreeCE.
+### workflow-run
+
+For the sake of concreteness, assume that you have 70 files that each contain a multiple sequence alignment
+of a different gene, for the same set of taxa, called alignment01.fasta ... alignment70.fasta.
+Say that we want to compute  Hamming distances and then run NeighborNet on each alignment, and
+then save the resulting splits to a file. 
+
+Assume that you have interactively setup the analysis workflow using SplitsTreeCE and have saved it to a file
+called script.wflow6.
+To run this script on all input files contained in the current working directory, type the following:
+
+workflow-run -w script.wflow6 -i . -f FastA -o . -e Nexus -n Splits
+
+This will read all files in the current directory that are in FastA format, will apply the format, and will have the block named Splits in Nexus format to a file in the current working directory.
 
 ## Menu items
 
