@@ -48,7 +48,7 @@ public class TSne extends Distances2Network {
 
 	@Override
 	public String getCitation() {
-		return "Maaten and Hinton (2008);Van der Maaten  and Hinton 2008. Visualizing data using t-SNE. Journal of machine learning research, 9(11)";
+		return "Maaten and Hinton 2008;Van der Maaten  and Hinton 2008. Visualizing data using t-SNE. Journal of machine learning research, 9(11)";
 	}
 
 

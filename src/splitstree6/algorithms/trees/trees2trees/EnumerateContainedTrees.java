@@ -1,5 +1,5 @@
 /*
- *  EnumerateTrees.java Copyright (C) 2023 Daniel H. Huson
+ *  EnumerateContainedTrees.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -26,9 +26,7 @@ import jloda.graph.EdgeArray;
 import jloda.graph.EdgeSet;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
-import jloda.util.SetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
@@ -42,7 +40,7 @@ import java.util.stream.Collectors;
  * enumerate all trees contained in a rooted network
  * Daniel Huson, 2.2023
  */
-public class EnumerateTrees extends Trees2Trees {
+public class EnumerateContainedTrees extends Trees2Trees {
 	private final BooleanProperty optionRemoveDuplicates = new SimpleBooleanProperty(this, "optionRemoveDuplicates", true);
 
 	@Override
@@ -66,16 +64,6 @@ public class EnumerateTrees extends Trees2Trees {
 			child.getTrees().addAll(containedTrees);
 		}
 		System.err.printf("Total number of trees enumerated: %,d%n", child.getNTrees());
-
-		if (true)
-			for (var s = 1; s <= child.getNTrees(); s++) {
-				var tree1 = child.getTree(s);
-				for (var t = s + 1; t <= child.getNTrees(); t++) {
-					var tree2 = child.getTree(t);
-					if (tree1.getNumberOfTaxa() == tree2.getNumberOfTaxa() && haveRootedSprDistanceOne(taxaBlock, tree1, tree2))
-						System.err.printf("Trees %s and %s have rSPR distance 1%n", tree1.getName(), tree2.getName());
-				}
-			}
 	}
 
 	/**
@@ -157,85 +145,6 @@ public class EnumerateTrees extends Trees2Trees {
 		}
 		return result;
 	}
-
-	public static boolean haveRootedSprDistanceOne(TaxaBlock taxa, PhyloTree tree1, PhyloTree tree2) {
-		if (true) {
-			var clusters1 = TreesUtilities.extractClusters(tree1).values();
-			var clusters2 = new HashSet<>(TreesUtilities.extractClusters(tree2).values());
-
-			if (allCompatible(clusters1, clusters2))
-				return false; // rSPR distance is 0
-
-			var clusters1sorted = new ArrayList<>(clusters1);
-			clusters1sorted.sort(Comparator.comparingInt(BitSet::cardinality));
-
-			for (var cluster : SetUtils.intersection(clusters1sorted, clusters2)) {
-				var inC1 = clusters1.stream().filter(c -> BitSetUtils.contains(cluster, c)).toList();
-				var inC2 = clusters2.stream().filter(c -> BitSetUtils.contains(cluster, c)).toList();
-				if (!allCompatible(inC1, inC2))
-					return false; // found two incompatible subtrees that we can fix, because going through clusters in order of increasing size
-				var withoutC1 = clusters1.stream().map(c -> BitSetUtils.minus(c, cluster)).filter(c -> c.cardinality() > 0).toList();
-				var withoutC2 = clusters2.stream().map(c -> BitSetUtils.minus(c, cluster)).filter(c -> c.cardinality() > 0).toList();
-				if (allCompatible(withoutC1, withoutC2))
-					return true;
-			}
-			return false;
-		} else {
-			var n2c1 = TreesUtilities.extractClusters(tree1);
-			var n2c2 = TreesUtilities.extractClusters(tree2);
-
-			{
-				if (allCompatible(n2c1.values(), n2c2.values()))
-					return false; // rSPR distance is 0
-			}
-
-			var c2n2 = new HashMap<BitSet, Node>();
-			for (var entry : n2c2.entrySet()) {
-				c2n2.put(entry.getValue(), entry.getKey());
-			}
-
-			for (var v : tree1.nodeStream().filter(v -> v.getInDegree() == 1).collect(Collectors.toList())) {
-				var c = n2c1.get(v);
-				var vp = v.getParent();
-				var cvp = n2c1.get(vp);
-
-				var w = c2n2.get(c);
-				if (w != null && w.getInDegree() == 1) {
-					var wp = w.getParent();
-					var cwp = n2c2.get(wp);
-					if (cvp != cwp) {
-						{
-							var inC1 = n2c1.values().stream().filter(cluster -> BitSetUtils.contains(c, cluster)).toList();
-							var inC2 = n2c2.values().stream().filter(cluster -> BitSetUtils.contains(c, cluster)).toList();
-							if (!allCompatible(inC1, inC2))
-								continue;
-						}
-						{
-							var withoutC1 = n2c1.values().stream().map(cluster -> BitSetUtils.minus(cluster, c))
-									.filter(cluster -> cluster.cardinality() > 0).toList();
-							var withoutC2 = n2c2.values().stream().map(cluster -> BitSetUtils.minus(cluster, c))
-									.filter(cluster -> cluster.cardinality() > 0).toList();
-							if (allCompatible(withoutC1, withoutC2))
-								return true;
-						}
-					}
-				}
-			}
-			return false;
-		}
-	}
-
-	private static boolean allCompatible(Collection<BitSet> clusters1, Collection<BitSet> clusters2) {
-		for (var c1 : clusters1) {
-			for (var c2 : clusters2) {
-				var intersectionSize = BitSetUtils.intersection(c1, c2).cardinality();
-				if (intersectionSize != 0 && intersectionSize != c1.cardinality() && intersectionSize != c2.cardinality())
-					return false;
-			}
-		}
-		return true;
-	}
-
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {

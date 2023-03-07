@@ -21,6 +21,7 @@ package splitstree6.io.readers.trees;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
@@ -92,7 +93,12 @@ public class NewickReader extends TreesReader {
 					}
 
 					if (TreesUtilities.hasNumbersOnLeafNodes(tree)) {
-						throw new IOExceptionWithLineNumber(lineno, "Leaf labels must not be numbers");
+						NotificationManager.showWarning("Leaf nodes have integer labels 'i', converting to t'i'");
+						for (var v : tree.leaves()) {
+							if (NumberUtils.isInteger(tree.getLabel(v))) {
+								tree.setLabel(v, "t" + tree.getLabel(v));
+							}
+						}
 					}
 
 					final var labelList = getNodeLabels(tree, true);

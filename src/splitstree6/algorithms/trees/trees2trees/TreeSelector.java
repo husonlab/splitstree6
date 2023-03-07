@@ -54,6 +54,7 @@ public class TreeSelector extends Trees2Trees implements IFilter {
 		child.getTrees().add(parent.getTree(getOptionWhich()));
 		child.setRooted(parent.isRooted());
 		child.setPartial(parent.isPartial());
+		child.setReticulated(parent.getTree(getOptionWhich()).isReticulated());
 		setShortDescription("using tree " + getOptionWhich() + " of " + parent.size() + " trees");
 	}
 

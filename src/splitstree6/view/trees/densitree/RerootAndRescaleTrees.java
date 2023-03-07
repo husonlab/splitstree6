@@ -87,7 +87,7 @@ public class RerootAndRescaleTrees {
 				splits.add(new ASplit(a, b, weight));
 			}
 			var consensusSplits = GreedyCompatible.apply(new ProgressSilent(), splits, s -> (double) splitPartWeightMap.get(s.getSmallerPart()).size());
-			var consensusTree = TreesUtilities.computeTreeFromCompatibleSplits(taxaBlock, consensusSplits);
+			var consensusTree = TreesUtilities.computeTreeFromCompatibleSplits(taxaBlock::getLabel, consensusSplits);
 
 			rescale(consensusTree);
 			RerootingUtils.rerootByMidpoint(consensusTree);

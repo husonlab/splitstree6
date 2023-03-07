@@ -23,16 +23,21 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
 import splitstree6.data.TaxaBlock;
 
+import java.util.function.Function;
+
 /**
  * some phylograph utilities
  * Daniel Huson, 2.2019
  */
 public class PhyloGraphUtils {
+	public static void addLabels(TaxaBlock taxaBlock, PhyloGraph graph) {
+		addLabels(taxaBlock::getLabel, graph);
+	}
+
 	/**
 	 * add labels to graph
-	 *
 	 */
-	public static void addLabels(TaxaBlock taxaBlock, PhyloGraph graph) {
+	public static void addLabels(Function<Integer, String> taxonLabel, PhyloGraph graph) {
 		// remove labels for taxon nodes, in case some algorithm has already been applied
 		for (int t = 1; t <= graph.getNumberOfTaxa(); t++) {
 			final Node v = graph.getTaxon2Node(t);
@@ -42,9 +47,9 @@ public class PhyloGraphUtils {
 		for (int t = 1; t <= graph.getNumberOfTaxa(); t++) {
 			final Node v = graph.getTaxon2Node(t);
 			if (graph.getLabel(v) == null)
-				graph.setLabel(v, taxaBlock.getLabel(t));
+				graph.setLabel(v, taxonLabel.apply(t));
 			else
-				graph.setLabel(v, graph.getLabel(v) + ", " + taxaBlock.getLabel(t));
+				graph.setLabel(v, graph.getLabel(v) + ", " + taxonLabel.apply(t));
 		}
 	}
 }

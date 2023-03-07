@@ -32,6 +32,7 @@ import splitstree6.data.parts.BiPartition;
 import splitstree6.data.parts.Compatibility;
 
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * some computations on trees
@@ -278,7 +279,10 @@ public class TreesUtilities {
 		return distances;
 	}
 
-	public static PhyloTree computeTreeFromCompatibleSplits(TaxaBlock taxaBlock, List<ASplit> splits) {
+	public static PhyloTree computeTreeFromCompatibleSplits(Function<Integer, String> taxonLabel, List<ASplit> splits) {
+		if (splits.size() == 0)
+			return new PhyloTree();
+
 		if (!Compatibility.isCompatible(splits))
 			throw new RuntimeException("Internal error: Splits are not compatible");
 		final var clusterWeightConfidenceMap = new HashMap<BitSet, WeightConfidence>();
@@ -297,8 +301,9 @@ public class TreesUtilities {
 		}
 		Arrays.sort(clusters, (a, b) -> Integer.compare(b.cardinality(), a.cardinality()));
 
-		final var allTaxa = taxaBlock.getTaxaSet();
+		final var allTaxa = splits.get(0).getAllTaxa();
 		var tree = new PhyloTree();
+
 		tree.setRoot(tree.newNode());
 
 		try (NodeArray<BitSet> node2taxa = tree.newNodeArray()) {
@@ -348,7 +353,7 @@ public class TreesUtilities {
 				tree.addTaxon(v, t);
 			}
 		}
-		PhyloGraphUtils.addLabels(taxaBlock, tree);
+		PhyloGraphUtils.addLabels(taxonLabel, tree);
 
 		// todo: ask about internal node labels
 		RerootingUtils.rerootByMidpoint(tree);

@@ -38,19 +38,17 @@ import java.util.List;
  * @author huson
  * Date: 17-Feb-2004
  */
-public class LeastSquaresWeights extends Splits2Splits {
+public class LeastSquaresWeights { // extends Splits2Splits {
 	final DistancesBlock distancesBlock = new DistancesBlock();
 
 	private final BooleanProperty optionConstrain = new SimpleBooleanProperty(this, "optionConstrain", false);
 
-	@Override
 	public List<String> listOptions() {
 		// todo: optionConstrain is not implemented
 		// return Collections.singletonList(optionConstrain.getName());
 		return Collections.emptyList();
 	}
 
-	@Override
 	public String getToolTip(String optionName) {
 		if ("optionConstrain".equals(optionName)) {
 			return "Use constrained least squares";
@@ -58,7 +56,6 @@ public class LeastSquaresWeights extends Splits2Splits {
 		return optionName;
 	}
 
-	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock parent, SplitsBlock child) throws IOException {
 		System.err.println("Computing least squares...");
         /*
@@ -85,7 +82,6 @@ public class LeastSquaresWeights extends Splits2Splits {
 
 	}
 
-	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, SplitsBlock parent) {
 		return !parent.isPartial();
 	}

@@ -44,6 +44,11 @@ public class UnrootedShapleyValues extends Trees2ReportBase {
 		return report(progress, taxaBlock, treesBlock, taxa);
 	}
 
+	@Override
+	public String getCitation() {
+		return "Haake et al 2008;Haake C.J., Kashiwada A., Su F.E. The Shapley value of phylogenetic trees. J Math Biol 56:479–497 (2008) ";
+	}
+
 	public static String report(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, BitSet selectedTaxa) throws CanceledException {
 		var buf = new StringBuilder();
 		progress.setTasks("Computing", "unrooted Shapley values");

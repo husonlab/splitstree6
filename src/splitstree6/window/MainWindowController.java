@@ -354,6 +354,9 @@ public class MainWindowController {
 	private MenuItem computeDeltaScoreMenuItem;
 
 	@FXML
+	private MenuItem phiTestMenuItem;
+
+	@FXML
 	private MenuItem computeRootedTreeFairProportionMenuItem;
 
 	@FXML
@@ -909,6 +912,10 @@ public class MainWindowController {
 
 	public MenuItem getComputeDeltaScoreMenuItem() {
 		return computeDeltaScoreMenuItem;
+	}
+
+	public MenuItem getPhiTestMenuItem() {
+		return phiTestMenuItem;
 	}
 
 	public MenuItem getComputeRootedTreeFairProportionMenuItem() {

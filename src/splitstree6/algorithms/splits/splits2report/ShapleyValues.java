@@ -40,6 +40,12 @@ public class ShapleyValues extends Splits2ReportBase {
 		return report(taxaBlock, splitsBlock.getSplits());
 	}
 
+	@Override
+	public String getCitation() {
+		return "Volkmann et al 2014;Volkmann L, Martyn I, Moulton V, Spillner A, Mooers AO." +
+			   " Prioritizing populations for conservation using phylogenetic networks. PLoS ONE 9(2):e88945 (2014)";
+	}
+
 	public static Map<Integer, Double> compute(BitSet taxa, Collection<ASplit> splits) {
 		var ntax = taxa.cardinality();
 		var taxonShapleyMap = new HashMap<Integer, Double>();

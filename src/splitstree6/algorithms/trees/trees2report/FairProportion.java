@@ -44,6 +44,11 @@ public class FairProportion extends Trees2ReportBase {
 		return report(progress, taxaBlock, treesBlock, taxa);
 	}
 
+	@Override
+	public String getCitation() {
+		return "D Redding 2004;Redding, D. Incorporating genetic distinctness and reserve occupancy into a conservation priorisation approach. Master’s thesis. University of East Anglia (2003)";
+	}
+
 	public static String report(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, BitSet selectedTaxa) throws CanceledException {
 		var buf = new StringBuilder();
 		buf.append("Fair Proportions:\n");

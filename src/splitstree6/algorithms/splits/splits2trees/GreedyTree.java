@@ -44,7 +44,7 @@ public class GreedyTree extends Splits2Trees {
 		progress.setTasks("Greedy Tree", "Extracting compatible splits...");
 
 		final var compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits(), ASplit::getWeight);
-		var tree = TreesUtilities.computeTreeFromCompatibleSplits(taxaBlock, compatibleSplits);
+		var tree = TreesUtilities.computeTreeFromCompatibleSplits(taxaBlock::getLabel, compatibleSplits);
 		trees.getTrees().setAll(tree);
 		trees.setRooted(true);
 		trees.setPartial(false);

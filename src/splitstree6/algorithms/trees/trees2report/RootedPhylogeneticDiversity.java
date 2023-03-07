@@ -41,6 +41,11 @@ public class RootedPhylogeneticDiversity extends Trees2ReportBase {
 		return report(progress, taxaBlock, treesBlock, taxa);
 	}
 
+	@Override
+	public String getCitation() {
+		return "Faith 1992;Faith, D.P. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10 (1992)";
+	}
+
 	public static String report(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, BitSet selectedTaxa) throws CanceledException {
 		var buf = new StringBuilder();
 		progress.setTasks("Computing", "fair proporitions");

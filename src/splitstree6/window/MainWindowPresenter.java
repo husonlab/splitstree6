@@ -57,6 +57,7 @@ import splitstree6.algorithms.characters.characters2distances.Uncorrected_P;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2report.EstimateInvariableSites;
+import splitstree6.algorithms.characters.characters2report.PhiTest;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.distances.distances2network.PCoA;
@@ -541,6 +542,9 @@ public class MainWindowPresenter {
 
 		controller.getComputeDeltaScoreMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new DeltaScore()));
 		controller.getComputeDeltaScoreMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new DeltaScore()));
+
+		controller.getPhiTestMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PhiTest()));
+		controller.getPhiTestMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PhiTest()));
 
 		controller.getEstimateInvariableSitesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new EstimateInvariableSites()));
 		controller.getEstimateInvariableSitesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new EstimateInvariableSites()));

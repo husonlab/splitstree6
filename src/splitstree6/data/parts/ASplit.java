@@ -117,8 +117,12 @@ public final class ASplit extends BiPartition {
 		this.label = label;
 	}
 
+	public BitSet getAllTaxa() {
+		return BitSetUtils.union(getA(), getB());
+	}
+
 	public String toString() {
-		return super.toString() + " weight=" + getWeight() + " confidence=" + getConfidence()+" label="+getLabel();
+		return super.toString() + " weight=" + getWeight() + " confidence=" + getConfidence() + " label=" + getLabel();
 	}
 
 	/**

@@ -395,6 +395,7 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites"/>
                         <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"/>
+                        <MenuItem fx:id="phiTestMenuItem" text="Conduct Phi Test for Recombination"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="computeSplitsPhylogeneticDiversityMenuItem"
                                   text="Compute Splits Phylogenetic Diversity"/>

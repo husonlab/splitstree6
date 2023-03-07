@@ -57,6 +57,11 @@ public class ConsensusTree extends Trees2Trees {
 	}
 
 	@Override
+	public String getCitation() {
+		return "Bryant 2001;D. Bryant, A classification of consensus methods for phylogenetics}, in Bioconsensus, 2001";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) throws IOException {
 		if (parent.getNTrees() <= 1)
 			child.getTrees().addAll(parent.getTrees());
