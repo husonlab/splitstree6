@@ -134,6 +134,31 @@ public class SplitsUtilities {
 
 
 	/**
+	 * is given set  consecutive in the ordering?
+	 *
+	 * @param set      set of integers
+	 * @param ordering ordering of integers
+	 * @return true, if set occurs consecutively in ordering
+	 */
+	public static boolean isCompatibleWithOrdering(BitSet set, ArrayList<Integer> ordering) {
+		var inside = false;
+		var count = 0;
+		for (var t : ordering) {
+			if (set.get(t)) {
+				if (!inside)
+					inside = true;
+				if (++count == set.cardinality())
+					return true;
+			} else {
+				if (inside)
+					return false;
+			}
+		}
+		return false;
+	}
+
+
+	/**
 	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
 	 *
 	 * @param ntax   number of taxa
