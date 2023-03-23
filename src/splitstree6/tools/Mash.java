@@ -29,10 +29,13 @@ import jloda.util.progress.ProgressPercentage;
 import java.io.OutputStreamWriter;
 import java.util.stream.Collectors;
 
+/**
+ * computes mash sketches
+ * Daniel Huson, 2021
+ */
 public class Mash {
 	/**
 	 * runs the mash algorithm
-	 *
 	 */
 	public static void main(String[] args) {
 		try {
@@ -81,7 +84,6 @@ public class Mash {
 			try (var iterator = new FastAFileIterator(inputFile)) {
 				var sequences = IteratorUtils.asStream(iterator.records()).map(p -> p.getSecond().getBytes()).collect(Collectors.toList());
 				sketches[i] = MashSketch.compute(name, sequences, true, sketchSize, kmerSize, 666, false, new ProgressPercentage(name));
-
 			}
 		}
 

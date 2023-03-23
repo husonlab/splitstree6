@@ -36,4 +36,4 @@ modulepath="$jars_dir:$jars2_dir:$jfx_dir"
 
 java_flags="-server -Duser.language=en -Duser.region=US $vmOptions"
 
-$java $java_flags --module-path=$modulepath --add-modules=splitstreesix splitstree6.tools.Mash  $options
+$java $java_flags --module-path=$modulepath --add-modules=splitstreesix splitstree6.tools.ComputeMashSketches $options

@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra;
+package splitstree6.io.utils;
 
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -48,32 +48,6 @@ import static splitstree6.algorithms.utils.SplitsUtilities.isCompatibleWithOrder
  * Daniel Huson, 3.2023
  */
 public class SplitNewick {
-
-	public static void main(String[] args) throws IOException {
-		Function<Integer, String> taxonLabel = t -> String.valueOf((char) ('a' - 1 + t));
-		var splits = new ArrayList<ASplit>();
-
-		splits.add(new ASplit(BitSetUtils.asBitSet(5, 6, 7), 7, 0.1));
-		splits.add(new ASplit(BitSetUtils.asBitSet(2, 3, 4, 5), 7, 0.2));
-		splits.add(new ASplit(BitSetUtils.asBitSet(1, 6, 7), 7, 0.3));
-		splits.add(new ASplit(BitSetUtils.asBitSet(3, 4, 5), 7, 0.4));
-		splits.add(new ASplit(BitSetUtils.asBitSet(3, 4, 5, 6), 7, 0.5));
-
-		for (var t = 1; t <= 7; t++)
-			splits.add(new ASplit(BitSetUtils.asBitSet(t), 7, t * 0.01));
-
-		var newick = toString(taxonLabel, splits, false);
-		System.err.println(newick);
-		var taxonLabelMap = new TreeMap<Integer, String>();
-		var newSplits = parse(newick, null, taxonLabelMap);
-		System.err.println("Taxa: " + StringUtils.toString(taxonLabelMap.entrySet().stream().map(e -> "%d %s".formatted(e.getKey(), e.getValue())).collect(Collectors.toList()), ","));
-		System.err.println("Splits:");
-		for (var split : newSplits) {
-			System.err.println(split);
-		}
-
-	}
-
 	/**
 	 * write a collection of splits in SplitsNewick format
 	 *
@@ -110,7 +84,7 @@ public class SplitNewick {
 			return "";
 		else {
 			var nTax = splits.get(0).getAllTaxa().cardinality();
-			if (ordering == null) {
+			if (true || ordering == null) { // todo: figure out why we can't use a given circular ordering
 				ordering = new ArrayList<>();
 				var cycle0based = SplitsUtilities.computeCycle(splits.get(0).getAllTaxa().cardinality(), splits);
 				for (var i = 1; i < cycle0based.length; i++)
@@ -294,7 +268,7 @@ public class SplitNewick {
 			treeNewick = newickString.replaceAll("<[0-9]+\\|", "").replaceAll("\\|[0-9]+(:[0-9eE.-]+)?(:[0-9eE.-]+)?(:[0-9eE.-]+)?>", "");
 		else
 			treeNewick = newickString;
-		System.err.println("treeNewick: " + treeNewick);
+		// System.err.println("treeNewick: " + treeNewick);
 
 		var tree = new PhyloTree();
 		tree.parseBracketNotation(treeNewick, true, true);
@@ -415,6 +389,31 @@ public class SplitNewick {
 		}
 		if (splitId > 0) {
 			used.clear(splitId);
+		}
+	}
+
+
+	public static void main(String[] args) throws IOException {
+		Function<Integer, String> taxonLabel = t -> String.valueOf((char) ('a' - 1 + t));
+		var splits = new ArrayList<ASplit>();
+
+		splits.add(new ASplit(BitSetUtils.asBitSet(5, 6, 7), 7, 0.1));
+		splits.add(new ASplit(BitSetUtils.asBitSet(2, 3, 4, 5), 7, 0.2));
+		splits.add(new ASplit(BitSetUtils.asBitSet(1, 6, 7), 7, 0.3));
+		splits.add(new ASplit(BitSetUtils.asBitSet(3, 4, 5), 7, 0.4));
+		splits.add(new ASplit(BitSetUtils.asBitSet(3, 4, 5, 6), 7, 0.5));
+
+		for (var t = 1; t <= 7; t++)
+			splits.add(new ASplit(BitSetUtils.asBitSet(t), 7, t * 0.01));
+
+		var newick = toString(taxonLabel, splits, false);
+		System.err.println(newick);
+		var taxonLabelMap = new TreeMap<Integer, String>();
+		var newSplits = parse(newick, null, taxonLabelMap);
+		System.err.println("Taxa: " + StringUtils.toString(taxonLabelMap.entrySet().stream().map(e -> "%d %s".formatted(e.getKey(), e.getValue())).collect(Collectors.toList()), ","));
+		System.err.println("Splits:");
+		for (var split : newSplits) {
+			System.err.println(split);
 		}
 	}
 }
