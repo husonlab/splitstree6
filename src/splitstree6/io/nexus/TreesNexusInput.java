@@ -183,6 +183,7 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			if (translator != null)
 				tree.changeLabels(translator, true);
 
+			var taxonCount = 0;
 			for (var v : tree.nodes()) {
 				final var label = tree.getLabel(v);
 				if (label != null && !label.isBlank()) {
@@ -200,15 +201,21 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 							taxonNamesFound.add(label);
 							taxName2Id.put(label, taxonNamesFound.size());
 							tree.addTaxon(v, taxName2Id.get(label));
+							taxonCount++;
 						}
-					} else
+					} else {
 						tree.addTaxon(v, taxName2Id.get(label));
+						taxonCount++;
+					}
 					//System.err.println(v+" -> "+label+" -> "+Basic.toString(tree.getTaxa(v)," "));
 				}
 			}
 			tree.setName(name);
 			treesBlock.getTrees().add(tree);
 			treeNumber++;
+			if (!treesBlock.isPartial() && (taxonCount < taxName2Id.size() || (taxaBlock.getNtax() > 0 && taxonCount < taxaBlock.getNtax()))) {
+				treesBlock.setPartial(true);
+			}
 		}
 
 		np.matchEndBlock();

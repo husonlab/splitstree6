@@ -136,6 +136,9 @@ public class SplitNewick {
 					var matcher = Pattern.compile("[(,]([^#<|>(:,)]+)").matcher(newick);
 					while (matcher.find()) {
 						var label = matcher.group(1);
+						if (label.startsWith("'") && label.endsWith("'") && label.length() > 1) {
+							label = label.substring(1, label.length() - 1);
+						}
 						//System.err.println(label);
 						var t = labelTaxonMap.get(label);
 						taxaList.add(t);
