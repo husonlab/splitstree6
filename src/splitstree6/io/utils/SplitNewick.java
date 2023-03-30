@@ -25,17 +25,15 @@ import jloda.phylo.PhyloSplitsGraph;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.*;
-import jloda.util.parse.NexusStreamParser;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
-import splitstree6.data.SplitsBlock;
-import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
-import splitstree6.io.nexus.SplitsNexusInput;
-import splitstree6.io.nexus.TaxaNexusInput;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -470,43 +468,5 @@ public class SplitNewick {
 	 */
 	public static void write(PhyloSplitsGraph graph, boolean includeWeights, ArrayList<Integer> ordering, Writer w) throws IOException {
 		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, ordering, w);
-	}
-
-	public static void main(String[] args) throws IOException {
-
-		var inputFile = "examples-testing/splitnewick-test.new";
-
-		var taxaBlock = new TaxaBlock();
-		var splitsBlock = new SplitsBlock();
-		try (NexusStreamParser np = new NexusStreamParser(new FileReader(inputFile))) {
-			np.matchIgnoreCase("#nexus");
-			(new TaxaNexusInput()).parse(np, taxaBlock);
-			(new SplitsNexusInput()).parse(np, taxaBlock, splitsBlock);
-		}
-
-		var taxonLabelMap = new TreeMap<Integer, String>();
-		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
-			taxonLabelMap.put(t, taxaBlock.getLabel(t));
-		}
-		var splitsIn = splitsBlock.getSplits();
-		var labelTaxonMap = new HashMap<String, Integer>();
-		for (var t : taxonLabelMap.keySet()) {
-			labelTaxonMap.put(taxonLabelMap.get(t), t);
-		}
-		System.err.println("in:  " + splitsIn.size());
-
-		var output = toString(taxonLabelMap::get, splitsIn, true, splitsBlock.getCycle()) + ";";
-		System.err.println("output: " + output);
-		var taxonLabelMap2 = new TreeMap<Integer, String>();
-		var splitsOut = parse(output, labelTaxonMap, taxonLabelMap2);
-		System.err.println("out: " + splitsOut.size());
-
-		var total = splitsIn.size() + splitsOut.size();
-		var intersection = IteratorUtils.size(SetUtils.intersection(splitsIn, splitsOut));
-		var difference = IteratorUtils.size(SetUtils.symmetricDifference(splitsIn, splitsOut));
-
-		//System.err.println("Symmetric difference: "+StringUtils.toString(SetUtils.symmetricDifference(splitsIn,splitsOut),"\n"));
-
-		System.err.println("[total=" + total + "] = [2*intersection=" + (2 * intersection) + "] + [difference=" + difference + "]");
 	}
 }
