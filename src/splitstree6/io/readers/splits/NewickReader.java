@@ -76,7 +76,27 @@ public class NewickReader extends SplitsReader {
 				for (var name : taxonLabelMap.values()) {
 					taxa.addTaxonByName(name);
 				}
-				SplitsUtilities.computeCycle(taxa.getNtax(), splitsBlock.getSplits());
+				if (true) {
+					var cycle1based = new int[taxa.getNtax() + 1];
+					for (var t = 1; t <= taxa.getNtax(); t++) {
+						cycle1based[t] = t;
+					}
+					// keep the input ordering, if we can
+					var count = SplitsUtilities.countCompatibleWithOrdering(splitsBlock.getSplits(), cycle1based);
+					if (count == splitsBlock.getNsplits())
+						splitsBlock.setCycle(cycle1based);
+					else {
+						var alt = SplitsUtilities.computeCycle(taxa.getNtax(), splitsBlock.getSplits());
+						var countAlt = SplitsUtilities.countCompatibleWithOrdering(splitsBlock.getSplits(), alt);
+						if (count < countAlt)
+							splitsBlock.setCycle(cycle1based);
+						else
+							splitsBlock.setCycle(alt);
+					}
+				} else {
+					var alt = SplitsUtilities.computeCycle(taxa.getNtax(), splitsBlock.getSplits());
+					splitsBlock.setCycle(alt);
+				}
 			} catch (IOException ex) {
 				throw new IOExceptionWithLineNumber(lineno, ex);
 			}

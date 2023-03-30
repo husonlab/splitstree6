@@ -140,4 +140,5 @@ module splitstreesix {
 	opens splitstree6.layout;
 	opens splitstree6.algorithms.distances.distances2splits.neighbornet;
 	exports splitstree6.io.utils;
+	exports splitstree6.data.parts;
 }

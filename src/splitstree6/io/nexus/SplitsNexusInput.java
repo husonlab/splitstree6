@@ -200,8 +200,8 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 	 */
 	private static void readMatrix(NexusStreamParser np, TaxaBlock taxaBlock, int nsplits, SplitsBlock splitsBlock, SplitsFormat splitsFormat) throws IOException {
 		for (int i = 1; i <= nsplits; i++) {
-			float weight = 1;
-			float confidence = -1;
+			double weight = 1;
+			double confidence = -1;
 			String label = null;
 
 			if (splitsFormat.isOptionLabels()) {
@@ -210,10 +210,10 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 					label = null;
 			}
 			if (splitsFormat.isOptionWeights())
-				weight = (float) Math.max(0.0, np.getDouble());
+				weight = Math.max(0.0, np.getDouble());
 
 			if (splitsFormat.isOptionConfidences())
-				confidence = (float) Math.max(0.0, np.getDouble());
+				confidence = Math.max(0.0, np.getDouble());
 
 
 			final ASplit split;

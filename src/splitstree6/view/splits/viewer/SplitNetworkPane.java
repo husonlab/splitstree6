@@ -206,4 +206,8 @@ public class SplitNetworkPane extends StackPane {
 	public Group getGroup() {
 		return group;
 	}
+
+	public SplitNetworkLayout getSplitNetworkLayout() {
+		return splitNetworkLayout;
+	}
 }

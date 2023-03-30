@@ -43,7 +43,6 @@ import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
-import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.splits.SplitsFormat;
@@ -219,7 +218,7 @@ public class SplitsView implements IView {
 	}
 
 	@Override
-	public IDisplayTabPresenter getPresenter() {
+	public SplitsViewPresenter getPresenter() {
 		return presenter;
 	}
 

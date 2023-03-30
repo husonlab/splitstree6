@@ -316,4 +316,12 @@ public class SplitNetworkLayout {
 	public RadialLabelLayout getLabelLayout() {
 		return labelLayout;
 	}
+
+	public PhyloSplitsGraph getGraph() {
+		return graph;
+	}
+
+	public NodeArray<Point2D> getNodePointMap() {
+		return nodePointMap;
+	}
 }

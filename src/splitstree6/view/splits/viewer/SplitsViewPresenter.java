@@ -436,4 +436,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	public ReadOnlyLongProperty updateCounterProperty() {
 		return updateCounter;
 	}
+
+	public SplitNetworkPane getSplitNetworkPane() {
+		return splitNetworkPane;
+	}
 }

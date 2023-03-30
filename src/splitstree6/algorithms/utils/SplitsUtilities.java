@@ -132,9 +132,8 @@ public class SplitsUtilities {
 		return order;
 	}
 
-
 	/**
-	 * is given set  consecutive in the ordering?
+	 * is given set consecutive in the ordering?
 	 *
 	 * @param set      set of integers
 	 * @param ordering ordering of integers
@@ -156,7 +155,6 @@ public class SplitsUtilities {
 		}
 		return false;
 	}
-
 
 	/**
 	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
@@ -378,5 +376,33 @@ public class SplitsUtilities {
 				splits.getSplits().add(new ASplit(BitSetUtils.asBitSet(t), ntaxa, 0.00001, 0.00001));
 			}
 		}
+	}
+
+	/**
+	 * returns the number of splits that are compatible with the given taxon ordering
+	 *
+	 * @param splits      splits
+	 * @param cycle1based ordering, 1-based (i.e., ignore 0-th entry)
+	 * @return true, if all splits are compatible with the ordering
+	 */
+	public static int countCompatibleWithOrdering(Collection<ASplit> splits, int[] cycle1based) {
+		var first = cycle1based[1];
+		var taxonRank = new int[cycle1based.length];
+		for (var t = 1; t < cycle1based.length; t++) {
+			taxonRank[cycle1based[t]] = t;
+		}
+		var count = 0;
+		for (var split : splits) {
+			var min = Integer.MAX_VALUE;
+			var max = 0;
+			var part = split.getPartNotContaining(first);
+			for (var t : BitSetUtils.members(part)) {
+				min = Math.min(min, taxonRank[t]);
+				max = Math.max(min, taxonRank[t]);
+				if (max - min + 1 == part.cardinality())
+					count++;
+			}
+		}
+		return count;
 	}
 }

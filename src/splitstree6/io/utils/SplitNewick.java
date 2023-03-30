@@ -23,19 +23,19 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.phylo.PhyloTree;
-import jloda.util.BitSetUtils;
-import jloda.util.CollectionUtils;
-import jloda.util.IteratorUtils;
-import jloda.util.StringUtils;
+import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
+import jloda.util.*;
+import jloda.util.parse.NexusStreamParser;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.io.nexus.SplitsNexusInput;
+import splitstree6.io.nexus.TaxaNexusInput;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -48,191 +48,6 @@ import static splitstree6.algorithms.utils.SplitsUtilities.isCompatibleWithOrder
  * Daniel Huson, 3.2023
  */
 public class SplitNewick {
-	/**
-	 * write a collection of splits in SplitsNewick format
-	 *
-	 * @param splits the splits
-	 * @param w      writer
-	 */
-	public static void write(Function<Integer, String> taxonLabel, List<ASplit> splits, boolean includeWeights, Writer w) throws IOException {
-		write(taxonLabel, splits, includeWeights, null, w);
-	}
-
-	/**
-	 * write a collection of splits in SplitsNewick format, using the given taxon ordering
-	 *
-	 * @param splits   splits
-	 * @param ordering the taxon ordering - using a good ordering will result in a shorter Newick string
-	 * @param w        writer
-	 */
-	public static void write(Function<Integer, String> taxonLabel, List<ASplit> splits, boolean includeWeights, ArrayList<Integer> ordering, Writer w) throws IOException {
-		w.write(toString(taxonLabel, splits, includeWeights, ordering));
-	}
-
-	public static String toString(Function<Integer, String> taxonLabel, List<ASplit> splits, boolean includeWeights) throws IOException {
-		return toString(taxonLabel, splits, includeWeights, null);
-	}
-
-	/**
-	 * get string in SplitsNewick format, using the given taxon ordering
-	 *
-	 * @param splits   splits
-	 * @param ordering the taxon ordering - using a good ordering will result in a shorter Newick string
-	 */
-	public static String toString(Function<Integer, String> taxonLabel, List<ASplit> splits, boolean includeWeights, ArrayList<Integer> ordering) throws IOException {
-		if (splits.size() == 0)
-			return "";
-		else {
-			var nTax = splits.get(0).getAllTaxa().cardinality();
-			if (true || ordering == null) { // todo: figure out why we can't use a given circular ordering
-				ordering = new ArrayList<>();
-				var cycle0based = SplitsUtilities.computeCycle(splits.get(0).getAllTaxa().cardinality(), splits);
-				for (var i = 1; i < cycle0based.length; i++)
-					ordering.add(cycle0based[i]);
-			}
-			var compatible = new ArrayList<ASplit>();
-			var additional = new ArrayList<ASplit>();
-			for (var split : splits) {
-				if (isCompatibleWithOrdering(split.getPartNotContaining(ordering.get(0)), ordering) && Compatibility.isCompatible(split, compatible)) {
-					compatible.add(split);
-				} else {
-					additional.add(split);
-				}
-			}
-
-			// System.err.println("Ordering:" + StringUtils.toString(ordering.stream().map(taxonLabel).collect(Collectors.toList()), ","));
-			var taxonRank = new HashMap<Integer, Integer>();
-			for (int rank = 0; rank < ordering.size(); rank++) {
-				taxonRank.put(ordering.get(rank), rank);
-			}
-			var tree = TreesUtilities.computeTreeFromCompatibleSplits(taxonLabel, new ArrayList<>(compatible));
-			try (NodeArray<Integer> node2rank = tree.newNodeArray()) {
-				for (var entry : TreesUtilities.extractClusters(tree).entrySet()) {
-					var rank = BitSetUtils.asStream(entry.getValue()).mapToInt(taxonRank::get).min().orElse(0);
-					node2rank.put(entry.getKey(), rank);
-				}
-
-				for (var v : tree.nodes()) {
-					var outEdges = IteratorUtils.asList(v.outEdges());
-					outEdges.sort(Comparator.comparingInt(a -> node2rank.get(a.getTarget())));
-					var all = CollectionUtils.concatenate(IteratorUtils.asList(v.inEdges()), outEdges);
-					v.rearrangeAdjacentEdges(all);
-				}
-			}
-			var newick = tree.toBracketString(includeWeights);
-
-			// System.err.println("Tree: " + newick);
-
-			if (additional.size() == 0)
-				return newick;
-			else { // insert other splits
-				var taxaList = new ArrayList<Integer>();
-				var taxon2StartEnd = new int[nTax + 1][2];
-				{
-					var labelTaxonMap = new HashMap<String, Integer>();
-					for (var t : BitSetUtils.members(splits.get(0).getAllTaxa())) {
-						labelTaxonMap.put(taxonLabel.apply(t), t);
-					}
-					var matcher = Pattern.compile("[(,]([^#<|>(:,)]+)").matcher(newick);
-					while (matcher.find()) {
-						var label = matcher.group(1);
-						if (label.startsWith("'") && label.endsWith("'") && label.length() > 1) {
-							label = label.substring(1, label.length() - 1);
-						}
-						//System.err.println(label);
-						var t = labelTaxonMap.get(label);
-						taxaList.add(t);
-						taxon2StartEnd[t][0] = matcher.start(1);
-						taxon2StartEnd[t][1] = matcher.end(1);
-					}
-				}
-
-				var insertBeforeTaxon = new StringBuilder[nTax + 1];
-				var appendAfterTaxon = new StringBuilder[nTax + 1];
-
-				var splitNumber = 0;
-				for (var split : additional) {
-					splitNumber++;
-					var inside = false;
-					var count = 0;
-					var set = split.getPartNotContaining(ordering.get(0));
-					// System.err.println("split "+splitNumber+": "+StringUtils.toString(BitSetUtils.asStream(set).map(taxonLabel).collect(Collectors.toList()),","));
-					var prev = 0;
-					for (var t : taxaList) {
-						if (set.get(t)) {
-							if (!inside) {
-								inside = true;
-								if (insertBeforeTaxon[t] == null)
-									insertBeforeTaxon[t] = new StringBuilder();
-								insertBeforeTaxon[t].append("<%d|".formatted(splitNumber));
-							}
-							count++;
-							if (count == set.cardinality()) {
-								if (appendAfterTaxon[t] == null)
-									appendAfterTaxon[t] = new StringBuilder();
-								if (!includeWeights) {
-									appendAfterTaxon[t].append("|%d>".formatted(splitNumber));
-								} else if (split.getConfidence() <= 0)
-									appendAfterTaxon[t].append("|%d:%s>".formatted(splitNumber,
-											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
-								else
-									appendAfterTaxon[t].append("|%d:%s:%s>".formatted(splitNumber,
-											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight()),
-											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getConfidence())));
-							}
-						} else {
-							if (inside) {
-								if (count < set.cardinality()) {
-									if (appendAfterTaxon[prev] == null)
-										appendAfterTaxon[prev] = new StringBuilder();
-									appendAfterTaxon[prev].append("|%d>".formatted(splitNumber));
-								}
-								inside = false;
-							}
-						}
-						prev = t;
-					}
-				}
-				var buf = new StringBuilder();
-				var prev = 0;
-				for (var t : taxaList) {
-					var tStart = taxon2StartEnd[t][0];
-					var tEnd = taxon2StartEnd[t][1];
-					buf.append(newick, prev, tStart);
-					if (insertBeforeTaxon[t] != null)
-						buf.append(insertBeforeTaxon[t].toString());
-					buf.append(newick, tStart, tEnd);
-					if (appendAfterTaxon[t] != null)
-						buf.append(appendAfterTaxon[t]);
-					prev = tEnd;
-				}
-				buf.append(newick.substring(prev));
-				return buf.toString();
-			}
-		}
-	}
-
-
-	/**
-	 * writes a split graph in SplitsNewick format
-	 *
-	 * @param graph split graph
-	 * @param w     writer
-	 */
-	public static void write(PhyloSplitsGraph graph, boolean includeWeights, Writer w) throws IOException {
-		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, null, w);
-	}
-
-	/**
-	 * writes a split graph in SplitsNewick format, using the given taxon ordering
-	 *
-	 * @param graph    split graph
-	 * @param ordering the taxon ordering
-	 * @param w        writer
-	 */
-	public static void write(PhyloSplitsGraph graph, boolean includeWeights, ArrayList<Integer> ordering, Writer w) throws IOException {
-		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, ordering, w);
-	}
 
 	/**
 	 * reads a string in SplitNewick format
@@ -271,12 +86,12 @@ public class SplitNewick {
 			treeNewick = newickString.replaceAll("<[0-9]+\\|", "").replaceAll("\\|[0-9]+(:[0-9eE.-]+)?(:[0-9eE.-]+)?(:[0-9eE.-]+)?>", "");
 		else
 			treeNewick = newickString;
-		// System.err.println("treeNewick: " + treeNewick);
+		// System.err.println("treeNewick in: " + treeNewick);
 
 		var tree = new PhyloTree();
 		tree.parseBracketNotation(treeNewick, true, true);
-		var nTax = 0;
 		if (labelTaxonMap == null) {
+			var nTax = 0;
 			labelTaxonMap = new HashMap<>();
 			for (var v : tree.leaves()) {
 				labelTaxonMap.put(tree.getLabel(v), ++nTax);
@@ -285,6 +100,7 @@ public class SplitNewick {
 		for (var v : tree.leaves()) {
 			tree.addTaxon(v, labelTaxonMap.get(tree.getLabel(v)));
 		}
+		var nTax = IteratorUtils.asStream(tree.getTaxa()).mapToInt(t -> t).max().orElse(0);
 
 		var splits = new ArrayList<ASplit>();
 		TreesUtilities.computeSplits(BitSetUtils.asBitSet(tree.getTaxa()), tree, splits);
@@ -293,10 +109,11 @@ public class SplitNewick {
 			var pos2tax = new TreeMap<Integer, Integer>();
 			{
 				// here we surround the taxon pattern by (?=( and )) to allow overlapping matches to get both a and b in a,b
-				var matcher = Pattern.compile("(?=([(,|]([a-zA-z]+[^#<>(:,)|]*)[:,|)]))").matcher(newickString);
+				var matcher = Pattern.compile("(?=([(,|]('{0,1}[a-zA-z]+[^#<>(:,)|]*)[:,|)]))").matcher(newickString);
 				while (matcher.find()) {
 					var label = matcher.group(2);
-					//System.err.println("label: "+matcher.group(2));
+					if (label.startsWith("'") && label.endsWith("'") && label.length() > 1)
+						label = label.substring(1, label.length() - 1);
 					var t = labelTaxonMap.get(label);
 					pos2tax.put(matcher.start(2), t);
 				}
@@ -315,7 +132,7 @@ public class SplitNewick {
 				for (var id : ids) {
 					var set = new BitSet();
 					{
-						var matcher = Pattern.compile("(<%d\\|)|(\\|%d[:0-9.eE-]*>)".formatted(id, id)).matcher(newickString);
+						var matcher = Pattern.compile("(<%d\\|)|(\\|%d>|\\|%d:[0-9.eE-]+>)".formatted(id, id, id)).matcher(newickString);
 						var start = -1;
 						while (matcher.find()) {
 							if (matcher.group(1) != null) {
@@ -395,28 +212,301 @@ public class SplitNewick {
 		}
 	}
 
+	/**
+	 * write a collection of splits in SplitsNewick format
+	 *
+	 * @param splits the splits
+	 * @param w      writer
+	 */
+	public static void write(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, Writer w) throws IOException {
+		write(taxonLabelFunction, splits, includeWeights, null, w);
+	}
+
+	/**
+	 * write a collection of splits in SplitsNewick format, using the given taxon ordering
+	 *
+	 * @param splits   splits
+	 * @param ordering the taxon ordering - using a good ordering will result in a shorter Newick string
+	 * @param w        writer
+	 */
+	public static void write(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, ArrayList<Integer> ordering, Writer w) throws IOException {
+		w.write(toString(taxonLabelFunction, splits, includeWeights, ordering));
+	}
+
+	public static String toString(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights) throws IOException {
+		return toString(taxonLabelFunction, splits, includeWeights, (ArrayList<Integer>) null);
+	}
+
+	public static String toString(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, int[] cycle1based) throws IOException {
+		var ordering = new ArrayList<Integer>();
+		for (int i = 1; i < cycle1based.length; i++)
+			ordering.add(cycle1based[i]);
+		return toString(taxonLabelFunction, splits, includeWeights, ordering);
+	}
+
+
+	/**
+	 * get string in SplitsNewick format, using the given taxon ordering
+	 *
+	 * @param splits   splits
+	 * @param ordering the taxon ordering - using a good ordering will result in a shorter Newick string
+	 */
+	public static String toString(Function<Integer, String> taxonLabelFunction0, List<ASplit> splits, boolean includeWeights, ArrayList<Integer> ordering) throws IOException {
+		if (splits.size() == 0)
+			return "";
+		else {
+			Function<Integer, String> taxonLabelFunction;
+			if (true)
+				taxonLabelFunction = taxonLabelFunction0;
+			else if (false)
+				taxonLabelFunction = t -> "t" + t;
+			else if (false)
+				taxonLabelFunction = t -> taxonLabelFunction0.apply(t).replaceAll(" ", "_");
+
+			var nTax = splits.get(0).getAllTaxa().cardinality();
+			if (ordering == null) {
+				ordering = new ArrayList<>();
+				var cycle1based = SplitsUtilities.computeCycle(splits.get(0).getAllTaxa().cardinality(), splits);
+				for (var i = 1; i < cycle1based.length; i++)
+					ordering.add(cycle1based[i]);
+			}
+			var compatible = new ArrayList<ASplit>();
+			var additional = new ArrayList<ASplit>();
+			for (var split : splits) {
+				if (split.isTrivial() || isCompatibleWithOrdering(split.getPartNotContaining(ordering.get(0)), ordering) && Compatibility.isCompatible(split, compatible)) {
+					compatible.add(split);
+				} else {
+					additional.add(split);
+				}
+			}
+
+			// System.err.println("Ordering:" + StringUtils.toString(ordering.stream().map(taxonLabel).collect(Collectors.toList()), ","));
+
+			var taxonRank = new HashMap<Integer, Integer>();
+			for (int rank = 0; rank < ordering.size(); rank++) {
+				taxonRank.put(ordering.get(rank), rank);
+			}
+			var tree = new PhyloTree();
+			var treeClusters = new ArrayList<BitSet>();
+			var clusterMap = new HashMap<BitSet, Pair<Double, Double>>();
+			for (var split : compatible) {
+				var cluster = split.getPartNotContaining(ordering.get(0));
+				treeClusters.add(cluster);
+				clusterMap.put(cluster, new Pair<>(split.getWeight(), split.getConfidence()));
+				if (split.getPartContaining(ordering.get(0)).cardinality() == 1) {
+					var other = split.getPartContaining(ordering.get(0));
+					treeClusters.add(other);
+					clusterMap.put(other, new Pair<>(0.0, split.getConfidence()));
+				}
+			}
+			ClusterPoppingAlgorithm.apply(treeClusters, c -> clusterMap.get(c).getFirst(), c -> clusterMap.get(c).getSecond(), tree);
+			tree.leaves().forEach(v -> tree.setLabel(v, taxonLabelFunction.apply(tree.getTaxon(v))));
+
+			try (NodeArray<Integer> node2rank = tree.newNodeArray()) {
+				for (var entry : TreesUtilities.extractClusters(tree).entrySet()) {
+					var rank = BitSetUtils.asStream(entry.getValue()).mapToInt(taxonRank::get).min().orElse(0);
+					node2rank.put(entry.getKey(), rank);
+				}
+
+				for (var v : tree.nodes()) {
+					var outEdges = IteratorUtils.asList(v.outEdges());
+					outEdges.sort(Comparator.comparingInt(a -> node2rank.get(a.getTarget())));
+					var all = CollectionUtils.concatenate(IteratorUtils.asList(v.inEdges()), outEdges);
+					v.rearrangeAdjacentEdges(all);
+				}
+			}
+			if (false) {
+				System.err.println("Tree taxon ordering:");
+				tree.postorderTraversal(v -> {
+					if (v.isLeaf())
+						System.err.print(" " + tree.getTaxon(v));
+				});
+				System.err.println();
+			}
+
+			var treeNewick = tree.toBracketString(includeWeights);
+
+			if (false)
+				System.err.println("TreeNewick out: " + treeNewick);
+
+			if (additional.size() == 0)
+				return treeNewick;
+			else { // insert other splits
+				var taxaList = new ArrayList<Integer>();
+				var taxon2StartEnd = new int[nTax + 1][2];
+				{
+					var labelTaxonMap = new HashMap<String, Integer>();
+					for (var t : BitSetUtils.members(splits.get(0).getAllTaxa())) {
+						labelTaxonMap.put(taxonLabelFunction.apply(t), t);
+					}
+					var matcher = Pattern.compile("[(,]([^#<|>(:,)]+)").matcher(treeNewick);
+					while (matcher.find()) {
+						var label = matcher.group(1);
+						if (label.startsWith("'") && label.endsWith("'") && label.length() > 1) {
+							label = label.substring(1, label.length() - 1);
+						}
+						//System.err.println(label);
+						var t = labelTaxonMap.get(label);
+						taxaList.add(t);
+						taxon2StartEnd[t][0] = matcher.start(1);
+						taxon2StartEnd[t][1] = matcher.end(1);
+					}
+				}
+
+				var insertBeforeTaxon = new StringBuilder[nTax + 1];
+				var appendAfterTaxon = new StringBuilder[nTax + 1];
+
+				var splitNumber = 0;
+				for (var split : additional) {
+					splitNumber++;
+					var inside = false;
+					var count = 0;
+					var set = split.getPartNotContaining(ordering.get(0));
+					var prev = 0;
+					for (var t : taxaList) {
+						if (set.get(t)) {
+							if (!inside) {
+								inside = true;
+								if (insertBeforeTaxon[t] == null)
+									insertBeforeTaxon[t] = new StringBuilder();
+								insertBeforeTaxon[t].append("<%d|".formatted(splitNumber));
+							}
+							count++;
+							if (count == set.cardinality()) {
+								if (appendAfterTaxon[t] == null)
+									appendAfterTaxon[t] = new StringBuilder();
+								if (!includeWeights) {
+									appendAfterTaxon[t].append("|%d>".formatted(splitNumber));
+								} else if (split.getConfidence() <= 0)
+									appendAfterTaxon[t].append("|%d:%s>".formatted(splitNumber,
+											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
+								else
+									appendAfterTaxon[t].append("|%d:%s:%s>".formatted(splitNumber,
+											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight()),
+											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getConfidence())));
+							}
+						} else {
+							if (inside) {
+								if (count < set.cardinality()) {
+									if (appendAfterTaxon[prev] == null)
+										appendAfterTaxon[prev] = new StringBuilder();
+									appendAfterTaxon[prev].append("|%d>".formatted(splitNumber));
+								}
+								inside = false;
+							}
+						}
+						prev = t;
+					}
+				}
+
+				var buf = new StringBuilder();
+				var prev = 0;
+				for (var t : taxaList) {
+					var tStart = taxon2StartEnd[t][0];
+					var tEnd = taxon2StartEnd[t][1];
+					buf.append(treeNewick, prev, tStart);
+					if (insertBeforeTaxon[t] != null)
+						buf.append(insertBeforeTaxon[t].toString());
+					buf.append(treeNewick, tStart, tEnd);
+					if (appendAfterTaxon[t] != null)
+						buf.append(appendAfterTaxon[t]);
+					prev = tEnd;
+				}
+				buf.append(treeNewick.substring(prev));
+
+				var result = buf.toString();
+
+				if (true) {
+					var labelTaxonMap = new HashMap<String, Integer>();
+					for (var t : BitSetUtils.members(splits.get(0).getAllTaxa())) {
+						labelTaxonMap.put(taxonLabelFunction.apply(t), t);
+					}
+					var backSplits = parse(result, labelTaxonMap, null);
+					{
+						var lines = new TreeSet<String>();
+						for (var split : splits) {
+							if (!backSplits.contains(split))
+								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
+						}
+						if (lines.size() > 0) {
+							System.err.println("In input, not in output: " + lines.size());
+							System.err.println(StringUtils.toString(lines, "\n"));
+						}
+					}
+					{
+						var lines = new TreeSet<String>();
+						for (var split : backSplits) {
+							if (!splits.contains(split))
+								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
+						}
+						if (lines.size() > 0) {
+							System.err.println("In output, not in input: " + lines.size());
+							System.err.println(StringUtils.toString(lines, "\n"));
+						}
+					}
+				}
+
+				return result;
+			}
+		}
+	}
+
+	/**
+	 * writes a split graph in SplitsNewick format
+	 *
+	 * @param graph split graph
+	 * @param w     writer
+	 */
+	public static void write(PhyloSplitsGraph graph, boolean includeWeights, Writer w) throws IOException {
+		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, null, w);
+	}
+
+	/**
+	 * writes a split graph in SplitsNewick format, using the given taxon ordering
+	 *
+	 * @param graph    split graph
+	 * @param ordering the taxon ordering
+	 * @param w        writer
+	 */
+	public static void write(PhyloSplitsGraph graph, boolean includeWeights, ArrayList<Integer> ordering, Writer w) throws IOException {
+		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, ordering, w);
+	}
 
 	public static void main(String[] args) throws IOException {
-		Function<Integer, String> taxonLabel = t -> String.valueOf((char) ('a' - 1 + t));
-		var splits = new ArrayList<ASplit>();
 
-		splits.add(new ASplit(BitSetUtils.asBitSet(5, 6, 7), 7, 0.1));
-		splits.add(new ASplit(BitSetUtils.asBitSet(2, 3, 4, 5), 7, 0.2));
-		splits.add(new ASplit(BitSetUtils.asBitSet(1, 6, 7), 7, 0.3));
-		splits.add(new ASplit(BitSetUtils.asBitSet(3, 4, 5), 7, 0.4));
-		splits.add(new ASplit(BitSetUtils.asBitSet(3, 4, 5, 6), 7, 0.5));
+		var inputFile = "examples-testing/splitnewick-test.new";
 
-		for (var t = 1; t <= 7; t++)
-			splits.add(new ASplit(BitSetUtils.asBitSet(t), 7, t * 0.01));
-
-		var newick = toString(taxonLabel, splits, false);
-		System.err.println(newick);
-		var taxonLabelMap = new TreeMap<Integer, String>();
-		var newSplits = parse(newick, null, taxonLabelMap);
-		System.err.println("Taxa: " + StringUtils.toString(taxonLabelMap.entrySet().stream().map(e -> "%d %s".formatted(e.getKey(), e.getValue())).collect(Collectors.toList()), ","));
-		System.err.println("Splits:");
-		for (var split : newSplits) {
-			System.err.println(split);
+		var taxaBlock = new TaxaBlock();
+		var splitsBlock = new SplitsBlock();
+		try (NexusStreamParser np = new NexusStreamParser(new FileReader(inputFile))) {
+			np.matchIgnoreCase("#nexus");
+			(new TaxaNexusInput()).parse(np, taxaBlock);
+			(new SplitsNexusInput()).parse(np, taxaBlock, splitsBlock);
 		}
+
+		var taxonLabelMap = new TreeMap<Integer, String>();
+		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+			taxonLabelMap.put(t, taxaBlock.getLabel(t));
+		}
+		var splitsIn = splitsBlock.getSplits();
+		var labelTaxonMap = new HashMap<String, Integer>();
+		for (var t : taxonLabelMap.keySet()) {
+			labelTaxonMap.put(taxonLabelMap.get(t), t);
+		}
+		System.err.println("in:  " + splitsIn.size());
+
+		var output = toString(taxonLabelMap::get, splitsIn, true, splitsBlock.getCycle()) + ";";
+		System.err.println("output: " + output);
+		var taxonLabelMap2 = new TreeMap<Integer, String>();
+		var splitsOut = parse(output, labelTaxonMap, taxonLabelMap2);
+		System.err.println("out: " + splitsOut.size());
+
+		var total = splitsIn.size() + splitsOut.size();
+		var intersection = IteratorUtils.size(SetUtils.intersection(splitsIn, splitsOut));
+		var difference = IteratorUtils.size(SetUtils.symmetricDifference(splitsIn, splitsOut));
+
+		//System.err.println("Symmetric difference: "+StringUtils.toString(SetUtils.symmetricDifference(splitsIn,splitsOut),"\n"));
+
+		System.err.println("[total=" + total + "] = [2*intersection=" + (2 * intersection) + "] + [difference=" + difference + "]");
 	}
 }

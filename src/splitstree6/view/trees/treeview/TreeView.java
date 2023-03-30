@@ -412,4 +412,6 @@ public class TreeView implements IView {
 				this.edgeSelectionModel.clearSelection(e.getElementRemoved());
 		});
 	}
+
+
 }
