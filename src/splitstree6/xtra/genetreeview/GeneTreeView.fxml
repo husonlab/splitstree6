@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  GeneTreeView.fxml Copyright (C) 2023 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.input.KeyCodeCombination?>
+<?import javafx.scene.layout.*?>
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.xtra.genetreeview.GeneTreeViewController">
+    <children>
+        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                    AnchorPane.topAnchor="0.0">
+            <top>
+                <VBox fx:id="topPane" BorderPane.alignment="CENTER">
+                    <children>
+                        <MenuBar fx:id="menuBar">
+                            <menus>
+                                <Menu mnemonicParsing="false" text="File">
+                                    <items>
+                                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open...">
+                                            <accelerator>
+                                                <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP"
+                                                                    shortcut="DOWN"/>
+                                            </accelerator>
+                                        </MenuItem>
+                                        <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" text="Close">
+                                            <accelerator>
+                                                <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP"
+                                                                    shortcut="DOWN"/>
+                                            </accelerator>
+                                        </MenuItem>
+                                    </items>
+                                </Menu>
+                                <Menu mnemonicParsing="false" text="Edit"/>
+                                <Menu mnemonicParsing="false" text="Help"/>
+                            </menus>
+                        </MenuBar>
+                        <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0"/>
+                    </children>
+                </VBox>
+            </top>
+            <bottom>
+                <FlowPane fx:id="bottomPane" minHeight="40.0" styleClass="tool-bar" BorderPane.alignment="CENTER">
+                    <children>
+                        <Label fx:id="label" text="Label"/>
+                    </children>
+                </FlowPane>
+            </bottom>
+            <center>
+                <StackPane fx:id="centerPane" BorderPane.alignment="CENTER"/>
+            </center>
+        </BorderPane>
+    </children>
+</AnchorPane>
