@@ -22,6 +22,8 @@ package splitstree6.io.readers;
 import javafx.stage.FileChooser;
 import jloda.util.Basic;
 import jloda.util.PluginClassLoader;
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.TreesBlock;
 import splitstree6.io.utils.DataReaderBase;
 import splitstree6.io.utils.DataType;
 import splitstree6.io.utils.IDataReaderNoAutoDetect;
@@ -44,6 +46,15 @@ public class ImportManager {
 
 	private ImportManager() {
 		readers.addAll(PluginClassLoader.getInstances(DataReaderBase.class, "splitstree6.io.readers"));
+		readers.sort((a, b) -> {
+			if (a.getToClass().equals(TreesBlock.class) && b.getToClass().equals(SplitsBlock.class))
+				return -1;
+			else if (a.getToClass().equals(SplitsBlock.class) && b.getToClass().equals(TreesBlock.class))
+				return 1;
+			else
+				return 0;
+		});
+
 		for (var reader : readers)
 			extensions.addAll(reader.getFileExtensions());
 	}

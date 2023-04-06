@@ -38,7 +38,6 @@ public enum DataType {
 
 	public static DataType getDataType(String fileName) {
 		return getDataType(ImportManager.getInstance().getReader(fileName));
-
 	}
 
 	public static DataType getDataType(DataReaderBase<?> reader) {
