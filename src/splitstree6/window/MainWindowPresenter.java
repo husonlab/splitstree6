@@ -88,6 +88,7 @@ import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.dialog.ExportImageDialog;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
 import splitstree6.dialog.analyzegenomes.AnalyzeGenomesDialog;
@@ -363,6 +364,15 @@ public class MainWindowPresenter {
 		}
 		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
 		controller.getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
+
+		if (focusedDisplayTab.get() != null) {
+			controller.getExportImageButton().setOnAction(e -> ExportImageDialog.show(mainWindow.getFileName(), stage, focusedDisplayTab.get().getImageNode()));
+			controller.getExportImageButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(focusedDisplayTab.isNull()));
+		}
+
+		controller.getExportImageMenuItem().setOnAction(controller.getExportImageButton().getOnAction());
+		controller.getExportImageMenuItem().disableProperty().bind(controller.getExportImageButton().disableProperty());
+
 
 		controller.getGroupIdenticalHaplotypesFilesMenuItem().setOnAction(null);
 

@@ -90,6 +90,8 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu mnemonicParsing="false" text="Export">
                             <items>
+                                <MenuItem fx:id="exportImageMenuItem" text="Image..."/>
+
                                 <MenuItem fx:id="exportTaxonTraitsMenuItem" text="Taxon Traits..."/>
                                 <MenuItem fx:id="exportTaxonDisplayLabelsMenuItem" mnemonicParsing="false"
                                           text="Taxon Display Labels..."/>
@@ -498,6 +500,23 @@
                                         </graphic>
                                         <tooltip>
                                             <Tooltip text="Save file"/>
+                                        </tooltip>
+                                    </Button>
+                                    <Button fx:id="exportImageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                            mnemonicParsing="false" prefHeight="20.0"
+                                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                                            text="Print">
+                                        <font>
+                                            <Font size="10.0"/>
+                                        </font>
+                                        <graphic>
+                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                                       preserveRatio="true">
+                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Export16.gif"/>
+                                            </ImageView>
+                                        </graphic>
+                                        <tooltip>
+                                            <Tooltip text="Export the selected tab as an image"/>
                                         </tooltip>
                                     </Button>
                                     <Button fx:id="printButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"

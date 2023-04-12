@@ -37,10 +37,10 @@ public class SaveDialog {
      * @param mainWindow the main window
      */
     public static void showSaveDialog(MainWindow mainWindow, boolean asWorkflowOnly) {
-        final FileChooser fileChooser = new FileChooser();
+        final var fileChooser = new FileChooser();
         fileChooser.setTitle(asWorkflowOnly ? "Export SplitsTree6 Workflow" : "Save SplitsTree6 file");
 
-        final File previousDir = new File(ProgramProperties.get("SaveDir", ""));
+		final var previousDir = new File(ProgramProperties.get("SaveDir", ""));
         if (previousDir.isDirectory()) {
             fileChooser.setInitialDirectory(previousDir);
         } else
@@ -54,7 +54,7 @@ public class SaveDialog {
             fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".wflow6")));
         }
 
-        final File selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
+		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
         if (selectedFile != null) {
             save(mainWindow, asWorkflowOnly, selectedFile);
         }

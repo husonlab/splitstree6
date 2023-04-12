@@ -77,6 +77,9 @@ public class MainWindowController {
 	private MenuItem saveAsMenuItem;
 
 	@FXML
+	private MenuItem exportImageMenuItem;
+
+	@FXML
 	private MenuItem exportTaxonDisplayLabelsMenuItem;
 
 	@FXML
@@ -437,6 +440,8 @@ public class MainWindowController {
 	private Button saveButton;
 
 	@FXML
+	private Button exportImageButton;
+	@FXML
 	private Button printButton;
 
 
@@ -551,6 +556,10 @@ public class MainWindowController {
 
 	public MenuItem getSaveAsMenuItem() {
 		return saveAsMenuItem;
+	}
+
+	public MenuItem getExportImageMenuItem() {
+		return exportImageMenuItem;
 	}
 
 	public MenuItem getExportTaxonDisplayLabelsMenuItem() {
@@ -1032,6 +1041,10 @@ public class MainWindowController {
 
 	public Button getSaveButton() {
 		return saveButton;
+	}
+
+	public Button getExportImageButton() {
+		return exportImageButton;
 	}
 
 	public Button getPrintButton() {
