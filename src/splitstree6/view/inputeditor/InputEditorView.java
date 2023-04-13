@@ -137,7 +137,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 			var name = mainWindow.getFileName();
 
 			if (tmpFile == null) {
-				tmpFile = FileUtils.getUniqueFileName(System.getProperty("user.dir"), "Untitled", "tmp");
+				tmpFile = File.createTempFile("Untitled", ".tmp");
 				tmpFile.deleteOnExit();
 			}
 			try (BufferedWriter w = new BufferedWriter(new FileWriter(tmpFile))) {

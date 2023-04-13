@@ -441,9 +441,9 @@ public class MainWindowController {
 
 	@FXML
 	private Button exportImageButton;
+
 	@FXML
 	private Button printButton;
-
 
 	//@FXML
 	//private TabPane algorithmTabPane;
