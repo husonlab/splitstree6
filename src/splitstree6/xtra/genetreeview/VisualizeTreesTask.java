@@ -32,6 +32,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.BasicFX;
 import jloda.graph.NodeArray;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TreesBlock;
@@ -69,8 +70,12 @@ public class VisualizeTreesTask extends Task<Group> {
                     new HashMap<>(),new HashMap<>()).getAllAsGroup();
 
             if (diagram.isRadialOrCircular()) {
-                layoutedTree.setTranslateX(treeWidth/2);
-                layoutedTree.setTranslateY(treeHeight/2);
+                layoutedTree.setTranslateX(treeWidth / 2);
+                layoutedTree.setTranslateY(treeHeight / 2);
+
+                for (var label : BasicFX.getAllRecursively(layoutedTree, RichTextLabel.class)) {
+                    label.setScale(1.5);
+                }
             }
             else if (diagram.isPhylogram()) { // for rectangular phylogram
                 layoutedTree.setTranslateX(5);

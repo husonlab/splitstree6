@@ -19,12 +19,14 @@
 
 package splitstree6.dialog.analyzegenomes;
 
+import javafx.application.Platform;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ProgramProperties;
 import splitstree6.main.Version;
 
@@ -91,6 +93,7 @@ public class AnalyzeGenomesDialog {
 
 	public void show() {
 		stage.show();
+		ProgramExecutorService.submit(500, () -> Platform.runLater(stage::toFront));
 	}
 
 	public Stage getStage() {

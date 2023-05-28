@@ -168,10 +168,14 @@ public class TreesUtilities {
 				if (v != tree.getRoot()) {
 					var complement = BitSetUtils.minus(taxaInTree, cluster);
 					if (cluster.cardinality() > 0 && complement.cardinality() > 0) {
-						var weight = tree.getWeight(v.getFirstInEdge());
+						var e = v.getFirstInEdge();
+						var weight = tree.getWeight(e);
 						var biPartition = new BiPartition(cluster, complement);
 						var split = biPartitionSplitMap.computeIfAbsent(biPartition, k -> new ASplit(cluster, complement, 0));
-						split.setWeight(split.getWeight() + weight); // this ensures that complementary clusters get mpped to same split
+						split.setWeight(split.getWeight() + weight); // this ensures that complementary clusters get mapped to same split
+						if (tree.hasEdgeConfidences()) {
+							split.setConfidence(tree.getConfidence(e));
+						}
 					}
 				}
 			}
@@ -179,17 +183,6 @@ public class TreesUtilities {
 			splits.addAll(biPartitionSplitMap.values());
 		}
 		return taxaInTree;
-	}
-
-	/**
-	 * compute the total weight of a tree
-	 */
-	public static double computeTotalWeight(PhyloTree tree) {
-		double weight = 0;
-		for (var e : tree.edges()) {
-			weight += tree.getWeight(e);
-		}
-		return weight;
 	}
 
 	/**

@@ -80,18 +80,17 @@ public enum CharactersType {
 		var best = 0.0;
 
 		for (var type : values()) {
-			var size = (float) intersection(type.symbols, alphabet).size() / (float) Math.min(type.symbols.length(), alphabet.length());
+			var size = (float) intersection(type.symbols, alphabet).size() / (float) union(type.symbols, alphabet).size();
 			if (size > best) {
-				if (type == DNAwithAmbiguityCodes)
-					result = DNA;
-				else if (type == RNAwithAmbiguityCodes)
-					result = RNA;
-				else
-					result = type;
 				best = size;
+				result = type;
 			}
 
 		}
+		if (result == DNAwithAmbiguityCodes)
+			result = DNA;
+		else if (result == RNAwithAmbiguityCodes)
+			result = RNA;
 		return result;
 	}
 

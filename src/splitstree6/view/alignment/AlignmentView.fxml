@@ -48,6 +48,8 @@
                             <MenuItem fx:id="selectConstantMenuItem" mnemonicParsing="false" text="Constant Sites"/>
                             <MenuItem fx:id="selectGapMenuItem" mnemonicParsing="false" text="Gap Sites"/>
                             <MenuItem fx:id="selectMissingMenuItem" mnemonicParsing="false" text="Missing Sites"/>
+                            <MenuItem fx:id="selectMajorityGapOrMissingMenuItem" mnemonicParsing="false"
+                                      text="Sites Majority Gap or Missing"/>
                             <MenuItem fx:id="selectAllNonInformativeMenuItem" mnemonicParsing="false"
                                       text="Non Informative Sites"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>

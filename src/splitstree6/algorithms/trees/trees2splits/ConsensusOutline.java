@@ -19,9 +19,6 @@
 
 package splitstree6.algorithms.trees.trees2splits;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.IToCircularSplits;
 import splitstree6.data.SplitsBlock;
@@ -32,66 +29,27 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * implements consensus outline
+ * runs consensus outline
  * <p>
  * Daniel Huson, 2.2018
  */
-public class ConsensusOutline extends Trees2Splits implements IToCircularSplits {
-	private final SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
-	private final DoubleProperty optionThresholdPercent = new SimpleDoubleProperty(this, "optionThresholdPercent", 0.0);
-
+public class ConsensusOutline extends ConsensusSplits implements IToCircularSplits {
 	@Override
 	public List<String> listOptions() {
 		return List.of(optionEdgeWeights.getName(), optionThresholdPercent.getName());
 	}
 
-	@Override
-	public String getToolTip(String optionName) {
-		if (optionName.equals(optionEdgeWeights.getName()))
-			return "Determine how to calculate edge weights in resulting network";
-		else if (optionName.equals(optionThresholdPercent.getName()))
-			return "Determine threshold for percent of input trees that split has to occur in for it to appear in the output";
-		else
-			return super.getToolTip(optionName);
+	public ConsensusOutline() {
+		setOptionConsensus(Consensus.ConsensusOutline);
+		setOptionThresholdPercent(0.0);
+		setOptionHighDimensionFilter(false);
+		setOptionEdgeWeights(EdgeWeights.TreeNormalizedSum);
 	}
 
 	/**
 	 * compute the consensus splits
 	 */
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
-		var consensusSplits = new ConsensusSplits();
-		consensusSplits.setOptionConsensus(ConsensusSplits.Consensus.GreedyCircular);
-		consensusSplits.setOptionEdgeWeights(getOptionEdgeWeights());
-		consensusSplits.setOptionThresholdPercent(getOptionThresholdPercent());
-		consensusSplits.compute(progress, taxaBlock, treesBlock, splitsBlock);
-	}
-
-	@Override
-	public boolean isApplicable(TaxaBlock taxaBlock, TreesBlock parent) {
-		return !parent.isPartial();
-	}
-
-	public ConsensusNetwork.EdgeWeights getOptionEdgeWeights() {
-		return optionEdgeWeights.get();
-	}
-
-	public SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeightsProperty() {
-		return optionEdgeWeights;
-	}
-
-	public void setOptionEdgeWeights(ConsensusNetwork.EdgeWeights optionEdgeWeights) {
-		this.optionEdgeWeights.set(optionEdgeWeights);
-	}
-
-	public double getOptionThresholdPercent() {
-		return optionThresholdPercent.get();
-	}
-
-	public DoubleProperty optionThresholdPercentProperty() {
-		return optionThresholdPercent;
-	}
-
-	public void setOptionThresholdPercent(double optionThresholdPercent) {
-		this.optionThresholdPercent.set(optionThresholdPercent);
+		super.compute(progress, taxaBlock, treesBlock, splitsBlock);
 	}
 }

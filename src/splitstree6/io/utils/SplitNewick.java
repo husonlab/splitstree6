@@ -130,7 +130,7 @@ public class SplitNewick {
 				for (var id : ids) {
 					var set = new BitSet();
 					{
-						var matcher = Pattern.compile("(<%d\\|)|(\\|%d>|\\|%d:[0-9.eE-]+>)".formatted(id, id, id)).matcher(newickString);
+						var matcher = Pattern.compile("(<%d\\|)|(\\|%d(:[+-]?[0-9.eE-]+){0,3}>)".formatted(id, id)).matcher(newickString);
 						var start = -1;
 						while (matcher.find()) {
 							if (matcher.group(1) != null) {
@@ -144,14 +144,36 @@ public class SplitNewick {
 							}
 						}
 					}
+					if (set.cardinality() == 0) {
+						System.err.println("Empty: " + id);
+						var matcher = Pattern.compile("(<%d\\|)|(\\|%d(:[+-]?[0-9][0-9.eE-]*){0,3}>)".formatted(id, id)).matcher(newickString);
+						while (matcher.find()) {
+							if (matcher.group(1) != null)
+								System.err.println("Found: " + newickString.substring(matcher.start(1), matcher.end(1)));
+							if (matcher.group(2) != null)
+								System.err.println("Found: " + newickString.substring(matcher.start(1), matcher.end(2)));
+						}
+
+					}
 					var split = new ASplit(set, nTax);
 					{
 						var weight = Double.MIN_VALUE;
 						var confidence = Double.MIN_VALUE;
 						var probability = Double.MIN_VALUE; // not used (yet?)
-						var matcher = Pattern.compile("\\|%d(:[0-9.-eE]+)?(:[0-9.-eE]+)?(:[0-9.-eE]+)?>".formatted(id)).matcher(newickString);
+						var matcher = Pattern.compile("\\|%d(:[-+]?[0-9]*\\.?[0-9eE]*)?(:[-+]?[0-9]*\\.?[0-9eE]*)?(:[-+]?[0-9]*\\.?[0-9eE]*)?>".formatted(id)).matcher(newickString);
 						while (matcher.find()) {
 							if (matcher.group(1) != null) {
+								if (false) {
+									System.err.println("Group(1): " + matcher.group(1));
+									System.err.println("Location: " + matcher.start(1) + "," + matcher.end(1));
+									System.err.println("Text is : " + newickString.substring(matcher.start(1), matcher.end(1)) + "\n");
+									if (matcher.group(2) != null) {
+										System.err.println("Group(2): " + matcher.group(2));
+										System.err.println("Location: " + matcher.start(2) + "," + matcher.end(2));
+										System.err.println("Text is : " + newickString.substring(matcher.start(2), matcher.end(2)) + "\n");
+									}
+								}
+
 								weight = Double.parseDouble(matcher.group(1).substring(1));
 								if (matcher.group(2) != null) {
 									confidence = Double.parseDouble(matcher.group(2).substring(1));

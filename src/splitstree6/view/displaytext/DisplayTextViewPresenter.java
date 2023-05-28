@@ -23,6 +23,8 @@ package splitstree6.view.displaytext;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
@@ -139,11 +141,6 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		mainController.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
 		mainController.getPrintMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		if (editable) {
-			mainController.getCutMenuItem().setOnAction(e -> codeArea.cut());
-			mainController.getCutMenuItem().disableProperty().bind(selectionEmpty);
-		}
-
 		mainController.getCopyMenuItem().setOnAction(e -> codeArea.copy());
 		mainController.getCopyMenuItem().disableProperty().bind(selectionEmpty);
 
@@ -169,13 +166,28 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				redoAvailable.bind(codeArea.redoAvailableProperty());
 				mainController.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
 			}
+		} else {
+			mainController.getPasteMenuItem().disableProperty().unbind();
+			mainController.getPasteMenuItem().setDisable(true);
 		}
-		mainController.getPasteMenuItem().disableProperty().unbind();
-		mainController.getPasteMenuItem().setDisable(true);
 
 		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
+
 		if (editable) {
 			mainController.getReplaceMenuItem().setOnAction(controller.getFindAndReplaceButton().getOnAction());
+		}
+
+		{
+			var cut = new MenuItem("Cut");
+			cut.setOnAction(a -> codeArea.cut());
+			var copy = new MenuItem("Copy");
+			copy.setOnAction(a -> codeArea.copy());
+			var paste = new MenuItem("Paste");
+			paste.setOnAction(a -> codeArea.paste());
+			if (editable)
+				codeArea.setContextMenu(new ContextMenu(cut, copy, paste));
+			else
+				codeArea.setContextMenu(new ContextMenu(copy));
 		}
 
 		mainController.getFindAgainMenuItem().setOnAction((e) -> findToolBar.findAgain());

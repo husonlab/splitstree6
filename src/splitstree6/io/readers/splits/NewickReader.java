@@ -110,12 +110,12 @@ public class NewickReader extends SplitsReader {
 			return false;
 		else {
 			var line = FileUtils.getFirstLineFromFileIgnoreEmptyLines(new File(filename), "#", 20);
-			return line != null && line.startsWith("(");
+			return acceptsFirstLine(line);
 		}
 	}
 
 	public boolean acceptsFirstLine(String text) {
 		var line = StringUtils.getFirstLine(text);
-		return line.startsWith("(");
+		return line.startsWith("(") && line.contains("<") && line.contains(">");
 	}
 }

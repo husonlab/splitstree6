@@ -145,6 +145,8 @@ public class SplitNetworkPane extends StackPane {
 
 			Platform.runLater(() -> applyOrientation(orientation.get()));
 
+			System.err.printf("Nodes: %,d, Edges: %,d%n", splitNetworkLayout.getGraph().getNumberOfNodes(), splitNetworkLayout.getGraph().getNumberOfEdges());
+
 			if (getRunAfterUpdate() != null) {
 				Platform.runLater(() -> getRunAfterUpdate().run());
 			}

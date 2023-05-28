@@ -109,21 +109,23 @@ public class AccessReferenceDatabase implements Closeable {
 
         connection = config.createConnection("jdbc:sqlite:" + dbFile);
 
-        unusableTaxa.addAll(executeQueryInt("SELECT taxon_id FROM genomes WHERE fasta_url is NULL or fasta_url='';", 1));
+        unusableTaxa.addAll(executeQueryIntList("SELECT taxon_id FROM genomes WHERE fasta_url is NULL or fasta_url='';", 1));
 
-        mashK = executeQueryInt("SELECT value FROM info WHERE key='mash_k';", 1).get(0);
-        mashS = executeQueryInt("SELECT value FROM info WHERE key='mash_s';", 1).get(0);
-        mashSeed = executeQueryInt("SELECT value FROM info WHERE key='mash_seed';", 1).get(0);
-        taxonomyRoot = executeQueryInt("SELECT taxon_id FROM taxa WHERE parent_id=0;", 1).get(0);
+        mashK = executeQueryOneInt("SELECT value FROM info WHERE key='mash_k';", 1);
+        mashS = executeQueryOneInt("SELECT value FROM info WHERE key='mash_s';", 1);
+        mashSeed = executeQueryOneInt("SELECT value FROM info WHERE key='mash_seed';", 1);
+        taxonomyRoot = executeQueryOneInt("SELECT taxon_id FROM taxa WHERE parent_id=0;", 1);
     }
 
     public static String getSchema() {
-        return "CREATE TABLE bloom_filters (taxon_id INTEGER PRIMARY KEY, bloom_filter TEXT NOT NULL) WITHOUT ROWID;\n" +
-               "CREATE TABLE tree (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;\n" +
-               "CREATE TABLE taxa (taxon_id INTEGER PRIMARY KEY, taxon_name TEXT, taxon_display_name TEXT, parent_id INTEGER REFERENCES taxa(taxon_id)) WITHOUT ROWID;\n" +
-               "CREATE TABLE info (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;\n" +
-               "CREATE TABLE genomes (taxon_id INTEGER PRIMARY KEY, genome_accession TEXT NOT NULL, genome_size INTEGER, fasta_url TEXT) WITHOUT ROWID;\n" +
-               "CREATE TABLE mash_sketches (taxon_id INTEGER PRIMARY KEY, mash_sketch TEXT NOT NULL) WITHOUT ROWID;\n";
+        return """
+                CREATE TABLE bloom_filters (taxon_id INTEGER PRIMARY KEY, bloom_filter TEXT NOT NULL) WITHOUT ROWID;
+                CREATE TABLE tree (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;
+                CREATE TABLE taxa (taxon_id INTEGER PRIMARY KEY, taxon_name TEXT, taxon_display_name TEXT, parent_id INTEGER REFERENCES taxa(taxon_id)) WITHOUT ROWID;
+                CREATE TABLE info (key TEXT PRIMARY KEY, value TEXT NOT NULL) WITHOUT ROWID;
+                CREATE TABLE genomes (taxon_id INTEGER PRIMARY KEY, genome_accession TEXT NOT NULL, genome_size INTEGER, fasta_url TEXT) WITHOUT ROWID;
+                CREATE TABLE mash_sketches (taxon_id INTEGER PRIMARY KEY, mash_sketch TEXT NOT NULL) WITHOUT ROWID;
+                """;
     }
 
     public static boolean isDatabaseFile(String fileName) {
@@ -137,13 +139,28 @@ public class AccessReferenceDatabase implements Closeable {
      * @return ArrayList containing all query results of the specified type
      * @throws SQLException if something went wrong with the database
      */
-    public ArrayList<Integer> executeQueryInt(String query, int index) throws SQLException {
+    public ArrayList<Integer> executeQueryIntList(String query, int index) throws SQLException {
         final var rs = connection.createStatement().executeQuery(query);
         final var list = new ArrayList<Integer>();
         while (rs.next()) {
             list.add(rs.getInt(index));
         }
         return list;
+    }
+
+    /**
+     * generic method for executing queries with results of type int/Integer
+     *
+     * @param query the SQL query
+     * @return ArrayList containing all query results of the specified type
+     * @throws SQLException if something went wrong with the database
+     */
+    public Integer executeQueryOneInt(String query, int index) throws SQLException {
+        final var rs = connection.createStatement().executeQuery(query);
+        if (rs.next())
+            return rs.getInt(index);
+        else
+            throw new SQLException("No result for: " + StringUtils.abbreviateDotDotDot(query, 60));
     }
 
     /**
@@ -188,6 +205,7 @@ public class AccessReferenceDatabase implements Closeable {
                 final var taxon = rs.getInt(1);
                 final var hexString = rs.getString(2);
                 final var mashSketch = MashSketch.parse(HexUtils.decodeHexString(hexString));
+                countMashCalls++;
                 result.add(new Pair<>(taxon, mashSketch));
             }
         }
@@ -199,13 +217,23 @@ public class AccessReferenceDatabase implements Closeable {
 
         final var rs = connection.createStatement().executeQuery(query);
 
+        var all = new TreeSet<>(taxonIds);
         final var result = new ArrayList<Pair<Integer, BloomFilter>>();
         while (rs.next()) {
             final var taxon = rs.getInt(1);
             final var hexString = rs.getString(2);
             final var bloomFilter = BloomFilter.parseBytes(HexUtils.decodeHexString(hexString));
             result.add(new Pair<>(taxon, bloomFilter));
+            countBloomFilterCalls++;
+            all.remove(taxon);
         }
+        for (var taxon : all) {
+            if (false) System.err.println("Bloom filter missing for taxon " + taxon);
+            result.add(new Pair<>(taxon, null)); // bloom filter is missing...
+            countMissingBloomFilterCalls++;
+
+        }
+        // System.err.println(query+": "+result.size());
         return result;
     }
 
@@ -325,15 +353,15 @@ public class AccessReferenceDatabase implements Closeable {
     }
 
     public int countGenomes() throws SQLException {
-        return executeQueryInt("SELECT count(*) FROM genomes;", 1).get(0);
+        return executeQueryIntList("SELECT count(*) FROM genomes;", 1).get(0);
     }
 
     public int countBloomFilters() throws SQLException {
-        return executeQueryInt("SELECT count(*) FROM bloom_filters;", 1).get(0);
+        return executeQueryIntList("SELECT count(*) FROM bloom_filters;", 1).get(0);
     }
 
     public int countMashSketches() throws SQLException {
-        return executeQueryInt("SELECT count(*) FROM mash_sketches;", 1).get(0);
+        return executeQueryIntList("SELECT count(*) FROM mash_sketches;", 1).get(0);
     }
 
     public int getMashK() {
@@ -353,11 +381,11 @@ public class AccessReferenceDatabase implements Closeable {
     }
 
     public Collection<Integer> getTaxonomyChildren(int parent_id) throws SQLException {
-        return new ArrayList<>(executeQueryInt("SELECT taxon_id FROM taxa WHERE parent_id=" + parent_id + ";", 1));
+        return new TreeSet<>(executeQueryIntList("SELECT taxon_id FROM taxa WHERE parent_id=" + parent_id + ";", 1));
     }
 
     public int getTaxonomyParent(int taxid) throws SQLException {
-        return new ArrayList<>(executeQueryInt("SELECT parent_id FROM taxa WHERE taxon_id=" + taxid + ";", 1)).get(0);
+        return new ArrayList<>(executeQueryIntList("SELECT parent_id FROM taxa WHERE taxon_id=" + taxid + ";", 1)).get(0);
     }
 
     public Map<String, String> getReferenceFile2Name(ObservableList<Integer> taxonIds, ProgressListener progress) throws SQLException, IOException {
@@ -410,6 +438,10 @@ public class AccessReferenceDatabase implements Closeable {
         return result;
     }
 
+    static int countBloomFilterCalls = 0;
+    static int countMissingBloomFilterCalls = 0;
+    static int countMashCalls = 0;
+
     /**
      * find all genomes that have non-zero Jaccard index when compared with the query
      */
@@ -452,6 +484,11 @@ public class AccessReferenceDatabase implements Closeable {
         final var exception = new Single<Exception>();
         final var jobs = new AtomicInteger(1);
 
+        countBloomFilterCalls = 0;
+        countMissingBloomFilterCalls = 0;
+        countMashCalls = 0;
+
+
         final var service = Executors.newFixedThreadPool(ProgramExecutorService.getNumberOfCoresToUse());
         try {
             service.submit(createTasksRec(getTaxonomyRoot(), querySketches, kmers, minSharedKMers, id2distance, progress, exception, jobs, service));
@@ -465,6 +502,9 @@ public class AccessReferenceDatabase implements Closeable {
             }
         } finally {
             service.shutdown();
+            System.err.println("countBloomFilterCalls: " + countBloomFilterCalls);
+            System.err.println("countMissingBloomFilterCalls: " + countMissingBloomFilterCalls);
+            System.err.println("countMashCalls: " + countMashCalls);
         }
 
         final ArrayList<Map.Entry<Integer, Double>> result;
@@ -501,34 +541,39 @@ public class AccessReferenceDatabase implements Closeable {
                 try {
                     final var database = getCopy();
                     final var ids = database.getTaxonomyChildren(taxonId);
-                    final var bloomFilters = database.getBloomFilters(ids);
-                    for (var pair : bloomFilters) {
-                        final var bloomFilter = pair.getSecond();
-                        if (bloomFilter == null || bloomFilter.cardinality() < database.getMashS() || bloomFilter.countContainedProbably(kmers) >= minSharedKMers) {
-                            final var id = pair.getFirst();
-                            jobCount.incrementAndGet();
-                            service.submit(createTasksRec(id, querySketches, kmers, minSharedKMers, id2distance, progress, exception, jobCount, service));
-                            //System.err.println("Adding bloom filter for " + id);
-                        }
-                        progress.incrementProgress();
-                    }
-                    final var mashSketches = database.getMashSketches(ids);
-                    for (var pair : mashSketches) {
-                        final var mashSketch = pair.getSecond();
-                        for (var sketch : querySketches) {
-                            if (MashDistance.computeIntersection(mashSketch, sketch) >= minSharedKMers) {
-                                final var id = pair.getFirst();
-                                final var distance = MashDistance.compute(mashSketch, sketch);
-                                synchronized (id2distance) {
-                                    if (!id2distance.containsKey(id) || id2distance.get(id) > distance) {
-                                        id2distance.put(id, distance);
+                    if (ids.size() > 0) {
+                        final var mashSketches = database.getMashSketches(ids);
+                        for (var pair : mashSketches) {
+                            final var mashSketch = pair.getSecond();
+                            for (var sketch : querySketches) {
+                                if (MashDistance.computeIntersection(mashSketch, sketch) >= minSharedKMers) {
+                                    final var id = pair.getFirst();
+                                    final var distance = MashDistance.compute(mashSketch, sketch);
+                                    synchronized (id2distance) {
+                                        if (!id2distance.containsKey(id) || id2distance.get(id) > distance) {
+                                            id2distance.put(id, distance);
+                                        }
                                     }
+                                    if (verbose)
+                                        System.err.printf("Found similar: " + id + " " + database.getName(id) + " JI: %f dist: %.8f%n", MashDistance.computeJaccardIndex(mashSketch, sketch), distance);
                                 }
-                                if (verbose)
-                                    System.err.printf("Found similar: " + id + " " + database.getName(id) + " JI: %f dist: %.8f%n", MashDistance.computeJaccardIndex(mashSketch, sketch), distance);
                             }
+                            progress.incrementProgress();
                         }
-                        progress.incrementProgress();
+                        // remove all id's that have a sketch, they can't be internal nodes:
+                        ids.removeAll(mashSketches.stream().map(Pair::getFirst).toList());
+
+                        final var bloomFilters = database.getBloomFilters(ids);
+                        for (var pair : bloomFilters) {
+                            final var bloomFilter = pair.getSecond();
+                            if (bloomFilter == null || bloomFilter.cardinality() < database.getMashS() || bloomFilter.countContainedProbably(kmers) >= minSharedKMers) {
+                                final var id = pair.getFirst();
+                                jobCount.incrementAndGet();
+                                service.submit(createTasksRec(id, querySketches, kmers, minSharedKMers, id2distance, progress, exception, jobCount, service));
+                                //System.err.println("Adding bloom filter for " + id);
+                            }
+                            progress.incrementProgress();
+                        }
                     }
                 } catch (IOException | SQLException ex) {
                     exception.setIfCurrentValueIsNull(ex);
