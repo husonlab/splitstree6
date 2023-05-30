@@ -104,7 +104,7 @@ public class EnumerateContainedTrees extends Trees2Trees {
 				tree.copy(network, null, oldEdge2NewEdgeMap);
 				inactive.stream().map(oldEdge2NewEdgeMap::get).forEach(tree::deleteEdge);
 				tree.clearTransferAcceptorEdges();
-				tree.clearRetciulateEdges();
+				tree.clearReticulateEdges();
 				tree.clearLsaChildrenMap();
 
 				while (true) {

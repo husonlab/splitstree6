@@ -89,7 +89,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.APGD;
 		else
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.GRADPROJECTION; //DEFAULT
-		
+
 		ArrayList<ASplit> splits;
 		splits= NeighborNetSplitWeightsClean.compute(cycle, distancesBlock.getDistances(), params, progress);
 

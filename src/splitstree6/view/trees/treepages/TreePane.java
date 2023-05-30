@@ -154,9 +154,6 @@ public class TreePane extends StackPane {
 						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
 				}
 			}
-			if (false)
-				System.err.println(phyloTree.toBracketString(new PhyloTree.NewickOutputFormat(true, false, true, true, true)));
-
 			return ComputeTreeLayout.apply(phyloTree, taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), diagram, averaging, width - 4, height - 4, true, nodeShapeMap, edgeShapeMap);
 		});
 

@@ -19,6 +19,7 @@
 
 package splitstree6.io.nexus;
 
+import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.IOExceptionWithLineNumber;
 import jloda.util.NumberUtils;
@@ -143,6 +144,9 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 
 		final var knownTaxonNames = new HashSet<>(taxonNamesFound);
 
+		var newickIO = new NewickIO();
+		newickIO.allowMultiLabeledNodes = false;
+
 		int treeNumber = 1;
 		while (np.peekMatchIgnoreCase("tree")) {
 			np.matchIgnoreCase("tree");
@@ -177,8 +181,8 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 
 			// final PhyloTree tree = PhyloTree.valueOf(buf.toString(), isRooted);
 			final var tree = new PhyloTree();
-			tree.allowMultiLabeledNodes = false;
-			tree.parseBracketNotation(buf.toString(), true);
+
+			newickIO.parseBracketNotation(tree, buf.toString(), true);
 
 			if (translator != null)
 				tree.changeLabels(translator, true);

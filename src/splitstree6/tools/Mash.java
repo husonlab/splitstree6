@@ -19,10 +19,10 @@
 
 package splitstree6.tools;
 
+import jloda.fx.util.ArgsOptions;
 import jloda.kmers.mash.MashDistance;
 import jloda.kmers.mash.MashSketch;
 import jloda.seq.FastAFileIterator;
-import jloda.swing.util.ArgsOptions;
 import jloda.util.*;
 import jloda.util.progress.ProgressPercentage;
 

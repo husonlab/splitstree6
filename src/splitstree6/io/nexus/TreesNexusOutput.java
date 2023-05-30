@@ -20,6 +20,7 @@
 package splitstree6.io.nexus;
 
 import jloda.graph.Node;
+import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
@@ -67,11 +68,13 @@ public class TreesNexusOutput extends NexusIOBase implements INexusOutput<TreesB
 			labeler = computeLabelByName(taxaBlock);
 
 		w.write("[TREES]\n");
+
+		var newickIO = new NewickIO();
 		int t = 1;
 		for (var tree : treesBlock.getTrees()) {
 			final String name = (tree.getName() != null && tree.getName().length() > 0 ? tree.getName() : "t" + t);
 			w.write("\t\t[" + (t++) + "] tree '" + name + "'=" + getFlags(tree) + " ");
-			tree.write(w, format.isOptionWeights(), labeler);
+			newickIO.write(tree, w, format.isOptionWeights(), labeler);
 			w.write(";\n");
 		}
 		w.write("END; [TREES]\n");

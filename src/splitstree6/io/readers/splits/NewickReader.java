@@ -20,7 +20,6 @@
 package splitstree6.io.readers.splits;
 
 import jloda.fx.window.NotificationManager;
-import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
@@ -68,8 +67,6 @@ public class NewickReader extends SplitsReader {
 		}
 		var newick = StringUtils.toString(parts, "");
 		if (newick.endsWith(";")) {
-			final var tree = new PhyloTree();
-			tree.allowMultiLabeledNodes = false;
 			try {
 				var taxonLabelMap = new TreeMap<Integer, String>();
 				splitsBlock.getSplits().addAll(SplitNewick.parse(newick, null, taxonLabelMap));

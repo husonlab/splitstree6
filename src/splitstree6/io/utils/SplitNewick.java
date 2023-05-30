@@ -87,7 +87,7 @@ public class SplitNewick {
 		// System.err.println("treeNewick in: " + treeNewick);
 
 		var tree = new PhyloTree();
-		tree.parseBracketNotation(treeNewick, true, true);
+		tree.parseBracketNotation(treeNewick, true);
 		if (labelTaxonMap == null) {
 			var nTax = 0;
 			labelTaxonMap = new HashMap<>();

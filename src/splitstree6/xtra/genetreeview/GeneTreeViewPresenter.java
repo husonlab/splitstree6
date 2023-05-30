@@ -29,18 +29,19 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.control.Menu;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.tree.*;
+import splitstree6.layout.tree.TreeDiagramType;
 
 public class GeneTreeViewPresenter {
 
@@ -230,9 +231,12 @@ public class GeneTreeViewPresenter {
 		slider.setMax(treesBlock.getNTrees());
 		slider.disableProperty().setValue(false);
 		//Tooltip.install(slider, currentTreeToolTip);
-		currentTreeToolTip.setText(treesBlock.getTree(1).getName());
-		previousTreeToolTip.setText(currentTreeToolTip.getText());
-		nextTreeToolTip.setText(treesBlock.getTree(2).getName());
+		if (treesBlock.getNTrees() > 0) {
+			currentTreeToolTip.setText(treesBlock.getTree(1).getName());
+			previousTreeToolTip.setText(currentTreeToolTip.getText());
+		}
+		if (treesBlock.getNTrees() > 1)
+			nextTreeToolTip.setText(treesBlock.getTree(2).getName());
 		slider.setMinorTickCount(1);
 		slider.setMajorTickUnit(5);
 		//slider.setShowTickMarks(true);

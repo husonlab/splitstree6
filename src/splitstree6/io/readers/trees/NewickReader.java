@@ -73,7 +73,8 @@ public class NewickReader extends TreesReader {
 		treesBlock.setRooted(true);
 
 		// read in the trees
-		var io = new NewickIO();
+		var newickIO = new NewickIO();
+		newickIO.allowMultiLabeledNodes = false;
 
 		while (it.hasNext()) {
 			lineno++;
@@ -88,18 +89,16 @@ public class NewickReader extends TreesReader {
 				} else
 					treeLine = line;
 				final var tree = new PhyloTree();
-				io.setNewickLeadingCommentConsumer(s -> {
-					if (s.startsWith(GENE_NAME_TAG))
-						tree.setName(s.substring(GENE_NAME_TAG.length() + 1).trim());
-				});
-				io.setNewickNodeCommentConsumer((v, s) -> {
-					if (s.startsWith(GENE_NAME_TAG))
-						tree.setName(s.substring(GENE_NAME_TAG.length()).trim());
-				});
-				io.allowMultiLabeledNodes = false;
 				try {
-					io.parseBracketNotation(tree, treeLine, true);
-					if (io.isInputHasMultiLabels())
+					newickIO.parseBracketNotation(tree, treeLine, true,
+							s -> {
+								if (s.startsWith(GENE_NAME_TAG))
+									tree.setName(s.substring(GENE_NAME_TAG.length() + 1).trim());
+							}, (v, s) -> {
+								if (s.startsWith(GENE_NAME_TAG))
+									tree.setName(s.substring(GENE_NAME_TAG.length()).trim());
+							});
+					if (newickIO.isInputHasMultiLabels())
 						throw new IOException("Tree contains multiple copies of the same label");
 					//System.err.println(tree.toBracketString(false));
 				} catch (IOException ex) {
@@ -107,9 +106,9 @@ public class NewickReader extends TreesReader {
 				}
 
 				if (TreesUtilities.hasNumbersOnLeafNodes(tree)) {
-						NotificationManager.showWarning("Leaf nodes have integer labels 'i', converting to t'i'");
-						for (var v : tree.leaves()) {
-							if (NumberUtils.isInteger(tree.getLabel(v))) {
+					NotificationManager.showWarning("Leaf nodes have integer labels 'i', converting to t'i'");
+					for (var v : tree.leaves()) {
+						if (NumberUtils.isInteger(tree.getLabel(v))) {
 								tree.setLabel(v, "t" + tree.getLabel(v));
 							}
 						}

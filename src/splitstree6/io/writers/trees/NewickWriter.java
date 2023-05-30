@@ -40,13 +40,13 @@ public class NewickWriter extends TreesWriterBase {
 
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, TreesBlock trees) throws IOException {
-		var io = new NewickIO();
+		var newickIO = new NewickIO();
 
 		if (trees != null) {
 			for (var i = 1; i <= trees.getNTrees(); i++) {
 				var tree = trees.getTree(i);
-				io.setNewickNodeCommentSupplier(v -> (v == tree.getRoot() && tree.getName() != null && !tree.getName().startsWith("tree-") ? "&&NHX:GN=" + tree.getName() : null));
-				w.write(io.toBracketString(tree, isOptionEdgeWeights()) + ";\n");
+				newickIO.setNewickNodeCommentSupplier(v -> (v == tree.getRoot() && tree.getName() != null && !tree.getName().startsWith("tree-") ? "&&NHX:GN=" + tree.getName() : null));
+				w.write(newickIO.toBracketString(tree, isOptionEdgeWeights()) + ";\n");
 			}
 		}
 		w.flush();
