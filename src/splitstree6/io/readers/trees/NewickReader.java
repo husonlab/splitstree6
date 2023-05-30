@@ -23,6 +23,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
+import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
@@ -64,35 +65,48 @@ public class NewickReader extends TreesReader {
 
 		final var parts = new ArrayList<String>();
 
+		final String GENE_NAME_TAG = "&&NHX:GN=";
+
 		treesBlock.clear();
-			treesBlock.setReticulated(false);
-			treesBlock.setPartial(false);
-			treesBlock.setRooted(true);
+		treesBlock.setReticulated(false);
+		treesBlock.setPartial(false);
+		treesBlock.setRooted(true);
 
-			// read in the trees
-			while (it.hasNext()) {
-				lineno++;
-				final var line = StringUtils.removeComments(it.next(), '[', ']');
-				if (line.endsWith(";")) {
-					final String treeLine;
-					if (parts.size() > 0) {
-						parts.add(line);
-						treeLine = StringUtils.toString(parts, "");
-						parts.clear();
-					} else
-						treeLine = line;
-					final var tree = new PhyloTree();
-					tree.allowMultiLabeledNodes = false;
-					try {
-						tree.parseBracketNotation(treeLine, true);
-						if (tree.isInputHasMultiLabels())
-							throw new IOException("Tree contains multiple copies of the same label");
-						//System.err.println(tree.toBracketString(false));
-					} catch (IOException ex) {
-						throw new IOExceptionWithLineNumber(lineno, ex);
-					}
+		// read in the trees
+		var io = new NewickIO();
 
-					if (TreesUtilities.hasNumbersOnLeafNodes(tree)) {
+		while (it.hasNext()) {
+			lineno++;
+			// var line = StringUtils.removeComments(it.next(), '[', ']');
+			var line = it.next();
+			if (line.endsWith(";")) {
+				final String treeLine;
+				if (parts.size() > 0) {
+					parts.add(line);
+					treeLine = StringUtils.toString(parts, "");
+					parts.clear();
+				} else
+					treeLine = line;
+				final var tree = new PhyloTree();
+				io.setNewickLeadingCommentConsumer(s -> {
+					if (s.startsWith(GENE_NAME_TAG))
+						tree.setName(s.substring(GENE_NAME_TAG.length() + 1).trim());
+				});
+				io.setNewickNodeCommentConsumer((v, s) -> {
+					if (s.startsWith(GENE_NAME_TAG))
+						tree.setName(s.substring(GENE_NAME_TAG.length()).trim());
+				});
+				io.allowMultiLabeledNodes = false;
+				try {
+					io.parseBracketNotation(tree, treeLine, true);
+					if (io.isInputHasMultiLabels())
+						throw new IOException("Tree contains multiple copies of the same label");
+					//System.err.println(tree.toBracketString(false));
+				} catch (IOException ex) {
+					throw new IOExceptionWithLineNumber(lineno, ex);
+				}
+
+				if (TreesUtilities.hasNumbersOnLeafNodes(tree)) {
 						NotificationManager.showWarning("Leaf nodes have integer labels 'i', converting to t'i'");
 						for (var v : tree.leaves()) {
 							if (NumberUtils.isInteger(tree.getLabel(v))) {
@@ -157,15 +171,16 @@ public class NewickReader extends TreesReader {
 						}
 					}
 
-					if (!treesBlock.isReticulated() && tree.edgeStream().anyMatch(tree::isReticulateEdge)) {
-						treesBlock.setReticulated(true);
-					}
+				if (!treesBlock.isReticulated() && tree.edgeStream().anyMatch(tree::isReticulateEdge)) {
+					treesBlock.setReticulated(true);
+				}
 
-					treesBlock.getTrees().add(tree);
+				treesBlock.getTrees().add(tree);
+				if (tree.getName() == null || tree.getName().isBlank())
 					tree.setName("tree-" + treesBlock.size());
 
-					progress.setProgress(it.getProgress());
-				} else
+				progress.setProgress(it.getProgress());
+			} else
 					parts.add(line);
 			}
 			if (parts.size() > 0)

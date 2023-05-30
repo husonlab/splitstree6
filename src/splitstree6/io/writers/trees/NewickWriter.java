@@ -21,6 +21,7 @@ package splitstree6.io.writers.trees;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import jloda.phylo.NewickIO;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
@@ -39,9 +40,13 @@ public class NewickWriter extends TreesWriterBase {
 
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, TreesBlock trees) throws IOException {
+		var io = new NewickIO();
+
 		if (trees != null) {
-			for (var i = 0; i < trees.getNTrees(); i++) {
-				w.write(trees.getTrees().get(i).toBracketString(isOptionEdgeWeights()) + ";\n");
+			for (var i = 1; i <= trees.getNTrees(); i++) {
+				var tree = trees.getTree(i);
+				io.setNewickNodeCommentSupplier(v -> (v == tree.getRoot() && tree.getName() != null && !tree.getName().startsWith("tree-") ? "&&NHX:GN=" + tree.getName() : null));
+				w.write(io.toBracketString(tree, isOptionEdgeWeights()) + ";\n");
 			}
 		}
 		w.flush();
