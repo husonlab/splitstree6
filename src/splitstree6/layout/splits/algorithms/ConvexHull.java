@@ -149,7 +149,6 @@ public class ConvexHull {
 
                 //construct the remainder of convex hull for split-side "0" by traversing all allowed (and reachable) edges (i.e. all edges in splits0)
 
-
                 convexHullPath(graph, start0, graph.newEdgeSet(), hulls, splits0, intersectionNodes, 0);
 
                 //construct the remainder of convex hull for split-side "1" by traversing all allowed (and reachable) edges (i.e. all edges in splits0)

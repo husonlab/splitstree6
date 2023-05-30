@@ -63,7 +63,8 @@ public class LayoutTreeRectangular {
 								levels.set(v, level + 1);
 						}
 					});
-					System.err.println(tree.toBracketString(false));
+					if (false)
+						System.err.println(tree.toBracketString(false));
 					LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> nodePointMap.put(v, new Point2D(-levels.get(v), yCoord.get(v))));
 				}
 			}

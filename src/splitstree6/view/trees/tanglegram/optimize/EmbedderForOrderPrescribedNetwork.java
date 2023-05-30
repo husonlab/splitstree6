@@ -37,9 +37,8 @@ public class EmbedderForOrderPrescribedNetwork {
 
 	/**
 	 * given a mapping of each leaf to a different position, computes an embedding of the network that respects the ordering
-	 *
 	 */
-	public static void apply(PhyloTree tree, Map<Node, Float> node2pos) throws IOException {
+	public static void apply(PhyloTree tree, Map<Node, Float> node2pos) {
 		if (tree.getRoot() != null) {
 			if (verbose)
 				System.err.println("Original network: " + tree.toBracketString(true) + ";");
@@ -111,7 +110,7 @@ public class EmbedderForOrderPrescribedNetwork {
 	private static void processNestedSubTrees(NodeArray<Integer> node2SubTreeId, int numberOfSubTrees,
 											  Map<Integer, Node> subTreeId2Root,
 											  Map<Node, Node> node2lsaParent,
-											  Node[] orderedLabeledLeaves, PhyloTree tree) throws IOException {
+											  Node[] orderedLabeledLeaves, PhyloTree tree) {
 		var first = new Integer[numberOfSubTrees + 1];
 		var last = new Integer[numberOfSubTrees + 1];
 
@@ -203,16 +202,15 @@ public class EmbedderForOrderPrescribedNetwork {
 
 	/**
 	 * remove the lsa edge from lsaParent to v and reattach it so as to lead from the lca of leftNode and rightNode to v
-	 *
 	 */
-	private static void moveLSAParentToEnclosingSubTreeNode(Node lsaParent, Node leftNode, Node rightNode, Node v) throws IOException {
+	private static void moveLSAParentToEnclosingSubTreeNode(Node lsaParent, Node leftNode, Node rightNode, Node v) {
 		if (v.getInDegree() == 1)
-			throw new IOException("Not subtree root");
+			throw new RuntimeException("Not subtree root");
 
 		var tree = (PhyloTree) lsaParent.getOwner();
 
 		if (true) {
-            Queue<Node> queue = new LinkedList<>();
+			Queue<Node> queue = new LinkedList<>();
 			queue.add(v);
 			String label = null;
 			while (label == null && queue.size() > 0) {
@@ -231,7 +229,7 @@ public class EmbedderForOrderPrescribedNetwork {
 		}
 
 		if (!tree.getLSAChildrenMap().get(lsaParent).contains(v))
-			throw new IOException("Not an LSA child");
+			throw new RuntimeException("Not an LSA child");
 
 		tree.getLSAChildrenMap().get(lsaParent).remove(v);
 
@@ -242,9 +240,8 @@ public class EmbedderForOrderPrescribedNetwork {
 
 	/**
 	 * remove the lsa edge from lsaParent to v and reattach it so as to lead from the root to v
-	 *
 	 */
-	private static void moveLSAParentToRoot(Node lsaParent, Node root, Node v) throws IOException {
+	private static void moveLSAParentToRoot(Node lsaParent, Node root, Node v) {
 		var tree = (PhyloTree) lsaParent.getOwner();
 
 		if (true) {
@@ -267,7 +264,7 @@ public class EmbedderForOrderPrescribedNetwork {
 		}
 
 		if (!tree.getLSAChildrenMap().get(lsaParent).contains(v))
-			throw new IOException("Not an LSA child");
+			throw new RuntimeException("Not an LSA child");
 
 		tree.getLSAChildrenMap().get(lsaParent).remove(v);
 
@@ -280,7 +277,7 @@ public class EmbedderForOrderPrescribedNetwork {
 	 *
 	 * @return lca(a, b)
 	 */
-	private static Node getLCA(Node a, Node b) throws IOException {
+	private static Node getLCA(Node a, Node b) {
 		var aboveA = new HashSet<Node>();
 		while (true) {
 			aboveA.add(a);
@@ -297,7 +294,7 @@ public class EmbedderForOrderPrescribedNetwork {
 			b = b.getFirstInEdge().getSource();
 		}
 		if (!aboveA.contains(b))
-			throw new IOException("Failed to determine LCA in tree");
+			throw new RuntimeException("Failed to determine LCA in tree");
 		return ((PhyloTree) b.getOwner()).getRoot();
 	}
 

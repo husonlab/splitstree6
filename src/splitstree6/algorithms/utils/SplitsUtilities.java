@@ -19,9 +19,11 @@
 
 package splitstree6.algorithms.utils;
 
+import jloda.graph.algorithms.PQTree;
 import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
+import jloda.util.Pair;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
@@ -105,31 +107,51 @@ public class SplitsUtilities {
 
 
 	/**
-	 * Computes a cycle for the given splits system
+	 * Computes a cycle for the given splits
 	 *
 	 * @param ntax   number of taxa
 	 * @param splits the splits
 	 */
 	static public int[] computeCycle(int ntax, List<ASplit> splits) {
-		if (ntax > 3) {
-			try {
-				final var pso = Basic.hideSystemOut();
-				final var pse = Basic.hideSystemErr();
-				try {
-					return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, false).getDistances());
-				} finally {
-					Basic.restoreSystemErr(pse);
-					Basic.restoreSystemOut(pso);
+		if (true) {
+			var pqTree = new PQTree(BitSetUtils.asBitSet(BitSetUtils.range(1, ntax + 1)));
+			var clusters = new ArrayList<Pair<Double, BitSet>>();
+			for (var split : splits) {
+				if (!split.isTrivial()) {
+					clusters.add(new Pair<>(split.getWeight() * split.size(), split.getPartNotContaining(1)));
 				}
-			} catch (Exception ex) {
-				Basic.caught(ex);
+			}
+			clusters.stream().sorted(Comparator.comparingDouble(a -> -a.getFirst())).map(Pair::getSecond).forEach(pqTree::accept);
+			var ordering = pqTree.extractAnOrdering();
+			var array1based = new int[ordering.size() + 1];
+			var index = 0;
+			for (var value : ordering) {
+				array1based[++index] = value;
+			}
+			return array1based;
+		} else {
+			if (ntax <= 3) {
+				var order = new int[ntax + 1];
+				for (var t = 1; t <= ntax; t++) {
+					order[t] = t;
+				}
+				return order;
+			} else {
+				try {
+					final var pso = Basic.hideSystemOut();
+					final var pse = Basic.hideSystemErr();
+					try {
+						return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, false).getDistances());
+					} finally {
+						Basic.restoreSystemErr(pse);
+						Basic.restoreSystemOut(pso);
+					}
+				} catch (Exception ex) {
+					Basic.caught(ex);
+					return new int[0];
+				}
 			}
 		}
-		final var order = new int[ntax + 1];
-		for (var t = 1; t <= ntax; t++) {
-			order[t] = t;
-		}
-		return order;
 	}
 
 	/**

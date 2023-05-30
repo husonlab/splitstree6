@@ -192,6 +192,16 @@ public class SplitsBlock extends DataBlock {
 		setCycle(cycle, true);
 	}
 
+	public void setCycle(Collection<Integer> cycle) {
+		var array1based = new int[cycle.size() + 1];
+		var index = 0;
+		for (var value : cycle) {
+			array1based[++index] = value;
+		}
+		setCycle(array1based, true);
+	}
+
+
 	/**
 	 * set the cycle and possibly normalize it
 	 */

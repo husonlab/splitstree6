@@ -39,7 +39,7 @@ public class EmbeddingOptimizer {
 	public static final boolean printILP = false;
 
 	/**
-	 * update the embedding algorithm to a single tree
+	 * update the embedding algorithm for a single tree
 	 */
 	public static void apply(PhyloTree tree, ProgressListener progressListener) throws CanceledException {
 		if (printILP) {
