@@ -98,7 +98,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		this.controller = view.getController();
 		this.tree = view.treeProperty();
 
-
 		view.optionTreeProperty().addListener((v, o, n) -> {
 			var nTree = n.intValue();
 			if (nTree > 0 && nTree <= view.getTrees().size())
@@ -130,7 +129,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 					Basic.caught(ex);
 				}
 			});
-
 		});
 
 		view.optionTreeProperty().addListener((v, o, n) -> {
