@@ -233,7 +233,10 @@ public class MainWindowPresenter {
 					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
 					if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null)
 						focusedDisplayTab.get().getPresenter().setupMenuItems();
-					enableAllMenuItemsWithDefinedAction(controller);
+					if (false) // todo: if this is enabled, then menu items are enabled that shouldn't be...
+						enableAllMenuItemsWithDefinedAction(controller);
+					if (true)
+						updateEnableStateAlgorithms();
 				}
 			} catch (Exception ex) {
 				Basic.caught(ex);
@@ -536,6 +539,7 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getNeighborNetMenuItem(), new NeighborNet());
 		setupAlgorithmMenuItem(controller.getSplitDecompositionMenuItem(), new SplitDecomposition());
 		setupAlgorithmMenuItem(controller.getParsimonySplitsMenuItem(), new ParsimonySplits());
+
 		setupAlgorithmMenuItem(controller.getConsensusNetworkMenuItem(), new ConsensusNetwork());
 		setupAlgorithmMenuItem(controller.getConsensusOutlineMenuItem(), new ConsensusOutline());
 		setupAlgorithmMenuItem(controller.getConsensusSplitsMenuItem(), new ConsensusSplits());
