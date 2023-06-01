@@ -231,7 +231,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						try {
 							if (true)
 								EmbeddingOptimizer.apply(tree, new ProgressSilent());
-							else if (false)
+							else
 								TreeEmbeddingOptimizer.apply(tree, new ProgressSilent());
 						} catch (CanceledException ignored) {
 						}

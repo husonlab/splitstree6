@@ -25,9 +25,9 @@ import jloda.graph.algorithms.PQTree;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
+import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.layout.tree.LSATree;
-import splitstree6.view.trees.tanglegram.optimize.EmbedderForOrderPrescribedNetwork;
 
 import java.util.*;
 
@@ -42,7 +42,7 @@ public class TreeEmbeddingOptimizer {
 		var bestOrder = new ArrayList<Integer>();
 		var taxa = BitSetUtils.asBitSet(tree.getTaxa());
 		progress.setMaximum(taxa.cardinality());
-		for (var t : BitSetUtils.members(taxa)) {
+		for (var t : BitSetUtils.members(taxa)) { // is this really necessary?
 			var count = 0;
 			var pqTree = new PQTree(taxa);
 			var lsaClusters = collectAllLSAClusters(tree);
@@ -54,6 +54,7 @@ public class TreeEmbeddingOptimizer {
 			}
 			var hardwiredClusters = collectAllHardwiredClusters(tree);
 			hardwiredClusters.removeAll(lsaClusters);
+			// order these clusters?
 			for (var cluster : hardwiredClusters) {
 				count += (pqTree.accept(cluster) ? 1 : 0);
 			}
@@ -61,20 +62,28 @@ public class TreeEmbeddingOptimizer {
 				bestOrder = pqTree.extractAnOrdering();
 			progress.incrementProgress();
 		}
-		var tax2pos = new float[bestOrder.size() + 1];
+		var tax2pos = new int[bestOrder.size() + 1];
 		int pos = 1;
 		for (var t : bestOrder) {
 			tax2pos[t] = pos++;
 		}
 
-		// todo: need to reimplement a simpler algorithm for rordering based on taxon order.
+		// label each node by the smallest position below and then sort out edges accordingly
+		try (var smallestBelow = tree.newNodeIntArray()) {
+			tree.postorderTraversal(tree.getRoot(), v -> !smallestBelow.containsKey(v), v -> {
+				var smallest = IteratorUtils.asStream(tree.getTaxa(v)).mapToInt(t -> tax2pos[t]).min().orElse(0);
+				for (var w : v.children()) {
+					smallest = Math.min(smallest, smallestBelow.get(w));
+				}
+				smallestBelow.set(v, smallest);
+			});
 
-		var node2pos = new HashMap<Node, Float>();
-		for (var v : tree.nodes()) {
-			if (tree.hasTaxa(v))
-				node2pos.put(v, tax2pos[tree.getTaxon(v)]);
+			for (var v : tree.nodes()) {
+				var edges = IteratorUtils.asList(v.inEdges());
+				edges.addAll(IteratorUtils.asStream(v.outEdges()).sorted(Comparator.comparingInt(a -> smallestBelow.get(a.getTarget()))).toList());
+				v.rearrangeAdjacentEdges(edges);
+			}
 		}
-		EmbedderForOrderPrescribedNetwork.apply(tree, node2pos);
 	}
 
 	/**
