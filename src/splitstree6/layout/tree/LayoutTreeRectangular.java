@@ -23,7 +23,6 @@ import javafx.geometry.Point2D;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
-import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 
@@ -65,7 +64,9 @@ public class LayoutTreeRectangular {
 					});
 					if (false)
 						System.err.println(tree.toBracketString(false));
-					LSAUtils.preorderTraversalLSA(tree, tree.getRoot(), v -> nodePointMap.put(v, new Point2D(-levels.get(v), yCoord.get(v))));
+					for (var v : tree.nodes()) {
+						nodePointMap.put(v, new Point2D(-levels.get(v), yCoord.get(v)));
+					}
 				}
 			}
 		}
@@ -74,7 +75,6 @@ public class LayoutTreeRectangular {
 
 	/**
 	 * This code assumes that all edges are directed away from the root.
-	 *
 	 */
 	public static void setCoordinatesPhylogram(PhyloTree tree, NodeDoubleArray yCoord, NodeArray<Point2D> nodePointMap) {
 		// todo: this could be a user option:
@@ -135,8 +135,8 @@ public class LayoutTreeRectangular {
 					queue.addAll(IteratorUtils.asList(w.children()));
 				else  // process this node again later
 					queue.add(w);
-				}
 			}
+		}
 	}
 }
 

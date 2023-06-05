@@ -22,12 +22,13 @@ package splitstree6.view.trees.treeview;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.algorithms.PQTree;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.layout.tree.LSATree;
+import splitstree6.view.trees.tanglegram.optimize.LSATree;
 
 import java.util.*;
 
@@ -38,50 +39,97 @@ import java.util.*;
  */
 public class TreeEmbeddingOptimizer {
 	public static void apply(PhyloTree tree, ProgressListener progress) throws CanceledException {
-		var bestSize = 0;
-		var bestOrder = new ArrayList<Integer>();
-		var taxa = BitSetUtils.asBitSet(tree.getTaxa());
-		progress.setMaximum(taxa.cardinality());
-		for (var t : BitSetUtils.members(taxa)) { // is this really necessary?
-			var count = 0;
-			var pqTree = new PQTree(taxa);
-			var lsaClusters = collectAllLSAClusters(tree);
-			for (var cluster : lsaClusters) {
-				if (cluster.get(t))
-					count += (pqTree.accept(BitSetUtils.minus(taxa, cluster)) ? 1 : 0);
-				else
-					count += (pqTree.accept(cluster) ? 1 : 0);
-			}
-			var hardwiredClusters = collectAllHardwiredClusters(tree);
-			hardwiredClusters.removeAll(lsaClusters);
-			// order these clusters?
-			for (var cluster : hardwiredClusters) {
-				count += (pqTree.accept(cluster) ? 1 : 0);
-			}
-			if (count > bestSize)
-				bestOrder = pqTree.extractAnOrdering();
-			progress.incrementProgress();
-		}
-		var tax2pos = new int[bestOrder.size() + 1];
-		int pos = 1;
-		for (var t : bestOrder) {
-			tax2pos[t] = pos++;
-		}
-
-		// label each node by the smallest position below and then sort out edges accordingly
-		try (var smallestBelow = tree.newNodeIntArray()) {
-			tree.postorderTraversal(tree.getRoot(), v -> !smallestBelow.containsKey(v), v -> {
-				var smallest = IteratorUtils.asStream(tree.getTaxa(v)).mapToInt(t -> tax2pos[t]).min().orElse(0);
-				for (var w : v.children()) {
-					smallest = Math.min(smallest, smallestBelow.get(w));
+		if (tree.isReticulated()) {
+			LSATree.computeNodeLSAChildrenMap(tree);
+			var bestSize = 0;
+			var bestOrder = new ArrayList<Integer>();
+			var taxa = BitSetUtils.asBitSet(tree.getTaxa());
+			progress.setMaximum(taxa.cardinality());
+			for (var t : BitSetUtils.members(taxa)) { // is this really necessary?
+				var count = 0;
+				var pqTree = new PQTree(taxa);
+				var lsaClusters = collectAllLSAClusters(tree);
+				for (var cluster : lsaClusters) {
+					if (cluster.get(t))
+						count += (pqTree.accept(BitSetUtils.minus(taxa, cluster)) ? 1 : 0);
+					else
+						count += (pqTree.accept(cluster) ? 1 : 0);
 				}
-				smallestBelow.set(v, smallest);
-			});
+				var hardwiredClusters = collectAllHardwiredClusters(tree);
+				hardwiredClusters.removeAll(lsaClusters);
+				// order these clusters?
+				for (var cluster : hardwiredClusters) {
+					count += (pqTree.accept(cluster) ? 1 : 0);
+				}
+				if (count > bestSize)
+					bestOrder = pqTree.extractAnOrdering();
+				progress.incrementProgress();
+			}
 
-			for (var v : tree.nodes()) {
-				var edges = IteratorUtils.asList(v.inEdges());
-				edges.addAll(IteratorUtils.asStream(v.outEdges()).sorted(Comparator.comparingInt(a -> smallestBelow.get(a.getTarget()))).toList());
-				v.rearrangeAdjacentEdges(edges);
+			// System.err.println("Cycle: " + StringUtils.toString(bestOrder, " "));
+
+			var tax2pos = new int[bestOrder.size() + 1];
+			int pos = 1;
+			for (var t : bestOrder) {
+				tax2pos[t] = pos++;
+			}
+
+
+			// label each node by the smallest position below and then sort out edges accordingly
+			try (var smallestBelow = tree.newNodeIntArray()) {
+				tree.postorderTraversal(tree.getRoot(), v -> {
+					var smallest = tax2pos.length + 1;
+					for (var t : tree.getTaxa(v))
+						smallest = Math.min(smallest, tax2pos[t]);
+					for (var w : v.children()) {
+						smallest = Math.min(smallest, smallestBelow.get(w));
+					}
+					smallestBelow.set(v, smallest);
+				});
+
+
+				for (var v : tree.nodes()) {
+					var edges = IteratorUtils.asList(v.inEdges());
+					edges.addAll(IteratorUtils.asStream(v.outEdges()).sorted(Comparator.comparingInt(a -> smallestBelow.get(a.getTarget()))).toList());
+					v.rearrangeAdjacentEdges(edges);
+				}
+
+				if (false) {
+					tree.postorderTraversal(v -> {
+						if (v.isLeaf()) {
+							System.err.println(tree.getLabel(v) + " (" + tree.getTaxon(v) + "):pos=" + tax2pos[tree.getTaxon(v)]);
+						}
+					});
+				}
+			}
+			try (var smallestBelow = tree.newNodeIntArray()) {
+				LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+					var smallest = tax2pos.length + 1;
+					for (var t : tree.getTaxa(v))
+						smallest = Math.min(smallest, tax2pos[t]);
+					for (var w : tree.lsaChildren(v)) {
+						smallest = Math.min(smallest, smallestBelow.get(w));
+					}
+					smallestBelow.set(v, smallest);
+				});
+
+				for (var v : tree.nodes()) {
+					var lsaChildren = IteratorUtils.asList(tree.lsaChildren(v));
+					if (!IteratorUtils.asSet(lsaChildren).equals(IteratorUtils.asSet(v.children()))) {
+						//System.err.println("Before (v=" + v + "): " + StringUtils.toString(lsaChildren.stream().mapToInt(smallestBelow::get).toArray(), " "));
+						lsaChildren.sort(Comparator.comparingInt(smallestBelow::get));
+						tree.getLSAChildrenMap().put(v, lsaChildren);
+						//System.err.println("After (v=" + v + "): " + StringUtils.toString(lsaChildren.stream().mapToInt(smallestBelow::get).toArray(), " "));
+					}
+				}
+
+				if (false) {
+					LSAUtils.postorderTraversalLSA(tree, tree.getRoot(), v -> {
+						if (v.isLeaf()) {
+							System.err.println("LSA: " + tree.getLabel(v) + " (" + tree.getTaxon(v) + "):pos=" + tax2pos[tree.getTaxon(v)]);
+						}
+					});
+				}
 			}
 		}
 	}
@@ -90,7 +138,6 @@ public class TreeEmbeddingOptimizer {
 	 * collects all LSA contained in the tree.
 	 */
 	public static Set<BitSet> collectAllLSAClusters(PhyloTree tree) {
-		LSATree.computeNodeLSAChildrenMap(tree);
 		var clusters = new HashSet<BitSet>();
 		collectAllLSAClustersRec(tree, tree.getRoot(), clusters);
 		return clusters;

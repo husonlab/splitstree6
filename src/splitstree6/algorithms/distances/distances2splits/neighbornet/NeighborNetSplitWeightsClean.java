@@ -2,6 +2,12 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.optim.MaxEval;
+import org.apache.commons.math3.optim.nonlinear.scalar.GoalType;
+import org.apache.commons.math3.optim.univariate.BrentOptimizer;
+import org.apache.commons.math3.optim.univariate.SearchInterval;
+import org.apache.commons.math3.optim.univariate.UnivariateObjectiveFunction;
 import splitstree6.data.parts.ASplit;
 
 import java.io.PrintWriter;
@@ -10,6 +16,7 @@ import java.util.*;
 import static java.lang.Math.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.copyArray;
+
 
 //import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.*;
 
@@ -28,10 +35,33 @@ public class NeighborNetSplitWeightsClean {
 
 		public MethodTypes method = MethodTypes.GRADPROJECTION;
 
-		public double cutoff; //Post processing: Only include split weights greater than this amount
+		public enum ProjectedLineSearches {NOCEDALWRIGHT, BRENTS_F, BRENTS_PG, BRENTS_FIXED}
+
+		//These are the options for line searches.
+		//  NOCEDALWRIGHT is the method we were using. Should work well for small ntax, but
+		//    appears to take too much time for larger number of taxa as it spends ages
+		//    doing tiny steps.
+		//  BRENTS_F uses the apache implementation of Brent's optimization algorithm, and
+		//    minimizes the sum of squares difference. A problem is that performance seems
+		//    to be really dependent on the tolerance levels (termination conditions) and
+		//    can think of no good way to select these.
+		//  BRENTS_PG is the same as BRENTS_F, expect that it minimizes the squared norm
+		//    of the projected gradient instead of the sum of squares. I thought this
+		//    would work better since that is the criterion we use as a stopping
+		//    condition for the whole algorithm. Unfortunately it doesnt seem to work. I
+		//    don't understand why - perhaps bugs?
+		//  BRENTS_FIXED is experimental - no convergence error, just we run the algorithm
+		//    for a fixed number of iterations. I haven't been able to test this.
+
+		public ProjectedLineSearches linesearchMethod = ProjectedLineSearches.BRENTS_F;
+		public int brentsIterations = 10; //Number of iterations to use in fixed algorithm
+
+		public double cutoff = 0.000001; //Post processing: Only include split weights greater than this amount
 
 		//Stopping conditions - main method
-		public double projGradBound = 1e-8; //Stop if squared projected gradient is less than this. This should be larger than the CGNR bound
+		public double projGradBound = 1e-5; //Stop if squared projected gradient is less than this. This should be larger than the CGNR bound
+		//TODO This should be linked to n and also to the condition of the Hessian. Someone?
+
 		public int maxIterations = Integer.MAX_VALUE;
 		public long maxTime = Long.MAX_VALUE; //Stop if the method has taken more than this many milliseconds
 
@@ -103,7 +133,7 @@ public class NeighborNetSplitWeightsClean {
 				}
 				case APGD -> {
 					params.APGDalpha = 1.0;
-					APGD(x, d, params, progress);
+					APGD(x, d, params,progress);
 				}
 //                case IPG -> {
 //                    IPG(x,d,params,progress);
@@ -136,15 +166,15 @@ public class NeighborNetSplitWeightsClean {
 
 	/**
 	 * cgnr
-	 * <p>
+	 *
 	 * Implementation of the CGNR algorithm in Saad, "Iterative Methods for Sparse Linear Systems", applied to the
 	 * problem of minimizing ||Ax - d|| such that x_{ij} = 0 for all ij in the activeSet.
 	 *
-	 * @param x         Initial value, overwritten with final value. Initially, we set x[i][j] = 0 for all [i][j] in the active set.
-	 * @param d         square array of distances
-	 * @param activeSet square array of boolean: specifying active (zero) set.
-	 * @param params    parameters - uses params.cgnrIterations for max number of iterations
-	 *                  and params.tolerance for bound on gradient at convergence
+	 * @param x             Initial value, overwritten with final value. Initially, we set x[i][j] = 0 for all [i][j] in the active set.
+	 * @param d             square array of distances
+	 * @param activeSet     square array of boolean: specifying active (zero) set.
+	 * @param params        parameters - uses params.cgnrIterations for max number of iterations
+	 *                      and params.tolerance for bound on gradient at convergence
 	 * @return int          number of iterations
 	 */
 	static public int cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params, ProgressListener progress) throws CanceledException {
@@ -199,7 +229,7 @@ public class NeighborNetSplitWeightsClean {
 			ztz = ztz2;
 
 			if (params.cgnrPrintResiduals)
-				System.err.println("\t" + k + "\t" + ztz);
+				System.err.println("\t"+k+"\t"+ztz);
 
 			k++;
 			if (progress != null && (k % n) == 0)
@@ -211,14 +241,14 @@ public class NeighborNetSplitWeightsClean {
 
 	/**
 	 * activeSetMethod
-	 * <p>
-	 * Implement the active set method for minimizing ||Ax-d|| over non-negative x.
 	 *
-	 * @param x        starting value - assumed feasible. Overwritten by solution.
-	 * @param d        vector of distances
-	 * @param params   method parameters. We use the following:
+	 * Implement the active set method for minimizing ||Ax-d|| over non-negative x.
+	 * @param x starting value - assumed feasible. Overwritten by solution.
+	 * @param d vector of distances
+	 * @param params method parameters. We use the following:
+	 *
 	 * @param progress pointer to progress bar.
-	 * @throws CanceledException User cancels calculation.
+	 * @throws CanceledException  User cancels calculation.
 	 */
 	static public void activeSetMethod(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
@@ -281,18 +311,19 @@ public class NeighborNetSplitWeightsClean {
 			if (gradmin < 0.0)
 				activeSet[imin][jmin] = false;
 		}
+
 	}
+
 
 	/**
 	 * Move the point x towards point xstar, while still maintaining feasibility.
-	 * <p>
+	 *
 	 * If xstar is feasible, then returns true. Otherwise, the activeset will change and a proportion
 	 * params.activeSetrho of the infeasible entries in xstar will be added to the active set.
-	 *
-	 * @param x         square matrix --- feasible initial point
-	 * @param xstar     square matrix ---  target point, will generally be infeasible
-	 * @param activeSet current active set. assumed that xstar will satisfy the active set, and x will be moved
-	 *                  to a point satisfying the active set
+	 * @param x square matrix --- feasible initial point
+	 * @param xstar   square matrix ---  target point, will generally be infeasible
+	 * @param activeSet    current active set. assumed that xstar will satisfy the active set, and x will be moved
+	 *                     to a point satisfying the active set
 	 * @param params    uses parameter activeSetRho, which is the proportion of infeasible entries of xstar which will
 	 *                  be added to the active set.
 	 * @return true if xstar is feasible, false otherwise
@@ -302,7 +333,7 @@ public class NeighborNetSplitWeightsClean {
 
 		//First check if xstar is feasible, and return true if it is after moving x to xstar
 		if (minArray(xstar) >= 0.0) {
-			copyArray(xstar, x);
+			copyArray(xstar,x);
 			return true;
 		}
 
@@ -354,7 +385,6 @@ public class NeighborNetSplitWeightsClean {
 				this.j = j;
 				this.val = val;
 			}
-
 			double val;
 			int i;
 			int j;
@@ -365,14 +395,12 @@ public class NeighborNetSplitWeightsClean {
 
 		public SortedPairs(int n) {
 			nentries = 0;
-			entries = new Entry[n * (n - 1) / 2];
+			entries = new Entry[n*(n-1)/2];
 		}
-
 		public void insert(int i, int j, double val) {
 			entries[nentries] = new Entry(i, j, val);
 			nentries++;
 		}
-
 		public void sort() {
 			Arrays.sort(entries, 0, nentries, Comparator.comparingDouble(o -> o.val));
 		}
@@ -383,7 +411,11 @@ public class NeighborNetSplitWeightsClean {
 			else
 				return entries[index];
 		}
+
 	}
+
+
+
 
 	//TODO: Javadoc
 	static public void gradientProjection(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
@@ -392,18 +424,32 @@ public class NeighborNetSplitWeightsClean {
 
 		double[][] xstar = new double[n + 1][n + 1];
 		double[][] p = new double[n + 1][n + 1];
+		double[][] Ap = new double[n + 1][n + 1];
 		var activeSet = new boolean[n + 1][n + 1];
 
+		boolean printDebugInfo = false;
 
 		for (var k = 1; k <= params.maxIterations; k++) {
 
 			//Search direction
 			evalGradient(x, d, p);
-			for (int i = 1; i <= n; i++)
-				for (int j = i + 1; j <= n; j++)
-					p[i][j] = -p[i][j];
+			//Normalise
+			calcAx(p, Ap);
+			double pAAp = sumArraySquared(Ap);
+			//System.err.println("\t\t sqrt(pAAp) = "+sqrt(pAAp));
+			scale(p, -1.0 / sqrt(pAAp));  //Scale p so that max unconstrained step is 1.0
 
-			projectedLineSearch(x, p, d);
+
+			if (params.linesearchMethod == NNLSParams.ProjectedLineSearches.NOCEDALWRIGHT)
+				projectedLineSearch(x, p, d);
+			else if (params.linesearchMethod == NNLSParams.ProjectedLineSearches.BRENTS_F)
+				projectedLineSearchBrents(x, p, d, 1.0, 0.2, ((1e-3) / sqrt(sumArraySquared(p))));
+			else if (params.linesearchMethod == NNLSParams.ProjectedLineSearches.BRENTS_PG)
+				projectedLineSearchBrentsPG(x, p, d, 20.0, 0.2, ((1e-6) / sqrt(sumArraySquared(p))));
+			else
+				projectedLineSearchBrentsFixed(x, p, d, 1.0, params.brentsIterations);
+
+
 			getActiveEntries(x, activeSet);
 
 			if (progress != null)
@@ -415,11 +461,24 @@ public class NeighborNetSplitWeightsClean {
 				for (int j = i + 1; j <= n; j++)
 					p[i][j] = xstar[i][j] - x[i][j];
 
-			projectedLineSearch(x, p, d);
+
+			if (params.linesearchMethod == NNLSParams.ProjectedLineSearches.NOCEDALWRIGHT)
+				projectedLineSearch(x, p, d);
+			else if (params.linesearchMethod == NNLSParams.ProjectedLineSearches.BRENTS_F)
+				projectedLineSearchBrents(x, p, d, 1.0, 0.2, 1e-6); //TODO Fix tolerance
+			else if (params.linesearchMethod == NNLSParams.ProjectedLineSearches.BRENTS_PG)
+				projectedLineSearchBrentsPG(x, p, d, 1.0, 0.2, 1e-6); //TODO Fix tolerance
+			else
+				projectedLineSearchBrentsFixed(x, p, d, 1.0, params.brentsIterations);
+
 			double pg = evalProjectedGradientSquared(x, d);
 			if (params.printResiduals) {
 				params.log.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + (n * (n - 1) / 2 - cardinality(activeSet)));
 			}
+
+			//TODO: clean this up
+			if (printDebugInfo)
+				System.err.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + (n * (n - 1) / 2 - cardinality(activeSet)));
 
 			if (progress != null)
 				progress.checkForCancel();
@@ -430,19 +489,36 @@ public class NeighborNetSplitWeightsClean {
 		}
 	}
 
-	//TODO: Javadoc
+//TODO: Test methods and remove line search algorithms which don't work well
+
+	/**
+	 * //Projected line search, following Nocedal, pg 486-488, though the fact we can rapidly compute Ax means we don't fuss
+	 * //around with updating (hopefully will help with accumulating error
+	 * //In Nocedal and Wright, the quadratic being minimized is (1/2) x'Gx+ x'c with l <= x <= u and the search
+	 * //direction is -g = -(Gx + c)
+	 * // For our problem
+	 * //   G = A'A, c = -A'd
+	 * // and the search direction may or may not equal -(Gx+c).
+	 * <p>
+	 * //Problem occurs here when n is large as there can be many tvals which are only a tiny bit different, so this procedure takes too long.
+	 * //Potential solutions:
+	 * // (i) Have a minimum move size, and skip over tvalues until this is achieved. Should probably be adaptive and scale-free.
+	 * // (ii) Implement another search method, something like Simpson's method or equivalent. This could be done using plug-in optimizers, and
+	 * //          with a bound on the number of iterations.
+	 **/
+
 	private static void projectedLineSearch(double[][] x, double[][] p, double[][] d) {
-		//Projected line search, following Nocedal, pg 486-488, though the fact we can rapidly compute Ax means we don't fuss
-		//around with updating (hopefully will help with accumulating error
+
+
 		int n = x.length - 1;
 		double tmin;
-
 		TreeSet<Double> tvals = new TreeSet<>();
-
 		for (int i = 1; i <= n; i++)
-			for (int j = i + 1; j <= n; j++)
+			for (int j = i + 1; j <= n; j++) {
+				double t = -x[i][j] / p[i][j];
 				if (p[i][j] < 0)
-					tvals.add(-x[i][j] / p[i][j]);
+					tvals.add(t);
+			}
 
 		double[][] xk = new double[n + 1][n + 1];
 		double[][] pk = new double[n + 1][n + 1];
@@ -471,13 +547,17 @@ public class NeighborNetSplitWeightsClean {
 			calcAx(xk, Ax);
 			double pAtAp = 0.0;
 			double pAtr = 0.0;
+			double f = 0.0;
 
 			for (int i = 1; i <= n; i++)
 				for (int j = i + 1; j <= n; j++) {
 					double APij = Ap[i][j];
-					pAtAp += APij * APij;
-					pAtr += APij * (Ax[i][j] - d[i][j]);
+					pAtAp += APij * APij; //f''
+					double rij = (Ax[i][j] - d[i][j]);
+					pAtr += APij * rij;   //f'
+					f += rij * rij;
 				}
+
 			double step = -pAtr / pAtAp;
 
 			if (step < 0) {
@@ -487,8 +567,108 @@ public class NeighborNetSplitWeightsClean {
 				tmin = left + step;
 				break;
 			}
+
 		}
 
+		for (int i = 1; i <= n; i++)
+			for (int j = i + 1; j <= n; j++)
+				x[i][j] = max(x[i][j] + tmin * p[i][j], 0.0);
+
+	}
+
+	static private double evalProjectedf(double[][] x, double t, double[][] p, double[][] d) {
+		int n = x.length - 1;
+
+		double[][] xk = new double[n + 1][n + 1];
+		double[][] Axk = new double[n + 1][n + 1];
+
+		for (int i = 1; i <= n; i++)
+			for (int j = i + 1; j <= n; j++)
+				xk[i][j] = max(x[i][j] + t * p[i][j], 0);
+		calcAx(xk, Axk);
+
+		double diff = 0.0;
+		for (int i = 1; i <= n; i++)
+			for (int j = i + 1; j <= n; j++) {
+				double rij = Axk[i][j] - d[i][j];
+				diff += rij * rij;
+			}
+
+
+		//System.err.println("\t\t\t\t\t\tt="+t+"\tdiff="+diff);
+
+		return diff;
+	}
+
+	static private double evalProjectedGrad(double[][] x, double t, double[][] p, double[][] d) {
+		int n = x.length - 1;
+
+		double[][] xk = new double[n + 1][n + 1];
+
+		for (int i = 1; i <= n; i++)
+			for (int j = i + 1; j <= n; j++)
+				xk[i][j] = max(x[i][j] + t * p[i][j], 0);
+		double pg = evalProjectedGradientSquared(xk, d);
+		System.err.println("\t\t\t\t\t\tt=" + t + "\tpg=" + pg);
+		return pg;
+	}
+
+
+	static private void projectedLineSearchBrents(double[][] x, double[][] p, double[][] d, double maxt, double rel, double abs) {
+		//Projected line search, we perform an (approximate) line search to optimize
+		// || A[x + tp]_+ - d ||
+		// where x is the current position, p is the search direction, and [y]_+ denotes the vector with all negative
+		//entries replaced by 0. Here t \in [0,1]
+
+		var n = x.length - 1;
+		final UnivariateFunction fn = t -> evalProjectedf(x, t, p, d);
+
+		var optimizer = new BrentOptimizer(rel, abs); //TODO Make these options
+		var result = optimizer.optimize(new MaxEval(100), new UnivariateObjectiveFunction(fn),
+				GoalType.MINIMIZE, new SearchInterval(0, maxt));
+
+		var tmin = result.getPoint();
+		//System.err.println("\t\t\ttmin=\t" + tmin+"\t+val="+result.getValue()+"\tstart val = "+evalProjectedf(x,0.0,p,d)+"\timprovement = "+(evalProjectedf(x,0.0,p,d) - result.getValue()) );
+		for (int i = 1; i <= n; i++)
+			for (int j = i + 1; j <= n; j++)
+				x[i][j] = max(x[i][j] + tmin * p[i][j], 0.0);
+	}
+
+	static private void projectedLineSearchBrentsPG(double[][] x, double[][] p, double[][] d, double maxt, double rel, double abs) {
+		//Projected line search, we perform an (approximate) line search to optimize
+		// || A[x + tp]_+ - d ||
+		// where x is the current position, p is the search direction, and [y]_+ denotes the vector with all negative
+		//entries replaced by 0. Here t \in [0,1]
+
+		var n = x.length - 1;
+		final UnivariateFunction fn2 = t -> evalProjectedGrad(x, t, p, d);
+
+		var optimizer = new BrentOptimizer(rel, abs); //TODO Make these options
+		var result = optimizer.optimize(new MaxEval(100), new UnivariateObjectiveFunction(fn2),
+				GoalType.MINIMIZE, new SearchInterval(0, maxt));
+
+		var tmin = result.getPoint();
+		// System.err.println("\t\t\ttmin=\t" + tmin+"\t+val="+result.getValue()+"\tstart val = "+evalProjectedGrad(x,0.0,p,d)+"\timprovement = "+(evalProjectedGrad(x,0.0,p,d) - result.getValue()) );
+		for (int i = 1; i <= n; i++)
+			for (int j = i + 1; j <= n; j++)
+				x[i][j] = max(x[i][j] + tmin * p[i][j], 0.0);
+	}
+
+	static private void projectedLineSearchBrentsFixed(double[][] x, double[][] p, double[][] d, double maxt, int numIterations) {
+		//Projected line search, we perform an (approximate) line search to optimize
+		// || A[x + tp]_+ - d ||
+		// where x is the current position, p is the search direction, and [y]_+ denotes the vector with all negative
+		//entries replaced by 0. Here t \in [0,1]
+
+		var n = x.length - 1;
+		final UnivariateFunction fn = t -> evalProjectedf(x, t, p, d);
+
+		var optimizer = new BrentOptimizer(0, 0);
+		var result = optimizer.optimize(new MaxEval(numIterations), new UnivariateObjectiveFunction(fn),
+				GoalType.MINIMIZE, new SearchInterval(0, maxt));
+
+		var tmin = result.getPoint();
+		// System.err.println("\t\t\ttmin=\t" + tmin+"\t+val="+result.getValue()+"\tstart val = "+evalProjectedGrad(x,0.0,p,d)+"\timprovement = "+(evalProjectedGrad(x,0.0,p,d) - result.getValue()) );
 		for (int i = 1; i <= n; i++)
 			for (int j = i + 1; j <= n; j++)
 				x[i][j] = max(x[i][j] + tmin * p[i][j], 0.0);
@@ -505,6 +685,8 @@ public class NeighborNetSplitWeightsClean {
 
 		double alpha_old;
 		double alpha = params.APGDalpha;
+
+
 
 		var y = new double[n + 1][n + 1];
 		var g = new double[n + 1][n + 1];
@@ -558,11 +740,14 @@ public class NeighborNetSplitWeightsClean {
 			}
 			if (pg < params.projGradBound || k >= params.maxIterations || (startTime - System.currentTimeMillis()) > params.maxTime)
 				return;
-			if (progress != null)
+			if (progress!=null)
 				progress.checkForCancel();
 			k++;
 		}
 	}
+
+
+
 
 	/**
 	 * Rough estimate of the 2-norm of A'A, which I got in MATLAB by computing the norms and fitting a 4 degree polynomial.
@@ -595,6 +780,7 @@ public class NeighborNetSplitWeightsClean {
 		var z = new double[n + 1][n + 1];
 		var p = new double[n + 1][n + 1];
 		var xmapped = new double[n + 1][n + 1];
+
 
 		for (k = 1; k <= params.maxIterations; k++) {
 			evalGradient(x, d, g);
@@ -636,6 +822,8 @@ public class NeighborNetSplitWeightsClean {
 			if (progress != null)
 				progress.checkForCancel();
 		}
+
 	}
+
 }
 

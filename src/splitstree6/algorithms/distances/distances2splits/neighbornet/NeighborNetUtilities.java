@@ -94,13 +94,13 @@ public class NeighborNetUtilities {
 
 
     /**
-	 * size
-	 * <p>
-	 * Returns number of entries in lower triangular of matrix which are set true.
-	 *
-	 * @param s boolean square matrix
-	 * @return number of entries
-	 */
+     * size
+     * <p>
+     * Returns number of entries in lower triangular of matrix which are set true.
+     *
+     * @param s boolean square matrix
+     * @return number of entries
+     */
     static public int cardinality(boolean[][] s) {
         int n=s.length-1;
         int count = 0;
@@ -136,15 +136,43 @@ public class NeighborNetUtilities {
         var res = new double[n + 1][n + 1];
         calcAx(x, res);
         for (var i = 1; i <= n; i++)
-            for (var j = i+1; j <= n; j++) 
+            for (var j = i + 1; j <= n; j++)
                 res[i][j] -= d[i][j];
         calcAtx(res, gradient);
     }
 
     /**
+     * Negate the entries in the array
+     *
+     * @param x square array. Written over with -x.
+     */
+    static public void negate(double[][] x) {
+        var n = x.length - 1;
+        for (var i = 1; i <= n; i++)
+            for (var j = i + 1; j <= n; j++)
+                x[i][j] = -x[i][j];
+    }
+
+    /**
+     * Scale entries in x by lambda
+     *
+     * @param x      doubl array
+     * @param lambda double
+     *               Overwrite x with lambda*x
+     */
+    static public void scale(double[][] x, double lambda) {
+        var n = x.length - 1;
+        for (var i = 1; i <= n; i++)
+            for (var j = i + 1; j <= n; j++)
+                x[i][j] *= lambda;
+    }
+
+
+    /**
      * Computes the square of the norm of the projected gradient. This is inefficient and should
      * probably only be used for development and debugging.
-     * @param x  square array
+     *
+     * @param x square array
      * @param d square array
      * @return square of the norm of the projected gradient
      */

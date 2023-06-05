@@ -54,12 +54,12 @@ public class LSATree {
 			var lsaTree = new LSATree();
 			lsaTree.computeReticulation2LSA(tree, reticulation2LSA);
 
-			for (Node v : tree.nodes()) {
+			for (var v : tree.nodes()) {
 				var children = v.outEdgesStream(false).filter(e -> !tree.isReticulateEdge(e))
 						.map(Edge::getTarget).collect(Collectors.toList());
 				tree.getLSAChildrenMap().put(v, children);
 			}
-			for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {
+			for (var v : tree.nodes()) {
 				Node lsa = reticulation2LSA.get(v);
 				if (lsa != null)
 					tree.getLSAChildrenMap().get(lsa).add(v);
@@ -102,7 +102,6 @@ public class LSATree {
 		}
 	}
 
-
 	NodeArray<BitSet> ret2PathSet;
 	NodeArray<EdgeArray<BitSet>> ret2Edge2PathSet;
 	NodeArray<Node> reticulation2LSA;
@@ -118,7 +117,6 @@ public class LSATree {
 		ret2Edge2PathSet = new NodeArray<>(network);
 		this.reticulation2LSA = reticulation2LSA;
 		node2below = new NodeArray<>(network); // set of reticulation nodes below a given node
-
 		computeReticulation2LSARec(network, network.getRoot());
 	}
 

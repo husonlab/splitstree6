@@ -81,7 +81,6 @@ public class CreateEdgesCircular {
 						label.setTranslateX(0.5 * (corner.getX() + wPt.getX()));
 						label.setTranslateY(0.5 * (corner.getY() + wPt.getY()));
 					}
-
 					line.getElements().add(new LineTo(wPt.getX(), wPt.getY()));
 				} else {
 					line.getStyleClass().add("graph-special-edge");
