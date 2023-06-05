@@ -41,7 +41,6 @@ import splitstree6.workflow.WorkflowDataLoader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 
@@ -92,8 +91,7 @@ public class RunWorkflow extends Application {
 
     private void run(String[] args) throws Exception {
         ResourceManagerFX.addResourceRoot(SplitsTree6.class, "splitsTree6/resources");
-
-        final ArgsOptions options = new ArgsOptions(args, RunWorkflow.class, "Runs a SplitsTree6 workflow on input data");
+        final var options = new ArgsOptions(args, RunWorkflow.class, "Runs a SplitsTree6 workflow on input data");
         options.setVersion(ProgramProperties.getProgramVersion());
         options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
         options.setAuthors("Daniel H. Huson and David Bryant");
@@ -136,18 +134,18 @@ public class RunWorkflow extends Application {
 
         // Setup and check input files:
         if (inputFiles.length == 1) {
-            final File input = new File(inputFiles[0]);
+            final var input = new File(inputFiles[0]);
             if (input.isDirectory()) {
-                final ArrayList<File> inputList = FileUtils.getAllFilesInDirectory(input, inputRecursively, inputFileExtension);
+                final var inputList = FileUtils.getAllFilesInDirectory(input, inputRecursively, inputFileExtension);
                 inputFiles = new String[inputList.size()];
-                for (int i = 0; i < inputList.size(); i++) {
+                for (var i = 0; i < inputList.size(); i++) {
                     inputFiles[i] = inputList.get(i).getPath();
                 }
                 System.err.println("Number of input files found: " + inputFiles.length);
             }
         }
 
-        for (String fileName : inputFiles) {
+        for (var fileName : inputFiles) {
             if (!(new File(fileName)).canRead())
                 throw new IOException("Input file not found or not readable: " + fileName);
         }
@@ -157,7 +155,7 @@ public class RunWorkflow extends Application {
             throw new IOException("No input file(s)");
         } else { // one or more input files
             if (outputFiles.length == 1) {
-                File output = new File(outputFiles[0]);
+                var output = new File(outputFiles[0]);
                 if (output.isDirectory()) {
                     final String extension;
                     if (exportCompleteWorkflow)
@@ -167,8 +165,8 @@ public class RunWorkflow extends Application {
                     }
 
                     outputFiles = new String[inputFiles.length];
-                    for (int i = 0; i < inputFiles.length; i++) {
-                        final File input = new File(inputFiles[i]);
+                    for (var i = 0; i < inputFiles.length; i++) {
+                        final var input = new File(inputFiles[i]);
                         var name = FileUtils.replaceFileSuffix(input.getName(), "-out" + extension);
                         outputFiles[i] = (new File(output.getPath(), name)).getPath();
                     }
@@ -202,8 +200,8 @@ public class RunWorkflow extends Application {
         System.err.println("Loaded workflow has " + workflow.getNumberOfDataNodes() + " data nodes and " + IteratorUtils.size(workflow.algorithmNodes()) + " algorithms");
         System.err.println("Number of input taxa: " + inputTaxaNode.getDataBlock().getNtax());
 
-        for (int i = 0; i < inputFiles.length; i++) {
-            final String inputFile = inputFiles[i];
+        for (var i = 0; i < inputFiles.length; i++) {
+            final var inputFile = inputFiles[i];
             System.err.println("++++ Processing " + inputFile + " (" + (i + 1) + " of " + inputFiles.length + ") ++++");
 
             if (false) {

@@ -110,7 +110,6 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 		if (!(progress instanceof ProgressSilent)) {
 			var seconds = (System.currentTimeMillis() - start) / 1000.0;
-			if (seconds > 1)
 				System.err.printf("NNet (%s) time: %,.1fs, fit: %.1f%%, splits: %,d%n", getOptionInferenceAlgorithm().name(),
 						seconds, splitsBlock.getFit(), splitsBlock.getNsplits());
 		}

@@ -52,7 +52,7 @@ public class PhylipWriter extends DistancesWriterBase {
 		w.write("\t" + ntax + "\n");
 
 		if (!isOptionTriangular()) {
-			System.err.println("standard");
+			// System.err.println("standard");
 			for (var i = 1; i <= distances.getDistances().length; i++) {
 				var buf = new StringBuilder();
 				for (int j = 1; j <= distances.getDistances()[i - 1].length; j++) {
@@ -69,7 +69,7 @@ public class PhylipWriter extends DistancesWriterBase {
 				w.write("\t" + buf + "\n");
 			}
 		} else {
-			System.err.println("triangular");
+			//System.err.println("triangular");
 			w.write(taxa.getLabel(1) + "\n");
 			for (var i = 2; i <= distances.getDistances().length; i++) {
 				var buf = new StringBuilder();
