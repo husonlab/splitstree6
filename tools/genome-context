@@ -31,8 +31,7 @@ jre_dir=${installer:sys.preferredJre}
 
 java=$jre_dir/bin/java
 vmOptions=$(grep "^-" $bin_dir/../SplitsTreeCE.vmoptions)
-jfx_dir="$bin_dir/../openjfx/${compiler:sys.platform}/lib"
-modulepath="$jars_dir:$jars2_dir:$jfx_dir"
+modulepath="$jars_dir:$jars2_dir"
 
 java_flags="-server -Duser.language=en -Duser.region=US $vmOptions"
 
