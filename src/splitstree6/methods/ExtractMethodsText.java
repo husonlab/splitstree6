@@ -74,122 +74,126 @@ public class ExtractMethodsText {
 	 * @return method text
 	 */
 	public String apply(Workflow workflow) {
-		if (workflow.getInputTaxaNode() == null || workflow.getInputDataNode() == null)
-			return "";
+		try {
+			if (workflow.getInputTaxaNode() == null || workflow.getInputDataNode() == null)
+				return "";
 
-		final var buf = new StringBuilder();
+			final var buf = new StringBuilder();
 
-		if (workflow.getInputTaxaBlock().getComments() != null) {
-			buf.append("Input:\n").append(workflow.getInputTaxaBlock().getComments().trim()).append("\n\n");
-		}
-
-		buf.append("Methods:\n");
-
-		buf.append(PreambleTemplate.formatted(Version.VERSION, ExtractCitations.getSplitsTreeKeysString()));
-
-		final Set<Pair<String, String>> allKeysAndPapers = new TreeSet<>(ExtractCitations.getSplitsTreeKeysAndPapers());
-
-		final Set<String> set = new HashSet<>(); // use this to avoid duplicate lines
-
-		buf.append(InputDataTemplate.formatted(workflow.getInputTaxaNode().getDataBlock().getShortDescription(), workflow.getInputDataNode().getDataBlock().getShortDescription()));
-
-		var topTaxaBlock = workflow.getInputTaxaBlock();
-		var workingTaxaBlock = workflow.getWorkingTaxaBlock();
-		if (workingTaxaBlock != null && workingTaxaBlock.getNtax() < topTaxaBlock.getNtax()) {
-			int removed = (topTaxaBlock.getNtax() - workingTaxaBlock.getNtax());
-			if (removed == 1)
-				buf.append(TaxonFilterTemplateOne.formatted(workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
-			else
-				buf.append(TaxonFilterTemplate.formatted(removed, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
-		}
-
-		if (workflow.getInputDataBlock() instanceof CharactersBlock inputCharacters) {
-			if (workflow.getWorkingDataBlock() instanceof CharactersBlock workingCharacters) {
-				if (inputCharacters.getNchar() > workingCharacters.getNchar()) {
-					buf.append(RemovedCharactersTemplate.formatted(inputCharacters.getNchar() - workingCharacters.getNchar(), workingCharacters.getNchar()));
-
-				}
+			if (workflow.getInputTaxaBlock().getComments() != null) {
+				buf.append("Input:\n").append(workflow.getInputTaxaBlock().getComments().trim()).append("\n\n");
 			}
-		}
 
-		final var root = workflow.getWorkingDataNode();
-		if (root.isValid()) {
-			final var visited = new HashSet<DataNode>();
-			final var stack = new Stack<DataNode>();
-			stack.push(root); // should only contain data nodes
-			while (stack.size() > 0) {
-				final var v = stack.pop();
-				if (!visited.contains(v)) {
-					visited.add(v);
-					for (var child : v.getChildren()) {
-						if (child.isValid()) {
-							if (child instanceof AlgorithmNode algorithmNode) {
-								final var algorithm = algorithmNode.getAlgorithm();
-								final var targetNode = algorithmNode.getTargetNode();
-								if (!(algorithm instanceof IgnoredInMethodsText)) {
-									if (algorithm instanceof IFilter filter) {
-										if (filter.isActive()) {
-											var name = StringUtils.fromCamelCase(algorithm.getName());
-											var optionsReport = ExtractOptionsText.apply(algorithm);
-											var line = FilterTemplate.formatted(name, (optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""), algorithm.getShortDescription());
-											if (!set.contains(line)) {
-												buf.append(line);
-												set.add(line);
-											}
-										}
-									} else {
-										if (algorithm != null) {
-											var keys = getKeysString(algorithm);
-											var keysAndPapers = ExtractCitations.apply(algorithm);
-											if (keysAndPapers != null)
-												allKeysAndPapers.addAll(keysAndPapers);
-											var name = StringUtils.fromCamelCase(algorithm.getName());
+			buf.append("Methods:\n");
 
-											var optionsReport = ExtractOptionsText.apply(algorithm);
-											String line;
-											if (targetNode != null) {
-												var targetBlock = targetNode.getDataBlock();
-												var targetKey = "";
-												{
-													targetKey = getKeysString(targetBlock);
-													var dataKeysAndPapers = ExtractCitations.apply(targetBlock);
-													if (dataKeysAndPapers != null) {
-														allKeysAndPapers.addAll(dataKeysAndPapers);
-													}
-												}
-												line = MethodWithOutputTemplate.formatted(name, keys,
-														(optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""),
-														targetBlock.getShortDescription(), (targetKey.isBlank() ? "" : targetKey));
+			buf.append(PreambleTemplate.formatted(Version.VERSION, ExtractCitations.getSplitsTreeKeysString()));
 
-											} else {
-												line = MethodTemplate.formatted(name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "");
-											}
-											if (!set.contains(line)) {
-												buf.append(line);
-												set.add(line);
-											}
-										}
-									}
-								}
-								stack.push(targetNode);
-							}
-						} else
-							buf.append("*** Calculation incomplete. ***\n");
+			final Set<Pair<String, String>> allKeysAndPapers = new TreeSet<>(ExtractCitations.getSplitsTreeKeysAndPapers());
+
+			final Set<String> set = new HashSet<>(); // use this to avoid duplicate lines
+
+			buf.append(InputDataTemplate.formatted(workflow.getInputTaxaNode().getDataBlock().getShortDescription(), workflow.getInputDataNode().getDataBlock().getShortDescription()));
+
+			var topTaxaBlock = workflow.getInputTaxaBlock();
+			var workingTaxaBlock = workflow.getWorkingTaxaBlock();
+			if (workingTaxaBlock != null && workingTaxaBlock.getNtax() < topTaxaBlock.getNtax()) {
+				int removed = (topTaxaBlock.getNtax() - workingTaxaBlock.getNtax());
+				if (removed == 1)
+					buf.append(TaxonFilterTemplateOne.formatted(workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
+				else
+					buf.append(TaxonFilterTemplate.formatted(removed, workflow.getWorkingTaxaBlock().getShortDescription(), workflow.getWorkingDataNode().getDataBlock().getShortDescription()));
+			}
+
+			if (workflow.getInputDataBlock() instanceof CharactersBlock inputCharacters) {
+				if (workflow.getWorkingDataBlock() instanceof CharactersBlock workingCharacters) {
+					if (inputCharacters.getNchar() > workingCharacters.getNchar()) {
+						buf.append(RemovedCharactersTemplate.formatted(inputCharacters.getNchar() - workingCharacters.getNchar(), workingCharacters.getNchar()));
+
 					}
 				}
 			}
-			buf.append("\n");
-			if (allKeysAndPapers.size() > 0) {
-				buf.append("References:\n");
 
-				for (Pair<String, String> pair : allKeysAndPapers) {
-					buf.append("%s: %s\n".formatted(pair.getFirst(), pair.getSecond()));
+			final var root = workflow.getWorkingDataNode();
+			if (root.isValid()) {
+				final var visited = new HashSet<DataNode>();
+				final var stack = new Stack<DataNode>();
+				stack.push(root); // should only contain data nodes
+				while (stack.size() > 0) {
+					final var v = stack.pop();
+					if (!visited.contains(v)) {
+						visited.add(v);
+						for (var child : v.getChildren()) {
+							if (child.isValid()) {
+								if (child instanceof AlgorithmNode algorithmNode) {
+									final var algorithm = algorithmNode.getAlgorithm();
+									final var targetNode = algorithmNode.getTargetNode();
+									if (!(algorithm instanceof IgnoredInMethodsText)) {
+										if (algorithm instanceof IFilter filter) {
+											if (filter.isActive()) {
+												var name = StringUtils.fromCamelCase(algorithm.getName());
+												var optionsReport = ExtractOptionsText.apply(algorithm);
+												var line = FilterTemplate.formatted(name, (optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""), algorithm.getShortDescription());
+												if (!set.contains(line)) {
+													buf.append(line);
+													set.add(line);
+												}
+											}
+										} else {
+											if (algorithm != null) {
+												var keys = getKeysString(algorithm);
+												var keysAndPapers = ExtractCitations.apply(algorithm);
+												if (keysAndPapers != null)
+													allKeysAndPapers.addAll(keysAndPapers);
+												var name = StringUtils.fromCamelCase(algorithm.getName());
+
+												var optionsReport = ExtractOptionsText.apply(algorithm);
+												String line;
+												if (targetNode != null) {
+													var targetBlock = targetNode.getDataBlock();
+													var targetKey = "";
+													{
+														targetKey = getKeysString(targetBlock);
+														var dataKeysAndPapers = ExtractCitations.apply(targetBlock);
+														if (dataKeysAndPapers != null) {
+															allKeysAndPapers.addAll(dataKeysAndPapers);
+														}
+													}
+													line = MethodWithOutputTemplate.formatted(name, keys,
+															(optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""),
+															targetBlock.getShortDescription(), (targetKey.isBlank() ? "" : targetKey));
+
+												} else {
+													line = MethodTemplate.formatted(name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "");
+												}
+												if (!set.contains(line)) {
+													buf.append(line);
+													set.add(line);
+												}
+											}
+										}
+									}
+									stack.push(targetNode);
+								}
+							} else
+								buf.append("*** Calculation incomplete. ***\n");
+						}
+					}
 				}
-			}
-		} else
-			buf.append("*** Calculation incomplete. ***\n");
+				buf.append("\n");
+				if (allKeysAndPapers.size() > 0) {
+					buf.append("References:\n");
 
-		return buf.toString();
+					for (Pair<String, String> pair : allKeysAndPapers) {
+						buf.append("%s: %s\n".formatted(pair.getFirst(), pair.getSecond()));
+					}
+				}
+			} else
+				buf.append("*** Calculation incomplete. ***\n");
+
+			return buf.toString();
+		} catch (Exception ignored) {
+			return "";
+		}
 	}
 
 	/**

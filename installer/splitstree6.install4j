@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.3" transformSequenceNumber="10">
+<install4j version="10.0.5" transformSequenceNumber="10">
   <directoryPresets config="../tools/bfilter-tool" />
-  <application name="SplitsTreeCE" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeCE" publisher="Daniel Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_alpha" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
+  <application name="SplitsTreeCE" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeCE" publisher="Daniel Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_beta" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
       <variable name="renderingVMOption" />
     </variables>
@@ -22,8 +22,8 @@
       <mountPoint id="1691242167" location="jars" />
       <mountPoint id="1691243203" location="jars2" />
       <mountPoint id="1691242153" location="Examples" />
-      <mountPoint id="675425072" />
       <mountPoint id="1691243205" location="tools" />
+      <mountPoint id="675425072" />
     </mountPoints>
     <entries>
       <dirEntry mountPoint="1691242167" file="../jars" subDirectory="jars" excludeSuffixes=".DS_Store">
@@ -34,12 +34,12 @@
       <fileEntry mountPoint="1691242167" file="../antbuild/splitstree6.jar" />
       <fileEntry mountPoint="1691243203" file="../jars/i4jruntime.jar" />
       <dirEntry mountPoint="1691242153" file="../examples" subDirectory="examples" />
-      <fileEntry mountPoint="675425072" file="./License.txt" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/genome-context" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/workflow-run" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/workflow-export" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/mash-sketches" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/bfilter-tool" fileMode="755" overrideFileMode="true" />
+      <fileEntry mountPoint="675425072" file="./License.txt" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
     </entries>
     <components>
       <component name="SplitsTreeCE" id="1691242194" changeable="false">
