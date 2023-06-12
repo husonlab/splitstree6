@@ -20,21 +20,21 @@
 package splitstree6.xtra.genetreeview;
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.Bounds;
-import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -43,11 +43,15 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.TreeDiagramType;
 
+import java.io.*;
+import java.util.ArrayList;
+import java.util.TreeMap;
+
 public class GeneTreeViewPresenter {
 
 	Group trees = new Group();
 	Group treeSnapshots = new Group();
-	double treeHeight = 200;
+	double treeHeight = 250;
 	double treeWidth = 200;
 	LayoutType layoutType = LayoutType.Stack;
 	MultipleFramesLayout currentLayout = new MultipleFramesLayout() {};
@@ -56,17 +60,14 @@ public class GeneTreeViewPresenter {
 	Tooltip previousTreeToolTip = new Tooltip("");
 	Tooltip nextTreeToolTip = new Tooltip("");
 	PerspectiveCamera camera = new PerspectiveCamera(true);
-	ObservableList<Color> heatmapColors = FXCollections.observableArrayList();
-	Service<Void> loadingTreesService;
-	Service<Group> visualizeTreesService;
-	//ArrayList<Integer> treeOrder;
+	ColorBar colorBar;
+	BooleanProperty[] treeSelectionProperties;
+	IntegerProperty selectedTreesCount = new SimpleIntegerProperty(0);
 
 	public GeneTreeViewPresenter(GeneTreeView geneTreeView) {
 
 		var controller = geneTreeView.getController();
 		Model model = geneTreeView.getModel();
-		var centerPaneWidth = controller.getCenterPane().getPrefWidth();
-		var centerPaneHeight = controller.getCenterPane().getPrefHeight();
 
 		// Setting up a subScene with camera
 		var subScene = new SubScene(trees, 600, 600, true, SceneAntialiasing.BALANCED);
@@ -80,34 +81,52 @@ public class GeneTreeViewPresenter {
 
 		// MenuBar
 		controller.getOpenMenuItem().setOnAction(e -> {
-			openFile(geneTreeView.getStage(),controller,model);
-			subScene.setRoot(trees);
-			controller.getSlider().setValue(controller.getSlider().getValue());
+			openFile(geneTreeView.getStage(),controller,model,subScene);
 		});
 
+		// Does not work anymore as trees are loaded in a Task
 		/*model.lastUpdateProperty().addListener(a -> {
 			controller.getLabel().setText("Taxa: %,d, Trees: %,d".formatted(model.getTaxaBlock().getNtax(),
 					model.getTreesBlock().getNTrees()));
 		});*/
 
+		controller.getImportGeneNamesMenuItem().disableProperty().bind(controller.getSlider().disableProperty());
+		controller.getImportGeneNamesMenuItem().setOnAction(e ->
+				importGeneNames(geneTreeView.getStage(),controller,model,subScene));
+
+		controller.getImportFeaturesMenuItem().disableProperty().bind(controller.getSlider().disableProperty());
 		controller.getImportFeaturesMenuItem().setOnAction(e ->
 				importFeatures(geneTreeView.getStage(),controller,model));
+
+		controller.getExportSubsetMenuItem().disableProperty().bind(selectedTreesCount.isEqualTo(0));
+		controller.getExportSubsetMenuItem().setOnAction(e ->
+		{
+			try {
+				exportTreeSubset(geneTreeView.getStage(),controller,model);
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		});
 
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
 
 		controller.getLayoutGroup().selectedToggleProperty().addListener((InvalidationListener) -> {
-			updateLayout(centerPaneWidth,centerPaneHeight,controller.getLayoutGroup().getSelectedToggle(),controller);
-			subScene.setRoot(trees);
+			updateLayout(controller.getCenterPane().getBoundsInParent().getWidth(),
+					controller.getCenterPane().getBoundsInParent().getHeight(),controller.getLayoutGroup().getSelectedToggle(),controller);
 		});
 
 		controller.getTreeLayoutGroup().selectedToggleProperty().addListener((InvalidationListener) -> {
-			updateTreeLayout(model.getTreesBlock(),centerPaneWidth, centerPaneHeight,
-					controller.getTreeLayoutGroup().getSelectedToggle(),controller);
-			subScene.setRoot(trees);
+			updateTreeLayout(model,controller.getCenterPane().getBoundsInParent().getWidth(),
+					controller.getCenterPane().getBoundsInParent().getHeight(),
+					controller.getTreeLayoutGroup().getSelectedToggle(),controller,subScene);
 		});
 
 		controller.getOrderGroup().selectedToggleProperty().addListener((InvalidationListener) -> {
-			changeTreeOrder(model,controller.getOrderGroup().getSelectedToggle(),controller);
+			try {
+				changeTreeOrder(model,controller.getOrderGroup().getSelectedToggle(),controller,subScene);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		});
 
 
@@ -116,9 +135,9 @@ public class GeneTreeViewPresenter {
 		controller.getSearchGeneComboBox().setOnAction(e -> {
 			String selectedItem = controller.getSearchGeneComboBox().getSelectionModel().getSelectedItem();
 			if (selectedItem != null) {
-				for (int i=1; i<=model.getTreesBlock().size(); i++) {
-					if (model.getTreesBlock().getTree(i).getName().equals(selectedItem)){
-						controller.getSlider().setValue(i);
+				for (int i=0; i<model.getOrderedGeneNames().size(); i++) {
+					if (model.getOrderedGeneNames().get(i).equals(selectedItem)){
+						controller.getSlider().setValue(i+1);
 						controller.getSearchGeneComboBox().getEditor().setText(selectedItem);
 					}
 				}
@@ -129,17 +148,20 @@ public class GeneTreeViewPresenter {
 		// Slider and buttons to go through the trees
 		controller.getSlider().prefWidthProperty().bind(controller.getCenterPane().widthProperty().subtract(50));
 		controller.getSlider().valueProperty().addListener((observableValue, oldValue, newValue) -> {
-			currentLayout.updatePosition((double)oldValue,(double)newValue, centerPaneWidth, treeWidth);
-			updateTooltip(newValue.doubleValue(),model.getTreesBlock());
+			currentLayout.updatePosition((double)oldValue,(double)newValue, controller.getCenterPane().getBoundsInParent().getWidth(), treeWidth);
+			updateButtonTooltips(newValue.doubleValue(),model.getOrderedGeneNames());
 		});
+		// For Stack layout: using snapshots whenever the slider is dragged for fluent performance
 		controller.getSlider().setOnMouseDragged(e -> {
-			currentLayout.setSliderDragged(true);
-			if (currentLayout.getType() == LayoutType.Stack) subScene.setRoot(treeSnapshots);
+			if (currentLayout.getType() == LayoutType.Stack) {
+				((StackLayout) currentLayout).setSliderDragged(true);
+				subScene.setRoot(treeSnapshots);
+			}
 		});
 		controller.getSlider().setOnMouseReleased(e -> {
-			currentLayout.setSliderDragged(false);
 			if (currentLayout.getType() == LayoutType.Stack) {
-				currentLayout.updatePosition(1,controller.getSlider().getValue(),centerPaneWidth, treeWidth);
+				((StackLayout) currentLayout).setSliderDragged(false);
+				currentLayout.updatePosition(1,controller.getSlider().getValue(),controller.getCenterPane().getBoundsInParent().getWidth(), treeWidth);
 				subScene.setRoot(trees);
 			}
 		});
@@ -151,20 +173,15 @@ public class GeneTreeViewPresenter {
 		controller.getNextButton().setOnAction(e -> focusOnNextTree(controller.getSlider()));
 		controller.getNextButton().setTooltip(nextTreeToolTip);
 		controller.getNextButton().disableProperty().bind(controller.getSlider().disableProperty());
-
-		/*controller.getProgressIndicator().layoutXProperty().bind(controller.getCenterPane().widthProperty()
-				.subtract(controller.getProgressIndicator().getPrefWidth()/2));
-		controller.getProgressIndicator().layoutYProperty().bind(controller.getCenterPane().widthProperty()
-				.subtract(controller.getProgressIndicator().getPrefHeight()/2));*/
 	}
 
-	private void openFile(Stage stage, GeneTreeViewController controller, Model model) {
+	private void openFile(Stage stage, GeneTreeViewController controller, Model model, SubScene subScene) {
 		final var fileChooser = new FileChooser();
 		fileChooser.setTitle("Open trees");
 
 		var file = fileChooser.showOpenDialog(stage);
 		if (file != null) {
-			loadingTreesService = new Service<>() {
+			Service<Void> loadingTreesService = new Service<>() {
 				@Override
 				protected Task<Void> createTask() {
 					return new LoadTreesTask(file,model);
@@ -177,24 +194,34 @@ public class GeneTreeViewPresenter {
 			});
 			loadingTreesService.setOnSucceeded(v -> {
 				System.out.println("Loading succeeded");
-
 				controller.getLabel().setText("Taxa: %,d, Trees: %,d".formatted(model.getTaxaBlock().getNtax(),
 						model.getTreesBlock().getNTrees()));
-
 				initializeSlider(model.getTreesBlock(), controller.getSlider());
-				initializeTreesLayout(model.getTreesBlock(), controller.getCenterPane().getPrefWidth(),
-						controller.getCenterPane().getPrefHeight(), controller);
+				initializeColorBar(controller.getvBox(),model.getTreesBlock(), controller.getSlider(),
+						model.getTreeOrder());
+				treeSelectionProperties = new SimpleBooleanProperty[model.getTreesBlock().getNTrees()];
+				initializeTreesLayout(model, controller.getCenterPane().getBoundsInParent().getWidth(),
+						controller.getCenterPane().getBoundsInParent().getHeight(), controller, subScene);
 				initializeGeneSearch(controller.getSearchGeneComboBox(),model.getOrderedGeneNames());
 				initializeTaxaList(controller.getTaxonOrderSubMenu(),controller.getOrderGroup(),model.getTaxaBlock());
-				initializeColorBar(controller.getHeatmapBox(),model.getTreesBlock(), controller.getSlider());
-				controller.getImportFeaturesMenuItem().setDisable(false);
 			});
 			loadingTreesService.setOnFailed(u -> {
 				System.out.println("Loading trees failed");
 				controller.getProgressLabel().setText("Loading trees failed");
 			});
 			loadingTreesService.restart();
+
 		}
+	}
+
+	private void importGeneNames(Stage stage, GeneTreeViewController controller, Model model, SubScene subScene) {
+		var geneNameParser = new GeneNameParser(stage,model);
+		geneNameParser.parsedProperty().addListener((InvalidationListener) -> {
+			// TODO: only update gene name labels instead of redrawing complete trees
+			initializeTreesLayout(model,controller.getCenterPane().getBoundsInParent().getWidth(),
+					controller.getCenterPane().getBoundsInParent().getHeight(),controller,subScene);
+			initializeGeneSearch(controller.getSearchGeneComboBox(),model.getOrderedGeneNames());
+		});
 	}
 
 	private void importFeatures(Stage stage, GeneTreeViewController controller, Model model) {
@@ -207,22 +234,52 @@ public class GeneTreeViewPresenter {
 				@Override
 				protected Task<Void> createTask() {
 					return new ImportFeaturesTask(file,model);
+					// TODO: implement ImportFeaturesTask
 				}
 			};
 			controller.getProgressBar().visibleProperty().bind(importFeaturesService.runningProperty());
 			controller.getProgressBar().progressProperty().bind(importFeaturesService.progressProperty());
-			loadingTreesService.setOnScheduled(v -> {
+			importFeaturesService.setOnScheduled(v -> {
 				controller.getProgressLabel().setText("Importing features ...");
 			});
-			loadingTreesService.setOnSucceeded(v -> {
+			importFeaturesService.setOnSucceeded(v -> {
 				System.out.println("Import succeeded");
 
 			});
-			loadingTreesService.setOnFailed(u -> {
+			importFeaturesService.setOnFailed(u -> {
 				System.out.println("Importing features failed");
 				controller.getProgressLabel().setText("Importing features failed");
 			});
-			loadingTreesService.restart();
+			importFeaturesService.restart();
+		}
+	}
+
+	private void exportTreeSubset(Stage stage, GeneTreeViewController controller, Model model) throws IOException {
+		final var fileChooser = new FileChooser();
+		fileChooser.setTitle("Save tree subset");
+
+		var file = fileChooser.showSaveDialog(stage);
+		if (file != null) {
+			Service<Void> exportTreesService = new Service<>() {
+				@Override
+				protected Task<Void> createTask() {
+					return new ExportTreesTask(file,model,treeSelectionProperties);
+				}
+			};
+			controller.getProgressBar().visibleProperty().bind(exportTreesService.runningProperty());
+			controller.getProgressBar().progressProperty().bind(exportTreesService.progressProperty());
+			exportTreesService.setOnScheduled(v -> {
+				controller.getProgressLabel().setText("Saving subset of trees in "+file.getName());
+			});
+			exportTreesService.setOnSucceeded(v -> {
+				System.out.println("Export succeeded");
+				controller.getProgressLabel().setText("");
+			});
+			exportTreesService.setOnFailed(u -> {
+				System.out.println("Export failed");
+				controller.getProgressLabel().setText("Saving subset of trees failed");
+			});
+			exportTreesService.restart();
 		}
 	}
 
@@ -239,31 +296,39 @@ public class GeneTreeViewPresenter {
 			nextTreeToolTip.setText(treesBlock.getTree(2).getName());
 		slider.setMinorTickCount(1);
 		slider.setMajorTickUnit(5);
-		//slider.setShowTickMarks(true);
 		slider.setValue(1);
 	}
 
-	public void initializeTreesLayout(TreesBlock treesBlock, double paneWidth, double paneHeight,
-									  GeneTreeViewController controller) {
+	private void initializeColorBar(VBox parent, TreesBlock treesBlock, Slider slider, ArrayList<Integer> treeOrder) {
+		colorBar = new ColorBar(treesBlock,slider,treeOrder);
+		parent.getChildren().remove(0);
+		parent.getChildren().add(0,colorBar);
+	}
+
+	public void initializeTreesLayout(Model model, double paneWidth, double paneHeight,
+									  GeneTreeViewController controller, SubScene subScene) {
 		trees.getChildren().clear();
-		treeSnapshots.getChildren().clear();
-		visualizeTreesService = new Service<>() {
+		Service<Group> visualizeTreesService = new Service<>() {
 			@Override
 			protected Task<Group> createTask() {
-				return new VisualizeTreesTask(treesBlock, treeWidth, treeHeight, treeDiagramType);
+				return new VisualizeTreesTask(model.getTreesBlock(), model.getTreeOrder(), treeWidth, treeHeight,
+						treeDiagramType);
 			}
 		};
 		controller.getProgressBar().visibleProperty().bind(visualizeTreesService.runningProperty());
 		controller.getProgressBar().progressProperty().bind(visualizeTreesService.progressProperty());
-		//visualizeTreesService.start();
 		visualizeTreesService.setOnScheduled(v -> {
 			controller.getProgressLabel().setText("Drawing trees ...");
 		});
 		visualizeTreesService.setOnSucceeded(v -> {
 			System.out.println("Visualizations succeeded");
+			controller.getCenterPane().getChildren().clear();
 			trees = visualizeTreesService.getValue();
-			createSnapshots(); // can not be done in a service as a JavaFX thread needed
+			setupTreeSelectionBindings(colorBar.getChildren(),controller);
+			createSnapshots(); // can not be done in a service as JavaFX thread is needed
 			updateLayout(paneWidth,paneHeight,controller.getLayoutGroup().getSelectedToggle(),controller);
+			subScene.setRoot(trees);
+			controller.getCenterPane().getChildren().add(subScene);
 			controller.getProgressLabel().setText("");
 		});
 		visualizeTreesService.setOnFailed(u -> {
@@ -271,22 +336,6 @@ public class GeneTreeViewPresenter {
 			controller.getProgressLabel().setText("Drawing trees failed");
 		});
 		visualizeTreesService.restart();
-	}
-
-	private void createSnapshots() {
-		for (int treeIndex = 0; treeIndex<trees.getChildren().size(); treeIndex++) {
-			Node treeVis = trees.getChildren().get(treeIndex);
-			Bounds bounds = treeVis.getLayoutBounds();
-			WritableImage writableImage = new WritableImage((int)Math.round(bounds.getWidth()*2),
-					(int)Math.round(bounds.getHeight()*2));
-			SnapshotParameters parameters = new SnapshotParameters();
-			parameters.setTransform(javafx.scene.transform.Transform.scale(2,2));
-			Image image = treeVis.snapshot(parameters,writableImage);
-			ImageView imageView = new ImageView(image);
-			imageView.setFitWidth(bounds.getWidth());
-			imageView.setFitHeight(bounds.getHeight());
-			treeSnapshots.getChildren().add(treeIndex,imageView);
-		}
 	}
 
 	private void initializeGeneSearch(ComboBox<String> searchGeneComboBox, ObservableList<String> geneNames) {
@@ -305,59 +354,87 @@ public class GeneTreeViewPresenter {
 		taxonOrderSubMenu.setDisable(false);
 	}
 
-	private void initializeColorBar(HBox heatmapBox, TreesBlock treesBlock, Slider slider) {
-		heatmapBox.getChildren().clear();
-
-		int nTrees = treesBlock.getNTrees();
-		Color[] colorList = new Color[nTrees];
-		for (int i = 0; i<nTrees; i++) {
-			colorList[i] = Color.LIGHTGOLDENRODYELLOW;
+	private void setupTreeSelectionBindings(ObservableList<Node> colorBarBoxes, GeneTreeViewController controller) {
+		// Binding the selection state of colorBarBox-treeSheet pairs
+		// A mediatorProperty is needed to avoid circular dependency
+		if (treeSelectionProperties == null) return;
+		selectedTreesCount.set(0);
+		for (int i = 0; i < trees.getChildren().size(); i++) {
+			ColorBarBox colorBarBox = (ColorBarBox) colorBarBoxes.get(i + 1); // first box is only for spacing
+			TreeSheet treeSheet = (TreeSheet) trees.getChildren().get(i);
+			BooleanProperty mediatorProperty;
+			if (treeSelectionProperties[i] == null) {
+				mediatorProperty = new SimpleBooleanProperty();
+				treeSelectionProperties[i] = mediatorProperty;
+				int treeIndex = i;
+				mediatorProperty.addListener((InvalidationListener) -> {
+					Platform.runLater(() -> updateSnapshot(treeIndex, controller));
+					if (mediatorProperty.get()) selectedTreesCount.set(selectedTreesCount.get()+1);
+					else selectedTreesCount.set(selectedTreesCount.get()-1);
+					System.out.println(selectedTreesCount.get());
+				});
+			}
+			else mediatorProperty = treeSelectionProperties[i];
+			colorBarBox.isSelectedProperty().bindBidirectional(mediatorProperty);
+			treeSheet.isSelectedProperty().bindBidirectional(mediatorProperty);
+			if (mediatorProperty.get()) selectedTreesCount.set(selectedTreesCount.get()+1);
 		}
-		assert false;
-		heatmapColors.addAll(colorList);
+	}
 
-		Node sliderKnob = slider.lookup(".thumb");
-		double knobRadius = sliderKnob.getLayoutBounds().getWidth() / 2;
-
-		var leftPane = new Pane();
-		HBox.setMargin(leftPane, Insets.EMPTY);
-		HBox.setHgrow(leftPane, Priority.NEVER);
-		heatmapBox.getChildren().add(leftPane);
-		var boxWidth = new SimpleDoubleProperty();
-		for (int i = 0; i<nTrees; i++) {
-			ColorBarBox colorBarBox = new ColorBarBox(treesBlock.getTree(i+1).getName(),heatmapColors.get(i));
-			heatmapBox.getChildren().add(colorBarBox);
-			if (i==nTrees-1) boxWidth.bind(colorBarBox.widthProperty());
+	private void createSnapshots() {
+		treeSnapshots.getChildren().clear();
+		for (int treeIndex = 0; treeIndex<trees.getChildren().size(); treeIndex++) {
+			Node treeVis = trees.getChildren().get(treeIndex);
+			Node snapShot = createSnapshot(treeVis);
+			treeSnapshots.getChildren().add(treeIndex,snapShot);
 		}
-		var rightPane = new Pane();
-		HBox.setMargin(rightPane,Insets.EMPTY);
-		HBox.setHgrow(rightPane, Priority.NEVER);
-		heatmapBox.getChildren().add(rightPane);
+	}
 
-		leftPane.prefWidthProperty().bind(boxWidth.multiply(-0.5).add(knobRadius));
-		rightPane.prefWidthProperty().bind(boxWidth.multiply(-0.5).add(knobRadius));
-		heatmapBox.setVisible(true);
+	private Node createSnapshot(Node treeVis) {
+		Bounds bounds = treeVis.getLayoutBounds();
+		WritableImage writableImage = new WritableImage((int)Math.round(bounds.getWidth()*2),
+				(int)Math.round(bounds.getHeight()*2)); // scaling with factor 2 for better resolution
+		SnapshotParameters parameters = new SnapshotParameters();
+		parameters.setTransform(javafx.scene.transform.Transform.scale(2,2));
+		Image image = treeVis.snapshot(parameters,writableImage);
+		ImageView snapShot = new ImageView(image);
+		snapShot.setFitWidth(bounds.getWidth());
+		snapShot.setFitHeight(bounds.getHeight());
+		return snapShot;
+	}
+
+	private void updateSnapshot(int treeIndex, GeneTreeViewController controller) {
+		Node treeVis = trees.getChildren().get(treeIndex);
+		currentLayout.resetNode(treeVis); // reset rotation and scaling for the snapshot
+
+		Node snapShot = createSnapshot(treeVis);
+
+		// Transformation of treeVis and snapshot according to the current layout and slider position
+		currentLayout.initializeNode(snapShot,treeIndex,controller.getSlider().getValue());
+		currentLayout.initializeNode(treeVis,treeIndex,controller.getSlider().getValue());
+		treeSnapshots.getChildren().remove(treeIndex);
+		treeSnapshots.getChildren().add(treeIndex,snapShot);
 	}
 
 	private void updateLayout(double paneWidth, double paneHeight, Toggle selectedLayoutToggle,
 							  GeneTreeViewController controller) {
 		if (selectedLayoutToggle.equals(controller.getStackMenuItem())) {
 			if (!trees.getChildren().isEmpty()) currentLayout = new StackLayout(trees.getChildren(),
-					treeSnapshots.getChildren(), treeWidth, treeHeight, camera, paneHeight,paneWidth,
+					treeSnapshots.getChildren(), treeWidth, treeHeight, camera, paneWidth,
 					controller.getSlider(), controller.getZoomSlider());
 			layoutType = LayoutType.Stack;
 		}
 		else if (selectedLayoutToggle.equals(controller.getCarouselMenuItem())) {
 			if (!trees.getChildren().isEmpty()) currentLayout = new CarouselLayout(trees.getChildren(), treeWidth,
-					treeHeight, camera,paneHeight, paneWidth, controller.getSlider(), controller.getZoomSlider());
+					treeHeight, camera, paneWidth, controller.getSlider(), controller.getZoomSlider());
 			layoutType = LayoutType.Carousel;
 		}
 		else System.out.println("No layout");
 		controller.getSlider().setValue(controller.getSlider().getValue());
 	}
 
-	private void updateTreeLayout(TreesBlock treesBlock, double paneWidth, double paneHeight,
-								  Toggle selectedTreeLayoutToggle, GeneTreeViewController controller) {
+	private void updateTreeLayout(Model model, double paneWidth, double paneHeight,
+								  Toggle selectedTreeLayoutToggle, GeneTreeViewController controller, SubScene subScene) {
 		if (selectedTreeLayoutToggle.equals(controller.getRectangularCladoMenuItem()))
 			treeDiagramType = TreeDiagramType.RectangularCladogram;
 		else if (selectedTreeLayoutToggle.equals(controller.getRectangularPhyloMenuItem()))
@@ -372,14 +449,16 @@ public class GeneTreeViewPresenter {
 			treeDiagramType = TreeDiagramType.CircularPhylogram;
 		else if (selectedTreeLayoutToggle.equals(controller.getTriangularCladoMenuItem()))
 			treeDiagramType = TreeDiagramType.TriangularCladogram;
-		if (treesBlock.getNTrees()>0) initializeTreesLayout(treesBlock,paneWidth,paneHeight, controller);
+		if (model.getTreesBlock().getNTrees()>0) initializeTreesLayout(model,paneWidth,paneHeight, controller,subScene);
 	}
 
-	private void changeTreeOrder(Model model, Toggle selectedOrder, GeneTreeViewController controller) {
+	private void changeTreeOrder(Model model, Toggle selectedOrder, GeneTreeViewController controller, SubScene subScene) throws IOException {
 		if (selectedOrder == controller.getDefaultOrderMenuItem()) {
 			model.resetTreeOrder();
-			initializeTreesLayout(model.getTreesBlock(),controller.getCenterPane().getPrefWidth(),
-					controller.getCenterPane().getPrefHeight(),controller);
+			initializeTreesLayout(model,controller.getCenterPane().getBoundsInParent().getWidth(),
+					controller.getCenterPane().getBoundsInParent().getHeight(),controller,subScene);
+			initializeColorBar(controller.getvBox(), model.getTreesBlock(),controller.getSlider(),
+					model.getTreeOrder());
 		}
 		else if (selectedOrder.equals(controller.getTopologyOrderMenuItem())) {
 			// TODO: order trees by topological similarity with the currently selected tree
@@ -387,26 +466,53 @@ public class GeneTreeViewPresenter {
 		else if (selectedOrder.equals(controller.getFeatureOrderMenuItem())) {
 			// TODO: order trees by feature similarity with the currently selected tree -> numerical features only
 		}
-		else { // remaining option: order as in taxon ...
+		else { // remaining option: order as in selected taxon
 			int toggleIndex = controller.getOrderGroup().getToggles().indexOf(selectedOrder)-3;
-			String taxonName = controller.getTaxonOrderSubMenu().getItems().get(toggleIndex).getText();
-			System.out.println(taxonName);
-			// TODO: order trees as in the selected taxon
+			String taxonName = controller.getTaxonOrderSubMenu().getItems().get(toggleIndex).getText().replaceAll(" ","+");
+			String[] taxonNames = taxonName.split("_");
+			String finalTaxonName = taxonNames[0]+"+"+taxonNames[1];
+			System.out.println(finalTaxonName);
+
+			Service<TreeMap<Integer,String>> getGeneOrderService = new Service<>() {
+				@Override
+				protected Task<TreeMap<Integer,String>> createTask() {
+					return new GetGeneOrderTask(model, finalTaxonName);
+				}
+			};
+			controller.getProgressBar().visibleProperty().bind(getGeneOrderService.runningProperty());
+			controller.getProgressBar().progressProperty().bind(getGeneOrderService.progressProperty());
+			getGeneOrderService.setOnScheduled(v -> {
+				controller.getProgressLabel().setText("Reordering trees ...");
+			});
+			getGeneOrderService.setOnSucceeded(v -> {
+				System.out.println("Reordering succeeded");
+				TreeMap<Integer,String> orderedGeneNames = getGeneOrderService.getValue();
+				if (orderedGeneNames.size() == model.getTreesBlock().size()) {
+					model.setTreeOrder(orderedGeneNames);
+					initializeTreesLayout(model,controller.getCenterPane().getBoundsInParent().getWidth(),
+							controller.getCenterPane().getBoundsInParent().getHeight(),controller,subScene);
+					initializeColorBar(controller.getvBox(), model.getTreesBlock(),controller.getSlider(),
+							model.getTreeOrder());
+				}
+				controller.getProgressLabel().setText("");
+			});
+			getGeneOrderService.setOnFailed(u -> {
+				System.out.println("Reordering trees failed");
+				controller.getProgressLabel().setText("Reordering trees failed");
+			});
+			getGeneOrderService.restart();
 		}
 	}
 
-	public void updateTooltip(double sliderValue, TreesBlock treesBlock) {
+	public void updateButtonTooltips(double sliderValue, ObservableList<String> orderedGeneNames) {
 		int index = (int)Math.round(sliderValue);
-		var currentTree = treesBlock.getTree(index);
-		currentTreeToolTip.setText(currentTree.getName());
-		if (index < treesBlock.size()-1) {
-			var nextTree = treesBlock.getTree(index+1);
-			nextTreeToolTip.setText(nextTree.getName());
+		currentTreeToolTip.setText(orderedGeneNames.get(index-1));
+		if (index < orderedGeneNames.size()) {
+			nextTreeToolTip.setText(orderedGeneNames.get(index));
 		}
 		else nextTreeToolTip.setText(currentTreeToolTip.getText());
 		if (index>1) {
-			var previousTree = treesBlock.getTree(index-1);
-			previousTreeToolTip.setText(previousTree.getName());
+			previousTreeToolTip.setText(orderedGeneNames.get(index-2));
 		}
 		else previousTreeToolTip.setText(currentTreeToolTip.getText());
 	}

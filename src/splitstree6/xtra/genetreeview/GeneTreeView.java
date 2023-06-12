@@ -55,6 +55,7 @@ public class GeneTreeView extends Application {
 
 		stage.setScene(new Scene(root));
 		stage.sizeToScene();
+		stage.setTitle("GeneTreeViewer");
 		stage.show();
 	}
 

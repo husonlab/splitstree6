@@ -30,9 +30,6 @@ public class GeneTreeViewController {
 	private Pane centerPane;
 
 	@FXML
-	private HBox heatmapBox;
-
-	@FXML
 	private MenuItem closeMenuItem;
 
 	@FXML
@@ -42,7 +39,13 @@ public class GeneTreeViewController {
 	private MenuItem openMenuItem;
 
 	@FXML
+	private MenuItem importGeneNamesMenuItem;
+
+	@FXML
 	private MenuItem importFeaturesMenuItem;
+
+	@FXML
+	private MenuItem exportSubsetMenuItem;
 
 	@FXML
 	private ToolBar toolBar;
@@ -126,6 +129,9 @@ public class GeneTreeViewController {
 	private Label progressLabel;
 
 	@FXML
+	private VBox vBox;
+
+	@FXML
 	private void initialize() {
 		label.setText("");
 	}
@@ -180,28 +186,28 @@ public class GeneTreeViewController {
 		return centerPane;
 	}
 
-	public HBox getHeatmapBox(){
-		return heatmapBox;
-	}
-
 	public MenuItem getCloseMenuItem() {
 		return closeMenuItem;
-	}
-
-	public MenuBar getMenuBar() {
-		return menuBar;
 	}
 
 	public MenuItem getOpenMenuItem() {
 		return openMenuItem;
 	}
 
-	public ToolBar getToolBar() {
-		return toolBar;
+	public MenuItem getImportGeneNamesMenuItem() {
+		return importGeneNamesMenuItem;
 	}
 
-	public VBox getTopPane() {
-		return topPane;
+	public MenuItem getImportFeaturesMenuItem() {
+		return importFeaturesMenuItem;
+	}
+
+	public MenuItem getExportSubsetMenuItem() {
+		return exportSubsetMenuItem;
+	}
+
+	public ToolBar getToolBar() {
+		return toolBar;
 	}
 
 	public Label getLabel() {
@@ -244,10 +250,6 @@ public class GeneTreeViewController {
 		this.zoomSlider = zoomSlider;
 	}
 
-	public MenuItem getImportFeaturesMenuItem() {
-		return importFeaturesMenuItem;
-	}
-
 	public ComboBox<String> getSearchGeneComboBox() {
 		return searchGeneComboBox;
 	}
@@ -276,7 +278,5 @@ public class GeneTreeViewController {
 		return featureOrderMenuItem;
 	}
 
-	public void setHeatmapBox(ColorBar colorBar) {
-		heatmapBox = colorBar;
-	}
+	public VBox getvBox() {return vBox;}
 }
