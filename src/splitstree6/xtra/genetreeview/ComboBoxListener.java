@@ -36,7 +36,7 @@ public class ComboBoxListener implements EventHandler<KeyEvent> {
 
     public ComboBoxListener(final ComboBox<String> comboBox) {
         this.comboBox = comboBox;
-        data = comboBox.getItems();
+        data = comboBox.itemsProperty().getValue();
 
         this.comboBox.setEditable(true);
         this.comboBox.setOnKeyPressed(e -> comboBox.hide());

@@ -29,52 +29,54 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import splitstree6.data.TreesBlock;
 
-// Not used at the moment
+import java.util.ArrayList;
+
 public class ColorBar extends HBox {
 
-    //private ObservableList<Color> colors = new SimpleListProperty<>();
     private final ObservableList<Color> colors = FXCollections.observableArrayList();
 
-    public ColorBar() {
-
+    public ColorBar(TreesBlock treesBlock, Slider slider, ArrayList<Integer> treeOrder) {
+        initializeColors(treesBlock.getNTrees());
+        initializeColorBar(treesBlock,slider, treeOrder);
     }
 
-    public ColorBar(TreesBlock treesBlock, Slider slider) {
-        initializeColorBar(treesBlock,slider);
-    }
-
-    public void initializeColorBar(TreesBlock treesBlock, Slider slider) {
+    public void initializeColorBar(TreesBlock treesBlock, Slider slider, ArrayList<Integer> treeOrder) {
         this.getChildren().clear();
+        this.setPrefHeight(14);
 
         int nTrees = treesBlock.getNTrees();
+
+        Node sliderKnob = slider.lookup(".thumb");
+        double knobRadius = sliderKnob.getLayoutBounds().getWidth() / 2;
+
+        var leftSpace = new Pane();
+        HBox.setMargin(leftSpace, Insets.EMPTY);
+        HBox.setHgrow(leftSpace, Priority.NEVER);
+        this.getChildren().add(leftSpace);
+        var boxWidth = new SimpleDoubleProperty();
+        for (int i = 0; i<nTrees; i++) {
+            ColorBarBox colorBarBox = new ColorBarBox(treesBlock.getTree(treeOrder.get(i)).getName(),colors.get(i));
+            this.getChildren().add(colorBarBox);
+            if (i==nTrees-1) boxWidth.bind(colorBarBox.widthProperty());
+        }
+        var rightSpace = new Pane();
+        HBox.setMargin(rightSpace,Insets.EMPTY);
+        HBox.setHgrow(rightSpace, Priority.NEVER);
+        this.getChildren().add(rightSpace);
+
+        // Left and right space are adjusted to make the boxes align with the slider values as good as possible
+        leftSpace.prefWidthProperty().bind(boxWidth.multiply(-0.5).add(knobRadius));
+        rightSpace.prefWidthProperty().bind(boxWidth.multiply(-0.5).add(knobRadius));
+        this.setVisible(true);
+    }
+
+    private void initializeColors(int nTrees) {
         Color[] colorList = new Color[nTrees];
         for (int i = 0; i<nTrees; i++) {
             colorList[i] = Color.LIGHTGOLDENRODYELLOW;
         }
         assert false;
         colors.addAll(colorList);
-
-        Node sliderKnob = slider.lookup(".thumb");
-        double knobRadius = sliderKnob.getLayoutBounds().getWidth() / 2;
-
-        var leftPane = new Pane();
-        HBox.setMargin(leftPane, Insets.EMPTY);
-        HBox.setHgrow(leftPane, Priority.NEVER);
-        this.getChildren().add(leftPane);
-        var boxWidth = new SimpleDoubleProperty();
-        for (int i = 0; i<nTrees; i++) {
-            ColorBarBox colorBarBox = new ColorBarBox(treesBlock.getTree(i+1).getName(),colors.get(i));
-            this.getChildren().add(colorBarBox);
-            if (i==nTrees-1) boxWidth.bind(colorBarBox.widthProperty());
-        }
-        var rightPane = new Pane();
-        HBox.setMargin(rightPane,Insets.EMPTY);
-        HBox.setHgrow(rightPane, Priority.NEVER);
-        this.getChildren().add(rightPane);
-
-        leftPane.prefWidthProperty().bind(boxWidth.multiply(-0.5).add(knobRadius));
-        rightPane.prefWidthProperty().bind(boxWidth.multiply(-0.5).add(knobRadius));
-        this.setVisible(true);
     }
 
     public ObservableList<Color> getColors() {

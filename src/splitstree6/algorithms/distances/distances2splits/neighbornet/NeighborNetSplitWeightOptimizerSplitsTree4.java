@@ -341,6 +341,13 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	static private void runActiveConjugate(int ntax, double[] d, double[] W, double[] x, Options options) {
 		final boolean collapse_many_negs = true;
 
+		//TODO Test Old Vs New
+		int numInnerLoops = 0;
+		int numOuterLoops = 0;
+
+
+
+
 		int npairs = d.length;
 		if (W.length != npairs || x.length != npairs)
 			throw new IllegalArgumentException("Vectors d,W,x have different dimensions");
@@ -396,6 +403,10 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 		boolean first_pass = true; //This is the first time through the loops.
 		while (true) {
 			while (true) /* Inner loop: find the next feasible optimum */ {
+
+				//TODO NEW VS OLD
+				numInnerLoops++;
+
 				if (!first_pass)  /* The first time through we use the unconstrained branch lengths */
 					NeighborNetSplitWeightOptimizerSplitsTree4.circularConjugateGrads(ntax, npairs, r, w, p, y, W, AtWd, active, x);
 				first_pass = false;
@@ -436,6 +447,10 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 				}
 			}
 
+			//TODO NEW VS OLD
+			numOuterLoops++;
+
+
 			/* Find i,j that minimizes the gradient over all i,j in the active set. Note that grad = (AtWAb-AtWd)  */
 			calculateAb(ntax, x, y);
 			for (int i = 0; i < npairs; i++)
@@ -471,6 +486,10 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 //            		computeRegularised = false;
 //            	}
 //            	else
+
+				//TODO NEW VS OLD
+				System.err.println("Exiting old Active Set. numInner="+numInnerLoops+"\tnumOuter="+numOuterLoops);
+
 				return; /* We have arrived at the constrained optimum */
 			} else
 				active[min_i] = false;
@@ -512,7 +531,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	 * @param d distance matrix
 	 * @param p the result
 	 */
-	static private void calculateAtx(int n, double[] d, double[] p) {
+	static public void calculateAtx(int n, double[] d, double[] p) {
 
 //First the trivial splits
 		int index = 0;
@@ -552,7 +571,7 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 	 * @param b split weights
 	 * @param d pairwise distances from split weights
 	 */
-	static private void calculateAb(int n, double[] b, double[] d) {
+	static public void calculateAb(int n, double[] b, double[] d) {
 		double d_ij;
 
 		//First the pairs distance one apart.

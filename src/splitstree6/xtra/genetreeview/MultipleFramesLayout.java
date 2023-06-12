@@ -47,6 +47,10 @@ public abstract class MultipleFramesLayout {
         node.setLayoutX(0);
     }
 
+    void initializeNode(Node node, int index, double sliderValue) {
+        resetNode(node);
+    };
+
     void resetCamera(PerspectiveCamera camera) {
         camera.getTransforms().clear();
         camera.translateXProperty().unbind();
@@ -64,12 +68,5 @@ public abstract class MultipleFramesLayout {
         zoomSlider.setValue(zoomSlider.getMin());
     }
 
-    void setSliderDragged(boolean isDragged) {}
-
     public LayoutType getType() {return type;}
-
-    public ObservableList<Node> getTransformedNodes() {return transformedNodes;}
-    public ObservableList<Node> getTransformedSnapshots() {
-        return transformedSnapshots;
-    }
 }

@@ -34,6 +34,7 @@ import splitstree6.io.utils.DataType;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
  * simple data model
@@ -42,6 +43,7 @@ public class Model {
 	private final TaxaBlock taxaBlock = new TaxaBlock();
 	private final TreesBlock treesBlock = new TreesBlock();
 	private final ObservableList<String> orderedGeneNames = FXCollections.observableArrayList();
+	private ArrayList<String> initialGeneNameOrder;
 	private ArrayList<Integer> treeOrder;
 	private final LongProperty lastUpdate = new SimpleLongProperty(this, "lastUpdate", 0L);
 
@@ -68,10 +70,20 @@ public class Model {
 			var fileFormat = importManager.getFileFormat(file.getPath());
 			var importer = (TreesReader) importManager.getImporterByDataTypeAndFileFormat(dataType, fileFormat);
 			importer.read(new ProgressPercentage(), file.getPath(), taxaBlock, treesBlock);
-			treeOrder = new ArrayList<>(treesBlock.getNTrees());
-			resetTreeOrder();
+			initializeTreeOrder();
 			lastUpdate.set(System.currentTimeMillis());
 		} else throw new IOException("File does not contain trees");
+	}
+
+	private void initializeTreeOrder() {
+		initialGeneNameOrder = new ArrayList<>(treesBlock.getNTrees());
+		treeOrder = new ArrayList<>(treesBlock.getNTrees());
+		orderedGeneNames.clear();
+		for (int i = 0; i < treesBlock.getNTrees(); i++) {
+			orderedGeneNames.add(treesBlock.getTree(i+1).getName());
+			initialGeneNameOrder.add(i,treesBlock.getTree(i+1).getName());
+			treeOrder.add(i,i+1);
+		}
 	}
 
 	public void resetTreeOrder() {
@@ -83,11 +95,36 @@ public class Model {
 		}
 	}
 
+	public void setTreeOrder(TreeMap<Integer,String> position2geneName) {
+		orderedGeneNames.clear();
+		treeOrder = new ArrayList<>(treesBlock.getNTrees());
+		int index = 0;
+		for (var position : position2geneName.keySet()) {
+			orderedGeneNames.add(position2geneName.get(position));
+			treeOrder.add(index,initialGeneNameOrder.indexOf(position2geneName.get(position))+1);
+			index++;
+		}
+	}
+
 	public long getLastUpdate() {
 		return lastUpdate.get();
 	}
 
 	public ReadOnlyLongProperty lastUpdateProperty() {
 		return lastUpdate;
+	}
+
+	public void setGeneNames(String[] geneNames) {
+		if (geneNames.length == treesBlock.getNTrees()) {
+			initialGeneNameOrder = new ArrayList<>(treesBlock.getNTrees());
+			for (int i = 0; i < treesBlock.getNTrees(); i++) {
+				treesBlock.getTree(i+1).setName(geneNames[i]);
+				initialGeneNameOrder.add(geneNames[i]);
+			}
+			orderedGeneNames.clear();
+			for (int i : treeOrder) {
+				orderedGeneNames.add(treesBlock.getTree(i).getName());
+			}
+		}
 	}
 }

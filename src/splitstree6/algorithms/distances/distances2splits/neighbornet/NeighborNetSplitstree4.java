@@ -16,6 +16,8 @@ import static splitstree6.algorithms.distances.distances2splits.neighbornet.Neig
 
 public class NeighborNetSplitstree4 {
 
+
+
     private static final double CG_EPSILON = 0.0001;
 
     /**
@@ -33,6 +35,11 @@ public class NeighborNetSplitstree4 {
 
         int ntax = distances.length-1;
         int npairs = (ntax * (ntax - 1)) / 2;
+
+
+        //TODO: TESTING NEW VS OLD
+        int numInnerIterations = 0;
+        int numOuterIterations = 0;
 
 
         //Copy distance array into a 1dim vector
@@ -89,6 +96,10 @@ public class NeighborNetSplitstree4 {
         boolean first_pass = true; //This is the first time through the loops.
         while (true) {
             while (true) /* Inner loop: find the next feasible optimum */ {
+
+                //TODO: TESTING NEW VS OLD
+                numInnerIterations++;
+
                 if (!first_pass)  /* The first time through we use the unconstrained branch lengths */ {
                     params.epsilon = nnlsParams.ST4pgbound;
                     circularConjugateGrads(ntax, npairs, r, w, p, y, Atd, active, x, params);
@@ -200,7 +211,8 @@ public class NeighborNetSplitstree4 {
 
             }
 
-
+            //TODO: TESTING NEW VS OLD
+            numOuterIterations++;
 
 
             /* Find i,j that minimizes the gradient over all i,j in the active set. Note that grad = (AtAb-Atd)  */
@@ -234,13 +246,19 @@ public class NeighborNetSplitstree4 {
 
             if (nnlsParams.ST4useGradientNorm) {
                 double epsilon = nactive / (double) npairs * nnlsParams.ST4pgbound;
-                if ((min_i == -1) || pgradSumSquares<epsilon*epsilon)
+                if ((min_i == -1) || pgradSumSquares<epsilon*epsilon) {
+                    System.err.println("Active Set: GradBound EXIT");
+                    System.err.println("\tNumInternal = "+numInnerIterations+"\tNumExternal = "+numOuterIterations);
                     break;
+                }
             }
             else {
                 double gradbound = -.0001;
-                if ((min_i == -1) || (min_grad > gradbound))
+                if ((min_i == -1) || (min_grad > gradbound)) {
+                    System.err.println("Active Set: Old style EXIT");
+                    System.err.println("\tNumInternal = "+numInnerIterations+"\tNumExternal = "+numOuterIterations);
                     break; /* We have arrived at the constrained optimum */
+                }
             }
             active[min_i] = false;
             nactive--;

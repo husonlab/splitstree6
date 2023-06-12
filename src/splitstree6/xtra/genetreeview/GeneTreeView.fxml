@@ -56,7 +56,9 @@
                                                 <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                                             </accelerator>
                                         </MenuItem>
+                              <MenuItem fx:id="importGeneNamesMenuItem" mnemonicParsing="false" text="Import gene names" />
                               <MenuItem fx:id="importFeaturesMenuItem" disable="true" mnemonicParsing="false" text="Import features" />
+                              <MenuItem fx:id="exportSubsetMenuItem" mnemonicParsing="false" text="Export selected trees" />
                                         <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" text="Close">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -121,7 +123,7 @@
             <center>
                 <StackPane BorderPane.alignment="CENTER">
                <children>
-                  <Pane fx:id="centerPane" prefHeight="292.0" prefWidth="800.0" />
+                  <Pane fx:id="centerPane" />
                </children></StackPane>
             </center>
          <bottom>
@@ -135,9 +137,9 @@
                         <Button fx:id="nextButton" disable="true" mnemonicParsing="false" text="&gt;" BorderPane.alignment="CENTER" />
                      </right>
                      <center>
-                        <VBox BorderPane.alignment="CENTER">
+                        <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                            <children>
-                              <HBox fx:id="heatmapBox" prefHeight="14.0" />
+                              <HBox prefHeight="14.0" visible="false" />
                               <Slider fx:id="slider" blockIncrement="1.0" disable="true" majorTickUnit="10.0" minorTickCount="1" />
                            </children>
                         </VBox>

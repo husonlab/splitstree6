@@ -33,27 +33,29 @@ public class CarouselLayout extends MultipleFramesLayout {
 
     private final LayoutType type = LayoutType.Carousel;
     private final PerspectiveCamera camera;
+    private final double nodeWidth;
+    private final double nodeHeight;
     private final double thetaDeg;
     private final double thetaRad;
+    private final double layoutRadius;
     private final DoubleProperty cameraRadius = new SimpleDoubleProperty();
 
     public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight, PerspectiveCamera camera,
-                          double layoutHeight, double layoutWidth, Slider slider, Slider zoomSlider) {
+                          double layoutWidth, Slider slider, Slider zoomSlider) {
         // Setting up variables
+        this.nodeWidth = nodeWidth;
+        this.nodeHeight = nodeHeight;
+        // For less than 50 trees, it makes no sense to arrange them in a circle, but in a partial circle
         int realNodeNumber = nodes.size();
-        int layoutNodeNumber = Math.max(realNodeNumber, 50);
-        double layoutRadius = (1.1 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
+        int layoutNodeNumber = Math.max(realNodeNumber, 50); // assuming at least 50 trees for the carousel size
+        layoutRadius = (1.1 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
         thetaDeg = 360 / (double) layoutNodeNumber;
         thetaRad = Math.toRadians(thetaDeg);
 
-        // Transforming nodes
+        // Transforming nodes -> circular layout (with layoutRadius) in x-z-plane with nodes facing outside
         for (int i=0; i<realNodeNumber; i++) {
             Node node = nodes.get(i);
-            resetNode(node);
-            node.setTranslateX(layoutRadius*Math.sin(i*thetaRad)-(Math.cos(i*thetaRad)*(nodeWidth/2.)));
-            node.setTranslateZ(-layoutRadius*Math.cos(i*thetaRad)-(Math.sin(i*thetaRad)*(nodeWidth/2.)));
-            Rotate rotate = new Rotate(-i*thetaDeg,0,node.getTranslateY(),0,Rotate.Y_AXIS);
-            node.getTransforms().add(rotate);
+            initializeNode(node,i,slider.getValue());
         }
         transformedNodes = nodes;
 
@@ -61,11 +63,12 @@ public class CarouselLayout extends MultipleFramesLayout {
         setUpZoomSlider(zoomSlider, -1200, -450);
         cameraRadius.bind(zoomSlider.valueProperty().multiply(-1).add(layoutRadius));
 
-        // Transforming camera
+        // Transforming camera -> moving on a larger circle (cameraRadius) around the nodes, facing inside
         resetCamera(camera);
         camera.setNearClip(100);
         camera.setFarClip(2500);
-        camera.setTranslateY((layoutHeight/2.)-40);
+        camera.setTranslateY(0);
+        // x and z position of the camera are managed with bindings
         DoubleBinding xTerm = Bindings.createDoubleBinding(
                 () -> cameraRadius.get()*Math.sin((slider.getValue()-1)*thetaRad),
                 cameraRadius,slider.valueProperty()
@@ -77,7 +80,18 @@ public class CarouselLayout extends MultipleFramesLayout {
         );
         camera.translateZProperty().bind(zTerm);
         this.camera = camera;
+        // Rotation of the camera is managed with updatePosition(),
+        // called by the listener of the slider in GeneTreeViewPresenter
         updatePosition(1,slider.getValue(),layoutWidth,nodeWidth);
+    }
+
+    public void initializeNode(Node node, int index, double sliderValue) {
+        resetNode(node);
+        node.setTranslateX(layoutRadius*Math.sin(index*thetaRad)-(Math.cos(index*thetaRad)*(nodeWidth/2.)));
+        node.setTranslateY(-nodeHeight/2.);
+        node.setTranslateZ(-layoutRadius*Math.cos(index*thetaRad)-(Math.sin(index*thetaRad)*(nodeWidth/2.)));
+        Rotate rotate = new Rotate(-index*thetaDeg,0,node.getTranslateY(),0,Rotate.Y_AXIS);
+        node.getTransforms().add(rotate);
     }
 
     void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {
@@ -87,13 +101,6 @@ public class CarouselLayout extends MultipleFramesLayout {
 
     public PerspectiveCamera getCamera() {
         return camera;
-    }
-
-    public double getCameraRadius() {
-        return cameraRadius.get();
-    }
-
-    void setSliderDragged(boolean isDragged) {
     }
 
     public LayoutType getType() {return type;}

@@ -31,16 +31,20 @@ public class StackLayout extends MultipleFramesLayout{
     private final LayoutType type = LayoutType.Stack;
     private final PerspectiveCamera camera;
     private final BooleanProperty isSnapshot = new SimpleBooleanProperty(false);
-    //private SimpleDoubleProperty[] treePositions;
+    private final double layoutWidth;
+    private final double nodeWidth;
+    private final double nodeHeight;
 
     public StackLayout(ObservableList<Node> nodes, ObservableList<Node> snapshots, double nodeWidth, double nodeHeight,
-                       PerspectiveCamera camera, double layoutHeight, double layoutWidth, Slider slider,
-                       Slider zoomSlider) {
+                       PerspectiveCamera camera, double layoutWidth, Slider slider, Slider zoomSlider) {
+        this.layoutWidth = layoutWidth;
+        this.nodeWidth = nodeWidth;
+        this.nodeHeight = nodeHeight;
+
         // Transforming nodes
         assert nodes.size() == snapshots.size();
-        //treePositions = new SimpleDoubleProperty[nodes.size()];
-        initializeNodes(nodes,layoutWidth,nodeWidth,slider);
-        initializeNodes(snapshots,layoutWidth,nodeWidth,slider);
+        initializeNodes(nodes, slider);
+        initializeNodes(snapshots, slider);
         transformedNodes = nodes;
         transformedSnapshots = snapshots;
 
@@ -51,7 +55,7 @@ public class StackLayout extends MultipleFramesLayout{
         resetCamera(camera);
         camera.setFarClip(1000);
         camera.setNearClip(100);
-        camera.setTranslateY((layoutHeight/2.)-40);
+        camera.setTranslateY(0);
         camera.translateZProperty().bind(zoomSlider.valueProperty());
         this.camera = camera;
         updatePosition(1,slider.getValue(),layoutWidth,nodeWidth);
@@ -62,21 +66,29 @@ public class StackLayout extends MultipleFramesLayout{
         if (isSnapshot.get()) nodesToTransform = transformedSnapshots;
         else nodesToTransform = transformedNodes;
         for (Node node : nodesToTransform) {
-            double x = nodesToTransform.indexOf(node)-newSliderValue+1;
-            transformNode(node, x, layoutWidth, nodeWidth);
+            // The positionalDistance is the desired distance between node and focus-position (in the middle),
+            // assuming distance of 1 between neighboring nodes and slider values starting with 1
+            double positionalDistance = nodesToTransform.indexOf(node)-newSliderValue+1;
+            transformNode(node, positionalDistance, nodeWidth);
         }
     }
 
-    private void initializeNodes(ObservableList<Node> nodes, double layoutWidth, double nodeWidth, Slider slider) {
+    private void initializeNodes(ObservableList<Node> nodes, Slider slider) {
         for (int i=0; i<nodes.size(); i++) {
             Node node = nodes.get(i);
-            resetNode(node);
-            node.setRotationAxis(Rotate.Y_AXIS);
-            transformNode(node, i, layoutWidth, nodeWidth);
+            initializeNode(node,i,slider.getValue());
         }
     }
 
-    private void transformNode(Node node, double x, double layoutWidth, double nodeWidth) {
+    public void initializeNode(Node node, int index, double sliderValue) {
+        resetNode(node);
+        node.setRotationAxis(Rotate.Y_AXIS);
+        node.setTranslateY(-nodeHeight/2.);
+        double positionalDistance = index-sliderValue+1;
+        transformNode(node, positionalDistance, nodeWidth);
+    }
+
+    private void transformNode(Node node, double x, double nodeWidth) {
         // Translate X
         //var functionForX = (1.045/(1.+Math.exp(-1.028*x))-0.522);
         var functionForX = (1.285/(1+Math.exp(-0.767*x))-0.642);

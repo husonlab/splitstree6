@@ -19,15 +19,19 @@
 
 package splitstree6.xtra.genetreeview;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
-public class ColorBarBox extends Pane {
+public class ColorBarBox extends Pane implements Selectable{
 
     private final String name;
     private Color color;
+    private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
+    private final BooleanProperty mediatorProperty = new SimpleBooleanProperty(); // for selection state binding
 
     public ColorBarBox(String name, Color color) {
         this.color = color;
@@ -38,6 +42,16 @@ public class ColorBarBox extends Pane {
         HBox.setHgrow(this, Priority.ALWAYS);
         this.name = name;
         Tooltip.install(this,new Tooltip(name));
+        this.setOnMouseClicked(e -> {
+            setSelectedProperty();
+        });
+        isSelectedProperty.addListener((observable, wasSelected, isSelected) -> {
+            if (isSelected) this.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,
+                    CornerRadii.EMPTY,new BorderWidths(0.4))));
+            else this.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,
+                    CornerRadii.EMPTY,new BorderWidths(0.1))));
+            if (isSelected != mediatorProperty.get()) mediatorProperty().set(isSelected);
+        });
     }
 
     public void setColor(Color color) {
@@ -51,5 +65,21 @@ public class ColorBarBox extends Pane {
 
     public Color getColor() {
         return color;
+    }
+
+    public void setSelectedProperty(boolean selected) {
+        isSelectedProperty.set(selected);
+    };
+
+    public void setSelectedProperty() {
+        setSelectedProperty(!isSelectedProperty.get());
+    }
+
+    public BooleanProperty isSelectedProperty() {
+        return isSelectedProperty;
+    }
+
+    public BooleanProperty mediatorProperty() {
+        return mediatorProperty;
     }
 }
