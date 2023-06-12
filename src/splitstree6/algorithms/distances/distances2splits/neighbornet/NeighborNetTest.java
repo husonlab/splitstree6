@@ -8,6 +8,7 @@ import java.io.FileOutputStream;
 import java.io.PrintWriter;
 import java.util.Random;
 
+import static java.lang.Math.sqrt;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.SquareArrays.copyArray;
@@ -18,35 +19,104 @@ public class NeighborNetTest {
 
     public static void main(String[] args) {
 
-        //Generate a single random data set
-        int n=30;
-        double p=0.2;
+        compareCalcAx(500,1);
 
-        double[][] x = new double[n+1][n+1];
-        double[][] xinitial = new double[n+1][n+1];
-        double[][] y = new double[n+1][n+1];
-        double sigma = 0.05;
-        randomData(x,y,p,sigma);
-        calcAinv_y(y,xinitial);
-        zeroNegativeEntries(xinitial);
-        var params = new NNLSParams();
-        params.printResiduals = true;
-        params.projGradBound = 2e-8;
-        params.maxIterations = 10000;
-        params.cgnrIterations = n*(n-1)/2;
-        params.cgnrTolerance = 1e-8;
 
         if (!runThese) {
-            testCGNR();
+            //Generate a single random data set
+            int n = 30;
+            double p = 0.2;
 
-        }
-        if (runThese) {
+            double[][] x = new double[n + 1][n + 1];
+            double[][] xinitial = new double[n + 1][n + 1];
+            double[][] y = new double[n + 1][n + 1];
+            double sigma = 0.05;
+            randomData(x, y, p, sigma);
+            calcAinv_y(y, xinitial);
+            zeroNegativeEntries(xinitial);
+            var params = new NNLSParams();
+            params.printResiduals = true;
+            params.projGradBound = 2e-8;
+            params.maxIterations = 10000;
+            params.cgnrIterations = n * (n - 1) / 2;
+            params.cgnrTolerance = 1e-8;
+
             testActiveSet(x,y,xinitial,params);
             testGradientProjection(x,y,xinitial,params);
             testAPGD(x,y,xinitial,params);
             testIPG(x,y,xinitial,params);
         }
     }
+
+    public static void compareCalcAx(int n, int nreps) {
+
+        double p = 0.2;
+
+        for (var rep=0;rep<nreps;rep++) {
+            double[][] x = new double[n + 1][n + 1];
+            double[][] y = new double[n + 1][n + 1];
+            double sigma = 0.05;
+            randomData(x, y, p, sigma);
+
+            int npairs = n * (n - 1) / 2;
+            double[] yvec = new double[npairs];
+            int index = 0;
+            for (int i = 0; i < n; i++)
+                for (int j = i + 1; j < n; j++) {
+                    yvec[index] = y[i][j];
+                    index++;
+                }
+
+            double[] zvec = new double[npairs];
+            double[][] z = new double[n + 1][n + 1];
+
+            long startTime = System.currentTimeMillis();
+            for (int k = 0; k < 1000; k++)
+                NeighborNetSplitWeightOptimizerSplitsTree4.calculateAtx(n, yvec, zvec);
+            long runTimeOld = System.currentTimeMillis() - startTime;
+
+            startTime = System.currentTimeMillis();
+            for (int k = 0; k < 1000; k++)
+                NeighborNetUtilities.calcAtx(y, z);
+            long runTimeNew = System.currentTimeMillis() - startTime;
+
+            startTime = System.currentTimeMillis();
+            for (int k = 0; k < 1000; k++) {
+                index = 0;
+                for (int i = 0; i < n; i++)
+                    for (int j = i + 1; j < n; j++) {
+                        yvec[index] = y[i][j];
+                        index++;
+                    }
+                NeighborNetSplitWeightOptimizerSplitsTree4.calculateAtx(n, yvec, zvec);
+                index = 0;
+                for (int i = 0; i < n; i++)
+                    for (int j = i + 1; j < n; j++) {
+                        z[i][j]=zvec[index];
+                        index++;
+                    }
+            }
+            long runTimeNew2 = System.currentTimeMillis() - startTime;
+
+
+
+
+            double diff = 0.0;
+            index = 0;
+            for(int i=0;i<n;i++)
+                for(int j=i+1;j<n;j++) {
+                    double diff_ij = (z[i][j] - zvec[index]);
+                    diff+= diff_ij * diff_ij;
+                }
+
+            System.out.println("Compared new and old implementations of calcAx. n="+n);
+            System.out.println(" Old algorithm = time = "+runTimeOld);
+            System.out.println(" New algorithm = time = "+runTimeNew);
+            System.out.println(" Old algorithm wrapped = time = "+runTimeNew2);
+            System.out.println(" Difference in solution = "+sqrt(diff));
+        }
+    }
+
 
 
     public static void printGraphs(double[][] d, String filename) {

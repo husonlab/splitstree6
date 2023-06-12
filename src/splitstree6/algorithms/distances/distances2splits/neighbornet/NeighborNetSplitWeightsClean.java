@@ -254,6 +254,10 @@ public class NeighborNetSplitWeightsClean {
 
 		//TODO add progress listener support.
 
+		//TODO: NEW VS OLD
+		int numInnerLoops = 0;
+		int numOuterLoops = 0;
+
 		long startTime = System.currentTimeMillis();
 
 		var n = x.length - 1;
@@ -267,6 +271,10 @@ public class NeighborNetSplitWeightsClean {
 
 		while (true) {
 			while (true) {
+
+				//TODO NEW VS OLD
+				numInnerLoops++;
+
 				copyArray(x, xstar);
 				int numIterations = cgnr(xstar, d, activeSet, params, progress);
 				k++;
@@ -285,10 +293,15 @@ public class NeighborNetSplitWeightsClean {
 				if (k > params.maxIterations || (startTime - System.currentTimeMillis()) > params.maxTime)
 					return;
 			}
+
+			numOuterLoops++;
+
 			copyArray(xstar, x);
 			double pg = evalProjectedGradientSquared(x, d);
-			if (pg < params.projGradBound)
+			if (pg < params.projGradBound) {
+				System.err.println("Exiting new Active Set. numInner="+numInnerLoops+"\tnumOuter="+numOuterLoops);
 				return;
+			}
 
 			//At this point x is feasible, but not necessarily a solution to the equality constrained problem.
 			//Determine if there is an active constraint which can be removed.
