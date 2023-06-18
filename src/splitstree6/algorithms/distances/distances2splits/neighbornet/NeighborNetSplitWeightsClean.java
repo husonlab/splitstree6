@@ -66,6 +66,13 @@ public class NeighborNetSplitWeightsClean {
 		public int maxIterations = Integer.MAX_VALUE;
 		public long maxTime = Long.MAX_VALUE; //Stop if the method has taken more than this many milliseconds
 
+		//Stopping conditions - ProjectedGradient
+		double gcp_kl = 0.9;
+		double gcp_ku = 0.2;
+		double gcp_ke = 0.3;
+
+
+
 		//Stopping conditions - CGNR
 		public int cgnrIterations; //Max number of iterations in CGNR
 		public double cgnrTolerance = projGradBound / 2; //Stopping condition for CGNR - bound on norm gradient squared.
@@ -480,7 +487,7 @@ public class NeighborNetSplitWeightsClean {
 
 		for (var k = 1; k <= params.maxIterations; k++) {
 
-			//System.err.println(" \t\tRSS, top of iteration = \t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
+			System.err.println(" \t\tRSS, top of iteration = \t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
 
 
 			//Search direction
@@ -492,11 +499,12 @@ public class NeighborNetSplitWeightsClean {
 
 			//projectedLineSearchBrents(x, p, d, relErr, absErr);
 			//projectedLineSearch(x,p,d);
-			//projectedLineSearchM1(x,p,d);
-			projectedLineSearchNoDerivatives(x, p, d, 0.1);
+			projectedLineSearchM1(x,p,d);
+			//projectedLineSearchNoDerivatives(x, p, d, 0.1);
+			//projectedGCP(x,p,d,params);
 
 
-			//System.err.println(" RSS, after line search = \t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
+			System.err.println(" RSS, after line search = \t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
 
 			getActiveEntries(x, activeSet);
 
@@ -523,7 +531,7 @@ public class NeighborNetSplitWeightsClean {
 //				for (int j = i + 1; j <= n; j++)
 //					x[i][j] += mint*(xstar[i][j] - x[i][j]);
 
-			//System.err.println(" RSS, after CG  = \t\t\t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
+			System.err.println(" RSS, after CG  = \t\t\t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
 
 			double pg = evalProjectedGradientSquared(x, d);
 
@@ -756,6 +764,115 @@ public class NeighborNetSplitWeightsClean {
 
 	}
 
+	/**
+	 * ProjectedGCP
+	 * <p>
+	 * Adaptation of the algorithm for finding a Generalized Cauchy Point (GCP), due to
+	 * Cartis et al. 2011  doi:10.1093/imanum/drr035
+	 * but for the case with no regularisation and simple non-negativity points.
+	 *
+	 * Given x and p, a GCP is a point y = x^GC such that
+	 * 		y = [x + tp]_+ for some t >= 0.
+	 * 		f(y) <= f(x) - \kappa_u p^T(y-x)
+	 * 	and either
+	 * 	    f(y) >= f(x) - \kappa_l p^T(y-x)
+	 * 	or
+	 *      ||w|| \leq \kappa_e  |p^T(y-x)|
+	 *  where
+	 *      w_i  =   \begin{cases} p_i    if  y_i > 0; max(p_i,0) if y_i = 0 \end{cases}
+	 * 	This second condition is equivalent to (2.6) in Cartis et al. Given y, the tangent
+	 * 	cone for the positive quadrant at y is {w:w_i \geq 0 for all i such that y_i = 0.}
+	 *		The three constants (in the params) are tuning factors which satisfy
+	 *			0 < k_u < k_l < 1 and k_e \in (0,0.5)
+	 *
+	 *   The search algorithm
+	 *
+	 * @param x  Starting value.This is overwritten by xGC, the Generalized Cauchy point
+	 * @param p  Search direction, typically equal to -\grad f(x)
+	 * @param d  Distances
+	 * @param params  Parameters. WE use gcp_ku,gcp_kl,gcp_ke.
+	 */
+	private static void projectedGCP(double[][] x, double[][] p, double[][] d, NNLSParams params) {
+		int n = x.length - 1;
+
+		double f0 = evalProjectedf(x,0,p,d);
+
+		//Locate the largest breakpoint. We start the search at 0.5 times this.
+		double tlimit = 0.0;
+		for (int i = 1; i <= n; i++)
+			for (int j = i + 1; j <= n; j++) {
+				double t = -x[i][j] / p[i][j];
+				if (p[i][j] < 0 && t>tlimit)
+					tlimit = t;
+			}
+
+
+		double tmin = 0, tmax = Double.MAX_VALUE, tk;
+		if (tlimit > 0.0)
+			tk = 0.5*tlimit;
+		else {
+			//For all i,j either p[i][j] >= 0 or x[i][j] = 0 and p[i][j] <0.
+			//We jump to an exact solution.
+			double[][] phat = new double[n+1][n+1];
+			for(int i=1;i<=n;i++)
+				for(int j=i+1;j<=n;j++) {
+					phat[i][j] = max(p[i][j],0.0);
+				}
+			/* Min 0.5 (A(x+tp) - d)'(A(x+tp) - d) = 0.5 t^2 p'A'Ap - t d'Ap + const
+			t = d'Ap / pA'Ap
+			 */
+			double[][] Ap = new double[n+1][n+1];
+			calcAx(phat,Ap);
+			double dAp=0.0, pAAp = 0.0;
+			for(int i=1;i<=n;i++)
+				for(int j=i+1;j<=n;j++) {
+					double Ap_ij = Ap[i][j];
+					dAp += Ap_ij * d[i][j];
+					pAAp+= Ap_ij * Ap_ij;
+				}
+			tk = dAp/pAAp;
+		}
+
+		while(true) {
+			double fk = evalProjectedf(x, tk, p, d);
+			double ptz = 0.0;
+			for (int i = 1; i <= n; i++)
+				for (int j = i + 1; j <= n; j++)
+					ptz += p[i][j] * (max(x[i][j] + tk * p[i][j], 0) - x[i][j]);
+
+			if (fk > f0 - params.gcp_ku * ptz) {
+				//Too far.
+				tmax = tk;
+				tk = 0.5 * (tmin + tmax);
+			} else {
+				double wsum = 0.0;
+				for (int i = 1; i <= n; i++)
+					for (int j = i + 1; j <= n; j++) {
+						double pij = p[i][j];
+						if (p[i][j] > 0 || x[i][j] + tk * p[i][j] > 0)
+							wsum += pij * pij;
+					}
+				if (fk < f0 - params.gcp_kl * ptz && sqrt(wsum) > params.gcp_ke * abs(ptz)) {
+					tmin = tk;
+					if (tmax == Double.MAX_VALUE)
+						tk = 2.0 * tk;
+					else
+						tk = 0.5 * (tmin + tmax);
+				} else {
+					for (int i = 1; i <= n; i++)
+						for (int j = i + 1; j <= n; j++)
+							x[i][j] = max(x[i][j] + tk * p[i][j], 0.0);
+					return;
+				}
+
+			}
+		}
+	}
+
+
+
+
+
 
 	static private double evalProjectedf(double[][] x, double t, double[][] p, double[][] d) {
 		int n = x.length - 1;
@@ -780,6 +897,8 @@ public class NeighborNetSplitWeightsClean {
 
 		return 0.5*(diff - sumArraySquared(d));
 	}
+
+
 
 	static private double evalProjectedGrad(double[][] x, double t, double[][] p, double[][] d) {
 		int n = x.length - 1;
