@@ -136,6 +136,7 @@ public class BootstrapTree extends Trees2Trees {
 				var ntax = workflow.getWorkingTaxaBlock().getNtax();
 
 				var numberOfThreads = Math.max(1, Math.min(numberOfReplicates, ProgramExecutorService.getNumberOfCoresToUse()));
+
 				var service = Executors.newFixedThreadPool(numberOfThreads);
 				try {
 					var exception = new Single<IOException>();
@@ -161,30 +162,28 @@ public class BootstrapTree extends Trees2Trees {
 										for (var entry : targetEdgeClustersMap.entrySet()) {
 											var e = entry.getKey();
 											var cluster = entry.getValue();
-											if (cluster.cardinality() == 1 || cluster.cardinality() == ntax - 1 || replicateClusters.contains(cluster))
-												targetEdgeSupport.get(e).add(100.0);
-											else if (transferBootstrap) {
-												if (cluster.cardinality() == 2 || cluster.cardinality() == ntax - 2)
-													targetEdgeSupport.get(e).add(100);
-												else
-													targetEdgeSupport.get(e).add(100 * computeTransferValue(ntax, cluster, edgeClusterMap));
+											if (cluster.cardinality() == 1 || cluster.cardinality() == ntax - 1 || replicateClusters.contains(cluster)) {
+												targetEdgeSupport.get(e).add(1d);
+											} else if (transferBootstrap) {
+												if (cluster.cardinality() == 2 || cluster.cardinality() == ntax - 2) {
+													targetEdgeSupport.get(e).add(1d);
+												} else {
+													targetEdgeSupport.get(e).add(computeTransferValue(ntax, cluster, edgeClusterMap));
+												}
 											}
 										}
 									}
-
 									if (thread == 0)
 										progress.incrementProgress();
 									if (exception.isNotNull())
 										return;
 								}
 
-							} catch (IOException ex) {
-								exception.setIfCurrentValueIsNull(ex);
+							} catch (Exception ex) {
+								exception.setIfCurrentValueIsNull(new IOException(ex));
 							}
 						});
 					}
-
-					progress.reportTaskCompleted();
 
 					service.shutdown();
 					try {
@@ -193,6 +192,7 @@ public class BootstrapTree extends Trees2Trees {
 					}
 					if (exception.isNotNull())
 						throw exception.get();
+					progress.reportTaskCompleted();
 				} finally {
 					service.shutdownNow();
 				}
@@ -208,8 +208,7 @@ public class BootstrapTree extends Trees2Trees {
 	private static double computeTransferValue(int ntax, BitSet cluster, EdgeArray<BitSet> replicateClusters) {
 		var smallest = Integer.MAX_VALUE;
 		for (var replicateCluster : replicateClusters.values()) {
-			replicateCluster.xor(cluster);
-			var size = replicateCluster.cardinality();
+			var size = BitSetUtils.xor(cluster, replicateCluster).cardinality();
 			smallest = NumberUtils.min(smallest, size, ntax - size);
 		}
 		return 1.0 - (double) smallest / Math.min(cluster.cardinality() - 1, ntax - cluster.cardinality() - 1);
@@ -245,7 +244,7 @@ public class BootstrapTree extends Trees2Trees {
 			var e = entry.getKey();
 			var v = e.getTarget();
 			if (!v.isLeaf()) {
-				var value = Math.min(100d, Math.max(0d, entry.getValue().doubleValue() / numberOfReplicates));
+				var value = Math.min(100d, Math.max(0d, 100 * entry.getValue().doubleValue() / numberOfReplicates));
 
 				if (value < minPercent) {
 					toContract.add(e);
