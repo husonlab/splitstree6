@@ -26,6 +26,7 @@ import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.trees.trees2splits.TreeSelectorSplits;
+import splitstree6.algorithms.utils.BootstrappingUtils;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
@@ -58,6 +59,7 @@ public class BootstrapSplits extends Splits2Splits {
 	private final BooleanProperty optionShowAllSplits = new SimpleBooleanProperty(this, "optionShowAllSplits", false);
 	private final IntegerProperty optionRandomSeed = new SimpleIntegerProperty(this, "optionRandomSeed", 42);
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
+
 
 	@Override
 	public List<String> listOptions() {
@@ -125,9 +127,9 @@ public class BootstrapSplits extends Splits2Splits {
 
 					service.execute(() -> {
 						try {
-							var path = extractPath(workflow.getWorkingDataNode(), targetNode);
+							var path = BootstrappingUtils.extractPath(workflow.getWorkingDataNode(), targetNode);
 							if (thread == 0)
-								System.err.println("Bootstrap workflow: " + toString(charactersBlock, path));
+								System.err.println("Bootstrap workflow: " + BootstrappingUtils.toString(charactersBlock, path));
 
 							if (targetNode.getDataBlock() instanceof TreesBlock) {
 								path.add(new Pair<>(new TreeSelectorSplits(), new SplitsBlock()));
@@ -135,7 +137,7 @@ public class BootstrapSplits extends Splits2Splits {
 								path.get(path.size() - 1).setSecond(new SplitsBlock());
 
 							for (var r = thread; r < getOptionReplicates(); r += numberOfThreads) {
-								SplitsBlock replicateSplits = (SplitsBlock) run(new ProgressSilent(), workflow.getWorkingTaxaBlock(), createReplicate(charactersBlock, new Random(seeds[r])), path);
+								var replicateSplits = (SplitsBlock) run(new ProgressSilent(), workflow.getWorkingTaxaBlock(), BootstrappingUtils.createReplicate(charactersBlock, new Random(seeds[r])), path);
 								for (var split : replicateSplits.getSplits()) {
 									if (isOptionShowAllSplits() || splitCountMap.containsKey(split)) {
 										splitCountMap.put(split, splitCountMap.getOrDefault(split, 0) + 1);
@@ -183,7 +185,6 @@ public class BootstrapSplits extends Splits2Splits {
 			}
 
 			if (getOptionHighDimensionFilter()) {
-				var dimensionsFilter = new DimensionFilter();
 				DimensionFilter.apply(progress, 4, computedSplits, splitsBlock.getSplits());
 			} else
 				splitsBlock.getSplits().addAll(computedSplits);
@@ -198,27 +199,6 @@ public class BootstrapSplits extends Splits2Splits {
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 
 		splitsBlock.getFormat().setOptionConfidences(true);
-	}
-
-	/**
-	 * creates a bootstrap replicate
-	 *
-	 * @param charactersBlock characters
-	 * @param random          random number generator
-	 * @return bootstrap replicate
-	 */
-	public static CharactersBlock createReplicate(CharactersBlock charactersBlock, Random random) {
-		final var srcMatrix = charactersBlock.getMatrix();
-		final var numRows = srcMatrix.length;
-		final var numCols = srcMatrix[0].length;
-		final var tarMatrix = new char[numRows][numCols];
-		for (var col = 0; col < numCols; col++) {
-			var randomCol = random.nextInt(numCols);
-			for (var row = 0; row < numRows; row++) {
-				tarMatrix[row][col] = srcMatrix[row][randomCol];
-			}
-		}
-		return new CharactersBlock(charactersBlock, tarMatrix);
 	}
 
 	@Override
@@ -291,27 +271,6 @@ public class BootstrapSplits extends Splits2Splits {
 	}
 
 	/**
-	 * get's the path of algorithms and datanodes from the working datanode to the target datanode
-	 *
-	 * @param workingDataNode
-	 * @param target
-	 * @return
-	 */
-	public static ArrayList<Pair<Algorithm, DataBlock>> extractPath(DataNode<? extends DataBlock> workingDataNode, DataNode target) throws IOException {
-		var list = new ArrayList<Pair<Algorithm, DataBlock>>();
-
-		var dataNode = target;
-		while (dataNode != workingDataNode) {
-			if (dataNode.getPreferredParent() == null)
-				throw new IOException("Algorithm path not found");
-			var algorithmNode = dataNode.getPreferredParent();
-			list.add(0, new Pair<>(algorithmNode.getAlgorithm(), dataNode.getDataBlock().newInstance()));
-			dataNode = algorithmNode.getPreferredParent();
-		}
-		return list;
-	}
-
-	/**
 	 * run all algorithms in the path on the given characters
 	 *
 	 * @param progress
@@ -335,25 +294,8 @@ public class BootstrapSplits extends Splits2Splits {
 		return inputData;
 	}
 
-	/**
-	 * return a overview of path
-	 *
-	 * @param characters input characters
-	 * @param path       path of algorithms and data
-	 * @return string
-	 */
-	public static String toString(CharactersBlock characters, ArrayList<Pair<Algorithm, DataBlock>> path) {
-		var buf = new StringBuilder();
-
-		DataBlock inputData = characters;
-		buf.append(inputData.getBlockName());
-
-		for (var pair : path) {
-			var algorithm = pair.getFirst();
-			var outputData = pair.getSecond();
-			buf.append(" -> ").append(algorithm.getName()).append(" -> ").append(inputData.getBlockName());
-			inputData = outputData;
-		}
-		return buf.toString();
+	@Override
+	public String getCitation() {
+		return "Felsensetin 1985;Felsenstein J. Confidence limits on phylogenies: an approach using the bootstrap. Evolution. 1985;39(4):783-791";
 	}
 }
