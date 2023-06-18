@@ -499,9 +499,9 @@ public class NeighborNetSplitWeightsClean {
 
 			//projectedLineSearchBrents(x, p, d, relErr, absErr);
 			//projectedLineSearch(x,p,d);
-			projectedLineSearchM1(x,p,d);
+			//projectedLineSearchM1(x,p,d);
 			//projectedLineSearchNoDerivatives(x, p, d, 0.1);
-			//projectedGCP(x,p,d,params);
+			projectedGCP(x,p,d,params);
 
 
 			System.err.println(" RSS, after line search = \t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
@@ -514,28 +514,28 @@ public class NeighborNetSplitWeightsClean {
 			//copyArray(x, xstar);
 			params.cgnrIterations = max(100, n);
 
-			params.abortIfNegative = true;
+			//params.abortIfNegative = true;
 			cgnr(x, d, activeSet, params, progress); //Just a few iterations of CG
-			params.abortIfNegative = false;
+			//params.abortIfNegative = false;
 
 
 			//Move towards xstar as far as possible while preserving feasibility
-//			double mint = 1.0;
-//			for (int i = 1; i <= n; i++)
-//				for (int j = i + 1; j <= n; j++)
-//					if (xstar[i][j] < 0.0) {
-//						double t_ij = x[i][j] / (x[i][j] - xstar[i][j]);
-//						mint = min(t_ij,mint);
-//					}
-//			for (int i = 1; i <= n; i++)
-//				for (int j = i + 1; j <= n; j++)
-//					x[i][j] += mint*(xstar[i][j] - x[i][j]);
+			double mint = 1.0;
+			for (int i = 1; i <= n; i++)
+				for (int j = i + 1; j <= n; j++)
+					if (xstar[i][j] < 0.0) {
+						double t_ij = x[i][j] / (x[i][j] - xstar[i][j]);
+						mint = min(t_ij,mint);
+					}
+			for (int i = 1; i <= n; i++)
+				for (int j = i + 1; j <= n; j++)
+					x[i][j] += mint*(xstar[i][j] - x[i][j]);
 
 			System.err.println(" RSS, after CG  = \t\t\t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
 
 			double pg = evalProjectedGradientSquared(x, d);
 
-			//System.err.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + (n * (n - 1) / 2 - cardinality(activeSet)));
+			System.err.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + (n * (n - 1) / 2 - cardinality(activeSet)));
 
 			if (progress != null)
 				progress.checkForCancel();
