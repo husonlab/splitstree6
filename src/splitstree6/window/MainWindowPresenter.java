@@ -237,6 +237,7 @@ public class MainWindowPresenter {
 						enableAllMenuItemsWithDefinedAction(controller);
 					if (true)
 						updateEnableStateAlgorithms();
+					controller.getNewMenuItem().disableProperty().bind(new SimpleBooleanProperty(false));
 				}
 			} catch (Exception ex) {
 				Basic.caught(ex);

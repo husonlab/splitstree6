@@ -103,11 +103,15 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
-		if (editable)
+
+		if (false && editable) {
 			codeArea.focusedProperty().addListener((c, o, n) -> {
-				if (n)
+				if (n) {
+					mainWindow.getController().getPasteMenuItem().disableProperty().unbind();
 					mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
+				}
 			});
+		}
 
 		controller.getIncreaseFontButton().setOnAction(e -> {
 			tab.setFontSize(1.1 * tab.getFontSize());
@@ -149,6 +153,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			mainController.getCutMenuItem().disableProperty().bind(selectionEmpty);
 
 			mainController.getPasteMenuItem().setOnAction(e -> codeArea.paste());
+			mainController.getPasteMenuItem().setDisable(false);
 
 			mainController.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
 			mainController.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());

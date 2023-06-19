@@ -31,7 +31,7 @@ import java.util.regex.Pattern;
  * Daria Evseeva, 2019
  */
 public class UniversalHighlighter implements Highlighter.IHighlighter {
-	private static final String PAREN_PATTERN = "[()]";
+	private static final String PAREN_PATTERN = "[()<>|]";
 	private static final String BRACE_PATTERN = "[{}]";
 	private static final String COMMENT_PATTERN = "(^|\\n)\\s*#[^\n]*";
 	private static final String HEADING_PATTERN = "(^|\\n)[\\pL\\s]*:(\n|$)";
