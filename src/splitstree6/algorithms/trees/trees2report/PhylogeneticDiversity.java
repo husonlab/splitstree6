@@ -45,8 +45,9 @@ public class PhylogeneticDiversity extends Trees2ReportBase {
 
 	@Override
 	public List<String> listOptions() {
-		var list = new ArrayList<>(super.listOptions());
+		var list = new ArrayList<String>();
 		list.add(optionRooted.getName());
+		list.addAll(super.listOptions());
 		return list;
 	}
 

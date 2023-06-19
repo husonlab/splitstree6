@@ -363,6 +363,9 @@ public class MainWindowController {
 	private MenuItem computeRootedTreeFairProportionMenuItem;
 
 	@FXML
+	private MenuItem computeRootedTreeEqualSplitsMenuItem;
+
+	@FXML
 	private MenuItem computeTreePhylogeneticDiversityMenuItem;
 
 	@FXML
@@ -929,6 +932,10 @@ public class MainWindowController {
 
 	public MenuItem getComputeRootedTreeFairProportionMenuItem() {
 		return computeRootedTreeFairProportionMenuItem;
+	}
+
+	public MenuItem getComputeRootedTreeEqualSplitsMenuItem() {
+		return computeRootedTreeEqualSplitsMenuItem;
 	}
 
 	public MenuItem getComputeTreePhylogeneticDiversityMenuItem() {

@@ -76,7 +76,7 @@ import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
-import splitstree6.algorithms.trees.trees2report.FairProportion;
+import splitstree6.algorithms.trees.trees2report.TreeDiversityIndex;
 import splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity;
 import splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues;
 import splitstree6.algorithms.trees.trees2splits.*;
@@ -572,8 +572,11 @@ public class MainWindowPresenter {
 		controller.getComputeUnrootedTreeShapleyMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new UnrootedShapleyValues()));
 		controller.getComputeUnrootedTreeShapleyMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new UnrootedShapleyValues()));
 
-		controller.getComputeRootedTreeFairProportionMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new FairProportion()));
-		controller.getComputeRootedTreeFairProportionMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new FairProportion()));
+		controller.getComputeRootedTreeFairProportionMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TreeDiversityIndex(), t -> ((TreeDiversityIndex) t).setOptionMethod(TreeDiversityIndex.Method.FairProportions)));
+		controller.getComputeRootedTreeFairProportionMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TreeDiversityIndex()));
+
+		controller.getComputeRootedTreeEqualSplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TreeDiversityIndex(), t -> ((TreeDiversityIndex) t).setOptionMethod(TreeDiversityIndex.Method.EqualSplits)));
+		controller.getComputeRootedTreeEqualSplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TreeDiversityIndex()));
 
 		controller.getComputeTreePhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PhylogeneticDiversity()));
 		controller.getComputeTreePhylogeneticDiversityMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PhylogeneticDiversity()));

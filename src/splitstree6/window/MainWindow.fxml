@@ -406,7 +406,9 @@
                         <MenuItem fx:id="computeTreePhylogeneticDiversityMenuItem"
                                   text="Compute Tree Phylogenetic Diversity"/>
                         <MenuItem fx:id="computeRootedTreeFairProportionMenuItem"
-                                  text="Compute Rooted Tree Fair Proportion"/>
+                                  text="Compute Rooted Tree Fair Proportion Diversity Index"/>
+                        <MenuItem fx:id="computeRootedTreeEqualSplitsMenuItem"
+                                  text="Compute Rooted Tree Equal Splits Diversity Index"/>
                         <MenuItem fx:id="computeUnrootedTreeShapleyMenuItem"
                                   text="Compute Unrooted Tree Shapley Values"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>

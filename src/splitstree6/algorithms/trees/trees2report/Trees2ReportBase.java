@@ -42,7 +42,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * perform an analysis on trees and then provides a report
+ * perform an analysis on trees and then provides a reportFairProportions
  * Daniel Huson, 2.2023
  */
 abstract public class Trees2ReportBase extends Algorithm<TreesBlock, ReportBlock> implements IViewChoice {
