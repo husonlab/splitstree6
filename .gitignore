@@ -3,6 +3,7 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+.idea/
 .idea/.gitignore
 .idea/misc.xml
 .idea/modules.xml
