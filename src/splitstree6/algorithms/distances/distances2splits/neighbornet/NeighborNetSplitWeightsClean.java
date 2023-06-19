@@ -515,21 +515,21 @@ public class NeighborNetSplitWeightsClean {
 			params.cgnrIterations = max(100, n);
 
 			//params.abortIfNegative = true;
-			cgnr(x, d, activeSet, params, progress); //Just a few iterations of CG
+			//cgnr(x, d, activeSet, params, progress); //Just a few iterations of CG
 			//params.abortIfNegative = false;
 
 
 			//Move towards xstar as far as possible while preserving feasibility
-			double mint = 1.0;
-			for (int i = 1; i <= n; i++)
-				for (int j = i + 1; j <= n; j++)
-					if (xstar[i][j] < 0.0) {
-						double t_ij = x[i][j] / (x[i][j] - xstar[i][j]);
-						mint = min(t_ij,mint);
-					}
-			for (int i = 1; i <= n; i++)
-				for (int j = i + 1; j <= n; j++)
-					x[i][j] += mint*(xstar[i][j] - x[i][j]);
+//			double mint = 1.0;
+//			for (int i = 1; i <= n; i++)
+//				for (int j = i + 1; j <= n; j++)
+//					if (xstar[i][j] < 0.0) {
+//						double t_ij = x[i][j] / (x[i][j] - xstar[i][j]);
+//						mint = min(t_ij,mint);
+//					}
+//			for (int i = 1; i <= n; i++)
+//				for (int j = i + 1; j <= n; j++)
+//					x[i][j] += mint*(xstar[i][j] - x[i][j]);
 
 			System.err.println(" RSS, after CG  = \t\t\t"+evalProjectedf(x,0,p,d)+"\t\t"+evalProjectedGradientSquared(x, d));
 
@@ -799,11 +799,24 @@ public class NeighborNetSplitWeightsClean {
 
 		//Locate the largest breakpoint. We start the search at 0.5 times this.
 		double tlimit = 0.0;
+		int[][] xpCount = new int[2][2];
+
 		for (int i = 1; i <= n; i++)
 			for (int j = i + 1; j <= n; j++) {
 				double t = -x[i][j] / p[i][j];
-				if (p[i][j] < 0 && t>tlimit)
-					tlimit = t;
+				if (p[i][j] < 0) {
+					if (x[i][j] == 0)
+						xpCount[0][0]++;
+					else {
+						xpCount[0][1]++;
+						tlimit = max(tlimit,t);
+					}
+				} else {
+					if (x[i][j] == 0)
+						xpCount[1][0]++;
+					else
+						xpCount[1][1]++;
+				}
 			}
 
 
@@ -819,18 +832,21 @@ public class NeighborNetSplitWeightsClean {
 					phat[i][j] = max(p[i][j],0.0);
 				}
 			/* Min 0.5 (A(x+tp) - d)'(A(x+tp) - d) = 0.5 t^2 p'A'Ap - t d'Ap + const
-			t = d'Ap / pA'Ap
+			t = (Ax-d)'Ap / pA'Ap
 			 */
 			double[][] Ap = new double[n+1][n+1];
+			double[][] Ax = new double[n+1][n+1];
 			calcAx(phat,Ap);
-			double dAp=0.0, pAAp = 0.0;
+			calcAx(x,Ax);
+			double rAp=0.0, pAAp = 0.0;
 			for(int i=1;i<=n;i++)
 				for(int j=i+1;j<=n;j++) {
 					double Ap_ij = Ap[i][j];
-					dAp += Ap_ij * d[i][j];
+					double r_ij = Ax[i][j] - d[i][j];
+					rAp += Ap_ij * r_ij;
 					pAAp+= Ap_ij * Ap_ij;
 				}
-			tk = dAp/pAAp;
+			tk = rAp/pAAp;
 		}
 
 		while(true) {
