@@ -4,8 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c05c99b9-280a-4894-88e5-af995f5aba49" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/distances/distances2splits/neighbornet/NeighborNetSplitWeightsClean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/distances/distances2splits/neighbornet/NeighborNetSplitWeightsClean.java" afterDir="false" />
+    <list default="true" id="7d8da93d-309e-48fc-bbf8-304bb0612dcc" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/splits/splits2report/PhylogeneticDiversity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/splits/splits2report/PhylogeneticDiversity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/splits/splits2report/ShapleyValues.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/splits/splits2report/ShapleyValues.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/RootedPhylogeneticDiversity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/PhylogeneticDiversity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/splitstree6/window/MainWindow.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/window/MainWindow.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/splitstree6/window/MainWindowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/window/MainWindowController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/splitstree6/window/MainWindowPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/window/MainWindowPresenter.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,24 +21,24 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="jar://$USER_HOME$/lib/javafx-sdk-17.0.1/src.zip!/javafx.controls/javafx/scene/control/MenuItem.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/Library/Java/JavaVirtualMachines/openjdk-18-1/Contents/Home/lib/src.zip!/java.base/jdk/internal/util/Preconditions.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/Library/Java/JavaVirtualMachines/openjdk-18-1/Contents/Home/lib/src.zip!/java.base/java/util/BitSet.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/lib/javafx-sdk-18/src.zip!/javafx.graphics/javafx/concurrent/Task.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/jars/jloda2-2.0.0-SNAPSHOT.jar!/jloda/fx/graph/GraphTraversals.class" root0="SKIP_INSPECTION" />
+    <setting file="jar://$USER_HOME$/lib/javafx-sdk-18/src.zip!/javafx.graphics/javafx/scene/PropertyHelper.java" root0="SKIP_INSPECTION" />
+    <setting file="jar://$PROJECT_DIR$/jars/jloda2-2.0.0-SNAPSHOT.jar!/jloda/graph/Edge.class" root0="SKIP_INSPECTION" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2ROZNfUIj6t287YXmrpQSnMwUlM" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Libraries&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;
-  }
-}</component>
   <component name="RunManager" selected="Application.splitstree6">
     <configuration name="Workflow" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="splitstree6.tools.RunWorkflow" />
@@ -80,5 +86,12 @@
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
+    <pin-to-top-manager>
+      <pinned-members>
+        <PinnedItemInfo parentTag="splitstree6.workflow.AlgorithmNode" memberName="parents" />
+        <PinnedItemInfo parentTag="splitstree6.data.CharactersBlock" memberName="matrix" />
+        <PinnedItemInfo parentTag="java.lang.String" memberName="value" />
+      </pinned-members>
+    </pin-to-top-manager>
   </component>
 </project>

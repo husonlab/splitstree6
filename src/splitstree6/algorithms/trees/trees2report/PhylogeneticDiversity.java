@@ -19,26 +19,41 @@
 
 package splitstree6.algorithms.trees.trees2report;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
+import jloda.util.NumberUtils;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
 
+import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * compute phylogenetic diversity
  * Daniel Huson, 2.2023
  */
-public class RootedPhylogeneticDiversity extends Trees2ReportBase {
+public class PhylogeneticDiversity extends Trees2ReportBase {
+	private final BooleanProperty optionRooted = new SimpleBooleanProperty(this, "optionRooted", true);
+
+	@Override
+	public List<String> listOptions() {
+		var list = new ArrayList<>(super.listOptions());
+		list.add(optionRooted.getName());
+		return list;
+	}
+
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
 		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());
-		return report(progress, taxaBlock, treesBlock, taxa);
+		return report(progress, taxaBlock, treesBlock, taxa, getOptionRooted());
 	}
 
 	@Override
@@ -46,20 +61,24 @@ public class RootedPhylogeneticDiversity extends Trees2ReportBase {
 		return "Faith 1992;Faith, D.P. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10 (1992)";
 	}
 
-	public static String report(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, BitSet selectedTaxa) throws CanceledException {
+	public static String report(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, BitSet selectedTaxa, boolean rooted) throws CanceledException {
 		var buf = new StringBuilder();
-		progress.setTasks("Computing", "fair proporitions");
+		progress.setTasks("Computing", "fair proportions");
 		progress.setMaximum(treesBlock.getNTrees());
 		progress.setProgress(0);
 
 		for (var tree : treesBlock.getTrees()) {
-			buf.append("%nTree %s:%n".formatted(tree.getName()));
 			var total = tree.edgeStream().mapToDouble(tree::getWeight).sum();
 			double diversity;
 			try (var nodeClusterMap = TreesUtilities.extractClusters(tree)) {
-				diversity = tree.edgeStream().filter(e -> nodeClusterMap.get(e.getTarget()).intersects(selectedTaxa)).mapToDouble(tree::getWeight).sum();
+				diversity = tree.edgeStream()
+						.filter(e -> nodeClusterMap.get(e.getTarget()).intersects(selectedTaxa) && (rooted || !BitSetUtils.contains(selectedTaxa, nodeClusterMap.get(e.getTarget()))))
+						.mapToDouble(tree::getWeight).sum();
 			}
-			buf.append("Phylogenetic Diversity = %.8f (%.1f%%)%n".formatted(diversity, 100.0 * (diversity / total)));
+			var totalRounded = NumberUtils.roundSigFig(total, 5);
+			buf.append("%nTree %s (total: %s):%n".formatted(tree.getName(), StringUtils.removeTrailingZerosAfterDot(totalRounded)));
+			var diversityRounded = NumberUtils.roundSigFig(diversity, 5);
+			buf.append("%s Phylogenetic Diversity = %s (%.1f%%)%n".formatted(rooted ? "Rooted" : "Unrooted", StringUtils.removeTrailingZerosAfterDot(diversityRounded), 100.0 * (diversity / total)));
 			progress.incrementProgress();
 		}
 		buf.append("Computed on %d (of %d) selected taxa:%n".formatted(selectedTaxa.cardinality(), taxaBlock.getNtax()));
@@ -72,5 +91,17 @@ public class RootedPhylogeneticDiversity extends Trees2ReportBase {
 		}
 		progress.reportTaskCompleted();
 		return buf.toString();
+	}
+
+	public boolean getOptionRooted() {
+		return optionRooted.get();
+	}
+
+	public BooleanProperty optionRootedProperty() {
+		return optionRooted;
+	}
+
+	public void setOptionRooted(boolean optionRooted) {
+		this.optionRooted.set(optionRooted);
 	}
 }

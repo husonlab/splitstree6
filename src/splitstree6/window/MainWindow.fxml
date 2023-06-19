@@ -403,8 +403,8 @@
                                   text="Compute Splits Phylogenetic Diversity"/>
                         <MenuItem fx:id="computeSplitsShapleyValuesMenuItem" text="Compute Splits Shapley Values"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="computeRootedTreePhylogeneticDiversityMenuItem"
-                                  text="Compute Rootred Tree Phylogenetic Diversity"/>
+                        <MenuItem fx:id="computeTreePhylogeneticDiversityMenuItem"
+                                  text="Compute Tree Phylogenetic Diversity"/>
                         <MenuItem fx:id="computeRootedTreeFairProportionMenuItem"
                                   text="Compute Rooted Tree Fair Proportion"/>
                         <MenuItem fx:id="computeUnrootedTreeShapleyMenuItem"

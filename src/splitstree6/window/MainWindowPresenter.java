@@ -71,14 +71,13 @@ import splitstree6.algorithms.distances.distances2trees.BioNJ;
 import splitstree6.algorithms.distances.distances2trees.MinSpanningTree;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
 import splitstree6.algorithms.distances.distances2trees.UPGMA;
-import splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity;
 import splitstree6.algorithms.splits.splits2report.ShapleyValues;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2report.FairProportion;
-import splitstree6.algorithms.trees.trees2report.RootedPhylogeneticDiversity;
+import splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity;
 import splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues;
 import splitstree6.algorithms.trees.trees2splits.*;
 import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
@@ -567,8 +566,8 @@ public class MainWindowPresenter {
 		controller.getComputeSplitsShapleyValuesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new ShapleyValues()));
 		controller.getComputeSplitsShapleyValuesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new ShapleyValues()));
 
-		controller.getComputeSplitsPhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PhylogeneticDiversity()));
-		controller.getComputeSplitsPhylogeneticDiversityMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PhylogeneticDiversity()));
+		controller.getComputeSplitsPhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity()));
+		controller.getComputeSplitsPhylogeneticDiversityMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity()));
 
 		controller.getComputeUnrootedTreeShapleyMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new UnrootedShapleyValues()));
 		controller.getComputeUnrootedTreeShapleyMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new UnrootedShapleyValues()));
@@ -576,8 +575,8 @@ public class MainWindowPresenter {
 		controller.getComputeRootedTreeFairProportionMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new FairProportion()));
 		controller.getComputeRootedTreeFairProportionMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new FairProportion()));
 
-		controller.getComputeRootedTreePhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new RootedPhylogeneticDiversity()));
-		controller.getComputeRootedTreePhylogeneticDiversityMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new RootedPhylogeneticDiversity()));
+		controller.getComputeTreePhylogeneticDiversityMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PhylogeneticDiversity()));
+		controller.getComputeTreePhylogeneticDiversityMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PhylogeneticDiversity()));
 
 		controller.getShowWorkflowMenuItem().setOnAction(e -> controller.getMainTabPane().getSelectionModel().select(mainWindow.getTabByClass(WorkflowTab.class)));
 
