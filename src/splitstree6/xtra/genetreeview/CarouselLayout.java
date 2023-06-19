@@ -60,13 +60,13 @@ public class CarouselLayout extends MultipleFramesLayout {
         transformedNodes = nodes;
 
         // Setting up zoomSlider
-        setUpZoomSlider(zoomSlider, -1200, -450);
+        setUpZoomSlider(zoomSlider, -1200, -500);
         cameraRadius.bind(zoomSlider.valueProperty().multiply(-1).add(layoutRadius));
 
         // Transforming camera -> moving on a larger circle (cameraRadius) around the nodes, facing inside
         resetCamera(camera);
-        camera.setNearClip(100);
-        camera.setFarClip(2500);
+        camera.setNearClip(0.2);
+        camera.setFarClip(1800);
         camera.setTranslateY(0);
         // x and z position of the camera are managed with bindings
         DoubleBinding xTerm = Bindings.createDoubleBinding(

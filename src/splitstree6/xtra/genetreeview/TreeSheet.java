@@ -36,6 +36,7 @@ import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 
 import java.util.HashMap;
+import java.util.TreeSet;
 import java.util.function.Function;
 
 public class TreeSheet extends Group implements Selectable{
@@ -43,6 +44,7 @@ public class TreeSheet extends Group implements Selectable{
     private final double width;
     private final double height;
     private Rectangle backgroundRectangle;
+    private Text nameLabel;
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
     private final BooleanProperty mediatorProperty = new SimpleBooleanProperty();
 
@@ -59,6 +61,18 @@ public class TreeSheet extends Group implements Selectable{
                 diagram, HeightAndAngles.Averaging.ChildAverage,width-80,height-20,
                 false, new HashMap<>(), new HashMap<>()).getAllAsGroup();
 
+
+        // For debugging only
+        var testTree =  ComputeTreeLayout.apply(tree, tree.getNumberOfTaxa(), taxonLabelMap,
+                diagram, HeightAndAngles.Averaging.ChildAverage,width-80,height-20,
+                false, new HashMap<>(), new HashMap<>());
+        var set = new TreeSet<Double>();
+        for (var node : testTree.nodes().getChildren()) {
+            set.add(node.getTranslateY());
+        }
+        //System.out.println(set.first());
+
+
         // Adjusting tree position on the background and label font size
         if (diagram.isRadialOrCircular()) {
             layoutedTree.setTranslateX(width / 2);
@@ -69,17 +83,26 @@ public class TreeSheet extends Group implements Selectable{
         }
         else if (diagram.isPhylogram()) { // for rectangular phylogram
             layoutedTree.setTranslateX(5);
+            int n = tree.getNumberOfTaxa();
+            if (n == 2) layoutedTree.setTranslateY(-216+15);
+            else if (n == 3) layoutedTree.setTranslateY(-108+15);
+            else layoutedTree.setTranslateY(-352.39*Math.pow(tree.getNumberOfTaxa(),-1.137)+15);
             for (var label : BasicFX.getAllRecursively(layoutedTree, RichTextLabel.class)) {
                 label.setScale(0.4);
             }
         }
         else { // for rectangular and triangular cladogram
-            layoutedTree.setTranslateX(width-105);
+            layoutedTree.setTranslateX(width-100);
+            int n = tree.getNumberOfTaxa();
+            if (n == 2) layoutedTree.setTranslateY(-216+15);
+            else if (n == 3) layoutedTree.setTranslateY(-108+15);
+            else layoutedTree.setTranslateY(-352.39*Math.pow(tree.getNumberOfTaxa(),-1.137)+15);
             for (var label : BasicFX.getAllRecursively(layoutedTree, RichTextLabel.class)) {
                 label.setScale(0.4);
             }
         }
         super.getChildren().addAll(layoutedTree);
+
         isSelectedProperty.addListener((observableValue, wasSelected, isSelected) -> {
             if (isSelected) {
                 backgroundRectangle.setStrokeWidth(1);
@@ -101,11 +124,16 @@ public class TreeSheet extends Group implements Selectable{
         backgroundRectangle.setOnMouseClicked(e -> {
             setSelectedProperty();
         });
-        var textLabel = new Text(treeName);
-        textLabel.setFont(new Font(9));
-        textLabel.setY(9);
-        treeBackground.getChildren().addAll(backgroundRectangle,textLabel);
+        nameLabel = new Text(treeName);
+        nameLabel.setFont(new Font(9));
+        nameLabel.setX(2);
+        nameLabel.setY(9);
+        treeBackground.getChildren().addAll(backgroundRectangle, nameLabel);
         return treeBackground;
+    }
+
+    public void setTreeName(String treeName) {
+        nameLabel.setText(treeName);
     }
 
     public void setSelectedProperty(boolean selected) {

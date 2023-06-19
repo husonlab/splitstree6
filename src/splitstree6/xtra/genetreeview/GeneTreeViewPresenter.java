@@ -20,24 +20,23 @@
 package splitstree6.xtra.genetreeview;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.collections.FXCollections;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.geometry.Bounds;
+import javafx.geometry.Insets;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
@@ -63,6 +62,7 @@ public class GeneTreeViewPresenter {
 	ColorBar colorBar;
 	BooleanProperty[] treeSelectionProperties;
 	IntegerProperty selectedTreesCount = new SimpleIntegerProperty(0);
+	IntegerProperty treesCount = new SimpleIntegerProperty(0);
 
 	public GeneTreeViewPresenter(GeneTreeView geneTreeView) {
 
@@ -73,8 +73,8 @@ public class GeneTreeViewPresenter {
 		var subScene = new SubScene(trees, 600, 600, true, SceneAntialiasing.BALANCED);
 		subScene.widthProperty().bind(controller.getCenterPane().widthProperty());
 		subScene.heightProperty().bind(controller.getCenterPane().heightProperty());
-		camera.setFarClip(1000);
-		camera.setNearClip(100);
+		//camera.setFarClip(1000);
+		//camera.setNearClip(100);
 		subScene.setCamera(camera);
 		controller.getCenterPane().getChildren().add(subScene);
 
@@ -92,7 +92,7 @@ public class GeneTreeViewPresenter {
 
 		controller.getImportGeneNamesMenuItem().disableProperty().bind(controller.getSlider().disableProperty());
 		controller.getImportGeneNamesMenuItem().setOnAction(e ->
-				importGeneNames(geneTreeView.getStage(),controller,model,subScene));
+				importGeneNames(geneTreeView.getStage(),controller,model));
 
 		controller.getImportFeaturesMenuItem().disableProperty().bind(controller.getSlider().disableProperty());
 		controller.getImportFeaturesMenuItem().setOnAction(e ->
@@ -121,9 +121,24 @@ public class GeneTreeViewPresenter {
 					controller.getTreeLayoutGroup().getSelectedToggle(),controller,subScene);
 		});
 
-		controller.getOrderGroup().selectedToggleProperty().addListener((InvalidationListener) -> {
+		controller.getSelectAllMenuItem().disableProperty().bind(selectedTreesCount.isEqualTo(treesCount)
+				.or(treesCount.isEqualTo(0)));
+		controller.getSelectAllMenuItem().setOnAction(e -> {
+			for (BooleanProperty selectionState : treeSelectionProperties) selectionState.set(true);
+		});
+		controller.getSelectNoneMenuItem().disableProperty().bind(selectedTreesCount.isEqualTo(0)
+				.or(treesCount.isEqualTo(0)));
+		controller.getSelectNoneMenuItem().setOnAction(e -> {
+			for (BooleanProperty selectionState : treeSelectionProperties) selectionState.set(false);
+		});
+		controller.getSelectInverseMenuItem().disableProperty().bind(treesCount.isEqualTo(0));
+		controller.getSelectInverseMenuItem().setOnAction(e -> {
+			for (Node treeSheet : trees.getChildren()) ((TreeSheet)treeSheet).setSelectedProperty();
+		});
+
+		controller.getOrderGroup().selectedToggleProperty().addListener((observableValue, oldValue, newValue) -> {
 			try {
-				changeTreeOrder(model,controller.getOrderGroup().getSelectedToggle(),controller,subScene);
+				changeTreeOrder(model,controller.getOrderGroup(),oldValue,newValue,controller,subScene,geneTreeView.getStage());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
@@ -196,6 +211,7 @@ public class GeneTreeViewPresenter {
 				System.out.println("Loading succeeded");
 				controller.getLabel().setText("Taxa: %,d, Trees: %,d".formatted(model.getTaxaBlock().getNtax(),
 						model.getTreesBlock().getNTrees()));
+				treesCount.set(model.getTreesBlock().getNTrees());
 				initializeSlider(model.getTreesBlock(), controller.getSlider());
 				initializeColorBar(controller.getvBox(),model.getTreesBlock(), controller.getSlider(),
 						model.getTreeOrder());
@@ -214,13 +230,13 @@ public class GeneTreeViewPresenter {
 		}
 	}
 
-	private void importGeneNames(Stage stage, GeneTreeViewController controller, Model model, SubScene subScene) {
+	private void importGeneNames(Stage stage, GeneTreeViewController controller, Model model) {
 		var geneNameParser = new GeneNameParser(stage,model);
 		geneNameParser.parsedProperty().addListener((InvalidationListener) -> {
-			// TODO: only update gene name labels instead of redrawing complete trees
-			initializeTreesLayout(model,controller.getCenterPane().getBoundsInParent().getWidth(),
-					controller.getCenterPane().getBoundsInParent().getHeight(),controller,subScene);
-			initializeGeneSearch(controller.getSearchGeneComboBox(),model.getOrderedGeneNames());
+			for (int i = 0; i < model.getOrderedGeneNames().size(); i++) {
+				((TreeSheet)trees.getChildren().get(i)).setTreeName(model.getOrderedGeneNames().get(i));
+				updateSnapshot(i,controller);
+			}
 		});
 	}
 
@@ -371,7 +387,6 @@ public class GeneTreeViewPresenter {
 					Platform.runLater(() -> updateSnapshot(treeIndex, controller));
 					if (mediatorProperty.get()) selectedTreesCount.set(selectedTreesCount.get()+1);
 					else selectedTreesCount.set(selectedTreesCount.get()-1);
-					System.out.println(selectedTreesCount.get());
 				});
 			}
 			else mediatorProperty = treeSelectionProperties[i];
@@ -452,22 +467,64 @@ public class GeneTreeViewPresenter {
 		if (model.getTreesBlock().getNTrees()>0) initializeTreesLayout(model,paneWidth,paneHeight, controller,subScene);
 	}
 
-	private void changeTreeOrder(Model model, Toggle selectedOrder, GeneTreeViewController controller, SubScene subScene) throws IOException {
-		if (selectedOrder == controller.getDefaultOrderMenuItem()) {
+	private void changeTreeOrder(Model model, ToggleGroup orderGroup, Toggle oldSelection, Toggle newSelection, GeneTreeViewController controller, SubScene subScene, Stage stage) throws IOException {
+		if (newSelection == controller.getDefaultOrderMenuItem()) {
 			model.resetTreeOrder();
 			initializeTreesLayout(model,controller.getCenterPane().getBoundsInParent().getWidth(),
 					controller.getCenterPane().getBoundsInParent().getHeight(),controller,subScene);
 			initializeColorBar(controller.getvBox(), model.getTreesBlock(),controller.getSlider(),
 					model.getTreeOrder());
 		}
-		else if (selectedOrder.equals(controller.getTopologyOrderMenuItem())) {
-			// TODO: order trees by topological similarity with the currently selected tree
+		else if (newSelection.equals(controller.getTopologyOrderMenuItem())) {
+			String selectedTreeName = currentTreeToolTip.getText();
+			Stage topologyOrderDialog = new Stage();
+			topologyOrderDialog.initStyle(stage.getStyle());
+			topologyOrderDialog.setTitle("Similarity calculation");
+			topologyOrderDialog.initModality(Modality.APPLICATION_MODAL);
+			topologyOrderDialog.initOwner(stage);
+
+			Button startButton = new Button("Calculate");
+			startButton.setOnAction(e -> {
+				int index = (int)Math.round(controller.getSlider().getValue());
+				PhyloTree selectedTree = model.getTreesBlock().getTree(model.getTreeOrder().get(index-1));
+				System.out.println(selectedTree.getName());
+				TreeMap<Integer,String> orderedGeneNames = new TreeMap<>();
+				// TODO: calculate pairwise similarities with selected tree and put similarity-treeName pairs in the TreeMap
+				if (orderedGeneNames.size() == model.getTreesBlock().size()) {
+					model.setTreeOrder(orderedGeneNames);
+					initializeTreesLayout(model,controller.getCenterPane().getBoundsInParent().getWidth(),
+							controller.getCenterPane().getBoundsInParent().getHeight(),controller,subScene);
+					initializeColorBar(controller.getvBox(), model.getTreesBlock(),controller.getSlider(),
+							model.getTreeOrder());
+				}
+				else orderGroup.selectToggle(oldSelection);
+			});
+
+			Button cancelButton = new Button("Cancel");
+			cancelButton.setOnAction(e -> {
+				topologyOrderDialog.close();
+				orderGroup.selectToggle(oldSelection);
+			});
+
+			VBox vBox = new VBox(10);
+			vBox.setPadding(new Insets(10));
+			HBox hBox = new HBox();
+			hBox.getChildren().addAll(startButton, cancelButton);
+			hBox.setSpacing(5);
+			var label = new Label("Pairwise similarity with gene tree "+selectedTreeName+" will be calculated");
+			vBox.getChildren().addAll(label, hBox);
+
+			Scene scene = new Scene(vBox, 400, 100);
+			topologyOrderDialog.setScene(scene);
+			topologyOrderDialog.show();
+
 		}
-		else if (selectedOrder.equals(controller.getFeatureOrderMenuItem())) {
+		else if (newSelection.equals(controller.getFeatureOrderMenuItem())) {
 			// TODO: order trees by feature similarity with the currently selected tree -> numerical features only
+			orderGroup.selectToggle(oldSelection);
 		}
 		else { // remaining option: order as in selected taxon
-			int toggleIndex = controller.getOrderGroup().getToggles().indexOf(selectedOrder)-3;
+			int toggleIndex = orderGroup.getToggles().indexOf(newSelection)-3;
 			String taxonName = controller.getTaxonOrderSubMenu().getItems().get(toggleIndex).getText().replaceAll(" ","+");
 			String[] taxonNames = taxonName.split("_");
 			String finalTaxonName = taxonNames[0]+"+"+taxonNames[1];
@@ -499,6 +556,7 @@ public class GeneTreeViewPresenter {
 			getGeneOrderService.setOnFailed(u -> {
 				System.out.println("Reordering trees failed");
 				controller.getProgressLabel().setText("Reordering trees failed");
+				orderGroup.selectToggle(oldSelection);
 			});
 			getGeneOrderService.restart();
 		}

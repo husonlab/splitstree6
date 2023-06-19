@@ -92,6 +92,13 @@
                               <RadioMenuItem fx:id="circularPhyloMenuItem" mnemonicParsing="false" text="Circular Phylogram" toggleGroup="$treeLayoutGroup" />
                            </items>
                         </Menu>
+                        <Menu mnemonicParsing="false" text="Tree Selection">
+                          <items>
+                            <MenuItem fx:id="selectAllMenuItem" disable="true" mnemonicParsing="false" text="Select All" />
+                              <MenuItem fx:id="selectNoneMenuItem" disable="true" mnemonicParsing="false" text="Select None" />
+                              <MenuItem fx:id="selectInverseMenuItem" disable="true" mnemonicParsing="false" text="Select Inverse" />
+                          </items>
+                        </Menu>
                         <Menu mnemonicParsing="false" text="Order">
                           <items>
                               <RadioMenuItem fx:id="defaultOrderMenuItem" mnemonicParsing="false" selected="true" text="as imported">
@@ -100,7 +107,7 @@
                                  </toggleGroup>
                               </RadioMenuItem>
                               <Menu fx:id="taxonOrderSubMenu" disable="true" mnemonicParsing="false" text="as in taxon" />
-                              <Menu fx:id="similarityOrderSubMenu" disable="true" mnemonicParsing="false" text="by similarity">
+                              <Menu fx:id="similarityOrderSubMenu" mnemonicParsing="false" text="by similarity">
                                   <RadioMenuItem fx:id="topologyOrderMenuItem" mnemonicParsing="false" text="topology" toggleGroup="$orderGroup" />
                                   <RadioMenuItem fx:id="featureOrderMenuItem" disable="true" mnemonicParsing="false" text="imported feature" toggleGroup="$orderGroup" />
                               </Menu>

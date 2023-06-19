@@ -99,6 +99,15 @@ public class GeneTreeViewController {
 	private RadioMenuItem triangularCladoMenuItem;
 
 	@FXML
+	private MenuItem selectAllMenuItem;
+
+	@FXML
+	private MenuItem selectInverseMenuItem;
+
+	@FXML
+	private MenuItem selectNoneMenuItem;
+
+	@FXML
 	private ToggleGroup orderGroup;
 
 	@FXML
@@ -252,6 +261,18 @@ public class GeneTreeViewController {
 
 	public ComboBox<String> getSearchGeneComboBox() {
 		return searchGeneComboBox;
+	}
+
+	public MenuItem getSelectAllMenuItem() {
+		return selectAllMenuItem;
+	}
+
+	public MenuItem getSelectNoneMenuItem() {
+		return selectNoneMenuItem;
+	}
+
+	public MenuItem getSelectInverseMenuItem() {
+		return selectInverseMenuItem;
 	}
 
 	public ToggleGroup getOrderGroup() {
