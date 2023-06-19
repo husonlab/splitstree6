@@ -6,20 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="7d8da93d-309e-48fc-bbf8-304bb0612dcc" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/FairProportion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/TreeDiversityIndex.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/PhylogeneticDiversity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/PhylogeneticDiversity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/Trees2ReportBase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2report/Trees2ReportBase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2trees/RerootOrReorderTrees.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/trees/trees2trees/RerootOrReorderTrees.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/data/ReportBlock.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/data/ReportBlock.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/io/nexus/CharactersNexusInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/io/nexus/CharactersNexusInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/io/nexus/ReportNexusInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/io/nexus/ReportNexusInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/io/nexus/ReportNexusOutput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/io/nexus/ReportNexusOutput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/io/nexus/SplitsNexusInput.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/io/nexus/SplitsNexusInput.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/methods/ExtractOptionsText.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/methods/ExtractOptionsText.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/view/displaytext/highlighters/NexusHighlighter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/view/displaytext/highlighters/NexusHighlighter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/window/MainWindow.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/window/MainWindow.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/window/MainWindowController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/window/MainWindowController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/splitstree6/window/MainWindowPresenter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/window/MainWindowPresenter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/splitstree6/algorithms/distances/distances2splits/neighbornet/NeighborNetSplitWeightsClean.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/splitstree6/algorithms/distances/distances2splits/neighbornet/NeighborNetSplitWeightsClean.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +34,11 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "git-widget-placeholder": "main"
+  }
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="splitstree6.algorithms.trees.trees2report" />

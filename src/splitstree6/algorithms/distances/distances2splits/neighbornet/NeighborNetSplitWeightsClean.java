@@ -540,7 +540,7 @@ public class NeighborNetSplitWeightsClean {
 			if (progress != null)
 				progress.checkForCancel();
 			if (pg < params.projGradBound) {
-//				getActiveEntries(x, activeSet);
+//				getActiveEntries(x, activeSet);    
 //				params.cgnrIterations = n*(n-1)/2;
 //				params.cgnrTolerance = 1e-6;
 //				cgnr(x, d, activeSet, params, progress); //Just a few iterations of CG to tidy up.
