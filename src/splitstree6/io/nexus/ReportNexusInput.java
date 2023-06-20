@@ -31,7 +31,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 /**
- * report block nexus input
+ * reportFairProportions block nexus input
  * Daniel Huson, 2.2023
  */
 public class ReportNexusInput extends NexusIOBase {

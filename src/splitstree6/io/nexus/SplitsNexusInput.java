@@ -68,7 +68,7 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 			""";
 
 	/**
-	 * report the syntax for this block
+	 * reportFairProportions the syntax for this block
 	 *
 	 * @return syntax string
 	 */

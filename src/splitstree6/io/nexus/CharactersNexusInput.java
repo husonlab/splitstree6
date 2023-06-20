@@ -114,7 +114,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 			np.matchIgnoreCase(";");
 		}
 
-		if (np.peekMatchIgnoreCase("PROPERTIES")) { // legacy: SPlitsTree4 might report this, we ignore it
+		if (np.peekMatchIgnoreCase("PROPERTIES")) { // legacy: SPlitsTree4 might reportFairProportions this, we ignore it
 			final var tokens = np.getTokensLowerCase("properties", ";");
 			np.findIgnoreCase(tokens, "gammaShape=", Float.MAX_VALUE);
 			np.findIgnoreCase(tokens, "PINVAR=", Float.MAX_VALUE);

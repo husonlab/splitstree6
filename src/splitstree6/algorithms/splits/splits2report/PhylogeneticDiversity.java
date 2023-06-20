@@ -20,6 +20,8 @@
 package splitstree6.algorithms.splits.splits2report;
 
 import jloda.util.BitSetUtils;
+import jloda.util.NumberUtils;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -60,8 +62,14 @@ public class PhylogeneticDiversity extends Splits2ReportBase {
 
 	public static String report(TaxaBlock taxaBlock, SplitsBlock splitsBlock, BitSet selectedTaxa) {
 		var total = splitsBlock.getSplits().stream().mapToDouble(ASplit::getWeight).sum();
+		var totalRounded = NumberUtils.roundSigFig(total, 5);
+
+		var buf = new StringBuilder();
+		buf.append("%nSplits (total: %s):%n".formatted(StringUtils.removeTrailingZerosAfterDot(totalRounded)));
+
 		var diversity = compute(splitsBlock, selectedTaxa);
-		var buf = new StringBuilder("Phylogenetic Diversity = %.8f (%.1f%%)%n".formatted(diversity, 100.0 * (diversity / total)));
+		var diversityRounded = NumberUtils.roundSigFig(diversity, 5);
+		buf.append("Phylogenetic Diversity = %s (%.1f%%)%n".formatted(StringUtils.removeTrailingZerosAfterDot(diversityRounded), 100.0 * (diversity / total)));
 		buf.append("Computed on %d (of %d) selected taxa:%n".formatted(selectedTaxa.cardinality(), taxaBlock.getNtax()));
 		if (selectedTaxa.cardinality() > 0) {
 			for (var t = 1; t <= taxaBlock.getNtax(); t++) {

@@ -46,10 +46,10 @@ public class NexusHighlighter implements Highlighter.IHighlighter {
     };
 
     private static final String[] BLOCKS = new String[]{
-            "data", "taxa", "characters", "distances", "trees", "sets",
-            "splits", "network", "traits", "analysis", "viewer", "report",
-            "splitstree6", "traits"
-    };
+			"data", "taxa", "characters", "distances", "trees", "sets",
+			"splits", "network", "traits", "analysis", "viewer", "reportFairProportions",
+			"splitstree6", "traits"
+	};
 
     private static final String KEYWORD_PATTERN = "(?<KEYWORDSLINE>(?<KEYWORD>(?i)\\b(" + String.join("|", KEYWORDS) + ")\\b)" +
                                                   "(?<OPTION>(?i)(?!\\h+" + String.join("|\\h+", BLOCKS) + ")[^;]*;(?!\\h*\\R*end))?)";

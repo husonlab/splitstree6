@@ -38,7 +38,7 @@ import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
 
 /**
- * report block for textual output
+ * reportFairProportions block for textual output
  * Daniel Huson, 2.2023
  */
 public class ReportBlock extends DataBlock {

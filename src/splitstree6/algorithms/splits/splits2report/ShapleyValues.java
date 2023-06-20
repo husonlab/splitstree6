@@ -22,6 +22,7 @@ package splitstree6.algorithms.splits.splits2report;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.util.BitSetUtils;
 import jloda.util.ExecuteInParallel;
+import jloda.util.NumberUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -46,6 +47,20 @@ public class ShapleyValues extends Splits2ReportBase {
 			   " Prioritizing populations for conservation using phylogenetic networks. PLoS ONE 9(2):e88945 (2014)";
 	}
 
+	public static String report(TaxaBlock taxaBlock, Collection<ASplit> splits) {
+		var total = splits.stream().mapToDouble(ASplit::getWeight).sum();
+
+		var map = compute(taxaBlock.getTaxaSet(), splits);
+		var entries = new ArrayList<>(map.entrySet());
+		entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue())); // by decreasing value
+		var buf = new StringBuilder("Unrooted Shapley values:\n");
+		for (var entry : entries) {
+			var valueRounded = NumberUtils.roundSigFig(entry.getValue(), 5);
+			buf.append(String.format("%s: %s (%.2f%%)%n", taxaBlock.get(entry.getKey()).getName(), valueRounded, 100 * entry.getValue() / total));
+		}
+		return buf.toString();
+	}
+
 	public static Map<Integer, Double> compute(BitSet taxa, Collection<ASplit> splits) {
 		var ntax = taxa.cardinality();
 		var taxonShapleyMap = new HashMap<Integer, Double>();
@@ -56,24 +71,6 @@ public class ShapleyValues extends Splits2ReportBase {
 			}, ProgramExecutorService.getNumberOfCoresToUse());
 		} catch (Exception ignored) {
 		}
-
-		{ // scale to 1:
-			var sum = taxonShapleyMap.values().stream().mapToDouble(d -> d).sum();
-			if (sum > 0)
-				taxonShapleyMap.entrySet().forEach(e -> e.setValue(e.getValue() / sum));
-
-		}
 		return taxonShapleyMap;
-	}
-
-	public static String report(TaxaBlock taxaBlock, Collection<ASplit> splits) {
-		var map = compute(taxaBlock.getTaxaSet(), splits);
-		var entries = new ArrayList<>(map.entrySet());
-		entries.sort((a, b) -> Double.compare(b.getValue(), a.getValue())); // by decreasing value
-		var buf = new StringBuilder("Unrooted Shapley values:\n");
-		for (var entry : entries) {
-			buf.append(String.format("%s: %.2f%%%n", taxaBlock.get(entry.getKey()).getName(), 100 * entry.getValue()));
-		}
-		return buf.toString();
 	}
 }
