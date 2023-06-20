@@ -45,7 +45,7 @@ public class NewickWriter extends SplitsWriterBase {
 		var ordering = new ArrayList<Integer>();
 		for (var i = 1; i < splits.getCycle().length; i++)
 			ordering.add(splits.getCycle()[i]);
-		w.write(SplitNewick.toString(taxa::getLabel, splits.getSplits(), isOptionEdgeWeights(), ordering) + ";");
+		w.write(SplitNewick.toString(taxa::getLabel, splits.getSplits(), isOptionEdgeWeights(), ordering) + ";\n");
 	}
 
 

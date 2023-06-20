@@ -28,7 +28,6 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.readers.distances.DistancesReader;
-import splitstree6.io.utils.DataType;
 import splitstree6.io.writers.distances.PhylipWriter;
 
 import java.io.File;
@@ -84,7 +83,7 @@ public class ExtractSmallerMatrices {
 		var sizes = parseSizeSpecification(sizeSpecification);
 		System.err.println("Sizes: " + StringUtils.toString(sizes, " "));
 
-		var importer = (DistancesReader) ImportManager.getInstance().getImporterByDataTypeAndFileFormat(DataType.Distances, ImportManager.getInstance().getFileFormat(input));
+		var importer = (DistancesReader) ImportManager.getInstance().getImporterByDataTypeAndFileFormat(DistancesBlock.class, ImportManager.getInstance().getFileFormat(input));
 		var taxaBlock = new TaxaBlock();
 		var distancesBlock = new DistancesBlock();
 		importer.read(new ProgressPercentage(), input, taxaBlock, distancesBlock);

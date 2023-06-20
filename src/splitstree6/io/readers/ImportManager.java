@@ -25,7 +25,6 @@ import jloda.util.PluginClassLoader;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.utils.DataReaderBase;
-import splitstree6.io.utils.DataType;
 import splitstree6.io.utils.IDataReaderNoAutoDetect;
 import splitstree6.workflow.DataBlock;
 
@@ -76,14 +75,49 @@ public class ImportManager {
 		return list;
 	}
 
+
 	public DataReaderBase getReader(String fileName) {
 		var readers = getReaders(fileName);
 		return readers.size() > 0 ? readers.get(0) : null;
 	}
 
+	public Class<? extends DataBlock> getDataType(String fileName) {
+		var reader = getReader(fileName);
+		return reader == null ? null : reader.getToClass();
+	}
+
+
+	public ArrayList<Class<? extends DataBlock>> getAllDataTypes(String fileName) {
+		var list = new HashSet<Class<? extends DataBlock>>();
+		for (var reader : getReaders(fileName)) {
+			list.add(reader.getToClass());
+		}
+		return new ArrayList<>(list);
+	}
+
+	public ArrayList<Class<? extends DataBlock>> getAllDataTypes() {
+		var list = new HashSet<Class<? extends DataBlock>>();
+		for (var reader : readers) {
+			list.add(reader.getToClass());
+		}
+		return new ArrayList<>(list);
+	}
+
+
 	public Collection<? extends String> getAllFileFormats() {
 		final Set<String> set = new TreeSet<>();
 		for (var reader : readers) {
+			set.add(getFileFormat(reader));
+		}
+		final ArrayList<String> result = new ArrayList<>();
+		result.add(UNKNOWN_FORMAT);
+		result.addAll(set);
+		return result;
+	}
+
+	public Collection<? extends String> getAllFileFormats(String file) {
+		final Set<String> set = new TreeSet<>();
+		for (var reader : getReaders(file)) {
 			set.add(getFileFormat(reader));
 		}
 		final ArrayList<String> result = new ArrayList<>();
@@ -161,9 +195,9 @@ public class ImportManager {
 	 *
 	 * @return importer or null
 	 */
-	public DataReaderBase getImporterByDataTypeAndFileFormat(DataType dataType, String fileFormat) {
+	public DataReaderBase getImporterByDataTypeAndFileFormat(Class<? extends DataBlock> dataType, String fileFormat) {
 		for (var importer : readers) {
-			if (DataType.getDataType(importer).equals(dataType) && getFileFormat(importer).equals(fileFormat))
+			if (importer.getToClass().equals(dataType) && getFileFormat(importer).equals(fileFormat))
 				return importer;
 		}
 		return null;

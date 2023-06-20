@@ -59,6 +59,8 @@ public class MainWindowController {
 	private MenuItem importTaxonTraitsMenuItem;
 
 	@FXML
+	private MenuItem importDialogMenuItem;
+	@FXML
 	private MenuItem importTaxonDisplayMenuItem;
 
 	@FXML
@@ -527,6 +529,10 @@ public class MainWindowController {
 
 	public MenuItem getImportTaxonTraitsMenuItem() {
 		return importTaxonTraitsMenuItem;
+	}
+
+	public MenuItem getImportDialogMenuItem() {
+		return importDialogMenuItem;
 	}
 
 	public MenuItem getImportTaxonDisplayMenuItem() {

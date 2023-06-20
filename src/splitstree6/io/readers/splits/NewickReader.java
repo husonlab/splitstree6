@@ -38,7 +38,7 @@ import java.util.TreeMap;
  * Daniel Huson, 3.2023
  */
 public class NewickReader extends SplitsReader {
-	public static final String[] extensions = {"snew", "snwk", "snewick"};
+	public static final String[] extensions = {"snew", "snwk", "snewick", "split-newick", "tree", "tre", "trees", "new", "nwk", "treefile"};
 
 	public NewickReader() {
 		setFileExtensions(extensions);

@@ -24,6 +24,7 @@ import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import splitstree6.dialog.importdialog.ImportDialog;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.tabs.inputeditor.InputEditorTab;
@@ -71,12 +72,13 @@ public class FileLoader {
 				var importManager = ImportManager.getInstance();
 				if (importManager.getReaders(fileName).size() == 1) { // unique input format
 					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
-					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler, () -> RecentFilesManager.getInstance().insertRecentFile(fileName));
+					WorkflowSetup.apply(fileName, newWindow.getWorkflow(), exceptionHandler, () -> RecentFilesManager.getInstance().insertRecentFile(fileName), importManager.getReaders(fileName).get(0).getToClass());
 					newWindow.setFileName(fileName);
 					newWindow.setDirty(true);
 				} else {
 					// ImportDialog.show(mainWindow, fileName);
-					System.err.println("Import dialog: not implemented");
+					newWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
+					ImportDialog.show(newWindow, fileName);
 				}
 			}
 			ProgramExecutorService.submit(200, () -> Platform.runLater(() -> newWindow.getStage().toFront()));

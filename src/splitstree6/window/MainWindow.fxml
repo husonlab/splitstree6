@@ -62,6 +62,9 @@
                         </MenuItem>
                         <Menu mnemonicParsing="false" text="Import">
                             <items>
+                                <MenuItem fx:id="importDialogMenuItem" mnemonicParsing="false"
+                                          text="Data Import Dialog..."/>
+                                <SeparatorMenuItem/>
                                 <MenuItem fx:id="importTaxonTraitsMenuItem" mnemonicParsing="false"
                                           text="Taxon Traits..."/>
                                 <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
