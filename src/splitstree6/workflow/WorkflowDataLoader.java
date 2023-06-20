@@ -74,8 +74,8 @@ public class WorkflowDataLoader {
                 }
                 System.err.println("Number of input taxa: " + workflow.getInputTaxaBlock().getNtax());
             }
-        } else
+        } else {
             throw new IOException("Unknown data or file format: " + inputFile);
-
+        }
     }
 }

@@ -30,6 +30,8 @@ import splitstree6.window.MainWindow;
 import java.io.File;
 import java.io.IOException;
 
+import static splitstree6.io.nexus.workflow.WorkflowNexusInput.WORKFLOW_FILE_SUFFIX;
+
 public class SaveDialog {
 	/**
      * save dialog
@@ -50,9 +52,9 @@ public class SaveDialog {
             fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Files", "*.stree6", "*.nxs", "*.nex"));
             fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".stree6")));
         } else {
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Workflow Files", "*.wflow6"));
-            fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".wflow6")));
-        }
+			fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Workflow Files", "*" + WORKFLOW_FILE_SUFFIX));
+			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), WORKFLOW_FILE_SUFFIX)));
+		}
 
 		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
         if (selectedFile != null) {

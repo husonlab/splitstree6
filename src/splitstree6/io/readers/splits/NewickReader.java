@@ -25,6 +25,7 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.parts.Compatibility;
 import splitstree6.io.utils.SplitNewick;
 
 import java.io.File;
@@ -50,7 +51,7 @@ public class NewickReader extends SplitsReader {
 		}
 	}
 
-	public void read(ProgressListener progress, ICloseableIterator<String> it, TaxaBlock taxa, SplitsBlock splitsBlock) throws IOException {
+	public void read(ProgressListener progress, ICloseableIterator<String> it, TaxaBlock taxaBlock, SplitsBlock splitsBlock) throws IOException {
 		var lineno = 0;
 		progress.setMaximum(it.getMaximumProgress());
 		progress.setProgress(0);
@@ -71,11 +72,11 @@ public class NewickReader extends SplitsReader {
 				var taxonLabelMap = new TreeMap<Integer, String>();
 				splitsBlock.getSplits().addAll(SplitNewick.parse(newick, null, taxonLabelMap));
 				for (var name : taxonLabelMap.values()) {
-					taxa.addTaxonByName(name);
+					taxaBlock.addTaxonByName(name);
 				}
 				if (true) {
-					var cycle1based = new int[taxa.getNtax() + 1];
-					for (var t = 1; t <= taxa.getNtax(); t++) {
+					var cycle1based = new int[taxaBlock.getNtax() + 1];
+					for (var t = 1; t <= taxaBlock.getNtax(); t++) {
 						cycle1based[t] = t;
 					}
 					// keep the input ordering, if we can
@@ -83,7 +84,7 @@ public class NewickReader extends SplitsReader {
 					if (count == splitsBlock.getNsplits())
 						splitsBlock.setCycle(cycle1based);
 					else {
-						var alt = SplitsUtilities.computeCycle(taxa.getNtax(), splitsBlock.getSplits());
+						var alt = SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits());
 						var countAlt = SplitsUtilities.countCompatibleWithOrdering(splitsBlock.getSplits(), alt);
 						if (count < countAlt)
 							splitsBlock.setCycle(cycle1based);
@@ -91,9 +92,10 @@ public class NewickReader extends SplitsReader {
 							splitsBlock.setCycle(alt);
 					}
 				} else {
-					var alt = SplitsUtilities.computeCycle(taxa.getNtax(), splitsBlock.getSplits());
+					var alt = SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits());
 					splitsBlock.setCycle(alt);
 				}
+				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
 			} catch (IOException ex) {
 				throw new IOExceptionWithLineNumber(lineno, ex);
 			}

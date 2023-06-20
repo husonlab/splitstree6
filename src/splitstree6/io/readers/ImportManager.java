@@ -169,4 +169,21 @@ public class ImportManager {
 		return null;
 	}
 
+	/**
+	 * merge extension filters, using the description of the first. All extensions are listed alphabetically
+	 *
+	 * @param filters filters
+	 * @return single filter
+	 */
+	public static FileChooser.ExtensionFilter mergeExtensionFilters(Collection<FileChooser.ExtensionFilter> filters) {
+		var filterDescription = "";
+		var extensions = new TreeSet<String>();
+		for (var filter : filters) {
+			if (filterDescription.isBlank())
+				filterDescription = filter.getDescription().replaceAll(" \\(.*?\\)", "");
+			extensions.addAll(filter.getExtensions());
+		}
+		return new FileChooser.ExtensionFilter(filterDescription, extensions.toArray(new String[0]));
+	}
+
 }

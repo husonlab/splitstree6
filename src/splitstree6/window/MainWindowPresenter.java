@@ -76,8 +76,8 @@ import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.splits.splits2splits.SplitsFilter;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
-import splitstree6.algorithms.trees.trees2report.TreeDiversityIndex;
 import splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity;
+import splitstree6.algorithms.trees.trees2report.TreeDiversityIndex;
 import splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues;
 import splitstree6.algorithms.trees.trees2splits.*;
 import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
@@ -88,6 +88,7 @@ import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.dialog.AskToDiscardChanges;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
 import splitstree6.dialog.analyzegenomes.AnalyzeGenomesDialog;
@@ -99,6 +100,7 @@ import splitstree6.dialog.importing.ImportTaxonTraits;
 import splitstree6.dialog.importing.ImportTreeNames;
 import splitstree6.io.FileLoader;
 import splitstree6.io.readers.ImportManager;
+import splitstree6.io.utils.ReaderWriterBase;
 import splitstree6.main.CheckForUpdate;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
@@ -109,6 +111,8 @@ import splitstree6.view.alignment.AlignmentView;
 import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
+import splitstree6.workflow.Workflow;
+import splitstree6.workflow.WorkflowDataLoader;
 
 import java.io.File;
 import java.time.Duration;
@@ -327,8 +331,7 @@ public class MainWindowPresenter {
 		controller.getImportTreeNamesMenuItem().disableProperty().bind(workflow.runningProperty().or(
 				Bindings.createBooleanBinding(() -> !(mainWindow.getWorkflow().getInputDataBlock() instanceof TreesBlock), mainWindow.getWorkflow().runningProperty())));
 
-		controller.getReplaceDataMenuItem().setOnAction(e -> System.err.println("Not implemented"));
-		controller.getReplaceDataMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
+		setupReplaceDataMenuItem(mainWindow, controller.getReplaceDataMenuItem());
 
 		controller.getInputEditorMenuItem().setOnAction(e -> showInputEditor());
 		controller.getInputEditorMenuItem().disableProperty().bind(workflow.runningProperty());
@@ -757,4 +760,46 @@ public class MainWindowPresenter {
 		mainWindow.getController().getMainTabPane().getSelectionModel().selectedItemProperty().addListener(listener);
 		mainWindow.getWorkflow().runningProperty().addListener(listener);
 	}
+
+	private static void setupReplaceDataMenuItem(MainWindow mainWindow, MenuItem replaceDataMenuItem) {
+		replaceDataMenuItem.setOnAction(e -> {
+			final Workflow workflow = mainWindow.getWorkflow();
+			if (mainWindow.isDirty() && !AskToDiscardChanges.apply(mainWindow.getStage(), "Overwrite"))
+				return;
+
+			var importManager = ImportManager.getInstance();
+
+			var readers = importManager.getReaders(workflow.getInputDataNode().getDataBlock().getClass());
+			var extensionsFilter = ImportManager.mergeExtensionFilters(readers.stream().map(ReaderWriterBase::getExtensionFilter).collect(Collectors.toList()));
+
+			var previousDir = new File(jloda.fx.util.ProgramProperties.get("InputDir", ""));
+			var fileChooser = new FileChooser();
+			if (previousDir.isDirectory())
+				fileChooser.setInitialDirectory(previousDir);
+			fileChooser.setTitle("Load data file");
+			fileChooser.getExtensionFilters().add(extensionsFilter);
+			fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("All (*.*)", "*.*"));
+
+			final var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
+			if (selectedFile != null) {
+				if (importManager.determineInputType(selectedFile.getPath()) != workflow.getInputDataNode().getDataBlock().getClass()) {
+					NotificationManager.showError("Can't replace data, selected file must contain data of type: " + workflow.getInputDataNode().getDataBlock().getClass());
+					return;
+				}
+				var inputFormat = ImportManager.getInstance().getFileFormat(selectedFile.getPath());
+
+				try {
+					jloda.fx.util.ProgramProperties.put("InputDir", selectedFile.getParent());
+					mainWindow.setFileName(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".splt6"));
+					WorkflowDataLoader.load(workflow, selectedFile.getPath(), inputFormat);
+					workflow.getInputTaxaFilterNode().restart();
+				} catch (Exception ex) {
+					NotificationManager.showError("Load data failed: " + ex.getMessage());
+				}
+			}
+		});
+
+		replaceDataMenuItem.setDisable(mainWindow.getWorkflow().isRunning() || mainWindow.getWorkflow().getWorkingTaxaBlock() == null);
+	}
+
 }

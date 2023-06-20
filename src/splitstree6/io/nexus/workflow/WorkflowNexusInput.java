@@ -50,6 +50,8 @@ import java.util.function.Consumer;
  * Daniel Huson, 10.2021
  */
 public class WorkflowNexusInput {
+	public static final String WORKFLOW_FILE_SUFFIX = ".wflow6";
+
 	public static boolean isApplicable(String fileName) {
 		try (NexusStreamParser np = new NexusStreamParser(new FileReader(fileName))) {
 			if (np.peekMatchIgnoreCase("#nexus")) {
@@ -89,14 +91,16 @@ public class WorkflowNexusInput {
 				workflow.shallowCopy(inputWorkFlow);
 				workflow.ensureAlignmentView();
 
-				for (var node : workflow.algorithmNodes()) {
-					if (((AlgorithmNode) node).getAlgorithm().getToClass() == ViewBlock.class) {
-						node.restart();
+				if (!isWorkflowFile(fileName)) {
+					for (var node : workflow.algorithmNodes()) {
+						if (((AlgorithmNode) node).getAlgorithm().getToClass() == ViewBlock.class) {
+							node.restart();
+						}
 					}
-				}
-
-				if (runOnSuccess != null)
-					runOnSuccess.run();
+					if (runOnSuccess != null)
+						runOnSuccess.run();
+				} else
+					NotificationManager.showInformation("Workflow loaded, now use the File-> Replace Data... menu item to load data");
 			});
 
 			service.setOnFailed(e -> {
@@ -192,4 +196,10 @@ public class WorkflowNexusInput {
 			throw ex;
 		}
 	}
+
+
+	private static boolean isWorkflowFile(String inputFile) {
+		return inputFile.toLowerCase().endsWith(WORKFLOW_FILE_SUFFIX) || inputFile.toLowerCase().endsWith(WORKFLOW_FILE_SUFFIX + ".gz");
+	}
+
 }
