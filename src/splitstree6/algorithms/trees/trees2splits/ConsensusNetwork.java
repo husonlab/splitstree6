@@ -37,7 +37,7 @@ public class ConsensusNetwork extends ConsensusSplits {
 	@Override
 	public String getCitation() {
 		return "Holland and Moulton 2003; B. Holland and V. Moulton. Consensus networks:  A method for visualizing incompatibilities in  collections  of  trees. " +
-			   "In  G.  Benson  and  R.  Page,  editors, Proceedings  of  “Workshop  on Algorithms in Bioinformatics, volume 2812 of LNBI, pages 165–176. Springer, 2003.";
+			   "In  G.  Benson  and  R.  Page,  editors, Proceedings  of  “Workshop  on ComputeOutlineAndReferenceTree in Bioinformatics, volume 2812 of LNBI, pages 165–176. Springer, 2003.";
 	}
 
 	public List<String> listOptions() {
