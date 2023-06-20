@@ -5,6 +5,29 @@ import static java.lang.Math.min;
 
 public class NeighborNetUtilities {
 
+
+
+    static private void vec2array(double[] x, double[][] X) {
+        int n = X.length-1;
+        int index = 0;
+        for (int i = 1; i <= n; i++)
+            for (int j = i + 1; j <= n; j++) {
+                X[i][j] = x[index];
+                index++;
+            }
+    }
+    static private void array2vec(double[][] X, double[] x) {
+        int n = X.length-1;
+        int index = 0;
+        for (int i = 1; i <= n; i++)
+            for (int j = i + 1; j <= n; j++) {
+                x[index]=X[i][j];
+                        index++;
+            }
+    }
+
+
+
     /**
      * Computes circular distances from an array of split weights.
      *
@@ -36,6 +59,15 @@ public class NeighborNetUtilities {
         }
     }
 
+    //Temporary wrapper
+    static public void calcAx(double[] x, double[] y, int n) {
+        double[][] X = new double[n + 1][n + 1];
+        double[][] Y = new double[n + 1][n + 1];
+        vec2array(x,X);
+        calcAx(X, Y);
+        array2vec(Y,y);
+    }
+
     /**
      * Compute Atx, when x and the result are represented as square arrays
      *
@@ -65,6 +97,16 @@ public class NeighborNetUtilities {
             }
         }
     }
+    //Temporary wrapper
+    static public void calcAtx(double[] x, double[] y, int n) {
+        double[][] X = new double[n + 1][n + 1];
+        double[][] Y = new double[n + 1][n + 1];
+        vec2array(x,X);
+        calcAtx(X, Y);
+        array2vec(Y,y);
+    }
+
+
 
     /**
      * calcAinv_y
@@ -92,6 +134,14 @@ public class NeighborNetUtilities {
         }
     }
 
+    //Temporary wrapper
+    static public void calcAinv_y(double[] x, double[] y, int n) {
+        double[][] X = new double[n + 1][n + 1];
+        double[][] Y = new double[n + 1][n + 1];
+        vec2array(x,X);
+        calcAinv_y(X, Y);
+        array2vec(Y,y);
+    }
 
     /**
      * size
@@ -111,16 +161,12 @@ public class NeighborNetUtilities {
         return count;
     }
 
-    /**
-     * Replace X with X XOR Y. Equivalently, swap entries of X for which Y is true.
-     * @param X boolean square array
-     * @param Y  boolean square array
-     */
-    static public void xor(boolean[][] X, boolean[][] Y) {
-        int n = X.length-1;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++)
-                X[i][j] = (X[i][j]^Y[i][j]);
+    static public int cardinality(boolean[] s) {
+        int count = 0;
+        for(int i=0;i<s.length;i++)
+            if (s[i])
+                count++;
+        return count;
     }
 
 
@@ -141,17 +187,14 @@ public class NeighborNetUtilities {
         calcAtx(res, gradient);
     }
 
-    /**
-     * Negate the entries in the array
-     *
-     * @param x square array. Written over with -x.
-     */
-    static public void negate(double[][] x) {
-        var n = x.length - 1;
-        for (var i = 1; i <= n; i++)
-            for (var j = i + 1; j <= n; j++)
-                x[i][j] = -x[i][j];
+    static public void evalGradient(double[] x, double[] d, double[] gradient, int n) {
+        var res = new double[x.length]; //TODO Avoid array allocation
+        calcAx(x, res,n);
+        for (var i = 1; i <res.length; i++)
+                res[i] -= d[i];
+        calcAtx(res, gradient,n);
     }
+
 
     /**
      * Scale entries in x by lambda
@@ -165,6 +208,11 @@ public class NeighborNetUtilities {
         for (var i = 1; i <= n; i++)
             for (var j = i + 1; j <= n; j++)
                 x[i][j] *= lambda;
+    }
+
+    static public void scale(double[] x, double lambda) {
+        for (var i = 0;i<x.length;i++)
+            x[i] *= lambda;
     }
 
 
@@ -191,6 +239,19 @@ public class NeighborNetUtilities {
         return pg;
     }
 
+    static public double evalProjectedGradientSquared(double[] x, double[] d, int n) {
+        int npairs = x.length;
+        double[] grad = new double[npairs];
+        evalGradient(x,d,grad,n);
+        double pg = 0.0;
+        for(int i=0;i<grad.length;i++) {
+            double grad_i = grad[i];
+            if (x[i] > 0.0 || grad_i < 0.0)
+                pg += grad_i*grad_i;
+
+        }
+        return pg;
+    }
 
     /**
      * Fill a boolean array indicating the elements of an array which are not positive
@@ -208,6 +269,17 @@ public class NeighborNetUtilities {
                 } else if (A!=null)
                     A[i][j] =  false;
             }
+    }
+
+    static void getActiveEntries(double[] x, boolean[] A, int n) {
+        for(int i=0;i<A.length;i++) {
+            if (x[i] <= 0.0) {
+                if (A != null)
+                    A[i] = true;
+                x[i] = 0.0;
+            } else if (A != null)
+                A[i] = false;
+        }
     }
 
     /**
@@ -233,6 +305,14 @@ public class NeighborNetUtilities {
                     r[i][j]=0;
     }
 
+    static public void maskElements(double[] r, boolean[] A) {
+        for(int i=0;i<A.length;i++)
+            if (A[i])
+                r[i]=0;
+    }
+
+
+
 
     /**
      * Replace values in v with absolute value less than val with zeros.
@@ -246,6 +326,14 @@ public class NeighborNetUtilities {
                 if (abs(v[i][j])<val)
                     v[i][j] = 0.0;
     }
+
+    static void threshold(double[] v, double val) {
+        for(var i=0;i<v.length;i++)
+            if (abs(v[i])<val)
+                    v[i] = 0.0;
+    }
+
+
 
     /**
      * Find the minimum value of an entry in a square array
@@ -261,16 +349,12 @@ public class NeighborNetUtilities {
         return minx;
     }
 
-    /**
-     * Copy elements from one square array to another of the same size.
-     * @param from square array
-     * @param to square array (assumed to be allocated already)
-     */
-    static public void copyArray(double[][] from, double[][] to) {
-        int n=from.length-1;
-        for(int i=1;i<=n;i++) {
-            System.arraycopy(from[i],i+1,to[i],i+1,n-i);
-        }
+    static public double minArray(double[] x) {
+        //TODO There must be standard code for this.
+        double minx = 0.0;
+        for(int i=0;i<x.length;i++)
+            minx = min(minx,x[i]);
+        return minx;
     }
 
     /**
@@ -293,6 +377,16 @@ public class NeighborNetUtilities {
         return total;
     }
 
+    static public double sumArraySquared(double[] x) {
+        double total = 0.0;
+        for(int i=0;i<x.length;i++) {
+            double x_i = x[i];
+            total+=x_i * x_i;
+        }
+        return total;
+    }
+
+
     /**
      * Return the sum of squared differences between two arrays of the same size (using
      * lower triangular parts only)
@@ -311,6 +405,18 @@ public class NeighborNetUtilities {
         return df;
     }
 
+    static public double diff(double[] x, double[] y) {
+        double total = 0.0;
+        for(int i=0;i<x.length;i++) {
+            double d_i = x[i]-y[i];
+            total+=d_i * d_i;
+        }
+        return total;
+    }
+
+
+
+
     /**
      * Count the number of non-zero entries.
      * @param x square array
@@ -327,6 +433,19 @@ public class NeighborNetUtilities {
         return count;
     }
 
+
+    static public int numberNonzero(double[] x) {
+        int count=0;
+        for(int i=0;i<x.length;i++)
+            if (x[i]!=0.0)
+                count++;
+        return count;
+    }
+
+
+
+
+
     /**
      * Compute the residual ||Ax-d||^2
      * @param x square array
@@ -337,10 +456,15 @@ public class NeighborNetUtilities {
         int n=x.length-1;
         double[][] Ax = new double[n+1][n+1];
         calcAx(x,Ax);
-        double ss = 0.0;
-        for(int i=1;i<=n;i++)
-            for(int j=i+1;j<=n;j++)
-                ss += Ax[i][j] - d[i][j];
-        return ss;
+        return diff(Ax,d);
     }
+
+    static public double evalResidual(double[] x, double[] d, int n) {
+        double[] Ax = new double[x.length];
+        calcAx(x,Ax,n);
+        return diff(Ax,d);
+    }
+
+
+
 }
