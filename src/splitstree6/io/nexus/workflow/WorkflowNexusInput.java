@@ -100,7 +100,7 @@ public class WorkflowNexusInput {
 					if (runOnSuccess != null)
 						runOnSuccess.run();
 				} else
-					NotificationManager.showInformation("Workflow loaded, use the File-> Replace Data... menu item to load data");
+					NotificationManager.showInformation("Workflow loaded, now use the File-> Replace Data... menu item to load data");
 			});
 
 			service.setOnFailed(e -> {
