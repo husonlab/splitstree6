@@ -26,7 +26,6 @@ import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.readers.Importer;
 import splitstree6.io.readers.NexusImporter;
-import splitstree6.io.utils.DataType;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -50,10 +49,10 @@ public class WorkflowDataLoader {
         if (inputDataNode == null)
             throw new IOException("Workflow does not have input data node");
 
-        final var dataType = DataType.getDataType(inputFile);
+        final var dataType = ImportManager.getInstance().getDataType(inputFile);
         final var fileFormat = (inputFormat.equalsIgnoreCase(UNKNOWN_FORMAT) ? ImportManager.getInstance().getFileFormat(inputFile) : inputFormat);
 
-        if (!dataType.equals(DataType.Unknown) && !fileFormat.equalsIgnoreCase(UNKNOWN_FORMAT)) {
+        if (dataType != null && !fileFormat.equalsIgnoreCase(UNKNOWN_FORMAT)) {
             final var importer = ImportManager.getInstance().getImporterByDataTypeAndFileFormat(dataType, fileFormat);
             if (importer == null)
                 throw new IOException("Can't open file '" + inputFile + "': Unknown data type or file format");

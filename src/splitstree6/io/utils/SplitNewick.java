@@ -311,14 +311,30 @@ public class SplitNewick {
 			var clusterMap = new HashMap<BitSet, Pair<Double, Double>>();
 			for (var split : compatible) {
 				var cluster = split.getPartNotContaining(ordering.get(0));
+				if (treeClusters.contains(cluster))
+					System.err.println("already contains: " + cluster);
 				treeClusters.add(cluster);
 				clusterMap.put(cluster, new Pair<>(split.getWeight(), split.getConfidence()));
 				if (split.getPartContaining(ordering.get(0)).cardinality() == 1) {
 					var other = split.getPartContaining(ordering.get(0));
+					if (treeClusters.contains(other))
+						System.err.println("already contains: " + other);
 					treeClusters.add(other);
 					clusterMap.put(other, new Pair<>(0.0, split.getConfidence()));
 				}
 			}
+			// make sure all trivial are present:
+			{
+				var taxa = BitSetUtils.union(splits.stream().map(ASplit::getAllTaxa).collect(Collectors.toList()));
+				for (var t : BitSetUtils.members(taxa)) {
+					var trivial = BitSetUtils.asBitSet(t);
+					if (!clusterMap.containsKey(trivial)) {
+						clusterMap.put(trivial, new Pair<>(0d, -1d));
+						treeClusters.add(trivial);
+					}
+				}
+			}
+
 			ClusterPoppingAlgorithm.apply(treeClusters, c -> clusterMap.get(c).getFirst(), c -> clusterMap.get(c).getSecond(), tree);
 			tree.leaves().forEach(v -> tree.setLabel(v, taxonLabelFunction.apply(tree.getTaxon(v))));
 
@@ -347,7 +363,7 @@ public class SplitNewick {
 			var treeNewick = tree.toBracketString(includeWeights);
 
 			if (false)
-				System.err.println("TreeNewick out: " + treeNewick);
+				System.err.println("TreeNewick out: " + treeNewick + ";");
 
 			if (additional.size() == 0)
 				return treeNewick;
@@ -445,7 +461,7 @@ public class SplitNewick {
 					{
 						var lines = new TreeSet<String>();
 						for (var split : splits) {
-							if (!backSplits.contains(split))
+							if (!backSplits.contains(split) && split.getWeight() > 0)
 								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
 						}
 						if (lines.size() > 0) {
@@ -456,7 +472,7 @@ public class SplitNewick {
 					{
 						var lines = new TreeSet<String>();
 						for (var split : backSplits) {
-							if (!splits.contains(split))
+							if (!splits.contains(split) && split.getWeight() > 0)
 								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
 						}
 						if (lines.size() > 0) {

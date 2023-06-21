@@ -22,6 +22,8 @@ package splitstree6.layout.splits;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
@@ -33,6 +35,7 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
@@ -76,6 +79,22 @@ public class SplitNetworkLayout {
 
 	public SplitNetworkLayout() {
 		labelLayout = new RadialLabelLayout();
+	}
+
+
+	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0,
+					   DoubleProperty unitLength, double width, double height,
+					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, // todo: this should be input
+					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap,
+					   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
+					   ObservableList<LoopView> loopViews) throws IOException {
+		return apply(progress, taxaBlock0, splitsBlock0, SplitsDiagramType.Outline,
+				SplitsRooting.None, 0, new SetSelectionModel<Taxon>(), new SetSelectionModel<Integer>(),
+				new SimpleBooleanProperty(false), unitLength, width, height,
+				taxonLabelMap,
+				nodeShapeMap,
+				splitShapeMap,
+				loopViews);
 	}
 
 	/**

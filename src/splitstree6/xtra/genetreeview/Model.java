@@ -29,7 +29,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.readers.trees.TreesReader;
-import splitstree6.io.utils.DataType;
 
 import java.io.File;
 import java.io.IOException;
@@ -65,8 +64,8 @@ public class Model {
 
 	public void load(File file) throws IOException {
 		var importManager = ImportManager.getInstance();
-		var dataType = DataType.getDataType(file.getPath());
-		if (dataType == DataType.Trees) {
+		var dataType = importManager.getDataType(file.getPath());
+		if (dataType.equals(TreesBlock.class)) {
 			var fileFormat = importManager.getFileFormat(file.getPath());
 			var importer = (TreesReader) importManager.getImporterByDataTypeAndFileFormat(dataType, fileFormat);
 			importer.read(new ProgressPercentage(), file.getPath(), taxaBlock, treesBlock);

@@ -37,7 +37,7 @@ public class SplitsLoader extends DataLoader<SourceBlock, SplitsBlock> {
 	public void load(ProgressListener progress, SourceBlock inputData, TaxaBlock outputTaxa, SplitsBlock outputBlock) throws IOException {
 		var file = inputData.getSources().get(0);
 		for (var reader : getReaders()) {
-			if (reader.accepts(file)) {
+			if (reader.getToClass().equals(SplitsBlock.class)) {
 				reader.read(progress, file, outputTaxa, outputBlock);
 				System.err.println("Loaded: Taxa: " + outputTaxa.getShortDescription() + " Splits: " + outputBlock.getShortDescription());
 				break;

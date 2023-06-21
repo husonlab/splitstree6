@@ -137,6 +137,8 @@ module splitstreesix {
 	opens splitstree6.view.alignment;
 	opens splitstree6.view.trees;
 	opens splitstree6.layout.network;
+	opens splitstree6.dialog.importdialog;
+
 	opens splitstree6.dialog.exporting;
 	opens splitstree6.layout;
 	opens splitstree6.algorithms.distances.distances2splits.neighbornet;
@@ -144,6 +146,8 @@ module splitstreesix {
 	exports splitstree6.data.parts;
 
 	opens splitstree6.xtra.genetreeview;
+	opens splitstree6.xtra.outliner;
+
 	opens splitstree6.algorithms.utils;
     opens splitstree6.xtra.genetreeview.layout;
 	opens splitstree6.xtra.genetreeview.io;

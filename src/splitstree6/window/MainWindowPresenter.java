@@ -94,6 +94,7 @@ import splitstree6.dialog.SaveDialog;
 import splitstree6.dialog.analyzegenomes.AnalyzeGenomesDialog;
 import splitstree6.dialog.exporting.ExportTaxonDisplayLabels;
 import splitstree6.dialog.exporting.ExportTaxonTraits;
+import splitstree6.dialog.importdialog.ImportDialog;
 import splitstree6.dialog.importing.ImportMultipleTrees;
 import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
 import splitstree6.dialog.importing.ImportTaxonTraits;
@@ -317,6 +318,9 @@ public class MainWindowPresenter {
 
 		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(workflow.runningProperty());
+
+		controller.getImportDialogMenuItem().setOnAction(e -> ImportDialog.show(mainWindow, ""));
+		controller.getImportDialogMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty().not()));
 
 		controller.getImportTaxonDisplayMenuItem().setOnAction(e -> ImportTaxonDisplayLabels.apply(mainWindow));
 		controller.getImportTaxonDisplayMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));

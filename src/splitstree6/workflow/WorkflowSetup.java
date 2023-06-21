@@ -49,15 +49,15 @@ public class WorkflowSetup {
 	public static Workflow apply(String fileName, MainWindow mainWindow) {
 		var workflow = new Workflow(mainWindow);
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(mainWindow.getController().getBottomFlowPane()));
-		return apply(fileName, workflow, null, null);
+		return apply(fileName, workflow, null, null, null);
 	}
 
-	public static Workflow apply(String fileName, Workflow workflow, Consumer<Throwable> exceptionHandler, Runnable runOnSuccess) {
+	public static Workflow apply(String fileName, Workflow workflow, Consumer<Throwable> exceptionHandler, Runnable runOnSuccess, Class<? extends DataBlock> inputDataType) {
 		workflow.clear();
 
 		var sourceBlock = new SourceBlock();
 		sourceBlock.getSources().add(fileName);
-		var clazz = ImportManager.getInstance().determineInputType(fileName);
+		var clazz = inputDataType != null ? inputDataType : ImportManager.getInstance().determineInputType(fileName);
 		if (clazz == null) {
 			NotificationManager.showError("No suitable importer found");
 			return workflow;

@@ -163,7 +163,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 			if (WorkflowNexusInput.isApplicable(tmpFile.getPath())) {
 				WorkflowNexusInput.open(mainWindow, tmpFile.getPath(), failedHandler, runOnSuccess);
 			} else
-				WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler, runOnSuccess);
+				WorkflowSetup.apply(tmpFile.getPath(), mainWindow.getWorkflow(), failedHandler, runOnSuccess, null);
 
 		} catch (Exception ex) {
 			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
