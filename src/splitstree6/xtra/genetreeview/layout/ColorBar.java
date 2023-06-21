@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;

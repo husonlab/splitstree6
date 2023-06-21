@@ -17,9 +17,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.io;
 
 import javafx.concurrent.Task;
+import splitstree6.xtra.genetreeview.Model;
 
 import java.net.HttpURLConnection;
 import java.net.URL;

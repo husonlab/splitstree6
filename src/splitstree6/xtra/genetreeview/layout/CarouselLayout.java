@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
@@ -94,7 +94,7 @@ public class CarouselLayout extends MultipleFramesLayout {
         node.getTransforms().add(rotate);
     }
 
-    void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {
+    public void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {
         var rotate = new Rotate(-(newSliderValue-oldSliderValue)*thetaDeg,Rotate.Y_AXIS);
         camera.getTransforms().add(rotate);
     }

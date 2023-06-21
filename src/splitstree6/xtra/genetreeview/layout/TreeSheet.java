@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -39,7 +39,7 @@ import java.util.HashMap;
 import java.util.TreeSet;
 import java.util.function.Function;
 
-public class TreeSheet extends Group implements Selectable{
+public class TreeSheet extends Group implements Selectable {
 
     private final double width;
     private final double height;

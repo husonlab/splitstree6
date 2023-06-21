@@ -1,5 +1,5 @@
 /*
- *  LoadTreesTask.java Copyright (C) 2023 Daniel H. Huson
+ *  Selectable.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,25 +17,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.layout;
 
-import javafx.concurrent.Task;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
-import java.io.File;
+public interface Selectable {
 
-public class LoadTreesTask extends Task<Void> {
+    void setSelectedProperty(boolean selected);
 
-    private final File file;
-    private final Model model;
+    void setSelectedProperty();
 
-    public LoadTreesTask(File file, Model model) {
-        this.file = file;
-        this.model = model;
-    }
+    BooleanProperty isSelectedProperty();
 
-    @Override
-    protected Void call() throws Exception {
-        model.load(file);
-        return null;
-    }
+    BooleanProperty mediatorProperty();
 }

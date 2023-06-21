@@ -1,5 +1,5 @@
 /*
- *  LayoutType.java Copyright (C) 2023 Daniel H. Huson
+ *  LoadTreesTask.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,8 +17,26 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.io;
 
-public enum LayoutType {
-    Stack, Carousel;
+import javafx.concurrent.Task;
+import splitstree6.xtra.genetreeview.Model;
+
+import java.io.File;
+
+public class LoadTreesTask extends Task<Void> {
+
+    private final File file;
+    private final Model model;
+
+    public LoadTreesTask(File file, Model model) {
+        this.file = file;
+        this.model = model;
+    }
+
+    @Override
+    protected Void call() throws Exception {
+        model.load(file);
+        return null;
+    }
 }

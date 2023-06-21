@@ -24,6 +24,8 @@ import javafx.scene.Group;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TreesBlock;
 import splitstree6.layout.tree.*;
+import splitstree6.xtra.genetreeview.layout.TreeSheet;
+
 import java.util.ArrayList;
 
 public class VisualizeTreesTask extends Task<Group> {

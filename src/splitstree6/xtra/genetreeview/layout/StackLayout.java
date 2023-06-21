@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
@@ -110,7 +110,7 @@ public class StackLayout extends MultipleFramesLayout{
         return camera;
     }
 
-    void setSliderDragged(boolean isDragged) {
+    public void setSliderDragged(boolean isDragged) {
         isSnapshot.set(isDragged);
     }
 

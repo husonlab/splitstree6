@@ -41,6 +41,8 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.xtra.genetreeview.io.*;
+import splitstree6.xtra.genetreeview.layout.*;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -69,12 +71,10 @@ public class GeneTreeViewPresenter {
 		var controller = geneTreeView.getController();
 		Model model = geneTreeView.getModel();
 
-		// Setting up a subScene with camera
+		// Setting up a subScene with camera (further camera settings are done by the layout)
 		var subScene = new SubScene(trees, 600, 600, true, SceneAntialiasing.BALANCED);
 		subScene.widthProperty().bind(controller.getCenterPane().widthProperty());
 		subScene.heightProperty().bind(controller.getCenterPane().heightProperty());
-		//camera.setFarClip(1000);
-		//camera.setNearClip(100);
 		subScene.setCamera(camera);
 		controller.getCenterPane().getChildren().add(subScene);
 
@@ -232,6 +232,7 @@ public class GeneTreeViewPresenter {
 
 	private void importGeneNames(Stage stage, GeneTreeViewController controller, Model model) {
 		var geneNameParser = new GeneNameParser(stage,model);
+		// If new names have been parsed to the model, names in treeSheets and snapshots need to be updated:
 		geneNameParser.parsedProperty().addListener((InvalidationListener) -> {
 			for (int i = 0; i < model.getOrderedGeneNames().size(); i++) {
 				((TreeSheet)trees.getChildren().get(i)).setTreeName(model.getOrderedGeneNames().get(i));
@@ -427,6 +428,7 @@ public class GeneTreeViewPresenter {
 		// Transformation of treeVis and snapshot according to the current layout and slider position
 		currentLayout.initializeNode(snapShot,treeIndex,controller.getSlider().getValue());
 		currentLayout.initializeNode(treeVis,treeIndex,controller.getSlider().getValue());
+
 		treeSnapshots.getChildren().remove(treeIndex);
 		treeSnapshots.getChildren().add(treeIndex,snapShot);
 	}

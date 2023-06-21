@@ -1,5 +1,5 @@
 /*
- *  ImportFeaturesTask.java Copyright (C) 2023 Daniel H. Huson
+ *  LayoutType.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,20 +17,8 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.layout;
 
-import javafx.concurrent.Task;
-
-import java.io.File;
-
-public class ImportFeaturesTask extends Task<Void> {
-    public ImportFeaturesTask(File file, Model model) {
-        // TODO
-    }
-
-    @Override
-    protected Void call() throws Exception {
-        // TODO
-        return null;
-    }
+public enum LayoutType {
+    Stack, Carousel;
 }

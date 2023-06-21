@@ -17,12 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.io;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.concurrent.Task;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.writers.trees.NewickWriter;
+import splitstree6.xtra.genetreeview.Model;
 
 import java.io.BufferedWriter;
 import java.io.File;

@@ -145,5 +145,7 @@ module splitstreesix {
 
 	opens splitstree6.xtra.genetreeview;
 	opens splitstree6.algorithms.utils;
+    opens splitstree6.xtra.genetreeview.layout;
+	opens splitstree6.xtra.genetreeview.io;
 
 }

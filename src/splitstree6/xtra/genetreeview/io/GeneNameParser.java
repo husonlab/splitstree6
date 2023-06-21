@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.io;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -29,6 +29,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import splitstree6.xtra.genetreeview.Model;
 
 public class GeneNameParser extends Stage {
 
@@ -84,7 +85,7 @@ public class GeneNameParser extends Stage {
         return geneNames;
     }
 
-    BooleanProperty parsedProperty() {
+    public BooleanProperty parsedProperty() {
         return parsedProperty;
     }
 }

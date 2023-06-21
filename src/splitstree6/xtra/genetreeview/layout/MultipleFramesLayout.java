@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.layout;
 
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -33,9 +33,9 @@ public abstract class MultipleFramesLayout {
     public MultipleFramesLayout() {
     };
 
-    void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {}
+    public void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {}
 
-    void resetNode(Node node) {
+    public void resetNode(Node node) {
         node.getTransforms().clear();
         node.translateXProperty().unbind();
         node.setTranslateX(0);
@@ -47,7 +47,7 @@ public abstract class MultipleFramesLayout {
         node.setLayoutX(0);
     }
 
-    void initializeNode(Node node, int index, double sliderValue) {
+    public void initializeNode(Node node, int index, double sliderValue) {
         resetNode(node);
     };
 

@@ -1,5 +1,5 @@
 /*
- *  Selectable.java Copyright (C) 2023 Daniel H. Huson
+ *  ImportFeaturesTask.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,19 +17,21 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.io;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.concurrent.Task;
+import splitstree6.xtra.genetreeview.Model;
 
-public interface Selectable {
-    // TODO: maybe make this an abstract class
+import java.io.File;
 
-    void setSelectedProperty(boolean selected);
+public class ImportFeaturesTask extends Task<Void> {
+    public ImportFeaturesTask(File file, Model model) {
+        // TODO
+    }
 
-    void setSelectedProperty();
-
-    BooleanProperty isSelectedProperty();
-
-    BooleanProperty mediatorProperty();
+    @Override
+    protected Void call() throws Exception {
+        // TODO
+        return null;
+    }
 }
