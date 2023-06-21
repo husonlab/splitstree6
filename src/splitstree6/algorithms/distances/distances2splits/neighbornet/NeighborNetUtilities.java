@@ -1,5 +1,7 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import java.util.Random;
+
 import static java.lang.Math.abs;
 import static java.lang.Math.min;
 
@@ -40,7 +42,7 @@ public class NeighborNetUtilities {
 
         for (var i = 1; i <= (n - 1); i++) {
             var s = 0.0;
-            for(var j=i+1;j<=n;j++)
+            for(var j=i+2;j<=n;j++)
                 s+=x[i+1][j];
             for(var j=1;j<=i;j++)
                 s+=x[j][i+1];
@@ -59,14 +61,54 @@ public class NeighborNetUtilities {
         }
     }
 
-    //Temporary wrapper
+
     static public void calcAx(double[] x, double[] y, int n) {
-        double[][] X = new double[n + 1][n + 1];
-        double[][] Y = new double[n + 1][n + 1];
-        vec2array(x,X);
-        calcAx(X, Y);
-        array2vec(Y,y);
+      //  double[][] X = new double[n + 1][n + 1];
+       // double[][] Y = new double[n + 1][n + 1];
+       // double[] y2 = new double[x.length];
+
+       // vec2array(x,X);
+      //  calcAx(X, Y);
+      //  array2vec(Y,y2);
+
+        //Converted code
+        var s_index = 0;
+        for(var i=1;i<n;i++) {
+            //y[i][i+1] = \sum_{j=i+2}^n x[i+1][j]   + \sum_{j=1}^i x[j][i+1]
+            double y_s = 0.0;
+            var d_index = (2 * n - i - 1) * i / 2;
+            for (int j = i + 2; j <= n; j++) {
+                y_s += x[d_index];
+                d_index++;
+            }
+            d_index = i - 1;
+            for (int j = 1; j <= i; j++) {
+                y_s += x[d_index];
+                d_index += n - j - 1;
+            }
+            y[s_index] = y_s;
+            s_index+=n-i;
+        }
+
+        s_index = 1; //(1,3)
+        for(var i=1;i<=n-2;i++) {
+            //y[i][i + 2] = y[i][i + 1] + y[i + 1][i + 2] - 2 * x[i + 1][i + 2];
+            y[s_index] = y[s_index - 1] + y[s_index + n - i-1] - 2 * x[s_index + n - i-1];
+            s_index += n - i;
+        }
+
+        for(var k=3;k<=n-1;k++) {
+            s_index = (k - 1); //(1,k+1)
+            for (var i = 1; i <= n - k; i++) {
+                //y[i][j] = y[i][j - 1] + y[i + 1][j] - y[i + 1][j - 1] - 2 * x[i + 1][j];
+                y[s_index] = y[s_index - 1] + y[s_index + n - i - 1] - y[s_index + n - i - 2] - 2 * x[s_index + n - i - 1];
+                s_index += n - i;
+            }
+        }
+       // System.err.println("Error = "+diff(y,y2));
+
     }
+
 
     /**
      * Compute Atx, when x and the result are represented as square arrays
@@ -97,13 +139,50 @@ public class NeighborNetUtilities {
             }
         }
     }
-    //Temporary wrapper
+
     static public void calcAtx(double[] x, double[] y, int n) {
-        double[][] X = new double[n + 1][n + 1];
+       /* double[][] X = new double[n + 1][n + 1];
         double[][] Y = new double[n + 1][n + 1];
+        double[] y2 = new double[n*(n-1)/2];
         vec2array(x,X);
         calcAtx(X, Y);
-        array2vec(Y,y);
+        array2vec(Y,y2);*/
+
+        int s_index = 0;
+        for(int i=1;i<n;i++){
+            //y[i][i+1] = \sum_{j=1}^{i-1} x[j][i] + \sum_{j=i+1}^n x[i][j];
+            int d_index = i-2;  //(1,i)
+            double y_s = 0.0;
+            for(int j=1;j<i;j++) {
+                y_s += x[d_index];
+                d_index += n - j - 1;
+            }
+            d_index = s_index; //(i,i+1)
+            for(int j=i+1;j<=n;j++) {
+                y_s += x[d_index];
+                d_index++;
+            }
+            y[s_index] = y_s;
+            s_index += n-i;
+        }
+
+        s_index = 1;
+        for(int i=1;i<=n-2;i++) {
+            //y[i][i + 2] = y[i][i + 1] + y[i + 1][i + 2] - 2 * x[i][i + 1];
+            y[s_index] = y[s_index-1] + y[s_index + n - i - 1] - 2*x[s_index-1];
+            s_index += n-i;
+        }
+
+        for(int k=3;k<=n-1;k++) {
+            s_index = k-1; //(1,1+k)
+            for(int i=1;i<=n-k;i++) {
+                y[s_index] = y[s_index - 1] + y[s_index + n - i - 1] - y[s_index + n - i - 2] - 2*x[s_index-1];
+                s_index += n-i;
+            }
+        }
+        //System.err.println("Error = "+diff(y,y2));
+
+
     }
 
 
@@ -122,7 +201,7 @@ public class NeighborNetUtilities {
     static public void calcAinv_y(double[][] y, double[][] x) {
         var n = y.length - 1;
         x[1][2] = (y[1][n] + y[1][2] - y[2][n]) / 2.0;
-        for (var j = 2; j <= n - 1; j++) {
+        for (var j = 3; j <= n - 1; j++) {
             x[1][j] = (y[j - 1][n] + y[1][j] - y[1][j - 1] - y[j][n]) / 2.0;
         }
         x[1][n] =  (y[1][n] + y[n - 1][n] - y[1][n - 1]) / 2.0;
@@ -134,13 +213,43 @@ public class NeighborNetUtilities {
         }
     }
 
+
+
+
+
     //Temporary wrapper
-    static public void calcAinv_y(double[] x, double[] y, int n) {
-        double[][] X = new double[n + 1][n + 1];
+    static public void calcAinv_y(double[] y, double[] x, int n) {
+        /*double[][] X = new double[n + 1][n + 1];
         double[][] Y = new double[n + 1][n + 1];
-        vec2array(x,X);
-        calcAinv_y(X, Y);
-        array2vec(Y,y);
+        double[] x2 = new double[n*(n-1)/2];
+
+        vec2array(y,Y);
+        calcAinv_y(Y, X);
+        array2vec(X,x2);*/
+
+        x[0] = (y[n-2]+y[0] - y[2*n-4])/2.0; //x[1][2] = (y[1][n] + y[1][2] - y[2][n]) / 2.0;
+        int s_index = 1;
+        int d_index = 2*n-4; //(2,n)
+        for(int j=3;j<=n;j++) {
+            //x[1][j] = (y[j - 1][n] + y[1][j] - y[1][j - 1] - y[j][n]) / 2.0;
+            x[j-2]=(y[d_index]+y[j-2] - y[j-3] - y[d_index+n-j])/2.0;
+            d_index += n-j; //(j,n);
+        }
+        x[n-2] = (y[n-2]+y[y.length-1] - y[n-3] )/2.0;  //x[1][n] =  (y[1][n] + y[n - 1][n] - y[1][n - 1]) / 2.0;
+
+
+        for(int i=2;i<=(n-1);i++) {
+            s_index = (2*n-i)*(i-1)/2; //(i,i+1)
+            x[s_index] = (y[s_index + i -n-1] + y[s_index]-y[s_index+i-n])/2; //x[i][i + 1] = (y[i - 1][i] + y[i][i + 1] - y[i - 1][i + 1]) / 2.0;
+            s_index++; //(i,i+2)
+            for(int j=(i+2);j<=n;j++) {
+                //x[i][j] =  (y[i - 1][j - 1] + y[i][j] - y[i][j - 1] - y[i - 1][j]) / 2.0;
+                x[s_index] = (y[s_index+i-n-1] + y[s_index] - y[s_index-1]-y[s_index+i-n])/2.0;
+                s_index++;
+            }
+        }
+
+        //System.err.println("Error = "+diff(x,x2));
     }
 
     /**
@@ -465,6 +574,15 @@ public class NeighborNetUtilities {
         return diff(Ax,d);
     }
 
-
-
+    public static void main(String[] args) {
+        int n=40;
+        Random generator = new Random(1000);
+        for(int r=0;r<20;r++) {
+            double[] x = new double[n*(n-1)/2];
+            for(int i=0;i<n*(n-1)/2;i++)
+                x[i] = generator.nextDouble();
+            double[] y = new double[x.length];
+            calcAinv_y(x,y,n);
+        }
+    }
 }
