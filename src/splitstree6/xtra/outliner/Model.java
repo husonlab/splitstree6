@@ -20,10 +20,7 @@
 package splitstree6.xtra.outliner;
 
 import javafx.beans.property.LongProperty;
-import javafx.beans.property.ReadOnlyLongProperty;
 import javafx.beans.property.SimpleLongProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -32,8 +29,6 @@ import splitstree6.io.readers.trees.TreesReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.TreeMap;
 
 /**
  * simple data model

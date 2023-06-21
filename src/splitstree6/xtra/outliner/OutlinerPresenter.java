@@ -23,11 +23,8 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.scene.Group;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-
-import java.io.IOException;
 
 public class OutlinerPresenter {
 
@@ -37,32 +34,38 @@ public class OutlinerPresenter {
 
 		var emptyProperty = new SimpleBooleanProperty(true);
 		model.lastUpdateProperty().addListener(e -> Platform.runLater(() -> emptyProperty.set(model.getTreesBlock().getNTrees() == 0)));
+		model.lastUpdateProperty().addListener(e -> Platform.runLater(() -> redraw(outliner)));
 
 		// MenuBar
-		controller.getOpenMenuItem().setOnAction(e -> {
-			openFile(outliner.getStage(), controller, model);
-		});
+		controller.getOpenMenuItem().setOnAction(e -> openFile(outliner.getStage(), controller, model));
 		controller.getOpenMenuItem().disableProperty().bind(controller.getProgressBar().visibleProperty());
+
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
 
-		model.lastUpdateProperty().addListener((v, o, n) -> Platform.runLater(() -> {
-			try {
-				var width = outliner.getStage().getWidth() - 10;
-				var height = outliner.getStage().getHeight() - 80;
-				controller.getStackPane().getChildren().clear();
-				controller.getStackPane().getChildren().add(ComputeOutlineAndReferenceTree.apply(model, controller.getReferenceCheckbox().isSelected(),
-						controller.getOthersCheckBox().isSelected(), width, height));
-			} catch (Exception ex) {
-				controller.getLabel().setText("Error: " + ex.getMessage());
-			}
-		}));
-
+		controller.getReferenceCheckbox().selectedProperty().addListener(e -> redraw(outliner));
 		controller.getReferenceCheckbox().disableProperty().bind(emptyProperty);
+
+		controller.getOthersCheckBox().selectedProperty().addListener(e -> redraw(outliner));
 		controller.getOthersCheckBox().disableProperty().bind(emptyProperty);
 
-		controller.getRedrawButton().setOnAction(e -> model.incrementLastUpdate());
+		controller.getRedrawButton().setOnAction(e -> redraw(outliner));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);
 
+	}
+
+	public void redraw(Outliner outliner) {
+		var model = outliner.getModel();
+		var controller = outliner.getController();
+
+		try {
+			var width = outliner.getStage().getWidth() - 10;
+			var height = outliner.getStage().getHeight() - 80;
+			controller.getStackPane().getChildren().clear();
+			controller.getStackPane().getChildren().add(ComputeOutlineAndReferenceTree.apply(model, controller.getReferenceCheckbox().isSelected(),
+					controller.getOthersCheckBox().isSelected(), width, height));
+		} catch (Exception ex) {
+			controller.getLabel().setText("Error: " + ex.getMessage());
+		}
 	}
 
 	private void openFile(Stage stage, OutlinerController controller, Model model) {

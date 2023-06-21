@@ -23,37 +23,23 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
-import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.selection.SetSelectionModel;
 import jloda.graph.Node;
-import jloda.graph.NodeArray;
-import jloda.graph.algorithms.PQTree;
-import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.trees.trees2splits.ConsensusOutline;
 import splitstree6.algorithms.trees.trees2splits.ConsensusSplits;
-import splitstree6.algorithms.utils.SplitsUtilities;
-import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
-import splitstree6.data.parts.Taxon;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitNetworkLayout;
-import splitstree6.layout.splits.SplitsDiagramType;
-import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
