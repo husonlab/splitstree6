@@ -20,9 +20,23 @@
   -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
-<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
 <AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.xtra.outliner.OutlinerController">
     <children>
@@ -62,11 +76,13 @@
                         <ToolBar fx:id="tooBar" prefHeight="40.0" prefWidth="200.0">
                             <items>
                                 <Button fx:id="redrawButton" disable="true" text="Redraw"/>
-                                <Label fx:id="label" text=""/>
+                                <Label fx:id="label" text="   "/>
                                 <CheckBox fx:id="referenceCheckbox" disable="true" mnemonicParsing="false"
                                           selected="true" text="Reference"/>
                                 <CheckBox fx:id="othersCheckBox" disable="true" mnemonicParsing="false" selected="true"
                                           text="Others"/>
+                                <ToggleButton fx:id="outlineTreeToggleButton" mnemonicParsing="false" selected="true"
+                                              text="Outlline Tree"/>
                             </items>
                         </ToolBar>
                     </children>

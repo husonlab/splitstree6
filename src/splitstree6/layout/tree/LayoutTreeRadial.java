@@ -21,8 +21,17 @@ package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.graph.algorithms.FruchtermanReingoldLayout;
+import jloda.graph.fmm.FastMultiLayerMethodLayout;
+import jloda.graph.fmm.FastMultiLayerMethodOptions;
 import jloda.phylo.PhyloTree;
+import jloda.util.APoint2D;
+import org.ejml.data.DGrowArray;
+import splitstree6.xtra.DavidsonHarelLayout;
+
+import java.util.HashMap;
 
 /**
  * compute a radial layout
@@ -35,7 +44,7 @@ public class LayoutTreeRadial {
 	public static NodeArray<Point2D> apply(PhyloTree tree) {
 		// compute angles:
 		try (var nodeAngleMap = tree.newNodeDoubleArray()) {
-				HeightAndAngles.computeAngles(tree, nodeAngleMap, HeightAndAngles.Averaging.LeafAverage);
+			HeightAndAngles.computeAngles(tree, nodeAngleMap, HeightAndAngles.Averaging.LeafAverage);
 
 			var percentOffset = 50.0;
 			var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);
@@ -66,6 +75,39 @@ public class LayoutTreeRadial {
 					}
 				}
 			});
+
+			if (true) {
+				try (NodeArray<APoint2D<?>> nodeAPointMap = tree.newNodeArray()) {
+					for (var v : nodePointMap.keySet()) {
+						nodeAPointMap.put(v, new APoint2D<>(nodePointMap.get(v).getX(), nodePointMap.get(v).getY()));
+					}
+					var layouter = new DavidsonHarelLayout();
+					layouter.setIterations(1);
+
+					nodePointMap.clear();
+					try (var result = layouter.performLayout(tree, null)) {
+						for (var v : result.keySet()) {
+							nodePointMap.put(v, new Point2D(result.get(v).getX(), result.get(v).getY()));
+						}
+					}
+				}
+			}
+			if (false) {
+				try (NodeArray<APoint2D<?>> nodeAPointMap = tree.newNodeArray()) {
+					for (var v : nodePointMap.keySet()) {
+						nodeAPointMap.put(v, new APoint2D<>(nodePointMap.get(v).getX(), nodePointMap.get(v).getY()));
+					}
+					var layouter = new FruchtermanReingoldLayout(tree, null, nodeAPointMap);
+					layouter.setGravity(0.1);
+
+					nodePointMap.clear();
+					try (var result = layouter.apply(1000)) {
+						for (var v : result.keySet()) {
+							nodePointMap.put(v, new Point2D(result.get(v).getX(), result.get(v).getY()));
+						}
+					}
+				}
+			}
 			return nodePointMap;
 		}
 	}

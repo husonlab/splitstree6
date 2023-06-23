@@ -71,6 +71,20 @@ public enum Compatibility {
 	}
 
 	/**
+	 * Determines whether a given splits system is (strongly) compatible
+	 *
+	 * @param splits the splits object
+	 * @return true, if the given splits are (strongly) compatible
+	 */
+	static public boolean isCompatible(ASplit... splits) {
+		for (int i = 0; i < splits.length; i++)
+			for (int j = i + 1; j < splits.length; j++)
+				if (!BiPartition.areCompatible(splits[i], splits[j]))
+					return false;
+		return true;
+	}
+
+	/**
 	 * Determines whether a given split is compatible with a list of given ones
 	 *
 	 * @param splits the splits object

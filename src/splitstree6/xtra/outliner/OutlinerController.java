@@ -105,6 +105,9 @@ public class OutlinerController {
 		return progressBar;
 	}
 
+	@FXML
+	private ToggleButton outlineTreeToggleButton;
+
 	public Button getRedrawButton() {
 		return redrawButton;
 	}
@@ -115,5 +118,9 @@ public class OutlinerController {
 
 	public CheckBox getReferenceCheckbox() {
 		return referenceCheckbox;
+	}
+
+	public ToggleButton getOutlineTreeToggleButton() {
+		return outlineTreeToggleButton;
 	}
 }

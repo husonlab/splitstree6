@@ -51,6 +51,8 @@ public class OutlinerPresenter {
 		controller.getRedrawButton().setOnAction(e -> redraw(outliner));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);
 
+		controller.getOutlineTreeToggleButton().selectedProperty().addListener(e -> redraw(outliner));
+
 	}
 
 	public void redraw(Outliner outliner) {
@@ -61,8 +63,12 @@ public class OutlinerPresenter {
 			var width = outliner.getStage().getWidth() - 10;
 			var height = outliner.getStage().getHeight() - 80;
 			controller.getStackPane().getChildren().clear();
-			controller.getStackPane().getChildren().add(ComputeOutlineAndReferenceTree.apply(model, controller.getReferenceCheckbox().isSelected(),
-					controller.getOthersCheckBox().isSelected(), width, height));
+			if (controller.getOutlineTreeToggleButton().isSelected()) {
+				controller.getStackPane().getChildren().add(OutlineTree.apply(model, width, height));
+			} else {
+				controller.getStackPane().getChildren().add(ComputeOutlineAndReferenceTree.apply(model, controller.getReferenceCheckbox().isSelected(),
+						controller.getOthersCheckBox().isSelected(), width, height));
+			}
 		} catch (Exception ex) {
 			controller.getLabel().setText("Error: " + ex.getMessage());
 		}

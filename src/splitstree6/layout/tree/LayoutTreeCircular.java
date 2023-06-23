@@ -23,7 +23,9 @@ import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
+import jloda.graph.algorithms.FruchtermanReingoldLayout;
 import jloda.phylo.PhyloTree;
+import jloda.util.APoint2D;
 import jloda.util.IteratorUtils;
 import jloda.util.Single;
 
@@ -80,6 +82,7 @@ public class LayoutTreeCircular {
 
 			final NodeArray<Point2D> nodePointMap = tree.newNodeArray();
 			tree.nodeStream().forEach(v -> nodePointMap.put(v, GeometryUtilsFX.computeCartesian(nodeRadiusMap.get(v), nodeAngleMap.get(v))));
+
 			return nodePointMap;
 		}
 	}

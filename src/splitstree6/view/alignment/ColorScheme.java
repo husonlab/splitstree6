@@ -23,7 +23,7 @@ import javafx.scene.paint.Color;
 import jloda.fx.util.ColorSchemeManager;
 
 public enum ColorScheme {
-	Nucleotide, CINEMA, ClustalX, Diamond11, MAEditor, PDNA, Zappo, Binary, Random, None;
+	Nucleotide, CINEMA, ClustalX, Chemistry, Diamond11, MAEditor, PDNA, Zappo, Binary, Random, None;
 
 	public Color apply(char ch) {
 		return apply(this, ch);
@@ -106,6 +106,14 @@ public enum ColorScheme {
 			case Binary -> switch (ch) {
 				case '1' -> Color.web("0xbbf7adff");
 				case '0' -> Color.web("0xffe2b3ff");
+				default -> Color.LIGHTGRAY;
+			};
+			case Chemistry -> switch (ch) {
+				case 'F', 'W', 'Y' -> Color.web("#FFFF53"); // aromatic
+				case 'D', 'E' -> Color.web("#FC545B"); // acidic
+				case 'R', 'H', 'K' -> Color.web("#638AC1"); // basic
+				case 'A', 'G', 'I', 'L', 'M', 'P', 'V' -> Color.web("#EDB22E"); // nonpolar
+				case 'C', 'N', 'Q', 'S', 'T' -> Color.web("#63C686"); // polar
 				default -> Color.LIGHTGRAY;
 			};
 			case Random -> {
