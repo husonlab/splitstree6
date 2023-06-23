@@ -140,6 +140,10 @@ public class SquareArrays {
         }
     }
 
+    static public void copyArray(double[] from, double[] to) {
+        System.arraycopy(from,0,to,0,to.length);
+    }
+
     /**
      * Return the sum of squares of entries in the matrix
      * @param x square array of doubles
