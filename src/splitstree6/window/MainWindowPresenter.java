@@ -408,8 +408,8 @@ public class MainWindowPresenter {
 
 		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getImageNode() != null) {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
-				final Image snapshot = focusedDisplayTab.get().getImageNode().snapshot(null, null);
-				final ClipboardContent clipboardContent = new ClipboardContent();
+				var snapshot = focusedDisplayTab.get().getImageNode().snapshot(null, null);
+				var clipboardContent = new ClipboardContent();
 				clipboardContent.putImage(snapshot);
 				Clipboard.getSystemClipboard().setContent(clipboardContent);
 			});

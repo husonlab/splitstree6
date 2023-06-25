@@ -31,6 +31,9 @@ public class OutlinerController {
 	private MenuItem closeMenuItem;
 
 	@FXML
+	private MenuItem copyMenuItem;
+
+	@FXML
 	private Pane mainPane;
 
 	@FXML
@@ -71,6 +74,10 @@ public class OutlinerController {
 
 	public MenuItem getCloseMenuItem() {
 		return closeMenuItem;
+	}
+
+	public MenuItem getCopyMenuItem() {
+		return copyMenuItem;
 	}
 
 	public Pane getMainPane() {

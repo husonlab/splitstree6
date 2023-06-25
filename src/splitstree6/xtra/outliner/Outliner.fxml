@@ -70,7 +70,17 @@
                                         </MenuItem>
                                     </items>
                                 </Menu>
-                                <Menu mnemonicParsing="false" text="Edit"/>
+                                <Menu mnemonicParsing="false" text="Edit">
+                                    <items>
+                                        <MenuItem fx:id="copyMenuItem" mnemonicParsing="false" text="Copy">
+                                            <accelerator>
+                                                <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP"
+                                                                    shortcut="DOWN"/>
+                                            </accelerator>
+                                        </MenuItem>
+                                    </items>
+                                </Menu>
+                                <Menu mnemonicParsing="false" text="Options"/>
                             </menus>
                         </MenuBar>
                         <ToolBar fx:id="tooBar" prefHeight="40.0" prefWidth="200.0">

@@ -23,6 +23,14 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -41,6 +49,12 @@ public class OutlinerPresenter {
 		controller.getOpenMenuItem().disableProperty().bind(controller.getProgressBar().visibleProperty());
 
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
+
+		controller.getCopyMenuItem().setOnAction(e -> {
+			var clipboardContent = new ClipboardContent();
+			clipboardContent.putImage(createImage(controller.getStackPane()));
+			Clipboard.getSystemClipboard().setContent(clipboardContent);
+		});
 
 		controller.getReferenceCheckbox().selectedProperty().addListener(e -> redraw(outliner));
 		controller.getReferenceCheckbox().disableProperty().bind(emptyProperty);
@@ -106,5 +120,11 @@ public class OutlinerPresenter {
 			service.start();
 
 		}
+	}
+
+	private Image createImage(Node node) {
+		var parameters = new SnapshotParameters();
+		parameters.setTransform(javafx.scene.transform.Transform.scale(2, 2));
+		return node.snapshot(parameters, null);
 	}
 }
