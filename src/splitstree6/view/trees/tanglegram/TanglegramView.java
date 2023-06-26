@@ -190,8 +190,9 @@ public class TanglegramView implements IView {
 		return empty;
 	}
 
-	public Node getImageNode() {
-		return PrintUtils.createImage(controller.getInnerAnchorPane(), controller.getScrollPane());
+	@Override
+	public Node getMainNode() {
+		return controller.getInnerAnchorPane();
 	}
 
 	public TreeDiagramType getOptionDiagram1() {

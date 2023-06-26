@@ -5,6 +5,7 @@ module splitstreesix {
 	requires transitive javafx.fxml;
 	requires transitive javafx.swing;
 	requires javafx.base;
+	requires pdfbox.app;
 
 	requires Jama;
 	requires richtextfx.fat;

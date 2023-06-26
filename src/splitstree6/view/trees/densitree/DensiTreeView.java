@@ -27,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.BoundingBox;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
@@ -217,8 +218,8 @@ public class DensiTreeView implements IView {
 	}
 
 	@Override
-	public javafx.scene.Node getImageNode() {
-		return PrintUtils.createImage(controller.getInnerAnchorPane(), null);
+	public Node getMainNode() {
+		return controller.getInnerAnchorPane();
 	}
 
 	@Override

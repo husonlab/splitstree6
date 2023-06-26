@@ -30,7 +30,7 @@ public interface IDisplayTab {
 
 	ReadOnlyBooleanProperty emptyProperty();
 
-	Node getImageNode();
+	Node getMainNode();
 
 	IDisplayTabPresenter getPresenter();
 }

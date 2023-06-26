@@ -75,23 +75,7 @@ public class LayoutTreeRadial {
 					}
 				}
 			});
-
-			if (true) {
-				try (NodeArray<APoint2D<?>> nodeAPointMap = tree.newNodeArray()) {
-					for (var v : nodePointMap.keySet()) {
-						nodeAPointMap.put(v, new APoint2D<>(nodePointMap.get(v).getX(), nodePointMap.get(v).getY()));
-					}
-					var layouter = new DavidsonHarelLayout();
-					layouter.setIterations(1);
-
-					nodePointMap.clear();
-					try (var result = layouter.performLayout(tree, null)) {
-						for (var v : result.keySet()) {
-							nodePointMap.put(v, new Point2D(result.get(v).getX(), result.get(v).getY()));
-						}
-					}
-				}
-			}
+			
 			if (false) {
 				try (NodeArray<APoint2D<?>> nodeAPointMap = tree.newNodeArray()) {
 					for (var v : nodePointMap.keySet()) {

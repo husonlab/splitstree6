@@ -306,8 +306,8 @@ public class TreePagesView implements IView {
 	}
 
 	@Override
-	public Node getImageNode() {
-		return PrintUtils.createImage(controller.getPagination(), null);
+	public Node getMainNode() {
+		return controller.getPagination();
 	}
 
 	@Override
