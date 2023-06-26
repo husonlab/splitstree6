@@ -19,10 +19,7 @@
 
 package splitstree6.algorithms.distances.distances2splits;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.*;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycle2023;
@@ -49,6 +46,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.SplitsTree4);
 	private final DoubleProperty optionThreshold = new SimpleDoubleProperty(this, "threshold", 1e-8);
 	private final ObjectProperty<CircularOrderingAlgorithm> optionCircularOrdering = new SimpleObjectProperty<>(this, "optionCircularOrdering", CircularOrderingAlgorithm.SplitsTree4);
+
+	private final BooleanProperty optionActiveCleanup = new SimpleBooleanProperty(this, "active cleanup", false);
 
 	public List<String> listOptions() {
 		return List.of(optionInferenceAlgorithm.getName(), optionThreshold.getName(), optionCircularOrdering.getName());
@@ -79,21 +78,31 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		progress.setTasks("NNet", "split weight optimization");
 
 		var params = new NeighborNetSplitWeightsClean.NNLSParams();
-		params.projGradBound = getOptionThreshold();
-		params.cgnrTolerance = params.projGradBound / 2.0;
-
-		//{GradientProjection,ActiveSet,APGD,IPG}
+		params.activeCleanup = getOptionActiveCleanup();
 
 		if (getOptionInferenceAlgorithm() == InferenceAlgorithm.ActiveSet)
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.ACTIVESET;
 		else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.APGD)
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.APGD;
+		//else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.IPG)
+		//	params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.IPG;
+		else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.GradientProjection)
+			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.GRADPROJECTION;
 		else
-			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.GRADPROJECTION; //DEFAULT
+			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.SPLITSTREE4;
 
-		ArrayList<ASplit> splits;
-		if (getOptionInferenceAlgorithm() != InferenceAlgorithm.SplitsTree4)
-			splits = NeighborNetSplitWeightsClean.compute(cycle, distancesBlock.getDistances(), params, progress);
+		ArrayList<ASplit> splits, splits2;
+		if (getOptionInferenceAlgorithm() != InferenceAlgorithm.SplitsTree4) {
+			//splits = NeighborNetSplitWeightsClean.compute(cycle, distancesBlock.getDistances(), params, progress);
+			splits = NeighborNetSplitWeightsClean.computeUse1D(cycle, distancesBlock.getDistances(), params, progress);
+//			System.err.println("OLD");
+//			for(int i=0;i<splits.size();i++)
+//				System.err.println(splits.get(i));
+//
+//			System.err.println("NEW");
+//			for(int i=0;i<splits2.size();i++)
+//				System.err.println(splits2.get(i));
+		}
 		else
 			splits = NeighborNetSplitWeightOptimizerSplitsTree4.apply(cycle, distancesBlock);
 
@@ -143,6 +152,19 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public void setOptionThreshold(double threshold) {
 		this.optionThreshold.set(threshold);
 	}
+
+	public boolean getOptionActiveCleanup() {
+		return optionActiveCleanup.get();
+	}
+
+	public BooleanProperty optionActiveCleanup() {
+		return optionActiveCleanup;
+	}
+
+	public void setOptionActiveCleanup(boolean active) {
+		this.optionActiveCleanup.set(active);
+	}
+
 
 	public CircularOrderingAlgorithm getOptionCircularOrdering() {
 		return optionCircularOrdering.get();
