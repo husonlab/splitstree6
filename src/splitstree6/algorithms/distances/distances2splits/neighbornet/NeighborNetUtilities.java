@@ -368,15 +368,8 @@ public class NeighborNetUtilities {
         return pg;
     }
 
-    static public double evalProjectedGradientSquared(double[] x, double[] d, int n, double[] grad, double[] residual) {
+    static public double evalProjectedGradientSquared(double[] x, double[] d, double[] grad, double[] residual, int n) {
         evalGradient(x,d,grad,residual,n);
-
-//        System.err.print("grad=");
-//        for(int i=0;i<n*(n-1)/2;i++)
-//            System.err.print(grad[i]+"' ");
-//        System.err.println();
-
-
 
         double pg = 0.0;
         int index = 0;
@@ -609,8 +602,7 @@ public class NeighborNetUtilities {
         return diff(Ax,d);
     }
 
-    static public double evalResidual(double[] x, double[] d, int n) {
-        double[] Ax = new double[x.length];
+    static public double evalResidual(double[] x, double[] d, double[] Ax, int n) {
         calcAx(x,Ax,n);
         return diff(Ax,d);
     }
@@ -621,7 +613,7 @@ public class NeighborNetUtilities {
     }
 
     public static void main(String[] args) {
-        int n=6;
+        int n=200;
         int npairs = n*(n-1)/2;
         Random generator = new Random(1000);
         for(int r=0;r<1;r++) {
@@ -654,12 +646,14 @@ public class NeighborNetUtilities {
             params.cgnrPrintResiduals = false;
             params.projGradBound = params.cgnrTolerance;
 
-            params.maxIterations = 2;
+            params.maxIterations = 20000;
             params.gcp_ke = 0.1;
             params.gcp_ku = 0.2;
             params.gcp_kl = 0.8;
             params.cgnrIterations = max(50, n * (n - 1) / 2);
             params.activeSetRho = 0.4;
+
+            params.APGDtheta = 0.5;
             double[] x2 = new double[npairs];
 
             long before,oldTime=0,newTime=0;
@@ -673,22 +667,27 @@ public class NeighborNetUtilities {
 //                newTime = System.currentTimeMillis()-before;
 //
 //                array2vec(X,x2);
-//                System.err.println("ACTIVE SET Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
 
 
 
                 before = System.currentTimeMillis();
-                activeSetMethod(X,D,params,null);
-                gradientProjection(X,D,params,null);
+                //activeSetMethod(X,D,params,null);
+                //gradientProjection(X,D,params,null);
+                //APGD(X,D,params,null);
+                IPG(X,D,params,null);
                 oldTime = System.currentTimeMillis() - before;
 
                 before = System.currentTimeMillis();
-                gradientProjection(x,d,n,params,null);
+                //gradientProjection(x,d,n,params,null);
+                //APGD(x,d,n,params,null);
                 //activeSetMethod(x,d,n,params,null);
+                IPG(x,d,n,params,null);
                 newTime = System.currentTimeMillis()-before;
 
                 array2vec(X,x2);
-                System.err.println("GRAD PROJECTION Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
+                //System.err.println("GRAD PROJECTION Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
+                //System.err.println("APGD SET Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
+                System.err.println("IPG SET Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
 
 
             } catch (CanceledException e) {

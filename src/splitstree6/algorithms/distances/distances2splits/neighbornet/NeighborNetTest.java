@@ -292,7 +292,7 @@ public class NeighborNetTest {
         double[][] x2 = new double[n+1][n+1];
 
         params.log = setupLogfile("TestAPGD.m",false);
-        params.APGDalpha = 0.5;
+        params.APGDtheta = 0.5;
 
         copyArray(xinitial,x2);
         try {
@@ -407,7 +407,7 @@ public class NeighborNetTest {
 
         double[][] xinitial = new double[n+1][n+1];
         for (int c = 0;c<=3;c++) {
-            params.APGDalpha = alpha0[c];
+            params.APGDtheta = alpha0[c];
             params.log.println("apgd_Data{"+(c+1)+"}=[");
             calcAinv_y(d,xinitial);
             zeroNegativeEntries(xinitial);
