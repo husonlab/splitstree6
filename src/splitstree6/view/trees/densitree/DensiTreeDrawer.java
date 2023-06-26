@@ -252,7 +252,8 @@ public class DensiTreeDrawer {
 			service.setOnSucceeded(e -> {
 				postprocessLabels(mainWindow.getStage(), mainWindow.getWorkingTaxa(), mainWindow.getTaxonSelectionModel(), pane, fontScaleFactor);
 				Platform.runLater(() -> invalidationListener.invalidated(null));
-				RunAfterAWhile.applyInFXThread(getRadialLabelLayout(), () -> getRadialLabelLayout().layoutLabels());
+				if (diagramType.isRadialOrCircular())
+					RunAfterAWhile.applyInFXThread(getRadialLabelLayout(), () -> getRadialLabelLayout().layoutLabels());
 			});
 			service.restart();
 		});

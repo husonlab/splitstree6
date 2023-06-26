@@ -21,17 +21,10 @@ package splitstree6.layout.tree;
 
 import javafx.geometry.Point2D;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.algorithms.FruchtermanReingoldLayout;
-import jloda.graph.fmm.FastMultiLayerMethodLayout;
-import jloda.graph.fmm.FastMultiLayerMethodOptions;
 import jloda.phylo.PhyloTree;
 import jloda.util.APoint2D;
-import org.ejml.data.DGrowArray;
-import splitstree6.xtra.DavidsonHarelLayout;
-
-import java.util.HashMap;
 
 /**
  * compute a radial layout
@@ -75,7 +68,7 @@ public class LayoutTreeRadial {
 					}
 				}
 			});
-			
+
 			if (false) {
 				try (NodeArray<APoint2D<?>> nodeAPointMap = tree.newNodeArray()) {
 					for (var v : nodePointMap.keySet()) {
