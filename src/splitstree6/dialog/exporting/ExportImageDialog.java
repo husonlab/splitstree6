@@ -35,6 +35,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import splitstree6.xtra.SaveToPDF;
+import splitstree6.xtra.SaveToSVG;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -62,7 +63,7 @@ public class ExportImageDialog {
 		fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPathOrSuffix(file) + "." + previousFormat);
 
 
-		var supported = new String[]{"gif", "png", "tif", "pdf"}; // ImageIO.getWriterFileSuffixes(); // not all work
+		var supported = new String[]{"gif", "png", "tif", "pdf", "svg"}; // ImageIO.getWriterFileSuffixes(); // not all work
 		var formats = Arrays.stream(supported).map(f -> "*." + f).toArray(String[]::new);
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(String.format("Image Files (%s)", StringUtils.toString(supported, ", ")), formats));
 
@@ -86,6 +87,8 @@ public class ExportImageDialog {
 	public static void saveNodeAsImage(Node node, String formatName, File file) throws IOException {
 		if (formatName.equalsIgnoreCase("pdf")) {
 			SaveToPDF.apply(node, file);
+		} else if (formatName.equalsIgnoreCase("svg")) {
+			SaveToSVG.apply(node, file);
 		} else {
 			if (node instanceof Pane pane) {
 				var scrollPane = pane.getChildren().stream().filter(c -> c instanceof ScrollPane).map(c -> (ScrollPane) c).findAny().orElse(null);

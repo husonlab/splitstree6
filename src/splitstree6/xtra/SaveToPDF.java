@@ -376,7 +376,7 @@ public class SaveToPDF {
 	 * @param node the node
 	 * @return angle in degrees
 	 */
-	private static double getAngleOnScreen(Node node) {
+	public static double getAngleOnScreen(Node node) {
 		var localOrig = new Point2D(0, 0);
 		var localX1000 = new Point2D(1000, 0);
 		var orig = node.localToScreen(localOrig);
@@ -395,7 +395,7 @@ public class SaveToPDF {
 	 * @param node the pane
 	 * @return true, if mirror image, false if direct image
 	 */
-	private static boolean isMirrored(Node node) {
+	public static boolean isMirrored(Node node) {
 		var orig = node.localToScreen(0, 0);
 		if (orig != null) {
 			var x1000 = node.localToScreen(1000, 0);
@@ -455,7 +455,7 @@ public class SaveToPDF {
 				maxY = Math.max(maxY, bounds.getMaxY());
 			}
 		}
-		if (true) {
+		if (true) { // this restricts to the currently
 			minX = Math.max(minX, pane.getBoundsInLocal().getMinX());
 			minY = Math.max(minY, pane.getBoundsInLocal().getMinY());
 
