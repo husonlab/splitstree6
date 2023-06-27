@@ -46,6 +46,8 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
@@ -140,7 +142,7 @@ public class SaveToPDF {
 		}
 
 		for (var n : BasicFX.getAllRecursively(pane, n -> true)) {
-			System.err.println("n: " + n.getClass().getSimpleName());
+			// System.err.println("n: " + n.getClass().getSimpleName());
 			if (isNodeVisible(n)) {
 				try {
 					if (n instanceof Line line) {
@@ -248,7 +250,10 @@ public class SaveToPDF {
 								screenAngle = 360 - screenAngle;
 							contentStream.setTextMatrix(Matrix.getRotateInstance(Math.toRadians(screenAngle), px.apply(rotateAnchorX), py.apply(rotateAnchorY)));
 							contentStream.setNonStrokingColor(pdfColor(text.getFill()));
-							var fontHeight = ps.apply(0.87f * localBounds.getHeight());
+							var fontHeight = ps.apply(text.getFont().getSize());
+							var altFontHeight = ps.apply(0.87 * text.localToScreen(localBounds).getHeight());
+							if (!(text instanceof TextExt) && Math.abs(fontHeight - altFontHeight) > 2)
+								fontHeight = altFontHeight;
 							setFont(contentStream, text, fontHeight);
 							contentStream.showText(text.getText());
 							contentStream.endText();
@@ -288,6 +293,7 @@ public class SaveToPDF {
 	}
 
 	private static void setFont(PDPageContentStream contentStream, Text text, float size) throws IOException {
+		//System.err.println(text.getFont().getFamily()+" size: "+size);
 		contentStream.setFont(convertToPDFBoxFont(text.getFont()), size);
 	}
 
@@ -297,7 +303,7 @@ public class SaveToPDF {
 			var fontFamily = javafxFont.getFamily().toLowerCase();
 			if (fontFamily.startsWith("times") || fontFamily.startsWith("arial"))
 				pdfboxFontFamily = Standard14Fonts.FontName.TIMES_ROMAN.getName();
-			else if (fontFamily.startsWith("courier"))
+			else if (fontFamily.startsWith("courier") || fontFamily.startsWith("monospaced"))
 				pdfboxFontFamily = Standard14Fonts.FontName.COURIER.getName();
 			else if (fontFamily.startsWith("symbol"))
 				pdfboxFontFamily = Standard14Fonts.FontName.SYMBOL.getName();
@@ -331,7 +337,6 @@ public class SaveToPDF {
 			font = Standard14Fonts.FontName.HELVETICA;
 		return new PDType1Font(font);
 	}
-
 	private static void doFillStroke(PDPageContentStream contentStream, Paint stroke, Paint fill) throws IOException {
 		var pdfStroke = pdfColor(stroke);
 		var pdfFill = pdfColor(fill);
@@ -442,7 +447,7 @@ public class SaveToPDF {
 		double maxY = Double.MIN_VALUE;
 
 		for (var node : BasicFX.getAllRecursively(pane, n -> true)) {
-			if (node instanceof Shape && (!(node instanceof Line))) {
+			if (node instanceof Shape) {
 				var bounds = pane.sceneToLocal(node.localToScene(node.getBoundsInLocal()));
 				minX = Math.min(minX, bounds.getMinX());
 				minY = Math.min(minY, bounds.getMinY());
@@ -450,9 +455,15 @@ public class SaveToPDF {
 				maxY = Math.max(maxY, bounds.getMaxY());
 			}
 		}
+		if (true) {
+			minX = Math.max(minX, pane.getBoundsInLocal().getMinX());
+			minY = Math.max(minY, pane.getBoundsInLocal().getMinY());
 
+			maxX = Math.min(maxX, (pane.getBoundsInLocal().getMaxX()));
+			maxY = Math.min(maxY, (pane.getBoundsInLocal().getMaxY()));
+		}
 
-		return new PDRectangle(new BoundingBox((float) minX, (float) minY, (float) maxX , (float) maxY));
+		return new PDRectangle(new BoundingBox((float) minX, (float) minY, (float) maxX, (float) maxY));
 	}
 
 	public static boolean isNodeVisible(Node node) {
