@@ -53,6 +53,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.thirdparty.PngEncoderFX;
 import jloda.util.Basic;
@@ -68,22 +69,47 @@ import org.apache.pdfbox.pdmodel.graphics.color.PDColor;
 import org.apache.pdfbox.pdmodel.graphics.color.PDDeviceRGB;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import org.apache.pdfbox.util.Matrix;
+import org.fxmisc.richtext.TextExt;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import java.util.function.Function;
 
 /**
  * save pane to PDF, trying to draw as objects
+ * This is quite incomplete, for example, doesn't draw effects or borders
  * Daniel Huson, 6.2023
  */
 public class SaveToPDF {
+	/**
+	 * draws given pane to a file in PDF format
+	 *
+	 * @param pane the pane
+	 * @param file the file
+	 * @throws IOException
+	 */
 	public static void apply(Node pane, File file) throws IOException {
-		file.delete();
+		if (file.exists())
+			Files.delete(file.toPath());
 
 		var document = new PDDocument();
 		var page = new PDPage(computeBoundingBox(pane));
 		document.addPage(page);
+
+		{
+			// Set the metadata
+			var documentInformation = document.getDocumentInformation();
+			documentInformation.setAuthor(System.getProperty("user.name"));
+			documentInformation.setTitle(file.getName());
+			documentInformation.setSubject("PDF image of " + file.getName());
+			documentInformation.setCreator(ProgramProperties.getProgramName());
+			var calendar = new GregorianCalendar(TimeZone.getDefault());
+			documentInformation.setCreationDate(calendar);
+			documentInformation.setModificationDate(calendar);
+		}
 
 		var pdfMinX = page.getCropBox().getLowerLeftX();
 		var pdfMaxX = page.getCropBox().getUpperRightX();
@@ -114,11 +140,13 @@ public class SaveToPDF {
 		}
 
 		for (var n : BasicFX.getAllRecursively(pane, n -> true)) {
-			//System.err.println("n: " + n.getClass().getSimpleName());
+			System.err.println("n: " + n.getClass().getSimpleName());
 			if (isNodeVisible(n)) {
 				try {
 					if (n instanceof Line line) {
 						contentStream.setLineWidth(ps.apply(line.getStrokeWidth()));
+						contentStream.setLineDashPattern(getLineDashPattern(line), 0);
+
 						var x1 = px.apply(pane.sceneToLocal(line.localToScene(line.getStartX(), line.getStartY())).getX());
 						var y1 = py.apply(pane.sceneToLocal(line.localToScene(line.getStartX(), line.getStartY())).getY());
 						var x2 = px.apply(pane.sceneToLocal(line.localToScene(line.getEndX(), line.getEndY())).getX());
@@ -126,8 +154,16 @@ public class SaveToPDF {
 						contentStream.moveTo(x1, y1);
 						contentStream.lineTo(x2, y2);
 						doFillStroke(contentStream, line.getStroke(), line.getFill());
+					} else if (n instanceof Rectangle rectangle) {
+						// todo: this might break of rectangle has been rotated
+						contentStream.setLineWidth(ps.apply(rectangle.getStrokeWidth()));
+						contentStream.setLineDashPattern(getLineDashPattern(rectangle), 0);
+						var bounds = pane.sceneToLocal(rectangle.localToScene(rectangle.getBoundsInLocal()));
+						contentStream.addRect(px.apply(bounds.getMinX()), py.apply(bounds.getMaxY()), ps.apply(bounds.getWidth()), ps.apply(bounds.getHeight()));
+						doFillStroke(contentStream, rectangle.getStroke(), rectangle.getFill());
 					} else if (n instanceof Circle circle) {
 						contentStream.setLineWidth(ps.apply(circle.getStrokeWidth()));
+						contentStream.setLineDashPattern(getLineDashPattern(circle), 0);
 						var bounds = pane.sceneToLocal(circle.localToScene(circle.getBoundsInLocal()));
 						var r = ps.apply(0.5 * bounds.getHeight());
 						var x = px.apply(bounds.getCenterX());
@@ -137,6 +173,7 @@ public class SaveToPDF {
 					} else if (n instanceof QuadCurve || n instanceof CubicCurve) {
 						var curve = (n instanceof QuadCurve ? convertQuadCurveToCubicCurve((QuadCurve) n) : (CubicCurve) n);
 						contentStream.setLineWidth(ps.apply(curve.getStrokeWidth()));
+						contentStream.setLineDashPattern(getLineDashPattern(curve),0);
 						var sX = px.apply(pane.sceneToLocal(curve.localToScene(curve.getStartX(), curve.getStartY())).getX());
 						var sY = py.apply(pane.sceneToLocal(curve.localToScene(curve.getStartX(), curve.getStartY())).getY());
 						var c1X = px.apply(pane.sceneToLocal(curve.localToScene(curve.getControlX1(), curve.getControlY1())).getX());
@@ -149,9 +186,8 @@ public class SaveToPDF {
 						contentStream.curveTo(c1X, c1Y, c2X, c2Y, tX, tY);
 						doFillStroke(contentStream, curve.getStroke(), curve.getFill());
 					} else if (n instanceof Path path) {
-						if (path.getParent() instanceof Axis)
-							continue;
 						contentStream.setLineWidth(ps.apply(path.getStrokeWidth()));
+						contentStream.setLineDashPattern(getLineDashPattern(path),0);
 						var local = new Point2D(0, 0);
 						for (var element : path.getElements()) {
 							if (element instanceof MoveTo moveTo) {
@@ -184,6 +220,7 @@ public class SaveToPDF {
 						doFillStroke(contentStream, path.getStroke(), path.getFill());
 					} else if (n instanceof Polygon polygon) {
 						contentStream.setLineWidth(ps.apply(polygon.getStrokeWidth()));
+						contentStream.setLineDashPattern(getLineDashPattern(polygon),0);
 						var points = polygon.getPoints();
 						if (points.size() > 0) {
 							var sX = px.apply(pane.sceneToLocal(polygon.localToScene(polygon.getPoints().get(0), polygon.getPoints().get(1))).getX());
@@ -199,8 +236,6 @@ public class SaveToPDF {
 							doFillStroke(contentStream, polygon.getStroke(), polygon.getFill());
 						}
 					} else if (n instanceof Text text) {
-						if (text.getParent() instanceof Axis)
-							continue;
 						if (!text.getText().isBlank()) {
 							double screenAngle = 360 - getAngleOnScreen(text); // because y axis points upward in PDF
 							var localBounds = text.getBoundsInLocal();
@@ -220,14 +255,14 @@ public class SaveToPDF {
 						}
 					} else if (n instanceof ImageView imageView) {
 						var encoder = new PngEncoderFX(imageView.getImage());
-						var image = PDImageXObject.createFromByteArray(document, encoder.pngEncode(false), "image/png");
+						var image = PDImageXObject.createFromByteArray(document, encoder.pngEncode(true), "image/png");
 						var bounds = pane.sceneToLocal(imageView.localToScene(imageView.getBoundsInLocal()));
 						var x = px.apply(bounds.getMinX());
 						var width = ps.apply(bounds.getWidth());
 						var y = py.apply(bounds.getMaxY());
 						var height = ps.apply(bounds.getHeight());
 						contentStream.drawImage(image, x, y, width, height);
-					} else if (n instanceof NumberAxis || n instanceof Shape3D || n instanceof Canvas) { // untested
+					} else if (n instanceof Shape3D || n instanceof Canvas) {
 						var parameters = new SnapshotParameters();
 						parameters.setFill(Color.TRANSPARENT);
 						var snapShot = n.snapshot(parameters, null);
@@ -242,6 +277,8 @@ public class SaveToPDF {
 					}
 				} catch (IOException ex) {
 					Basic.caught(ex);
+				} finally {
+					contentStream.setLineDashPattern(new float[0],0);
 				}
 			}
 		}
@@ -266,7 +303,7 @@ public class SaveToPDF {
 				pdfboxFontFamily = Standard14Fonts.FontName.SYMBOL.getName();
 			else if (fontFamily.startsWith("zapf_dingbats"))
 				pdfboxFontFamily = Standard14Fonts.FontName.ZAPF_DINGBATS.getName();
-			else // if(fontFamily.startsWith("helvetica") || fontFamily.startsWith("system"))
+			else // if(fontFamily.startsWith("arial") || fontFamily.startsWith("helvetica") || fontFamily.startsWith("system"))
 				pdfboxFontFamily = Standard14Fonts.FontName.HELVETICA.getName();
 		}
 
@@ -322,10 +359,10 @@ public class SaveToPDF {
 	}
 
 	private static PDColor pdfColor(Paint paint) {
-		var color = (Color) paint;
-		if (color == null || color.equals(Color.TRANSPARENT))
+		if (paint instanceof Color color && !color.equals(Color.TRANSPARENT))
+			return new PDColor(new float[]{(float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()}, PDDeviceRGB.INSTANCE);
+		else
 			return null;
-		return new PDColor(new float[]{(float) color.getRed(), (float) color.getGreen(), (float) color.getBlue()}, PDDeviceRGB.INSTANCE);
 	}
 
 	/**
@@ -413,7 +450,9 @@ public class SaveToPDF {
 				maxY = Math.max(maxY, bounds.getMaxY());
 			}
 		}
-		return new PDRectangle(new BoundingBox((float) minX - 5, (float) minY - 5, (float) maxX + 5, (float) maxY + 5));
+
+
+		return new PDRectangle(new BoundingBox((float) minX, (float) minY, (float) maxX , (float) maxY));
 	}
 
 	public static boolean isNodeVisible(Node node) {
@@ -431,4 +470,16 @@ public class SaveToPDF {
 
 		return true;
 	}
+
+	public static float[] getLineDashPattern(Shape shape) {
+		if (shape.getStrokeDashArray().size() > 0) {
+			var array = new float[shape.getStrokeDashArray().size()];
+			for (var i = 0; i < shape.getStrokeDashArray().size(); i++) {
+				array[i] = shape.getStrokeDashArray().get(i).floatValue();
+			}
+			return array;
+		} else
+			return new float[0];
+	}
+
 }

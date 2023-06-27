@@ -20,7 +20,10 @@
 package splitstree6.tabs.workflow;
 
 import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import jloda.fx.selection.SelectionModel;
+import jloda.fx.window.MainWindowManager;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.workflow.Workflow;
 
@@ -38,13 +41,22 @@ abstract public class WorkflowNodeItem extends Pane {
 	private final Workflow workflow;
 	private final WorkflowTab workflowTab;
 
-
 	public WorkflowNodeItem(Workflow workflow, WorkflowTab workflowTab, WorkflowNode node) {
 		this.workflow = workflow;
 		this.workflowTab = workflowTab;
 		setupMouseInteraction(workflow.getSelectionModel());
 		this.node = node;
 		setStyle("-fx-background-color: -fx-base;");
+		if (true) {
+			var rect = new Rectangle();
+			rect.setX(1);
+			rect.setY(1);
+			rect.widthProperty().bind(widthProperty().subtract(2));
+			rect.heightProperty().bind(heightProperty().subtract(2));
+			rect.setStroke(Color.LIGHTGRAY);
+			rect.setStyle("-fx-fill: -fx-base;");
+			getChildren().add(0, rect);
+		}
 	}
 
 	public void move(double dx, double dy) {
