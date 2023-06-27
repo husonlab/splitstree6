@@ -24,6 +24,10 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.chart.Chart;
+import javafx.scene.control.Label;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
@@ -31,6 +35,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.thirdparty.PngEncoderFX;
@@ -104,7 +109,7 @@ public class SaveToSVG {
 		}
 
 		for (var n : BasicFX.getAllRecursively(pane, n -> true)) {
-			System.err.println("n: " + n.getClass().getSimpleName());
+			// System.err.println("n: " + n.getClass().getSimpleName());
 			if (isNodeVisible(n)) {
 				try {
 					if (n instanceof Line line) {
@@ -115,13 +120,20 @@ public class SaveToSVG {
 						appendLine(svgBuilder, x1, y1, x2, y2, line.getStrokeWidth(), line.getStrokeDashArray(), line.getStroke());
 					} else if (n instanceof Rectangle rectangle) {
 						var bounds = pane.sceneToLocal(rectangle.localToScene(rectangle.getBoundsInLocal()));
-						appendRect(svgBuilder, px.apply(bounds.getMinX()), py.apply(bounds.getMaxY()), ps.apply(bounds.getWidth()), ps.apply(bounds.getHeight()), rectangle.getStrokeWidth(), rectangle.getStrokeDashArray(), rectangle.getStroke(), rectangle.getFill());
+						appendRect(svgBuilder, px.apply(bounds.getMinX()), py.apply(bounds.getMinY()), ps.apply(bounds.getWidth()), ps.apply(bounds.getHeight()), rectangle.getStrokeWidth(), rectangle.getStrokeDashArray(), rectangle.getStroke(), rectangle.getFill());
 					} else if (n instanceof Circle circle) {
 						var bounds = pane.sceneToLocal(circle.localToScene(circle.getBoundsInLocal()));
 						var r = ps.apply(0.5 * bounds.getHeight());
 						var x = px.apply(bounds.getCenterX());
 						var y = py.apply(bounds.getCenterY());
 						appendCircle(svgBuilder, x, y, r, circle.getStrokeWidth(), circle.getStrokeDashArray(), circle.getStroke(), circle.getFill());
+					} else if (n instanceof Ellipse ellipse) {
+						var bounds = pane.sceneToLocal(ellipse.localToScene(ellipse.getBoundsInLocal()));
+						var rx = ps.apply(ellipse.getRadiusX());
+						var ry = ps.apply(ellipse.getRadiusY());
+						var x = px.apply(bounds.getCenterX());
+						var y = py.apply(bounds.getCenterY());
+						appendEllipse(svgBuilder, x, y, rx, ry, ellipse.getStrokeWidth(), ellipse.getStrokeDashArray(), ellipse.getStroke(), ellipse.getFill());
 					} else if (n instanceof QuadCurve curve) {
 						var sX = px.apply(pane.sceneToLocal(curve.localToScene(curve.getStartX(), curve.getStartY())).getX());
 						var sY = py.apply(pane.sceneToLocal(curve.localToScene(curve.getStartX(), curve.getStartY())).getY());
@@ -141,10 +153,13 @@ public class SaveToSVG {
 						var tY = py.apply(pane.sceneToLocal(curve.localToScene(curve.getEndX(), curve.getEndY())).getY());
 						appendCubicCurve(svgBuilder, sX, sY, c1X, c1Y, c2X, c2Y, tX, tY, curve.getStrokeWidth(), curve.getStrokeDashArray(), curve.getStroke());
 					} else if (n instanceof Path path) {
+						if (containedInText(path))
+							continue;
 						var local = new Point2D(0, 0);
 						svgBuilder.append("<path d=\"");
 						try {
 							for (var element : path.getElements()) {
+								System.err.println("Element: " + element);
 								if (element instanceof MoveTo moveTo) {
 									local = new Point2D(moveTo.getX(), moveTo.getY());
 									var t = pane.sceneToLocal(path.localToScene(local.getX(), local.getY()));
@@ -213,21 +228,20 @@ public class SaveToSVG {
 							appendText(svgBuilder, px.apply(rotateAnchorX), py.apply(rotateAnchorY), screenAngle, text.getText(), text.getFont(), fontHeight, text.getFill());
 						}
 					} else if (n instanceof ImageView imageView) {
-						var encoder = new PngEncoderFX(imageView.getImage());
 						var bounds = pane.sceneToLocal(imageView.localToScene(imageView.getBoundsInLocal()));
 						var x = px.apply(bounds.getMinX());
 						var width = ps.apply(bounds.getWidth());
-						var y = py.apply(bounds.getMaxY());
+						var y = py.apply(bounds.getMinY());
 						var height = ps.apply(bounds.getHeight());
 						appendImage(svgBuilder, x, y, width, height, imageView.getImage());
-					} else if (n instanceof Shape3D || n instanceof Canvas) {
+					} else if (n instanceof Shape3D || n instanceof Canvas || n instanceof Chart) {
 						var parameters = new SnapshotParameters();
 						parameters.setFill(Color.TRANSPARENT);
 						var snapShot = n.snapshot(parameters, null);
 						var bounds = pane.sceneToLocal(n.localToScene(n.getBoundsInLocal()));
 						var x = px.apply(bounds.getMinX());
 						var width = ps.apply(bounds.getWidth());
-						var y = py.apply(bounds.getMaxY());
+						var y = py.apply(bounds.getMinY());
 						var height = ps.apply(bounds.getHeight());
 						appendImage(svgBuilder, x, y, width, height, snapShot);
 					}
@@ -268,6 +282,20 @@ public class SaveToSVG {
 
 	public static void appendCircle(StringBuilder svgBuilder, double x, double y, double radius, double strokeWidth, List<Double> strokeDashArray, Paint stroke, Paint fill) {
 		svgBuilder.append("<circle cx=\"%.2f\" cy=\"%.2f\" r=\"%.2f\"".formatted(x, y, radius));
+		if (stroke instanceof Color color && stroke != Color.TRANSPARENT)
+			svgBuilder.append(" stroke=\"%s\"".formatted(asSvgColor(color)));
+		else
+			svgBuilder.append(" stroke=\"none\"");
+		svgBuilder.append(" stroke-width=\"%.2f\"".formatted(strokeWidth));
+		if (fill instanceof Color color && color != Color.TRANSPARENT)
+			svgBuilder.append(" fill=\"%s\"".formatted(asSvgColor(color)));
+		else
+			svgBuilder.append(" fill=\"none\"");
+		svgBuilder.append("/>\n");
+	}
+
+	public static void appendEllipse(StringBuilder svgBuilder, double x, double y, double rx, double ry, double strokeWidth, List<Double> strokeDashArray, Paint stroke, Paint fill) {
+		svgBuilder.append("<ellipse cx=\"%.2f\" cy=\"%.2f\" rx=\"%.2f\" ry=\"%.2f\"".formatted(x, y, rx, ry));
 		if (stroke instanceof Color color && stroke != Color.TRANSPARENT)
 			svgBuilder.append(" stroke=\"%s\"".formatted(asSvgColor(color)));
 		else
@@ -352,7 +380,7 @@ public class SaveToSVG {
 	public static void appendImage(StringBuilder svgBuilder, double x, double y, double width, double height, Image image) {
 		var encoder = new PngEncoderFX(image);
 		var base64Data = Base64.getEncoder().encodeToString(encoder.pngEncode(true));
-		svgBuilder.append("<image xlink:href=\"data:image/png;base64,\"").append(base64Data).append("\"");
+		svgBuilder.append("<image href=\"data:image/png;base64,").append(base64Data).append("\"");
 		svgBuilder.append(" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\"/>\n".formatted(x, y, width, height));
 	}
 

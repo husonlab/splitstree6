@@ -44,7 +44,10 @@ import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.Axis;
+import javafx.scene.chart.Chart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.control.Labeled;
+import javafx.scene.control.TextInputControl;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
@@ -53,6 +56,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.util.ProgramProperties;
@@ -163,6 +167,16 @@ public class SaveToPDF {
 						var bounds = pane.sceneToLocal(rectangle.localToScene(rectangle.getBoundsInLocal()));
 						contentStream.addRect(px.apply(bounds.getMinX()), py.apply(bounds.getMaxY()), ps.apply(bounds.getWidth()), ps.apply(bounds.getHeight()));
 						doFillStroke(contentStream, rectangle.getStroke(), rectangle.getFill());
+					} else if (n instanceof Ellipse ellipse) {
+						contentStream.setLineWidth(ps.apply(ellipse.getStrokeWidth()));
+						contentStream.setLineDashPattern(getLineDashPattern(ellipse), 0);
+						var bounds = pane.sceneToLocal(ellipse.localToScene(ellipse.getBoundsInLocal()));
+						var rx = ps.apply(0.5 * bounds.getHeight());
+						var ry = ps.apply(0.5 * bounds.getWidth());
+						var x = px.apply(bounds.getCenterX());
+						var y = py.apply(bounds.getCenterY());
+						addEllipse(contentStream, x, y, rx, ry);
+						doFillStroke(contentStream, ellipse.getStroke(), ellipse.getFill());
 					} else if (n instanceof Circle circle) {
 						contentStream.setLineWidth(ps.apply(circle.getStrokeWidth()));
 						contentStream.setLineDashPattern(getLineDashPattern(circle), 0);
@@ -175,7 +189,7 @@ public class SaveToPDF {
 					} else if (n instanceof QuadCurve || n instanceof CubicCurve) {
 						var curve = (n instanceof QuadCurve ? convertQuadCurveToCubicCurve((QuadCurve) n) : (CubicCurve) n);
 						contentStream.setLineWidth(ps.apply(curve.getStrokeWidth()));
-						contentStream.setLineDashPattern(getLineDashPattern(curve),0);
+						contentStream.setLineDashPattern(getLineDashPattern(curve), 0);
 						var sX = px.apply(pane.sceneToLocal(curve.localToScene(curve.getStartX(), curve.getStartY())).getX());
 						var sY = py.apply(pane.sceneToLocal(curve.localToScene(curve.getStartX(), curve.getStartY())).getY());
 						var c1X = px.apply(pane.sceneToLocal(curve.localToScene(curve.getControlX1(), curve.getControlY1())).getX());
@@ -188,8 +202,10 @@ public class SaveToPDF {
 						contentStream.curveTo(c1X, c1Y, c2X, c2Y, tX, tY);
 						doFillStroke(contentStream, curve.getStroke(), curve.getFill());
 					} else if (n instanceof Path path) {
+						if (containedInText(path))
+							continue; // don't draw caret
 						contentStream.setLineWidth(ps.apply(path.getStrokeWidth()));
-						contentStream.setLineDashPattern(getLineDashPattern(path),0);
+						contentStream.setLineDashPattern(getLineDashPattern(path), 0);
 						var local = new Point2D(0, 0);
 						for (var element : path.getElements()) {
 							if (element instanceof MoveTo moveTo) {
@@ -267,7 +283,7 @@ public class SaveToPDF {
 						var y = py.apply(bounds.getMaxY());
 						var height = ps.apply(bounds.getHeight());
 						contentStream.drawImage(image, x, y, width, height);
-					} else if (n instanceof Shape3D || n instanceof Canvas) {
+					} else if (n instanceof Shape3D || n instanceof Canvas || n instanceof Chart) {
 						var parameters = new SnapshotParameters();
 						parameters.setFill(Color.TRANSPARENT);
 						var snapShot = n.snapshot(parameters, null);
@@ -362,6 +378,17 @@ public class SaveToPDF {
 		contentStream.curveTo(cx + r, cy - k * r, cx + k * r, cy - r, cx, cy - r);
 		contentStream.curveTo(cx - k * r, cy - r, cx - r, cy - k * r, cx - r, cy);
 	}
+
+	private static void addEllipse(PDPageContentStream contentStream, float cx, float cy, float rx, float ry) throws IOException {
+		final float k = 0.552284749831f;
+		//System.err.println("Circle at: " + cx + "," + cy);
+		contentStream.moveTo(cx - rx, cy);
+		contentStream.curveTo(cx - rx, cy + k * ry, cx - k * rx, cy + ry, cx, cy + ry);
+		contentStream.curveTo(cx + k * rx, cy + ry, cx + rx, cy + k * ry, cx + rx, cy);
+		contentStream.curveTo(cx + rx, cy - k * ry, cx + k * rx, cy - ry, cx, cy - ry);
+		contentStream.curveTo(cx - k * rx, cy - ry, cx - rx, cy - k * ry, cx - rx, cy);
+	}
+
 
 	private static PDColor pdfColor(Paint paint) {
 		if (paint instanceof Color color && !color.equals(Color.TRANSPARENT))
@@ -480,6 +507,16 @@ public class SaveToPDF {
 		}
 
 		return true;
+	}
+
+	public static boolean containedInText(Node node) {
+		while (node != null) {
+			if (node instanceof Text || node instanceof RichTextLabel || node instanceof Labeled || node instanceof TextInputControl) {
+				return true;
+			} else
+				node = node.getParent();
+		}
+		return false;
 	}
 
 	public static float[] getLineDashPattern(Shape shape) {
