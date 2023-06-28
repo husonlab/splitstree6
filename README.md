@@ -26,7 +26,7 @@ SplitsTreeCE is currently under rapid development. We are currently calling this
 
 ## Latest news:
 
-Just added export to SVG to the program. Now anything that you see in the program can be exported as individual objects and then edited in a program like Inkscape or LibreOffice. (Sadly, Powerpoint and KeyNote don't really support SVG objects...)
+Just added export to SVG to the program. Now anything that you see in the program can be exported as individual objects and then edited in a program like LibreOffice or Inkscape. LibreOffice appears to be able to import all objects, whereas Inkscape loses any images... Unfortunately, KeyNote loses text as well (one you try to "break" an SVG image, whereas Powerpoint fails to give you any access to the objects.
 
 
 
