@@ -34,15 +34,13 @@ import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
 import jloda.util.StringUtils;
-import splitstree6.xtra.SaveToPDF;
-import splitstree6.xtra.SaveToSVG;
+import splitstree6.xtra.exportimages.SaveToPDF;
+import splitstree6.xtra.exportimages.SaveToSVG;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.stream.Collectors;
 
 /**
  * save an image to a file

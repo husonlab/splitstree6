@@ -17,27 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra;
-
-/*
- * SaveToPDF.java Copyright (C) 2023. Daniel H. Huson
- *
- *  (Some files contain contributions from other authors, who are then mentioned separately.)
- *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- */
+package splitstree6.xtra.exportimages;
 
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
@@ -56,6 +36,7 @@ import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Scale;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
@@ -267,9 +248,10 @@ public class SaveToPDF {
 							contentStream.setTextMatrix(Matrix.getRotateInstance(Math.toRadians(screenAngle), px.apply(rotateAnchorX), py.apply(rotateAnchorY)));
 							contentStream.setNonStrokingColor(pdfColor(text.getFill()));
 							var fontHeight = ps.apply(text.getFont().getSize());
-							var altFontHeight = ps.apply(0.87 * text.localToScreen(localBounds).getHeight());
+							var altFontHeight = ps.apply(0.87 * localBounds.getHeight());
 							if (!(text instanceof TextExt) && Math.abs(fontHeight - altFontHeight) > 2)
 								fontHeight = altFontHeight;
+							fontHeight *= (float) getScaleFactors(text).getY();
 							setFont(contentStream, text, fontHeight);
 							contentStream.showText(text.getText());
 							contentStream.endText();
@@ -528,6 +510,24 @@ public class SaveToPDF {
 			return array;
 		} else
 			return new float[0];
+	}
+
+	public static Point2D getScaleFactors(Node node) {
+		var scaleX = 1.0;
+		var scaleY = 1.0;
+
+		while (node != null) {
+			scaleX *= node.getScaleX();
+			scaleY *= node.getScaleY();
+			for (var transform : node.getTransforms()) {
+				if (transform instanceof Scale scale) {
+					scaleX *= scale.getX();
+					scaleY *= scale.getY();
+				}
+			}
+			node = node.getParent();
+		}
+		return new Point2D(scaleX, scaleY);
 	}
 
 }

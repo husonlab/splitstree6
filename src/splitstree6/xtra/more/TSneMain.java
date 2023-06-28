@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2018. Daniel H. Huson
+ *  TSneMain.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra;
+package splitstree6.xtra.more;
 
 import com.jujutsu.tsne.barneshut.ParallelBHTsne;
 import com.jujutsu.utils.TSneUtils;
