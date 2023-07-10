@@ -44,13 +44,13 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 
 	public enum CircularOrderingAlgorithm {SplitsTree4, BryantHuson2023}
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.ActiveSet);
-	private final DoubleProperty optionThreshold = new SimpleDoubleProperty(this, "threshold", 1e-8);
+	private final DoubleProperty optionThreshold = new SimpleDoubleProperty(this, "optionThreshold", 1e-8);
 	private final ObjectProperty<CircularOrderingAlgorithm> optionCircularOrdering = new SimpleObjectProperty<>(this, "optionCircularOrdering", CircularOrderingAlgorithm.SplitsTree4);
 
-	private final BooleanProperty optionActiveCleanup = new SimpleBooleanProperty(this, "active cleanup", false);
+	private final BooleanProperty optionActiveCleanup = new SimpleBooleanProperty(this, "optionActiveCleanup", false);
 
 	public List<String> listOptions() {
-		return List.of(optionInferenceAlgorithm.getName(), optionThreshold.getName(), optionCircularOrdering.getName(), optionActiveCleanup.getName());
+		return List.of(optionInferenceAlgorithm.getName()/*, optionThreshold.getName(),*/ /*optionCircularOrdering.getName(), */ /*optionActiveCleanup.getName()*/);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		return optionThreshold.get();
 	}
 
-	public DoubleProperty optionThreshold() {
+	public DoubleProperty optionThresholdProperty() {
 		return optionThreshold;
 	}
 
@@ -157,11 +157,11 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		return optionActiveCleanup.get();
 	}
 
-	public BooleanProperty optionActiveCleanup() {
+	public BooleanProperty optionActiveCleanupProperty() {
 		return optionActiveCleanup;
 	}
 
-	public void setOptionActiveCleanup(boolean active) {
+	public void isOptionActiveCleanup(boolean active) {
 		this.optionActiveCleanup.set(active);
 	}
 
