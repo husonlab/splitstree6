@@ -63,8 +63,7 @@ public class RunWorkflow extends Application {
 
 	@Override
 	public void stop() {
-		System.err.println("Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
-		System.err.println("Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
+		PeakMemoryUsageMonitor.report();
 		System.exit(0);
 	}
 
@@ -110,6 +109,8 @@ public class RunWorkflow extends Application {
 		final var inputFileExtension = options.getOption("-x", "inputExt", "File extension for input files (when providing directory for input)", "");
 		final var inputRecursively = options.getOption("-r", "recursive", "Recursively visit all sub-directories (when providing directory for input)", false);
 
+		final var maxTime = options.getOption("-t", "time", "Maximum wall-clock time for program to run (e.g. 100s, 2m, 3h or 4d)", "unlimited");
+
 		final String defaultPreferenceFile;
 		if (ProgramProperties.isMacOS())
 			defaultPreferenceFile = System.getProperty("user.home") + "/Library/Preferences/SplitsTree6.def";
@@ -123,6 +124,9 @@ public class RunWorkflow extends Application {
 		options.done();
 
 		ProgramProperties.load(propertiesFile);
+
+		if (!maxTime.equals("unlimited"))
+			PeakMemoryUsageMonitor.setMaximumWallClockTime(maxTime);
 
 		if (!inputWorkflowFile.canRead())
 			throw new IOException("File not found or unreadable: " + inputWorkflowFile);

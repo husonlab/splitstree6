@@ -36,6 +36,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.phylo.PhyloTree;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -49,6 +51,7 @@ import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class GeneTreeViewPresenter {
+	private final SelectionModel<Integer> taxonSelection = new SetSelectionModel<Integer>();
 
 	Group trees = new Group();
 	Group treeSnapshots = new Group();

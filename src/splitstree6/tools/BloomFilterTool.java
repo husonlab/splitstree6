@@ -51,8 +51,7 @@ public class BloomFilterTool {
 
 			PeakMemoryUsageMonitor.start();
 			(new BloomFilterTool()).run(args);
-			System.err.println("Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
-			System.err.println("Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
+			PeakMemoryUsageMonitor.report();
 			System.exit(0);
 		} catch (Exception ex) {
 			Basic.caught(ex);

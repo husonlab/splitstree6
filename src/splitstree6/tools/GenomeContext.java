@@ -51,9 +51,8 @@ public class GenomeContext {
 
             PeakMemoryUsageMonitor.start();
             (new GenomeContext()).run(args);
-            System.err.println("Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
-            System.err.println("Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
-            System.exit(0);
+			PeakMemoryUsageMonitor.report();
+			System.exit(0);
         } catch (Exception ex) {
             Basic.caught(ex);
             System.exit(1);

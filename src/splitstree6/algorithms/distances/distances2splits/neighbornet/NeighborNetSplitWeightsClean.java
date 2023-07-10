@@ -149,7 +149,7 @@ public class NeighborNetSplitWeightsClean {
 			}
 		}
 
-		System.err.println("Completed split weight calculation in "+(System.currentTimeMillis()-before)+" ms");
+		//System.err.println("Completed split weight calculation in "+(System.currentTimeMillis()-before)+" ms");
 		return splitList;
 	}
 
@@ -241,7 +241,7 @@ public class NeighborNetSplitWeightsClean {
 			}
 		}
 
-		System.err.println("Completed split weight calculation in "+(System.currentTimeMillis()-before)+" ms");
+		//System.err.println("Completed split weight calculation in "+(System.currentTimeMillis()-before)+" ms");
 		return splitList;
 	}
 
@@ -535,7 +535,7 @@ public class NeighborNetSplitWeightsClean {
 			double pg = sumArraySquared(pgrad,n);
 
 			if (pg < params.projGradBound) {
-				System.err.println("Exiting Active set\tpg=" + pg + "\t target = "+ +params.projGradBound+"\tNumber iterations=" + k);
+				//System.err.println("Exiting Active set\tpg=" + pg + "\t target = "+ +params.projGradBound+"\tNumber iterations=" + k);
 				//System.err.println("Exiting new Active Set. numInner="+numInnerLoops+"\tnumOuter="+numOuterLoops);
 				return;
 			}

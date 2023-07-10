@@ -45,11 +45,13 @@ import jloda.util.CanceledException;
 import jloda.util.StringUtils;
 import jloda.util.Triplet;
 import jloda.util.progress.ProgressListener;
+
 import splitstree6.algorithms.utils.SplitsUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Compatibility;
 import splitstree6.data.parts.Taxon;
+
 import splitstree6.layout.splits.algorithms.ConvexHull;
 import splitstree6.layout.splits.algorithms.EqualAngle;
 import splitstree6.layout.splits.algorithms.PhylogeneticOutline;

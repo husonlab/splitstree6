@@ -32,7 +32,7 @@ import java.util.ArrayList;
  * David Bryant and Daniel Huson, 2.2023
  */
 public class NeighborNetCycle2023 {
-	private static boolean verbose = false;
+	private static boolean verbose = true;
 
 	/**
 	 * computes the circular ordering
@@ -168,8 +168,11 @@ public class NeighborNetCycle2023 {
 
 			assert pair != null;
 
+			System.err.println("pair: " + pair + " " + components.get(pair.getFirst()).size() + " vs " + components.get(pair.getSecond()).size());
+
 			if (components.get(pair.getFirst()).size() > components.get(pair.getSecond()).size()) {
 				pair = new Pair<>(pair.getSecond(), pair.getFirst());
+				System.err.println("swapped: " + pair);
 			}
 			return pair;
 		}

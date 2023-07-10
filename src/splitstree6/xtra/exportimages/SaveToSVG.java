@@ -365,11 +365,17 @@ public class SaveToSVG {
 			buf.append(" fill=\"%s\"".formatted(asSvgColor(color)));
 		if (angle != 0) {
 			buf.append(" transform=\"rotate(%.1f %.2f %.2f)\"".formatted(angle, x, y));
-			//buf.append(" transform=\"rotate(%.1f)\"".formatted(angle));
 		}
 		buf.append(">");
 		buf.append(text.replaceAll("&", " &amp;"));
 		buf.append("</text>\n");
+	}
+
+	public static void appendImage(StringBuilder buf, double x, double y, double width, double height, Image image) {
+		var encoder = new PngEncoderFX(image);
+		var base64Data = Base64.getEncoder().encodeToString(encoder.pngEncode(true));
+		buf.append("<image xlink:href=\"data:image/png;base64,").append(base64Data).append("\"");
+		buf.append(" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\"/>\n".formatted(x, y, width, height));
 	}
 
 	private static Object getSVGFontName(String fontFamily) {
@@ -383,14 +389,6 @@ public class SaveToSVG {
 		else // if(fontFamily.startsWith("arial") || fontFamily.startsWith("helvetica") || fontFamily.startsWith("system"))
 			return "Helvetica";
 	}
-
-	public static void appendImage(StringBuilder buf, double x, double y, double width, double height, Image image) {
-		var encoder = new PngEncoderFX(image);
-		var base64Data = Base64.getEncoder().encodeToString(encoder.pngEncode(true));
-		buf.append("<image href=\"data:image/png;base64,").append(base64Data).append("\"");
-		buf.append(" x=\"%.2f\" y=\"%.2f\" width=\"%.2f\" height=\"%.2f\"/>\n".formatted(x, y, width, height));
-	}
-
 
 	public static Rectangle2D computeBoundingBox(Node pane) {
 		double minX = Double.MAX_VALUE;

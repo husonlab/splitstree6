@@ -47,6 +47,7 @@ public class ExtractSmallerMatrices {
 
 			PeakMemoryUsageMonitor.start();
 			(new ExtractSmallerMatrices()).run(args);
+			PeakMemoryUsageMonitor.report();
 			System.err.println("Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
 			System.err.println("Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
 			System.exit(0);
@@ -99,7 +100,7 @@ public class ExtractSmallerMatrices {
 					System.err.printf("Finishing early: specified size (%d) exceeds input size (%d)%n", size, taxaBlock.getNtax());
 				}
 				for (var r = 1; r <= replicates; r++) {
-					var outputFile = output.replaceAll("%s", String.format("s%03d", size)).replaceAll("%r", String.format("r%03d", r));
+					var outputFile = output.replaceAll("%s", String.format("s%04d", size)).replaceAll("%r", String.format("r%04d", r));
 					var subTaxa = BitSetUtils.randomSubset(size, random, taxaBlock.getTaxaSet());
 					var subTaxaBlock = new TaxaBlock();
 					for (var t : BitSetUtils.members(subTaxa)) {
