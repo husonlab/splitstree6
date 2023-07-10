@@ -54,6 +54,9 @@ public class InputEditorTab extends ViewTab {
 
 	public void importFromFile(String fileName) {
 		inputEditorView.importFromFile(fileName);
+		Platform.runLater(() -> {
+			inputEditorView.getController().getCodeArea().getUndoManager().forgetHistory();
+		});
 	}
 }
 
