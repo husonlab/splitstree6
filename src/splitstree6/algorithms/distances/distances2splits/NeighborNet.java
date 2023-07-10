@@ -91,7 +91,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		else
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.SPLITSTREE4;
 
-		ArrayList<ASplit> splits, splits2;
+		ArrayList<ASplit> splits;
 		if (getOptionInferenceAlgorithm() != InferenceAlgorithm.SplitsTree4) {
 			//splits = NeighborNetSplitWeightsClean.compute(cycle, distancesBlock.getDistances(), params, progress);
 			splits = NeighborNetSplitWeightsClean.computeUse1D(cycle, distancesBlock.getDistances(), params, progress);
