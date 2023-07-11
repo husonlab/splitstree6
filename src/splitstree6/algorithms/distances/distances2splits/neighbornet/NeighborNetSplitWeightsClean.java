@@ -412,7 +412,7 @@ public class NeighborNetSplitWeightsClean {
 	 * Implement the active set method for minimizing ||Ax-d|| over non-negative x.
 	 * @param x starting value - assumed feasible. Overwritten by solution.
 	 * @param d vector of distances
-	 * @param params method parameters. We use the following:
+	 * @param params method parameters.
 	 *
 	 * @param progress pointer to progress bar.
 	 * @throws CanceledException  User cancels calculation.
@@ -441,10 +441,7 @@ public class NeighborNetSplitWeightsClean {
 
 				boolean xstarFeasible = feasibleMoveActiveSet(x, xstar, activeSet, params);
 
-				if (params.printResiduals) {
-					params.log.print("\t" + k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + evalProjectedGradientSquared(x, d) + "\t" + (n * (n - 1) / 2 - cardinality(activeSet)));
-					params.log.println();
-				}
+
 
 				if (xstarFeasible && numIterations < params.cgnrIterations)
 					break;
@@ -484,6 +481,8 @@ public class NeighborNetSplitWeightsClean {
 
 	static public void activeSetMethod(double[] x, double[] d, int n, NNLSParams params, ProgressListener progress) throws CanceledException {
 
+		var startTime = System.currentTimeMillis();
+
 		int npairs = n*(n-1)/2;
 		boolean[] activeSet = new boolean[npairs];
 		getActiveEntries(x, activeSet);
@@ -505,6 +504,11 @@ public class NeighborNetSplitWeightsClean {
 					progress.checkForCancel();
 
 				boolean xstarFeasible = feasibleMoveActiveSet(x, xstar, activeSet, scratchInt,scratchInteger,scratch[0],n, params);
+
+				if (params.printResiduals) {
+					params.log.print("\t" + k + "\t"+params.cgnrIterations+"\t" + params.activeSetRho+"\t"+(System.currentTimeMillis() - startTime) + "\t" + evalProjectedGradientSquared(x, d,scratch[0],scratch[1],n) + "\t" + numberNonzero(x));
+					params.log.println();
+				}
 
 				if (xstarFeasible && numIterations < params.cgnrIterations)
 					break;
@@ -709,6 +713,9 @@ public class NeighborNetSplitWeightsClean {
 	 * @throws CanceledException   User presses cancel
 	 */
 	static public void gradientProjection(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
+
+		var startTime = System.currentTimeMillis();
+
 		var n = x.length - 1;
 		double[][] p = new double[n + 1][n + 1];
 
@@ -723,6 +730,10 @@ public class NeighborNetSplitWeightsClean {
 				progress.checkForCancel();
 
 			double pg = evalProjectedGradientSquared(x, d);
+
+			if (params.printResiduals) {
+				System.err.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg+"\t"+numberNonzero(x));
+			}
 //			System.err.print("X=");
 //			for(int i=1;i<=n;i++)
 //				for(int j=i+1;j<=n;j++)
@@ -742,7 +753,7 @@ public class NeighborNetSplitWeightsClean {
 
 	static public void gradientProjection(double[] x, double[] d, int n, NNLSParams params, ProgressListener progress) throws CanceledException {
 		var npairs = n*(n-1)/2;
-
+		var startTime = System.currentTimeMillis();
 		double[] p = new double[npairs];
 		double[][] scratch = new double[2][npairs];
 
@@ -764,6 +775,11 @@ public class NeighborNetSplitWeightsClean {
 				progress.checkForCancel();
 
 			double pg = evalProjectedGradientSquared(x, d, scratch[0],scratch[1], n);
+			if (params.printResiduals) {
+				params.log.print("\t" + k +"\t"+(System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + numberNonzero(x));
+				params.log.println();
+			}
+
 			//System.err.println("k="+k+"\tNew pg = "+pg);
 
 			if (pg < params.projGradBound) {
@@ -1051,7 +1067,7 @@ public class NeighborNetSplitWeightsClean {
 
 			double pg = evalProjectedGradientSquared(x, d);
 			if (params.printResiduals && k % 10 == 0) {
-				params.log.println("\t" + k + "\t" +  pg + "\t" + (numberNonzero(x)));
+				params.log.println("\t" + k + "\t" +  params.APGDtheta + "\t"+pg + "\t" + (numberNonzero(x)));
 			}
 			if (pg < params.projGradBound || k >= params.maxIterations) {
 				System.err.println("Exiting (old) AGPD\tpg="+pg+"\tk="+k);
@@ -1066,6 +1082,7 @@ public class NeighborNetSplitWeightsClean {
 
 	static public void APGD(double[] x, double[] d, int n, NNLSParams params, ProgressListener progress) throws CanceledException {
 		var npairs = n*(n-1)/2;
+		var startTime = System.currentTimeMillis();
 
 		zeroNegativeEntries(x);
 		double[] scratch = new double[npairs];
@@ -1114,7 +1131,7 @@ public class NeighborNetSplitWeightsClean {
 
 			double pg = evalProjectedGradientSquared(x, d, g, scratch, n);
 			if (params.printResiduals && k % 10 == 0) {
-				params.log.println("\t" + k + "\t"  + pg + "\t" + (numberNonzero(x)));
+				params.log.println("\t" + k + "\t"  + pg + "\t" + (System.currentTimeMillis() - startTime) + "\t" + (numberNonzero(x)));
 			}
 			if (pg < params.projGradBound || k >= params.maxIterations) {
 				System.err.println("Exiting AGPD\tpg=" + pg + "\tk=" + k);
