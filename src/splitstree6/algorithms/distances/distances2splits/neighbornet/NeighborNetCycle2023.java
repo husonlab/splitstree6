@@ -93,8 +93,8 @@ public class NeighborNetCycle2023 {
                     if (i != ip && i != iq) {
                         for (var r : components.get(i).values()) {
                             if (r != p && r != q && r != qb) { // this 'if' should be superfluous
-                                D[p][r] = D[r][p] = (2.0 * D[p][r] + D[qb][r]) / 3.0;
-                                D[qb][r] = D[r][qb] = (2.0 * D[q][r] + D[qb][r]) / 3.0;
+                                D[p][r] = D[r][p] = (2.0 * D[p][r] + D[q][r]) / 3.0;
+                                D[qb][r] = D[r][qb] = (2.0 * D[qb][r] + D[q][r]) / 3.0;
                             }
                         }
                     }

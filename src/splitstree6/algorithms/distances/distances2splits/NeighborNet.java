@@ -50,7 +50,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	private final BooleanProperty optionActiveCleanup = new SimpleBooleanProperty(this, "optionActiveCleanup", false);
 
 	public List<String> listOptions() {
-		return List.of(optionInferenceAlgorithm.getName()/*, optionThreshold.getName(),*/ /*optionCircularOrdering.getName(), */ /*optionActiveCleanup.getName()*/);
+		return List.of(optionInferenceAlgorithm.getName()/*, optionThreshold.getName()*/ /*, optionCircularOrdering.getName()*/ /*, optionActiveCleanup.getName()*/);
 	}
 
 	@Override
