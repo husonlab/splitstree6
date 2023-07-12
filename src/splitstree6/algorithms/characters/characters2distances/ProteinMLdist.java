@@ -24,7 +24,9 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.fx.window.NotificationManager;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 import splitstree6.data.CharactersBlock;
@@ -77,9 +79,6 @@ public class ProteinMLdist extends Characters2Distances {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-
-		boolean hasSaturated = false;
-
 		int ntax = charactersBlock.getNtax();
 		int npairs = ntax * (ntax - 1) / 2;
 
@@ -94,36 +93,33 @@ public class ProteinMLdist extends Characters2Distances {
         /*if (model == null) {
             throw new SplitsException("Incorrect model name");
         }*/
-		int k = 0;
+		var maxValue = 0.0;
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
-				final PairwiseCompare seqPair = new PairwiseCompare(charactersBlock, s, t);
-				double dist = 100.0;
+				final var seqPair = new PairwiseCompare(charactersBlock, s, t);
+				var dist = -1.0;
 
 				//Maximum likelihood distance. Note we want to ignore sites
 				//with the stop codon.
 				try {
 					dist = seqPair.mlDistance(model);
-				} catch (SaturatedDistancesException e) {
-					hasSaturated = true;
+				} catch (SaturatedDistancesException ignored) {
 				}
 
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
 
-				double var = seqPair.bulmerVariance(dist, 0.93);
-				distancesBlock.setVariance(s, t, var);
-				distancesBlock.setVariance(t, s, var);
-
-				k++;
+				if (dist != -1.0) {
+					var variance = seqPair.bulmerVariance(dist, 0.93);
+					distancesBlock.setVariance(s, t, variance);
+					distancesBlock.setVariance(t, s, variance);
+				}
 				progress.incrementProgress();
 			}
 		}
 
-		progress.close();
-		if (hasSaturated) {
-			NotificationManager.showWarning("Proceed with caution: saturated or missing entries in the distance matrix");
-		}
+		FixUndefinedDistances.apply(distancesBlock);
+		progress.reportTaskCompleted();
 	}
 
 	@Override

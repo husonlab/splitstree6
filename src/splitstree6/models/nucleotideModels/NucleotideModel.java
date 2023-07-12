@@ -29,7 +29,9 @@ import Jama.EigenvalueDecomposition;
 import Jama.Matrix;
 import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 import splitstree6.algorithms.utils.SplitsException;
@@ -413,53 +415,47 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	 *
 	 * @param progress used to display the progress
 	 */
-	public void apply(ProgressListener progress, CharactersBlock characters, DistancesBlock distances, boolean useML) throws SplitsException, CanceledException {
+	public void apply(ProgressListener progress, CharactersBlock characters, DistancesBlock distancesBlock, boolean useML) throws SplitsException, CanceledException {
 		final int ntax = characters.getNtax();
-		distances.setNtax(ntax);
+		distancesBlock.setNtax(ntax);
 		progress.setMaximum(ntax);
-
-		int numMissing = 0;
 
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
 				final PairwiseCompare seqPair = new PairwiseCompare(characters, s, t);
-				double dist = 100.0;
+				double dist = -1.0;
 
 				if (useML) {
 					//Maximum likelihood distance
 					try {
 						dist = seqPair.mlDistance(this);
 					} catch (SaturatedDistancesException e) {
-						numMissing++;
 					}
 				} else {
 					//Exact distance
 					final double[][] F = seqPair.getF();
-					if (F == null)
-						numMissing++;
-					else {
+					if (F != null) {
 						try {
 							dist = exactDistance(F);
-						} catch (SaturatedDistancesException e) {
-							numMissing++;
+						} catch (SaturatedDistancesException ignored) {
 						}
 					}
 				}
 
-				distances.set(s, t, dist);
-				distances.set(t, s, dist);
+				distancesBlock.set(s, t, dist);
+				distancesBlock.set(t, s, dist);
 
-				final double var = seqPair.bulmerVariance(dist, 0.75);
-				distances.setVariance(s, t, var);
-				distances.setVariance(t, s, var);
+				if (dist != -1) {
+					final double var = seqPair.bulmerVariance(dist, 0.75);
+					distancesBlock.setVariance(s, t, var);
+					distancesBlock.setVariance(t, s, var);
+				}
 			}
 			progress.incrementProgress();
 		}
-		progress.close();
 
-		if (numMissing > 0) {
-			NotificationManager.showWarning("Proceed with caution: " + numMissing + " saturated or missing entries in the distance matrix");
-		}
+		FixUndefinedDistances.apply(distancesBlock);
+		progress.reportTaskCompleted();
 	}
 
 	/**

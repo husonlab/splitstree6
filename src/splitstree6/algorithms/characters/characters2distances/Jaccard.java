@@ -48,9 +48,6 @@ public class Jaccard extends Characters2Distances {
 		progress.setTasks("Jaccard distance", "Init.");
 		progress.setMaximum(ntax);
 
-		double maxDist = 0.0;
-		int numUndefined = 0;
-
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
 				//System.err.println(s+","+t);
@@ -59,32 +56,23 @@ public class Jaccard extends Characters2Distances {
 
 				var dist = -1.0;
 
-				if (F == null) {
-					numUndefined++;
-				} else {
+				if (F != null) {
 					double b = F[1][0];
 					double c = F[0][1];
 					double a = F[1][1];
 
-					if (a + b + c <= 0.0) {
-						numUndefined++;
-					} else {
+					if (a + b + c > 0.0) {
 						dist = 1.0 - 2 * a / (2 * a + b + c);
 					}
-
 				}
-
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
-				if (dist > maxDist)
-					maxDist = dist;
 			}
 			progress.incrementProgress();
 		}
-		if (numUndefined > 0)
-			FixUndefinedDistances.apply(ntax, maxDist, distancesBlock);
 
-		progress.close();
+		FixUndefinedDistances.apply(distancesBlock);
+		progress.reportTaskCompleted();
 	}
 
 	@Override

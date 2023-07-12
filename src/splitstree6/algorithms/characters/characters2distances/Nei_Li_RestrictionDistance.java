@@ -62,8 +62,6 @@ public class Nei_Li_RestrictionDistance extends Characters2Distances {
 		progress.setTasks("Nei Li (1979) Restriction Site Distance", "Init.");
 		progress.setMaximum(ntax);
 
-		double maxDist = 0.0;
-		int numUndefined = 0;
 
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
@@ -71,36 +69,29 @@ public class Nei_Li_RestrictionDistance extends Characters2Distances {
 				PairwiseCompare seqPair = new PairwiseCompare(charactersBlock, s, t);
 				final double[][] F = seqPair.getF();
 				double dist = -1.0;
-				if (F == null)
-					numUndefined++;
-				else {
+				if (F != null) {
 					final double ns = F[1][0] + F[1][1];
 					final double nt = F[0][1] + F[1][1];
 					final double nst = F[1][1];
 
 					if (nst == 0) {
 						dist = -1;
-						numUndefined++;
 					} else {
 						final double s_hat = 2.0 * nst / (ns + nt);
 						final double a = (4.0 * Math.pow(s_hat, 1.0 / (2 * getOptionRestrictionSiteLength())) - 1.0) / 3.0;
 						if (a <= 0.0) {
 							dist = -1;
-							numUndefined++;
 						} else
 							dist = -1.5 * Math.log(a);
 					}
 				}
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
-				if (dist > maxDist)
-					maxDist = dist;
 
 			}
 			progress.incrementProgress();
 		}
-		if (numUndefined > 0)
-			FixUndefinedDistances.apply(ntax, maxDist, distancesBlock);
+		FixUndefinedDistances.apply(distancesBlock);
 
 		progress.close();
 	}

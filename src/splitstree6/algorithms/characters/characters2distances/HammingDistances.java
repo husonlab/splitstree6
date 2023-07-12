@@ -25,7 +25,9 @@ import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.util.Counter;
 import jloda.util.Single;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
@@ -35,6 +37,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.DoubleAccumulator;
+import java.util.concurrent.atomic.LongAccumulator;
 
 /**
  * hamming distances
@@ -62,18 +66,17 @@ public class HammingDistances extends Characters2Distances {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distances) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distancesBlock) throws IOException {
 		progress.setMaximum(((long) taxa.getNtax() * taxa.getNtax()) / 2 - taxa.getNtax());
 
-		distances.setNtax(characters.getNtax());
+		distancesBlock.setNtax(characters.getNtax());
 
 		var service = Executors.newFixedThreadPool(ProgramExecutorService.getNumberOfCoresToUse());
 
-		var numMissing = new Counter();
 		var exception = new Single<IOException>(null);
+		final int ntax = taxa.getNtax();
 
 		try {
-			final int ntax = taxa.getNtax();
 			for (int s0 = 1; s0 <= ntax; s0++) {
 				for (int t0 = s0 + 1; t0 <= ntax; t0++) {
 					final var s = s0;
@@ -82,22 +85,21 @@ public class HammingDistances extends Characters2Distances {
 						if (exception.isNull()) {
 							try {
 								final PairwiseCompare seqPair = new PairwiseCompare(characters, s, t);
-								var p = 1.0;
+								var dist = -1.0;
 
 								final var F = seqPair.getF();
 
-								if (F == null) {
-									numMissing.increment();
-								} else {
+								if (F != null) {
+									var p = 1.0;
 									for (var x = 0; x < seqPair.getNumStates(); x++) {
 										p = p - F[x][x];
 									}
-
 									if (!isOptionNormalize())
 										p = Math.round(p * seqPair.getNumNotMissing());
+									dist = p;
 								}
-								distances.set(s, t, p);
-								distances.set(t, s, p);
+								distancesBlock.set(s, t, dist);
+								distancesBlock.set(t, s, dist);
 								progress.incrementProgress();
 							} catch (IOException ex) {
 								exception.setIfCurrentValueIsNull(ex);
@@ -117,8 +119,8 @@ public class HammingDistances extends Characters2Distances {
 		if (exception.isNotNull())
 			throw exception.get();
 
-		if (numMissing.get() > 0)
-			NotificationManager.showWarning("Proceed with caution: " + numMissing + " saturated or missing entries in the distance matrix");
+		FixUndefinedDistances.apply(distancesBlock);
+		progress.reportTaskCompleted();
 	}
 
 	public boolean isOptionNormalize() {
