@@ -116,7 +116,7 @@ public class ImportManager {
 	}
 
 	public Collection<? extends String> getAllFileFormats(String file) {
-		final Set<String> set = new TreeSet<>();
+		final var set = new TreeSet<String>();
 		for (var reader : getReaders(file)) {
 			set.add(getFileFormat(reader));
 		}

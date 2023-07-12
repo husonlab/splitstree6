@@ -73,11 +73,7 @@
         </modulePath>
       </java>
       <iconImageFiles>
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-16.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-32.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-48.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-64.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-128.png" />
+        <file path="../src/splitstree6/resources/icons/SplitsTree6-512.png" />
       </iconImageFiles>
     </launcher>
   </launchers>

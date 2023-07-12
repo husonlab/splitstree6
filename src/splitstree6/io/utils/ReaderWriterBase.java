@@ -20,6 +20,7 @@
 package splitstree6.io.utils;
 
 import javafx.stage.FileChooser;
+import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 
 import java.util.ArrayList;
@@ -47,7 +48,7 @@ public class ReaderWriterBase {
 	}
 
 	public boolean accepts(String file) {
-		if (fileExtensions.size() == 0 || file.endsWith(".tmp"))
+		if (fileExtensions.size() == 0 || file.endsWith(".tmp") || FileUtils.getFileSuffix(file).length() > 4)
 			return true;
 		else {
 			for (var ex : fileExtensions) {
