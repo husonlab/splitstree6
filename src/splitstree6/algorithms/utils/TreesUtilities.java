@@ -30,6 +30,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.ASplit;
 import splitstree6.data.parts.BiPartition;
 import splitstree6.data.parts.Compatibility;
+import splitstree6.view.trees.treeview.TreeEmbeddingOptimizer;
 
 import java.util.*;
 import java.util.function.Function;
@@ -379,17 +380,26 @@ public class TreesUtilities {
 					stack.pop();
 					var cluster = BitSetUtils.asBitSet(tree.getTaxa(v));
 					for (var w : v.children()) {
-						cluster.or(nodeClusterMap.get(w));
-					}
-					nodeClusterMap.put(v, cluster);
-				}
-			}
-		}
-		tree.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
-		return nodeClusterMap;
-	}
+                        cluster.or(nodeClusterMap.get(w));
+                    }
+                    nodeClusterMap.put(v, cluster);
+                }
+            }
+        }
+        tree.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
+        return nodeClusterMap;
+    }
 
-	private static record WeightConfidence(double weight, double confidence) {
-	}
+    /**
+     * collects all hardwired clusters contained in the tree.
+     */
+    public static Set<BitSet> collectAllHardwiredClusters(PhyloTree tree) {
+        var clusters = new HashSet<BitSet>();
+        TreeEmbeddingOptimizer.collectAllHardwiredClustersRec(tree, tree.getRoot(), clusters);
+        return clusters;
+    }
+
+    private static record WeightConfidence(double weight, double confidence) {
+    }
 
 }

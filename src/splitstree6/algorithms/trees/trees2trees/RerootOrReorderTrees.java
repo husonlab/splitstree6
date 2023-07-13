@@ -40,6 +40,7 @@ import splitstree6.algorithms.utils.RerootingUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.utils.Stabilizer;
 import splitstree6.workflow.AlgorithmNode;
 
 import java.util.*;
@@ -53,7 +54,7 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 
 	public enum RearrangeBy {Off, RotateChildren, RotateSubTrees, ReverseChildren, ReverseSubTrees}
 
-	public enum Reorder {Off, ByTaxa, Lexicographically, ReverseOrder, LadderizedUp, LadderizedDown, LadderizedRandom}
+	public enum Reorder {Off, ByTaxa, Lexicographically, ReverseOrder, LadderizedUp, LadderizedDown, LadderizedRandom, Stabilize}
 
 	private final ObjectProperty<RootBy> optionRootBy = new SimpleObjectProperty<>(this, "optionRootBy", RootBy.Off);
 
@@ -257,6 +258,13 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 							v.rearrangeAdjacentEdges(list);
 						});
 					}, ProgramExecutorService.getNumberOfCoresToUse());
+				} catch (Exception ignored) {
+				}
+			} else if (getOptionReorder() == Reorder.Stabilize) {
+				var stabilizer = new Stabilizer();
+				stabilizer.setup(trees);
+				try {
+					stabilizer.apply(trees);
 				} catch (Exception ignored) {
 				}
 			}
