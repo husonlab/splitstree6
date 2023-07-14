@@ -143,13 +143,13 @@ public class TreePane extends StackPane {
 				}
 				case Confidence -> {
 					if (phyloTree.hasEdgeConfidences())
-						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeConfidences().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getConfidence(e)) : null));
+						phyloTree.edgeStream().filter(e -> !e.getTarget().isLeaf()).forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeConfidences().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getConfidence(e)) : null));
 					else
 						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
 				}
 				case Probability -> {
 					if (phyloTree.hasEdgeProbabilities())
-						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeProbabilities().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getProbability(e)) : null));
+						phyloTree.edgeStream().filter(e -> !e.getTarget().isLeaf()).forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeProbabilities().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getProbability(e)) : null));
 					else
 						phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
 				}

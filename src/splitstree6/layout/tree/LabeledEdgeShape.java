@@ -31,7 +31,9 @@ public class LabeledEdgeShape extends Group {
 	private RichTextLabel label;
 
 	public LabeledEdgeShape() {
+
 		getStyleClass().add("graph-edge");
+		label.setStyle("-fx-display-caret: false;");
 	}
 
 	public LabeledEdgeShape(Shape shape) {

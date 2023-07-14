@@ -113,7 +113,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 	}
 
 	public void importFromFile(String fileName) {
-		try (FileLineIterator it = new FileLineIterator(fileName)) {
+		try (var it = new FileLineIterator(fileName)) {
 			replaceText(StringUtils.toString(it.lines(), "\n"));
 			var name = FileUtils.getFileBaseName(fileName);
 			mainWindow.setFileName(name);

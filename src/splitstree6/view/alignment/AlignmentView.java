@@ -378,8 +378,8 @@ public class AlignmentView implements IView {
 	}
 
 	@Override
-	public Node getImageNode() {
-		return PrintUtils.createImage(controller.getInnerAnchorPane(), null);
+	public Node getMainNode() {
+		return controller.getInnerAnchorPane();
 	}
 
 	@Override

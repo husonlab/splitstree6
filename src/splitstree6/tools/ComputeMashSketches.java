@@ -48,11 +48,9 @@ public class ComputeMashSketches {
 		try {
 			ProgramProperties.setProgramName("ComputeMashSketches");
 			ProgramProperties.setProgramVersion(splitstree6.main.Version.SHORT_DESCRIPTION);
-
 			PeakMemoryUsageMonitor.start();
 			(new ComputeMashSketches()).run(args);
-			System.err.println("Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
-			System.err.println("Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
+			PeakMemoryUsageMonitor.report();
 			System.exit(0);
 		} catch (Exception ex) {
 			Basic.caught(ex);

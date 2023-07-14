@@ -41,7 +41,7 @@ public interface IView extends IOptionsCarrier {
 
 	ReadOnlyBooleanProperty emptyProperty();
 
-	Node getImageNode();
+	Node getMainNode();
 
 	void clear();
 

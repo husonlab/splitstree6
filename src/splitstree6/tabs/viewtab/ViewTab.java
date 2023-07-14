@@ -129,8 +129,8 @@ public class ViewTab extends Tab implements IDisplayTab {
 	}
 
 	@Override
-	public Node getImageNode() {
-		return getView() == null ? null : getView().getImageNode();
+	public Node getMainNode() {
+		return getView() == null ? null : getView().getMainNode();
 	}
 
 	@Override

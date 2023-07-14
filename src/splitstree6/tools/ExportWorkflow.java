@@ -61,9 +61,8 @@ public class ExportWorkflow extends Application {
 
     @Override
     public void stop() {
-        System.err.println("Total time:  " + PeakMemoryUsageMonitor.getSecondsSinceStartString());
-        System.err.println("Peak memory: " + PeakMemoryUsageMonitor.getPeakUsageString());
-        System.exit(0);
+        PeakMemoryUsageMonitor.report();
+		System.exit(0);
     }
 
     /**

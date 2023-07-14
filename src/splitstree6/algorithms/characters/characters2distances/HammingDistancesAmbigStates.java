@@ -24,7 +24,9 @@ import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.fx.window.NotificationManager;
+import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
@@ -61,17 +63,16 @@ public class HammingDistancesAmbigStates extends Characters2Distances {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distances) throws IOException {
+	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distancesBlock) throws IOException {
 		progress.setMaximum(taxa.getNtax());
 
-		distances.setNtax(characters.getNtax());
+		distancesBlock.setNtax(characters.getNtax());
 
 		if (optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.MatchStates)
 			&& characters.getDataType().isNucleotides() && characters.isHasAmbiguityCodes())
-			computeMatchStatesHamming(taxa, characters, distances);
+			computeMatchStatesHamming(taxa, characters, distancesBlock);
 		else {
 			// all the same here
-			int numMissing = 0;
 			final int ntax = taxa.getNtax();
 			for (int s = 1; s <= ntax; s++) {
 				for (int t = s + 1; t <= ntax; t++) {
@@ -82,28 +83,28 @@ public class HammingDistancesAmbigStates extends Characters2Distances {
 					else
 						seqPair = new PairwiseCompare(characters, s, t, false);
 
-					double p = 1.0;
 
 					final double[][] F = seqPair.getF();
 
-					if (F == null) {
-						numMissing++;
-					} else {
+					var dist = -1.0;
+					if (F != null) {
+						var p = 1.0;
 						for (int x = 0; x < seqPair.getNumStates(); x++) {
 							p = p - F[x][x];
 						}
 
 						if (!isOptionNormalize())
 							p = Math.round(p * seqPair.getNumNotMissing());
+						dist = p;
 					}
-					distances.set(s, t, p);
-					distances.set(t, s, p);
+					distancesBlock.set(s, t, dist);
+					distancesBlock.set(t, s, dist);
 				}
 				progress.incrementProgress();
 			}
-			if (numMissing > 0)
-				NotificationManager.showWarning("Proceed with caution: " + numMissing + " saturated or missing entries in the distance matrix");
 		}
+		FixUndefinedDistances.apply(distancesBlock);
+		progress.reportTaskCompleted();
 	}
 
 	/**

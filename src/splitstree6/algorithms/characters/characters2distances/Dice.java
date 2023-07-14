@@ -52,44 +52,30 @@ public class Dice extends Characters2Distances {
 		progress.setTasks("Dice distance", "Init.");
 		progress.setMaximum(ntax);
 
-		double maxDist = 0.0;
-		int numUndefined = 0;
-
-		for (int s = 1; s <= ntax; s++) {
-			for (int t = s + 1; t <= ntax; t++) {
+		for (var s = 1; s <= ntax; s++) {
+			for (var t = s + 1; t <= ntax; t++) {
 				var seqPair = new PairwiseCompare(charactersBlock, s, t);
-				double dist;
+				var dist = -1.0;
+				var F = seqPair.getF();
+				if (F != null) {
 
-				double[][] F = seqPair.getF();
-				if (F == null) {
-					numUndefined++;
-					dist = -1;
-				} else {
+					var b = F[1][0];
+					var c = F[0][1];
+					var a = F[1][1];
 
-					double b = F[1][0];
-					double c = F[0][1];
-					double a = F[1][1];
-
-					if (2 * a + b + c <= 0.0) {
-						numUndefined++;
-						dist = -1;
-					} else {
+					if (2 * a + b + c > 0.0) {
 						dist = 1.0 - 2.0 * a / (2.0 * a + b + c);
 					}
 				}
 
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
-				if (dist > maxDist)
-					maxDist = dist;
 			}
 			progress.incrementProgress();
 		}
 
-		if (numUndefined > 0)
-			FixUndefinedDistances.apply(ntax, maxDist, distancesBlock);
-
-		progress.close();
+		FixUndefinedDistances.apply(distancesBlock);
+		progress.reportTaskCompleted();
 	}
 
 	@Override

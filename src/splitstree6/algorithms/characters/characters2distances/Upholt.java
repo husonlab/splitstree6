@@ -62,9 +62,6 @@ public class Upholt extends Characters2Distances {
 		progress.setTasks("Upholt distance", "Init.");
 		progress.setMaximum(ntax);
 
-		double maxDist = 0.0;
-		int numUndefined = 0;
-
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
 				//System.err.println(s+","+t);
@@ -72,35 +69,25 @@ public class Upholt extends Characters2Distances {
 				double[][] F = seqPair.getF();
 				double dist = -1.0;
 
-				if (F == null)
-					numUndefined++;
-				else {
+				if (F != null) {
 
 					double ns = F[1][0] + F[1][1];
 					double nt = F[0][1] + F[1][1];
 					double nst = F[1][1];
 
-					if (nst == 0) {
-						numUndefined++;
-						dist = -1;
-					} else {
+					if (nst != 0) {
 						double s_hat = 2.0 * nst / (ns + nt);
 						dist = -Math.log(s_hat) / getOptionRestrictionSiteLength();
 					}
-
 				}
-
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
-				if (dist > maxDist)
-					maxDist = dist;
 			}
 			progress.incrementProgress();
 		}
-		if (numUndefined > 0)
-			FixUndefinedDistances.apply(ntax, maxDist, distancesBlock);
+		FixUndefinedDistances.apply(distancesBlock);
 
-		progress.close();
+		progress.reportTaskCompleted();
 	}
 
 	@Override

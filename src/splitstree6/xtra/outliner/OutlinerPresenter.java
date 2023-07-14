@@ -23,6 +23,14 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.geometry.Bounds;
+import javafx.scene.Node;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -42,6 +50,12 @@ public class OutlinerPresenter {
 
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
 
+		controller.getCopyMenuItem().setOnAction(e -> {
+			var clipboardContent = new ClipboardContent();
+			clipboardContent.putImage(createImage(controller.getStackPane()));
+			Clipboard.getSystemClipboard().setContent(clipboardContent);
+		});
+
 		controller.getReferenceCheckbox().selectedProperty().addListener(e -> redraw(outliner));
 		controller.getReferenceCheckbox().disableProperty().bind(emptyProperty);
 
@@ -50,6 +64,8 @@ public class OutlinerPresenter {
 
 		controller.getRedrawButton().setOnAction(e -> redraw(outliner));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);
+
+		controller.getOutlineTreeToggleButton().selectedProperty().addListener(e -> redraw(outliner));
 
 	}
 
@@ -61,8 +77,12 @@ public class OutlinerPresenter {
 			var width = outliner.getStage().getWidth() - 10;
 			var height = outliner.getStage().getHeight() - 80;
 			controller.getStackPane().getChildren().clear();
-			controller.getStackPane().getChildren().add(ComputeOutlineAndReferenceTree.apply(model, controller.getReferenceCheckbox().isSelected(),
-					controller.getOthersCheckBox().isSelected(), width, height));
+			if (controller.getOutlineTreeToggleButton().isSelected()) {
+				controller.getStackPane().getChildren().add(OutlineTree.apply(model, width, height));
+			} else {
+				controller.getStackPane().getChildren().add(ComputeOutlineAndReferenceTree.apply(model, controller.getReferenceCheckbox().isSelected(),
+						controller.getOthersCheckBox().isSelected(), width, height));
+			}
 		} catch (Exception ex) {
 			controller.getLabel().setText("Error: " + ex.getMessage());
 		}
@@ -100,5 +120,11 @@ public class OutlinerPresenter {
 			service.start();
 
 		}
+	}
+
+	private Image createImage(Node node) {
+		var parameters = new SnapshotParameters();
+		parameters.setTransform(javafx.scene.transform.Transform.scale(2, 2));
+		return node.snapshot(parameters, null);
 	}
 }

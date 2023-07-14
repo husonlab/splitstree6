@@ -213,8 +213,8 @@ public class SplitsView implements IView {
 	}
 
 	@Override
-	public Node getImageNode() {
-		return PrintUtils.createImage(controller.getInnerAnchorPane(), controller.getScrollPane());
+	public Node getMainNode() {
+		return controller.getInnerAnchorPane();
 	}
 
 	@Override

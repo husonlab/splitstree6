@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.5" transformSequenceNumber="10">
+<install4j version="10.0.6" transformSequenceNumber="10">
   <directoryPresets config="../tools/bfilter-tool" />
   <application name="SplitsTreeCE" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeCE" publisher="Daniel Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_beta" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
@@ -13,7 +13,7 @@
         <entry>sqlite-jdbc-*</entry>
       </macSearchedJars>
     </codeSigning>
-    <jreBundles jdkProviderId="Liberica" release="18/18.0.2.1+1">
+    <jreBundles jdkProviderId="Liberica" release="20/20.0.1+10">
       <modules />
     </jreBundles>
   </application>
@@ -73,11 +73,7 @@
         </modulePath>
       </java>
       <iconImageFiles>
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-16.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-32.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-48.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-64.png" />
-        <file path="../src/splitstree6/resources/icons/SplitsTree6-128.png" />
+        <file path="../src/splitstree6/resources/icons/SplitsTree6-512.png" />
       </iconImageFiles>
     </launcher>
   </launchers>

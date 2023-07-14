@@ -28,6 +28,7 @@ import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.view.trees.tanglegram.optimize.LSATree;
 
 import java.util.*;
@@ -55,7 +56,7 @@ public class TreeEmbeddingOptimizer {
 					else
 						count += (pqTree.accept(cluster) ? 1 : 0);
 				}
-				var hardwiredClusters = collectAllHardwiredClusters(tree);
+				var hardwiredClusters = TreesUtilities.collectAllHardwiredClusters(tree);
 				hardwiredClusters.removeAll(lsaClusters);
 				// order these clusters?
 				for (var cluster : hardwiredClusters) {
@@ -150,16 +151,6 @@ public class TreeEmbeddingOptimizer {
 		}
 		clusters.add(set);
 		return set;
-	}
-
-
-	/**
-	 * collects all hardwired clusters contained in the tree.
-	 */
-	public static Set<BitSet> collectAllHardwiredClusters(PhyloTree tree) {
-		var clusters = new HashSet<BitSet>();
-		collectAllHardwiredClustersRec(tree, tree.getRoot(), clusters);
-		return clusters;
 	}
 
 	public static BitSet collectAllHardwiredClustersRec(PhyloTree tree, Node v, HashSet<BitSet> clusters) {

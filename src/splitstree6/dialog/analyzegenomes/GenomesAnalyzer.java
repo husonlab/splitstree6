@@ -240,7 +240,7 @@ public class GenomesAnalyzer {
 		var aService = new AService<Integer>(statusFlowPane);
 
 		aService.setCallable(() -> {
-			aService.getProgressListener().setTasks("Find similar", "");
+			aService.getProgressListener().setTasks("Processing", "");
 
 			if (referenceIds.size() > 0 && referenceDatabase != null) {
 				try {

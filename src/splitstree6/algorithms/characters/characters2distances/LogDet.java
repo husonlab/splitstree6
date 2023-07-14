@@ -24,8 +24,8 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import jloda.fx.window.NotificationManager;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
@@ -122,21 +122,20 @@ public class LogDet extends Characters2Distances {
 		progress.setTasks("logDet distance", "Calculating");
 		progress.setMaximum(ntax);
 		distancesBlock.setNtax(ntax);
-		int numUndefined = 0;
 
 		for (var t = 1; t <= ntax; t++) {
 			for (var s = t + 1; s <= ntax; s++) {
 				var seqPair = new PairwiseCompare(charactersBlock, s, t);
-				var dist = -1.0;
-
 				var r = seqPair.getNumStates();
 
 				var F = seqPair.getF();
 				if (F == null) {
-					numUndefined++;
+					distancesBlock.set(s, t, -1);
+					distancesBlock.set(t, s, -1);
+
 				} else {
 					if (this.optionFudgeFactor.getValue()) {
-                        /* LDDist 1.2 implements some questionable tricks to avoid singluar matrices. To enable
+                        /* LDDist 1.2 implements some questionable tricks to avoid singular matrices. To enable
                    comparisons, I've implemented these here. */
 						var extF = seqPair.getfCount();
 
@@ -228,28 +227,24 @@ public class LogDet extends Characters2Distances {
 					}
 					/* now x =  trace(log(F)) = log(det(F)) */
 					if (thisIsSaturated) {
-						numUndefined++;
-						x = -10000000;
-					}
+						distancesBlock.set(s, t, -1);
+						distancesBlock.set(t, s, -1);
+					} else {
+						var PiSum = 0.0;
+						for (var i = 0; i < r; i++) {
+							PiSum += Pi[i] * Pi[i];
+						}
 
-					var PiSum = 0.0;
-					for (var i = 0; i < r; i++) {
-						PiSum += Pi[i] * Pi[i];
+						var dist = -(1.0 - PiSum) / (r - 1.0) * (x - logPi);
+						distancesBlock.set(s, t, dist);
+						distancesBlock.set(t, s, dist);
 					}
-
-					dist = -(1.0 - PiSum) / (r - 1.0) * (x - logPi);
 				}
-				distancesBlock.set(s, t, dist);
-				distancesBlock.set(t, s, dist);
-
 			}
 			progress.incrementProgress();
 		}
-
-		if (numUndefined > 0)
-			NotificationManager.showWarning("Proceed with caution: " + numUndefined + " saturated or missing entries in the distance matrix. These have been replaced by very large values.");
-
-		progress.close();
+		FixUndefinedDistances.apply(distancesBlock);
+		progress.reportTaskCompleted();
 	}
 
 
@@ -275,7 +270,6 @@ public class LogDet extends Characters2Distances {
 
 	/**
 	 * Sets flag of whether missing entries in the F matrix are imputed, using the method that LDDist uses.
-	 *
 	 */
 	public void setOptionFudgeFactor(boolean val) {
 		this.optionFudgeFactor.setValue(val);
@@ -296,7 +290,6 @@ public class LogDet extends Characters2Distances {
 
 	/**
 	 * Set proportion of invariable sites to use for log det.
-	 *
 	 */
 	public void setOptionPropInvariableSites(double pInvar) {
 		this.optionPropInvariableSites.setValue(pInvar);

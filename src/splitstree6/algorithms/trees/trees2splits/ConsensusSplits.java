@@ -137,7 +137,8 @@ public class ConsensusSplits extends Trees2Splits {
 			var totalWeight = splitWeightMap.values().stream().mapToDouble(d -> d).sum();
 			var consensusWeight = splitsBlock.getSplits().stream().mapToDouble(s -> splitWeightMap.getOrDefault(s, 0.0)).sum();
 			splitsBlock.setFit((float) (totalWeight > 0 ? 100 * consensusWeight / totalWeight : -1));
-			System.err.printf("Fit: %.1f%n", splitsBlock.getFit());
+			if (false)
+				System.err.printf("Fit: %.1f%n", splitsBlock.getFit());
 		}
 
 		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));

@@ -19,6 +19,7 @@
 
 package splitstree6.xtra.outliner;
 
+import javafx.application.Platform;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -57,7 +58,7 @@ public class ComputeOutlineAndReferenceTree {
 		consensusOutline.setOptionEdgeWeights(ConsensusSplits.EdgeWeights.Count);
 		consensusOutline.compute(new ProgressSilent(), model.getTaxaBlock(), model.getTreesBlock(), consensusSplits);
 		var outlineGroup = new Group();
-		computeOutline(model, consensusSplits, width, height, g -> outlineGroup.getChildren().add(g));
+		computeOutline(model, consensusSplits, width, height, g -> outlineGroup.getChildren().add(g), false);
 		if (showOther)
 			group.getChildren().add(outlineGroup);
 
@@ -68,14 +69,14 @@ public class ComputeOutlineAndReferenceTree {
 		consensusMethod.compute(new ProgressSilent(), model.getTaxaBlock(), model.getTreesBlock(), referenceSplits);
 		referenceSplits.setCycle(consensusSplits.getCycle());
 		var referenceGroup = new Group();
-		computeOutline(model, referenceSplits, width, height, g -> referenceGroup.getChildren().add(g));
+		computeOutline(model, referenceSplits, width, height, g -> referenceGroup.getChildren().add(g), true);
 		if (showReference)
 			group.getChildren().addAll(referenceGroup);
 
 		return group;
 	}
 
-	public static void computeOutline(Model model, SplitsBlock splits, double width, double height, Consumer<Group> addGroup) throws IOException {
+	public static void computeOutline(Model model, SplitsBlock splits, double width, double height, Consumer<Group> addGroup, boolean saveLabels) throws IOException {
 
 		SplitNetworkLayout splitNetworkLayout = new SplitNetworkLayout();
 
@@ -86,6 +87,7 @@ public class ComputeOutlineAndReferenceTree {
 		ObservableMap<Integer, ArrayList<Shape>> splitShapeMap = FXCollections.observableHashMap();
 		ObservableList<LoopView> loopViews = FXCollections.observableArrayList();
 		splitNetworkLayout.apply(new ProgressSilent(), model.getTaxaBlock(), splits, unitLength, width, height, taxonLabelMap, nodeShapeMap, splitShapeMap, loopViews);
+		Platform.runLater(() -> splitNetworkLayout.getLabelLayout().layoutLabels());
 
 		addGroup.accept(asGroup(loopViews));
 
@@ -97,14 +99,14 @@ public class ComputeOutlineAndReferenceTree {
 					line.setStroke(Color.BLACK);
 					lines.add(line);
 				}
-
 			}
 		}
 		addGroup.accept(asGroup(lines));
 
 		addGroup.accept(asGroup(nodeShapeMap.values()));
 
-		addGroup.accept(asGroup(taxonLabelMap.values()));
+		if (saveLabels)
+			addGroup.accept(asGroup(taxonLabelMap.values()));
 	}
 
 	public static Group asGroup(Collection<? extends javafx.scene.Node> nodes) {

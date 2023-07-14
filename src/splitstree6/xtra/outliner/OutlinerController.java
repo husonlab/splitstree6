@@ -31,6 +31,9 @@ public class OutlinerController {
 	private MenuItem closeMenuItem;
 
 	@FXML
+	private MenuItem copyMenuItem;
+
+	@FXML
 	private Pane mainPane;
 
 	@FXML
@@ -73,6 +76,10 @@ public class OutlinerController {
 		return closeMenuItem;
 	}
 
+	public MenuItem getCopyMenuItem() {
+		return copyMenuItem;
+	}
+
 	public Pane getMainPane() {
 		return mainPane;
 	}
@@ -105,6 +112,9 @@ public class OutlinerController {
 		return progressBar;
 	}
 
+	@FXML
+	private ToggleButton outlineTreeToggleButton;
+
 	public Button getRedrawButton() {
 		return redrawButton;
 	}
@@ -115,5 +125,9 @@ public class OutlinerController {
 
 	public CheckBox getReferenceCheckbox() {
 		return referenceCheckbox;
+	}
+
+	public ToggleButton getOutlineTreeToggleButton() {
+		return outlineTreeToggleButton;
 	}
 }

@@ -276,7 +276,12 @@ public class PairwiseCompare { // todo: add support for character weights
 		//TODO: Replace the golden arc method with Brent's algorithm
 		final int nStates = model.getNstates();
 		final double[][] fullF = getF();
+
+		if (fullF == null)
+			return -1;
+
 		final double[][] F = new double[nStates][nStates];
+
 
 		double k = 0.0;
 		for (int i = 0; i < nStates; i++) {

@@ -160,6 +160,7 @@ public class AlignmentDrawer {
 				var canvas = getCanvas();
 				var gc = canvas.getGraphicsContext2D();
 				gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+
 				canvas.setWidth((int) canvasWidth);
 				canvas.setHeight((int) canvasHeight);
 

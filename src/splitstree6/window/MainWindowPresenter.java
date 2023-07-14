@@ -39,7 +39,6 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jloda.fx.dialog.ExportImageDialog;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
@@ -92,6 +91,7 @@ import splitstree6.dialog.AskToDiscardChanges;
 import splitstree6.dialog.SaveBeforeClosingDialog;
 import splitstree6.dialog.SaveDialog;
 import splitstree6.dialog.analyzegenomes.AnalyzeGenomesDialog;
+import splitstree6.dialog.exporting.ExportImageDialog;
 import splitstree6.dialog.exporting.ExportTaxonDisplayLabels;
 import splitstree6.dialog.exporting.ExportTaxonTraits;
 import splitstree6.dialog.importdialog.ImportDialog;
@@ -369,14 +369,14 @@ public class MainWindowPresenter {
 		controller.getPageSetupMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		if (focusedDisplayTab.get() != null) {
-			controller.getPrintButton().setOnAction(e -> Print.print(stage, focusedDisplayTab.get().getImageNode()));
+			controller.getPrintButton().setOnAction(e -> Print.print(stage, focusedDisplayTab.get().getMainNode()));
 			controller.getPrintButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(focusedDisplayTab.isNull()));
 		}
 		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
 		controller.getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
 
 		if (focusedDisplayTab.get() != null) {
-			controller.getExportImageButton().setOnAction(e -> ExportImageDialog.show(mainWindow.getFileName(), stage, focusedDisplayTab.get().getImageNode()));
+			controller.getExportImageButton().setOnAction(e -> ExportImageDialog.show(mainWindow.getFileName(), stage, focusedDisplayTab.get().getMainNode()));
 			controller.getExportImageButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(focusedDisplayTab.isNull()));
 		}
 
@@ -406,10 +406,10 @@ public class MainWindowPresenter {
 		controller.getCutMenuItem().setDisable(false);
 		controller.getCopyMenuItem().setDisable(false);
 
-		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getImageNode() != null) {
+		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
-				final Image snapshot = focusedDisplayTab.get().getImageNode().snapshot(null, null);
-				final ClipboardContent clipboardContent = new ClipboardContent();
+				var snapshot = focusedDisplayTab.get().getMainNode().snapshot(null, null);
+				var clipboardContent = new ClipboardContent();
 				clipboardContent.putImage(snapshot);
 				Clipboard.getSystemClipboard().setContent(clipboardContent);
 			});

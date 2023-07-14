@@ -183,7 +183,7 @@ public class DisplayTextView implements IView {
 	}
 
 	@Override
-	public Node getImageNode() {
+	public Node getMainNode() {
 		return controller.getCodeArea();
 	}
 

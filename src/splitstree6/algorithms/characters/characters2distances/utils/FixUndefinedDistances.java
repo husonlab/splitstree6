@@ -20,7 +20,10 @@
 package splitstree6.algorithms.characters.characters2distances.utils;
 
 import jloda.fx.window.NotificationManager;
+import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
+
+import java.util.Arrays;
 
 /**
  * fix undefined distances
@@ -28,22 +31,42 @@ import splitstree6.data.DistancesBlock;
  */
 public class FixUndefinedDistances {
 	/**
-	 * computeConsensusAndCycle
+	 * fix undefined distances
 	 */
-	public static void apply(int ntax, double maxDist, DistancesBlock distancesBlock) {
-		int numUndefined = 0;
-		for (int s = 1; s <= ntax; s++)
-			for (int t = s + 1; t <= ntax; t++) {
-				if (distancesBlock.get(s, t) < 0) {
-					distancesBlock.set(s, t, 2.0 * maxDist);
-					distancesBlock.set(t, s, 2.0 * maxDist);
+	public static void apply(DistancesBlock distancesBlock) {
+
+		var maxValue = 0.0;
+		var numUndefined = 0;
+
+		var ntax = distancesBlock.getNtax();
+		for (int s = 1; s <= ntax; s++) {
+			for (int t = 1; t <= ntax; t++) {
+				if (distancesBlock.get(s, t) == -1)
 					numUndefined++;
+				else
+					maxValue = Math.max(maxValue, distancesBlock.get(s, t));
+			}
+		}
+
+		if (numUndefined > 0) {
+			var largeValue = 1.0;
+			if (maxValue > 1) {
+				maxValue *= 1.1;
+				var power = (int) Math.ceil(Math.log10(maxValue));
+				var firstDigit = Math.ceil(maxValue / Math.pow(10, power - 1));
+				largeValue = firstDigit * Math.pow(10, power - 1);
+			}
+			for (var t = 1; t <= ntax; t++) {
+				for (var s = t + 1; s <= ntax; s++) {
+					if (distancesBlock.get(s, t) == -1) {
+						distancesBlock.set(s, t, largeValue);
+						distancesBlock.set(t, s, largeValue);
+					}
 				}
 			}
-		if (numUndefined > 0)
-			NotificationManager.showWarning("Distance matrix contains " + numUndefined + " undefined " +
-											"distances. These have been arbitrarily set to 2 times the maximum" +
-											" defined distance (= " + (2.0 * maxDist) + ").");
+			NotificationManager.showWarning("Distance calculation produced " + numUndefined + " saturated or missing entries.\n" +
+											"These have been replaced by the value '" + StringUtils.removeTrailingZerosAfterDot(largeValue) + "'.");
+		}
 
 	}
 }

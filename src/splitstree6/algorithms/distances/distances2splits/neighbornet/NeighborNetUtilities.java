@@ -1,9 +1,11 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
+import jloda.util.CanceledException;
+
 import java.util.Random;
 
-import static java.lang.Math.abs;
-import static java.lang.Math.min;
+import static java.lang.Math.*;
+import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean.*;
 
 public class NeighborNetUtilities {
 
@@ -296,16 +298,15 @@ public class NeighborNetUtilities {
         calcAtx(res, gradient);
     }
 
-    static public void evalGradient(double[] x, double[] d, double[] gradient, int n) {
-        var res = new double[x.length]; //TODO Avoid array allocation
-        calcAx(x, res,n);
-        for (var i = 1; i <res.length; i++)
-                res[i] -= d[i];
-        calcAtx(res, gradient,n);
+    static public void evalGradient(double[] x, double[] d, double[] gradient, double[] residual, int n) {
+        calcAx(x, residual,n);
+        for (var i=0; i <residual.length; i++)
+                residual[i] -= d[i];
+        calcAtx(residual, gradient,n);
     }
 
-
     /**
+     *
      * Scale entries in x by lambda
      *
      * @param x      doubl array
@@ -336,28 +337,51 @@ public class NeighborNetUtilities {
     static public double evalProjectedGradientSquared(double[][] x, double[][] d) {
         int n=x.length-1;
         double[][] grad = new double[n+1][n+1];
+
+//        System.err.print("X=");
+//        for(int i=1;i<=n;i++)
+//            for(int j=i+1;j<=n;j++)
+//                System.err.print(x[i][j]+", ");
+//        System.err.println();
+
+
         evalGradient(x,d,grad);
+
+//        System.err.print("Grad=");
+//        for(int i=1;i<=n;i++)
+//            for(int j=i+1;j<=n;j++)
+//                System.err.print(grad[i][j]+", ");
+//        System.err.println();
+
+
+
         double pg = 0.0;
         for(int i=1;i<=n;i++) {
+            double row_i = 0.0;
             for(int j=i+1;j<=n;j++) {
                 double grad_ij = grad[i][j];
                 if (x[i][j] > 0.0 || grad_ij < 0.0)
-                    pg += grad_ij*grad_ij;
+                    row_i += grad_ij*grad_ij;
             }
+            pg += row_i;
         }
         return pg;
     }
 
-    static public double evalProjectedGradientSquared(double[] x, double[] d, int n) {
-        int npairs = x.length;
-        double[] grad = new double[npairs];
-        evalGradient(x,d,grad,n);
-        double pg = 0.0;
-        for(int i=0;i<grad.length;i++) {
-            double grad_i = grad[i];
-            if (x[i] > 0.0 || grad_i < 0.0)
-                pg += grad_i*grad_i;
+    static public double evalProjectedGradientSquared(double[] x, double[] d, double[] grad, double[] residual, int n) {
+        evalGradient(x,d,grad,residual,n);
 
+        double pg = 0.0;
+        int index = 0;
+        for(int i=1;i<=n;i++) {
+            double row_i = 0.0;
+            for (int j = i + 1; j <= n; j++) {
+                double grad_i = grad[index];
+                if (x[index] > 0.0 || grad_i < 0.0)
+                    row_i += grad_i * grad_i;
+                index++;
+            }
+            pg += row_i;
         }
         return pg;
     }
@@ -380,8 +404,8 @@ public class NeighborNetUtilities {
             }
     }
 
-    static void getActiveEntries(double[] x, boolean[] A, int n) {
-        for(int i=0;i<A.length;i++) {
+    static void getActiveEntries(double[] x, boolean[] A) {
+        for(int i=0;i<x.length;i++) {
             if (x[i] <= 0.0) {
                 if (A != null)
                     A[i] = true;
@@ -396,6 +420,10 @@ public class NeighborNetUtilities {
      * @param x square array
      */
     static void zeroNegativeEntries(double[][] x) {
+        getActiveEntries(x, null);
+    }
+
+    static void zeroNegativeEntries(double[] x) {
         getActiveEntries(x, null);
     }
 
@@ -477,7 +505,7 @@ public class NeighborNetUtilities {
         double si;
         for(int i=1;i<=n;i++) {
             si=0.0;
-            for (int j = 1; j <= n; j++) {
+            for (int j = i+1; j <= n; j++) {
                 double x_ij = x[i][j];
                 si += x_ij * x_ij;
             }
@@ -486,11 +514,17 @@ public class NeighborNetUtilities {
         return total;
     }
 
-    static public double sumArraySquared(double[] x) {
+    static public double sumArraySquared(double[] x, int n) {
         double total = 0.0;
-        for(int i=0;i<x.length;i++) {
-            double x_i = x[i];
-            total+=x_i * x_i;
+        int index = 0;
+        for(int i=1;i<=n;i++) {
+            double s_i = 0.0;
+            for(int j=i+1;j<=n;j++) {
+                double x_ij = x[index];
+                s_i+=x_ij * x_ij;
+                index++;
+            }
+            total+=s_i; //More stable if we sum each row separately and then add row sums.
         }
         return total;
     }
@@ -568,21 +602,99 @@ public class NeighborNetUtilities {
         return diff(Ax,d);
     }
 
-    static public double evalResidual(double[] x, double[] d, int n) {
-        double[] Ax = new double[x.length];
+    static public double evalResidual(double[] x, double[] d, double[] Ax, int n) {
         calcAx(x,Ax,n);
         return diff(Ax,d);
     }
 
+    static public void rand(double[] x, Random generator) {
+        for(int i=0;i<x.length;i++)
+            x[i] = generator.nextDouble();
+    }
+
     public static void main(String[] args) {
-        int n=40;
+        int n=200;
+        int npairs = n*(n-1)/2;
         Random generator = new Random(1000);
-        for(int r=0;r<20;r++) {
-            double[] x = new double[n*(n-1)/2];
-            for(int i=0;i<n*(n-1)/2;i++)
-                x[i] = generator.nextDouble();
-            double[] y = new double[x.length];
-            calcAinv_y(x,y,n);
+        for(int r=0;r<1;r++) {
+            double[] x = new double[npairs];
+            double[] d = new double[npairs];
+            rand(x,generator);
+            rand(d,generator);
+            double[] Atd = new double[npairs];
+            calcAtx(d, Atd,n);
+            double normAtd = sqrt(sumArraySquared(Atd,n));
+
+
+            double[][] X = new double[n+1][n+1];
+            double[][] D = new double[n+1][n+1];
+            vec2array(x,X);
+            vec2array(d,D);
+            boolean[] active = new boolean[npairs];
+            for(int i=0;i<active.length;i++)
+                active[i] = (generator.nextDouble()<0.6);
+            int index=0;
+            boolean[][] Active = new boolean[n+1][n+1];
+            for(int i=1;i<=n;i++)
+                for(int j=i+1;j<=n;j++) {
+                    Active[i][j] = active[index];
+                    index++;
+                }
+            NeighborNetSplitWeightsClean.NNLSParams params = new NeighborNetSplitWeightsClean.NNLSParams();
+            params.cgnrIterations = n*(n-1)/2;
+            params.cgnrTolerance = (0.0001 * normAtd) * (0.0001 * normAtd)/10;
+            params.cgnrPrintResiduals = false;
+            params.projGradBound = params.cgnrTolerance;
+
+            params.maxIterations = 20000;
+            params.gcp_ke = 0.1;
+            params.gcp_ku = 0.2;
+            params.gcp_kl = 0.8;
+            params.cgnrIterations = max(50, n * (n - 1) / 2);
+            params.activeSetRho = 0.4;
+
+            params.APGDtheta = 0.5;
+            double[] x2 = new double[npairs];
+
+            long before,oldTime=0,newTime=0;
+            try {
+//                before = System.currentTimeMillis();
+//                activeSetMethod(X,D,params,null);
+//                oldTime = System.currentTimeMillis() - before;
+//
+//                before = System.currentTimeMillis();
+//                activeSetMethod(x,d,n,params,null);
+//                newTime = System.currentTimeMillis()-before;
+//
+//                array2vec(X,x2);
+
+
+
+                before = System.currentTimeMillis();
+                //activeSetMethod(X,D,params,null);
+                //gradientProjection(X,D,params,null);
+                //APGD(X,D,params,null);
+                IPG(X,D,params,null);
+                oldTime = System.currentTimeMillis() - before;
+
+                before = System.currentTimeMillis();
+                //gradientProjection(x,d,n,params,null);
+                //APGD(x,d,n,params,null);
+                //activeSetMethod(x,d,n,params,null);
+                IPG(x,d,n,params,null);
+                newTime = System.currentTimeMillis()-before;
+
+                array2vec(X,x2);
+                //System.err.println("GRAD PROJECTION Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
+                //System.err.println("APGD SET Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
+                System.err.println("IPG SET Difference = "+diff(x,x2)+"\told time = "+oldTime+"\tnewTime = "+newTime);
+
+
+            } catch (CanceledException e) {
+                System.err.println("Cancelled");
+            }
+
+
         }
     }
 }
