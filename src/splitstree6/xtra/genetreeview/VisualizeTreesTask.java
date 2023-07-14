@@ -35,23 +35,28 @@ public class VisualizeTreesTask extends Task<Group> {
     private final double treeWidth;
     private final double treeHeight;
     private final TreeDiagramType diagram;
+    private final SelectionModelSet<Integer> taxaSelectionModel;
+    private final SelectionModelSet<Integer> edgeSelectionModel;
 
     public VisualizeTreesTask(TreesBlock treesBlock, ArrayList<Integer> treeOrder, double treeWidth, double treeHeight,
-                              TreeDiagramType diagram) {
+                              TreeDiagramType diagram, SelectionModelSet<Integer> taxaSelectionModel,
+                              SelectionModelSet<Integer> edgeSelectionModel) {
         this.treesBlock = treesBlock;
         this.treeOrder = treeOrder;
         this.treeWidth = treeWidth;
         this.treeHeight = treeHeight;
         this.diagram = diagram;
+        this.taxaSelectionModel = taxaSelectionModel;
+        this.edgeSelectionModel = edgeSelectionModel;
     }
 
     @Override
     protected Group call() throws Exception {
         Group trees = new Group();
         int treeIndex = 0;
-        for (int i : treeOrder) {
-            PhyloTree tree = treesBlock.getTree(i);
-            TreeSheet treeSheet = new TreeSheet(tree,treeWidth,treeHeight,diagram);
+        for (int id : treeOrder) {
+            PhyloTree tree = treesBlock.getTree(id);
+            TreeSheet treeSheet = new TreeSheet(tree,id,treeWidth,treeHeight,diagram,taxaSelectionModel,edgeSelectionModel);
             trees.getChildren().add(treeIndex, treeSheet);
             treeIndex++;
             updateProgress(treeIndex,treesBlock.getNTrees());

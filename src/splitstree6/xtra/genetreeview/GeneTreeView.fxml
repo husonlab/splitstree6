@@ -29,6 +29,7 @@
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.RadioMenuItem?>
 <?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
@@ -51,14 +52,19 @@
                             <menus>
                                 <Menu mnemonicParsing="false" text="File">
                                     <items>
-                                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open trees">
+                                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open Trees">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                                             </accelerator>
                                         </MenuItem>
-                              <MenuItem fx:id="importGeneNamesMenuItem" mnemonicParsing="false" text="Import gene names" />
-                              <MenuItem fx:id="importFeaturesMenuItem" disable="true" mnemonicParsing="false" text="Import features" />
-                              <MenuItem fx:id="exportSubsetMenuItem" mnemonicParsing="false" text="Export selected trees" />
+                              <MenuItem fx:id="importGeneNamesMenuItem" mnemonicParsing="false" text="Import Gene Names" />
+                              <MenuItem fx:id="importFeaturesMenuItem" disable="true" mnemonicParsing="false" text="Import Features" />
+                              <MenuItem fx:id="exportSubsetMenuItem" mnemonicParsing="false" text="Export Selected Trees" />
+                              <MenuItem fx:id="printMenuItem" mnemonicParsing="false" text="Print...">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
                                         <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" text="Close">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -66,7 +72,51 @@
                                         </MenuItem>
                                     </items>
                                 </Menu>
-                                <Menu mnemonicParsing="false" text="Edit" />
+                                <Menu mnemonicParsing="false" text="Edit">
+                           <items>
+                              <MenuItem fx:id="undoMenuItem" mnemonicParsing="false" text="Undo">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
+                              <MenuItem fx:id="redoMenuItem" mnemonicParsing="false" text="Redo">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
+                              <MenuItem fx:id="copyTaxaMenuItem" mnemonicParsing="false" text="Copy Taxa">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
+                              <MenuItem fx:id="copyImageMenuItem" mnemonicParsing="false" text="Copy Image" />
+                              <MenuItem fx:id="copySelectedTreesMenuItem" mnemonicParsing="false" text="Copy Selected Tree Images" />
+                              <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="Paste Newick Tree">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
+                           </items></Menu>
+                        <Menu mnemonicParsing="false" text="Selection">
+                          <items>
+                            <MenuItem fx:id="selectAllMenuItem" disable="true" mnemonicParsing="false" text="Select All Trees">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator></MenuItem>
+                              <MenuItem fx:id="selectNoneMenuItem" disable="true" mnemonicParsing="false" text="Select No Trees">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                                 </accelerator></MenuItem>
+                              <MenuItem fx:id="selectInverseMenuItem" disable="true" mnemonicParsing="false" text="Inverse Tree Selection">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator></MenuItem>
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem fx:id="selectAllTaxaMenuItem" mnemonicParsing="false" text="Select All Taxa" />
+                              <MenuItem fx:id="selectNoTaxaMenuItem" mnemonicParsing="false" text="Select No Taxa" />
+                              <MenuItem fx:id="selectInverseTaxaMenuItem" mnemonicParsing="false" text="Inverse Taxa Selection" />
+                          </items>
+                        </Menu>
                         <Menu mnemonicParsing="false" text="Layout">
                           <items>
                               <RadioMenuItem fx:id="stackMenuItem" mnemonicParsing="false" selected="true" text="Stack">
@@ -75,9 +125,20 @@
                                  </toggleGroup>
                               </RadioMenuItem>
                               <RadioMenuItem fx:id="carouselMenuItem" mnemonicParsing="false" text="Carousel" toggleGroup="$layoutGroup" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <RadioMenuItem fx:id="defaultOrderMenuItem" mnemonicParsing="false" selected="true" text="Tree Order As Imported">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="orderGroup" />
+                                 </toggleGroup>
+                              </RadioMenuItem>
+                              <Menu fx:id="taxonOrderSubMenu" disable="true" mnemonicParsing="false" text="Tree Order As In Genome" />
+                              <Menu fx:id="similarityOrderSubMenu" mnemonicParsing="false" text="Tree Order By Similarity">
+                                  <RadioMenuItem fx:id="topologyOrderMenuItem" mnemonicParsing="false" text="Topology" toggleGroup="$orderGroup" />
+                                  <RadioMenuItem fx:id="featureOrderMenuItem" disable="true" mnemonicParsing="false" text="Imported Feature" toggleGroup="$orderGroup" />
+                              </Menu>
                           </items>
                         </Menu>
-                        <Menu mnemonicParsing="false" text="Tree Layout">
+                        <Menu mnemonicParsing="false" text="View">
                            <items>
                               <RadioMenuItem fx:id="rectangularCladoMenuItem" mnemonicParsing="false" selected="true" text="Rectangular Cladogram">
                                  <toggleGroup>
@@ -91,27 +152,6 @@
                               <RadioMenuItem fx:id="circularCladoMenuItem" mnemonicParsing="false" text="Circular Cladogram" toggleGroup="$treeLayoutGroup" />
                               <RadioMenuItem fx:id="circularPhyloMenuItem" mnemonicParsing="false" text="Circular Phylogram" toggleGroup="$treeLayoutGroup" />
                            </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Tree Selection">
-                          <items>
-                            <MenuItem fx:id="selectAllMenuItem" disable="true" mnemonicParsing="false" text="Select All" />
-                              <MenuItem fx:id="selectNoneMenuItem" disable="true" mnemonicParsing="false" text="Select None" />
-                              <MenuItem fx:id="selectInverseMenuItem" disable="true" mnemonicParsing="false" text="Select Inverse" />
-                          </items>
-                        </Menu>
-                        <Menu mnemonicParsing="false" text="Order">
-                          <items>
-                              <RadioMenuItem fx:id="defaultOrderMenuItem" mnemonicParsing="false" selected="true" text="as imported">
-                                 <toggleGroup>
-                                    <ToggleGroup fx:id="orderGroup" />
-                                 </toggleGroup>
-                              </RadioMenuItem>
-                              <Menu fx:id="taxonOrderSubMenu" disable="true" mnemonicParsing="false" text="as in taxon" />
-                              <Menu fx:id="similarityOrderSubMenu" mnemonicParsing="false" text="by similarity">
-                                  <RadioMenuItem fx:id="topologyOrderMenuItem" mnemonicParsing="false" text="topology" toggleGroup="$orderGroup" />
-                                  <RadioMenuItem fx:id="featureOrderMenuItem" disable="true" mnemonicParsing="false" text="imported feature" toggleGroup="$orderGroup" />
-                              </Menu>
-                          </items>
                         </Menu>
                                 <Menu mnemonicParsing="false" text="Help" />
                             </menus>

@@ -19,121 +19,231 @@
 
 package splitstree6.xtra.genetreeview.layout;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
 import javafx.scene.Group;
+import javafx.scene.Node;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.SelectionEffectBlue;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.ComputeTreeLayout;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.xtra.genetreeview.SelectionModel;
+import splitstree6.xtra.genetreeview.SelectionModelSet;
 
 import java.util.HashMap;
-import java.util.TreeSet;
 import java.util.function.Function;
 
-public class TreeSheet extends Group implements Selectable {
+public class TreeSheet extends StackPane implements Selectable {
 
+    private final int id;
     private final double width;
     private final double height;
-    private Rectangle backgroundRectangle;
+    private Rectangle selectionRectangle;
     private Text nameLabel;
+    private final Group taxonLabels;
+    private final Group edges;
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
-    private final BooleanProperty mediatorProperty = new SimpleBooleanProperty();
+    private final LongProperty lastUpdate = new SimpleLongProperty(this, "lastUpdate", 0L);
 
-    public TreeSheet(PhyloTree tree, double width, double height, TreeDiagramType diagram) {
+    public TreeSheet(PhyloTree tree, int id, double width, double height, TreeDiagramType diagram,
+                     SelectionModelSet<Integer> taxaSelectionModel, SelectionModelSet<Integer> edgeSelectionModel) {
+        this.id = id;
         this.width = width;
         this.height = height;
+
+        createTreeBackground(tree.getName());
 
         Function<Integer, StringProperty> taxonLabelMap = (taxonId) ->
                 new SimpleStringProperty(tree.getTaxon2Node(taxonId).getLabel());
 
-        super.getChildren().add(createTreeBackground(tree.getName()));
-
-        Group layoutedTree = ComputeTreeLayout.apply(tree, tree.getNumberOfTaxa(), taxonLabelMap,
+        // Computing the actual tree with splitstree6.layout.tree.ComputeTreeLayout
+        /*Group layoutedTree = ComputeTreeLayout.apply(tree, tree.getNumberOfTaxa(), taxonLabelMap,
                 diagram, HeightAndAngles.Averaging.ChildAverage,width-80,height-20,
-                false, new HashMap<>(), new HashMap<>()).getAllAsGroup();
+                false, new HashMap<>(), new HashMap<>()).getAllAsGroup();*/
 
-
-        // For debugging only
-        var testTree =  ComputeTreeLayout.apply(tree, tree.getNumberOfTaxa(), taxonLabelMap,
+        var computedTreeLayout = ComputeTreeLayout.apply(tree, tree.getNumberOfTaxa(), taxonLabelMap,
                 diagram, HeightAndAngles.Averaging.ChildAverage,width-80,height-20,
                 false, new HashMap<>(), new HashMap<>());
-        var set = new TreeSet<Double>();
-        for (var node : testTree.nodes().getChildren()) {
-            set.add(node.getTranslateY());
-        }
-        //System.out.println(set.first());
 
+        Group layoutedTree = new Group();
+        if (computedTreeLayout.labelConnectors() != null)
+            layoutedTree.getChildren().add(computedTreeLayout.labelConnectors());
+        if (computedTreeLayout.edges() != null)
+            layoutedTree.getChildren().add(computedTreeLayout.edges());
+        if (computedTreeLayout.nodes() != null)
+            layoutedTree.getChildren().add(computedTreeLayout.nodes());
+        if (computedTreeLayout.otherLabels() != null)
+            layoutedTree.getChildren().add(computedTreeLayout.otherLabels());
+        if (computedTreeLayout.taxonLabels() != null)
+            layoutedTree.getChildren().add(computedTreeLayout.taxonLabels());
+        this.edges = computedTreeLayout.edges();
+        this.taxonLabels = computedTreeLayout.taxonLabels();
 
-        // Adjusting tree position on the background and label font size
+        // Adjusting label font size
         if (diagram.isRadialOrCircular()) {
-            layoutedTree.setTranslateX(width / 2);
-            layoutedTree.setTranslateY(height / 2);
-            for (var label : BasicFX.getAllRecursively(layoutedTree, RichTextLabel.class)) {
-                label.setScale(0.3);
+            assert taxonLabels != null;
+            for (var label : taxonLabels.getChildren()) {
+                ((RichTextLabel)label).setScale(0.3);
+            }
+        } else if (diagram.equals(TreeDiagramType.RectangularCladogram) |
+                diagram.equals(TreeDiagramType.RectangularPhylogram)) {
+            assert taxonLabels != null;
+            for (var label : taxonLabels.getChildren()) {
+                ((RichTextLabel)label).setScale(0.4);
+            }
+            layoutedTree.setTranslateY(5); // space on top needed for name label
+        }
+        else { // for triangular
+            assert taxonLabels != null;
+            for (var label : taxonLabels.getChildren()) {
+                ((RichTextLabel)label).setScale(0.4);
             }
         }
-        else if (diagram.isPhylogram()) { // for rectangular phylogram
-            layoutedTree.setTranslateX(5);
-            int n = tree.getNumberOfTaxa();
-            if (n == 2) layoutedTree.setTranslateY(-216+15);
-            else if (n == 3) layoutedTree.setTranslateY(-108+15);
-            else layoutedTree.setTranslateY(-352.39*Math.pow(tree.getNumberOfTaxa(),-1.137)+15);
-            for (var label : BasicFX.getAllRecursively(layoutedTree, RichTextLabel.class)) {
-                label.setScale(0.4);
-            }
-        }
-        else { // for rectangular and triangular cladogram
-            layoutedTree.setTranslateX(width-100);
-            int n = tree.getNumberOfTaxa();
-            if (n == 2) layoutedTree.setTranslateY(-216+15);
-            else if (n == 3) layoutedTree.setTranslateY(-108+15);
-            else layoutedTree.setTranslateY(-352.39*Math.pow(tree.getNumberOfTaxa(),-1.137)+15);
-            for (var label : BasicFX.getAllRecursively(layoutedTree, RichTextLabel.class)) {
-                label.setScale(0.4);
-            }
-        }
-        super.getChildren().addAll(layoutedTree);
+        this.getChildren().addAll(layoutedTree);
 
+        // Taxon Selection
+        HashMap<String, Integer> taxonName2id = new HashMap<>();
+        for (var taxonId : tree.getTaxonNodeMap().keySet())
+            taxonName2id.put(tree.getTaxon2Node(taxonId).getLabel(),taxonId);
+        for (var taxonLabel : taxonLabels.getChildren()) {
+            RichTextLabel taxonRichTextLabel = (RichTextLabel) taxonLabel;
+            taxonLabel.setOnMouseEntered(e -> taxonRichTextLabel.setScale(1.1*taxonRichTextLabel.getScale()));
+            taxonLabel.setOnMouseExited(e -> taxonRichTextLabel.setScale(1/1.1*taxonRichTextLabel.getScale()));
+            int taxonId = taxonName2id.get(taxonRichTextLabel.getText());
+            if (taxaSelectionModel.getSelectedItems().contains(taxonId)) selectTaxon(taxonRichTextLabel.getText(),true);
+            taxonLabel.setOnMouseClicked(e -> {
+                boolean selectedBefore = taxaSelectionModel.getSelectedItems().contains(taxonId);
+                if (!e.isShiftDown()) {
+                    taxaSelectionModel.clearSelection();
+                    edgeSelectionModel.clearSelection();
+                    if (!selectedBefore) {
+                        taxaSelectionModel.select(taxonId);
+                        updateEdgeSelection();
+                    }
+                } else {
+                    taxaSelectionModel.setSelected(taxonId, !selectedBefore);
+                    updateEdgeSelection();
+                }
+            });
+        }
+        for (var edge : edges.getChildren()) {
+            var labeledEdgeShape = (LabeledEdgeShape) edge;
+            for (var line : labeledEdgeShape.all()) {
+                if (line instanceof Shape shape) {
+                    shape.setOnMouseEntered(e -> shape.setStrokeWidth(shape.getStrokeWidth() + 3));
+                    shape.setOnMouseExited(e -> shape.setStrokeWidth(shape.getStrokeWidth() - 3));
+                    //shape.setOnMouseClicked(e -> selectEdge(shape,true));
+                }
+            }
+            int edgeIndex = edges.getChildren().indexOf(edge);
+            if (edgeSelectionModel.getSelectedItems().contains(edgeIndex)) selectEdge(edge,true);
+            edge.setOnMouseClicked(e -> {
+                boolean selectedBefore = edgeSelectionModel.getSelectedItems().contains(edgeIndex);
+                if (!e.isShiftDown()) {
+                    taxaSelectionModel.clearSelection();
+                    edgeSelectionModel.clearSelection();
+                    if (!selectedBefore) {
+                        edgeSelectionModel.select(edgeIndex);
+                        updateEdgeSelection();
+                        updateTaxaSelection();
+                    }
+                } else {
+                    edgeSelectionModel.setSelected(edgeIndex, !selectedBefore);
+                    updateEdgeSelection();
+                    updateTaxaSelection();
+                }
+                lastUpdate.set(System.currentTimeMillis());
+            });
+        }
+
+        // Tree Selection
         isSelectedProperty.addListener((observableValue, wasSelected, isSelected) -> {
             if (isSelected) {
-                backgroundRectangle.setStrokeWidth(1);
+                this.setStyle("-fx-border-color: -fx-accent");
             }
             else {
-                backgroundRectangle.setStrokeWidth(0);
+                this.setStyle("-fx-border-color: -fx-box-border");
             }
-            if (isSelected != mediatorProperty.get()) mediatorProperty.set(isSelected);
+            lastUpdate.set(System.currentTimeMillis());
         });
     }
 
-    private Group createTreeBackground(String treeName) {
-        var treeBackground = new Group();
-        backgroundRectangle = new Rectangle(width, height, Color.WHITE);
-        //backgroundRectangle.setOpacity(0.5); // not working in 3D
-        backgroundRectangle.setStroke(Color.BLACK);
-        backgroundRectangle.setStrokeWidth(0);
-        backgroundRectangle.setTranslateZ(2); // to avoid conflicts with the on top drawn tree later
-        backgroundRectangle.setOnMouseClicked(e -> {
-            setSelectedProperty();
-        });
+    private void createTreeBackground(String treeName) {
+        this.setPrefSize(width,height);
+        this.setBackground(new Background(new BackgroundFill(Color.web("white",1),null,null)));
+        this.setStyle("-fx-border-color: -fx-box-border; -fx-display:inline;");
+        var nameLabelContainer = new Pane();
         nameLabel = new Text(treeName);
         nameLabel.setFont(new Font(9));
-        nameLabel.setX(2);
-        nameLabel.setY(9);
-        treeBackground.getChildren().addAll(backgroundRectangle, nameLabel);
-        return treeBackground;
+        nameLabel.setLayoutX(2);
+        nameLabel.setLayoutY(9);
+        nameLabelContainer.getChildren().add(nameLabel);
+        this.getChildren().add(nameLabelContainer);
+
+        selectionRectangle = new Rectangle(width, height, Color.TRANSPARENT);
+        this.getChildren().add(selectionRectangle);
     }
+
+    public boolean selectTaxon(String taxonName, boolean select) {
+        for (var label : taxonLabels.getChildren()) {
+            if (((RichTextLabel)label).getText().equals(taxonName)) {
+                // Selection indication like in splitstree
+                if (select) label.setEffect(SelectionEffectBlue.getInstance());
+                else label.setEffect(null);
+                // Alternative: Selection indication with CSS style ( no suitable color yet)
+                //if (select) label.setStyle("-fx-effect: dropshadow(one-pass-box,-fx-focus-color,5,1,0,0)");
+                //else label.setStyle("-fx-effect: dropshadow(one-pass-box,transparent,5,1,0,0)");
+                lastUpdate.set(System.currentTimeMillis());
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean selectEdge(int edgeId, boolean select) {
+        var edge = edges.getChildren().get(edgeId);
+        if (edge != null) {
+            selectEdge(edge,select);
+            return true;
+        }
+        return false;
+    }
+
+    private void selectEdge(Node edge, boolean select) {
+        if (select) edge.setEffect(SelectionEffectBlue.getInstance());
+        else edge.setEffect(null);
+        lastUpdate.set(System.currentTimeMillis());
+    }
+
+    public void updateEdgeSelection() {
+        // TODO
+    }
+
+    private void updateTaxaSelection() {
+        // TODO
+    }
+
+    public int getTreeId() {
+        return id;
+    }
+
+    public Rectangle getSelectionRectangle() {
+        return selectionRectangle;
+    };
 
     public void setTreeName(String treeName) {
         nameLabel.setText(treeName);
+        lastUpdate.set(System.currentTimeMillis());
     }
 
     public void setSelectedProperty(boolean selected) {
@@ -148,7 +258,11 @@ public class TreeSheet extends Group implements Selectable {
         return isSelectedProperty;
     }
 
-    public BooleanProperty mediatorProperty() {
-        return mediatorProperty;
+    public long getLastUpdate() {
+        return lastUpdate.get();
+    }
+
+    public ReadOnlyLongProperty lastUpdateProperty() {
+        return lastUpdate;
     }
 }

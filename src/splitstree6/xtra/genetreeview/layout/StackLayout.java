@@ -42,14 +42,33 @@ public class StackLayout extends MultipleFramesLayout{
         this.nodeHeight = nodeHeight;
 
         // Transforming nodes
-        assert nodes.size() == snapshots.size();
         initializeNodes(nodes, slider);
-        initializeNodes(snapshots, slider);
+        if (snapshots!=null) initializeNodes(snapshots, slider); // initial layout possible without snapshots
         transformedNodes = nodes;
         transformedSnapshots = snapshots;
+        /*transformedNodes.addListener((ListChangeListener<Node>) change -> {
+            if (change.wasAdded()) {
+                for (int i = 0; i < change.getAddedSize(); i++) {
+                    Node node = change.getAddedSubList().get(i);
+                    int index = transformedNodes.indexOf(node);
+                    initializeNode(node,index,slider.getValue());
+                }
+            } else if (change.wasRemoved()) {
+            }
+        });
+        transformedSnapshots.addListener((ListChangeListener<Node>) change -> {
+            if (change.wasAdded()) {
+                for (int i = 0; i < change.getAddedSize(); i++) {
+                    Node node = change.getAddedSubList().get(i);
+                    int index = transformedNodes.indexOf(node);
+                    initializeNode(node,index,slider.getValue());
+                }
+            } else if (change.wasRemoved()) {
+            }
+        });*/
 
         // Setting up zoomSlider
-        setUpZoomSlider(zoomSlider, -750, -550);
+        setUpZoomSlider(zoomSlider, -750, -620);
 
         // Transforming camera
         resetCamera(camera);
@@ -58,10 +77,10 @@ public class StackLayout extends MultipleFramesLayout{
         camera.setTranslateY(0);
         camera.translateZProperty().bind(zoomSlider.valueProperty());
         this.camera = camera;
-        updatePosition(1,slider.getValue(),layoutWidth,nodeWidth);
+        updatePosition(1,slider.getValue(),nodeWidth);
     }
 
-    public void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {
+    public void updatePosition(double oldSliderValue, double newSliderValue, double nodeWidth) {
         ObservableList<Node> nodesToTransform;
         if (isSnapshot.get()) nodesToTransform = transformedSnapshots;
         else nodesToTransform = transformedNodes;
@@ -95,15 +114,24 @@ public class StackLayout extends MultipleFramesLayout{
         node.setTranslateX((layoutWidth) * functionForX - (nodeWidth/2.));
 
         // Rotation
-        node.setRotate((179./(1+Math.exp(-1.15*x)))-89.); // layout draft 4
-        //node.setRotate((190./(1.+Math.exp(0.2*x)))-102.); // layout draft 3
+        //var rotate = (190./(1.+Math.exp(0.2*x)))-102.; // layout draft 3
+        var rotate = (179./(1+Math.exp(-1.15*x)))-89.; // layout draft 4
+        node.setRotate(rotate);
 
         // Scaling size
         final var scalingFunction = 0.9 / (Math.exp(x) + Math.exp(-x)) + 0.7;
         node.setScaleX(scalingFunction);
         node.setScaleY(scalingFunction);
 
-        //node.setOpacity(1-(Math.abs(x)/5)); // works only for snapshots
+        // Show node larger and without rotation when hovered
+        node.setOnMouseEntered(e -> {
+            node.setTranslateZ(-80);
+            node.setRotate(0);
+        });
+        node.setOnMouseExited(e -> {
+            node.setTranslateZ(0);
+            node.setRotate(rotate);
+        });
     }
 
     public PerspectiveCamera getCamera() {

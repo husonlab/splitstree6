@@ -20,10 +20,12 @@
 package splitstree6.xtra.genetreeview.io;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.collections.ObservableSet;
 import javafx.concurrent.Task;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.writers.trees.NewickWriter;
 import splitstree6.xtra.genetreeview.Model;
+import splitstree6.xtra.genetreeview.SelectionModelSet;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -34,12 +36,12 @@ public class ExportTreesTask extends Task<Void> {
 
     private final File file;
     private final Model model;
-    private final BooleanProperty[] treeSelection;
+    private final ObservableSet<Integer> selection;
 
-    public ExportTreesTask(File file, Model model, BooleanProperty[] treeSelection) {
+    public ExportTreesTask(File file, Model model, ObservableSet<Integer> selection) {
         this.file = file;
         this.model = model;
-        this.treeSelection = treeSelection;
+        this.selection = selection;
     }
 
     @Override
@@ -49,10 +51,8 @@ public class ExportTreesTask extends Task<Void> {
         var selectedTreesBlock = new TreesBlock();
         selectedTreesBlock.copy(model.getTreesBlock());
         selectedTreesBlock.getTrees().removeAll(model.getTreesBlock().getTrees());
-        for (int i = 0; i < treeSelection.length; i++) {
-            if (treeSelection[i].getValue()) {
-                selectedTreesBlock.getTrees().add(model.getTreesBlock().getTree(i+1));
-            }
+        for (int treeId : selection) {
+            selectedTreesBlock.getTrees().add(model.getTreesBlock().getTree(treeId));
         }
         newickWriter.write(writer, model.getTaxaBlock(), selectedTreesBlock);
         writer.close();

@@ -33,12 +33,13 @@ public abstract class MultipleFramesLayout {
     public MultipleFramesLayout() {
     };
 
-    public void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {}
+    public void updatePosition(double oldSliderValue, double newSliderValue, double nodeWidth) {}
 
     public void resetNode(Node node) {
         node.getTransforms().clear();
         node.translateXProperty().unbind();
         node.setTranslateX(0);
+        node.setTranslateY(0);
         node.setTranslateZ(0);
         node.setRotate(0);
         node.setScaleX(1);
@@ -69,4 +70,8 @@ public abstract class MultipleFramesLayout {
     }
 
     public LayoutType getType() {return type;}
+
+    public int size() {
+        return transformedNodes.size();
+    }
 }

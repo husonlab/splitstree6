@@ -1,5 +1,5 @@
 /*
- *  Selectable.java Copyright (C) 2023 Daniel H. Huson
+ *  Command.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,17 +17,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview.layout;
+package splitstree6.xtra.genetreeview;
 
-import javafx.beans.property.BooleanProperty;
-
-public interface Selectable {
-
-    void setSelectedProperty(boolean selected);
-
-    void setSelectedProperty();
-
-    BooleanProperty isSelectedProperty();
-
-    //BooleanProperty mediatorProperty();
+public interface Command {
+    void undo();
+    void redo();
+    String name();
+    boolean canUndo();
+    boolean canRedo();
 }

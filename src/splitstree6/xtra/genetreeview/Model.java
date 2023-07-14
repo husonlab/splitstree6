@@ -24,6 +24,7 @@ import javafx.beans.property.ReadOnlyLongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -42,8 +43,8 @@ public class Model {
 	private final TaxaBlock taxaBlock = new TaxaBlock();
 	private final TreesBlock treesBlock = new TreesBlock();
 	private final ObservableList<String> orderedGeneNames = FXCollections.observableArrayList();
-	private ArrayList<String> initialGeneNameOrder;
-	private ArrayList<Integer> treeOrder;
+	private ArrayList<String> initialGeneNameOrder = new ArrayList<>();
+	private ArrayList<Integer> treeOrder = new ArrayList<>();
 	private final LongProperty lastUpdate = new SimpleLongProperty(this, "lastUpdate", 0L);
 
 	public TaxaBlock getTaxaBlock() {
@@ -105,6 +106,16 @@ public class Model {
 		}
 	}
 
+	public void setTreeOrder(ArrayList<Integer> newTreeOrder) {
+		if (newTreeOrder.size() == treeOrder.size()) {
+			orderedGeneNames.clear();
+			treeOrder = newTreeOrder;
+			for (var id : treeOrder) {
+				orderedGeneNames.add(initialGeneNameOrder.get(id-1));
+			}
+		}
+	}
+
 	public long getLastUpdate() {
 		return lastUpdate.get();
 	}
@@ -125,5 +136,22 @@ public class Model {
 				orderedGeneNames.add(treesBlock.getTree(i).getName());
 			}
 		}
+	}
+
+	public void addTree(PhyloTree tree) {
+		treesBlock.getTrees().add(tree);
+		String treeName = tree.getName();
+		initialGeneNameOrder.add(treeName);
+		orderedGeneNames.add(treeName);
+		treeOrder.add(treesBlock.size());
+	}
+
+	public void remove(int treeId) {
+		PhyloTree treeToRemove = treesBlock.getTree(treeId);
+		treesBlock.getTrees().remove(treeToRemove);
+		initialGeneNameOrder.remove(treeToRemove.getName());
+		int position = orderedGeneNames.indexOf(treeToRemove.getName());
+		treeOrder.remove(position);
+		orderedGeneNames.remove(treeToRemove.getName());
 	}
 }

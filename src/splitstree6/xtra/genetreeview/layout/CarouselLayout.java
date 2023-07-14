@@ -33,11 +33,14 @@ public class CarouselLayout extends MultipleFramesLayout {
 
     private final LayoutType type = LayoutType.Carousel;
     private final PerspectiveCamera camera;
+    private final Slider slider;
+    private final Slider zoomSlider;
     private final double nodeWidth;
     private final double nodeHeight;
-    private final double thetaDeg;
-    private final double thetaRad;
-    private final double layoutRadius;
+    private int realNodeNumber;
+    private double thetaDeg;
+    private double thetaRad;
+    private double layoutRadius;
     private final DoubleProperty cameraRadius = new SimpleDoubleProperty();
 
     public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight, PerspectiveCamera camera,
@@ -45,26 +48,80 @@ public class CarouselLayout extends MultipleFramesLayout {
         // Setting up variables
         this.nodeWidth = nodeWidth;
         this.nodeHeight = nodeHeight;
+        this.slider = slider;
+        this.zoomSlider = zoomSlider;
+        setUpZoomSlider(zoomSlider, -1200, -620);
+        this.camera = camera;
+        transformedNodes = nodes;
+
+        initializeLayout();
+        setUpCamera();
+
+        // Rotation of the camera is managed with updatePosition()
+        updatePosition(1,slider.getValue(),nodeWidth);
+    }
+
+    // Allows to initialize a node with existing index (0-based) or to add a node with the next index
+    public void initializeNode(Node node, int index, double sliderValue) {
+        if (index > realNodeNumber) return;
+        if (index == realNodeNumber && realNodeNumber > 49) {
+            // The layout needs to be expanded for the additional node -> larger carousel
+            initializeLayout();
+            System.out.println("initializing layout for added node");
+        }
+        else {
+            resetNode(node);
+            node.setTranslateX(layoutRadius * Math.sin(index * thetaRad) - (Math.cos(index * thetaRad) * (nodeWidth / 2.)));
+            node.setTranslateY(-nodeHeight / 2.);
+            node.setTranslateZ(-layoutRadius * Math.cos(index * thetaRad) - (Math.sin(index * thetaRad) * (nodeWidth / 2.)));
+            Rotate rotate = new Rotate(-index * thetaDeg, 0, node.getTranslateY(), 0, Rotate.Y_AXIS);
+            node.getTransforms().add(rotate);
+
+            // Show node larger and without rotation when hovered
+            node.setOnMouseEntered(e -> {
+                // Move node towards camera
+                double deltaX = camera.getTranslateX() - node.getTranslateX();
+                double deltaZ = camera.getTranslateZ() - node.getTranslateZ();
+                double distanceNode2Camera = Math.sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
+                double desiredMoveDistance = 140;
+                double fraction = desiredMoveDistance / distanceNode2Camera;
+                node.setTranslateX(node.getTranslateX() + (deltaX * fraction));
+                node.setTranslateZ(node.getTranslateZ() + (deltaZ * fraction));
+                rotate.setAngle((-slider.getValue() + 1) * thetaDeg); // angle of tree in focus position
+            });
+            node.setOnMouseExited(e -> {
+                // Reset to standard transformation
+                node.setTranslateX(layoutRadius * Math.sin(index * thetaRad) - (Math.cos(index * thetaRad) * (nodeWidth / 2.)));
+                node.setTranslateZ(-layoutRadius * Math.cos(index * thetaRad) - (Math.sin(index * thetaRad) * (nodeWidth / 2.)));
+                rotate.setAngle(-index * thetaDeg);
+            });
+        }
+    }
+
+    public void updatePosition(double oldSliderValue, double newSliderValue, double nodeWidth) {
+        var rotate = new Rotate(-(newSliderValue-oldSliderValue)*thetaDeg,Rotate.Y_AXIS);
+        camera.getTransforms().add(rotate);
+    }
+
+    public void initializeLayout() {
+        realNodeNumber = transformedNodes.size();
         // For less than 50 trees, it makes no sense to arrange them in a circle, but in a partial circle
-        int realNodeNumber = nodes.size();
         int layoutNodeNumber = Math.max(realNodeNumber, 50); // assuming at least 50 trees for the carousel size
+
         layoutRadius = (1.1 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
         thetaDeg = 360 / (double) layoutNodeNumber;
         thetaRad = Math.toRadians(thetaDeg);
 
-        // Transforming nodes -> circular layout (with layoutRadius) in x-z-plane with nodes facing outside
-        for (int i=0; i<realNodeNumber; i++) {
-            Node node = nodes.get(i);
-            initializeNode(node,i,slider.getValue());
+        for (int i=0; i<transformedNodes.size(); i++) {
+            Node n = transformedNodes.get(i);
+            initializeNode(n,i,slider.getValue());
         }
-        transformedNodes = nodes;
+    }
 
-        // Setting up zoomSlider
-        setUpZoomSlider(zoomSlider, -1200, -500);
-        cameraRadius.bind(zoomSlider.valueProperty().multiply(-1).add(layoutRadius));
-
-        // Transforming camera -> moving on a larger circle (cameraRadius) around the nodes, facing inside
+    // Transforming camera -> moving on a larger circle (cameraRadius) around the nodes, facing inside
+    private void setUpCamera() {
         resetCamera(camera);
+        if (cameraRadius.isBound()) cameraRadius.unbind();
         camera.setNearClip(0.2);
         camera.setFarClip(1800);
         camera.setTranslateY(0);
@@ -79,24 +136,8 @@ public class CarouselLayout extends MultipleFramesLayout {
                 cameraRadius,slider.valueProperty()
         );
         camera.translateZProperty().bind(zTerm);
-        this.camera = camera;
-        // Rotation of the camera is managed with updatePosition(),
-        // called by the listener of the slider in GeneTreeViewPresenter
-        updatePosition(1,slider.getValue(),layoutWidth,nodeWidth);
-    }
 
-    public void initializeNode(Node node, int index, double sliderValue) {
-        resetNode(node);
-        node.setTranslateX(layoutRadius*Math.sin(index*thetaRad)-(Math.cos(index*thetaRad)*(nodeWidth/2.)));
-        node.setTranslateY(-nodeHeight/2.);
-        node.setTranslateZ(-layoutRadius*Math.cos(index*thetaRad)-(Math.sin(index*thetaRad)*(nodeWidth/2.)));
-        Rotate rotate = new Rotate(-index*thetaDeg,0,node.getTranslateY(),0,Rotate.Y_AXIS);
-        node.getTransforms().add(rotate);
-    }
-
-    public void updatePosition(double oldSliderValue, double newSliderValue, double layoutWidth, double nodeWidth) {
-        var rotate = new Rotate(-(newSliderValue-oldSliderValue)*thetaDeg,Rotate.Y_AXIS);
-        camera.getTransforms().add(rotate);
+        cameraRadius.bind(zoomSlider.valueProperty().multiply(-1).add(layoutRadius));
     }
 
     public PerspectiveCamera getCamera() {

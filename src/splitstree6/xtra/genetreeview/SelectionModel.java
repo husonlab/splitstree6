@@ -1,5 +1,5 @@
 /*
- *  Selectable.java Copyright (C) 2023 Daniel H. Huson
+ *  SelectionModel.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,17 +17,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview.layout;
+package splitstree6.xtra.genetreeview;
 
-import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyIntegerProperty;
+import javafx.collections.ObservableSet;
+import java.util.Collection;
 
-public interface Selectable {
+public interface SelectionModel<T> {
+    boolean select(T t);
 
-    void setSelectedProperty(boolean selected);
+    boolean setSelected(T t, boolean select);
 
-    void setSelectedProperty();
+    boolean selectAll(Collection<T> list);
 
-    BooleanProperty isSelectedProperty();
+    void clearSelection();
 
-    //BooleanProperty mediatorProperty();
+    boolean clearSelection(T t);
+
+    boolean clearSelection(Collection<T> list);
+
+    ObservableSet<T> getSelectedItems();
+
+    int size();
+
+    ReadOnlyIntegerProperty sizeProperty();
 }

@@ -31,26 +31,22 @@ public class ColorBarBox extends Pane implements Selectable {
     private final String name;
     private Color color;
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
-    private final BooleanProperty mediatorProperty = new SimpleBooleanProperty(); // for selection state binding
+    //private final BooleanProperty mediatorProperty = new SimpleBooleanProperty(); // for selection state binding
 
     public ColorBarBox(String name, Color color) {
         this.color = color;
         this.setBackground(new Background(new BackgroundFill(this.color,null,null)));
-        this.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,
-                CornerRadii.EMPTY,new BorderWidths(0.1))));
+        //this.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,
+        //        CornerRadii.EMPTY,new BorderWidths(0.1))));
+        this.setStyle("-fx-border-color: -fx-box-border");
         HBox.setMargin(this, Insets.EMPTY);
         HBox.setHgrow(this, Priority.ALWAYS);
         this.name = name;
         Tooltip.install(this,new Tooltip(name));
-        this.setOnMouseClicked(e -> {
-            setSelectedProperty();
-        });
         isSelectedProperty.addListener((observable, wasSelected, isSelected) -> {
-            if (isSelected) this.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,
-                    CornerRadii.EMPTY,new BorderWidths(0.4))));
-            else this.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,
-                    CornerRadii.EMPTY,new BorderWidths(0.1))));
-            if (isSelected != mediatorProperty.get()) mediatorProperty().set(isSelected);
+            if (isSelected) this.setStyle("-fx-border-color: -fx-accent");
+            else this.setStyle("-fx-border-color: -fx-box-border");
+            //if (isSelected != mediatorProperty.get()) mediatorProperty().set(isSelected);
         });
     }
 
@@ -79,7 +75,7 @@ public class ColorBarBox extends Pane implements Selectable {
         return isSelectedProperty;
     }
 
-    public BooleanProperty mediatorProperty() {
-        return mediatorProperty;
-    }
+    //public BooleanProperty mediatorProperty() {
+    //    return mediatorProperty;
+    //}
 }

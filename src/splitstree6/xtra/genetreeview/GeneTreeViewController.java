@@ -27,15 +27,6 @@ import javafx.scene.layout.*;
 public class GeneTreeViewController {
 
 	@FXML
-	private Pane centerPane;
-
-	@FXML
-	private MenuItem closeMenuItem;
-
-	@FXML
-	private MenuBar menuBar;
-
-	@FXML
 	private MenuItem openMenuItem;
 
 	@FXML
@@ -48,22 +39,46 @@ public class GeneTreeViewController {
 	private MenuItem exportSubsetMenuItem;
 
 	@FXML
-	private ToolBar toolBar;
+	private MenuItem printMenuItem;
 
 	@FXML
-	private Slider zoomSlider;
+	private MenuItem closeMenuItem;
 
 	@FXML
-	private ComboBox<String> searchGeneComboBox;
+	private MenuItem undoMenuItem;
 
 	@FXML
-	private Slider slider;
+	private MenuItem redoMenuItem;
 
 	@FXML
-	private VBox topPane;
+	private MenuItem copyTaxaMenuItem;
 
 	@FXML
-	private Label label;
+	private MenuItem copyImageMenuItem;
+
+	@FXML
+	private MenuItem copySelectedTreesMenuItem;
+
+	@FXML
+	private MenuItem pasteMenuItem;
+
+	@FXML
+	private MenuItem selectAllMenuItem;
+
+	@FXML
+	private MenuItem selectNoneMenuItem;
+
+	@FXML
+	private MenuItem selectInverseMenuItem;
+
+	@FXML
+	private MenuItem selectAllTaxaMenuItem;
+
+	@FXML
+	private MenuItem selectNoTaxaMenuItem;
+
+	@FXML
+	private MenuItem selectInverseTaxaMenuItem;
 
 	@FXML
 	private ToggleGroup layoutGroup;
@@ -73,6 +88,24 @@ public class GeneTreeViewController {
 
 	@FXML
 	private RadioMenuItem carouselMenuItem;
+
+	@FXML
+	private ToggleGroup orderGroup;
+
+	@FXML
+	private RadioMenuItem defaultOrderMenuItem;
+
+	@FXML
+	private Menu taxonOrderSubMenu;
+
+	@FXML
+	private Menu similarityOrderSubMenu;
+
+	@FXML
+	private RadioMenuItem topologyOrderMenuItem;
+
+	@FXML
+	private RadioMenuItem featureOrderMenuItem;
 
 	@FXML
 	private ToggleGroup treeLayoutGroup;
@@ -99,31 +132,22 @@ public class GeneTreeViewController {
 	private RadioMenuItem triangularCladoMenuItem;
 
 	@FXML
-	private MenuItem selectAllMenuItem;
+	private ToolBar toolBar;
 
 	@FXML
-	private MenuItem selectInverseMenuItem;
+	private Slider zoomSlider;
 
 	@FXML
-	private MenuItem selectNoneMenuItem;
+	private ComboBox<String> searchGeneComboBox;
 
 	@FXML
-	private ToggleGroup orderGroup;
+	private Pane centerPane;
 
 	@FXML
-	private RadioMenuItem defaultOrderMenuItem;
+	private VBox vBox;
 
 	@FXML
-	private Menu taxonOrderSubMenu;
-
-	@FXML
-	private Menu similarityOrderSubMenu;
-
-	@FXML
-	private RadioMenuItem topologyOrderMenuItem;
-
-	@FXML
-	private RadioMenuItem featureOrderMenuItem;
+	private Slider slider;
 
 	@FXML
 	private Button nextButton;
@@ -132,172 +156,173 @@ public class GeneTreeViewController {
 	private Button previousButton;
 
 	@FXML
+	private Label label;
+
+	@FXML
 	private ProgressBar progressBar;
 
 	@FXML
 	private Label progressLabel;
 
 	@FXML
-	private VBox vBox;
-
-	@FXML
 	private void initialize() {
 		label.setText("");
 	}
 
-	public Button getNextButton() {
-		return nextButton;
+	// File Menu
+	public MenuItem getOpenMenuItem() {
+		return openMenuItem;
 	}
-
-	public Button getPreviousButton() {
-		return previousButton;
+	public MenuItem getImportGeneNamesMenuItem() {
+		return importGeneNamesMenuItem;
 	}
-
-	public ProgressBar getProgressBar() {
-		return progressBar;
+	public MenuItem getImportFeaturesMenuItem() {
+		return importFeaturesMenuItem;
 	}
-
-	public Label getProgressLabel() {
-		return progressLabel;
+	public MenuItem getExportSubsetMenuItem() {
+		return exportSubsetMenuItem;
 	}
-
-	public RadioMenuItem getCircularCladoMenuItem() {
-		return circularCladoMenuItem;
+	public MenuItem getPrintMenuItem() {
+		return printMenuItem;
 	}
-
-	public RadioMenuItem getCircularPhyloMenuItem() {
-		return circularPhyloMenuItem;
-	}
-
-	public RadioMenuItem getRadialCladoMenuItem() {
-		return radialCladoMenuItem;
-	}
-
-	public RadioMenuItem getRadialPhyloMenuItem() {
-		return radialPhyloMenuItem;
-	}
-
-	public RadioMenuItem getRectangularCladoMenuItem() {
-		return rectangularCladoMenuItem;
-	}
-
-	public RadioMenuItem getRectangularPhyloMenuItem() {
-		return rectangularPhyloMenuItem;
-	}
-
-	public RadioMenuItem getTriangularCladoMenuItem() {
-		return triangularCladoMenuItem;
-	}
-
-	private final Group stack = new Group();
-
-	public Pane getCenterPane() {
-		return centerPane;
-	}
-
 	public MenuItem getCloseMenuItem() {
 		return closeMenuItem;
 	}
 
-	public MenuItem getOpenMenuItem() {
-		return openMenuItem;
+	// Edit Menu
+	public MenuItem getUndoMenuItem() {
+		return undoMenuItem;
+	}
+	public MenuItem getRedoMenuItem() {
+		return redoMenuItem;
+	}
+	public MenuItem getCopyTaxaMenuItem() {
+		return copyTaxaMenuItem;
+	}
+	public MenuItem getCopyImageMenuItem() {
+		return copyImageMenuItem;
+	}
+	public MenuItem getCopySelectedTreesMenuItem() {
+		return copySelectedTreesMenuItem;
+	}
+	public MenuItem getPasteMenuItem() {
+		return pasteMenuItem;
 	}
 
-	public MenuItem getImportGeneNamesMenuItem() {
-		return importGeneNamesMenuItem;
-	}
-
-	public MenuItem getImportFeaturesMenuItem() {
-		return importFeaturesMenuItem;
-	}
-
-	public MenuItem getExportSubsetMenuItem() {
-		return exportSubsetMenuItem;
-	}
-
-	public ToolBar getToolBar() {
-		return toolBar;
-	}
-
-	public Label getLabel() {
-		return label;
-	}
-
-	public Group getStack() {
-		return stack;
-	}
-
-	public Slider getSlider() {
-		return slider;
-	}
-
-	public void setSlider(Slider slider) {
-		this.slider = slider;
-	}
-
-	public ToggleGroup getLayoutGroup() {
-		return layoutGroup;
-	}
-
-	public RadioMenuItem getStackMenuItem() {
-		return stackMenuItem;
-	}
-
-	public RadioMenuItem getCarouselMenuItem() {
-		return carouselMenuItem;
-	}
-
-	public ToggleGroup getTreeLayoutGroup() {
-		return treeLayoutGroup;
-	}
-
-	public Slider getZoomSlider() {
-		return zoomSlider;
-	}
-
-	public void setZoomSlider(Slider zoomSlider) {
-		this.zoomSlider = zoomSlider;
-	}
-
-	public ComboBox<String> getSearchGeneComboBox() {
-		return searchGeneComboBox;
-	}
-
+	// Selection Menu
 	public MenuItem getSelectAllMenuItem() {
 		return selectAllMenuItem;
 	}
-
 	public MenuItem getSelectNoneMenuItem() {
 		return selectNoneMenuItem;
 	}
-
 	public MenuItem getSelectInverseMenuItem() {
 		return selectInverseMenuItem;
 	}
+	public MenuItem getSelectAllTaxaMenuItem() {
+		return selectAllTaxaMenuItem;
+	}
+	public MenuItem getSelectNoTaxaMenuItem() {
+		return selectNoTaxaMenuItem;
+	}
+	public MenuItem getSelectInverseTaxaMenuItem() {
+		return selectInverseTaxaMenuItem;
+	}
 
+	// Layout Menu
+	public ToggleGroup getLayoutGroup() {
+		return layoutGroup;
+	}
+	public RadioMenuItem getStackMenuItem() {
+		return stackMenuItem;
+	}
+	public RadioMenuItem getCarouselMenuItem() {
+		return carouselMenuItem;
+	}
 	public ToggleGroup getOrderGroup() {
 		return orderGroup;
 	}
-
 	public RadioMenuItem getDefaultOrderMenuItem() {
 		return defaultOrderMenuItem;
 	}
-
 	public Menu getTaxonOrderSubMenu() {
 		return taxonOrderSubMenu;
 	}
-
 	public Menu getSimilarityOrderSubMenu() {
 		return similarityOrderSubMenu;
 	}
-
 	public RadioMenuItem getTopologyOrderMenuItem() {
 		return topologyOrderMenuItem;
 	}
-
 	public RadioMenuItem getFeatureOrderMenuItem() {
 		return featureOrderMenuItem;
 	}
 
-	public VBox getvBox() {return vBox;}
+	// View Menu
+	public ToggleGroup getTreeLayoutGroup() {
+		return treeLayoutGroup;
+	}
+	public RadioMenuItem getCircularCladoMenuItem() {
+		return circularCladoMenuItem;
+	}
+	public RadioMenuItem getCircularPhyloMenuItem() {
+		return circularPhyloMenuItem;
+	}
+	public RadioMenuItem getRadialCladoMenuItem() {
+		return radialCladoMenuItem;
+	}
+	public RadioMenuItem getRadialPhyloMenuItem() {
+		return radialPhyloMenuItem;
+	}
+	public RadioMenuItem getRectangularCladoMenuItem() {
+		return rectangularCladoMenuItem;
+	}
+	public RadioMenuItem getRectangularPhyloMenuItem() {
+		return rectangularPhyloMenuItem;
+	}
+	public RadioMenuItem getTriangularCladoMenuItem() {
+		return triangularCladoMenuItem;
+	}
+
+	// ToolBar
+	public ToolBar getToolBar() {
+		return toolBar;
+	}
+	public Slider getZoomSlider() {
+		return zoomSlider;
+	}
+	public ComboBox<String> getSearchGeneComboBox() {
+		return searchGeneComboBox;
+	}
+
+	// Center Pane for Visualizations
+	public Pane getCenterPane() {
+		return centerPane;
+	}
+
+	// Navigation Controls
+	public VBox getvBox() {return vBox;} // vBox as container for colorBar, buttons and slider
+	public Slider getSlider() {
+		return slider;
+	}
+	public void setSlider(Slider slider) {
+		this.slider = slider;
+	}
+	public Button getNextButton() {
+		return nextButton;
+	}
+	public Button getPreviousButton() {
+		return previousButton;
+	}
+
+	// Bottom labels and progress indicator
+	public Label getLabel() {
+		return label;
+	}
+	public ProgressBar getProgressBar() {
+		return progressBar;
+	}
+	public Label getProgressLabel() {
+		return progressLabel;
+	}
 }

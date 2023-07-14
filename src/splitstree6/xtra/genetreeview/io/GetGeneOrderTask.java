@@ -41,30 +41,11 @@ public class GetGeneOrderTask extends Task<TreeMap<Integer,String>> {
     @Override
     protected TreeMap<Integer, String> call() throws Exception {
         // Getting the gene order from ncbi using a simple E-utility pipeline: ESearch-ESummary
-        // TODO: try to directly parse the list of gene names instead of getting each gene one by one (maybe with EPost)
         TreeMap<Integer,String> orderedGeneNames = new TreeMap<>();
         System.out.println(taxonName);
         var base = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
-        /* // EPost works with a list of genes but not with taxon as additional query term
-        StringBuilder geneListBuilder = new StringBuilder();
         for (var index = 0; index < model.getTreesBlock().getNTrees(); index++) {
-            String geneName = model.getOrderedGeneNames().get(index);
-            geneListBuilder.append(geneName).append(",");
-        }
-        String geneList = geneListBuilder.deleteCharAt(geneListBuilder.length()-1).toString();
-        System.out.println(geneList);
 
-        var query = taxonName + "[organism]+AND+" + geneList + "[gene]";
-        var searchUrl = base + "epost.fcgi?db=gene&term=" + query;
-        var connection = (HttpURLConnection) (new URL(searchUrl)).openConnection();
-        connection.setRequestMethod("GET");
-        connection.connect();
-        var searchResult = new String(connection.getInputStream().readAllBytes());
-        connection.disconnect();
-        //System.out.println(searchResult);*/
-
-
-        for (var index = 0; index < model.getTreesBlock().getNTrees(); index++) {
             // ESearch
             String geneName = model.getOrderedGeneNames().get(index);
             System.out.println(geneName);
@@ -87,7 +68,8 @@ public class GetGeneOrderTask extends Task<TreeMap<Integer,String>> {
             if (webEnvMatcher.find()) {
                 webEnv = webEnvMatcher.group(1);
             }
-            if (queryKey == null | webEnv == null) return null;
+            if (queryKey == null | webEnv == null) throw new RuntimeException("Failed to retrieve "+geneName+
+                    " position for taxon "+taxonName+" from ncbi");
 
             // ESummary
             var summaryUrl = base + "esummary.fcgi?db=gene&query_key=" + queryKey + "&WebEnv=" + webEnv;
@@ -109,11 +91,12 @@ public class GetGeneOrderTask extends Task<TreeMap<Integer,String>> {
                 stop = Integer.parseInt(stopMatcher.group(1));
                 System.out.println("\tStop: " + stop);
             }
-            if (start == 0 & stop == 0) return null;
+            if (start == 0 & stop == 0) throw new RuntimeException("Failed to retrieve "+geneName+
+                    " position for taxon "+taxonName+" from ncbi");
             orderedGeneNames.put(start,geneName); // genes will be ordered by their start position in the genome
             updateProgress(index,model.getTreesBlock().getNTrees());
         }
         if (orderedGeneNames.size() == model.getTreesBlock().getNTrees()) return orderedGeneNames;
-        return null;
+        throw new RuntimeException("Failed to retrieve all gene positions for "+taxonName);
     }
 }
