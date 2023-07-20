@@ -21,6 +21,7 @@ package splitstree6.xtra.genetreeview.io;
 
 import javafx.concurrent.Task;
 import splitstree6.xtra.genetreeview.Model;
+import splitstree6.utils.*;
 
 import java.io.File;
 
@@ -28,15 +29,19 @@ public class LoadTreesTask extends Task<Void> {
 
     private final File file;
     private final Model model;
+    private final Stabilizer stabilizer;
 
-    public LoadTreesTask(File file, Model model) {
+    public LoadTreesTask(File file, Model model, Stabilizer stabilizer) {
         this.file = file;
         this.model = model;
+        this.stabilizer = stabilizer;
     }
 
     @Override
     protected Void call() throws Exception {
         model.load(file);
+        stabilizer.setup(model.getTreesBlock().getTrees());
+        stabilizer.apply(model.getTreesBlock().getTrees());
         return null;
     }
 }

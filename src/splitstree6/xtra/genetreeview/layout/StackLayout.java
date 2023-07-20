@@ -28,7 +28,6 @@ import javafx.scene.transform.Rotate;
 
 public class StackLayout extends MultipleFramesLayout{
 
-    private final LayoutType type = LayoutType.Stack;
     private final PerspectiveCamera camera;
     private final BooleanProperty isSnapshot = new SimpleBooleanProperty(false);
     private final double layoutWidth;
@@ -37,6 +36,7 @@ public class StackLayout extends MultipleFramesLayout{
 
     public StackLayout(ObservableList<Node> nodes, ObservableList<Node> snapshots, double nodeWidth, double nodeHeight,
                        PerspectiveCamera camera, double layoutWidth, Slider slider, Slider zoomSlider) {
+        type = LayoutType.Stack;
         this.layoutWidth = layoutWidth;
         this.nodeWidth = nodeWidth;
         this.nodeHeight = nodeHeight;
@@ -141,6 +141,4 @@ public class StackLayout extends MultipleFramesLayout{
     public void setSliderDragged(boolean isDragged) {
         isSnapshot.set(isDragged);
     }
-
-    public LayoutType getType() {return type;}
 }

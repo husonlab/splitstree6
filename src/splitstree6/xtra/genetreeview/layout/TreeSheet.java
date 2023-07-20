@@ -136,13 +136,19 @@ public class TreeSheet extends StackPane implements Selectable {
                 }
             });
         }
+
+        // Edge Selection
         for (var edge : edges.getChildren()) {
             var labeledEdgeShape = (LabeledEdgeShape) edge;
-            for (var line : labeledEdgeShape.all()) {
-                if (line instanceof Shape shape) {
+            for (var node : labeledEdgeShape.all()) {
+                if (node instanceof Shape shape) {
                     shape.setOnMouseEntered(e -> shape.setStrokeWidth(shape.getStrokeWidth() + 3));
                     shape.setOnMouseExited(e -> shape.setStrokeWidth(shape.getStrokeWidth() - 3));
                     //shape.setOnMouseClicked(e -> selectEdge(shape,true));
+                }
+                else if (node instanceof RichTextLabel label) {
+                    label.setOnMouseEntered(e -> label.setScale(1.1*label.getScale()));
+                    label.setOnMouseExited(e -> label.setScale(1/1.1*label.getScale()));
                 }
             }
             int edgeIndex = edges.getChildren().indexOf(edge);
@@ -256,10 +262,6 @@ public class TreeSheet extends StackPane implements Selectable {
 
     public BooleanProperty isSelectedProperty() {
         return isSelectedProperty;
-    }
-
-    public long getLastUpdate() {
-        return lastUpdate.get();
     }
 
     public ReadOnlyLongProperty lastUpdateProperty() {

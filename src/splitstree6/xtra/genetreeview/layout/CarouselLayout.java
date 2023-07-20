@@ -31,7 +31,6 @@ import javafx.scene.transform.Rotate;
 
 public class CarouselLayout extends MultipleFramesLayout {
 
-    private final LayoutType type = LayoutType.Carousel;
     private final PerspectiveCamera camera;
     private final Slider slider;
     private final Slider zoomSlider;
@@ -45,6 +44,7 @@ public class CarouselLayout extends MultipleFramesLayout {
 
     public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight, PerspectiveCamera camera,
                           double layoutWidth, Slider slider, Slider zoomSlider) {
+        type = LayoutType.Carousel;
         // Setting up variables
         this.nodeWidth = nodeWidth;
         this.nodeHeight = nodeHeight;
@@ -55,10 +55,25 @@ public class CarouselLayout extends MultipleFramesLayout {
         transformedNodes = nodes;
 
         initializeLayout();
-        setUpCamera();
+    }
 
-        // Rotation of the camera is managed with updatePosition()
-        updatePosition(1,slider.getValue(),nodeWidth);
+    public void initializeLayout() {
+        realNodeNumber = transformedNodes.size();
+        // For less than 50 trees, it makes no sense to arrange them in a circle, but in a partial circle
+        int layoutNodeNumber = Math.max(realNodeNumber, 50); // assuming at least 50 trees for the carousel size
+
+        layoutRadius = (1.1 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
+        thetaDeg = 360 / (double) layoutNodeNumber;
+        thetaRad = Math.toRadians(thetaDeg);
+
+        for (int i=0; i<transformedNodes.size(); i++) {
+            Node n = transformedNodes.get(i);
+            initializeNode(n,i,slider.getValue());
+        }
+
+        setUpCamera(); // for x- and z-translation
+
+        updatePosition(1,slider.getValue(),nodeWidth); // for camera rotation
     }
 
     // Allows to initialize a node with existing index (0-based) or to add a node with the next index
@@ -67,7 +82,6 @@ public class CarouselLayout extends MultipleFramesLayout {
         if (index == realNodeNumber && realNodeNumber > 49) {
             // The layout needs to be expanded for the additional node -> larger carousel
             initializeLayout();
-            System.out.println("initializing layout for added node");
         }
         else {
             resetNode(node);
@@ -103,21 +117,6 @@ public class CarouselLayout extends MultipleFramesLayout {
         camera.getTransforms().add(rotate);
     }
 
-    public void initializeLayout() {
-        realNodeNumber = transformedNodes.size();
-        // For less than 50 trees, it makes no sense to arrange them in a circle, but in a partial circle
-        int layoutNodeNumber = Math.max(realNodeNumber, 50); // assuming at least 50 trees for the carousel size
-
-        layoutRadius = (1.1 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
-        thetaDeg = 360 / (double) layoutNodeNumber;
-        thetaRad = Math.toRadians(thetaDeg);
-
-        for (int i=0; i<transformedNodes.size(); i++) {
-            Node n = transformedNodes.get(i);
-            initializeNode(n,i,slider.getValue());
-        }
-    }
-
     // Transforming camera -> moving on a larger circle (cameraRadius) around the nodes, facing inside
     private void setUpCamera() {
         resetCamera(camera);
@@ -143,6 +142,4 @@ public class CarouselLayout extends MultipleFramesLayout {
     public PerspectiveCamera getCamera() {
         return camera;
     }
-
-    public LayoutType getType() {return type;}
 }

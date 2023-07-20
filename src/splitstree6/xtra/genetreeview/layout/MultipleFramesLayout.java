@@ -26,7 +26,7 @@ import javafx.scene.control.Slider;
 
 public abstract class MultipleFramesLayout {
 
-    private LayoutType type;
+    protected LayoutType type;
     protected ObservableList<Node> transformedNodes = null;
     protected ObservableList<Node> transformedSnapshots = null;
 
