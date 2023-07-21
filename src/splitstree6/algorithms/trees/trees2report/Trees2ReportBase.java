@@ -100,7 +100,6 @@ abstract public class Trees2ReportBase extends Algorithm<TreesBlock, ReportBlock
 		});
 
 		var mainWindow = getNode().getOwner().getMainWindow();
-		var trees = new ArrayList<PhyloTree>();
 		if (getOptionApplyTo() == ApplyTo.OneTree && getOptionWhichTree() >= 1 && getOptionWhichTree() <= treesBlock.getNTrees()) {
 			var tree = treesBlock.getTree(getOptionWhichTree());
 			treesBlock = new TreesBlock();

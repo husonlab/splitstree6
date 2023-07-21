@@ -195,7 +195,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				codeArea.setContextMenu(new ContextMenu(copy));
 		}
 
-		mainController.getFindAgainMenuItem().setOnAction((e) -> findToolBar.findAgain());
+		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
 		mainController.getGotoLineMenuItem().setOnAction((e) -> {
