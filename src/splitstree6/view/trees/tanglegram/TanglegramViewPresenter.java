@@ -185,6 +185,10 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			tree1Pane.setRunAfterUpdate(connectors::update);
 			tree2Pane.setRunAfterUpdate(connectors::update);
 			tanglegramView.optionFontScaleFactorProperty().addListener(e -> connectors.update());
+
+			tanglegramView.optionOrientationProperty().addListener((v, o, n) -> {
+				LayoutUtils.applyOrientation(controller.getMiddlePane(), n, o, false, new SimpleBooleanProperty(false), connectors::update);
+			});
 		}
 
 		{
@@ -228,9 +232,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		controller.getOrientationCBox().disableProperty().bind(tanglegramView.emptyProperty().or(changingOrientation));
 
 		tanglegramView.optionOrientationProperty().addListener((v, o, n) -> controller.getOrientationCBox().setValue(n));
-		tanglegramView.optionOrientationProperty().addListener((v, o, n) ->
-				LayoutUtils.applyOrientation(controller.getMiddlePane().getChildren().get(0), n, o, false, new SimpleBooleanProperty(false)));
-
 		{
 			var labelProperty = new SimpleStringProperty();
 			var defaultState = (tanglegramView.isOptionShowTreeInfo() ? "d" : tanglegramView.isOptionShowTreeNames() ? "n" : null);
@@ -286,8 +287,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 			controller.getMiddlePane().setPrefWidth(middleWidth);
 			controller.getMiddlePane().setPrefHeight(height);
 			treePaneDimensions.set(new Dimension2D(tanglegramView.getOptionHorizontalZoomFactor() * treePaneWidth, tanglegramView.getOptionVerticalZoomFactor() * height));
-
 		};
+
 		targetBounds.addListener(updateDimensions);
 		tanglegramView.optionVerticalZoomFactorProperty().addListener(updateDimensions);
 		tanglegramView.optionHorizontalZoomFactorProperty().addListener(updateDimensions);

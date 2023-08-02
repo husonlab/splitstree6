@@ -175,10 +175,14 @@ public class LayoutUtils {
 		ensureRichTextLabelsUpright(node);
 	}
 
+	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, boolean keepLabelsUnrotated, BooleanProperty changingOrientation) {
+		applyOrientation(node, newOrientation, oldOrientation, keepLabelsUnrotated, changingOrientation, null);
+	}
+
 	/**
 	 * update a change of orientation to a node
 	 */
-	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, boolean keepLabelsUnrotated, BooleanProperty changingOrientation) {
+	public static void applyOrientation(javafx.scene.Node node, LayoutOrientation newOrientation, LayoutOrientation oldOrientation, boolean keepLabelsUnrotated, BooleanProperty changingOrientation, Runnable runAtFinished) {
 		if (!changingOrientation.get()) {
 			changingOrientation.set(true);
 			final var angle0 = (oldOrientation != null ? oldOrientation.angle() : 0.0) - newOrientation.angle();
@@ -197,6 +201,8 @@ public class LayoutUtils {
 						rotateLabels(node, -angle0);
 					ensureRichTextLabelsUpright(node);
 					changingOrientation.set(false);
+					if (runAtFinished != null)
+						runAtFinished.run();
 				});
 				scaleTransition.play();
 			} else {
@@ -223,6 +229,8 @@ public class LayoutUtils {
 						rotateLabels(node, -angle);
 					ensureRichTextLabelsUpright(node);
 					changingOrientation.set(false);
+					if (runAtFinished != null)
+						runAtFinished.run();
 				});
 			}
 		}

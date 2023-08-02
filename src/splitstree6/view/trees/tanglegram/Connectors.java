@@ -25,10 +25,14 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Text;
+import jloda.fx.util.BasicFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.phylo.PhyloGraph;
 import splitstree6.data.parts.Taxon;
@@ -97,78 +101,99 @@ public class Connectors {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionListener));
 
+		tree1Pane.boundsInParentProperty().addListener(e -> update());
+		tree2Pane.boundsInParentProperty().addListener(e -> update());
+
 		update();
 	}
 
+	private int count = 0;
+
 	public void update() {
-		taxonConnectorMap.clear();
+		RunAfterAWhile.applyInFXThread(this, () -> {
+			// System.err.println("update "+(++count));
 
-		group.getChildren().clear();
+			taxonConnectorMap.clear();
 
-		if (nodeShapeMap1.size() > 0 && nodeShapeMap2.size() > 0) {
-			var taxaBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
-			Map<Taxon, javafx.scene.Node> taxonShapeMap1 = new HashMap<>();
-			{
-				var graph1 = (PhyloGraph) nodeShapeMap1.keySet().iterator().next().getOwner();
-				for (var v : nodeShapeMap1.keySet()) {
-					for (var t : graph1.getTaxa(v)) {
-						var taxon = taxaBlock.get(t);
-						taxonShapeMap1.put(taxon, nodeShapeMap1.get(v));
-					}
+			group.getChildren().clear();
+
+			if (false) {
+				for (var y = 0; y < 1500; y += 50) {
+					var text = new Text(10, y, "" + y);
+					text.setFill(Color.BLUE);
+					group.getChildren().add(text);
 				}
-			}
-			Map<Taxon, javafx.scene.Node> taxonShapeMap2 = new HashMap<>();
-			{
-				var graph2 = (PhyloGraph) nodeShapeMap2.keySet().iterator().next().getOwner();
-				for (var v : nodeShapeMap2.keySet()) {
-					for (var t : graph2.getTaxa(v)) {
-						var taxon = taxaBlock.get(t);
-						taxonShapeMap2.put(taxon, nodeShapeMap2.get(v));
-					}
+
+				for (var y = 0; y < 1500; y += 50) {
+					var text = new Text(50, y, "" + y);
+					text.setFill(Color.RED);
+					group.getChildren().add(text);
 				}
 			}
 
 
-			for (var taxon : taxonShapeMap1.keySet()) {
-				var shape1 = taxonShapeMap1.get(taxon);
-				var shape2 = taxonShapeMap2.get(taxon);
-				if (shape1 != null && shape2 != null) {
-					var line = new Path();
-					group.getChildren().add(line);
-					taxonConnectorMap.put(taxon, line);
+			if (nodeShapeMap1.size() > 0 && nodeShapeMap2.size() > 0) {
+				var taxaBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
+				var taxonShapeMap1 = new HashMap<Taxon, javafx.scene.Node>();
+				{
+					var graph1 = (PhyloGraph) nodeShapeMap1.keySet().iterator().next().getOwner();
+					for (var v : nodeShapeMap1.keySet()) {
+						for (var t : graph1.getTaxa(v)) {
+							var taxon = taxaBlock.get(t);
+							taxonShapeMap1.put(taxon, nodeShapeMap1.get(v));
+						}
+					}
+				}
+				var taxonShapeMap2 = new HashMap<Taxon, javafx.scene.Node>();
+				{
+					var graph2 = (PhyloGraph) nodeShapeMap2.keySet().iterator().next().getOwner();
+					for (var v : nodeShapeMap2.keySet()) {
+						for (var t : graph2.getTaxa(v)) {
+							var taxon = taxaBlock.get(t);
+							taxonShapeMap2.put(taxon, nodeShapeMap2.get(v));
+						}
+					}
+				}
 
-					line.getStyleClass().add("graph-special-edge");
+				for (var taxon : taxonShapeMap1.keySet()) {
+					var shape1 = taxonShapeMap1.get(taxon);
+					var shape2 = taxonShapeMap2.get(taxon);
+					if (shape1 != null && shape2 != null) {
+						var line = new Path();
+						group.getChildren().add(line);
+						taxonConnectorMap.put(taxon, line);
 
-					line.setOnMouseClicked(e -> {
-						if (!e.isShiftDown())
-							mainWindow.getTaxonSelectionModel().clearSelection();
-						mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
-					});
+						line.getStyleClass().add("graph-special-edge");
 
-					if (mainWindow.getTaxonSelectionModel().isSelected(taxon))
-						line.setEffect(SelectionEffectBlue.getInstance());
+						line.setOnMouseClicked(e -> {
+							if (!e.isShiftDown())
+								mainWindow.getTaxonSelectionModel().clearSelection();
+							mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
+						});
 
-					InvalidationListener invalidationListener = e -> Platform.runLater(() -> {
-						line.getElements().clear();
+						if (mainWindow.getTaxonSelectionModel().isSelected(taxon))
+							line.setEffect(SelectionEffectBlue.getInstance());
+
 						var screenStartPoint = shape1.getParent().localToScreen(shape1.getTranslateX(), shape1.getTranslateY());
 						var screenEndPoint = shape2.getParent().localToScreen(shape2.getTranslateX(), shape2.getTranslateY());
+
 						if (screenStartPoint != null && screenEndPoint != null) {
 							var localStartPoint = line.screenToLocal(screenStartPoint);
 							var localEndPoint = line.screenToLocal(screenEndPoint);
 							if (localStartPoint != null && localEndPoint != null) {
-								line.getElements().add(new MoveTo(0, localStartPoint.getY()));
-								line.getElements().add(new CubicCurveTo(0.3 * drawPane.getWidth(), localStartPoint.getY(),
+								var moveTo = new MoveTo(0, localStartPoint.getY());
+								var cubicCurveTo = new CubicCurveTo(0.3 * drawPane.getWidth(), localStartPoint.getY(),
 										0.7 * drawPane.getWidth(), localEndPoint.getY(),
-										drawPane.getWidth(), localEndPoint.getY()));
+										drawPane.getWidth(), localEndPoint.getY());
+								line.getElements().add(moveTo);
+								line.getElements().add(cubicCurveTo);
 							}
-						} else
+						} else {
 							group.getChildren().remove(line);
-					});
-					tree1Pane.boundsInParentProperty().addListener(invalidationListener);
-					tree2Pane.boundsInParentProperty().addListener(invalidationListener);
-					invalidationListener.invalidated(null);
+						}
+					}
 				}
 			}
-		}
+		});
 	}
 }

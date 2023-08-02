@@ -5,10 +5,8 @@ module splitstreesix {
 	requires transitive javafx.fxml;
 	requires transitive javafx.swing;
 	requires javafx.base;
-	requires pdfbox.app;
 
 	requires Jama;
-	requires richtextfx.fat;
 	requires org.apache.commons.collections4;
 	requires commons.math3;
 	requires com.install4j.runtime;
@@ -17,6 +15,9 @@ module splitstreesix {
 	requires java.sql.rowset;
 	requires org.xerial.sqlitejdbc;
 	requires java.desktop;
+	requires org.fxmisc.flowless;
+	requires org.fxmisc.richtext;
+	requires org.fxmisc.undo;
 
 	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
@@ -153,7 +154,6 @@ module splitstreesix {
 	opens splitstree6.algorithms.utils;
 	opens splitstree6.xtra.genetreeview.layout;
 	opens splitstree6.xtra.genetreeview.io;
-	exports splitstree6.xtra.exportimages;
 	exports splitstree6.xtra.more;
 
 }
