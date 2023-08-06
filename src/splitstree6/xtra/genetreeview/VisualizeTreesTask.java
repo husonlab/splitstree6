@@ -27,6 +27,7 @@ import splitstree6.layout.tree.*;
 import splitstree6.xtra.genetreeview.layout.TreeSheet;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class VisualizeTreesTask extends Task<Group> {
 
@@ -36,30 +37,32 @@ public class VisualizeTreesTask extends Task<Group> {
     private final double treeHeight;
     private final TreeDiagramType diagram;
     private final SelectionModelSet<Integer> taxaSelectionModel;
-    private final SelectionModelSet<Integer> edgeSelectionModel;
+    private final HashMap<Integer,SelectionModelSet<Integer>> edgeSelectionModels;
 
     public VisualizeTreesTask(TreesBlock treesBlock, ArrayList<Integer> treeOrder, double treeWidth, double treeHeight,
                               TreeDiagramType diagram, SelectionModelSet<Integer> taxaSelectionModel,
-                              SelectionModelSet<Integer> edgeSelectionModel) {
+                              HashMap<Integer,SelectionModelSet<Integer>> edgeSelectionModels) {
         this.treesBlock = treesBlock;
         this.treeOrder = treeOrder;
         this.treeWidth = treeWidth;
         this.treeHeight = treeHeight;
         this.diagram = diagram;
         this.taxaSelectionModel = taxaSelectionModel;
-        this.edgeSelectionModel = edgeSelectionModel;
+        this.edgeSelectionModels = edgeSelectionModels;
     }
 
     @Override
     protected Group call() throws Exception {
         Group trees = new Group();
         int treeIndex = 0;
-        for (int id : treeOrder) {
-            PhyloTree tree = treesBlock.getTree(id);
-            TreeSheet treeSheet = new TreeSheet(tree,id,treeWidth,treeHeight,diagram,taxaSelectionModel,edgeSelectionModel);
+        for (int treeId : treeOrder) {
+            PhyloTree tree = treesBlock.getTree(treeId);
+            edgeSelectionModels.put(treeId,new SelectionModelSet<>());
+            TreeSheet treeSheet = new TreeSheet(tree, treeId, treeWidth, treeHeight, diagram, taxaSelectionModel,
+                    edgeSelectionModels.get(treeId));
             trees.getChildren().add(treeIndex, treeSheet);
             treeIndex++;
-            updateProgress(treeIndex,treesBlock.getNTrees());
+            updateProgress(treeIndex, treesBlock.getNTrees());
         }
         return trees;
     }

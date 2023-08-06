@@ -33,7 +33,7 @@ public abstract class MultipleFramesLayout {
     public MultipleFramesLayout() {
     };
 
-    public void updatePosition(double oldSliderValue, double newSliderValue, double nodeWidth) {}
+    public void updatePosition(double oldSliderValue, double newSliderValue) {}
 
     public void resetNode(Node node) {
         node.getTransforms().clear();
@@ -45,10 +45,11 @@ public abstract class MultipleFramesLayout {
         node.setScaleX(1);
         node.setScaleY(1);
         node.setScaleZ(1);
+        node.layoutXProperty().unbind();
         node.setLayoutX(0);
     }
 
-    public void initializeNode(Node node, int index, double sliderValue) {
+    public void initializeNode(Node node, int index) {
         resetNode(node);
     };
 

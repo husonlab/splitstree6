@@ -19,7 +19,10 @@
 
 package splitstree6.xtra.genetreeview.layout;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -34,13 +37,15 @@ import java.util.HashMap;
 
 public class ColorBar extends HBox {
 
-    private final ObservableList<Color> colors = FXCollections.observableArrayList();
     private final Color backgroundColor = Color.web("#ececec",0.264); // -fx-background in modena.css
     private final HashMap<Integer,ColorBarBox> id2colorBarBox;
+    private HashMap<Integer, Color> id2color;
+    private final DoubleProperty boxWidth = new SimpleDoubleProperty();
 
     public ColorBar(TreesBlock treesBlock, Slider slider, ArrayList<Integer> treeOrder) {
         id2colorBarBox = new HashMap<>();
-        initializeColors(treesBlock.getNTrees());
+        id2color = new HashMap<>();
+        initializeColors(treeOrder);
         initializeColorBar(treesBlock,slider, treeOrder);
     }
 
@@ -53,18 +58,17 @@ public class ColorBar extends HBox {
         Node sliderKnob = slider.lookup(".thumb");
         double knobRadius = sliderKnob.getLayoutBounds().getWidth() / 2;
 
-
         var leftSpace = new Pane();
         HBox.setMargin(leftSpace, Insets.EMPTY);
         HBox.setHgrow(leftSpace, Priority.NEVER);
         this.getChildren().add(leftSpace);
-        var boxWidth = new SimpleDoubleProperty();
-        for (int i = 0; i<nTrees; i++) {
-            ColorBarBox colorBarBox = new ColorBarBox(treesBlock.getTree(treeOrder.get(i)).getName(),colors.get(i));
+        if (boxWidth.isBound()) boxWidth.unbind();
+        for (int id : treeOrder) {
+            ColorBarBox colorBarBox = new ColorBarBox(treesBlock.getTree(id).getName(), id2color.get(id));
             this.getChildren().add(colorBarBox);
-            id2colorBarBox.put(treeOrder.get(i),colorBarBox);
-            if (i==nTrees-1) boxWidth.bind(colorBarBox.widthProperty());
+            id2colorBarBox.put(id, colorBarBox);
         }
+        boxWidth.bind(id2colorBarBox.get(treeOrder.get(nTrees-1)).widthProperty());
         var rightSpace = new Pane();
         HBox.setMargin(rightSpace,Insets.EMPTY);
         HBox.setHgrow(rightSpace, Priority.NEVER);
@@ -76,31 +80,54 @@ public class ColorBar extends HBox {
         this.setVisible(true);
     }
 
-    private void initializeColors(int nTrees) {
-        Color[] colorList = new Color[nTrees];
-        for (int i = 0; i<nTrees; i++) {
-            colorList[i] = backgroundColor;
+    private void initializeColors(ArrayList<Integer> treeOrder) {
+        id2color.clear();
+        for (int treeId : treeOrder) {
+            id2color.put(treeId, backgroundColor);
         }
-        assert false;
-        colors.addAll(colorList);
     }
 
     public void addColorBox(String treeName, int id) {
-        colors.add(backgroundColor);
-        ColorBarBox colorBarBox = new ColorBarBox(treeName,colors.get(colors.size()-1));
-        this.getChildren().add(this.getChildren().size()-1,colorBarBox);
+        id2color.put(id, backgroundColor);
+        ColorBarBox colorBarBox = new ColorBarBox(treeName,id2color.get(id));
+        this.getChildren().add(this.getChildren().size()-1, colorBarBox);
         id2colorBarBox.put(id,colorBarBox);
     }
 
     public void removeColorBox(int id) {
         ColorBarBox boxToRemove = id2colorBarBox.get(id);
         id2colorBarBox.remove(id);
-        colors.remove(boxToRemove.getColor());
+        id2color.remove(id);
         this.getChildren().remove(boxToRemove);
     }
 
-    public ObservableList<Color> getColors() {
-        return colors;
+    public void resetColoring() {
+        ArrayList<Integer> array = new ArrayList<>(id2color.keySet());
+        initializeColors(array);
+        for (var treeId : id2color.keySet())
+            id2colorBarBox.get(treeId).setColor(id2color.get(treeId));
+    }
+
+    public void setColor(int id, Color color) {
+        if (id2colorBarBox.containsKey(id)) {
+            id2color.replace(id, color);
+            id2colorBarBox.get(id).setColor(color);
+        }
+    }
+
+    public void setColors(HashMap<Integer,Color> id2color) {
+        if (id2color.size() == this.id2color.size()) this.id2color = id2color;
+
+    }
+
+    public void reorder(ArrayList<Integer> treeOrder) {
+        if (treeOrder.size() != id2colorBarBox.size()) return;
+        this.getChildren().remove(1,treeOrder.size()+1);
+        if (boxWidth.isBound()) boxWidth.unbind();
+        for (int i = 0; i< treeOrder.size(); i++) {
+            this.getChildren().add(i+1, id2colorBarBox.get(treeOrder.get(i)));
+        }
+        boxWidth.bind(id2colorBarBox.get(treeOrder.get(treeOrder.size()-1)).widthProperty());
     }
 
     public HashMap<Integer,ColorBarBox> getId2colorBarBox() {

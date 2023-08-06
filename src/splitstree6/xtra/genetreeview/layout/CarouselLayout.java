@@ -43,7 +43,7 @@ public class CarouselLayout extends MultipleFramesLayout {
     private final DoubleProperty cameraRadius = new SimpleDoubleProperty();
 
     public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight, PerspectiveCamera camera,
-                          double layoutWidth, Slider slider, Slider zoomSlider) {
+                          Slider slider, Slider zoomSlider) {
         type = LayoutType.Carousel;
         // Setting up variables
         this.nodeWidth = nodeWidth;
@@ -68,16 +68,16 @@ public class CarouselLayout extends MultipleFramesLayout {
 
         for (int i=0; i<transformedNodes.size(); i++) {
             Node n = transformedNodes.get(i);
-            initializeNode(n,i,slider.getValue());
+            initializeNode(n, i);
         }
 
         setUpCamera(); // for x- and z-translation
 
-        updatePosition(1,slider.getValue(),nodeWidth); // for camera rotation
+        updatePosition(1,slider.getValue()); // for camera rotation
     }
 
     // Allows to initialize a node with existing index (0-based) or to add a node with the next index
-    public void initializeNode(Node node, int index, double sliderValue) {
+    public void initializeNode(Node node, int index) {
         if (index > realNodeNumber) return;
         if (index == realNodeNumber && realNodeNumber > 49) {
             // The layout needs to be expanded for the additional node -> larger carousel
@@ -91,11 +91,11 @@ public class CarouselLayout extends MultipleFramesLayout {
             Rotate rotate = new Rotate(-index * thetaDeg, 0, node.getTranslateY(), 0, Rotate.Y_AXIS);
             node.getTransforms().add(rotate);
 
-            // Show node larger and without rotation when hovered
+            // Show node closer and without rotation when hovered
             node.setOnMouseEntered(e -> {
                 // Move node towards camera
-                double deltaX = camera.getTranslateX() - node.getTranslateX();
-                double deltaZ = camera.getTranslateZ() - node.getTranslateZ();
+                double deltaX = camera.getTranslateX() - (node.getTranslateX() + (Math.cos(index * thetaRad) * (nodeWidth / 2.)));
+                double deltaZ = camera.getTranslateZ() - (node.getTranslateZ() + (Math.sin(index * thetaRad) * (nodeWidth / 2.)));
                 double distanceNode2Camera = Math.sqrt((deltaX * deltaX) + (deltaZ * deltaZ));
                 double desiredMoveDistance = 140;
                 double fraction = desiredMoveDistance / distanceNode2Camera;
@@ -112,7 +112,7 @@ public class CarouselLayout extends MultipleFramesLayout {
         }
     }
 
-    public void updatePosition(double oldSliderValue, double newSliderValue, double nodeWidth) {
+    public void updatePosition(double oldSliderValue, double newSliderValue) {
         var rotate = new Rotate(-(newSliderValue-oldSliderValue)*thetaDeg,Rotate.Y_AXIS);
         camera.getTransforms().add(rotate);
     }

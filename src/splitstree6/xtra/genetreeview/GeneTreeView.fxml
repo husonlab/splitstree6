@@ -91,11 +91,12 @@
                               </MenuItem>
                               <MenuItem fx:id="copyImageMenuItem" mnemonicParsing="false" text="Copy Image" />
                               <MenuItem fx:id="copySelectedTreesMenuItem" mnemonicParsing="false" text="Copy Selected Tree Images" />
-                              <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="Paste Newick Tree">
+                              <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="Paste Newick Trees">
                                  <accelerator>
                                     <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                                  </accelerator>
                               </MenuItem>
+                              <MenuItem fx:id="deleteSelectedMenuItem" mnemonicParsing="false" text="Delete Selected Trees" />
                            </items></Menu>
                         <Menu mnemonicParsing="false" text="Selection">
                           <items>
@@ -132,10 +133,7 @@
                                  </toggleGroup>
                               </RadioMenuItem>
                               <Menu fx:id="taxonOrderSubMenu" disable="true" mnemonicParsing="false" text="Tree Order As In Genome" />
-                              <Menu fx:id="similarityOrderSubMenu" mnemonicParsing="false" text="Tree Order By Similarity">
-                                  <RadioMenuItem fx:id="topologyOrderMenuItem" mnemonicParsing="false" text="Topology" toggleGroup="$orderGroup" />
-                                  <RadioMenuItem fx:id="featureOrderMenuItem" disable="true" mnemonicParsing="false" text="Imported Feature" toggleGroup="$orderGroup" />
-                              </Menu>
+                              <Menu fx:id="similarityOrderSubMenu" mnemonicParsing="false" text="Tree Order By Similarity" />
                           </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="View">
@@ -151,6 +149,14 @@
                               <RadioMenuItem fx:id="radialPhyloMenuItem" mnemonicParsing="false" text="Radial Phylogram" toggleGroup="$treeLayoutGroup" />
                               <RadioMenuItem fx:id="circularCladoMenuItem" mnemonicParsing="false" text="Circular Cladogram" toggleGroup="$treeLayoutGroup" />
                               <RadioMenuItem fx:id="circularPhyloMenuItem" mnemonicParsing="false" text="Circular Phylogram" toggleGroup="$treeLayoutGroup" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <RadioMenuItem fx:id="noColoringMenuItem" mnemonicParsing="false" selected="true" text="No Coloring">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="coloringGroup" />
+                                 </toggleGroup>
+                              </RadioMenuItem>
+                              <RadioMenuItem fx:id="monophyleticColoringMenuItem" mnemonicParsing="false" text="Monophyletic Selection Coloring" toggleGroup="$coloringGroup" />
+                              <Menu fx:id="similarityColoringSubMenu" mnemonicParsing="false" text="Coloring By Similarity With Tree" />
                            </items>
                         </Menu>
                                 <Menu mnemonicParsing="false" text="Help" />

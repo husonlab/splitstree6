@@ -40,7 +40,7 @@ import java.util.TreeMap;
  * simple data model
  */
 public class Model {
-	private final TaxaBlock taxaBlock = new TaxaBlock();
+	private TaxaBlock taxaBlock = new TaxaBlock();
 	private final TreesBlock treesBlock = new TreesBlock();
 	private final ObservableList<String> orderedGeneNames = FXCollections.observableArrayList();
 	private ArrayList<String> initialGeneNameOrder = new ArrayList<>();
@@ -69,6 +69,7 @@ public class Model {
 		if (dataType.equals(TreesBlock.class)) {
 			var fileFormat = importManager.getFileFormat(file.getPath());
 			var importer = (TreesReader) importManager.getImporterByDataTypeAndFileFormat(dataType, fileFormat);
+			taxaBlock = new TaxaBlock();
 			importer.read(new ProgressPercentage(), file.getPath(), taxaBlock, treesBlock);
 			initializeTreeOrder();
 			lastUpdate.set(System.currentTimeMillis());
@@ -95,7 +96,7 @@ public class Model {
 		}
 	}
 
-	public void setTreeOrder(TreeMap<Integer,String> position2geneName) {
+	public void setTreeOrder(TreeMap<?,String> position2geneName) {
 		orderedGeneNames.clear();
 		treeOrder = new ArrayList<>(treesBlock.getNTrees());
 		int index = 0;

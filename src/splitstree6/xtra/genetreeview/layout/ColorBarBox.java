@@ -31,13 +31,10 @@ public class ColorBarBox extends Pane implements Selectable {
     private final String name;
     private Color color;
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
-    //private final BooleanProperty mediatorProperty = new SimpleBooleanProperty(); // for selection state binding
 
     public ColorBarBox(String name, Color color) {
         this.color = color;
-        this.setBackground(new Background(new BackgroundFill(this.color,null,null)));
-        //this.setBorder(new Border(new BorderStroke(Color.BLACK,BorderStrokeStyle.SOLID,
-        //        CornerRadii.EMPTY,new BorderWidths(0.1))));
+        this.setBackground(new Background(new BackgroundFill(color,null,null)));
         this.setStyle("-fx-border-color: -fx-box-border");
         HBox.setMargin(this, Insets.EMPTY);
         HBox.setHgrow(this, Priority.ALWAYS);
@@ -46,13 +43,12 @@ public class ColorBarBox extends Pane implements Selectable {
         isSelectedProperty.addListener((observable, wasSelected, isSelected) -> {
             if (isSelected) this.setStyle("-fx-border-color: -fx-accent");
             else this.setStyle("-fx-border-color: -fx-box-border");
-            //if (isSelected != mediatorProperty.get()) mediatorProperty().set(isSelected);
         });
     }
 
-    public void setColor(Color color) {
+    void setColor(Color color) {
         this.color = color;
-        this.setBackground(new Background(new BackgroundFill(this.color,null,null)));
+        this.setBackground(new Background(new BackgroundFill(color,null,null)));
     }
 
     public String getName() {
@@ -74,8 +70,4 @@ public class ColorBarBox extends Pane implements Selectable {
     public BooleanProperty isSelectedProperty() {
         return isSelectedProperty;
     }
-
-    //public BooleanProperty mediatorProperty() {
-    //    return mediatorProperty;
-    //}
 }

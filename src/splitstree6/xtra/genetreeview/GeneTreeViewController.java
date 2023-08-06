@@ -63,6 +63,9 @@ public class GeneTreeViewController {
 	private MenuItem pasteMenuItem;
 
 	@FXML
+	private MenuItem deleteSelectedMenuItem;
+
+	@FXML
 	private MenuItem selectAllMenuItem;
 
 	@FXML
@@ -102,12 +105,6 @@ public class GeneTreeViewController {
 	private Menu similarityOrderSubMenu;
 
 	@FXML
-	private RadioMenuItem topologyOrderMenuItem;
-
-	@FXML
-	private RadioMenuItem featureOrderMenuItem;
-
-	@FXML
 	private ToggleGroup treeLayoutGroup;
 
 	@FXML
@@ -130,6 +127,18 @@ public class GeneTreeViewController {
 
 	@FXML
 	private RadioMenuItem triangularCladoMenuItem;
+
+	@FXML
+	private ToggleGroup coloringGroup;
+
+	@FXML
+	private RadioMenuItem noColoringMenuItem;
+
+	@FXML
+	private RadioMenuItem monophyleticColoringMenuItem;
+
+	@FXML
+	private Menu similarityColoringSubMenu;
 
 	@FXML
 	private ToolBar toolBar;
@@ -208,6 +217,9 @@ public class GeneTreeViewController {
 	public MenuItem getPasteMenuItem() {
 		return pasteMenuItem;
 	}
+	public MenuItem getDeleteSelectedMenuItem() {
+		return deleteSelectedMenuItem;
+	}
 
 	// Selection Menu
 	public MenuItem getSelectAllMenuItem() {
@@ -251,12 +263,6 @@ public class GeneTreeViewController {
 	public Menu getSimilarityOrderSubMenu() {
 		return similarityOrderSubMenu;
 	}
-	public RadioMenuItem getTopologyOrderMenuItem() {
-		return topologyOrderMenuItem;
-	}
-	public RadioMenuItem getFeatureOrderMenuItem() {
-		return featureOrderMenuItem;
-	}
 
 	// View Menu
 	public ToggleGroup getTreeLayoutGroup() {
@@ -282,6 +288,18 @@ public class GeneTreeViewController {
 	}
 	public RadioMenuItem getTriangularCladoMenuItem() {
 		return triangularCladoMenuItem;
+	}
+	public ToggleGroup getColoringGroup() {
+		return coloringGroup;
+	}
+	public RadioMenuItem getNoColoringMenuItem() {
+		return noColoringMenuItem;
+	}
+	public RadioMenuItem getMonophyleticColoringMenuItem() {
+		return monophyleticColoringMenuItem;
+	}
+	public Menu getSimilarityColoringSubMenu() {
+		return similarityColoringSubMenu;
 	}
 
 	// ToolBar

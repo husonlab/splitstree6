@@ -20,31 +20,31 @@
 package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.property.*;
+import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Path;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.ComputeTreeLayout;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.xtra.genetreeview.SelectionModel;
 import splitstree6.xtra.genetreeview.SelectionModelSet;
 
-import java.util.HashMap;
+import java.util.*;
 import java.util.function.Function;
 
 public class TreeSheet extends StackPane implements Selectable {
 
+    private final PhyloTree tree;
     private final int id;
     private final double width;
     private final double height;
@@ -53,23 +53,24 @@ public class TreeSheet extends StackPane implements Selectable {
     private final Group taxonLabels;
     private final Group edges;
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
+    private final SelectionModelSet<Integer> taxaSelectionModel;
+    private final SelectionModelSet<Integer> edgeSelectionModel;
+    private final HashMap<String, Integer> taxonName2id = new HashMap<>();
     private final LongProperty lastUpdate = new SimpleLongProperty(this, "lastUpdate", 0L);
 
     public TreeSheet(PhyloTree tree, int id, double width, double height, TreeDiagramType diagram,
                      SelectionModelSet<Integer> taxaSelectionModel, SelectionModelSet<Integer> edgeSelectionModel) {
+        this.tree = tree;
         this.id = id;
         this.width = width;
         this.height = height;
+        this.taxaSelectionModel = taxaSelectionModel;
+        this.edgeSelectionModel = edgeSelectionModel;
 
         createTreeBackground(tree.getName());
 
         Function<Integer, StringProperty> taxonLabelMap = (taxonId) ->
                 new SimpleStringProperty(tree.getTaxon2Node(taxonId).getLabel());
-
-        // Computing the actual tree with splitstree6.layout.tree.ComputeTreeLayout
-        /*Group layoutedTree = ComputeTreeLayout.apply(tree, tree.getNumberOfTaxa(), taxonLabelMap,
-                diagram, HeightAndAngles.Averaging.ChildAverage,width-80,height-20,
-                false, new HashMap<>(), new HashMap<>()).getAllAsGroup();*/
 
         var computedTreeLayout = ComputeTreeLayout.apply(tree, tree.getNumberOfTaxa(), taxonLabelMap,
                 diagram, HeightAndAngles.Averaging.ChildAverage,width-80,height-20,
@@ -94,6 +95,7 @@ public class TreeSheet extends StackPane implements Selectable {
             assert taxonLabels != null;
             for (var label : taxonLabels.getChildren()) {
                 ((RichTextLabel)label).setScale(0.3);
+                ((RichTextLabel)label).ensureUpright();
             }
         } else if (diagram.equals(TreeDiagramType.RectangularCladogram) |
                 diagram.equals(TreeDiagramType.RectangularPhylogram)) {
@@ -109,10 +111,14 @@ public class TreeSheet extends StackPane implements Selectable {
                 ((RichTextLabel)label).setScale(0.4);
             }
         }
+        assert computedTreeLayout.otherLabels() != null;
+        for (var label : computedTreeLayout.otherLabels().getChildren()) {
+            ((RichTextLabel)label).ensureUpright();
+            ((RichTextLabel)label).setScale(0.2);
+        }
         this.getChildren().addAll(layoutedTree);
 
         // Taxon Selection
-        HashMap<String, Integer> taxonName2id = new HashMap<>();
         for (var taxonId : tree.getTaxonNodeMap().keySet())
             taxonName2id.put(tree.getTaxon2Node(taxonId).getLabel(),taxonId);
         for (var taxonLabel : taxonLabels.getChildren()) {
@@ -120,57 +126,65 @@ public class TreeSheet extends StackPane implements Selectable {
             taxonLabel.setOnMouseEntered(e -> taxonRichTextLabel.setScale(1.1*taxonRichTextLabel.getScale()));
             taxonLabel.setOnMouseExited(e -> taxonRichTextLabel.setScale(1/1.1*taxonRichTextLabel.getScale()));
             int taxonId = taxonName2id.get(taxonRichTextLabel.getText());
-            if (taxaSelectionModel.getSelectedItems().contains(taxonId)) selectTaxon(taxonRichTextLabel.getText(),true);
+            if (taxaSelectionModel.getSelectedItems().contains(taxonId))
+                selectTaxon(taxonRichTextLabel.getText(),true);
             taxonLabel.setOnMouseClicked(e -> {
                 boolean selectedBefore = taxaSelectionModel.getSelectedItems().contains(taxonId);
                 if (!e.isShiftDown()) {
                     taxaSelectionModel.clearSelection();
-                    edgeSelectionModel.clearSelection();
                     if (!selectedBefore) {
                         taxaSelectionModel.select(taxonId);
-                        updateEdgeSelection();
                     }
                 } else {
                     taxaSelectionModel.setSelected(taxonId, !selectedBefore);
-                    updateEdgeSelection();
                 }
             });
         }
 
         // Edge Selection
+        edgeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super Integer>) c -> {
+            if (c.wasAdded()) {
+                int edgeId = c.getElementAdded();
+                selectEdge(edgeId, true);
+            } else if (c.wasRemoved()) {
+                int edgeId = c.getElementRemoved();
+                selectEdge(edgeId, false);
+            }
+        });
         for (var edge : edges.getChildren()) {
             var labeledEdgeShape = (LabeledEdgeShape) edge;
             for (var node : labeledEdgeShape.all()) {
                 if (node instanceof Shape shape) {
                     shape.setOnMouseEntered(e -> shape.setStrokeWidth(shape.getStrokeWidth() + 3));
                     shape.setOnMouseExited(e -> shape.setStrokeWidth(shape.getStrokeWidth() - 3));
-                    //shape.setOnMouseClicked(e -> selectEdge(shape,true));
                 }
                 else if (node instanceof RichTextLabel label) {
                     label.setOnMouseEntered(e -> label.setScale(1.1*label.getScale()));
                     label.setOnMouseExited(e -> label.setScale(1/1.1*label.getScale()));
                 }
             }
-            int edgeIndex = edges.getChildren().indexOf(edge);
-            if (edgeSelectionModel.getSelectedItems().contains(edgeIndex)) selectEdge(edge,true);
-            edge.setOnMouseClicked(e -> {
-                boolean selectedBefore = edgeSelectionModel.getSelectedItems().contains(edgeIndex);
-                if (!e.isShiftDown()) {
-                    taxaSelectionModel.clearSelection();
-                    edgeSelectionModel.clearSelection();
-                    if (!selectedBefore) {
-                        edgeSelectionModel.select(edgeIndex);
-                        updateEdgeSelection();
-                        updateTaxaSelection();
+
+            int edgeId = edges.getChildren().indexOf(edge)+1;
+            if (edgeSelectionModel.getSelectedItems().contains(edgeId)) selectEdge(edge,true);
+            edge.setOnMousePressed(e -> {
+                if (e.getButton().equals(MouseButton.PRIMARY)) {
+                    if (e.getClickCount() == 1) {
+                        boolean selectedBefore = edgeSelectionModel.getSelectedItems().contains(edgeId);
+                        if (!e.isShiftDown()) {
+                            taxaSelectionModel.clearSelection();
+                            edgeSelectionModel.clearSelection();
+                        }
+                        edgeSelectionModel.setSelected(edgeId, !selectedBefore);
                     }
-                } else {
-                    edgeSelectionModel.setSelected(edgeIndex, !selectedBefore);
-                    updateEdgeSelection();
-                    updateTaxaSelection();
+                    else if (e.getClickCount() == 2) { // if-block above has been executed after first click
+                        boolean selectedBefore = !edgeSelectionModel.getSelectedItems().contains(edgeId);
+                        selectTaxaBelow(edgeId, !selectedBefore);
+                    }
+                    lastUpdate.set(System.currentTimeMillis());
                 }
-                lastUpdate.set(System.currentTimeMillis());
             });
         }
+        updateEdgeSelection();
 
         // Tree Selection
         isSelectedProperty.addListener((observableValue, wasSelected, isSelected) -> {
@@ -206,7 +220,7 @@ public class TreeSheet extends StackPane implements Selectable {
                 // Selection indication like in splitstree
                 if (select) label.setEffect(SelectionEffectBlue.getInstance());
                 else label.setEffect(null);
-                // Alternative: Selection indication with CSS style ( no suitable color yet)
+                // Alternative: Selection indication with CSS style (no suitable fx color found yet)
                 //if (select) label.setStyle("-fx-effect: dropshadow(one-pass-box,-fx-focus-color,5,1,0,0)");
                 //else label.setStyle("-fx-effect: dropshadow(one-pass-box,transparent,5,1,0,0)");
                 lastUpdate.set(System.currentTimeMillis());
@@ -216,27 +230,107 @@ public class TreeSheet extends StackPane implements Selectable {
         return false;
     }
 
-    public boolean selectEdge(int edgeId, boolean select) {
-        var edge = edges.getChildren().get(edgeId);
+    private void selectEdge(int edgeId, boolean select) {
+        var edge = edges.getChildren().get(edgeId-1);
         if (edge != null) {
             selectEdge(edge,select);
-            return true;
         }
-        return false;
     }
 
     private void selectEdge(Node edge, boolean select) {
         if (select) edge.setEffect(SelectionEffectBlue.getInstance());
         else edge.setEffect(null);
-        lastUpdate.set(System.currentTimeMillis());
+    }
+
+    private void selectTaxaBelow(int edgeId, boolean select) {
+        tree.postorderTraversal(tree.findEdgeById(edgeId).getTarget(), n -> n.outEdges().forEach(e -> {
+            if (e.getTarget().isLeaf()) {
+                taxaSelectionModel.setSelected(taxonName2id.get(e.getTarget().getLabel()),select);
+            }
+        }));
     }
 
     public void updateEdgeSelection() {
-        // TODO
+        edgeSelectionModel.clearSelection();
+        LinkedList<jloda.graph.Node> nodes = new LinkedList<>();
+        for (var taxonId : taxaSelectionModel.getSelectedItems()) {
+            var taxonNode = tree.getTaxon2Node(taxonId);
+            if (taxonNode != null) {
+                edgeSelectionModel.setSelected(taxonNode.getFirstInEdge().getId(), true);
+                nodes.add(taxonNode);
+            }
+        }
+        int counter = 0;
+        int max = (int) (nodes.size()*((nodes.size()-1)/2.));
+        while (nodes.size() > 1 & counter < max) {
+            var node = nodes.removeFirst();
+            var edgeIn = node.getFirstInEdge();
+            var sourceNode = edgeIn.getSource();
+            LinkedList<jloda.graph.Node> sisters = new LinkedList<>();
+            for (var outEdge : sourceNode.outEdges()) {
+                var sister = outEdge.getTarget();
+                if (sister == node) continue;
+                if (nodes.contains(sister)) {
+                    sisters.add(sister);
+                }
+                else {
+                    nodes.addLast(node);
+                    break;
+                }
+            }
+            if (sisters.size() == sourceNode.getOutDegree()-1) {
+                for (var sisterNode : sisters) {
+                    edgeSelectionModel.setSelected(sisterNode.getFirstInEdge().getId(), true);
+                    nodes.remove(sisterNode);
+                }
+                nodes.addLast(sourceNode);
+                if (sourceNode.getFirstInEdge() != null)
+                    edgeSelectionModel.setSelected(sourceNode.getFirstInEdge().getId(), true);
+            }
+            counter++;
+        }
+        System.out.println(tree.getName()+" updateEdgeSelection: "+counter+" of max rounds "+max);
+        lastUpdate.set(System.currentTimeMillis());
     }
 
-    private void updateTaxaSelection() {
-        // TODO
+    private boolean monophyletic(List<jloda.graph.Node> taxa) {
+        LinkedList<jloda.graph.Node> nodes = new LinkedList<>(taxa);
+        int counter = 0;
+        int max = (int) (nodes.size()*((nodes.size()-1)/2.));
+        while (nodes.size() > 1 & counter < max) {
+            var node = nodes.removeFirst();
+            var edgeIn = node.getFirstInEdge();
+            var sourceNode = edgeIn.getSource();
+            LinkedList<jloda.graph.Node> sisters = new LinkedList<>();
+            for (var outEdge : sourceNode.outEdges()) {
+                var sister = outEdge.getTarget();
+                if (sister == node) continue;
+                if (nodes.contains(sister)) {
+                    sisters.add(sister);
+                }
+                else {
+                    nodes.addLast(node);
+                    break;
+                }
+            }
+            if (sisters.size() == sourceNode.getOutDegree()-1) {
+                for (var sisterNode : sisters) nodes.remove(sisterNode);
+                nodes.addLast(sourceNode);
+            }
+            counter++;
+        }
+        System.out.println(tree.getName()+" monophyletic check: "+counter+" of max rounds "+max);
+        return nodes.size() == 1;
+    }
+
+    public boolean monophyleticSelection() {
+        LinkedList<jloda.graph.Node> selectedLeafNodes = new LinkedList<>();
+        for (int taxonId : taxaSelectionModel.getSelectedItems()) {
+            if (tree.getTaxon2Node(taxonId) != null) {
+                selectedLeafNodes.add(tree.getTaxon2Node(taxonId));
+            }
+        }
+        return monophyletic(selectedLeafNodes);
     }
 
     public int getTreeId() {
