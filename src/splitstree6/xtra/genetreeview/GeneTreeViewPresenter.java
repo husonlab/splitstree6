@@ -99,9 +99,11 @@ public class GeneTreeViewPresenter {
 		Model model = geneTreeView.getModel();
 
 		// Setting up a subScene with camera (further camera settings are done by the layout)
-		var subScene = new SubScene(trees, 600, 600, true, SceneAntialiasing.BALANCED);
+		var subScene = new SubScene(trees, controller.getCenterPane().getWidth(), controller.getCenterPane().getHeight(), false, SceneAntialiasing.BALANCED);
+
 		subScene.widthProperty().bind(controller.getCenterPane().widthProperty());
 		subScene.heightProperty().bind(controller.getCenterPane().heightProperty());
+
 		subScene.setCamera(camera);
 		controller.getCenterPane().getChildren().add(subScene);
 
