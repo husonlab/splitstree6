@@ -24,7 +24,7 @@ import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.SetUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
@@ -69,8 +69,8 @@ public class ListOneRSPRTrees extends Trees2ReportBase {
 	}
 
 	public static boolean haveRootedSprDistanceOne(PhyloTree tree1, PhyloTree tree2) {
-		var clusters1 = TreesUtilities.extractClusters(tree1).values();
-		var clusters2 = new HashSet<>(TreesUtilities.extractClusters(tree2).values());
+		var clusters1 = TreesUtils.extractClusters(tree1).values();
+		var clusters2 = new HashSet<>(TreesUtils.extractClusters(tree2).values());
 
 		if (allCompatible(clusters1, clusters2))
 			return false; // rSPR distance is 0

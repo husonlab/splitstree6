@@ -19,7 +19,7 @@
 
 package splitstree6.algorithms.utils;
 
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.util.ArrayList;
 import java.util.BitSet;

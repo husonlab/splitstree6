@@ -23,7 +23,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.workflow.DataTaxaFilter;
@@ -50,12 +50,12 @@ public class TreesTaxaFilter extends DataTaxaFilter<TreesBlock, TreesBlock> {
 
 			for (PhyloTree tree : inputData.getTrees()) {
 				// PhyloTree inducedTree = computeInducedTree(tree, modifiedTaxaBlock.getLabels());
-				final PhyloTree inducedTree = TreesUtilities.computeInducedTree(oldTaxonId2NewTaxonId, tree);
+				final PhyloTree inducedTree = TreesUtils.computeInducedTree(oldTaxonId2NewTaxonId, tree);
 				if (inducedTree != null) {
 					outputData.getTrees().add(inducedTree);
-					if (false && !BitSetUtils.contains(modifiedTaxaBlock.getTaxaSet(), TreesUtilities.getTaxa(inducedTree))) {
+					if (false && !BitSetUtils.contains(modifiedTaxaBlock.getTaxaSet(), TreesUtils.getTaxa(inducedTree))) {
 						System.err.println("taxa:" + StringUtils.toString(modifiedTaxaBlock.getTaxaSet()));
-						System.err.println("tree:" + StringUtils.toString(TreesUtilities.getTaxa(inducedTree)));
+						System.err.println("tree:" + StringUtils.toString(TreesUtils.getTaxa(inducedTree)));
 						throw new RuntimeException("Induce tree failed");
 					}
 				}

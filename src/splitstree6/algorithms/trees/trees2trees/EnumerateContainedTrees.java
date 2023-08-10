@@ -28,7 +28,7 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
@@ -137,7 +137,7 @@ public class EnumerateContainedTrees extends Trees2Trees {
 		var clusterSets = new ArrayList<Set<BitSet>>();
 
 		for (var tree : trees) {
-			var clusters = new HashSet<BitSet>(TreesUtilities.extractClusters(tree).values());
+			var clusters = new HashSet<BitSet>(TreesUtils.extractClusters(tree).values());
 			if (!clusterSets.contains(clusters)) {
 				result.add(tree);
 				clusterSets.add(clusters);

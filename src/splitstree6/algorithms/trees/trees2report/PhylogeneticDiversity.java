@@ -26,7 +26,7 @@ import jloda.util.CanceledException;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
@@ -71,7 +71,7 @@ public class PhylogeneticDiversity extends Trees2ReportBase {
 		for (var tree : treesBlock.getTrees()) {
 			var total = tree.edgeStream().mapToDouble(tree::getWeight).sum();
 			double diversity;
-			try (var nodeClusterMap = TreesUtilities.extractClusters(tree)) {
+			try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
 				diversity = tree.edgeStream()
 						.filter(e -> nodeClusterMap.get(e.getTarget()).intersects(selectedTaxa) && (rooted || !BitSetUtils.contains(selectedTaxa, nodeClusterMap.get(e.getTarget()))))
 						.mapToDouble(tree::getWeight).sum();

@@ -155,5 +155,7 @@ module splitstreesix {
 	opens splitstree6.xtra.genetreeview.layout;
 	opens splitstree6.xtra.genetreeview.io;
 	exports splitstree6.xtra.more;
+	exports splitstree6.splits;
+	opens splitstree6.splits;
 
 }

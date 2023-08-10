@@ -23,12 +23,12 @@ import jloda.util.BitSetUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.BitSet;
@@ -145,14 +145,14 @@ public class DnaToSplits extends Characters2Splits {
         }
 
         // add all missing trivial
-        computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), 0.0));
+		computedSplits.getSplits().addAll(SplitsBlockUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), 0.0));
 
         if (isOptionHighDimensionFilter()) {
             DimensionFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
         } else
             splitsBlock.copy(computedSplits);
 
-        splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
         splitsBlock.setFit(-1);
         splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
     }

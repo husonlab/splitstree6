@@ -34,7 +34,7 @@ import jloda.fx.control.sliderhistogram.SliderHistogramView;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.data.SplitsBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
 import splitstree6.tabs.IDisplayTabPresenter;

@@ -22,9 +22,10 @@ package splitstree6.data;
 import javafx.collections.FXCollections;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.splits.splits2splits.SplitsTaxaFilter;
-import splitstree6.algorithms.utils.SplitsUtilities;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitUtils;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
@@ -159,7 +160,7 @@ public class SplitsBlock extends DataBlock {
 				taxa.or(split.getA());
 				taxa.or(split.getB());
 			}
-			cycle = SplitsUtilities.computeCycle(taxa.cardinality(), splits);
+			cycle = SplitsBlockUtilities.computeCycle(taxa.cardinality(), splits);
 		}
 		return cycle;
 	}
@@ -216,7 +217,7 @@ public class SplitsBlock extends DataBlock {
 				cycle = null;
 			} else {
 				if (normalize)
-					cycle = SplitsUtilities.normalizeCycle(cycle);
+					cycle = SplitUtils.normalizeCycle(cycle);
 			}
 		}
 		this.cycle = cycle;

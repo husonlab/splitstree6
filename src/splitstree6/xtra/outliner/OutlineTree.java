@@ -27,7 +27,6 @@ import javafx.collections.ObservableMap;
 import javafx.scene.Group;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.effect.DropShadow;
-import javafx.scene.effect.Glow;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
@@ -35,25 +34,16 @@ import javafx.scene.shape.StrokeLineCap;
 import jloda.fx.control.RichTextLabel;
 import jloda.graph.Node;
 import jloda.util.progress.ProgressSilent;
-import splitstree6.algorithms.splits.splits2trees.GreedyTree;
 import splitstree6.algorithms.trees.trees2splits.ConsensusOutline;
 import splitstree6.algorithms.trees.trees2splits.ConsensusSplits;
-import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.Compatibility;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitNetworkLayout;
 import splitstree6.layout.tree.LabeledNodeShape;
-import splitstree6.layout.tree.LayoutTreeRadial;
-import splitstree6.layout.tree.RadialLabelLayout;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.function.Consumer;
-
-import static splitstree6.xtra.outliner.ComputeOutlineAndReferenceTree.asGroup;
 
 public class OutlineTree {
 	public static Group apply(Model model, double width, double height) throws IOException {

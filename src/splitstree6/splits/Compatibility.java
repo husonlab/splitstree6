@@ -1,25 +1,23 @@
 /*
- * Compatibility.java Copyright (C) 2023 Daniel H. Huson
+ *  Compatibility.java Copyright (C) 2023 Daniel H. Huson
  *
- * (Some files contain contributions from other authors, who are then mentioned separately.)
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.data.parts;
-
-import splitstree6.algorithms.utils.SplitsUtilities;
+package splitstree6.splits;
 
 import java.util.BitSet;
 import java.util.List;
@@ -32,7 +30,7 @@ public enum Compatibility {
 	compatible, cyclic, weaklyCompatible, incompatible, unknown;
 
 	/**
-	 * computes the compatiblity of a set of splits
+	 * computes the compatibility of a set of splits
 	 *
 	 * @return compatibility
 	 */
@@ -138,9 +136,6 @@ public enum Compatibility {
 	 * @return true, if the given splits are cyclic
 	 */
 	public static boolean isCyclic(int ntax, List<ASplit> splits, int[] cycle) {
-		if (cycle == null)
-			cycle = SplitsUtilities.computeCycle(ntax, splits);
-
 		var inverse = new int[ntax + 1];
 		for (var t = 1; t <= ntax; t++)
 			inverse[cycle[t]] = t;

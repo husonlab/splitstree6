@@ -23,7 +23,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
@@ -46,10 +45,10 @@ import jloda.util.StringUtils;
 import jloda.util.Triplet;
 import jloda.util.progress.ProgressListener;
 
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.Compatibility;
 import splitstree6.data.parts.Taxon;
 
 import splitstree6.layout.splits.algorithms.ConvexHull;
@@ -118,7 +117,7 @@ public class SplitNetworkLayout {
 			return new Group();
 
 		if (splitsBlock0.getCycle() == null || splitsBlock0.getCycle().length == 0) {
-			splitsBlock0.setCycle(SplitsUtilities.computeCycle(taxaBlock0.getNtax(), splitsBlock0.getSplits()));
+			splitsBlock0.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock0.getNtax(), splitsBlock0.getSplits()));
 		}
 
 		// if rooting is desired, need to create a modified set of taxa and splits

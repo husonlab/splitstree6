@@ -28,11 +28,11 @@ import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.PhyloGraphUtils;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.splits.GraphUtils;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -62,12 +62,12 @@ public class PhylogeneticOutline {
 
         final var origNSplits = splits0.getNsplits();
         var splits = new SplitsBlock(splits0);
-        SplitsUtilities.addAllTrivial(taxaBlock.getNtax(), splits);
+        SplitsBlockUtilities.addAllTrivial(taxaBlock.getNtax(), splits);
         // these will be removed again
 
         try {
             final var cycle = splits.getCycle();
-            //final int[] cycle=SplitsUtilities.normalizeCycle(splits.getCycle());
+            //final int[] cycle=SplitsBlockUtilities.normalizeCycle(splits.getCycle());
             final var split2angle = EqualAngle.assignAnglesToSplits(taxaBlock.getNtax(), splits, splits.getCycle(), rootSplit == 0 ? 360 : rootAngle);
 
             final ArrayList<Event> events;
@@ -77,7 +77,7 @@ public class PhylogeneticOutline {
 
                 for (var s = 1; s <= splits.getNsplits(); s++) {
                     final var split = splits.get(s);
-                    if (split.isTrivial() || SplitsUtilities.isCircular(taxaBlock, cycle, split)) {
+                    if (split.isTrivial() || SplitsBlockUtilities.isCircular(taxaBlock, cycle, split)) {
                         outbound.add(new Event(Event.Type.outbound, s, cycle, split));
                         inbound.add(new Event(Event.Type.inbound, s, cycle, split));
                         if (s <= origNSplits)
@@ -189,7 +189,7 @@ public class PhylogeneticOutline {
             progress.setMaximum(100);
             progress.setProgress(90);
 
-            PhyloGraphUtils.addLabels(taxaBlock, graph);
+            GraphUtils.addLabels(taxaBlock::getLabel, graph);
             progress.setProgress(100);   //set progress to 100%
 
             if (false) {

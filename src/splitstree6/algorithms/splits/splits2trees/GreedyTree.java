@@ -21,11 +21,12 @@ package splitstree6.algorithms.splits.splits2trees;
 
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.GreedyCompatible;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.algorithms.utils.RerootingUtils;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.io.IOException;
 
@@ -44,7 +45,8 @@ public class GreedyTree extends Splits2Trees {
 		progress.setTasks("Greedy Tree", "Extracting compatible splits...");
 
 		final var compatibleSplits = GreedyCompatible.apply(progress, splits.getSplits(), ASplit::getWeight);
-		var tree = TreesUtilities.computeTreeFromCompatibleSplits(taxaBlock::getLabel, compatibleSplits);
+		var tree = TreesUtils.computeTreeFromCompatibleSplits(taxaBlock::getLabel, compatibleSplits);
+		RerootingUtils.rerootByMidpoint(tree);
 		trees.getTrees().setAll(tree);
 		trees.setRooted(true);
 		trees.setPartial(false);

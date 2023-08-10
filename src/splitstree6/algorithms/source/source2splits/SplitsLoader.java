@@ -36,13 +36,20 @@ public class SplitsLoader extends DataLoader<SourceBlock, SplitsBlock> {
 	@Override
 	public void load(ProgressListener progress, SourceBlock inputData, TaxaBlock outputTaxa, SplitsBlock outputBlock) throws IOException {
 		var file = inputData.getSources().get(0);
+		var ok = false;
 		for (var reader : getReaders()) {
-			if (reader.getToClass().equals(SplitsBlock.class)) {
-				reader.read(progress, file, outputTaxa, outputBlock);
-				System.err.println("Loaded: Taxa: " + outputTaxa.getShortDescription() + " Splits: " + outputBlock.getShortDescription());
-				break;
+			try {
+				if (reader.getToClass().equals(SplitsBlock.class)) {
+					reader.read(progress, file, outputTaxa, outputBlock);
+					System.err.println("Loaded: Taxa: " + outputTaxa.getShortDescription() + " Splits: " + outputBlock.getShortDescription());
+					ok = true;
+					break;
+				}
+			} catch (IOException ignored) {
 			}
 		}
+		if (!ok)
+			throw new IOException("Failed to parse: " + file);
 	}
 
 	@Override

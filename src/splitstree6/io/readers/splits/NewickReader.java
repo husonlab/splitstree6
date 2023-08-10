@@ -22,11 +22,11 @@ package splitstree6.io.readers.splits;
 import jloda.fx.window.NotificationManager;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.Compatibility;
-import splitstree6.io.utils.SplitNewick;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitNewick;
 
 import java.io.File;
 import java.io.IOException;
@@ -80,19 +80,19 @@ public class NewickReader extends SplitsReader {
 						cycle1based[t] = t;
 					}
 					// keep the input ordering, if we can
-					var count = SplitsUtilities.countCompatibleWithOrdering(splitsBlock.getSplits(), cycle1based);
+					var count = SplitsBlockUtilities.countCompatibleWithOrdering(splitsBlock.getSplits(), cycle1based);
 					if (count == splitsBlock.getNsplits())
 						splitsBlock.setCycle(cycle1based);
 					else {
-						var alt = SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits());
-						var countAlt = SplitsUtilities.countCompatibleWithOrdering(splitsBlock.getSplits(), alt);
+						var alt = SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits());
+						var countAlt = SplitsBlockUtilities.countCompatibleWithOrdering(splitsBlock.getSplits(), alt);
 						if (count < countAlt)
 							splitsBlock.setCycle(cycle1based);
 						else
 							splitsBlock.setCycle(alt);
 					}
 				} else {
-					var alt = SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits());
+					var alt = SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits());
 					splitsBlock.setCycle(alt);
 				}
 				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));

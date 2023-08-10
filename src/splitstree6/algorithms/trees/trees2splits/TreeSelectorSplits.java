@@ -23,12 +23,12 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.SplitsUtilities;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitUtils;
 
 import java.io.IOException;
 import java.util.BitSet;
@@ -77,13 +77,13 @@ public class TreeSelectorSplits extends Trees2Splits {
 		progress.setTasks("TreeSelectorSplits", "Extracting splits");
 		progress.incrementProgress();
 
-		final BitSet taxaInTree = TreesUtilities.computeSplits(null, tree, splits.getSplits());
+		final BitSet taxaInTree = SplitUtils.computeSplits(null, tree, splits.getSplits());
 
 		splits.setPartial(taxaInTree.cardinality() < taxaBlock.getNtax());
 		splits.setCompatibility(Compatibility.compatible);
-		splits.setCycle(SplitsUtilities.computeCycle(taxaBlock.size(), splits.getSplits()));
+		splits.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.size(), splits.getSplits()));
 
-		SplitsUtilities.verifySplits(splits.getSplits(), taxaBlock);
+		SplitsBlockUtilities.verifySplits(splits.getSplits(), taxaBlock);
 		progress.close();
 	}
 

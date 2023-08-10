@@ -25,8 +25,8 @@ import splitstree6.algorithms.IFilter;
 import splitstree6.algorithms.utils.*;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -126,7 +126,7 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			child.setThreshold(parent.getThreshold());
 			setShortDescription("using all " + parent.getNsplits() + " splits");
 		} else {
-			child.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
+			child.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
 
 			child.setFit(-1);
 			if (compatibility == Compatibility.unknown)

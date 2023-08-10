@@ -19,7 +19,6 @@
 
 package splitstree6.view.trees.treeview;
 
-import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.algorithms.PQTree;
 import jloda.phylo.LSAUtils;
@@ -28,7 +27,7 @@ import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.view.trees.tanglegram.optimize.LSATree;
 
 import java.util.*;
@@ -56,7 +55,7 @@ public class TreeEmbeddingOptimizer {
 					else
 						count += (pqTree.accept(cluster) ? 1 : 0);
 				}
-				var hardwiredClusters = TreesUtilities.collectAllHardwiredClusters(tree);
+				var hardwiredClusters = TreesUtils.collectAllHardwiredClusters(tree);
 				hardwiredClusters.removeAll(lsaClusters);
 				// order these clusters?
 				for (var cluster : hardwiredClusters) {
@@ -148,16 +147,6 @@ public class TreeEmbeddingOptimizer {
 		var set = BitSetUtils.asBitSet(tree.getTaxa(v));
 		for (var w : tree.getLSAChildrenMap().get(v)) {
 			set.or(collectAllLSAClustersRec(tree, w, clusters));
-		}
-		clusters.add(set);
-		return set;
-	}
-
-	public static BitSet collectAllHardwiredClustersRec(PhyloTree tree, Node v, HashSet<BitSet> clusters) {
-		var set = BitSetUtils.asBitSet(tree.getTaxa(v));
-		for (Edge f : v.outEdges()) {
-			var w = f.getTarget();
-			set.or(collectAllHardwiredClustersRec(tree, w, clusters));
 		}
 		clusters.add(set);
 		return set;

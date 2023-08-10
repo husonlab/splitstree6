@@ -27,13 +27,13 @@ import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.trees.trees2splits.TreeSelectorSplits;
 import splitstree6.algorithms.utils.BootstrappingUtils;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataNode;
@@ -190,11 +190,11 @@ public class BootstrapSplits extends Splits2Splits {
 				splitsBlock.getSplits().addAll(computedSplits);
 		}
 
-		SplitsUtilities.addAllTrivial(taxaBlock.getNtax(), splitsBlock);
+		SplitsBlockUtilities.addAllTrivial(taxaBlock.getNtax(), splitsBlock);
 
-		SplitsUtilities.verifySplits(splitsBlock.getSplits(), taxaBlock);
+		SplitsBlockUtilities.verifySplits(splitsBlock.getSplits(), taxaBlock);
 
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		splitsBlock.setFit(-1);
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 

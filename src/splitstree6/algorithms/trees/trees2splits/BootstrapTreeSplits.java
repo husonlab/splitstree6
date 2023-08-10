@@ -23,12 +23,12 @@ import javafx.beans.property.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.trees.IToSingleTree;
-import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitUtils;
 import splitstree6.workflow.Workflow;
 
 import java.io.IOException;
@@ -66,7 +66,7 @@ public class BootstrapTreeSplits extends Trees2Splits {
 		var inputSplits = new SplitsBlock();
 
 		{
-			var taxaInTree = TreesUtilities.computeSplits(taxaBlock.getTaxaSet(), tree, inputSplits.getSplits());
+			var taxaInTree = SplitUtils.computeSplits(taxaBlock.getTaxaSet(), tree, inputSplits.getSplits());
 
 			if (taxaInTree.cardinality() != taxaBlock.getNtax())
 				throw new IOException("Unexpected number of taxa in tree");

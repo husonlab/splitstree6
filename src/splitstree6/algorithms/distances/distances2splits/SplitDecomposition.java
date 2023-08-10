@@ -20,12 +20,12 @@
 package splitstree6.algorithms.distances.distances2splits;
 
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,7 +46,7 @@ public class SplitDecomposition extends Distances2Splits {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws IOException {
-		if (SplitsUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
+		if (SplitsBlockUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;
 
 		var previousSplits = new ArrayList<ASplit>(); // list of previously computed splits
@@ -112,13 +112,13 @@ public class SplitDecomposition extends Distances2Splits {
 		}
 
 		// add all missing trivial
-		previousSplits.addAll(SplitsUtilities.createAllMissingTrivial(previousSplits, ntax, 0.0));
+		previousSplits.addAll(SplitsBlockUtilities.createAllMissingTrivial(previousSplits, ntax, 0.0));
 
 		// copy splits to splits
 		splitsBlock.getSplits().addAll(previousSplits);
 
-		splitsBlock.setFit(SplitsUtilities.computeSplitDecompositionFit(distancesBlock, splitsBlock.getSplits()));
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setFit(SplitsBlockUtilities.computeSplitDecompositionFit(distancesBlock, splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 
 		progress.setProgress(taxaBlock.getNtax());   //set progress to 100%

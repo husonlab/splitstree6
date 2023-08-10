@@ -22,13 +22,13 @@ package splitstree6.algorithms.characters.characters2splits;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.data.parts.AmbiguityCodes;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -120,11 +120,11 @@ public class ParsimonySplits extends Characters2Splits {
 			progress.incrementProgress();
 		}
 
-		previousSplits.addAll(SplitsUtilities.createAllMissingTrivial(previousSplits, taxaBlock.getNtax(), 0.0));
+		previousSplits.addAll(SplitsBlockUtilities.createAllMissingTrivial(previousSplits, taxaBlock.getNtax(), 0.0));
 
 		splitsBlock.getSplits().addAll(previousSplits);
 
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), previousSplits));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), previousSplits));
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 	}
 

@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.data.parts;
+package splitstree6.splits;
 
 import jloda.util.BitSetUtils;
 import jloda.util.StringUtils;

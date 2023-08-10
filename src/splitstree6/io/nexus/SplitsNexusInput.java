@@ -25,8 +25,8 @@ import jloda.util.parse.NexusStreamParser;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.SplitsFormat;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;

@@ -6,7 +6,7 @@ import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.ExecuteInParallel;
 import jloda.util.IteratorUtils;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 
 import java.util.*;
 
@@ -28,7 +28,7 @@ public class Stabilizer {
             var pqTree = new PQTree(taxa);
             var clusterCountMap = new HashMap<BitSet, Integer>();
             trees.forEach(tree -> {
-                for (var cluster : TreesUtilities.collectAllHardwiredClusters(tree)) {
+                for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
                     if (cluster.cardinality() > 1)
                         clusterCountMap.put(cluster, clusterCountMap.getOrDefault(cluster, 0) + 1);
                 }

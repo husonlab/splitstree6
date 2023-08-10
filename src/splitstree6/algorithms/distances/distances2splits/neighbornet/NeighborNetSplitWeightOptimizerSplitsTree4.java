@@ -21,7 +21,7 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.util.BitSetUtils;
 import splitstree6.data.DistancesBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;

@@ -23,11 +23,11 @@ import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2report.ShapleyValues;
-import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.data.parts.Taxon;
+import splitstree6.splits.SplitUtils;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -58,7 +58,7 @@ public class UnrootedShapleyValues extends Trees2ReportBase {
 		for (var tree : treesBlock.getTrees()) {
 			buf.append("%nTree %s:%n".formatted(tree.getName()));
 			var splits = new ArrayList<ASplit>();
-			TreesUtilities.computeSplits(null, tree, splits);
+			SplitUtils.computeSplits(null, tree, splits);
 			buf.append(ShapleyValues.report(taxaBlock, splits));
 			progress.incrementProgress();
 		}

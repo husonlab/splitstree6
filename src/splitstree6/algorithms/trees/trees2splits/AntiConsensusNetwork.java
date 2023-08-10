@@ -33,12 +33,12 @@ import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
-import splitstree6.algorithms.utils.TreesUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.BiPartition;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.BiPartition;
+import splitstree6.splits.SplitUtils;
 import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.io.IOException;
@@ -205,7 +205,7 @@ public class AntiConsensusNetwork extends Trees2Splits implements DoNotLoadThisA
 						final PhyloTree geneTree = treesBlock.getTree(t);
 						final ArrayList<ASplit> splits = new ArrayList<>(geneTree.getNumberOfEdges());
 
-						TreesUtilities.computeSplits(taxaBlock.getTaxaSet(), geneTree, splits);
+						SplitUtils.computeSplits(taxaBlock.getTaxaSet(), geneTree, splits);
 
 						// normalize weights:
 						{

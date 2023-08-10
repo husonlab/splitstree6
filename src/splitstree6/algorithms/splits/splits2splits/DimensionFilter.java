@@ -31,12 +31,12 @@ import jloda.util.CanceledException;
 import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.BiPartition;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.BiPartition;
+import splitstree6.splits.Compatibility;
 
 import java.util.BitSet;
 import java.util.HashSet;
@@ -79,7 +79,7 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 				child.setCompatibility(parent.getCompatibility());
 				setShortDescription("using all " + parent.getNsplits() + " splits");
 			} else {
-				child.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
+				child.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
 				child.setFit(-1);
 				child.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), child.getSplits(), child.getCycle()));
 				child.setThreshold(parent.getThreshold());

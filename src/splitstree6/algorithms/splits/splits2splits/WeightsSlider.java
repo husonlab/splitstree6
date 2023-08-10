@@ -23,11 +23,11 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -72,11 +72,11 @@ public class WeightsSlider extends Splits2Splits implements IFilter {
 			active = true;
 
 		if (active) {
-			splits.addAll(SplitsUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax(), 0.0));
+			splits.addAll(SplitsBlockUtilities.createAllMissingTrivial(splits, taxaBlock.getNtax(), 0.0));
 
 			child.getSplits().clear();
 			child.getSplits().addAll(splits);
-			child.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
+			child.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
 
 			child.setFit(-1);
 			child.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), child.getSplits(), child.getCycle()));

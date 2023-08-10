@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.io.utils;
+package splitstree6.splits;
 
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -25,10 +25,7 @@ import jloda.phylo.PhyloSplitsGraph;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.*;
-import splitstree6.algorithms.utils.SplitsUtilities;
-import splitstree6.algorithms.utils.TreesUtilities;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import jloda.util.progress.ProgressSilent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -39,13 +36,32 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import static splitstree6.algorithms.utils.SplitsUtilities.isCompatibleWithOrdering;
-
 /**
  * Newick IO for splits
  * Daniel Huson, 3.2023
  */
 public class SplitNewick {
+
+	/**
+	 * reads in a split-newick string and sets up the graph
+	 *
+	 * @param r              reader
+	 * @param r              the input reader
+	 * @param labelTaxonMap  the label taxon map to use. If null, we setup new mapping
+	 * @param taxonLabelMap0 if non-null and empty, will return the taxon to label mapping here
+	 * @param graph          the split network
+	 * @throws IOException
+	 */
+	public void read(Reader r, Map<String, Integer> labelTaxonMap, Map<Integer, String> taxonLabelMap0, PhyloSplitsGraph graph) throws IOException {
+		Map<Integer, String> taxonLabelMap = (taxonLabelMap0 == null ? new HashMap<>() : taxonLabelMap0);
+		var splits = read(r, labelTaxonMap, taxonLabelMap);
+		graph.clear();
+		if (splits.size() > 0) {
+			var taxa = splits.get(0).getAllTaxa();
+
+			ConvexHull.apply(new ProgressSilent(), taxa.cardinality(), taxonLabelMap::get, splits, graph);
+		}
+	}
 
 	/**
 	 * reads a string in SplitNewick format
@@ -101,7 +117,7 @@ public class SplitNewick {
 		var nTax = IteratorUtils.asStream(tree.getTaxa()).mapToInt(t -> t).max().orElse(0);
 
 		var splits = new ArrayList<ASplit>();
-		TreesUtilities.computeSplits(BitSetUtils.asBitSet(tree.getTaxa()), tree, splits);
+		SplitUtils.computeSplits(BitSetUtils.asBitSet(tree.getTaxa()), tree, splits);
 
 		if (hasSplits) {
 			var pos2tax = new TreeMap<Integer, Integer>();
@@ -286,14 +302,14 @@ public class SplitNewick {
 			var nTax = splits.get(0).getAllTaxa().cardinality();
 			if (ordering == null) {
 				ordering = new ArrayList<>();
-				var cycle1based = SplitsUtilities.computeCycle(splits.get(0).getAllTaxa().cardinality(), splits);
+				var cycle1based = SplitUtils.computeCycle(splits.get(0).getAllTaxa().cardinality(), splits);
 				for (var i = 1; i < cycle1based.length; i++)
 					ordering.add(cycle1based[i]);
 			}
 			var compatible = new ArrayList<ASplit>();
 			var additional = new ArrayList<ASplit>();
 			for (var split : splits) {
-				if (split.isTrivial() || isCompatibleWithOrdering(split.getPartNotContaining(ordering.get(0)), ordering) && Compatibility.isCompatible(split, compatible)) {
+				if (split.isTrivial() || SplitUtils.isCompatibleWithOrdering(split.getPartNotContaining(ordering.get(0)), ordering) && Compatibility.isCompatible(split, compatible)) {
 					compatible.add(split);
 				} else {
 					additional.add(split);
@@ -339,16 +355,18 @@ public class SplitNewick {
 			tree.leaves().forEach(v -> tree.setLabel(v, taxonLabelFunction.apply(tree.getTaxon(v))));
 
 			try (NodeArray<Integer> node2rank = tree.newNodeArray()) {
-				for (var entry : TreesUtilities.extractClusters(tree).entrySet()) {
-					var rank = BitSetUtils.asStream(entry.getValue()).mapToInt(taxonRank::get).min().orElse(0);
-					node2rank.put(entry.getKey(), rank);
-				}
+				try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
+					for (var entry : nodeClusterMap.entrySet()) {
+						var rank = BitSetUtils.asStream(entry.getValue()).mapToInt(taxonRank::get).min().orElse(0);
+						node2rank.put(entry.getKey(), rank);
+					}
 
-				for (var v : tree.nodes()) {
-					var outEdges = IteratorUtils.asList(v.outEdges());
-					outEdges.sort(Comparator.comparingInt(a -> node2rank.get(a.getTarget())));
-					var all = CollectionUtils.concatenate(IteratorUtils.asList(v.inEdges()), outEdges);
-					v.rearrangeAdjacentEdges(all);
+					for (var v : tree.nodes()) {
+						var outEdges = IteratorUtils.asList(v.outEdges());
+						outEdges.sort(Comparator.comparingInt(a -> node2rank.get(a.getTarget())));
+						var all = CollectionUtils.concatenate(IteratorUtils.asList(v.inEdges()), outEdges);
+						v.rearrangeAdjacentEdges(all);
+					}
 				}
 			}
 			if (false) {

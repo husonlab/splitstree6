@@ -27,12 +27,12 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.Distortion;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.SplitsUtilities;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -76,7 +76,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 
 		final BitSet[] tree2taxa = new BitSet[treesBlock.getNTrees() + 1];
 		for (int t = 1; t <= treesBlock.getNTrees(); t++) {
-			tree2taxa[t] = TreesUtilities.getTaxa(treesBlock.getTree(t));
+			tree2taxa[t] = TreesUtils.getTaxa(treesBlock.getTree(t));
 			//System.err.println("number of taxa in tree " + t + ":" + tree2taxa[t].size());
 			progress.setProgress(t);
 		}
@@ -147,7 +147,7 @@ public class FilteredSuperNetwork extends SuperNetwork {
 				}
 			}
 		}
-		splitsBlock.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(splitsBlock.getSplits(), taxaBlock.getNtax(), 0.0));
+		splitsBlock.getSplits().addAll(SplitsBlockUtilities.createAllMissingTrivial(splitsBlock.getSplits(), taxaBlock.getNtax(), 0.0));
 
 		System.err.println("Splits: " + zClosureSplits.getNsplits() + " -> " + splitsBlock.getNsplits());
 	}

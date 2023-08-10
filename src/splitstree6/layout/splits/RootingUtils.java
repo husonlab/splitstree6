@@ -22,11 +22,12 @@ package splitstree6.layout.splits;
 import jloda.util.BitSetUtils;
 import jloda.util.Pair;
 import jloda.util.Triplet;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.data.parts.Taxon;
+import splitstree6.splits.SplitUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,11 +53,11 @@ public class RootingUtils {
 																	   int[] cycle, SplitsBlock splitsBlock, boolean useWeights) {
 		if (outGroup.size() > 0) {
 			final var outGroupBits = BitSetUtils.asBitSet(outGroup);
-			var split = SplitsUtilities.getTighestSplit(splitsBlock, outGroupBits);
+			var split = SplitsBlockUtilities.getTighestSplit(splitsBlock, outGroupBits);
 			if (split > 0) {
 				double factor1;
 				double factor2;
-				switch (SplitsUtilities.compareMaxDistanceInSplitParts(nTax, splitsBlock, split, useWeights)) {
+				switch (SplitsBlockUtilities.compareMaxDistanceInSplitParts(nTax, splitsBlock, split, useWeights)) {
 					case 1 -> {
 						factor1 = 0.9;
 						factor2 = 0.1;
@@ -182,7 +183,7 @@ public class RootingUtils {
 	 * @return root split
 	 */
 	public static int setupForRootedNetwork(boolean altLayout, Triplet<Integer, Double, Double> triplet, TaxaBlock taxaBlockSrc, SplitsBlock splitsBlockSrc, TaxaBlock taxaBlockTarget, SplitsBlock splitsBlockTarget) throws IOException {
-		//final Triplet<Integer,Double,Double> triplet= SplitsUtilities.getMidpointSplit(taxaBlockSrc.getNtax(), splitsBlockSrc);
+		//final Triplet<Integer,Double,Double> triplet= SplitsBlockUtilities.getMidpointSplit(taxaBlockSrc.getNtax(), splitsBlockSrc);
 		final var mid = triplet.getFirst();
 		final var weightWith1 = triplet.getSecond();
 		final var weightOpposite1 = triplet.getThird();
@@ -229,7 +230,7 @@ public class RootingUtils {
 				}
 			}
 		}
-		SplitsUtilities.rotateCycle(cycle, rootTaxonId);
+		SplitUtils.rotateCycle(cycle, rootTaxonId);
 
 		// create splits:
 		splitsBlockTarget.clear();

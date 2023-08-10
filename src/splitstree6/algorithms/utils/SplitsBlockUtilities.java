@@ -1,5 +1,5 @@
 /*
- * SplitsUtilities.java Copyright (C) 2023 Daniel H. Huson
+ * SplitsBlockUtilities.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -23,6 +23,7 @@ import jloda.graph.algorithms.PQTree;
 import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
+
 import jloda.util.Pair;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
@@ -31,8 +32,9 @@ import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitUtils;
 
 import java.util.*;
 
@@ -40,7 +42,7 @@ import java.util.*;
  * utilities for splits
  * Daniel Huson, 12.2021
  */
-public class SplitsUtilities {
+public class SplitsBlockUtilities {
 	/**
 	 * computes the least squares fit
 	 *
@@ -107,92 +109,6 @@ public class SplitsUtilities {
 
 
 	/**
-	 * Computes a cycle for the given splits
-	 *
-	 * @param ntax   number of taxa
-	 * @param splits the splits
-	 */
-	static public int[] computeCycle(int ntax, List<ASplit> splits) {
-		if (true) {
-			var pqTree = new PQTree(BitSetUtils.asBitSet(BitSetUtils.range(1, ntax + 1)));
-			var clusters = new ArrayList<Pair<Double, BitSet>>();
-			for (var split : splits) {
-				if (!split.isTrivial()) {
-					clusters.add(new Pair<>(split.getWeight() * split.size(), split.getPartNotContaining(1)));
-				}
-			}
-			clusters.stream().sorted(Comparator.comparingDouble(a -> -a.getFirst())).map(Pair::getSecond).forEach(pqTree::accept);
-			var ordering = pqTree.extractAnOrdering();
-			var array1based = new int[ordering.size() + 1];
-			var index = 0;
-			for (var value : ordering) {
-				array1based[++index] = value;
-			}
-			return array1based;
-		} else {
-			if (ntax <= 3) {
-				var order = new int[ntax + 1];
-				for (var t = 1; t <= ntax; t++) {
-					order[t] = t;
-				}
-				return order;
-			} else {
-				try {
-					final var pso = Basic.hideSystemOut();
-					final var pse = Basic.hideSystemErr();
-					try {
-						return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, false).getDistances());
-					} finally {
-						Basic.restoreSystemErr(pse);
-						Basic.restoreSystemOut(pso);
-					}
-				} catch (Exception ex) {
-					Basic.caught(ex);
-					return new int[0];
-				}
-			}
-		}
-	}
-
-	/**
-	 * is given set consecutive in the ordering?
-	 *
-	 * @param set      set of integers
-	 * @param ordering ordering of integers
-	 * @return true, if set occurs consecutively in ordering
-	 */
-	public static boolean isCompatibleWithOrdering(BitSet set, ArrayList<Integer> ordering) {
-		var inside = false;
-		var count = 0;
-		for (var t : ordering) {
-			if (set.get(t)) {
-				if (!inside)
-					inside = true;
-				if (++count == set.cardinality())
-					return true;
-			} else {
-				if (inside)
-					return false;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
-	 *
-	 * @param ntax   number of taxa
-	 * @param splits with 1-based taxa
-	 * @return distance matrix, 0-based
-	 */
-	public static DistancesBlock splitsToDistances(int ntax, List<ASplit> splits, boolean useWeights) {
-		var distancesBlock = new DistancesBlock();
-		distancesBlock.setNtax(ntax);
-		splitsToDistances(splits, useWeights, distancesBlock);
-		return distancesBlock;
-	}
-
-	/**
 	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
 	 *
 	 * @param splits with 1-based taxa
@@ -206,46 +122,6 @@ public class SplitsUtilities {
 					distancesBlock.set(j, i, dist);
 				}
 			}
-		}
-	}
-
-	/**
-	 * normalize cycle so that it is lexicographically smallest
-	 *
-	 * @return normalized cycle
-	 */
-	public static int[] normalizeCycle(int[] cycle) {
-		var posOf1 = -1;
-		for (var i = 1; i < cycle.length; i++) {
-			if (cycle[i] == 1) {
-				posOf1 = i;
-				break;
-			}
-		}
-		final var posPrev = (posOf1 == 1 ? cycle.length - 1 : posOf1 - 1);
-		final var posNext = (posOf1 == cycle.length - 1 ? 1 : posOf1 + 1);
-		if (cycle[posPrev] > cycle[posNext]) { // has correct orientation, ensure that taxon 1 is at first position
-			if (posOf1 != 1) {
-				var tmp = new int[cycle.length];
-				var i = posOf1;
-				for (var j = 1; j < tmp.length; j++) {
-					tmp[j] = cycle[i];
-					if (++i == cycle.length)
-						i = 1;
-				}
-				return tmp;
-			} else
-				return cycle;
-		} else // change orientation, as well
-		{
-			var tmp = new int[cycle.length];
-			var i = posOf1;
-			for (var j = 1; j < tmp.length; j++) {
-				tmp[j] = cycle[i];
-				if (--i == 0)
-					i = cycle.length - 1;
-			}
-			return tmp;
 		}
 	}
 
@@ -290,20 +166,6 @@ public class SplitsUtilities {
 	}
 
 
-	public static void rotateCycle(int[] cycle, int first) {
-		final var tmp = new int[2 * cycle.length - 1];
-		System.arraycopy(cycle, 0, tmp, 0, cycle.length);
-		System.arraycopy(cycle, 1, tmp, cycle.length, cycle.length - 1);
-		for (var i = 1; i < tmp.length; i++) {
-			if (tmp[i] == first) {
-				for (int j = 1; j < cycle.length; j++) {
-					cycle[j] = tmp[i++];
-				}
-				return;
-			}
-		}
-	}
-
 	/**
 	 * computes a tightest split around a subset of taxa
 	 *
@@ -332,9 +194,9 @@ public class SplitsUtilities {
 			final TreesBlock treesBlock = new TreesBlock();
 			new NeighborJoining().compute(new ProgressSilent(), taxaBlock, distancesBlock, treesBlock);
 			splitsBlock.clear();
-			TreesUtilities.computeSplits(taxaBlock.getTaxaSet(), treesBlock.getTree(1), splitsBlock.getSplits());
+			SplitUtils.computeSplits(taxaBlock.getTaxaSet(), treesBlock.getTree(1), splitsBlock.getSplits());
 			splitsBlock.setCompatibility(Compatibility.compatible);
-			splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+			splitsBlock.setCycle(computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 			splitsBlock.setFit(100);
 			return true;
 		}
@@ -426,5 +288,67 @@ public class SplitsUtilities {
 			}
 		}
 		return count;
+	}
+
+	/**
+	 * Computes a cycle for the given splits
+	 *
+	 * @param ntax   number of taxa
+	 * @param splits the splits
+	 */
+	static public int[] computeCycle(int ntax, List<ASplit> splits) {
+		if (true) {
+			var pqTree = new PQTree(BitSetUtils.asBitSet(BitSetUtils.range(1, ntax + 1)));
+			var clusters = new ArrayList<Pair<Double, BitSet>>();
+			for (var split : splits) {
+				if (!split.isTrivial()) {
+					clusters.add(new Pair<>(split.getWeight() * split.size(), split.getPartNotContaining(1)));
+				}
+			}
+			clusters.stream().sorted(Comparator.comparingDouble(a -> -a.getFirst())).map(Pair::getSecond).forEach(pqTree::accept);
+			var ordering = pqTree.extractAnOrdering();
+			var array1based = new int[ordering.size() + 1];
+			var index = 0;
+			for (var value : ordering) {
+				array1based[++index] = value;
+			}
+			return array1based;
+		} else {
+			if (ntax <= 3) {
+				var order = new int[ntax + 1];
+				for (var t = 1; t <= ntax; t++) {
+					order[t] = t;
+				}
+				return order;
+			} else {
+				try {
+					final var pso = Basic.hideSystemOut();
+					final var pse = Basic.hideSystemErr();
+					try {
+						return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, false).getDistances());
+					} finally {
+						Basic.restoreSystemErr(pse);
+						Basic.restoreSystemOut(pso);
+					}
+				} catch (Exception ex) {
+					Basic.caught(ex);
+					return new int[0];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Given splits, returns the matrix split distances, as the number of splits separating each pair of taxa
+	 *
+	 * @param ntax   number of taxa
+	 * @param splits with 1-based taxa
+	 * @return distance matrix, 0-based
+	 */
+	public static DistancesBlock splitsToDistances(int ntax, List<ASplit> splits, boolean useWeights) {
+		var distancesBlock = new DistancesBlock();
+		distancesBlock.setNtax(ntax);
+		splitsToDistances(splits, useWeights, distancesBlock);
+		return distancesBlock;
 	}
 }

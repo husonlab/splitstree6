@@ -27,7 +27,7 @@ import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
@@ -105,7 +105,7 @@ public class NewickReader extends TreesReader {
 					throw new IOExceptionWithLineNumber(lineno, ex);
 				}
 
-				if (TreesUtilities.hasNumbersOnLeafNodes(tree)) {
+				if (TreesUtils.hasNumbersOnLeafNodes(tree)) {
 					NotificationManager.showWarning("Leaf nodes have integer labels 'i', converting to t'i'");
 					for (var v : tree.leaves()) {
 						if (NumberUtils.isInteger(tree.getLabel(v))) {

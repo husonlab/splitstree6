@@ -29,8 +29,9 @@ import splitstree6.algorithms.utils.*;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -141,7 +142,7 @@ public class ConsensusSplits extends Trees2Splits {
 				System.err.printf("Fit: %.1f%n", splitsBlock.getFit());
 		}
 
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 	}
 
 	@Override
@@ -255,9 +256,9 @@ public class ConsensusSplits extends Trees2Splits {
 							//System.err.println("Tree "+which+": "+factor);
 
 							final var treeSplits = new ArrayList<ASplit>();
-							TreesUtilities.computeSplits(taxaInTree, tree, treeSplits);
+							SplitUtils.computeSplits(taxaInTree, tree, treeSplits);
 							try {
-								SplitsUtilities.verifySplits(treeSplits, taxaBlock);
+								SplitsBlockUtilities.verifySplits(treeSplits, taxaBlock);
 							} catch (SplitsException ex) {
 								Basic.caught(ex);
 							}
@@ -358,7 +359,7 @@ public class ConsensusSplits extends Trees2Splits {
 		} else
 			splits.addAll(computedSplits.getSplits());
 
-		SplitsUtilities.verifySplits(splits, taxaBlock);
+		SplitsBlockUtilities.verifySplits(splits, taxaBlock);
 	}
 
 	/**

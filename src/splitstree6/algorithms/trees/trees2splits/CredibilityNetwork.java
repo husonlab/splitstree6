@@ -26,12 +26,12 @@ import javafx.beans.property.SimpleDoubleProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
 import splitstree6.algorithms.utils.SplitMatrix;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.io.IOException;
@@ -162,9 +162,9 @@ public class CredibilityNetwork extends Trees2Splits implements DoNotLoadThisAlg
 		} else
 			splitsBlock.copy(computedSplits);
 
-		SplitsUtilities.verifySplits(splitsBlock.getSplits(), taxaBlock);
+		SplitsBlockUtilities.verifySplits(splitsBlock.getSplits(), taxaBlock);
 
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		splitsBlock.setFit(-1);
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 	}

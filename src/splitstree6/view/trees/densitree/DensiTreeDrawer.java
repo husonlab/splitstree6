@@ -52,7 +52,7 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
@@ -204,7 +204,7 @@ public class DensiTreeDrawer {
 				var start = System.currentTimeMillis();
 				if (colorIncompatibleEdges) {
 					for (PhyloTree tree : trees) {
-						var consensusClusters = TreesUtilities.extractClusters(consensusTree).values();
+						var consensusClusters = TreesUtils.extractClusters(consensusTree).values();
 						final NodeArray<Point2D> nodePointMap = computeTreeCoordinates(mainWindow.getWorkingTaxa(), tree, averaging, vFlip, taxon2pos, lastTaxon,
 								treeScaleAndAlignment, diagramType, jitter, random);
 						Platform.runLater(() -> {
@@ -381,7 +381,7 @@ public class DensiTreeDrawer {
 
 		gc.setLineWidth(lineWidth);
 
-		var treeClusters = (round < 2 ? TreesUtilities.extractClusters(tree) : null);
+		var treeClusters = (round < 2 ? TreesUtils.extractClusters(tree) : null);
 
 		gc.setStroke(edgeColor);
 
@@ -437,7 +437,7 @@ public class DensiTreeDrawer {
 		// count all clusters:
 		var clusterCountMap = new HashMap<BitSet, Integer>();
 		for (var tree : trees) {
-			try (var nodeClusterMap = TreesUtilities.extractClusters(tree)) {
+			try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
 				for (var cluster : nodeClusterMap.values()) {
 					var count = clusterCountMap.computeIfAbsent(cluster, k -> 0);
 					clusterCountMap.put(cluster, count + 1);
@@ -489,7 +489,7 @@ public class DensiTreeDrawer {
 			// determine all trees that have same clusters as consensus:
 			var treesWithConsensusTopology = new ArrayList<PhyloTree>();
 			for (var tree : trees) {
-				var nodeClusterMap = TreesUtilities.extractClusters(tree);
+				var nodeClusterMap = TreesUtils.extractClusters(tree);
 				if (consensusClusters.equals(new HashSet<>(nodeClusterMap.values()))) {
 					treesWithConsensusTopology.add(tree);
 				}
@@ -498,7 +498,7 @@ public class DensiTreeDrawer {
 			// compute weights, if trees with consensus clusters exist, use them, otherwise use all
 			var countTrees = 0;
 			for (var tree : treesWithConsensusTopology.size() > 0 ? treesWithConsensusTopology : trees) {
-				var nodeClusterMap = TreesUtilities.extractClusters(tree);
+				var nodeClusterMap = TreesUtils.extractClusters(tree);
 				countTrees++;
 				for (var entry : nodeClusterMap.entrySet()) {
 					var v = entry.getKey();

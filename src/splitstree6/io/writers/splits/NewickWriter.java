@@ -23,7 +23,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.io.utils.SplitNewick;
+import splitstree6.splits.SplitNewick;
 
 import java.io.IOException;
 import java.io.Writer;

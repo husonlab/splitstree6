@@ -22,8 +22,8 @@ package splitstree6.algorithms.utils;
 import jloda.util.CanceledException;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.BiPartition;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.BiPartition;
 
 import java.util.ArrayList;
 import java.util.List;

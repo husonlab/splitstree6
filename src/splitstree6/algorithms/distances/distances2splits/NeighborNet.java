@@ -27,12 +27,12 @@ import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNet
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightOptimizerSplitsTree4;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetSplitWeightsClean;
 import splitstree6.algorithms.splits.IToCircularSplits;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -113,7 +113,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		else
 			splitsBlock.setCompatibility(Compatibility.cyclic);
 		splitsBlock.setCycle(cycle);
-		splitsBlock.setFit(SplitsUtilities.computeLeastSquaresFit(distancesBlock, splits));
+		splitsBlock.setFit(SplitsBlockUtilities.computeLeastSquaresFit(distancesBlock, splits));
 
 		splitsBlock.getSplits().addAll(splits);
 

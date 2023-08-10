@@ -36,7 +36,7 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
 import splitstree6.tabs.IDisplayTabPresenter;

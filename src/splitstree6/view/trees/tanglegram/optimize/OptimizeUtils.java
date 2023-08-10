@@ -26,7 +26,7 @@ import jloda.graph.NodeIntArray;
 import jloda.graph.algorithms.Dijkstra;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.util.*;
 

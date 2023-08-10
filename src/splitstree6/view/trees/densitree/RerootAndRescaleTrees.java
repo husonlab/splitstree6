@@ -29,9 +29,10 @@ import jloda.util.Single;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.utils.GreedyCompatible;
 import splitstree6.algorithms.utils.RerootingUtils;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.SplitUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -70,7 +71,7 @@ public class RerootAndRescaleTrees {
 			var splitPartWeightMap = new HashMap<BitSet, ArrayList<Double>>();
 			for (var tree : fullTrees) {
 				var splits = new ArrayList<ASplit>();
-				TreesUtilities.computeSplits(allTaxa, tree, splits);
+				SplitUtils.computeSplits(allTaxa, tree, splits);
 				for (var split : splits) {
 					var weights = splitPartWeightMap.computeIfAbsent(split.getSmallerPart(), k -> new ArrayList<>());
 					weights.add(split.getWeight());
@@ -87,8 +88,9 @@ public class RerootAndRescaleTrees {
 				splits.add(new ASplit(a, b, weight));
 			}
 			var consensusSplits = GreedyCompatible.apply(new ProgressSilent(), splits, s -> (double) splitPartWeightMap.get(s.getSmallerPart()).size());
-			var consensusTree = TreesUtilities.computeTreeFromCompatibleSplits(taxaBlock::getLabel, consensusSplits);
+			var consensusTree = TreesUtils.computeTreeFromCompatibleSplits(taxaBlock::getLabel, consensusSplits);
 
+			RerootingUtils.rerootByMidpoint(consensusTree);
 			rescale(consensusTree);
 			RerootingUtils.rerootByMidpoint(consensusTree);
 

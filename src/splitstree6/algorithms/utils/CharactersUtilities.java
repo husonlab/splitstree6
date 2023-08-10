@@ -22,7 +22,7 @@ package splitstree6.algorithms.utils;
 import jloda.util.BitSetUtils;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.util.BitSet;
 import java.util.Collection;

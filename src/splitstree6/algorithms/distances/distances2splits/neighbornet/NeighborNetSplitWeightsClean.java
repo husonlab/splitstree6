@@ -2,7 +2,7 @@ package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 
 import java.io.PrintWriter;
 import java.util.*;

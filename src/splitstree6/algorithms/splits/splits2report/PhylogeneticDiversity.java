@@ -25,7 +25,7 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.data.parts.Taxon;
 
 import java.util.BitSet;

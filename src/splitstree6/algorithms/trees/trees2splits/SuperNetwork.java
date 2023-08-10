@@ -27,13 +27,13 @@ import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2splits.DimensionFilter;
 import splitstree6.algorithms.utils.PartialSplit;
-import splitstree6.algorithms.utils.SplitsUtilities;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitUtils;
 
 import java.io.IOException;
 import java.util.*;
@@ -97,9 +97,9 @@ public class SuperNetwork extends Trees2Splits {
 		if (!treesBlock.isPartial()) {
 			if (treesBlock.getNTrees() == 1) {
 				NotificationManager.showInformation("SuperNetwork: Only one input tree, extracting all splits");
-				TreesUtilities.computeSplits(taxaBlock.getTaxaSet(), treesBlock.getTree(1), splitsBlock.getSplits());
+				SplitUtils.computeSplits(taxaBlock.getTaxaSet(), treesBlock.getTree(1), splitsBlock.getSplits());
 				splitsBlock.setCompatibility(Compatibility.compatible);
-				splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 				return;
 			} else {
 				NotificationManager.showInformation("SuperNetwork: None of the input trees are partial, computing 50% consensus network using TreeSizeWeightedMean edge weights");
@@ -220,7 +220,7 @@ public class SuperNetwork extends Trees2Splits {
 		}
 
 		// add all missing trivial splits
-		computedSplits.getSplits().addAll(SplitsUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), 0.0));
+		computedSplits.getSplits().addAll(SplitsBlockUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), 0.0));
 
 		if (getOptionEdgeWeights().equals(EdgeWeights.AverageRelative)) {
 			setWeightAverageReleativeLength(pSplitsOfTrees, supportSet, computedSplits);
@@ -234,7 +234,7 @@ public class SuperNetwork extends Trees2Splits {
 		} else
 			splitsBlock.copy(computedSplits);
 
-		splitsBlock.setCycle(SplitsUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		progress.close();
 	}
 

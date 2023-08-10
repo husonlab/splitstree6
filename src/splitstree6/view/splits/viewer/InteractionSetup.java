@@ -39,7 +39,7 @@ import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Node;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.BitSetUtils;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
 

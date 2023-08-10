@@ -23,7 +23,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.LeastSquares;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -69,7 +69,7 @@ public class LeastSquaresWeights { // extends Splits2Splits {
         */
 		child.copy(parent);
 		LeastSquares.optimizeLS(progress, child, distancesBlock, isOptionConstrain());
-		parent.setFit(SplitsUtilities.computeLeastSquaresFit(distancesBlock, parent.getSplits()));
+		parent.setFit(SplitsBlockUtilities.computeLeastSquaresFit(distancesBlock, parent.getSplits()));
         /*
         try {
             Writer w = new StringWriter();

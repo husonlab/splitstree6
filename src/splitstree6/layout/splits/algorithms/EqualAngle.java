@@ -26,8 +26,8 @@ import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.CanceledException;
 import jloda.util.Pair;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.PhyloGraphUtils;
-import splitstree6.algorithms.utils.SplitsUtilities;
+import splitstree6.splits.GraphUtils;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 
@@ -66,7 +66,7 @@ public class EqualAngle {
         {
             var count = 0;
             for (var s : interiorSplits) {
-                if (SplitsUtilities.isCircular(taxaBlock, cycle, splits.get(s))) {
+                if (SplitsBlockUtilities.isCircular(taxaBlock, cycle, splits.get(s))) {
                     wrapSplit(taxaBlock, splits, s, cycle, graph);
                     usedSplits.set(s, true);
                     progress.setProgress(++count);
@@ -91,7 +91,7 @@ public class EqualAngle {
             }
         }
 
-        PhyloGraphUtils.addLabels(taxaBlock, graph);
+        GraphUtils.addLabels(taxaBlock::getLabel, graph);
         progress.setProgress(100);   //set progress to 100%
 
         if (false) {

@@ -21,12 +21,12 @@ package splitstree6.xtra.densitree_old;
 
 import javafx.stage.FileChooser;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
-import splitstree6.algorithms.utils.SplitsUtilities;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
 import splitstree6.io.readers.trees.NewickReader;
+import splitstree6.splits.SplitUtils;
 
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -46,8 +46,8 @@ public class Utilities {
 		for (int i = 0; i < trees.size(); i += step) {
 			var tree = trees.get(i);
 			var splits = new ArrayList<ASplit>();
-			TreesUtilities.computeSplits(taxa, tree, splits);
-			SplitsUtilities.splitsToDistances(splits, true, distances);
+			SplitUtils.computeSplits(taxa, tree, splits);
+			SplitsBlockUtilities.splitsToDistances(splits, true, distances);
 		}
 		return NeighborNetCycleSplitsTree4.compute(taxa.cardinality(), distances.getDistances());
 	}

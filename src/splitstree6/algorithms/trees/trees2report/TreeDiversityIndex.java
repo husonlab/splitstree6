@@ -23,18 +23,16 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
-import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.algorithms.utils.TreesUtilities;
+import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
 
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
 
@@ -117,7 +115,7 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 	}
 
 	public static NodeDoubleArray computeFairProportions(PhyloTree tree) {
-		try (var node2clusters = TreesUtilities.extractClusters(tree)) {
+		try (var node2clusters = TreesUtils.extractClusters(tree)) {
 			var diversityIndex = tree.newNodeDoubleArray();
 			diversityIndex.put(tree.getRoot(), 0.0);
 			tree.preorderTraversal(tree.getRoot(), v -> v.parentsStream(false).allMatch(diversityIndex::containsKey),

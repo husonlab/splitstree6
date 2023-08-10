@@ -24,7 +24,8 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.data.parts.ASplit;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.SplitUtils;
 
 import java.util.BitSet;
 import java.util.HashMap;
@@ -63,8 +64,8 @@ public class SplitMatrix {
 
 		for (int i = 0; i < trees.getNTrees(); i++) {
 			SplitsBlock splitsBlock = new SplitsBlock();
-			TreesUtilities.computeSplits(null, trees.getTrees().get(i), splitsBlock.getSplits());
-			SplitsUtilities.verifySplits(splitsBlock.getSplits(), taxa);
+			SplitUtils.computeSplits(null, trees.getTrees().get(i), splitsBlock.getSplits());
+			SplitsBlockUtilities.verifySplits(splitsBlock.getSplits(), taxa);
 			add(splitsBlock);
 			progress.incrementProgress();
 		}

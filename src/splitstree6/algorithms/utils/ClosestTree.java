@@ -21,8 +21,8 @@ package splitstree6.algorithms.utils;
 
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
-import splitstree6.data.parts.ASplit;
-import splitstree6.data.parts.Compatibility;
+import splitstree6.splits.ASplit;
+import splitstree6.splits.Compatibility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class ClosestTree {
 		}
 
 		if (cycle == null)
-			cycle = SplitsUtilities.computeCycle(ntax, splits);
+			cycle = SplitsBlockUtilities.computeCycle(ntax, splits);
 
 		final var result = new ArrayList<ASplit>(splits.size());
 		if (Compatibility.isCyclic(ntax, splits, cycle)) {
