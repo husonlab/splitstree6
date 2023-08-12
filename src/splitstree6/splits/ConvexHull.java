@@ -59,15 +59,18 @@ public class ConvexHull {
 	 * @param progress         progress listener
 	 * @param nTax             number of taxa (1-based)
 	 * @param taxLabelFunction taxon to label function
-	 * @param splits           the splits
+	 * @param splitsList           the splits
 	 * @param graph            the output graph
 	 * @param usedSplits       the indices of splits already in the graph before this algrothm is called
 	 * @throws CanceledException
 	 */
-	public static void apply(ProgressListener progress, int nTax, Function<Integer, String> taxLabelFunction, ArrayList<ASplit> splits, PhyloSplitsGraph graph, BitSet usedSplits) throws CanceledException {
-		if (usedSplits.cardinality() == splits.size())
+	public static void apply(ProgressListener progress, int nTax, Function<Integer, String> taxLabelFunction, ArrayList<ASplit> splitsList, PhyloSplitsGraph graph, BitSet usedSplits) throws CanceledException {
+		if (usedSplits.cardinality() == splitsList.size())
 			return; // all nodes have been processed
 		//System.err.println("Running convex hull algorithm");
+
+		// todo: this is a stupid hack, because splits are 1-based
+		var splits = new Splits1Based(splitsList);
 
 		progress.setTasks("Computing Splits Network", "Convex Hull algorithm");
 		progress.setMaximum(splits.size());    //initialize maximum progress
@@ -302,7 +305,7 @@ public class ConvexHull {
 	 *
 	 * @return order
 	 */
-	private static int[] getOrderToProcessSplitsIn(ArrayList<ASplit> splits, BitSet usedSplits) {
+	private static int[] getOrderToProcessSplitsIn(Splits1Based splits, BitSet usedSplits) {
 		var set = new TreeSet<Integer>();
 		for (var s = 1; s <= splits.size(); s++) {
 			if (!usedSplits.get(s)) {
@@ -322,4 +325,25 @@ public class ConvexHull {
 		return order;
 	}
 
+	private static class Splits1Based {
+		private final ArrayList<ASplit> splits0based;
+
+		public Splits1Based(ArrayList<ASplit> splits0based) {
+			this.splits0based = splits0based;
+		}
+
+		/**
+		 * get the i-th split, 1-based
+		 *
+		 * @param i index
+		 * @return split
+		 */
+		public ASplit get(int i) {
+			return splits0based.get(i - 1);
+		}
+
+		public int size() {
+			return splits0based.size();
+		}
+	}
 }

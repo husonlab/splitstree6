@@ -27,10 +27,7 @@ import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.*;
 import jloda.util.progress.ProgressSilent;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Writer;
+import java.io.*;
 import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
@@ -48,18 +45,18 @@ public class SplitNewick {
 	 * @param r              reader
 	 * @param r              the input reader
 	 * @param labelTaxonMap  the label taxon map to use. If null, we setup new mapping
-	 * @param taxonLabelMap0 if non-null and empty, will return the taxon to label mapping here
+	 * @param taxonLabelMap if non-null and empty, will return the taxon to label mapping here
 	 * @param graph          the split network
 	 * @throws IOException
 	 */
-	public void read(Reader r, Map<String, Integer> labelTaxonMap, Map<Integer, String> taxonLabelMap0, PhyloSplitsGraph graph) throws IOException {
-		Map<Integer, String> taxonLabelMap = (taxonLabelMap0 == null ? new HashMap<>() : taxonLabelMap0);
-		var splits = read(r, labelTaxonMap, taxonLabelMap);
+	public static void read(Reader r, Map<String, Integer> labelTaxonMap, Map<Integer, String> taxonLabelMap, PhyloSplitsGraph graph) throws IOException {
+		Map<Integer, String> taxonLabelMapf = (taxonLabelMap == null ? new HashMap<>() : taxonLabelMap);
+		var splits = read(r, labelTaxonMap, taxonLabelMapf);
 		graph.clear();
-		if (splits.size() > 0) {
+		if (!splits.isEmpty()) {
 			var taxa = splits.get(0).getAllTaxa();
 
-			ConvexHull.apply(new ProgressSilent(), taxa.cardinality(), taxonLabelMap::get, splits, graph);
+			ConvexHull.apply(new ProgressSilent(), taxa.cardinality(), taxonLabelMapf::get, splits, graph);
 		}
 	}
 
@@ -217,34 +214,34 @@ public class SplitNewick {
 	}
 
 	public static ArrayList<ASplit> extractSplits(PhyloSplitsGraph graph) {
-		var id2cluster = new HashMap<Integer, BitSet>();
-		extractSplitsRec(graph.getTaxon2Node(1), 0, new BitSet(), id2cluster);
-		var taxa = BitSetUtils.asBitSet(graph.getTaxa());
-		var split2weight = new HashMap<Integer, Double>();
-		for (var e : graph.edges()) {
-			var splitId = graph.getSplit(e);
-			if (!split2weight.containsKey(splitId))
-				split2weight.put(splitId, graph.getWeight(e));
+		var nTax = IteratorUtils.count(graph.getTaxa());
+		var splits = new ArrayList<ASplit>();
+		var startNode = graph.getTaxon2Node(1);
+		for (var id : graph.edgeStream().map(graph::getSplit).collect(Collectors.toSet())) {
+			var set = new HashSet<Node>();
+			collectSideRec(graph, startNode, id, set);
+			var aSet = new BitSet();
+			for (var v : set) {
+				for (var t : graph.getTaxa(v))
+					aSet.set(t);
+			}
+			var splitEdge = graph.edgeStream().filter(e -> graph.getSplit(e) == id).findAny();
+			if (splitEdge.isPresent())
+				splits.add(new ASplit(aSet, nTax, graph.getWeight(splitEdge.get())));
+			else
+				splits.add(new ASplit(aSet, nTax));
 		}
-		return id2cluster.entrySet().stream().map(e -> new ASplit(BitSetUtils.minus(taxa, e.getValue()), e.getValue(), split2weight.get(e.getKey()))).collect(Collectors.toCollection(ArrayList::new));
+		return splits;
 	}
 
-	private static void extractSplitsRec(Node v, int splitId, BitSet used, HashMap<Integer, BitSet> id2cluster) {
-		var graph = (PhyloSplitsGraph) v.getOwner();
-		if (splitId > 0) {
-			used.set(splitId);
-			if (graph.hasTaxa(v)) {
-				id2cluster.computeIfAbsent(splitId, k -> new BitSet()).set(graph.getTaxon(v));
-			}
-		}
+	private static void collectSideRec(PhyloSplitsGraph graph, Node v, int splitId, Set<Node> nodes) {
+		nodes.add(v);
 		for (var e : v.adjacentEdges()) {
-			var eSplitId = graph.getSplit(e);
-			if (eSplitId != splitId) {
-				extractSplitsRec(e.getOpposite(v), eSplitId, used, id2cluster);
+			if (graph.getSplit(e) != splitId) {
+				var w = e.getOpposite(v);
+				if (!nodes.contains(w))
+					collectSideRec(graph, w, splitId, nodes);
 			}
-		}
-		if (splitId > 0) {
-			used.clear(splitId);
 		}
 	}
 
@@ -503,6 +500,12 @@ public class SplitNewick {
 				return result;
 			}
 		}
+	}
+
+	public static String toString(PhyloSplitsGraph graph, boolean includeWeights) throws IOException {
+		var w = new StringWriter();
+		write(graph, includeWeights, w);
+		return w.toString();
 	}
 
 	/**

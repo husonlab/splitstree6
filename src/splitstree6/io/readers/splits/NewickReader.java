@@ -95,7 +95,7 @@ public class NewickReader extends SplitsReader {
 					var alt = SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits());
 					splitsBlock.setCycle(alt);
 				}
-				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 			} catch (IOException ex) {
 				throw new IOExceptionWithLineNumber(lineno, ex);
 			}
