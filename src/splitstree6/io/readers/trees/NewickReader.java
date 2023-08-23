@@ -23,6 +23,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
+import jloda.graph.NodeArray;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
@@ -65,7 +66,7 @@ public class NewickReader extends TreesReader {
 
 		final var parts = new ArrayList<String>();
 
-		final String GENE_NAME_TAG = "&&NHX:GN=";
+		final var GENE_NAME_TAG = "&&NHX:GN=";
 
 		treesBlock.clear();
 		treesBlock.setReticulated(false);
@@ -82,7 +83,7 @@ public class NewickReader extends TreesReader {
 			var line = it.next();
 			if (line.endsWith(";")) {
 				final String treeLine;
-				if (parts.size() > 0) {
+				if (!parts.isEmpty()) {
 					parts.add(line);
 					treeLine = StringUtils.toString(parts, "");
 					parts.clear();
@@ -90,16 +91,23 @@ public class NewickReader extends TreesReader {
 					treeLine = line;
 				final var tree = new PhyloTree();
 				try {
-					newickIO.parseBracketNotation(tree, treeLine, true,
-							s -> {
-								if (s.startsWith(GENE_NAME_TAG))
-									tree.setName(s.substring(GENE_NAME_TAG.length() + 1).trim());
-							}, (v, s) -> {
+					try (NodeArray<String> nodeCommentMap = tree.newNodeArray()) {
+						newickIO.parseBracketNotation(tree, treeLine, true,
+								s -> {
+									if (s.startsWith(GENE_NAME_TAG))
+										tree.setName(s.substring(GENE_NAME_TAG.length() + 1).trim());
+								}, (v, s) -> {
+									if (v != null && s != null) {
 								if (s.startsWith(GENE_NAME_TAG))
 									tree.setName(s.substring(GENE_NAME_TAG.length()).trim());
-							});
-					if (newickIO.isInputHasMultiLabels())
-						throw new IOException("Tree contains multiple copies of the same label");
+								else
+									nodeCommentMap.put(v, s);
+									}
+								});
+						if (newickIO.isInputHasMultiLabels())
+							throw new IOException("Tree contains multiple copies of the same label");
+						setupEdgeConfidenceFromComments(tree, nodeCommentMap);
+					}
 					//System.err.println(tree.toBracketString(false));
 				} catch (IOException ex) {
 					throw new IOExceptionWithLineNumber(lineno, ex);
@@ -182,9 +190,24 @@ public class NewickReader extends TreesReader {
 			} else
 					parts.add(line);
 			}
-			if (parts.size() > 0)
+		if (!parts.isEmpty())
 				System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
 			taxa.addTaxaByNames(orderedTaxonNames);
+	}
+
+	private void setupEdgeConfidenceFromComments(PhyloTree tree, NodeArray<String> nodeCommentMap) {
+		var hasNonNumericalComment = tree.nodeStream().filter(v -> v.getInDegree() == 1).map(nodeCommentMap::get).filter(Objects::nonNull).anyMatch(c -> !NumberUtils.isDouble(c));
+		var hasNumericalComment = tree.nodeStream().filter(v -> v.getInDegree() == 1).map(nodeCommentMap::get).filter(Objects::nonNull).anyMatch(NumberUtils::isDouble);
+		if (hasNumericalComment && !hasNonNumericalComment) {
+			for (var v : tree.nodes()) {
+				if (v.getInDegree() == 1) {
+					var comment = nodeCommentMap.get(v);
+					if (comment != null && NumberUtils.isDouble(comment)) {
+						tree.setConfidence(v.getFirstInEdge(), NumberUtils.parseDouble(comment));
+					}
+				}
+			}
+		}
 	}
 
 	public boolean isOptionConvertMultiLabeledTree() {
@@ -209,7 +232,7 @@ public class NewickReader extends TreesReader {
 		final var list = new ArrayList<String>();
 		var queue = new LinkedList<Node>();
 		queue.add(tree.getRoot());
-		while (queue.size() > 0) {
+		while (!queue.isEmpty()) {
 			var w = queue.pop();
 			var label = tree.getLabel(w);
 			if (label != null && (w.isLeaf() || !(ignoreInternalNumericalLabels && NumberUtils.isDouble(label))))

@@ -72,7 +72,7 @@ public class SplitsBlock extends DataBlock {
 		fit = that.getFit();
 		threshold = that.getThreshold();
 		partial = that.isPartial();
-		if (that.getCycle() != null)
+		if (that.getCycle(false) != null)
 			cycle = that.getCycle().clone();
 		splitLabels.putAll(that.splitLabels);
 		format = that.format;
@@ -154,13 +154,19 @@ public class SplitsBlock extends DataBlock {
 	}
 
 	public int[] getCycle() {
-		if (cycle == null && getNsplits() > 0) {
-			final BitSet taxa = new BitSet();
-			for (ASplit split : splits) {
-				taxa.or(split.getA());
-				taxa.or(split.getB());
+		return getCycle(true);
+	}
+
+	public int[] getCycle(boolean computeAndSetIfMissing) {
+		if (computeAndSetIfMissing) {
+			if (cycle == null && getNsplits() > 0) {
+				final BitSet taxa = new BitSet();
+				for (ASplit split : splits) {
+					taxa.or(split.getA());
+					taxa.or(split.getB());
+				}
+				cycle = SplitsBlockUtilities.computeCycle(taxa.cardinality(), splits);
 			}
-			cycle = SplitsBlockUtilities.computeCycle(taxa.cardinality(), splits);
 		}
 		return cycle;
 	}

@@ -81,7 +81,7 @@ public class ExtractSmallerMatrices {
 		if (replicates <= 0)
 			throw new IOException("Number of replications must be positive, got: " + replicates);
 
-		var sizes = parseSizeSpecification(sizeSpecification);
+		var sizes = BitSetUtils.valueOf(sizeSpecification);
 		System.err.println("Sizes: " + StringUtils.toString(sizes, " "));
 
 		var importer = (DistancesReader) ImportManager.getInstance().getImporterByDataTypeAndFileFormat(DistancesBlock.class, ImportManager.getInstance().getFileFormat(input));
@@ -119,46 +119,4 @@ public class ExtractSmallerMatrices {
 		System.err.printf("Files created: %,d%n", created);
 	}
 
-	private BitSet parseSizeSpecification(String sizeSpecification) throws IOException {
-		var result = new BitSet();
-		for (var part : StringUtils.split(sizeSpecification, ',')) {
-			var matcher = Pattern.compile("^(\\d+)-(\\d+)/(\\d+)$").matcher(part);
-			if (matcher.find()) {
-				// Extract the first, second, and third numbers
-				int a = Integer.parseInt(matcher.group(1));
-				int b = Integer.parseInt(matcher.group(2));
-				int step = Integer.parseInt(matcher.group(3));
-				if (0 < a && a <= b && step > 0) {
-					for (var v = a; v <= b; v += step) {
-						result.set(v);
-					}
-				} else
-					throw new IOException("Problem parsing: " + part);
-			} else {
-				matcher = Pattern.compile("^(\\d+)-(\\d+)$").matcher(part);
-				if (matcher.find()) {
-					// Extract the first, second, and third numbers
-					int a = Integer.parseInt(matcher.group(1));
-					int b = Integer.parseInt(matcher.group(2));
-					if (0 < a && a <= b) {
-						for (var v = a; v <= b; v++) {
-							result.set(v);
-						}
-					} else
-						throw new IOException("Problem parsing: " + part);
-				} else {
-					matcher = Pattern.compile("^(\\d+)$").matcher(part);
-					if (matcher.find()) {
-						int a = Integer.parseInt(matcher.group(1));
-						if (0 < a)
-							result.set(a);
-						else
-							throw new IOException("Problem parsing: " + part);
-					} else
-						throw new IOException("Problem parsing: " + part);
-				}
-			}
-		}
-		return result;
-	}
 }

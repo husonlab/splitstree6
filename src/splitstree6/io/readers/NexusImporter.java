@@ -22,6 +22,8 @@ package splitstree6.io.readers;
 import jloda.util.FileUtils;
 import jloda.util.Single;
 import jloda.util.parse.NexusStreamParser;
+import jloda.util.progress.ProgressPercentage;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.*;
 import splitstree6.io.nexus.*;
 import splitstree6.workflow.DataBlock;
@@ -125,6 +127,9 @@ public class NexusImporter {
 			} else if (dataBlock instanceof SplitsBlock splitsBlock) {
 				var parser = new SplitsNexusInput();
 				taxLabels = parser.parse(np, taxaBlock, splitsBlock);
+				if (splitsBlock.getCycle(false) == null) {
+					splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				}
 				comments.setIfCurrentValueIsNull(np.popComments());
 			} else if (dataBlock instanceof TreesBlock treesBlock) {
 				var parser = new TreesNexusInput();

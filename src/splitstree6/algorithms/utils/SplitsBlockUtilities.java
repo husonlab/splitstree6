@@ -23,8 +23,8 @@ import jloda.graph.algorithms.PQTree;
 import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
-
 import jloda.util.Pair;
+import jloda.util.progress.ProgressPercentage;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
 import splitstree6.algorithms.distances.distances2trees.NeighborJoining;
@@ -37,6 +37,7 @@ import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * utilities for splits
@@ -146,7 +147,6 @@ public class SplitsBlockUtilities {
 
 	/**
 	 * verify that all splits are proper and are contained in the taxon set
-	 *
 	 */
 	public static void verifySplits(Collection<ASplit> splits, TaxaBlock taxa) throws SplitsException {
 		final var seen = new HashSet<BitSet>();
@@ -218,12 +218,12 @@ public class SplitsBlockUtilities {
 		var maxA = 0.0;
 		for (var a : BitSetUtils.members(splitsBlock.get(split).getA())) {
 			for (var b : BitSetUtils.members(splitsBlock.get(split).getA(), a + 1))
-				maxA = Math.max(maxA, distances.get(a,b));
+				maxA = Math.max(maxA, distances.get(a, b));
 		}
 		var maxB = 0.0;
 		for (var a : BitSetUtils.members(splitsBlock.get(split).getB())) {
 			for (var b : BitSetUtils.members(splitsBlock.get(split).getB(), a + 1))
-				maxB = Math.max(maxB,distances.get(a,b));
+				maxB = Math.max(maxB, distances.get(a, b));
 		}
 		return Double.compare(maxA, maxB);
 	}
@@ -297,22 +297,26 @@ public class SplitsBlockUtilities {
 	 * @param splits the splits
 	 */
 	static public int[] computeCycle(int ntax, List<ASplit> splits) {
-		if (true) {
-			var pqTree = new PQTree(BitSetUtils.asBitSet(BitSetUtils.range(1, ntax + 1)));
-			var clusters = new ArrayList<Pair<Double, BitSet>>();
-			for (var split : splits) {
-				if (!split.isTrivial()) {
-					clusters.add(new Pair<>(split.getWeight() * split.size(), split.getPartNotContaining(1)));
+		if (false) { // this is too slow for large examples
+			var clusters = splits.parallelStream().filter(s -> !s.isTrivial()).map(s -> new Pair<>(s.getWeight() * s.size(), s.getPartNotContaining(1))).collect(Collectors.toCollection(ArrayList::new));
+			try (var progress = (clusters.size() > 2000 ? new ProgressPercentage("Computing cycle:", clusters.size()) : new ProgressSilent())) {
+				clusters.sort(Comparator.comparingDouble(a -> -a.getFirst()));
+				var pqTree = new PQTree(BitSetUtils.asBitSet(BitSetUtils.range(1, ntax + 1)));
+				for (var pair : clusters) {
+					pqTree.accept(pair.getSecond());
+					try {
+						progress.incrementProgress();
+					} catch (CanceledException ignored) {
+					}
 				}
+				var ordering = pqTree.extractAnOrdering();
+				var array1based = new int[ordering.size() + 1];
+				var index = 0;
+				for (var value : ordering) {
+					array1based[++index] = value;
+				}
+				return array1based;
 			}
-			clusters.stream().sorted(Comparator.comparingDouble(a -> -a.getFirst())).map(Pair::getSecond).forEach(pqTree::accept);
-			var ordering = pqTree.extractAnOrdering();
-			var array1based = new int[ordering.size() + 1];
-			var index = 0;
-			for (var value : ordering) {
-				array1based[++index] = value;
-			}
-			return array1based;
 		} else {
 			if (ntax <= 3) {
 				var order = new int[ntax + 1];
