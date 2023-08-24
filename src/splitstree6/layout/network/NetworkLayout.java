@@ -120,8 +120,6 @@ public class NetworkLayout {
 
 			for (var v : graph.nodes()) {
 				var point = nodePointMap.get(v);
-
-
 				var nodeShape = new LabeledNodeShape();
 				nodeShape.setTranslateX(point.getX());
 				nodeShape.setTranslateY(point.getY());
@@ -169,12 +167,10 @@ public class NetworkLayout {
 
 					labelLayout.addAvoidable(() -> nodeShape.getTranslateX() - 0.5 * nodeShape.prefWidth(0), () -> nodeShape.getTranslateY() - 0.5 * nodeShape.prefHeight(0), () -> nodeShape.prefWidth(0), () -> nodeShape.prefHeight(0));
 				}
-
 				progress.incrementProgress();
 			}
 
 			var edgesGroup = new Group();
-
 			for (var e : graph.edges()) {
 				var line = new Line();
 				line.getStyleClass().add("graph-edge");
@@ -223,7 +219,7 @@ public class NetworkLayout {
 	}
 
 	private Point2D computeCenter(Collection<Point2D> points) {
-		if (points.size() > 0) {
+		if (!points.isEmpty()) {
 			var x = points.stream().mapToDouble(Point2D::getX).sum();
 			var y = points.stream().mapToDouble(Point2D::getY).sum();
 			return new Point2D(x / points.size(), y / points.size());

@@ -20,6 +20,7 @@
 package splitstree6.xtra;
 
 import javafx.geometry.Point2D;
+import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.graph.io.GraphGML;
@@ -28,57 +29,56 @@ import jloda.util.StringUtils;
 
 import java.io.*;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiFunction;
 
 /**
- * reads and writes a coordinates for a rooted network
+ * reads and writes coordinates for a rooted network
  * Daniel Huson, 8.2022
  */
 public class CoordinatesForRootedNetworkIO {
 	public static void write(Writer w, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) throws IOException {
-		try (NodeArray<String> nodeXMap = tree.newNodeArray(); NodeArray<String> nodeYMap = tree.newNodeArray();
-			 NodeArray<String> nodeAngleStringMap = tree.newNodeArray(); NodeArray<String> nodeLabelMap = tree.newNodeArray()) {
-			for (var v : tree.nodes()) {
-				var point = nodePointMap.get(v);
-				nodeXMap.put(v, "%.5f".formatted(point.getX()));
-				nodeYMap.put(v, "%.5f".formatted(point.getY()));
-				if (nodeAngleMap.containsKey(v))
-					nodeAngleStringMap.put(v, "%.5f".formatted(nodeAngleMap.get(v)));
-				nodeLabelMap.put(v, tree.getLabel(v));
-			}
-			var labelNodeValueMap = new HashMap<String, NodeArray<String>>();
-			labelNodeValueMap.put("x", nodeXMap);
-			labelNodeValueMap.put("y", nodeYMap);
-			labelNodeValueMap.put("angle", nodeAngleStringMap);
-			labelNodeValueMap.put("label", nodeLabelMap);
-			GraphGML.writeGML(tree, "Rooted network with node coordinates", tree.getName(), true, 1, w, labelNodeValueMap, null);
-		}
+		var nodeLabels = List.of("x", "y", "angle", "label");
+		BiFunction<String, Node, String> labelNodeValueFunction = (label, v) -> switch (label) {
+			case "x" -> "%.5f".formatted(nodePointMap.get(v).getX());
+			case "y" -> "%.5f".formatted(nodePointMap.get(v).getY());
+			case "angle" -> "%.5f".formatted(nodeAngleMap.get(v));
+			case "label" -> tree.getLabel(v);
+			default -> null;
+		};
+		GraphGML.writeGML(tree, "Rooted network with node coordinates", tree.getName(), true, 1, w, nodeLabels, labelNodeValueFunction, null, null);
 	}
 
 	public static GraphGML.GMLInfo read(Reader r, PhyloTree tree, NodeArray<Point2D> nodePointMap, NodeDoubleArray nodeAngleMap) throws IOException {
 		tree.clear();
-		var labelNodeValueMap = new HashMap<String, NodeArray<String>>();
+		var labelNodeValueMap = new HashMap<String, Map<Node, String>>();
 		var gmlInfo = GraphGML.readGML(r, tree, labelNodeValueMap, null);
 		tree.setRoot(tree.nodeStream().filter(v -> v.getInDegree() == 0).findAny().orElse(tree.getFirstNode()));
-		try (var nodeXMap = labelNodeValueMap.get("x"); var nodeYMap = labelNodeValueMap.get("y");
-			 var nodeAngleStringMap = labelNodeValueMap.get("angle");
-			 var nodeLabelMap = labelNodeValueMap.get("label")) {
-			if (nodeXMap == null)
-				throw new IOException("x: not found");
-			if (nodeYMap == null)
-				throw new IOException("y: not found");
-			if (nodeAngleStringMap == null)
-				throw new IOException("angle: not found");
-			if (nodeLabelMap == null)
-				throw new IOException("label: not found");
 
-			for (var v : tree.nodes()) {
-				var x = Double.parseDouble(nodeXMap.get(v));
-				var y = Double.parseDouble(nodeYMap.get(v));
-				nodePointMap.put(v, new Point2D(x, y));
-				if (nodeAngleStringMap.containsKey(v) && !nodeAngleStringMap.get(v).equals("null"))
-					nodeAngleMap.put(v, Double.parseDouble(nodeAngleStringMap.get(v)));
-				tree.setLabel(v, nodeLabelMap.get(v));
-			}
+		var nodeXMap = labelNodeValueMap.get("x");
+		if (nodeXMap == null)
+			throw new IOException("x: not found");
+
+		var nodeYMap = labelNodeValueMap.get("y");
+		if (nodeYMap == null)
+			throw new IOException("y: not found");
+
+		var nodeAngleStringMap = labelNodeValueMap.get("angle");
+		if (nodeAngleStringMap == null)
+			throw new IOException("angle: not found");
+
+		var nodeLabelMap = labelNodeValueMap.get("label");
+		if (nodeLabelMap == null)
+			throw new IOException("label: not found");
+
+		for (var v : tree.nodes()) {
+			var x = Double.parseDouble(nodeXMap.get(v));
+			var y = Double.parseDouble(nodeYMap.get(v));
+			nodePointMap.put(v, new Point2D(x, y));
+			if (nodeAngleStringMap.containsKey(v) && !nodeAngleStringMap.get(v).equals("null"))
+				nodeAngleMap.put(v, Double.parseDouble(nodeAngleStringMap.get(v)));
+			tree.setLabel(v, nodeLabelMap.get(v));
 		}
 		return gmlInfo;
 	}

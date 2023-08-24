@@ -31,6 +31,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.util.AService;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Node;
@@ -109,20 +110,26 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				networkView.optionZoomFactorProperty(), networkView.optionFontScaleFactorProperty(),
 				taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
-		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, networkView.getUndoManager(), mainWindow.getTaxonSelectionModel());
-
+		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, networkView.getUndoManager(), networkView.optionEditsProperty(), mainWindow.getTaxonSelectionModel());
 
 		networkPane.setRunAfterUpdate(() -> {
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
 			interactionSetup.apply(taxonLabelMap, nodeShapeMap,
 					t -> (t >= 1 && t <= taxa.getNtax() ? taxa.get(t) : null), taxa::indexOf);
 
-			/*
 			if (networkView.getOptionEdits().length > 0) {
-				SplitNetworkEdits.applyEdits(networkView.getOptionEdits(), nodeShapeMap, null);
-				Platform.runLater(() -> SplitNetworkEdits.clearEdits(networkView.optionEditsProperty()));
+				AService.run(() -> {
+					Thread.sleep(700); // wait long enough for all label layouting to finish
+					Platform.runLater(() -> {
+						NetworkEdits.applyEdits(networkView.getOptionEdits(), nodeShapeMap, edgeShapeMap);
+						NetworkEdits.clearEdits(networkView.optionEditsProperty());
+					});
+					return null;
+				}, k -> {
+				}, k -> {
+				});
 			}
-			 */
+
 			updateCounter.set(updateCounter.get() + 1);
 			controller.getInfoLabel().setText(networkBlock.get().getInfoString());
 		});

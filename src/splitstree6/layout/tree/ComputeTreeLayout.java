@@ -24,6 +24,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.shape.Circle;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.DraggableUtils;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -118,8 +119,7 @@ public class ComputeTreeLayout {
 					nodeShape.setUserData(taxonId);
 				} else {
 					otherLabelsGroup.getChildren().add(label);
-					splitstree6.layout.LayoutUtils.installTranslateUsingLayout(label, () -> {
-					});
+					DraggableUtils.setupDragMouseLayout(label);
 				}
 			}
 		}

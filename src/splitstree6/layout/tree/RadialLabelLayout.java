@@ -70,7 +70,7 @@ public class RadialLabelLayout {
 	 * @param orientation layout orientation
 	 */
 	public void layoutLabels(LayoutOrientation orientation) {
-		if (items.size() > 0) {
+		if (!items.isEmpty()) {
 			if (deferredCounter < items.size() && items.stream().anyMatch(item -> item.width() == 0 || item.height() == 0)) {
 				//System.err.println("not ready");
 				deferredCounter++;

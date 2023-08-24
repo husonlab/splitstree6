@@ -19,18 +19,23 @@
 
 package splitstree6.io.writers.view;
 
+import jloda.graph.Edge;
 import jloda.graph.EdgeArray;
+import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.io.GraphGML;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
+import splitstree6.view.network.NetworkView;
 import splitstree6.view.splits.viewer.SplitsView;
 
 import java.io.IOException;
 import java.io.Writer;
 import java.util.BitSet;
 import java.util.HashMap;
+import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * write as text
@@ -48,43 +53,52 @@ public class GMLWriter extends ViewWriterBase {
 			w.write("VIEW: not set");
 		else if (view instanceof SplitsView splitsView) {
 			var graph = splitsView.getPresenter().getSplitNetworkPane().getSplitNetworkLayout().getGraph();
-			var nodePointMap = splitsView.getPresenter().getSplitNetworkPane().getSplitNetworkLayout().getNodePointMap();
 			if (graph != null) {
-				try (NodeArray<String> nodeLabelMap = graph.newNodeArray();
-					 NodeArray<String> nodeXMap = graph.newNodeArray();
-					 NodeArray<String> nodeYMap = graph.newNodeArray();
-					 EdgeArray<String> edgeSplitMap = graph.newEdgeArray();
-					 EdgeArray<String> edgeWeightMap = graph.newEdgeArray()) {
-
-					for (var v : graph.nodes()) {
-						if (graph.hasTaxa(v))
-							nodeLabelMap.put(v, taxaBlock.getLabel(graph.getTaxon(v)));
-						nodeXMap.put(v, StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getX()));
-						nodeYMap.put(v, StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getY()));
-					}
-					var labelNodeValueMap = new HashMap<String, NodeArray<String>>();
-					labelNodeValueMap.put("label", nodeLabelMap);
-					labelNodeValueMap.put("x", nodeXMap);
-					labelNodeValueMap.put("y", nodeYMap);
-
-					var splits = new BitSet();
-					for (var e : graph.edges()) {
-						edgeSplitMap.put(e, String.valueOf(graph.getSplit(e)));
-						splits.set(graph.getSplit(e));
-						edgeWeightMap.put(e, StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e)));
-					}
-					var labelEdgeValueMap = new HashMap<String, EdgeArray<String>>();
-					labelEdgeValueMap.put("split", edgeSplitMap);
-					labelEdgeValueMap.put("weight", edgeWeightMap);
-					var comment = "Exported from SplitsTreeCE: %,d nodes, %,d edges, %,d splits".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges(), splits.cardinality());
-					var graphLabel = (graph.getName() != null ? graph.getName() : splitsView.getName());
+				var nodePointMap = splitsView.getPresenter().getSplitNetworkPane().getSplitNetworkLayout().getNodePointMap();
+				var labelNodes = List.of("label", "x", "y");
+				BiFunction<String, Node, String> labelNodeValue = (label, v) -> switch (label) {
+					case "label" -> taxaBlock.getLabel(graph.getTaxon(v));
+					case "x" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getX());
+					case "y" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodePointMap.get(v).getY());
+					default -> null;
+				};
+				var labelEdges = List.of("split", "weight");
+				BiFunction<String, Edge, String> labelEdgeValue = (label, e) -> switch (label) {
+					case "split" -> String.valueOf(graph.getSplit(e));
+					case "weight" -> StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e));
+					default -> null;
+				};
+				var comment = "Exported from SplitsTreeCE: %,d nodes, %,d edges, %,d splits".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges(), splitsView.getSplitsBlock().getNsplits());
+				var graphLabel = (graph.getName() != null ? graph.getName() : splitsView.getName());
 					GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
-							labelNodeValueMap, labelEdgeValueMap);
-				}
+							labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
+			}
+		} else if (view instanceof NetworkView networkView) {
+			var graph = networkView.getNetworkBlock().getGraph();
+			if (graph != null) {
+				var nodeShapeMap = networkView.getNodeShapeMap();
+				var labelNodes = List.of("label", "x", "y");
+				BiFunction<String, Node, String> labelNodeValue = (label, v) -> switch (label) {
+					case "label" ->
+							nodeShapeMap.get(v).getLabel() != null ? nodeShapeMap.get(v).getLabel().getRawText() : null;
+					case "x" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateX());
+					case "y" -> StringUtils.removeTrailingZerosAfterDot("%.4f", nodeShapeMap.get(v).getTranslateY());
+					default -> null;
+				};
+				var labelEdges = List.of("weight", "sites");
+				var edgeShapeMap = networkView.getEdgeShapeMap();
+				BiFunction<String, Edge, String> labelEdgeValue = (label, e) -> switch (label) {
+					case "weight" -> StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e));
+					case "sites" -> networkView.getNetworkBlock().getEdgeData(e).get("sites");
+					default -> null;
+				};
+				var comment = "Exported from SplitsTreeCE: %,d nodes, %,d edges,".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges());
+				var graphLabel = (graph.getName() != null ? graph.getName() : networkView.getName());
+				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
+						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
 			}
 		} else {
 			w.write("GML not implemented for view '" + view.getName() + "'");
-
 		}
 		w.write("\n");
 		w.flush();

@@ -35,6 +35,7 @@ import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
+import jloda.fx.util.DraggableUtils;
 import jloda.fx.util.GeometryUtilsFX;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
@@ -292,7 +293,7 @@ public class SplitNetworkLayout {
 					label.setStyle("-fx-background-color: rgba(128,128,128,0.2)");
 				placeLabel(line, label);
 				label.effectProperty().bind(line.effectProperty());
-				splitstree6.layout.LayoutUtils.installTranslateUsingLayout(label, () -> splitSelectionModel.select(split));
+				DraggableUtils.setupDragMouseLayout(label, () -> splitSelectionModel.select(split));
 				confidenceLabels.getChildren().add(label);
 			}
 			progress.incrementProgress();

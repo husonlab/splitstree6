@@ -33,6 +33,7 @@ import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
+import jloda.graph.Edge;
 import splitstree6.data.NetworkBlock;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LabeledEdgeShape;
@@ -73,9 +74,16 @@ public class NetworkView implements IView {
 	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
 	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
 
+	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
+
 	private final ObjectProperty<SitesStyle> optionSitesStyle = new SimpleObjectProperty<>(this, "optionSitesStyle");
 
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
+
+
+	private final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
+	private final ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap = FXCollections.observableHashMap();
+
 
 	{
 		ProgramProperties.track(optionDiagram, DiagramType::valueOf, DiagramType.Network);
@@ -85,7 +93,8 @@ public class NetworkView implements IView {
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionSitesStyle.getName());
+				optionFontScaleFactor.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionSitesStyle.getName(),
+				optionEdits.getName());
 	}
 
 	public NetworkView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -94,8 +103,6 @@ public class NetworkView implements IView {
 		controller = loader.getController();
 
 		final ObservableMap<Integer, RichTextLabel> taxonLabelMap = FXCollections.observableHashMap();
-		final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
-		final ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap = FXCollections.observableHashMap();
 
 		presenter = new NetworkViewPresenter(mainWindow, this, targetBounds, networkBlock, taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
@@ -146,7 +153,6 @@ public class NetworkView implements IView {
 						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfNodes(),
 						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfEdges()),
 				mainWindow.workingTaxaProperty(), networkBlockProperty()));
-
 	}
 
 	@Override
@@ -299,8 +305,28 @@ public class NetworkView implements IView {
 		this.optionSitesStyle.set(optionSitesStyle);
 	}
 
+	public String[] getOptionEdits() {
+		return optionEdits.get();
+	}
+
+	public ObjectProperty<String[]> optionEditsProperty() {
+		return optionEdits;
+	}
+
+	public void setOptionEdits(String[] optionEdits) {
+		this.optionEdits.set(optionEdits);
+	}
+
 	public void setNetworkBlock(NetworkBlock networkBlock) {
 		this.networkBlock.set(networkBlock);
+	}
+
+	public ObservableMap<jloda.graph.Node, LabeledNodeShape> getNodeShapeMap() {
+		return nodeShapeMap;
+	}
+
+	public ObservableMap<Edge, LabeledEdgeShape> getEdgeShapeMap() {
+		return edgeShapeMap;
 	}
 
 	public NetworkViewController getController() {

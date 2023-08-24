@@ -22,7 +22,9 @@ package splitstree6.view.network;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.ObjectProperty;
 import javafx.event.EventHandler;
+import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
@@ -33,13 +35,14 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.DraggableUtils;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
+import jloda.util.Single;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -48,22 +51,28 @@ import java.util.function.Function;
  * Daniel Huson, 4.2022
  */
 public class InteractionSetup {
+
+	private final Stage stage;
+
+	private final UndoManager undoManager;
+	private final ObjectProperty<String[]> edits;
+
 	private static boolean nodeShapeOrLabelEntered;
 	private static boolean edgeShapeEntered;
 	private static double mouseDownX;
 	private static double mouseDownY;
 
-	private final Stage stage;
-	private final UndoManager undoManager;
 	private final SelectionModel<Taxon> taxonSelectionModel;
+
 
 	private InvalidationListener taxonSelectionInvalidationListener;
 
 	/**
 	 * constructor
 	 */
-	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, SelectionModel<Taxon> taxonSelectionModel) {
+	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, ObjectProperty<String[]> edits, SelectionModel<Taxon> taxonSelectionModel) {
 		this.stage = stage;
+		this.edits = edits;
 		this.undoManager = undoManager;
 		this.taxonSelectionModel = taxonSelectionModel;
 
@@ -79,8 +88,14 @@ public class InteractionSetup {
 	 * setup network mouse interaction
 	 */
 	public void apply(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
-		for (var shape : nodeShapeMap.values()) {
-			DraggableUtils.setupDragMouseTranslate(shape);
+		for (var node : nodeShapeMap.keySet()) {
+			var shape = nodeShapeMap.get(node);
+			shape.translateXProperty().addListener((v, o, n) -> {
+				edits.set(NetworkEdits.addTranslateNodeEdits(edits.get(), List.of(node), shape.getTranslateX(), shape.getTranslateY()));
+			});
+			shape.translateYProperty().addListener((v, o, n) -> {
+				edits.set(NetworkEdits.addTranslateNodeEdits(edits.get(), List.of(node), shape.getTranslateX(), shape.getTranslateY()));
+			});
 			shape.setOnMouseEntered(e -> {
 				if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
 					nodeShapeOrLabelEntered = true;
@@ -97,6 +112,40 @@ public class InteractionSetup {
 					e.consume();
 				}
 			});
+
+			var start = new Single<Point2D>();
+			var end = new Single<Point2D>();
+
+			shape.setOnMousePressed(e -> {
+				mouseDownX = e.getScreenX();
+				mouseDownY = e.getScreenY();
+				start.set(new Point2D(mouseDownX, mouseDownY));
+				end.set(start.get());
+				e.consume();
+			});
+			shape.setOnMouseDragged(e -> {
+				var dx = e.getScreenX() - mouseDownX;
+				var dy = e.getScreenY() - mouseDownY;
+				shape.setTranslateX(shape.getTranslateX() + dx);
+				shape.setTranslateY(shape.getTranslateY() + dy);
+				mouseDownX = e.getScreenX();
+				mouseDownY = e.getScreenY();
+				end.set(new Point2D(mouseDownX, mouseDownY));
+				e.consume();
+			});
+			shape.setOnMouseReleased(e -> {
+				if (!e.isStillSincePress()) {
+					undoManager.add("move node",
+							() -> {
+								shape.setTranslateX(shape.getTranslateX() - (end.get().getX() - start.get().getX()));
+								shape.setTranslateY(shape.getTranslateY() - (end.get().getY() - start.get().getY()));
+							},
+							() -> {
+								shape.setTranslateX(shape.getTranslateX() + (end.get().getX() - start.get().getX()));
+								shape.setTranslateY(shape.getTranslateY() + (end.get().getY() - start.get().getY()));
+							});
+				}
+			});
 		}
 
 		var graphOptional = nodeShapeMap.keySet().stream().filter(v -> v.getOwner() != null).map(v -> (PhyloGraph) v.getOwner()).findAny();
@@ -108,8 +157,15 @@ public class InteractionSetup {
 				try {
 					var label = taxonLabelMap.get(id);
 					if (label != null) {
-						var v = graph.getTaxon2Node(id);
-						var shape = nodeShapeMap.get(v);
+						var node = graph.getTaxon2Node(id);
+						label.layoutXProperty().addListener((v, o, n) -> {
+							edits.set(NetworkEdits.addLayoutNodeLabelEdits(edits.get(), List.of(node), label.getLayoutX(), label.getLayoutY()));
+						});
+						label.layoutYProperty().addListener((v, o, n) -> {
+							edits.set(NetworkEdits.addLayoutNodeLabelEdits(edits.get(), List.of(node), label.getLayoutX(), label.getLayoutY()));
+						});
+
+						var shape = nodeShapeMap.get(node);
 						var taxon = idTaxonMap.apply(id);
 						if (taxon != null && shape != null) {
 							shape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
@@ -150,10 +206,15 @@ public class InteractionSetup {
 							label.setOnMouseEntered(shape.getOnMouseEntered());
 							label.setOnMouseExited(shape.getOnMouseExited());
 
+							var start = new Single<Point2D>();
+							var end = new Single<Point2D>();
+
 							label.setOnMousePressed(e -> {
 								if (taxonSelectionModel.isSelected(taxon)) {
 									mouseDownX = e.getScreenX();
 									mouseDownY = e.getScreenY();
+									start.set(new Point2D(mouseDownX, mouseDownY));
+									end.set(start.get());
 									e.consume();
 								}
 							});
@@ -170,7 +231,22 @@ public class InteractionSetup {
 									}
 									mouseDownX = e.getScreenX();
 									mouseDownY = e.getScreenY();
+									end.set(new Point2D(mouseDownX, mouseDownY));
 									e.consume();
+								}
+							});
+
+							label.setOnMouseReleased(e -> {
+								if (!e.isStillSincePress()) {
+									undoManager.add("move label",
+											() -> {
+												label.setLayoutX(label.getLayoutX() - (end.get().getX() - start.get().getX()));
+												label.setLayoutY(label.getLayoutY() - (end.get().getY() - start.get().getY()));
+											},
+											() -> {
+												label.setLayoutX(label.getLayoutX() + (end.get().getX() - start.get().getX()));
+												label.setLayoutY(label.getLayoutY() + (end.get().getY() - start.get().getY()));
+											});
 								}
 							});
 						}

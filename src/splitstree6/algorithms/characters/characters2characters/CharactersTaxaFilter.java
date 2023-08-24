@@ -24,6 +24,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
+import splitstree6.data.CharactersFormat;
 import splitstree6.data.TaxaBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
@@ -81,6 +82,8 @@ public class CharactersTaxaFilter extends DataTaxaFilter<CharactersBlock, Charac
 
 		}
 		workingCharacters.setDataType(inputCharacters.getDataType());
+
+		workingCharacters.setFormat(new CharactersFormat(inputCharacters.getFormat()));
 
 		workingCharacters.setMissingCharacter(inputCharacters.getMissingCharacter());
 		workingCharacters.setGapCharacter(inputCharacters.getGapCharacter());

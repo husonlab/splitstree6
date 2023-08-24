@@ -39,9 +39,6 @@ import java.util.function.Consumer;
  * Daniel Huson, 1.2022
  */
 public class LayoutUtils {
-	private static double mouseX;
-	private static double mouseY;
-
 	public static void applyOrientation(Collection<? extends Node> shapes, LayoutOrientation oldOrientation, LayoutOrientation newOrientation,
 										Consumer<LayoutOrientation> orientationConsumer,
 										BooleanProperty changingOrientation) {
@@ -76,22 +73,5 @@ public class LayoutUtils {
 				}));
 			parallel.play();
 		}
-	}
-
-	public static void installTranslateUsingLayout(javafx.scene.Node node, Runnable select) {
-		node.setOnMousePressed(e -> {
-			mouseX = e.getSceneX();
-			mouseY = e.getSceneY();
-			select.run();
-			e.consume();
-		});
-
-		node.setOnMouseDragged(e -> {
-			node.setLayoutX(node.getLayoutX() + (e.getSceneX() - mouseX));
-			node.setLayoutY(node.getLayoutY() + (e.getSceneY() - mouseY));
-			mouseX = e.getSceneX();
-			mouseY = e.getSceneY();
-			e.consume();
-		});
 	}
 }
