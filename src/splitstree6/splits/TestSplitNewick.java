@@ -19,7 +19,9 @@
 
 package splitstree6.splits;
 
+import jloda.graph.Edge;
 import jloda.graph.EdgeArray;
+import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.io.GraphGML;
 import jloda.phylo.PhyloSplitsGraph;
@@ -28,6 +30,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.HashMap;
+import java.util.List;
+import java.util.function.BiFunction;
 
 /**
  * test split netwick i/o
@@ -43,22 +47,18 @@ public class TestSplitNewick {
 
 		if (false) {
 			var w = new StringWriter();
-			try (EdgeArray<String> edgeSplitMap = splitNetwork.newEdgeArray();
-				 NodeArray<String> nodeLabelMap = splitNetwork.newNodeArray()) {
-				for (var e : splitNetwork.edges()) {
-					edgeSplitMap.put(e, String.valueOf(splitNetwork.getSplit(e)));
-				}
-				for (var v : splitNetwork.nodes()) {
-					if (splitNetwork.getNumberOfTaxa(v) > 0)
-						nodeLabelMap.put(v, String.valueOf(splitNetwork.getTaxon(v)));
-				}
-				var nodeMap = new HashMap<String, NodeArray<String>>();
-				nodeMap.put("taxon", nodeLabelMap);
-				var edgeMap = new HashMap<String, EdgeArray<String>>();
-				edgeMap.put("split", edgeSplitMap);
-				GraphGML.writeGML(splitNetwork, "", "Splits", false, 1, w, nodeMap, edgeMap);
 
-			}
+			BiFunction<String, Node, String> labelNodeValueFunction = (label, v) -> {
+				if (label.equals("taxon") && splitNetwork.getNumberOfTaxa(v) > 0)
+					return String.valueOf(splitNetwork.getTaxon(v));
+				else return null;
+			};
+			BiFunction<String, Edge, String> labelEdgeValueFunction = (label, e) -> {
+				if (label.equals("split"))
+					return String.valueOf(splitNetwork.getSplit(e));
+				else return null;
+			};
+			GraphGML.writeGML(splitNetwork, "", "Splits", false, 1, w, List.of("taxon"), labelNodeValueFunction, List.of("split"), labelEdgeValueFunction);
 			System.err.println(w);
 		}
 
