@@ -34,6 +34,7 @@ import splitstree6.io.readers.trees.TreesReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.TreeMap;
 
 /**
@@ -154,5 +155,16 @@ public class Model {
 		int position = orderedGeneNames.indexOf(treeToRemove.getName());
 		treeOrder.remove(position);
 		orderedGeneNames.remove(treeToRemove.getName());
+	}
+
+	public void remove(String treeName) {
+		int index = orderedGeneNames.indexOf(treeName);
+		PhyloTree treeToRemove = treesBlock.getTree(index+1);
+		treesBlock.getTrees().remove(treeToRemove);
+		initialGeneNameOrder.remove(treeName);
+		//int position = orderedGeneNames.indexOf(treeToRemove.getName());
+		treeOrder.remove(index);
+		orderedGeneNames.remove(treeName);
+		if (!Objects.equals(treeToRemove.getName(), treeName)) System.out.println("Problem with tree deletion: "+treeName+" or "+treeToRemove.getName());
 	}
 }

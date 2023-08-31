@@ -52,8 +52,8 @@ public class RobinsonFouldsDistance {
                 }
             }
         }
-        System.out.println("Total split number of "+tree1.getName()+" and "+tree2.getName()+": "+totalSplitNumber);
-        System.out.println("\t number of splits in common: "+numberOfSplitsInCommon);
+        //System.out.println("Total split number of "+tree1.getName()+" and "+tree2.getName()+": "+totalSplitNumber);
+        //System.out.println("\t number of splits in common: "+numberOfSplitsInCommon);
         return totalSplitNumber - (2*numberOfSplitsInCommon);
     }
 

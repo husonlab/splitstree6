@@ -32,14 +32,16 @@ public class StackLayout extends MultipleFramesLayout{
     private final BooleanProperty isSnapshot = new SimpleBooleanProperty(false);
     private final Slider slider;
     private final ReadOnlyDoubleProperty layoutWidthProperty;
+    private final ReadOnlyDoubleProperty layoutHeightProperty;
     private final double nodeWidth;
     private final double nodeHeight;
-    private final static double CONSTANT = 1.0;
 
     public StackLayout(ObservableList<Node> nodes, ObservableList<Node> snapshots, double nodeWidth, double nodeHeight,
-                       PerspectiveCamera camera, ReadOnlyDoubleProperty layoutWidthProperty, Slider slider, Slider zoomSlider) {
+                       ReadOnlyDoubleProperty layoutWidthProperty, ReadOnlyDoubleProperty layoutHeightProperty,
+                       PerspectiveCamera camera, Slider slider, Slider zoomSlider) {
         type = LayoutType.Stack;
         this.layoutWidthProperty = layoutWidthProperty;
+        this.layoutHeightProperty = layoutHeightProperty;
         this.nodeWidth = nodeWidth;
         this.nodeHeight = nodeHeight;
         this.slider = slider;
@@ -51,11 +53,14 @@ public class StackLayout extends MultipleFramesLayout{
         transformedSnapshots = snapshots;
 
         // Setting up zoomSlider
-        setUpZoomSlider(zoomSlider, -750, -620);
+        setUpZoomSlider(zoomSlider); // min: -750, max: -620
+        zoomSlider.minProperty().bind(layoutHeightProperty.multiply(-2.6));
+        zoomSlider.maxProperty().bind(zoomSlider.minProperty().add(250));
+        zoomSlider.setValue(zoomSlider.getMin());
 
         // Transforming camera
         resetCamera(camera);
-        camera.setFarClip(1000);
+        camera.setFarClip(3000);
         camera.setNearClip(0.1);
         camera.setTranslateY(0);
         camera.translateZProperty().bind(zoomSlider.valueProperty());
@@ -94,7 +99,6 @@ public class StackLayout extends MultipleFramesLayout{
         // Translate X
         //var functionForX = (1.045/(1.+Math.exp(-1.028*x))-0.522);
         var functionForX = (1.285/(1+Math.exp(-0.767*x))-0.642); // returns a value between 0 and 1
-        //node.setTranslateX((layoutWidthProperty.doubleValue()) * functionForX - (nodeWidth/2.));
         node.translateXProperty().unbind();
         node.translateXProperty().bind(layoutWidthProperty.multiply(functionForX).subtract(nodeWidth/2.));
 
@@ -103,14 +107,16 @@ public class StackLayout extends MultipleFramesLayout{
         var rotate = (179./(1+Math.exp(-1.15*x)))-89.; // layout draft 4
         node.setRotate(rotate);
 
-        // Scaling size
+        // Scaling size: larger nodes in the center
         final var scalingFunction = 0.9 / (Math.exp(x) + Math.exp(-x)) + 0.7;
-        node.setScaleX(scalingFunction);
-        node.setScaleY(scalingFunction);
+        node.scaleXProperty().unbind();
+        node.scaleXProperty().bind(layoutWidthProperty.multiply(0.24).divide(nodeWidth).multiply(scalingFunction));
+        node.scaleYProperty().unbind();
+        node.scaleYProperty().bind(layoutHeightProperty.multiply(0.75).divide(nodeHeight).multiply(scalingFunction));
 
         // Show node closer and without rotation when hovered
         node.setOnMouseEntered(e -> {
-            node.setTranslateZ(-80);
+            node.setTranslateZ(-100);
             node.setRotate(0);
         });
         node.setOnMouseExited(e -> {

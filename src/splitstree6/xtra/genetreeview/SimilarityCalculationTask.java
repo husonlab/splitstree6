@@ -24,8 +24,6 @@ import jloda.phylo.PhyloTree;
 import splitstree6.data.TreesBlock;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.TreeMap;
 
 public class SimilarityCalculationTask extends Task<ArrayList<Integer>> {
 
@@ -46,10 +44,10 @@ public class SimilarityCalculationTask extends Task<ArrayList<Integer>> {
                 System.out.println("Negative distance calculated with tree "+tree.getName());
                 robinsonFouldsDistance = 0;
             }
-            System.out.println("Distance of "+referenceTree.getName()+" and "+tree.getName()+": "+robinsonFouldsDistance);
+            //System.out.println("Distance of "+referenceTree.getName()+" and "+tree.getName()+": "+robinsonFouldsDistance);
             int maximum = referenceTree.getNumberOfEdges() + tree.getNumberOfEdges();
             int similarity = maximum - robinsonFouldsDistance;
-            System.out.println("Similarity of "+referenceTree.getName()+" and "+tree.getName()+": "+similarity);
+            //System.out.println("Similarity of "+referenceTree.getName()+" and "+tree.getName()+": "+similarity);
             similarities.add(similarity);
         }
         return similarities;

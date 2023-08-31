@@ -289,7 +289,7 @@ public class TreeSheet extends StackPane implements Selectable {
             }
             counter++;
         }
-        System.out.println(tree.getName()+" updateEdgeSelection: "+counter+" of max rounds "+max);
+        //System.out.println(tree.getName()+" updateEdgeSelection: "+counter+" of max rounds "+max);
         lastUpdate.set(System.currentTimeMillis());
     }
 
@@ -319,7 +319,7 @@ public class TreeSheet extends StackPane implements Selectable {
             }
             counter++;
         }
-        System.out.println(tree.getName()+" monophyletic check: "+counter+" of max rounds "+max);
+        //System.out.println(tree.getName()+" monophyletic check: "+counter+" of max rounds "+max);
         return nodes.size() == 1;
     }
 
@@ -344,6 +344,10 @@ public class TreeSheet extends StackPane implements Selectable {
     public void setTreeName(String treeName) {
         nameLabel.setText(treeName);
         lastUpdate.set(System.currentTimeMillis());
+    }
+
+    public String getTreeName() {
+        return nameLabel.getText();
     }
 
     public void setSelectedProperty(boolean selected) {

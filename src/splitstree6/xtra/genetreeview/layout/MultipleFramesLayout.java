@@ -42,7 +42,9 @@ public abstract class MultipleFramesLayout {
         node.setTranslateY(0);
         node.setTranslateZ(0);
         node.setRotate(0);
+        if (node.scaleXProperty().isBound()) node.scaleXProperty().unbind();
         node.setScaleX(1);
+        if (node.scaleYProperty().isBound()) node.scaleYProperty().unbind();
         node.setScaleY(1);
         node.setScaleZ(1);
         node.layoutXProperty().unbind();
@@ -65,9 +67,17 @@ public abstract class MultipleFramesLayout {
 
     void setUpZoomSlider(Slider zoomSlider, double min, double max) {
         zoomSlider.setDisable(false);
+        if (zoomSlider.minProperty().isBound()) zoomSlider.minProperty().unbind();
+        if (zoomSlider.maxProperty().isBound()) zoomSlider.maxProperty().unbind();
         zoomSlider.setMin(min);
         zoomSlider.setMax(max);
         zoomSlider.setValue(zoomSlider.getMin());
+    }
+
+    void setUpZoomSlider(Slider zoomSlider) {
+        zoomSlider.setDisable(false);
+        if (zoomSlider.minProperty().isBound()) zoomSlider.minProperty().unbind();
+        if (zoomSlider.maxProperty().isBound()) zoomSlider.maxProperty().unbind();
     }
 
     public LayoutType getType() {return type;}

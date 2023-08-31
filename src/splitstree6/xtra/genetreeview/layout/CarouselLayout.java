@@ -22,6 +22,7 @@ package splitstree6.xtra.genetreeview.layout;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
@@ -36,18 +37,23 @@ public class CarouselLayout extends MultipleFramesLayout {
     private final Slider zoomSlider;
     private final double nodeWidth;
     private final double nodeHeight;
+    private final ReadOnlyDoubleProperty layoutWidthProperty;
+    private final ReadOnlyDoubleProperty layoutHeightProperty;
     private int realNodeNumber;
     private double thetaDeg;
     private double thetaRad;
     private double layoutRadius;
     private final DoubleProperty cameraRadius = new SimpleDoubleProperty();
 
-    public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight, PerspectiveCamera camera,
-                          Slider slider, Slider zoomSlider) {
+    public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight,
+                          ReadOnlyDoubleProperty layoutWidthProperty, ReadOnlyDoubleProperty layoutHeightProperty,
+                          PerspectiveCamera camera, Slider slider, Slider zoomSlider) {
         type = LayoutType.Carousel;
         // Setting up variables
         this.nodeWidth = nodeWidth;
         this.nodeHeight = nodeHeight;
+        this.layoutWidthProperty = layoutWidthProperty;
+        this.layoutHeightProperty = layoutHeightProperty;
         this.slider = slider;
         this.zoomSlider = zoomSlider;
         setUpZoomSlider(zoomSlider, -1200, -620);
@@ -85,11 +91,22 @@ public class CarouselLayout extends MultipleFramesLayout {
         }
         else {
             resetNode(node);
+            realNodeNumber++;
             node.setTranslateX(layoutRadius * Math.sin(index * thetaRad) - (Math.cos(index * thetaRad) * (nodeWidth / 2.)));
             node.setTranslateY(-nodeHeight / 2.);
             node.setTranslateZ(-layoutRadius * Math.cos(index * thetaRad) - (Math.sin(index * thetaRad) * (nodeWidth / 2.)));
             Rotate rotate = new Rotate(-index * thetaDeg, 0, node.getTranslateY(), 0, Rotate.Y_AXIS);
             node.getTransforms().add(rotate);
+            var scalingFunctionX = Bindings.createDoubleBinding(() ->
+                            (layoutWidthProperty.get()*0.23/nodeWidth) / (1 + (Math.abs(layoutWidthProperty.get()*0.23/nodeWidth))) + 0.5,
+                    layoutWidthProperty
+            );
+            //node.scaleXProperty().bind(scalingFunctionX);
+            var scalingFunctionY = Bindings.createDoubleBinding(() ->
+                            (layoutHeightProperty.get()*0.7/nodeHeight) / (1 + (Math.abs(layoutHeightProperty.get()*0.7/nodeHeight))) + 0.5,
+                    layoutHeightProperty
+            );
+            node.scaleYProperty().bind(scalingFunctionY);
 
             // Show node closer and without rotation when hovered
             node.setOnMouseEntered(e -> {

@@ -58,7 +58,6 @@
                                             </accelerator>
                                         </MenuItem>
                               <MenuItem fx:id="importGeneNamesMenuItem" mnemonicParsing="false" text="Import Gene Names" />
-                              <MenuItem fx:id="importFeaturesMenuItem" disable="true" mnemonicParsing="false" text="Import Features" />
                               <MenuItem fx:id="exportSubsetMenuItem" mnemonicParsing="false" text="Export Selected Trees" />
                               <MenuItem fx:id="printMenuItem" mnemonicParsing="false" text="Print...">
                                  <accelerator>
@@ -90,7 +89,12 @@
                                  </accelerator>
                               </MenuItem>
                               <MenuItem fx:id="copyImageMenuItem" mnemonicParsing="false" text="Copy Image" />
-                              <MenuItem fx:id="copySelectedTreesMenuItem" mnemonicParsing="false" text="Copy Selected Tree Images" />
+                              <Menu mnemonicParsing="false" text="Copy Selected Trees">
+                                <items>
+                                  <MenuItem fx:id="copySelectedNewicksMenuItem" mnemonicParsing="false" text="in Newick format" />
+                                    <MenuItem fx:id="copySelectedTreesMenuItem" mnemonicParsing="false" text="as Image" />
+                                </items>
+                              </Menu>
                               <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="Paste Newick Trees">
                                  <accelerator>
                                     <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -159,7 +163,14 @@
                               <Menu fx:id="similarityColoringSubMenu" mnemonicParsing="false" text="Coloring By Similarity With Tree" />
                            </items>
                         </Menu>
-                                <Menu mnemonicParsing="false" text="Help" />
+                                <Menu mnemonicParsing="false" text="Help">
+                           <items>
+                              <MenuItem fx:id="aboutMenuItem" mnemonicParsing="false" text="About...">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
+                                 </accelerator>
+                              </MenuItem>
+                           </items></Menu>
                             </menus>
                         </MenuBar>
                         <ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0">

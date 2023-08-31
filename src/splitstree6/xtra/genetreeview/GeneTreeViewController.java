@@ -33,9 +33,6 @@ public class GeneTreeViewController {
 	private MenuItem importGeneNamesMenuItem;
 
 	@FXML
-	private MenuItem importFeaturesMenuItem;
-
-	@FXML
 	private MenuItem exportSubsetMenuItem;
 
 	@FXML
@@ -55,6 +52,9 @@ public class GeneTreeViewController {
 
 	@FXML
 	private MenuItem copyImageMenuItem;
+
+	@FXML
+	private MenuItem copySelectedNewicksMenuItem;
 
 	@FXML
 	private MenuItem copySelectedTreesMenuItem;
@@ -141,6 +141,9 @@ public class GeneTreeViewController {
 	private Menu similarityColoringSubMenu;
 
 	@FXML
+	private MenuItem aboutMenuItem;
+
+	@FXML
 	private ToolBar toolBar;
 
 	@FXML
@@ -185,9 +188,6 @@ public class GeneTreeViewController {
 	public MenuItem getImportGeneNamesMenuItem() {
 		return importGeneNamesMenuItem;
 	}
-	public MenuItem getImportFeaturesMenuItem() {
-		return importFeaturesMenuItem;
-	}
 	public MenuItem getExportSubsetMenuItem() {
 		return exportSubsetMenuItem;
 	}
@@ -210,6 +210,9 @@ public class GeneTreeViewController {
 	}
 	public MenuItem getCopyImageMenuItem() {
 		return copyImageMenuItem;
+	}
+	public MenuItem getCopySelectedNewicksMenuItem() {
+		return copySelectedNewicksMenuItem;
 	}
 	public MenuItem getCopySelectedTreesMenuItem() {
 		return copySelectedTreesMenuItem;
@@ -300,6 +303,11 @@ public class GeneTreeViewController {
 	}
 	public Menu getSimilarityColoringSubMenu() {
 		return similarityColoringSubMenu;
+	}
+
+	// Help Menu
+	public MenuItem getAboutMenuItem() {
+		return aboutMenuItem;
 	}
 
 	// ToolBar
