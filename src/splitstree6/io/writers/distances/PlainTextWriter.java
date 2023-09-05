@@ -19,7 +19,9 @@
 
 package splitstree6.io.writers.distances;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
@@ -33,9 +35,10 @@ import java.io.Writer;
  * Daniel Huson, 11.2021
  */
 public class PlainTextWriter extends DistancesWriterBase {
-	public enum Format {Matrix, Vector}
+	public enum Format {Matrix, OrderedPairs, AllPairs}
 
 	private final ObjectProperty<Format> optionFormat = new SimpleObjectProperty<>(this, "optionFormat", Format.Matrix);
+	private final BooleanProperty optionLabels = new SimpleBooleanProperty(this, "optionLabels", false);
 
 	public PlainTextWriter() {
 		setFileExtensions("tab", "txt");
@@ -47,20 +50,43 @@ public class PlainTextWriter extends DistancesWriterBase {
 		switch (optionFormat.get()) {
 			case Matrix -> {
 				w.write("# Distance matrix:\n");
+				if (optionLabels.get()) {
+					for (var i = 1; i <= ntax; i++) {
+						if (i > 1)
+							w.write("\t");
+						w.write(taxa.get(i).getName());
+					}
+				}
 				for (var i = 1; i <= ntax; i++) {
 					for (var j = 1; j <= ntax; j++) {
-						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))) + "\t");
+						if (j > 1)
+							w.write("\t");
+						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))));
 					}
 					w.write("\n");
 				}
 				w.write("\n");
 			}
-			case Vector -> {
-
-				//Export the distances as a matrix then as a column vector.
-				w.write("Distance matrix as column vector (1,2),(1,3),..,(1,n),(2,3),... :\n");
+			case OrderedPairs -> {
+				w.write("# Ordered pairs of distances D(1,2), D(1,3), ..,D(1,n), D(2,3), ... :\n");
 				for (var i = 1; i <= ntax; i++) {
 					for (var j = i + 1; j <= ntax; j++) {
+						if (optionLabels.get()) {
+							w.write(taxa.get(i).getName() + "\t" + taxa.get(j) + "\t");
+						}
+						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))) + "\n");
+					}
+				}
+				w.write("\n");
+				w.flush();
+			}
+			case AllPairs -> {
+				w.write("# All pairs of distances D(1,1), D(1,2), ..., D(2,1), D(2,2), D(2,3), ...\n");
+				for (var i = 1; i <= ntax; i++) {
+					for (var j = 1; j <= ntax; j++) {
+						if (optionLabels.get()) {
+							w.write(taxa.get(i).getName() + "\t" + taxa.get(j) + "\t");
+						}
 						w.write(StringUtils.removeTrailingZerosAfterDot(String.format("%.8f", distances.get(i, j))) + "\n");
 					}
 				}
@@ -70,7 +96,12 @@ public class PlainTextWriter extends DistancesWriterBase {
 		}
 	}
 
+
 	public ObjectProperty<Format> optionFormatProperty() {
 		return optionFormat;
+	}
+
+	public BooleanProperty optionLabelsProperty() {
+		return optionLabels;
 	}
 }
