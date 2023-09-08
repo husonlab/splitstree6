@@ -92,13 +92,13 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 		};
 
 		if (getOptionWeightThreshold() > 0) {
-			var filtered = splits.stream().filter(s -> s.getWeight() >= getOptionWeightThreshold()).collect(Collectors.toList());
+			var filtered = splits.stream().filter(s -> s.getWeight() >= getOptionWeightThreshold()).toList();
 			splits.clear();
 			splits.addAll(filtered);
 		}
 
 		if (getOptionConfidenceThreshold() > 0) {
-			var filtered = splits.stream().filter(s -> s.getConfidence() >= getOptionConfidenceThreshold()).collect(Collectors.toList());
+			var filtered = splits.stream().filter(s -> s.getConfidence() >= getOptionConfidenceThreshold()).toList();
 			splits.clear();
 			splits.addAll(filtered);
 		}
@@ -109,7 +109,7 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 		}
 
 		child.getSplits().addAll(splits);
-		if (split2label.size() > 0) {
+		if (!split2label.isEmpty()) {
 			for (var s = 1; s <= child.getNsplits(); s++) {
 				var label = split2label.get(child.get(s));
 				child.getSplitLabels().put(s, label);
