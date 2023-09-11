@@ -20,13 +20,16 @@
 package splitstree6.layout.tree;
 
 import javafx.scene.control.Label;
+import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
+import jloda.util.IteratorUtils;
 import jloda.util.Pair;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,8 +62,9 @@ public class HeightAndAngles {
 		computeYCoordinateOfLeavesRec(tree, root, 0, nodeHeightMap, leafOrder);
 		if (tree.getNumberReticulateEdges() > 0)
 			fixSpacing(leafOrder, nodeHeightMap);
-		if (averaging == Averaging.ChildAverage)
+		if (averaging == Averaging.ChildAverage) {
 			computeHeightInternalNodesAsChildAverageRec(tree, root, nodeHeightMap);
+		}
 		else {
 
 			try (NodeArray<Pair<Double, Double>> minMaxBelowMap = tree.newNodeArray()) {
@@ -76,6 +80,20 @@ public class HeightAndAngles {
 				});
 			}
 		}
+		// todo: this is a fix to accommodate transfer acceptor edges
+		tree.postorderTraversal(v -> {
+			var transferAcceptorEdges = v.outEdgesStream(false).filter(tree::isTransferAcceptorEdge).toList();
+			if (!transferAcceptorEdges.isEmpty()) {
+				var min = v.outEdgesStream(false).map(Edge::getTarget).mapToDouble(nodeHeightMap::get).min().orElse(0);
+				var max = v.outEdgesStream(false).map(Edge::getTarget).mapToDouble(nodeHeightMap::get).max().orElse(0);
+				for (var e : transferAcceptorEdges) {
+					var value = nodeHeightMap.get(e.getTarget());
+					min = Math.min(min, value);
+					max = Math.max(max, value);
+				}
+				nodeHeightMap.put(v, (min + max) * 0.5);
+			}
+		});
 	}
 
 	public static void computeAngles(PhyloTree tree, NodeDoubleArray nodeAngleMap, Averaging averaging) {
@@ -114,7 +132,6 @@ public class HeightAndAngles {
 		if (v.getOutDegree() > 0) {
 			double first = Double.NEGATIVE_INFINITY;
 			double last = Double.NEGATIVE_INFINITY;
-
 			for (Node w : tree.lsaChildren(v)) {
 				var height = nodeHeightMap.get(w);
 				if (height == null) {
@@ -126,6 +143,7 @@ public class HeightAndAngles {
 					first = last;
 			}
 			nodeHeightMap.put(v, 0.5 * (last + first));
+
 		}
 	}
 

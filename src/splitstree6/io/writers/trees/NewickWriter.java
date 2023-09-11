@@ -33,6 +33,7 @@ import java.io.Writer;
  */
 public class NewickWriter extends TreesWriterBase {
 	private final BooleanProperty optionEdgeWeights = new SimpleBooleanProperty(this, "optionEdgeWeights", true);
+	private final BooleanProperty optionEdgeConfidences = new SimpleBooleanProperty(this, "optionEdgeConfidences", false);
 
 	public NewickWriter() {
 		setFileExtensions("tree", "tre", "trees", "new", "nwk", "treefile");
@@ -41,12 +42,13 @@ public class NewickWriter extends TreesWriterBase {
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, TreesBlock trees) throws IOException {
 		var newickIO = new NewickIO();
+		var format = new NewickIO.OutputFormat(isOptionEdgeWeights(), isOptionEdgeConfidences(), isOptionEdgeConfidences(), false, false);
 
 		if (trees != null) {
 			for (var i = 1; i <= trees.getNTrees(); i++) {
 				var tree = trees.getTree(i);
 				newickIO.setNewickNodeCommentSupplier(v -> (v == tree.getRoot() && tree.getName() != null && !tree.getName().startsWith("tree-") ? "&&NHX:GN=" + tree.getName() : null));
-				w.write(newickIO.toBracketString(tree, isOptionEdgeWeights()) + ";\n");
+				w.write(newickIO.toBracketString(tree, format) + ";\n");
 			}
 		}
 		w.flush();
@@ -58,5 +60,13 @@ public class NewickWriter extends TreesWriterBase {
 
 	public BooleanProperty optionEdgeWeightsProperty() {
 		return optionEdgeWeights;
+	}
+
+	public boolean isOptionEdgeConfidences() {
+		return optionEdgeConfidences.get();
+	}
+
+	public BooleanProperty optionEdgeConfidencesProperty() {
+		return optionEdgeConfidences;
 	}
 }

@@ -54,8 +54,19 @@ public class LayoutTreeRectangular {
 							levels.put(v, 0);
 						else {
 							var level = 0;
+							if (true) {
+								for (var e : v.outEdges()) {
+									var w = e.getTarget();
+
+									if (tree.isTransferEdge(e))
+										level = Math.max(level, levels.get(w) - 1);
+									else
+										level = Math.max(level, levels.get(w));
+								}
+							} else {
 							for (var w : v.children()) {
 								level = Math.max(level, levels.get(w));
+							}
 							}
 							var prev = (levels.get(v) != null ? levels.get(v) : 0);
 							if (level + 1 > prev)

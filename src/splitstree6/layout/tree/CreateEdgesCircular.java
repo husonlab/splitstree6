@@ -57,7 +57,7 @@ public class CreateEdgesCircular {
 
 				var line = new Path();
 
-				if (tree.isTreeEdge(e)) {
+				if (tree.isTreeEdge(e) || tree.isTransferAcceptorEdge(e)) {
 					line.getStyleClass().add("graph-edge");
 
 					line.getElements().add(new MoveTo(vPt.getX(), vPt.getY()));

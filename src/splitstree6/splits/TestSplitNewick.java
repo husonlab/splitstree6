@@ -70,7 +70,7 @@ public class TestSplitNewick {
 				System.err.println(split);
 			}
 		}
-		var output = SplitNewick.toString(splitNetwork, true);
+		var output = SplitNewick.toString(splitNetwork, true, false);
 
 		System.err.println("Output:\n" + output + ";");
 

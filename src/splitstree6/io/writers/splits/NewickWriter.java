@@ -36,6 +36,8 @@ import java.util.ArrayList;
 public class NewickWriter extends SplitsWriterBase {
 	private final BooleanProperty optionEdgeWeights = new SimpleBooleanProperty(this, "optionEdgeWeights", true);
 
+	private final BooleanProperty optionEdgeConfidences = new SimpleBooleanProperty(this, "optionEdgeConfidences", false);
+
 	public NewickWriter() {
 		setFileExtensions("tree", "tre", "trees", "new", "nwk", "treefile");
 	}
@@ -45,7 +47,7 @@ public class NewickWriter extends SplitsWriterBase {
 		var ordering = new ArrayList<Integer>();
 		for (var i = 1; i < splits.getCycle().length; i++)
 			ordering.add(splits.getCycle()[i]);
-		w.write(SplitNewick.toString(taxa::getLabel, splits.getSplits(), isOptionEdgeWeights(), ordering) + ";\n");
+		w.write(SplitNewick.toString(taxa::getLabel, splits.getSplits(), isOptionEdgeWeights(), isOptionEdgeConfidences(), ordering) + ";\n");
 	}
 
 
@@ -57,4 +59,11 @@ public class NewickWriter extends SplitsWriterBase {
 		return optionEdgeWeights;
 	}
 
+	public boolean isOptionEdgeConfidences() {
+		return optionEdgeConfidences.get();
+	}
+
+	public BooleanProperty optionEdgeConfidencesProperty() {
+		return optionEdgeConfidences;
+	}
 }

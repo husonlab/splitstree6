@@ -340,7 +340,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			try {
 				BasicFX.putTextOnClipBoard(SplitNewick.toString(t -> mainWindow.getWorkingTaxa().get(t).getName(),
-						view.getSplitsBlock().getSplits(), true) + ";\n");
+						view.getSplitsBlock().getSplits(), true, false) + ";\n");
 			} catch (IOException ex) {
 				NotificationManager.showError("Copy Newick failed: " + ex.getMessage());
 			}

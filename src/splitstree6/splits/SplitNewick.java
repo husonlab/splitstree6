@@ -21,6 +21,7 @@ package splitstree6.splits;
 
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
@@ -251,8 +252,8 @@ public class SplitNewick {
 	 * @param splits the splits
 	 * @param w      writer
 	 */
-	public static void write(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, Writer w) throws IOException {
-		write(taxonLabelFunction, splits, includeWeights, null, w);
+	public static void write(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, boolean includeConfidences, Writer w) throws IOException {
+		write(taxonLabelFunction, splits, includeWeights, includeConfidences, null, w);
 	}
 
 	/**
@@ -262,19 +263,19 @@ public class SplitNewick {
 	 * @param ordering the taxon ordering - using a good ordering will result in a shorter Newick string
 	 * @param w        writer
 	 */
-	public static void write(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, ArrayList<Integer> ordering, Writer w) throws IOException {
-		w.write(toString(taxonLabelFunction, splits, includeWeights, ordering));
+	public static void write(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, boolean includeConfidences, ArrayList<Integer> ordering, Writer w) throws IOException {
+		w.write(toString(taxonLabelFunction, splits, includeWeights, includeConfidences, ordering));
 	}
 
-	public static String toString(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights) throws IOException {
-		return toString(taxonLabelFunction, splits, includeWeights, (ArrayList<Integer>) null);
+	public static String toString(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, boolean includeConfidences) throws IOException {
+		return toString(taxonLabelFunction, splits, includeWeights, includeConfidences, (ArrayList<Integer>) null);
 	}
 
-	public static String toString(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, int[] cycle1based) throws IOException {
+	public static String toString(Function<Integer, String> taxonLabelFunction, List<ASplit> splits, boolean includeWeights, boolean includeConfidences, int[] cycle1based) throws IOException {
 		var ordering = new ArrayList<Integer>();
 		for (int i = 1; i < cycle1based.length; i++)
 			ordering.add(cycle1based[i]);
-		return toString(taxonLabelFunction, splits, includeWeights, ordering);
+		return toString(taxonLabelFunction, splits, includeWeights, includeConfidences, ordering);
 	}
 
 
@@ -284,8 +285,8 @@ public class SplitNewick {
 	 * @param splits   splits
 	 * @param ordering the taxon ordering - using a good ordering will result in a shorter Newick string
 	 */
-	public static String toString(Function<Integer, String> taxonLabelFunction0, List<ASplit> splits, boolean includeWeights, ArrayList<Integer> ordering) throws IOException {
-		if (splits.size() == 0)
+	public static String toString(Function<Integer, String> taxonLabelFunction0, List<ASplit> splits, boolean includeWeights, boolean includeConfidences, ArrayList<Integer> ordering) throws IOException {
+		if (splits.isEmpty())
 			return "";
 		else {
 			Function<Integer, String> taxonLabelFunction;
@@ -375,12 +376,12 @@ public class SplitNewick {
 				System.err.println();
 			}
 
-			var treeNewick = tree.toBracketString(includeWeights);
+			var treeNewick = NewickIO.toString(tree, includeWeights, includeConfidences);
 
 			if (false)
 				System.err.println("TreeNewick out: " + treeNewick + ";");
 
-			if (additional.size() == 0)
+			if (additional.isEmpty())
 				return treeNewick;
 			else { // insert other splits
 				var taxaList = new ArrayList<Integer>();
@@ -428,7 +429,7 @@ public class SplitNewick {
 									appendAfterTaxon[t] = new StringBuilder();
 								if (!includeWeights) {
 									appendAfterTaxon[t].append("|%d>".formatted(splitNumber));
-								} else if (split.getConfidence() <= 0)
+								} else if (!includeConfidences)
 									appendAfterTaxon[t].append("|%d:%s>".formatted(splitNumber,
 											StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
 								else
@@ -502,9 +503,9 @@ public class SplitNewick {
 		}
 	}
 
-	public static String toString(PhyloSplitsGraph graph, boolean includeWeights) throws IOException {
+	public static String toString(PhyloSplitsGraph graph, boolean includeWeights, boolean includeConfidences) throws IOException {
 		var w = new StringWriter();
-		write(graph, includeWeights, w);
+		write(graph, includeWeights, includeConfidences, w);
 		return w.toString();
 	}
 
@@ -514,8 +515,8 @@ public class SplitNewick {
 	 * @param graph split graph
 	 * @param w     writer
 	 */
-	public static void write(PhyloSplitsGraph graph, boolean includeWeights, Writer w) throws IOException {
-		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, null, w);
+	public static void write(PhyloSplitsGraph graph, boolean includeWeights, boolean includeConfidences, Writer w) throws IOException {
+		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, includeConfidences, null, w);
 	}
 
 	/**
@@ -525,7 +526,7 @@ public class SplitNewick {
 	 * @param ordering the taxon ordering
 	 * @param w        writer
 	 */
-	public static void write(PhyloSplitsGraph graph, boolean includeWeights, ArrayList<Integer> ordering, Writer w) throws IOException {
-		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, ordering, w);
+	public static void write(PhyloSplitsGraph graph, boolean includeWeights, boolean includeConfidences, ArrayList<Integer> ordering, Writer w) throws IOException {
+		write(t -> graph.getLabel(graph.getTaxon2Node(t)), extractSplits(graph), includeWeights, includeConfidences, ordering, w);
 	}
 }

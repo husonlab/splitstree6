@@ -229,7 +229,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 					if (tree.isReticulated()) {
 						tree = new PhyloTree(tree);
 						try {
-							if (false)
+							if (true)
 								EmbeddingOptimizer.apply(tree, new ProgressSilent());
 							else
 								TreeEmbeddingOptimizer.apply(tree, new ProgressSilent());
