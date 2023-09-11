@@ -119,9 +119,9 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 		// copy splits to splits
 		splitsBlock.getSplits().addAll(previousSplits);
 
-		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		splitsBlock.setFit(SplitsBlockUtilities.computeSplitDecompositionFit(distancesBlock, splitsBlock.getSplits()));
 		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 	}
 
 

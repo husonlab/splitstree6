@@ -32,15 +32,6 @@ public enum Compatibility {
 	compatible, cyclic, weaklyCompatible, incompatible, unknown;
 
 	/**
-	 * computes the compatibility of a set of splits
-	 *
-	 * @return compatibility
-	 */
-	public static Compatibility compute(int ntax, List<ASplit> splits) {
-		return compute(ntax, splits, null);
-	}
-
-	/**
 	 * computes the compatiblity of a set of splits
 	 *
 	 * @return compatibility

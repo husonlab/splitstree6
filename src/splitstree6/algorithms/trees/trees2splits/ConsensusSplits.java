@@ -107,23 +107,28 @@ public class ConsensusSplits extends Trees2Splits {
 		switch (getOptionConsensus()) {
 			case GreedyCompatible -> {
 				splitsBlock.getSplits().addAll(GreedyCompatible.apply(progress, consensusSplits, ASplit::getConfidence));
+				splitsBlock.setCycle(SplitUtils.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 				splitsBlock.setCompatibility(Compatibility.compatible);
 			}
 			case ConsensusOutline -> {
 				splitsBlock.getSplits().addAll(GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), consensusSplits, ASplit::getConfidence));
-				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCycle(SplitUtils.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 			}
 			case GreedyWeaklyCompatible -> {
 				splitsBlock.getSplits().addAll(GreedyWeaklyCompatible.apply(progress, consensusSplits, ASplit::getConfidence));
-				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCycle(SplitUtils.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 			}
 			case Majority, Strict -> {
 				splitsBlock.getSplits().addAll(consensusSplits);
+				splitsBlock.setCycle(SplitUtils.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 				splitsBlock.setCompatibility(Compatibility.compatible);
 			}
 			case ConsensusNetwork -> {
 				splitsBlock.getSplits().addAll(consensusSplits);
-				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCycle(SplitUtils.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 			}
 		}
 
@@ -141,8 +146,6 @@ public class ConsensusSplits extends Trees2Splits {
 			if (false)
 				System.err.printf("Fit: %.1f%n", splitsBlock.getFit());
 		}
-
-		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 	}
 
 	@Override

@@ -94,7 +94,7 @@ public class MainWindow implements IMainWindow {
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
-		methodsTab = new DisplayTextTab(this, "Methods", false);
+		methodsTab = new DisplayTextTab(this, "How to cite", false);
 		methodsTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/History24.gif", 16));
 
 		workflow.validProperty().addListener(e -> updateMethodsTab());
