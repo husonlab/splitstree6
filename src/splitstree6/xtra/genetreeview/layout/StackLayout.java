@@ -53,17 +53,14 @@ public class StackLayout extends MultipleFramesLayout{
         transformedSnapshots = snapshots;
 
         // Setting up zoomSlider
-        setUpZoomSlider(zoomSlider); // min: -750, max: -620
-        zoomSlider.minProperty().bind(layoutHeightProperty.multiply(-2.6));
-        zoomSlider.maxProperty().bind(zoomSlider.minProperty().add(250));
-        zoomSlider.setValue(zoomSlider.getMin());
+        setUpZoomSlider(zoomSlider, 0, 300);
 
         // Transforming camera
         resetCamera(camera);
         camera.setFarClip(3000);
         camera.setNearClip(0.1);
         camera.setTranslateY(0);
-        camera.translateZProperty().bind(zoomSlider.valueProperty());
+        camera.translateZProperty().bind(layoutHeightProperty.multiply(-2.6).add(zoomSlider.valueProperty()));
         this.camera = camera;
         updatePosition(1,slider.getValue());
     }

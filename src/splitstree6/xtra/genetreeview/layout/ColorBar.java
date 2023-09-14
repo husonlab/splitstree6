@@ -20,17 +20,13 @@
 package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Slider;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import splitstree6.data.TreesBlock;
+import splitstree6.xtra.genetreeview.model.GeneTreeSet;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,18 +38,18 @@ public class ColorBar extends HBox {
     private HashMap<Integer, Color> id2color;
     private final DoubleProperty boxWidth = new SimpleDoubleProperty();
 
-    public ColorBar(TreesBlock treesBlock, Slider slider, ArrayList<Integer> treeOrder) {
+    public ColorBar(GeneTreeSet geneTreeSet, Slider slider) {
         id2colorBarBox = new HashMap<>();
         id2color = new HashMap<>();
-        initializeColors(treeOrder);
-        initializeColorBar(treesBlock,slider, treeOrder);
+        initializeColors(geneTreeSet.getTreeOrder());
+        initializeColorBar(geneTreeSet, slider);
     }
 
-    public void initializeColorBar(TreesBlock treesBlock, Slider slider, ArrayList<Integer> treeOrder) {
+    public void initializeColorBar(GeneTreeSet geneTreeSet, Slider slider) {
         this.getChildren().clear();
         this.setPrefHeight(14);
 
-        int nTrees = treesBlock.getNTrees();
+        int nTrees = geneTreeSet.size();
 
         Node sliderKnob = slider.lookup(".thumb");
         double knobRadius = sliderKnob.getLayoutBounds().getWidth() / 2;
@@ -63,12 +59,12 @@ public class ColorBar extends HBox {
         HBox.setHgrow(leftSpace, Priority.NEVER);
         this.getChildren().add(leftSpace);
         if (boxWidth.isBound()) boxWidth.unbind();
-        for (int id : treeOrder) {
-            ColorBarBox colorBarBox = new ColorBarBox(treesBlock.getTree(id).getName(), id2color.get(id));
+        for (int id : geneTreeSet.getTreeOrder()) {
+            ColorBarBox colorBarBox = new ColorBarBox(geneTreeSet.getPhyloTree(id).getName(), id2color.get(id));
             this.getChildren().add(colorBarBox);
             id2colorBarBox.put(id, colorBarBox);
         }
-        boxWidth.bind(id2colorBarBox.get(treeOrder.get(nTrees-1)).widthProperty());
+        boxWidth.bind(id2colorBarBox.get(geneTreeSet.getTreeOrder().get(nTrees-1)).widthProperty());
         var rightSpace = new Pane();
         HBox.setMargin(rightSpace,Insets.EMPTY);
         HBox.setHgrow(rightSpace, Priority.NEVER);
@@ -87,10 +83,11 @@ public class ColorBar extends HBox {
         }
     }
 
-    public void addColorBox(String treeName, int id) {
+    public void addColorBox(String treeName, int id, int position) {
         id2color.put(id, backgroundColor);
-        ColorBarBox colorBarBox = new ColorBarBox(treeName,id2color.get(id));
-        this.getChildren().add(this.getChildren().size()-1, colorBarBox);
+        ColorBarBox colorBarBox = new ColorBarBox(treeName, id2color.get(id));
+        if (position < 0 | position > this.getChildren().size()-2) position = this.getChildren().size()-1;
+        this.getChildren().add(position+1, colorBarBox);
         id2colorBarBox.put(id,colorBarBox);
     }
 

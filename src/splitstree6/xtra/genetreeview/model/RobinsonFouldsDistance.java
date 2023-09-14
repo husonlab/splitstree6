@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.model;
 
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;

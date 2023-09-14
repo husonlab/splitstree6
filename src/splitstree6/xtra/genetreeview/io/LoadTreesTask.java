@@ -20,7 +20,7 @@
 package splitstree6.xtra.genetreeview.io;
 
 import javafx.concurrent.Task;
-import splitstree6.xtra.genetreeview.Model;
+import splitstree6.xtra.genetreeview.model.Model;
 import splitstree6.utils.*;
 
 import java.io.File;

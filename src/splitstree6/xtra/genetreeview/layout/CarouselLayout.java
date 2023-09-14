@@ -21,9 +21,7 @@ package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
@@ -44,6 +42,7 @@ public class CarouselLayout extends MultipleFramesLayout {
     private double thetaRad;
     private double layoutRadius;
     private final DoubleProperty cameraRadius = new SimpleDoubleProperty();
+    private static final IntegerProperty constant1 = new SimpleIntegerProperty(1);
 
     public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight,
                           ReadOnlyDoubleProperty layoutWidthProperty, ReadOnlyDoubleProperty layoutHeightProperty,
@@ -68,7 +67,7 @@ public class CarouselLayout extends MultipleFramesLayout {
         // For less than 50 trees, it makes no sense to arrange them in a circle, but in a partial circle
         int layoutNodeNumber = Math.max(realNodeNumber, 50); // assuming at least 50 trees for the carousel size
 
-        layoutRadius = (1.1 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
+        layoutRadius = (1.05 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
         thetaDeg = 360 / (double) layoutNodeNumber;
         thetaRad = Math.toRadians(thetaDeg);
 
@@ -97,16 +96,8 @@ public class CarouselLayout extends MultipleFramesLayout {
             node.setTranslateZ(-layoutRadius * Math.cos(index * thetaRad) - (Math.sin(index * thetaRad) * (nodeWidth / 2.)));
             Rotate rotate = new Rotate(-index * thetaDeg, 0, node.getTranslateY(), 0, Rotate.Y_AXIS);
             node.getTransforms().add(rotate);
-            var scalingFunctionX = Bindings.createDoubleBinding(() ->
-                            (layoutWidthProperty.get()*0.23/nodeWidth) / (1 + (Math.abs(layoutWidthProperty.get()*0.23/nodeWidth))) + 0.5,
-                    layoutWidthProperty
-            );
-            //node.scaleXProperty().bind(scalingFunctionX);
-            var scalingFunctionY = Bindings.createDoubleBinding(() ->
-                            (layoutHeightProperty.get()*0.7/nodeHeight) / (1 + (Math.abs(layoutHeightProperty.get()*0.7/nodeHeight))) + 0.5,
-                    layoutHeightProperty
-            );
-            node.scaleYProperty().bind(scalingFunctionY);
+
+            scaleNode(node);
 
             // Show node closer and without rotation when hovered
             node.setOnMouseEntered(e -> {
@@ -154,6 +145,30 @@ public class CarouselLayout extends MultipleFramesLayout {
         camera.translateZProperty().bind(zTerm);
 
         cameraRadius.bind(zoomSlider.valueProperty().multiply(-1).add(layoutRadius));
+        cameraRadius.addListener((observableValue, oldValue, newValue) -> {
+            int i = 0;
+            for (var node : transformedNodes) {
+                scaleNode(node);
+                i++;
+            }
+            System.out.println("Rescaled nodes: "+i);
+        });
+    }
+
+    private void scaleNode(Node node) {
+        var scalingFunctionX = Bindings.createDoubleBinding(() ->
+                        (layoutWidthProperty.get()*0.23/nodeWidth) / (1 + (Math.abs(layoutWidthProperty.get()*0.23/nodeWidth))) + 0.5,
+                layoutWidthProperty
+        );
+        if (node.scaleXProperty().isBound()) node.scaleXProperty().unbind();
+        node.scaleXProperty().bind(constant1);
+
+        var scalingFunctionY = Bindings.createDoubleBinding(() ->
+                        (layoutHeightProperty.get()*0.7/nodeHeight) / (1 + (Math.abs(layoutHeightProperty.get()*0.7/nodeHeight))) + 0.5,
+                layoutHeightProperty
+        );
+        if (node.scaleYProperty().isBound()) node.scaleYProperty().unbind();
+        node.scaleYProperty().bind(scalingFunctionY);
     }
 
     public PerspectiveCamera getCamera() {

@@ -17,7 +17,9 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.util;
+
+import splitstree6.xtra.genetreeview.util.Command;
 
 public class SimpleCommand implements Command {
     private final String name;
