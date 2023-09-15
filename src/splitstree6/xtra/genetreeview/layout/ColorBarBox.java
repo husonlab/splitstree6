@@ -28,8 +28,8 @@ import javafx.scene.paint.Color;
 
 public class ColorBarBox extends Pane implements Selectable {
 
-    private final String name;
     private Color color;
+    private final Tooltip tooltip;
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
 
     public ColorBarBox(String name, Color color) {
@@ -38,8 +38,8 @@ public class ColorBarBox extends Pane implements Selectable {
         this.setStyle("-fx-border-color: -fx-box-border");
         HBox.setMargin(this, Insets.EMPTY);
         HBox.setHgrow(this, Priority.ALWAYS);
-        this.name = name;
-        Tooltip.install(this,new Tooltip(name));
+        tooltip = new Tooltip(name);
+        Tooltip.install(this, tooltip);
         isSelectedProperty.addListener((observable, wasSelected, isSelected) -> {
             if (isSelected) this.setStyle("-fx-border-color: -fx-accent");
             else this.setStyle("-fx-border-color: -fx-box-border");
@@ -52,7 +52,11 @@ public class ColorBarBox extends Pane implements Selectable {
     }
 
     public String getName() {
-        return name;
+        return tooltip.getText();
+    }
+
+    public void setName(String name) {
+        tooltip.setText(name);
     }
 
     public Color getColor() {

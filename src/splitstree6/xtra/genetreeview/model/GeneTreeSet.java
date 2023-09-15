@@ -111,6 +111,7 @@ public class GeneTreeSet extends LinkedHashMap<Integer, GeneTree> {
                 orderedGeneNames.add(geneName);
                 geneName2treeId.put(geneName, id);
                 this.get(id).setGeneName(geneName);
+                index++;
             }
         }
     }

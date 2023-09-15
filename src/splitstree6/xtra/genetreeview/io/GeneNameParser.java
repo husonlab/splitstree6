@@ -46,7 +46,7 @@ public class GeneNameParser extends Stage {
         Button parseButton = new Button("Import");
         parseButton.setOnAction(e -> {
             String textInput = textInputArea.getText();
-            String[] geneNames = extractGeneNames(textInput, model.getTreesBlock().getNTrees());
+            String[] geneNames = extractGeneNames(textInput, model.getGeneTreeSet().size());
             if (geneNames != null) {
                 model.getGeneTreeSet().setGeneNames(geneNames);
                 parsedProperty.set(true);

@@ -21,6 +21,7 @@ package splitstree6.xtra.genetreeview.layout;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Slider;
@@ -125,6 +126,13 @@ public class ColorBar extends HBox {
             this.getChildren().add(i+1, id2colorBarBox.get(treeOrder.get(i)));
         }
         boxWidth.bind(id2colorBarBox.get(treeOrder.get(treeOrder.size()-1)).widthProperty());
+    }
+
+    public void setNames(ObservableList<String> orderedGeneNames) {
+        for (int i = 1; i < this.getChildren().size()-1; i++) {
+            String name = orderedGeneNames.get(i-1);
+            ((ColorBarBox)this.getChildren().get(i)).setName(name);
+        }
     }
 
     public HashMap<Integer,ColorBarBox> getId2colorBarBox() {

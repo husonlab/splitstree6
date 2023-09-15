@@ -260,10 +260,12 @@ public class TreeSheet extends StackPane implements Selectable {
         edgeSelectionModel.clearSelection();
         LinkedList<jloda.graph.Node> nodes = new LinkedList<>();
         for (var taxonId : taxaSelectionModel.getSelectedItems()) {
-            var taxonNode = tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId));
-            if (taxonNode != null) {
-                edgeSelectionModel.setSelected(taxonNode.getFirstInEdge().getId(), true);
-                nodes.add(taxonNode);
+            if (taxaBlock2phyloTreeIds.containsKey(taxonId)) {
+                var taxonNode = tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId));
+                if (taxonNode != null) {
+                    edgeSelectionModel.setSelected(taxonNode.getFirstInEdge().getId(), true);
+                    nodes.add(taxonNode);
+                }
             }
         }
         int counter = 0;
@@ -330,7 +332,7 @@ public class TreeSheet extends StackPane implements Selectable {
     public boolean monophyleticSelection() {
         LinkedList<jloda.graph.Node> selectedLeafNodes = new LinkedList<>();
         for (int taxonId : taxaSelectionModel.getSelectedItems()) {
-            if (tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId)) != null) {
+            if (taxaBlock2phyloTreeIds.containsKey(taxonId) && tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId)) != null) {
                 selectedLeafNodes.add(tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId)));
             }
         }

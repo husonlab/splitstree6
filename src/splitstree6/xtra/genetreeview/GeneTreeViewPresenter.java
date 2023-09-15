@@ -122,7 +122,7 @@ public class GeneTreeViewPresenter {
 		//RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, geneTreeView, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
 
-		controller.getImportGeneNamesMenuItem().disableProperty().bind(controller.getSlider().disableProperty());
+		controller.getImportGeneNamesMenuItem().disableProperty().bind(treesCount.isEqualTo(0));
 		controller.getImportGeneNamesMenuItem().setOnAction(e ->
 				importGeneNames(geneTreeView.getStage(), model, controller));
 
@@ -242,26 +242,32 @@ public class GeneTreeViewPresenter {
 					break;
 				}
 			}
-			int columnCount = 0;
-			int rowCount = 0;
-			for (int treeId : treeSelectionModel.getSelectedItems()) {
-				int index = trees.getChildren().indexOf(id2treeSheet.get(treeId));
-				// TODO: maybe remove the selection-indicating blue frame for the image
-				ImageView treeSnap = (ImageView) treeSnapshots.getChildren().get(index);
-				Image treeImage = treeSnap.getImage();
-				WritableImage treeImageCopy = new WritableImage(treeImage.getPixelReader(),
-						(int) treeImage.getWidth(), (int) treeImage.getHeight());
-				var finalImage = new ImageView(treeImageCopy);
-				gridPane.add(finalImage,columnCount,rowCount);
-				columnCount++;
-				if (columnCount%columnNumber == 0) {
-					rowCount++;
-					columnCount = 0;
+			TreeSet<Integer> selectedTreeIds = new TreeSet<>(treeSelectionModel.getSelectedItems());
+			for (int treeId : selectedTreeIds) treeSelectionModel.setSelected(treeId, false);
+			int finalColumnNumber = columnNumber;
+			Runnable copyImages = () -> {
+				int columnCount = 0;
+				int rowCount = 0;
+				for (int treeId : selectedTreeIds) {
+					int index = model.getGeneTreeSet().getPosition(treeId);
+					ImageView treeSnap = (ImageView) treeSnapshots.getChildren().get(index);
+					Image treeImage = treeSnap.getImage();
+					WritableImage treeImageCopy = new WritableImage(treeImage.getPixelReader(),
+							(int) treeImage.getWidth(), (int) treeImage.getHeight());
+					var finalImage = new ImageView(treeImageCopy);
+					gridPane.add(finalImage,columnCount,rowCount);
+					columnCount++;
+					if (columnCount% finalColumnNumber == 0) {
+						rowCount++;
+						columnCount = 0;
+					}
+					treeSelectionModel.select(treeId);
 				}
-			}
-			Image image = gridPane.snapshot(null,null);
-			clipboardContent.putImage(image);
-			Clipboard.getSystemClipboard().setContent(clipboardContent);
+				Image image = gridPane.snapshot(null,null);
+				clipboardContent.putImage(image);
+				Clipboard.getSystemClipboard().setContent(clipboardContent);
+			};
+			Platform.runLater(() -> RunAfterAWhile.applyInFXThread("ImageCopying", copyImages));
 		});
 
 		controller.getPasteMenuItem().disableProperty().bind(treesCount.isEqualTo(0));
@@ -584,9 +590,10 @@ public class GeneTreeViewPresenter {
 			for (int i = 0; i < model.getGeneTreeSet().size(); i++) {
 				((TreeSheet)trees.getChildren().get(i)).setTreeName(model.getGeneTreeSet().getOrderedGeneNames().get(i));
 			}
+			initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
+					controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
+			colorBar.setNames(model.getGeneTreeSet().getOrderedGeneNames());
 		});
-		initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
-				controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
 	}
 
 	private void exportTreeSubset(Stage stage, GeneTreeViewController controller, Model model) throws IOException {
