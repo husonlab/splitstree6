@@ -30,8 +30,6 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
@@ -58,7 +56,6 @@ import java.util.stream.Collectors;
  */
 public class SplitNetworkPane extends StackPane {
 	private final Group group = new Group();
-	private final ChangeListener<Number> zoomFactorChangedListener;
 	private final ChangeListener<Number> fontScaleChangeListener;
 	private final ChangeListener<LayoutOrientation> orientChangeListener;
 	private final InvalidationListener layoutLabelsListener;
@@ -77,7 +74,7 @@ public class SplitNetworkPane extends StackPane {
 							SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
 							ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight, ReadOnlyObjectProperty<SplitsDiagramType> diagram,
 							ReadOnlyObjectProperty<LayoutOrientation> orientation,
-							ReadOnlyObjectProperty<SplitsRooting> rooting, ReadOnlyDoubleProperty rootAngle, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
+							ReadOnlyObjectProperty<SplitsRooting> rooting, ReadOnlyDoubleProperty rootAngle, ReadOnlyDoubleProperty labelScaleFactor,
 							ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
 							ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 							ObservableMap<Node, LabeledNodeShape> nodeLabeledShapeMap,
@@ -98,19 +95,11 @@ public class SplitNetworkPane extends StackPane {
 
 		layoutLabelsListener = e -> layoutLabels(orientation.get());
 
-		zoomFactorChangedListener = (v, o, n) -> {
-			setScaleX(getScaleX() / o.doubleValue() * n.doubleValue());
-			setScaleY(getScaleY() / o.doubleValue() * n.doubleValue());
-		};
-
-		zoomFactor.addListener(new WeakChangeListener<>(zoomFactorChangedListener));
-
 		orientChangeListener = (v, o, n) -> {
 			var shapes = nodeLabeledShapeMap.values().stream().filter(LabeledNodeShape::hasShape).collect(Collectors.toList());
 			splitstree6.layout.LayoutUtils.applyOrientation(shapes, o, n, or -> splitNetworkLayout.getLabelLayout().layoutLabels(or), changingOrientation);
 		};
 		orientation.addListener(new WeakChangeListener<>(orientChangeListener));
-
 
 		redrawListener = e -> drawNetwork();
 
@@ -135,11 +124,6 @@ public class SplitNetworkPane extends StackPane {
 		service.setOnScheduled(a -> unitLength.set(0));
 
 		service.setOnSucceeded(a -> {
-			if (zoomFactor.get() != 1) {
-				setScaleX(zoomFactor.get());
-				setScaleY(zoomFactor.get());
-			}
-
 			setMinHeight(getPrefHeight() - 12);
 			setMinWidth(getPrefWidth());
 			group.getChildren().setAll(service.getValue());

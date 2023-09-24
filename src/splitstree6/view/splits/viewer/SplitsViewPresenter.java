@@ -38,6 +38,7 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ResourceManagerFX;
@@ -49,14 +50,15 @@ import jloda.util.StringUtils;
 import splitstree6.algorithms.utils.CharactersUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
-import splitstree6.splits.Compatibility;
 import splitstree6.data.parts.Taxon;
-import splitstree6.splits.SplitNewick;
+import splitstree6.layout.LayoutUtils;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.splits.Compatibility;
+import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
@@ -207,11 +209,13 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		splitNetworkPane = new SplitNetworkPane(mainWindow, mainWindow.workingTaxaProperty(), splitsBlock, mainWindow.getTaxonSelectionModel(),
 				view.getSplitSelectionModel(), paneWidth, paneHeight, view.optionDiagramProperty(), view.optionOrientationProperty(),
-				view.optionRootingProperty(), view.optionRootAngleProperty(), view.optionZoomFactorProperty(), view.optionFontScaleFactorProperty(),
+				view.optionRootingProperty(), view.optionRootAngleProperty(), view.optionFontScaleFactorProperty(),
 				view.optionShowConfidenceProperty(), controller.getScaleBar().unitLengthXProperty(),
 				taxonLabelMap, nodeLabeledShapeMap, splitShapeMap, loopViews);
 
 		var mouseInteraction = new InteractionSetup(mainWindow.getStage(), splitNetworkPane, view.getUndoManager(), mainWindow.getTaxonSelectionModel(), view.getSplitSelectionModel());
+
+		// todo: before update: reset zoom???
 
 		splitNetworkPane.setRunAfterUpdate(() -> {
 			var taxa = mainWindow.getWorkingTaxa();
@@ -238,7 +242,19 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		controller.getOrientationCBox().disableProperty().bind(view.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
 
+		view.optionZoomFactorProperty().addListener((v, o, n) -> {
+			var zoomFactor = n.doubleValue() / o.doubleValue();
+			if (zoomFactor > 0 && zoomFactor != 1.0) {
+				//System.err.println("Zoom factor: "+zoomFactor);
+				view.getUndoManager().doAndAdd(UndoableRedoableCommand.create("Zoom",
+						() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / zoomFactor, 1.0 / zoomFactor),
+						() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), zoomFactor, zoomFactor)));
+			}
+		});
+
 		controller.getScrollPane().setContent(splitNetworkPane);
+		controller.getScrollPane().setPannable(false);
+		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(view.getOptionZoomFactor() * controller.getScrollPane().getZoomFactorY()));
 
 		updateListener = e -> RunAfterAWhile.apply(splitNetworkPane, () -> Platform.runLater(splitNetworkPane::drawNetwork));
 

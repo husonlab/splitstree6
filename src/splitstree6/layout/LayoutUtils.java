@@ -25,14 +25,18 @@ import javafx.animation.TranslateTransition;
 import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.shape.Shape;
 import javafx.util.Duration;
+import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
 import splitstree6.layout.tree.LayoutOrientation;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 /**
  * layout utils
@@ -72,6 +76,22 @@ public class LayoutUtils {
 					changingOrientation.set(false);
 				}));
 			parallel.play();
+		}
+	}
+
+
+	/**
+	 * scale the translateX and translateY properties by the given values
+	 *
+	 * @param root      applied to this node and all descendants
+	 * @param predicate determines whether node should be processed
+	 * @param scaleX    scale x factor
+	 * @param scaleY    scale y factor
+	 */
+	public static void scaleTranslate(javafx.scene.Node root, Predicate<Node> predicate, double scaleX, double scaleY) {
+		for (var node : BasicFX.getAllRecursively(root, predicate)) {
+			node.setTranslateX(node.getTranslateX() * scaleX);
+			node.setTranslateY(node.getTranslateY() * scaleY);
 		}
 	}
 }

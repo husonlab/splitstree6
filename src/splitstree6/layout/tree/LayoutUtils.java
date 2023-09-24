@@ -26,6 +26,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
+import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.BasicFX;
@@ -37,6 +38,7 @@ import jloda.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -247,5 +249,4 @@ public class LayoutUtils {
 			label.setRotate(label.getRotate() + angle);
 		}
 	}
-
 }
