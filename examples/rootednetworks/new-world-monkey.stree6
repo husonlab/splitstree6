@@ -1,0 +1,169 @@
+#nexus [SplitsTree6]
+
+BEGIN SPLITSTREE6;
+DIMENSIONS nDataNodes=8 nAlgorithms=6;
+PROGRAM version='SplitsTree CE (version 6.1.10-beta, built 5 Sep 2023)';
+WORKFLOW creationDate='1694396208431'; [Mon Sep 11 09:36:48 SGT 2023]
+END; [SPLITSTREE6]
+
+[
+Methods:
+Analysis was performed using SplitsTree CE 6.0.0_alpha (Huson and Bryant 2006).
+The original input consisted of 5 taxa and 3 trees.
+The Show Trees method was used (View=TreePages) so as to obtain a Tree Pages visualization.
+The ALT S Network method (Zhang et al 2023) was used (default options) so as to obtain 2 rooted networks.
+
+References:
+Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
+Zhang et al 2023: Louxin Zhang, Niloufar Niloufar Abhari, Caroline Colijn and Yufeng Wu3. A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023
+]
+
+BEGIN TAXA;
+TITLE 'Input Taxa';
+LINK ALGORITHM = 'Input Data Loader';
+DIMENSIONS ntax=5;
+TAXLABELS
+	[1] 'Macaca_mulatta'
+	[2] 'Callithrix_jacchus'
+	[3] 'Aotus_nancymaee'
+	[4] 'Saimiri_boliviensis'
+	[5] 'Cebus_capucinus_imitator'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN ALGORITHM;
+TITLE 'Taxa Filter';
+LINK ALGORITHM = 'Input Data Loader';
+NAME 'Taxa Filter';
+OPTIONS
+;
+END; [ALGORITHM]
+
+BEGIN TAXA;
+TITLE 'Working Taxa';
+LINK ALGORITHM = 'Taxa Filter';
+DIMENSIONS ntax=5;
+TAXLABELS
+	[1] 'Macaca_mulatta'
+	[2] 'Callithrix_jacchus'
+	[3] 'Aotus_nancymaee'
+	[4] 'Saimiri_boliviensis'
+	[5] 'Cebus_capucinus_imitator'
+;
+[DISPLAYLABELS;]
+[TAXINFO;]
+END; [TAXA]
+
+BEGIN TREES;
+TITLE 'Input Trees';
+LINK ALGORITHM = 'Input Data Loader';
+[Number of trees: 3]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'Macaca_mulatta',
+	2 'Callithrix_jacchus',
+	3 'Aotus_nancymaee',
+	4 'Saimiri_boliviensis',
+	5 'Cebus_capucinus_imitator',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] ((2,(3,(4,5))),1);
+		[2] tree 'tree-2'=[&R] (((2,(4,5)),3),1);
+		[3] tree 'tree-3'=[&R] (((2,3),(4,5)),1);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Input Data Filter';
+LINK TREES = 'Input Trees';
+NAME 'Trees Taxa Filter';
+END; [ALGORITHM]
+
+BEGIN TREES;
+TITLE 'Working Trees';
+LINK ALGORITHM = 'Input Data Filter';
+[Number of trees: 3]
+PROPERTIES partialTrees=no rooted=yes;
+TRANSLATE
+	1 'Macaca_mulatta',
+	2 'Callithrix_jacchus',
+	3 'Aotus_nancymaee',
+	4 'Saimiri_boliviensis',
+	5 'Cebus_capucinus_imitator',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] ((2,(3,(4,5))),1);
+		[2] tree 'tree-2'=[&R] (((2,(4,5)),3),1);
+		[3] tree 'tree-3'=[&R] (((2,3),(4,5)),1);
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees';
+LINK TREES = 'Working Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreePages';
+END; [ALGORITHM]
+
+BEGIN ALGORITHM;
+TITLE 'ALTS Network';
+LINK TREES = 'Working Trees';
+NAME 'ALTS Network';
+OPTIONS
+	ALTSExecutableFile = '/Users/huson/cpp/louxin/alts';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreePages';
+LINK ALGORITHM = 'Show Trees';
+NAME 'TreePages';
+INPUT 'TREES';
+OPTIONS
+	Diagram = 'RectangularPhylogram',
+	Orientation = 'Rotate0Deg',
+	Rows = 3,
+	Cols = 1,
+	ZoomFactor = 0.7513148,
+	FontScaleFactor = 2.985984,
+	TreeLabels = 'None';
+END; [VIEW]
+
+BEGIN TREES;
+TITLE 'Trees';
+LINK ALGORITHM = 'ALTS Network';
+[Number of trees: 2]
+TRANSLATE
+	1 'Macaca_mulatta',
+	2 'Callithrix_jacchus',
+	3 'Aotus_nancymaee',
+	4 'Saimiri_boliviensis',
+	5 'Cebus_capucinus_imitator',
+;
+[TREES]
+		[1] tree 't1'=[&R] ((((((4,5))#H1,(((#H1,2))#H2,3)),#H2),1));
+		[2] tree 't2'=[&R] ((((((2)#H1,3),(#H1,(4,5))),#H1),1));
+END; [TREES]
+
+BEGIN ALGORITHM;
+TITLE 'Show Trees-2';
+LINK TREES = 'Trees';
+NAME 'Show Trees';
+OPTIONS
+	View = 'TreePages';
+END; [ALGORITHM]
+
+BEGIN VIEW;
+TITLE 'TreePages';
+LINK ALGORITHM = 'Show Trees-2';
+NAME 'TreePages';
+INPUT 'TREES';
+OPTIONS
+	Diagram = 'RectangularPhylogram',
+	Orientation = 'Rotate0Deg',
+	Rows = 2,
+	Cols = 1,
+	ZoomFactor = 0.68301346,
+	FontScaleFactor = 3.5831808,
+	TreeLabels = 'None';
+END; [VIEW]

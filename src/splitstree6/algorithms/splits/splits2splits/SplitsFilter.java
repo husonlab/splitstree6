@@ -20,6 +20,8 @@
 package splitstree6.algorithms.splits.splits2splits;
 
 import javafx.beans.property.*;
+import jloda.graph.Graph;
+import jloda.graph.NodeArray;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
 import splitstree6.algorithms.utils.*;
@@ -32,14 +34,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+
+import static splitstree6.splits.SplitUtils.buildIncompatibilityGraph;
 
 /**
  * splits filter
  * Daniel Huson 12/2016
  */
 public class SplitsFilter extends Splits2Splits implements IFilter {
-	public enum FilterAlgorithm {None, ClosestTree, GreedyCompatible, GreedyCircular, GreedyWeaklyCompatible}
+	public enum FilterAlgorithm {None, ClosestTree, GreedyCompatible, GreedyCircular, GreedyWeaklyCompatible, BlobTree}
 
 	private final ObjectProperty<FilterAlgorithm> optionFilterAlgorithm = new SimpleObjectProperty<>(this, "optionFilterAlgorithm", FilterAlgorithm.None);
 
@@ -47,10 +50,12 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 	private final FloatProperty optionConfidenceThreshold = new SimpleFloatProperty(this, "optionConfidenceThreshold", 0);
 	private final IntegerProperty optionMaximumDimension = new SimpleIntegerProperty(this, "optionMaximumDimension", 4);
 
+	private final BooleanProperty optionRecomputeCycle = new SimpleBooleanProperty(this, "optionRecomputeCycle", false);
+
 	private boolean active = false;
 
 	public List<String> listOptions() {
-		return List.of(optionWeightThreshold.getName(), optionConfidenceThreshold.getName(), optionMaximumDimension.getName(), optionFilterAlgorithm.getName());
+		return List.of(optionWeightThreshold.getName(), optionConfidenceThreshold.getName(), optionMaximumDimension.getName(), optionFilterAlgorithm.getName(), optionRecomputeCycle.getName());
 	}
 
 	@Override
@@ -60,6 +65,7 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			case "optionWeightThreshold" -> "Set minimum split weight threshold";
 			case "optionConfidenceThreshold" -> "Set the minimum split confidence threshold";
 			case "optionMaximumDimension" -> "Set maximum dimension threshold (necessary to avoid computational overload)";
+			case "optionRecomputeCycle" -> "Recompute circular ordering";
 			default -> optionName;
 		};
 	}
@@ -88,7 +94,20 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			}
 			case GreedyWeaklyCompatible -> GreedyWeaklyCompatible.apply(progress, parent.getSplits(), ASplit::getWeight);
 			case GreedyCircular -> GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), parent.getSplits(), ASplit::getWeight);
-			default -> new ArrayList<>(parent.getSplits());
+			case BlobTree -> {
+				compatibility = Compatibility.compatible;
+				var result = new ArrayList<ASplit>();
+				var graph = new Graph();
+				try (NodeArray<ASplit> nodeSplitMap = buildIncompatibilityGraph(parent.getSplits(), graph)) {
+					for (var v : graph.nodes()) {
+						if (v.getDegree() == 0) {// compatible with all
+							result.add(nodeSplitMap.get(v));
+						}
+					}
+				}
+				yield result;
+			}
+			case None -> new ArrayList<>(parent.getSplits());
 		};
 
 		if (getOptionWeightThreshold() > 0) {
@@ -126,7 +145,10 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			child.setThreshold(parent.getThreshold());
 			setShortDescription("using all " + parent.getNsplits() + " splits");
 		} else {
-			child.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
+			if (getOptionRecomputeCycle())
+				child.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
+			else
+				child.setCycle(parent.getCycle());
 
 			child.setFit(-1);
 			if (compatibility == Compatibility.unknown)
@@ -198,5 +220,17 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 
 	public void setOptionMaximumDimension(int optionMaximumDimension) {
 		this.optionMaximumDimension.set(optionMaximumDimension);
+	}
+
+	public boolean getOptionRecomputeCycle() {
+		return optionRecomputeCycle.get();
+	}
+
+	public BooleanProperty optionRecomputeCycleProperty() {
+		return optionRecomputeCycle;
+	}
+
+	public void setOptionRecomputeCycle(boolean optionRecomputeCycle) {
+		this.optionRecomputeCycle.set(optionRecomputeCycle);
 	}
 }

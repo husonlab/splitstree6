@@ -13,7 +13,7 @@
         <entry>sqlite-jdbc-*</entry>
       </macSearchedJars>
     </codeSigning>
-    <jreBundles jdkProviderId="Liberica" release="20/20.0.1+10">
+    <jreBundles jdkProviderId="Liberica" release="20/20.0.2+10">
       <modules />
     </jreBundles>
   </application>

@@ -19,6 +19,9 @@
 
 package splitstree6.splits;
 
+import jloda.graph.Graph;
+import jloda.graph.Node;
+import jloda.graph.NodeArray;
 import jloda.graph.algorithms.PQTree;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
@@ -177,5 +180,23 @@ public class SplitUtils {
 			array1based[++index] = value;
 		}
 		return array1based;
+	}
+
+	public static NodeArray<ASplit> buildIncompatibilityGraph(List<ASplit> splits, Graph graph) {
+		NodeArray<ASplit> nodeSplitMap = graph.newNodeArray();
+		var split2node = new Node[splits.size()];
+
+		for (var s = 0; s < splits.size(); s++) {
+			var v = graph.newNode();
+			split2node[s] = v;
+			nodeSplitMap.put(v, splits.get(s));
+		}
+		for (var s = 0; s < splits.size(); s++) {
+			for (var t = s + 1; t < splits.size(); t++)
+				if (!BiPartition.areCompatible(splits.get(s), splits.get(t))) {
+					graph.newEdge(split2node[s], split2node[t]);
+				}
+		}
+		return nodeSplitMap;
 	}
 }
