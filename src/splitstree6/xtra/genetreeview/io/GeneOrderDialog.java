@@ -1,5 +1,5 @@
 /*
- *  SelectionModel.java Copyright (C) 2023 Daniel H. Huson
+ *  GeneOrderDialog.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,28 +17,18 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.io;
 
-import javafx.beans.property.ReadOnlyIntegerProperty;
-import javafx.collections.ObservableSet;
-import java.util.Collection;
+import javafx.stage.Stage;
 
-public interface SelectionModel<T> {
-    boolean select(T t);
+public class GeneOrderDialog extends SelectionDialog {
 
-    boolean setSelected(T t, boolean select);
-
-    boolean selectAll(Collection<T> list);
-
-    void clearSelection();
-
-    boolean clearSelection(T t);
-
-    boolean clearSelection(Collection<T> list);
-
-    ObservableSet<T> getSelectedItems();
-
-    int size();
-
-    ReadOnlyIntegerProperty sizeProperty();
+    public GeneOrderDialog(Stage parentStage, String taxonName) {
+        super(parentStage, taxonName, "taxon name");
+        this.setTitle("GeneOrderRequest");
+        introLabel.setText("If entries are available in NCBI for all genes for the selected taxon, the " +
+                "genes' starting positions in the genome can be downloaded. This might take some time. \nThe gene trees " +
+                "will be ordered as genes in the genome of:");
+        startButton.setText("Get gene order from NCBI");
+    }
 }

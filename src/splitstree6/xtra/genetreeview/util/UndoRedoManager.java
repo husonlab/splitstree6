@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.util;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
@@ -28,6 +28,7 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import splitstree6.xtra.genetreeview.util.Command;
 
 public class UndoRedoManager {
 

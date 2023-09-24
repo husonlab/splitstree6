@@ -17,15 +17,17 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.util;
 
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import splitstree6.xtra.genetreeview.util.SelectionModel;
+
 import java.util.Collection;
 
-public class SelectionModelSet<T> implements SelectionModel<T>{
+public class SelectionModelSet<T> implements SelectionModel<T> {
 
     private final ObservableSet<T> initialValue = FXCollections.observableSet();
     SimpleSetProperty<T> selection = new SimpleSetProperty<>(initialValue);

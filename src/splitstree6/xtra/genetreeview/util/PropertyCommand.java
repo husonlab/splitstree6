@@ -1,4 +1,4 @@
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.util;
 
 import javafx.beans.property.Property;
 

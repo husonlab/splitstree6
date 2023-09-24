@@ -33,11 +33,12 @@ import javafx.scene.text.Text;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.phylo.PhyloTree;
+import splitstree6.data.TaxaBlock;
 import splitstree6.layout.tree.ComputeTreeLayout;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.xtra.genetreeview.SelectionModelSet;
+import splitstree6.xtra.genetreeview.util.SelectionModelSet;
 
 import java.util.*;
 import java.util.function.Function;
@@ -53,17 +54,19 @@ public class TreeSheet extends StackPane implements Selectable {
     private final Group taxonLabels;
     private final Group edges;
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
+    private final TaxaBlock taxaBlock;
     private final SelectionModelSet<Integer> taxaSelectionModel;
+    private final HashMap<Integer,Integer> taxaBlock2phyloTreeIds;
     private final SelectionModelSet<Integer> edgeSelectionModel;
-    private final HashMap<String, Integer> taxonName2id = new HashMap<>();
     private final LongProperty lastUpdate = new SimpleLongProperty(this, "lastUpdate", 0L);
 
-    public TreeSheet(PhyloTree tree, int id, double width, double height, TreeDiagramType diagram,
+    public TreeSheet(PhyloTree tree, int id, double width, double height, TreeDiagramType diagram, TaxaBlock taxaBlock,
                      SelectionModelSet<Integer> taxaSelectionModel, SelectionModelSet<Integer> edgeSelectionModel) {
         this.tree = tree;
         this.id = id;
         this.width = width;
         this.height = height;
+        this.taxaBlock = taxaBlock;
         this.taxaSelectionModel = taxaSelectionModel;
         this.edgeSelectionModel = edgeSelectionModel;
 
@@ -119,13 +122,16 @@ public class TreeSheet extends StackPane implements Selectable {
         this.getChildren().addAll(layoutedTree);
 
         // Taxon Selection
-        for (var taxonId : tree.getTaxonNodeMap().keySet())
-            taxonName2id.put(tree.getTaxon2Node(taxonId).getLabel(),taxonId);
+        taxaBlock2phyloTreeIds = new HashMap<>();
+        for (var taxonId : tree.getTaxonNodeMap().keySet()) {
+            String taxonName = tree.getTaxon2Node(taxonId).getLabel();
+            taxaBlock2phyloTreeIds.put(taxaBlock.indexOf(taxonName), taxonId);
+        }
         for (var taxonLabel : taxonLabels.getChildren()) {
             RichTextLabel taxonRichTextLabel = (RichTextLabel) taxonLabel;
             taxonLabel.setOnMouseEntered(e -> taxonRichTextLabel.setScale(1.1*taxonRichTextLabel.getScale()));
             taxonLabel.setOnMouseExited(e -> taxonRichTextLabel.setScale(1/1.1*taxonRichTextLabel.getScale()));
-            int taxonId = taxonName2id.get(taxonRichTextLabel.getText());
+            int taxonId = taxaBlock.indexOf(taxonRichTextLabel.getText());
             if (taxaSelectionModel.getSelectedItems().contains(taxonId))
                 selectTaxon(taxonRichTextLabel.getText(),true);
             taxonLabel.setOnMouseClicked(e -> {
@@ -245,7 +251,7 @@ public class TreeSheet extends StackPane implements Selectable {
     private void selectTaxaBelow(int edgeId, boolean select) {
         tree.postorderTraversal(tree.findEdgeById(edgeId).getTarget(), n -> n.outEdges().forEach(e -> {
             if (e.getTarget().isLeaf()) {
-                taxaSelectionModel.setSelected(taxonName2id.get(e.getTarget().getLabel()),select);
+                taxaSelectionModel.setSelected(taxaBlock.indexOf(e.getTarget().getLabel()), select);
             }
         }));
     }
@@ -254,10 +260,12 @@ public class TreeSheet extends StackPane implements Selectable {
         edgeSelectionModel.clearSelection();
         LinkedList<jloda.graph.Node> nodes = new LinkedList<>();
         for (var taxonId : taxaSelectionModel.getSelectedItems()) {
-            var taxonNode = tree.getTaxon2Node(taxonId);
-            if (taxonNode != null) {
-                edgeSelectionModel.setSelected(taxonNode.getFirstInEdge().getId(), true);
-                nodes.add(taxonNode);
+            if (taxaBlock2phyloTreeIds.containsKey(taxonId)) {
+                var taxonNode = tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId));
+                if (taxonNode != null) {
+                    edgeSelectionModel.setSelected(taxonNode.getFirstInEdge().getId(), true);
+                    nodes.add(taxonNode);
+                }
             }
         }
         int counter = 0;
@@ -289,7 +297,6 @@ public class TreeSheet extends StackPane implements Selectable {
             }
             counter++;
         }
-        //System.out.println(tree.getName()+" updateEdgeSelection: "+counter+" of max rounds "+max);
         lastUpdate.set(System.currentTimeMillis());
     }
 
@@ -319,15 +326,14 @@ public class TreeSheet extends StackPane implements Selectable {
             }
             counter++;
         }
-        //System.out.println(tree.getName()+" monophyletic check: "+counter+" of max rounds "+max);
         return nodes.size() == 1;
     }
 
     public boolean monophyleticSelection() {
         LinkedList<jloda.graph.Node> selectedLeafNodes = new LinkedList<>();
         for (int taxonId : taxaSelectionModel.getSelectedItems()) {
-            if (tree.getTaxon2Node(taxonId) != null) {
-                selectedLeafNodes.add(tree.getTaxon2Node(taxonId));
+            if (taxaBlock2phyloTreeIds.containsKey(taxonId) && tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId)) != null) {
+                selectedLeafNodes.add(tree.getTaxon2Node(taxaBlock2phyloTreeIds.get(taxonId)));
             }
         }
         return monophyletic(selectedLeafNodes);

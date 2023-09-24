@@ -20,7 +20,7 @@
 package splitstree6.xtra.genetreeview.io;
 
 import javafx.concurrent.Task;
-import splitstree6.xtra.genetreeview.Model;
+import splitstree6.xtra.genetreeview.model.Model;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GetGeneOrderTask extends Task<TreeMap<Integer,String>> {
+public class GetGeneOrderTask extends Task<TreeMap<Integer,Integer>> {
 
     private final Model model;
     private final String taxonName;
@@ -39,15 +39,15 @@ public class GetGeneOrderTask extends Task<TreeMap<Integer,String>> {
     }
 
     @Override
-    protected TreeMap<Integer, String> call() throws Exception {
+    protected TreeMap<Integer,Integer> call() throws Exception {
         // Getting the gene order from ncbi using a simple E-utility pipeline: ESearch-ESummary
-        TreeMap<Integer,String> orderedGeneNames = new TreeMap<>();
+        TreeMap<Integer,Integer> orderedTreeIds = new TreeMap<>();
         System.out.println(taxonName);
         var base = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
-        for (var index = 0; index < model.getTreesBlock().getNTrees(); index++) {
+        for (var index = 0; index < model.getGeneTreeSet().size(); index++) {
 
             // ESearch
-            String geneName = model.getOrderedGeneNames().get(index);
+            String geneName = model.getGeneTreeSet().getOrderedGeneNames().get(index);
             System.out.println(geneName);
             var query = taxonName + "[organism]+AND+" + geneName + "[gene]";
             var searchUrl = base + "esearch.fcgi?db=gene&term=" + query + "&usehistory=y";
@@ -91,12 +91,12 @@ public class GetGeneOrderTask extends Task<TreeMap<Integer,String>> {
                 stop = Integer.parseInt(stopMatcher.group(1));
                 System.out.println("\tStop: " + stop);
             }
-            if (start == 0 & stop == 0) throw new RuntimeException("Failed to retrieve "+geneName+
-                    " position for taxon "+taxonName+" from ncbi");
-            orderedGeneNames.put(start,geneName); // genes will be ordered by their start position in the genome
-            updateProgress(index,model.getTreesBlock().getNTrees());
+            if (start == 0 & stop == 0) throw new RuntimeException("Failed to retrieve " + geneName +
+                    " position for taxon " + taxonName + " from ncbi");
+            orderedTreeIds.put(start, model.getGeneTreeSet().getTreeId(geneName)); // genes will be ordered by their start position in the genome
+            updateProgress(index, model.getGeneTreeSet().size());
         }
-        if (orderedGeneNames.size() == model.getTreesBlock().getNTrees()) return orderedGeneNames;
-        throw new RuntimeException("Failed to retrieve all gene positions for "+taxonName);
+        if (orderedTreeIds.size() == model.getGeneTreeSet().size()) return orderedTreeIds;
+        throw new RuntimeException("Failed to retrieve all gene positions for " + taxonName);
     }
 }

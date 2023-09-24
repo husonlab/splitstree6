@@ -52,18 +52,22 @@
                             <menus>
                                 <Menu mnemonicParsing="false" text="File">
                                     <items>
-                                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open Trees">
+                                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open...">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                                             </accelerator>
                                         </MenuItem>
+                              <Menu fx:id="openRecentMenu" mnemonicParsing="false" text="Open Recent" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="importGeneNamesMenuItem" mnemonicParsing="false" text="Import Gene Names" />
                               <MenuItem fx:id="exportSubsetMenuItem" mnemonicParsing="false" text="Export Selected Trees" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="printMenuItem" mnemonicParsing="false" text="Print...">
                                  <accelerator>
                                     <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                                  </accelerator>
                               </MenuItem>
+                              <SeparatorMenuItem mnemonicParsing="false" />
                                         <MenuItem fx:id="closeMenuItem" mnemonicParsing="false" text="Close">
                                             <accelerator>
                                                 <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -83,6 +87,7 @@
                                     <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
                                  </accelerator>
                               </MenuItem>
+                              <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="copyTaxaMenuItem" mnemonicParsing="false" text="Copy Taxa">
                                  <accelerator>
                                     <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
@@ -95,6 +100,7 @@
                                     <MenuItem fx:id="copySelectedTreesMenuItem" mnemonicParsing="false" text="as Image" />
                                 </items>
                               </Menu>
+                              <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="pasteMenuItem" mnemonicParsing="false" text="Paste Newick Trees">
                                  <accelerator>
                                     <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP" shortcut="DOWN" />

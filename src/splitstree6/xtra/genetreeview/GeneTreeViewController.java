@@ -30,6 +30,9 @@ public class GeneTreeViewController {
 	private MenuItem openMenuItem;
 
 	@FXML
+	private Menu openRecentMenu;
+
+	@FXML
 	private MenuItem importGeneNamesMenuItem;
 
 	@FXML
@@ -184,6 +187,9 @@ public class GeneTreeViewController {
 	// File Menu
 	public MenuItem getOpenMenuItem() {
 		return openMenuItem;
+	}
+	public Menu getOpenRecentMenu() {
+		return openRecentMenu;
 	}
 	public MenuItem getImportGeneNamesMenuItem() {
 		return importGeneNamesMenuItem;

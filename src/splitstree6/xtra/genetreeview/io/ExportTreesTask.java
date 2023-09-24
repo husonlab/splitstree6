@@ -19,13 +19,11 @@
 
 package splitstree6.xtra.genetreeview.io;
 
-import javafx.beans.property.BooleanProperty;
 import javafx.collections.ObservableSet;
 import javafx.concurrent.Task;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.writers.trees.NewickWriter;
-import splitstree6.xtra.genetreeview.Model;
-import splitstree6.xtra.genetreeview.SelectionModelSet;
+import splitstree6.xtra.genetreeview.model.Model;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -52,7 +50,7 @@ public class ExportTreesTask extends Task<Void> {
         selectedTreesBlock.copy(model.getTreesBlock());
         selectedTreesBlock.getTrees().removeAll(model.getTreesBlock().getTrees());
         for (int treeId : selection) {
-            selectedTreesBlock.getTrees().add(model.getTreesBlock().getTree(treeId));
+            selectedTreesBlock.getTrees().add(model.getGeneTreeSet().getPhyloTree(treeId));
         }
         newickWriter.write(writer, model.getTaxaBlock(), selectedTreesBlock);
         writer.close();

@@ -1,5 +1,5 @@
 /*
- *  ImportFeaturesTask.java Copyright (C) 2023 Daniel H. Huson
+ *  SimilarityCalculationDialog.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,19 +19,16 @@
 
 package splitstree6.xtra.genetreeview.io;
 
-import javafx.concurrent.Task;
-import splitstree6.xtra.genetreeview.Model;
+import javafx.stage.Stage;
+import splitstree6.xtra.genetreeview.io.SelectionDialog;
 
-import java.io.File;
+public class SimilarityCalculationDialog extends SelectionDialog {
 
-public class ImportFeaturesTask extends Task<Void> {
-    public ImportFeaturesTask(File file, Model model) {
-        // TODO
-    }
-
-    @Override
-    protected Void call() throws Exception {
-        // TODO
-        return null;
+    public SimilarityCalculationDialog(Stage parentStage, String selectedTreeName) {
+        super(parentStage, selectedTreeName, "gene tree name");
+        this.setTitle("SimilarityCalculation");
+        introLabel.setText("Tree similarities will be calculated based on pairwise Robinson-Foulds Distances " +
+                "with gene tree:");
+        startButton.setText("Calculate");
     }
 }

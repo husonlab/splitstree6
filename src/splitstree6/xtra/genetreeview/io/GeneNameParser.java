@@ -29,7 +29,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.*;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import splitstree6.xtra.genetreeview.Model;
+import splitstree6.xtra.genetreeview.model.Model;
 
 public class GeneNameParser extends Stage {
 
@@ -46,9 +46,9 @@ public class GeneNameParser extends Stage {
         Button parseButton = new Button("Import");
         parseButton.setOnAction(e -> {
             String textInput = textInputArea.getText();
-            String[] geneNames = extractGeneNames(textInput, model.getTreesBlock().getNTrees());
+            String[] geneNames = extractGeneNames(textInput, model.getGeneTreeSet().size());
             if (geneNames != null) {
-                model.setGeneNames(geneNames);
+                model.getGeneTreeSet().setGeneNames(geneNames);
                 parsedProperty.set(true);
                 this.close();
             }
@@ -64,7 +64,7 @@ public class GeneNameParser extends Stage {
         HBox hBox = new HBox();
         hBox.getChildren().addAll(parseButton, cancelButton, infoLabel);
         hBox.setSpacing(5);
-        vBox.getChildren().addAll(new Label("Enter gene names in tree input order:"), textInputArea, hBox);
+        vBox.getChildren().addAll(new Label("Enter gene names in current tree order:"), textInputArea, hBox);
 
         Scene scene = new Scene(vBox, 300, 200);
         this.setScene(scene);

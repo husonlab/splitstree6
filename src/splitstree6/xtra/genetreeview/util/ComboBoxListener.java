@@ -20,7 +20,7 @@
  * from https://stackoverflow.com/questions/19924852/autocomplete-combobox-in-javafx
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.util;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

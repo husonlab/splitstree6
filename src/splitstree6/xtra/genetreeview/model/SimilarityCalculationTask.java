@@ -17,39 +17,41 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.model;
 
 import javafx.concurrent.Task;
 import jloda.phylo.PhyloTree;
-import splitstree6.data.TreesBlock;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
-public class SimilarityCalculationTask extends Task<ArrayList<Integer>> {
+public class SimilarityCalculationTask extends Task<LinkedHashMap<Integer,Integer>> {
 
-    private final TreesBlock treesBlock;
+    private final ArrayList<GeneTree> geneTrees;
     private final PhyloTree referenceTree;
 
-    public SimilarityCalculationTask(TreesBlock treesBlock, PhyloTree referenceTree) {
-        this.treesBlock = treesBlock;
+    public SimilarityCalculationTask(ArrayList<GeneTree> geneTrees, PhyloTree referenceTree) {
+        this.geneTrees = geneTrees;
         this.referenceTree = referenceTree;
     }
 
     @Override
-    protected ArrayList<Integer> call() throws Exception {
-        ArrayList<Integer> similarities = new ArrayList<>();
-        for (PhyloTree tree : treesBlock.getTrees()) {
-            int robinsonFouldsDistance = RobinsonFouldsDistance.calculate(referenceTree, tree);
+    protected LinkedHashMap<Integer,Integer> call() throws Exception {
+        ArrayList<Integer> similarities = new ArrayList<>(geneTrees.size());
+        LinkedHashMap<Integer,Integer> id2similarities = new LinkedHashMap<>();
+        for (GeneTree geneTree : geneTrees) {
+            int robinsonFouldsDistance = RobinsonFouldsDistance.calculate(referenceTree, geneTree.getPhyloTree());
             if (robinsonFouldsDistance < 0) { // can happen with partial trees
-                System.out.println("Negative distance calculated with tree "+tree.getName());
+                System.out.println("Negative distance calculated with tree "+geneTree.getGeneName());
                 robinsonFouldsDistance = 0;
             }
             //System.out.println("Distance of "+referenceTree.getName()+" and "+tree.getName()+": "+robinsonFouldsDistance);
-            int maximum = referenceTree.getNumberOfEdges() + tree.getNumberOfEdges();
+            int maximum = referenceTree.getNumberOfEdges() + geneTree.getPhyloTree().getNumberOfEdges();
             int similarity = maximum - robinsonFouldsDistance;
             //System.out.println("Similarity of "+referenceTree.getName()+" and "+tree.getName()+": "+similarity);
             similarities.add(similarity);
+            id2similarities.put(geneTree.getId(), similarity);
         }
-        return similarities;
+        return id2similarities;
     }
 }

@@ -1,5 +1,5 @@
 /*
- *  GeneOrderDialog.java Copyright (C) 2023 Daniel H. Huson
+ *  SelectionDialog.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.genetreeview;
+package splitstree6.xtra.genetreeview.io;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -26,55 +26,63 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import java.util.Objects;
 
-public class GeneOrderDialog extends Stage {
+public abstract class SelectionDialog extends Stage {
 
-    private final BooleanProperty doneProperty = new SimpleBooleanProperty(false);
-    private String finalTaxonName;
+    protected Label introLabel;
+    protected final Button startButton;
+    protected final Button cancelButton;
+    protected final BooleanProperty doneProperty = new SimpleBooleanProperty(false);
+    protected String finalSelectedName;
 
-    public GeneOrderDialog(Stage parentStage, String taxonName) {
+    protected SelectionDialog(Stage parentStage, String selectedName, String selectionType) {
         this.initStyle(parentStage.getStyle());
-        this.setTitle("GeneOrderRequest");
         this.initModality(Modality.APPLICATION_MODAL);
         this.initOwner(parentStage);
+        this.setTitle("SelectionDialog");
 
-        Label introLabel = new Label("If entries are available in NCBI for all genes for the selected taxon, the " +
-                "genes' starting positions in the genome can be downloaded. This might take some time. \nThe gene trees " +
-                "will be ordered as genes in the genome of:");
+        introLabel = new Label("Continue with following selection:");
         introLabel.setWrapText(true);
-        TextField taxonNameTextField = new TextField(taxonName);
+        TextField nameTextField = new TextField(selectedName);
         Label infoLabel = new Label("");
-        Button startButton = new Button("Get gene order from NCBI");
+        startButton = new Button("Start");
         startButton.setOnAction(e -> {
-            String finalTaxonName = taxonNameTextField.getText();
-            if (finalTaxonName != null) {
-                this.finalTaxonName = finalTaxonName;
+            String finalSelectedName = nameTextField.getText();
+            if (finalSelectedName != null & !Objects.equals(finalSelectedName, "")) {
+                this.finalSelectedName = finalSelectedName;
                 doneProperty.set(true);
                 this.close();
             }
             else {
-                infoLabel.setText("Please provide a taxon name");
+                infoLabel.setText("Please provide a " + selectionType);
             }
         });
-        Button cancelButton = new Button("Cancel");
+        cancelButton = new Button("Cancel");
         cancelButton.setOnAction(e -> {
-            finalTaxonName = null;
+            finalSelectedName = null;
             doneProperty.set(true);
             this.close();
         });
 
+        BorderPane borderPane = new BorderPane();
+        borderPane.setPadding(new Insets(10));
         VBox vBox = new VBox(10);
         vBox.setPadding(new Insets(10));
         HBox hBox = new HBox();
         hBox.getChildren().addAll(startButton, cancelButton);
         hBox.setSpacing(5);
-        vBox.getChildren().addAll(introLabel, taxonNameTextField, hBox, infoLabel);
+        vBox.getChildren().addAll(nameTextField, hBox);
+        borderPane.setTop(introLabel);
+        borderPane.setCenter(vBox);
+        borderPane.setBottom(infoLabel);
 
-        Scene scene = new Scene(vBox, 370, 190);
+        Scene scene = new Scene(borderPane, 370, 155);
         this.setScene(scene);
         this.show();
     }
@@ -83,7 +91,7 @@ public class GeneOrderDialog extends Stage {
         return doneProperty;
     }
 
-    public String getFinalTaxonName() {
-        return finalTaxonName;
+    public String getFinalSelectedName() {
+        return finalSelectedName;
     }
 }
