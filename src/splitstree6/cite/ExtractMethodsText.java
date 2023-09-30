@@ -17,7 +17,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.methods;
+package splitstree6.cite;
 
 import jloda.util.Pair;
 import jloda.util.StringUtils;

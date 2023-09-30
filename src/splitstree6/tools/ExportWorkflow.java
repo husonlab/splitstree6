@@ -36,7 +36,7 @@ import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.writers.ExportManager;
 import splitstree6.main.SplitsTree6;
 import splitstree6.main.Version;
-import splitstree6.methods.ExtractMethodsText;
+import splitstree6.cite.ExtractMethodsText;
 import splitstree6.window.MainWindow;
 
 import java.io.File;

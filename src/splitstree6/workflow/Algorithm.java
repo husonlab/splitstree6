@@ -24,7 +24,7 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.data.TaxaBlock;
-import splitstree6.methods.IHasCitations;
+import splitstree6.cite.IHasCitations;
 import splitstree6.options.IOptionsCarrier;
 import splitstree6.options.Option;
 import splitstree6.workflow.interfaces.HasFromClass;

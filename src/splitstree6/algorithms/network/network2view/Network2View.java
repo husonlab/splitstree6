@@ -22,7 +22,7 @@ package splitstree6.algorithms.network.network2view;
 import splitstree6.data.IViewChoice;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.methods.IgnoredInMethodsText;
+import splitstree6.cite.IgnoredInMethodsText;
 import splitstree6.workflow.Algorithm;
 
 public abstract class Network2View extends Algorithm<NetworkBlock, ViewBlock> implements IgnoredInMethodsText, IViewChoice {

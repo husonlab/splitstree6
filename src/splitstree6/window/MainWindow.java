@@ -43,7 +43,7 @@ import jloda.util.Single;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.methods.ExtractMethodsText;
+import splitstree6.cite.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;

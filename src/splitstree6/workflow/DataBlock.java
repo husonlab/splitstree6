@@ -20,7 +20,7 @@
 package splitstree6.workflow;
 
 import jloda.util.Basic;
-import splitstree6.methods.IHasCitations;
+import splitstree6.cite.IHasCitations;
 
 /**
  * splitstree data block

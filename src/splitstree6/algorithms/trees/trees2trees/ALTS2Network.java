@@ -19,51 +19,35 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
-import jloda.fx.util.ProgramProperties;
-import jloda.fx.window.NotificationManager;
-import jloda.graph.Node;
-import jloda.phylo.LSAUtils;
-import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
-import jloda.util.FileUtils;
-import jloda.util.IteratorUtils;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.regex.Pattern;
 
 /**
- * this runs the ALTSNetwork algorithm externally
- * Daniel Huson, 7.2023
+ * this runs the non-binary ALTS Network algorithm
+ * Banu Cetinkaya and Daniel Huson, 10.2023
  */
-public class ALTS2Network extends Trees2Trees {
+public class ALTS2Network extends Trees2Trees implements DoNotLoadThisAlgorithm { // comment DoNotLoadThisAlgorithm to use
 
-	@Override
 	public String getCitation() {
-		return "Zhang et al 2023; Louxin Zhang, Niloufar Niloufar Abhari, Caroline Colijn and Yufeng Wu3." +
-			   " A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023";
+		return "Zhang et al 2023; L. Zhang, N. Abhari, C. Colijn and Y. Wu3." +
+			   " A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023;" +
+			   "Cetinkaya et al 2023. B. Cetinkaya, D.H. Huson, L. Zhang. Inferring phylogenetic network from non-binary gene trees, in preparation;";
 	}
 
-	@Override
 	public List<String> listOptions() {
 		return List.of();
 	}
 
-	@Override
 	public String getToolTip(String optionName) {
-		return super.getToolTip(optionName);
+		return optionName;
 	}
 
-	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		outputBlock.setRooted(true);
 		// just copying trees to output
@@ -73,7 +57,6 @@ public class ALTS2Network extends Trees2Trees {
 		}
 	}
 
-	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
 		return !datablock.isReticulated() && datablock.isRooted();
 	}

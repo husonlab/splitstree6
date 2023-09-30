@@ -151,7 +151,7 @@ public class SplitsTree6 extends Application {
 
 			MainWindowManager.getInstance().addMainWindow(mainWindow);
 
-			if (inputFiles.size() > 0) {
+			if (!inputFiles.isEmpty()) {
 				for (var file : inputFiles)
 					Platform.runLater(() -> FileLoader.apply(false, mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
 			}

@@ -1,5 +1,5 @@
 /*
- * IgnoredInMethodsText.java Copyright (C) 2023 Daniel H. Huson
+ * IHasCitations.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,10 +17,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.methods;
+package splitstree6.cite;
 
-/**
- * algorithms marked with this interface are ignored when generating methods text
- */
-public interface IgnoredInMethodsText {
+public interface IHasCitations {
+	String getCitation();
 }
