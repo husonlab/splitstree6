@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  TaxonMark.fxml Copyright (C) 2023 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+<Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="splitstree6.view.format.taxmark.TaxonMarkController">
+    <panes>
+        <TitledPane fx:id="titledPane" text="Taxon Marks">
+            <content>
+                <VBox fx:id="vBox" prefWidth="200.0" spacing="5.0">
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </padding>
+                    <AnchorPane>
+                        <children>
+                            <HBox alignment="CENTER_LEFT" spacing="4.0" AnchorPane.bottomAnchor="0.0"
+                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <ColorPicker fx:id="fillColorPicker" prefWidth="130.0">
+                                    <tooltip>
+                                        <Tooltip text="Mark color"/>
+                                    </tooltip>
+                                    <value>
+                                        <Color opacity="0.0"/>
+                                    </value>
+                                </ColorPicker>
+                            </HBox>
+                            <Button fx:id="clearColorButton" mnemonicParsing="false" text="Delete"
+                                    AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="4.0">
+                                <font>
+                                    <Font size="10.0"/>
+                                </font>
+                                <tooltip>
+                                    <Tooltip text="Remove marks"/>
+                                </tooltip>
+                            </Button>
+                        </children>
+                    </AnchorPane>
+                    <AnchorPane>
+                        <children>
+                            <HBox alignment="CENTER_LEFT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                  AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                <children>
+                                    <ChoiceBox fx:id="shapeCBox" prefWidth="130.0">
+                                        <tooltip>
+                                            <Tooltip text="Choose the shape used to mark the selected taxa"/>
+                                        </tooltip>
+                                    </ChoiceBox>
+                                </children>
+                            </HBox>
+                            <Button fx:id="addButton" mnemonicParsing="false" text="Add" AnchorPane.rightAnchor="2.0"
+                                    AnchorPane.topAnchor="0.0"/>
+                        </children>
+                    </AnchorPane>
+                </VBox>
+            </content>
+            <tooltip>
+                <Tooltip text="Insert colored marks (boxes)"/>
+            </tooltip>
+        </TitledPane>
+    </panes>
+</Accordion>

@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~  TreePagesView.fxml Copyright (C) 2023 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<AnchorPane fx:id="anchorPane" prefWidth="700.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="splitstree6.view.trees.treepages.TreePagesViewController">
+    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0">
+        <top>
+            <VBox fx:id="vBox" BorderPane.alignment="CENTER">
+                <AnchorPane>
+                    <children>
+                        <ToolBar fx:id="toolBar" minHeight="-Infinity" prefHeight="32.0" AnchorPane.bottomAnchor="0.0"
+                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                            <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                            <ComboBox fx:id="diagramCBox" prefWidth="50.0">
+                                <tooltip>
+                                    <Tooltip text="Choose diagram"/>
+                                </tooltip>
+                            </ComboBox>
+                            <ComboBox fx:id="orientationCBox" prefWidth="50.0">
+                                <tooltip>
+                                    <Tooltip text="Choose layout orientation"/>
+                                </tooltip>
+                            </ComboBox>
+                            <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                                <tooltip>
+                                    <Tooltip text="use child-average or leaf-average to place internal nodes"/>
+                                </tooltip>
+                            </ComboBox>
+                            <Separator layoutX="144.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
+                                       orientation="VERTICAL" prefHeight="20.0"/>
+                            <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
+                                <tooltip>
+                                    <Tooltip text="Set rows x columns"/>
+                                </tooltip>
+                            </ComboBox>
+                            <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                       orientation="VERTICAL" prefHeight="20.0"/>
+                            <ComboBox fx:id="treeCBox" minWidth="100.0"/>
+                            <Separator layoutX="369.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
+                                       orientation="VERTICAL" prefHeight="20.0"/>
+                            <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
+                                          maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
+                                          minWidth="-Infinity" mnemonicParsing="false" prefHeight="24.0"
+                                          prefWidth="24.0" text="n" textOverrun="CLIP">
+                                <tooltip>
+                                    <Tooltip text="Show tree names and details"/>
+                                </tooltip>
+                                <font>
+                                    <Font size="12.0"/>
+                                </font>
+                            </ToggleButton>
+                            <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                            <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                                    mnemonicParsing="false" prefHeight="20.0"
+                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom In">
+                                <font>
+                                    <Font size="12.0"/>
+                                </font>
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
+                                    </ImageView>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Zoom in"/>
+                                </tooltip>
+                            </Button>
+                            <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
+                                    minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                                    style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom Out">
+                                <font>
+                                    <Font size="10.0"/>
+                                </font>
+                                <graphic>
+                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
+                                               preserveRatio="true">
+                                        <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
+                                    </ImageView>
+                                </graphic>
+                                <tooltip>
+                                    <Tooltip text="Zoom out"/>
+                                </tooltip>
+                            </Button>
+                            <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                                    prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    text="A+">
+                                <font>
+                                    <Font size="11.0"/>
+                                </font>
+                                <tooltip>
+                                    <Tooltip text="Increase font size"/>
+                                </tooltip>
+                            </Button>
+                            <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
+                                    prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    text="A-">
+                                <font>
+                                    <Font size="11.0"/>
+                                </font>
+                                <tooltip>
+                                    <Tooltip text="Decrease font size"/>
+                                </tooltip>
+                            </Button>
+                            <StackPane alignment="TOP_LEFT"/>
+                        </ToolBar>
+                    </children>
+                </AnchorPane>
+            </VBox>
+        </top>
+        <center>
+            <AnchorPane fx:id="innerAnchorPane" BorderPane.alignment="CENTER">
+                <BorderPane.margin>
+                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                </BorderPane.margin>
+                <children>
+                    <Pane fx:id="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
+                    </Pane>
+                    <VBox fx:id="formatVBox" prefWidth="200.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"
+                          AnchorPane.topAnchor="2.0"/>
+                </children>
+            </AnchorPane>
+        </center>
+    </BorderPane>
+    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="32.0"
+          AnchorPane.topAnchor="0.0">
+        <children>
+            <ToggleButton fx:id="settingsToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
+                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                          style="-fx-border-style: none;" text="Settings">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/jloda/resources/icons/sun/Edit24.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Settings toolbar"/>
+                </tooltip>
+            </ToggleButton>
+            <ToggleButton fx:id="findToggleButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
+                          mnemonicParsing="false" prefHeight="20.0" style="-fx-border-style: none;" text="Find">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Find or Find/Replace toolbar"/>
+                </tooltip>
+            </ToggleButton>
+            <ToggleButton fx:id="formatToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
+                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                          style="-fx-border-style: none;" text="Format">
+                <font>
+                    <Font size="10.0"/>
+                </font>
+                <graphic>
+                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
+                        <Image url="@/jloda/resources/icons/sun/Preferences24.gif"/>
+                    </ImageView>
+                </graphic>
+                <tooltip>
+                    <Tooltip text="Show the Format toolbar"/>
+                </tooltip>
+            </ToggleButton>
+        </children>
+    </HBox>
+</AnchorPane>

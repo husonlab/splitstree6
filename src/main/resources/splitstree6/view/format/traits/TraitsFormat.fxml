@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<!--
+  ~  TraitsFormat.fxml Copyright (C) 2023 Daniel H. Huson
+  ~
+  ~  (Some files contain contributions from other authors, who are then mentioned separately.)
+  ~
+  ~  This program is free software: you can redistribute it and/or modify
+  ~  it under the terms of the GNU General Public License as published by
+  ~  the Free Software Foundation, either version 3 of the License, or
+  ~  (at your option) any later version.
+  ~
+  ~  This program is distributed in the hope that it will be useful,
+  ~  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~  GNU General Public License for more details.
+  ~
+  ~  You should have received a copy of the GNU General Public License
+  ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  -->
+
+<Accordion maxWidth="-Infinity" minHeight="-Infinity" prefWidth="200.0" xmlns="http://javafx.com/javafx/16"
+           xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.format.traits.TraitsFormatController">
+    <panes>
+        <TitledPane fx:id="titledPane" minHeight="-Infinity" minWidth="-Infinity" text="Taxon Traits Pie Charts">
+            <content>
+                <VBox fx:id="vBox" minHeight="-Infinity" prefWidth="200.0" spacing="5.0">
+                    <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
+                    </padding>
+                    <HBox alignment="CENTER" layoutX="15.0" layoutY="37.0" spacing="4.0">
+                        <children>
+                            <MenuButton fx:id="showMenuButton" mnemonicParsing="false" prefWidth="180.0" text="Traits">
+                                <items>
+                                    <MenuItem fx:id="showAllMenuItem" mnemonicParsing="false" text="All"/>
+                                    <MenuItem fx:id="showNoneMenuItem" mnemonicParsing="false" text="None"/>
+                                    <SeparatorMenuItem mnemonicParsing="false"/>
+                                </items>
+                                <tooltip>
+                                    <Tooltip text="Choose traits to show in pie charts"/>
+                                </tooltip>
+                            </MenuButton>
+                        </children>
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="37.0" spacing="4.0">
+                        <CheckBox fx:id="legendCBox" contentDisplay="RIGHT" mnemonicParsing="false"
+                                  nodeOrientation="RIGHT_TO_LEFT" text="Legend:">
+                            <HBox.margin>
+                                <Insets right="10.0"/>
+                            </HBox.margin>
+                            <tooltip>
+                                <Tooltip text="Show/hide pie-chart legend"/>
+                            </tooltip>
+                        </CheckBox>
+                        <Label alignment="CENTER_RIGHT" text="Size:" textOverrun="CLIP">
+                            <HBox.margin>
+                                <Insets right="2.0"/>
+                            </HBox.margin>
+                        </Label>
+                        <TextField fx:id="maxSizeField" prefColumnCount="4" prefWidth="50.0">
+                            <tooltip>
+                                <Tooltip text="Set maximum pie-chart size"/>
+                            </tooltip>
+                        </TextField>
+                    </HBox>
+                </VBox>
+            </content>
+        </TitledPane>
+    </panes>
+</Accordion>
