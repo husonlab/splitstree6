@@ -416,7 +416,6 @@
                                   text="Unrooted Tree Shapley Values"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="pcoaMenuItem" text="PCoA"/>
-                        <CheckMenuItem fx:id="tsneMenuItem" text="tSNE"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="showWorkflowMenuItem" text="Show Workflow"/>
                     </Menu>

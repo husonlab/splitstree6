@@ -32,11 +32,11 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
-        <javafx.version>17</javafx.version>
+        <javafx.version>19</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <main.class>splitstree6.main.SplitsTree6</main.class>
-
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.husonlab</groupId>
@@ -94,12 +94,15 @@
             <artifactId>jama</artifactId>
             <version>1.0.3</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.lejon</groupId>
-            <artifactId>T-SNE-Java</artifactId>
-            <version>2.6.4</version>
-        </dependency>
+        <!--
+            <dependency>
+                <groupId>com.github.lejon</groupId>
+                <artifactId>T-SNE-Java</artifactId>
+                <version>2.6.4</version>
+            </dependency>
+            -->
     </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -114,6 +117,19 @@
                 <configuration>
                     <mainClass>${main.class}</mainClass>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>license-maven-plugin</artifactId>
+                <version>2.2.0</version>
+                <executions>
+                    <execution>
+                        <id>download-licenses</id>
+                        <goals>
+                            <goal>download-licenses</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <!-->
             <plugin>
@@ -156,8 +172,5 @@
             <id>ej-technologies</id>
             <url>https://maven.ej-technologies.com/repository</url>
         </repository>
-
     </repositories>
-
-
 </project>

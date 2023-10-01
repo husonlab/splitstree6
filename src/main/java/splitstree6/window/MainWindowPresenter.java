@@ -61,7 +61,6 @@ import splitstree6.algorithms.characters.characters2report.PhiTest;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.distances.distances2network.PCoA;
-import splitstree6.algorithms.distances.distances2network.TSne;
 import splitstree6.algorithms.distances.distances2report.DeltaScore;
 import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
@@ -555,7 +554,7 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getMinSpanningNetworkMenuItem(), new MinSpanningNetwork());
 		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new AutumnAlgorithm());
 		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCoA());
-		setupAlgorithmMenuItem(controller.getTsneMenuItem(), new TSne());
+		//setupAlgorithmMenuItem(controller.getTsneMenuItem(), new TSne());
 		setupAlgorithmMenuItem(controller.getBootStrapTreeMenuItem(), new BootstrapTree());
 		setupAlgorithmMenuItem(controller.getBootstrapTreeAsNetworkMenuItem(), new BootstrapTreeSplits());
 		setupAlgorithmMenuItem(controller.getBootStrapNetworkMenuItem(), new BootstrapSplits());
