@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.6" transformSequenceNumber="10">
-  <directoryPresets config="../target/generated-resources" />
+  <directoryPresets config="../src/main/resources/NOTICE.txt" />
   <application name="SplitsTreeCE" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeCE" publisher="Daniel Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_beta" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
       <variable name="renderingVMOption" />
@@ -41,10 +41,11 @@
       <fileEntry mountPoint="1691243205" file="../tools/workflow-export" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/mash-sketches" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/bfilter-tool" fileMode="755" overrideFileMode="true" />
+      <dirEntry mountPoint="1691243210" file="../target/generated-resources/licenses" subDirectory="licenses" />
       <fileEntry mountPoint="1691243207" file="../target/generated-resources/licenses.xml" />
       <fileEntry mountPoint="1691243207" file="../licenses/JLODA-LICENSE.txt" />
-      <dirEntry mountPoint="1691243210" file="../target/generated-resources/licenses" subDirectory="licenses" />
-      <fileEntry mountPoint="675425072" file="./License.txt" overrideFileMode="true" overrideOverwriteMode="true" overrideUninstallMode="true" />
+      <fileEntry mountPoint="675425072" file="../src/main/resources/LICENSE.txt" />
+      <fileEntry mountPoint="675425072" file="../src/main/resources/NOTICE.txt" />
     </entries>
     <components>
       <component name="SplitsTreeCE" id="1691242194" changeable="false">
@@ -52,8 +53,10 @@
         <include>
           <entry location="jars" />
           <entry location="jars2" />
-          <entry location="License.txt" />
           <entry location="tools" />
+          <entry location="Licenses" />
+          <entry location="LICENSE.txt" />
+          <entry location="NOTICE.txt" />
           <entry location="SplitsTreeCE" fileType="launcher" />
         </include>
       </component>
@@ -64,40 +67,6 @@
         <dependencies>
           <component id="1691242194" />
         </dependencies>
-      </component>
-      <component name="Licences" id="1691243209">
-        <include>
-          <entry location="jars/commons-logging-1.2.jar" />
-          <entry location="jars/pdfbox-io-3.0.0-beta1.jar" />
-          <entry location="jars/flowless-0.6.9.jar" />
-          <entry location="jars/richtextfx-0.10.9.jar" />
-          <entry location="jars/fontbox-3.0.0-beta1.jar" />
-          <entry location="jars/commons-math4-legacy-4.0-beta1.jar" />
-          <entry location="jars/undofx-2.1.1.jar" />
-          <entry location="jars/pdfbox-LICENSE.txt" />
-          <entry location="jars/VectorGraphics2D-License.txt" />
-          <entry location="jars/pdfbox-3.0.0-beta1.jar" />
-          <entry location="jars/TSNE_LISENSE.txt" />
-          <entry location="jars/VectorGraphics2D-0.13.jar" />
-          <entry location="jars/commons-collections4-4.3.jar" />
-          <entry location="jars/reactfx-2.0-M5.jar" />
-          <entry location="jars/sqlite-LICENSE.txt" />
-          <entry location="jars/commons-math-LICENSE.txt" />
-          <entry location="jars/jama-1.0.3.jar" />
-          <entry location="jars/Jama-NOTICE.txt" />
-          <entry location="jars/jloda2-2.0.0-SNAPSHOT.jar" />
-          <entry location="jars/tsne.jar" />
-          <entry location="jars/richtextfx-license.txt" />
-          <entry location="jars/jloda2-LICENSE.txt" />
-          <entry location="jars/commons-math4-core-4.0-beta1.jar" />
-          <entry location="jars/sqlite-jdbc-3.42.0.0.jar" />
-          <entry location="jars/commons-math4-legacy-exception-4.0-beta1.jar" />
-          <entry location="jars/commons-collections-LICENSE.txt" />
-          <entry location="jars/wellbehavedfx-0.3.3.jar" />
-          <entry location="jars/splitstree6.jar" />
-          <entry location="Licenses" />
-          <entry location="License.txt" />
-        </include>
       </component>
     </components>
   </files>
@@ -180,7 +149,7 @@ return console.askOkCancel(message, true);
                       <entry>
                         <string>en</string>
                         <object class="com.install4j.api.beans.ExternalFile">
-                          <string>./License.txt</string>
+                          <string>../src/main/resources/LICENSE.txt</string>
                         </object>
                       </entry>
                     </property>

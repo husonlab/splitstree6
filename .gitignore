@@ -4,7 +4,7 @@ out/
 !**/src/test/**/out/
 
 .idea
-splitstree6.iml
+splitstreeCE.iml
 
 ### Eclipse ###
 .apt_generated
@@ -30,3 +30,25 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+# maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+# https://github.com/takari/maven-wrapper#usage-without-binary-jar
+.mvn/wrapper/maven-wrapper.jar
+
+# LaTeX auxiliary files
+*.aux
+*.blg
+*.idx
+*.ilg
+*.ind
+*.out
+*.toc
