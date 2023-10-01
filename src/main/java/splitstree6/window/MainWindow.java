@@ -40,10 +40,10 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.Single;
+import splitstree6.cite.ExtractMethodsText;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.cite.ExtractMethodsText;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
@@ -94,7 +94,7 @@ public class MainWindow implements IMainWindow {
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
-		methodsTab = new DisplayTextTab(this, "How to cite", false);
+		methodsTab = new DisplayTextTab(this, "How to Cite", false);
 		methodsTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/History24.gif", 16));
 
 		workflow.validProperty().addListener(e -> updateMethodsTab());

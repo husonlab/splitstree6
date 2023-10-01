@@ -25,8 +25,8 @@
  */
 package splitstree6.models.nucleotideModels;
 
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
+import jama.EigenvalueDecomposition;
+import jama.Matrix;
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 
 /**

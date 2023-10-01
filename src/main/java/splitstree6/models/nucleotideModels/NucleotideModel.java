@@ -25,11 +25,10 @@
  */
 package splitstree6.models.nucleotideModels;
 
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
+import jama.EigenvalueDecomposition;
+import jama.Matrix;
 import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;

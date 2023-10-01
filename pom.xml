@@ -32,7 +32,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
-        <javafx.version>19</javafx.version>
+        <javafx.version>17</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <main.class>splitstree6.main.SplitsTree6</main.class>
     </properties>
@@ -88,11 +88,6 @@
             <groupId>org.fxmisc.richtext</groupId>
             <artifactId>richtextfx</artifactId>
             <version>0.11.0</version>
-        </dependency>
-        <dependency>
-            <groupId>gov.nist.math</groupId>
-            <artifactId>jama</artifactId>
-            <version>1.0.3</version>
         </dependency>
         <!--
             <dependency>

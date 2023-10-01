@@ -19,8 +19,8 @@
 
 package splitstree6.algorithms.distances.distances2network;
 
-import Jama.EigenvalueDecomposition;
-import Jama.Matrix;
+import jama.EigenvalueDecomposition;
+import jama.Matrix;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import jloda.phylo.PhyloGraph;

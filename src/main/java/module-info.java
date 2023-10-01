@@ -6,8 +6,6 @@ module splitstreesix {
 	requires transitive javafx.swing;
 	requires javafx.base;
 
-	requires jama;
-
 	requires org.apache.commons.collections4;
 	requires org.apache.commons.math4.legacy;
 	requires org.apache.commons.math4.legacy.exception;

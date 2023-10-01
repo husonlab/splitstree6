@@ -19,7 +19,7 @@
 
 package splitstree6.algorithms.characters.characters2distances;
 
-import Jama.Matrix;
+import jama.Matrix;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleBooleanProperty;

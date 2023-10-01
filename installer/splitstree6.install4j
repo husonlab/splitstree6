@@ -11,6 +11,8 @@
         <entry>swt-*</entry>
         <entry>javafx-*</entry>
         <entry>sqlite-jdbc-*</entry>
+        <entry>libi4jinst*</entry>
+        <entry>install4j*</entry>
       </macSearchedJars>
     </codeSigning>
     <jreBundles jdkProviderId="Liberica" release="20/20.0.2+10">
@@ -1161,5 +1163,5 @@ return true;</property>
   <buildIds buildAll="false">
     <mediaSet refId="1691242165" />
   </buildIds>
-  <buildOptions disableSigning="true" disableNotarization="true" />
+  <buildOptions verbose="true" />
 </install4j>
