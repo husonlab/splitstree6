@@ -27,7 +27,8 @@ import jloda.util.UsageException;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.io.readers.trees.NewickReader;
+import splitstree6.io.readers.ImportManager;
+import splitstree6.io.readers.trees.TreesReader;
 import splitstree6.io.writers.trees.NewickWriter;
 
 import java.io.IOException;
@@ -43,8 +44,7 @@ public class AltsNonBinary {
 
 		var taxaBlock = new TaxaBlock();
 		var inputTreesBlock = new TreesBlock();
-
-		(new NewickReader()).read(new ProgressPercentage(), infile, taxaBlock, inputTreesBlock);
+		loadTrees(infile, taxaBlock, inputTreesBlock);
 
 		// copy trees to output:
 		var treesBlock = new TreesBlock();
@@ -56,5 +56,19 @@ public class AltsNonBinary {
 		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
 			(new NewickWriter()).write(w, taxaBlock, treesBlock);
 		}
+	}
+
+	public static void loadTrees(String fileName, TaxaBlock taxaBlock, TreesBlock treesBlock) throws IOException {
+		var importManager = ImportManager.getInstance();
+		var dataType = importManager.getDataType(fileName);
+		if (dataType.equals(TreesBlock.class)) {
+			var fileFormat = importManager.getFileFormat(fileName);
+			var importer = (TreesReader) importManager.getImporterByDataTypeAndFileFormat(dataType, fileFormat);
+			try (var progress = new ProgressPercentage("Reading: " + fileName)) {
+				importer.read(progress, fileName, taxaBlock, treesBlock);
+			}
+			System.err.println("Trees: " + treesBlock.getNTrees());
+		} else throw new IOException("File does not contain trees");
+
 	}
 }
