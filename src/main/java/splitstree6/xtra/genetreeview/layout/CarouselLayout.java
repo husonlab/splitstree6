@@ -156,12 +156,12 @@ public class CarouselLayout extends MultipleFramesLayout {
     }
 
     private void scaleNode(Node node) {
-        var scalingFunctionX = Bindings.createDoubleBinding(() ->
+        /*var scalingFunctionX = Bindings.createDoubleBinding(() ->
                         (layoutWidthProperty.get()*0.23/nodeWidth) / (1 + (Math.abs(layoutWidthProperty.get()*0.23/nodeWidth))) + 0.5,
                 layoutWidthProperty
         );
         if (node.scaleXProperty().isBound()) node.scaleXProperty().unbind();
-        node.scaleXProperty().bind(constant1);
+        node.scaleXProperty().bind(constant1);*/
 
         var scalingFunctionY = Bindings.createDoubleBinding(() ->
                         (layoutHeightProperty.get()*0.7/nodeHeight) / (1 + (Math.abs(layoutHeightProperty.get()*0.7/nodeHeight))) + 0.5,

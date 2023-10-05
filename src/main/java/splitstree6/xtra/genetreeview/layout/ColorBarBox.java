@@ -26,10 +26,14 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
+import java.util.HashMap;
+
 public class ColorBarBox extends Pane implements Selectable {
 
     private Color color;
     private final Tooltip tooltip;
+    private String name;
+    private final HashMap<String,String> attachedValues = new HashMap<>();
     private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
 
     public ColorBarBox(String name, Color color) {
@@ -38,6 +42,7 @@ public class ColorBarBox extends Pane implements Selectable {
         this.setStyle("-fx-border-color: -fx-box-border");
         HBox.setMargin(this, Insets.EMPTY);
         HBox.setHgrow(this, Priority.ALWAYS);
+        this.name = name;
         tooltip = new Tooltip(name);
         Tooltip.install(this, tooltip);
         isSelectedProperty.addListener((observable, wasSelected, isSelected) -> {
@@ -52,11 +57,14 @@ public class ColorBarBox extends Pane implements Selectable {
     }
 
     public String getName() {
-        return tooltip.getText();
+        return name;
     }
 
     public void setName(String name) {
-        tooltip.setText(name);
+        {
+            this.name = name;
+            updateTooltip();
+        }
     }
 
     public Color getColor() {
@@ -73,5 +81,18 @@ public class ColorBarBox extends Pane implements Selectable {
 
     public BooleanProperty isSelectedProperty() {
         return isSelectedProperty;
+    }
+
+    public void addToTooltipOrReplace(String featureName, String value) {
+        attachedValues.put(featureName, value);
+        updateTooltip();
+    }
+
+    private void updateTooltip() {
+        StringBuilder sb = new StringBuilder(name);
+        for (var feature : attachedValues.keySet()) {
+            sb.append("\n").append(feature).append(": ").append(attachedValues.get(feature));
+        }
+        tooltip.setText(sb.toString());
     }
 }

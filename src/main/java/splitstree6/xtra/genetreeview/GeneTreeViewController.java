@@ -20,7 +20,6 @@
 package splitstree6.xtra.genetreeview;
 
 import javafx.fxml.FXML;
-import javafx.scene.Group;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -34,6 +33,9 @@ public class GeneTreeViewController {
 
 	@FXML
 	private MenuItem importGeneNamesMenuItem;
+
+	@FXML
+	private MenuItem importFeatureMenuItem;
 
 	@FXML
 	private MenuItem exportSubsetMenuItem;
@@ -108,6 +110,9 @@ public class GeneTreeViewController {
 	private Menu similarityOrderSubMenu;
 
 	@FXML
+	private Menu featureOrderSubMenu;
+
+	@FXML
 	private ToggleGroup treeLayoutGroup;
 
 	@FXML
@@ -142,6 +147,12 @@ public class GeneTreeViewController {
 
 	@FXML
 	private Menu similarityColoringSubMenu;
+
+	@FXML
+	private Menu featureColoringSubMenu;
+
+	@FXML
+	private MenuItem featureOverviewMenuItem;
 
 	@FXML
 	private MenuItem aboutMenuItem;
@@ -193,6 +204,9 @@ public class GeneTreeViewController {
 	}
 	public MenuItem getImportGeneNamesMenuItem() {
 		return importGeneNamesMenuItem;
+	}
+	public MenuItem getImportFeatureMenuItem() {
+		return importFeatureMenuItem;
 	}
 	public MenuItem getExportSubsetMenuItem() {
 		return exportSubsetMenuItem;
@@ -272,6 +286,9 @@ public class GeneTreeViewController {
 	public Menu getSimilarityOrderSubMenu() {
 		return similarityOrderSubMenu;
 	}
+	public Menu getFeatureOrderSubMenu() {
+		return featureOrderSubMenu;
+	}
 
 	// View Menu
 	public ToggleGroup getTreeLayoutGroup() {
@@ -309,6 +326,12 @@ public class GeneTreeViewController {
 	}
 	public Menu getSimilarityColoringSubMenu() {
 		return similarityColoringSubMenu;
+	}
+	public Menu getFeatureColoringSubMenu() {
+		return featureColoringSubMenu;
+	}
+	public MenuItem getFeatureOverviewMenuItem() {
+		return featureOverviewMenuItem;
 	}
 
 	// Help Menu

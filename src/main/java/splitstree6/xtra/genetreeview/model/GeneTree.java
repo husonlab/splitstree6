@@ -19,13 +19,18 @@
 
 package splitstree6.xtra.genetreeview.model;
 
+import javafx.scene.paint.Color;
 import jloda.phylo.PhyloTree;
+
+import java.util.HashMap;
 
 public class GeneTree {
 
     private final PhyloTree phyloTree;
     private final int id;
     private int position;
+    private Color color;
+    private final HashMap<String,Object> furtherFeatures = new HashMap<>();
 
     public GeneTree(PhyloTree phyloTree, int id, int position) {
         this.phyloTree = phyloTree;
@@ -57,5 +62,25 @@ public class GeneTree {
 
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    public void addFeature(String name, Object value) {
+        furtherFeatures.put(name, value);
+    }
+
+    public Object getFeature(String featureName) {
+        return furtherFeatures.get(featureName);
+    }
+
+    public void setColor(Color color) {
+        this.color = color;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public HashMap<String,Object> getFurtherFeatures() {
+        return furtherFeatures;
     }
 }

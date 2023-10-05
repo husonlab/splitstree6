@@ -60,6 +60,7 @@
                               <Menu fx:id="openRecentMenu" mnemonicParsing="false" text="Open Recent" />
                               <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="importGeneNamesMenuItem" mnemonicParsing="false" text="Import Gene Names" />
+                              <MenuItem fx:id="importFeatureMenuItem" mnemonicParsing="false" text="Import Feature" />
                               <MenuItem fx:id="exportSubsetMenuItem" mnemonicParsing="false" text="Export Selected Trees" />
                               <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="printMenuItem" mnemonicParsing="false" text="Print...">
@@ -144,6 +145,7 @@
                               </RadioMenuItem>
                               <Menu fx:id="taxonOrderSubMenu" disable="true" mnemonicParsing="false" text="Tree Order As In Genome" />
                               <Menu fx:id="similarityOrderSubMenu" mnemonicParsing="false" text="Tree Order By Similarity" />
+                              <Menu fx:id="featureOrderSubMenu" disable="true" mnemonicParsing="false" text="Tree Order By Feature" />
                           </items>
                         </Menu>
                         <Menu mnemonicParsing="false" text="View">
@@ -167,6 +169,9 @@
                               </RadioMenuItem>
                               <RadioMenuItem fx:id="monophyleticColoringMenuItem" mnemonicParsing="false" text="Monophyletic Selection Coloring" toggleGroup="$coloringGroup" />
                               <Menu fx:id="similarityColoringSubMenu" mnemonicParsing="false" text="Coloring By Similarity With Tree" />
+                              <Menu fx:id="featureColoringSubMenu" disable="true" mnemonicParsing="false" text="Coloring By Feature Values" />
+                              <SeparatorMenuItem mnemonicParsing="false" />
+                              <MenuItem fx:id="featureOverviewMenuItem" disable="true" mnemonicParsing="false" text="Feature Overview" />
                            </items>
                         </Menu>
                                 <Menu mnemonicParsing="false" text="Help">
