@@ -158,4 +158,6 @@ module splitstreesix {
 	exports splitstree6.splits;
 	opens splitstree6.splits;
 	opens splitstree6.xtra.more;
+	opens splitstree6.xtra.alts;
+
 }
