@@ -91,7 +91,6 @@ public class Kernelize {
 
 		// System.err.println("Blob tree: " + NewickIO.toString(network, false) + ";");
 
-		if (true) {
 			// run the algorithm on all components:
 			try (NodeArray<TreesAndTaxonClasses> blobNetworksMap = blobTree.newNodeArray()) {
 				for (var component : components) {
@@ -116,65 +115,18 @@ public class Kernelize {
 				}
 				return networks;
 			}
-		} else {
-			for (var component : components) {
-				if (component.getNumberOfNodes() > 1) {
-					var reducedTrees = extractTrees(component);
-					var subnetworks = algorithm.apply(reducedTrees.trees());
-					insert(blobTree, clusterNodeMap, reducedTrees.taxonClasses(), subnetworks.get(0));
-					// todo: insert all sub-networks networks
-				}
-			}
-			for (var v : blobTree.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
-				blobTree.delDivertex(v);
-			}
-			for (var e : blobTree.edges()) {
-				blobTree.setReticulate(e, e.getTarget().getInDegree() > 1);
-
-			}
-			return List.of(blobTree);
-		}
 	}
 
 	/**
-	 * insert the given donor network into the acceptor network replacing the node that contains exactly the correct set of taxa
-	 *
-	 * @param blobTree       acceptor network
-	 * @param clusterNodeMap cluster to node map
-	 * @param taxonClasses   taxon equivalence classes
-	 * @param donorNetwork   donor network
+	 * recursively inserts sub-networks in all possible combinations
+	 * @param blobTree the backbone tree
+	 * @param clusterNodeMap maps clusters to the blob tree
+	 * @param blobNetworksMap the blob to networks map
+	 * @param numberOfBlobs total number of blobs (non-trivial connected components in the incompatibity graph)
+	 * @param resolvedBlobs blobs that have been resolved
+	 * @param maxNumberOfResults max number of desired results
+	 * @param networks resulting networks
 	 */
-	private static void insert(PhyloTree blobTree, HashMap<BitSet, Node> clusterNodeMap, List<BitSet> taxonClasses, PhyloTree donorNetwork) {
-		var donorTaxa = BitSetUtils.union(taxonClasses);
-		var blobNode = clusterNodeMap.get(donorTaxa);
-		try (NodeArray<Node> donor2acceptorMap = donorNetwork.newNodeArray()) {
-			for (var v : donorNetwork.nodes()) {
-				var w = blobTree.newNode(v.getInfo());
-				donor2acceptorMap.put(v, w);
-			}
-			for (var e : donorNetwork.edges()) {
-				blobTree.newEdge(donor2acceptorMap.get(e.getSource()), donor2acceptorMap.get(e.getTarget()));
-			}
-			for (var e : IteratorUtils.asList(blobNode.outEdges())) {
-				blobTree.deleteEdge(e);
-			}
-			var donorRoot = donorNetwork.getRoot();
-			if (blobNode.getParent() == null)
-				blobTree.setRoot(donorRoot);
-			else
-				blobTree.newEdge(blobNode, donor2acceptorMap.get(donorRoot));
-			for (var v : donorNetwork.nodeStream().filter(Node::isLeaf).toList()) {
-				var cluster = BitSetUtils.asBitSet(donorNetwork.getTaxa(v));
-				for (var set : taxonClasses) {
-					if (cluster.get(set.nextSetBit(1)))
-						cluster.or(set);
-				}
-				var target = clusterNodeMap.get(cluster);
-				blobTree.newEdge(donor2acceptorMap.get(v), target);
-			}
-		}
-	}
-
 	private static void insertRec(PhyloTree blobTree, HashMap<BitSet, Node> clusterNodeMap, NodeArray<TreesAndTaxonClasses> blobNetworksMap,
 								  int numberOfBlobs, Set<Node> resolvedBlobs, int maxNumberOfResults, List<PhyloTree> networks) {
 		for (var blobNode : blobNetworksMap.keySet()) {
@@ -201,10 +153,7 @@ public class Kernelize {
 							blobTree.deleteEdge(e);
 						}
 						var donorRoot = donorNetwork.getRoot();
-						if (blobNode.getParent() == null)
-							blobTree.setRoot(donorRoot);
-						else
-							blobTree.newEdge(blobNode, donor2acceptorMap.get(donorRoot));
+						blobTree.newEdge(blobNode, donor2acceptorMap.get(donorRoot));
 						for (var v : donorNetwork.nodeStream().filter(Node::isLeaf).toList()) {
 							var cluster = BitSetUtils.asBitSet(donorNetwork.getTaxa(v));
 							for (var set : taxonClasses) {
