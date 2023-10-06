@@ -84,12 +84,17 @@ public class ColorBar extends HBox {
         }
     }
 
-    public void addColorBox(String treeName, int id, int position) {
-        id2color.put(id, backgroundColor);
+    public void addColorBox(String treeName, int id, int position, Color color, HashMap<String, Object> furtherFeatures) {
+        if (color == null) id2color.put(id, backgroundColor);
+        else id2color.put(id, color);
         ColorBarBox colorBarBox = new ColorBarBox(treeName, id2color.get(id));
         if (position < 0 | position > this.getChildren().size()-2) position = this.getChildren().size()-1;
         this.getChildren().add(position+1, colorBarBox);
         id2colorBarBox.put(id,colorBarBox);
+        if (furtherFeatures == null) return;
+        for (var feature : furtherFeatures.keySet()) {
+            colorBarBox.addToTooltipOrReplace(feature, furtherFeatures.get(feature).toString());
+        }
     }
 
     public void removeColorBox(int id) {
@@ -115,7 +120,6 @@ public class ColorBar extends HBox {
 
     public void setColors(HashMap<Integer,Color> id2color) {
         if (id2color.size() == this.id2color.size()) this.id2color = id2color;
-
     }
 
     public void reorder(ArrayList<Integer> treeOrder) {
@@ -137,5 +141,17 @@ public class ColorBar extends HBox {
 
     public HashMap<Integer,ColorBarBox> getId2colorBarBox() {
         return id2colorBarBox;
+    }
+
+    public void addValuesToTooltip(String featureName, HashMap<Integer,String> finalValues) {
+        if (finalValues.size() == id2colorBarBox.size()) {
+            for (int id : finalValues.keySet()) {
+                id2colorBarBox.get(id).addToTooltipOrReplace(featureName, finalValues.get(id));
+            }
+        }
+    }
+
+    public Color getBackgroundColor() {
+        return backgroundColor;
     }
 }

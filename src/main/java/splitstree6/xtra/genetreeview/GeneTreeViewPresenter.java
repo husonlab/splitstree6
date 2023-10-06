@@ -45,7 +45,6 @@ import javafx.util.Duration;
 import jloda.fx.util.ColorSchemeManager;
 import jloda.fx.util.Print;
 
-import jloda.fx.util.RecentFilesManager;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.phylo.PhyloTree;
 import jloda.util.FileLineIterator;
@@ -58,10 +57,7 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.utils.*;
 import splitstree6.xtra.genetreeview.io.*;
 import splitstree6.xtra.genetreeview.layout.*;
-import splitstree6.xtra.genetreeview.model.GeneTree;
-import splitstree6.xtra.genetreeview.model.GeneTreeSet;
-import splitstree6.xtra.genetreeview.model.Model;
-import splitstree6.xtra.genetreeview.model.SimilarityCalculationTask;
+import splitstree6.xtra.genetreeview.model.*;
 import splitstree6.xtra.genetreeview.util.*;
 
 import java.io.*;
@@ -91,6 +87,8 @@ public class GeneTreeViewPresenter {
 	private final UndoRedoManager undoRedoManager = new UndoRedoManager();
 	private double lastSliderValue = 1;
 	private final Stabilizer stabilizer = new Stabilizer();
+	private final ArrayList<String> recentFiles = new ArrayList<>();
+	private final IntegerProperty recentFilesCount = new SimpleIntegerProperty(0);
 
 	public GeneTreeViewPresenter(GeneTreeView geneTreeView) {
 
@@ -107,24 +105,20 @@ public class GeneTreeViewPresenter {
 		subScene.setCamera(camera);
 		controller.getCenterPane().getChildren().add(subScene);
 
-		// Does not work anymore as trees are loaded in a Task
-		/*model.lastUpdateProperty().addListener(a -> {
-			controller.getLabel().setText("Taxa: %,d, Trees: %,d".formatted(model.getTaxaBlock().getNtax(),
-					model.getTreesBlock().getNTrees()));
-		});*/
-
 
 		// MenuBar
 		// File Menu
-		controller.getOpenMenuItem().setOnAction(e -> openFile(geneTreeView.getStage(),controller,model,subScene));
+		controller.getOpenMenuItem().setOnAction(e -> openFile(geneTreeView.getStage(), controller, model, subScene));
 
-		// TODO: open recent
-		//RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, geneTreeView, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
-		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
+		controller.getOpenRecentMenu().disableProperty().bind(recentFilesCount.isEqualTo(0));
 
 		controller.getImportGeneNamesMenuItem().disableProperty().bind(treesCount.isEqualTo(0));
 		controller.getImportGeneNamesMenuItem().setOnAction(e ->
 				importGeneNames(geneTreeView.getStage(), model, controller));
+
+		controller.getImportFeatureMenuItem().disableProperty().bind(treesCount.isEqualTo(0));
+		controller.getImportFeatureMenuItem().setOnAction(e ->
+				importFeature(geneTreeView.getStage(), model, controller));
 
 		controller.getExportSubsetMenuItem().disableProperty().bind(treeSelectionModel.sizeProperty().isEqualTo(0));
 		controller.getExportSubsetMenuItem().setOnAction(e ->
@@ -272,7 +266,7 @@ public class GeneTreeViewPresenter {
 
 		controller.getPasteMenuItem().disableProperty().bind(treesCount.isEqualTo(0));
 		controller.getPasteMenuItem().setOnAction(event -> {
-			var pastedTrees = pasteTrees(model, controller);
+			var pastedTrees = pasteTrees(geneTreeView.getStage(), model, controller);
 			if (pastedTrees != null) {
 				Runnable undo = () -> {
 					for (int i = pastedTrees.size()-1; i >= 0; i--)
@@ -303,6 +297,11 @@ public class GeneTreeViewPresenter {
 				}
 			};
 			undoRedoManager.add(new SimpleCommand("delete", undo, redo));
+		});
+
+		controller.getFeatureOverviewMenuItem().disableProperty().bind(controller.getFeatureColoringSubMenu().disableProperty());
+		controller.getFeatureOverviewMenuItem().setOnAction(e -> {
+			new FeatureOverviewDialog(geneTreeView.getStage(), model.getGeneTreeSet());
 		});
 
 		// Selection Menu: Tree Selection
@@ -458,7 +457,7 @@ public class GeneTreeViewPresenter {
 
 		// Help Menu
 		controller.getAboutMenuItem().setOnAction(e -> {
-		// TODO: show some kind of information
+			// TODO: show some kind of information
 		});
 
 		// ToolBar (the zoom slider is handled by the layout)
@@ -537,7 +536,15 @@ public class GeneTreeViewPresenter {
 				"*.tre","*.tree",".trees", ".new", ".nwk", ".treefile"));
 
 		var file = fileChooser.showOpenDialog(stage);
+		openFile(file, stage, controller, model, subScene);
+	}
+
+	private void openFile(File file, Stage stage, GeneTreeViewController controller, Model model, SubScene subScene) {
 		if (file != null) {
+			recentFiles.remove(file.getPath());
+			recentFiles.add(0, file.getPath());
+			while (recentFiles.size() > 10) recentFiles.remove(10);
+			updateOpenRecentMenu(stage, controller, model, subScene);
 			Service<Void> loadingTreesService = new Service<>() {
 				@Override
 				protected Task<Void> createTask() {
@@ -567,9 +574,13 @@ public class GeneTreeViewPresenter {
 				controller.getOrderGroup().selectedToggleProperty().removeListener(orderGroupListener);
 				controller.getDefaultOrderMenuItem().setSelected(true);
 				controller.getOrderGroup().selectedToggleProperty().addListener(orderGroupListener);
+				controller.getFeatureOrderSubMenu().setDisable(true);
+				controller.getFeatureOrderSubMenu().getItems().clear();
 				controller.getColoringGroup().selectedToggleProperty().removeListener(colorGroupListener);
 				controller.getNoColoringMenuItem().setSelected(true);
 				controller.getColoringGroup().selectedToggleProperty().addListener(colorGroupListener);
+				controller.getFeatureColoringSubMenu().setDisable(true);
+				controller.getFeatureColoringSubMenu().getItems().clear();
 				initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
 						controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
 				initializeTaxaList(controller.getTaxonOrderSubMenu(),controller.getOrderGroup(), model.getTaxaBlock());
@@ -583,16 +594,45 @@ public class GeneTreeViewPresenter {
 		}
 	}
 
+	private void updateOpenRecentMenu(Stage stage, GeneTreeViewController controller, Model model, SubScene subScene) {
+		controller.getOpenRecentMenu().getItems().clear();
+		for (String filePath : recentFiles) {
+			MenuItem recentFileMenuItem = new MenuItem(filePath);
+			recentFileMenuItem.setOnAction(e -> openFile(new File(filePath), stage, controller, model, subScene));
+			controller.getOpenRecentMenu().getItems().add(recentFileMenuItem);
+		}
+		recentFilesCount.set(recentFiles.size());
+	}
+
 	private void importGeneNames(Stage stage, Model model, GeneTreeViewController controller) {
 		var geneNameParser = new GeneNameParser(stage, model);
 		// If new names have been parsed to the model, names in treeSheets and snapshots need to be updated:
-		geneNameParser.parsedProperty().addListener((InvalidationListener) -> {
+		geneNameParser.getParsedProperty().addListener((InvalidationListener) -> {
 			for (int i = 0; i < model.getGeneTreeSet().size(); i++) {
 				((TreeSheet)trees.getChildren().get(i)).setTreeName(model.getGeneTreeSet().getOrderedGeneNames().get(i));
 			}
 			initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
 					controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
 			colorBar.setNames(model.getGeneTreeSet().getOrderedGeneNames());
+		});
+	}
+
+	private void importFeature(Stage stage, Model model, GeneTreeViewController controller) {
+		var featureParser = new FeatureParser(stage, model);
+		featureParser.getParsedProperty().addListener((InvalidationListener) -> {
+			String featureName = featureParser.getParsedFeatureName();
+			RadioMenuItem newFeatureOrderMenuItem = new RadioMenuItem();
+			newFeatureOrderMenuItem.setText(featureName);
+			newFeatureOrderMenuItem.setToggleGroup(controller.getOrderGroup());
+			controller.getFeatureOrderSubMenu().getItems().add(newFeatureOrderMenuItem);
+			controller.getFeatureOrderSubMenu().setDisable(false);
+
+			RadioMenuItem newFeatureColoringMenuItem = new RadioMenuItem();
+			newFeatureColoringMenuItem.setText(featureName);
+			newFeatureColoringMenuItem.setToggleGroup(controller.getColoringGroup());
+			controller.getFeatureColoringSubMenu().getItems().add(newFeatureColoringMenuItem);
+			controller.getFeatureColoringSubMenu().setDisable(false);
+			colorBar.addValuesToTooltip(featureName, model.getGeneTreeSet().getFeatureValues(featureName));
 		});
 	}
 
@@ -764,7 +804,7 @@ public class GeneTreeViewPresenter {
 		taxonOrderSubMenu.setDisable(false);
 	}
 
-	private ArrayList<GeneTree> pasteTrees(Model model, GeneTreeViewController controller) {
+	private ArrayList<GeneTree> pasteTrees(Stage stage, Model model, GeneTreeViewController controller) {
 		Clipboard clipboard = Clipboard.getSystemClipboard();
 		try {
 			String content;
@@ -789,14 +829,15 @@ public class GeneTreeViewPresenter {
 			for (PhyloTree phyloTree : newTreeBlock.getTrees()) {
 				stabilizer.apply(phyloTree);
 			}
-			return pasteTrees(newTreeBlock.getTrees(), model, controller);
+			return pasteTrees(newTreeBlock.getTrees(), model, controller, stage);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			return null;
 		}
 	}
 
-	private ArrayList<GeneTree> pasteTrees(ObservableList<PhyloTree> phyloTrees, Model model, GeneTreeViewController controller) {
+	private ArrayList<GeneTree> pasteTrees(ObservableList<PhyloTree> phyloTrees, Model model,
+										   GeneTreeViewController controller, Stage stage) {
 		ArrayList<GeneTree> pastedGeneTrees = new ArrayList<>(phyloTrees.size());
 		for (PhyloTree phyloTree : phyloTrees) {
 			int treeId = model.getGeneTreeSet().addTree(phyloTree);
@@ -807,7 +848,7 @@ public class GeneTreeViewPresenter {
 			if (colorBar == null)
 				initializeColorBar(controller.getvBox(), model.getGeneTreeSet(), controller.getSlider());
 			else {
-				colorBar.addColorBox(phyloTree.getName(), treeId, index);
+				colorBar.addColorBox(phyloTree.getName(), treeId, index, null, null);
 			}
 
 			treeId2edgeSelectionModel.put(treeId, new SelectionModelSet<>());
@@ -819,11 +860,35 @@ public class GeneTreeViewPresenter {
 			treeSnapshots.getChildren().add(index, new Rectangle());
 			setupTreeSelectionAndSnapshots(treeSheet, treeId);
 		}
+		if (model.getGeneTreeSet().getAvailableFeatures().size() > 0) {
+			for (var tree : pastedGeneTrees) {
+				for (var feature : model.getGeneTreeSet().getAvailableFeatures()) {
+					tree.addFeature(feature, null);
+					colorBar.getId2colorBarBox().get(tree.getId()).addToTooltipOrReplace(feature, "NaN");
+				}
+			}
+			var featureParser = new FeatureParserForPastedTrees(stage, model.getGeneTreeSet().getAvailableFeatures(), pastedGeneTrees.size());
+			featureParser.getParsedProperty().addListener((InvalidationListener) -> {
+				var parsedFeatures = featureParser.getParsedFeatureValues();
+				for (int i = 0; i < pastedGeneTrees.size(); i++) {
+					for (var featureName : parsedFeatures.keySet()) {
+						var value = parsedFeatures.get(featureName).get(i);
+						pastedGeneTrees.get(i).addFeature(featureName, value);
+						colorBar.getId2colorBarBox().get(pastedGeneTrees.get(i).getId()).addToTooltipOrReplace(featureName, value);
+					}
+				}
+				if (controller.getFeatureColoringSubMenu().getItems().contains((MenuItem)controller.getColoringGroup().getSelectedToggle()))
+					updateColoring(controller.getColoringGroup(), controller.getColoringGroup().getSelectedToggle(),
+							controller.getColoringGroup().getSelectedToggle(), controller, model, stage);
+			});
+		}
 		treesCount.set(model.getGeneTreeSet().size());
 		taxaCount.set(model.getTaxaBlock().getNtax());
 		initializeTaxaList(controller.getTaxonOrderSubMenu(), controller.getOrderGroup(), model.getTaxaBlock());
 		initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
 				controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
+		updateColoring(controller.getColoringGroup(), controller.getColoringGroup().getSelectedToggle(),
+				controller.getColoringGroup().getSelectedToggle(), controller, model, stage);
 		updateInfoLabel(controller.getLabel());
 		return pastedGeneTrees;
 	}
@@ -841,7 +906,7 @@ public class GeneTreeViewPresenter {
 			if (colorBar == null)
 				initializeColorBar(controller.getvBox(), model.getGeneTreeSet(), controller.getSlider());
 			else {
-				colorBar.addColorBox(geneTree.getGeneName(), treeId, index);
+				colorBar.addColorBox(geneTree.getGeneName(), treeId, index, geneTree.getColor(), geneTree.getFurtherFeatures());
 			}
 
 			treeId2edgeSelectionModel.put(treeId, new SelectionModelSet<>());
@@ -870,6 +935,7 @@ public class GeneTreeViewPresenter {
 		if (model.getGeneTreeSet().containsGeneTree(geneTree)) {
 			int removedId = geneTree.getId();
 			int removedPosition = geneTree.getPosition();
+			geneTree.setColor(colorBar.getId2colorBarBox().get(removedId).getColor());
 			trees.getChildren().remove(removedPosition);
 			treeSelectionModel.setSelected(removedId,false);
 			treeId2edgeSelectionModel.remove(removedId);
@@ -968,7 +1034,7 @@ public class GeneTreeViewPresenter {
 				if (monophyletic) colorBar.setColor(treeId, Color.KHAKI);
 			}
 		}
-		else { // remaining option: color by similarity with selected tree
+		else if (controller.getSimilarityColoringSubMenu().getItems().contains((MenuItem)newSelection)) {
 			String selectedTreeName = ((MenuItem) newSelection).getText();
 
 			var selectionDialog = new SimilarityCalculationDialog(stage, selectedTreeName);
@@ -980,32 +1046,94 @@ public class GeneTreeViewPresenter {
 				getTreeSimilaritiesService.setOnSucceeded(v -> {
 					System.out.println("Similarity calculation succeeded");
 					LinkedHashMap<Integer,Integer> treeId2similarities = getTreeSimilaritiesService.getValue();
-					if (treeId2similarities.size() == model.getGeneTreeSet().size()) {
-						colorBar.resetColoring();
-						var colors = ColorSchemeManager.getInstance().getColorScheme("White-Green");
-						//for (String colorSchemeName : ColorSchemeManager.getInstance().getNames()) System.out.println(colorSchemeName);
-						TreeSet<Integer> sorted = new TreeSet<>(treeId2similarities.values());
-						int max = sorted.last();
-						int min = sorted.first();
-						int range = max - min;
-						if (range == 0) range = 1;
-						for (int treeId : model.getGeneTreeSet().keySet()) {
-							double relativeSimilarity = (treeId2similarities.get(treeId) - min) / (double)range;
-							Color color = colors.get((int) ((colors.size()-1)*relativeSimilarity));
-							colorBar.setColor(treeId, color);
-						}
-					}
-					else {
-						coloringGroup.selectedToggleProperty().removeListener(colorGroupListener);
-						coloringGroup.selectToggle(oldSelection);
-						coloringGroup.selectedToggleProperty().addListener(colorGroupListener);
-					}
+					setColors(treeId2similarities, model, coloringGroup, colorGroupListener, oldSelection, FeatureType.NUMERICAL);
 					controller.getProgressLabel().setText("");
 				});
 				getTreeSimilaritiesService.restart();
 			});
 		}
+		else if (controller.getFeatureColoringSubMenu().getItems().contains((MenuItem) newSelection)) {
+			String featureName = ((MenuItem) newSelection).getText();
+			HashMap<Integer,String> id2featureValues = model.getGeneTreeSet().getFeatureValues(featureName);
+			FeatureType featureType = model.getGeneTreeSet().getFeatureType(featureName);
+			HashMap<Integer,Double> finalValues = new HashMap<>();
+			if (featureType == FeatureType.NUMERICAL) {
+				try {
+					for (var id : id2featureValues.keySet()) {
+						if (Objects.equals(id2featureValues.get(id), "NaN")) finalValues.put(id, null);
+						else finalValues.put(id, Double.parseDouble(id2featureValues.get(id)));
+					}
+				} catch (Exception e) {
+					return;
+				}
+			}
+			else if (featureType == FeatureType.CATEGORICAL) {
+				HashMap<String,Double> value2category = new HashMap<>();
+				double highestCategory = 0;
+				for (int id : id2featureValues.keySet()) {
+					String value = id2featureValues.get(id);
+					double category;
+					if (value2category.containsKey(value)) {
+						category = value2category.get(value);
+					}
+					else if (value.equals("NaN")) {
+						category = -1.;
+						value2category.put(value, category);
+					}
+					else {
+						category = highestCategory;
+						value2category.put(value, category);
+						highestCategory++;
+					}
+					finalValues.put(id, category);
+				}
+			}
+			setColors(finalValues, model, coloringGroup, colorGroupListener, oldSelection, featureType);
+		}
 	}
+
+	private void setColors(HashMap<Integer,? extends Number> treeId2FeatureValue, Model model, ToggleGroup toggleGroup,
+						   ChangeListener<Toggle> toggleChangeListener, Toggle oldSelection, FeatureType featureType) {
+		if (treeId2FeatureValue.size() == model.getGeneTreeSet().size()) {
+			colorBar.resetColoring();
+			ObservableList<Color> colors;
+			if (featureType == FeatureType.NUMERICAL) {
+				colors = ColorSchemeManager.getInstance().getColorScheme("White-Green");
+				TreeSet<? extends Number> sorted = new TreeSet<>(treeId2FeatureValue.values());
+				var max = sorted.last().doubleValue();
+				var min = sorted.first().doubleValue();
+				var range = max - min;
+				if (range == 0) range = 1;
+				for (int treeId : model.getGeneTreeSet().keySet()) {
+					Color color;
+					if (treeId2FeatureValue.get(treeId) == null) color = colorBar.getBackgroundColor();
+					else {
+						double relativeValue = (treeId2FeatureValue.get(treeId).doubleValue() - min) / range;
+						color = colors.get((int) ((colors.size()-1)*relativeValue));
+					}
+					colorBar.setColor(treeId, color);
+				}
+			}
+			else if (featureType == FeatureType.CATEGORICAL) {
+				colors = ColorSchemeManager.getInstance().getColorScheme("Glasbey29");
+				//System.out.println("Available colors: " + colors.size());
+				for (int treeId : model.getGeneTreeSet().keySet()) {
+					int category = (int) Math.round((double) treeId2FeatureValue.get(treeId));
+					while (category > colors.size()-1) category -= colors.size();
+					Color color;
+					if (category == -1) color = colorBar.getBackgroundColor();
+					else color = colors.get(category);
+					colorBar.setColor(treeId, color);
+				}
+			}
+			//for (String colorSchemeName : ColorSchemeManager.getInstance().getNames()) System.out.println(colorSchemeName);
+		}
+		else {
+			toggleGroup.selectedToggleProperty().removeListener(toggleChangeListener);
+			toggleGroup.selectToggle(oldSelection);
+			toggleGroup.selectedToggleProperty().addListener(toggleChangeListener);
+		}
+	};
 
 	private void changeTreeOrder(Model model, ToggleGroup orderGroup, Toggle oldSelection, Toggle newSelection,
 								 GeneTreeViewController controller, SubScene subScene, Stage stage) throws IOException {
@@ -1031,23 +1159,16 @@ public class GeneTreeViewPresenter {
 					TreeMap<Double,Integer> orderedTreeIds = new TreeMap<>(Collections.reverseOrder());
 					for (int treeId : similarities.keySet()) {
 						double similarity = (double) similarities.get(treeId);
-						while (orderedTreeIds.containsKey(similarity)) similarity -= 0.000001;
+						while (orderedTreeIds.containsKey(similarity)) similarity -= 0.0000000000001;
 						orderedTreeIds.put(similarity, treeId);
 					}
-					System.out.println(orderedTreeIds.size());
-					if (orderedTreeIds.size() == model.getGeneTreeSet().size()) {
-						model.getGeneTreeSet().setTreeOrder(orderedTreeIds);
-						initializeTreesLayout(model, controller, subScene);
-						colorBar.reorder(model.getGeneTreeSet().getTreeOrder());
-						initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
-							controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
-					}
+					updateTreeOrder(model, controller, subScene, orderedTreeIds);
 					controller.getProgressLabel().setText("");
 				});
 				getTreeSimilaritiesService.restart();
 			});
 		}
-		else { // remaining option: order as in selected taxon's genome
+		else if (controller.getTaxonOrderSubMenu().getItems().contains((MenuItem) newSelection)){
 			String taxonName = ((String) orderGroup.getSelectedToggle().getUserData()).replace(" ","+");
 			if (taxonName.contains("_")) {
 				String[] taxonNames = taxonName.split("_");
@@ -1064,9 +1185,9 @@ public class GeneTreeViewPresenter {
 					return;
 				}
 				System.out.println(finalTaxonName);
-				Service<TreeMap<Integer,Integer>> getGeneOrderService = new Service<>() {
+				Service<TreeMap<Double,Integer>> getGeneOrderService = new Service<>() {
 					@Override
-					protected Task<TreeMap<Integer,Integer>> createTask() {
+					protected Task<TreeMap<Double,Integer>> createTask() {
 						return new GetGeneOrderTask(model, finalTaxonName);
 					}
 				};
@@ -1077,14 +1198,8 @@ public class GeneTreeViewPresenter {
 				});
 				getGeneOrderService.setOnSucceeded(v -> {
 					System.out.println("Reordering succeeded");
-					TreeMap<Integer,Integer> orderedTreeIds = getGeneOrderService.getValue();
-					if (orderedTreeIds.size() == model.getGeneTreeSet().size()) {
-						model.getGeneTreeSet().setTreeOrder(orderedTreeIds);
-						initializeTreesLayout(model, controller, subScene);
-						colorBar.reorder(model.getGeneTreeSet().getTreeOrder());
-						initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
-							controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
-					}
+					TreeMap<Double,Integer> orderedTreeIds = getGeneOrderService.getValue();
+					updateTreeOrder(model, controller, subScene, orderedTreeIds);
 					controller.getProgressLabel().setText("");
 				});
 				getGeneOrderService.setOnFailed(u -> {
@@ -1097,11 +1212,58 @@ public class GeneTreeViewPresenter {
 				getGeneOrderService.restart();
 			});
 		}
+		else if (controller.getFeatureOrderSubMenu().getItems().contains((MenuItem) newSelection)) {
+			String selectedFeature = ((MenuItem) newSelection).getText();
+			var featureType = model.getGeneTreeSet().getFeatureType(selectedFeature);
+			var id2featureValues = model.getGeneTreeSet().getFeatureValues(selectedFeature);
+			TreeMap<Double,Integer> orderedTreeIds = new TreeMap<>();
+			// TODO: trees without a value for this feature should go to the end? (currently sorting not possible with missing values)
+			if (featureType == FeatureType.NUMERICAL) {
+				for (int treeId : model.getGeneTreeSet().keySet()) {
+					double value;
+					//if (id2featureValues.get(treeId) == null) value = ;
+					value = Double.parseDouble(id2featureValues.get(treeId));
+					while (orderedTreeIds.containsKey(value)) value += 0.0000000000001;
+					orderedTreeIds.put(value, treeId);
+				}
+			}
+			else if (featureType == FeatureType.CATEGORICAL) {
+				double highestCategory = 1;
+				HashMap<String,Double> value2category = new HashMap<>();
+				for (int treeId : model.getGeneTreeSet().keySet()) {
+					String value = id2featureValues.get(treeId);
+					double category;
+					if (value2category.containsKey(value)) {
+						category = value2category.get(value);
+					}
+					else {
+						category = highestCategory;
+						value2category.put(value, category);
+						highestCategory++;
+					}
+					while (orderedTreeIds.containsKey(category)) category += 0.0000000000001;
+					orderedTreeIds.put(category, treeId);
+				}
+			}
+			System.out.println(orderedTreeIds.size());
+			updateTreeOrder(model, controller, subScene, orderedTreeIds);
+		}
+	}
+
+	private void updateTreeOrder(Model model, GeneTreeViewController controller, SubScene subScene,
+								 TreeMap<Double, Integer> orderedTreeIds) {
+		if (orderedTreeIds.size() == model.getGeneTreeSet().size()) {
+			model.getGeneTreeSet().setTreeOrder(orderedTreeIds);
+			initializeTreesLayout(model, controller, subScene);
+			colorBar.reorder(model.getGeneTreeSet().getTreeOrder());
+			initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
+					controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
+		}
 	}
 
 	private Service<LinkedHashMap<Integer,Integer>> setUpSimilarityCalculation(String finalTreeName, ToggleGroup toggleGroup,
-																   ChangeListener<Toggle> listener, Toggle oldSelection,
-																   Model model, GeneTreeViewController controller) {
+																			   ChangeListener<Toggle> listener, Toggle oldSelection,
+																			   Model model, GeneTreeViewController controller) {
 		if (finalTreeName == null | model.getGeneTreeSet().getPhyloTree(finalTreeName) == null) {
 			toggleGroup.selectedToggleProperty().removeListener(listener);
 			toggleGroup.selectToggle(oldSelection);

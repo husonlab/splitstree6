@@ -28,7 +28,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class GetGeneOrderTask extends Task<TreeMap<Integer,Integer>> {
+public class GetGeneOrderTask extends Task<TreeMap<Double,Integer>> {
 
     private final Model model;
     private final String taxonName;
@@ -39,9 +39,9 @@ public class GetGeneOrderTask extends Task<TreeMap<Integer,Integer>> {
     }
 
     @Override
-    protected TreeMap<Integer,Integer> call() throws Exception {
+    protected TreeMap<Double,Integer> call() throws Exception {
         // Getting the gene order from ncbi using a simple E-utility pipeline: ESearch-ESummary
-        TreeMap<Integer,Integer> orderedTreeIds = new TreeMap<>();
+        TreeMap<Double,Integer> orderedTreeIds = new TreeMap<>();
         System.out.println(taxonName);
         var base = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
         for (var index = 0; index < model.getGeneTreeSet().size(); index++) {
@@ -79,8 +79,8 @@ public class GetGeneOrderTask extends Task<TreeMap<Integer,Integer>> {
             var summaryResult = new String(connection.getInputStream().readAllBytes());
             connection.disconnect();
             //System.out.println(summaryResult);
-            int start = 0;
-            int stop = 0;
+            double start = 0;
+            double stop = 0;
             Matcher startMatcher = Pattern.compile("<ChrStart>(\\d+)</ChrStart>").matcher(summaryResult);
             if (startMatcher.find()) {
                 start = Integer.parseInt(startMatcher.group(1));

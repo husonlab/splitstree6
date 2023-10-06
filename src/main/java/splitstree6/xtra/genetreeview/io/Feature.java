@@ -1,5 +1,5 @@
 /*
- *  GeneNameParser.java Copyright (C) 2023 Daniel H. Huson
+ *  Feature.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,29 +19,26 @@
 
 package splitstree6.xtra.genetreeview.io;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.stage.Stage;
-import splitstree6.xtra.genetreeview.model.Model;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 
-public class GeneNameParser extends ParserDialog {
+// class for tableView generation in FeatureOverviewDialog
+public class Feature {
+    private final StringProperty featureName;
+    private final HashMap<String, String> treeName2value;
 
-    private final Model model;
-
-    public GeneNameParser(Stage parentStage, Model model) {
-        super(parentStage, "gene names", model.getGeneTreeSet().size());
-        this.model = model;
-        this.setTitle("GeneNameParser");
+    Feature(String name, HashMap<String, String> treeName2value) {
+        featureName = new SimpleStringProperty(name);
+        this.treeName2value = treeName2value;
     }
 
-    @Override
-    boolean parseFeatureToModel(String featureName, ArrayList<String> values) {
-        if (model.getGeneTreeSet().setGeneNames(values)) {
-            parsedProperty.set(true);
-            return true;
-        }
-        return false;
+    public String getFeatureName() {
+        return featureName.get();
+    }
+
+    HashMap<String, String> getTreeName2value() {
+        return treeName2value;
     }
 }

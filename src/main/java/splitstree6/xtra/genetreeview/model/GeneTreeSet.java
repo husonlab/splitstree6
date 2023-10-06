@@ -31,6 +31,7 @@ public class GeneTreeSet extends LinkedHashMap<Integer, GeneTree> {
     private final ObservableList<String> orderedGeneNames = FXCollections.observableArrayList();
     private final HashMap<String,Integer> geneName2treeId = new HashMap<>();
     private int maxId = 0;
+    private final HashMap<String,FeatureType> availableFeatures = new HashMap<>();
 
     public GeneTreeSet(TreesBlock treesBlock) {
         initialize(treesBlock);
@@ -101,19 +102,21 @@ public class GeneTreeSet extends LinkedHashMap<Integer, GeneTree> {
             System.out.println("Could not set new tree order");
     }
 
-    public void setGeneNames(String[] geneNames) {
-        if (geneNames.length == this.size()) {
+    public boolean setGeneNames(ArrayList<String> geneNames) {
+        if (geneNames.size() == this.size()) {
             orderedGeneNames.clear();
             geneName2treeId.clear();
             int index = 0;
             for (int id : this.keySet()) {
-                String geneName = geneNames[index];
+                String geneName = geneNames.get(index);
                 orderedGeneNames.add(geneName);
                 geneName2treeId.put(geneName, id);
                 this.get(id).setGeneName(geneName);
                 index++;
             }
+            return true;
         }
+        return false;
     }
 
     public boolean addTree(GeneTree geneTree) {
@@ -175,7 +178,38 @@ public class GeneTreeSet extends LinkedHashMap<Integer, GeneTree> {
                 }
             }
         }
-        //System.out.println("Removed tree "+removedTree.getGeneName()+" with id "+treeId+" and position "+removedTree.getPosition());
+    }
+
+    public boolean addProperty(String propertyName, ArrayList<?> values, FeatureType featureType) {
+        if (values.size() != this.size()) return false;
+        int index = 0;
+        for (int id : this.keySet()) {
+            GeneTree geneTree = this.get(id);
+            var value = values.get(index);
+            geneTree.addFeature(propertyName, value);
+            index++;
+        }
+        availableFeatures.put(propertyName, featureType);
+        return true;
+    }
+
+    public HashMap<Integer,String> getFeatureValues(String featureName) {
+        if (!availableFeatures.containsKey(featureName)) return null;
+        HashMap<Integer,String> id2featureValues = new HashMap<>();
+        for (int id : this.keySet()) {
+            String value = "NaN";
+            if (this.get(id).getFeature(featureName) != null) value = this.get(id).getFeature(featureName).toString();
+            id2featureValues.put(id, value);
+        }
+        return id2featureValues;
+    }
+
+    public FeatureType getFeatureType(String featureName) {
+        return availableFeatures.get(featureName);
+    }
+
+    public ArrayList<String> getAvailableFeatures() {
+        return new ArrayList<>(availableFeatures.keySet());
     }
 
     public GeneTree getGeneTree(int treeId) {
