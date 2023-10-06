@@ -40,10 +40,20 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Kernelizer multifurcating rooted-tree reconciliation algorithms
+ * Kernelization of multi-furcating rooted-tree reconciliation algorithms
  * Daniel Huson, 10.23
  */
 public class Kernelize {
+	/**
+	 * run the given algorithm on each minimal subproblem
+	 *
+	 * @param progress           progress listener
+	 * @param taxaBlock          taxa
+	 * @param inputTrees         input trees
+	 * @param algorithm          the algorithm
+	 * @param maxNumberOfResults maximum number of solutions to report
+	 * @return computed networks
+	 */
 	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> inputTrees, Function<List<PhyloTree>, List<PhyloTree>> algorithm, int maxNumberOfResults) throws UsageException, IOException {
 
 		// setup incompatibility graph
@@ -82,7 +92,7 @@ public class Kernelize {
 			var count = 0;
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
-					System.err.println("Component: " + (++count));
+					System.err.println("Component " + (++count)+": "+component.getNumberOfNodes()+" clusters");
 					var reducedTrees = extractTrees(component);
 					System.err.println(reducedTrees.report());
 				}
@@ -118,7 +128,7 @@ public class Kernelize {
 	}
 
 	/**
-	 * recursively inserts sub-networks in all possible combinations
+	 * recursively inserts subnetworks in all possible combinations
 	 * @param blobTree the backbone tree
 	 * @param clusterNodeMap maps clusters to the blob tree
 	 * @param blobNetworksMap the blob to networks map
@@ -195,8 +205,9 @@ public class Kernelize {
 		// v.getData() contains indices of all trees that have the cluster, as bit set
 		var clusterNodeMap = new HashMap<BitSet, Node>();
 		// setup nodes:
-		var t = 0;
+		var treeId = 0;
 		for (var tree : trees) {
+			treeId++;
 			try (var clusterMap = TreesUtils.extractClusters(tree)) {
 				for (var cluster : clusterMap.values()) {
 					var v = clusterNodeMap.computeIfAbsent(cluster, graph::newNode);
@@ -205,7 +216,7 @@ public class Kernelize {
 						which = new BitSet();
 						v.setData(which);
 					}
-					which.set(++t);
+					which.set(treeId);
 				}
 			}
 		}
@@ -285,6 +296,7 @@ public class Kernelize {
 				treeIds.or(bits);
 			}
 		}
+
 		var allClusters = graph.nodeStream().map(v -> (BitSet) v.getInfo()).collect(Collectors.toSet());
 		var allTaxa = BitSetUtils.union(allClusters);
 		var taxonClasses = computeTaxonEquivalenceClasses(allTaxa, allClusters);
