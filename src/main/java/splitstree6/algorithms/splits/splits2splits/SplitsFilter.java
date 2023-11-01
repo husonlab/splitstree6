@@ -24,7 +24,10 @@ import jloda.graph.Graph;
 import jloda.graph.NodeArray;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.IFilter;
-import splitstree6.algorithms.utils.*;
+import splitstree6.algorithms.utils.GreedyCircular;
+import splitstree6.algorithms.utils.GreedyCompatible;
+import splitstree6.algorithms.utils.GreedyWeaklyCompatible;
+import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.splits.ASplit;
@@ -42,7 +45,7 @@ import static splitstree6.splits.SplitUtils.buildIncompatibilityGraph;
  * Daniel Huson 12/2016
  */
 public class SplitsFilter extends Splits2Splits implements IFilter {
-	public enum FilterAlgorithm {None, ClosestTree, GreedyCompatible, GreedyCircular, GreedyWeaklyCompatible, BlobTree}
+	public enum FilterAlgorithm {None, /*ClosestTree,*/ GreedyCompatible, GreedyCircular, GreedyWeaklyCompatible, BlobTree}
 
 	private final ObjectProperty<FilterAlgorithm> optionFilterAlgorithm = new SimpleObjectProperty<>(this, "optionFilterAlgorithm", FilterAlgorithm.None);
 
@@ -88,10 +91,12 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 				compatibility = Compatibility.compatible;
 				yield GreedyCompatible.apply(progress, parent.getSplits(), ASplit::getWeight);
 			}
+			/*
 			case ClosestTree -> {
 				compatibility = Compatibility.compatible;
 				yield ClosestTree.apply(progress, taxaBlock.getNtax(), parent.getSplits(), parent.getCycle());
 			}
+			 */
 			case GreedyWeaklyCompatible -> GreedyWeaklyCompatible.apply(progress, parent.getSplits(), ASplit::getWeight);
 			case GreedyCircular -> GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), parent.getSplits(), ASplit::getWeight);
 			case BlobTree -> {
