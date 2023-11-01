@@ -329,7 +329,7 @@ public class SplitsBlockUtilities {
 					final var pso = Basic.hideSystemOut();
 					final var pse = Basic.hideSystemErr();
 					try {
-						return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, false).getDistances());
+						return NeighborNetCycleSplitsTree4.compute(ntax, splitsToDistances(ntax, splits, true).getDistances());
 					} finally {
 						Basic.restoreSystemErr(pse);
 						Basic.restoreSystemOut(pso);

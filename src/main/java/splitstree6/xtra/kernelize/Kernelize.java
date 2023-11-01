@@ -315,20 +315,6 @@ public class Kernelize {
 				}
 			}
 
-			// add any compatible clusters
-			for (var other : allClusters) {
-				if (BitSetUtils.contains(taxa, other)) {
-					var ok = true;
-					for (var cluster : clusters) {
-						if (cluster.equals(other) || Cluster.incompatible(cluster, other)) {
-							ok = false;
-							break;
-						}
-					}
-					if (ok)
-						clusters.add(other);
-				}
-			}
 			var reducedClusters = reduceClusters(clusters, taxonClasses);
 			for (var t : BitSetUtils.members(reducedTaxa)) {
 				reducedClusters.add(BitSetUtils.asBitSet(t));
