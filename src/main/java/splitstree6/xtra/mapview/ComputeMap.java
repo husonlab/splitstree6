@@ -1,0 +1,48 @@
+/*
+ *  ComputeMap.java Copyright (C) 2023 Daniel H. Huson
+ *
+ *  (Some files contain contributions from other authors, who are then mentioned separately.)
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package splitstree6.xtra.mapview;
+
+import javafx.scene.Node;
+import javafx.scene.control.TextArea;
+import splitstree6.io.nexus.TraitsNexusOutput;
+
+import java.io.IOException;
+import java.io.StringWriter;
+
+
+/**
+ * compute a map visualization for the given model
+ * Niko Kreisz, 11.2023
+ */
+public class ComputeMap {
+	public static Node apply(Model model, double targetWidth, double targetHeight) {
+		var text = new TextArea();
+		text.setWrapText(true);
+		text.setEditable(false);
+
+		try (var w = new StringWriter()) {
+			(new TraitsNexusOutput()).write(w, model.getTaxaBlock(), model.getTaxaBlock().getTraitsBlock());
+			text.setText(w.toString());
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return text;
+	}
+}

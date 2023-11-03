@@ -95,6 +95,8 @@ public class TaxaBlock extends DataBlock {
 		taxa.clear();
 		taxon2index.clear();
 		name2taxon.clear();
+		if (traitsBlock.get() != null)
+			traitsBlock.get().clear();
 	}
 
 	/**
