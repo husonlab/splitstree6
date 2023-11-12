@@ -469,12 +469,8 @@
                             </center>
                             <top>
                                 <ToolBar BorderPane.alignment="CENTER">
-                                    <Button fx:id="openButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                            text="Open">
-                                        <tooltip>
-                                            <Tooltip text="Open a file"/>
-                                        </tooltip>
-                                    </Button>
+                                    <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
+                                                text="File"/>
                                     <Button fx:id="saveButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="Save">
                                         <tooltip>

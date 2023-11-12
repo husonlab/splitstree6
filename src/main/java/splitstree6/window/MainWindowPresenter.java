@@ -286,7 +286,7 @@ public class MainWindowPresenter {
 
 		var loadingFile = new SimpleBooleanProperty(this, "loadingFile", false);
 
-		controller.getOpenButton().setOnAction(e -> {
+		controller.getOpenMenuItem().setOnAction(e -> {
 			{
 				var previousDir = new File(ProgramProperties.get("InputDir", ""));
 				var fileChooser = new FileChooser();
@@ -307,9 +307,9 @@ public class MainWindowPresenter {
 				}
 			}
 		});
-		controller.getOpenButton().disableProperty().bind(workflow.runningProperty().or(loadingFile));
+		controller.getOpenMenuItem().disableProperty().bind(workflow.runningProperty().or(loadingFile));
 
-		controller.getOpenMenuItem().setOnAction(controller.getOpenButton().getOnAction());
+		controller.getOpenMenuItem().setOnAction(controller.getOpenMenuItem().getOnAction());
 		controller.getOpenMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		controller.getImportDialogMenuItem().setOnAction(e -> ImportDialog.show(mainWindow, ""));
