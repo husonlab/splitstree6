@@ -393,6 +393,7 @@ public class MainWindowPresenter {
 					mainWindow.getWorkflow().cancel();
 			}
 		});
+		controller.getCloseMenuItem().setDisable(false);
 
 		updateUndoRedo();
 
