@@ -23,58 +23,29 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToolBar;
+import jloda.fx.icons.MaterialIcons;
 
 public class InputEditorViewController {
 	@FXML
-	private ToolBar firstToolBar;
-
-	@FXML
-	private Button openButton;
-
-	@FXML
-	private Button saveButton;
-
-	@FXML
-	private ToolBar lastToolBar;
+	private ToolBar toolBar;
 
 	@FXML
 	private Button parseAndLoadButton;
 
 	@FXML
-	public Button increaseFontButton;
-
-	@FXML
-	public Button decreaseFontButton;
-
-	@FXML
 	private Label formatLabel;
 
-	public ToolBar getFirstToolBar() {
-		return firstToolBar;
+	@FXML
+	private void initialize() {
+		MaterialIcons.setIcon(parseAndLoadButton, "play_circle");
 	}
 
-	public Button getOpenButton() {
-		return openButton;
-	}
-
-	public Button getSaveButton() {
-		return saveButton;
-	}
-
-	public ToolBar getLastToolBar() {
-		return lastToolBar;
+	public ToolBar getToolBar() {
+		return toolBar;
 	}
 
 	public Button getParseAndLoadButton() {
 		return parseAndLoadButton;
-	}
-
-	public Button getIncreaseFontButton() {
-		return increaseFontButton;
-	}
-
-	public Button getDecreaseFontButton() {
-		return decreaseFontButton;
 	}
 
 	public Label getFormatLabel() {

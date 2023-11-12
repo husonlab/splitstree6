@@ -22,6 +22,7 @@ package splitstree6.tabs.workflow.algorithm;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ProgressIndicator;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ResourceManagerFX;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
@@ -58,12 +59,12 @@ public class AlgorithmItemPresenter {
 
 		node.getService().runningProperty().addListener((v, o, n) -> {
 			if (n) {
-				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Stop16.gif", 16));
+				MaterialIcons.setIcon(controller.getPlayButton(), "cancel_outlined");
 				controller.getPlayButton().setOnAction(e -> node.getService().cancel());
 				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Stop this algorithm");
 			} else {
-				controller.getPlayButton().setGraphic(ResourceManagerFX.getIconAsImageView("Play.png", 16));
+				MaterialIcons.setIcon(controller.getPlayButton(), "play_circle");
 				controller.getPlayButton().setOnAction(e -> node.restart());
 				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().not().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Run this algorithm");

@@ -41,7 +41,6 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.NotificationManager;
 import jloda.util.BitSetUtils;
@@ -56,12 +55,12 @@ import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.io.IOException;
@@ -187,11 +186,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getRootingCBox().getItems().addAll(SplitsRooting.values());
 		controller.getRootingCBox().valueProperty().bindBidirectional(view.optionRootingProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
-		controller.getOrientationCBox().valueProperty().bindBidirectional(view.optionOrientationProperty());
-
 		controller.showInternalLabelsToggleButton().selectedProperty().bindBidirectional(view.optionShowConfidenceProperty());
 
 		controller.getScaleBar().visibleProperty().bind((view.optionDiagramProperty().isEqualTo(SplitsDiagramType.Outline).or(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.Splits)))
@@ -240,8 +234,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			updateCounter.set(updateCounter.get() + 1);
 		});
 
-		controller.getOrientationCBox().disableProperty().bind(view.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
-
 		view.optionZoomFactorProperty().addListener((v, o, n) -> {
 			var zoomFactor = n.doubleValue() / o.doubleValue();
 			if (zoomFactor > 0 && zoomFactor != 1.0) {
@@ -287,21 +279,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindToggleButton().setOnAction(e -> {
-			if (!findToolBar.isShowFindToolBar()) {
-				findToolBar.setShowFindToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
-			} else if (!findToolBar.isShowReplaceToolBar()) {
-				findToolBar.setShowReplaceToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-			} else {
-				findToolBar.setShowFindToolBar(false);
-				findToolBar.setShowReplaceToolBar(false);
-				controller.getFindToggleButton().setSelected(false);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
-			}
-		});
+
+		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -342,7 +321,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
-			if (list.size() > 0) {
+			if (!list.isEmpty()) {
 				var content = new ClipboardContent();
 				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
 				Clipboard.getSystemClipboard().setContent(content);
@@ -378,9 +357,13 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
 		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
+		mainController.getFindMenuItem().setDisable(false);
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getReplaceMenuItem().setDisable(false);
 
 		mainController.getSelectAllMenuItem().setOnAction(e -> {
 			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
@@ -424,23 +407,30 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.SplitsTopology).or(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.OutlineTopology)));
 
-		mainController.getRotateLeftMenuItem().setOnAction(e -> {
+		controller.getRotateLeftButton().setOnAction(e -> {
 			if (view.getSplitSelectionModel().size() == 0)
 				view.setOptionOrientation(view.getOptionOrientation().getRotateLeft());
 			else
 				view.getSplitsFormat().getPresenter().rotateSplitsLeft();
 		});
-		mainController.getRotateLeftMenuItem().disableProperty().bind(view.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
+		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(splitNetworkPane.changingOrientationProperty()));
+		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
-		mainController.getRotateRightMenuItem().setOnAction(e -> {
+		controller.getRotateRightButton().setOnAction(e -> {
 			if (view.getSplitSelectionModel().size() == 0)
 				view.setOptionOrientation(view.getOptionOrientation().getRotateRight());
 			else
 				view.getSplitsFormat().getPresenter().rotateSplitsRight();
 		});
-		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
-		mainController.getFlipMenuItem().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
+		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		mainController.getRotateRightMenuItem().setOnAction(controller.getRotateRightButton().getOnAction());
+		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
+
+		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
+		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
+		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 	}
 
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {

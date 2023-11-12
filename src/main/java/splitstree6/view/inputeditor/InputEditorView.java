@@ -62,7 +62,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 
 		var loader = new ExtendedFXMLLoader<InputEditorViewController>(this.getClass());
 		inputEditorViewController = loader.getController();
-		inputEditorViewPresenter = new InputEditorViewPresenter(mainWindow, this);
+		inputEditorViewPresenter = new InputEditorViewPresenter(mainWindow, super.getPresenter(), this);
 	}
 
 	public InputEditorViewController getInputEditorViewController() {

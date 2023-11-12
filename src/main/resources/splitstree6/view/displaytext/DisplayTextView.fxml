@@ -20,106 +20,48 @@
   -->
 
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16"
+<?import javafx.scene.text.Font?>
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.displaytext.DisplayTextViewController">
     <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
                 <ToolBar fx:id="toolBar" prefHeight="32.0">
-                    <Button fx:id="findButton" contentDisplay="GRAPHIC_ONLY" layoutX="98.0" layoutY="11.0"
-                            maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                            mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Find">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
-                            </ImageView>
-                        </graphic>
+                    <ToggleButton fx:id="findToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Find">
                         <tooltip>
-                            <Tooltip text="Find"/>
+                            <Tooltip text="Show the Find or Find/Replace toolbar"/>
                         </tooltip>
-                    </Button>
-                    <Button fx:id="findAndReplaceButton" contentDisplay="GRAPHIC_ONLY" layoutX="98.0"
-                            layoutY="11.0" maxHeight="18.0" maxWidth="18.0" minHeight="18.0" minWidth="18.0"
-                            mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="Find and Replace">
+                    </ToggleButton>
+                    <ToggleButton fx:id="wrapTextToggle" contentDisplay="CENTER" layoutX="98.0" layoutY="11.0"
+                                  mnemonicParsing="false" selected="true" text="Wrap">
                         <font>
                             <Font size="10.0"/>
                         </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Replace16.gif"/>
-                            </ImageView>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="Find and replace"/>
-                        </tooltip>
-                    </Button>
-                    <ToggleButton fx:id="wrapTextToggle" contentDisplay="GRAPHIC_ONLY" layoutX="98.0"
-                                  layoutY="11.0" maxHeight="18.0" maxWidth="18.0" minHeight="18.0"
-                                  minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                                  selected="true" style="-fx-border-style: none;" text="Wrap">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/WrapText32.png"/>
-                            </ImageView>
-                        </graphic>
                         <tooltip>
                             <Tooltip text="Wrap lines"/>
                         </tooltip>
                     </ToggleButton>
-                    <ToggleButton fx:id="lineNumbersToggle" contentDisplay="GRAPHIC_ONLY" layoutX="98.0"
-                                  layoutY="11.0" maxHeight="18.0" maxWidth="18.0" minHeight="18.0"
-                                  minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                                  style="-fx-border-style: none;" text="Line Numbers">
+                    <ToggleButton fx:id="lineNumbersToggle" contentDisplay="CENTER" layoutX="98.0" layoutY="11.0"
+                                  mnemonicParsing="false" text="Line Numbers">
                         <font>
                             <Font size="10.0"/>
                         </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                       preserveRatio="true">
-                                <Image smooth="false"
-                                       url="@/jloda/resources/icons/sun/AlignLeft16.gif"/>
-                            </ImageView>
-                        </graphic>
                         <tooltip>
                             <Tooltip text="Show line numbers"/>
                         </tooltip>
                     </ToggleButton>
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
-                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="A+">
+                    <Button fx:id="increaseFontButton" contentDisplay="CENTER" mnemonicParsing="false" text="A+">
                         <font>
                             <Font size="11.0"/>
                         </font>
-                        <tooltip>
-                            <Tooltip text="Increase font size"/>
-                        </tooltip>
                     </Button>
-                    <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
-                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="A-">
+                    <Button fx:id="decreaseFontButton" contentDisplay="CENTER" mnemonicParsing="false" text="A-">
                         <font>
                             <Font size="11.0"/>
                         </font>
-                        <tooltip>
-                            <Tooltip text="Decrease font size"/>
-                        </tooltip>
                     </Button>
                 </ToolBar>
             </VBox>

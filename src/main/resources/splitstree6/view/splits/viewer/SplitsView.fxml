@@ -21,11 +21,9 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
-            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.splits.viewer.SplitsViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -50,58 +48,31 @@
                     </ToggleButton>
                     <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
-                    <ComboBox fx:id="orientationCBox" layoutX="220.0" layoutY="10.0" prefWidth="50.0">
-                        <tooltip>
-                            <Tooltip text="Choose orientation"/>
-                        </tooltip>
-                    </ComboBox>
+                    <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
+                    <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
+                            text="Rotate Right"/>
+                    <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false" text="Flip"/>
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <Button fx:id="zoomInButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom In">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@/jloda/resources/icons/sun/ZoomIn24.gif"/>
-                            </ImageView>
-                        </graphic>
-                        <tooltip>
-                            <Tooltip text="Zoom out"/>
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="zoomOutButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom Out">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image url="@/jloda/resources/icons/sun/ZoomOut24.gif"/>
-                            </ImageView>
-                        </graphic>
+                    <Button fx:id="zoomInButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
+                            text="Zoom In">
                         <tooltip>
                             <Tooltip text="Zoom in"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="increaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
-                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="A+">
-                        <font>
-                            <Font size="11.0"/>
-                        </font>
+                    <Button fx:id="zoomOutButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
+                            text="Zoom Out">
+                        <tooltip>
+                            <Tooltip text="Zoom in"/>
+                        </tooltip>
+                    </Button>
+                    <Separator layoutX="365.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+                               prefHeight="20.0"/>
+                    <Button fx:id="increaseFontButton" maxHeight="20.0" mnemonicParsing="false" text="A+">
                         <tooltip>
                             <Tooltip text="Increase font size"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="decreaseFontButton" maxHeight="20.0" minHeight="20.0" mnemonicParsing="false"
-                            prefHeight="20.0" style="-fx-border-style: none; -fx-background-color: transparent;"
-                            text="A-">
-                        <font>
-                            <Font size="11.0"/>
-                        </font>
+                    <Button fx:id="decreaseFontButton" mnemonicParsing="false" text="A-">
                         <tooltip>
                             <Tooltip text="Decrease font size"/>
                         </tooltip>
@@ -131,46 +102,17 @@
     <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="32.0"
           AnchorPane.topAnchor="0.0">
         <children>
-            <ToggleButton fx:id="settingsToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
-                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                          style="-fx-border-style: none;" text="Settings">
-                <font>
-                    <Font size="10.0"/>
-                </font>
-                <graphic>
-                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@/jloda/resources/icons/sun/Edit24.gif"/>
-                    </ImageView>
-                </graphic>
+            <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>
                     <Tooltip text="Show the Settings toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <ToggleButton fx:id="findToggleButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                          mnemonicParsing="false" prefHeight="20.0" style="-fx-border-style: none;" text="Find">
-                <font>
-                    <Font size="10.0"/>
-                </font>
-                <graphic>
-                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                        <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
-                    </ImageView>
-                </graphic>
+            <ToggleButton fx:id="findToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Find">
                 <tooltip>
                     <Tooltip text="Show the Find or Find/Replace toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <ToggleButton fx:id="formatToggleButton" contentDisplay="GRAPHIC_ONLY" focusTraversable="false"
-                          maxHeight="20.0" minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                          style="-fx-border-style: none;" text="Format">
-                <font>
-                    <Font size="10.0"/>
-                </font>
-                <graphic>
-                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@/jloda/resources/icons/sun/Preferences24.gif"/>
-                    </ImageView>
-                </graphic>
+            <ToggleButton fx:id="formatToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Format">
                 <tooltip>
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>

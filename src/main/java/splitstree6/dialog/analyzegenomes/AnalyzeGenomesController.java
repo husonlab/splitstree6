@@ -28,6 +28,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.util.converter.DoubleStringConverter;
 import javafx.util.converter.IntegerStringConverter;
+import jloda.fx.icons.MaterialIcons;
 
 public class AnalyzeGenomesController {
 
@@ -150,6 +151,20 @@ public class AnalyzeGenomesController {
 	private TabPane mainTabPane;
 
 	public void initialize() {
+		MaterialIcons.setIcon(inputBrowseButton, "file_open");
+		MaterialIcons.setIcon(outputBrowseButton, "file_open");
+		MaterialIcons.setIcon(referencesDatabaseButton, "file_open");
+		//MaterialIcons.setIcon(findReferencesButton, "search","",false);
+		MaterialIcons.setIcon(replaceButton, "find_replace");
+		MaterialIcons.setIcon(cacheButton, "folder_open");
+		MaterialIcons.setIcon(htmlInfoButton, "info", "-fx-font-size: 13", true);
+
+		//MaterialIcons.setIcon(addReferencesButton, "add");
+		// MaterialIcons.setIcon(removeAllReferencesButton, "remove");
+		// MaterialIcons.setIcon(applyButton, "play_circle","",false);
+		MaterialIcons.setIcon(labelsUndoButton, "undo");
+		MaterialIcons.setIcon(labelsRedoButton, "redo");
+
 		mashDistancesChart.setLegendVisible(false);
 		mashDistancesChart.setAnimated(false);
 		mashDistancesXAxis.setLabel("Mash distance");

@@ -28,6 +28,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.icons.MaterialIcons;
 
 public class WorkflowTabController {
 
@@ -63,9 +64,13 @@ public class WorkflowTabController {
 	@FXML
 	private ProgressIndicator progressIndicator;
 
-
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(findButton, "search");
+		MaterialIcons.setIcon(zoomButton, "crop_free");
+		MaterialIcons.setIcon(zoomInButton, "zoom_in");
+		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
+
 		borderPane.getChildren().remove(mainPane);
 		var anchorPane = new AnchorPane(mainPane);
 		AnchorPane.setRightAnchor(mainPane, 20.0);

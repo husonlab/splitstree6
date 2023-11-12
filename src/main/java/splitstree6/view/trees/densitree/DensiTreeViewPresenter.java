@@ -1,5 +1,5 @@
 /*
- * DensiTreePresenter.java Copyright (C) 2023 Daniel H. Huson
+ * DensiTreeViewPresenter.java Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -34,15 +34,14 @@ import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -50,7 +49,7 @@ import java.util.ArrayList;
 import static splitstree6.layout.tree.LayoutOrientation.FlipRotate180Deg;
 import static splitstree6.layout.tree.LayoutOrientation.Rotate0Deg;
 
-public class DensiTreePresenter implements IDisplayTabPresenter {
+public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 	private final DensiTreeView view;
 	private final DensiTreeViewController controller;
@@ -59,7 +58,7 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 	private final FindToolBar findToolBar;
 
 
-	public DensiTreePresenter(MainWindow mainWindow, DensiTreeView view, ObjectProperty<Bounds> targetBounds) {
+	public DensiTreeViewPresenter(MainWindow mainWindow, DensiTreeView view, ObjectProperty<Bounds> targetBounds) {
 		this.mainWindow = mainWindow;
 		this.view = view;
 		this.controller = view.getController();
@@ -162,21 +161,8 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindToggleButton().setOnAction(e -> {
-			if (!findToolBar.isShowFindToolBar()) {
-				findToolBar.setShowFindToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
-			} else if (!findToolBar.isShowReplaceToolBar()) {
-				findToolBar.setShowReplaceToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-			} else {
-				findToolBar.setShowFindToolBar(false);
-				findToolBar.setShowReplaceToolBar(false);
-				controller.getFindToggleButton().setSelected(false);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
-			}
-		});
+
+		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -198,13 +184,13 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 		view.optionAveragingProperty().addListener(invalidationListener);
 
-
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().getItems().addAll(Rotate0Deg, FlipRotate180Deg);
-		controller.getOrientationCBox().setValue(view.getOptionOrientation());
-		controller.getOrientationCBox().valueProperty().addListener((v, o, n) -> view.optionOrientationProperty().set(n));
-		controller.getOrientationCBox().disableProperty().bind(Bindings.createBooleanBinding(() -> view.getOptionDiagram() == DensiTreeDiagramType.RadialPhylogram, view.optionDiagramProperty()));
+		controller.getFlipButton().setOnAction(e -> {
+			if (view.getOptionOrientation() == Rotate0Deg)
+				view.setOptionOrientation(FlipRotate180Deg);
+			else
+				view.setOptionOrientation(Rotate0Deg);
+		});
+		controller.getFlipButton().disableProperty().bind(view.emptyProperty());
 		view.optionOrientationProperty().addListener(invalidationListener);
 
 
@@ -266,11 +252,11 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
 
 		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
-
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getReplaceMenuItem().setDisable(false);
 
 		mainController.getSelectAllMenuItem().setOnAction(e ->
 		{
@@ -286,6 +272,9 @@ public class DensiTreePresenter implements IDisplayTabPresenter {
 
 		mainController.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
 		mainController.getSelectInverseMenuItem().disableProperty().bind(view.emptyProperty());
+
+		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
+		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> drawer.getRadialLabelLayout().layoutLabels());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());

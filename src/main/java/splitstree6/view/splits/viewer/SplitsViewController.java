@@ -28,12 +28,12 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
-import splitstree6.layout.tree.LayoutOrientation;
 
 public class SplitsViewController {
 
@@ -60,9 +60,6 @@ public class SplitsViewController {
 
 	@FXML
 	private ComboBox<SplitsRooting> rootingCBox;
-
-	@FXML
-	private ComboBox<LayoutOrientation> orientationCBox;
 
 	@FXML
 	private Button zoomInButton;
@@ -94,14 +91,35 @@ public class SplitsViewController {
 	@FXML
 	private ToggleButton formatToggleButton;
 
+	@FXML
+	private Button rotateLeftButton;
+
+	@FXML
+	private Button rotateRightButton;
+
+	@FXML
+	private Button flipButton;
+
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();
 
 	private final CopyableLabel fitLabel = new CopyableLabel();
 
+
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
+		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
+		MaterialIcons.setIcon(flipButton, "flip");
+		MaterialIcons.setIcon(zoomInButton, "zoom_in");
+		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
+		MaterialIcons.setIcon(increaseFontButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(settingsToggleButton, "tune");
+		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
+
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
 		zoomableScrollPane.setPannable(true);
@@ -167,10 +185,6 @@ public class SplitsViewController {
 		return rootingCBox;
 	}
 
-	public ComboBox<LayoutOrientation> getOrientationCBox() {
-		return orientationCBox;
-	}
-
 	public Button getZoomInButton() {
 		return zoomInButton;
 	}
@@ -213,6 +227,18 @@ public class SplitsViewController {
 
 	public ToggleButton getFormatToggleButton() {
 		return formatToggleButton;
+	}
+
+	public Button getRotateLeftButton() {
+		return rotateLeftButton;
+	}
+
+	public Button getRotateRightButton() {
+		return rotateRightButton;
+	}
+
+	public Button getFlipButton() {
+		return flipButton;
 	}
 }
 

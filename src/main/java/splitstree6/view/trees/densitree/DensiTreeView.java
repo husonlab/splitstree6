@@ -31,7 +31,6 @@ import javafx.scene.Node;
 import javafx.scene.paint.Color;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.MainWindowManager;
 import jloda.phylo.PhyloTree;
@@ -59,7 +58,7 @@ public class DensiTreeView implements IView {
 	private final UndoManager undoManager = new UndoManager();
 
 	private final DensiTreeViewController controller;
-	private final DensiTreePresenter presenter;
+	private final DensiTreeViewPresenter presenter;
 
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
@@ -136,7 +135,7 @@ public class DensiTreeView implements IView {
 
 
 		// this is the target area for the tree page:
-		presenter = new DensiTreePresenter(mainWindow, this, targetBounds);
+		presenter = new DensiTreeViewPresenter(mainWindow, this, targetBounds);
 
 		this.viewTab.addListener((v, o, n) -> {
 			targetBounds.unbind();

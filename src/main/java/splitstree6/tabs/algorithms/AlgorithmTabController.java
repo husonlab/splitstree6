@@ -24,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.MenuButton;
 import javafx.scene.layout.Pane;
+import jloda.fx.icons.MaterialIcons;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 
@@ -49,6 +50,7 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(applyButton, "play_circle");
 		menuButton.setVisible(false);
 	}
 

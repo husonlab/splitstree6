@@ -32,7 +32,6 @@ import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.AService;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
@@ -41,10 +40,10 @@ import splitstree6.data.parts.Taxon;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -71,32 +70,34 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	 * the network view presenter
 	 *
 	 * @param mainWindow
-	 * @param networkView
+	 * @param view
 	 * @param targetBounds
 	 * @param networkBlock
 	 * @param taxonLabelMap
 	 * @param nodeShapeMap
 	 * @param edgeShapeMap
 	 */
-	public NetworkViewPresenter(MainWindow mainWindow, NetworkView networkView, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
+	public NetworkViewPresenter(MainWindow mainWindow, NetworkView view, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 								ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap) {
 		this.mainWindow = mainWindow;
-		this.networkView = networkView;
-		this.controller = networkView.getController();
+		this.networkView = view;
+		this.controller = view.getController();
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
-		controller.getScrollPane().setUpdateScaleMethod(() -> networkView.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * networkView.getOptionZoomFactor()));
+		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * view.getOptionZoomFactor()));
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, null));
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, null));
 		controller.getDiagramCBox().getItems().addAll(DiagramType.values());
-		controller.getDiagramCBox().valueProperty().bindBidirectional(networkView.optionDiagramProperty());
+		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
-		controller.getOrientationCBox().valueProperty().bindBidirectional(networkView.optionOrientationProperty());
+		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
+		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
+		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
+		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
+		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 		var paneWidth = new SimpleDoubleProperty();
 		var paneHeight = new SimpleDoubleProperty();
@@ -106,23 +107,23 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		});
 
 		networkPane = new NetworkPane(mainWindow, mainWindow.workingTaxaProperty(), networkBlock, mainWindow.getTaxonSelectionModel(),
-				paneWidth, paneHeight, networkView.optionDiagramProperty(), networkView.optionOrientationProperty(),
-				networkView.optionZoomFactorProperty(), networkView.optionFontScaleFactorProperty(),
+				paneWidth, paneHeight, view.optionDiagramProperty(), view.optionOrientationProperty(),
+				view.optionZoomFactorProperty(), view.optionFontScaleFactorProperty(),
 				taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
-		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, networkView.getUndoManager(), networkView.optionEditsProperty(), mainWindow.getTaxonSelectionModel());
+		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, view.getUndoManager(), view.optionEditsProperty(), mainWindow.getTaxonSelectionModel());
 
 		networkPane.setRunAfterUpdate(() -> {
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
 			interactionSetup.apply(taxonLabelMap, nodeShapeMap,
 					t -> (t >= 1 && t <= taxa.getNtax() ? taxa.get(t) : null), taxa::indexOf);
 
-			if (networkView.getOptionEdits().length > 0) {
+			if (view.getOptionEdits().length > 0) {
 				AService.run(() -> {
 					Thread.sleep(700); // wait long enough for all label layouting to finish
 					Platform.runLater(() -> {
-						NetworkEdits.applyEdits(networkView.getOptionEdits(), nodeShapeMap, edgeShapeMap);
-						NetworkEdits.clearEdits(networkView.optionEditsProperty());
+						NetworkEdits.applyEdits(view.getOptionEdits(), nodeShapeMap, edgeShapeMap);
+						NetworkEdits.clearEdits(view.optionEditsProperty());
 					});
 					return null;
 				}, k -> {
@@ -139,50 +140,36 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		updateListener = e -> networkPane.drawNetwork();
 
 		networkBlock.addListener(updateListener);
-		networkView.optionDiagramProperty().addListener(updateListener);
+		view.optionDiagramProperty().addListener(updateListener);
 
-		controller.getZoomInButton().setOnAction(e -> networkView.setOptionZoomFactor(1.1 * networkView.getOptionZoomFactor()));
-		controller.getZoomInButton().disableProperty().bind(networkView.emptyProperty().or(networkView.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
-		controller.getZoomOutButton().setOnAction(e -> networkView.setOptionZoomFactor((1.0 / 1.1) * networkView.getOptionZoomFactor()));
-		controller.getZoomOutButton().disableProperty().bind(networkView.emptyProperty());
+		controller.getZoomInButton().setOnAction(e -> view.setOptionZoomFactor(1.1 * view.getOptionZoomFactor()));
+		controller.getZoomInButton().disableProperty().bind(view.emptyProperty().or(view.optionZoomFactorProperty().greaterThan(8.0 / 1.1)));
+		controller.getZoomOutButton().setOnAction(e -> view.setOptionZoomFactor((1.0 / 1.1) * view.getOptionZoomFactor()));
+		controller.getZoomOutButton().disableProperty().bind(view.emptyProperty());
 
-		controller.getIncreaseFontButton().setOnAction(e -> networkView.setOptionFontScaleFactor(1.2 * networkView.getOptionFontScaleFactor()));
-		controller.getIncreaseFontButton().disableProperty().bind(networkView.emptyProperty());
-		controller.getDecreaseFontButton().setOnAction(e -> networkView.setOptionFontScaleFactor((1.0 / 1.2) * networkView.getOptionFontScaleFactor()));
-		controller.getDecreaseFontButton().disableProperty().bind(networkView.emptyProperty());
+		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
+		controller.getIncreaseFontButton().disableProperty().bind(view.emptyProperty());
+		controller.getDecreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor((1.0 / 1.2) * view.getOptionFontScaleFactor()));
+		controller.getDecreaseFontButton().disableProperty().bind(view.emptyProperty());
 
-		findToolBar = FindReplaceTaxa.create(mainWindow, networkView.getUndoManager());
+		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindToggleButton().setOnAction(e -> {
-			if (!findToolBar.isShowFindToolBar()) {
-				findToolBar.setShowFindToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
-			} else if (!findToolBar.isShowReplaceToolBar()) {
-				findToolBar.setShowReplaceToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-			} else {
-				findToolBar.setShowFindToolBar(false);
-				findToolBar.setShowReplaceToolBar(false);
-				controller.getFindToggleButton().setSelected(false);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
-			}
-		});
+		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
-		networkView.viewTabProperty().addListener((v, o, n) -> {
+		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
 				controller.getvBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
 			}
 		});
-		networkView.emptyProperty().addListener(e -> networkView.getRoot().setDisable(networkView.emptyProperty().get()));
+		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
-		var undoManager = networkView.getUndoManager();
+		var undoManager = view.getUndoManager();
 
-		networkView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram", networkView.optionDiagramProperty(), o, n));
-		networkView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", networkView.optionOrientationProperty(), o, n));
-		networkView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", networkView.optionFontScaleFactorProperty(), o, n));
-		networkView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", networkView.optionZoomFactorProperty(), o, n));
+		view.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram", view.optionDiagramProperty(), o, n));
+		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
+		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
+		view.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", view.optionZoomFactorProperty(), o, n));
 
 		var object = new Object();
 		selectionChangeListener = e -> {
@@ -238,17 +225,18 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getReplaceMenuItem().setDisable(false);
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(networkView.emptyProperty());
 
-		mainController.getRotateLeftMenuItem().setOnAction(e -> networkView.setOptionOrientation(networkView.getOptionOrientation().getRotateLeft()));
-		mainController.getRotateLeftMenuItem().disableProperty().bind(networkView.emptyProperty());
-		mainController.getRotateRightMenuItem().setOnAction(e -> networkView.setOptionOrientation(networkView.getOptionOrientation().getRotateRight()));
-		mainController.getRotateRightMenuItem().disableProperty().bind(networkView.emptyProperty());
-		mainController.getFlipMenuItem().setOnAction(e -> networkView.setOptionOrientation(networkView.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(networkView.emptyProperty());
-
+		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		mainController.getRotateRightMenuItem().setOnAction(controller.getRotateRightButton().getOnAction());
+		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
+		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
+		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 	}
 
 	public LongProperty updateCounterProperty() {

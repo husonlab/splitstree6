@@ -25,6 +25,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import jloda.fx.icons.MaterialIcons;
 
 public class DataItemController {
 	@FXML
@@ -45,6 +46,10 @@ public class DataItemController {
 	@FXML
 	private ImageView statusImageView;
 
+	@FXML
+	private void initialize() {
+		MaterialIcons.setIcon(editButton, "preview");
+	}
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;

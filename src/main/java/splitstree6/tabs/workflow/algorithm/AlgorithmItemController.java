@@ -24,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import jloda.fx.icons.MaterialIcons;
 
 public class AlgorithmItemController {
 
@@ -41,6 +42,12 @@ public class AlgorithmItemController {
 
 	@FXML
 	private Button playButton;
+
+	@FXML
+	private void initialize() {
+		MaterialIcons.setIcon(editButton, "design_services");
+		MaterialIcons.setIcon(playButton, "play_circle");
+	}
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;

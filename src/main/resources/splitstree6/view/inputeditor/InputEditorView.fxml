@@ -19,71 +19,23 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
-<VBox xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="splitstree6.view.inputeditor.InputEditorViewController">
-    <ToolBar fx:id="firstToolBar">
-        <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0" minHeight="18.0"
-                minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                style="-fx-border-style: none; -fx-background-color: transparent;" text="Open">
-            <font>
-                <Font size="10.0"/>
-            </font>
-            <graphic>
-                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                    <Image smooth="false" url="@/jloda/resources/icons/sun/Open16.gif"/>
-                </ImageView>
-            </graphic>
-            <tooltip>
-                <Tooltip text="Open a file"/>
-            </tooltip>
-        </Button>
-        <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" layoutX="10.0" layoutY="11.0" maxHeight="18.0"
-                maxWidth="18.0" minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0"
-                prefWidth="18.0" style="-fx-border-style: none; -fx-background-color: transparent;" text="Save">
-            <font>
-                <Font size="10.0"/>
-            </font>
-            <graphic>
-                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                    <Image smooth="false" url="@/jloda/resources/icons/sun/SaveAs16.gif"/>
-                </ImageView>
-            </graphic>
-            <tooltip>
-                <Tooltip text="Save input to text file"/>
-            </tooltip>
-        </Button>
-        <Separator layoutX="71.0" layoutY="18.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                   prefHeight="20.0"/>
-    </ToolBar>
-    <ToolBar fx:id="lastToolBar" prefHeight="40.0" prefWidth="200.0">
-        <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+<ToolBar fx:id="toolBar" prefHeight="40.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/18"
+         xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.inputeditor.InputEditorViewController">
+    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
 
-        <Button fx:id="parseAndLoadButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0"
-                minHeight="18.0" minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                style="-fx-border-style: none; -fx-background-color: transparent;" text="Parse and Load">
-            <font>
-                <Font size="10.0"/>
-            </font>
-            <graphic>
-                <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                    <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
-                </ImageView>
-            </graphic>
-            <tooltip>
-                <Tooltip text="Parse text and load data"/>
-            </tooltip>
-        </Button>
-        <Separator layoutX="10.0" layoutY="15.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                   prefHeight="20.0"/>
-        <Label fx:id="formatLabel" textFill="DARKGRAY">
-            <padding>
-                <Insets left="10.0"/>
-            </padding>
-        </Label>
-    </ToolBar>
-</VBox>
+    <Button fx:id="parseAndLoadButton" mnemonicParsing="false" text="Parse and Load">
+        <tooltip>
+            <Tooltip text="Parse text and load data"/>
+        </tooltip>
+    </Button>
+    <Separator layoutX="10.0" layoutY="15.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
+               prefHeight="20.0"/>
+    <Label fx:id="formatLabel" textFill="DARKGRAY">
+        <padding>
+            <Insets left="10.0"/>
+        </padding>
+    </Label>
+</ToolBar>

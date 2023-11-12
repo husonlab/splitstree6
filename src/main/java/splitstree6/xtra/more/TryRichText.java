@@ -24,6 +24,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.control.ToolBar;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
@@ -36,6 +37,14 @@ public class TryRichText extends Application {
 
         var richText = new RichTextLabel();
         var textField = new TextField();
+		var otherTextField = new TextField();
+		otherTextField.setEditable(false);
+
+		richText.textProperty().addListener(c -> {
+			otherTextField.setText(richText.getText());
+		});
+
+		richText.setStyle("-fx-border-color: green;");
 
         var bold = new ToggleButton("Bold");
         bold.selectedProperty().addListener((v, o, n) -> richText.setBold(n));
@@ -66,7 +75,7 @@ public class TryRichText extends Application {
 		unRotate.setOnAction(e -> richText.setRotate(richText.getRotate() - 20));
 
 		var root = new BorderPane();
-		root.setTop(textField);
+		root.setTop(new ToolBar(textField, otherTextField));
 		root.setCenter(richText);
 		root.setBottom(new HBox(rotate, unRotate));
 

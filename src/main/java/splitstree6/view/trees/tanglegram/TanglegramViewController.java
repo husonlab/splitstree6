@@ -27,9 +27,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 
 /**
@@ -83,7 +83,7 @@ public class TanglegramViewController {
 	private ComboBox<TreeDiagramType> diagram2CBox;
 
 	@FXML
-	private ComboBox<LayoutOrientation> orientationCBox;
+	private Button flipButton;
 
 	@FXML
 	private Button previousButton;
@@ -127,6 +127,20 @@ public class TanglegramViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(flipButton, "swap_vert");
+
+		MaterialIcons.setIcon(previousButton, "arrow_left");
+		MaterialIcons.setIcon(nextButton, "arrow_right");
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(settingsToggleButton, "tune");
+		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
+		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
+		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
+		MaterialIcons.setIcon(increaseFontButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
+
 		// draw applyCentering first:
 		var left = borderPane.getLeft();
 		var right = borderPane.getRight();
@@ -231,8 +245,8 @@ public class TanglegramViewController {
 		return diagram2CBox;
 	}
 
-	public ComboBox<LayoutOrientation> getOrientationCBox() {
-		return orientationCBox;
+	public Button getFlipButton() {
+		return flipButton;
 	}
 
 	public Button getPreviousButton() {

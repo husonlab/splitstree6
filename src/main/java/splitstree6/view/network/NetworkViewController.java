@@ -29,10 +29,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import splitstree6.layout.network.DiagramType;
-import splitstree6.layout.tree.LayoutOrientation;
 
 public class NetworkViewController {
 	@FXML
@@ -51,7 +51,13 @@ public class NetworkViewController {
 	private ComboBox<DiagramType> diagramCBox;
 
 	@FXML
-	private ComboBox<LayoutOrientation> orientationCBox;
+	private Button rotateLeftButton;
+
+	@FXML
+	private Button rotateRightButton;
+
+	@FXML
+	private Button flipButton;
 
 	@FXML
 	private Button zoomInButton;
@@ -92,6 +98,17 @@ public class NetworkViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
+		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
+		MaterialIcons.setIcon(flipButton, "flip");
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(settingsToggleButton, "tune");
+		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
+		MaterialIcons.setIcon(zoomInButton, "zoom_in");
+		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
+		MaterialIcons.setIcon(increaseFontButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
+
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
 		zoomableScrollPane.setPannable(true);
@@ -147,8 +164,16 @@ public class NetworkViewController {
 		return diagramCBox;
 	}
 
-	public ComboBox<LayoutOrientation> getOrientationCBox() {
-		return orientationCBox;
+	public Button getRotateLeftButton() {
+		return rotateLeftButton;
+	}
+
+	public Button getRotateRightButton() {
+		return rotateRightButton;
+	}
+
+	public Button getFlipButton() {
+		return flipButton;
 	}
 
 	public Button getZoomInButton() {

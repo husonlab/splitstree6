@@ -30,17 +30,16 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 /**
@@ -68,14 +67,14 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	/**
 	 * constructor
 	 */
-	public TreePagesViewPresenter(MainWindow mainWindow, TreePagesView treePagesView, ObjectProperty<Bounds> targetBounds, ObservableList<PhyloTree> phyloTrees) {
+	public TreePagesViewPresenter(MainWindow mainWindow, TreePagesView view, ObjectProperty<Bounds> targetBounds, ObservableList<PhyloTree> phyloTrees) {
 		this.mainWindow = mainWindow;
-		this.treePageView = treePagesView;
+		this.treePageView = view;
 
-		controller = treePagesView.getController();
+		controller = view.getController();
 
 		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();
-		treePagesView.reticulatedProperty().addListener((v, o, n) -> {
+		view.reticulatedProperty().addListener((v, o, n) -> {
 			disabledDiagrams.clear();
 			if (n) {
 				disabledDiagrams.add(TreeDiagramType.TriangularCladogram);
@@ -87,15 +86,17 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams, TreeDiagramType::createNode));
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams, TreeDiagramType::createNode));
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
-		controller.getDiagramCBox().valueProperty().bindBidirectional(treePagesView.optionDiagramProperty());
+		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
-		controller.getOrientationCBox().valueProperty().bindBidirectional(treePagesView.optionOrientationProperty());
+		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
+		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
+		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
+		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
+		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 		final ObservableSet<HeightAndAngles.Averaging> disabledAveraging = FXCollections.observableSet();
-		treePagesView.optionDiagramProperty().addListener((v, o, n) -> {
+		view.optionDiagramProperty().addListener((v, o, n) -> {
 			disabledAveraging.clear();
 			if (n == TreeDiagramType.RadialPhylogram) {
 				disabledAveraging.add(HeightAndAngles.Averaging.ChildAverage);
@@ -105,26 +106,26 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getAveragingCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledAveraging, HeightAndAngles.Averaging::createLabel));
 		controller.getAveragingCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledAveraging, HeightAndAngles.Averaging::createLabel));
 		controller.getAveragingCBox().getItems().addAll(HeightAndAngles.Averaging.values());
-		controller.getAveragingCBox().valueProperty().bindBidirectional(treePagesView.optionAveragingProperty());
+		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 
 		controller.getRowsColsCBox().getItems().setAll(gridValues);
 		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
 
-		treePagesView.optionRowsProperty().addListener((v, o, n) -> {
+		view.optionRowsProperty().addListener((v, o, n) -> {
 			if (rowsAndCols.get().rows() != n.intValue())
 				rowsAndCols.set(new RowsCols(n.intValue(), rowsAndCols.get().cols()));
 		});
-		treePagesView.optionColsProperty().addListener((v, o, n) -> {
+		view.optionColsProperty().addListener((v, o, n) -> {
 			if (rowsAndCols.get().cols() != n.intValue())
 				rowsAndCols.set(new RowsCols(rowsAndCols.get().rows(), n.intValue()));
 		});
 
 		rowsAndCols.addListener((v, o, n) -> {
 			if (n != null) {
-				treePagesView.setOptionRows(n.rows());
-				treePagesView.setOptionCols(n.cols());
-				treePagesView.setOptionZoomFactor(1);
-				treePagesView.setOptionFontScaleFactor(1);
+				view.setOptionRows(n.rows());
+				view.setOptionCols(n.cols());
+				view.setOptionZoomFactor(1);
+				view.setOptionFontScaleFactor(1);
 				controller.getRowsColsCBox().setValue(n.toString());
 			}
 		});
@@ -135,36 +136,36 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				rowsAndCols.set(rowsCols);
 		});
 
-		rowsAndCols.set(new RowsCols(treePagesView.getOptionRows(), treePagesView.getOptionCols()));
+		rowsAndCols.set(new RowsCols(view.getOptionRows(), view.getOptionCols()));
 
 		controller.getTreeCBox().valueProperty().addListener((v, o, n) -> {
 			if (n != null) {
 				var index = phyloTrees.indexOf(n);
-				var page = index / (treePagesView.getOptionRows() * treePagesView.getOptionCols()) + 1;
-				treePagesView.setPageNumber(page);
+				var page = index / (view.getOptionRows() * view.getOptionCols()) + 1;
+				view.setPageNumber(page);
 			}
 		});
 		controller.getTreeCBox().setItems(phyloTrees);
 
 		InvalidationListener updateTreeInvalidationListener = e -> {
-			var t = (treePagesView.getPageNumber() - 1) * (treePagesView.getOptionRows() * treePagesView.getOptionCols());
+			var t = (view.getPageNumber() - 1) * (view.getOptionRows() * view.getOptionCols());
 			if (t >= 0 && t < phyloTrees.size())
 				controller.getTreeCBox().setValue(phyloTrees.get(t));
 			else
 				controller.getTreeCBox().setValue(null);
 		};
 
-		treePagesView.pageNumberProperty().addListener(updateTreeInvalidationListener);
-		treePagesView.optionRowsProperty().addListener(updateTreeInvalidationListener);
-		treePagesView.optionColsProperty().addListener(updateTreeInvalidationListener);
-		treePagesView.getTrees().addListener(updateTreeInvalidationListener);
+		view.pageNumberProperty().addListener(updateTreeInvalidationListener);
+		view.optionRowsProperty().addListener(updateTreeInvalidationListener);
+		view.optionColsProperty().addListener(updateTreeInvalidationListener);
+		view.getTrees().addListener(updateTreeInvalidationListener);
 
 		targetBounds.addListener((v, o, n) -> {
 			var width = n.getWidth();
 			var height = Math.max(150, n.getHeight() - 150);
 			controller.getPagination().setPrefWidth(width);
 			controller.getPagination().setPrefHeight(height);
-			boxDimensions.set(new Dimension2D(width / treePagesView.getOptionCols() - 5, height / treePagesView.getOptionRows() - 5));
+			boxDimensions.set(new Dimension2D(width / view.getOptionCols() - 5, height / view.getOptionRows() - 5));
 			if (false)
 				Platform.runLater(() -> mainWindow.getController().getLayoutLabelsMenuItem().getOnAction().handle(null));
 		});
@@ -173,12 +174,11 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		var numberOfPages = new SimpleIntegerProperty(0);
 
-		treePagesView.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
-		controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> treePagesView.setPageNumber(n.intValue() + 1));
+		view.pageNumberProperty().addListener((v, o, n) -> controller.getPagination().setCurrentPageIndex(n.intValue() - 1));
+		controller.getPagination().currentPageIndexProperty().addListener((v, o, n) -> view.setPageNumber(n.intValue() + 1));
 
-		treePageFactory.set(new TreePageFactory(mainWindow, treePagesView, phyloTrees, treePagesView.optionRowsProperty(), treePagesView.optionColsProperty(), boxDimensions));
+		treePageFactory.set(new TreePageFactory(mainWindow, view, phyloTrees, view.optionRowsProperty(), view.optionColsProperty(), boxDimensions));
 		changingOrientation.bind(treePageFactory.get().changingOrientationBinding());
-		controller.getOrientationCBox().disableProperty().bind(treePageView.emptyProperty().or(changingOrientation));
 
 		controller.getPagination().pageFactoryProperty().bind(treePageFactory);
 		controller.getPagination().pageCountProperty().bind(numberOfPages);
@@ -190,37 +190,24 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			invalidationListener.invalidated(null);
 		}
 
-		treePagesView.pageNumberProperty().addListener((v, o, n) -> {
+		view.pageNumberProperty().addListener((v, o, n) -> {
 			if (n.intValue() < 1)
-				Platform.runLater(() -> treePagesView.setPageNumber(1));
+				Platform.runLater(() -> view.setPageNumber(1));
 			else if (n.intValue() >= numberOfPages.get())
-				Platform.runLater(() -> treePagesView.setPageNumber((Math.max(1, numberOfPages.get()))));
+				Platform.runLater(() -> view.setPageNumber((Math.max(1, numberOfPages.get()))));
 		});
 
 		{
 			var labelProperty = new SimpleStringProperty();
-			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), treePagesView.getOptionTreeLabels().label(), labelProperty, TreeLabel.labels());
-			labelProperty.addListener((v, o, n) -> treePagesView.setOptionTreeLabels(TreeLabel.valueOfLabel(n)));
+			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), view.getOptionTreeLabels().label(), labelProperty, TreeLabel.labels());
+			labelProperty.addListener((v, o, n) -> view.setOptionTreeLabels(TreeLabel.valueOfLabel(n)));
 		}
 
-		findToolBar = FindReplaceTaxa.create(mainWindow, treePagesView.getUndoManager());
+		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindToggleButton().setOnAction(e -> {
-			if (!findToolBar.isShowFindToolBar()) {
-				findToolBar.setShowFindToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
-			} else if (!findToolBar.isShowReplaceToolBar()) {
-				findToolBar.setShowReplaceToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-			} else {
-				findToolBar.setShowFindToolBar(false);
-				findToolBar.setShowReplaceToolBar(false);
-				controller.getFindToggleButton().setSelected(false);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
-			}
-		});
+
+		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		controller.getZoomInButton().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
@@ -233,21 +220,21 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getDecreaseFontButton().disableProperty().bind(treePageView.emptyProperty());
 
 
-		var undoManager = treePagesView.getUndoManager();
+		var undoManager = view.getUndoManager();
 		rowsAndCols.addListener((v, o, n) -> undoManager.add("grid dimensions", rowsAndCols, o, n));
-		treePagesView.pageNumberProperty().addListener((c, o, n) -> undoManager.add("page", treePagesView.pageNumberProperty(), o, n));
-		treePagesView.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram type", treePagesView.optionDiagramProperty(), o, n));
-		treePagesView.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("layout orientation", treePagesView.optionOrientationProperty(), o, n));
-		treePagesView.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("show tree names", treePagesView.optionTreeLabelsProperty(), o, n));
-		treePagesView.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", treePagesView.optionFontScaleFactorProperty(), o, n));
-		treePagesView.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom", treePagesView.optionZoomFactorProperty(), o, n));
+		view.pageNumberProperty().addListener((c, o, n) -> undoManager.add("page", view.pageNumberProperty(), o, n));
+		view.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram type", view.optionDiagramProperty(), o, n));
+		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("layout orientation", view.optionOrientationProperty(), o, n));
+		view.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("show tree names", view.optionTreeLabelsProperty(), o, n));
+		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
+		view.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom", view.optionZoomFactorProperty(), o, n));
 
-		treePagesView.viewTabProperty().addListener((v, o, n) -> {
+		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
 				Platform.runLater(() -> controller.getvBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar()));
 			}
 		});
-		treePagesView.emptyProperty().addListener(e -> treePagesView.getRoot().setDisable(treePagesView.emptyProperty().get()));
+		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
 		Platform.runLater(this::setupMenuItems);
 	}
@@ -283,16 +270,18 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getReplaceMenuItem().setDisable(false);
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(treePageView.getOptionOrientation()));
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 
-		mainController.getRotateLeftMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getRotateLeft()));
-		mainController.getRotateLeftMenuItem().disableProperty().bind(treePageView.emptyProperty().or(changingOrientation));
-		mainController.getRotateRightMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getRotateRight()));
-		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
-		mainController.getFlipMenuItem().setOnAction(e -> treePageView.setOptionOrientation(treePageView.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
+		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		mainController.getRotateRightMenuItem().setOnAction(controller.getRotateRightButton().getOnAction());
+		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
+		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
+		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 	}
 
     private record RowsCols(int rows, int cols) {

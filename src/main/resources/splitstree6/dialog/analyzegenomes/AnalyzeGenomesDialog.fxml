@@ -23,9 +23,7 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <AnchorPane fx:id="rootPane" prefHeight="440.0" prefWidth="650.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.dialog.analyzegenomes.AnalyzeGenomesController">
@@ -87,19 +85,7 @@
                                                         <VBox alignment="TOP_CENTER" spacing="10.0" HBox.hgrow="NEVER">
                                                             <children>
                                                                 <Button fx:id="inputBrowseButton"
-                                                                        contentDisplay="GRAPHIC_ONLY" maxHeight="26.0"
-                                                                        maxWidth="26.0" minHeight="26.0" minWidth="26.0"
-                                                                        mnemonicParsing="false" prefHeight="26.0"
-                                                                        prefWidth="26.0" text="Browse...">
-                                                                    <graphic>
-                                                                        <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                                   pickOnBounds="true"
-                                                                                   preserveRatio="true">
-                                                                            <image>
-                                                                                <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
-                                                                            </image>
-                                                                        </ImageView>
-                                                                    </graphic>
+                                                                        contentDisplay="CENTER" text="Browse...">
                                                                     <tooltip>
                                                                         <Tooltip text="Browse for input files"/>
                                                                     </tooltip>
@@ -162,16 +148,8 @@
                                                                 <Tooltip text="Location of output file"/>
                                                             </tooltip>
                                                         </TextField>
-                                                        <Button fx:id="outputBrowseButton" contentDisplay="GRAPHIC_ONLY"
+                                                        <Button fx:id="outputBrowseButton" contentDisplay="CENTER"
                                                                 mnemonicParsing="false" text="Browse...">
-                                                            <graphic>
-                                                                <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                           pickOnBounds="true" preserveRatio="true">
-                                                                    <image>
-                                                                        <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
-                                                                    </image>
-                                                                </ImageView>
-                                                            </graphic>
                                                             <tooltip>
                                                                 <Tooltip text="Browse for location of output file"/>
                                                             </tooltip>
@@ -233,15 +211,9 @@
                                                                     <children>
                                                                         <Label text="Set display labels (using HTML tags to style, if desired "/>
                                                                         <ToggleButton fx:id="htmlInfoButton"
-                                                                                      alignment="CENTER"
-                                                                                      contentDisplay="TEXT_ONLY"
+                                                                                      contentDisplay="CENTER"
                                                                                       focusTraversable="false"
-                                                                                      mnemonicParsing="false"
-                                                                                      style="-fx-background-radius: 5em; -fx-max-width: 16; -fx-min-width: 16; -fx-max-height: 16; -fx-min-height: 16;"
                                                                                       text="?">
-                                                                            <font>
-                                                                                <Font size="8.0"/>
-                                                                            </font>
                                                                         </ToggleButton>
                                                                         <Label layoutX="10.0" layoutY="10.0" text=")"/>
                                                                     </children>
@@ -264,48 +236,18 @@
                                         <HBox alignment="CENTER_LEFT" AnchorPane.rightAnchor="30.0"
                                               AnchorPane.topAnchor="2.0">
                                             <children>
-                                                <Button fx:id="replaceButton" contentDisplay="GRAPHIC_ONLY"
-                                                        layoutX="10.0" layoutY="10.0" mnemonicParsing="false"
-                                                        style="-fx-background-color: transparent;" text="Replace...">
-                                                    <graphic>
-                                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                                   preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@/jloda/resources/icons/sun/Replace16.gif"/>
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                                <Button fx:id="replaceButton" contentDisplay="CENTER" text="Replace...">
                                                     <tooltip>
                                                         <Tooltip text="Open find and replace tool bar"/>
                                                     </tooltip>
                                                 </Button>
                                                 <Separator orientation="VERTICAL" prefHeight="16.0"/>
-                                                <Button fx:id="labelsUndoButton" contentDisplay="GRAPHIC_ONLY"
-                                                        mnemonicParsing="false"
-                                                        style="-fx-background-color: transparent;" text="Undo">
-                                                    <graphic>
-                                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                                   preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@/jloda/resources/icons/sun/Undo16.gif"/>
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                                <Button fx:id="labelsUndoButton" contentDisplay="CENTER" text="Undo">
                                                     <tooltip>
                                                         <Tooltip text="Undo label edits"/>
                                                     </tooltip>
                                                 </Button>
-                                                <Button fx:id="labelsRedoButton" contentDisplay="GRAPHIC_ONLY"
-                                                        layoutX="10.0" layoutY="10.0" mnemonicParsing="false"
-                                                        style="-fx-background-color: transparent;" text="Redo">
-                                                    <graphic>
-                                                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                                   preserveRatio="true">
-                                                            <image>
-                                                                <Image url="@/jloda/resources/icons/sun/Redo16.gif"/>
-                                                            </image>
-                                                        </ImageView>
-                                                    </graphic>
+                                                <Button fx:id="labelsRedoButton" contentDisplay="CENTER" text="Redo">
                                                     <tooltip>
                                                         <Tooltip text="Redo label edits"/>
                                                     </tooltip>
@@ -335,20 +277,12 @@
                                                             </tooltip>
                                                         </TextField>
                                                         <Button fx:id="referencesDatabaseButton"
-                                                                contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
+                                                                contentDisplay="CENTER" mnemonicParsing="false"
                                                                 text="Browse">
                                                             <tooltip>
                                                                 <Tooltip
                                                                         text="Browse for SplitsTree6  reference database"/>
                                                             </tooltip>
-                                                            <graphic>
-                                                                <ImageView fitHeight="16.0" fitWidth="16.0"
-                                                                           pickOnBounds="true" preserveRatio="true">
-                                                                    <image>
-                                                                        <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
-                                                                    </image>
-                                                                </ImageView>
-                                                            </graphic>
                                                         </Button>
                                                     </children>
                                                 </HBox>

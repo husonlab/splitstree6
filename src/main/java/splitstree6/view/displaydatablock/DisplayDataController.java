@@ -24,6 +24,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TitledPane;
 import javafx.scene.layout.Pane;
+import jloda.fx.icons.MaterialIcons;
 
 public class DisplayDataController {
 
@@ -38,6 +39,11 @@ public class DisplayDataController {
 
 	@FXML
 	private Pane mainPane;
+
+	@FXML
+	private void initialize() {
+		MaterialIcons.setIcon(applyButton, "play_circle");
+	}
 
 	public TitledPane getTitledPane() {
 		return titledPane;

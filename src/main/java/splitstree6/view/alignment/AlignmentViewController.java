@@ -25,10 +25,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.util.StringConverter;
 import jloda.fx.control.CopyableLabel;
+import jloda.fx.icons.MaterialIcons;
 import splitstree6.data.parts.Taxon;
 
 public class AlignmentViewController {
@@ -201,6 +200,13 @@ public class AlignmentViewController {
 
     @FXML
     private void initialize() {
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(zoomToFitButton, "crop_free");
+		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
+		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
+
         rightTopStackPane.getChildren().add(axis);
         axis.prefWidthProperty().bind(rightTopStackPane.widthProperty());
         axis.setLowerBound(1);

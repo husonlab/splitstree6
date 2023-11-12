@@ -21,10 +21,9 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
 <AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.window.MainWindowController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
@@ -406,14 +405,12 @@
                                   text="Splits Phylogenetic Diversity"/>
                         <MenuItem fx:id="computeSplitsShapleyValuesMenuItem" text="Splits Shapley Values"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="computeTreePhylogeneticDiversityMenuItem"
-                                  text="Tree Phylogenetic Diversity"/>
+                        <MenuItem fx:id="computeTreePhylogeneticDiversityMenuItem" text="Tree Phylogenetic Diversity"/>
                         <MenuItem fx:id="computeRootedTreeFairProportionMenuItem"
                                   text="Rooted Tree Fair Proportion Diversity Index"/>
                         <MenuItem fx:id="computeRootedTreeEqualSplitsMenuItem"
                                   text="Rooted Tree Equal Splits Diversity Index"/>
-                        <MenuItem fx:id="computeUnrootedTreeShapleyMenuItem"
-                                  text="Unrooted Tree Shapley Values"/>
+                        <MenuItem fx:id="computeUnrootedTreeShapleyMenuItem" text="Unrooted Tree Shapley Values"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="pcoaMenuItem" text="PCoA"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
@@ -472,70 +469,26 @@
                             </center>
                             <top>
                                 <ToolBar BorderPane.alignment="CENTER">
-                                    <Button fx:id="openButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    <Button fx:id="openButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="Open">
-                                        <font>
-                                            <Font size="10.0"/>
-                                        </font>
-                                        <graphic>
-                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                       preserveRatio="true">
-                                                <Image url="@/jloda/resources/icons/sun/Open16.gif"/>
-                                            </ImageView>
-                                        </graphic>
                                         <tooltip>
                                             <Tooltip text="Open a file"/>
                                         </tooltip>
                                     </Button>
-                                    <Button fx:id="saveButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                            mnemonicParsing="false" prefHeight="20.0"
-                                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    <Button fx:id="saveButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="Save">
-                                        <font>
-                                            <Font size="10.0"/>
-                                        </font>
-                                        <graphic>
-                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                       preserveRatio="true">
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Save16.gif"/>
-                                            </ImageView>
-                                        </graphic>
                                         <tooltip>
                                             <Tooltip text="Save file"/>
                                         </tooltip>
                                     </Button>
-                                    <Button fx:id="exportImageButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                            mnemonicParsing="false" prefHeight="20.0"
-                                            style="-fx-border-style: none; -fx-background-color: transparent;"
-                                            text="Print">
-                                        <font>
-                                            <Font size="10.0"/>
-                                        </font>
-                                        <graphic>
-                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                       preserveRatio="true">
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Export16.gif"/>
-                                            </ImageView>
-                                        </graphic>
+                                    <Button fx:id="exportImageButton" contentDisplay="CENTER" mnemonicParsing="false"
+                                            text="Export">
                                         <tooltip>
                                             <Tooltip text="Export the selected tab as an image"/>
                                         </tooltip>
                                     </Button>
-                                    <Button fx:id="printButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                            mnemonicParsing="false" prefHeight="20.0"
-                                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                                    <Button fx:id="printButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="Print">
-                                        <font>
-                                            <Font size="10.0"/>
-                                        </font>
-                                        <graphic>
-                                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                                       preserveRatio="true">
-                                                <Image smooth="false" url="@/jloda/resources/icons/sun/Print16.gif"/>
-                                            </ImageView>
-                                        </graphic>
                                         <tooltip>
                                             <Tooltip text="Print the selected tab"/>
                                         </tooltip>
@@ -555,8 +508,7 @@
                                 <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                             </padding>
                             <center>
-                                <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE"
-                                         BorderPane.alignment="CENTER"/>
+                                <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER"/>
                             </center>
                         </BorderPane>
                     </AnchorPane>

@@ -307,6 +307,8 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getReplaceMenuItem().setDisable(false);
 	}
 
 	public static <T, S> void updateColumnWidths(TableView<T> tableView, TableColumn<T, S> displayCol) {

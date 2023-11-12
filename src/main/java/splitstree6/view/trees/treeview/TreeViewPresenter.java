@@ -37,7 +37,6 @@ import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
@@ -47,7 +46,6 @@ import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -56,6 +54,7 @@ import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -192,11 +191,12 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().getItems().addAll(TreeDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
-		controller.getOrientationCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().setCellFactory(ComboBoxUtils.createCellFactory(null, LayoutOrientation::createLabel));
-		controller.getOrientationCBox().getItems().addAll(LayoutOrientation.values());
-		controller.getOrientationCBox().valueProperty().bindBidirectional(view.optionOrientationProperty());
-		controller.getOrientationCBox().disableProperty().bind(view.emptyProperty().or(changingOrientation));
+		controller.getRotateLeftButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
+		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
+		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
+		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
+		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 		controller.getScaleBar().visibleProperty().bind(toScale.and(showScaleBar));
 
@@ -346,21 +346,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		controller.getFindToggleButton().setOnAction(e -> {
-			if (!findToolBar.isShowFindToolBar()) {
-				findToolBar.setShowFindToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Replace24.gif", 16));
-			} else if (!findToolBar.isShowReplaceToolBar()) {
-				findToolBar.setShowReplaceToolBar(true);
-				controller.getFindToggleButton().setSelected(true);
-			} else {
-				findToolBar.setShowFindToolBar(false);
-				findToolBar.setShowReplaceToolBar(false);
-				controller.getFindToggleButton().setSelected(false);
-				controller.getFindToggleButton().setGraphic(ResourceManagerFX.getIconAsImageView("sun/Find24.gif", 16));
-			}
-		});
+
+		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -445,11 +432,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
 
 		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
-
 		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
 		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-
 		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getReplaceMenuItem().setDisable(false);
 
 		mainController.getSelectAllMenuItem().setOnAction(e ->
 		{
@@ -473,12 +460,12 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.TriangularCladogram))
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.RectangularCladogram)));
 
-		mainController.getRotateLeftMenuItem().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateLeft()));
-		mainController.getRotateLeftMenuItem().disableProperty().bind(view.emptyProperty().or(changingOrientation));
-		mainController.getRotateRightMenuItem().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
-		mainController.getRotateRightMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
-		mainController.getFlipMenuItem().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
-		mainController.getFlipMenuItem().disableProperty().bind(mainController.getRotateLeftMenuItem().disableProperty());
+		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
+		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		mainController.getRotateRightMenuItem().setOnAction(controller.getRotateRightButton().getOnAction());
+		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
+		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
+		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));

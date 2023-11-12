@@ -30,6 +30,7 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jloda.fx.control.SplittableTabPane;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
@@ -401,9 +402,6 @@ public class MainWindowController {
 	private MenuItem aboutMenuItem;
 
 	@FXML
-	private ToolBar toolBar;
-
-	@FXML
 	private Button openCloseLeftButton;
 
 	@FXML
@@ -462,6 +460,11 @@ public class MainWindowController {
 
 	@FXML
 	void initialize() {
+		MaterialIcons.setIcon(openButton, "file_open");
+		MaterialIcons.setIcon(saveButton, "save");
+		MaterialIcons.setIcon(exportImageButton, "ios_share");
+		MaterialIcons.setIcon(printButton, "print");
+
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
 
@@ -986,10 +989,6 @@ public class MainWindowController {
 
 	public MenuItem getAboutMenuItem() {
 		return aboutMenuItem;
-	}
-
-	public ToolBar getToolBar() {
-		return toolBar;
 	}
 
 	public Button getOpenCloseLeftButton() {

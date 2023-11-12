@@ -27,6 +27,7 @@ import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ResourceManagerFX;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
@@ -44,10 +45,7 @@ public class DisplayTextViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private Button findButton;
-
-	@FXML
-	private Button findAndReplaceButton;
+	private ToggleButton findToggleButton;
 
 	@FXML
 	private ToggleButton wrapTextToggle;
@@ -72,6 +70,13 @@ public class DisplayTextViewController {
 
 	@FXML
 	private void initialize() {
+
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(wrapTextToggle, "wrap_text");
+		MaterialIcons.setIcon(lineNumbersToggle, "format_list_numbered");
+		MaterialIcons.setIcon(increaseFontButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
+
 		codeArea = new CodeArea();
 		codeArea.requestFollowCaret();
 
@@ -103,12 +108,8 @@ public class DisplayTextViewController {
 		return toolBar;
 	}
 
-	public Button getFindButton() {
-		return findButton;
-	}
-
-	public Button getFindAndReplaceButton() {
-		return findAndReplaceButton;
+	public ToggleButton getFindToggleButton() {
+		return findToggleButton;
 	}
 
 	public ToggleButton getWrapTextToggle() {

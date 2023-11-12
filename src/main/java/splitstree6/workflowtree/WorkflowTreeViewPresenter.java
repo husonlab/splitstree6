@@ -19,7 +19,6 @@
 
 package splitstree6.workflowtree;
 
-import javafx.beans.binding.Bindings;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.SelectionMode;
@@ -28,7 +27,6 @@ import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 
-import java.util.LinkedList;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -78,44 +76,25 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	}
 
 	public void setupMenuItems() {
-		var controller = mainWindow.getController();
+		var mainController = mainWindow.getController();
 		var tabController = workflowTreeView.getController();
 
-		controller.getCopyMenuItem().setOnAction(null);
+		mainController.getCopyMenuItem().setOnAction(null);
 
-		controller.getFindMenuItem().setOnAction(null);
-		controller.getFindAgainMenuItem().setOnAction(null);
+		mainController.getFindMenuItem().setOnAction(null);
+		mainController.getFindAgainMenuItem().setOnAction(null);
+		mainController.getSelectAllMenuItem().setOnAction(null);
+		mainController.getSelectNoneMenuItem().setOnAction(null);
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getReplaceMenuItem().setDisable(false);
 
-		controller.getSelectAllMenuItem().setOnAction(null);
-		controller.getSelectNoneMenuItem().setOnAction(null);
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(null);
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(null);
 
-		controller.getIncreaseFontSizeMenuItem().setOnAction(null);
-		controller.getDecreaseFontSizeMenuItem().setOnAction(null);
-
-		controller.getZoomInMenuItem().setOnAction(null);
-		controller.getZoomOutMenuItem().setOnAction(null);
+		mainController.getZoomInMenuItem().setOnAction(null);
+		mainController.getZoomOutMenuItem().setOnAction(null);
 
 		var treeView = tabController.getWorkflowTreeView();
 		treeView.getStyleClass().add("viewer-background");
-
-		tabController.getCollapseAllButton().setOnAction((e) -> treeView.getRoot().setExpanded(false));
-
-		tabController.getExpandAllButton().setOnAction((e) -> {
-			final var queue = new LinkedList<TreeItem<String>>();
-			queue.add(treeView.getRoot());
-			while (queue.size() > 0) {
-				final var item = queue.poll();
-				item.setExpanded(true);
-				queue.addAll(item.getChildren());
-			}
-		});
-
-		tabController.getShowButton().setOnAction((e) -> {
-			for (var item : treeView.getSelectionModel().getSelectedItems()) {
-				//final Point2D point2D = item.getGraphic().localToScreen(item.getGraphic().getLayoutX(), item.getGraphic().getLayoutY());
-				((WorkflowTreeItem) item).showView();
-			}
-		});
-		tabController.getShowButton().disableProperty().bind(Bindings.isEmpty(treeView.getSelectionModel().getSelectedItems()));
 	}
 }

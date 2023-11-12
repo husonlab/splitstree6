@@ -26,7 +26,6 @@
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.Font?>
 <AnchorPane fx:id="anchorPane" prefHeight="50.0" prefWidth="160.0" style="-fx-border-color: darkgray;"
             xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.tabs.workflow.data.DataItemController">
@@ -56,20 +55,10 @@
             </Label>
         </center>
         <left>
-            <Button fx:id="editButton" contentDisplay="GRAPHIC_ONLY" maxHeight="18.0" maxWidth="18.0" minHeight="18.0"
-                    minWidth="18.0" mnemonicParsing="false" prefHeight="18.0" prefWidth="18.0"
-                    style="-fx-border-style: none; -fx-background-color: transparent;" text="Edit"
+            <Button fx:id="editButton" contentDisplay="CENTER" mnemonicParsing="false" text="Edit"
                     BorderPane.alignment="CENTER">
-                <font>
-                    <Font size="10.0"/>
-                </font>
-                <graphic>
-                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                        <Image url="@/jloda/resources/icons/sun/Edit16.gif"/>
-                    </ImageView>
-                </graphic>
                 <tooltip>
-                    <Tooltip text="View data as text"/>
+                    <Tooltip text="View associated data"/>
                 </tooltip>
             </Button>
         </left>

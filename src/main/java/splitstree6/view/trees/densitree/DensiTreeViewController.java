@@ -24,11 +24,11 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ResourceManagerFX;
 import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
 
 public class DensiTreeViewController {
 
@@ -124,16 +124,27 @@ public class DensiTreeViewController {
 	private CheckMenuItem colorIncompatibleTreesMenuItem;
 
 	@FXML
-	private ComboBox<LayoutOrientation> orientationCBox;
+	private Button flipButton;
 
 	@FXML
 	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
-
 
 	private final ToggleGroup diagramToggleGroup = new ToggleGroup();
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(flipButton, "swap_vert");
+
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(settingsToggleButton, "tune");
+		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
+		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
+		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
+		MaterialIcons.setIcon(increaseFontButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
+
 		centerPane.getStyleClass().add("viewer-background");
 
 		diagramToggleGroup.getToggles().addAll(trianglePhylogramToggleItem, radialPhylogramToggleItem, rectangularPhylogramToggleItem, roundedPhylogramToggleItem);
@@ -281,8 +292,8 @@ public class DensiTreeViewController {
 		return rerootAndRescaleChekMenuItem;
 	}
 
-	public ComboBox<LayoutOrientation> getOrientationCBox() {
-		return orientationCBox;
+	public Button getFlipButton() {
+		return flipButton;
 	}
 
 	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {

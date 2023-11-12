@@ -23,9 +23,8 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.Group?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.text.Font?>
 <AnchorPane fx:id="root" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.view.alignment.AlignmentViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
@@ -72,98 +71,40 @@
                         </tooltip>
                     </ComboBox>
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <ToggleButton fx:id="findToggleButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                                  minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
+                    <ToggleButton fx:id="findToggleButton" contentDisplay="CENTER" mnemonicParsing="false"
                                   style="-fx-border-style: none;" text="Find">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/sun/Find16.gif"/>
-                            </ImageView>
-                        </graphic>
                         <tooltip>
                             <Tooltip text="Show the Find toolbar"/>
                         </tooltip>
                     </ToggleButton>
                     <Separator layoutX="179.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
-                    <Button fx:id="zoomToFitButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0" minHeight="20.0"
-                            mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Zoom to Fit">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/ZoomToFit32.png"/>
-                            </ImageView>
-                        </graphic>
+                    <Button fx:id="zoomToFitButton" contentDisplay="CENTER" mnemonicParsing="false" text="Zoom to Fit">
                         <tooltip>
                             <Tooltip text="Zoom to fit or zoom to default"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="expandVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;" text="Expand Vertically">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/ExpandVertical16.gif"/>
-                            </ImageView>
-                        </graphic>
+                    <Button fx:id="expandVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
+                            text="Expand Vertically">
                         <tooltip>
                             <Tooltip text="Expand vertically"/>
                         </tooltip>
                     </Button>
 
-                    <Button fx:id="contractVerticallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                    <Button fx:id="contractVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                             text="Contract Vertically">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/ContractVertical16.gif"/>
-                            </ImageView>
-                        </graphic>
                         <tooltip>
                             <Tooltip text="Contract vertically"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="expandHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                    <Button fx:id="expandHorizontallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                             text="Expand Horizontally">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/ExpandHorizontal16.gif"/>
-                            </ImageView>
-                        </graphic>
                         <tooltip>
                             <Tooltip text="Expand horizontally"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="contractHorizontallyButton" contentDisplay="GRAPHIC_ONLY" maxHeight="20.0"
-                            minHeight="20.0" mnemonicParsing="false" prefHeight="20.0"
-                            style="-fx-border-style: none; -fx-background-color: transparent;"
+                    <Button fx:id="contractHorizontallyButton" contentDisplay="CENTER" mnemonicParsing="false"
                             text="Contract Horizontally">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                        <graphic>
-                            <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true" preserveRatio="true">
-                                <Image smooth="false" url="@/jloda/resources/icons/ContractHorizontal16.gif"/>
-                            </ImageView>
-                        </graphic>
                         <tooltip>
                             <Tooltip text="Contract horizontally"/>
                         </tooltip>

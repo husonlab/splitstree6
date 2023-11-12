@@ -38,6 +38,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.AlgorithmBreadCrumbsToolBar;
+import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.Optional;
@@ -80,15 +81,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getFindButton().setOnAction((e) -> findToolBar.setShowFindToolBar(true));
-
-		if (editable) {
-			controller.getFindAndReplaceButton().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-		}
-		if (!editable) {
-			var items = controller.getToolBar().getItems();
-			items.remove(controller.getFindAndReplaceButton());
-		}
+		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), editable);
 
 		controller.getWrapTextToggle().selectedProperty().bindBidirectional(tab.wrapTextProperty());
 		controller.getLineNumbersToggle().selectedProperty().bindBidirectional(tab.showLineNumbersProperty());
@@ -171,16 +164,21 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				redoAvailable.bind(codeArea.redoAvailableProperty());
 				mainController.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
 			}
+
 		} else {
 			mainController.getPasteMenuItem().disableProperty().unbind();
 			mainController.getPasteMenuItem().setDisable(true);
 		}
 
-		mainController.getFindMenuItem().setOnAction(controller.getFindButton().getOnAction());
-
+		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
+		mainController.getFindMenuItem().setDisable(false);
+		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 		if (editable) {
-			mainController.getReplaceMenuItem().setOnAction(controller.getFindAndReplaceButton().getOnAction());
+			mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
+			mainController.getReplaceMenuItem().setDisable(false);
 		}
+
 
 		{
 			var cut = new MenuItem("Cut");
@@ -194,9 +192,6 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			else
 				codeArea.setContextMenu(new ContextMenu(copy));
 		}
-
-		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
 
 		mainController.getGotoLineMenuItem().setOnAction((e) -> {
 			final TextInputDialog dialog = new TextInputDialog("");

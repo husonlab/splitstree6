@@ -36,9 +36,9 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
-import splitstree6.splits.ASplit;
 import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
+import splitstree6.splits.ASplit;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.window.MainWindowController;
@@ -181,6 +181,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			if (!inSelectionUpdate.get()) {
 				try {
 					inSelectionUpdate.set(true);
+					var start = System.currentTimeMillis();
 					controller.getTaxaListView().getSelectionModel().clearSelection();
 					var inputTaxa = alignmentView.getInputTaxa();
 					if (inputTaxa != null) {
@@ -189,6 +190,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 							var t = inputTaxa.indexOf(taxon);
 							if (t != -1 && n.get(t))
 								controller.getTaxaListView().getSelectionModel().select(taxon);
+							if (System.currentTimeMillis() - start > 1000)
+								break; // this is taking too long
 						}
 						alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), inputTaxa, alignmentView.getInputCharacters(),
 								alignmentView.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), alignmentView.getSelectedTaxa());

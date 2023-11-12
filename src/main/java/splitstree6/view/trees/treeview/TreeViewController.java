@@ -28,11 +28,11 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
 import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreeViewController {
@@ -59,7 +59,13 @@ public class TreeViewController {
 	private ComboBox<TreeDiagramType> diagramCBox;
 
 	@FXML
-	private ComboBox<LayoutOrientation> orientationCBox;
+	private Button rotateLeftButton;
+
+	@FXML
+	private Button rotateRightButton;
+
+	@FXML
+	private Button flipButton;
 
 	@FXML
 	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
@@ -117,6 +123,26 @@ public class TreeViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
+		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
+		MaterialIcons.setIcon(flipButton, "flip");
+
+		MaterialIcons.setIcon(previousButton, "arrow_left");
+		MaterialIcons.setIcon(nextButton, "arrow_right");
+
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(settingsToggleButton, "tune");
+		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
+
+		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
+
+		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
+		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
+
+		MaterialIcons.setIcon(increaseFontButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
+
 		zoomableScrollPane.setPannable(true);
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
@@ -185,10 +211,6 @@ public class TreeViewController {
 		return centerPane;
 	}
 
-	public ComboBox<LayoutOrientation> getOrientationCBox() {
-		return orientationCBox;
-	}
-
 	public ComboBox<String> getTreeCBox() {
 		return treeCBox;
 	}
@@ -251,5 +273,17 @@ public class TreeViewController {
 
 	public ToggleButton getFormatToggleButton() {
 		return formatToggleButton;
+	}
+
+	public Button getRotateLeftButton() {
+		return rotateLeftButton;
+	}
+
+	public Button getRotateRightButton() {
+		return rotateRightButton;
+	}
+
+	public Button getFlipButton() {
+		return flipButton;
 	}
 }

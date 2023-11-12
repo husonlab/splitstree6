@@ -20,7 +20,6 @@
 package splitstree6.workflowtree;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ToolBar;
 import javafx.scene.control.TreeView;
 
@@ -30,31 +29,10 @@ public class WorkflowTreeViewController {
 	private ToolBar treeViewToolBar;
 
 	@FXML
-	private Button expandAllButton;
-
-	@FXML
-	private Button collapseAllButton;
-
-	@FXML
-	private Button showButton;
-
-	@FXML
 	private TreeView<String> workflowTreeView;
 
 	public ToolBar getTreeViewToolBar() {
 		return treeViewToolBar;
-	}
-
-	public Button getExpandAllButton() {
-		return expandAllButton;
-	}
-
-	public Button getCollapseAllButton() {
-		return collapseAllButton;
-	}
-
-	public Button getShowButton() {
-		return showButton;
 	}
 
 	public TreeView<String> getWorkflowTreeView() {

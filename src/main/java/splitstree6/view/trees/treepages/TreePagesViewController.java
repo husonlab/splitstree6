@@ -25,11 +25,11 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.HeightAndAngles;
-import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
 
 public class TreePagesViewController {
@@ -50,7 +50,13 @@ public class TreePagesViewController {
 	private ComboBox<TreeDiagramType> diagramCBox;
 
 	@FXML
-	private ComboBox<LayoutOrientation> orientationCBox;
+	private Button rotateLeftButton;
+
+	@FXML
+	private Button rotateRightButton;
+
+	@FXML
+	private Button flipButton;
 
 	@FXML
 	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
@@ -96,6 +102,19 @@ public class TreePagesViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
+		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
+		MaterialIcons.setIcon(flipButton, "flip");
+
+		MaterialIcons.setIcon(zoomInButton, "zoom_in");
+		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
+
+		MaterialIcons.setIcon(increaseFontButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
+
+		MaterialIcons.setIcon(findToggleButton, "search");
+		MaterialIcons.setIcon(settingsToggleButton, "tune");
+		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		innerAnchorPane.getChildren().remove(formatVBox);
 		innerAnchorPane.getChildren().add(formatVBox);
 
@@ -137,8 +156,16 @@ public class TreePagesViewController {
 		return diagramCBox;
 	}
 
-	public ComboBox<LayoutOrientation> getOrientationCBox() {
-		return orientationCBox;
+	public Button getRotateLeftButton() {
+		return rotateLeftButton;
+	}
+
+	public Button getRotateRightButton() {
+		return rotateRightButton;
+	}
+
+	public Button getFlipButton() {
+		return flipButton;
 	}
 
 	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {

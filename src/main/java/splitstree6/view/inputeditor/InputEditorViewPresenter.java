@@ -36,13 +36,12 @@ import splitstree6.view.displaytext.DisplayTextViewPresenter;
 import splitstree6.window.MainWindow;
 
 import java.io.File;
-import java.util.ArrayList;
 
 /**
  * input editor tab presenter
  * Daniel Huson, 10.2021
  */
-public class InputEditorViewPresenter extends DisplayTextViewPresenter {
+public class InputEditorViewPresenter {
 	private final MainWindow mainWindow;
 	private final InputEditorView view;
 
@@ -50,9 +49,11 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 
 	private final ReadOnlyBooleanProperty TRUE = new SimpleBooleanProperty(true);
 
-	public InputEditorViewPresenter(MainWindow mainWindow, InputEditorView view) {
-		super(mainWindow, view, true);
+	private final DisplayTextViewPresenter displayTextViewPresenter;
+
+	public InputEditorViewPresenter(MainWindow mainWindow, DisplayTextViewPresenter displayTextViewPresenter, InputEditorView view) {
 		this.mainWindow = mainWindow;
+		this.displayTextViewPresenter = displayTextViewPresenter;
 		this.view = view;
 
 		view.setShowLineNumbers(true);
@@ -64,44 +65,10 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 		var codeArea = tabController.getCodeArea();
 		codeArea.setEditable(true);
 
-		var list = new ArrayList<>(toolBarController.getFirstToolBar().getItems());
-		list.addAll(tabController.getToolBar().getItems());
-		list.addAll(toolBarController.getLastToolBar().getItems());
-		tabController.getToolBar().getItems().setAll(list);
+		tabController.getToolBar().getItems().addAll(toolBarController.getToolBar().getItems());
 
 		toolBarController.getParseAndLoadButton().setOnAction(e -> view.parseAndLoad());
 		toolBarController.getParseAndLoadButton().disableProperty().bind(view.emptyProperty().or(toolBarController.getFormatLabel().textProperty().isEmpty()));
-
-		toolBarController.getOpenButton().setOnAction(e -> {
-			final var previousDir = new File(ProgramProperties.get("InputDir", ""));
-			final var fileChooser = new FileChooser();
-			if (previousDir.isDirectory())
-				fileChooser.setInitialDirectory(previousDir);
-			fileChooser.setTitle("Open input file");
-			fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
-			final var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
-			if (selectedFile != null) {
-				if (selectedFile.getParentFile().isDirectory())
-					ProgramProperties.put("InputDir", selectedFile.getParent());
-				view.importFromFile(selectedFile.getPath());
-			}
-		});
-		toolBarController.getOpenButton().disableProperty().bind(view.emptyProperty().not());
-
-		toolBarController.getSaveButton().setOnAction(e -> {
-			var fileChooser = new FileChooser();
-			fileChooser.setTitle("Save input text");
-			var previousDir = new File(ProgramProperties.get("InputDir", ""));
-			if (previousDir.isDirectory()) {
-				fileChooser.setInitialDirectory(previousDir);
-			}
-			fileChooser.setInitialFileName(mainWindow.getFileName());
-			var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
-			if (selectedFile != null) {
-				view.saveToFile(selectedFile);
-			}
-		});
-		toolBarController.getSaveButton().disableProperty().bind(view.emptyProperty());
 
 		// prevent double paste:
 		codeArea.addEventHandler(KeyEvent.ANY, e -> {
@@ -138,23 +105,56 @@ public class InputEditorViewPresenter extends DisplayTextViewPresenter {
 	}
 
 	public void setupMenuItems() {
-		super.setupMenuItems();
 
-		var controller = mainWindow.getController();
-		var toolBarController = view.getInputEditorViewController();
+		var mainController = mainWindow.getController();
 
-		mainWindow.getController().getMenuBar().getMenus().stream().filter(m -> m.getText().equals("Edit"))
+		mainController.getMenuBar().getMenus().stream().filter(m -> m.getText().equals("Edit"))
 				.forEach(m -> m.disableProperty().bind(new SimpleBooleanProperty(false)));
 
-		controller.getOpenMenuItem().setOnAction(toolBarController.getOpenButton().getOnAction());
-		controller.getOpenMenuItem().disableProperty().bind(toolBarController.getOpenButton().disableProperty());
+		displayTextViewPresenter.setupMenuItems();
 
-		controller.getReplaceDataMenuItem().disableProperty().bind(TRUE);
-		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(TRUE);
-		controller.getInputEditorMenuItem().disableProperty().bind(TRUE);
+		mainController.getOpenMenuItem().setOnAction(e -> openDialog(mainWindow, view));
+		mainController.getOpenMenuItem().disableProperty().bind(view.emptyProperty().not());
 
-		controller.getOpenRecentMenu().disableProperty().bind(TRUE);
+		mainController.getSaveAsMenuItem().setOnAction(e -> saveDialog(mainWindow, view));
+		mainController.getSaveAsMenuItem().disableProperty().bind(view.emptyProperty());
 
-		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(TRUE);
+		mainController.getReplaceDataMenuItem().disableProperty().bind(TRUE);
+		mainController.getAnalyzeGenomesMenuItem().disableProperty().bind(TRUE);
+		mainController.getInputEditorMenuItem().disableProperty().bind(TRUE);
+
+		mainController.getOpenRecentMenu().disableProperty().bind(TRUE);
+
+		mainController.getImportMultipleTreeFilesMenuItem().disableProperty().bind(TRUE);
+	}
+
+	public static void openDialog(MainWindow mainWindow, InputEditorView view) {
+		final var previousDir = new File(ProgramProperties.get("InputDir", ""));
+		final var fileChooser = new FileChooser();
+		if (previousDir.isDirectory())
+			fileChooser.setInitialDirectory(previousDir);
+		fileChooser.setTitle("Open input file");
+		fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
+		final var selectedFile = fileChooser.showOpenDialog(mainWindow.getStage());
+		if (selectedFile != null) {
+			if (selectedFile.getParentFile().isDirectory())
+				ProgramProperties.put("InputDir", selectedFile.getParent());
+			view.importFromFile(selectedFile.getPath());
+		}
+	}
+
+	public static void saveDialog(MainWindow mainWindow, InputEditorView view) {
+		var fileChooser = new FileChooser();
+		fileChooser.setTitle("Save input text");
+		var previousDir = new File(ProgramProperties.get("InputDir", ""));
+		if (previousDir.isDirectory()) {
+			fileChooser.setInitialDirectory(previousDir);
+		}
+		fileChooser.setInitialFileName(mainWindow.getFileName());
+		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
+		if (selectedFile != null) {
+			view.saveToFile(selectedFile);
+			jloda.util.ProgramProperties.put("InputDir", selectedFile.getPath());
+		}
 	}
 }

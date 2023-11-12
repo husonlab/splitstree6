@@ -107,7 +107,6 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
-import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.Workflow;
@@ -288,11 +287,7 @@ public class MainWindowPresenter {
 		var loadingFile = new SimpleBooleanProperty(this, "loadingFile", false);
 
 		controller.getOpenButton().setOnAction(e -> {
-			if (mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof InputEditorTab inputEditorTab
-				&& inputEditorTab.getView() instanceof InputEditorView inputEditorView) {
-				// this shouldn't be necessary, but is...
-				inputEditorView.getInputEditorViewController().getOpenButton().fire();
-			} else {
+			{
 				var previousDir = new File(ProgramProperties.get("InputDir", ""));
 				var fileChooser = new FileChooser();
 				if (previousDir.isDirectory())
@@ -640,7 +635,7 @@ public class MainWindowPresenter {
 	private void disableAllMenuItems(MainWindowController controller) {
 		var stack = new Stack<MenuItem>();
 		stack.addAll(controller.getMenuBar().getMenus());
-		while (stack.size() > 0) {
+		while (!stack.isEmpty()) {
 			var item = stack.pop();
 			if (item instanceof Menu menu) {
 				if (menu != controller.getOpenRecentMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
