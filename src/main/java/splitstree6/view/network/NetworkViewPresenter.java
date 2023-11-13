@@ -43,6 +43,7 @@ import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
@@ -52,7 +53,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
 
 	private final MainWindow mainWindow;
-	private final NetworkView networkView;
+	private final NetworkView view;
 	private final NetworkViewController controller;
 
 	private final FindToolBar findToolBar;
@@ -80,7 +81,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	public NetworkViewPresenter(MainWindow mainWindow, NetworkView view, ObjectProperty<Bounds> targetBounds, ObjectProperty<NetworkBlock> networkBlock, ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 								ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap) {
 		this.mainWindow = mainWindow;
-		this.networkView = view;
+		this.view = view;
 		this.controller = view.getController();
 
 		controller.getScrollPane().setLockAspectRatio(true);
@@ -197,7 +198,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
-			if (list.size() > 0) {
+			if (!list.isEmpty()) {
 				var content = new ClipboardContent();
 				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
 				Clipboard.getSystemClipboard().setContent(content);
@@ -229,7 +230,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getReplaceMenuItem().setDisable(false);
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
-		mainController.getLayoutLabelsMenuItem().disableProperty().bind(networkView.emptyProperty());
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
 		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
@@ -237,6 +238,10 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+
+		if (controller.getExportMenuButton().getItems().isEmpty()) {
+			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
+		}
 	}
 
 	public LongProperty updateCounterProperty() {
@@ -244,6 +249,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	}
 
 	public void updateLabelLayout() {
-		Platform.runLater(() -> networkPane.layoutLabels(networkView.getOptionOrientation()));
+		Platform.runLater(() -> networkPane.layoutLabels(view.getOptionOrientation()));
 	}
 }

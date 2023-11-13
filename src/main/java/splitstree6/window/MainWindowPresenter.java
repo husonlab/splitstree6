@@ -35,10 +35,8 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jloda.fx.dialog.ExportImageDialog;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
@@ -138,11 +136,7 @@ public class MainWindowPresenter {
 
 		var workflowTreeView = mainWindow.getWorkflowTreeView();
 
-		controller.getTreeViewAnchorPane().getChildren().add(workflowTreeView);
-		AnchorPane.setRightAnchor(workflowTreeView, 0.0);
-		AnchorPane.setLeftAnchor(workflowTreeView, 0.0);
-		AnchorPane.setTopAnchor(workflowTreeView, 0.0);
-		AnchorPane.setBottomAnchor(workflowTreeView, 0.0);
+		controller.getWorkflowBorderPane().setCenter(workflowTreeView);
 
 		keyEventEventHandler = e -> {
 			var ch = e.getCharacter();
@@ -203,6 +197,8 @@ public class MainWindowPresenter {
 				}
 			}
 		});
+
+		controller.getFileNameLabel().textProperty().bind(mainWindow.fileNameProperty().map(FileUtils::getFileNameWithoutPath));
 
 		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 
@@ -336,15 +332,13 @@ public class MainWindowPresenter {
 		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> (new AnalyzeGenomesDialog(stage)).show());
 		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(controller.getOpenMenuItem().disableProperty());
 
-		controller.getSaveButton().setOnAction(e -> {
+		controller.getSaveMenuItem().setOnAction(e -> {
 			if (mainWindow.isHasSplitsTree6File())
 				SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName()));
 			else
 				controller.getSaveAsMenuItem().getOnAction().handle(e);
 		});
-		controller.getSaveButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(mainWindow.dirtyProperty().not()));
-		controller.getSaveMenuItem().setOnAction(controller.getSaveButton().getOnAction());
-		controller.getSaveMenuItem().disableProperty().bind(controller.getSaveButton().disableProperty());
+		controller.getSaveMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(mainWindow.dirtyProperty().not()));
 
 		controller.getSaveAsMenuItem().setOnAction(e -> SaveDialog.showSaveDialog(mainWindow, false));
 		controller.getSaveAsMenuItem().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()));
@@ -360,22 +354,6 @@ public class MainWindowPresenter {
 
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(stage));
 		controller.getPageSetupMenuItem().disableProperty().bind(workflow.runningProperty());
-
-		if (focusedDisplayTab.get() != null) {
-			controller.getPrintButton().setOnAction(e -> Print.print(stage, focusedDisplayTab.get().getMainNode()));
-			controller.getPrintButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(focusedDisplayTab.isNull()));
-		}
-		controller.getPrintMenuItem().setOnAction(controller.getPrintButton().getOnAction());
-		controller.getPrintMenuItem().disableProperty().bind(controller.getPrintButton().disableProperty());
-
-		if (focusedDisplayTab.get() != null) {
-			controller.getExportImageButton().setOnAction(e -> ExportImageDialog.show(mainWindow.getFileName(), stage, focusedDisplayTab.get().getMainNode()));
-			controller.getExportImageButton().disableProperty().bind(mainWindow.emptyProperty().or(workflow.runningProperty()).or(focusedDisplayTab.isNull()));
-		}
-
-		controller.getExportImageMenuItem().setOnAction(controller.getExportImageButton().getOnAction());
-		controller.getExportImageMenuItem().disableProperty().bind(controller.getExportImageButton().disableProperty());
-
 
 		controller.getGroupIdenticalHaplotypesFilesMenuItem().setOnAction(null);
 
@@ -601,6 +579,18 @@ public class MainWindowPresenter {
 				}
 			}
 		});
+
+		if (controller.getFileMenuButton().getItems().isEmpty()) {
+			controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
+					controller.getNewMenuItem(), controller.getInputEditorMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
+					controller.getCloseMenuItem(), new SeparatorMenuItem(),
+					controller.getSaveAsMenuItem(), new SeparatorMenuItem())));
+			var recentFilesFirstIndex = controller.getFileMenuButton().getItems().size();
+			controller.getOpenRecentMenu().getItems().addListener((InvalidationListener) e -> {
+				controller.getFileMenuButton().getItems().remove(recentFilesFirstIndex, controller.getFileMenuButton().getItems().size());
+				controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems()));
+			});
+		}
 
 		controller.getAboutMenuItem().setOnAction((e) -> SplashScreen.showSplash(Duration.ofMinutes(1)));
 

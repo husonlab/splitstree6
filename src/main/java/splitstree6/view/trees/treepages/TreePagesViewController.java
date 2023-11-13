@@ -101,7 +101,12 @@ public class TreePagesViewController {
 	private AnchorPane innerAnchorPane;
 
 	@FXML
+	private MenuButton exportMenuButton;
+
+	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(exportMenuButton, "ios_share");
+
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
@@ -210,5 +215,9 @@ public class TreePagesViewController {
 
 	public VBox getFormatVBox() {
 		return formatVBox;
+	}
+
+	public MenuButton getExportMenuButton() {
+		return exportMenuButton;
 	}
 }

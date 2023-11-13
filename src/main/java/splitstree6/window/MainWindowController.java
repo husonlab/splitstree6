@@ -31,13 +31,11 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.icons.MaterialIcons;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainWindowController {
 	@FXML
@@ -415,7 +413,7 @@ public class MainWindowController {
 	private AnchorPane leftAnchorPane;
 
 	@FXML
-	private AnchorPane treeViewAnchorPane;
+	private BorderPane workflowBorderPane;
 
 	@FXML
 	private BorderPane algorithmsBorderPane;
@@ -442,16 +440,7 @@ public class MainWindowController {
 	private MenuButton fileMenuButton;
 
 	@FXML
-	private Button saveButton;
-
-	@FXML
-	private Button exportImageButton;
-
-	@FXML
-	private Button printButton;
-
-	//@FXML
-	//private TabPane algorithmTabPane;
+	private Label fileNameLabel;
 
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
 
@@ -463,9 +452,6 @@ public class MainWindowController {
 	@FXML
 	void initialize() {
 		MaterialIcons.setIcon(fileMenuButton, "file_open");
-		MaterialIcons.setIcon(saveButton, "save");
-		MaterialIcons.setIcon(exportImageButton, "ios_share");
-		MaterialIcons.setIcon(printButton, "print");
 
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
@@ -506,13 +492,6 @@ public class MainWindowController {
 		};
 		MainWindowManager.getInstance().changedProperty().addListener(invalidationListener);
 		invalidationListener.invalidated(null);
-
-		fileMenuButton.getItems().addAll(BasicFX.copyMenu(List.of(newMenuItem, openMenuItem, closeMenuItem, new SeparatorMenuItem())));
-		var recentFilesFirstIndex = fileMenuButton.getItems().size();
-		openRecentMenu.getItems().addListener((InvalidationListener) e -> {
-			fileMenuButton.getItems().remove(recentFilesFirstIndex, fileMenuButton.getItems().size());
-			fileMenuButton.getItems().addAll(BasicFX.copyMenu(openRecentMenu.getItems()));
-		});
 	}
 
 	public VBox getTopVBox() {
@@ -1016,12 +995,12 @@ public class MainWindowController {
 		return leftAnchorPane;
 	}
 
-	public AnchorPane getTreeViewAnchorPane() {
-		return treeViewAnchorPane;
-	}
-
 	public BorderPane getAlgorithmsBorderPane() {
 		return algorithmsBorderPane;
+	}
+
+	public BorderPane getWorkflowBorderPane() {
+		return workflowBorderPane;
 	}
 
 	public ToolBar getAlgorithmsTabToolBar() {
@@ -1056,19 +1035,11 @@ public class MainWindowController {
 		return mainTabPane;
 	}
 
+	public Label getFileNameLabel() {
+		return fileNameLabel;
+	}
+
 	public MenuButton getFileMenuButton() {
 		return fileMenuButton;
-	}
-
-	public Button getSaveButton() {
-		return saveButton;
-	}
-
-	public Button getExportImageButton() {
-		return exportImageButton;
-	}
-
-	public Button getPrintButton() {
-		return printButton;
 	}
 }

@@ -44,6 +44,7 @@ import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
@@ -58,7 +59,7 @@ import static splitstree6.layout.tree.TreeDiagramType.*;
  */
 public class TanglegramViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
-	private final TanglegramView tanglegramView;
+	private final TanglegramView view;
 	private final TanglegramViewController controller;
 
 	private final ObjectProperty<PhyloTree> tree1 = new SimpleObjectProperty<>(this, "tree1");
@@ -72,7 +73,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 	public TanglegramViewPresenter(MainWindow mainWindow, TanglegramView view, ObjectProperty<Bounds> targetBounds, ObservableList<PhyloTree> trees) {
 		this.mainWindow = mainWindow;
-		this.tanglegramView = view;
+		this.view = view;
 		controller = view.getController();
 
 		tree1.addListener((v, o, n) -> {
@@ -365,7 +366,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				buf.append(tree2.get().toBracketString(true)).append(";\n");
 			BasicFX.putTextOnClipBoard(buf.toString());
 		});
-		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(tanglegramView.emptyProperty());
+		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
+		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
@@ -393,5 +395,9 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+
+		if (controller.getExportMenuButton().getItems().isEmpty()) {
+			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
+		}
 	}
 }

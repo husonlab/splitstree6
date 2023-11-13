@@ -60,6 +60,7 @@ import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
@@ -149,6 +150,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagramTypes, null));
 		controller.getDiagramCBox().getItems().addAll(SplitsDiagramType.values());
 		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
+
 
 		final ObservableSet<SplitsRooting> disabledRootings = FXCollections.observableSet();
 
@@ -431,6 +433,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+
+		if (controller.getExportMenuButton().getItems().isEmpty()) {
+			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
+		}
 	}
 
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {

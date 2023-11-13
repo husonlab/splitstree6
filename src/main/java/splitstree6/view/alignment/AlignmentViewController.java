@@ -192,6 +192,9 @@ public class AlignmentViewController {
     @FXML
     private Group imageGroup;
 
+	@FXML
+	private MenuButton exportMenuButton;
+
     private final NumberAxis axis = new NumberAxis();
 
     private final Pane rightTopPane = new Pane();
@@ -200,6 +203,7 @@ public class AlignmentViewController {
 
     @FXML
     private void initialize() {
+		MaterialIcons.setIcon(exportMenuButton, "ios_share");
 		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(zoomToFitButton, "crop_free");
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
@@ -469,4 +473,8 @@ public class AlignmentViewController {
     public Group getImageGroup() {
         return imageGroup;
     }
+
+	public MenuButton getExportMenuButton() {
+		return exportMenuButton;
+	}
 }

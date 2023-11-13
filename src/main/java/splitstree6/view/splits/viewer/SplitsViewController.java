@@ -100,6 +100,9 @@ public class SplitsViewController {
 	@FXML
 	private Button flipButton;
 
+	@FXML
+	private MenuButton exportMenuButton;
+
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();
@@ -109,6 +112,8 @@ public class SplitsViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(exportMenuButton, "ios_share");
+
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
@@ -239,6 +244,10 @@ public class SplitsViewController {
 
 	public Button getFlipButton() {
 		return flipButton;
+	}
+
+	public MenuButton getExportMenuButton() {
+		return exportMenuButton;
 	}
 }
 

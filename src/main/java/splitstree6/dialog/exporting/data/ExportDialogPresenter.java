@@ -68,7 +68,7 @@ public class ExportDialogPresenter {
 				controller.getFormatCBox().setValue(name);
 			}
 		}
-		if (controller.getFormatCBox().getValue() == null && controller.getFormatCBox().getItems().size() > 0)
+		if (controller.getFormatCBox().getValue() == null && !controller.getFormatCBox().getItems().isEmpty())
 			controller.getFormatCBox().setValue(controller.getFormatCBox().getItems().get(0));
 
 		controller.getBrowseButton().setOnAction(e -> {
@@ -82,6 +82,10 @@ public class ExportDialogPresenter {
 			MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
 		});
 
+		dataNode.titleProperty().addListener(e -> controller.getTitleLabel().setText("Export '%s' of type '%s'"
+				.formatted(dataNode.getTitle(), dataNode.getClass().getSimpleName())));
+		controller.getTitleLabel().setText("Export '%s' of type '%s'".formatted(dataNode.getTitle(),
+				dataNode.getDataBlock().getClass().getSimpleName().replaceAll("Block$", "")));
 		controller.getApplyButton().setOnAction(e -> {
 			try {
 				var fileName = controller.getFileTextField().getText();

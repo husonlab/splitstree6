@@ -41,6 +41,7 @@ import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
@@ -93,7 +94,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 			view.setOptionVerticalZoomFactor(1.0 / 1.2);
 		});
 
-		view.optionRerootAndRescaleProperty().bindBidirectional(controller.getRerootAndRescaleChekMenuItem().selectedProperty());
+		view.optionRerootAndRescaleProperty().bindBidirectional(controller.getRerootAndRescaleCheckMenuItem().selectedProperty());
 		view.optionRerootAndRescaleProperty().addListener((v, o, n) -> {
 			if (n)
 				NotificationManager.showWarning("Option reroot and rescale under development");
@@ -220,10 +221,9 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 				Clipboard.getSystemClipboard().setContent(content);
 			}
 		});
+
 		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
-
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
@@ -278,5 +278,9 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> drawer.getRadialLabelLayout().layoutLabels());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());
+
+		if (controller.getExportMenuButton().getItems().isEmpty() && view.getViewTab() != null) {
+			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
+		}
 	}
 }

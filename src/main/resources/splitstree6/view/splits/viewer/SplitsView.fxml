@@ -99,7 +99,7 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="32.0"
+    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="10.0"
           AnchorPane.topAnchor="0.0">
         <children>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
@@ -117,6 +117,8 @@
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
+            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            </MenuButton>
         </children>
     </HBox>
 </AnchorPane>

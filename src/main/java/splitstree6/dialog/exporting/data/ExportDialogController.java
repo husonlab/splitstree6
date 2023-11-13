@@ -22,8 +22,10 @@ package splitstree6.dialog.exporting.data;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import jloda.fx.icons.MaterialIcons;
 
 public class ExportDialogController {
 
@@ -44,6 +46,14 @@ public class ExportDialogController {
 
 	@FXML
 	private Button applyButton;
+
+	@FXML
+	private Label titleLabel;
+
+	@FXML
+	private void initialize() {
+		MaterialIcons.setIcon(browseButton, "file_open");
+	}
 
 	public ChoiceBox<String> getFormatCBox() {
 		return formatCBox;
@@ -67,5 +77,9 @@ public class ExportDialogController {
 
 	public Button getApplyButton() {
 		return applyButton;
+	}
+
+	public Label getTitleLabel() {
+		return titleLabel;
 	}
 }

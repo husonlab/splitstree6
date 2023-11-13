@@ -133,7 +133,6 @@ public class DensiTreeView implements IView {
 		var loader = new ExtendedFXMLLoader<DensiTreeViewController>(DensiTreeViewController.class);
 		controller = loader.getController();
 
-
 		// this is the target area for the tree page:
 		presenter = new DensiTreeViewPresenter(mainWindow, this, targetBounds);
 
@@ -151,7 +150,7 @@ public class DensiTreeView implements IView {
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), new SelectTraits(mainWindow), new EdgesFormat(this));
 
 		trees.addListener((InvalidationListener) e -> {
-			empty.set(trees.size() == 0);
+			empty.set(trees.isEmpty());
 		});
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));

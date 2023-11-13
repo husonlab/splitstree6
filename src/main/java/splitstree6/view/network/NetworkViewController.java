@@ -92,12 +92,16 @@ public class NetworkViewController {
 	@FXML
 	private ToggleButton formatToggleButton;
 
+	@FXML
+	private MenuButton exportMenuButton;
+
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final CopyableLabel infoLabel = new CopyableLabel();
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(exportMenuButton, "ios_share");
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
@@ -222,5 +226,10 @@ public class NetworkViewController {
 
 	public CopyableLabel getInfoLabel() {
 		return infoLabel;
+	}
+
+
+	public MenuButton getExportMenuButton() {
+		return exportMenuButton;
 	}
 }

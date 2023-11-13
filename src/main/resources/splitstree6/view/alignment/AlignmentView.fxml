@@ -199,7 +199,7 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <HBox prefHeight="24.0" spacing="5.0" AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="2.0">
+    <HBox prefHeight="24.0" spacing="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="2.0">
         <children>
             <MenuButton fx:id="filterMenu" mnemonicParsing="false" text="Filter">
                 <items>
@@ -218,6 +218,8 @@
                     <MenuItem fx:id="disableSelectedSitesMenuItem" mnemonicParsing="false"
                               text="Disable Selected Sites"/>
                 </items>
+            </MenuButton>
+            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
             </MenuButton>
         </children>
     </HBox>

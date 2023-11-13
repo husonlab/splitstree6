@@ -103,7 +103,7 @@ public class DensiTreeViewController {
 	private RadioMenuItem roundedPhylogramToggleItem;
 
 	@FXML
-	private CheckMenuItem rerootAndRescaleChekMenuItem;
+	private CheckMenuItem rerootAndRescaleCheckMenuItem;
 
 	@FXML
 	private MenuButton menuButton;
@@ -129,10 +129,15 @@ public class DensiTreeViewController {
 	@FXML
 	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
 
+	@FXML
+	private MenuButton exportMenuButton;
+
 	private final ToggleGroup diagramToggleGroup = new ToggleGroup();
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(exportMenuButton, "ios_share");
+
 		MaterialIcons.setIcon(flipButton, "swap_vert");
 
 		MaterialIcons.setIcon(findToggleButton, "search");
@@ -288,8 +293,8 @@ public class DensiTreeViewController {
 		return colorIncompatibleTreesMenuItem;
 	}
 
-	public CheckMenuItem getRerootAndRescaleChekMenuItem() {
-		return rerootAndRescaleChekMenuItem;
+	public CheckMenuItem getRerootAndRescaleCheckMenuItem() {
+		return rerootAndRescaleCheckMenuItem;
 	}
 
 	public Button getFlipButton() {
@@ -298,5 +303,9 @@ public class DensiTreeViewController {
 
 	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
 		return averagingCBox;
+	}
+
+	public MenuButton getExportMenuButton() {
+		return exportMenuButton;
 	}
 }

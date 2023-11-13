@@ -39,6 +39,7 @@ import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
@@ -50,7 +51,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	private final static ObservableList<String> gridValues = FXCollections.observableArrayList("1 x 1");
 
 	private final MainWindow mainWindow;
-	private final TreePagesView treePageView;
+	private final TreePagesView view;
 
 	private final TreePagesViewController controller;
 
@@ -69,7 +70,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	 */
 	public TreePagesViewPresenter(MainWindow mainWindow, TreePagesView view, ObjectProperty<Bounds> targetBounds, ObservableList<PhyloTree> phyloTrees) {
 		this.mainWindow = mainWindow;
-		this.treePageView = view;
+		this.view = view;
 
 		controller = view.getController();
 
@@ -209,15 +210,15 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
-		controller.getZoomInButton().setOnAction(e -> treePageView.setOptionZoomFactor(1.1 * treePageView.getOptionZoomFactor()));
-		controller.getZoomInButton().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
-		controller.getZoomOutButton().setOnAction(e -> treePageView.setOptionZoomFactor((1.0 / 1.1) * treePageView.getOptionZoomFactor()));
-		controller.getZoomOutButton().disableProperty().bind(treePageView.emptyProperty());
+		controller.getZoomInButton().setOnAction(e -> this.view.setOptionZoomFactor(1.1 * this.view.getOptionZoomFactor()));
+		controller.getZoomInButton().disableProperty().bind(this.view.emptyProperty().or(this.view.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
+		controller.getZoomOutButton().setOnAction(e -> this.view.setOptionZoomFactor((1.0 / 1.1) * this.view.getOptionZoomFactor()));
+		controller.getZoomOutButton().disableProperty().bind(this.view.emptyProperty());
 
-		controller.getIncreaseFontButton().setOnAction(e -> treePageView.setOptionFontScaleFactor(1.2 * treePageView.getOptionFontScaleFactor()));
-		controller.getIncreaseFontButton().disableProperty().bind(treePageView.emptyProperty());
-		controller.getDecreaseFontButton().setOnAction(e -> treePageView.setOptionFontScaleFactor((1.0 / 1.2) * treePageView.getOptionFontScaleFactor()));
-		controller.getDecreaseFontButton().disableProperty().bind(treePageView.emptyProperty());
+		controller.getIncreaseFontButton().setOnAction(e -> this.view.setOptionFontScaleFactor(1.2 * this.view.getOptionFontScaleFactor()));
+		controller.getIncreaseFontButton().disableProperty().bind(this.view.emptyProperty());
+		controller.getDecreaseFontButton().setOnAction(e -> this.view.setOptionFontScaleFactor((1.0 / 1.2) * this.view.getOptionFontScaleFactor()));
+		controller.getDecreaseFontButton().disableProperty().bind(this.view.emptyProperty());
 
 
 		var undoManager = view.getUndoManager();
@@ -244,17 +245,19 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		var mainController = mainWindow.getController();
 
 		mainController.getCopyNewickMenuItem().setOnAction(e -> {
-			var page = treePageView.getPageNumber();
-			var count = treePageView.getOptionCols() * treePageView.getOptionRows();
+			var page = view.getPageNumber();
+			var count = view.getOptionCols() * view.getOptionRows();
 			var bot = (page - 1) * count;
-			var top = Math.min(treePageView.getTrees().size(), page * count);
+			var top = Math.min(view.getTrees().size(), page * count);
 			var buf = new StringBuilder();
 			for (var t = bot; t < top; t++) {
-				buf.append(treePageView.getTrees().get(t).toBracketString(true)).append(";\n");
+				buf.append(view.getTrees().get(t).toBracketString(true)).append(";\n");
 			}
 			BasicFX.putTextOnClipBoard(buf.toString());
 		});
-		mainController.getCopyNewickMenuItem().disableProperty().bind(treePageView.emptyProperty());
+		mainController.getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
+
+		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainController.getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
 		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
@@ -273,8 +276,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getFindMenuItem().setDisable(false);
 		mainController.getReplaceMenuItem().setDisable(false);
 
-		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(treePageView.getOptionOrientation()));
-		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePageView.emptyProperty().or(treePageView.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
+		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(view.getOptionOrientation()));
+		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 
 		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
 		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
@@ -282,6 +285,10 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+
+		if (controller.getExportMenuButton().getItems().isEmpty()) {
+			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
+		}
 	}
 
     private record RowsCols(int rows, int cols) {

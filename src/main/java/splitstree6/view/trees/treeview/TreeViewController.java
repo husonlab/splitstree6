@@ -115,6 +115,9 @@ public class TreeViewController {
 	@FXML
 	private VBox formatVBox;
 
+	@FXML
+	private MenuButton exportMenuButton;
+
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();
@@ -123,23 +126,20 @@ public class TreeViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(exportMenuButton, "ios_share");
+
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
-
 		MaterialIcons.setIcon(previousButton, "arrow_left");
 		MaterialIcons.setIcon(nextButton, "arrow_right");
-
 		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
-
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
-
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
-
 		MaterialIcons.setIcon(increaseFontButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 
@@ -285,5 +285,9 @@ public class TreeViewController {
 
 	public Button getFlipButton() {
 		return flipButton;
+	}
+
+	public MenuButton getExportMenuButton() {
+		return exportMenuButton;
 	}
 }

@@ -150,7 +150,8 @@ public class AnalyzeGenomesController {
 	@FXML
 	private TabPane mainTabPane;
 
-	public void initialize() {
+	@FXML
+	private void initialize() {
 		MaterialIcons.setIcon(inputBrowseButton, "file_open");
 		MaterialIcons.setIcon(outputBrowseButton, "file_open");
 		MaterialIcons.setIcon(referencesDatabaseButton, "file_open");

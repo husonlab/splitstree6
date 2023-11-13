@@ -20,20 +20,12 @@
 package splitstree6.workflowtree;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.ToolBar;
 import javafx.scene.control.TreeView;
 
 public class WorkflowTreeViewController {
 
 	@FXML
-	private ToolBar treeViewToolBar;
-
-	@FXML
 	private TreeView<String> workflowTreeView;
-
-	public ToolBar getTreeViewToolBar() {
-		return treeViewToolBar;
-	}
 
 	public TreeView<String> getWorkflowTreeView() {
 		return workflowTreeView;

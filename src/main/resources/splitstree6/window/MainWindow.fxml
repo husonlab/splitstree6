@@ -92,7 +92,7 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu mnemonicParsing="false" text="Export">
                             <items>
-                                <MenuItem fx:id="exportImageMenuItem" text="Image..."/>
+                                <MenuItem fx:id="exportImageMenuItem" text="Export Image..."/>
 
                                 <MenuItem fx:id="exportTaxonTraitsMenuItem" text="Taxon Traits..."/>
                                 <MenuItem fx:id="exportTaxonDisplayLabelsMenuItem" mnemonicParsing="false"
@@ -450,14 +450,23 @@
                                     AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <center>
                                 <SplitPane fx:id="leftSplitPane" dividerPositions="1.0" orientation="VERTICAL">
-                                    <AnchorPane fx:id="treeViewAnchorPane" minHeight="0.0" minWidth="0.0"
-                                                prefHeight="100.0" prefWidth="160.0"/>
+                                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                                        <children>
+                                            <BorderPane fx:id="workflowBorderPane" AnchorPane.bottomAnchor="0.0"
+                                                        AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                                        AnchorPane.topAnchor="0.0">
+                                                <top>
+                                                    <ToolBar prefHeight="5.0" BorderPane.alignment="CENTER"/>
+                                                </top>
+                                            </BorderPane>
+                                        </children>
+                                    </AnchorPane>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                                         <BorderPane fx:id="algorithmsBorderPane" AnchorPane.bottomAnchor="0.0"
                                                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                                                     AnchorPane.topAnchor="0.0">
                                             <top>
-                                                <ToolBar fx:id="algorithmsTabToolBar" prefHeight="28.0"
+                                                <ToolBar fx:id="algorithmsTabToolBar" prefHeight="5.0"
                                                          BorderPane.alignment="CENTER"/>
                                             </top>
                                             <center>
@@ -471,24 +480,7 @@
                                 <ToolBar BorderPane.alignment="CENTER">
                                     <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
                                                 text="File"/>
-                                    <Button fx:id="saveButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                            text="Save">
-                                        <tooltip>
-                                            <Tooltip text="Save file"/>
-                                        </tooltip>
-                                    </Button>
-                                    <Button fx:id="exportImageButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                            text="Export">
-                                        <tooltip>
-                                            <Tooltip text="Export the selected tab as an image"/>
-                                        </tooltip>
-                                    </Button>
-                                    <Button fx:id="printButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                            text="Print">
-                                        <tooltip>
-                                            <Tooltip text="Print the selected tab"/>
-                                        </tooltip>
-                                    </Button>
+                                    <Label fx:id="fileNameLabel" text="File name"/>
                                     <BorderPane.margin>
                                         <Insets/>
                                     </BorderPane.margin>

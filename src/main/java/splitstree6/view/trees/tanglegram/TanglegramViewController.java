@@ -121,12 +121,16 @@ public class TanglegramViewController {
 	@FXML
 	private ToggleButton formatToggleButton;
 
+	@FXML
+	private MenuButton exportMenuButton;
+
 	private final CopyableLabel tree1NameLabel = new CopyableLabel();
 	private final CopyableLabel tree2NameLabel = new CopyableLabel();
 
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(exportMenuButton, "ios_share");
 		MaterialIcons.setIcon(flipButton, "swap_vert");
 
 		MaterialIcons.setIcon(previousButton, "arrow_left");
@@ -295,5 +299,9 @@ public class TanglegramViewController {
 
 	public ScrollPane getScrollPane() {
 		return scrollPane;
+	}
+
+	public MenuButton getExportMenuButton() {
+		return exportMenuButton;
 	}
 }

@@ -54,6 +54,7 @@ import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
 import splitstree6.view.trees.treepages.TreePane;
 import splitstree6.view.utils.ComboBoxUtils;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
@@ -394,7 +395,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
-			if (list.size() > 0) {
+			if (!list.isEmpty()) {
 				var content = new ClipboardContent();
 				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
 				Clipboard.getSystemClipboard().setContent(content);
@@ -469,6 +470,10 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
+
+		if (controller.getExportMenuButton().getItems().isEmpty()) {
+			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
+		}
 	}
 
 	public void updateLabelLayout() {

@@ -19,15 +19,10 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.BorderPane?>
-<BorderPane xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.workflowtree.WorkflowTreeViewController">
-    <top>
-        <ToolBar fx:id="treeViewToolBar" prefHeight="28.0" BorderPane.alignment="CENTER">
-        </ToolBar>
-    </top>
     <center>
         <TreeView fx:id="workflowTreeView" BorderPane.alignment="CENTER"/>
     </center>

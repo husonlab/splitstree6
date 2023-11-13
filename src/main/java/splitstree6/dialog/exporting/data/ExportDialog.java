@@ -19,7 +19,9 @@
 
 package splitstree6.dialog.exporting.data;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.scene.Scene;
+import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jloda.fx.util.ExtendedFXMLLoader;
@@ -53,6 +55,16 @@ public class ExportDialog {
 
 	public Stage getStage() {
 		return stage;
+	}
+
+	public static MenuItem createMenuItem(MainWindow mainWindow, DataNode dataNode, ReadOnlyBooleanProperty empty) {
+		var menuItem = new MenuItem("Export data...");
+		menuItem.setOnAction(e -> {
+			var exportDialog = new ExportDialog(mainWindow, dataNode);
+			exportDialog.getStage().show();
+		});
+		menuItem.disableProperty().bind(empty);
+		return menuItem;
 	}
 
 }

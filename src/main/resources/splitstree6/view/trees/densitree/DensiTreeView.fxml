@@ -97,8 +97,13 @@
                                     </ImageView>
                                 </graphic>
                             </RadioMenuItem>
+                            <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                                <tooltip>
+                                    <Tooltip text="use child-average or leaf-average to place internal nodes"/>
+                                </tooltip>
+                            </ComboBox>
                             <SeparatorMenuItem mnemonicParsing="false"/>
-                            <CheckMenuItem fx:id="rerootAndRescaleChekMenuItem" mnemonicParsing="false"
+                            <CheckMenuItem fx:id="rerootAndRescaleCheckMenuItem" mnemonicParsing="false"
                                            text="Reroot and Rescale"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
                             <CheckMenuItem fx:id="showTreesMenuItem" mnemonicParsing="false" text="Show Trees"/>
@@ -113,11 +118,7 @@
                     </MenuButton>
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                     <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false" text="Flip"/>
-                    <ComboBox fx:id="averagingCBox" minWidth="50.0">
-                        <tooltip>
-                            <Tooltip text="use child-average or leaf-average to place internal nodes"/>
-                        </tooltip>
-                    </ComboBox>
+
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
 
                     <Button fx:id="expandVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
@@ -160,7 +161,7 @@
         </top>
 
     </BorderPane>
-    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="32.0"
+    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="10.0"
           AnchorPane.topAnchor="0.0">
         <children>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
@@ -178,6 +179,8 @@
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
+            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            </MenuButton>
         </children>
     </HBox>
 </AnchorPane>
