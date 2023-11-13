@@ -586,6 +586,7 @@ public class MainWindowPresenter {
 					controller.getCloseMenuItem(), new SeparatorMenuItem(),
 					controller.getSaveAsMenuItem(), new SeparatorMenuItem())));
 			var recentFilesFirstIndex = controller.getFileMenuButton().getItems().size();
+			controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems()));
 			controller.getOpenRecentMenu().getItems().addListener((InvalidationListener) e -> {
 				controller.getFileMenuButton().getItems().remove(recentFilesFirstIndex, controller.getFileMenuButton().getItems().size());
 				controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems()));

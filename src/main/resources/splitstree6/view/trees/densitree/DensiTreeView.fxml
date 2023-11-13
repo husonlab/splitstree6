@@ -97,11 +97,6 @@
                                     </ImageView>
                                 </graphic>
                             </RadioMenuItem>
-                            <ComboBox fx:id="averagingCBox" minWidth="50.0">
-                                <tooltip>
-                                    <Tooltip text="use child-average or leaf-average to place internal nodes"/>
-                                </tooltip>
-                            </ComboBox>
                             <SeparatorMenuItem mnemonicParsing="false"/>
                             <CheckMenuItem fx:id="rerootAndRescaleCheckMenuItem" mnemonicParsing="false"
                                            text="Reroot and Rescale"/>
@@ -116,6 +111,11 @@
                             <CheckMenuItem fx:id="jitterMenuItem" mnemonicParsing="false" text="Jitter"/>
                         </items>
                     </MenuButton>
+                    <ComboBox fx:id="averagingCBox" minWidth="50.0">
+                        <tooltip>
+                            <Tooltip text="use child-average or leaf-average to place internal nodes"/>
+                        </tooltip>
+                    </ComboBox>
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                     <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false" text="Flip"/>
 
