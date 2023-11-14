@@ -28,7 +28,6 @@ import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import splitstree6.xtra.genetreeview.util.Command;
 
 public class UndoRedoManager {
 

@@ -35,7 +35,7 @@ public class FeatureParser extends ParserDialog {
     private final ComboBox<String> featureTypeSelection;
 
     public FeatureParser(Stage parentStage, Model model) {
-        super(parentStage, "feature values", model.getGeneTreeSet().size());
+        super(parentStage, "feature name and values", model.getGeneTreeSet().size());
         this.model = model;
         this.setTitle("FeatureParser");
 

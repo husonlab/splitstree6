@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 public class RobinsonFouldsDistance {
 
+    // Calculation of a modified Robinson-Foulds distance that supports partial and multifurcating phylogenetic trees
     public static int calculate(PhyloTree tree1, PhyloTree tree2) {
         ArrayList<HashMap<String,Integer>> idMaps = createNewTaxonName2IdMaps(tree1, tree2);
         ArrayList<Pair<BitSet,BitSet>> splits1 = getSplitsFromEdges(tree1, idMaps.get(0));
@@ -37,23 +38,33 @@ public class RobinsonFouldsDistance {
         for (var split1 : splits1) {
             var part1A = split1.getFirst();
             var part1B = split1.getSecond();
+            int toRemove = -1;
             for (var split2 : splits2) {
                 var part2A = split2.getFirst();
                 var part2B = split2.getSecond();
                 if (part1A.equals(part2A)) {
-                    //if (part1B.equals(part2B))
                         numberOfSplitsInCommon+=1;
+                        toRemove = splits2.indexOf(split2);
                         break;
                 }
                 else if (part1B.equals(part2A)) {
-                    //if (part1A.equals(part2B))
                         numberOfSplitsInCommon+=1;
+                        toRemove = splits2.indexOf(split2);
                         break;
                 }
+                else if (part1A.equals(part2B)) {
+                    numberOfSplitsInCommon+=1;
+                    toRemove = splits2.indexOf(split2);
+                    break;
+                }
+                else if (part1B.equals(part2B)) {
+                    numberOfSplitsInCommon+=1;
+                    toRemove = splits2.indexOf(split2);
+                    break;
+                }
             }
+            if (toRemove != -1) splits2.remove(toRemove);
         }
-        //System.out.println("Total split number of "+tree1.getName()+" and "+tree2.getName()+": "+totalSplitNumber);
-        //System.out.println("\t number of splits in common: "+numberOfSplitsInCommon);
         return totalSplitNumber - (2*numberOfSplitsInCommon);
     }
 

@@ -37,19 +37,15 @@ public class SimilarityCalculationTask extends Task<LinkedHashMap<Integer,Intege
 
     @Override
     protected LinkedHashMap<Integer,Integer> call() throws Exception {
-        ArrayList<Integer> similarities = new ArrayList<>(geneTrees.size());
         LinkedHashMap<Integer,Integer> id2similarities = new LinkedHashMap<>();
         for (GeneTree geneTree : geneTrees) {
             int robinsonFouldsDistance = RobinsonFouldsDistance.calculate(referenceTree, geneTree.getPhyloTree());
-            if (robinsonFouldsDistance < 0) { // can happen with partial trees
+            if (robinsonFouldsDistance < 0) {
                 System.out.println("Negative distance calculated with tree "+geneTree.getGeneName());
                 robinsonFouldsDistance = 0;
             }
-            //System.out.println("Distance of "+referenceTree.getName()+" and "+tree.getName()+": "+robinsonFouldsDistance);
             int maximum = referenceTree.getNumberOfEdges() + geneTree.getPhyloTree().getNumberOfEdges();
             int similarity = maximum - robinsonFouldsDistance;
-            //System.out.println("Similarity of "+referenceTree.getName()+" and "+tree.getName()+": "+similarity);
-            similarities.add(similarity);
             id2similarities.put(geneTree.getId(), similarity);
         }
         return id2similarities;

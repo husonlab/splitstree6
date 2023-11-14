@@ -34,8 +34,6 @@ import java.util.HashMap;
 
 public class FeatureOverviewDialog extends Stage {
 
-    // TODO: make editable
-
     public FeatureOverviewDialog(Stage parentStage, GeneTreeSet geneTreeSet) {
         this.initStyle(parentStage.getStyle());
         this.setTitle("FeatureOverview");

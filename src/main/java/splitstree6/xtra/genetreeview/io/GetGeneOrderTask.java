@@ -40,7 +40,7 @@ public class GetGeneOrderTask extends Task<TreeMap<Double,Integer>> {
 
     @Override
     protected TreeMap<Double,Integer> call() throws Exception {
-        // Getting the gene order from ncbi using a simple E-utility pipeline: ESearch-ESummary
+        // Getting the gene order from NCBI's gene database using a simple E-utility pipeline: ESearch-ESummary
         TreeMap<Double,Integer> orderedTreeIds = new TreeMap<>();
         System.out.println(taxonName);
         var base = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/";
@@ -56,7 +56,6 @@ public class GetGeneOrderTask extends Task<TreeMap<Double,Integer>> {
             connection.connect();
             var searchResult = new String(connection.getInputStream().readAllBytes());
             connection.disconnect();
-            //System.out.println(searchResult);
             // Extraction of QueryKey and WebEnv for the next step in the pipeline
             String webEnv = null;
             String queryKey = null;
@@ -78,7 +77,6 @@ public class GetGeneOrderTask extends Task<TreeMap<Double,Integer>> {
             connection.connect();
             var summaryResult = new String(connection.getInputStream().readAllBytes());
             connection.disconnect();
-            //System.out.println(summaryResult);
             double start = 0;
             double stop = 0;
             Matcher startMatcher = Pattern.compile("<ChrStart>(\\d+)</ChrStart>").matcher(summaryResult);

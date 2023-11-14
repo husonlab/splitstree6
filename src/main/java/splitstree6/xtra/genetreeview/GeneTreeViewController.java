@@ -193,6 +193,7 @@ public class GeneTreeViewController {
 	@FXML
 	private void initialize() {
 		label.setText("");
+		centerPane.setStyle("-fx-border-color: -fx-box-border; -fx-border-insets: -1;");
 	}
 
 	// File Menu

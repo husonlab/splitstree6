@@ -23,7 +23,6 @@ import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.beans.property.SimpleSetProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import splitstree6.xtra.genetreeview.util.SelectionModel;
 
 import java.util.Collection;
 
