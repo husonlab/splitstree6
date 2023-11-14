@@ -78,7 +78,7 @@ public class PairwiseCompare { // todo: add support for character weights
 
 			//Handle ambiguous states?
 			final boolean ambigI, ambigJ;
-			if (isNucleotides && !isIgnoreAmbiguous) {
+			if (isNucleotides) {
 				ambigI = AmbiguityCodes.isAmbiguityCode(ci);
 				ambigJ = AmbiguityCodes.isAmbiguityCode(cj);
 			} else {
@@ -86,28 +86,29 @@ public class PairwiseCompare { // todo: add support for character weights
 			}
 
 			if (ambigI || ambigJ) {
-
-				final String si = AmbiguityCodes.getNucleotides(ci);
-				final String sj = AmbiguityCodes.getNucleotides(cj);
+				if (isIgnoreAmbiguous)
+					continue;
+				final var si = AmbiguityCodes.getNucleotides(ci);
+				final var sj = AmbiguityCodes.getNucleotides(cj);
 
 				//Two cases... if they are the same states, then this needs to be distributed
 				//down the diagonal of F. Otherwise, average.
 
 				if (si.equals(sj)) {
-					double weight = 1.0 / si.length();
+					var weight = 1.0 / si.length();
 					for (int pos = 0; pos < si.length(); pos++) {
 						int statei = states.indexOf(si.charAt(pos));
 						fCount[statei][statei] += weight * charWeight;
 					}
 				} else {
-					double weight = 1.0 / (si.length() * sj.length());
+					var weight = 1.0 / (si.length() * sj.length());
 
-					for (int x = 0; x < si.length(); x++) {
-						for (int y = 0; y < sj.length(); y++) {
-							final int cx = si.charAt(x);
-							final int cy = sj.charAt(y);
-							int stateX = states.indexOf(cx);
-							int stateY = states.indexOf(cy);
+					for (var x = 0; x < si.length(); x++) {
+						for (var y = 0; y < sj.length(); y++) {
+							final var cx = si.charAt(x);
+							final var cy = sj.charAt(y);
+							var stateX = states.indexOf(cx);
+							var stateY = states.indexOf(cy);
 							if (cx == gapChar) stateX = gapIndex;
 							if (cx == missingChar) stateX = missingIndex;
 							if (cy == gapChar) stateY = gapIndex;

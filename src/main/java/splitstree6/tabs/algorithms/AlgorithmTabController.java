@@ -50,6 +50,7 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(menuButton, "edit");
 		MaterialIcons.setIcon(applyButton, "play_circle");
 		menuButton.setVisible(false);
 	}

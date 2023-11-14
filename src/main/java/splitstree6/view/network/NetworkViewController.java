@@ -130,7 +130,8 @@ public class NetworkViewController {
 
 		DraggableLabel.makeDraggable(infoLabel);
 
-		settingsToggleButton.setSelected(true);
+		settingsToggleButton.setSelected(false);
+
 		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
 		toolBar.setMaxHeight(ToolBar.USE_COMPUTED_SIZE);
 		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());

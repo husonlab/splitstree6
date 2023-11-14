@@ -198,7 +198,7 @@ public class MainWindowPresenter {
 			}
 		});
 
-		controller.getFileNameLabel().textProperty().bind(mainWindow.fileNameProperty().map(FileUtils::getFileNameWithoutPath));
+		mainWindow.fileNameProperty().addListener((v, o, n) -> controller.getFileNameLabel().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n)));
 
 		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 

@@ -22,7 +22,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/16"
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.tabs.workflow.WorkflowTabController">
     <BorderPane fx:id="borderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -38,12 +38,6 @@
         <top>
             <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
                 <ToolBar fx:id="toolBar" prefHeight="32.0">
-                    <Button fx:id="findButton" contentDisplay="CENTER" mnemonicParsing="false" text="Find">
-                        <tooltip>
-                            <Tooltip text="Find in selected tab"/>
-                        </tooltip>
-                    </Button>
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                     <Button fx:id="zoomButton" contentDisplay="CENTER" mnemonicParsing="false" text="zoomToFit">
                         <tooltip>
                             <Tooltip text="Zoom to fit"/>

@@ -22,30 +22,17 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
-            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="1200.0" style="-fx-background-color: transparent;"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.treeview.TreeViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="vBox">
-                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
+                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0">
                     <Separator layoutX="44.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
                     <ComboBox fx:id="treeCBox" minWidth="100.0"/>
-
-                    <Button fx:id="previousButton" mnemonicParsing="false" text="Previous">
-                        <tooltip>
-                            <Tooltip text="Move to previous phylogeny"/>
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="nextButton" mnemonicParsing="false" text="Next">
-                        <tooltip>
-                            <Tooltip text="Move to next phylogeny"/>
-                        </tooltip>
-                    </Button>
-                    <Separator layoutX="155.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
                     <ComboBox fx:id="diagramCBox">
                         <tooltip>
                             <Tooltip text="Choose diagram type"/>
@@ -80,25 +67,25 @@
                     <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
 
                     <Button fx:id="expandVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
-                            text="Expand Vertically">
+                            text="X Vert">
                         <tooltip>
                             <Tooltip text="Expand tree vertically"/>
                         </tooltip>
                     </Button>
 
                     <Button fx:id="contractVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
-                            text="Contract Vertically">
+                            text="C Vert">
                         <tooltip>
                             <Tooltip text="Contract tree vertically"/>
                         </tooltip>
                     </Button>
                     <Button fx:id="expandHorizontallyButton" contentDisplay="CENTER" mnemonicParsing="false"
-                            prefHeight="20.0" text="Expand Horizontally">
+                            prefHeight="20.0" text="X Horz">
                         <tooltip>
                             <Tooltip text="Expand tree horizontally"/>
                         </tooltip>
                     </Button>
-                    <Button fx:id="contractHorizontallyButton" mnemonicParsing="false" text="Contract Horizontally">
+                    <Button fx:id="contractHorizontallyButton" mnemonicParsing="false" text="C Horz">
                         <tooltip>
                             <Tooltip text="Contract tree horizontally"/>
                         </tooltip>
@@ -132,9 +119,22 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="10.0"
+    <HBox alignment="BOTTOM_CENTER" layoutX="840.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0"
+          spacing="5.0" style="-fx-background-color: derive(-fx-base, 20%);" AnchorPane.rightAnchor="10.0"
           AnchorPane.topAnchor="0.0">
         <children>
+
+            <Button fx:id="previousButton" mnemonicParsing="false" text="Prev">
+                <tooltip>
+                    <Tooltip text="Move to previous phylogeny"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="nextButton" mnemonicParsing="false" text="Next">
+                <tooltip>
+                    <Tooltip text="Move to next phylogeny"/>
+                </tooltip>
+            </Button>
+            <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>
                     <Tooltip text="Show the Settings toolbar"/>
@@ -150,7 +150,8 @@
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
+                        prefHeight="26.0" text="Export">
             </MenuButton>
         </children>
     </HBox>

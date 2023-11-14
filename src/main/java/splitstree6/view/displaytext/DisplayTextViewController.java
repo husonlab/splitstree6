@@ -92,7 +92,6 @@ public class DisplayTextViewController {
 		scrollPane = new VirtualizedScrollPane<>(codeArea);
 		borderPane.setCenter(scrollPane);
 		codeArea.prefWidthProperty().bind(borderPane.widthProperty());
-
 		highlighter = new Highlighter(codeArea);
 	}
 

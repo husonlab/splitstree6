@@ -31,7 +31,8 @@
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="vBox">
-                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
+                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="36.0"
+                         VBox.vgrow="NEVER">
                     <MenuButton fx:id="selectSitesMenu" mnemonicParsing="false" text="Select Sites">
                         <items>
                             <MenuItem fx:id="selectAllMenuItem" mnemonicParsing="false" text="Select All"/>
@@ -199,7 +200,8 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <HBox prefHeight="24.0" spacing="5.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="2.0">
+    <HBox alignment="BOTTOM_RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="30.0" spacing="5.0"
+          style="-fx-background-color: derive(-fx-base, 20%);" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="2.0">
         <children>
             <MenuButton fx:id="filterMenu" mnemonicParsing="false" text="Filter">
                 <items>
@@ -219,8 +221,12 @@
                               text="Disable Selected Sites"/>
                 </items>
             </MenuButton>
-            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
+                        prefHeight="26.0" text="Export">
             </MenuButton>
         </children>
+        <padding>
+            <Insets right="10.0"/>
+        </padding>
     </HBox>
 </AnchorPane>

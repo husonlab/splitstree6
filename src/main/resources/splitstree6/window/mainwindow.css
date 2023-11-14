@@ -1,5 +1,5 @@
 /*
- * Version.java Copyright (C) 2023 Daniel H. Huson
+ * mainwindow.css Copyright (C) 2023 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,15 +17,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.main;
-
-/**
- * The version string
- * Daniel Huson, 6.2017
- */
-public class Version {
-	static public final String NAME = "SplitsTree CE";
-	static public final String SHORT_DESCRIPTION = "SplitsTree CE (version 6.2.0-beta, built 14 Nov 2023)";
-	static public final String VERSION = "6.0.0_alpha";
-
+viewer-background {
+    -fx-background-color: white;
 }
+
+.scroll-pane {
+    -fx-background: white;
+}
+
+.chart-pie {
+    -fx-border-width: 0.5px;
+}
+
+.split-pane .split-pane-divider {
+    -fx-background-color: derive(-fx-base, 50%);
+    -fx-min-width: 20;
+    -fx-min-height: 20;
+}
+
+.table-view .column-header-background {
+    -fx-background-color: derive(-fx-base, 50%);
+    -fx-min-width: 20;
+    -fx-min-height: 20;
+}
+
+
+

@@ -121,7 +121,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		};
 		node.getService().stateProperty().addListener(new WeakChangeListener<>(stateChangeListener));
 
-		vBox.setOnMouseClicked((e) -> {
+		vBox.setOnMouseClicked(e -> {
 			if (e.getClickCount() == 2) {
 				showView();
 				e.consume();
@@ -169,13 +169,21 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 		stateChangeListener = null;
 
-		if (node.getDataBlock() instanceof ViewBlock viewBlock)
-			vBox.setOnMouseClicked((e) -> {
+		if (node.getDataBlock() instanceof ViewBlock viewBlock) {
+			vBox.setOnMouseClicked(e -> {
 				if (e.getClickCount() == 2) {
 					mainWindow.getController().getMainTabPane().getSelectionModel().select(viewBlock.getViewTab());
 					e.consume();
 				}
 			});
+		} else {
+			vBox.setOnMouseClicked(e -> {
+				if (e.getClickCount() == 2) {
+					mainWindow.getTextTabsManager().showDataNodeTab(node, true);
+					e.consume();
+				}
+			});
+		}
 
 		label.disableProperty().bind(node.validProperty().not());
 

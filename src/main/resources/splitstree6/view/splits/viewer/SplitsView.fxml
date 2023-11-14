@@ -29,7 +29,7 @@
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="vBox">
-                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
+                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0">
                     <ComboBox fx:id="diagramCBox">
                         <tooltip>
                             <Tooltip text="Choose diagram type"/>
@@ -99,8 +99,8 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="10.0"
-          AnchorPane.topAnchor="0.0">
+    <HBox alignment="BOTTOM_CENTER" prefHeight="30.0" spacing="5.0" style="-fx-background-color: derive(-fx-base, 20%);"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <children>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>
@@ -117,8 +117,12 @@
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
+                        prefHeight="26.0" text="Export">
             </MenuButton>
         </children>
+        <padding>
+            <Insets right="10.0"/>
+        </padding>
     </HBox>
 </AnchorPane>

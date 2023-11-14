@@ -26,7 +26,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Parent;
-import javafx.scene.shape.Shape;
 import javafx.util.Duration;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.BasicFX;
@@ -38,7 +37,6 @@ import jloda.util.StringUtils;
 
 import java.util.LinkedList;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -133,7 +131,6 @@ public class LayoutUtils {
 			var label = new RichTextLabel();
 			var taxonId = IteratorUtils.getFirst(graph.getTaxa(v));
 			if (taxonId != null) {
-				var taxon = taxonLabelMap.apply(taxonId);
 				label.textProperty().bindBidirectional(taxonLabelMap.apply(taxonId));
 			} else
 				label.setText(graph.getLabel(v));
@@ -152,7 +149,7 @@ public class LayoutUtils {
 	public static void applyLabelScaleFactor(Parent root, double factor) {
 		if (factor != 0 && factor != 1) {
 			var queue = new LinkedList<>(root.getChildrenUnmodifiable());
-			while (queue.size() > 0) {
+			while (!queue.isEmpty()) {
 				var node = queue.pop();
 				if (node instanceof RichTextLabel richTextLabel) {
 					richTextLabel.setScale(factor * richTextLabel.getScale());

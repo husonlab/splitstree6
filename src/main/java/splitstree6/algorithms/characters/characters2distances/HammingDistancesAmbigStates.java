@@ -23,8 +23,6 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.fx.window.NotificationManager;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
@@ -73,19 +71,11 @@ public class HammingDistancesAmbigStates extends Characters2Distances {
 			computeMatchStatesHamming(taxa, characters, distancesBlock);
 		else {
 			// all the same here
-			final int ntax = taxa.getNtax();
-			for (int s = 1; s <= ntax; s++) {
-				for (int t = s + 1; t <= ntax; t++) {
-
-					final PairwiseCompare seqPair;
-					if (optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.Ignore))
-						seqPair = new PairwiseCompare(characters, s, t, true);
-					else
-						seqPair = new PairwiseCompare(characters, s, t, false);
-
-
-					final double[][] F = seqPair.getF();
-
+			var ntax = taxa.getNtax();
+			for (var s = 1; s <= ntax; s++) {
+				for (var t = s + 1; t <= ntax; t++) {
+					var seqPair = new PairwiseCompare(characters, s, t, optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.Ignore));
+					var F = seqPair.getF();
 					var dist = -1.0;
 					if (F != null) {
 						var p = 1.0;

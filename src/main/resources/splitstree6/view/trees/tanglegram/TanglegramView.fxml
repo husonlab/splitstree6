@@ -23,17 +23,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="1200.0" style="-fx-background-color: transparent;"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.tanglegram.TanglegramViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="vBox" BorderPane.alignment="CENTER">
-                <AnchorPane>
+                <AnchorPane VBox.vgrow="NEVER">
                     <children>
-                        <ToolBar fx:id="toolBar" prefHeight="32.0" AnchorPane.bottomAnchor="0.0"
-                                 AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0"
+                                 styleClass="button-bar" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                                 AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <ComboBox fx:id="tree1CBox" prefWidth="100.0"/>
                             <ComboBox fx:id="diagram1CBox" prefWidth="50.0">
                                 <tooltip>
@@ -52,16 +53,6 @@
                                     text="Flip"/>
                             <Separator layoutX="494.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                        orientation="VERTICAL" prefHeight="20.0"/>
-                            <Button fx:id="previousButton" mnemonicParsing="false" text="Previous">
-                                <tooltip>
-                                    <Tooltip text="Move to previous pair of phylogenies"/>
-                                </tooltip>
-                            </Button>
-                            <Button fx:id="nextButton" mnemonicParsing="false" text="Next">
-                                <tooltip>
-                                    <Tooltip text="Move to next pair of phylogenies"/>
-                                </tooltip>
-                            </Button>
                             <Separator layoutX="548.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0"
                                        orientation="VERTICAL" prefHeight="20.0"/>
                             <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
@@ -78,26 +69,25 @@
                             <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
 
                             <Button fx:id="expandVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                    text="Expand Vertically">
+                                    text="X Vert">
                                 <tooltip>
                                     <Tooltip text="Expand tree vertically"/>
                                 </tooltip>
                             </Button>
 
                             <Button fx:id="contractVerticallyButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                    text="Contract Vertically">
+                                    text="C  Vert">
                                 <tooltip>
                                     <Tooltip text="Contract tree vertically"/>
                                 </tooltip>
                             </Button>
                             <Button fx:id="expandHorizontallyButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                    prefHeight="20.0" text="Expand Horizontally">
+                                    prefHeight="20.0" text="X Horiz">
                                 <tooltip>
                                     <Tooltip text="Expand tree horizontally"/>
                                 </tooltip>
                             </Button>
-                            <Button fx:id="contractHorizontallyButton" mnemonicParsing="false"
-                                    text="Contract Horizontally">
+                            <Button fx:id="contractHorizontallyButton" mnemonicParsing="false" text="C Horiz">
                                 <tooltip>
                                     <Tooltip text="Contract tree horizontally"/>
                                 </tooltip>
@@ -144,9 +134,21 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="10.0"
-          AnchorPane.topAnchor="0.0">
+    <HBox alignment="BOTTOM_CENTER" layoutX="827.0" layoutY="-7.0" maxHeight="-Infinity" minHeight="-Infinity"
+          prefHeight="30.0" spacing="5.0" style="-fx-background-color: derive(-fx-base, 20%);"
+          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <children>
+            <Button fx:id="previousButton" mnemonicParsing="false" text="Prev">
+                <tooltip>
+                    <Tooltip text="Move to previous pair of phylogenies"/>
+                </tooltip>
+            </Button>
+            <Button fx:id="nextButton" mnemonicParsing="false" text="Next">
+                <tooltip>
+                    <Tooltip text="Move to next pair of phylogenies"/>
+                </tooltip>
+            </Button>
+            <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>
                     <Tooltip text="Show the Settings toolbar"/>
@@ -162,8 +164,12 @@
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
+                        prefHeight="26.0" text="Export">
             </MenuButton>
         </children>
+        <padding>
+            <Insets right="10.0"/>
+        </padding>
     </HBox>
 </AnchorPane>

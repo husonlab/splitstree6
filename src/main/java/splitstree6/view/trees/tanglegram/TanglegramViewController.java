@@ -172,7 +172,8 @@ public class TanglegramViewController {
 		DraggableLabel.makeDraggable(tree1NameLabel);
 		DraggableLabel.makeDraggable(tree2NameLabel);
 
-		settingsToggleButton.setSelected(true);
+		settingsToggleButton.setSelected(false);
+
 		toolBar.setMinHeight(ToolBar.USE_PREF_SIZE);
 		toolBar.setMaxHeight(ToolBar.USE_COMPUTED_SIZE);
 		toolBar.visibleProperty().bind(settingsToggleButton.selectedProperty());

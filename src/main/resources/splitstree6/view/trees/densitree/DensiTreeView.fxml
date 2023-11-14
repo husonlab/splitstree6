@@ -179,7 +179,8 @@
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
+                        prefHeight="26.0" text="Export">
             </MenuButton>
         </children>
     </HBox>

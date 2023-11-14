@@ -48,9 +48,6 @@ public class WorkflowTabController {
 	private ToolBar toolBar;
 
 	@FXML
-	private Button findButton;
-
-	@FXML
 	private Button zoomButton;
 
 	@FXML
@@ -66,7 +63,6 @@ public class WorkflowTabController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(findButton, "search");
 		MaterialIcons.setIcon(zoomButton, "crop_free");
 		MaterialIcons.setIcon(zoomInButton, "zoom_in");
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
@@ -103,10 +99,6 @@ public class WorkflowTabController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
-	}
-
-	public Button getFindButton() {
-		return findButton;
 	}
 
 	public Button getZoomButton() {

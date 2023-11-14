@@ -52,6 +52,8 @@ import splitstree6.view.alignment.AlignmentView;
 import splitstree6.workflow.Workflow;
 import splitstree6.workflowtree.WorkflowTreeView;
 
+import java.util.Objects;
+
 public class MainWindow implements IMainWindow {
 	private final Parent root;
 	private MainWindowPresenter presenter;
@@ -152,6 +154,7 @@ public class MainWindow implements IMainWindow {
 		stage.getIcons().addAll(ProgramProperties.getProgramIconsFX());
 
 		var scene = new Scene(root);
+		scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("mainwindow.css")).toExternalForm());
 
 		stage.setScene(scene);
 		scene.getStylesheets().add("jloda/resources/css/white_pane.css");

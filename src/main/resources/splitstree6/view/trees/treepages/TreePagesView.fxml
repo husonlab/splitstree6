@@ -23,7 +23,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane fx:id="anchorPane" prefWidth="700.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<AnchorPane fx:id="anchorPane" prefWidth="1200.0" xmlns="http://javafx.com/javafx/18"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.trees.treepages.TreePagesViewController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                 AnchorPane.topAnchor="0.0">
@@ -31,7 +32,7 @@
             <VBox fx:id="vBox" BorderPane.alignment="CENTER">
                 <AnchorPane>
                     <children>
-                        <ToolBar fx:id="toolBar" minHeight="-Infinity" prefHeight="32.0" AnchorPane.bottomAnchor="0.0"
+                        <ToolBar fx:id="toolBar" minHeight="-Infinity" prefHeight="34.0" AnchorPane.bottomAnchor="0.0"
                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                             <ComboBox fx:id="diagramCBox" prefWidth="50.0">
@@ -123,7 +124,8 @@
             </AnchorPane>
         </center>
     </BorderPane>
-    <HBox alignment="CENTER_LEFT" prefHeight="32.0" spacing="5.0" AnchorPane.rightAnchor="10.0"
+    <HBox alignment="BOTTOM_CENTER" prefHeight="30.0" spacing="5.0"
+          style="-fx-background-color: derive(-fx-base, 20%) derive(-fx-base, 20%);" AnchorPane.rightAnchor="10.0"
           AnchorPane.topAnchor="0.0">
         <children>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
@@ -141,7 +143,8 @@
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <MenuButton fx:id="exportMenuButton" mnemonicParsing="false" text="Export">
+            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
+                        prefHeight="26.0" text="Export">
             </MenuButton>
         </children>
     </HBox>
