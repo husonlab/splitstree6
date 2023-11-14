@@ -67,8 +67,8 @@ public class GeneTreeViewPresenter {
 
 	private Group trees = new Group();
 	private final Group treeSnapshots = new Group();
-	private final double treeHeight = 250;
-	private final double treeWidth = 220; // including taxa label space ~ 80 // TODO: make label space more flexible
+	private final double treeHeight = 280;
+	private final double treeWidth = 220; // including taxa label space ~ 80
 	private MultipleFramesLayout currentLayout = new MultipleFramesLayout() {};
 	private TreeDiagramType treeDiagramType = TreeDiagramType.RectangularCladogram;;
 	private final Tooltip currentTreeToolTip = new Tooltip("");
@@ -457,7 +457,6 @@ public class GeneTreeViewPresenter {
 
 		// Help Menu
 		controller.getAboutMenuItem().setOnAction(e -> {
-			// TODO: show some kind of information
 		});
 
 		// ToolBar (the zoom slider is handled by the layout)
@@ -698,9 +697,7 @@ public class GeneTreeViewPresenter {
 		};
 		controller.getProgressBar().visibleProperty().bind(visualizeTreesService.runningProperty());
 		controller.getProgressBar().progressProperty().bind(visualizeTreesService.progressProperty());
-		visualizeTreesService.setOnScheduled(v -> {
-			controller.getProgressLabel().setText("Drawing trees ...");
-		});
+		visualizeTreesService.setOnScheduled(v -> controller.getProgressLabel().setText("Drawing trees ..."));
 		visualizeTreesService.setOnSucceeded(v -> {
 			controller.getCenterPane().getChildren().clear();
 			trees = visualizeTreesService.getValue();
@@ -924,10 +921,12 @@ public class GeneTreeViewPresenter {
 		initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
 				controller.getSimilarityOrderSubMenu(), controller.getOrderGroup(), model.getGeneTreeSet().getOrderedGeneNames());
 		updateInfoLabel(controller.getLabel());
-		if (currentLayout.getType().equals(LayoutType.Carousel) & (treesCount.get() >= 50 || geneTrees.size() > 1 || geneTrees.get(0).getPosition() != treesCount.get()-1)) {
+		if (currentLayout.getType().equals(LayoutType.Carousel) & (treesCount.get() >= 50 || geneTrees.size() > 1 ||
+				geneTrees.get(0).getPosition() != treesCount.get()-1)) {
 			((CarouselLayout)currentLayout).initializeLayout();
 		}
-		else if (currentLayout.getType().equals(LayoutType.Stack) & (geneTrees.size() > 1 || geneTrees.get(0).getPosition() != treesCount.get()-1))
+		else if (currentLayout.getType().equals(LayoutType.Stack) & (geneTrees.size() > 1 ||
+				geneTrees.get(0).getPosition() != treesCount.get()-1))
 			currentLayout.updatePosition(controller.getSlider().getValue(), controller.getSlider().getValue());
 	}
 
@@ -942,7 +941,6 @@ public class GeneTreeViewPresenter {
 			treeSnapshots.getChildren().remove(removedPosition);
 			model.getGeneTreeSet().removeTree(removedId);
 			treesCount.set(treesCount.get()-1);
-			// TODO: If taxa are unique in the removed tree, they should be removed from the TaxaBlock
 			colorBar.removeColorBox(removedId);
 			id2treeSheet.remove(removedId);
 			initializeTreeLists(controller.getSimilarityColoringSubMenu(), controller.getColoringGroup(),
@@ -956,14 +954,14 @@ public class GeneTreeViewPresenter {
 		}
 	}
 
-	private Node createSnapshot(Node treeVis) {
-		Bounds bounds = treeVis.getLayoutBounds();
+	private Node createSnapshot(Node treeSheet) {
+		Bounds bounds = treeSheet.getLayoutBounds();
 		WritableImage writableImage = new WritableImage((int)Math.ceil(bounds.getWidth()*2),
 				(int)Math.ceil(bounds.getHeight()*2)); // scaling with factor 2 for better resolution
 		SnapshotParameters parameters = new SnapshotParameters();
 		parameters.setFill(Color.TRANSPARENT);
 		parameters.setTransform(javafx.scene.transform.Transform.scale(2,2));
-		Image image = treeVis.snapshot(parameters,writableImage);
+		Image image = treeSheet.snapshot(parameters,writableImage);
 		ImageView snapShot = new ImageView(image);
 		snapShot.setFitWidth(bounds.getWidth());
 		snapShot.setFitHeight(bounds.getHeight());
@@ -1116,7 +1114,6 @@ public class GeneTreeViewPresenter {
 			}
 			else if (featureType == FeatureType.CATEGORICAL) {
 				colors = ColorSchemeManager.getInstance().getColorScheme("Glasbey29");
-				//System.out.println("Available colors: " + colors.size());
 				for (int treeId : model.getGeneTreeSet().keySet()) {
 					int category = (int) Math.round((double) treeId2FeatureValue.get(treeId));
 					while (category > colors.size()-1) category -= colors.size();
@@ -1126,7 +1123,6 @@ public class GeneTreeViewPresenter {
 					colorBar.setColor(treeId, color);
 				}
 			}
-			//for (String colorSchemeName : ColorSchemeManager.getInstance().getNames()) System.out.println(colorSchemeName);
 		}
 		else {
 			toggleGroup.selectedToggleProperty().removeListener(toggleChangeListener);
@@ -1174,7 +1170,6 @@ public class GeneTreeViewPresenter {
 				String[] taxonNames = taxonName.split("_");
 				taxonName = taxonNames[0]+"+"+taxonNames[1];
 			}
-			System.out.println(taxonName);
 			var geneOrderDialog = new GeneOrderDialog(stage,taxonName);
 			geneOrderDialog.doneProperty().addListener((InvalidationListener) -> {
 				String finalTaxonName = geneOrderDialog.getFinalSelectedName();
@@ -1184,7 +1179,6 @@ public class GeneTreeViewPresenter {
 					orderGroup.selectedToggleProperty().addListener(orderGroupListener);
 					return;
 				}
-				System.out.println(finalTaxonName);
 				Service<TreeMap<Double,Integer>> getGeneOrderService = new Service<>() {
 					@Override
 					protected Task<TreeMap<Double,Integer>> createTask() {
@@ -1217,11 +1211,9 @@ public class GeneTreeViewPresenter {
 			var featureType = model.getGeneTreeSet().getFeatureType(selectedFeature);
 			var id2featureValues = model.getGeneTreeSet().getFeatureValues(selectedFeature);
 			TreeMap<Double,Integer> orderedTreeIds = new TreeMap<>();
-			// TODO: trees without a value for this feature should go to the end? (currently sorting not possible with missing values)
 			if (featureType == FeatureType.NUMERICAL) {
 				for (int treeId : model.getGeneTreeSet().keySet()) {
 					double value;
-					//if (id2featureValues.get(treeId) == null) value = ;
 					value = Double.parseDouble(id2featureValues.get(treeId));
 					while (orderedTreeIds.containsKey(value)) value += 0.0000000000001;
 					orderedTreeIds.put(value, treeId);
@@ -1326,6 +1318,6 @@ public class GeneTreeViewPresenter {
 	}
 
 	private void updateInfoLabel(Label label) {
-		label.setText("Trees: %,d, Taxa: %,d".formatted(treesCount.get(), taxaCount.get()));
+		label.setText("Trees: %,d, Leaves: %,d".formatted(treesCount.get(), taxaCount.get()));
 	}
 }

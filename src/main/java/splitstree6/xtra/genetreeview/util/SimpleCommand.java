@@ -19,8 +19,6 @@
 
 package splitstree6.xtra.genetreeview.util;
 
-import splitstree6.xtra.genetreeview.util.Command;
-
 public class SimpleCommand implements Command {
     private final String name;
     private final Runnable undoRunnable;

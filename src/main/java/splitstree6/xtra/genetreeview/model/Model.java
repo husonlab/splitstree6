@@ -20,15 +20,12 @@
 package splitstree6.xtra.genetreeview.model;
 
 import javafx.beans.property.LongProperty;
-import javafx.beans.property.ReadOnlyLongProperty;
 import javafx.beans.property.SimpleLongProperty;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.readers.trees.TreesReader;
-import splitstree6.xtra.genetreeview.model.GeneTreeSet;
-
 import java.io.File;
 import java.io.IOException;
 
@@ -66,13 +63,5 @@ public class Model {
 			geneTreeSet = new GeneTreeSet(treesBlock);
 			lastUpdate.set(System.currentTimeMillis());
 		} else throw new IOException("File does not contain trees");
-	}
-
-	public long getLastUpdate() {
-		return lastUpdate.get();
-	}
-
-	public ReadOnlyLongProperty lastUpdateProperty() {
-		return lastUpdate;
 	}
 }

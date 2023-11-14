@@ -20,7 +20,6 @@
 package splitstree6.xtra.genetreeview.io;
 
 import javafx.stage.Stage;
-import splitstree6.xtra.genetreeview.io.SelectionDialog;
 
 public class SimilarityCalculationDialog extends SelectionDialog {
 

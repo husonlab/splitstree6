@@ -75,7 +75,10 @@
                                     <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP" shortcut="DOWN" />
                                  </accelerator>
                               </MenuItem>
-                              <MenuItem fx:id="copyImageMenuItem" mnemonicParsing="false" text="Copy Image" />
+                              <MenuItem fx:id="copyImageMenuItem" mnemonicParsing="false" text="Copy Image">
+                                 <accelerator>
+                                    <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="DOWN" shortcut="DOWN" />
+                                 </accelerator></MenuItem>
                               <Menu mnemonicParsing="false" text="Copy Selected Trees">
                                 <items>
                                   <MenuItem fx:id="copySelectedNewicksMenuItem" mnemonicParsing="false" text="in Newick format" />
@@ -149,7 +152,7 @@
                                  </toggleGroup>
                               </RadioMenuItem>
                               <RadioMenuItem fx:id="monophyleticColoringMenuItem" mnemonicParsing="false" text="Monophyletic Selection Coloring" toggleGroup="$coloringGroup" />
-                              <Menu fx:id="similarityColoringSubMenu" mnemonicParsing="false" text="Coloring By Similarity With Tree" />
+                              <Menu fx:id="similarityColoringSubMenu" mnemonicParsing="false" text="Coloring By Similarity" />
                               <Menu fx:id="featureColoringSubMenu" disable="true" mnemonicParsing="false" text="Coloring By Feature Values" />
                               <SeparatorMenuItem mnemonicParsing="false" />
                               <MenuItem fx:id="featureOverviewMenuItem" disable="true" mnemonicParsing="false" text="Feature Overview" />
@@ -179,16 +182,17 @@
             <center>
                 <StackPane BorderPane.alignment="CENTER">
                <children>
-                   <Pane fx:id="centerPane">
-                       <StackPane.margin>
-                           <Insets/>
-                       </StackPane.margin>
-                   </Pane>
+                  <Pane fx:id="centerPane">
+                     <StackPane.margin>
+                        <Insets />
+                     </StackPane.margin></Pane>
                </children>
-                    <BorderPane.margin>
-                        <Insets/>
-                    </BorderPane.margin>
-                </StackPane>
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin>
+               <padding>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </padding></StackPane>
             </center>
          <bottom>
             <VBox BorderPane.alignment="CENTER">

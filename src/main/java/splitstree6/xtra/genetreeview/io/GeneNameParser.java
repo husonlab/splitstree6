@@ -19,8 +19,6 @@
 
 package splitstree6.xtra.genetreeview.io;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.stage.Stage;
 import splitstree6.xtra.genetreeview.model.Model;
 

@@ -35,14 +35,12 @@ public class CarouselLayout extends MultipleFramesLayout {
     private final Slider zoomSlider;
     private final double nodeWidth;
     private final double nodeHeight;
-    private final ReadOnlyDoubleProperty layoutWidthProperty;
     private final ReadOnlyDoubleProperty layoutHeightProperty;
     private int realNodeNumber;
     private double thetaDeg;
     private double thetaRad;
     private double layoutRadius;
     private final DoubleProperty cameraRadius = new SimpleDoubleProperty();
-    private static final IntegerProperty constant1 = new SimpleIntegerProperty(1);
 
     public CarouselLayout(ObservableList<Node> nodes, double nodeWidth, double nodeHeight,
                           ReadOnlyDoubleProperty layoutWidthProperty, ReadOnlyDoubleProperty layoutHeightProperty,
@@ -51,7 +49,6 @@ public class CarouselLayout extends MultipleFramesLayout {
         // Setting up variables
         this.nodeWidth = nodeWidth;
         this.nodeHeight = nodeHeight;
-        this.layoutWidthProperty = layoutWidthProperty;
         this.layoutHeightProperty = layoutHeightProperty;
         this.slider = slider;
         this.zoomSlider = zoomSlider;
@@ -65,7 +62,7 @@ public class CarouselLayout extends MultipleFramesLayout {
     public void initializeLayout() {
         realNodeNumber = transformedNodes.size();
         // For less than 50 trees, it makes no sense to arrange them in a circle, but in a partial circle
-        int layoutNodeNumber = Math.max(realNodeNumber, 50); // assuming at least 50 trees for the carousel size
+        int layoutNodeNumber = Math.max(realNodeNumber, 50) + 5; // assuming at least 50 trees for the carousel size
 
         layoutRadius = (1.05 * nodeWidth * layoutNodeNumber) / (2 * Math.PI);
         thetaDeg = 360 / (double) layoutNodeNumber;
@@ -90,7 +87,7 @@ public class CarouselLayout extends MultipleFramesLayout {
         }
         else {
             resetNode(node);
-            realNodeNumber++;
+            realNodeNumber = transformedNodes.size();
             node.setTranslateX(layoutRadius * Math.sin(index * thetaRad) - (Math.cos(index * thetaRad) * (nodeWidth / 2.)));
             node.setTranslateY(-nodeHeight / 2.);
             node.setTranslateZ(-layoutRadius * Math.cos(index * thetaRad) - (Math.sin(index * thetaRad) * (nodeWidth / 2.)));
@@ -146,23 +143,13 @@ public class CarouselLayout extends MultipleFramesLayout {
 
         cameraRadius.bind(zoomSlider.valueProperty().multiply(-1).add(layoutRadius));
         cameraRadius.addListener((observableValue, oldValue, newValue) -> {
-            int i = 0;
             for (var node : transformedNodes) {
                 scaleNode(node);
-                i++;
             }
-            System.out.println("Rescaled nodes: "+i);
         });
     }
 
     private void scaleNode(Node node) {
-        /*var scalingFunctionX = Bindings.createDoubleBinding(() ->
-                        (layoutWidthProperty.get()*0.23/nodeWidth) / (1 + (Math.abs(layoutWidthProperty.get()*0.23/nodeWidth))) + 0.5,
-                layoutWidthProperty
-        );
-        if (node.scaleXProperty().isBound()) node.scaleXProperty().unbind();
-        node.scaleXProperty().bind(constant1);*/
-
         var scalingFunctionY = Bindings.createDoubleBinding(() ->
                         (layoutHeightProperty.get()*0.7/nodeHeight) / (1 + (Math.abs(layoutHeightProperty.get()*0.7/nodeHeight))) + 0.5,
                 layoutHeightProperty

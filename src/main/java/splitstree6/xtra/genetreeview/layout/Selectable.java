@@ -19,15 +19,7 @@
 
 package splitstree6.xtra.genetreeview.layout;
 
-import javafx.beans.property.BooleanProperty;
-
 public interface Selectable {
 
     void setSelectedProperty(boolean selected);
-
-    void setSelectedProperty();
-
-    BooleanProperty isSelectedProperty();
-
-    //BooleanProperty mediatorProperty();
 }

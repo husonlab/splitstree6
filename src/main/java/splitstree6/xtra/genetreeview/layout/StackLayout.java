@@ -31,6 +31,7 @@ public class StackLayout extends MultipleFramesLayout{
     private final PerspectiveCamera camera;
     private final BooleanProperty isSnapshot = new SimpleBooleanProperty(false);
     private final Slider slider;
+    private final Slider zoomSlider;
     private final ReadOnlyDoubleProperty layoutWidthProperty;
     private final ReadOnlyDoubleProperty layoutHeightProperty;
     private final double nodeWidth;
@@ -45,6 +46,7 @@ public class StackLayout extends MultipleFramesLayout{
         this.nodeWidth = nodeWidth;
         this.nodeHeight = nodeHeight;
         this.slider = slider;
+        this.zoomSlider = zoomSlider;
 
         // Transforming nodes
         initializeNodes(nodes);
@@ -53,14 +55,14 @@ public class StackLayout extends MultipleFramesLayout{
         transformedSnapshots = snapshots;
 
         // Setting up zoomSlider
-        setUpZoomSlider(zoomSlider, 0, 300);
+        setUpZoomSlider(zoomSlider, 1, 1.2);
 
         // Transforming camera
         resetCamera(camera);
         camera.setFarClip(3000);
         camera.setNearClip(0.1);
         camera.setTranslateY(0);
-        camera.translateZProperty().bind(layoutHeightProperty.multiply(-2.6).add(zoomSlider.valueProperty()));
+        camera.translateZProperty().bind(layoutHeightProperty.multiply(-2.6));
         this.camera = camera;
         updatePosition(1,slider.getValue());
     }
@@ -94,14 +96,12 @@ public class StackLayout extends MultipleFramesLayout{
 
     private void transformNode(Node node, double x) {
         // Translate X
-        //var functionForX = (1.045/(1.+Math.exp(-1.028*x))-0.522);
         var functionForX = (1.285/(1+Math.exp(-0.767*x))-0.642); // returns a value between 0 and 1
         node.translateXProperty().unbind();
         node.translateXProperty().bind(layoutWidthProperty.multiply(functionForX).subtract(nodeWidth/2.));
 
         // Rotation
-        //var rotate = (190./(1.+Math.exp(0.2*x)))-102.; // layout draft 3
-        var rotate = (179./(1+Math.exp(-1.15*x)))-89.; // layout draft 4
+        var rotate = (179.925/(1+Math.exp(-1.148*x)))-89.463;
         node.setRotate(rotate);
 
         // Scaling size: larger nodes in the center
@@ -109,7 +109,7 @@ public class StackLayout extends MultipleFramesLayout{
         node.scaleXProperty().unbind();
         node.scaleXProperty().bind(layoutWidthProperty.multiply(0.24).divide(nodeWidth).multiply(scalingFunction));
         node.scaleYProperty().unbind();
-        node.scaleYProperty().bind(layoutHeightProperty.multiply(0.75).divide(nodeHeight).multiply(scalingFunction));
+        node.scaleYProperty().bind(layoutHeightProperty.divide(nodeHeight).multiply(scalingFunction).multiply(zoomSlider.valueProperty()));
 
         // Show node closer and without rotation when hovered
         node.setOnMouseEntered(e -> {
