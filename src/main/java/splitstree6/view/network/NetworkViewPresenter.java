@@ -85,7 +85,9 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		this.controller = view.getController();
 
 		controller.getScrollPane().setLockAspectRatio(true);
-		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
+		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
+		controller.getScrollPane().setPannable(true);
+
 		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * view.getOptionZoomFactor()));
 
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(null, null));

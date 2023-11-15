@@ -66,7 +66,9 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 			scrollPane.prefHeightProperty().bind(controller.getMainPane().heightProperty());
 
 			scrollPane.setLockAspectRatio(true);
-			scrollPane.setRequireShiftOrControlToZoom(true);
+			scrollPane.setRequireShiftOrControlToZoom(false);
+			scrollPane.setPannable(true);
+
 			controller.getZoomButton().setOnAction(e -> scrollPane.resetZoom());
 			controller.getZoomInButton().setOnAction(e -> scrollPane.zoomBy(1.1, 1.1));
 			controller.getZoomOutButton().setOnAction(e -> scrollPane.zoomBy(1 / 1.1, 1 / 1.1));

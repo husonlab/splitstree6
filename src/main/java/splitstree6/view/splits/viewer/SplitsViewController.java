@@ -109,6 +109,8 @@ public class SplitsViewController {
 
 	private final CopyableLabel fitLabel = new CopyableLabel();
 
+	private ZoomButtonsPanel zoomButtonPane;
+
 	@FXML
 	private void initialize() {
 		MaterialIcons.setIcon(exportMenuButton, "ios_share");
@@ -160,6 +162,13 @@ public class SplitsViewController {
 		});
 
 		DraggableLabel.makeDraggable(formatVBox);
+
+		if (false) {
+			zoomButtonPane = new ZoomButtonsPanel(zoomInButton, zoomOutButton, null, null, zoomInButton.disableProperty(), null);
+			AnchorPane.setLeftAnchor(zoomButtonPane, 20.0);
+			AnchorPane.setBottomAnchor(zoomButtonPane, 20.0);
+			anchorPane.getChildren().add(zoomButtonPane);
+		}
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -248,6 +257,10 @@ public class SplitsViewController {
 
 	public MenuButton getExportMenuButton() {
 		return exportMenuButton;
+	}
+
+	public ZoomButtonsPanel getZoomButtonPane() {
+		return zoomButtonPane;
 	}
 }
 

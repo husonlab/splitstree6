@@ -174,8 +174,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		toScale.set(view.getOptionDiagram() != null && view.getOptionDiagram().isPhylogram());
 
 		var scrollPane = controller.getScrollPane();
+
 		scrollPane.lockAspectRatioProperty().bind(lockAspectRatio);
-		scrollPane.setRequireShiftOrControlToZoom(true);
+		scrollPane.setRequireShiftOrControlToZoom(false);
+		controller.getScrollPane().setPannable(true);
+
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
 
 		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();

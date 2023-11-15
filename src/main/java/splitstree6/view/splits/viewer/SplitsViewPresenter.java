@@ -114,9 +114,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.view = view;
 		this.controller = view.getController();
 
-
 		controller.getScrollPane().setLockAspectRatio(true);
-		controller.getScrollPane().setRequireShiftOrControlToZoom(true);
+		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
+		controller.getScrollPane().setPannable(true);
+
 		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * view.getOptionZoomFactor()));
 
 		final ObservableSet<SplitsDiagramType> disabledDiagramTypes = FXCollections.observableSet();
@@ -157,7 +158,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		selectionListener = e -> {
 			// splitsView.getSplitSelectionModel().clearSelection();
 
-			if (mainWindow.getTaxonSelectionModel().getSelectedItems().size() == 0) {
+			if (mainWindow.getTaxonSelectionModel().getSelectedItems().isEmpty()) {
 				disabledRootings.add(SplitsRooting.OutGroup);
 				disabledRootings.add(SplitsRooting.OutGroupAlt);
 			} else
@@ -247,7 +248,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		});
 
 		controller.getScrollPane().setContent(splitNetworkPane);
-		controller.getScrollPane().setPannable(false);
 		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(view.getOptionZoomFactor() * controller.getScrollPane().getZoomFactorY()));
 
 		updateListener = e -> RunAfterAWhile.apply(splitNetworkPane, () -> Platform.runLater(splitNetworkPane::drawNetwork));
@@ -299,6 +299,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
 		view.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", view.optionZoomFactorProperty(), o, n));
+
+		view.optionZoomFactorProperty().addListener(e -> controller.getZoomButtonPane().show());
 
 		var object = new Object();
 		selectionChangeListener = e -> {
