@@ -71,7 +71,7 @@ public class AlgorithmItemPresenter {
 			}
 		});
 
-		controller.getNameLabel().setGraphic(ResourceManagerFX.getIconAsImageView(node.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16));
+		controller.getNameLabel().setGraphic(node.getName().endsWith("Filter") ? MaterialIcons.graphic("filter_alt") : MaterialIcons.graphic("settings"));
 
 		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");
@@ -81,7 +81,7 @@ public class AlgorithmItemPresenter {
 
 		node.validProperty().addListener((v, o, n) -> {
 			if (!n)
-				controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Scheduled.png", 16));
+				controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("schedule", "-fx-text-fill: yellow;"));
 		});
 
 		var progressIndicator = new ProgressIndicator();
@@ -93,9 +93,12 @@ public class AlgorithmItemPresenter {
 
 		node.getService().stateProperty().addListener((v, o, n) -> {
 			switch (n) {
-				case CANCELLED, FAILED -> controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Failed.png", 16));
-				case READY, SCHEDULED -> controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Scheduled.png", 16));
-				case SUCCEEDED -> controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Done.png", 16));
+				case CANCELLED, FAILED ->
+						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("close", "-fx-text-fill: red;"));
+				case READY, SCHEDULED ->
+						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("schedule", "-fx-text-fill: yellow;"));
+				case SUCCEEDED ->
+						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("done", "-fx-text-fill: green;"));
 				case RUNNING -> controller.getIconPane().getChildren().setAll(progressIndicator);
 			}
 		});

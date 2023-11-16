@@ -24,7 +24,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
 import jloda.fx.control.SplittableTabPane;
-import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.displaydatablock.DisplayData;
@@ -65,7 +65,7 @@ public class TextTabsManager {
 			tab = nodeTabMap.get(node);
 		else {
 			tab = new ViewTab(mainWindow, node, true);
-			tab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16));
+			tab.setGraphic(MaterialIcons.graphic("notes"));
 			var view = new DisplayData(mainWindow, node, node.getTitle(), false);
 			tab.setView(view);
 			tab.setText(view.getName());

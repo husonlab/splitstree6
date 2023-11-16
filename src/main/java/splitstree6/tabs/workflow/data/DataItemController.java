@@ -22,9 +22,9 @@ package splitstree6.tabs.workflow.data;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import jloda.fx.icons.MaterialIcons;
 
 public class DataItemController {
@@ -44,11 +44,12 @@ public class DataItemController {
 	private Button editButton;
 
 	@FXML
-	private ImageView statusImageView;
+	private Pane statusPane;
 
 	@FXML
 	private void initialize() {
 		MaterialIcons.setIcon(editButton, "preview");
+		statusPane.getChildren().setAll(MaterialIcons.graphic("done", "-fx-text-fill: green;"));
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -67,8 +68,8 @@ public class DataItemController {
 		return nameLabel;
 	}
 
-	public ImageView getStatusImageView() {
-		return statusImageView;
+	public Pane getStatusPane() {
+		return statusPane;
 	}
 
 	public Button getEditButton() {

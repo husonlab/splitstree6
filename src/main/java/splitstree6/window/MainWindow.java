@@ -29,12 +29,12 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
 import javafx.stage.Stage;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.util.ProgramProperties;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
@@ -97,13 +97,13 @@ public class MainWindow implements IMainWindow {
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
 		methodsTab = new DisplayTextTab(this, "How to Cite", false);
-		methodsTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/History24.gif", 16));
+		methodsTab.setGraphic(MaterialIcons.graphic("subject"));
 
 		workflow.validProperty().addListener(e -> updateMethodsTab());
 		workflow.numberOfNodesProperty().addListener(e -> Platform.runLater(this::updateMethodsTab));
 
 		workflowTab = new WorkflowTab(this);
-		workflowTab.setGraphic(ResourceManagerFX.getIconAsImageView("sun/Preferences24.gif", 16));
+		workflowTab.setGraphic(MaterialIcons.graphic("map"));
 		workflow.validProperty().addListener((v, o, n) -> {
 			if (workflow.getWorkingTaxaBlock() == null) {
 				activeTaxa.clear();

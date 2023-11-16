@@ -28,7 +28,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.icons.MaterialIcons;
 import jloda.util.StringUtils;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.displaytext.DisplayTextView;
@@ -70,7 +70,7 @@ public class ReportBlock extends DataBlock {
 					viewTab = new ViewTab(mainWindow, getNode(), false);
 					var displayTextView = new DisplayTextView(mainWindow, getName(), false);
 					viewTab.setView(displayTextView);
-					viewTab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16));
+					viewTab.setGraphic(MaterialIcons.graphic("dataset"));
 
 					displayTextView.setViewTab(getViewTab());
 					displayTextView.setOptionText(StringUtils.toString(getLines(), "\n"));
@@ -79,7 +79,7 @@ public class ReportBlock extends DataBlock {
 			}
 
 			invalidationListener = e -> {
-				if (getNode().getParents().size() == 0) { // have removed the node from the workflow
+				if (getNode().getParents().isEmpty()) { // have removed the node from the workflow
 					if (viewTab != null)
 						mainWindow.removeTabFromMainTabPane(viewTab);
 				} else { // have added the node to the workflow, e.g. after undo delete
@@ -91,7 +91,7 @@ public class ReportBlock extends DataBlock {
 						viewTab = new ViewTab(mainWindow, getNode(), false);
 						mainWindow.addTabToMainTabPane(viewTab);
 						viewTab.setView(view);
-						viewTab.setGraphic(ResourceManagerFX.getIconAsImageView("TextView16.gif", 16));
+						viewTab.setGraphic(MaterialIcons.graphic("dataset"));
 					}
 					setInputBlockName(getNode().getParents().get(0).getName());
 				}

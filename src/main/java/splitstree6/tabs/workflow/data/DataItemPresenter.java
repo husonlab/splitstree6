@@ -21,8 +21,7 @@ package splitstree6.tabs.workflow.data;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.scene.image.ImageView;
-import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.icons.MaterialIcons;
 import splitstree6.contextmenus.datanode.DataNodeContextMenu;
 import splitstree6.data.ReportBlock;
 import splitstree6.data.ViewBlock;
@@ -60,24 +59,22 @@ public class DataItemPresenter<D extends DataBlock> {
 		controller.getNameLabel().textProperty().bind(node.titleProperty());
 
 		controller.getInfoLabel().setText(String.format("size: %,d", node.getDataBlock().size()));
-		controller.getStatusImageView().setImage(node.getDataBlock().size() > 0 ? ResourceManagerFX.getIcon("Done.png") : ResourceManagerFX.getIcon("Scheduled.png"));
+		if (node.getDataBlock().size() > 0)
+			controller.getStatusPane().getChildren().setAll(MaterialIcons.graphic("done", "-fx-text-fill: green;"));
+		else
+			controller.getStatusPane().getChildren().setAll(MaterialIcons.graphic("schedule", "-fx-text-fill: yellow;"));
 
 		node.allParentsValidProperty().addListener((v, o, n) -> {
 			if (n && node.isValid()) {
 				controller.getInfoLabel().setText(String.format("size: %,d", node.getDataBlock().size()));
-				controller.getStatusImageView().setImage(ResourceManagerFX.getIcon("Done.png"));
+				controller.getStatusPane().getChildren().setAll(MaterialIcons.graphic("done", "-fx-text-fill: green;"));
 			} else {
 				controller.getInfoLabel().setText("-");
-				controller.getStatusImageView().setImage(ResourceManagerFX.getIcon("Scheduled.png"));
-
+				controller.getStatusPane().getChildren().setAll(MaterialIcons.graphic("schedule", "-fx-text-fill: yellow;"));
 			}
 		});
 
-		var icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").replaceAll("\\s+", "")
-													 .replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
-		if (icon != null) {
-			controller.getNameLabel().setGraphic(new ImageView(icon));
-		}
+		controller.getNameLabel().setGraphic(MaterialIcons.graphic("dataset"));
 
 		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");

@@ -24,11 +24,10 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.AService;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.PrintUtils;
-import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.NotificationManager;
 import jloda.util.BitSetUtils;
 import jloda.util.Single;
@@ -116,7 +115,7 @@ public class AlignmentView implements IView {
 			targetBounds.unbind();
 			if (n != null) {
 				targetBounds.bind(n.layoutBoundsProperty());
-				n.setGraphic(ResourceManagerFX.getIconAsImageView("Alignment16.gif", 16));
+				n.setGraphic(MaterialIcons.graphic("settings"));
 			}
 		});
 

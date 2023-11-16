@@ -20,7 +20,7 @@
 package splitstree6.view.trees.densitree;
 
 import javafx.scene.Node;
-import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.icons.MaterialIcons;
 
 public enum DensiTreeDiagramType {
 	TriangularPhylogram, RectangularPhylogram, RoundedPhylogram, RadialPhylogram;
@@ -30,6 +30,6 @@ public enum DensiTreeDiagramType {
 	}
 
 	public Node createNode() {
-		return ResourceManagerFX.getIconAsImageView(name() + "16.gif", 16);
+		return MaterialIcons.graphic("wysiwyg");
 	}
 }

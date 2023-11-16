@@ -300,8 +300,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
 		view.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", view.optionZoomFactorProperty(), o, n));
 
-		view.optionZoomFactorProperty().addListener(e -> controller.getZoomButtonPane().show());
-
+		view.optionZoomFactorProperty().addListener(e -> {
+			if (controller.getZoomButtonPane() != null)
+				controller.getZoomButtonPane().show();
+		});
 		var object = new Object();
 		selectionChangeListener = e -> {
 			if (e.wasAdded()) {

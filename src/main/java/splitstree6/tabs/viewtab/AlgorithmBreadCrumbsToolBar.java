@@ -30,7 +30,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 import jloda.fx.control.CopyableLabel;
-import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.PluginClassLoader;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
@@ -128,8 +128,7 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
         tooltip.textProperty().bind(algorithmNode.shortDescriptionProperty());
         button.setTooltip(tooltip);
 
-        final var imageView = ResourceManagerFX.getIconAsImageView(algorithmNode.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16);
-        button.setGraphic(imageView);
+        button.setGraphic(algorithmNode.getName().endsWith("Filter") ? MaterialIcons.graphic("filter_alt") : MaterialIcons.graphic("settings"));
 
         final Runnable showTab = () -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 

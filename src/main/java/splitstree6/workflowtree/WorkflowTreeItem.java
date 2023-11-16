@@ -19,9 +19,6 @@
 
 package splitstree6.workflowtree;
 
-import javafx.animation.Animation;
-import javafx.animation.Interpolator;
-import javafx.animation.RotateTransition;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
@@ -29,12 +26,9 @@ import javafx.concurrent.Worker;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeItem;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.util.Duration;
-import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.icons.MaterialIcons;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.FileUtils;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
@@ -62,7 +56,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		workflowNode = null;
 		Label label = new Label();
 		label.textProperty().bind(Bindings.createStringBinding(() -> FileUtils.getFileNameWithoutPath(mainWindow.getFileName()), mainWindow.fileNameProperty()));
-		label.setGraphic(ResourceManagerFX.getIconAsImageView("Document16.gif", 16));
+		label.setGraphic(MaterialIcons.graphic("source"));
 		setGraphic(label);
 
 		label.setOnMouseClicked(e -> {
@@ -90,32 +84,21 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		tooltip.textProperty().bind(node.shortDescriptionProperty());
 		Tooltip.install(getGraphic(), new Tooltip(node.getShortDescription()));
 
-		final var imageView = ResourceManagerFX.getIconAsImageView(node.getName().endsWith("Filter") ? "Filter16.gif" : "Algorithm16.gif", 16);
-		var rotateTransition = new RotateTransition(Duration.millis(1000), imageView);
-		rotateTransition.setByAngle(360);
-		rotateTransition.setCycleCount(Animation.INDEFINITE);
-		rotateTransition.setInterpolator(Interpolator.LINEAR);
-		label.setGraphic(imageView);
-
+		label.setGraphic(MaterialIcons.graphic("settings"));
 		stateChangeListener = (c, o, n) -> {
 			// System.err.println("State change: " + workflowNode.getName() + ": " + n);
 			switch (n) {
 				case SCHEDULED, RUNNING -> {
 					label.setTextFill(Color.BLACK);
 					label.setStyle("-fx-background-color: LIGHTBLUE;");
-					rotateTransition.play();
 				}
 				case CANCELLED, FAILED -> {
 					label.setStyle("");
 					label.setTextFill(Color.DARKRED);
-					rotateTransition.stop();
-					rotateTransition.getNode().setRotate(0);
 				}
 				default -> {
 					label.setTextFill(Color.BLACK);
 					label.setStyle("");
-					rotateTransition.stop();
-					rotateTransition.getNode().setRotate(0);
 				}
 			}
 		};
@@ -153,15 +136,10 @@ public class WorkflowTreeItem extends TreeItem<String> {
 
 		label.textProperty().bind(node.titleProperty());
 
-		Image icon;
-		if (node.getDataBlock() instanceof ViewBlock)
-			icon = ResourceManagerFX.getIcon("ViewBlock16.png");
-		else
-			icon = ResourceManagerFX.getIcon(node.getName().replaceAll("Input", "").
-													 replaceAll("Working", "").replaceAll(".*]", "").trim() + "16.gif");
-		if (icon != null) {
-			var iconView = new ImageView(icon);
-			label.setGraphic(iconView);
+		if (node.getDataBlock() instanceof ViewBlock) {
+			label.setGraphic(MaterialIcons.graphic("wysiwyg"));
+		} else {
+			label.setGraphic(MaterialIcons.graphic("dataset"));
 		}
 
 		tooltip.textProperty().bind(node.shortDescriptionProperty());

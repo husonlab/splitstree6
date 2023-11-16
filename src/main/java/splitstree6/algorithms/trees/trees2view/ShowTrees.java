@@ -23,7 +23,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import jloda.fx.util.ResourceManagerFX;
+import jloda.fx.icons.MaterialIcons;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -76,7 +76,7 @@ public class ShowTrees extends Trees2View {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputData, ViewBlock viewBlock) throws IOException {
 		viewBlock.setInputBlockName(TreesBlock.BLOCK_NAME);
-		Platform.runLater(() -> viewBlock.getViewTab().setGraphic(ResourceManagerFX.getIconAsImageView("TreeViewer16.gif", 16)));
+		Platform.runLater(() -> viewBlock.getViewTab().setGraphic(MaterialIcons.graphic("wysiwyg")));
 
 		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 		if (viewBlock.getView() != null)

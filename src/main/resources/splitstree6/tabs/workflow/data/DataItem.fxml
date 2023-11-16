@@ -23,11 +23,9 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Tooltip?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="50.0" prefWidth="160.0" style="-fx-border-color: darkgray;"
-            xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
+            xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.tabs.workflow.data.DataItemController">
     <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                 AnchorPane.topAnchor="0.0">
@@ -37,10 +35,7 @@
                     <Label fx:id="nameLabel" minHeight="-Infinity" text="Data" BorderPane.alignment="CENTER"/>
                 </left>
                 <right>
-                    <ImageView fx:id="statusImageView" fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                               preserveRatio="true" BorderPane.alignment="CENTER">
-                        <Image url="@/jloda/resources/icons/Done.png"/>
-                    </ImageView>
+                    <Pane fx:id="statusPane" prefHeight="24.0" prefWidth="24.0" BorderPane.alignment="CENTER"/>
                 </right>
             </BorderPane>
         </top>
