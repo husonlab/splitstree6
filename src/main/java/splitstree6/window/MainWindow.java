@@ -97,13 +97,13 @@ public class MainWindow implements IMainWindow {
 		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
 		methodsTab = new DisplayTextTab(this, "How to Cite", false);
-		methodsTab.setGraphic(MaterialIcons.graphic("subject"));
+		methodsTab.setGraphic(MaterialIcons.graphic("notes"));
 
 		workflow.validProperty().addListener(e -> updateMethodsTab());
 		workflow.numberOfNodesProperty().addListener(e -> Platform.runLater(this::updateMethodsTab));
 
 		workflowTab = new WorkflowTab(this);
-		workflowTab.setGraphic(MaterialIcons.graphic("map"));
+		workflowTab.setGraphic(MaterialIcons.graphic("margin"));
 		workflow.validProperty().addListener((v, o, n) -> {
 			if (workflow.getWorkingTaxaBlock() == null) {
 				activeTaxa.clear();

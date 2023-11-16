@@ -65,7 +65,7 @@ public class TextTabsManager {
 			tab = nodeTabMap.get(node);
 		else {
 			tab = new ViewTab(mainWindow, node, true);
-			tab.setGraphic(MaterialIcons.graphic("notes"));
+			tab.setGraphic(MaterialIcons.graphic("dataset"));
 			var view = new DisplayData(mainWindow, node, node.getTitle(), false);
 			tab.setView(view);
 			tab.setText(view.getName());

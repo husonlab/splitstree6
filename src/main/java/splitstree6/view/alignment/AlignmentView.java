@@ -115,7 +115,7 @@ public class AlignmentView implements IView {
 			targetBounds.unbind();
 			if (n != null) {
 				targetBounds.bind(n.layoutBoundsProperty());
-				n.setGraphic(MaterialIcons.graphic("settings"));
+				n.setGraphic(MaterialIcons.graphic("format_align_justify"));
 			}
 		});
 

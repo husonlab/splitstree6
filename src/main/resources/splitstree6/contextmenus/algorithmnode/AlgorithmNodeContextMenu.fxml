@@ -19,58 +19,21 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<MenuButton mnemonicParsing="false" text="MenuButton" xmlns="http://javafx.com/javafx/16"
+<MenuButton mnemonicParsing="false" text="MenuButton" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenuController">
 
     <contextMenu>
         <ContextMenu fx:id="contextMenu">
             <items>
-                <MenuItem fx:id="editMenuItem" mnemonicParsing="false" text="Edit">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Edit16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
+                <MenuItem fx:id="editMenuItem" mnemonicParsing="false" text="Edit"/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
-                <MenuItem fx:id="runMenuItem" mnemonicParsing="false" text="Run">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/Play.png"/>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
-                <MenuItem fx:id="stopMenuItem" mnemonicParsing="false" text="Stop">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Stop16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
+                <MenuItem fx:id="runMenuItem" mnemonicParsing="false" text="Run"/>
+                <MenuItem fx:id="stopMenuItem" mnemonicParsing="false" text="Stop"/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
-                <MenuItem fx:id="duplicateMenuItem" mnemonicParsing="false" text="Duplicate">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Paste16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
-                <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" text="Delete">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Delete16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
+                <MenuItem fx:id="duplicateMenuItem" mnemonicParsing="false" text="Duplicate"/>
+                <MenuItem fx:id="deleteMenuItem" mnemonicParsing="false" text="Delete"/>
             </items>
         </ContextMenu>
     </contextMenu>

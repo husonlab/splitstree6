@@ -42,8 +42,7 @@
                     <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
                     <ColumnConstraints halignment="LEFT" hgrow="SOMETIMES"/>
                     <ColumnConstraints halignment="CENTER" hgrow="ALWAYS"/>
-                    <ColumnConstraints halignment="CENTER" hgrow="NEVER" maxWidth="30.0" minWidth="30.0"
-                                       prefWidth="30.0"/>
+                    <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES"/>
                     <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES"/>
                 </columnConstraints>
                 <rowConstraints>
@@ -54,13 +53,13 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </GridPane.margin>
                 </ChoiceBox>
-                <Button fx:id="applyButton" contentDisplay="CENTER" mnemonicParsing="false" text="Apply"
-                        GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                <Button fx:id="applyButton" mnemonicParsing="false" text="Run" GridPane.columnIndex="3"
+                        GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                     <tooltip>
                         <Tooltip text="Run algorithm"/>
                     </tooltip>
                     <GridPane.margin>
-                        <Insets/>
+                        <Insets left="5.0" right="5.0"/>
                     </GridPane.margin>
                 </Button>
                 <MenuButton fx:id="menuButton" minWidth="0.0" mnemonicParsing="false" text="Edit"

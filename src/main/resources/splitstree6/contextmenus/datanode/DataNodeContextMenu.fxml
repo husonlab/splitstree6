@@ -19,58 +19,20 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<MenuButton mnemonicParsing="false" text="MenuButton" xmlns="http://javafx.com/javafx/16"
+<MenuButton mnemonicParsing="false" text="MenuButton" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.contextmenus.datanode.DataNodeContextMenuController">
 
     <contextMenu>
         <ContextMenu fx:id="contextMenu">
             <items>
-                <MenuItem fx:id="showTextMenuItem" mnemonicParsing="false" text="Show Text...">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Edit16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
-                <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export...">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Export16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </MenuItem>
+                <MenuItem fx:id="showTextMenuItem" mnemonicParsing="false" text="Show Text..."/>
+                <MenuItem fx:id="exportMenuItem" mnemonicParsing="false" text="Export..."/>
                 <SeparatorMenuItem mnemonicParsing="false"/>
-                <Menu fx:id="addTreeMenu" text="Add Tree">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </Menu>
-                <Menu fx:id="addNetworkMenu" text="Add Network">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </Menu>
-                <SeparatorMenuItem mnemonicParsing="false"/>
-                <Menu fx:id="addAlgorithmMenu" text="Add Algorithm">
-                    <graphic>
-                        <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                   preserveRatio="true">
-                            <Image smooth="false" url="@/jloda/resources/icons/sun/Add16.gif"/>
-                        </ImageView>
-                    </graphic>
-                </Menu>
+                <Menu fx:id="addTreeMenu" text="Add Tree"/>
+                <Menu fx:id="addNetworkMenu" text="Add Network"/>
+                <Menu fx:id="addAlgorithmMenu" text="Add Algorithm"/>
             </items>
         </ContextMenu>
     </contextMenu>
