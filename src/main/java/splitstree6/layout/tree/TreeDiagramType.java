@@ -20,6 +20,10 @@
 package splitstree6.layout.tree;
 
 import javafx.scene.Node;
+import javafx.scene.effect.BlendMode;
+import javafx.scene.effect.DropShadow;
+import javafx.scene.effect.Effect;
+import javafx.scene.paint.Color;
 import jloda.fx.util.ResourceManagerFX;
 
 /**
@@ -37,7 +41,32 @@ public enum TreeDiagramType {
 		return this == RadialPhylogram || this == CircularPhylogram || this == RectangularPhylogram;
 	}
 
-	public Node createNode() {
-		return ResourceManagerFX.getIconAsImageView(name() + "16.gif", 16);
+
+	private static Effect effect;
+
+	public Node icon() {
+		if (effect == null) {
+			var dropShadow = new DropShadow();
+			dropShadow.setColor(Color.WHITE);
+			dropShadow.setRadius(2);
+			dropShadow.setSpread(0);
+			effect = dropShadow;
+		}
+		var node = ResourceManagerFX.getIconAsImageView(name() + ".png", 16);
+		node.setEffect(effect);
+		node.setBlendMode(BlendMode.SRC_ATOP);
+
+		return node;
+	}
+
+	/**
+	 * this is not currently one of the supported tree drawing modes (only used in Densitree)
+	 *
+	 * @return icon
+	 */
+	public static Node iconForRoundedPhylogram() {
+		var node = ResourceManagerFX.getIconAsImageView("RoundedPhylogram.png", 16);
+		node.setEffect(effect);
+		return node;
 	}
 }

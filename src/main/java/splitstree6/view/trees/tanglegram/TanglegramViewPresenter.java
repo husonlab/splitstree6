@@ -201,8 +201,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 			});
 
-			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams1, TreeDiagramType::createNode, false));
-			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams1, TreeDiagramType::createNode, false));
+			controller.getDiagram1CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams1, TreeDiagramType::icon, false));
+			controller.getDiagram1CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams1, TreeDiagramType::icon, false));
 			controller.getDiagram1CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram1CBox().setValue(view.getOptionDiagram1());
 			view.optionDiagram1Property().addListener((v, o, n) -> controller.getDiagram1CBox().setValue(n));
@@ -217,8 +217,8 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 				}
 			});
 
-			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams2, TreeDiagramType::createNode, true));
-			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams2, TreeDiagramType::createNode, true));
+			controller.getDiagram2CBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagrams2, TreeDiagramType::icon, true));
+			controller.getDiagram2CBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagrams2, TreeDiagramType::icon, true));
 			controller.getDiagram2CBox().getItems().addAll(RectangularPhylogram, RectangularCladogram, TriangularCladogram);
 			controller.getDiagram2CBox().setValue(view.getOptionDiagram2());
 			view.optionDiagram2Property().addListener((v, o, n) -> controller.getDiagram2CBox().setValue(n));

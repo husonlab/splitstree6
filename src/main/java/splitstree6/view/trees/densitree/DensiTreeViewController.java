@@ -27,8 +27,8 @@ import javafx.scene.layout.*;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
-import jloda.fx.util.ResourceManagerFX;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.TreeDiagramType;
 
 public class DensiTreeViewController {
 
@@ -91,7 +91,7 @@ public class DensiTreeViewController {
 
 
 	@FXML
-	private RadioMenuItem trianglePhylogramToggleItem;
+	private RadioMenuItem trianglDendrogramToggleItem;
 
 	@FXML
 	private RadioMenuItem radialPhylogramToggleItem;
@@ -152,21 +152,25 @@ public class DensiTreeViewController {
 
 		centerPane.getStyleClass().add("viewer-background");
 
-		diagramToggleGroup.getToggles().addAll(trianglePhylogramToggleItem, radialPhylogramToggleItem, rectangularPhylogramToggleItem, roundedPhylogramToggleItem);
+		diagramToggleGroup.getToggles().addAll(trianglDendrogramToggleItem, radialPhylogramToggleItem, rectangularPhylogramToggleItem, roundedPhylogramToggleItem);
 
-		trianglePhylogramToggleItem.selectedProperty().addListener((v, o, n) -> {
-			if (n) {
-				menuButton.setText(trianglePhylogramToggleItem.getText());
-				menuButton.setGraphic(ResourceManagerFX.getIconAsImageView("TriangularCladogram16.gif", 16));
+		diagramToggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
+			if (n == trianglDendrogramToggleItem) {
+				menuButton.setGraphic(TreeDiagramType.TriangularCladogram.icon());
+			} else if (n == radialPhylogramToggleItem) {
+				menuButton.setGraphic(TreeDiagramType.RadialPhylogram.icon());
+			} else if (n == rectangularPhylogramToggleItem) {
+				menuButton.setGraphic(TreeDiagramType.RectangularPhylogram.icon());
+			} else if (n == roundedPhylogramToggleItem) {
+				menuButton.setGraphic(TreeDiagramType.iconForRoundedPhylogram());
 			}
 		});
-		radialPhylogramToggleItem.selectedProperty().addListener((v, o, n) -> {
-			if (n) {
-				menuButton.setText(radialPhylogramToggleItem.getText());
-				menuButton.setGraphic(ResourceManagerFX.getIconAsImageView("RadialPhylogram16.gif", 16));
-			}
-		});
-		diagramToggleGroup.selectToggle(trianglePhylogramToggleItem);
+		trianglDendrogramToggleItem.setGraphic(TreeDiagramType.TriangularCladogram.icon());
+		radialPhylogramToggleItem.setGraphic(TreeDiagramType.RadialPhylogram.icon());
+		rectangularPhylogramToggleItem.setGraphic(TreeDiagramType.RectangularPhylogram.icon());
+		roundedPhylogramToggleItem.setGraphic(TreeDiagramType.iconForRoundedPhylogram());
+
+		diagramToggleGroup.selectToggle(trianglDendrogramToggleItem);
 
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);

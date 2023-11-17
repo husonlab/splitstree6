@@ -480,7 +480,11 @@
                                 <ToolBar BorderPane.alignment="CENTER">
                                     <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
                                                 text="File"/>
-                                    <Label fx:id="fileNameLabel" text="File name"/>
+                                    <Label fx:id="fileNameLabel" text="Untitled">
+                                        <tooltip>
+                                            <Tooltip fx:id="fileTooltip" text="Untitled"/>
+                                        </tooltip>
+                                    </Label>
                                     <BorderPane.margin>
                                         <Insets/>
                                     </BorderPane.margin>

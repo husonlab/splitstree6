@@ -19,7 +19,6 @@ module splitstreesix {
 	requires org.fxmisc.richtext;
 	requires org.fxmisc.undo;
 
-	opens splitstree6.resources.css;
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
 

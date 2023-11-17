@@ -39,6 +39,9 @@ import java.util.ArrayList;
 
 public class MainWindowController {
 	@FXML
+	private Tooltip fileTooltip;
+
+	@FXML
 	private VBox topVBox;
 
 	@FXML
@@ -1041,5 +1044,9 @@ public class MainWindowController {
 
 	public MenuButton getFileMenuButton() {
 		return fileMenuButton;
+	}
+
+	public Tooltip getFileTooltip() {
+		return fileTooltip;
 	}
 }

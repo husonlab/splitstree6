@@ -68,7 +68,6 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramToggleGroup().selectedToggleProperty().addListener((v, o, n) -> {
 			if (n instanceof RadioMenuItem radioMenuItem) {
 				view.setOptionDiagram(DensiTreeDiagramType.valueOf(radioMenuItem.getText()));
-				controller.getMenuButton().setGraphic(view.getOptionDiagram().createNode());
 			}
 		});
 		view.optionDiagramProperty().addListener((v, o, n) -> {

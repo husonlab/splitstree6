@@ -28,7 +28,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.icons.MaterialIcons;
-import jloda.fx.util.ResourceManagerFX;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import splitstree6.view.displaytext.highlighters.Highlighter;
@@ -80,12 +79,8 @@ public class DisplayTextViewController {
 		codeArea = new CodeArea();
 		codeArea.requestFollowCaret();
 
-		final var url = ResourceManagerFX.getCssURL("styles.css");
-		if (url != null) {
-			codeArea.getStylesheets().add(url.toExternalForm());
-		}
+		codeArea.getStylesheets().add(DisplayTextViewController.class.getResource("display_text_styles.css").toExternalForm());
 
-		//codeArea.getStyleClass().add("text");
 		codeArea.getStyleClass().add("viewer-background");
 
 		codeArea.setPadding(new Insets(5, 2, 5, 2));

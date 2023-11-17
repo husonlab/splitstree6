@@ -21,7 +21,6 @@
 
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
@@ -51,52 +50,16 @@
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
                     <MenuButton fx:id="menuButton" contentDisplay="GRAPHIC_ONLY" mnemonicParsing="false"
-                                prefWidth="45.0" text="DensiTree">
+                                text="DensiTree">
                         <items>
-                            <RadioMenuItem fx:id="trianglePhylogramToggleItem" mnemonicParsing="false"
-                                           text="TriangularPhylogram">
-                                <graphic>
-                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                               preserveRatio="true">
-                                        <image>
-                                            <Image url="@/splitstree6/resources/icons/TriangularCladogram16.gif"/>
-                                        </image>
-                                    </ImageView>
-                                </graphic>
-                            </RadioMenuItem>
+                            <RadioMenuItem fx:id="trianglDendrogramToggleItem" mnemonicParsing="false"
+                                           text="TriangularPhylogram"/>
                             <RadioMenuItem fx:id="rectangularPhylogramToggleItem" mnemonicParsing="false"
-                                           text="RectangularPhylogram">
-                                <graphic>
-                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                               preserveRatio="true">
-                                        <image>
-                                            <Image url="@/splitstree6/resources/icons/RectangularPhylogram16.gif"/>
-                                        </image>
-                                    </ImageView>
-                                </graphic>
-                            </RadioMenuItem>
+                                           text="RectangularPhylogram"/>
                             <RadioMenuItem fx:id="roundedPhylogramToggleItem" mnemonicParsing="false"
-                                           text="RoundedPhylogram">
-                                <graphic>
-                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                               preserveRatio="true">
-                                        <image>
-                                            <Image url="@/splitstree6/resources/icons/RoundedPhylogram16.gif"/>
-                                        </image>
-                                    </ImageView>
-                                </graphic>
-                            </RadioMenuItem>
+                                           text="RoundedPhylogram"/>
                             <RadioMenuItem fx:id="radialPhylogramToggleItem" mnemonicParsing="false"
-                                           text="RadialPhylogram">
-                                <graphic>
-                                    <ImageView fitHeight="16.0" fitWidth="16.0" pickOnBounds="true"
-                                               preserveRatio="true">
-                                        <image>
-                                            <Image url="@/splitstree6/resources/icons/RadialPhylogram16.gif"/>
-                                        </image>
-                                    </ImageView>
-                                </graphic>
-                            </RadioMenuItem>
+                                           text="RadialPhylogram"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
                             <CheckMenuItem fx:id="rerootAndRescaleCheckMenuItem" mnemonicParsing="false"
                                            text="Reroot and Rescale"/>

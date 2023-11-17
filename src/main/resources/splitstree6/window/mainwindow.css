@@ -41,6 +41,7 @@ viewer-background {
     -fx-min-height: 20;
 }
 
+/*
 .scroll-bar:horizontal .increment-button,
 .scroll-bar:horizontal .decrement-button {
     -fx-background: transparent;
@@ -78,7 +79,7 @@ viewer-background {
     -fx-background-insets: 2, 0, 0;
     -fx-background-radius: 2em;
 }
-
+ */
 
 
 

@@ -41,8 +41,6 @@ public class DisplayTextTab extends ViewTab {
 			setView(displayTextView);
 			displayTextView.getController().getCodeArea().requestFocus();
 		});
-
-		//setGraphic(new ImageView(ResourceManagerFX.getIcon("sun/Import16.gif")));
 		displayTextView.getController().getCodeArea().textProperty().addListener(e -> setEmpty(displayTextView.getController().getCodeArea().getText().isEmpty()));
 	}
 

@@ -23,7 +23,6 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ProgressIndicator;
 import jloda.fx.icons.MaterialIcons;
-import jloda.fx.util.ResourceManagerFX;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.tabs.workflow.WorkflowTabPresenter;
@@ -89,7 +88,7 @@ public class AlgorithmItemPresenter {
 		progressIndicator.setPrefHeight(16);
 		progressIndicator.setPrefWidth(16);
 
-		controller.getIconPane().getChildren().setAll(ResourceManagerFX.getIconAsImageView("Done.png", 16));
+		controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("done"));
 
 		node.getService().stateProperty().addListener((v, o, n) -> {
 			switch (n) {
