@@ -49,8 +49,6 @@ public class SplitsViewController {
 	@FXML
 	private ToolBar toolBar;
 
-	@FXML
-	private ToggleButton findToggleButton;
 
 	@FXML
 	private StackPane centerPane;
@@ -101,8 +99,6 @@ public class SplitsViewController {
 	private Button flipButton;
 
 	@FXML
-	private MenuButton exportMenuButton;
-
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();
@@ -113,8 +109,6 @@ public class SplitsViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(exportMenuButton, "ios_share");
-
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
@@ -122,7 +116,6 @@ public class SplitsViewController {
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
 		MaterialIcons.setIcon(increaseFontButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
-		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 
@@ -187,10 +180,6 @@ public class SplitsViewController {
 		return toolBar;
 	}
 
-	public ToggleButton getFindToggleButton() {
-		return findToggleButton;
-	}
-
 	public ComboBox<SplitsDiagramType> getDiagramCBox() {
 		return diagramCBox;
 	}
@@ -253,10 +242,6 @@ public class SplitsViewController {
 
 	public Button getFlipButton() {
 		return flipButton;
-	}
-
-	public MenuButton getExportMenuButton() {
-		return exportMenuButton;
 	}
 
 	public ZoomButtonsPanel getZoomButtonPane() {

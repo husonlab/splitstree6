@@ -23,8 +23,8 @@ import jloda.util.Basic;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
-import splitstree6.data.TaxaBlock;
 import splitstree6.cite.IHasCitations;
+import splitstree6.data.TaxaBlock;
 import splitstree6.options.IOptionsCarrier;
 import splitstree6.options.Option;
 import splitstree6.workflow.interfaces.HasFromClass;
@@ -122,7 +122,7 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	public void reset() {
 		try {
 			var allOptions = Option.getAllOptions(this);
-			var instance = this.getClass().getConstructor().newInstance();
+			var instance = newInstance();
 			for (var defaultOption : Option.getAllOptions(instance)) {
 				var option = allOptions.stream().filter(o -> o.getName().equals(defaultOption.getName())).findFirst();
 				option.ifPresent(value -> value.getProperty().setValue(defaultOption.getProperty().getValue()));

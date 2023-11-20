@@ -36,7 +36,7 @@ public class ExtractOptionsText {
 		var hasDefaultOption = false;
 		try {
 			var clazz = algorithm.getClass();
-			var algorithmWithDefaultOptions = clazz.getConstructor().newInstance();
+			var algorithmWithDefaultOptions = algorithm.newInstance();
 
 			for (var method : clazz.getMethods()) {
 				var methodName = method.getName();
@@ -55,11 +55,11 @@ public class ExtractOptionsText {
 			Basic.caught(e);
 		}
 		if (hasDefaultOption) {
-			if (list.size() == 0)
+			if (list.isEmpty())
 				return "default options";
 			else return "default options, except " + StringUtils.toString(list, ", ");
 		} else {
-			if (list.size() == 0)
+			if (list.isEmpty())
 				return "";
 			else
 				return StringUtils.toString(list, ", ");

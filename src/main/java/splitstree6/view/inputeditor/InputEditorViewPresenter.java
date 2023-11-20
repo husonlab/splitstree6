@@ -93,7 +93,7 @@ public class InputEditorViewPresenter {
 		firstLine.addListener((v, o, n) -> {
 			RunAfterAWhile.apply(toolBarController.getFormatLabel(), () -> Platform.runLater(() -> {
 				var readers = ImportManager.getInstance().getReadersByText(n);
-				if (readers.size() == 0)
+				if (readers.isEmpty())
 					toolBarController.getFormatLabel().setText(null);
 				else if (readers.size() == 1) {
 					toolBarController.getFormatLabel().setText(readers.get(0).getName());

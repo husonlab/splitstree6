@@ -87,13 +87,8 @@ public class NetworkViewController {
 	private ToggleButton settingsToggleButton;
 
 	@FXML
-	private ToggleButton findToggleButton;
-
-	@FXML
 	private ToggleButton formatToggleButton;
 
-	@FXML
-	private MenuButton exportMenuButton;
 
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
@@ -101,11 +96,9 @@ public class NetworkViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(exportMenuButton, "ios_share");
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
-		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		MaterialIcons.setIcon(zoomInButton, "zoom_in");
@@ -213,10 +206,6 @@ public class NetworkViewController {
 		return settingsToggleButton;
 	}
 
-	public ToggleButton getFindToggleButton() {
-		return findToggleButton;
-	}
-
 	public ToggleButton getFormatToggleButton() {
 		return formatToggleButton;
 	}
@@ -227,10 +216,5 @@ public class NetworkViewController {
 
 	public CopyableLabel getInfoLabel() {
 		return infoLabel;
-	}
-
-
-	public MenuButton getExportMenuButton() {
-		return exportMenuButton;
 	}
 }

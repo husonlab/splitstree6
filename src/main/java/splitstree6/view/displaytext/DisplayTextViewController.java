@@ -21,6 +21,7 @@ package splitstree6.view.displaytext;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.scene.Node;
 import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
@@ -28,8 +29,6 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.icons.MaterialIcons;
-import org.fxmisc.flowless.VirtualizedScrollPane;
-import org.fxmisc.richtext.CodeArea;
 import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class DisplayTextViewController {
@@ -61,9 +60,9 @@ public class DisplayTextViewController {
 	@FXML
 	public Button decreaseFontButton;
 
-	private CodeArea codeArea;
+	private MyTextArea codeArea;
 
-	private VirtualizedScrollPane<CodeArea> scrollPane;
+	private Node scrollPane;
 
 	private Highlighter highlighter;
 
@@ -76,7 +75,7 @@ public class DisplayTextViewController {
 		MaterialIcons.setIcon(increaseFontButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 
-		codeArea = new CodeArea();
+		codeArea = new MyTextArea();
 		codeArea.requestFollowCaret();
 
 		codeArea.getStylesheets().add(DisplayTextViewController.class.getResource("display_text_styles.css").toExternalForm());
@@ -84,10 +83,10 @@ public class DisplayTextViewController {
 		codeArea.getStyleClass().add("viewer-background");
 
 		codeArea.setPadding(new Insets(5, 2, 5, 2));
-		scrollPane = new VirtualizedScrollPane<>(codeArea);
+		scrollPane = codeArea.getEnclosingNode();
 		borderPane.setCenter(scrollPane);
 		codeArea.prefWidthProperty().bind(borderPane.widthProperty());
-		highlighter = new Highlighter(codeArea);
+		highlighter = codeArea.getHighlighter();
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -118,11 +117,11 @@ public class DisplayTextViewController {
 		return topVBox;
 	}
 
-	public CodeArea getCodeArea() {
+	public MyTextArea getCodeArea() {
 		return codeArea;
 	}
 
-	public VirtualizedScrollPane<CodeArea> getScrollPane() {
+	public Node getScrollPane() {
 		return scrollPane;
 	}
 

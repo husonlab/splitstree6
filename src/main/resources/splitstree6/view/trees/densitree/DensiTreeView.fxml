@@ -132,19 +132,11 @@
                     <Tooltip text="Show the Settings toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <ToggleButton fx:id="findToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Find">
-                <tooltip>
-                    <Tooltip text="Show the Find or Find/Replace toolbar"/>
-                </tooltip>
-            </ToggleButton>
             <ToggleButton fx:id="formatToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Format">
                 <tooltip>
                     <Tooltip text="Show the Format toolbar"/>
                 </tooltip>
             </ToggleButton>
-            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
-                        prefHeight="26.0" text="Export">
-            </MenuButton>
         </children>
     </HBox>
 </AnchorPane>

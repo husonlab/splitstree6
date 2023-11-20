@@ -71,13 +71,6 @@
                             <Tooltip text="Choose Color Scheme"/>
                         </tooltip>
                     </ComboBox>
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <ToggleButton fx:id="findToggleButton" contentDisplay="CENTER" mnemonicParsing="false"
-                                  style="-fx-border-style: none;" text="Find">
-                        <tooltip>
-                            <Tooltip text="Show the Find toolbar"/>
-                        </tooltip>
-                    </ToggleButton>
                     <Separator layoutX="179.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
                                prefHeight="20.0"/>
                     <Button fx:id="zoomToFitButton" contentDisplay="CENTER" mnemonicParsing="false" text="Zoom to Fit">
@@ -220,9 +213,6 @@
                     <MenuItem fx:id="disableSelectedSitesMenuItem" mnemonicParsing="false"
                               text="Disable Selected Sites"/>
                 </items>
-            </MenuButton>
-            <MenuButton fx:id="exportMenuButton" maxHeight="-Infinity" minHeight="-Infinity" mnemonicParsing="false"
-                        prefHeight="26.0" text="Export">
             </MenuButton>
         </children>
         <padding>

@@ -32,11 +32,10 @@ import javafx.scene.paint.Color;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.workflow.WorkflowNode;
-import jloda.util.PluginClassLoader;
+import splitstree6.algorithms.AlgorithmList;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.window.MainWindow;
-import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
@@ -193,7 +192,7 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
 
     public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode0, Runnable runlater) {
         var menu = new ContextMenu();
-        for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+		for (var algorithm : AlgorithmList.list()) {
             if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
                 if (algorithm.getFromClass() == algorithmNode0.getAlgorithm().getFromClass()
                     && algorithm.getToClass() == algorithmNode0.getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter)) {

@@ -44,7 +44,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
-import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -158,7 +157,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
-		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -241,9 +239,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
-		if (controller.getExportMenuButton().getItems().isEmpty()) {
-			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
-		}
+		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
 
 	public LongProperty updateCounterProperty() {

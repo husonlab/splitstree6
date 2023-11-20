@@ -20,7 +20,6 @@
 package splitstree6.view.utils;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.scene.control.MenuButton;
 import javafx.scene.control.SeparatorMenuItem;
 import jloda.fx.util.BasicFX;
 import splitstree6.data.ViewBlock;
@@ -31,16 +30,16 @@ import splitstree6.workflow.DataNode;
 import java.util.List;
 
 /**
- * setup the export menu button using existing main menu items
+ * set up the export menu button using existing main menu items
  * Daniel Huson, 11.2023
  */
 public class ExportUtils {
-	public static void setup(MenuButton menuButton, MainWindow mainWindow, DataNode dataNode, ReadOnlyBooleanProperty emptyProperty) {
+	public static void setup(MainWindow mainWindow, DataNode dataNode, ReadOnlyBooleanProperty emptyProperty) {
 		if (dataNode.getDataBlock() instanceof ViewBlock)
 			dataNode = dataNode.getPreferredParent().getPreferredParent();
 
 		var mainController = mainWindow.getController();
-		menuButton.getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
+		mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
 				mainController.getCopyImageMenuItem(), new SeparatorMenuItem(), mainController.getPrintMenuItem(),
 				new SeparatorMenuItem(), mainController.getExportImageMenuItem(),
 				ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty))));

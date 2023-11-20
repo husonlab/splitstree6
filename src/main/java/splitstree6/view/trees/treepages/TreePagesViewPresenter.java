@@ -40,7 +40,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
-import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 /**
@@ -208,7 +207,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
 
-		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
+		// FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		controller.getZoomInButton().setOnAction(e -> this.view.setOptionZoomFactor(1.1 * this.view.getOptionZoomFactor()));
 		controller.getZoomInButton().disableProperty().bind(this.view.emptyProperty().or(this.view.optionZoomFactorProperty().greaterThan(4.0 / 1.1)));
@@ -286,9 +285,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
-		if (controller.getExportMenuButton().getItems().isEmpty()) {
-			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
-		}
+		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
 
     private record RowsCols(int rows, int cols) {

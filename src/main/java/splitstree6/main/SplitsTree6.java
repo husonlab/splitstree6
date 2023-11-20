@@ -95,6 +95,8 @@ public class SplitsTree6 extends Application {
 	}
 
 	protected static void parseArguments(String[] args) throws CanceledException, UsageException {
+		if (!splitstree6.utils.Platform.isDesktop())
+			args = new String[0];
 
 		final ArgsOptions options = new ArgsOptions(args, SplitsTree6.class, Version.NAME + " - Phylogenetic analysis using trees and networks");
 		options.setAuthors("Daniel H. Huson and David Bryant");
@@ -139,7 +141,8 @@ public class SplitsTree6 extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
-		SplashScreen.showSplash(Duration.ofSeconds(5));
+		if (splitstree6.utils.Platform.isDesktop())
+			SplashScreen.showSplash(Duration.ofSeconds(5));
 		try {
 			stage.setTitle("Untitled - " + ProgramProperties.getProgramName());
 			NotificationManager.setShowNotifications(true);

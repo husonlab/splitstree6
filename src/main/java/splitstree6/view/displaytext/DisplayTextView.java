@@ -25,8 +25,6 @@ import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
-import org.fxmisc.richtext.CodeArea;
-import org.fxmisc.richtext.LineNumberFactory;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
@@ -79,9 +77,7 @@ public class DisplayTextView implements IView {
 
 		controller.getCodeArea().setWrapText(true);
 
-		showLineNumbers.addListener((v, o, n) -> controller.getCodeArea().setParagraphGraphicFactory(n ? LineNumberFactory.get(controller.getCodeArea()) : null));
-		if (isShowLineNumbers())
-			controller.getCodeArea().setParagraphGraphicFactory(LineNumberFactory.get(controller.getCodeArea()));
+		showLineNumbers.addListener((v, o, n) -> controller.getCodeArea().showLineNumbers(n));
 
 		controller.getCodeArea().setWrapText(isWrapText());
 		wrapText.bindBidirectional(controller.getCodeArea().wrapTextProperty());
@@ -141,7 +137,7 @@ public class DisplayTextView implements IView {
 	/**
 	 * select matching brackets
 	 */
-	public void selectBrackets(CodeArea codeArea) {
+	public void selectBrackets(MyTextArea codeArea) {
 		int pos = codeArea.getCaretPosition() - 1;
 		while (pos > 0 && pos < codeArea.getText().length()) {
 			final char close = codeArea.getText().charAt(pos);
@@ -184,7 +180,7 @@ public class DisplayTextView implements IView {
 
 	@Override
 	public Node getMainNode() {
-		return controller.getCodeArea();
+		return controller.getCodeArea().getNode();
 	}
 
 	@Override

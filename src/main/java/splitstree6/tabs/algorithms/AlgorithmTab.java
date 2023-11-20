@@ -26,7 +26,7 @@ import javafx.scene.Node;
 import javafx.scene.control.Tab;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.util.PluginClassLoader;
+import splitstree6.algorithms.AlgorithmList;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
@@ -60,7 +60,7 @@ public class AlgorithmTab extends Tab implements IDisplayTab {
 
 		presenter = new AlgorithmTabPresenter(mainWindow, this);
 
-		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+		for (var algorithm : AlgorithmList.list()) {
 			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
 				if (algorithm.getFromClass() == getAlgorithm().getFromClass()
 					&& algorithm.getToClass() == getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter))

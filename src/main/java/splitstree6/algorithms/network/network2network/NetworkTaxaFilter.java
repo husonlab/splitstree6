@@ -32,6 +32,9 @@ import java.util.HashSet;
  * removes nodes from graph
  */
 public class NetworkTaxaFilter extends DataTaxaFilter<NetworkBlock, NetworkBlock> {
+	public NetworkTaxaFilter() {
+		super(NetworkBlock.class, NetworkBlock.class);
+	}
 	public NetworkTaxaFilter(Class<NetworkBlock> fromClass, Class<NetworkBlock> toClass) {
 		super(fromClass, toClass);
 	}

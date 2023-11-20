@@ -21,8 +21,8 @@ package splitstree6.io.nexus;
 
 import jloda.util.Basic;
 import jloda.util.IOExceptionWithLineNumber;
-import jloda.util.PluginClassLoader;
 import jloda.util.parse.NexusStreamParser;
+import splitstree6.algorithms.AlgorithmList;
 import splitstree6.options.OptionIO;
 import splitstree6.workflow.Algorithm;
 
@@ -86,8 +86,8 @@ public class AlgorithmNexusInput extends NexusIOBase {
 	 * @return instance or null
 	 */
 	public static Algorithm createAlgorithmFromName(String algorithmName) {
-		var algorithms = PluginClassLoader.getInstances(algorithmName, Algorithm.class, null, "splitstree6.algorithms");
-		if (algorithms.size() > 0)
+		var algorithms = AlgorithmList.list().stream().filter(algorithm -> algorithm.getName().equals(algorithmName)).toList();
+		if (!algorithms.isEmpty())
 			return algorithms.get(0);
 		else
 			return null;

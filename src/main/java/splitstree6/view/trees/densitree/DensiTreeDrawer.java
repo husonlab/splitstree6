@@ -52,11 +52,11 @@ import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.RadialLabelLayout;
+import splitstree6.splits.TreesUtils;
 import splitstree6.view.trees.InteractionSetup;
 import splitstree6.window.MainWindow;
 
@@ -121,6 +121,7 @@ public class DensiTreeDrawer {
 					  boolean colorIncompatibleEdges, double horizontalZoomFactor, double verticalZoomFactor, ReadOnlyDoubleProperty fontScaleFactor,
 					  ReadOnlyBooleanProperty showTrees, boolean hideFirst10PercentTrees, ReadOnlyBooleanProperty showConsensus,
 					  double lineWidth, Color edgeColor, Color otherColor) {
+
 		radialLabelLayout.getItems().clear();
 
 		var trees = new ArrayList<>(hideFirst10PercentTrees ? new ArrayList<>(trees0).subList(trees0.size() / 10, trees0.size()) : trees0);

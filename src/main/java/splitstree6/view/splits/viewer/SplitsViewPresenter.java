@@ -26,6 +26,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.geometry.Bounds;
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.Clipboard;
@@ -38,13 +39,13 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.NotificationManager;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
+import jloda.util.Single;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.utils.CharactersUtilities;
 import splitstree6.data.CharactersBlock;
@@ -61,7 +62,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
-import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.io.IOException;
@@ -69,6 +69,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -237,13 +238,24 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			updateCounter.set(updateCounter.get() + 1);
 		});
 
+		var oldZoom = new Single<Double>(null);
+
 		view.optionZoomFactorProperty().addListener((v, o, n) -> {
 			var zoomFactor = n.doubleValue() / o.doubleValue();
 			if (zoomFactor > 0 && zoomFactor != 1.0) {
-				//System.err.println("Zoom factor: "+zoomFactor);
-				view.getUndoManager().doAndAdd(UndoableRedoableCommand.create("Zoom",
-						() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / zoomFactor, 1.0 / zoomFactor),
-						() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), zoomFactor, zoomFactor)));
+				if (oldZoom.get() == null) {
+					oldZoom.set(o.doubleValue());
+				}
+				RunAfterAWhile.applyInFXThread(oldZoom, () -> {
+					var factor = n.doubleValue() / oldZoom.get();
+					if (factor > 0 && factor != 1.0) {
+						view.getUndoManager().add("Zoom",
+								() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / factor, 1.0 / factor),
+								() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), factor, factor));
+						oldZoom.set(null);
+					}
+				});
+				LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), zoomFactor, zoomFactor);
 			}
 		});
 
@@ -282,7 +294,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
 
-		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
+		// FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -298,7 +310,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		view.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram", view.optionDiagramProperty(), o, n));
 		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
-		view.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", view.optionZoomFactorProperty(), o, n));
 
 		view.optionZoomFactorProperty().addListener(e -> {
 			if (controller.getZoomButtonPane() != null)
@@ -317,6 +328,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
 		Platform.runLater(this::setupMenuItems);
+	}
+
+	private void collectZoom(UndoManager undoManager, Node node, Predicate<jloda.graph.Node> predicate, double undoX, double undoY, double doX, double doY) {
+
 	}
 
 	public void setupMenuItems() {
@@ -438,9 +453,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
-		if (controller.getExportMenuButton().getItems().isEmpty()) {
-			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
-		}
+		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
 
 	private static void showContextMenu(ContextMenuEvent event, Stage stage, UndoManager undoManager, RichTextLabel label) {

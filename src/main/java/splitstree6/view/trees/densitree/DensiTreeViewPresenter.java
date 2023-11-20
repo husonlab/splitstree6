@@ -42,7 +42,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
-import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -162,7 +161,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
 
-		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
+		// FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
@@ -192,7 +191,6 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		});
 		controller.getFlipButton().disableProperty().bind(view.emptyProperty());
 		view.optionOrientationProperty().addListener(invalidationListener);
-
 
 		setupMenuItems();
 
@@ -278,8 +276,9 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> drawer.getRadialLabelLayout().layoutLabels());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());
 
-		if (controller.getExportMenuButton().getItems().isEmpty() && view.getViewTab() != null) {
-			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
-		}
+		view.viewTabProperty().addListener((v, o, n) -> {
+			if (n != null)
+				ExportUtils.setup(mainWindow, n.getDataNode(), view.emptyProperty());
+		});
 	}
 }

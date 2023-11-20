@@ -22,7 +22,6 @@ package splitstree6.io.writers;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
-import jloda.util.PluginClassLoader;
 import splitstree6.data.TaxaBlock;
 import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.utils.ReaderWriterBase;
@@ -42,12 +41,41 @@ import java.util.stream.Collectors;
  * Daniel Huson, 11.21
  */
 public class ExportManager {
-	private final ArrayList<DataBlockWriter> exporters;
+	private final ArrayList<DataBlockWriter> exporters = new ArrayList<>();
 
 	private static ExportManager instance;
 
 	private ExportManager() {
-		exporters = new ArrayList<>(PluginClassLoader.getInstances(DataBlockWriter.class, "splitstree6.io.writers"));
+		exporters.add(new splitstree6.io.writers.characters.ClustalWriter());
+		exporters.add(new splitstree6.io.writers.characters.FastAWriter());
+		exporters.add(new splitstree6.io.writers.characters.NexusWriter());
+		exporters.add(new splitstree6.io.writers.characters.PhylipWriter());
+		exporters.add(new splitstree6.io.writers.characters.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.distances.NexusWriter());
+		exporters.add(new splitstree6.io.writers.distances.PhylipWriter());
+		exporters.add(new splitstree6.io.writers.distances.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.genomes.NexusWriter());
+		exporters.add(new splitstree6.io.writers.network.NexusWriter());
+		exporters.add(new splitstree6.io.writers.network.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.report.NexusWriter());
+		exporters.add(new splitstree6.io.writers.report.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.sets.NexusWriter());
+		exporters.add(new splitstree6.io.writers.sets.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.splits.FastAWriter());
+		exporters.add(new splitstree6.io.writers.splits.NewickWriter());
+		exporters.add(new splitstree6.io.writers.splits.NexusWriter());
+		exporters.add(new splitstree6.io.writers.splits.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.taxa.NexusWriter());
+		exporters.add(new splitstree6.io.writers.taxa.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.traits.NexusWriter());
+		exporters.add(new splitstree6.io.writers.traits.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.trees.NeXMLWriter());
+		exporters.add(new splitstree6.io.writers.trees.NewickWriter());
+		exporters.add(new splitstree6.io.writers.trees.NexusWriter());
+		exporters.add(new splitstree6.io.writers.trees.PlainTextWriter());
+		exporters.add(new splitstree6.io.writers.view.GMLWriter());
+		exporters.add(new splitstree6.io.writers.view.NexusWriter());
+		exporters.add(new splitstree6.io.writers.view.PlainTextWriter());
 	}
 
 	public static ExportManager getInstance() {

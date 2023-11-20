@@ -45,7 +45,6 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
-import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.stream.Collectors;
@@ -298,7 +297,7 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		findToolBar.setShowFindToolBar(false);
 		controller.getvBox().getChildren().add(findToolBar);
 
-		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
+		// FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), true);
 
 		var undoManager = view.getUndoManager();
 		view.optionTree1Property().addListener((v, o, n) -> undoManager.add("tree 1", view.optionTree1Property(), o, n));
@@ -396,8 +395,6 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
-		if (controller.getExportMenuButton().getItems().isEmpty()) {
-			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
-		}
+		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
 }

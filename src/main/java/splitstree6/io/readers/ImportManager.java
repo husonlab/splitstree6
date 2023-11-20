@@ -21,7 +21,6 @@ package splitstree6.io.readers;
 
 import javafx.stage.FileChooser;
 import jloda.util.Basic;
-import jloda.util.PluginClassLoader;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.utils.DataReaderBase;
@@ -44,7 +43,22 @@ public class ImportManager {
 	}
 
 	private ImportManager() {
-		readers.addAll(PluginClassLoader.getInstances(DataReaderBase.class, "splitstree6.io.readers"));
+		readers.add(new splitstree6.io.readers.characters.FastAReader());
+		readers.add(new splitstree6.io.readers.characters.MSFReader());
+		readers.add(new splitstree6.io.readers.characters.NexusReader());
+		readers.add(new splitstree6.io.readers.characters.PhylipReader());
+		readers.add(new splitstree6.io.readers.distances.NexusReader());
+		readers.add(new splitstree6.io.readers.distances.PhylipReader());
+		readers.add(new splitstree6.io.readers.genomes.NexusReader());
+		readers.add(new splitstree6.io.readers.network.NexusReader());
+		readers.add(new splitstree6.io.readers.report.NexusReader());
+		readers.add(new splitstree6.io.readers.splits.NewickReader());
+		readers.add(new splitstree6.io.readers.splits.NexusReader());
+		readers.add(new splitstree6.io.readers.trees.NewickReader());
+		readers.add(new splitstree6.io.readers.trees.NexmlReader());
+		readers.add(new splitstree6.io.readers.trees.NexusReader());
+		readers.add(new splitstree6.io.readers.view.NexusReader());
+
 		readers.sort((a, b) -> {
 			if (a.getToClass().equals(TreesBlock.class) && b.getToClass().equals(SplitsBlock.class))
 				return -1;

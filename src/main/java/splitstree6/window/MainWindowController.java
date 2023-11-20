@@ -24,16 +24,14 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCombination;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
+import splitstree6.utils.Platform;
 
 import java.util.ArrayList;
 
@@ -445,6 +443,17 @@ public class MainWindowController {
 	@FXML
 	private Label fileNameLabel;
 
+	@FXML
+	private Button undoButton;
+
+	@FXML
+	private Button redoButton;
+	@FXML
+	private Button findButton;
+
+	@FXML
+	private MenuButton exportButton;
+
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
 
 	//@FXML
@@ -454,7 +463,17 @@ public class MainWindowController {
 
 	@FXML
 	void initialize() {
+		if (!Platform.isDesktop()) {
+			((Pane) menuBar.getParent()).getChildren().remove(menuBar);
+		}
+
 		MaterialIcons.setIcon(fileMenuButton, "file_open");
+
+		MaterialIcons.setIcon(undoButton, "undo");
+		MaterialIcons.setIcon(redoButton, "redo");
+		MaterialIcons.setIcon(findButton, "search");
+		MaterialIcons.setIcon(exportButton, "ios_share");
+
 
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
@@ -1048,5 +1067,21 @@ public class MainWindowController {
 
 	public Tooltip getFileTooltip() {
 		return fileTooltip;
+	}
+
+	public Button getUndoButton() {
+		return undoButton;
+	}
+
+	public Button getRedoButton() {
+		return redoButton;
+	}
+
+	public Button getFindButton() {
+		return findButton;
+	}
+
+	public MenuButton getExportButton() {
+		return exportButton;
 	}
 }

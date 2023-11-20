@@ -396,6 +396,9 @@ public class MainWindowPresenter {
 		// controller.getDuplicateMenuItem().setOnAction(null);
 		// controller.getDeleteMenuItem().setOnAction(null);
 
+		controller.getFindButton().onActionProperty().bind(controller.getFindMenuItem().onActionProperty());
+		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
+
 		controller.getFindMenuItem().setOnAction(null);
 		controller.getFindAgainMenuItem().setOnAction(null);
 
@@ -582,10 +585,19 @@ public class MainWindowPresenter {
 		});
 
 		if (controller.getFileMenuButton().getItems().isEmpty()) {
-			controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
-					controller.getNewMenuItem(), controller.getInputEditorMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
-					controller.getCloseMenuItem(), new SeparatorMenuItem(),
-					controller.getSaveAsMenuItem(), new SeparatorMenuItem())));
+			if (splitstree6.utils.Platform.isDesktop()) {
+				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
+						controller.getNewMenuItem(), controller.getInputEditorMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
+						controller.getCloseMenuItem(), new SeparatorMenuItem(),
+						controller.getSaveAsMenuItem(), new SeparatorMenuItem())));
+			} else // mobile
+			{
+				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
+						controller.getInputEditorMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
+						controller.getCloseMenuItem(), new SeparatorMenuItem(),
+						controller.getSaveMenuItem(), new SeparatorMenuItem())));
+				controller.getFileMenuButton().getItems().get(0).setText("Edit");
+			}
 
 			var recentFilesFirstIndex = controller.getFileMenuButton().getItems().size();
 			controller.getFileMenuButton().getItems().addAll(BasicFX.copyMenu(controller.getOpenRecentMenu().getItems()));
@@ -678,18 +690,27 @@ public class MainWindowPresenter {
 	public void updateUndoRedo() {
 		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getUndoManager() != null) {
 			var undoManager = focusedDisplayTab.get().getUndoManager();
+			controller.getUndoButton().setOnAction(e -> undoManager.undo());
+			controller.getUndoButton().disableProperty().bind(undoManager.undoableProperty().not());
 			controller.getUndoMenuItem().textProperty().bind(undoManager.undoNameProperty());
-			controller.getUndoMenuItem().setOnAction(e -> undoManager.undo());
-			controller.getUndoMenuItem().disableProperty().bind(undoManager.undoableProperty().not());
+			controller.getUndoMenuItem().setOnAction(controller.getUndoMenuItem().getOnAction());
+			controller.getUndoMenuItem().disableProperty().bind(controller.getUndoButton().disableProperty());
+
+			controller.getRedoButton().setOnAction(e -> undoManager.redo());
+			controller.getRedoButton().disableProperty().bind(undoManager.redoableProperty().not());
 			controller.getRedoMenuItem().textProperty().bind(undoManager.redoNameProperty());
-			controller.getRedoMenuItem().setOnAction(e -> undoManager.redo());
-			controller.getRedoMenuItem().disableProperty().bind(undoManager.redoableProperty().not());
+			controller.getRedoMenuItem().setOnAction(controller.getRedoButton().getOnAction());
+			controller.getRedoMenuItem().disableProperty().bind(controller.getRedoButton().disableProperty());
 		} else {
+			controller.getUndoButton().disableProperty().unbind();
+			controller.getUndoButton().setDisable(true);
 			controller.getUndoMenuItem().textProperty().unbind();
 			controller.getUndoMenuItem().setText("Undo");
 			controller.getUndoMenuItem().disableProperty().unbind();
 			controller.getUndoMenuItem().setDisable(true);
 
+			controller.getRedoButton().disableProperty().unbind();
+			controller.getRedoButton().setDisable(true);
 			controller.getRedoMenuItem().textProperty().unbind();
 			controller.getRedoMenuItem().setText("Redo");
 			controller.getRedoMenuItem().disableProperty().unbind();

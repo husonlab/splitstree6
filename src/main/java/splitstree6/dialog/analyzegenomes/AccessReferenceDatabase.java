@@ -31,7 +31,6 @@ import jloda.phylo.PhyloTree;
 import jloda.thirdparty.HexUtils;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import org.sqlite.SQLiteConfig;
 
 import java.io.*;
 import java.net.URL;
@@ -103,11 +102,7 @@ public class AccessReferenceDatabase implements Closeable {
         if (!FileUtils.fileExistsAndIsNonEmpty(dbFile))
             throw new IOException("File not found or empty: " + dbFile);
 
-        final SQLiteConfig config = new SQLiteConfig();
-        config.setCacheSize(10000);
-        config.setReadOnly(readOnly);
-
-        connection = config.createConnection("jdbc:sqlite:" + dbFile);
+		connection = DatabaseConnector.createSQLiteConnection(dbFile, readOnly);
 
         unusableTaxa.addAll(executeQueryInt("SELECT taxon_id FROM genomes WHERE fasta_url is NULL or fasta_url='';", 1));
 

@@ -23,7 +23,7 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.control.MenuItem;
 import javafx.util.Pair;
 import jloda.fx.undo.UndoManager;
-import jloda.util.PluginClassLoader;
+import splitstree6.algorithms.AlgorithmList;
 import splitstree6.dialog.exporting.data.ExportDialog;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
@@ -80,11 +80,9 @@ public class DataNodeContextMenuPresenter {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
-		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
-			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
-				if (AddTreePipelineCommand.isApplicable(dataNode, algorithm))
-					list.add(new Pair<>(algorithm.getName(), algorithm));
-			}
+		{
+			var algorithms = new ArrayList<Algorithm>();
+
 		}
 		list.sort(Comparator.comparing(Pair::getKey));
 
@@ -106,7 +104,7 @@ public class DataNodeContextMenuPresenter {
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
 		var seen = new HashSet<String>();
-		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+		for (var algorithm : AlgorithmList.list()) {
 			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
 				if (AddNetworkPipelineCommand.isApplicable(dataNode, algorithm)) {
 					if (!seen.contains(algorithm.getName())) {
@@ -132,7 +130,7 @@ public class DataNodeContextMenuPresenter {
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
 		var seen = new HashSet<String>();
-		for (var algorithm : PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms")) {
+		for (var algorithm : AlgorithmList.list()) {
 			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
 				if (AddAlgorithmCommand.isApplicable(dataNode, algorithm) && !(algorithm instanceof DataTaxaFilter))
 					if (!seen.contains(algorithm.getName())) {

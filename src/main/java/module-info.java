@@ -13,7 +13,7 @@ module splitstreesix {
 	requires com.install4j.runtime;
 	requires java.sql;
 	requires java.sql.rowset;
-	requires org.xerial.sqlitejdbc;
+	//requires org.xerial.sqlitejdbc;
 	requires java.desktop;
 	requires org.fxmisc.flowless;
 	requires org.fxmisc.richtext;

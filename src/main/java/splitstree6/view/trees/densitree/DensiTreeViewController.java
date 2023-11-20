@@ -57,9 +57,6 @@ public class DensiTreeViewController {
 	private Button expandVerticallyButton;
 
 	@FXML
-	private ToggleButton findToggleButton;
-
-	@FXML
 	private ToggleButton formatToggleButton;
 
 	@FXML
@@ -129,18 +126,12 @@ public class DensiTreeViewController {
 	@FXML
 	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
 
-	@FXML
-	private MenuButton exportMenuButton;
 
 	private final ToggleGroup diagramToggleGroup = new ToggleGroup();
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(exportMenuButton, "ios_share");
-
 		MaterialIcons.setIcon(flipButton, "swap_vert");
-
-		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
@@ -226,10 +217,6 @@ public class DensiTreeViewController {
 		return expandVerticallyButton;
 	}
 
-	public ToggleButton getFindToggleButton() {
-		return findToggleButton;
-	}
-
 	public ToggleButton getFormatToggleButton() {
 		return formatToggleButton;
 	}
@@ -308,9 +295,5 @@ public class DensiTreeViewController {
 
 	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {
 		return averagingCBox;
-	}
-
-	public MenuButton getExportMenuButton() {
-		return exportMenuButton;
 	}
 }

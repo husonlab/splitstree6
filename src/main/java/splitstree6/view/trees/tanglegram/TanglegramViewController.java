@@ -50,8 +50,6 @@ public class TanglegramViewController {
 	@FXML
 	private ToolBar toolBar;
 
-	@FXML
-	private ToggleButton findToggleButton;
 
 	@FXML
 	private Button expandVerticallyButton;
@@ -121,21 +119,16 @@ public class TanglegramViewController {
 	@FXML
 	private ToggleButton formatToggleButton;
 
-	@FXML
-	private MenuButton exportMenuButton;
-
 	private final CopyableLabel tree1NameLabel = new CopyableLabel();
 	private final CopyableLabel tree2NameLabel = new CopyableLabel();
 
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(exportMenuButton, "ios_share");
 		MaterialIcons.setIcon(flipButton, "swap_vert");
 
 		MaterialIcons.setIcon(previousButton, "arrow_left");
 		MaterialIcons.setIcon(nextButton, "arrow_right");
-		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
@@ -204,10 +197,6 @@ public class TanglegramViewController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
-	}
-
-	public ToggleButton getFindToggleButton() {
-		return findToggleButton;
 	}
 
 	public Button getExpandVerticallyButton() {
@@ -302,7 +291,4 @@ public class TanglegramViewController {
 		return scrollPane;
 	}
 
-	public MenuButton getExportMenuButton() {
-		return exportMenuButton;
-	}
 }

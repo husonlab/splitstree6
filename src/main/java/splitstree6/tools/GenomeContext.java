@@ -102,7 +102,7 @@ public class GenomeContext {
             if (!name.equals("stdin") && !FileUtils.fileExistsAndIsNonEmpty(name)) {
                 inputFiles.clear();
                 inputFiles.addAll(FileUtils.getAllFilesInDirectory(name, true, ".fa", ".fna", ".fasta", ".fa.gz", ".fna.gz", ".fasta.gz"));
-                if (inputFiles.size() == 0)
+				if (inputFiles.isEmpty())
                     throw new IOException("No FastA files found in directory: " + name);
             }
         }
@@ -181,15 +181,15 @@ public class GenomeContext {
                             if (reportDistance) {
                                 buf.append("\t").append(result.getValue());
                             }
-                            if (buf.length() > 0)
+							if (!buf.isEmpty())
                                 buf.append("\n");
                         }
 
-                        if (reportLCA && taxa.size() > 0) {
+						if (reportLCA && !taxa.isEmpty()) {
                             final int lca = computeLCA(database, taxa);
                             buf.append("LCA: ").append(lca).append(" ").append(database.getNames(Collections.singleton(lca)).get(lca));
                         }
-                        if (buf.length() > 0) {
+						if (!buf.isEmpty()) {
                             w.write(buf + "\n");
                         }
                         w.write("\n");
@@ -211,13 +211,13 @@ public class GenomeContext {
     }
 
     private static int computeLCA(AccessReferenceDatabase database, Collection<Integer> taxonIds) throws SQLException {
-        if (taxonIds.size() == 0)
+		if (taxonIds.isEmpty())
             return 0;
         else if (taxonIds.size() == 1)
             return taxonIds.iterator().next();
 
         final Collection<List<Integer>> list = database.getAncestors(taxonIds).values();
-        if (list.size() == 0) {
+		if (list.isEmpty()) {
             return 0;
         } else {
             int prev = 0;

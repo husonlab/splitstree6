@@ -69,7 +69,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		controller.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
 		codeArea.setWrapText(true);
 
-		findToolBar = new FindToolBar(null, new CodeAreaSearcher("Text", codeArea));
+		findToolBar = new FindToolBar(null, codeArea.createSearcher());
 		controller.getTopVBox().getChildren().add(findToolBar);
 
 		selectionEmpty = Bindings.createBooleanBinding(() -> codeArea.getSelection().getLength() == 0, codeArea.selectionProperty());

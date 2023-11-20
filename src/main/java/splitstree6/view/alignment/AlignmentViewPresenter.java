@@ -635,9 +635,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		mainController.getSelectCompatibleSitesMenuItem().setOnAction(controller.getSelectCompatibleMenuItem().getOnAction());
 		mainController.getSelectCompatibleSitesMenuItem().disableProperty().bind(controller.getSelectCompatibleMenuItem().disableProperty());
 
-		if (controller.getExportMenuButton().getItems().isEmpty()) {
-			ExportUtils.setup(controller.getExportMenuButton(), mainWindow, view.getWorkingCharactersNode().getDataBlock().getNode(), view.emptyProperty());
-		}
+		ExportUtils.setup(mainWindow, view.getWorkingCharactersNode().getDataBlock().getNode(), view.emptyProperty());
 	}
 
 	public static void updateCharSetSelection(MainWindow mainWindow, AlignmentView view, List<MenuItem> items) {

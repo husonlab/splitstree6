@@ -44,9 +44,6 @@ public class TreePagesViewController {
 	private ToolBar toolBar;
 
 	@FXML
-	private ToggleButton findToggleButton;
-
-	@FXML
 	private ComboBox<TreeDiagramType> diagramCBox;
 
 	@FXML
@@ -100,13 +97,9 @@ public class TreePagesViewController {
 	@FXML
 	private AnchorPane innerAnchorPane;
 
-	@FXML
-	private MenuButton exportMenuButton;
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(exportMenuButton, "ios_share");
-
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
 		MaterialIcons.setIcon(flipButton, "flip");
@@ -117,7 +110,6 @@ public class TreePagesViewController {
 		MaterialIcons.setIcon(increaseFontButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 
-		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		innerAnchorPane.getChildren().remove(formatVBox);
@@ -152,10 +144,6 @@ public class TreePagesViewController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
-	}
-
-	public ToggleButton getFindToggleButton() {
-		return findToggleButton;
 	}
 
 	public ComboBox<TreeDiagramType> getDiagramCBox() {
@@ -216,9 +204,5 @@ public class TreePagesViewController {
 
 	public VBox getFormatVBox() {
 		return formatVBox;
-	}
-
-	public MenuButton getExportMenuButton() {
-		return exportMenuButton;
 	}
 }

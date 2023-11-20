@@ -27,6 +27,8 @@
     <artifactId>SplitsTreeCE</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <name>SplitsTreeCE</name>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
@@ -35,6 +37,13 @@
         <javafx.version>17</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <main.class>splitstree6.main.SplitsTree6</main.class>
+
+        <gluonfx.plugin.version>1.0.21</gluonfx.plugin.version>
+        <charm.version>6.1.1</charm.version>
+        <attach.version>4.0.17</attach.version>
+        <gluonfx.target></gluonfx.target>
+        <app.version>1.0.0</app.version>
+
     </properties>
 
     <dependencies>
@@ -59,11 +68,13 @@
             <artifactId>javafx-web</artifactId>
             <version>19.0.2.1</version>
         </dependency>
+        <!-->
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.41.2.2</version>
         </dependency>
+        </!-->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math4-legacy</artifactId>
@@ -89,13 +100,42 @@
             <artifactId>richtextfx</artifactId>
             <version>0.11.0</version>
         </dependency>
-        <!--
-            <dependency>
-                <groupId>com.github.lejon</groupId>
-                <artifactId>T-SNE-Java</artifactId>
-                <version>2.6.4</version>
-            </dependency>
-            -->
+
+        <dependency>
+            <groupId>com.gluonhq</groupId>
+            <artifactId>charm-glisten</artifactId>
+            <version>${charm.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>display</artifactId>
+            <version>${attach.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>lifecycle</artifactId>
+            <version>${attach.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>share</artifactId>
+            <version>${attach.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>statusbar</artifactId>
+            <version>${attach.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>storage</artifactId>
+            <version>${attach.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gluonhq.attach</groupId>
+            <artifactId>util</artifactId>
+            <version>${attach.version}</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -156,9 +196,398 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>com.gluonhq</groupId>
+                <artifactId>gluonfx-maven-plugin</artifactId>
+                <version>${gluonfx.plugin.version}</version>
+                <configuration>
+                    <target>${gluonfx.target}</target>
+                    <mainClass>${main.class}</mainClass>
+                    <attachList>
+                        <list>display</list>
+                        <list>lifecycle</list>
+                        <list>statusbar</list>
+                        <list>storage</list>
+                        <list>share</list>
+                    </attachList>
+                    <reflectionList>
+                        <list>jloda.fx.find.FindToolBarController</list>
+                        <list>jloda.fx.label.EditLabelDialogController</list>
+
+                        <list>splitstree6.algorithms.characters.characters2characters.Characters2Characters</list>
+                        <list>splitstree6.algorithms.characters.characters2characters.CharactersFilter</list>
+                        <list>splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.BaseFreqDistance</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.Characters2Distances</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.Codominant</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.Dice</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.GapDist</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.GeneContentDistance</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.HammingDistances</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.HammingDistancesAmbigStates</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.Jaccard</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.LogDet</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.NeiMiller</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.Nei_Li_RestrictionDistance</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.ProteinMLdist</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.Uncorrected_P</list>
+                        <list>splitstree6.algorithms.characters.characters2distances.Upholt</list>
+                        <list>splitstree6.algorithms.characters.characters2network.Characters2Network</list>
+                        <list>splitstree6.algorithms.characters.characters2network.MedianJoining</list>
+                        <list>splitstree6.algorithms.characters.characters2network.MedianJoiningCalculator</list>
+                        <list>splitstree6.algorithms.characters.characters2network.QuasiMedianBase</list>
+                        <list>splitstree6.algorithms.characters.characters2report.AnalyzeCharactersBase</list>
+                        <list>splitstree6.algorithms.characters.characters2report.Characters2Report</list>
+                        <list>splitstree6.algorithms.characters.characters2report.EstimateInvariableSites</list>
+                        <list>splitstree6.algorithms.characters.characters2report.PhiTest</list>
+                        <list>splitstree6.algorithms.characters.characters2splits.BinaryToSplits</list>
+                        <list>splitstree6.algorithms.characters.characters2splits.Characters2Splits</list>
+                        <list>splitstree6.algorithms.characters.characters2splits.DnaToSplits</list>
+                        <list>splitstree6.algorithms.characters.characters2splits.ParsimonySplits</list>
+                        <list>splitstree6.algorithms.characters.characters2trees.Characters2Trees</list>
+                        <list>splitstree6.algorithms.characters.characters2trees.ExternalProgram</list>
+                        <list>splitstree6.algorithms.characters.characters2view.Characters2View</list>
+                        <list>splitstree6.algorithms.distances.distances2distances.Distances2Distances</list>
+                        <list>splitstree6.algorithms.distances.distances2distances.DistancesTaxaFilter</list>
+                        <list>splitstree6.algorithms.distances.distances2network.Distances2Network</list>
+                        <list>splitstree6.algorithms.distances.distances2network.MinSpanningNetwork</list>
+                        <list>splitstree6.algorithms.distances.distances2network.PCoA</list>
+                        <list>splitstree6.algorithms.distances.distances2report.DeltaScore</list>
+                        <list>splitstree6.algorithms.distances.distances2report.Distances2ReportBase</list>
+                        <list>splitstree6.algorithms.distances.distances2splits.BunemanTree</list>
+                        <list>splitstree6.algorithms.distances.distances2splits.Distances2Splits</list>
+                        <list>splitstree6.algorithms.distances.distances2splits.NeighborNet</list>
+                        <list>splitstree6.algorithms.distances.distances2splits.SplitDecomposition</list>
+                        <list>splitstree6.algorithms.distances.distances2trees.BioNJ</list>
+                        <list>splitstree6.algorithms.distances.distances2trees.Distances2Trees</list>
+                        <list>splitstree6.algorithms.distances.distances2trees.MinSpanningTree</list>
+                        <list>splitstree6.algorithms.distances.distances2trees.NeighborJoining</list>
+                        <list>splitstree6.algorithms.distances.distances2trees.UPGMA</list>
+                        <list>splitstree6.algorithms.distances.distances2view.Distances2View</list>
+                        <list>splitstree6.algorithms.genomes.genome2distances.Genomes2Distances</list>
+                        <list>splitstree6.algorithms.genomes.genome2distances.Mash</list>
+                        <list>splitstree6.algorithms.genomes.genomes2genomes.Genomes2Genomes</list>
+                        <list>splitstree6.algorithms.genomes.genomes2genomes.GenomesTaxaFilter</list>
+                        <list>splitstree6.algorithms.network.network2network.Network2Network</list>
+                        <list>splitstree6.algorithms.network.network2network.NetworkTaxaFilter</list>
+                        <list>splitstree6.algorithms.network.network2view.Network2View</list>
+                        <list>splitstree6.algorithms.network.network2view.ShowNetwork</list>
+                        <list>splitstree6.algorithms.source.source2characters.CharactersLoader</list>
+                        <list>splitstree6.algorithms.source.source2characters.Source2Characters</list>
+                        <list>splitstree6.algorithms.source.source2distances.DistancesLoader</list>
+                        <list>splitstree6.algorithms.source.source2distances.Sources2Distances</list>
+                        <list>splitstree6.algorithms.source.source2genomes.GenomesLoader</list>
+                        <list>splitstree6.algorithms.source.source2genomes.Source2Genomes</list>
+                        <list>splitstree6.algorithms.source.source2network.NetworkLoader</list>
+                        <list>splitstree6.algorithms.source.source2splits.Sources2Splits</list>
+                        <list>splitstree6.algorithms.source.source2splits.SplitsLoader</list>
+                        <list>splitstree6.algorithms.source.source2trees.Sources2Trees</list>
+                        <list>splitstree6.algorithms.source.source2trees.TreesLoader</list>
+                        <list>splitstree6.algorithms.splits.splits2distances.LeastSquaresDistances</list>
+                        <list>splitstree6.algorithms.splits.splits2distances.Splits2Distances</list>
+                        <list>splitstree6.algorithms.splits.splits2network.Splits2Network</list>
+                        <list>splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity</list>
+                        <list>splitstree6.algorithms.splits.splits2report.ShapleyValues</list>
+                        <list>splitstree6.algorithms.splits.splits2report.Splits2ReportBase</list>
+                        <list>splitstree6.algorithms.splits.splits2splits.BootstrapSplits</list>
+                        <list>splitstree6.algorithms.splits.splits2splits.DimensionFilter</list>
+                        <list>splitstree6.algorithms.splits.splits2splits.LeastSquaresWeights</list>
+                        <list>splitstree6.algorithms.splits.splits2splits.Splits2Splits</list>
+                        <list>splitstree6.algorithms.splits.splits2splits.SplitsFilter</list>
+                        <list>splitstree6.algorithms.splits.splits2splits.SplitsTaxaFilter</list>
+                        <list>splitstree6.algorithms.splits.splits2splits.WeightsSlider</list>
+                        <list>splitstree6.algorithms.splits.splits2trees.GreedyTree</list>
+                        <list>splitstree6.algorithms.splits.splits2trees.Splits2Trees</list>
+                        <list>splitstree6.algorithms.splits.splits2view.ShowSplits</list>
+                        <list>splitstree6.algorithms.splits.splits2view.Splits2View</list>
+                        <list>splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa</list>
+                        <list>splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter</list>
+                        <list>splitstree6.algorithms.taxa.taxa2view.Taxa2View</list>
+                        <list>splitstree6.algorithms.trees.trees2distances.AverageDistances</list>
+                        <list>splitstree6.algorithms.trees.trees2distances.Trees2Distances</list>
+                        <list>splitstree6.algorithms.trees.trees2network.Trees2Network</list>
+                        <list>splitstree6.algorithms.trees.trees2report.ListOneRSPRTrees</list>
+                        <list>splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity</list>
+                        <list>splitstree6.algorithms.trees.trees2report.TreeDiversityIndex</list>
+                        <list>splitstree6.algorithms.trees.trees2report.Trees2ReportBase</list>
+                        <list>splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.AntiConsensusNetwork</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.AverageConsensus</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.BootstrapTreeSplits</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.ConsensusNetwork</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.ConsensusOutline</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.ConsensusSplits</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.CredibilityNetwork</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.SuperNetwork</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.TreeSelectorSplits</list>
+                        <list>splitstree6.algorithms.trees.trees2splits.Trees2Splits</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.ALTSNetwork</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.BootstrapTree</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.ConsensusTree</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.EnumerateContainedTrees</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.LooseAndLacy</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.RerootOrReorderTrees</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.RootedConsensusTree</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.TreeSelector</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.Trees2Trees</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.TreesFilter</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.TreesFilter2</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.TreesTaxaFilter</list>
+                        <list>splitstree6.algorithms.trees.trees2view.ShowTrees</list>
+                        <list>splitstree6.algorithms.trees.trees2view.Trees2View</list>
+
+                        <list>splitstree6.data.CharactersBlock</list>
+                        <list>splitstree6.data.CharactersFormat</list>
+                        <list>splitstree6.data.DistancesBlock</list>
+                        <list>splitstree6.data.DistancesFormat</list>
+                        <list>splitstree6.data.GenomesBlock</list>
+                        <list>splitstree6.data.GenomesFormat</list>
+                        <list>splitstree6.data.NetworkBlock</list>
+                        <list>splitstree6.data.ReportBlock</list>
+                        <list>splitstree6.data.SetsBlock</list>
+                        <list>splitstree6.data.SourceBlock</list>
+                        <list>splitstree6.data.SplitsBlock</list>
+                        <list>splitstree6.data.SplitsFormat</list>
+                        <list>splitstree6.data.SplitsTree6Block</list>
+                        <list>splitstree6.data.TaxaBlock</list>
+                        <list>splitstree6.data.TraitsBlock</list>
+                        <list>splitstree6.data.TraitsNexusFormat</list>
+                        <list>splitstree6.data.TreesBlock</list>
+                        <list>splitstree6.data.TreesFormat</list>
+                        <list>splitstree6.data.ViewBlock</list>
+
+                        <list>splitstree6.io.readers.characters.CharactersReader</list>
+                        <list>splitstree6.io.readers.characters.FastAReader</list>
+                        <list>splitstree6.io.readers.characters.MSFReader</list>
+                        <list>splitstree6.io.readers.characters.NexusReader</list>
+                        <list>splitstree6.io.readers.characters.PhylipReader</list>
+                        <list>splitstree6.io.readers.distances.DistancesReader</list>
+                        <list>splitstree6.io.readers.distances.NexusReader</list>
+                        <list>splitstree6.io.readers.distances.PhylipReader</list>
+                        <list>splitstree6.io.readers.genomes.GenomesReader</list>
+                        <list>splitstree6.io.readers.genomes.NexusReader</list>
+                        <list>splitstree6.io.readers.network.NetworkReader</list>
+                        <list>splitstree6.io.readers.network.NexusReader</list>
+                        <list>splitstree6.io.readers.report.NexusReader</list>
+                        <list>splitstree6.io.readers.report.TextReader</list>
+                        <list>splitstree6.io.readers.splits.NewickReader</list>
+                        <list>splitstree6.io.readers.splits.NexusReader</list>
+                        <list>splitstree6.io.readers.splits.SplitsReader</list>
+                        <list>splitstree6.io.readers.trees.NewickReader</list>
+                        <list>splitstree6.io.readers.trees.NexmlReader</list>
+                        <list>splitstree6.io.readers.trees.NexusReader</list>
+                        <list>splitstree6.io.readers.trees.TreesReader</list>
+                        <list>splitstree6.io.readers.view.NexusReader</list>
+                        <list>splitstree6.io.readers.view.ViewReader</list>
+
+                        <list>splitstree6.tabs.algorithms.taxafilter.TaxaFilterTableItem</list>
+                        <list>splitstree6.workflowtree.WorkflowTreeViewController</list>
+
+                        <list>splitstree6.io.writers.characters.FastAWriter</list>
+                        <list>splitstree6.io.writers.characters.NexusWriter</list>
+                        <list>splitstree6.io.writers.characters.PhylipWriter</list>
+                        <list>splitstree6.io.writers.characters.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.distances.NexusWriter</list>
+                        <list>splitstree6.io.writers.distances.PhylipWriter</list>
+                        <list>splitstree6.io.writers.distances.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.genomes.NexusWriter</list>
+                        <list>splitstree6.io.writers.network.NexusWriter</list>
+                        <list>splitstree6.io.writers.network.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.report.NexusWriter</list>
+                        <list>splitstree6.io.writers.report.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.sets.NexusWriter</list>
+                        <list>splitstree6.io.writers.sets.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.splits.FastAWriter</list>
+                        <list>splitstree6.io.writers.splits.NewickWriter</list>
+                        <list>splitstree6.io.writers.splits.NexusWriter</list>
+                        <list>splitstree6.io.writers.splits.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.taxa.NexusWriter</list>
+                        <list>splitstree6.io.writers.taxa.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.traits.NexusWriter</list>
+                        <list>splitstree6.io.writers.traits.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.trees.NeXMLWriter</list>
+                        <list>splitstree6.io.writers.trees.NewickWriter</list>
+                        <list>splitstree6.io.writers.trees.NexusWriter</list>
+                        <list>splitstree6.io.writers.trees.PlainTextWriter</list>
+                        <list>splitstree6.io.writers.view.GMLWriter</list>
+                        <list>splitstree6.io.writers.view.NexusWriter</list>
+                        <list>splitstree6.io.writers.view.PlainTextWriter</list>
+
+                        <list>splitstree6.contextmenus.datanode.DataNodeContextMenuController</list>
+                        <list>splitstree6.dialog.analyzegenomes.AnalyzeGenomesController</list>
+                        <list>splitstree6.dialog.exporting.data.ExportDialogController</list>
+                        <list>splitstree6.dialog.importdialog.ImportDialogController</list>
+                        <list>splitstree6.tabs.algorithms.AlgorithmTabController</list>
+                        <list>splitstree6.tabs.algorithms.taxafilter.TaxaFilterController</list>
+                        <list>splitstree6.tabs.algorithms.treefilter.TreeFilterTabController</list>
+                        <list>splitstree6.tabs.workflow.WorkflowTabController</list>
+                        <list>splitstree6.tabs.workflow.algorithm.AlgorithmItemController</list>
+                        <list>splitstree6.tabs.workflow.data.DataItemController</list>
+                        <list>splitstree6.view.alignment.AlignmentViewController</list>
+                        <list>splitstree6.view.displaydatablock.DisplayDataController</list>
+                        <list>splitstree6.view.displaytext.DisplayTextViewController</list>
+                        <list>splitstree6.view.format.densitree.EdgesFormatController</list>
+                        <list>splitstree6.view.format.edges.EdgesFormatController</list>
+                        <list>splitstree6.view.format.selecttraits.SelectTraitsController</list>
+                        <list>splitstree6.view.format.sites.SitesFormatController</list>
+                        <list>splitstree6.view.format.splits.SplitsFormatController</list>
+                        <list>splitstree6.view.format.taxlabel.TaxonLabelFormatController</list>
+                        <list>splitstree6.view.format.taxmark.TaxonMarkController</list>
+                        <list>splitstree6.view.format.traits.TraitsFormatController</list>
+                        <list>splitstree6.view.inputeditor.InputEditorViewController</list>
+                        <list>splitstree6.view.network.NetworkViewController</list>
+                        <list>splitstree6.view.splits.viewer.SplitsViewController</list>
+                        <list>splitstree6.view.trees.densitree.DensiTreeViewController</list>
+                        <list>splitstree6.view.trees.tanglegram.TanglegramViewController</list>
+                        <list>splitstree6.view.trees.treepages.TreePagesViewController</list>
+                        <list>splitstree6.view.trees.treeview.TreeViewController</list>
+                        <list>splitstree6.window.MainWindowController</list>
+                        <list>splitstree6.workflowtree.WorkflowTreeViewController</list>
+                        <list>splitstree6.xtra.genetreeview.GeneTreeViewController</list>
+                        <list>splitstree6.xtra.mapview.MapViewController</list>
+                        <list>splitstree6.xtra.outliner.OutlinerController</list>
+
+                        <list>javafx.geometry.Insets</list>
+
+                        <list>javafx.scene.canvas.Canvas</list>
+
+                        <list>javafx.scene.control.Accordion</list>
+                        <list>javafx.scene.control.Button</list>
+                        <list>javafx.scene.control.CheckBox</list>
+                        <list>javafx.scene.control.CheckMenuItem</list>
+                        <list>javafx.scene.control.ChoiceBox</list>
+                        <list>javafx.scene.control.ColorPicker</list>
+                        <list>javafx.scene.control.ComboBox</list>
+                        <list>javafx.scene.control.ContextMenu</list>
+                        <list>javafx.scene.control.OverrunStyle</list>
+                        <list>javafx.scene.control.Menu</list>
+                        <list>javafx.scene.control.MenuButton</list>
+                        <list>javafx.scene.control.MenuBar</list>
+                        <list>javafx.scene.control.MenuItem</list>
+                        <list>javafx.scene.control.ProgressBar</list>
+                        <list>javafx.scene.control.ProgressIndicator</list>
+                        <list>javafx.scene.control.RadioButton</list>
+                        <list>javafx.scene.control.RadioMenuItem</list>
+                        <list>javafx.scene.control.ScrollBar</list>
+                        <list>javafx.scene.control.ScrollPane</list>
+                        <list>javafx.scene.control.Separator</list>
+                        <list>javafx.scene.control.SeparatorMenuItem</list>
+                        <list>javafx.scene.control.SplitPane</list>
+                        <list>javafx.scene.control.Slider</list>
+                        <list>javafx.scene.control.Tab</list>
+                        <list>javafx.scene.control.TableColumn</list>
+                        <list>javafx.scene.control.TableRow</list>
+                        <list>javafx.scene.control.TableView</list>
+                        <list>javafx.scene.control.TabPane</list>
+                        <list>javafx.scene.control.TextArea</list>
+                        <list>javafx.scene.control.TitledPane</list>
+                        <list>javafx.scene.control.TextField</list>
+                        <list>javafx.scene.control.ToggleButton</list>
+                        <list>javafx.scene.control.ToolBar</list>
+                        <list>javafx.scene.control.Tooltip</list>
+                        <list>javafx.scene.control.TreeView</list>
+                        <list>javafx.scene.Group</list>
+
+                        <list>javafx.geometry.NodeOrientation</list>
+                        <list>javafx.scene.image.ImageView</list>
+                        <list>javafx.scene.input.KeyCharacterCombination</list>
+                        <list>javafx.scene.input.KeyCode</list>
+                        <list>javafx.scene.input.KeyCodeCombination</list>
+                        <list>javafx.scene.input.KeyCombination</list>
+                        <list>javafx.scene.layout.AnchorPane</list>
+                        <list>javafx.scene.layout.BorderPane</list>
+                        <list>javafx.scene.layout.StackPane</list>
+                        <list>javafx.scene.layout.FlowPane</list>
+                        <list>javafx.scene.layout.GridPane</list>
+                        <list>javafx.scene.layout.HBox</list>
+                        <list>javafx.scene.layout.Pane</list>
+                        <list>javafx.scene.layout.VBox</list>
+                        <list>javafx.scene.paint.Color</list>
+                        <list>javafx.scene.text.Font</list>
+
+                    </reflectionList>
+                    <!-->
+                    <releaseConfiguration>
+                        <bundleVersion>${app.version}</bundleVersion>
+                        <bundleShortVersion>${app.version}</bundleShortVersion>
+                                 <providedProvisioningProfile>
+                                    PhyloSketch
+                                </providedProvisioningProfile>
+                     </releaseConfiguration>
+                     </!-->
+                </configuration>
+            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>desktop</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <client.target>host</client.target>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>com.gluonhq.attach</groupId>
+                    <artifactId>display</artifactId>
+                    <version>${attach.version}</version>
+                    <classifier>desktop</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.gluonhq.attach</groupId>
+                    <artifactId>lifecycle</artifactId>
+                    <version>${attach.version}</version>
+                    <classifier>desktop</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.gluonhq.attach</groupId>
+                    <artifactId>storage</artifactId>
+                    <version>${attach.version}</version>
+                    <classifier>desktop</classifier>
+                </dependency>
+                <dependency>
+                    <groupId>com.gluonhq.attach</groupId>
+                    <artifactId>util</artifactId>
+                    <version>${attach.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <id>android</id>
+            <properties>
+                <gluonfx.target>android</gluonfx.target>
+            </properties>
+        </profile>
+        <profile>
+            <id>ios</id>
+            <properties>
+                <gluonfx.target>ios</gluonfx.target>
+            </properties>
+        </profile>
+        <profile>
+            <id>ios-sim</id>
+            <properties>
+                <gluonfx.target>ios-sim</gluonfx.target>
+            </properties>
+        </profile>
+        <profile> <!-- This one doesn't work-->
+            <id>web</id>
+            <properties>
+                <gluonfx.target>web</gluonfx.target>
+            </properties>
+        </profile>
+    </profiles>
+
     <repositories>
+        <repository>
+            <id>gluon-releases</id>
+            <url>https://nexus.gluonhq.com/nexus/content/repositories/releases/</url>
+        </repository>
         <repository>
             <id>jitpack.io</id>
             <url>https://jitpack.io</url>

@@ -25,6 +25,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Tab;
@@ -32,7 +33,6 @@ import javafx.stage.Stage;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
-import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.IMainWindow;
@@ -52,6 +52,7 @@ import splitstree6.view.alignment.AlignmentView;
 import splitstree6.workflow.Workflow;
 import splitstree6.workflowtree.WorkflowTreeView;
 
+import java.io.IOException;
 import java.util.Objects;
 
 public class MainWindow implements IMainWindow {
@@ -84,10 +85,16 @@ public class MainWindow implements IMainWindow {
 	public MainWindow() {
 		Platform.setImplicitExit(false);
 
-		final ExtendedFXMLLoader<MainWindowController> loader = new ExtendedFXMLLoader<>(this.getClass());
-		root = loader.getRoot();
-		controller = loader.getController();
-
+		{
+			var fxmlLoader = new FXMLLoader();
+			try (var ins = StatementFilter.applyMobileFXML(Objects.requireNonNull(MainWindowController.class.getResource("MainWindow.fxml")).openStream())) {
+				fxmlLoader.load(ins);
+				root = fxmlLoader.getRoot();
+				controller = fxmlLoader.getController();
+			} catch (IOException ex) {
+				throw new RuntimeException(ex);
+			}
+		}
 		workflow.setServiceConfigurator(s -> s.setProgressParentPane(controller.getBottomFlowPane()));
 
 		empty.bind(Bindings.isEmpty(workflow.nodes())
