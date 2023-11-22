@@ -81,5 +81,11 @@ viewer-background {
 }
  */
 
+.tool-bar {
+    -fx-background-insets: 0;
+    -fx-background-color: transparent;
+    -fx-spacing: 3mm;
+}
+
 
 

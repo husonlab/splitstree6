@@ -95,6 +95,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final SetChangeListener<Taxon> selectionChangeListener;
 
+	private final Single<Double> oldZoom = new Single<>(null);
+
 	/**
 	 * the splits view presenter
 	 *
@@ -238,8 +240,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			updateCounter.set(updateCounter.get() + 1);
 		});
 
-		var oldZoom = new Single<Double>(null);
-
 		view.optionZoomFactorProperty().addListener((v, o, n) -> {
 			var zoomFactor = n.doubleValue() / o.doubleValue();
 			if (zoomFactor > 0 && zoomFactor != 1.0) {
@@ -247,12 +247,14 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 					oldZoom.set(o.doubleValue());
 				}
 				RunAfterAWhile.applyInFXThread(oldZoom, () -> {
-					var factor = n.doubleValue() / oldZoom.get();
-					if (factor > 0 && factor != 1.0) {
-						view.getUndoManager().add("Zoom",
-								() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / factor, 1.0 / factor),
-								() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), factor, factor));
-						oldZoom.set(null);
+					if (oldZoom.isNotNull()) {
+						var factor = n.doubleValue() / oldZoom.get();
+						if (factor > 0 && factor != 1.0) {
+							view.getUndoManager().add("Zoom",
+									() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / factor, 1.0 / factor),
+									() -> LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), factor, factor));
+							oldZoom.set(null);
+						}
 					}
 				});
 				LayoutUtils.scaleTranslate(controller.getScrollPane().getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), zoomFactor, zoomFactor);

@@ -21,6 +21,7 @@ package splitstree6.window;
 
 import javafx.beans.InvalidationListener;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCharacterCombination;
 import javafx.scene.input.KeyCombination;
@@ -172,7 +173,6 @@ public class MainWindowController {
 
 	@FXML
 	private MenuItem selectFromPreviousMenuItem;
-
 
 	@FXML
 	private MenuItem selectBracketsMenuItem;
@@ -343,9 +343,6 @@ public class MainWindowController {
 	private CheckMenuItem pcoaMenuItem;
 
 	@FXML
-	private CheckMenuItem tsneMenuItem;
-
-	@FXML
 	private CheckMenuItem bootStrapTreeMenuItem;
 
 	@FXML
@@ -441,7 +438,7 @@ public class MainWindowController {
 	private MenuButton fileMenuButton;
 
 	@FXML
-	private Label fileNameLabel;
+	private TextField fileNameTextField;
 
 	@FXML
 	private Button undoButton;
@@ -465,6 +462,7 @@ public class MainWindowController {
 	void initialize() {
 		if (!Platform.isDesktop()) {
 			((Pane) menuBar.getParent()).getChildren().remove(menuBar);
+			topVBox.setPadding(new Insets(30, 0, 0, 0));
 		}
 
 		MaterialIcons.setIcon(fileMenuButton, "file_open");
@@ -921,10 +919,6 @@ public class MainWindowController {
 		return pcoaMenuItem;
 	}
 
-	public CheckMenuItem getTsneMenuItem() {
-		return tsneMenuItem;
-	}
-
 	public CheckMenuItem getBootStrapTreeMenuItem() {
 		return bootStrapTreeMenuItem;
 	}
@@ -1057,8 +1051,8 @@ public class MainWindowController {
 		return mainTabPane;
 	}
 
-	public Label getFileNameLabel() {
-		return fileNameLabel;
+	public TextField getFileNameTextField() {
+		return fileNameTextField;
 	}
 
 	public MenuButton getFileMenuButton() {

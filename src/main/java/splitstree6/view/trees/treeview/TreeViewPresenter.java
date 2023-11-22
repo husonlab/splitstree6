@@ -35,16 +35,20 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
 import jloda.util.CanceledException;
+import jloda.util.Single;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressSilent;
 import splitstree6.data.parts.Taxon;
+import splitstree6.layout.LayoutUtils;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
@@ -366,8 +370,10 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		view.optionAveragingProperty().addListener((v, o, n) -> undoManager.add("node averaging", view.optionAveragingProperty(), o, n));
 		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
-		view.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("horizontal zoom", view.optionHorizontalZoomFactorProperty(), o, n));
-		view.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("vertical zoom", view.optionVerticalZoomFactorProperty(), o, n));
+
+		//view.optionHorizontalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("horizontal zoom", view.optionHorizontalZoomFactorProperty(), o, n));
+		//view.optionVerticalZoomFactorProperty().addListener((v, o, n) -> undoManager.add("vertical zoom", view.optionVerticalZoomFactorProperty(), o, n));
+
 		// treeView.optionShowTreeNamesProperty().addListener((v, o, n) -> undoManager.add("show tree names", treeView.optionShowTreeNamesProperty(), o, n));
 		// treeView.optionShowTreeInfoProperty().addListener((v, o, n) -> undoManager.add("show tree info", treeView.optionShowTreeInfoProperty(), o, n));
 
@@ -485,4 +491,45 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		return updateCounter;
 	}
 
+	private static void setupZoomTracking(UndoManager undoManager, ZoomableScrollPane scrollPane, ReadOnlyDoubleProperty zoomX, ReadOnlyDoubleProperty zoomY) {
+		var oldZoomX = new Single<Double>(null);
+
+		zoomX.addListener((v, o, n) -> {
+			var zoomFactor = n.doubleValue() / o.doubleValue();
+			if (zoomFactor > 0 && zoomFactor != 1.0) {
+				if (oldZoomX.get() == null) {
+					oldZoomX.set(o.doubleValue());
+				}
+				RunAfterAWhile.applyInFXThread(oldZoomX, () -> {
+					var factor = n.doubleValue() / oldZoomX.get();
+					if (factor > 0 && factor != 1.0) {
+						undoManager.add("Zoom horizontally",
+								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0 / factor, 1.0),
+								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), factor, 1.0));
+						oldZoomX.set(null);
+					}
+				});
+			}
+		});
+
+		var oldZoomY = new Single<Double>(null);
+
+		zoomY.addListener((v, o, n) -> {
+			var zoomFactor = n.doubleValue() / o.doubleValue();
+			if (zoomFactor > 0 && zoomFactor != 1.0) {
+				if (oldZoomY.get() == null) {
+					oldZoomY.set(o.doubleValue());
+				}
+				RunAfterAWhile.applyInFXThread(oldZoomY, () -> {
+					var factor = n.doubleValue() / oldZoomY.get();
+					if (factor > 0 && factor != 1.0) {
+						undoManager.add("Zoom vertically",
+								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, 1.0 / factor),
+								() -> LayoutUtils.scaleTranslate(scrollPane.getContent(), a -> a.getId() != null && a.getId().equals("graph-node"), 1.0, factor));
+						oldZoomY.set(null);
+					}
+				});
+			}
+		});
+	}
 }

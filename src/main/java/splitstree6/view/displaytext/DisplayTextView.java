@@ -72,6 +72,8 @@ public class DisplayTextView implements IView {
 
 		controller.getCodeArea().textProperty().addListener(e -> empty.set(controller.getCodeArea().getLength() == 0));
 
+		controller.getCodeArea().setStyle("-fx-border-color: lightgray; -fx-border-width: 2 0 0 0;");
+
 		controller.getCodeArea().textProperty().addListener(e -> optionText.set(controller.getCodeArea().getText()));
 		optionText.addListener(e -> controller.getCodeArea().replaceText(optionText.get()));
 

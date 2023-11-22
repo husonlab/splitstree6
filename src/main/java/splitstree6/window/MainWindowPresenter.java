@@ -34,6 +34,7 @@ import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -139,17 +140,17 @@ public class MainWindowPresenter {
 		controller.getWorkflowBorderPane().setCenter(workflowTreeView);
 
 		keyEventEventHandler = e -> {
-			var ch = e.getCharacter();
-			if ((ch.equals("+") || ch.equals("=") && e.isShiftDown()) && e.isShortcutDown()
-				&& controller.getIncreaseFontSizeMenuItem().getOnAction() != null && !controller.getIncreaseFontSizeMenuItem().isDisable()) {
-				controller.getIncreaseFontSizeMenuItem().getOnAction().handle(null);
-				e.consume();
-			} else if (ch.equals("-") && !e.isShiftDown() && e.isShortcutDown() && controller.getDecreaseFontSizeMenuItem().getOnAction() != null && !controller.getDecreaseFontSizeMenuItem().isDisable()) {
-				controller.getDecreaseFontSizeMenuItem().getOnAction().handle(null);
-				e.consume();
+			if (mainWindow.getStage().isFocused()) {
+				if ((e.getCharacter().equals("=") || e.getCode() == KeyCode.EQUALS || e.getCharacter().equals("+") || e.getCode() == KeyCode.ADD || e.getCode() == KeyCode.PLUS) && e.isShortcutDown()
+					&& controller.getIncreaseFontSizeMenuItem().getOnAction() != null && !controller.getIncreaseFontSizeMenuItem().isDisable()) {
+					controller.getIncreaseFontSizeMenuItem().fire();
+					e.consume();
+				} else if ((e.getCharacter().equals("-") || e.getCode() == KeyCode.SUBTRACT || e.getCode() == KeyCode.MINUS) && controller.getDecreaseFontSizeMenuItem().getOnAction() != null && !controller.getDecreaseFontSizeMenuItem().isDisable()) {
+					controller.getDecreaseFontSizeMenuItem().fire();
+					e.consume();
+				}
 			}
 		};
-
 
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
@@ -198,8 +199,23 @@ public class MainWindowPresenter {
 			}
 		});
 
-		mainWindow.fileNameProperty().addListener((v, o, n) -> controller.getFileNameLabel().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n)));
+		mainWindow.fileNameProperty().addListener((v, o, n) -> controller.getFileNameTextField().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n)));
 		controller.getFileTooltip().textProperty().bind(mainWindow.fileNameProperty());
+
+		controller.getFileNameTextField().setOnAction(e -> {
+			var currentName = FileUtils.getFileNameWithoutPath(mainWindow.getFileName());
+			var entry = controller.getFileNameTextField().getText();
+			if (!entry.isBlank() && !entry.equals(currentName)) {
+				var newFile = FileUtils.getFilePath(mainWindow.getFileName(), entry);
+				var count = 0;
+				var suffix = FileUtils.getFileSuffix(newFile);
+				var name = FileUtils.replaceFileSuffix(newFile, "");
+				while (count < 100 && FileUtils.fileExistsAndIsNonEmpty(newFile)) {
+					newFile = FileUtils.getFilePath(mainWindow.getFileName(), name + (++count) + "." + suffix);
+				}
+				mainWindow.setFileName(newFile);
+			}
+		});
 
 		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 
@@ -217,15 +233,11 @@ public class MainWindowPresenter {
 
 	public void setStage(Stage stage) {
 		this.stage = stage;
-
+		stage.addEventFilter(KeyEvent.KEY_TYPED, keyEventEventHandler);
 		stage.getScene().focusOwnerProperty().addListener((v, o, n) -> {
 			try {
-				if (o != null)
-					o.removeEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
 				var displayTab = getContainingDisplayTab(n);
 				if (displayTab != null) {
-					n.addEventHandler(KeyEvent.KEY_TYPED, keyEventEventHandler);
-
 					focusedDisplayTab.set(displayTab);
 					disableAllMenuItems(controller);
 					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);

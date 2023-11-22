@@ -265,14 +265,14 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="PLUS" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCharacterCombination alt="UP" character="+" control="UP" meta="UP" shift="UP"
+                                                         shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size">
                             <accelerator>
-                                <KeyCodeCombination alt="UP" code="MINUS" control="UP" meta="UP" shift="UP"
-                                                    shortcut="DOWN"/>
+                                <KeyCharacterCombination alt="UP" character="-" control="UP" meta="UP" shift="UP"
+                                                         shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
@@ -439,11 +439,12 @@
                             <children>
                                 <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="File"/>
-                                <Label fx:id="fileNameLabel" text="Untitled">
+                                <TextField fx:id="fileNameTextField" focusTraversable="false" promptText="File name"
+                                           style="-fx-background-color: transparent;">
                                     <tooltip>
-                                        <Tooltip fx:id="fileTooltip" text="Untitled"/>
+                                        <Tooltip fx:id="fileTooltip" text="Empty Tooltip"/>
                                     </tooltip>
-                                </Label>
+                                </TextField>
                             </children>
                             <padding>
                                 <Insets left="10.0" right="100.0"/>
