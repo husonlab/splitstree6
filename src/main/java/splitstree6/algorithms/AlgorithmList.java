@@ -25,7 +25,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * list all algorithms
+ * Daniel Huson, 12.2023
+ */
 public class AlgorithmList {
+	/**
+	 * create a list of algorithm options
+	 *
+	 * @param names0 if non-empty, only list those classes whose simple name is contained in this
+	 * @return algorithm objects
+	 */
 	public static List<Algorithm> list(String... names0) {
 		var names = List.of(names0);
 		var algorithms = new ArrayList<Algorithm>();

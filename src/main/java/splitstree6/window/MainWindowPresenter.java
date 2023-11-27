@@ -199,7 +199,8 @@ public class MainWindowPresenter {
 			}
 		});
 
-		mainWindow.fileNameProperty().addListener((v, o, n) -> controller.getFileNameTextField().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n.replaceAll("\\*$", ""))));
+		mainWindow.fileNameProperty().addListener((v, o, n) ->
+				controller.getFileNameTextField().setText(n == null ? "" : (FileUtils.getFileNameWithoutPath(n.replaceAll("\\*$", "")) + (mainWindow.isDirty() ? "*" : ""))));
 		controller.getFileTooltip().textProperty().bind(mainWindow.fileNameProperty());
 
 		controller.getFileNameTextField().setOnAction(e -> {
@@ -216,11 +217,19 @@ public class MainWindowPresenter {
 					suffix = currentSuffix;
 				var name = FileUtils.replaceFileSuffix(newFile, "");
 				while (count < 100 && FileUtils.fileExistsAndIsNonEmpty(newFile)) {
-					newFile = FileUtils.getFilePath(mainWindow.getFileName(), name + (++count) + "." + suffix);
+					newFile = FileUtils.getFilePath(mainWindow.getFileName(), name + "-" + (++count) + suffix);
 				}
-				mainWindow.setFileName(newFile);
+				if (!newFile.equals(mainWindow.getFileName())) {
+					var nextFile = newFile;
+					Platform.runLater(() -> {
+						mainWindow.setFileName(nextFile);
+						mainWindow.setDirty(true);
+					});
+				}
 			}
 		});
+		controller.getFileNameTextField().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName()));
+		controller.getFileNameTextField().getOnAction().handle(null);
 
 		mainWindow.dirtyProperty().addListener((v, o, n) -> {
 			var text = controller.getFileNameTextField().getText();

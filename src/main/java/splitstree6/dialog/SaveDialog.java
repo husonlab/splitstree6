@@ -38,7 +38,7 @@ public class SaveDialog {
      *
      * @param mainWindow the main window
      */
-    public static void showSaveDialog(MainWindow mainWindow, boolean asWorkflowOnly) {
+	public static boolean showSaveDialog(MainWindow mainWindow, boolean asWorkflowOnly) {
         final var fileChooser = new FileChooser();
         fileChooser.setTitle(asWorkflowOnly ? "Export SplitsTree6 Workflow" : "Save SplitsTree6 file");
 
@@ -58,8 +58,8 @@ public class SaveDialog {
 
 		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
         if (selectedFile != null) {
-            save(mainWindow, asWorkflowOnly, selectedFile);
-        }
+			return save(mainWindow, asWorkflowOnly, selectedFile);
+        } else return false;
     }
 
 	public static boolean save(MainWindow mainWindow, boolean asWorkflowOnly, File file) {

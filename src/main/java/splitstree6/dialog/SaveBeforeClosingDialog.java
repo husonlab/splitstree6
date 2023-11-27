@@ -24,7 +24,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import jloda.fx.window.MainWindowManager;
+import jloda.util.FileUtils;
 import splitstree6.window.MainWindow;
+
+import java.io.File;
 
 /**
  * save before closing?
@@ -60,9 +63,9 @@ public class SaveBeforeClosingDialog {
 			var result = alert.showAndWait();
 			if (result.isPresent()) {
 				if (result.get() == buttonTypeYes) {
-					var saved = false;
-					// todo: save file here
-					return saved ? Result.save : Result.close;
+					var file = new File(mainWindow.getFileName());
+					var saved = FileUtils.fileExistsAndIsNonEmpty(file) ? SaveDialog.save(mainWindow, false, file) : SaveDialog.showSaveDialog(mainWindow, false);
+					return saved ? Result.save : Result.cancel;
 				} else if (result.get() == buttonTypeNo) {
 					return Result.close;
 				} else

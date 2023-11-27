@@ -20,6 +20,7 @@
 package splitstree6.tabs.inputeditor;
 
 import javafx.application.Platform;
+import jloda.fx.icons.MaterialIcons;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.window.MainWindow;
@@ -45,6 +46,7 @@ public class InputEditorTab extends ViewTab {
 			this.inputEditorView = new InputEditorView(mainWindow, this);
 			Platform.runLater(() -> {
 				setView(inputEditorView);
+				setGraphic(MaterialIcons.graphic("edit_note"));
 				inputEditorView.getController().getCodeArea().requestFocus();
 			});
 		}

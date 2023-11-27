@@ -472,7 +472,6 @@ public class MainWindowController {
 		MaterialIcons.setIcon(findButton, "search");
 		MaterialIcons.setIcon(exportButton, "ios_share");
 
-
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
 
@@ -482,6 +481,8 @@ public class MainWindowController {
 			// windowMenu.getItems().remove(getAboutMenuItem());
 			//editMenu.getItems().remove(getPreferencesMenuItem());
 		}
+
+		fileNameTextField.textProperty().addListener((v, o, n) -> fileNameTextField.setPrefColumnCount(n.length() + 1));
 
 		final ArrayList<MenuItem> originalWindowMenuItems = new ArrayList<>(windowMenu.getItems());
 

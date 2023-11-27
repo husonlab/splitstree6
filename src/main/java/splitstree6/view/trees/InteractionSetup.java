@@ -123,7 +123,7 @@ public class InteractionSetup {
 				}
 			}
 		};
-		taxonSelectionModel.getSelectedItems().addListener(new WeakSetChangeListener<>(taxonSelectionChangeListener));
+		Platform.runLater(() -> taxonSelectionModel.getSelectedItems().addListener(new WeakSetChangeListener<>(taxonSelectionChangeListener)));
 
 		edgeSelectionChangeListener = e -> {
 			if (e.wasAdded()) {
@@ -142,7 +142,7 @@ public class InteractionSetup {
 				}
 			}
 		};
-		edgeSelectionModel.getSelectedItems().addListener(new WeakSetChangeListener<>(edgeSelectionChangeListener));
+		Platform.runLater(() -> edgeSelectionModel.getSelectedItems().addListener(new WeakSetChangeListener<>(edgeSelectionChangeListener)));
 
 		// setup mouse interaction for new created node shapes
 		{
