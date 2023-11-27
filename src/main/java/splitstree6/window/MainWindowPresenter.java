@@ -199,22 +199,35 @@ public class MainWindowPresenter {
 			}
 		});
 
-		mainWindow.fileNameProperty().addListener((v, o, n) -> controller.getFileNameTextField().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n)));
+		mainWindow.fileNameProperty().addListener((v, o, n) -> controller.getFileNameTextField().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n.replaceAll("\\*$", ""))));
 		controller.getFileTooltip().textProperty().bind(mainWindow.fileNameProperty());
 
 		controller.getFileNameTextField().setOnAction(e -> {
+			var currentSuffix = FileUtils.getFileSuffix(mainWindow.getFileName());
+			if (currentSuffix.isBlank())
+				currentSuffix = ".stree6";
 			var currentName = FileUtils.getFileNameWithoutPath(mainWindow.getFileName());
 			var entry = controller.getFileNameTextField().getText();
 			if (!entry.isBlank() && !entry.equals(currentName)) {
 				var newFile = FileUtils.getFilePath(mainWindow.getFileName(), entry);
 				var count = 0;
 				var suffix = FileUtils.getFileSuffix(newFile);
+				if (suffix.isBlank())
+					suffix = currentSuffix;
 				var name = FileUtils.replaceFileSuffix(newFile, "");
 				while (count < 100 && FileUtils.fileExistsAndIsNonEmpty(newFile)) {
 					newFile = FileUtils.getFilePath(mainWindow.getFileName(), name + (++count) + "." + suffix);
 				}
 				mainWindow.setFileName(newFile);
 			}
+		});
+
+		mainWindow.dirtyProperty().addListener((v, o, n) -> {
+			var text = controller.getFileNameTextField().getText();
+			if (n && !text.endsWith("*"))
+				controller.getFileNameTextField().setText(text + "*");
+			if (!n && text.endsWith("*"))
+				controller.getFileNameTextField().setText(text.substring(0, text.length() - 1));
 		});
 
 		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));

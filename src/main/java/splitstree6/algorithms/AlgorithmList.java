@@ -19,63 +19,112 @@
 
 package splitstree6.algorithms;
 
-import jloda.util.PluginClassLoader;
 import splitstree6.workflow.Algorithm;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class AlgorithmList {
-	public static List<Algorithm> list() {
+	public static List<Algorithm> list(String... names0) {
+		var names = List.of(names0);
 		var algorithms = new ArrayList<Algorithm>();
-
-		if (true) {
-			algorithms.addAll(PluginClassLoader.getInstances(Algorithm.class, "splitstree6.algorithms"));
-		} else {
-			algorithms.add(new splitstree6.algorithms.characters.characters2characters.CharactersFilter());
-			algorithms.add(new splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.BaseFreqDistance());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.Codominant());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.Dice());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.GapDist());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.GeneContentDistance());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.HammingDistances());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.HammingDistancesAmbigStates());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.Jaccard());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.LogDet());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.NeiMiller());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.Nei_Li_RestrictionDistance());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.ProteinMLdist());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.Uncorrected_P());
-			algorithms.add(new splitstree6.algorithms.characters.characters2distances.Upholt());
-			algorithms.add(new splitstree6.algorithms.characters.characters2network.MedianJoining());
-			algorithms.add(new splitstree6.algorithms.characters.characters2report.EstimateInvariableSites());
-			algorithms.add(new splitstree6.algorithms.characters.characters2report.PhiTest());
-			algorithms.add(new splitstree6.algorithms.characters.characters2splits.BinaryToSplits());
-			algorithms.add(new splitstree6.algorithms.characters.characters2splits.DnaToSplits());
-			algorithms.add(new splitstree6.algorithms.characters.characters2splits.ParsimonySplits());
-			algorithms.add(new splitstree6.algorithms.characters.characters2trees.ExternalProgram());
-			algorithms.add(new splitstree6.algorithms.distances.distances2distances.DistancesTaxaFilter());
-			algorithms.add(new splitstree6.algorithms.distances.distances2network.MinSpanningNetwork());
-			algorithms.add(new splitstree6.algorithms.distances.distances2network.PCoA());
-			algorithms.add(new splitstree6.algorithms.distances.distances2report.DeltaScore());
-			algorithms.add(new splitstree6.algorithms.distances.distances2splits.BunemanTree());
-			algorithms.add(new splitstree6.algorithms.distances.distances2splits.NeighborNet());
-			algorithms.add(new splitstree6.algorithms.distances.distances2splits.SplitDecomposition());
-			algorithms.add(new splitstree6.algorithms.distances.distances2trees.BioNJ());
-			algorithms.add(new splitstree6.algorithms.distances.distances2trees.MinSpanningTree());
-			algorithms.add(new splitstree6.algorithms.distances.distances2trees.NeighborJoining());
-			algorithms.add(new splitstree6.algorithms.distances.distances2trees.UPGMA());
-			algorithms.add(new splitstree6.algorithms.genomes.genome2distances.Mash());
-			algorithms.add(new splitstree6.algorithms.genomes.genomes2genomes.GenomesTaxaFilter());
-			algorithms.add(new splitstree6.algorithms.network.network2network.NetworkTaxaFilter());
-			algorithms.add(new splitstree6.algorithms.network.network2view.ShowNetwork());
-			algorithms.add(new splitstree6.algorithms.source.source2characters.CharactersLoader());
-			algorithms.add(new splitstree6.algorithms.source.source2distances.DistancesLoader());
-			algorithms.add(new splitstree6.algorithms.source.source2genomes.GenomesLoader());
-			algorithms.add(new splitstree6.algorithms.source.source2network.NetworkLoader());
-			algorithms.add(new splitstree6.algorithms.source.source2splits.SplitsLoader());
-		}
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2characters.CharactersFilter());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.BaseFreqDistance());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Codominant());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Dice());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.GapDist());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.GeneContentDistance());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.HammingDistances());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.HammingDistancesAmbigStates());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Jaccard());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.LogDet());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.NeiMiller());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Nei_Li_RestrictionDistance());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.ProteinMLdist());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Uncorrected_P());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Upholt());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.F81());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.F84());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.GTR());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.HKY85());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.JukesCantor());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.K2P());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.K3ST());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2network.MedianJoining());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2report.EstimateInvariableSites());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2report.PhiTest());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2splits.BinaryToSplits());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2splits.DnaToSplits());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2splits.ParsimonySplits());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2trees.ExternalProgram());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2distances.DistancesTaxaFilter());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2network.MinSpanningNetwork());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2network.PCoA());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2report.DeltaScore());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2splits.BunemanTree());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2splits.NeighborNet());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2splits.SplitDecomposition());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2trees.BioNJ());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2trees.MinSpanningTree());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2trees.NeighborJoining());
+		add(algorithms, names, new splitstree6.algorithms.distances.distances2trees.UPGMA());
+		add(algorithms, names, new splitstree6.algorithms.genomes.genome2distances.Mash());
+		add(algorithms, names, new splitstree6.algorithms.genomes.genomes2genomes.GenomesTaxaFilter());
+		add(algorithms, names, new splitstree6.algorithms.network.network2network.NetworkTaxaFilter());
+		add(algorithms, names, new splitstree6.algorithms.network.network2view.ShowNetwork());
+		add(algorithms, names, new splitstree6.algorithms.source.source2characters.CharactersLoader());
+		add(algorithms, names, new splitstree6.algorithms.source.source2distances.DistancesLoader());
+		add(algorithms, names, new splitstree6.algorithms.source.source2genomes.GenomesLoader());
+		add(algorithms, names, new splitstree6.algorithms.source.source2network.NetworkLoader());
+		add(algorithms, names, new splitstree6.algorithms.source.source2splits.SplitsLoader());
+		add(algorithms, names, new splitstree6.algorithms.source.source2trees.TreesLoader());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2distances.LeastSquaresDistances());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2report.ShapleyValues());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2splits.BootstrapSplits());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2splits.DimensionFilter());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2splits.SplitsFilter());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2splits.SplitsTaxaFilter());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2splits.WeightsSlider());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2trees.GreedyTree());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2view.ShowSplits());
+		add(algorithms, names, new splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2distances.AverageDistances());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.ListOneRSPRTrees());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.TreeDiversityIndex());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.AntiConsensusNetwork());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.AverageConsensus());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.BootstrapTreeSplits());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.ConsensusNetwork());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.ConsensusOutline());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.ConsensusSplits());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.CredibilityNetwork());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.SuperNetwork());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.TreeSelectorSplits());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ALTSNetwork());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.BootstrapTree());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ConsensusTree());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.EnumerateContainedTrees());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.LooseAndLacy());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.RerootOrReorderTrees());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.RootedConsensusTree());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.TreeSelector());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.TreesFilter());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.TreesFilter2());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.TreesTaxaFilter());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2view.ShowTrees());
 		return algorithms;
+	}
+
+	private static void add(Collection<Algorithm> algorithms, Collection<String> names, Algorithm algorithm) {
+		var aname = algorithm.getClass().getSimpleName();
+		if (names == null || names.isEmpty() || names.contains(aname))
+			algorithms.add(algorithm);
 	}
 }

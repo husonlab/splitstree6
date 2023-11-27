@@ -86,7 +86,7 @@ public class AlgorithmNexusInput extends NexusIOBase {
 	 * @return instance or null
 	 */
 	public static Algorithm createAlgorithmFromName(String algorithmName) {
-		var algorithms = AlgorithmList.list().stream().filter(algorithm -> algorithm.getName().equals(algorithmName)).toList();
+		var algorithms = AlgorithmList.list(algorithmName);
 		if (!algorithms.isEmpty())
 			return algorithms.get(0);
 		else
