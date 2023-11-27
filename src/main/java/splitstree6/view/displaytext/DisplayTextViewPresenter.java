@@ -151,18 +151,18 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			mainController.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
 			mainController.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());
 
-			mainController.getUndoMenuItem().setOnAction(e -> codeArea.undo());
+			mainController.getUndoButton().setOnAction(e -> codeArea.undo());
 			{
 				var undoAvailable = new SimpleBooleanProperty();
 				undoAvailable.bind(codeArea.undoAvailableProperty());
-				mainController.getUndoMenuItem().disableProperty().bind(undoAvailable.not());
+				mainController.getUndoButton().disableProperty().bind(undoAvailable.not());
 			}
 
-			mainController.getRedoMenuItem().setOnAction(e -> codeArea.redo());
+			mainController.getRedoButton().setOnAction(e -> codeArea.redo());
 			{
 				var redoAvailable = new SimpleBooleanProperty();
 				redoAvailable.bind(codeArea.redoAvailableProperty());
-				mainController.getRedoMenuItem().disableProperty().bind(redoAvailable.not());
+				mainController.getRedoButton().disableProperty().bind(redoAvailable.not());
 			}
 
 		} else {

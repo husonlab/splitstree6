@@ -681,6 +681,7 @@ public class MainWindowPresenter {
 				if (menu != controller.getOpenRecentMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
 					stack.addAll(menu.getItems());
 			} else if (!(item instanceof SeparatorMenuItem)) {
+				item.onActionProperty().unbind();
 				item.setOnAction(null);
 				item.disableProperty().unbind();
 				item.setDisable(true);
@@ -691,7 +692,7 @@ public class MainWindowPresenter {
 	private void enableAllMenuItemsWithDefinedAction(MainWindowController controller) {
 		var stack = new Stack<MenuItem>();
 		stack.addAll(controller.getMenuBar().getMenus());
-		while (stack.size() > 0) {
+		while (!stack.isEmpty()) {
 			var item = stack.pop();
 			if (item instanceof Menu menu) {
 				if (menu != controller.getOpenRecentMenu() && menu != controller.getWindowMenu() && menu != controller.getHelpMenu())
@@ -726,14 +727,16 @@ public class MainWindowPresenter {
 			var undoManager = focusedDisplayTab.get().getUndoManager();
 			controller.getUndoButton().setOnAction(e -> undoManager.undo());
 			controller.getUndoButton().disableProperty().bind(undoManager.undoableProperty().not());
+
 			controller.getUndoMenuItem().textProperty().bind(undoManager.undoNameProperty());
-			controller.getUndoMenuItem().setOnAction(controller.getUndoMenuItem().getOnAction());
+			controller.getUndoMenuItem().onActionProperty().bind(controller.getUndoButton().onActionProperty());
 			controller.getUndoMenuItem().disableProperty().bind(controller.getUndoButton().disableProperty());
 
 			controller.getRedoButton().setOnAction(e -> undoManager.redo());
 			controller.getRedoButton().disableProperty().bind(undoManager.redoableProperty().not());
+
 			controller.getRedoMenuItem().textProperty().bind(undoManager.redoNameProperty());
-			controller.getRedoMenuItem().setOnAction(controller.getRedoButton().getOnAction());
+			controller.getRedoMenuItem().onActionProperty().bind(controller.getRedoButton().onActionProperty());
 			controller.getRedoMenuItem().disableProperty().bind(controller.getRedoButton().disableProperty());
 		} else {
 			controller.getUndoButton().disableProperty().unbind();

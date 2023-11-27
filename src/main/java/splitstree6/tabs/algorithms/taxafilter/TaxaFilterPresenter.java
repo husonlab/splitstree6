@@ -278,13 +278,13 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
 
-		mainController.getUndoMenuItem().textProperty().bind(tab.getUndoManager().undoNameProperty());
-		mainController.getUndoMenuItem().setOnAction(e -> tab.getUndoManager().undo());
-		mainController.getUndoMenuItem().disableProperty().bind(tab.getUndoManager().undoableProperty().not());
+		mainController.getUndoButton().textProperty().bind(tab.getUndoManager().undoNameProperty());
+		mainController.getUndoButton().setOnAction(e -> tab.getUndoManager().undo());
+		mainController.getUndoButton().disableProperty().bind(tab.getUndoManager().undoableProperty().not());
 
-		mainController.getRedoMenuItem().textProperty().bind(tab.getUndoManager().redoNameProperty());
-		mainController.getRedoMenuItem().setOnAction(e -> tab.getUndoManager().redo());
-		mainController.getRedoMenuItem().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
+		mainController.getRedoButton().textProperty().bind(tab.getUndoManager().redoNameProperty());
+		mainController.getRedoButton().setOnAction(e -> tab.getUndoManager().redo());
+		mainController.getRedoButton().disableProperty().bind(tab.getUndoManager().redoableProperty().not());
 
 		mainController.getSelectAllMenuItem().setOnAction(e -> controller.getTableView().getSelectionModel().selectAll());
 		mainController.getSelectAllMenuItem().disableProperty().bind(Bindings.size(controller.getTableView().getSelectionModel().getSelectedItems()).isEqualTo(
