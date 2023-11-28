@@ -19,6 +19,7 @@
 
 package splitstree6.dialog;
 
+import javafx.application.Platform;
 import javafx.stage.FileChooser;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.RecentFilesManager;
@@ -81,5 +82,33 @@ public class SaveDialog {
 			NotificationManager.showError("Save FAILED: " + ex);
 		}
 		return result;
+	}
+
+	/**
+	 * save using a unique name
+	 *
+	 * @param mainWindow the main window
+	 * @param asWorkFlow as workflow?
+	 * @return true, if saved
+	 */
+	public static boolean saveUsingUniqueName(MainWindow mainWindow, boolean asWorkFlow) {
+		var suffix = FileUtils.getFileSuffix(mainWindow.getFileName());
+		if (suffix.isBlank())
+			suffix = ".stree6";
+		var name = FileUtils.replaceFileSuffix(mainWindow.getFileName(), "");
+		var count = 0;
+		var fileName = name + suffix;
+		while (FileUtils.fileExistsAndIsNonEmpty(fileName)) {
+			fileName = name + "-" + (++count) + suffix;
+		}
+		var file = new File(fileName);
+		var saved = save(mainWindow, asWorkFlow, file);
+		if (saved) {
+			Platform.runLater(() -> {
+				mainWindow.setFileName(file.getPath());
+				mainWindow.setDirty(false);
+			});
+		}
+		return saved;
 	}
 }

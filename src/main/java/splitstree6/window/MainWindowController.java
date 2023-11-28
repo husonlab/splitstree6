@@ -70,7 +70,7 @@ public class MainWindowController {
 	private MenuItem replaceDataMenuItem;
 
 	@FXML
-	private MenuItem inputEditorMenuItem;
+	private MenuItem editInputMenuItem;
 
 	@FXML
 	private MenuItem analyzeGenomesMenuItem;
@@ -451,6 +451,9 @@ public class MainWindowController {
 	@FXML
 	private MenuButton exportButton;
 
+	@FXML
+	private MenuButton fileNameMenuButton;
+
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
 
 	//@FXML
@@ -472,6 +475,7 @@ public class MainWindowController {
 		MaterialIcons.setIcon(findButton, "search");
 		MaterialIcons.setIcon(exportButton, "ios_share");
 
+
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
 
@@ -481,8 +485,6 @@ public class MainWindowController {
 			// windowMenu.getItems().remove(getAboutMenuItem());
 			//editMenu.getItems().remove(getPreferencesMenuItem());
 		}
-
-		fileNameTextField.textProperty().addListener((v, o, n) -> fileNameTextField.setPrefColumnCount(n.length() + 1));
 
 		final ArrayList<MenuItem> originalWindowMenuItems = new ArrayList<>(windowMenu.getItems());
 
@@ -563,8 +565,8 @@ public class MainWindowController {
 		return replaceDataMenuItem;
 	}
 
-	public MenuItem getInputEditorMenuItem() {
-		return inputEditorMenuItem;
+	public MenuItem getEditInputMenuItem() {
+		return editInputMenuItem;
 	}
 
 	public MenuItem getAnalyzeGenomesMenuItem() {
@@ -1078,5 +1080,9 @@ public class MainWindowController {
 
 	public MenuButton getExportButton() {
 		return exportButton;
+	}
+
+	public MenuButton getFileNameMenuButton() {
+		return fileNameMenuButton;
 	}
 }

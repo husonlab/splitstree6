@@ -121,7 +121,7 @@ public class InputEditorViewPresenter {
 
 		mainController.getReplaceDataMenuItem().disableProperty().bind(TRUE);
 		mainController.getAnalyzeGenomesMenuItem().disableProperty().bind(TRUE);
-		mainController.getInputEditorMenuItem().disableProperty().bind(TRUE);
+		mainController.getEditInputMenuItem().disableProperty().bind(TRUE);
 
 		mainController.getOpenRecentMenu().disableProperty().bind(TRUE);
 

@@ -199,45 +199,8 @@ public class MainWindowPresenter {
 			}
 		});
 
-		mainWindow.fileNameProperty().addListener((v, o, n) ->
-				controller.getFileNameTextField().setText(n == null ? "" : (FileUtils.getFileNameWithoutPath(n.replaceAll("\\*$", "")) + (mainWindow.isDirty() ? "*" : ""))));
-		controller.getFileTooltip().textProperty().bind(mainWindow.fileNameProperty());
 
-		controller.getFileNameTextField().setOnAction(e -> {
-			var currentSuffix = FileUtils.getFileSuffix(mainWindow.getFileName());
-			if (currentSuffix.isBlank())
-				currentSuffix = ".stree6";
-			var currentName = FileUtils.getFileNameWithoutPath(mainWindow.getFileName());
-			var entry = controller.getFileNameTextField().getText();
-			if (!entry.isBlank() && !entry.equals(currentName)) {
-				var newFile = FileUtils.getFilePath(mainWindow.getFileName(), entry);
-				var count = 0;
-				var suffix = FileUtils.getFileSuffix(newFile);
-				if (suffix.isBlank())
-					suffix = currentSuffix;
-				var name = FileUtils.replaceFileSuffix(newFile, "");
-				while (count < 100 && FileUtils.fileExistsAndIsNonEmpty(newFile)) {
-					newFile = FileUtils.getFilePath(mainWindow.getFileName(), name + "-" + (++count) + suffix);
-				}
-				if (!newFile.equals(mainWindow.getFileName())) {
-					var nextFile = newFile;
-					Platform.runLater(() -> {
-						mainWindow.setFileName(nextFile);
-						mainWindow.setDirty(true);
-					});
-				}
-			}
-		});
-		controller.getFileNameTextField().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName()));
-		controller.getFileNameTextField().getOnAction().handle(null);
-
-		mainWindow.dirtyProperty().addListener((v, o, n) -> {
-			var text = controller.getFileNameTextField().getText();
-			if (n && !text.endsWith("*"))
-				controller.getFileNameTextField().setText(text + "*");
-			if (!n && text.endsWith("*"))
-				controller.getFileNameTextField().setText(text.substring(0, text.length() - 1));
-		});
+		setupFileNameMenu(mainWindow, controller);
 
 		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 
@@ -252,6 +215,7 @@ public class MainWindowPresenter {
 				m -> m.getText().equals("Edit"),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
 	}
+
 
 	public void setStage(Stage stage) {
 		this.stage = stage;
@@ -361,8 +325,8 @@ public class MainWindowPresenter {
 
 		setupReplaceDataMenuItem(mainWindow, controller.getReplaceDataMenuItem());
 
-		controller.getInputEditorMenuItem().setOnAction(e -> showInputEditor());
-		controller.getInputEditorMenuItem().disableProperty().bind(workflow.runningProperty());
+		controller.getEditInputMenuItem().setOnAction(e -> showInputEditor());
+		controller.getEditInputMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		controller.getAnalyzeGenomesMenuItem().setOnAction(e -> (new AnalyzeGenomesDialog(stage)).show());
 		controller.getAnalyzeGenomesMenuItem().disableProperty().bind(controller.getOpenMenuItem().disableProperty());
@@ -621,13 +585,13 @@ public class MainWindowPresenter {
 		if (controller.getFileMenuButton().getItems().isEmpty()) {
 			if (splitstree6.utils.Platform.isDesktop()) {
 				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
-						controller.getNewMenuItem(), controller.getInputEditorMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
+						controller.getNewMenuItem(), controller.getEditInputMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
 						controller.getCloseMenuItem(), new SeparatorMenuItem(),
 						controller.getSaveAsMenuItem(), new SeparatorMenuItem())));
 			} else // mobile
 			{
 				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
-						controller.getInputEditorMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
+						controller.getEditInputMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
 						controller.getCloseMenuItem(), new SeparatorMenuItem(),
 						controller.getSaveMenuItem(), new SeparatorMenuItem())));
 				controller.getFileMenuButton().getItems().get(0).setText("Edit");
@@ -652,7 +616,6 @@ public class MainWindowPresenter {
 			if (!n)
 				updateEnableStateAlgorithms();
 		});
-
 	}
 
 	public void showInputEditor() {
@@ -670,6 +633,45 @@ public class MainWindowPresenter {
 			//emptyWindow.getController().getMainTabPane().getTabs().add(tab);
 		}
 		Platform.runLater(() -> mainWindow.getController().getMainTabPane().getSelectionModel().select(tab));
+	}
+
+	private static void setupFileNameMenu(MainWindow mainWindow, MainWindowController controller) {
+		controller.getFileNameTextField().textProperty().addListener((v, o, n) -> controller.getFileNameTextField().setPrefColumnCount(n.length() + 1));
+
+		mainWindow.fileNameProperty().addListener((v, o, n) -> {
+			controller.getFileNameTextField().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n));
+			controller.getFileNameMenuButton().setText(n == null ? "" : (FileUtils.getFileNameWithoutPath(n.replaceAll("\\*$", "")) + (mainWindow.isDirty() ? "*" : "")));
+		});
+		controller.getFileTooltip().textProperty().bind(mainWindow.fileNameProperty());
+
+		controller.getFileNameTextField().setOnAction(e -> {
+			var currentSuffix = FileUtils.getFileSuffix(mainWindow.getFileName());
+			if (currentSuffix.isBlank())
+				currentSuffix = ".stree6";
+			var entry = FileUtils.replaceFileSuffix(controller.getFileNameTextField().getText(), currentSuffix);
+			var newFile = new File(FileUtils.getFilePath(mainWindow.getFileName(), entry));
+			if (!newFile.equals(new File(mainWindow.getFileName()))) {
+				Platform.runLater(() -> {
+					mainWindow.setFileName(newFile.getPath());
+					mainWindow.setDirty(true);
+				});
+			}
+		});
+		controller.getFileNameTextField().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName()));
+		controller.getFileNameMenuButton().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName().replaceAll("\\*$", "")) + (mainWindow.isDirty() ? "*" : ""));
+
+		controller.getFileNameTextField().focusedProperty().addListener((v, o, n) -> {
+			if (!n)
+				Platform.runLater(() -> controller.getFileNameTextField().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName())));
+		});
+
+		mainWindow.dirtyProperty().addListener((v, o, n) -> {
+			var text = controller.getFileNameMenuButton().getText();
+			if (n && !text.endsWith("*"))
+				controller.getFileNameMenuButton().setText(text + "*");
+			if (!n && text.endsWith("*"))
+				controller.getFileNameMenuButton().setText(text.substring(0, text.length() - 1));
+		});
 	}
 
 	private void disableAllMenuItems(MainWindowController controller) {

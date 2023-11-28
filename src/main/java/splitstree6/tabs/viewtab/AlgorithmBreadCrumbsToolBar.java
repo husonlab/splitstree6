@@ -25,9 +25,9 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.concurrent.Worker;
-import javafx.geometry.Orientation;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import jloda.fx.control.CopyableLabel;
 import jloda.fx.icons.MaterialIcons;
@@ -49,8 +49,8 @@ import java.util.List;
  * algorithms bread crumbs for viewer toolbar
  * Daniel Huson, 1.2018
  */
-public class AlgorithmBreadCrumbsToolBar extends ToolBar {
-    private static final String shape = "-fx-shape: \"M 0 0 L 5 9 L 0 18 L 100 18 L 105 9 L 100 0 z\";-fx-font-size: 10;"; // arrow getShape and font size
+public class AlgorithmBreadCrumbsToolBar extends HBox {
+    private static final String shape = "-fx-font-size: 12;-fx-background-color: transparent;"; // arrow getShape and font size
 	private static final String computingColor = "-fx-background-color: LIGHTBLUE;";
 
     private final ArrayList<ChangeListener<Worker.State>> stateChangeListeners = new ArrayList<>();
@@ -64,30 +64,42 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
      */
     public AlgorithmBreadCrumbsToolBar(MainWindow mainWindow, WorkflowNode node) {
         //infoLabel.setFont(Font.font("Courier new", 10));
+        getStyleClass().add("tool-bar");
+        setStyle("-fx-spacing: 0;");
 
         invalidationListener = e -> {
             stateChangeListeners.clear();
             final Workflow workflow = mainWindow.getWorkflow();
-            getItems().clear();
+            getChildren().clear();
 
             var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
             if (editorTab != null) {
-                getItems().add(makeInputTabBreadCrumb(mainWindow));
+                getChildren().add(makeInputTabBreadCrumb(mainWindow));
             }
 
             if (workflow.getInputTaxaFilterNode() != null) {
-                getItems().add(makeBreadCrumb(mainWindow, workflow.getInputTaxaFilterNode(), stateChangeListeners));
+                if (!getChildren().isEmpty()) {
+                    var label = new Label("→");
+                    label.setStyle(shape);
+                    getChildren().add(label);
+                }
+                getChildren().add(makeBreadCrumb(mainWindow, workflow.getInputTaxaFilterNode(), stateChangeListeners));
             }
             if (workflow.getWorkingTaxaNode() != null) {
                 var algorithmNodes = getAlgorithmNodesPath(workflow, node);
 
                 for (var aNode : algorithmNodes) {
                     if (!(aNode.getAlgorithm() instanceof DataTaxaFilter)) {
-                        getItems().add(makeBreadCrumb(mainWindow, aNode, stateChangeListeners));
+                        if (!getChildren().isEmpty()) {
+                            var label = new Label("→");
+                            label.setStyle(shape);
+                            getChildren().add(label);
+                        }
+                        getChildren().add(makeBreadCrumb(mainWindow, aNode, stateChangeListeners));
                     }
                 }
             }
-            getItems().addAll(new Separator(Orientation.VERTICAL), new Label("  "), infoLabel);
+            getChildren().addAll(new Label("  "), infoLabel);
         };
         //mainWindow.getWorkflow().nodes().addListener(new WeakInvalidationListener(invalidationListener));
         mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
@@ -120,6 +132,7 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
     private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {
         final var button = new Button();
         button.setStyle(shape);
+
         button.textProperty().bind(algorithmNode.titleProperty());
 
         button.disableProperty().bind(algorithmNode.validProperty().not());
@@ -127,7 +140,8 @@ public class AlgorithmBreadCrumbsToolBar extends ToolBar {
         tooltip.textProperty().bind(algorithmNode.shortDescriptionProperty());
         button.setTooltip(tooltip);
 
-        button.setGraphic(algorithmNode.getName().endsWith("Filter") ? MaterialIcons.graphic("filter_alt") : MaterialIcons.graphic("settings"));
+        if (false)
+            button.setGraphic(algorithmNode.getName().endsWith("Filter") ? MaterialIcons.graphic("filter_alt") : MaterialIcons.graphic("settings"));
 
         final Runnable showTab = () -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 
