@@ -228,7 +228,7 @@ public class RerootingUtils {
 		return v;
 	}
 
-	public static record RootingRecord(Edge edge, double weight, double sourceToLeafMaxDistance,
+	public record RootingRecord(Edge edge, double weight, double sourceToLeafMaxDistance,
 									   double targetToLeafMaxDistance) {
 
 		public static Comparator<RootingRecord> comparatorForMidpointRooting() {

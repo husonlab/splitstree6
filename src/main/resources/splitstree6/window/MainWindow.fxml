@@ -260,8 +260,6 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <CheckMenuItem fx:id="presentationModeMenuItem" mnemonicParsing="false"
-                                       text="Presentation Mode"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
                             <accelerator>
@@ -391,6 +389,8 @@
                         <CheckMenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"/>
+                        <CheckMenuItem fx:id="clusterNetworkMenuItem" text="Cluster Network"/>
+
                     </Menu>
                     <Menu text="Analysis">
                         <CheckMenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."/>

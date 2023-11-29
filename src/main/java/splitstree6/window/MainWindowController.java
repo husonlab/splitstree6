@@ -226,9 +226,6 @@ public class MainWindowController {
 	private MenuItem useFullScreenMenuItem;
 
 	@FXML
-	private CheckMenuItem presentationModeMenuItem;
-
-	@FXML
 	private MenuItem filterTaxaMenuItem;
 
 	@FXML
@@ -338,6 +335,9 @@ public class MainWindowController {
 
 	@FXML
 	private CheckMenuItem hybridizationNetworkMenuItem;
+
+	@FXML
+	private CheckMenuItem clusterNetworkMenuItem;
 
 	@FXML
 	private CheckMenuItem pcoaMenuItem;
@@ -766,10 +766,6 @@ public class MainWindowController {
 		return useFullScreenMenuItem;
 	}
 
-	public CheckMenuItem getPresentationModeMenuItem() {
-		return presentationModeMenuItem;
-	}
-
 	public MenuItem getFilterTaxaMenuItem() {
 		return filterTaxaMenuItem;
 	}
@@ -916,6 +912,10 @@ public class MainWindowController {
 
 	public CheckMenuItem getHybridizationNetworkMenuItem() {
 		return hybridizationNetworkMenuItem;
+	}
+
+	public CheckMenuItem getClusterNetworkMenuItem() {
+		return clusterNetworkMenuItem;
 	}
 
 	public CheckMenuItem getPcoaMenuItem() {

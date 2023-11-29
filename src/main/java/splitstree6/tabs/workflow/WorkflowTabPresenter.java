@@ -25,8 +25,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
-import javafx.scene.effect.DropShadow;
-import javafx.scene.paint.Color;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -82,7 +80,7 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 			} else if (e.wasRemoved()) {
 				var item = workflowTab.getNodeItemMap().get(e.getElementRemoved());
 				if (item != null)
-					item.setEffect(getDropShadow());
+					item.setEffect(null);
 			}
 			if (workflow.getSelectionModel().size() == 1) {
 				var node = workflow.getSelectionModel().getSelectedItem();
@@ -132,14 +130,6 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 
 		mainController.getResetMenuItem().setOnAction(controller.getZoomButton().getOnAction());
-	}
-
-	public static DropShadow getDropShadow() {
-		var dropShadow = new DropShadow();
-		dropShadow.setOffsetX(0.5);
-		dropShadow.setOffsetY(0.5);
-		dropShadow.setColor(Color.DARKGREY);
-		return dropShadow;
 	}
 
 	public WorkflowTabLayout getWorkflowTabLayout() {

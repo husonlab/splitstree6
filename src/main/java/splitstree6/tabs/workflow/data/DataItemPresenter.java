@@ -26,7 +26,6 @@ import splitstree6.contextmenus.datanode.DataNodeContextMenu;
 import splitstree6.data.ReportBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.tabs.workflow.WorkflowTab;
-import splitstree6.tabs.workflow.WorkflowTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataBlock;
 
@@ -39,8 +38,6 @@ public class DataItemPresenter<D extends DataBlock> {
 	public DataItemPresenter(MainWindow mainWindow, WorkflowTab workflowTab, DataItem<D> dataItem) {
 		var node = dataItem.getWorkflowNode();
 		var controller = dataItem.getController();
-
-		dataItem.setEffect(WorkflowTabPresenter.getDropShadow());
 
 		var selected = new SimpleBooleanProperty(false);
 		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node)));

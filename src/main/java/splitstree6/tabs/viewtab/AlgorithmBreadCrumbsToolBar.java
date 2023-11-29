@@ -50,8 +50,7 @@ import java.util.List;
  * Daniel Huson, 1.2018
  */
 public class AlgorithmBreadCrumbsToolBar extends HBox {
-    private static final String shape = "-fx-font-size: 12;-fx-background-color: transparent;"; // arrow getShape and font size
-	private static final String computingColor = "-fx-background-color: LIGHTBLUE;";
+    private static final String computingColor = "-fx-background-color: LIGHTBLUE;";
 
     private final ArrayList<ChangeListener<Worker.State>> stateChangeListeners = new ArrayList<>();
 
@@ -80,7 +79,6 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
             if (workflow.getInputTaxaFilterNode() != null) {
                 if (!getChildren().isEmpty()) {
                     var label = new Label("→");
-                    label.setStyle(shape);
                     getChildren().add(label);
                 }
                 getChildren().add(makeBreadCrumb(mainWindow, workflow.getInputTaxaFilterNode(), stateChangeListeners));
@@ -92,7 +90,6 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
                     if (!(aNode.getAlgorithm() instanceof DataTaxaFilter)) {
                         if (!getChildren().isEmpty()) {
                             var label = new Label("→");
-                            label.setStyle(shape);
                             getChildren().add(label);
                         }
                         getChildren().add(makeBreadCrumb(mainWindow, aNode, stateChangeListeners));
@@ -131,7 +128,7 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 
     private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {
         final var button = new Button();
-        button.setStyle(shape);
+        button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
 
         button.textProperty().bind(algorithmNode.titleProperty());
 
@@ -157,15 +154,15 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
             switch (n) {
                 case RUNNING -> {
                     button.setTextFill(Color.BLACK);
-                    button.setStyle(shape + computingColor);
+                    button.setStyle(computingColor);
                 }
                 case FAILED -> {
                     button.setTextFill(Color.DARKRED);
-                    button.setStyle(shape);
+                    button.setStyle(null);
                 }
                 default -> {
                     button.setTextFill(Color.BLACK);
-                    button.setStyle(shape);
+                    button.setStyle(null);
                 }
             }
         };
@@ -177,7 +174,7 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 
     private static Node makeInputTabBreadCrumb(MainWindow mainWindow) {
         final var button = new Button();
-        button.setStyle(shape);
+        button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
         button.setText("Input");
         button.disableProperty().bind(mainWindow.getWorkflow().runningProperty());
         final var tooltip = new Tooltip("Input editor");

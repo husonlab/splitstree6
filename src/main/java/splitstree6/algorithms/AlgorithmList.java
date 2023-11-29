@@ -119,6 +119,7 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ALTSNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.BootstrapTree());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ClusterNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ConsensusTree());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.EnumerateContainedTrees());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.LooseAndLacy());

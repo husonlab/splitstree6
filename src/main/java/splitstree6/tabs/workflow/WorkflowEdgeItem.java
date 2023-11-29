@@ -57,7 +57,8 @@ public class WorkflowEdgeItem extends Group {
 		part2.strokeProperty().bind(stroke);
 		part2.strokeWidthProperty().bind(strokeWidth);
 
-		setEffect(GrayOutlineEffect.getInstance());
+		if (false)
+			setEffect(GrayOutlineEffect.getInstance());
 
 		part1.startXProperty().bind(source.translateXProperty().add(source.widthProperty().divide(2)));
 		part1.startYProperty().bind(source.translateYProperty().add(source.heightProperty().divide(2)));

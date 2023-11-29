@@ -325,6 +325,7 @@
                         <list>splitstree6.algorithms.trees.trees2trees.ALTSNetwork</list>
                         <list>splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm</list>
                         <list>splitstree6.algorithms.trees.trees2trees.BootstrapTree</list>
+                        <list>splitstree6.algorithms.trees.trees2trees.ClusterNetwork</list>
                         <list>splitstree6.algorithms.trees.trees2trees.ConsensusTree</list>
                         <list>splitstree6.algorithms.trees.trees2trees.EnumerateContainedTrees</list>
                         <list>splitstree6.algorithms.trees.trees2trees.LooseAndLacy</list>

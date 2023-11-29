@@ -25,7 +25,6 @@ import javafx.scene.control.ProgressIndicator;
 import jloda.fx.icons.MaterialIcons;
 import splitstree6.contextmenus.algorithmnode.AlgorithmNodeContextMenu;
 import splitstree6.tabs.workflow.WorkflowTab;
-import splitstree6.tabs.workflow.WorkflowTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.Workflow;
@@ -39,8 +38,6 @@ public class AlgorithmItemPresenter {
 
 		var node = algorithmItem.getWorkflowNode();
 		var controller = algorithmItem.getController();
-
-		algorithmItem.setEffect(WorkflowTabPresenter.getDropShadow());
 
 		controller.getNameLabel().textProperty().bind(node.titleProperty());
 

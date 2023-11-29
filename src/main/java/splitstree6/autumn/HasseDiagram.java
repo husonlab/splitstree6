@@ -20,6 +20,7 @@ package splitstree6.autumn;
 
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
+import jloda.util.BitSetUtils;
 
 import java.util.Arrays;
 import java.util.BitSet;
@@ -33,7 +34,7 @@ public class HasseDiagram {
 	 * construct the Hasse diagram for a set of clusters
 	 *
 	 */
-	public static PhyloTree constructHasse(Cluster[] clusters) {
+	public static PhyloTree constructHasse(BitSet[] clusters) {
 		Arrays.sort(clusters, Cluster.getComparatorByDecreasingSize());
 		var tree = new PhyloTree();
 
@@ -65,7 +66,7 @@ public class HasseDiagram {
 			for (var j = i + 1; j < clusters.length; j++) {
 				if (cardinality[j] < cardinality[i]) {
 					var subCluster = clusters[j];
-					if (Cluster.contains(cluster, subCluster) && !Cluster.contains(covered, subCluster)) {
+					if (BitSetUtils.contains(cluster, subCluster) && !BitSetUtils.contains(covered, subCluster)) {
 						tree.newEdge(nodes[i], nodes[j]);
 						covered.or(subCluster);
 						// if (covered.size() == size[i]) break;

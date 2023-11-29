@@ -45,7 +45,6 @@ import jloda.fx.util.Print;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
-import jloda.fx.window.PresentationMode;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.*;
@@ -77,10 +76,7 @@ import splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity;
 import splitstree6.algorithms.trees.trees2report.TreeDiversityIndex;
 import splitstree6.algorithms.trees.trees2report.UnrootedShapleyValues;
 import splitstree6.algorithms.trees.trees2splits.*;
-import splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm;
-import splitstree6.algorithms.trees.trees2trees.BootstrapTree;
-import splitstree6.algorithms.trees.trees2trees.ConsensusTree;
-import splitstree6.algorithms.trees.trees2trees.RerootOrReorderTrees;
+import splitstree6.algorithms.trees.trees2trees.*;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TreesBlock;
@@ -449,10 +445,6 @@ public class MainWindowPresenter {
 		controller.getUseDarkThemeMenuItem().setSelected(MainWindowManager.isUseDarkTheme());
 		controller.getUseDarkThemeMenuItem().setDisable(false);
 
-		PresentationMode.setupPresentationModeMenuItem(mainWindow, controller.getPresentationModeMenuItem());
-
-		controller.getPresentationModeMenuItem().setDisable(false);
-
 		controller.getFilterTaxaMenuItem().setOnAction(e -> {
 			var nodes = workflow.getNodes(TaxaFilter.class);
 			if (nodes.size() == 1)
@@ -529,6 +521,8 @@ public class MainWindowPresenter {
 
 		setupAlgorithmMenuItem(controller.getMinSpanningNetworkMenuItem(), new MinSpanningNetwork());
 		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new AutumnAlgorithm());
+		setupAlgorithmMenuItem(controller.getClusterNetworkMenuItem(), new ClusterNetwork());
+
 		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCoA());
 		//setupAlgorithmMenuItem(controller.getTsneMenuItem(), new TSne());
 		setupAlgorithmMenuItem(controller.getBootStrapTreeMenuItem(), new BootstrapTree());
@@ -616,6 +610,8 @@ public class MainWindowPresenter {
 			if (!n)
 				updateEnableStateAlgorithms();
 		});
+
+		BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
 	}
 
 	public void showInputEditor() {

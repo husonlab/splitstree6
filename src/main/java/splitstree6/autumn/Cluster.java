@@ -126,7 +126,7 @@ public class Cluster extends BitSet {
 	/**
 	 * compare clusters first by size and then lexicographically
 	 */
-	static public Comparator<Cluster> getComparatorByDecreasingSize() {
+	static public Comparator<BitSet> getComparatorByDecreasingSize() {
 		return (cluster1, cluster2) -> {
 			if (cluster1.cardinality() > cluster2.cardinality())
 				return -1;
@@ -263,9 +263,9 @@ public class Cluster extends BitSet {
 	 *
 	 * @return taxa
 	 */
-	public static BitSet extractTaxa(Cluster[] clusters) {
+	public static BitSet extractTaxa(BitSet[] clusters) {
 		BitSet taxa = new BitSet();
-		for (Cluster cluster : clusters) taxa.or(cluster);
+		for (BitSet cluster : clusters) taxa.or(cluster);
 		return taxa;
 	}
 
