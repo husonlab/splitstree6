@@ -248,13 +248,6 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutHorizontalMenuItem().setOnAction(controller.getContractHorizontallyButton().getOnAction());
 		mainController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
 
-		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
-		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getReplaceMenuItem().setDisable(false);
-
 		mainController.getSelectAllMenuItem().setOnAction(e ->
 		{
 			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
@@ -280,5 +273,14 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 			if (n != null)
 				ExportUtils.setup(mainWindow, n.getDataNode(), view.emptyProperty());
 		});
+	}
+
+	public FindToolBar getFindToolBar() {
+		return findToolBar;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return true;
 	}
 }

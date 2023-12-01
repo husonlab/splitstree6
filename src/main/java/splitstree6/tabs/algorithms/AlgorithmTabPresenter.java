@@ -31,12 +31,13 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.sliderhistogram.SliderHistogramView;
+import jloda.fx.find.FindToolBar;
 import jloda.util.StringUtils;
 import splitstree6.algorithms.splits.splits2splits.WeightsSlider;
 import splitstree6.data.SplitsBlock;
-import splitstree6.splits.ASplit;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
+import splitstree6.splits.ASplit;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
@@ -141,5 +142,15 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 
 	@Override
 	public void setupMenuItems() {
+	}
+
+	@Override
+	public FindToolBar getFindToolBar() {
+		return null;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return false;
 	}
 }

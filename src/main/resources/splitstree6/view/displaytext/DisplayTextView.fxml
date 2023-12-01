@@ -29,11 +29,6 @@
         <top>
             <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
                 <ToolBar fx:id="toolBar" prefHeight="32.0">
-                    <ToggleButton fx:id="findToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Find">
-                        <tooltip>
-                            <Tooltip text="Show the Find or Find/Replace toolbar"/>
-                        </tooltip>
-                    </ToggleButton>
                     <ToggleButton fx:id="wrapTextToggle" contentDisplay="CENTER" layoutX="98.0" layoutY="11.0"
                                   mnemonicParsing="false" selected="true" text="Wrap">
                         <font>

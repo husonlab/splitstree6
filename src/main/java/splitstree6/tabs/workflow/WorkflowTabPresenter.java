@@ -25,6 +25,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
+import jloda.fx.find.FindToolBar;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -134,5 +135,15 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 	public WorkflowTabLayout getWorkflowTabLayout() {
 		return workflowTabLayout;
+	}
+
+	@Override
+	public FindToolBar getFindToolBar() {
+		return null;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return false;
 	}
 }

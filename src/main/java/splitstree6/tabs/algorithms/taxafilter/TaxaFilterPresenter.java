@@ -302,13 +302,6 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			}
 		});
 		mainController.getSelectInverseMenuItem().disableProperty().bind(mainWindow.emptyProperty());
-
-		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(!findToolBar.isShowFindToolBar()));
-		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getReplaceMenuItem().setDisable(false);
 	}
 
 	public static <T, S> void updateColumnWidths(TableView<T> tableView, TableColumn<T, S> displayCol) {
@@ -321,4 +314,13 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 			displayCol.setPrefWidth(newLayoutTableColumnWidth);
 	}
 
+	@Override
+	public FindToolBar getFindToolBar() {
+		return findToolBar;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return true;
+	}
 }

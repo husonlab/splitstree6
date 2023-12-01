@@ -38,7 +38,6 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.AlgorithmBreadCrumbsToolBar;
-import splitstree6.view.utils.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.Optional;
@@ -80,8 +79,6 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				MainWindowManager.getPreviousSelection().add(codeArea.getText(n.getStart(), n.getEnd()));
 			}
 		});
-
-		FindReplaceUtils.setup(findToolBar, controller.getFindToggleButton(), editable);
 
 		controller.getWrapTextToggle().selectedProperty().bindBidirectional(tab.wrapTextProperty());
 		controller.getLineNumbersToggle().selectedProperty().bindBidirectional(tab.showLineNumbersProperty());
@@ -170,16 +167,6 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			mainController.getPasteMenuItem().setDisable(true);
 		}
 
-		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		if (editable) {
-			mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-			mainController.getReplaceMenuItem().setDisable(false);
-		}
-
-
 		{
 			var cut = new MenuItem("Cut");
 			cut.setOnAction(a -> codeArea.cut());
@@ -243,5 +230,15 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getZoomInMenuItem().setOnAction(null);
 		mainController.getZoomOutMenuItem().setOnAction(null);
+	}
+
+	@Override
+	public FindToolBar getFindToolBar() {
+		return findToolBar;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return editable;
 	}
 }

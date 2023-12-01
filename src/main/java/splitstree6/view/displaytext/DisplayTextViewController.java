@@ -42,8 +42,6 @@ public class DisplayTextViewController {
 	@FXML
 	private ToolBar toolBar;
 
-	@FXML
-	private ToggleButton findToggleButton;
 
 	@FXML
 	private ToggleButton wrapTextToggle;
@@ -68,8 +66,6 @@ public class DisplayTextViewController {
 
 	@FXML
 	private void initialize() {
-
-		MaterialIcons.setIcon(findToggleButton, "search");
 		MaterialIcons.setIcon(wrapTextToggle, "wrap_text");
 		MaterialIcons.setIcon(lineNumbersToggle, "format_list_numbered");
 		MaterialIcons.setIcon(increaseFontButton, "text_increase");
@@ -99,10 +95,6 @@ public class DisplayTextViewController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
-	}
-
-	public ToggleButton getFindToggleButton() {
-		return findToggleButton;
 	}
 
 	public ToggleButton getWrapTextToggle() {

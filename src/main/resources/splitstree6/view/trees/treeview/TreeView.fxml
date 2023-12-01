@@ -30,8 +30,6 @@
         <top>
             <VBox fx:id="vBox">
                 <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="34.0">
-                    <Separator layoutX="44.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
                     <ComboBox fx:id="treeCBox" minWidth="100.0"/>
                     <ComboBox fx:id="diagramCBox">
                         <tooltip>
@@ -110,8 +108,8 @@
                     <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
                                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                                 AnchorPane.topAnchor="0.0">
-                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0"
+                                   AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="2.0"/>
                     </AnchorPane>
                     <VBox fx:id="formatVBox" minHeight="30.0" prefWidth="200.0" styleClass="context-menu"
                           AnchorPane.rightAnchor="16.0" AnchorPane.topAnchor="4.0"/>

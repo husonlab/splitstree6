@@ -36,7 +36,6 @@ import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
@@ -158,8 +157,8 @@ public class TreeView implements IView {
 		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
 		trees.addListener((InvalidationListener) e -> {
-			empty.set(trees.size() == 0);
-			if (getOptionTree() == 0 && trees.size() > 0)
+			empty.set(trees.isEmpty());
+			if (getOptionTree() == 0 && !trees.isEmpty())
 				setOptionTree(1);
 			else if (getOptionTree() > trees.size())
 				setOptionTree(trees.size());

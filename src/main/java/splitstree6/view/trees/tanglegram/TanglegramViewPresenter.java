@@ -385,16 +385,18 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutHorizontalMenuItem().setOnAction(controller.getContractHorizontallyButton().getOnAction());
 		mainController.getZoomOutHorizontalMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disableProperty());
 
-		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
-		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getReplaceMenuItem().setDisable(false);
-
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
 		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
+	}
+
+	public FindToolBar getFindToolBar() {
+		return findToolBar;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return true;
 	}
 }

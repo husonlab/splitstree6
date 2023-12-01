@@ -23,6 +23,7 @@ package splitstree6.window;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -195,7 +196,6 @@ public class MainWindowPresenter {
 			}
 		});
 
-
 		setupFileNameMenu(mainWindow, controller);
 
 		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
@@ -210,6 +210,21 @@ public class MainWindowPresenter {
 		BasicFX.applyToAllMenus(controller.getMenuBar(),
 				m -> m.getText().equals("Edit"),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
+
+		controller.getFindButton().setOnAction(e -> {
+			if (controller.getFindMenuItem().isSelected()) {
+				controller.getFindMenuItem().setSelected(false);
+				if (controller.getReplaceMenuItem().isSelected()) {
+					controller.getReplaceMenuItem().setSelected(false);
+				}
+				if (!controller.getReplaceMenuItem().isDisable()) {
+					controller.getReplaceMenuItem().setSelected(true);
+				}
+			} else {
+				controller.getFindMenuItem().setSelected(true);
+			}
+		});
+		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
 	}
 
 
@@ -390,13 +405,46 @@ public class MainWindowPresenter {
 		// controller.getDuplicateMenuItem().setOnAction(null);
 		// controller.getDeleteMenuItem().setOnAction(null);
 
-		controller.getFindButton().onActionProperty().bind(controller.getFindMenuItem().onActionProperty());
-		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
+		if (controller.getFindMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
+			controller.getFindMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
+			controller.getFindMenuItem().setUserData(null);
+		}
+		controller.getFindMenuItem().setDisable(true);
+		if (controller.getReplaceMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
+			controller.getReplaceMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
+			controller.getReplaceMenuItem().setUserData(null);
+		}
+		controller.getReplaceMenuItem().setDisable(true);
 
-		controller.getFindMenuItem().setOnAction(null);
-		controller.getFindAgainMenuItem().setOnAction(null);
-
-		controller.getReplaceMenuItem().setOnAction(null);
+		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null) {
+			var findToolBar = focusedDisplayTab.get().getPresenter().getFindToolBar();
+			if (findToolBar != null) {
+				{
+					var booleanProperty = findToolBar.showFindToolBarProperty();
+					controller.getFindMenuItem().selectedProperty().bindBidirectional(booleanProperty);
+					controller.getFindMenuItem().setUserData(booleanProperty);
+					controller.getFindMenuItem().setDisable(false);
+				}
+				{
+					if (focusedDisplayTab.get().getPresenter().allowFindReplace()) {
+						var booleanProperty = findToolBar.showReplaceToolBarProperty();
+						controller.getReplaceMenuItem().selectedProperty().bindBidirectional(booleanProperty);
+						controller.getReplaceMenuItem().setUserData(booleanProperty);
+						controller.getReplaceMenuItem().setDisable(false);
+					}
+				}
+				{
+					controller.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+					controller.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+				}
+			} else {
+				controller.getFindMenuItem().setSelected(false);
+				controller.getFindMenuItem().setDisable(true);
+				controller.getReplaceMenuItem().setSelected(false);
+				controller.getReplaceMenuItem().setDisable(true);
+				controller.getFindAgainMenuItem().setDisable(true);
+			}
+		}
 
 		// controller.getGotoLineMenuItem().setOnAction(null);
 

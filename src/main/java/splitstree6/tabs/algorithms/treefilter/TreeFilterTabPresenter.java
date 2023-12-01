@@ -23,6 +23,7 @@ import javafx.beans.binding.Bindings;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.cell.CheckBoxTableCell;
 import javafx.scene.control.cell.PropertyValueFactory;
+import jloda.fx.find.FindToolBar;
 import splitstree6.algorithms.trees.trees2trees.TreesFilter;
 import splitstree6.data.TreesBlock;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -115,5 +116,15 @@ public class TreeFilterTabPresenter implements IDisplayTabPresenter {
 	@Override
 	public void setupMenuItems() {
 
+	}
+
+	@Override
+	public FindToolBar getFindToolBar() {
+		return null;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return false;
 	}
 }

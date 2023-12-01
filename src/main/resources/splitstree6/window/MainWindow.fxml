@@ -184,20 +184,20 @@
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="findMenuItem" text="Find...">
+                        <CheckMenuItem fx:id="findMenuItem" text="Find...">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="F" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
-                        </MenuItem>
+                        </CheckMenuItem>
                         <MenuItem fx:id="findAgainMenuItem" text="Find Again">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="replaceMenuItem" text="Replace...">
-                        </MenuItem>
+                        <CheckMenuItem fx:id="replaceMenuItem" text="Replace...">
+                        </CheckMenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="gotoLineMenuItem" text="Goto Line...">
                             <accelerator>

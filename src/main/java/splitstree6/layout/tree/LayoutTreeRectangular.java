@@ -25,6 +25,7 @@ import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
+import jloda.util.ProgramProperties;
 
 import java.util.LinkedList;
 
@@ -64,9 +65,9 @@ public class LayoutTreeRectangular {
 										level = Math.max(level, levels.get(w));
 								}
 							} else {
-							for (var w : v.children()) {
-								level = Math.max(level, levels.get(w));
-							}
+								for (var w : v.children()) {
+									level = Math.max(level, levels.get(w));
+								}
 							}
 							var prev = (levels.get(v) != null ? levels.get(v) : 0);
 							if (level + 1 > prev)
@@ -88,8 +89,7 @@ public class LayoutTreeRectangular {
 	 * This code assumes that all edges are directed away from the root.
 	 */
 	public static void setCoordinatesPhylogram(PhyloTree tree, NodeDoubleArray yCoord, NodeArray<Point2D> nodePointMap) {
-		// todo: this could be a user option:
-		var percentOffset = 50.0;
+		var percentOffset = ProgramProperties.get("ReticulationOffsetPercent", 50.0);
 
 		var averageWeight = tree.edgeStream().mapToDouble(tree::getWeight).average().orElse(1);
 		var smallOffsetForReticulateEdge = (percentOffset / 100.0) * averageWeight;
@@ -100,7 +100,7 @@ public class LayoutTreeRectangular {
 			// assign coordinates:
 			var queue = new LinkedList<Node>();
 			queue.add(tree.getRoot());
-			while (queue.size() > 0) // breath-first assignment
+			while (!queue.isEmpty()) // breath-first assignment
 			{
 				var w = queue.remove(0); // pop
 				var ok = true;
@@ -121,7 +121,7 @@ public class LayoutTreeRectangular {
 					}
 				} else if (w.getInDegree() > 1) // all in edges are 'blue' edges
 				{
-					double x = Double.NEGATIVE_INFINITY;
+					var x = Double.NEGATIVE_INFINITY;
 					for (var f : w.inEdges()) {
 						var u = f.getSource();
 						var location = nodePointMap.get(u);

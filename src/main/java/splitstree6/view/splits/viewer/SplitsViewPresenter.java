@@ -379,15 +379,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
-		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getReplaceMenuItem().setDisable(false);
-
 		mainController.getSelectAllMenuItem().setOnAction(e -> {
 			mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa());
 			view.getSplitSelectionModel().selectAll(IteratorUtils.asList(BitSetUtils.range(1, view.getSplitsBlock().getNsplits() + 1)));
@@ -483,5 +474,15 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	public SplitNetworkPane getSplitNetworkPane() {
 		return splitNetworkPane;
+	}
+
+	@Override
+	public FindToolBar getFindToolBar() {
+		return findToolBar;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return true;
 	}
 }

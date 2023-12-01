@@ -20,8 +20,9 @@
 package splitstree6.xtra.genetreeview.io;
 
 import javafx.concurrent.Task;
+import splitstree6.utils.Stabilizer;
+import splitstree6.view.trees.tanglegram.optimize.LayoutUnoptimized;
 import splitstree6.xtra.genetreeview.model.Model;
-import splitstree6.utils.*;
 
 import java.io.File;
 
@@ -40,8 +41,18 @@ public class LoadTreesTask extends Task<Void> {
     @Override
     protected Void call() throws Exception {
         model.load(file);
-        stabilizer.setup(model.getTreesBlock().getTrees());
-        stabilizer.apply(model.getTreesBlock().getTrees());
+        if (model.getTreesBlock().isReticulated()) {
+            var layoutUnoptmized = new LayoutUnoptimized();
+            for (var tree : model.getTreesBlock().getTrees()) {
+                if (tree.isReticulated()) {
+                    layoutUnoptmized.apply(tree);
+                }
+            }
+        }
+        if (!model.getTreesBlock().isReticulated()) {
+            stabilizer.setup(model.getTreesBlock().getTrees());
+            stabilizer.apply(model.getTreesBlock().getTrees());
+        }
         return null;
     }
 }

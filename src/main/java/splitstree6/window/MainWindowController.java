@@ -148,13 +148,13 @@ public class MainWindowController {
 	private MenuItem deleteMenuItem;
 
 	@FXML
-	private MenuItem findMenuItem;
+	private CheckMenuItem findMenuItem;
 
 	@FXML
 	private MenuItem findAgainMenuItem;
 
 	@FXML
-	private MenuItem replaceMenuItem;
+	private CheckMenuItem replaceMenuItem;
 
 	@FXML
 	private MenuItem gotoLineMenuItem;
@@ -662,7 +662,7 @@ public class MainWindowController {
 		return deleteMenuItem;
 	}
 
-	public MenuItem getFindMenuItem() {
+	public CheckMenuItem getFindMenuItem() {
 		return findMenuItem;
 	}
 
@@ -670,7 +670,7 @@ public class MainWindowController {
 		return findAgainMenuItem;
 	}
 
-	public MenuItem getReplaceMenuItem() {
+	public CheckMenuItem getReplaceMenuItem() {
 		return replaceMenuItem;
 	}
 

@@ -32,6 +32,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Font;
+import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.*;
@@ -654,5 +655,14 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 				items.add(menuItem);
 			}
 		}
+	}
+
+	public FindToolBar getFindToolBar() {
+		return null;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return false;
 	}
 }

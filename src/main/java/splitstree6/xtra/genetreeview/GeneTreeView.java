@@ -55,9 +55,11 @@ public class GeneTreeView extends Application {
 		presenter = new GeneTreeViewPresenter(this);
 
 		stage.setScene(new Scene(root));
+		stage.getScene().getStylesheets().add("jloda/resources/css/white_pane.css");
 		stage.sizeToScene();
 		stage.setTitle("GeneTreeViewer");
 		stage.show();
+
 	}
 
 	public GeneTreeViewController getController() {

@@ -34,7 +34,6 @@
                     <children>
                         <ToolBar fx:id="toolBar" minHeight="-Infinity" prefHeight="34.0" AnchorPane.bottomAnchor="0.0"
                                  AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                            <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
                             <ComboBox fx:id="diagramCBox" prefWidth="50.0">
                                 <tooltip>
                                     <Tooltip text="Choose diagram"/>
@@ -114,8 +113,8 @@
                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                 </BorderPane.margin>
                 <children>
-                    <Pane fx:id="pane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                          AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <Pane fx:id="pane" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0"
+                          AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="4.0">
                         <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
                     </Pane>
                     <VBox fx:id="formatVBox" prefWidth="200.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"

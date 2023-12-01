@@ -268,13 +268,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
-		mainController.getFindMenuItem().setOnAction(e -> findToolBar.setShowFindToolBar(true));
-		mainController.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
-		mainController.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
-		mainController.getReplaceMenuItem().setOnAction(e -> findToolBar.setShowReplaceToolBar(true));
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getReplaceMenuItem().setDisable(false);
-
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(view.getOptionOrientation()));
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 
@@ -301,5 +294,14 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
         public String toString() {
 			return rows + " x " + cols;
 		}
+	}
+
+	public FindToolBar getFindToolBar() {
+		return findToolBar;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return true;
 	}
 }

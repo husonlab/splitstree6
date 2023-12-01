@@ -23,6 +23,7 @@ import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
+import jloda.fx.find.FindToolBar;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
@@ -81,13 +82,6 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getCopyMenuItem().setOnAction(null);
 
-		mainController.getFindMenuItem().setOnAction(null);
-		mainController.getFindAgainMenuItem().setOnAction(null);
-		mainController.getSelectAllMenuItem().setOnAction(null);
-		mainController.getSelectNoneMenuItem().setOnAction(null);
-		mainController.getFindMenuItem().setDisable(false);
-		mainController.getReplaceMenuItem().setDisable(false);
-
 		mainController.getIncreaseFontSizeMenuItem().setOnAction(null);
 		mainController.getDecreaseFontSizeMenuItem().setOnAction(null);
 
@@ -96,5 +90,15 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 
 		var treeView = tabController.getWorkflowTreeView();
 		treeView.getStyleClass().add("viewer-background");
+	}
+
+	@Override
+	public FindToolBar getFindToolBar() {
+		return null;
+	}
+
+	@Override
+	public boolean allowFindReplace() {
+		return false;
 	}
 }
