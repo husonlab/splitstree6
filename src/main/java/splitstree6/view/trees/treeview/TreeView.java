@@ -20,7 +20,7 @@
 package splitstree6.view.trees.treeview;
 
 import javafx.beans.InvalidationListener;
-import javafx.beans.binding.Bindings;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -167,7 +167,25 @@ public class TreeView implements IView {
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
 
-		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size()), mainWindow.workingTaxaProperty(), trees));
+		InvalidationListener updateBreadCrumbs = e -> {
+			var text = "";
+			if (mainWindow.getWorkingTaxa() != null)
+				text += "taxa %,d".formatted(mainWindow.getWorkingTaxa().getNtax());
+			if (getTree() != null) {
+				var tree = getTree();
+				text += ", nodes: %,d, edges: %,d".formatted(tree.getNumberOfNodes(), tree.getNumberOfEdges());
+				if (tree.isReticulated()) {
+					var hybridNumber = tree.nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
+					text += ", h: %,d".formatted(hybridNumber);
+				}
+				if (getTrees().size() > 1) {
+					text += "  (%,d of %,d)".formatted(getOptionTree(), getTrees().size());
+				}
+			}
+			viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().setText(text);
+		};
+		mainWindow.workingTaxaProperty().addListener(new WeakInvalidationListener(updateBreadCrumbs));
+		treeProperty().addListener(updateBreadCrumbs);
 	}
 
 	@Override

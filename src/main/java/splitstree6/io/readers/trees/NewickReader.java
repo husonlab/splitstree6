@@ -28,13 +28,14 @@ import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.splits.TreesUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * reads trees in Newick format,
@@ -255,8 +256,10 @@ public class NewickReader extends TreesReader {
 		}
 	}
 
+	private static final Pattern splitNewickPattern = Pattern.compile(".*<\\s*\\d+\\s*\\|.*");
+
 	public boolean acceptsFirstLine(String text) {
 		var line = StringUtils.getFirstLine(text);
-		return line.startsWith("(") && !(line.contains("<") && line.contains(">"));
+		return line.startsWith("(") && !splitNewickPattern.matcher(line).matches();
 	}
 }
