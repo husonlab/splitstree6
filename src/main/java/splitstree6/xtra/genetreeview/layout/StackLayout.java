@@ -19,7 +19,9 @@
 
 package splitstree6.xtra.genetreeview.layout;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
@@ -99,9 +101,8 @@ public class StackLayout extends MultipleFramesLayout{
         var functionForX = (1.285/(1+Math.exp(-0.767*x))-0.642); // returns a value between 0 and 1
         node.translateXProperty().unbind();
         node.translateXProperty().bind(layoutWidthProperty.multiply(functionForX).subtract(nodeWidth/2.));
+        var rotate = (179.925 / (1 + Math.exp(-1.148 * x))) - 89.463;
 
-        // Rotation
-        var rotate = (179.925/(1+Math.exp(-1.148*x)))-89.463;
         node.setRotate(rotate);
 
         // Scaling size: larger nodes in the center

@@ -24,7 +24,10 @@ import javafx.collections.SetChangeListener;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
@@ -40,7 +43,9 @@ import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.xtra.genetreeview.util.SelectionModelSet;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 public class TreeSheet extends StackPane implements Selectable {
