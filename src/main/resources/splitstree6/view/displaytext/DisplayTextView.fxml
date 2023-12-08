@@ -47,17 +47,6 @@
                             <Tooltip text="Show line numbers"/>
                         </tooltip>
                     </ToggleButton>
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <Button fx:id="increaseFontButton" contentDisplay="CENTER" mnemonicParsing="false" text="A+">
-                        <font>
-                            <Font size="11.0"/>
-                        </font>
-                    </Button>
-                    <Button fx:id="decreaseFontButton" contentDisplay="CENTER" mnemonicParsing="false" text="A-">
-                        <font>
-                            <Font size="11.0"/>
-                        </font>
-                    </Button>
                 </ToolBar>
             </VBox>
         </top>

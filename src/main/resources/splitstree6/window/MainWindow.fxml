@@ -24,10 +24,10 @@
 <?import javafx.scene.input.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
-<AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="splitstree6.window.MainWindowController">
-    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                AnchorPane.topAnchor="0.0">
+<AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.window.MainWindowController">
+    <BorderPane fx:id="mainBorderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
                 <MenuBar fx:id="menuBar">
@@ -252,7 +252,7 @@
                         <Menu fx:id="selectSetsMenu" text="Sets">
                         </Menu>
                     </Menu>
-                    <Menu text="View">
+                    <Menu fx:id="viewMenu" text="View">
                         <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false" text="Use Dark Theme"/>
                         <MenuItem fx:id="useFullScreenMenuItem" mnemonicParsing="false" text="Enter Full Screen">
                             <accelerator>
@@ -432,45 +432,58 @@
                         </MenuItem>
                     </Menu>
                 </MenuBar>
-                <AnchorPane minHeight="-Infinity" prefHeight="27.5" styleClass="tool-bar">
+                <AnchorPane styleClass="tool-bar">
                     <children>
-                        <HBox alignment="TOP_CENTER" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                              AnchorPane.topAnchor="0.0">
-                            <children>
-                                <MenuButton fx:id="fileNameMenuButton" alignment="CENTER" mnemonicParsing="false"
-                                            style="-fx-background-color: transparent;" text="File name">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false">
-                                            <graphic>
-                                                <TextField fx:id="fileNameTextField" alignment="CENTER"
-                                                           focusTraversable="false" promptText="File name"
-                                                           style="-fx-background-color: transparent;"/>
-                                            </graphic>
-                                        </MenuItem>
-                                    </items>
-                                    <tooltip>
-                                        <Tooltip fx:id="fileTooltip" text="Empty Tooltip"/>
-                                    </tooltip>
-                                </MenuButton>
-                            </children>
+                        <BorderPane fx:id="toolBarBorderPane" layoutX="16.5" AnchorPane.bottomAnchor="0.0"
+                                    AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
+                                    AnchorPane.topAnchor="0.0">
+                            <right>
+                                <HBox fx:id="rightToolBarPane" alignment="CENTER_RIGHT" spacing="4.0"
+                                      BorderPane.alignment="CENTER_RIGHT">
+                                    <children>
+                                        <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
+                                        <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
+                                        <Button fx:id="increaseFontSizeButton" layoutX="111.0" layoutY="10.0"
+                                                mnemonicParsing="false" text="Font+"/>
+                                        <Button fx:id="decreaseFontSizeButton" layoutX="111.0" layoutY="10.0"
+                                                mnemonicParsing="false" text="Font-"/>
+                                        <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
+                                        <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
+                                                    text="Export"/>
+                                    </children>
+                                </HBox>
+                            </right>
+                            <left>
+                                <HBox fx:id="leftToolBarPane" alignment="CENTER_LEFT">
+                                    <children>
+                                        <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER"
+                                                    mnemonicParsing="false" text="File"/>
+                                    </children>
+                                </HBox>
+                            </left>
+                            <center>
+                                <HBox fx:id="centerToolBarPane" alignment="CENTER" BorderPane.alignment="TOP_CENTER">
+                                    <children>
+                                        <MenuButton fx:id="fileNameMenuButton" alignment="CENTER"
+                                                    mnemonicParsing="false" style="-fx-background-color: transparent;"
+                                                    text="File name">
+                                            <items>
+                                                <MenuItem mnemonicParsing="false">
+                                                    <graphic>
+                                                        <TextField fx:id="fileNameTextField" alignment="CENTER"
+                                                                   focusTraversable="false" promptText="File name"
+                                                                   style="-fx-background-color: transparent;"/>
+                                                    </graphic>
+                                                </MenuItem>
+                                            </items>
+                                            <tooltip>
+                                                <Tooltip fx:id="fileTooltip" text="Empty Tooltip"/>
+                                            </tooltip>
+                                        </MenuButton>
+                                    </children>
                         </HBox>
-                        <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" layoutX="16.5"
-                                    layoutY="5.400000095367432" mnemonicParsing="false" text="File"
-                                    AnchorPane.topAnchor="0.0"/>
-                        <FlowPane alignment="CENTER_RIGHT" columnHalignment="CENTER" hgap="10.0" layoutX="468.0"
-                                  prefWrapLength="300.0" vgap="10.0" AnchorPane.rightAnchor="0.0"
-                                  AnchorPane.topAnchor="0.0">
-                            <children>
-                                <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
-                                <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
-                                <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
-                                <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
-                                            text="Export"/>
-                            </children>
-                            <padding>
-                                <Insets right="10.0"/>
-                            </padding>
-                        </FlowPane>
+                            </center>
+                        </BorderPane>
                     </children>
                     <padding>
                         <Insets bottom="5.0"/>

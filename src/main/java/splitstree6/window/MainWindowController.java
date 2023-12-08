@@ -32,6 +32,7 @@ import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
+import jloda.util.Single;
 import splitstree6.utils.Platform;
 
 import java.util.ArrayList;
@@ -454,6 +455,32 @@ public class MainWindowController {
 	@FXML
 	private MenuButton fileNameMenuButton;
 
+	@FXML
+	private HBox leftToolBarPane;
+
+	@FXML
+	private HBox centerToolBarPane;
+
+	@FXML
+	private HBox rightToolBarPane;
+
+	@FXML
+	private BorderPane toolBarBorderPane;
+
+	@FXML
+	private Pane rootPane;
+
+	@FXML
+	private Button increaseFontSizeButton;
+
+	@FXML
+	private Button decreaseFontSizeButton;
+
+	@FXML
+	private Menu viewMenu;
+
+
+
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
 
 	//@FXML
@@ -472,9 +499,18 @@ public class MainWindowController {
 
 		MaterialIcons.setIcon(undoButton, "undo");
 		MaterialIcons.setIcon(redoButton, "redo");
+		MaterialIcons.setIcon(increaseFontSizeButton, "text_increase");
+		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
+
+		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
+		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
+
+		decreaseFontSizeButton.setOnAction(e -> decreaseFontSizeMenuItem.getOnAction().handle(e));
+		decreaseFontSizeButton.disableProperty().bind(decreaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
+
+
 		MaterialIcons.setIcon(findButton, "search");
 		MaterialIcons.setIcon(exportButton, "ios_share");
-
 
 		algorithmsBorderPane.setCenter(algorithmTabPane);
 		mainBorderPane.setCenter(mainTabPane);
@@ -515,6 +551,25 @@ public class MainWindowController {
 		};
 		MainWindowManager.getInstance().changedProperty().addListener(invalidationListener);
 		invalidationListener.invalidated(null);
+
+		var rightWidth = new Single<>(250.0);
+		javafx.application.Platform.runLater(() -> {
+			rightToolBarPane.applyCss();
+			rightWidth.set(rightToolBarPane.getWidth());
+		});
+
+		InvalidationListener listener = e -> {
+			var remainingLength = rootPane.getWidth() - 20 - leftToolBarPane.getWidth() - fileNameMenuButton.getWidth();
+			if (remainingLength < rightWidth.get() + 10) { // will need to set this
+				toolBarBorderPane.setRight(null);
+				toolBarBorderPane.setBottom(rightToolBarPane);
+			} else {
+				toolBarBorderPane.setBottom(null);
+				toolBarBorderPane.setRight(rightToolBarPane);
+			}
+		};
+		fileNameMenuButton.widthProperty().addListener(listener);
+		rootPane.widthProperty().addListener(listener);
 	}
 
 	public VBox getTopVBox() {

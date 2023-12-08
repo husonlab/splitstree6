@@ -19,6 +19,7 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
@@ -33,10 +34,14 @@
                     <AnchorPane fx:id="innerAnchorPane" layoutY="4.0" style="-fx-background-color: transparent;"
                                 AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                                 AnchorPane.topAnchor="0.0">
-                        <StackPane fx:id="centerPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                   AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                        <StackPane fx:id="centerPane" style="-fx-border-color: gray;" AnchorPane.bottomAnchor="0.0"
+                                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <children>
-                                <Canvas fx:id="mainCanvas" height="200.0" width="200.0" StackPane.alignment="CENTER"/>
+                                <Canvas fx:id="mainCanvas" height="200.0" width="200.0" StackPane.alignment="CENTER">
+                                    <StackPane.margin>
+                                        <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
+                                    </StackPane.margin>
+                                </Canvas>
                                 <Pane fx:id="mainPane" StackPane.alignment="CENTER"/>
                             </children>
                         </StackPane>
@@ -106,17 +111,6 @@
                     <Button fx:id="contractHorizontallyButton" mnemonicParsing="false" text="Contract Horizontally">
                         <tooltip>
                             <Tooltip text="Contract tree horizontally"/>
-                        </tooltip>
-                    </Button>
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
-                    <Button fx:id="increaseFontButton" mnemonicParsing="false" text="A+">
-                        <tooltip>
-                            <Tooltip text="Increase font size"/>
-                        </tooltip>
-                    </Button>
-                    <Button fx:id="decreaseFontButton" mnemonicParsing="false" text="A-">
-                        <tooltip>
-                            <Tooltip text="Decrease font size"/>
                         </tooltip>
                     </Button>
                 </ToolBar>

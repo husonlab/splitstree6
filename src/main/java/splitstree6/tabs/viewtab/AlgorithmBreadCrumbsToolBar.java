@@ -66,6 +66,16 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
         getStyleClass().add("tool-bar");
         setStyle("-fx-spacing: 0;");
 
+        infoLabel.textProperty().addListener((v, o, n) -> {
+            var text = n.replaceAll("\\bn:", "taxa:")
+                    .replaceAll("\\bv:", "nodes:")
+                    .replaceAll("\\be:", "edges:")
+                    .replaceAll("\\bs:", "splits:")
+                    .replaceAll("\\bt:", "trees:")
+                    .replaceAll("\\bh:", "hybrid-number:");
+            infoLabel.setTooltip(text.isBlank() ? null : new Tooltip(text));
+        });
+
         invalidationListener = e -> {
             stateChangeListeners.clear();
             final Workflow workflow = mainWindow.getWorkflow();

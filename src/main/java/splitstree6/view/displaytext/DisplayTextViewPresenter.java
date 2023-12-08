@@ -103,18 +103,6 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
-		controller.getIncreaseFontButton().setOnAction(e -> {
-			tab.setFontSize(1.1 * tab.getFontSize());
-			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
-		});
-		controller.getIncreaseFontButton().disableProperty().bind(tab.fontSizeProperty().greaterThan(128));
-
-		controller.getDecreaseFontButton().setOnAction(e -> {
-			tab.setFontSize(1.0 / 1.1 * tab.getFontSize());
-			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
-		});
-		controller.getDecreaseFontButton().disableProperty().bind(tab.fontSizeProperty().lessThan(6));
-
 		codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
 
 		tab.viewTabProperty().addListener((v, o, n) -> {
@@ -222,12 +210,17 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		mainController.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
 		mainController.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
 
-		mainController.getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
-		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> {
+			tab.setFontSize(1.1 * tab.getFontSize());
+			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
+		});
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(tab.fontSizeProperty().greaterThan(128));
 
-		mainController.getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
-		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
-
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> {
+			tab.setFontSize(1.0 / 1.1 * tab.getFontSize());
+			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
+		});
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(tab.fontSizeProperty().lessThan(6));
 		mainController.getZoomInMenuItem().setOnAction(null);
 		mainController.getZoomOutMenuItem().setOnAction(null);
 	}

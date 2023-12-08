@@ -170,16 +170,16 @@ public class TreeView implements IView {
 		InvalidationListener updateBreadCrumbs = e -> {
 			var text = "";
 			if (mainWindow.getWorkingTaxa() != null)
-				text += "taxa %,d".formatted(mainWindow.getWorkingTaxa().getNtax());
+				text += "n: %,d".formatted(mainWindow.getWorkingTaxa().getNtax());
 			if (getTree() != null) {
 				var tree = getTree();
-				text += ", nodes: %,d, edges: %,d".formatted(tree.getNumberOfNodes(), tree.getNumberOfEdges());
+				text += " v: %,d e: %,d".formatted(tree.getNumberOfNodes(), tree.getNumberOfEdges());
 				if (tree.isReticulated()) {
 					var hybridNumber = tree.nodeStream().filter(v -> v.getInDegree() > 1).mapToInt(v -> v.getInDegree() - 1).sum();
-					text += ", h: %,d".formatted(hybridNumber);
+					text += " h: %,d".formatted(hybridNumber);
 				}
 				if (getTrees().size() > 1) {
-					text += "  (%,d of %,d)".formatted(getOptionTree(), getTrees().size());
+					text += " (%,d of %,d)".formatted(getOptionTree(), getTrees().size());
 				}
 			}
 			viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().setText(text);

@@ -93,12 +93,6 @@ public class TreeViewController {
 	private Button contractHorizontallyButton;
 
 	@FXML
-	private Button increaseFontButton;
-
-	@FXML
-	private Button decreaseFontButton;
-
-	@FXML
 	private AnchorPane outerAnchorPane;
 
 	@FXML
@@ -133,8 +127,6 @@ public class TreeViewController {
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
-		MaterialIcons.setIcon(increaseFontButton, "text_increase");
-		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 
 		zoomableScrollPane.setPannable(true);
 		zoomableScrollPane.setFitToWidth(true);
@@ -235,14 +227,6 @@ public class TreeViewController {
 
 	public Button getContractHorizontallyButton() {
 		return contractHorizontallyButton;
-	}
-
-	public Button getIncreaseFontButton() {
-		return increaseFontButton;
-	}
-
-	public Button getDecreaseFontButton() {
-		return decreaseFontButton;
 	}
 
 	public AnchorPane getInnerAnchorPane() {

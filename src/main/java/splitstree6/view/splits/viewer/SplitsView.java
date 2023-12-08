@@ -35,7 +35,6 @@ import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
 import splitstree6.layout.splits.LoopView;
@@ -162,7 +161,7 @@ public class SplitsView implements IView {
 
 		optionDiagramProperty().addListener(e -> mainWindow.updateMethodsTab());
 
-		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  splits: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), getSplitsBlock() == null ? 0 : getSplitsBlock().size()), mainWindow.workingTaxaProperty(), splitsBlockProperty()));
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "n: %,d s: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), getSplitsBlock() == null ? 0 : getSplitsBlock().size()), mainWindow.workingTaxaProperty(), splitsBlockProperty()));
 	}
 
 	@Override

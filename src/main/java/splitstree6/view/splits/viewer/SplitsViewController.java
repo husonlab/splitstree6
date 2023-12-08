@@ -66,12 +66,6 @@ public class SplitsViewController {
 	private Button zoomOutButton;
 
 	@FXML
-	private Button increaseFontButton;
-
-	@FXML
-	private Button decreaseFontButton;
-
-	@FXML
 	private ToggleButton showInternalLabelsToggleButton;
 
 	@FXML
@@ -114,8 +108,6 @@ public class SplitsViewController {
 		MaterialIcons.setIcon(flipButton, "flip");
 		MaterialIcons.setIcon(zoomInButton, "zoom_in");
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
-		MaterialIcons.setIcon(increaseFontButton, "text_increase");
-		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 
@@ -194,14 +186,6 @@ public class SplitsViewController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
-	}
-
-	public Button getIncreaseFontButton() {
-		return increaseFontButton;
-	}
-
-	public Button getDecreaseFontButton() {
-		return decreaseFontButton;
 	}
 
 	public ZoomableScrollPane getScrollPane() {

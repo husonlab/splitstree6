@@ -48,9 +48,6 @@ public class DensiTreeViewController {
 	private Button contractVerticallyButton;
 
 	@FXML
-	private Button decreaseFontButton;
-
-	@FXML
 	private Button expandHorizontallyButton;
 
 	@FXML
@@ -61,9 +58,6 @@ public class DensiTreeViewController {
 
 	@FXML
 	private VBox formatVBox;
-
-	@FXML
-	private Button increaseFontButton;
 
 	@FXML
 	private AnchorPane innerAnchorPane;
@@ -138,8 +132,6 @@ public class DensiTreeViewController {
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
-		MaterialIcons.setIcon(increaseFontButton, "text_increase");
-		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 
 		centerPane.getStyleClass().add("viewer-background");
 
@@ -205,10 +197,6 @@ public class DensiTreeViewController {
 		return contractVerticallyButton;
 	}
 
-	public Button getDecreaseFontButton() {
-		return decreaseFontButton;
-	}
-
 	public Button getExpandHorizontallyButton() {
 		return expandHorizontallyButton;
 	}
@@ -223,10 +211,6 @@ public class DensiTreeViewController {
 
 	public VBox getFormatVBox() {
 		return formatVBox;
-	}
-
-	public Button getIncreaseFontButton() {
-		return increaseFontButton;
 	}
 
 	public AnchorPane getInnerAnchorPane() {

@@ -31,7 +31,6 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import splitstree6.data.NetworkBlock;
@@ -149,7 +148,7 @@ public class NetworkView implements IView {
 
 		empty.bind(Bindings.createBooleanBinding(() -> getNetworkBlock() == null || getNetworkBlock().size() == 0, networkBlockProperty()));
 
-		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "taxa: %,d  nodes: %,d  edges: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(),
+		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "n: %,d  v: %,d  e: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(),
 						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfNodes(),
 						networkBlock.get() == null || networkBlock.get().getGraph() == null ? 0 : networkBlock.get().getGraph().getNumberOfEdges()),
 				mainWindow.workingTaxaProperty(), networkBlockProperty()));

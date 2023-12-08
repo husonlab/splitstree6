@@ -22,7 +22,6 @@ package splitstree6.view.displaytext;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
@@ -52,12 +51,6 @@ public class DisplayTextViewController {
 	@FXML
 	private VBox topVBox;
 
-	@FXML
-	public Button increaseFontButton;
-
-	@FXML
-	public Button decreaseFontButton;
-
 	private MyTextArea codeArea;
 
 	private Node scrollPane;
@@ -68,8 +61,6 @@ public class DisplayTextViewController {
 	private void initialize() {
 		MaterialIcons.setIcon(wrapTextToggle, "wrap_text");
 		MaterialIcons.setIcon(lineNumbersToggle, "format_list_numbered");
-		MaterialIcons.setIcon(increaseFontButton, "text_increase");
-		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 
 		codeArea = new MyTextArea();
 		codeArea.requestFollowCaret();
@@ -115,13 +106,5 @@ public class DisplayTextViewController {
 
 	public Node getScrollPane() {
 		return scrollPane;
-	}
-
-	public Button getIncreaseFontButton() {
-		return increaseFontButton;
-	}
-
-	public Button getDecreaseFontButton() {
-		return decreaseFontButton;
 	}
 }

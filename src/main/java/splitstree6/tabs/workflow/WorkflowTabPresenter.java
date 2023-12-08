@@ -21,6 +21,7 @@ package splitstree6.tabs.workflow;
 
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
@@ -67,10 +68,6 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 			scrollPane.setLockAspectRatio(true);
 			scrollPane.setRequireShiftOrControlToZoom(false);
 			scrollPane.setPannable(true);
-
-			controller.getZoomButton().setOnAction(e -> scrollPane.resetZoom());
-			controller.getZoomInButton().setOnAction(e -> scrollPane.zoomBy(1.1, 1.1));
-			controller.getZoomOutButton().setOnAction(e -> scrollPane.zoomBy(1 / 1.1, 1 / 1.1));
 		}
 
 		workflow.getSelectionModel().getSelectedItems().addListener((SetChangeListener<WorkflowNode>) e -> {
@@ -124,13 +121,13 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 			workflow.nodes().forEach(n -> Platform.runLater(() -> workflow.getSelectionModel().toggleSelection(n)));
 		});
 
-		mainController.getIncreaseFontSizeMenuItem().setOnAction(null);
-		mainController.getDecreaseFontSizeMenuItem().setOnAction(null);
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> controller.getScrollPane().zoomBy(1.1, 1.1));
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(Bindings.isEmpty(mainWindow.getWorkflow().nodes()));
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> controller.getScrollPane().zoomBy(1 / 1.1, 1 / 1.1));
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(Bindings.isEmpty(mainWindow.getWorkflow().nodes()));
 
-		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
-		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
-
-		mainController.getResetMenuItem().setOnAction(controller.getZoomButton().getOnAction());
+		mainController.getZoomInMenuItem().setOnAction(null);
+		mainController.getZoomOutMenuItem().setOnAction(null);
 	}
 
 	public WorkflowTabLayout getWorkflowTabLayout() {

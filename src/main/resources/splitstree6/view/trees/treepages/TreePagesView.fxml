@@ -89,18 +89,6 @@
                                     <Tooltip text="Zoom in"/>
                                 </tooltip>
                             </Button>
-                            <Separator layoutX="365.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0"
-                                       orientation="VERTICAL" prefHeight="20.0"/>
-                            <Button fx:id="increaseFontButton" maxHeight="20.0" mnemonicParsing="false" text="A+">
-                                <tooltip>
-                                    <Tooltip text="Increase font size"/>
-                                </tooltip>
-                            </Button>
-                            <Button fx:id="decreaseFontButton" mnemonicParsing="false" text="A-">
-                                <tooltip>
-                                    <Tooltip text="Decrease font size"/>
-                                </tooltip>
-                            </Button>
                             <StackPane alignment="TOP_LEFT"/>
                         </ToolBar>
                     </children>
@@ -113,10 +101,11 @@
                     <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                 </BorderPane.margin>
                 <children>
-                    <Pane fx:id="pane" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="2.0"
-                          AnchorPane.rightAnchor="2.0" AnchorPane.topAnchor="4.0">
-                        <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"/>
-                    </Pane>
+                    <Pane fx:id="pane" style="-fx-border-color: grey;" AnchorPane.bottomAnchor="0.0"
+                          AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                    <Pagination fx:id="pagination" pageCount="1" styleClass="viewer-background"
+                                AnchorPane.bottomAnchor="3.0" AnchorPane.leftAnchor="3.0" AnchorPane.rightAnchor="3.0"
+                                AnchorPane.topAnchor="3.0"/>
                     <VBox fx:id="formatVBox" prefWidth="200.0" styleClass="context-menu" AnchorPane.rightAnchor="16.0"
                           AnchorPane.topAnchor="2.0"/>
                 </children>

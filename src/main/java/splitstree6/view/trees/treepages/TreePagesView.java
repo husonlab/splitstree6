@@ -28,7 +28,6 @@ import javafx.scene.Node;
 import javafx.scene.layout.Pane;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.PrintUtils;
 import jloda.fx.util.ProgramProperties;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.HeightAndAngles;
@@ -116,7 +115,7 @@ public class TreePagesView implements IView {
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> {
 					if (mainWindow.getWorkingTaxa() == null)
 						return "";
-					else return "taxa: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size());
+					else return "n: %,d  trees: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(), trees.size());
 				}
 				, mainWindow.workingTaxaProperty(), trees));
 	}

@@ -147,9 +147,6 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		view.optionOtherColorProperty().addListener(invalidationListener);
 		view.optionRerootAndRescaleProperty().addListener(invalidationListener);
 
-		controller.getDecreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1 / 1.1 * view.getOptionFontScaleFactor()));
-		controller.getIncreaseFontButton().setOnAction(e -> view.setOptionFontScaleFactor(1.1 * view.getOptionFontScaleFactor()));
-
 		view.optionHideFirst10PercentTreesProperty().addListener(invalidationListener);
 		view.optionHorizontalZoomFactorProperty().addListener(invalidationListener);
 		view.optionJitterProperty().addListener(invalidationListener);
@@ -230,11 +227,10 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty().or(controller.getShowConsensusMenuItem().selectedProperty().not()));
 
-
-		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
-		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
-		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
-		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
+		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
+		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor((1.0 / 1.2) * view.getOptionFontScaleFactor()));
+		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getExpandVerticallyButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getExpandVerticallyButton().disableProperty());

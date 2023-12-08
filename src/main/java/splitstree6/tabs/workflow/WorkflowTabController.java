@@ -20,7 +20,6 @@
 package splitstree6.tabs.workflow;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
@@ -28,7 +27,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.ZoomableScrollPane;
-import jloda.fx.icons.MaterialIcons;
 
 public class WorkflowTabController {
 
@@ -47,15 +45,6 @@ public class WorkflowTabController {
 	@FXML
 	private ToolBar toolBar;
 
-	@FXML
-	private Button zoomButton;
-
-	@FXML
-	private Button zoomInButton;
-
-	@FXML
-	private Button zoomOutButton;
-
 	private ZoomableScrollPane scrollPane;
 
 	@FXML
@@ -63,10 +52,6 @@ public class WorkflowTabController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(zoomButton, "crop_free");
-		MaterialIcons.setIcon(zoomInButton, "zoom_in");
-		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
-
 		borderPane.getChildren().remove(mainPane);
 		var anchorPane = new AnchorPane(mainPane);
 		AnchorPane.setRightAnchor(mainPane, 20.0);
@@ -99,18 +84,6 @@ public class WorkflowTabController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
-	}
-
-	public Button getZoomButton() {
-		return zoomButton;
-	}
-
-	public Button getZoomInButton() {
-		return zoomInButton;
-	}
-
-	public Button getZoomOutButton() {
-		return zoomOutButton;
 	}
 
 	public ProgressIndicator getProgressIndicator() {

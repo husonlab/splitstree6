@@ -80,12 +80,6 @@ public class TreePagesViewController {
 	private Button zoomOutButton;
 
 	@FXML
-	private Button increaseFontButton;
-
-	@FXML
-	private Button decreaseFontButton;
-
-	@FXML
 	private VBox formatVBox;
 
 	@FXML
@@ -106,10 +100,6 @@ public class TreePagesViewController {
 
 		MaterialIcons.setIcon(zoomInButton, "zoom_in");
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
-
-		MaterialIcons.setIcon(increaseFontButton, "text_increase");
-		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
-
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		innerAnchorPane.getChildren().remove(formatVBox);
@@ -192,14 +182,6 @@ public class TreePagesViewController {
 
 	public Button getZoomOutButton() {
 		return zoomOutButton;
-	}
-
-	public Button getIncreaseFontButton() {
-		return increaseFontButton;
-	}
-
-	public Button getDecreaseFontButton() {
-		return decreaseFontButton;
 	}
 
 	public VBox getFormatVBox() {

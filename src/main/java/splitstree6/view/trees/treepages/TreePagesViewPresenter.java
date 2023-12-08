@@ -214,12 +214,6 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getZoomOutButton().setOnAction(e -> this.view.setOptionZoomFactor((1.0 / 1.1) * this.view.getOptionZoomFactor()));
 		controller.getZoomOutButton().disableProperty().bind(this.view.emptyProperty());
 
-		controller.getIncreaseFontButton().setOnAction(e -> this.view.setOptionFontScaleFactor(1.2 * this.view.getOptionFontScaleFactor()));
-		controller.getIncreaseFontButton().disableProperty().bind(this.view.emptyProperty());
-		controller.getDecreaseFontButton().setOnAction(e -> this.view.setOptionFontScaleFactor((1.0 / 1.2) * this.view.getOptionFontScaleFactor()));
-		controller.getDecreaseFontButton().disableProperty().bind(this.view.emptyProperty());
-
-
 		var undoManager = view.getUndoManager();
 		rowsAndCols.addListener((v, o, n) -> undoManager.add("grid dimensions", rowsAndCols, o, n));
 		view.pageNumberProperty().addListener((c, o, n) -> undoManager.add("page", view.pageNumberProperty(), o, n));
@@ -258,15 +252,10 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
-		mainController.getIncreaseFontSizeMenuItem().setOnAction(controller.getIncreaseFontButton().getOnAction());
-		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getIncreaseFontButton().disableProperty());
-		mainController.getDecreaseFontSizeMenuItem().setOnAction(controller.getDecreaseFontButton().getOnAction());
-		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getDecreaseFontButton().disableProperty());
-
-		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
-		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomInButton().disableProperty());
-		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
-		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
+		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
+		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
+		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor((1.0 / 1.2) * view.getOptionFontScaleFactor()));
+		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> treePageFactory.get().updateLabelLayout(view.getOptionOrientation()));
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));

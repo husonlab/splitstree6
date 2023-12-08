@@ -66,12 +66,6 @@ public class NetworkViewController {
 	private Button zoomOutButton;
 
 	@FXML
-	private Button increaseFontButton;
-
-	@FXML
-	private Button decreaseFontButton;
-
-	@FXML
 	private AnchorPane outerAnchorPane;
 
 	@FXML
@@ -103,8 +97,6 @@ public class NetworkViewController {
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		MaterialIcons.setIcon(zoomInButton, "zoom_in");
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
-		MaterialIcons.setIcon(increaseFontButton, "text_increase");
-		MaterialIcons.setIcon(decreaseFontButton, "text_decrease");
 
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
@@ -181,15 +173,6 @@ public class NetworkViewController {
 	public Button getZoomOutButton() {
 		return zoomOutButton;
 	}
-
-	public Button getIncreaseFontButton() {
-		return increaseFontButton;
-	}
-
-	public Button getDecreaseFontButton() {
-		return decreaseFontButton;
-	}
-
 	public AnchorPane getInnerAnchorPane() {
 		return innerAnchorPane;
 	}
