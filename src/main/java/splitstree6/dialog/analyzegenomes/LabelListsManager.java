@@ -37,6 +37,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.util.CollectionUtils;
 import jloda.util.Pair;
+import splitstree6.view.findreplace.FindReplaceTaxa;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,6 +71,7 @@ public class LabelListsManager {
 
 		final ListViewSearcher<String> listViewSearcher = new ListViewSearcher<>(controller.getDisplayLabelsListView());
 		final FindToolBar findToolBar = new FindToolBar(null, listViewSearcher);
+		FindReplaceTaxa.adaptFindToolBar(findToolBar);
 
 		controller.getDisplayLabelsVBox().getChildren().add(findToolBar);
 		controller.getReplaceButton().setOnAction(c -> findToolBar.setShowReplaceToolBar(!findToolBar.isShowReplaceToolBar()));

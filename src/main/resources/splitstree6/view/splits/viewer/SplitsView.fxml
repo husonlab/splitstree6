@@ -46,13 +46,13 @@
                             <Tooltip text="Show internal labels"/>
                         </tooltip>
                     </ToggleButton>
-                    <Separator layoutX="274.0" layoutY="13.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
+                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+
                     <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                     <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
                             text="Rotate Right"/>
                     <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false" text="Flip"/>
-                    <Separator maxHeight="20.0" minHeight="20.0" orientation="VERTICAL" prefHeight="20.0"/>
+                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
                     <Button fx:id="zoomInButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
                             text="Zoom In">
                         <tooltip>

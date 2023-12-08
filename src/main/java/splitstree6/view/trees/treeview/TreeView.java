@@ -182,6 +182,7 @@ public class TreeView implements IView {
 					text += " (%,d of %,d)".formatted(getOptionTree(), getTrees().size());
 				}
 			}
+			viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().unbind();
 			viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().setText(text);
 		};
 		mainWindow.workingTaxaProperty().addListener(new WeakInvalidationListener(updateBreadCrumbs));

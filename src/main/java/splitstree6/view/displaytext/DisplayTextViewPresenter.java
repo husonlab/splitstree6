@@ -38,6 +38,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.AlgorithmBreadCrumbsToolBar;
+import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.window.MainWindow;
 
 import java.util.Optional;
@@ -68,7 +69,8 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		controller.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
 		codeArea.setWrapText(true);
 
-		findToolBar = new FindToolBar(null, codeArea.createSearcher());
+		findToolBar = new FindToolBar(mainWindow.getStage(), codeArea.createSearcher());
+		FindReplaceTaxa.adaptFindToolBar(findToolBar);
 		controller.getTopVBox().getChildren().add(findToolBar);
 
 		selectionEmpty = Bindings.createBooleanBinding(() -> codeArea.getSelection().getLength() == 0, codeArea.selectionProperty());

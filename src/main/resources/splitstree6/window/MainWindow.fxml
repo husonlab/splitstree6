@@ -443,10 +443,13 @@
                                     <children>
                                         <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
                                         <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
-                                        <Button fx:id="increaseFontSizeButton" layoutX="111.0" layoutY="10.0"
-                                                mnemonicParsing="false" text="Font+"/>
-                                        <Button fx:id="decreaseFontSizeButton" layoutX="111.0" layoutY="10.0"
-                                                mnemonicParsing="false" text="Font-"/>
+                                        <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0"
+                                                HBox.hgrow="NEVER"/>
+
+                                        <Button fx:id="increaseFontSizeButton" mnemonicParsing="false" text="Font+"/>
+                                        <Button fx:id="decreaseFontSizeButton" mnemonicParsing="false" text="Font-"/>
+                                        <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0"
+                                                HBox.hgrow="NEVER"/>
                                         <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
                                         <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
                                                     text="Export"/>

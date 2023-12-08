@@ -494,6 +494,8 @@ public class MainWindowController {
 			((Pane) menuBar.getParent()).getChildren().remove(menuBar);
 			topVBox.setPadding(new Insets(30, 0, 0, 0));
 		}
+		algorithmTabPane.setAllowUndock(false);
+		mainTabPane.setAllowUndock(false);
 
 		MaterialIcons.setIcon(fileMenuButton, "file_open");
 
