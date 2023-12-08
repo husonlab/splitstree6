@@ -20,16 +20,11 @@
 package splitstree6.view.findreplace;
 
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.scene.control.Button;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.Separator;
-import javafx.scene.layout.Region;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.find.Searcher;
-import jloda.fx.icons.MaterialIcons;
 import jloda.fx.undo.UndoManager;
 import splitstree6.data.parts.Taxon;
-import splitstree6.utils.Platform;
 import splitstree6.window.MainWindow;
 
 import java.util.ArrayList;
@@ -66,35 +61,11 @@ public class FindReplaceTaxa {
 		searcher.setSelectionFindable(true);
 
 		var findToolBar = new FindToolBar(mainWindow.getStage(), searcher);
-		adaptFindToolBar(findToolBar);
+		FindReplaceUtils.additionalSetup(findToolBar);
 		return findToolBar;
 	}
 
 	private record TaxonOldLabelNewLabel(Taxon taxon, String oldLabel, String newLabel) {
 	}
 
-	public static void adaptFindToolBar(FindToolBar findToolBar) {
-		if (Platform.isDesktop())
-			for (var which = 0; which <= 1; which++) {
-				var items = (which == 0 ? findToolBar.getController().getToolBar().getItems() : findToolBar.getController().getReplaceToolBar().getItems());
-				for (var i = 0; i < items.size(); i++) {
-					var item = items.get(i);
-					if (item instanceof Separator) {
-						var region = new Region();
-						region.setPrefWidth(1);
-						region.setMinWidth(Region.USE_PREF_SIZE);
-						region.setMaxWidth(Region.USE_PREF_SIZE);
-						region.setStyle("-fx-background-color: transparent;");
-						items.set(i, region);
-					} else if (item instanceof Button) {
-						((Button) item).getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
-					}
-				}
-			}
-		var findFromFileButton = findToolBar.getController().getFindFromFileButton();
-		if (Platform.isDesktop())
-			MaterialIcons.setIcon(findFromFileButton, "upload", "-fx-font-size: 10;", true);
-		else
-			findToolBar.getController().getToolBar().getItems().remove(findFromFileButton);
-	}
 }

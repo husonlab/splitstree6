@@ -241,7 +241,8 @@
                                                         <Tooltip text="Open find and replace tool bar"/>
                                                     </tooltip>
                                                 </Button>
-                                                <Separator orientation="VERTICAL" prefHeight="16.0"/>
+                                                <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0"
+                                                        HBox.hgrow="NEVER"/>
                                                 <Button fx:id="labelsUndoButton" contentDisplay="CENTER" text="Undo">
                                                     <tooltip>
                                                         <Tooltip text="Undo label edits"/>
@@ -330,7 +331,8 @@
                                                         <Insets bottom="5.0" top="5.0"/>
                                                     </VBox.margin>
                                                 </HBox>
-                                                <Separator prefWidth="200.0"/>
+                                                <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0"
+                                                        HBox.hgrow="NEVER"/>
                                                 <HBox alignment="CENTER" layoutX="20.0" layoutY="20.0" spacing="20.0">
                                                     <children>
                                                         <Label text="Max dist:"/>

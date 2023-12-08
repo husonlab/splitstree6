@@ -64,15 +64,13 @@
                                       text="Synapomorphies"/>
                         </items>
                     </MenuButton>
-                    <Separator layoutX="119.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
+                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
                     <ComboBox fx:id="colorSchemeCBox">
                         <tooltip>
                             <Tooltip text="Choose Color Scheme"/>
                         </tooltip>
                     </ComboBox>
-                    <Separator layoutX="179.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
+                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
                     <Button fx:id="zoomToFitButton" contentDisplay="CENTER" mnemonicParsing="false" text="Zoom to Fit">
                         <tooltip>
                             <Tooltip text="Zoom to fit or zoom to default"/>
@@ -103,8 +101,7 @@
                             <Tooltip text="Contract horizontally"/>
                         </tooltip>
                     </Button>
-                    <Separator layoutX="401.0" layoutY="11.0" maxHeight="20.0" minHeight="20.0" orientation="VERTICAL"
-                               prefHeight="20.0"/>
+                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
                     <Label fx:id="selectionLabel" text="Selected"/>
                 </ToolBar>
             </VBox>

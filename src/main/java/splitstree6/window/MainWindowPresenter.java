@@ -212,7 +212,10 @@ public class MainWindowPresenter {
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
 
 		controller.getFindButton().setOnAction(e -> {
-			if (controller.getFindMenuItem().isSelected()) {
+			if (controller.getReplaceMenuItem().isSelected()) {
+				controller.getFindMenuItem().setSelected(false);
+				controller.getReplaceMenuItem().setSelected(false);
+			} else if (controller.getFindMenuItem().isSelected()) {
 				controller.getFindMenuItem().setSelected(false);
 				if (controller.getReplaceMenuItem().isSelected()) {
 					controller.getReplaceMenuItem().setSelected(false);
@@ -655,9 +658,13 @@ public class MainWindowPresenter {
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(a -> updateEnableStateAlgorithms());
 
 		workflow.runningProperty().addListener((v, o, n) -> {
-			if (!n)
+			if (!n) {
 				updateEnableStateAlgorithms();
+				updateFindReplace();
+			}
 		});
+
+		updateFindReplace();
 
 		BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
 	}
@@ -895,6 +902,49 @@ public class MainWindowPresenter {
 		});
 
 		replaceDataMenuItem.setDisable(mainWindow.getWorkflow().isRunning() || mainWindow.getWorkflow().getWorkingTaxaBlock() == null);
+	}
+
+	private void updateFindReplace() {
+		if (controller.getFindMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
+			controller.getFindMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
+			controller.getFindMenuItem().setUserData(null);
+		}
+		controller.getFindMenuItem().setDisable(true);
+		if (controller.getReplaceMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
+			controller.getReplaceMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
+			controller.getReplaceMenuItem().setUserData(null);
+		}
+		controller.getReplaceMenuItem().setDisable(true);
+
+		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null) {
+			var findToolBar = focusedDisplayTab.get().getPresenter().getFindToolBar();
+			if (findToolBar != null) {
+				{
+					var booleanProperty = findToolBar.showFindToolBarProperty();
+					controller.getFindMenuItem().selectedProperty().bindBidirectional(booleanProperty);
+					controller.getFindMenuItem().setUserData(booleanProperty);
+					controller.getFindMenuItem().setDisable(false);
+				}
+				{
+					if (focusedDisplayTab.get().getPresenter().allowFindReplace()) {
+						var booleanProperty = findToolBar.showReplaceToolBarProperty();
+						controller.getReplaceMenuItem().selectedProperty().bindBidirectional(booleanProperty);
+						controller.getReplaceMenuItem().setUserData(booleanProperty);
+						controller.getReplaceMenuItem().setDisable(false);
+					}
+				}
+				{
+					controller.getFindAgainMenuItem().setOnAction(e -> findToolBar.findAgain());
+					controller.getFindAgainMenuItem().disableProperty().bind(findToolBar.canFindAgainProperty().not());
+				}
+			} else {
+				controller.getFindMenuItem().setSelected(false);
+				controller.getFindMenuItem().setDisable(true);
+				controller.getReplaceMenuItem().setSelected(false);
+				controller.getReplaceMenuItem().setDisable(true);
+				controller.getFindAgainMenuItem().setDisable(true);
+			}
+		}
 	}
 
 }
