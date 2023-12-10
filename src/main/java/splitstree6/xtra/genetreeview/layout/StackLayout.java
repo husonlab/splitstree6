@@ -36,6 +36,7 @@ public class StackLayout extends MultipleFramesLayout{
     private final ReadOnlyDoubleProperty layoutHeightProperty;
     private final double nodeWidth;
     private final double nodeHeight;
+    private int focusedNodeIndex;
 
     public StackLayout(ObservableList<Node> nodes, ObservableList<Node> snapshots, double nodeWidth, double nodeHeight,
                        ReadOnlyDoubleProperty layoutWidthProperty, ReadOnlyDoubleProperty layoutHeightProperty,
@@ -47,6 +48,7 @@ public class StackLayout extends MultipleFramesLayout{
         this.nodeHeight = nodeHeight;
         this.slider = slider;
         this.zoomSlider = zoomSlider;
+        focusedNodeIndex = -1;
 
         // Transforming nodes
         initializeNodes(nodes);
@@ -111,14 +113,26 @@ public class StackLayout extends MultipleFramesLayout{
         node.scaleYProperty().unbind();
         node.scaleYProperty().bind(layoutHeightProperty.divide(nodeHeight).multiply(scalingFunction).multiply(zoomSlider.valueProperty()));
 
+        int index = -1;
+        if (transformedNodes != null && transformedNodes.contains(node)) index = transformedNodes.indexOf(node);
+        else if (transformedSnapshots != null && transformedSnapshots.contains(node)) index = transformedSnapshots.indexOf(node);
+
+        if (focusedNodeIndex == index & focusedNodeIndex != -1) {
+            node.setTranslateZ(-100);
+            node.setRotate(0);
+        }
+
         // Show node closer and without rotation when hovered
+        int finalIndex = index;
         node.setOnMouseEntered(e -> {
             node.setTranslateZ(-100);
             node.setRotate(0);
+            focusedNodeIndex = finalIndex;
         });
         node.setOnMouseExited(e -> {
             node.setTranslateZ(0);
             node.setRotate(rotate);
+            focusedNodeIndex = -1;
         });
     }
 
