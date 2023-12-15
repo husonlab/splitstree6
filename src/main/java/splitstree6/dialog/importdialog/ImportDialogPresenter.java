@@ -20,21 +20,19 @@
 package splitstree6.dialog.importdialog;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.stage.FileChooser;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
-import jloda.util.IOExceptionWithLineNumber;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.readers.ImportManager;
+import splitstree6.io.utils.SimilaritiesToDistances;
 import splitstree6.window.MainWindow;
-import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.WorkflowSetup;
 
 import java.io.File;
@@ -53,6 +51,8 @@ public class ImportDialogPresenter {
 
 		controller.getDataTypeComboBox().getItems().setAll(List.of(CharactersBlock.class, DistancesBlock.class, SplitsBlock.class, TreesBlock.class));
 		controller.getDataTypeComboBox().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
+
+		controller.getSimilarityToDistanceMethod().disableProperty().bind(controller.getSimilarityValues().selectedProperty().not());
 
 		controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			if (n == CharactersBlock.class)
@@ -112,7 +112,7 @@ public class ImportDialogPresenter {
 			if (importer == null)
 				NotificationManager.showWarning("Can't import selected data type and file format");
 			else {
-				parseAndLoad(mainWindow, fileName.get(), controller.getDataTypeComboBox().getValue());
+				parseAndLoad(mainWindow, fileName.get(), controller);
 				importDialog.getStage().hide();
 			}
 		});
@@ -122,13 +122,27 @@ public class ImportDialogPresenter {
 
 	}
 
-	public void parseAndLoad(MainWindow mainWindow, String fileName, Class<? extends DataBlock> dataType) {
+	private static void parseAndLoad(MainWindow mainWindow, String fileName, ImportDialogController controller) {
+		var dataType = controller.getDataTypeComboBox().getValue();
 		try {
 			final Consumer<Throwable> failedHandler = ex -> {
 				mainWindow.getWorkflow().clear();
 				NotificationManager.showError("Import failed: " + ex.getMessage());
 			};
 			final Runnable runOnSuccess = () -> {
+				if (dataType.equals(DistancesBlock.class)) {
+					if (controller.getSimilarityValues().isSelected()) {
+						var method = controller.getSimilarityToDistanceMethod().getValue();
+						if (method != null) {
+							if (mainWindow.getWorkflow().getInputDataBlock() instanceof DistancesBlock distancesBlock) {
+								SimilaritiesToDistances.apply(method, distancesBlock);
+							}
+							if (mainWindow.getWorkflow().getWorkingDataBlock() instanceof DistancesBlock distancesBlock) {
+								SimilaritiesToDistances.apply(method, distancesBlock);
+							}
+						}
+					}
+				}
 				mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 				mainWindow.setFileName(fileName);
 				mainWindow.setDirty(true);

@@ -1142,4 +1142,8 @@ public class MainWindowController {
 	public MenuButton getFileNameMenuButton() {
 		return fileNameMenuButton;
 	}
+
+	public Pane getRootPane() {
+		return rootPane;
+	}
 }

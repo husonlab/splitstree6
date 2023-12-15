@@ -23,6 +23,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import splitstree6.io.utils.SimilaritiesToDistances;
 import splitstree6.workflow.DataBlock;
 
 public class ImportDialogController {
@@ -52,28 +53,28 @@ public class ImportDialogController {
 	private TextField fileTextField;
 
 	@FXML
-	private TextField gapInput;
+	private TextField gapInputTextField;
 
 	@FXML
 	private Button importButton;
 
 	@FXML
-	private CheckBox innerNodesLabeling;
+	private CheckBox innerNodesLabelingCheckBox;
 
 	@FXML
 	private VBox mainVBox;
 
 	@FXML
-	private TextField matchInput;
+	private TextField matchInputTextField;
 
 	@FXML
-	private TextField missingInput;
+	private TextField missingInputTextField;
 
 	@FXML
 	private FlowPane progressBarPane;
 
 	@FXML
-	private ComboBox<?> similarityCalculation;
+	private ComboBox<SimilaritiesToDistances.Method> similarityToDistanceMethod;
 
 	@FXML
 	private CheckBox similarityValues;
@@ -86,6 +87,9 @@ public class ImportDialogController {
 
 	@FXML
 	private void initialize() {
+		similarityToDistanceMethod.getItems().addAll(SimilaritiesToDistances.Method.values());
+		similarityToDistanceMethod.setValue(SimilaritiesToDistances.Method.log);
+
 		// Set the cell factory to display the short name
 		dataTypeComboBox.setCellFactory(param -> new ListCell<>() {
 			@Override
@@ -144,36 +148,36 @@ public class ImportDialogController {
 		return fileTextField;
 	}
 
-	public TextField getGapInput() {
-		return gapInput;
+	public TextField getGapInputTextField() {
+		return gapInputTextField;
 	}
 
 	public Button getImportButton() {
 		return importButton;
 	}
 
-	public CheckBox getInnerNodesLabeling() {
-		return innerNodesLabeling;
+	public CheckBox getInnerNodesLabelingCheckBox() {
+		return innerNodesLabelingCheckBox;
 	}
 
 	public VBox getMainVBox() {
 		return mainVBox;
 	}
 
-	public TextField getMatchInput() {
-		return matchInput;
+	public TextField getMatchInputTextField() {
+		return matchInputTextField;
 	}
 
-	public TextField getMissingInput() {
-		return missingInput;
+	public TextField getMissingInputTextField() {
+		return missingInputTextField;
 	}
 
 	public FlowPane getProgressBarPane() {
 		return progressBarPane;
 	}
 
-	public ComboBox<?> getSimilarityCalculation() {
-		return similarityCalculation;
+	public ComboBox<SimilaritiesToDistances.Method> getSimilarityToDistanceMethod() {
+		return similarityToDistanceMethod;
 	}
 
 	public CheckBox getSimilarityValues() {

@@ -55,7 +55,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SplitsView implements IView {
-	public static final Color OUTLINE_FILL_COLOR = Color.SILVER;
+	public static final Color OUTLINE_FILL_COLOR = Color.DARKGRAY;
 
 	private final UndoManager undoManager = new UndoManager();
 

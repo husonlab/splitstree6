@@ -24,6 +24,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import jloda.fx.util.ProgramProperties;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.TaxaBlock;
 
@@ -37,12 +38,17 @@ import java.util.Set;
  * Daniel Huson, 11.2021
  */
 public class PhylipWriter extends CharactersWriterBase {
-	private final BooleanProperty optionInterleaved = new SimpleBooleanProperty(this, "optionInterleaved", false);
-	private final BooleanProperty optionInterleaveLabels = new SimpleBooleanProperty(this, "optionInterleaveLabels", false);
-	private final IntegerProperty optionLineLength = new SimpleIntegerProperty(this, "optionLineLength", 40);
+	private final BooleanProperty optionInterleaved = new SimpleBooleanProperty(this, "optionInterleaved");
+	private final BooleanProperty optionInterleaveLabels = new SimpleBooleanProperty(this, "optionInterleaveLabels");
+	private final IntegerProperty optionLineLength = new SimpleIntegerProperty(this, "optionLineLength");
+
+	private final BooleanProperty optionTruncateLabels = new SimpleBooleanProperty(this, "optionTruncateLabels");
 
 	public PhylipWriter() {
 		setFileExtensions("phylip", "phy");
+		ProgramProperties.track(optionInterleaved, false);
+		ProgramProperties.track(optionInterleaveLabels, false);
+		ProgramProperties.track(optionLineLength, 40);
 	}
 
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {
@@ -75,7 +81,7 @@ public class PhylipWriter extends CharactersWriterBase {
 					}
 
 					if (i == 1 || optionInterleaveLabels.get())
-						w.write(get10CharLabel(labels[t]) + sequence.toString().toUpperCase() + "\n");
+						w.write(getPhylipTaxonLabel(labels[t], optionTruncateLabels.get()) + sequence.toString().toUpperCase() + "\n");
 					else
 						w.write(sequence.toString().toUpperCase() + "\n");
 				}
@@ -88,7 +94,7 @@ public class PhylipWriter extends CharactersWriterBase {
 					if ((j - 1) % 10 == 0 && (j - 1) != 0) sequence.append(" "); // set space after every 10 chars
 					sequence.append(characters.get(t, j));
 				}
-				w.write(get10CharLabel(labels[t]) + sequence.toString().toUpperCase() + "\n");
+				w.write(getPhylipTaxonLabel(labels[t], optionTruncateLabels.get()) + sequence.toString().toUpperCase() + "\n");
 			}
 		}
 	}
@@ -110,12 +116,14 @@ public class PhylipWriter extends CharactersWriterBase {
 		return labels;
 	}
 
-	private static String get10CharLabel(String label) {
-		if (label.length() >= 10)
-			return label.substring(0, 10);
-		else {
-			return label + " ".repeat(10 - label.length());
-		}
+	public static String getPhylipTaxonLabel(String label, boolean truncate) {
+		if (truncate) {
+			if (label.length() >= 10)
+				return label.substring(0, 10);
+			else {
+				return label + " ".repeat(10 - label.length());
+			}
+		} else return label + "\t";
 	}
 
 	public BooleanProperty optionInterleavedProperty() {
@@ -128,5 +136,9 @@ public class PhylipWriter extends CharactersWriterBase {
 
 	public IntegerProperty optionLineLengthProperty() {
 		return optionLineLength;
+	}
+
+	public BooleanProperty optionTruncateLabelsProperty() {
+		return optionTruncateLabels;
 	}
 }

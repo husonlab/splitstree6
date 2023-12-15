@@ -36,11 +36,13 @@ import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.UsageException;
 import splitstree6.io.FileLoader;
+import splitstree6.mainframe.MainFrame;
 import splitstree6.window.MainWindow;
 
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * the main SplitsTree CE program
@@ -141,6 +143,15 @@ public class SplitsTree6 extends Application {
 
 	@Override
 	public void start(Stage stage) throws Exception {
+
+		if (true || !splitstree6.utils.Platform.isDesktop()) {
+			var mainFrame = new MainFrame(stage);
+			stage.getScene().getStylesheets().add(Objects.requireNonNull(MainWindow.class.getResource("mainwindow.css")).toExternalForm());
+			stage.getScene().getStylesheets().add("jloda/resources/css/white_pane.css");
+			stage.show();
+			return;
+		}
+
 		if (splitstree6.utils.Platform.isDesktop())
 			SplashScreen.showSplash(Duration.ofSeconds(5));
 		try {

@@ -97,6 +97,11 @@ module splitstreesix {
 	opens splitstree6.tabs.workflow.algorithm;
 	opens splitstree6.tabs.workflow.data;
 	opens splitstree6.tabs.algorithms.treefilter;
+	opens splitstree6.tabs.algorithms;
+	opens splitstree6.tabs.algorithms.taxafilter;
+	opens splitstree6.mainframe.filestab;
+	opens splitstree6.mainframe;
+
 
 	opens splitstree6.contextmenus.algorithmnode;
 	opens splitstree6.contextmenus.datanode;
@@ -104,9 +109,6 @@ module splitstreesix {
 	exports splitstree6.xtra;
 	exports splitstree6.main;
 	opens splitstree6.tools;
-
-	opens splitstree6.tabs.algorithms;
-	opens splitstree6.tabs.algorithms.taxafilter;
 
 	opens splitstree6.layout.splits;
 	opens splitstree6.layout.tree;

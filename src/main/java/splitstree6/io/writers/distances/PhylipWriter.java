@@ -21,6 +21,7 @@ package splitstree6.io.writers.distances;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import jloda.fx.util.ProgramProperties;
 import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
@@ -28,15 +29,22 @@ import splitstree6.data.TaxaBlock;
 import java.io.IOException;
 import java.io.Writer;
 
+import static splitstree6.io.writers.characters.PhylipWriter.getPhylipTaxonLabel;
+
 /**
  * writes distances in Phylip format
  * Daniel Huson, 11.2021
  */
 public class PhylipWriter extends DistancesWriterBase {
-	private final BooleanProperty optionTriangular = new SimpleBooleanProperty(this, "optionTriangular", false);
+	private final BooleanProperty optionTriangular = new SimpleBooleanProperty(this, "optionTriangular");
+
+	private final BooleanProperty optionTruncateLabels = new SimpleBooleanProperty(this, "optionTruncateLabels");
+
 
 	public PhylipWriter() {
 		setFileExtensions("dist", "dst", "phylip", "phy");
+		ProgramProperties.track(optionTriangular, false);
+		ProgramProperties.track(optionTruncateLabels, false);
 	}
 
 	@Override
@@ -51,53 +59,34 @@ public class PhylipWriter extends DistancesWriterBase {
 
 		w.write("\t" + ntax + "\n");
 
-		if (!isOptionTriangular()) {
+		if (!optionTriangular.get()) {
 			// System.err.println("standard");
 			for (var i = 1; i <= distances.getDistances().length; i++) {
 				var buf = new StringBuilder();
 				for (int j = 1; j <= distances.getDistances()[i - 1].length; j++) {
 					buf.append(StringUtils.removeTrailingZerosAfterDot("%.5f ", distances.get(i, j)));
 				}
-				if (taxa.getLabel(i).length() >= 10)
-					w.write(taxa.getLabel(i).substring(0, 10));
-				else {
-					w.write(taxa.getLabel(i));
-					for (var k = 0; k < 10 - taxa.getLabel(i).length(); k++) {
-						w.write(" ");
-					}
-				}
-				w.write("\t" + buf + "\n");
+				w.write(getPhylipTaxonLabel(taxa.getLabel(i), optionTruncateLabels.get()));
+				w.write(buf + "\n");
 			}
 		} else {
 			//System.err.println("triangular");
-			w.write(taxa.getLabel(1) + "\n");
-			for (var i = 2; i <= distances.getDistances().length; i++) {
+			for (var i = 1; i <= distances.getDistances().length; i++) {
 				var buf = new StringBuilder();
 				for (var j = 1; j <= i - 1; j++) {
 					buf.append(StringUtils.removeTrailingZerosAfterDot("%.5f ", distances.get(i, j)));
 				}
-				if (taxa.getLabel(i).length() >= 10)
-					w.write(taxa.getLabel(i).substring(0, 10));
-				else {
-					w.write(taxa.getLabel(i));
-					for (int k = 0; k < 10 - taxa.getLabel(i).length(); k++) {
-						w.write(" ");
-					}
-				}
-				w.write("\t" + buf + "\n");
+				w.write(getPhylipTaxonLabel(taxa.getLabel(i), optionTruncateLabels.get()));
+				w.write(buf + "\n");
 			}
 		}
-	}
-
-	public boolean isOptionTriangular() {
-		return optionTriangular.get();
 	}
 
 	public BooleanProperty optionTriangularProperty() {
 		return optionTriangular;
 	}
 
-	public void setOptionTriangular(boolean optionTriangular) {
-		this.optionTriangular.set(optionTriangular);
+	public BooleanProperty optionTruncateLabelsProperty() {
+		return optionTruncateLabels;
 	}
 }

@@ -19,24 +19,9 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tab?>
-<?import javafx.scene.control.TabPane?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.Pane?>
-<?import javafx.scene.layout.RowConstraints?>
-<?import javafx.scene.layout.VBox?>
-
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <BorderPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="300.0" prefWidth="500.0"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.dialog.importdialog.ImportDialogController">
@@ -132,19 +117,22 @@
                                             </rowConstraints>
                                             <children>
                                                 <Label text="Gap character" GridPane.rowIndex="1"/>
-                                                <TextField fx:id="gapInput" alignment="CENTER" maxHeight="-Infinity"
+                                                <TextField fx:id="gapInputTextField" alignment="CENTER"
+                                                           maxHeight="-Infinity"
                                                            maxWidth="-Infinity" minHeight="-Infinity"
                                                            minWidth="-Infinity" prefHeight="25.0" prefWidth="42.0"
                                                            promptText="-" GridPane.columnIndex="1"
                                                            GridPane.rowIndex="1"/>
                                                 <Label text="Missing character" GridPane.rowIndex="2"/>
-                                                <TextField fx:id="missingInput" alignment="CENTER" maxHeight="-Infinity"
+                                                <TextField fx:id="missingInputTextField" alignment="CENTER"
+                                                           maxHeight="-Infinity"
                                                            maxWidth="-Infinity" minHeight="-Infinity"
                                                            minWidth="-Infinity" prefHeight="25.0" prefWidth="42.0"
                                                            promptText="?" GridPane.columnIndex="1"
                                                            GridPane.rowIndex="2"/>
                                                 <Label text="Match character" GridPane.rowIndex="3"/>
-                                                <TextField fx:id="matchInput" alignment="CENTER" maxHeight="-Infinity"
+                                                <TextField fx:id="matchInputTextField" alignment="CENTER"
+                                                           maxHeight="-Infinity"
                                                            maxWidth="-Infinity" minHeight="-Infinity"
                                                            minWidth="-Infinity" prefHeight="25.0" prefWidth="42.0"
                                                            promptText="." GridPane.columnIndex="1"
@@ -169,7 +157,7 @@
                                             <children>
                                                 <CheckBox fx:id="similarityValues" alignment="CENTER"
                                                           mnemonicParsing="false" text="Data are similarity values"/>
-                                                <ComboBox fx:id="similarityCalculation" prefWidth="150.0"
+                                                <ComboBox fx:id="similarityToDistanceMethod" prefWidth="150.0"
                                                           promptText="D = -ln(S)"/>
                                             </children>
                                             <padding>
@@ -192,7 +180,7 @@
                                         <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" spacing="10.0"
                                               BorderPane.alignment="CENTER">
                                             <children>
-                                                <CheckBox fx:id="innerNodesLabeling" alignment="CENTER"
+                                                <CheckBox fx:id="innerNodesLabelingCheckBox" alignment="CENTER"
                                                           mnemonicParsing="false" text="Keep inner nodes labeling"/>
                                             </children>
                                             <padding>

@@ -46,7 +46,5 @@ public abstract class DistancesReader extends DataReaderBase<DistancesBlock> {
 			if (changed)
 				NotificationManager.showWarning("Distance matrix not symmetric, using mean values");
 		}
-
-
 	}
 }

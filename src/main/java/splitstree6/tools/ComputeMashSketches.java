@@ -97,7 +97,7 @@ public class ComputeMashSketches {
 			}
 		}
 
-		if (inputFiles.size() == 0)
+		if (inputFiles.isEmpty())
 			throw new UsageException("No input files");
 
 		for (String name : inputFiles) {

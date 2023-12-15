@@ -666,7 +666,8 @@ public class MainWindowPresenter {
 
 		updateFindReplace();
 
-		BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
+		if (stage != null)
+			BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
 	}
 
 	public void showInputEditor() {

@@ -26,8 +26,8 @@
 <?import javafx.scene.text.Font?>
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.window.MainWindowController">
-    <BorderPane fx:id="mainBorderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                AnchorPane.topAnchor="0.0">
         <top>
             <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
                 <MenuBar fx:id="menuBar">
@@ -75,6 +75,7 @@
                             </items>
                         </Menu>
                         <SeparatorMenuItem mnemonicParsing="false"/>
+
                         <MenuItem fx:id="analyzeGenomesMenuItem" text="Analyze Genomes..."/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="saveMenuItem" text="Save">
@@ -432,7 +433,7 @@
                         </MenuItem>
                     </Menu>
                 </MenuBar>
-                <AnchorPane styleClass="tool-bar">
+                <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" styleClass="tool-bar">
                     <children>
                         <BorderPane fx:id="toolBarBorderPane" layoutX="16.5" AnchorPane.bottomAnchor="0.0"
                                     AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
@@ -443,12 +444,12 @@
                                     <children>
                                         <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
                                         <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
-                                        <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0"
+                                        <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
                                                 HBox.hgrow="NEVER"/>
 
                                         <Button fx:id="increaseFontSizeButton" mnemonicParsing="false" text="Font+"/>
                                         <Button fx:id="decreaseFontSizeButton" mnemonicParsing="false" text="Font-"/>
-                                        <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0"
+                                        <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
                                                 HBox.hgrow="NEVER"/>
                                         <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
                                         <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
@@ -457,7 +458,8 @@
                                 </HBox>
                             </right>
                             <left>
-                                <HBox fx:id="leftToolBarPane" alignment="CENTER_LEFT">
+                                <HBox fx:id="leftToolBarPane" alignment="CENTER_LEFT" maxHeight="-Infinity"
+                                      minHeight="-Infinity" prefHeight="26.0">
                                     <children>
                                         <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER"
                                                     mnemonicParsing="false" text="File"/>

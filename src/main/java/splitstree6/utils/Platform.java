@@ -28,6 +28,8 @@ public enum Platform {
 
 	private static final Platform platform;
 
+	private static String userDirectory;
+
 	static {
 		var os = System.getProperty("os.name", null).toLowerCase();
 		if (os.contains("win")) {
@@ -40,6 +42,7 @@ public enum Platform {
 			platform = Other;
 		}
 		System.err.println("Platform detected: " + platform);
+		setUserDirectory(System.getProperty("user.dir"));
 	}
 
 	public static boolean isDesktop() {
@@ -48,5 +51,13 @@ public enum Platform {
 
 	public static Platform getPlatform() {
 		return platform;
+	}
+
+	public static String getUserDirectory() {
+		return userDirectory;
+	}
+
+	public static void setUserDirectory(String userDirectory) {
+		Platform.userDirectory = userDirectory;
 	}
 }
