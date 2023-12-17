@@ -19,9 +19,11 @@
 
 package splitstree6.contextmenus.algorithmnode;
 
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import splitstree6.main.SplitsTree6;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 
@@ -43,8 +45,10 @@ public class AlgorithmNodeContextMenu {
 		return contextMenu;
 	}
 
-	public static ContextMenu create(MainWindow mainWindow, UndoManager undoManager, AlgorithmNode algorithmNode) {
-		var menu = new AlgorithmNodeContextMenu(mainWindow, undoManager, algorithmNode);
-		return menu.getContextMenu();
+	public static void show(MainWindow mainWindow, UndoManager undoManager, AlgorithmNode algorithmNode, Node node, double x, double y) {
+		if (SplitsTree6.isDesktop()) {
+			var menu = new AlgorithmNodeContextMenu(mainWindow, undoManager, algorithmNode);
+			menu.getContextMenu().show(node, x, y);
+		}
 	}
 }

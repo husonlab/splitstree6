@@ -19,6 +19,8 @@
 
 package splitstree6.workflowtree;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
 import javafx.scene.control.SelectionMode;
@@ -27,9 +29,14 @@ import jloda.fx.find.FindToolBar;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
+import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataNode;
+import splitstree6.workflow.commands.DeleteCommand;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import static splitstree6.contextmenus.datanode.DataNodeContextMenuPresenter.createAddAlgorithmMenuItems;
 
 public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
@@ -38,10 +45,11 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 	public WorkflowTreeViewPresenter(MainWindow mainWindow, WorkflowTreeView workflowTreeView) {
 		this.mainWindow = mainWindow;
 		this.workflowTreeView = workflowTreeView;
+		var controller = workflowTreeView.getController();
 		var workflow = mainWindow.getWorkflow();
-		var treeView = workflowTreeView.getController().getWorkflowTreeView();
+		var treeView = controller.getWorkflowTreeView();
 
-		treeView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
 		treeView.setRoot(new WorkflowTreeItem(mainWindow));
 
@@ -74,6 +82,37 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 				}
 			}
 		});
+
+		var algorithmNodeSelected = new SimpleBooleanProperty(this, "algorithmSelected", false);
+		treeView.getSelectionModel().selectedItemProperty().addListener((v, o, n) ->
+				algorithmNodeSelected.set(n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof AlgorithmNode<?, ?>));
+		var dataNodeSelected = new SimpleBooleanProperty(this, "dataSelected", false);
+		treeView.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+			if (n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof DataNode<?> dataNode) {
+				dataNodeSelected.set(true);
+				controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTreeView.getUndoManager(), dataNode));
+			} else {
+				dataNodeSelected.set(false);
+				controller.getAddMenuButton().getItems().clear();
+			}
+		});
+
+		controller.getEditButton().setOnAction(e -> {
+			if (treeView.getSelectionModel().getSelectedItem() instanceof WorkflowTreeItem item) {
+				item.showView();
+			}
+		});
+		controller.getEditButton().disableProperty().bind((algorithmNodeSelected.or(dataNodeSelected)).not());
+
+		controller.getAddMenuButton().disableProperty().bind(Bindings.isEmpty(controller.getAddMenuButton().getItems()));
+
+		controller.getDeleteButton().setOnAction(e -> {
+			if (treeView.getSelectionModel().getSelectedItem() instanceof WorkflowTreeItem item
+				&& item.getWorkflowNode() instanceof AlgorithmNode<?, ?> algorithmNode) {
+				workflowTreeView.getUndoManager().doAndAdd(DeleteCommand.create(workflow, algorithmNode));
+			}
+		});
+		controller.getDeleteButton().disableProperty().bind(algorithmNodeSelected.not());
 	}
 
 	public void setupMenuItems() {

@@ -37,7 +37,7 @@ import jloda.fx.find.TextAreaSearcher;
 import org.fxmisc.flowless.VirtualizedScrollPane;
 import org.fxmisc.richtext.CodeArea;
 import org.fxmisc.richtext.LineNumberFactory;
-import splitstree6.utils.Platform;
+import splitstree6.main.SplitsTree6;
 import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class MyTextArea {
@@ -51,7 +51,7 @@ public class MyTextArea {
 
 
 	public MyTextArea() {
-		if (Platform.isDesktop()) {
+		if (SplitsTree6.isDesktop()) {
 			codeArea = new CodeArea();
 			codeArea.requestFollowCaret();
 			node = codeArea;

@@ -48,7 +48,7 @@ public class AlignmentViewController {
     private MenuButton selectSitesMenu;
 
     @FXML
-    private ComboBox<ColorScheme> colorSchemeCBox;
+    private MenuButton colorSchemeMenuButton;
 
     @FXML
     private MenuItem selectCodon0MenuItem;
@@ -197,7 +197,12 @@ public class AlignmentViewController {
 
     @FXML
     private void initialize() {
-		MaterialIcons.setIcon(zoomToFitButton, "crop_free");
+        MaterialIcons.setIcon(colorSchemeMenuButton, "palette");
+
+        MaterialIcons.setIcon(selectSitesMenu, "checklist_rtl");
+        MaterialIcons.setIcon(filterMenu, "filter_alt");
+
+        MaterialIcons.setIcon(zoomToFitButton, "crop_free");
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
@@ -265,8 +270,8 @@ public class AlignmentViewController {
         return selectSitesMenu;
     }
 
-    public ComboBox<ColorScheme> getColorSchemeCBox() {
-        return colorSchemeCBox;
+    public MenuButton getColorSchemeMenuButton() {
+        return colorSchemeMenuButton;
     }
 
     public MenuButton getSelectSitesMenu() {
@@ -459,5 +464,25 @@ public class AlignmentViewController {
 
     public Group getImageGroup() {
         return imageGroup;
+    }
+
+    public static class ListCellWithIcon<T> extends javafx.scene.control.ListCell<T> {
+        private final String name;
+
+        ListCellWithIcon(String name) {
+            this.name = name;
+            MaterialIcons.setIcon(this, "name");
+        }
+
+        @Override
+        protected void updateItem(T item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty || item == null) {
+                setGraphic(null);
+                setText(null);
+            } else {
+                MaterialIcons.setIcon(this, "name");
+            }
+        }
     }
 }

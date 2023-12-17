@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.mainframe.filestab;
+package splitstree6.mobileframe.filestab;
 
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.*;
@@ -26,7 +26,7 @@ import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.NotificationManager;
 import jloda.util.Basic;
 import jloda.util.FileUtils;
-import splitstree6.utils.Platform;
+import splitstree6.main.SplitsTree6;
 
 import java.io.File;
 import java.io.IOException;
@@ -166,7 +166,7 @@ public class FilesTabPresenter {
 	}
 
 	private static String requestName(Stage stage, List<String> fileNames) {
-		var file = createUniqueFile(Platform.getUserDirectory() + File.separator + "Untitled.stree6", fileNames);
+		var file = createUniqueFile(SplitsTree6.getUserDirectory() + File.separator + "Untitled.stree6", fileNames);
 		var dialog = new TextInputDialog(file.getName());
 		dialog.initOwner(stage);
 		dialog.initModality(javafx.stage.Modality.APPLICATION_MODAL);
@@ -175,7 +175,7 @@ public class FilesTabPresenter {
 		dialog.setContentText("Please enter a file name:");
 		var result = dialog.showAndWait();
 		if (result.isPresent())
-			return createUniqueFile(Platform.getUserDirectory() + File.separator + result.get(), fileNames).getPath();
+			return createUniqueFile(SplitsTree6.getUserDirectory() + File.separator + result.get(), fileNames).getPath();
 		else
 			return null;
 	}

@@ -23,76 +23,78 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.control.SplitPane;
 import javafx.util.Duration;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.RunAfterAWhile;
 
 /**
  * split pane presenter
  * Daniel Huson, 10.2021
  */
 public class SplitPanePresenter {
+	private final static double SIDE_BAR_DEFAULT_WIDTH = 250.0;
+	private final static double BOTTOM_BAR_DEFAULT_HEIGHT = 250.0;
+
 	private final MainWindowController controller;
 	private final SplitPane leftSplitPane;
 	private final SplitPane mainSplitPane;
+
+	private final DoubleProperty sideBarWidth = new SimpleDoubleProperty(this, "sideBarWidth", SIDE_BAR_DEFAULT_WIDTH);
+
 
 	public SplitPanePresenter(MainWindowController controller) {
 		this.controller = controller;
 		this.mainSplitPane = controller.getMainSplitPane();
 		this.leftSplitPane = controller.getLeftSplitPane();
-		var sideBarWidth = new SimpleDoubleProperty(this, "sideBarWidth");
-		var bottomBarHeight = new SimpleDoubleProperty(this, "bottomBarHeight");
 
-		ProgramProperties.track(sideBarWidth, 300.0);
-		ProgramProperties.track(bottomBarHeight, 250.0);
 
-		var openCloseLeftButton = controller.getOpenCloseLeftButton();
-		openCloseLeftButton.setOnAction(e -> {
-			if (true) {
-				if (mainSplitPane.getDividerPositions()[0] <= 0.01) {
-					mainSplitPane.setDividerPositions(sideBarWidth.get() / mainSplitPane.getWidth());
-					controller.getOpenCloseLeftButton().setText("<");
-				} else {
-					var pos = mainSplitPane.getDividerPositions()[0] * mainSplitPane.getWidth();
-					if (pos > 0)
-						sideBarWidth.set(pos);
-					mainSplitPane.setDividerPositions(0.0);
-					controller.getOpenCloseLeftButton().setText(">");
+		if (false) {
+			ProgramProperties.track(sideBarWidth, SIDE_BAR_DEFAULT_WIDTH);
+			DoubleProperty bottomBarHeight = new SimpleDoubleProperty(this, "bottomBarHeight", BOTTOM_BAR_DEFAULT_HEIGHT);
+			ProgramProperties.track(bottomBarHeight, BOTTOM_BAR_DEFAULT_HEIGHT);
+		}
+
+		var mainSplitPaneDividerChanging = new SimpleBooleanProperty(false);
+
+		controller.getShowWorkflowTreeCheckButton().selectedProperty().addListener((v, o, n) -> {
+			if (!mainSplitPaneDividerChanging.get()) {
+				try {
+					if (n) {
+						mainSplitPaneDividerChanging.set(true);
+						mainSplitPane.setDividerPositions(sideBarWidth.get() / mainSplitPane.getWidth());
+					} else {
+						var pos = mainSplitPane.getDividerPositions()[0] * mainSplitPane.getWidth();
+						if (pos > 0)
+							sideBarWidth.set(pos);
+						mainSplitPane.setDividerPositions(0.0);
+					}
+				} finally {
+					mainSplitPaneDividerChanging.set(false);
 				}
-			} else {
-				if (mainSplitPane.getDividerPositions()[0] <= 0.01)
-					animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> openCloseLeftButton.setText("<"), true);
-				else
-					animateSplitPane(mainSplitPane, 0, () -> openCloseLeftButton.setText(">"), true);
 			}
 		});
+
+		mainSplitPane.getDividers().get(0).positionProperty().addListener((v, o, n) -> {
+			RunAfterAWhile.applyInFXThread(mainSplitPaneDividerChanging, () -> {
+						if (!mainSplitPaneDividerChanging.get()) {
+							try {
+								mainSplitPaneDividerChanging.set(true);
+								controller.getShowWorkflowTreeCheckButton().setSelected(n.doubleValue() >= 0.01);
+							} finally {
+								mainSplitPaneDividerChanging.set(false);
+							}
+						}
+					}
+			);
+		});
+
 		Platform.runLater(() -> {
 			mainSplitPane.setDividerPositions(sideBarWidth.get() / mainSplitPane.getWidth());
-			controller.getOpenCloseLeftButton().setText("<");
-		});
-
-		var openCloseRightButton = controller.getOpenCloseRightButton();
-		openCloseRightButton.setOnAction(e -> {
-			if (false) ensureTreeViewIsOpen(false);
-			if (true) {
-				if (leftSplitPane.getDividerPositions()[0] >= 0.99) {
-					var pos = (leftSplitPane.getHeight() - bottomBarHeight.get()) / leftSplitPane.getHeight();
-					leftSplitPane.getDividers().get(0).setPosition(pos);
-					openCloseRightButton.setText("<");
-				} else {
-					bottomBarHeight.set((1.0 - leftSplitPane.getDividerPositions()[0]) * leftSplitPane.getHeight());
-					leftSplitPane.getDividers().get(0).setPosition(1.0);
-					openCloseRightButton.setText(">");
-				}
-			} else {
-				if (leftSplitPane.getDividerPositions()[0] >= 0.99)
-					animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight(), () -> openCloseRightButton.setText("<"), true);
-				else
-					animateSplitPane(leftSplitPane, 1.0, () -> openCloseRightButton.setText(">"), true);
-			}
 		});
 
 		mainSplitPane.widthProperty().addListener((c, o, n) -> {
@@ -105,6 +107,7 @@ public class SplitPanePresenter {
 				mainSplitPane.setDividerPositions(dividerPositions);
 			}
 		});
+
 		mainSplitPane.heightProperty().addListener((c, o, n) -> {
 			if (n.doubleValue() > 0) {
 				var dividerPositions = leftSplitPane.getDividerPositions();
@@ -120,42 +123,38 @@ public class SplitPanePresenter {
 			}
 		});
 
-	}
-
-	public void openCloseLeft(boolean animate) {
-		var openCloseLeftButton = controller.getOpenCloseLeftButton();
-		if (mainSplitPane.getDividerPositions()[0] <= 0.01)
-			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> openCloseLeftButton.setText("<"), animate);
-		else
-			animateSplitPane(mainSplitPane, 0, () -> openCloseLeftButton.setText(">"), animate);
+		controller.getAlgorithmTabPane().getTabs().addListener((InvalidationListener) e -> {
+			if (controller.getAlgorithmTabPane().getTabs().isEmpty())
+				ensureAlgorithmsTabPaneIsClosed();
+		});
 	}
 
 	public void ensureTreeViewIsOpen(boolean animate) {
 		if (mainSplitPane.getDividerPositions()[0] <= 0.01)
-			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> controller.getOpenCloseLeftButton().setText("<"), animate);
+			animateSplitPane(mainSplitPane, SIDE_BAR_DEFAULT_WIDTH / mainSplitPane.getWidth(), () -> {
+			}, animate);
 		Platform.runLater(() -> leftSplitPane.setDividerPositions(1.0));
 	}
 
 
 	public void ensureAlgorithmsTabPaneIsOpen(Runnable runAfterward) {
 		if (mainSplitPane.getDividerPositions()[0] <= 0.01)
-			animateSplitPane(mainSplitPane, 300 / mainSplitPane.getWidth(), () -> {
-				controller.getOpenCloseLeftButton().setText("<");
-				runAfterward.run();
-			}, false);
-		else if (leftSplitPane.getDividerPositions()[0] >= (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight())
-			animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - 300) / leftSplitPane.getHeight(), () -> {
-				controller.getOpenCloseLeftButton().setText("<");
-				runAfterward.run();
-			}, true);
+			animateSplitPane(mainSplitPane, SIDE_BAR_DEFAULT_WIDTH / mainSplitPane.getWidth(), null, false);
+		if (leftSplitPane.getDividerPositions()[0] >= (leftSplitPane.getHeight() - BOTTOM_BAR_DEFAULT_HEIGHT) / leftSplitPane.getHeight())
+			animateSplitPane(leftSplitPane, (leftSplitPane.getHeight() - BOTTOM_BAR_DEFAULT_HEIGHT) / leftSplitPane.getHeight(), runAfterward, true);
 		else
 			runAfterward.run();
 	}
 
+	public void ensureAlgorithmsTabPaneIsClosed() {
+		animateSplitPane(leftSplitPane, 1.0, null, true);
+	}
+
 	private void animateSplitPane(SplitPane splitPane, double target, Runnable runnable, boolean animate) {
-		KeyValue keyValue = new KeyValue(splitPane.getDividers().get(0).positionProperty(), target);
-		Timeline timeline = new Timeline(new KeyFrame(Duration.millis(animate ? 500 : 1), keyValue));
+		var keyValue = new KeyValue(splitPane.getDividers().get(0).positionProperty(), target);
+		var timeline = new Timeline(new KeyFrame(Duration.millis(animate ? 500 : 1), keyValue));
+		if (runnable != null)
+			timeline.setOnFinished(x -> runnable.run());
 		timeline.play();
-		timeline.setOnFinished(x -> runnable.run());
 	}
 }

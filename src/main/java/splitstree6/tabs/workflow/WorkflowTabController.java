@@ -20,6 +20,8 @@
 package splitstree6.tabs.workflow;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
@@ -27,6 +29,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.icons.MaterialIcons;
 
 public class WorkflowTabController {
 
@@ -45,6 +48,19 @@ public class WorkflowTabController {
 	@FXML
 	private ToolBar toolBar;
 
+	@FXML
+	private MenuButton addMenuButton;
+
+	@FXML
+	private Button deleteButton;
+
+	@FXML
+	private Button editButton;
+
+	@FXML
+	private Button duplicateButton;
+
+
 	private ZoomableScrollPane scrollPane;
 
 	@FXML
@@ -52,6 +68,11 @@ public class WorkflowTabController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(editButton, "edit_note");
+		MaterialIcons.setIcon(addMenuButton, "add");
+		MaterialIcons.setIcon(deleteButton, "delete");
+		MaterialIcons.setIcon(duplicateButton, "duplicate");
+
 		borderPane.getChildren().remove(mainPane);
 		var anchorPane = new AnchorPane(mainPane);
 		AnchorPane.setRightAnchor(mainPane, 20.0);
@@ -88,5 +109,21 @@ public class WorkflowTabController {
 
 	public ProgressIndicator getProgressIndicator() {
 		return progressIndicator;
+	}
+
+	public MenuButton getAddMenuButton() {
+		return addMenuButton;
+	}
+
+	public Button getDeleteButton() {
+		return deleteButton;
+	}
+
+	public Button getEditButton() {
+		return editButton;
+	}
+
+	public Button getDuplicateButton() {
+		return duplicateButton;
 	}
 }

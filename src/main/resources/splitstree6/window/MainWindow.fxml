@@ -26,11 +26,11 @@
 <?import javafx.scene.text.Font?>
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.window.MainWindowController">
-    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                AnchorPane.topAnchor="0.0">
+    <BorderPane fx:id="outsideBorderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
         <top>
-            <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
-                <MenuBar fx:id="menuBar">
+            <VBox fx:id="topVBox" minHeight="0.0" BorderPane.alignment="CENTER">
+                <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
                     <Menu fx:id="fileMenu" text="File">
                         <MenuItem fx:id="newMenuItem" text="New...">
                             <accelerator>
@@ -433,67 +433,63 @@
                         </MenuItem>
                     </Menu>
                 </MenuBar>
-                <AnchorPane maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" styleClass="tool-bar">
-                    <children>
-                        <BorderPane fx:id="toolBarBorderPane" layoutX="16.5" AnchorPane.bottomAnchor="0.0"
-                                    AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0"
-                                    AnchorPane.topAnchor="0.0">
-                            <right>
-                                <HBox fx:id="rightToolBarPane" alignment="CENTER_RIGHT" spacing="4.0"
-                                      BorderPane.alignment="CENTER_RIGHT">
-                                    <children>
-                                        <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
-                                        <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
-                                        <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
-                                                HBox.hgrow="NEVER"/>
+                <BorderPane fx:id="toolBarBorderPane" VBox.vgrow="NEVER">
+                    <right>
+                        <HBox fx:id="rightToolBarPane" alignment="CENTER_RIGHT" maxHeight="-Infinity"
+                              minHeight="-Infinity" prefHeight="26.0" spacing="4.0" BorderPane.alignment="CENTER_RIGHT">
+                            <children>
+                                <Button fx:id="undoButton" mnemonicParsing="false" text="Undo"/>
+                                <Button fx:id="redoButton" mnemonicParsing="false" text="Redo"/>
+                                <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
+                                        HBox.hgrow="NEVER"/>
 
-                                        <Button fx:id="increaseFontSizeButton" mnemonicParsing="false" text="Font+"/>
-                                        <Button fx:id="decreaseFontSizeButton" mnemonicParsing="false" text="Font-"/>
-                                        <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
-                                                HBox.hgrow="NEVER"/>
-                                        <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
-                                        <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
-                                                    text="Export"/>
-                                    </children>
-                                </HBox>
-                            </right>
-                            <left>
-                                <HBox fx:id="leftToolBarPane" alignment="CENTER_LEFT" maxHeight="-Infinity"
-                                      minHeight="-Infinity" prefHeight="26.0">
-                                    <children>
-                                        <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER"
-                                                    mnemonicParsing="false" text="File"/>
-                                    </children>
-                                </HBox>
-                            </left>
-                            <center>
-                                <HBox fx:id="centerToolBarPane" alignment="CENTER" BorderPane.alignment="TOP_CENTER">
-                                    <children>
-                                        <MenuButton fx:id="fileNameMenuButton" alignment="CENTER"
-                                                    mnemonicParsing="false" style="-fx-background-color: transparent;"
-                                                    text="File name">
-                                            <items>
-                                                <MenuItem mnemonicParsing="false">
-                                                    <graphic>
-                                                        <TextField fx:id="fileNameTextField" alignment="CENTER"
-                                                                   focusTraversable="false" promptText="File name"
-                                                                   style="-fx-background-color: transparent;"/>
-                                                    </graphic>
-                                                </MenuItem>
-                                            </items>
-                                            <tooltip>
-                                                <Tooltip fx:id="fileTooltip" text="Empty Tooltip"/>
-                                            </tooltip>
-                                        </MenuButton>
-                                    </children>
+                                <Button fx:id="increaseFontSizeButton" mnemonicParsing="false" text="Font+"/>
+                                <Button fx:id="decreaseFontSizeButton" mnemonicParsing="false" text="Font-"/>
+                                <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"
+                                        HBox.hgrow="NEVER"/>
+                                <Button fx:id="findButton" mnemonicParsing="false" text="Find"/>
+                                <MenuButton fx:id="exportButton" alignment="CENTER" mnemonicParsing="false"
+                                            text="Export"/>
+                            </children>
                         </HBox>
-                            </center>
-                        </BorderPane>
-                    </children>
+                    </right>
+                    <left>
+                        <HBox fx:id="leftToolBarPane" alignment="CENTER_LEFT" maxHeight="-Infinity"
+                              minHeight="-Infinity" prefHeight="26.0">
+                            <children>
+                                <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
+                                            text="File"/>
+                                <ToggleButton fx:id="showWorkflowTreeCheckButton" mnemonicParsing="false"
+                                              text="Workflow"/>
+                            </children>
+                        </HBox>
+                    </left>
+                    <center>
+                        <HBox fx:id="centerToolBarPane" alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity"
+                              prefHeight="26.0" BorderPane.alignment="TOP_CENTER">
+                            <children>
+                                <MenuButton fx:id="fileNameMenuButton" alignment="CENTER" mnemonicParsing="false"
+                                            style="-fx-background-color: transparent;" text="File name">
+                                    <items>
+                                        <MenuItem mnemonicParsing="false">
+                                            <graphic>
+                                                <TextField fx:id="fileNameTextField" alignment="CENTER"
+                                                           focusTraversable="false" promptText="File name"
+                                                           style="-fx-background-color: transparent;"/>
+                                            </graphic>
+                                        </MenuItem>
+                                    </items>
+                                    <tooltip>
+                                        <Tooltip fx:id="fileTooltip" text="Empty Tooltip"/>
+                                    </tooltip>
+                                </MenuButton>
+                            </children>
+                        </HBox>
+                    </center>
                     <padding>
-                        <Insets bottom="5.0"/>
+                        <Insets left="9.0" right="20.0"/>
                     </padding>
-                </AnchorPane>
+                </BorderPane>
             </VBox>
         </top>
         <center>
@@ -516,11 +512,7 @@
                                         <children>
                                             <BorderPane fx:id="workflowBorderPane" AnchorPane.bottomAnchor="0.0"
                                                         AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                                                        AnchorPane.topAnchor="0.0">
-                                                <top>
-                                                    <ToolBar prefHeight="5.0" BorderPane.alignment="CENTER"/>
-                                                </top>
-                                            </BorderPane>
+                                                        AnchorPane.topAnchor="0.0"/>
                                         </children>
                                     </AnchorPane>
                                     <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
@@ -540,8 +532,7 @@
                             </center>
                         </BorderPane>
                     </AnchorPane>
-                    <AnchorPane fx:id="rightAnchorPane" minHeight="0.0" minWidth="0.0" prefHeight="160.0"
-                                prefWidth="100.0">
+                    <AnchorPane fx:id="rightAnchorPane" minWidth="0.0">
                         <BorderPane fx:id="mainBorderPane" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
                                     AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                             <padding>
@@ -553,28 +544,6 @@
                         </BorderPane>
                     </AnchorPane>
                 </SplitPane>
-                <Button fx:id="openCloseLeftButton" contentDisplay="CENTER" maxHeight="10.0" maxWidth="10.0"
-                        mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0"
-                        style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;"
-                        AnchorPane.leftAnchor="-6.0" AnchorPane.topAnchor="10.0">
-                    <font>
-                        <Font size="10.0"/>
-                    </font>
-                    <tooltip>
-                        <Tooltip text="Open or close the side bar"/>
-                    </tooltip>
-                </Button>
-                <Button fx:id="openCloseRightButton" contentDisplay="CENTER" maxHeight="10.0" maxWidth="10.0"
-                        mnemonicParsing="false" prefHeight="10.0" prefWidth="10.0" rotate="-90.0"
-                        style="-fx-border-style: none; -fx-background-color: transparent;" text="&gt;"
-                        AnchorPane.bottomAnchor="40.0" AnchorPane.leftAnchor="-6.0">
-                    <font>
-                        <Font size="10.0"/>
-                    </font>
-                    <tooltip>
-                        <Tooltip text="Open or close the algorithm tabs"/>
-                    </tooltip>
-                </Button>
             </AnchorPane>
         </center>
         <bottom>

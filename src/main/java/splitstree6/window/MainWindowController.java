@@ -33,11 +33,13 @@ import jloda.fx.util.ProgramProperties;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Single;
-import splitstree6.utils.Platform;
+import splitstree6.main.SplitsTree6;
 
 import java.util.ArrayList;
 
 public class MainWindowController {
+	@FXML
+	private ToggleButton showWorkflowTreeCheckButton;
 	@FXML
 	private Tooltip fileTooltip;
 
@@ -401,9 +403,6 @@ public class MainWindowController {
 	private MenuItem aboutMenuItem;
 
 	@FXML
-	private Button openCloseLeftButton;
-
-	@FXML
 	private SplitPane mainSplitPane;
 
 	@FXML
@@ -424,10 +423,11 @@ public class MainWindowController {
 	private AnchorPane rightAnchorPane;
 
 	@FXML
-	private BorderPane mainBorderPane;
+	private BorderPane outsideBorderPane;
 
 	@FXML
-	private Button openCloseRightButton;
+	private BorderPane mainBorderPane;
+
 
 	@FXML
 	private FlowPane bottomFlowPane;
@@ -490,9 +490,10 @@ public class MainWindowController {
 
 	@FXML
 	void initialize() {
-		if (!Platform.isDesktop()) {
-			((Pane) menuBar.getParent()).getChildren().remove(menuBar);
+		if (!SplitsTree6.isDesktop()) {
+			menuBar.setVisible(false);
 			topVBox.setPadding(new Insets(30, 0, 0, 0));
+			((Pane) fileMenuButton.getParent()).getChildren().remove(fileMenuButton);
 		}
 		algorithmTabPane.setAllowUndock(false);
 		mainTabPane.setAllowUndock(false);
@@ -503,6 +504,7 @@ public class MainWindowController {
 		MaterialIcons.setIcon(redoButton, "redo");
 		MaterialIcons.setIcon(increaseFontSizeButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
+		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "format_list_bulleted");
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -1055,10 +1057,6 @@ public class MainWindowController {
 		return aboutMenuItem;
 	}
 
-	public Button getOpenCloseLeftButton() {
-		return openCloseLeftButton;
-	}
-
 	public SplitPane getMainSplitPane() {
 		return mainSplitPane;
 	}
@@ -1087,12 +1085,12 @@ public class MainWindowController {
 		return rightAnchorPane;
 	}
 
-	public BorderPane getMainBorderPane() {
-		return mainBorderPane;
+	public BorderPane getOutsideBorderPane() {
+		return outsideBorderPane;
 	}
 
-	public Button getOpenCloseRightButton() {
-		return openCloseRightButton;
+	public BorderPane getToolBarBorderPane() {
+		return toolBarBorderPane;
 	}
 
 	public FlowPane getBottomFlowPane() {
@@ -1145,5 +1143,13 @@ public class MainWindowController {
 
 	public Pane getRootPane() {
 		return rootPane;
+	}
+
+	public HBox getLeftToolBarPane() {
+		return leftToolBarPane;
+	}
+
+	public ToggleButton getShowWorkflowTreeCheckButton() {
+		return showWorkflowTreeCheckButton;
 	}
 }

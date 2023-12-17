@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.mainframe.filestab;
+package splitstree6.mobileframe.filestab;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
@@ -26,7 +26,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.AnchorPane;
 import jloda.fx.icons.MaterialIcons;
 import jloda.util.Basic;
-import splitstree6.utils.Platform;
+import splitstree6.main.SplitsTree6;
 
 import java.nio.file.attribute.FileTime;
 import java.time.LocalDateTime;
@@ -84,7 +84,7 @@ public class FilesTabController {
 					setTooltip(null);
 				} else {
 					setText(name);
-					if (Platform.isDesktop()) {
+					if (SplitsTree6.isDesktop()) {
 						var fileInfo = getTableView().getItems().get(getIndex());
 						setTooltip(new Tooltip(fileInfo.getPath())); // todo: place the path here
 					}

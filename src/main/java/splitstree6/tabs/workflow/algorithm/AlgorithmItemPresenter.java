@@ -105,8 +105,9 @@ public class AlgorithmItemPresenter {
 		}
 
 		algorithmItem.setOnContextMenuRequested(e -> {
-					if (selected.get())
-						AlgorithmNodeContextMenu.create(mainWindow, workflowTab.getUndoManager(), node).show(algorithmItem, e.getScreenX(), e.getScreenY());
+			if (selected.get()) {
+				AlgorithmNodeContextMenu.show(mainWindow, workflowTab.getUndoManager(), node, algorithmItem, e.getScreenX(), e.getScreenY());
+			}
 				}
 		);
 	}

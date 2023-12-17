@@ -156,6 +156,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 
 			};
 			final Runnable runOnSuccess = () -> {
+				if (false)
 				mainWindow.getPresenter().getSplitPanePresenter().ensureTreeViewIsOpen(false);
 				mainWindow.setFileName(name);
 				mainWindow.setDirty(true);

@@ -232,4 +232,12 @@ public class WorkflowTreeViewLayout {
 	public Map<WorkflowNode, WorkflowTreeItem> getNodeItemMap() {
 		return nodeItemMap;
 	}
+
+	public WorkflowNode getNode(WorkflowTreeItem item) {
+		for (var entry : nodeItemMap.entrySet()) {
+			if (entry.getValue().equals(item))
+				return entry.getKey();
+		}
+		return null;
+	}
 }

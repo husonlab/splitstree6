@@ -118,8 +118,6 @@ public class ZoomButtonsPanel extends Pane {
 	private void updatePending(Runnable task) {
 		if (pending.isNotNull()) {
 			service.cancel();
-			//var oldTask=pending.get();
-			//Platform.runLater(oldTask);
 		}
 		pending.set(task);
 		service.restart();

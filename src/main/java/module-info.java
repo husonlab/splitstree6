@@ -6,6 +6,13 @@ module splitstreesix {
 	requires transitive javafx.swing;
 	requires javafx.base;
 
+	requires transitive com.gluonhq.attach.display;
+	requires transitive com.gluonhq.attach.storage;
+	requires transitive com.gluonhq.attach.util;
+	requires transitive com.gluonhq.charm.glisten;
+	requires transitive com.gluonhq.attach.share;
+	requires transitive com.gluonhq.attach.lifecycle;
+
 	requires org.apache.commons.collections4;
 	requires org.apache.commons.math4.legacy;
 	requires org.apache.commons.math4.legacy.exception;
@@ -99,8 +106,8 @@ module splitstreesix {
 	opens splitstree6.tabs.algorithms.treefilter;
 	opens splitstree6.tabs.algorithms;
 	opens splitstree6.tabs.algorithms.taxafilter;
-	opens splitstree6.mainframe.filestab;
-	opens splitstree6.mainframe;
+	opens splitstree6.mobileframe.filestab;
+	opens splitstree6.mobileframe;
 
 
 	opens splitstree6.contextmenus.algorithmnode;

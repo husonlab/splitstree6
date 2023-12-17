@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.mainframe;
+package splitstree6.mobileframe;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.TabPane;

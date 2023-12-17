@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.mainframe.filestab;
+package splitstree6.mobileframe.filestab;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Tab;

@@ -24,6 +24,7 @@ import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.When;
+import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
@@ -77,8 +78,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller = view.getController();
 		mainController = mainWindow.getController();
 
-		controller.getColorSchemeCBox().getItems().addAll(ColorScheme.values());
-		controller.getColorSchemeCBox().valueProperty().bindBidirectional(view.optionColorSchemeProperty());
+		setupColorSchemeMenu(view.optionColorSchemeProperty(), controller.getColorSchemeMenuButton());
+		controller.getColorSchemeMenuButton().disableProperty().bind(view.emptyProperty());
 
 		controller.getTaxaListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -664,5 +665,18 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return false;
+	}
+
+	private static void setupColorSchemeMenu(ObjectProperty<ColorScheme> colorSchemeProperty, MenuButton menuButton) {
+		var toggleGroup = new ToggleGroup();
+		for (var colorScheme : ColorScheme.values()) {
+			var menuItem = new RadioMenuItem(colorScheme.name());
+			menuItem.selectedProperty().addListener((v, o, n) -> {
+				if (n)
+					colorSchemeProperty.set(colorScheme);
+			});
+			toggleGroup.getToggles().add(menuItem);
+			menuButton.getItems().add(menuItem);
+		}
 	}
 }

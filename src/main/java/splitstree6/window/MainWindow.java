@@ -44,6 +44,7 @@ import splitstree6.cite.ExtractMethodsText;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.ViewBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTab;
 import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
@@ -161,7 +162,7 @@ public class MainWindow implements IMainWindow {
 		stage.getIcons().addAll(ProgramProperties.getProgramIconsFX());
 
 		var scene = new Scene(root);
-		scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("mainwindow.css")).toExternalForm());
+		scene.getStylesheets().add(Objects.requireNonNull(getClass().getResource("MainWindow.css")).toExternalForm());
 
 		stage.setScene(scene);
 		scene.getStylesheets().add("jloda/resources/css/white_pane.css");
@@ -178,7 +179,8 @@ public class MainWindow implements IMainWindow {
 		name.addListener(invalidationListener);
 		dirty.addListener(invalidationListener);
 		invalidationListener.invalidated(null);
-		stage.show();
+		if (SplitsTree6.isDesktop())
+			stage.show();
 		Platform.runLater(() -> {
 			stage.setWidth(stage.getWidth() - 1);
 			stage.setWidth(stage.getWidth() + 1);

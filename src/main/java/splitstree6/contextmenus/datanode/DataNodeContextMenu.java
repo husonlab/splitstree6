@@ -19,9 +19,11 @@
 
 package splitstree6.contextmenus.datanode;
 
+import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
+import splitstree6.main.SplitsTree6;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataNode;
 
@@ -44,7 +46,16 @@ public class DataNodeContextMenu {
 	}
 
 	public static ContextMenu create(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode) {
-		var menu = new DataNodeContextMenu(mainWindow, undoManager, dataNode);
-		return menu.getContextMenu();
+		if (SplitsTree6.isDesktop()) {
+			var menu = new DataNodeContextMenu(mainWindow, undoManager, dataNode);
+			return menu.getContextMenu();
+		} else return null;
+	}
+
+	public static void show(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode, Node node, double x, double y) {
+		if (SplitsTree6.isDesktop()) {
+			var menu = new DataNodeContextMenu(mainWindow, undoManager, dataNode);
+			menu.getContextMenu().show(node, x, y);
+		}
 	}
 }

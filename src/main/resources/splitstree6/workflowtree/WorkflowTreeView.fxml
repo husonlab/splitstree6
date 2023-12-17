@@ -19,11 +19,25 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-<?import javafx.scene.control.TreeView?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.BorderPane?>
 <BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.workflowtree.WorkflowTreeViewController">
     <center>
         <TreeView fx:id="workflowTreeView" BorderPane.alignment="CENTER"/>
     </center>
+    <top>
+        <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+            <items>
+                <Button fx:id="editButton" mnemonicParsing="false" text="Edit"/>
+                <MenuButton fx:id="addMenuButton" mnemonicParsing="false" text="Add">
+                    <items>
+                        <MenuItem mnemonicParsing="false" text="Action 1"/>
+                        <MenuItem mnemonicParsing="false" text="Action 2"/>
+                    </items>
+                </MenuButton>
+                <Button fx:id="deleteButton" layoutX="68.0" layoutY="12.0" mnemonicParsing="false" text="Delete"/>
+            </items>
+        </ToolBar>
+    </top>
 </BorderPane>

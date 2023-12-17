@@ -20,14 +20,43 @@
 package splitstree6.workflowtree;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TreeView;
+import jloda.fx.icons.MaterialIcons;
 
 public class WorkflowTreeViewController {
 
 	@FXML
+	private MenuButton addMenuButton;
+
+	@FXML
+	private Button deleteButton;
+
+	@FXML
+	private Button editButton;
+	@FXML
 	private TreeView<String> workflowTreeView;
 
+	@FXML
+	private void initialize() {
+		MaterialIcons.setIcon(editButton, "edit_note");
+		MaterialIcons.setIcon(addMenuButton, "add");
+		MaterialIcons.setIcon(deleteButton, "delete");
+	}
 	public TreeView<String> getWorkflowTreeView() {
 		return workflowTreeView;
+	}
+
+	public MenuButton getAddMenuButton() {
+		return addMenuButton;
+	}
+
+	public Button getDeleteButton() {
+		return deleteButton;
+	}
+
+	public Button getEditButton() {
+		return editButton;
 	}
 }

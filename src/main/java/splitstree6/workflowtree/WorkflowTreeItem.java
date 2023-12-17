@@ -114,8 +114,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		label.disableProperty().bind(node.validProperty().not());
 
 		vBox.setOnContextMenuRequested(me -> {
-			var contextMenu = AlgorithmNodeContextMenu.create(mainWindow, workflowTreeView.getUndoManager(), node);
-			contextMenu.show(label, me.getScreenX(), me.getScreenY());
+			AlgorithmNodeContextMenu.show(mainWindow, workflowTreeView.getUndoManager(), node, label, me.getScreenX(), me.getScreenY());
 		});
 
 		expandedProperty().addListener((v, o, n) -> {
@@ -124,30 +123,30 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		});
 	}
 
-	public WorkflowTreeItem(MainWindow mainWindow, DataNode node) {
+	public WorkflowTreeItem(MainWindow mainWindow, DataNode workflowNode) {
 		super("");
 		this.mainWindow = mainWindow;
 		this.workflowTreeView = mainWindow.getWorkflowTreeView();
-		workflowNode = node;
+		this.workflowNode = workflowNode;
 
 		final var label = new Label();
 		final var vBox = new VBox(label);
 		setGraphic(vBox);
 
-		label.textProperty().bind(node.titleProperty());
+		label.textProperty().bind(workflowNode.titleProperty());
 
-		if (node.getDataBlock() instanceof ViewBlock) {
+		if (workflowNode.getDataBlock() instanceof ViewBlock) {
 			label.setGraphic(MaterialIcons.graphic("wysiwyg"));
 		} else {
 			label.setGraphic(MaterialIcons.graphic("dataset"));
 		}
 
-		tooltip.textProperty().bind(node.shortDescriptionProperty());
-		Tooltip.install(getGraphic(), new Tooltip(node.getShortDescription()));
+		tooltip.textProperty().bind(workflowNode.shortDescriptionProperty());
+		Tooltip.install(getGraphic(), new Tooltip(workflowNode.getShortDescription()));
 
 		stateChangeListener = null;
 
-		if (node.getDataBlock() instanceof ViewBlock viewBlock) {
+		if (workflowNode.getDataBlock() instanceof ViewBlock viewBlock) {
 			vBox.setOnMouseClicked(e -> {
 				if (e.getClickCount() == 2) {
 					mainWindow.getController().getMainTabPane().getSelectionModel().select(viewBlock.getViewTab());
@@ -157,18 +156,18 @@ public class WorkflowTreeItem extends TreeItem<String> {
 		} else {
 			vBox.setOnMouseClicked(e -> {
 				if (e.getClickCount() == 2) {
-					mainWindow.getTextTabsManager().showDataNodeTab(node, true);
+					mainWindow.getTextTabsManager().showDataNodeTab(workflowNode, true);
 					e.consume();
 				}
 			});
 		}
 
-		label.disableProperty().bind(node.validProperty().not());
+		label.disableProperty().bind(workflowNode.validProperty().not());
 
-		vBox.setOnContextMenuRequested(e -> DataNodeContextMenu.create(mainWindow, workflowTreeView.getUndoManager(), node).show(label, e.getScreenX(), e.getScreenY()));
+		vBox.setOnContextMenuRequested(me -> DataNodeContextMenu.show(mainWindow, workflowTreeView.getUndoManager(), workflowNode, label, me.getScreenX(), me.getScreenY()));
 
 		expandedProperty().addListener((v, o, n) -> {
-			if (n && mainWindow.getWorkflow().getSelectionModel().isSelected(node))
+			if (n && mainWindow.getWorkflow().getSelectionModel().isSelected(workflowNode))
 				workflowTreeView.getController().getWorkflowTreeView().getSelectionModel().select(this);
 		});
 	}

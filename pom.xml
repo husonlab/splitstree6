@@ -420,6 +420,9 @@
                         <list>splitstree6.dialog.analyzegenomes.AnalyzeGenomesController</list>
                         <list>splitstree6.dialog.exporting.data.ExportDialogController</list>
                         <list>splitstree6.dialog.importdialog.ImportDialogController</list>
+                        <list>splitstree6.mobileframe.MainFrameController</list>
+                        <list>splitstree6.mobileframe.filestab.FileItem</list>
+                        <list>splitstree6.mobileframe.filestab.FilesTabController</list>
                         <list>splitstree6.tabs.algorithms.AlgorithmTabController</list>
                         <list>splitstree6.tabs.algorithms.taxafilter.TaxaFilterController</list>
                         <list>splitstree6.tabs.algorithms.treefilter.TreeFilterTabController</list>

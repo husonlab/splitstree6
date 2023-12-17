@@ -19,7 +19,7 @@
 
 package splitstree6.window;
 
-import splitstree6.utils.Platform;
+import splitstree6.main.SplitsTree6;
 
 import java.io.*;
 
@@ -94,7 +94,7 @@ public class StatementFilter {
 	 * @return stream was some statements removed
 	 */
 	public static InputStream applyMobileFXML(InputStream ins) {
-		if (Platform.isDesktop())
+		if (SplitsTree6.isDesktop())
 			return ins;
 		else
 			return apply(ins, "<accelerator>", "</accelerator>");

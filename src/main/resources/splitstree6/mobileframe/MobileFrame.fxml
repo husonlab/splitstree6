@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~  MainFrame.fxml Copyright (C) 2023 Daniel H. Huson
+  ~  MobileFrame.fxml Copyright (C) 2023 Daniel H. Huson
   ~  
   ~  (Some files contain contributions from other authors, who are then mentioned separately.)
   ~  
@@ -19,14 +19,19 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.mainframe.MainFrameController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.mobileframe.MainFrameController">
    <children>
-      <TabPane fx:id="tabPane" layoutX="83.0" layoutY="53.0" prefHeight="200.0" prefWidth="200.0"
-               tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-               AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+       <TabPane fx:id="tabPane" layoutX="83.0" layoutY="53.0" prefHeight="200.0" prefWidth="200.0"
+                tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="26.0"/>
+       <ToolBar maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+       <Label alignment="CENTER" contentDisplay="CENTER" text="SplitsTree-App" AnchorPane.leftAnchor="0.0"
+              AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0"/>
    </children>
 </AnchorPane>

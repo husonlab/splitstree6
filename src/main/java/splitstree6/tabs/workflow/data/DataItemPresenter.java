@@ -29,6 +29,8 @@ import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataBlock;
 
+import static splitstree6.contextmenus.datanode.DataNodeContextMenuPresenter.createAddAlgorithmMenuItems;
+
 /**
  * data item presenter
  * Daniel Huson, 10.21
@@ -36,11 +38,11 @@ import splitstree6.workflow.DataBlock;
 public class DataItemPresenter<D extends DataBlock> {
 
 	public DataItemPresenter(MainWindow mainWindow, WorkflowTab workflowTab, DataItem<D> dataItem) {
-		var node = dataItem.getWorkflowNode();
+		var dataNode = dataItem.getWorkflowNode();
 		var controller = dataItem.getController();
 
 		var selected = new SimpleBooleanProperty(false);
-		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(node)));
+		mainWindow.getWorkflow().getSelectionModel().getSelectedItems().addListener((InvalidationListener) e -> selected.set(mainWindow.getWorkflow().getSelectionModel().isSelected(dataNode)));
 
 		controller.getEditButton().setOnAction(e -> {
 			if (dataItem.getWorkflowNode().getDataBlock() instanceof ViewBlock block) {
@@ -48,22 +50,22 @@ public class DataItemPresenter<D extends DataBlock> {
 			} else if (dataItem.getWorkflowNode().getDataBlock() instanceof ReportBlock block) {
 				block.getViewTab().getTabPane().getSelectionModel().select(block.getViewTab());
 			} else {
-				mainWindow.getTextTabsManager().showDataNodeTab(node, true);
+				mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
 			}
 		});
-		controller.getEditButton().disableProperty().bind((selected.and(node.validProperty()).not()));
+		controller.getEditButton().disableProperty().bind((selected.and(dataNode.validProperty()).not()));
 
-		controller.getNameLabel().textProperty().bind(node.titleProperty());
+		controller.getNameLabel().textProperty().bind(dataNode.titleProperty());
 
-		controller.getInfoLabel().setText(String.format("size: %,d", node.getDataBlock().size()));
-		if (node.getDataBlock().size() > 0)
+		controller.getInfoLabel().setText(String.format("size: %,d", dataNode.getDataBlock().size()));
+		if (dataNode.getDataBlock().size() > 0)
 			controller.getStatusPane().getChildren().setAll(MaterialIcons.graphic("done", "-fx-text-fill: green;"));
 		else
 			controller.getStatusPane().getChildren().setAll(MaterialIcons.graphic("schedule", "-fx-text-fill: yellow;"));
 
-		node.allParentsValidProperty().addListener((v, o, n) -> {
-			if (n && node.isValid()) {
-				controller.getInfoLabel().setText(String.format("size: %,d", node.getDataBlock().size()));
+		dataNode.allParentsValidProperty().addListener((v, o, n) -> {
+			if (n && dataNode.isValid()) {
+				controller.getInfoLabel().setText(String.format("size: %,d", dataNode.getDataBlock().size()));
 				controller.getStatusPane().getChildren().setAll(MaterialIcons.graphic("done", "-fx-text-fill: green;"));
 			} else {
 				controller.getInfoLabel().setText("-");
@@ -73,7 +75,7 @@ public class DataItemPresenter<D extends DataBlock> {
 
 		controller.getNameLabel().setGraphic(MaterialIcons.graphic("dataset"));
 
-		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
+		if (!mainWindow.getWorkflow().isDerivedNode(dataNode)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");
 			controller.getInfoLabel().setStyle("-fx-text-fill: darkgray");
 			if (controller.getNameLabel().getGraphic() != null)
@@ -81,8 +83,12 @@ public class DataItemPresenter<D extends DataBlock> {
 		}
 
 		dataItem.setOnContextMenuRequested(e -> {
-			if (selected.get())
-				DataNodeContextMenu.create(mainWindow, workflowTab.getUndoManager(), node).show(dataItem, e.getScreenX(), e.getScreenY());
+			if (selected.get()) {
+				DataNodeContextMenu.show(mainWindow, workflowTab.getUndoManager(), dataNode, dataItem, e.getScreenX(), e.getScreenY());
+			}
 		});
+
+		controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTab.getUndoManager(), dataNode));
+
 	}
 }

@@ -32,8 +32,11 @@ import jloda.fx.workflow.WorkflowNode;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
+import splitstree6.workflow.DataNode;
 import splitstree6.workflow.commands.DeleteCommand;
 import splitstree6.workflow.commands.DuplicateCommand;
+
+import static splitstree6.contextmenus.datanode.DataNodeContextMenuPresenter.createAddAlgorithmMenuItems;
 
 /**
  * workflow tab presenter
@@ -83,13 +86,38 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 			if (workflow.getSelectionModel().size() == 1) {
 				var node = workflow.getSelectionModel().getSelectedItem();
 				nodeToDuplicateOrDelete.set(node instanceof AlgorithmNode && mainWindow.getWorkflow().isDerivedNode(node) ? (AlgorithmNode) node : null);
-			} else
+				if (node instanceof DataNode<?> dataNode) {
+					controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTab.getUndoManager(), dataNode));
+				}
+			} else {
 				nodeToDuplicateOrDelete.set(null);
+				controller.getAddMenuButton().getItems().clear();
+			}
 		});
+
+		controller.getAddMenuButton().disableProperty().bind(Bindings.isEmpty(controller.getAddMenuButton().getItems()));
 
 		controller.getMainPane().setOnMouseClicked(e -> workflow.getSelectionModel().clearSelection());
 
 		controller.getProgressIndicator().visibleProperty().bind(mainWindow.getWorkflow().runningProperty());
+
+		controller.getEditButton().setOnAction(e -> {
+			if (workflow.getSelectionModel().size() == 1) {
+				var workflowNode = workflow.getSelectionModel().getSelectedItem();
+				if (workflowNode instanceof DataNode dataNode)
+					mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
+				else if (workflowNode instanceof AlgorithmNode algorithmNode)
+					mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
+			}
+		});
+		controller.getEditButton().disableProperty().bind(Bindings.size(workflow.getSelectionModel().getSelectedItems()).isNotEqualTo(1));
+
+		controller.getDuplicateButton().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DuplicateCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
+		controller.getDuplicateButton().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+
+		controller.getDeleteButton().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DeleteCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
+		controller.getDeleteButton().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+
 	}
 
 	public void setupMenuItems() {
@@ -103,11 +131,11 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		mainController.getPasteMenuItem().setOnAction(null);
 
-		mainController.getDuplicateMenuItem().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DuplicateCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
-		mainController.getDuplicateMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+		mainController.getDuplicateMenuItem().setOnAction(e -> controller.getDuplicateButton().getOnAction().handle(e));
+		mainController.getDuplicateMenuItem().disableProperty().bind(controller.getDuplicateButton().disableProperty());
 
-		mainController.getDeleteMenuItem().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DeleteCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
-		mainController.getDeleteMenuItem().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
+		mainController.getDeleteMenuItem().setOnAction(e -> controller.getDeleteButton().getOnAction().handle(e));
+		mainController.getDeleteMenuItem().disableProperty().bind(controller.getDeleteButton().disableProperty());
 
 		mainController.getFindMenuItem().setOnAction(null);
 		mainController.getFindAgainMenuItem().setOnAction(null);

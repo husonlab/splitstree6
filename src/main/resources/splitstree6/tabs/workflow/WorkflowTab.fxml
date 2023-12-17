@@ -20,8 +20,7 @@
   -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ProgressIndicator?>
-<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.tabs.workflow.WorkflowTabController">
@@ -39,6 +38,18 @@
         <top>
             <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
                 <ToolBar fx:id="toolBar" prefHeight="32.0">
+                    <items>
+                        <Button fx:id="editButton" mnemonicParsing="false" text="Show"/>
+                        <MenuButton fx:id="addMenuButton" mnemonicParsing="false" text="Add">
+                            <items>
+                                <MenuItem mnemonicParsing="false" text="Action 1"/>
+                                <MenuItem mnemonicParsing="false" text="Action 2"/>
+                            </items>
+                        </MenuButton>
+                        <Button fx:id="duplicateButton" mnemonicParsing="false" text="Duplicate"/>
+                        <Button fx:id="deleteButton" layoutX="125.0" layoutY="10.0" mnemonicParsing="false"
+                                text="Delete"/>
+                    </items>
                 </ToolBar>
             </VBox>
         </top>

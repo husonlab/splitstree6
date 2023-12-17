@@ -25,6 +25,7 @@ import javafx.collections.ObservableMap;
 import javafx.scene.control.Tab;
 import jloda.fx.control.SplittableTabPane;
 import jloda.fx.workflow.WorkflowNode;
+import jloda.util.Basic;
 import splitstree6.algorithms.taxa.taxa2taxa.TaxaFilter;
 import splitstree6.algorithms.trees.trees2trees.TreesFilter;
 import splitstree6.tabs.algorithms.AlgorithmTab;
@@ -72,25 +73,30 @@ public class AlgorithmTabsManager {
 		});
 	}
 
-	public void showTab(AlgorithmNode node, boolean show) {
-		var tab = nodeTabMap.get(node);
+	public void showTab(AlgorithmNode<?, ?> algorithmNode, boolean show) {
+		var tab = nodeTabMap.get(algorithmNode);
 		if (tab != null) {
 			if (show) {
 				mainWindow.getPresenter().getSplitPanePresenter().ensureAlgorithmsTabPaneIsOpen(() -> {
-					if (!tabPane.getTabs().contains(tab)) {
-						var newTab = new Tab();
-						newTab.setText(tab.getText());
-						newTab.setGraphic(tab.getGraphic());
-						var content = tab.getContent();
-						tab.setContent(null);
-						newTab.setContent(content);
-						nodeTabMap.put(node, newTab);
-						tabPane.getTabs().add(newTab);
+					try {
+						if (!tabPane.getTabs().contains(tab)) {
+							var newTab = new Tab();
+							newTab.setText(tab.getText());
+							newTab.setGraphic(tab.getGraphic());
+							var content = tab.getContent();
+							tab.setContent(null);
+							newTab.setContent(content);
+							nodeTabMap.put(algorithmNode, newTab);
+							tabPane.getTabs().add(newTab);
+						}
+						tabPane.getSelectionModel().select(tab);
+					} catch (Exception ex) {
+						Basic.caught(ex);
 					}
-					tabPane.getSelectionModel().select(tab);
 				});
-			}
-			} else
+			} else {
 				tabPane.getTabs().remove(tab);
+			}
+		}
 	}
 }

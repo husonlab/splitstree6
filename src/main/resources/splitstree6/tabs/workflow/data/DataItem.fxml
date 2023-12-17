@@ -20,42 +20,44 @@
   -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="50.0" prefWidth="160.0" style="-fx-border-color: darkgray;"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.tabs.workflow.data.DataItemController">
-    <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                AnchorPane.topAnchor="0.0">
-        <top>
-            <BorderPane fx:id="borderPane" minHeight="-Infinity" BorderPane.alignment="CENTER">
+    <BorderPane fx:id="borderPane" minHeight="-Infinity" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <left>
+            <Label fx:id="nameLabel" minHeight="-Infinity" text="Data" BorderPane.alignment="CENTER"/>
+        </left>
+        <right>
+            <Pane fx:id="statusPane" prefHeight="24.0" prefWidth="24.0" BorderPane.alignment="CENTER"/>
+        </right>
+        <bottom>
+            <BorderPane BorderPane.alignment="CENTER">
+                <BorderPane.margin>
+                    <Insets/>
+                </BorderPane.margin>
+                <center>
+                    <Label fx:id="infoLabel" prefHeight="32.0" text="Label"/>
+                </center>
                 <left>
-                    <Label fx:id="nameLabel" minHeight="-Infinity" text="Data" BorderPane.alignment="CENTER"/>
+                    <Button fx:id="editButton" contentDisplay="CENTER" mnemonicParsing="false" text="Edit"
+                            BorderPane.alignment="CENTER">
+                        <tooltip>
+                            <Tooltip text="View associated data"/>
+                        </tooltip>
+                    </Button>
                 </left>
                 <right>
-                    <Pane fx:id="statusPane" prefHeight="24.0" prefWidth="24.0" BorderPane.alignment="CENTER"/>
+                    <MenuButton fx:id="addMenuButton" mnemonicParsing="false" text="Add" BorderPane.alignment="CENTER">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="Action 1"/>
+                            <MenuItem mnemonicParsing="false" text="Action 2"/>
+                        </items>
+                    </MenuButton>
                 </right>
             </BorderPane>
-        </top>
-        <padding>
-            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0"/>
-        </padding>
-        <center>
-            <Label fx:id="infoLabel" prefHeight="32.0" text="Label" BorderPane.alignment="CENTER">
-                <BorderPane.margin>
-                    <Insets right="16.0"/>
-                </BorderPane.margin>
-            </Label>
-        </center>
-        <left>
-            <Button fx:id="editButton" contentDisplay="CENTER" mnemonicParsing="false" text="Edit"
-                    BorderPane.alignment="CENTER">
-                <tooltip>
-                    <Tooltip text="View associated data"/>
-                </tooltip>
-            </Button>
-        </left>
+        </bottom>
     </BorderPane>
 </AnchorPane>

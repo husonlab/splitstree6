@@ -1,5 +1,5 @@
 /*
- *  MainFrame.java Copyright (C) 2023 Daniel H. Huson
+ *  MobileFrame.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.mainframe;
+package splitstree6.mobileframe;
 
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
@@ -29,7 +29,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.util.RunAfterAWhile;
@@ -41,8 +40,9 @@ import splitstree6.dialog.SaveDialog;
 import splitstree6.dialog.importdialog.ImportDialog;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.readers.ImportManager;
-import splitstree6.mainframe.filestab.FileItem;
-import splitstree6.mainframe.filestab.FilesTab;
+import splitstree6.main.SplitsTree6;
+import splitstree6.mobileframe.filestab.FileItem;
+import splitstree6.mobileframe.filestab.FilesTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.WorkflowSetup;
@@ -51,17 +51,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
-public class MainFrame {
+public class MobileFrame {
 	private final MainFrameController controller;
+
+	private final Stage stage;
 
 	private final FilesTab filesTab;
 	private final ObservableMap<MainWindow, Tab> windowTabMap = FXCollections.observableHashMap();
 
-	public MainFrame(Stage stage) {
+	public MobileFrame(Stage stage) {
+		this.stage = stage;
 		stage.setOnHidden(e -> System.exit(0));
 
 		var fxmlLoader = new FXMLLoader();
-		try (var ins = Objects.requireNonNull(getClass().getResource("MainFrame.fxml")).openStream()) {
+		try (var ins = Objects.requireNonNull(getClass().getResource("MobileFrame.fxml")).openStream()) {
 			fxmlLoader.load(ins);
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
@@ -71,7 +74,7 @@ public class MainFrame {
 
 		controller.getTabPane().setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
 
-		filesTab = new FilesTab(new File(splitstree6.utils.Platform.getUserDirectory()), stage, MainFrame::openFile, f -> closeFile(f));
+		filesTab = new FilesTab(new File(SplitsTree6.getUserDirectory()), stage, this::openFile, this::closeFile);
 		filesTab.setClosable(false);
 		controller.getTabPane().getTabs().add(filesTab);
 
@@ -97,12 +100,13 @@ public class MainFrame {
 						tab.setOnCloseRequest(a -> MainWindowManager.getInstance().getMainWindows().remove(mainWindow));
 
 						Platform.runLater(() -> {
-							if (mainWindow.getController().getMenuBar().getParent() instanceof Pane pane) {
-								pane.getChildren().remove(mainWindow.getController().getMenuBar());
-							}
+							mainWindow.getController().getTopVBox().getChildren().remove(mainWindow.getController().getToolBarBorderPane());
+							mainWindow.getController().getOutsideBorderPane().setTop(mainWindow.getController().getToolBarBorderPane());
+							mainWindow.getController().getRootPane().requestLayout();
+							mainWindow.getController().getFileMenuButton().setVisible(false);
+
 							if (mainWindow.getStage() != null) {
 								mainWindow.getStage().hide();
-								mainWindow.getStage().getScene().setRoot(null);
 							}
 						});
 						Platform.runLater(() -> {
@@ -114,7 +118,7 @@ public class MainFrame {
 						// setup auto-save:
 						Platform.runLater(() -> {
 							mainWindow.getWorkflow().runningProperty().addListener((v, o, n) -> {
-								RunAfterAWhile.applyInFXThread(MainFrame.this, () -> {
+								RunAfterAWhile.applyInFXThread(MobileFrame.this, () -> {
 									if (!n && !mainWindow.isEmpty() && mainWindow.isDirty()) {
 										try {
 											var fileInfo = findFileInfo(mainWindow.getFileName());
@@ -151,9 +155,11 @@ public class MainFrame {
 		return filesTab;
 	}
 
-	private static void openFile(String fileName) {
+	private void openFile(String fileName) {
 		var newWindow = new MainWindow();
 		newWindow.setFileName(fileName);
+		newWindow.show(new Stage(), 0, 0, stage.getWidth(), stage.getHeight());
+
 		MainWindowManager.getInstance().addMainWindow(newWindow);
 		newWindow.fileNameProperty().addListener((v, o, n) -> System.err.println("Name changed: " + n));
 

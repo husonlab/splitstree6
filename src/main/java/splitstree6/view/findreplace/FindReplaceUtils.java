@@ -24,7 +24,7 @@ import javafx.scene.control.Separator;
 import javafx.scene.layout.Region;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.icons.MaterialIcons;
-import splitstree6.utils.Platform;
+import splitstree6.main.SplitsTree6;
 
 import java.util.ArrayList;
 
@@ -42,7 +42,7 @@ public class FindReplaceUtils {
 	 * @param findToolBar
 	 */
 	public static void additionalSetup(FindToolBar findToolBar) {
-		if (Platform.isDesktop())
+		if (SplitsTree6.isDesktop())
 			for (var which = 0; which <= 1; which++) {
 				var items = (which == 0 ? findToolBar.getController().getToolBar().getItems() : findToolBar.getController().getReplaceToolBar().getItems());
 				for (var i = 0; i < items.size(); i++) {
@@ -60,7 +60,7 @@ public class FindReplaceUtils {
 				}
 			}
 		var findFromFileButton = findToolBar.getController().getFindFromFileButton();
-		if (Platform.isDesktop())
+		if (SplitsTree6.isDesktop())
 			MaterialIcons.setIcon(findFromFileButton, "upload", "-fx-font-size: 12;", true);
 		else
 			findToolBar.getController().getToolBar().getItems().remove(findFromFileButton);

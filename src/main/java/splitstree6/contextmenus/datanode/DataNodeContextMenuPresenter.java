@@ -76,7 +76,7 @@ public class DataNodeContextMenuPresenter {
 		}
 	}
 
-	private List<MenuItem> createAddTreeMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
+	public static List<MenuItem> createAddTreeMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
@@ -99,7 +99,7 @@ public class DataNodeContextMenuPresenter {
 		return result;
 	}
 
-	private List<MenuItem> createAddNetworkMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
+	public static List<MenuItem> createAddNetworkMenuItems(Workflow workflow, UndoManager undoManager, DataNode dataNode) {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
@@ -125,7 +125,7 @@ public class DataNodeContextMenuPresenter {
 		return result;
 	}
 
-	private List<MenuItem> createAddAlgorithmMenuItems(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode) {
+	public static List<MenuItem> createAddAlgorithmMenuItems(MainWindow mainWindow, UndoManager undoManager, DataNode dataNode) {
 		// todo: sort items logically
 
 		var list = new ArrayList<Pair<String, Algorithm>>();
@@ -145,7 +145,7 @@ public class DataNodeContextMenuPresenter {
 		for (var pair : list) {
 			var menuItem = new MenuItem(pair.getKey());
 			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(mainWindow, dataNode, pair.getValue())));
-			menuItem.setDisable(!pair.getValue().isApplicable(mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock()));
+			menuItem.setDisable(mainWindow.getWorkflow().getWorkingTaxaBlock() == null || !pair.getValue().isApplicable(mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock()));
 			result.add(menuItem);
 		}
 		return result;

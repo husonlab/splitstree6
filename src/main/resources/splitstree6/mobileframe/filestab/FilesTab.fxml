@@ -23,51 +23,58 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
-            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.mainframe.filestab.FilesTabController">
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.mobileframe.filestab.FilesTabController">
    <children>
-      <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                  AnchorPane.topAnchor="0.0">
+       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                   AnchorPane.topAnchor="0.0">
          <center>
-            <TableView fx:id="tableView">
-               <columns>
-                  <TableColumn fx:id="nameColumn" editable="false" prefWidth="150.0" text="Name"/>
-                  <TableColumn fx:id="dateColumn" editable="false" prefWidth="75.0" text="Date"/>
-                  <TableColumn fx:id="sizeColumn" editable="false" prefWidth="75.0" text="Size"/>
-                  <TableColumn fx:id="kindColumn" editable="false" prefWidth="75.0" text="Kind"/>
-               </columns>
-            </TableView>
+             <StackPane>
+                 <children>
+                     <TableView fx:id="tableView">
+                         <columns>
+                             <TableColumn fx:id="nameColumn" editable="false" prefWidth="150.0" text="Name"/>
+                             <TableColumn fx:id="dateColumn" editable="false" prefWidth="75.0" text="Date"/>
+                             <TableColumn fx:id="sizeColumn" editable="false" prefWidth="75.0" text="Size"/>
+                             <TableColumn fx:id="kindColumn" editable="false" prefWidth="75.0" text="Kind"/>
+                         </columns>
+                     </TableView>
+                 </children>
+                 <padding>
+                     <Insets left="3.0" right="3.0"/>
+                 </padding>
+             </StackPane>
          </center>
          <bottom>
             <HBox spacing="30.0" BorderPane.alignment="CENTER">
                <children>
                   <Button fx:id="duplicateButton" mnemonicParsing="false" text="Dupliciate">
                      <tooltip>
-                        <Tooltip text="Duplicate selected files"/>
+                         <Tooltip text="Duplicate selected files"/>
                      </tooltip>
                   </Button>
                   <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">
                      <tooltip>
-                        <Tooltip text="Delete selected files"/>
+                         <Tooltip text="Delete selected files"/>
                      </tooltip>
                   </Button>
                   <Button fx:id="openButton" mnemonicParsing="false" text="Open">
                      <tooltip>
-                        <Tooltip text="Open selected files"/>
+                         <Tooltip text="Open selected files"/>
                      </tooltip>
                   </Button>
                </children>
                <BorderPane.margin>
-                  <Insets/>
+                   <Insets/>
                </BorderPane.margin>
                <padding>
-                  <Insets bottom="2.0" left="20.0" right="20.0" top="2.0"/>
+                   <Insets bottom="2.0" left="20.0" right="20.0" top="2.0"/>
                </padding>
             </HBox>
          </bottom>
       </BorderPane>
       <Button fx:id="newButton" mnemonicParsing="false" text="+" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="0.0">
          <tooltip>
-            <Tooltip text="Create a new file"/>
+             <Tooltip text="Create a new file"/>
          </tooltip>
       </Button>
    </children>
