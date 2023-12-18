@@ -39,9 +39,10 @@ import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Node;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.BitSetUtils;
-import splitstree6.splits.ASplit;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
+import splitstree6.main.SplitsTree6;
+import splitstree6.splits.ASplit;
 
 import java.util.ArrayList;
 import java.util.Map;
@@ -130,7 +131,7 @@ public class InteractionSetup {
 
 						final EventHandler<MouseEvent> mouseClickedHandler = e -> {
 							if (e.isStillSincePress()) {
-								if (!e.isShiftDown())
+								if (!e.isShiftDown() && SplitsTree6.isDesktop())
 									taxonSelectionModel.clearSelection();
 								taxonSelectionModel.toggleSelection(taxon);
 								e.consume();
@@ -196,7 +197,7 @@ public class InteractionSetup {
 							try {
 								inClickOnEdge = true;
 								if (e.getClickCount() == 1) {
-									if (!e.isShiftDown())
+									if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
 										splitSelectionModel.clearSelection();
 									splitSelectionModel.toggleSelection(splitId);
 
@@ -206,7 +207,7 @@ public class InteractionSetup {
 									var whichPart = ((partA.cardinality() < partB.cardinality()) == !e.isAltDown() ? partA : partB);
 									var taxa = BitSetUtils.asStream(whichPart).map(idTaxonMap).collect(Collectors.toList());
 									if (splitSelectionModel.isSelected(splitId)) {
-										if (!e.isShiftDown())
+										if (!e.isShiftDown() && SplitsTree6.isDesktop())
 											taxonSelectionModel.clearSelection();
 										taxonSelectionModel.selectAll(taxa);
 									} else

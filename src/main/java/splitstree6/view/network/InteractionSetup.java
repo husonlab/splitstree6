@@ -41,6 +41,7 @@ import jloda.phylo.PhyloGraph;
 import jloda.util.Single;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
+import splitstree6.main.SplitsTree6;
 
 import java.util.List;
 import java.util.Map;
@@ -194,7 +195,7 @@ public class InteractionSetup {
 
 							final EventHandler<MouseEvent> mouseClickedHandler = e -> {
 								if (e.isStillSincePress()) {
-									if (!e.isShiftDown())
+									if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
 										taxonSelectionModel.clearSelection();
 									taxonSelectionModel.toggleSelection(taxon);
 									e.consume();

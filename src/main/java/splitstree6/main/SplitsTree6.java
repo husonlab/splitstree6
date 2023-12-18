@@ -152,6 +152,9 @@ public class SplitsTree6 extends Application {
 	public void start(Stage stage) throws Exception {
 		try {
 			if (!isDesktop()) {
+				NotificationManager.setShowNotifications(false);
+				NotificationManager.setEchoToConsole(true);
+
 				mobileFrame = new MobileFrame(stage);
 				stage.getScene().getStylesheets().add(Objects.requireNonNull(MainWindow.class.getResource("MainWindow.css")).toExternalForm());
 				stage.getScene().getStylesheets().add("jloda/resources/css/white_pane.css");
@@ -196,7 +199,7 @@ public class SplitsTree6 extends Application {
 
 	public static String getUserDirectory() {
 		if (userDirectory == null) {
-			if (isDesktop()) {
+			if (com.gluonhq.attach.util.Platform.isDesktop()) {
 				userDirectory = System.getProperty("user.dir");
 			} else {
 				var storageService = Services.get(StorageService.class).orElseThrow(() -> new RuntimeException("StorageService not available."));
@@ -209,7 +212,7 @@ public class SplitsTree6 extends Application {
 
 	public static String getTmpDirectory() {
 		if (tmpDirectory == null) {
-			if (isDesktop()) {
+			if (com.gluonhq.attach.util.Platform.isDesktop()) {
 				tmpDirectory = System.getProperty("java.io.tmpdir");
 			} else {
 				var storageService = Services.get(StorageService.class).orElseThrow(() -> new RuntimeException("StorageService not available."));

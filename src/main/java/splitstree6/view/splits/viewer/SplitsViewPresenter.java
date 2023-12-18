@@ -346,7 +346,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		if (mainWindow.getStage() != null)
-			mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0).or(mainWindow.getStage().focusedProperty().not()));
+			mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 

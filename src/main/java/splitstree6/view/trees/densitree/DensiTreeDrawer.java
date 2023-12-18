@@ -56,6 +56,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.RadialLabelLayout;
+import splitstree6.main.SplitsTree6;
 import splitstree6.splits.TreesUtils;
 import splitstree6.view.trees.InteractionSetup;
 import splitstree6.window.MainWindow;
@@ -291,7 +292,7 @@ public class DensiTreeDrawer {
 			shape.getStyleClass().add("graph-special-edge");
 			edgesGroup.getChildren().add(shape);
 			shape.setOnMouseClicked(a -> {
-				if (!a.isShiftDown())
+				if (!a.isShiftDown() && SplitsTree6.isDesktop())
 					mainWindow.getTaxonSelectionModel().clearSelection();
 
 				consensusTree.preorderTraversal(e.getTarget(), v -> {
@@ -541,7 +542,7 @@ public class DensiTreeDrawer {
 				//label.setOnMouseDragged(mouseDraggedHandler);
 				final EventHandler<MouseEvent> mouseClickedHandler = e -> {
 					if (e.isStillSincePress()) {
-						if (!e.isShiftDown())
+						if (!e.isShiftDown() && SplitsTree6.isDesktop())
 							taxonSelectionModel.clearSelection();
 						taxonSelectionModel.toggleSelection(taxon);
 					}

@@ -19,23 +19,20 @@
 
 package splitstree6.view.trees.tanglegram;
 
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
-import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
-import jloda.fx.util.BasicFX;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.phylo.PhyloGraph;
 import splitstree6.data.parts.Taxon;
+import splitstree6.main.SplitsTree6;
 import splitstree6.window.MainWindow;
 
 import java.util.HashMap;
@@ -166,7 +163,7 @@ public class Connectors {
 						line.getStyleClass().add("graph-special-edge");
 
 						line.setOnMouseClicked(e -> {
-							if (!e.isShiftDown())
+							if (!e.isShiftDown() && SplitsTree6.isDesktop())
 								mainWindow.getTaxonSelectionModel().clearSelection();
 							mainWindow.getTaxonSelectionModel().toggleSelection(taxon);
 						});

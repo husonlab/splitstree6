@@ -51,6 +51,7 @@ import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.main.SplitsTree6;
 
 import java.util.BitSet;
 import java.util.Collection;
@@ -86,7 +87,7 @@ public class InteractionSetup {
 		});
 
 		taxonSelectionChangeListener = e -> {
-			if (nodeShapeMap.size() > 0) {
+			if (!nodeShapeMap.isEmpty()) {
 				if (nodeShapeMap.keySet().iterator().next().getOwner() instanceof PhyloTree tree) {
 					if (e.wasAdded()) {
 						var t = taxaBlock.indexOf(e.getElementAdded());
@@ -322,9 +323,9 @@ public class InteractionSetup {
 	}
 
 	private EventHandler<MouseEvent> createMouseClickedOnNodeHandler(TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel, Node v) {
-		return me -> {
+		return e -> {
 			if (v.getOwner() instanceof PhyloGraph graph) {
-				if (!me.isShiftDown()) {
+				if (!e.isShiftDown() && SplitsTree6.isDesktop()) {
 					taxonSelectionModel.clearSelection();
 				}
 				for (var t : graph.getTaxa(v)) {
@@ -332,7 +333,7 @@ public class InteractionSetup {
 					if (taxon != null)
 						taxonSelectionModel.toggleSelection(taxon);
 				}
-				me.consume();
+				e.consume();
 			}
 		};
 	}
@@ -344,7 +345,7 @@ public class InteractionSetup {
 					if (me.isAltDown()) {
 						edgeSelectionModel.toggleSelection(e);
 					} else {
-						if (!me.isShiftDown()) {
+						if (!me.isShiftDown() && SplitsTree6.isDesktop()) {
 							taxonSelectionModel.clearSelection();
 						}
 						edgeSelectionModel.toggleSelection(e);
