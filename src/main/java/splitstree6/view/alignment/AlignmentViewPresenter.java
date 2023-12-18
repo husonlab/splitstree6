@@ -633,6 +633,22 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> {
+			if (!controller.getExpandHorizontallyButton().isDisabled())
+				controller.getExpandHorizontallyButton().fire();
+			if (!controller.getExpandVerticallyButton().isDisabled())
+				controller.getExpandVerticallyButton().fire();
+		});
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getExpandHorizontallyButton().disabledProperty().and(controller.getExpandVerticallyButton().disabledProperty()));
+
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> {
+			if (!controller.getContractHorizontallyButton().isDisabled())
+				controller.getContractHorizontallyButton().fire();
+			if (!controller.getContractVerticallyButton().isDisabled())
+				controller.getContractVerticallyButton().fire();
+		});
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getContractHorizontallyButton().disabledProperty().and(controller.getContractVerticallyButton().disabledProperty()));
+
 		mainController.getSelectInverseMenuItem().disableProperty().bind(mainController.getSelectNoneMenuItem().disableProperty());
 		mainController.getSelectCompatibleSitesMenuItem().setOnAction(controller.getSelectCompatibleMenuItem().getOnAction());
 		mainController.getSelectCompatibleSitesMenuItem().disableProperty().bind(controller.getSelectCompatibleMenuItem().disableProperty());

@@ -93,7 +93,7 @@ public class MobileFrame {
 						tab.setClosable(true);
 						if (false) {
 							var closeMenuItem = new MenuItem("Close");
-							closeMenuItem.setOnAction(a -> getRecentFilesTab().getTabPane().getTabs().remove(tab));
+							closeMenuItem.setOnAction(a -> getFilesTab().getTabPane().getTabs().remove(tab));
 							tab.setContextMenu(new ContextMenu(closeMenuItem));
 						}
 
@@ -151,7 +151,7 @@ public class MobileFrame {
 		});
 	}
 
-	public FilesTab getRecentFilesTab() {
+	public FilesTab getFilesTab() {
 		return filesTab;
 	}
 
@@ -194,7 +194,7 @@ public class MobileFrame {
 
 	public FileItem findFileInfo(String fileName) {
 		var file = new File(fileName);
-		for (var fileInfo : getRecentFilesTab().getController().getTableView().getItems()) {
+		for (var fileInfo : getFilesTab().getController().getTableView().getItems()) {
 			if (file.equals(new File(fileInfo.getPath())))
 				return fileInfo;
 		}

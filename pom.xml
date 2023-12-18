@@ -459,6 +459,7 @@
 
                         <list>javafx.scene.control.Accordion</list>
                         <list>javafx.scene.control.Button</list>
+                        <list>javafx.scene.control.ButtonBar</list>
                         <list>javafx.scene.control.CheckBox</list>
                         <list>javafx.scene.control.CheckMenuItem</list>
                         <list>javafx.scene.control.ChoiceBox</list>

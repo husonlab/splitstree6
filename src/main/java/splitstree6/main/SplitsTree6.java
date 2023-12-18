@@ -192,16 +192,32 @@ public class SplitsTree6 extends Application {
 
 	private static String userDirectory = null;
 
+	private static String tmpDirectory = null;
+
 	public static String getUserDirectory() {
 		if (userDirectory == null) {
-			if (com.gluonhq.attach.util.Platform.isIOS()) {
+			if (isDesktop()) {
+				userDirectory = System.getProperty("user.dir");
+			} else {
 				var storageService = Services.get(StorageService.class).orElseThrow(() -> new RuntimeException("StorageService not available."));
 				var storage = storageService.getPublicStorage("SplitsTree");
 				storage.ifPresent(file -> userDirectory = file.getPath());
-			} else
-				userDirectory = System.getProperty("user.dir");
+			}
 		}
 		return userDirectory;
+	}
+
+	public static String getTmpDirectory() {
+		if (tmpDirectory == null) {
+			if (isDesktop()) {
+				tmpDirectory = System.getProperty("java.io.tmpdir");
+			} else {
+				var storageService = Services.get(StorageService.class).orElseThrow(() -> new RuntimeException("StorageService not available."));
+				var storage = storageService.getPrivateStorage();
+				storage.ifPresent(file -> tmpDirectory = file.getPath());
+			}
+		}
+		return tmpDirectory;
 	}
 }
 
