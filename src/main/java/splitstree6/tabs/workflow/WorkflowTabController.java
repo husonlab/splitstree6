@@ -30,7 +30,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.icons.MaterialIcons;
-import splitstree6.main.SplitsTree6;
 
 public class WorkflowTabController {
 
@@ -82,7 +81,6 @@ public class WorkflowTabController {
 		AnchorPane.setBottomAnchor(mainPane, 20.0);
 
 		scrollPane = new ZoomableScrollPane(anchorPane);
-		scrollPane.setAllowZoom(SplitsTree6.isDesktop());
 		scrollPane.setPannable(true);
 		borderPane.setCenter(scrollPane);
 	}

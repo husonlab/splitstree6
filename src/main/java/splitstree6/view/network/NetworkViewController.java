@@ -33,7 +33,6 @@ import jloda.fx.icons.MaterialIcons;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import splitstree6.layout.network.DiagramType;
-import splitstree6.main.SplitsTree6;
 
 public class NetworkViewController {
 	@FXML
@@ -101,7 +100,6 @@ public class NetworkViewController {
 
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
-		zoomableScrollPane.setAllowZoom(SplitsTree6.isDesktop());
 		zoomableScrollPane.setPannable(true);
 
 		centerPane.getChildren().add(zoomableScrollPane);

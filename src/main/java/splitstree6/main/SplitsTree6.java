@@ -25,6 +25,7 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.stage.Stage;
+import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.ArgsOptions;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ProgramProperties;
@@ -152,6 +153,7 @@ public class SplitsTree6 extends Application {
 	public void start(Stage stage) throws Exception {
 		try {
 			if (!isDesktop()) {
+				ZoomableScrollPane.zoomByScroll = false; // zoom by zoom
 				NotificationManager.setShowNotifications(false);
 				NotificationManager.setEchoToConsole(true);
 

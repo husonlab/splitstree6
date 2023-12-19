@@ -97,6 +97,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final Single<Double> oldZoom = new Single<>(null);
 
+	private final Object sync1 = new Object();
+
+	private final Object sync2 = new Object();
+
 	/**
 	 * the splits view presenter
 	 *
@@ -246,7 +250,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				if (oldZoom.get() == null) {
 					oldZoom.set(o.doubleValue());
 				}
-				RunAfterAWhile.applyInFXThread(oldZoom, () -> {
+				RunAfterAWhile.applyInFXThread(sync1, () -> {
 					if (oldZoom.isNotNull()) {
 						var factor = n.doubleValue() / oldZoom.get();
 						if (factor > 0 && factor != 1.0) {
@@ -312,10 +316,10 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			if (controller.getZoomButtonPane() != null)
 				controller.getZoomButtonPane().show();
 		});
-		var object = new Object();
+
 		selectionChangeListener = e -> {
 			if (e.wasAdded()) {
-				RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(object, () -> {
+				RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(sync2, () -> {
 					var taxon = e.getElementAdded();
 					var node = taxonLabelMap.get(mainWindow.getWorkingTaxa().indexOf(taxon));
 					controller.getScrollPane().ensureVisible(node);

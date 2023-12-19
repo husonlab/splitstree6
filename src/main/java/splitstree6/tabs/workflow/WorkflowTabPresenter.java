@@ -29,6 +29,7 @@ import javafx.scene.Group;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.fx.workflow.WorkflowNode;
+import splitstree6.data.ViewBlock;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
@@ -104,8 +105,12 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		controller.getEditButton().setOnAction(e -> {
 			if (workflow.getSelectionModel().size() == 1) {
 				var workflowNode = workflow.getSelectionModel().getSelectedItem();
-				if (workflowNode instanceof DataNode dataNode)
-					mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
+				if (workflowNode instanceof DataNode dataNode) {
+					if (dataNode.getDataBlock() instanceof ViewBlock viewBlock) {
+						mainWindow.getController().getMainTabPane().getSelectionModel().select(viewBlock.getViewTab());
+					} else
+						mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
+				}
 				else if (workflowNode instanceof AlgorithmNode algorithmNode)
 					mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 			}
