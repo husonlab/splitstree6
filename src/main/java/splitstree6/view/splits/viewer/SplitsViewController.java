@@ -34,6 +34,7 @@ import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
+import splitstree6.main.SplitsTree6;
 
 public class SplitsViewController {
 
@@ -111,9 +112,21 @@ public class SplitsViewController {
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 
+		zoomableScrollPane.setAllowZoom(SplitsTree6.isDesktop());
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
 		zoomableScrollPane.setPannable(true);
+
+		if (!SplitsTree6.isDesktop()) {
+			zoomableScrollPane.setOnZoom(e -> {
+				try {
+					zoomableScrollPane.setAllowZoom(true);
+					zoomableScrollPane.zoomBy(e.getZoomFactor(), e.getZoomFactor());
+				} finally {
+					zoomableScrollPane.setAllowZoom(false);
+				}
+			});
+		}
 
 		centerPane.getChildren().add(zoomableScrollPane);
 

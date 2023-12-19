@@ -34,6 +34,7 @@ import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ScaleBar;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.main.SplitsTree6;
 
 public class TreeViewController {
 
@@ -128,6 +129,7 @@ public class TreeViewController {
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
 
+		zoomableScrollPane.setAllowZoom(SplitsTree6.isDesktop());
 		zoomableScrollPane.setPannable(true);
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);

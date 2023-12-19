@@ -471,6 +471,7 @@
                         <list>javafx.scene.control.MenuButton</list>
                         <list>javafx.scene.control.MenuBar</list>
                         <list>javafx.scene.control.MenuItem</list>
+                        <list>javafx.scene.control.Pagination</list>
                         <list>javafx.scene.control.ProgressBar</list>
                         <list>javafx.scene.control.ProgressIndicator</list>
                         <list>javafx.scene.control.RadioButton</list>

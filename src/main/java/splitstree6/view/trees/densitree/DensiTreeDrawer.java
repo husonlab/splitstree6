@@ -123,11 +123,11 @@ public class DensiTreeDrawer {
 					  ReadOnlyBooleanProperty showTrees, boolean hideFirst10PercentTrees, ReadOnlyBooleanProperty showConsensus,
 					  double lineWidth, Color edgeColor, Color otherColor) {
 
-		radialLabelLayout.getItems().clear();
-
-		var trees = new ArrayList<>(hideFirst10PercentTrees ? new ArrayList<>(trees0).subList(trees0.size() / 10, trees0.size()) : trees0);
-
 		RunAfterAWhile.applyInFXThread(parent, () -> {
+			radialLabelLayout.getItems().clear();
+
+			var trees = new ArrayList<>(hideFirst10PercentTrees ? new ArrayList<>(trees0).subList(trees0.size() / 10, trees0.size()) : trees0);
+
 			parent.getChildren().clear();
 
 			var canvas0 = new Canvas(targetBounds.getWidth(), targetBounds.getHeight());
