@@ -107,7 +107,7 @@ public class SplitsTree6 extends Application {
 		if (!isDesktop())
 			args = new String[0];
 
-		final ArgsOptions options = new ArgsOptions(args, SplitsTree6.class, Version.NAME + " - Phylogenetic analysis using trees and networks");
+		var options = new ArgsOptions(args, SplitsTree6.class, Version.NAME + " - Phylogenetic analysis using trees and networks");
 		options.setAuthors("Daniel H. Huson and David Bryant");
 		options.setLicense(ProgramProperties.getProgramLicence());
 		options.setVersion(ProgramProperties.getProgramVersion());
@@ -116,10 +116,13 @@ public class SplitsTree6 extends Application {
 		inputFiles.addAll(options.getOption("-i", "input", "Input files to open upon startup", new ArrayList<String>()));
 
 		final String defaultPropertiesFile;
-		if (ProgramProperties.isMacOS())
+		if (!isDesktop())
+			defaultPropertiesFile = getPrivateDirectory() + File.separator + "SplitsTree6.def";
+		else if (ProgramProperties.isMacOS())
 			defaultPropertiesFile = System.getProperty("user.home") + "/Library/Preferences/SplitsTree6.def";
 		else
 			defaultPropertiesFile = System.getProperty("user.home") + File.separator + ".SplitsTree6.def";
+
 		final var propertiesFile = options.getOption("-p", "propertiesFile", "Properties file", defaultPropertiesFile);
 		final var showVersion = options.getOption("-V", "version", "Show version string", false);
 		final var silentMode = options.getOption("-S", "silentMode", "Silent mode", false);
@@ -162,13 +165,12 @@ public class SplitsTree6 extends Application {
 				//stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("MaterialDesign.css")).toExternalForm());
 				stage.getScene().getStylesheets().add("jloda/resources/css/white_pane.css");
 				stage.show();
-
 			} else {
 				SplashScreen.showSplash(Duration.ofSeconds(5));
 				stage.setTitle("Untitled - " + ProgramProperties.getProgramName());
 				NotificationManager.setShowNotifications(true);
 
-				final MainWindow mainWindow = new MainWindow();
+				final var mainWindow = new MainWindow();
 				WindowGeometry.setToStage(stage);
 				mainWindow.show(stage, stage.getX(), stage.getY(), stage.getWidth(), stage.getHeight());
 				WindowGeometry.listenToStage(stage);
@@ -198,7 +200,7 @@ public class SplitsTree6 extends Application {
 
 	private static String userDirectory = null;
 
-	private static String tmpDirectory = null;
+	private static String privateDirectory = null;
 
 	public static String getUserDirectory() {
 		if (userDirectory == null) {
@@ -213,17 +215,17 @@ public class SplitsTree6 extends Application {
 		return userDirectory;
 	}
 
-	public static String getTmpDirectory() {
-		if (tmpDirectory == null) {
+	public static String getPrivateDirectory() {
+		if (privateDirectory == null) {
 			if (com.gluonhq.attach.util.Platform.isDesktop()) {
-				tmpDirectory = System.getProperty("java.io.tmpdir");
+				privateDirectory = System.getProperty("java.io.tmpdir");
 			} else {
 				var storageService = Services.get(StorageService.class).orElseThrow(() -> new RuntimeException("StorageService not available."));
 				var storage = storageService.getPrivateStorage();
-				storage.ifPresent(file -> tmpDirectory = file.getPath());
+				storage.ifPresent(file -> privateDirectory = file.getPath());
 			}
 		}
-		return tmpDirectory;
+		return privateDirectory;
 	}
 }
 

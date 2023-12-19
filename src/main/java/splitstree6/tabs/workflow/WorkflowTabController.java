@@ -71,7 +71,8 @@ public class WorkflowTabController {
 		MaterialIcons.setIcon(editButton, "edit_note");
 		MaterialIcons.setIcon(addMenuButton, "add");
 		MaterialIcons.setIcon(deleteButton, "delete");
-		MaterialIcons.setIcon(duplicateButton, "duplicate");
+		MaterialIcons.setIcon(duplicateButton, "content_copy");
+
 
 		borderPane.getChildren().remove(mainPane);
 		var anchorPane = new AnchorPane(mainPane);

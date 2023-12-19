@@ -409,7 +409,7 @@ public class MainWindowPresenter {
 						clipboardContent.putImage(snapshot);
 						Clipboard.getSystemClipboard().setContent(clipboardContent);
 					} else {
-						var saveFile = new File(SplitsTree6.getTmpDirectory(), "copy-image.png");
+						var saveFile = new File(SplitsTree6.getPrivateDirectory(), "copy-image.png");
 						var pngEncoder = new PngEncoderFX();
 						pngEncoder.setImage(focusedDisplayTab.get().getMainNode().snapshot(null, null));
 						try (var outs = new FileOutputStream(saveFile)) {
