@@ -31,10 +31,6 @@
             <items>
                 <Button fx:id="editButton" mnemonicParsing="false" text="Edit"/>
                 <MenuButton fx:id="addMenuButton" mnemonicParsing="false" text="Add">
-                    <items>
-                        <MenuItem mnemonicParsing="false" text="Action 1"/>
-                        <MenuItem mnemonicParsing="false" text="Action 2"/>
-                    </items>
                 </MenuButton>
                 <Button fx:id="deleteButton" layoutX="68.0" layoutY="12.0" mnemonicParsing="false" text="Delete"/>
             </items>

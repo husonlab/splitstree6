@@ -157,6 +157,7 @@ public class SplitsTree6 extends Application {
 
 				mobileFrame = new MobileFrame(stage);
 				stage.getScene().getStylesheets().add(Objects.requireNonNull(MainWindow.class.getResource("MainWindow.css")).toExternalForm());
+				//stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("MaterialDesign.css")).toExternalForm());
 				stage.getScene().getStylesheets().add("jloda/resources/css/white_pane.css");
 				stage.show();
 

@@ -693,6 +693,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			});
 			toggleGroup.getToggles().add(menuItem);
 			menuButton.getItems().add(menuItem);
+			if (colorScheme.equals(colorSchemeProperty.get()))
+				menuItem.setSelected(true);
 		}
 	}
 }

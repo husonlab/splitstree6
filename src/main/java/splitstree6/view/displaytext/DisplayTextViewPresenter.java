@@ -109,11 +109,19 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 		tab.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null && n.getAlgorithmBreadCrumbsToolBar() != null
-				&& BasicFX.getAllRecursively(controller.getTopVBox(), AlgorithmBreadCrumbsToolBar.class).size() == 0
+				&& BasicFX.getAllRecursively(controller.getTopVBox(), AlgorithmBreadCrumbsToolBar.class).isEmpty()
 				&& !tab.getViewTab().isClosable()) {
 				controller.getTopVBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
 			}
 		});
+
+		controller.getSelectButton().setOnAction(e -> {
+			if (controller.getCodeArea().getSelection().getLength() > 0)
+				codeArea.selectRange(0, 0);
+			else
+				codeArea.selectAll();
+		});
+		controller.getSelectButton().disableProperty().bind(tab.emptyProperty());
 	}
 
 	public void setupMenuItems() {

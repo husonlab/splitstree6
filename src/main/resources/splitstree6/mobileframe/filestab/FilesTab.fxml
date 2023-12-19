@@ -45,11 +45,17 @@
              </StackPane>
          </center>
          <bottom>
-            <HBox spacing="30.0" BorderPane.alignment="CENTER">
+             <HBox spacing="30.0" style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
+                   BorderPane.alignment="CENTER">
                <children>
-                  <Button fx:id="duplicateButton" mnemonicParsing="false" text="Dupliciate">
+                   <Button fx:id="duplicateButton" mnemonicParsing="false" text="Duplicate">
                      <tooltip>
                          <Tooltip text="Duplicate selected files"/>
+                     </tooltip>
+                   </Button>
+                   <Button fx:id="renameButton" layoutX="30.0" layoutY="13.0" mnemonicParsing="false" text="Rename">
+                       <tooltip>
+                           <Tooltip text="Renamed selected files"/>
                      </tooltip>
                   </Button>
                   <Button fx:id="deleteButton" mnemonicParsing="false" text="Delete">

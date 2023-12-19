@@ -20,6 +20,8 @@
 package splitstree6.mobileframe;
 
 import javafx.application.Platform;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
@@ -52,13 +54,14 @@ import java.io.IOException;
 import java.util.Objects;
 
 public class MobileFrame {
-	private final MainFrameController controller;
+	private final MobileFrameController controller;
 
 	private final Stage stage;
 
 	private final FilesTab filesTab;
 	private final ObservableMap<MainWindow, Tab> windowTabMap = FXCollections.observableHashMap();
 
+	private final BooleanProperty hideTabs = new SimpleBooleanProperty(this, "hideTabs", false);
 	public MobileFrame(Stage stage) {
 		this.stage = stage;
 		stage.setOnHidden(e -> System.exit(0));
@@ -148,6 +151,30 @@ public class MobileFrame {
 					}
 				}
 			}
+
+			controller.getTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+				if (o != null && o.getUserData() instanceof MainWindow prevMainWindow
+					&& prevMainWindow.getTaxonSelectionModel().size() > 0
+					&& n != null && n.getUserData() instanceof MainWindow curMainWindow && curMainWindow.getWorkflow().getWorkingTaxaBlock() != null) {
+					var taxonBlock = curMainWindow.getWorkflow().getWorkingTaxaBlock();
+					if (taxonBlock != null) {
+						prevMainWindow.getTaxonSelectionModel().getSelectedItems().stream()
+								.map(t -> curMainWindow.getWorkflow().getWorkingTaxaBlock().get(t.getName()))
+								.filter(Objects::nonNull).forEach(t -> curMainWindow.getTaxonSelectionModel().select(t));
+					}
+				}
+			});
+		});
+
+
+		controller.getTopToolBar().setOnMousePressed(e -> {
+			hideTabs.set(!hideTabs.get());
+			if (hideTabs.get()) {
+				controller.getTabPane().setStyle("-fx-tab-min-height: 0; -fx-tab-max-height: 0; -fx-padding: -4 0 0 0;");
+			} else {
+				controller.getTabPane().setStyle("-fx-tab-min-height: 20; -fx-tab-max-height: 30; -fx-padding: 0 0 0 0;");
+			}
+
 		});
 	}
 

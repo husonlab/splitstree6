@@ -59,6 +59,9 @@ public class FilesTabController {
 	private Button duplicateButton;
 
 	@FXML
+	private Button renameButton;
+
+	@FXML
 	private Button newButton;
 
 	@FXML
@@ -70,6 +73,7 @@ public class FilesTabController {
 		MaterialIcons.setIcon(deleteButton, "delete");
 		MaterialIcons.setIcon(duplicateButton, "content_copy");
 		MaterialIcons.setIcon(openButton, "open_in_new");
+		MaterialIcons.setIcon(renameButton, "edit");
 
 		tableView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		tableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
@@ -91,7 +95,6 @@ public class FilesTabController {
 				}
 			}
 		});
-
 		dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
 		var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 		dateColumn.setCellFactory(column -> new TableCell<>() {
@@ -150,6 +153,10 @@ public class FilesTabController {
 
 	public Button getDuplicateButton() {
 		return duplicateButton;
+	}
+
+	public Button getRenameButton() {
+		return renameButton;
 	}
 
 	public Button getNewButton() {

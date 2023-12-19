@@ -206,8 +206,6 @@ public class MainWindowPresenter {
 			}
 		});
 
-		setupFileNameMenu(mainWindow, controller);
-
 		RecentFilesManager.getInstance().setFileOpener(fileName -> FileLoader.apply(false, mainWindow, fileName, ex -> NotificationManager.showError("Open recent file failed: " + ex)));
 
 		RecentFilesManager.getInstance().setupMenu(controller.getOpenRecentMenu());
@@ -712,45 +710,6 @@ public class MainWindowPresenter {
 			//emptyWindow.getController().getMainTabPane().getTabs().add(tab);
 		}
 		Platform.runLater(() -> mainWindow.getController().getMainTabPane().getSelectionModel().select(tab));
-	}
-
-	private static void setupFileNameMenu(MainWindow mainWindow, MainWindowController controller) {
-		controller.getFileNameTextField().textProperty().addListener((v, o, n) -> controller.getFileNameTextField().setPrefColumnCount(n.length() + 1));
-
-		mainWindow.fileNameProperty().addListener((v, o, n) -> {
-			controller.getFileNameTextField().setText(n == null ? "" : FileUtils.getFileNameWithoutPath(n));
-			controller.getFileNameMenuButton().setText(n == null ? "" : (FileUtils.getFileNameWithoutPath(n.replaceAll("\\*$", "")) + (mainWindow.isDirty() ? "*" : "")));
-		});
-		controller.getFileTooltip().textProperty().bind(mainWindow.fileNameProperty());
-
-		controller.getFileNameTextField().setOnAction(e -> {
-			var currentSuffix = FileUtils.getFileSuffix(mainWindow.getFileName());
-			if (currentSuffix.isBlank())
-				currentSuffix = ".stree6";
-			var entry = FileUtils.replaceFileSuffix(controller.getFileNameTextField().getText(), currentSuffix);
-			var newFile = new File(FileUtils.getFilePath(mainWindow.getFileName(), entry));
-			if (!newFile.equals(new File(mainWindow.getFileName()))) {
-				Platform.runLater(() -> {
-					mainWindow.setFileName(newFile.getPath());
-					mainWindow.setDirty(true);
-				});
-			}
-		});
-		controller.getFileNameTextField().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName()));
-		controller.getFileNameMenuButton().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName().replaceAll("\\*$", "")) + (mainWindow.isDirty() ? "*" : ""));
-
-		controller.getFileNameTextField().focusedProperty().addListener((v, o, n) -> {
-			if (!n)
-				Platform.runLater(() -> controller.getFileNameTextField().setText(FileUtils.getFileNameWithoutPath(mainWindow.getFileName())));
-		});
-
-		mainWindow.dirtyProperty().addListener((v, o, n) -> {
-			var text = controller.getFileNameMenuButton().getText();
-			if (n && !text.endsWith("*"))
-				controller.getFileNameMenuButton().setText(text + "*");
-			if (!n && text.endsWith("*"))
-				controller.getFileNameMenuButton().setText(text.substring(0, text.length() - 1));
-		});
 	}
 
 	private void disableAllMenuItems(MainWindowController controller) {

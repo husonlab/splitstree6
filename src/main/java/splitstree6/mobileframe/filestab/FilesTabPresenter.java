@@ -19,6 +19,7 @@
 
 package splitstree6.mobileframe.filestab;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -86,6 +87,35 @@ public class FilesTabPresenter {
 		});
 		controller.getDuplicateButton().disableProperty().bind(Bindings.isEmpty(controller.getTableView().getSelectionModel().getSelectedItems()));
 
+
+		controller.getRenameButton().setOnAction(e -> {
+			for (var fileInfo : new ArrayList<>(controller.getTableView().getSelectionModel().getSelectedItems())) {
+				var path = requestName(stage, controller.getTableView().getItems().stream().map(FileItem::getPath).toList(),
+						fileInfo.getPath(), false);
+				var pos = controller.getTableView().getItems().indexOf(fileInfo);
+				if (path == null)
+					break;
+				if (!path.equals(fileInfo.getPath())) {
+					path = createUniqueFile(FileUtils.replaceFileSuffix(path, ".stree6"), controller.getTableView().getItems().stream().map(FileItem::getPath).toList()).getPath();
+					var original = new File(fileInfo.getPath());
+					var target = new File(path);
+					try {
+						Files.move(original.toPath(), target.toPath());
+					} catch (IOException ex) {
+						NotificationManager.showWarning("Rename failed: " + ex.getMessage());
+					}
+
+					controller.getTableView().getItems().remove(fileInfo);
+					if (fileCloser != null)
+						Platform.runLater(() -> fileCloser.accept(fileInfo.getPath()));
+					Platform.runLater(() -> controller.getTableView().getItems().add(pos, new FileItem(target.getPath())));
+					if (fileOpener != null)
+						Platform.runLater(() -> fileOpener.accept(target.getPath()));
+				}
+			}
+		});
+		controller.getRenameButton().disableProperty().bind(Bindings.isEmpty(controller.getTableView().getSelectionModel().getSelectedItems()));
+
 		controller.getDeleteButton().setOnAction(e -> {
 			controller.getTableView().requestFocus();
 			if (confirmDelete(stage, controller.getTableView().getSelectionModel().getSelectedItems().size())) {
@@ -108,18 +138,19 @@ public class FilesTabPresenter {
 
 		controller.getNewButton().setOnAction(e -> {
 			controller.getTableView().requestFocus();
-			var name = requestName(stage, controller.getTableView().getItems().stream().map(FileItem::getPath).toList());
-			name = FileUtils.replaceFileSuffix(name, ".stree6");
-			if (name != null) {
+			var path = requestName(stage, controller.getTableView().getItems().stream().map(FileItem::getPath).toList(),
+					SplitsTree6.getUserDirectory() + File.separator + "Untitled.stree6", true);
+			path = FileUtils.replaceFileSuffix(path, ".stree6");
+			if (path != null) {
 				try {
-					FileUtils.writeLinesToFile(List.of(""), name, false);
+					FileUtils.writeLinesToFile(List.of(""), path, false);
 				} catch (IOException ex) {
-					NotificationManager.showError("Failed to create file: " + name + ": " + ex.getMessage());
+					NotificationManager.showError("Failed to create file: " + path + ": " + ex.getMessage());
 					return;
 				}
 				if (fileOpener != null)
-					fileOpener.accept(name);
-				controller.getTableView().getItems().add(new FileItem(name));
+					fileOpener.accept(path);
+				controller.getTableView().getItems().add(new FileItem(path));
 				javafx.application.Platform.runLater(() -> controller.getTableView().sort());
 			}
 		});
@@ -165,8 +196,8 @@ public class FilesTabPresenter {
 		return result.isPresent() && result.get() == ButtonType.OK;
 	}
 
-	private static String requestName(Stage stage, List<String> fileNames) {
-		var file = createUniqueFile(SplitsTree6.getUserDirectory() + File.separator + "Untitled.stree6", fileNames);
+	private static String requestName(Stage stage, List<String> fileNames, String initialName, boolean makeInitialNameUnique) {
+		var file = makeInitialNameUnique ? createUniqueFile(initialName, fileNames) : new File(initialName);
 		var dialog = new TextInputDialog(file.getName());
 		dialog.initOwner(stage);
 		dialog.initModality(javafx.stage.Modality.APPLICATION_MODAL);

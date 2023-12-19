@@ -439,9 +439,6 @@ public class MainWindowController {
 	private MenuButton fileMenuButton;
 
 	@FXML
-	private TextField fileNameTextField;
-
-	@FXML
 	private Button undoButton;
 
 	@FXML
@@ -452,8 +449,6 @@ public class MainWindowController {
 	@FXML
 	private MenuButton exportButton;
 
-	@FXML
-	private MenuButton fileNameMenuButton;
 
 	@FXML
 	private HBox leftToolBarPane;
@@ -561,19 +556,6 @@ public class MainWindowController {
 			rightToolBarPane.applyCss();
 			rightWidth.set(rightToolBarPane.getWidth());
 		});
-
-		InvalidationListener listener = e -> {
-			var remainingLength = rootPane.getWidth() - 20 - leftToolBarPane.getWidth() - fileNameMenuButton.getWidth();
-			if (remainingLength < rightWidth.get() + 10) { // will need to set this
-				toolBarBorderPane.setRight(null);
-				toolBarBorderPane.setBottom(rightToolBarPane);
-			} else {
-				toolBarBorderPane.setBottom(null);
-				toolBarBorderPane.setRight(rightToolBarPane);
-			}
-		};
-		fileNameMenuButton.widthProperty().addListener(listener);
-		rootPane.widthProperty().addListener(listener);
 	}
 
 	public VBox getTopVBox() {
@@ -1109,10 +1091,6 @@ public class MainWindowController {
 		return mainTabPane;
 	}
 
-	public TextField getFileNameTextField() {
-		return fileNameTextField;
-	}
-
 	public MenuButton getFileMenuButton() {
 		return fileMenuButton;
 	}
@@ -1137,9 +1115,6 @@ public class MainWindowController {
 		return exportButton;
 	}
 
-	public MenuButton getFileNameMenuButton() {
-		return fileNameMenuButton;
-	}
 
 	public Pane getRootPane() {
 		return rootPane;

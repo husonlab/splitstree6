@@ -468,21 +468,6 @@
                         <HBox fx:id="centerToolBarPane" alignment="CENTER" maxHeight="-Infinity" minHeight="-Infinity"
                               prefHeight="26.0" BorderPane.alignment="TOP_CENTER">
                             <children>
-                                <MenuButton fx:id="fileNameMenuButton" alignment="CENTER" mnemonicParsing="false"
-                                            style="-fx-background-color: transparent;" text="File name">
-                                    <items>
-                                        <MenuItem mnemonicParsing="false">
-                                            <graphic>
-                                                <TextField fx:id="fileNameTextField" alignment="CENTER"
-                                                           focusTraversable="false" promptText="File name"
-                                                           style="-fx-background-color: transparent;"/>
-                                            </graphic>
-                                        </MenuItem>
-                                    </items>
-                                    <tooltip>
-                                        <Tooltip fx:id="fileTooltip" text="Empty Tooltip"/>
-                                    </tooltip>
-                                </MenuButton>
                             </children>
                         </HBox>
                     </center>
@@ -549,7 +534,7 @@
         <bottom>
             <HBox minHeight="-Infinity" spacing="5.0" style="-fx-border-width: 1 0 0 0; -fx-border-color: lightgray;"
                   BorderPane.alignment="BOTTOM_CENTER">
-                <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="35.0" vgap="5.0" HBox.hgrow="ALWAYS">
+                <FlowPane fx:id="bottomFlowPane" hgap="10.0" minHeight="26.0" vgap="5.0" HBox.hgrow="ALWAYS">
                     <padding>
                         <Insets bottom="2.0" right="50.0" top="2.0"/>
                     </padding>

@@ -1,5 +1,5 @@
 /*
- *  MainFrameController.java Copyright (C) 2023 Daniel H. Huson
+ *  MobileFrameController.java Copyright (C) 2023 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -22,14 +22,22 @@ package splitstree6.mobileframe;
 import javafx.fxml.FXML;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 
-public class MainFrameController {
+public class MobileFrameController {
+
+	@FXML
+	private Pane topPane;
 
 	@FXML
 	private AnchorPane rootPane;
 
 	@FXML
 	private TabPane tabPane;
+
+	public Pane getTopToolBar() {
+		return topPane;
+	}
 
 	public AnchorPane getRootPane() {
 		return rootPane;

@@ -37,9 +37,7 @@ public class FileItem {
 
 	public FileItem(String path) {
 		setPath(path);
-		setName(FileUtils.getFileNameWithoutPathOrSuffix(path));
 		updateInfo();
-		setKind(FileUtils.getFileSuffix(path));
 	}
 
 	public String getName() {
@@ -80,6 +78,8 @@ public class FileItem {
 
 	public void setPath(String path) {
 		this.path = path;
+		setName(FileUtils.getFileNameWithoutPathOrSuffix(path));
+		setKind(FileUtils.getFileSuffix(path));
 	}
 
 	public void updateInfo() {

@@ -35,10 +35,13 @@ viewer-background {
     -fx-min-height: 20;
 }
 
+.table-view {
+    -fx-background-color: transparent;
+}
+
 .table-view .column-header-background {
-    -fx-background-color: derive(-fx-base, 50%);
-    -fx-min-width: 20;
-    -fx-min-height: 20;
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
 }
 
 /*
