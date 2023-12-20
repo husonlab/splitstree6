@@ -277,6 +277,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		});
 		controller.getZoomToFitButton().disableProperty().bind(view.inputCharactersNodeValidProperty().not());
 
+		controller.getCanvas().setOnZoom(e -> {
+			view.setOptionUnitWidth(e.getZoomFactor() * view.getOptionUnitWidth());
+			view.setOptionUnitHeight(e.getZoomFactor() * view.getOptionUnitHeight());
+		});
+
 		controller.getSelectAllMenuItem().setOnAction(e ->
 				view.setSelectedSites(BitSetUtils.asBitSet(BitSetUtils.range(1, view.getInputCharacters().getNchar() + 1))));
 		controller.getSelectAllMenuItem().disableProperty().bind(view.inputCharactersNodeValidProperty().not());

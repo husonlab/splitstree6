@@ -23,22 +23,15 @@ import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import jloda.fx.util.RecentFilesManager;
-import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.util.FileUtils;
-import splitstree6.dialog.SaveDialog;
 import splitstree6.dialog.importdialog.ImportDialog;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.readers.ImportManager;
@@ -53,8 +46,14 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * the top-level stage used in the mobile version of the program
+ * Daniel Huson, 12.23
+ */
 public class MobileFrame {
 	private final MobileFrameController controller;
+
+	private final MobileFramePresenter presenter;
 
 	private final Stage stage;
 
@@ -62,6 +61,7 @@ public class MobileFrame {
 	private final ObservableMap<MainWindow, Tab> windowTabMap = FXCollections.observableHashMap();
 
 	private final BooleanProperty hideTabs = new SimpleBooleanProperty(this, "hideTabs", false);
+
 	public MobileFrame(Stage stage) {
 		this.stage = stage;
 		stage.setOnHidden(e -> System.exit(0));
@@ -74,115 +74,50 @@ public class MobileFrame {
 		}
 		controller = fxmlLoader.getController();
 		stage.setScene(new Scene(controller.getRootPane()));
-
-		controller.getTabPane().setTabClosingPolicy(TabPane.TabClosingPolicy.ALL_TABS);
-
 		filesTab = new FilesTab(new File(SplitsTree6.getUserDirectory()), stage, this::openFile, this::closeFile);
 		filesTab.setClosable(false);
-		controller.getTabPane().getTabs().add(filesTab);
 
-		MainWindowManager.getInstance().getMainWindows().addListener((ListChangeListener<? super IMainWindow>) e -> {
-			while (e.next()) {
-				for (var w : e.getRemoved()) {
-					if (w instanceof MainWindow mainWindow) {
-						var tab = windowTabMap.get(mainWindow);
-						controller.getTabPane().getTabs().remove(tab);
-					}
-				}
-				for (var w : e.getAddedSubList()) {
-					if (w instanceof MainWindow mainWindow) {
-						var tab = new Tab();
-						windowTabMap.put(mainWindow, tab);
-						tab.setClosable(true);
-						if (false) {
-							var closeMenuItem = new MenuItem("Close");
-							closeMenuItem.setOnAction(a -> getFilesTab().getTabPane().getTabs().remove(tab));
-							tab.setContextMenu(new ContextMenu(closeMenuItem));
-						}
+		presenter = new MobileFramePresenter(this);
+	}
 
-						tab.setOnCloseRequest(a -> MainWindowManager.getInstance().getMainWindows().remove(mainWindow));
+	public Stage getStage() {
+		return stage;
+	}
 
-						Platform.runLater(() -> {
-							mainWindow.getController().getTopVBox().getChildren().remove(mainWindow.getController().getToolBarBorderPane());
-							mainWindow.getController().getOutsideBorderPane().setTop(mainWindow.getController().getToolBarBorderPane());
-							mainWindow.getController().getRootPane().requestLayout();
-							mainWindow.getController().getFileMenuButton().setVisible(false);
+	public MobileFrameController getController() {
+		return controller;
+	}
 
-							if (mainWindow.getStage() != null) {
-								mainWindow.getStage().hide();
-							}
-						});
-						Platform.runLater(() -> {
-							tab.setContent(mainWindow.getController().getRootPane());
-							tab.textProperty().bind(mainWindow.nameProperty());
-							controller.getTabPane().getTabs().add(tab);
-							filesTab.getTabPane().getSelectionModel().select(tab);
-						});
-						// setup auto-save:
-						Platform.runLater(() -> {
-							mainWindow.getWorkflow().runningProperty().addListener((v, o, n) -> {
-								RunAfterAWhile.applyInFXThread(MobileFrame.this, () -> {
-									if (!n && !mainWindow.isEmpty() && mainWindow.isDirty()) {
-										try {
-											var fileInfo = findFileInfo(mainWindow.getFileName());
-											var suffix = FileUtils.getFileSuffix(mainWindow.getFileName());
-											if (!suffix.equals(".stree6"))
-												mainWindow.setFileName(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".stree6"));
-											FileUtils.checkFileWritable(mainWindow.getFileName(), true);
-											SaveDialog.save(mainWindow, false, new File(mainWindow.getFileName()));
-											if (false)
-												RecentFilesManager.getInstance().insertRecentFile(mainWindow.getFileName());
-											if (fileInfo != null) {
-												fileInfo.setName(mainWindow.getName());
-												fileInfo.updateInfo();
-												var pos = filesTab.getController().getTableView().getItems().indexOf(fileInfo);
-												filesTab.getController().getTableView().getItems().remove(pos);
-												Platform.runLater(() -> {
-													filesTab.getController().getTableView().getItems().add(pos, fileInfo);
-													filesTab.getController().getTableView().sort();
-												});
-											}
-										} catch (IOException ignored) {
-										}
-									}
-								});
-							});
-						});
-					}
-				}
-			}
+	public MobileFramePresenter getPresenter() {
+		return presenter;
+	}
 
-			controller.getTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
-				if (o != null && o.getUserData() instanceof MainWindow prevMainWindow
-					&& prevMainWindow.getTaxonSelectionModel().size() > 0
-					&& n != null && n.getUserData() instanceof MainWindow curMainWindow && curMainWindow.getWorkflow().getWorkingTaxaBlock() != null) {
-					var taxonBlock = curMainWindow.getWorkflow().getWorkingTaxaBlock();
-					if (taxonBlock != null) {
-						prevMainWindow.getTaxonSelectionModel().getSelectedItems().stream()
-								.map(t -> curMainWindow.getWorkflow().getWorkingTaxaBlock().get(t.getName()))
-								.filter(Objects::nonNull).forEach(t -> curMainWindow.getTaxonSelectionModel().select(t));
-					}
-				}
-			});
-		});
-
-
-		controller.getTopToolBar().setOnMousePressed(e -> {
-			hideTabs.set(!hideTabs.get());
-			if (hideTabs.get()) {
-				controller.getTabPane().setStyle("-fx-tab-min-height: 0; -fx-tab-max-height: 0; -fx-padding: -4 0 0 0;");
-			} else {
-				controller.getTabPane().setStyle("-fx-tab-min-height: 20; -fx-tab-max-height: 30; -fx-padding: 0 0 0 0;");
-			}
-
-		});
+	public ObservableMap<MainWindow, Tab> getWindowTabMap() {
+		return windowTabMap;
 	}
 
 	public FilesTab getFilesTab() {
 		return filesTab;
 	}
 
-	private void openFile(String fileName) {
+	public boolean isHideTabs() {
+		return hideTabs.get();
+	}
+
+	public void setHideTabs(boolean hideTabs) {
+		this.hideTabs.set(hideTabs);
+	}
+
+	public FileItem findFileInfo(String fileName) {
+		var file = new File(fileName);
+		for (var fileInfo : getFilesTab().getController().getTableView().getItems()) {
+			if (file.equals(new File(fileInfo.getPath())))
+				return fileInfo;
+		}
+		return null;
+	}
+
+	public void openFile(String fileName) {
 		var newWindow = new MainWindow();
 		newWindow.setFileName(fileName);
 		newWindow.show(new Stage(), 0, 0, stage.getWidth(), stage.getHeight());
@@ -209,7 +144,7 @@ public class MobileFrame {
 		}
 	}
 
-	private void closeFile(String fileName) {
+	public void closeFile(String fileName) {
 		for (var window : windowTabMap.keySet()) {
 			if (FileUtils.equals(fileName, window.getFileName())) {
 				controller.getTabPane().getTabs().remove(windowTabMap.get(window));
@@ -219,13 +154,6 @@ public class MobileFrame {
 		}
 	}
 
-	public FileItem findFileInfo(String fileName) {
-		var file = new File(fileName);
-		for (var fileInfo : getFilesTab().getController().getTableView().getItems()) {
-			if (file.equals(new File(fileInfo.getPath())))
-				return fileInfo;
-		}
-		return null;
-	}
+
 }
 

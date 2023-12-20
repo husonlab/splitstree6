@@ -168,6 +168,14 @@ public class MainWindowPresenter {
 				Basic.caught(ex);
 			}
 		});
+		controller.getMainTabPane().setOnSwipeLeft(e -> {
+		});
+		controller.getMainTabPane().setOnSwipeUp(e -> {
+		});
+		controller.getMainTabPane().setOnSwipeRight(e -> {
+		});
+		controller.getMainTabPane().setOnSwipeDown(e -> {
+		});
 
 		controller.getAlgorithmTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
@@ -183,6 +191,15 @@ public class MainWindowPresenter {
 				Basic.caught(ex);
 			}
 		});
+		controller.getAlgorithmTabPane().setOnSwipeLeft(e -> {
+		});
+		controller.getAlgorithmTabPane().setOnSwipeUp(e -> {
+		});
+		controller.getAlgorithmTabPane().setOnSwipeRight(e -> {
+		});
+		controller.getAlgorithmTabPane().setOnSwipeDown(e -> {
+		});
+
 
 		focusedDisplayTab.set(null);
 		Platform.runLater(() -> {
