@@ -95,16 +95,16 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
-
-		if (false && editable) {
-			codeArea.focusedProperty().addListener((c, o, n) -> {
-				if (n) {
-					mainWindow.getController().getPasteMenuItem().disableProperty().unbind();
-					mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
-				}
+		if (!editable) {
+			controller.getToolBar().getItems().remove(controller.getPasteButton());
+		} else {
+			controller.getPasteButton().setOnAction(e -> {
+				codeArea.paste();
 			});
+			controller.getPasteButton().disableProperty().bind(mainWindow.getController().getPasteMenuItem().disableProperty());
+			codeArea.focusedProperty().addListener((c, o, n) ->
+					mainWindow.getController().getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(!Clipboard.getSystemClipboard().hasString())));
 		}
-
 		codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
 
 		tab.viewTabProperty().addListener((v, o, n) -> {

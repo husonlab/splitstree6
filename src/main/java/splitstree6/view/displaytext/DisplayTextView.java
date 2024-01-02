@@ -25,6 +25,7 @@ import javafx.scene.Node;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.RunAfterAWhile;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
@@ -70,7 +71,13 @@ public class DisplayTextView implements IView {
 
 		presenter = new DisplayTextViewPresenter(mainWindow, this, editable);
 
-		controller.getCodeArea().textProperty().addListener(e -> empty.set(controller.getCodeArea().getLength() == 0));
+		controller.getCodeArea().textProperty().addListener((v, o, n) -> {
+			RunAfterAWhile.applyInFXThread(empty, () -> {
+				empty.set(n.isEmpty());
+				if (getViewTab() != null)
+					getViewTab().setEmpty(n.isEmpty());
+			});
+		});
 
 		controller.getCodeArea().setStyle("-fx-border-color: lightgray; -fx-border-width: 2 0 0 0;");
 

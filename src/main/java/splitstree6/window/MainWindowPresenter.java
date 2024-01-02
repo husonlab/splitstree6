@@ -823,7 +823,7 @@ public class MainWindowPresenter {
 
 	public void setupSelectButton() {
 		controller.getSelectButton().setOnAction(e -> {
-			if (selectedDisplayTab.get() instanceof DisplayTextTab displayTextTab && displayTextTab.getPresenter() instanceof DisplayTextViewPresenter presenter) {
+			if (selectedDisplayTab.get().getPresenter() instanceof DisplayTextViewPresenter presenter) {
 				presenter.processSelectButtonPressed();
 			} else if (selectedDisplayTab.get() instanceof WorkflowTab workflowTab) {
 				workflowTab.getPresenter().processSelectButtonPressed();

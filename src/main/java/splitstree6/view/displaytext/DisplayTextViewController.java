@@ -22,12 +22,14 @@ package splitstree6.view.displaytext;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToolBar;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.VBox;
 import jloda.fx.icons.MaterialIcons;
+import splitstree6.main.SplitsTree6;
 import splitstree6.view.displaytext.highlighters.Highlighter;
 
 public class DisplayTextViewController {
@@ -40,6 +42,9 @@ public class DisplayTextViewController {
 
 	@FXML
 	private ToolBar toolBar;
+
+	@FXML
+	private Button pasteButton;
 
 	@FXML
 	private ToggleButton wrapTextToggle;
@@ -58,6 +63,7 @@ public class DisplayTextViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(pasteButton, "content_paste");
 		MaterialIcons.setIcon(wrapTextToggle, "wrap_text");
 		MaterialIcons.setIcon(lineNumbersToggle, "format_list_numbered");
 
@@ -73,6 +79,9 @@ public class DisplayTextViewController {
 		borderPane.setCenter(scrollPane);
 		codeArea.prefWidthProperty().bind(borderPane.widthProperty());
 		highlighter = codeArea.getHighlighter();
+
+		if (!SplitsTree6.isDesktop())
+			toolBar.getItems().remove(lineNumbersToggle);
 	}
 
 	public AnchorPane getAnchorPane() {
@@ -85,6 +94,10 @@ public class DisplayTextViewController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
+	}
+
+	public Button getPasteButton() {
+		return pasteButton;
 	}
 
 	public ToggleButton getWrapTextToggle() {
