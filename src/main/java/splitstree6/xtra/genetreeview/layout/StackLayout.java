@@ -19,9 +19,7 @@
 
 package splitstree6.xtra.genetreeview.layout;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
@@ -30,25 +28,27 @@ import javafx.scene.transform.Rotate;
 
 public class StackLayout extends MultipleFramesLayout {
 
-	private final PerspectiveCamera camera;
-	private final BooleanProperty isSnapshot = new SimpleBooleanProperty(false);
-	private final Slider slider;
-	private final Slider zoomSlider;
-	private final ReadOnlyDoubleProperty layoutWidthProperty;
-	private final ReadOnlyDoubleProperty layoutHeightProperty;
-	private final double nodeWidth;
-	private final double nodeHeight;
+    private final PerspectiveCamera camera;
+    private final BooleanProperty isSnapshot = new SimpleBooleanProperty(false);
+    private final Slider slider;
+    private final Slider zoomSlider;
+    private final ReadOnlyDoubleProperty layoutWidthProperty;
+    private final ReadOnlyDoubleProperty layoutHeightProperty;
+    private final double nodeWidth;
+    private final double nodeHeight;
+    private int focusedNodeIndex;
 
-	public StackLayout(ObservableList<Node> nodes, ObservableList<Node> snapshots, double nodeWidth, double nodeHeight,
-					   ReadOnlyDoubleProperty layoutWidthProperty, ReadOnlyDoubleProperty layoutHeightProperty,
-					   PerspectiveCamera camera, Slider slider, Slider zoomSlider) {
-		type = LayoutType.Stack;
-		this.layoutWidthProperty = layoutWidthProperty;
-		this.layoutHeightProperty = layoutHeightProperty;
-		this.nodeWidth = nodeWidth;
-		this.nodeHeight = nodeHeight;
-		this.slider = slider;
-		this.zoomSlider = zoomSlider;
+    public StackLayout(ObservableList<Node> nodes, ObservableList<Node> snapshots, double nodeWidth, double nodeHeight,
+                       ReadOnlyDoubleProperty layoutWidthProperty, ReadOnlyDoubleProperty layoutHeightProperty,
+                       PerspectiveCamera camera, Slider slider, Slider zoomSlider) {
+        type = LayoutType.Stack;
+        this.layoutWidthProperty = layoutWidthProperty;
+        this.layoutHeightProperty = layoutHeightProperty;
+        this.nodeWidth = nodeWidth;
+        this.nodeHeight = nodeHeight;
+        this.slider = slider;
+        this.zoomSlider = zoomSlider;
+        focusedNodeIndex = -1;
 
 		// Transforming nodes
 		initializeNodes(nodes);
@@ -112,16 +112,28 @@ public class StackLayout extends MultipleFramesLayout {
 		node.scaleYProperty().unbind();
 		node.scaleYProperty().bind(layoutHeightProperty.divide(nodeHeight).multiply(scalingFunction).multiply(zoomSlider.valueProperty()));
 
-		// Show node closer and without rotation when hovered
-		node.setOnMouseEntered(e -> {
-			node.setTranslateZ(-100);
-			node.setRotate(0);
-		});
-		node.setOnMouseExited(e -> {
-			node.setTranslateZ(0);
-			node.setRotate(rotate);
-		});
-	}
+        int index = -1;
+        if (transformedNodes != null && transformedNodes.contains(node)) index = transformedNodes.indexOf(node);
+        else if (transformedSnapshots != null && transformedSnapshots.contains(node)) index = transformedSnapshots.indexOf(node);
+
+        if (focusedNodeIndex == index & focusedNodeIndex != -1) {
+            node.setTranslateZ(-100);
+            node.setRotate(0);
+        }
+
+        // Show node closer and without rotation when hovered
+        int finalIndex = index;
+        node.setOnMouseEntered(e -> {
+            node.setTranslateZ(-100);
+            node.setRotate(0);
+            focusedNodeIndex = finalIndex;
+        });
+        node.setOnMouseExited(e -> {
+            node.setTranslateZ(0);
+            node.setRotate(rotate);
+            focusedNodeIndex = -1;
+        });
+    }
 
 	public PerspectiveCamera getCamera() {
 		return camera;
