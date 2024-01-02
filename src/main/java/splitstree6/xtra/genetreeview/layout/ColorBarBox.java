@@ -30,69 +30,71 @@ import java.util.HashMap;
 
 public class ColorBarBox extends Pane implements Selectable {
 
-    private Color color;
-    private final Tooltip tooltip;
-    private String name;
-    private final HashMap<String,String> attachedValues = new HashMap<>();
-    private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
+	private Color color;
+	private final Tooltip tooltip;
+	private String name;
+	private final HashMap<String, String> attachedValues = new HashMap<>();
+	private final BooleanProperty isSelectedProperty = new SimpleBooleanProperty();
 
-    public ColorBarBox(String name, Color color) {
-        this.color = color;
-        this.setBackground(new Background(new BackgroundFill(color,null,null)));
-        this.setStyle("-fx-border-color: -fx-box-border");
-        HBox.setMargin(this, Insets.EMPTY);
-        HBox.setHgrow(this, Priority.ALWAYS);
-        this.name = name;
-        tooltip = new Tooltip(name);
-        Tooltip.install(this, tooltip);
-        isSelectedProperty.addListener((observable, wasSelected, isSelected) -> {
-            if (isSelected) this.setStyle("-fx-border-color: -fx-accent");
-            else this.setStyle("-fx-border-color: -fx-box-border");
-        });
-    }
+	public ColorBarBox(String name, Color color) {
+		this.color = color;
+		this.setBackground(new Background(new BackgroundFill(color, null, null)));
+		this.setStyle("-fx-border-color: -fx-box-border");
+		HBox.setMargin(this, Insets.EMPTY);
+		HBox.setHgrow(this, Priority.ALWAYS);
+		this.name = name;
+		tooltip = new Tooltip(name);
+		Tooltip.install(this, tooltip);
+		isSelectedProperty.addListener((observable, wasSelected, isSelected) -> {
+			if (isSelected) this.setStyle("-fx-border-color: -fx-accent");
+			else this.setStyle("-fx-border-color: -fx-box-border");
+		});
+	}
 
-    void setColor(Color color) {
-        this.color = color;
-        this.setBackground(new Background(new BackgroundFill(color,null,null)));
-    }
+	void setColor(Color color) {
+		this.color = color;
+		this.setBackground(new Background(new BackgroundFill(color, null, null)));
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        {
-            this.name = name;
-            updateTooltip();
-        }
-    }
+	public void setName(String name) {
+		{
+			this.name = name;
+			updateTooltip();
+		}
+	}
 
-    public Color getColor() {
-        return color;
-    }
+	public Color getColor() {
+		return color;
+	}
 
-    public void setSelectedProperty(boolean selected) {
-        isSelectedProperty.set(selected);
-    };
+	public void setSelectedProperty(boolean selected) {
+		isSelectedProperty.set(selected);
+	}
 
-    public void setSelectedProperty() {
-        setSelectedProperty(!isSelectedProperty.get());
-    }
+	;
 
-    public BooleanProperty isSelectedProperty() {
-        return isSelectedProperty;
-    }
+	public void setSelectedProperty() {
+		setSelectedProperty(!isSelectedProperty.get());
+	}
 
-    public void addToTooltipOrReplace(String featureName, String value) {
-        attachedValues.put(featureName, value);
-        updateTooltip();
-    }
+	public BooleanProperty isSelectedProperty() {
+		return isSelectedProperty;
+	}
 
-    private void updateTooltip() {
-        StringBuilder sb = new StringBuilder(name);
-        for (var feature : attachedValues.keySet()) {
-            sb.append("\n").append(feature).append(": ").append(attachedValues.get(feature));
-        }
-        tooltip.setText(sb.toString());
-    }
+	public void addToTooltipOrReplace(String featureName, String value) {
+		attachedValues.put(featureName, value);
+		updateTooltip();
+	}
+
+	private void updateTooltip() {
+		StringBuilder sb = new StringBuilder(name);
+		for (var feature : attachedValues.keySet()) {
+			sb.append("\n").append(feature).append(": ").append(attachedValues.get(feature));
+		}
+		tooltip.setText(sb.toString());
+	}
 }

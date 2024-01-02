@@ -43,6 +43,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	public enum InferenceAlgorithm {GradientProjection, ActiveSet, APGD, SplitsTree4}
 
 	public enum CircularOrderingAlgorithm {SplitsTree4, BryantHuson2023}
+
 	private final ObjectProperty<InferenceAlgorithm> optionInferenceAlgorithm = new SimpleObjectProperty<>(this, "optionInferenceAlgorithm", InferenceAlgorithm.ActiveSet);
 	private final DoubleProperty optionThreshold = new SimpleDoubleProperty(this, "optionThreshold", 1e-8);
 	private final ObjectProperty<CircularOrderingAlgorithm> optionCircularOrdering = new SimpleObjectProperty<>(this, "optionCircularOrdering", CircularOrderingAlgorithm.SplitsTree4);
@@ -71,7 +72,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 		long start = System.currentTimeMillis();
 
 		var cycle = switch (getOptionCircularOrdering()) {
-			case SplitsTree4 -> NeighborNetCycleSplitsTree4.compute(distancesBlock.size(), distancesBlock.getDistances());
+			case SplitsTree4 ->
+					NeighborNetCycleSplitsTree4.compute(distancesBlock.size(), distancesBlock.getDistances());
 			case BryantHuson2023 -> NeighborNetCycle2023.computeOrdering(distancesBlock);
 		};
 
@@ -84,8 +86,8 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.ACTIVESET;
 		else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.APGD)
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.APGD;
-		//else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.IPG)
-		//	params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.IPG;
+			//else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.IPG)
+			//	params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.IPG;
 		else if (getOptionInferenceAlgorithm() == InferenceAlgorithm.GradientProjection)
 			params.method = NeighborNetSplitWeightsClean.NNLSParams.MethodTypes.GRADPROJECTION;
 		else
@@ -102,8 +104,7 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 //			System.err.println("NEW");
 //			for(int i=0;i<splits2.size();i++)
 //				System.err.println(splits2.get(i));
-		}
-		else
+		} else
 			splits = NeighborNetSplitWeightOptimizerSplitsTree4.apply(cycle, distancesBlock);
 
 		progress.setTasks("NNet", "post-analysis");

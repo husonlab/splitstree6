@@ -147,16 +147,22 @@ public class MobileFramePresenter {
 			});
 		});
 
-
 		controller.getTopToolBar().setOnMousePressed(e -> {
-			view.setHideTabs(!view.isHideTabs());
-			if (view.isHideTabs()) {
-				controller.getTabPane().setStyle("-fx-tab-min-height: 0; -fx-tab-max-height: 0; -fx-padding: -4 0 0 0;");
-			} else {
-				controller.getTabPane().setStyle("-fx-tab-min-height: 20; -fx-tab-max-height: 30; -fx-padding: 0 0 0 0;");
-			}
-
+			showHideTabBar();
+			e.consume();
+		});
+		controller.getTopToolBar().setOnTouchPressed(e -> {
+			showHideTabBar();
+			e.consume();
 		});
 	}
 
+	private void showHideTabBar() {
+		view.setHideTabs(!view.isHideTabs());
+		if (view.isHideTabs()) {
+			view.getController().getTabPane().setStyle("-fx-tab-min-height: 0; -fx-tab-max-height: 0; -fx-padding: -4 0 0 0;");
+		} else {
+			view.getController().getTabPane().setStyle("-fx-tab-min-height: 20; -fx-tab-max-height: 30; -fx-padding: 0 0 0 0;");
+		}
+	}
 }

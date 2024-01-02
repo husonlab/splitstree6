@@ -82,7 +82,6 @@ public class AlignmentDrawer {
 			var left = Math.max(1, (int) axis.getLowerBound() - 1);
 			var right = Math.min(inputCharacters.getNchar(), Math.ceil(axis.getUpperBound()));
 
-
 			imageGroup.getChildren().clear();
 
 			service.setCallable(() -> {

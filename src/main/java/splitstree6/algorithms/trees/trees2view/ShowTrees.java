@@ -99,11 +99,11 @@ public class ShowTrees extends Trees2View {
 				});
 			}
 			case Tanglegram -> {
-					Platform.runLater(() -> {
-						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new TanglegramView(mainWindow, ViewType.Tanglegram.name(), viewBlock.getViewTab());
-						viewBlock.setView(view);
-					});
+				Platform.runLater(() -> {
+					var mainWindow = getNode().getOwner().getMainWindow();
+					var view = new TanglegramView(mainWindow, ViewType.Tanglegram.name(), viewBlock.getViewTab());
+					viewBlock.setView(view);
+				});
 
 				Platform.runLater(() -> {
 					if (viewBlock.getView() instanceof TanglegramView view) {

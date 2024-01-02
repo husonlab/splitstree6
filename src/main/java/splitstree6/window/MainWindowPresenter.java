@@ -105,6 +105,7 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
+import splitstree6.view.displaytext.DisplayTextViewPresenter;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.Workflow;
@@ -121,7 +122,7 @@ public class MainWindowPresenter {
 	private final MainWindow mainWindow;
 	private Stage stage;
 	private final MainWindowController controller;
-	private final ObjectProperty<IDisplayTab> focusedDisplayTab = new SimpleObjectProperty<>();
+	private final ObjectProperty<IDisplayTab> selectedDisplayTab = new SimpleObjectProperty<>();
 
 	private final ObservableMap<WorkflowNode, Tab> workFlowTabs = FXCollections.observableHashMap();
 
@@ -152,22 +153,31 @@ public class MainWindowPresenter {
 			}
 		};
 
-		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+		InvalidationListener listener = e -> {
 			try {
+				var tab = controller.getMainTabPane().getSelectionModel().getSelectedItem();
 				disableAllMenuItems(controller);
-				if (n instanceof IDisplayTab displayTab) {
-					focusedDisplayTab.set(displayTab);
+				if (tab instanceof IDisplayTab displayTab) {
+					selectedDisplayTab.set(displayTab);
 				} else
-					focusedDisplayTab.set(null);
-				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
-				if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null) {
-					focusedDisplayTab.get().getPresenter().setupMenuItems();
+					selectedDisplayTab.set(null);
+				setupCommonMenuItems(mainWindow, controller, selectedDisplayTab);
+				if (selectedDisplayTab.get() != null && selectedDisplayTab.get().getPresenter() != null) {
+					selectedDisplayTab.get().getPresenter().setupMenuItems();
 				}
 				enableAllMenuItemsWithDefinedAction(controller);
 			} catch (Exception ex) {
 				Basic.caught(ex);
 			}
-		});
+		};
+
+
+		controller.getMainTabPane().focusedProperty().addListener(listener);
+		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(listener);
+
+		if (controller.getMainTabPane().getSelectionModel().getSelectedItem() instanceof IDisplayTab displayTab)
+			Platform.runLater(() -> selectedDisplayTab.set(displayTab));
+
 		controller.getMainTabPane().setOnSwipeLeft(e -> {
 		});
 		controller.getMainTabPane().setOnSwipeUp(e -> {
@@ -180,12 +190,7 @@ public class MainWindowPresenter {
 		controller.getAlgorithmTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
 				disableAllMenuItems(controller);
-				setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
-				if (n instanceof IDisplayTab displayTab) {
-					displayTab.getPresenter().setupMenuItems();
-					focusedDisplayTab.set(displayTab);
-				} else
-					focusedDisplayTab.set(null);
+				setupCommonMenuItems(mainWindow, controller, selectedDisplayTab);
 				enableAllMenuItemsWithDefinedAction(controller);
 			} catch (Exception ex) {
 				Basic.caught(ex);
@@ -198,14 +203,6 @@ public class MainWindowPresenter {
 		controller.getAlgorithmTabPane().setOnSwipeRight(e -> {
 		});
 		controller.getAlgorithmTabPane().setOnSwipeDown(e -> {
-		});
-
-
-		focusedDisplayTab.set(null);
-		Platform.runLater(() -> {
-			if (mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof IDisplayTab displayTab) {
-				focusedDisplayTab.set(displayTab);
-			}
 		});
 
 		controller.getMainTabPane().getTabs().addListener((ListChangeListener<? super Tab>) e -> {
@@ -264,11 +261,11 @@ public class MainWindowPresenter {
 			try {
 				var displayTab = getContainingDisplayTab(n);
 				if (displayTab != null) {
-					focusedDisplayTab.set(displayTab);
+					selectedDisplayTab.set(displayTab);
 					disableAllMenuItems(controller);
-					setupCommonMenuItems(mainWindow, controller, focusedDisplayTab);
-					if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null)
-						focusedDisplayTab.get().getPresenter().setupMenuItems();
+					setupCommonMenuItems(mainWindow, controller, selectedDisplayTab);
+					if (selectedDisplayTab.get() != null && selectedDisplayTab.get().getPresenter() != null)
+						selectedDisplayTab.get().getPresenter().setupMenuItems();
 					if (false) // todo: if this is enabled, then menu items are enabled that shouldn't be...
 						enableAllMenuItemsWithDefinedAction(controller);
 					if (true)
@@ -281,7 +278,7 @@ public class MainWindowPresenter {
 		});
 
 		stage.focusedProperty().addListener((v, o, n) -> {
-			if (!n && mainWindow.getTaxonSelectionModel().getSelectedItems().size() > 0) {
+			if (!n && !mainWindow.getTaxonSelectionModel().getSelectedItems().isEmpty()) {
 				MainWindowManager.getPreviousSelection().clear();
 				mainWindow.getTaxonSelectionModel().getSelectedItems().stream().map(Taxon::getName).filter(s -> !s.isBlank()).forEach(s -> MainWindowManager.getPreviousSelection().add(s));
 			}
@@ -294,13 +291,19 @@ public class MainWindowPresenter {
 
 
 		BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
+
+		Platform.runLater(() -> {
+			if (mainWindow.getController().getMainTabPane().getSelectionModel().getSelectedItem() instanceof IDisplayTab displayTab) {
+				selectedDisplayTab.set(displayTab);
+			}
+		});
 	}
 
 	public static void updateTaxSetSelection(MainWindow mainWindow, List<MenuItem> items) {
-		items.removeAll(items.stream().filter(t -> t.getText() != null && t.getText().startsWith("TaxSet")).collect(Collectors.toList()));
+		items.removeAll(items.stream().filter(t -> t.getText() != null && t.getText().startsWith("TaxSet")).toList());
 
 		var taxaBlock = mainWindow.getWorkflow().getInputTaxaBlock();
-		if (taxaBlock != null && taxaBlock.getSetsBlock() != null && taxaBlock.getSetsBlock().getTaxSets().size() > 0) {
+		if (taxaBlock != null && taxaBlock.getSetsBlock() != null && !taxaBlock.getSetsBlock().getTaxSets().isEmpty()) {
 			for (var set : taxaBlock.getSetsBlock().getTaxSets()) {
 				var menuItem = new MenuItem("TaxSet " + set.getName());
 				menuItem.setOnAction(e -> {
@@ -413,6 +416,11 @@ public class MainWindowPresenter {
 		controller.getCloseMenuItem().setDisable(false);
 
 		updateUndoRedo();
+		setupSelectButton();
+		workflow.runningProperty().addListener((v, o, n) -> {
+			if (!n)
+				setupSelectButton();
+		});
 
 		controller.getCutMenuItem().setDisable(false);
 		controller.getCopyMenuItem().setDisable(false);
@@ -780,8 +788,8 @@ public class MainWindowPresenter {
 	}
 
 	public void updateUndoRedo() {
-		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getUndoManager() != null) {
-			var undoManager = focusedDisplayTab.get().getUndoManager();
+		if (selectedDisplayTab.get() != null && selectedDisplayTab.get().getUndoManager() != null) {
+			var undoManager = selectedDisplayTab.get().getUndoManager();
 			controller.getUndoButton().setOnAction(e -> undoManager.undo());
 			controller.getUndoButton().disableProperty().bind(undoManager.undoableProperty().not());
 
@@ -810,6 +818,29 @@ public class MainWindowPresenter {
 			controller.getRedoMenuItem().disableProperty().unbind();
 			controller.getRedoMenuItem().setDisable(true);
 		}
+
+	}
+
+	public void setupSelectButton() {
+		controller.getSelectButton().setOnAction(e -> {
+			if (selectedDisplayTab.get() instanceof DisplayTextTab displayTextTab && displayTextTab.getPresenter() instanceof DisplayTextViewPresenter presenter) {
+				presenter.processSelectButtonPressed();
+			} else if (selectedDisplayTab.get() instanceof WorkflowTab workflowTab) {
+				workflowTab.getPresenter().processSelectButtonPressed();
+			} else if (mainWindow.getWorkingTaxa() != null) {
+				if (mainWindow.getWorkingTaxa().getNtax() > 0) {
+					if (mainWindow.getTaxonSelectionModel().size() == mainWindow.getWorkingTaxa().getNtax()) {
+						mainWindow.getTaxonSelectionModel().clearSelection();
+					} else {
+						mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkingTaxa().getTaxa());
+					}
+				}
+			}
+		});
+		if (selectedDisplayTab.get() != null)
+			controller.getSelectButton().disableProperty().bind(selectedDisplayTab.get().emptyProperty());
+		else
+			controller.getSelectButton().disableProperty().bind(new SimpleBooleanProperty(true));
 	}
 
 	private void setupAlgorithmMenuItem(CheckMenuItem menuItem, Algorithm<? extends DataBlock, ? extends DataBlock> algorithm) {
@@ -920,8 +951,8 @@ public class MainWindowPresenter {
 		}
 		controller.getReplaceMenuItem().setDisable(true);
 
-		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getPresenter() != null) {
-			var findToolBar = focusedDisplayTab.get().getPresenter().getFindToolBar();
+		if (selectedDisplayTab.get() != null && selectedDisplayTab.get().getPresenter() != null) {
+			var findToolBar = selectedDisplayTab.get().getPresenter().getFindToolBar();
 			if (findToolBar != null) {
 				{
 					var booleanProperty = findToolBar.showFindToolBarProperty();
@@ -930,7 +961,7 @@ public class MainWindowPresenter {
 					controller.getFindMenuItem().setDisable(false);
 				}
 				{
-					if (focusedDisplayTab.get().getPresenter().allowFindReplace()) {
+					if (selectedDisplayTab.get().getPresenter().allowFindReplace()) {
 						var booleanProperty = findToolBar.showReplaceToolBarProperty();
 						controller.getReplaceMenuItem().selectedProperty().bindBidirectional(booleanProperty);
 						controller.getReplaceMenuItem().setUserData(booleanProperty);

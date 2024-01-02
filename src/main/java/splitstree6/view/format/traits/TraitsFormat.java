@@ -149,7 +149,6 @@ public class TraitsFormat extends Pane {
 	}
 
 
-
 	public void setRunAfterUpdateNodes(Runnable runAfterUpdateNodes) {
 		this.runAfterUpdateNodes = runAfterUpdateNodes;
 	}

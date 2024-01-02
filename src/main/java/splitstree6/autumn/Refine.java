@@ -61,17 +61,15 @@ public class Refine {
 
 	/**
 	 * recursively does the work
-	 *
 	 */
 	public static void apply(Root root1, Root root2) {
-        applyRec(root1, root2, new HashSet<>());
+		applyRec(root1, root2, new HashSet<>());
 		if (!root1.getTaxa().equals(root2.getTaxa()))
 			throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(root1.getTaxa()) + " vs " + StringUtils.toString(root2.getTaxa()));
 	}
 
 	/**
 	 * refines two rooted trees with respect to each other
-	 *
 	 */
 	private static void applyRec(Root v1, Root v2, Set<Pair<Root, Root>> compared) {
 		var pair = new Pair<>(v1, v2);

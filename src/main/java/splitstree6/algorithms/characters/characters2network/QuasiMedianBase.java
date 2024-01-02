@@ -215,7 +215,6 @@ public abstract class QuasiMedianBase {
 
 	/**
 	 * computes the actual graph
-	 *
 	 */
 	public abstract void computeGraph(ProgressListener progressListener, Set<String> inputSequences, double[] weights, PhyloGraph graph) throws CanceledException;
 
@@ -420,28 +419,28 @@ public abstract class QuasiMedianBase {
 		// condensed taxa start at 0
 		for (int t = 1; t <= ntax; t++) {
 			origTaxa2CondensedTaxa[t]--;
-        }
+		}
 
-        String[] result = new String[list.size()];
-        int which = 0;
-        for (Object aList : list) {
-            result[which++] = (String) aList;
-        }
-        return result;
-    }
+		String[] result = new String[list.size()];
+		int which = 0;
+		for (Object aList : list) {
+			result[which++] = (String) aList;
+		}
+		return result;
+	}
 
-    static class Translator {
-        final Map mapOrigPosCondensedPosCondensedCharToOrigChar = new HashMap();
-        int maxOrigPos = 0;
-        int maxOrigChar = 0;
-        int maxCondensedPos = 0;
+	static class Translator {
+		final Map mapOrigPosCondensedPosCondensedCharToOrigChar = new HashMap();
+		int maxOrigPos = 0;
+		int maxOrigChar = 0;
+		int maxCondensedPos = 0;
 
-        public void put(int origPos, char origChar, int condensedPos, char condensedChar) {
-            maxOrigPos = Math.max(maxOrigPos, origPos);
-            maxOrigChar = Math.max(maxOrigChar, origChar);
-            maxCondensedPos = Math.max(maxCondensedPos, condensedPos);
-            Triple triple = new Triple(origPos, condensedPos, condensedChar);
-            Character ch = origChar;
+		public void put(int origPos, char origChar, int condensedPos, char condensedChar) {
+			maxOrigPos = Math.max(maxOrigPos, origPos);
+			maxOrigChar = Math.max(maxOrigChar, origChar);
+			maxCondensedPos = Math.max(maxCondensedPos, condensedPos);
+			Triple triple = new Triple(origPos, condensedPos, condensedChar);
+			Character ch = origChar;
 			mapOrigPosCondensedPosCondensedCharToOrigChar.put(triple, ch);
 		}
 
@@ -471,7 +470,7 @@ public abstract class QuasiMedianBase {
 			return buf.toString();
 		}
 
-        static class Triple {
+		static class Triple {
 			final int first;
 			final int second;
 			final char third;
@@ -482,15 +481,15 @@ public abstract class QuasiMedianBase {
 				this.third = third;
 			}
 
-            public int hashCode() {
-                return first + 17 * second + 37 * third;
-            }
+			public int hashCode() {
+				return first + 17 * second + 37 * third;
+			}
 
 			public boolean equals(Object other) {
-                if (other instanceof Triple t) {
-                    return first == t.first && second == t.second && third == t.third;
-                } else
-                    return false;
+				if (other instanceof Triple t) {
+					return first == t.first && second == t.second && third == t.third;
+				} else
+					return false;
 			}
 		}
 	}

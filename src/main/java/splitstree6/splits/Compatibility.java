@@ -19,8 +19,6 @@
 
 package splitstree6.splits;
 
-import splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetCycleSplitsTree4;
-
 import java.util.BitSet;
 import java.util.List;
 

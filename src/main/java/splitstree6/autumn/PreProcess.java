@@ -52,7 +52,6 @@ public class PreProcess {
 
 	/**
 	 * update preprocessing to one tree
-	 *
 	 */
 	static public Root apply(PhyloTree tree1, TaxaBlock allTaxa, boolean mustHaveSameTaxa) throws IOException {
 

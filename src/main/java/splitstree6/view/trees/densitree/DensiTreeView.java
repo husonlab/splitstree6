@@ -119,7 +119,7 @@ public class DensiTreeView implements IView {
 
 		ProgramProperties.track(optionStrokeWidth, DEFAULT_STROKE_WIDTH);
 		ProgramProperties.track(optionEdgeColor, MainWindowManager.isUseDarkTheme() ? DEFAULT_DARKMODE_EDGE_COLOR : DEFAULT_LIGHTMODE_EDGE_COLOR);
-		ProgramProperties.track(optionOtherColor, DEFAULT_DARKMODE_EDGE_COLOR);
+		ProgramProperties.track(optionOtherColor, DEFAULT_OTHER_COLOR);
 	}
 
 	public List<String> listOptions() {
@@ -149,6 +149,13 @@ public class DensiTreeView implements IView {
 
 		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), new SelectTraits(mainWindow), new EdgesFormat(this));
 
+		viewTab.emptyProperty().bind(empty);
+		viewTabProperty().addListener((v, o, n) -> {
+			if (o != null)
+				o.emptyProperty().unbind();
+			if (n != null)
+				n.emptyProperty().bind(empty);
+		});
 		trees.addListener((InvalidationListener) e -> {
 			empty.set(trees.isEmpty());
 		});

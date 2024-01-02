@@ -110,8 +110,7 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 						mainWindow.getController().getMainTabPane().getSelectionModel().select(viewBlock.getViewTab());
 					} else
 						mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
-				}
-				else if (workflowNode instanceof AlgorithmNode algorithmNode)
+				} else if (workflowNode instanceof AlgorithmNode algorithmNode)
 					mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 			}
 		});
@@ -175,5 +174,12 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return false;
+	}
+
+	public void processSelectButtonPressed() {
+		var workflow = mainWindow.getWorkflow();
+		if (workflow.getSelectionModel().getSelectedItems().size() < workflow.getNumberOfNodes()) {
+			workflow.getSelectionModel().selectAll(workflow.nodes());
+		} else workflow.getSelectionModel().clearSelection();
 	}
 }

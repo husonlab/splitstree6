@@ -53,8 +53,8 @@
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0"/>
                     </GridPane.margin>
                 </ChoiceBox>
-                <Button fx:id="applyButton" mnemonicParsing="false" text="Run" GridPane.columnIndex="3"
-                        GridPane.halignment="CENTER" GridPane.valignment="CENTER">
+                <Button fx:id="applyButton" maxWidth="-Infinity" minWidth="-Infinity" mnemonicParsing="false" text="Run"
+                        GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
                     <tooltip>
                         <Tooltip text="Run algorithm"/>
                     </tooltip>

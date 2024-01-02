@@ -181,8 +181,7 @@ public class WorkflowTreeItem extends TreeItem<String> {
 				mainWindow.getController().getMainTabPane().getSelectionModel().select(viewBlock.getViewTab());
 			} else
 				mainWindow.getTextTabsManager().showDataNodeTab(dataNode, true);
-		}
-		else if (workflowNode instanceof AlgorithmNode algorithmNode)
+		} else if (workflowNode instanceof AlgorithmNode algorithmNode)
 			mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 	}
 

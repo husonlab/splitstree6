@@ -472,8 +472,10 @@ public class MainWindowController {
 	private Button decreaseFontSizeButton;
 
 	@FXML
-	private Menu viewMenu;
+	private Button selectButton;
 
+	@FXML
+	private Menu viewMenu;
 
 
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
@@ -499,6 +501,7 @@ public class MainWindowController {
 		MaterialIcons.setIcon(redoButton, "redo");
 		MaterialIcons.setIcon(increaseFontSizeButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
+		MaterialIcons.setIcon(selectButton, "select_all");
 		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "format_list_bulleted");
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
@@ -650,6 +653,9 @@ public class MainWindowController {
 		return toolsMenu;
 	}
 
+	public Button getSelectButton() {
+		return selectButton;
+	}
 
 	public MenuItem getGroupIdenticalHaplotypesFilesMenuItem() {
 		return GroupIdenticalHaplotypesFilesMenuItem;

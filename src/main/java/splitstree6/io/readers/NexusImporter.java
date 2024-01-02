@@ -22,7 +22,6 @@ package splitstree6.io.readers;
 import jloda.util.FileUtils;
 import jloda.util.Single;
 import jloda.util.parse.NexusStreamParser;
-import jloda.util.progress.ProgressPercentage;
 import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.*;
 import splitstree6.io.nexus.*;

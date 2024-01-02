@@ -31,67 +31,67 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+
 import java.util.Objects;
 
 public abstract class SelectionDialog extends Stage {
 
-    protected Label introLabel;
-    protected final Button startButton;
-    protected final Button cancelButton;
-    protected final BooleanProperty doneProperty = new SimpleBooleanProperty(false);
-    protected String finalSelectedName;
+	protected Label introLabel;
+	protected final Button startButton;
+	protected final Button cancelButton;
+	protected final BooleanProperty doneProperty = new SimpleBooleanProperty(false);
+	protected String finalSelectedName;
 
-    protected SelectionDialog(Stage parentStage, String selectedName, String selectionType) {
-        this.initStyle(parentStage.getStyle());
-        this.initModality(Modality.APPLICATION_MODAL);
-        this.initOwner(parentStage);
-        this.setTitle("SelectionDialog");
+	protected SelectionDialog(Stage parentStage, String selectedName, String selectionType) {
+		this.initStyle(parentStage.getStyle());
+		this.initModality(Modality.APPLICATION_MODAL);
+		this.initOwner(parentStage);
+		this.setTitle("SelectionDialog");
 
-        introLabel = new Label("Continue with following selection:");
-        introLabel.setWrapText(true);
-        TextField nameTextField = new TextField(selectedName);
-        Label infoLabel = new Label("");
-        startButton = new Button("Start");
-        startButton.setOnAction(e -> {
-            String finalSelectedName = nameTextField.getText();
-            if (finalSelectedName != null & !Objects.equals(finalSelectedName, "")) {
-                this.finalSelectedName = finalSelectedName;
-                doneProperty.set(true);
-                this.close();
-            }
-            else {
-                infoLabel.setText("Please provide a " + selectionType);
-            }
-        });
-        cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> {
-            finalSelectedName = null;
-            doneProperty.set(true);
-            this.close();
-        });
+		introLabel = new Label("Continue with following selection:");
+		introLabel.setWrapText(true);
+		TextField nameTextField = new TextField(selectedName);
+		Label infoLabel = new Label("");
+		startButton = new Button("Start");
+		startButton.setOnAction(e -> {
+			String finalSelectedName = nameTextField.getText();
+			if (finalSelectedName != null & !Objects.equals(finalSelectedName, "")) {
+				this.finalSelectedName = finalSelectedName;
+				doneProperty.set(true);
+				this.close();
+			} else {
+				infoLabel.setText("Please provide a " + selectionType);
+			}
+		});
+		cancelButton = new Button("Cancel");
+		cancelButton.setOnAction(e -> {
+			finalSelectedName = null;
+			doneProperty.set(true);
+			this.close();
+		});
 
-        BorderPane borderPane = new BorderPane();
-        borderPane.setPadding(new Insets(10));
-        VBox vBox = new VBox(10);
-        vBox.setPadding(new Insets(10));
-        HBox hBox = new HBox();
-        hBox.getChildren().addAll(startButton, cancelButton);
-        hBox.setSpacing(5);
-        vBox.getChildren().addAll(nameTextField, hBox);
-        borderPane.setTop(introLabel);
-        borderPane.setCenter(vBox);
-        borderPane.setBottom(infoLabel);
+		BorderPane borderPane = new BorderPane();
+		borderPane.setPadding(new Insets(10));
+		VBox vBox = new VBox(10);
+		vBox.setPadding(new Insets(10));
+		HBox hBox = new HBox();
+		hBox.getChildren().addAll(startButton, cancelButton);
+		hBox.setSpacing(5);
+		vBox.getChildren().addAll(nameTextField, hBox);
+		borderPane.setTop(introLabel);
+		borderPane.setCenter(vBox);
+		borderPane.setBottom(infoLabel);
 
-        Scene scene = new Scene(borderPane, 370, 155);
-        this.setScene(scene);
-        this.show();
-    }
+		Scene scene = new Scene(borderPane, 370, 155);
+		this.setScene(scene);
+		this.show();
+	}
 
-    public BooleanProperty doneProperty() {
-        return doneProperty;
-    }
+	public BooleanProperty doneProperty() {
+		return doneProperty;
+	}
 
-    public String getFinalSelectedName() {
-        return finalSelectedName;
-    }
+	public String getFinalSelectedName() {
+		return finalSelectedName;
+	}
 }

@@ -214,7 +214,7 @@ public class TaxaBlock extends DataBlock {
 		}
 	}
 
-    /**
+	/**
 	 * adds a name to the taxa, making it unique, if necessary
 	 *
 	 * @param name0 original name

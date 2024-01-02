@@ -99,10 +99,10 @@ public class NewickReader extends TreesReader {
 										tree.setName(s.substring(GENE_NAME_TAG.length() + 1).trim());
 								}, (v, s) -> {
 									if (v != null && s != null) {
-								if (s.startsWith(GENE_NAME_TAG))
-									tree.setName(s.substring(GENE_NAME_TAG.length()).trim());
-								else
-									nodeCommentMap.put(v, s);
+										if (s.startsWith(GENE_NAME_TAG))
+											tree.setName(s.substring(GENE_NAME_TAG.length()).trim());
+										else
+											nodeCommentMap.put(v, s);
 									}
 								});
 						if (newickIO.isInputHasMultiLabels())
@@ -118,66 +118,66 @@ public class NewickReader extends TreesReader {
 					NotificationManager.showWarning("Leaf nodes have integer labels 'i', converting to t'i'");
 					for (var v : tree.leaves()) {
 						if (NumberUtils.isInteger(tree.getLabel(v))) {
-								tree.setLabel(v, "t" + tree.getLabel(v));
-							}
+							tree.setLabel(v, "t" + tree.getLabel(v));
 						}
 					}
+				}
 
-					final var labelList = getNodeLabels(tree, true);
-					final var labelSet = new HashSet<>(labelList);
-					final var multiLabeled = (labelSet.size() < labelList.size());
+				final var labelList = getNodeLabels(tree, true);
+				final var labelSet = new HashSet<>(labelList);
+				final var multiLabeled = (labelSet.size() < labelList.size());
 
-					if (multiLabeled) {
-						if (isOptionConvertMultiLabeledTree()) {
-							final var seen = new HashSet<String>();
-							for (var v : tree.nodes()) {
-								var label = tree.getLabel(v);
-								if (label != null) {
-									var count = 1;
-									while (seen.contains(label)) {
-										label = tree.getLabel(v) + "-" + (++count);
-									}
-									if (count > 1)
-										tree.setLabel(v, label);
-									seen.add(label);
+				if (multiLabeled) {
+					if (isOptionConvertMultiLabeledTree()) {
+						final var seen = new HashSet<String>();
+						for (var v : tree.nodes()) {
+							var label = tree.getLabel(v);
+							if (label != null) {
+								var count = 1;
+								while (seen.contains(label)) {
+									label = tree.getLabel(v) + "-" + (++count);
 								}
+								if (count > 1)
+									tree.setLabel(v, label);
+								seen.add(label);
 							}
-						} else {
-							for (var z : labelSet) {
-								labelList.remove(z);
-							}
-							throw new IOExceptionWithLineNumber(lineno, "Name appears multiple times in tree: " + labelList.get(0));
-						}
-					}
-
-					if (taxonNamesFound.size() == 0) {
-						for (var name : labelList) {
-							taxonNamesFound.add(name);
-							orderedTaxonNames.add(name);
-							taxName2Id.put(name, orderedTaxonNames.size());
 						}
 					} else {
-						if (!taxonNamesFound.equals(IteratorUtils.asSet(labelList))) {
-							treesBlock.setPartial(true);
-							for (var name : labelList) {
-								if (!taxonNamesFound.contains(name)) {
-									if (false)
-										System.err.println("Additional taxon name: " + name);
-									taxonNamesFound.add(name);
-									orderedTaxonNames.add(name);
-									taxName2Id.put(name, orderedTaxonNames.size());
-								}
+						for (var z : labelSet) {
+							labelList.remove(z);
+						}
+						throw new IOExceptionWithLineNumber(lineno, "Name appears multiple times in tree: " + labelList.get(0));
+					}
+				}
+
+				if (taxonNamesFound.size() == 0) {
+					for (var name : labelList) {
+						taxonNamesFound.add(name);
+						orderedTaxonNames.add(name);
+						taxName2Id.put(name, orderedTaxonNames.size());
+					}
+				} else {
+					if (!taxonNamesFound.equals(IteratorUtils.asSet(labelList))) {
+						treesBlock.setPartial(true);
+						for (var name : labelList) {
+							if (!taxonNamesFound.contains(name)) {
+								if (false)
+									System.err.println("Additional taxon name: " + name);
+								taxonNamesFound.add(name);
+								orderedTaxonNames.add(name);
+								taxName2Id.put(name, orderedTaxonNames.size());
 							}
 						}
 					}
-					for (var v : tree.nodes()) {
-						final var label = tree.getLabel(v);
-						if (label != null && label.length() > 0) {
-							if (taxonNamesFound.contains(label)) { // need to check that this is a taxon name, could also be a number placed on the root...
-								tree.addTaxon(v, taxName2Id.get(label));
-							}
+				}
+				for (var v : tree.nodes()) {
+					final var label = tree.getLabel(v);
+					if (label != null && label.length() > 0) {
+						if (taxonNamesFound.contains(label)) { // need to check that this is a taxon name, could also be a number placed on the root...
+							tree.addTaxon(v, taxName2Id.get(label));
 						}
 					}
+				}
 
 				if (!treesBlock.isReticulated() && tree.edgeStream().anyMatch(tree::isReticulateEdge)) {
 					treesBlock.setReticulated(true);
@@ -189,11 +189,11 @@ public class NewickReader extends TreesReader {
 
 				progress.setProgress(it.getProgress());
 			} else
-					parts.add(line);
-			}
+				parts.add(line);
+		}
 		if (!parts.isEmpty())
-				System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
-			taxa.addTaxaByNames(orderedTaxonNames);
+			System.err.println("Ignoring trailing lines at end of file:\n" + StringUtils.abbreviateDotDotDot(StringUtils.toString(parts, "\n"), 400));
+		taxa.addTaxaByNames(orderedTaxonNames);
 	}
 
 	private void setupEdgeConfidenceFromComments(PhyloTree tree, NodeArray<String> nodeCommentMap) {

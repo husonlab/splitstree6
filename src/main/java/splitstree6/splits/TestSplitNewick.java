@@ -20,16 +20,13 @@
 package splitstree6.splits;
 
 import jloda.graph.Edge;
-import jloda.graph.EdgeArray;
 import jloda.graph.Node;
-import jloda.graph.NodeArray;
 import jloda.graph.io.GraphGML;
 import jloda.phylo.PhyloSplitsGraph;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
 

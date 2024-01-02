@@ -26,61 +26,61 @@ import java.util.HashMap;
 
 public class GeneTree {
 
-    private final PhyloTree phyloTree;
-    private final int id;
-    private int position;
-    private Color color;
-    private final HashMap<String,Object> furtherFeatures = new HashMap<>();
+	private final PhyloTree phyloTree;
+	private final int id;
+	private int position;
+	private Color color;
+	private final HashMap<String, Object> furtherFeatures = new HashMap<>();
 
-    public GeneTree(PhyloTree phyloTree, int id, int position) {
-        this.phyloTree = phyloTree;
-        this.id = id;
-        this.position = position;
-    }
+	public GeneTree(PhyloTree phyloTree, int id, int position) {
+		this.phyloTree = phyloTree;
+		this.id = id;
+		this.position = position;
+	}
 
-    public PhyloTree getPhyloTree() {
-        return phyloTree;
-    }
+	public PhyloTree getPhyloTree() {
+		return phyloTree;
+	}
 
-    public int getId() {
-        return id;
-    }
+	public int getId() {
+		return id;
+	}
 
-    public String getGeneName() {
-        return phyloTree.getName();
-    }
+	public String getGeneName() {
+		return phyloTree.getName();
+	}
 
-    public int getPosition() {
-        return position;
-    }
+	public int getPosition() {
+		return position;
+	}
 
-    public void setGeneName(String geneName) {
-        if (geneName != null) {
-            phyloTree.setName(geneName);
-        }
-    }
+	public void setGeneName(String geneName) {
+		if (geneName != null) {
+			phyloTree.setName(geneName);
+		}
+	}
 
-    public void setPosition(int position) {
-        this.position = position;
-    }
+	public void setPosition(int position) {
+		this.position = position;
+	}
 
-    public void addFeature(String name, Object value) {
-        furtherFeatures.put(name, value);
-    }
+	public void addFeature(String name, Object value) {
+		furtherFeatures.put(name, value);
+	}
 
-    public Object getFeature(String featureName) {
-        return furtherFeatures.get(featureName);
-    }
+	public Object getFeature(String featureName) {
+		return furtherFeatures.get(featureName);
+	}
 
-    public void setColor(Color color) {
-        this.color = color;
-    }
+	public void setColor(Color color) {
+		this.color = color;
+	}
 
-    public Color getColor() {
-        return color;
-    }
+	public Color getColor() {
+		return color;
+	}
 
-    public HashMap<String,Object> getFurtherFeatures() {
-        return furtherFeatures;
-    }
+	public HashMap<String, Object> getFurtherFeatures() {
+		return furtherFeatures;
+	}
 }

@@ -25,23 +25,23 @@ import java.util.regex.Pattern;
 
 public class LeafCounter {
 
-        public static void main(String[] args) throws IOException {
-            var filePath = args[0];
-            FileInputStream fis = new FileInputStream(filePath);
-            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
-            StringBuilder sb = new StringBuilder();
-            for (var line : br.lines().toList()) {
-                Pattern pattern = Pattern.compile("[(,][^:]*:");
-                Matcher matcher = pattern.matcher(line);
-                var count = matcher.results().count();
-                sb.append(count).append("\n");
-            }
-            br.close();
-            String targetFilePath = filePath.replaceAll("\\.[a-z]*","");
-            targetFilePath = targetFilePath + "_leafCounts.txt";
-            System.out.println(targetFilePath);
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath)));
-            bw.write(sb.toString());
-            bw.close();
-        }
-    }
+	public static void main(String[] args) throws IOException {
+		var filePath = args[0];
+		FileInputStream fis = new FileInputStream(filePath);
+		BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+		StringBuilder sb = new StringBuilder();
+		for (var line : br.lines().toList()) {
+			Pattern pattern = Pattern.compile("[(,][^:]*:");
+			Matcher matcher = pattern.matcher(line);
+			var count = matcher.results().count();
+			sb.append(count).append("\n");
+		}
+		br.close();
+		String targetFilePath = filePath.replaceAll("\\.[a-z]*", "");
+		targetFilePath = targetFilePath + "_leafCounts.txt";
+		System.out.println(targetFilePath);
+		BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(targetFilePath)));
+		bw.write(sb.toString());
+		bw.close();
+	}
+}

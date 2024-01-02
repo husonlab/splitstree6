@@ -75,12 +75,15 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 		return switch (optionName) {
 			case "optionPropInvariableSites" -> "Proportion of invariable sites";
 			case "optionGamma" -> "Alpha value for the Gamma distribution";
-			case "optionUseML_Distances" -> "Use maximum likelihood estimation of distances (rather than exact distances)";
+			case "optionUseML_Distances" ->
+					"Use maximum likelihood estimation of distances (rather than exact distances)";
 			case "optionTsTvRatio" -> "Ratio of transitions vs transversions";
 			case "optionBaseFrequencies" -> "Base frequencies (in order ACGT/U)";
 			case "optionRateMatrix" -> "Rate matrix for GTR (in order ACGT/U)";
-			case "optionSetBaseFrequencies" -> "Set base frequencies to default values, or to estimations from characters (using Capture-recapture for invariable sites)";
-			case "optionSetSiteVarParams" -> "Set site variation parameters to default values, or to estimations from characters";
+			case "optionSetBaseFrequencies" ->
+					"Set base frequencies to default values, or to estimations from characters (using Capture-recapture for invariable sites)";
+			case "optionSetSiteVarParams" ->
+					"Set site variation parameters to default values, or to estimations from characters";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -93,13 +96,13 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 			optionSetSiteVarParamsProperty().removeListener(listenerSetSiteVarParams);
 		// create set Parameters control:
 		listenerSetSiteVarParams = (c, o, n) -> {
-            switch (n) {
-                case defaultValues -> {
-                    setOptionPropInvariableSites(DEFAULT_PROP_INVARIABLE_SITES);
-                    setOptionGamma(DEFAULT_GAMMA);
+			switch (n) {
+				case defaultValues -> {
+					setOptionPropInvariableSites(DEFAULT_PROP_INVARIABLE_SITES);
+					setOptionGamma(DEFAULT_GAMMA);
 				}
-                case fromChars -> {
-                    final AService<Double> service = new AService<>(() -> {
+				case fromChars -> {
+					final AService<Double> service = new AService<>(() -> {
 						// todo: want this to run in foot pane
 						try (ProgressPercentage progress = new ProgressPercentage("Estimate invariable sites")) {
 							final var estimateInvariableSites = new EstimateInvariableSites();
@@ -110,32 +113,32 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 					service.setOnFailed((e) -> NotificationManager.showError("Calculation of proportion of invariable sites failed: " + service.getException().getMessage()));
 					service.start();
 				}
-            }
-        };
+			}
+		};
 		optionSetSiteVarParamsProperty().addListener(listenerSetSiteVarParams);
 
 		if (listenerSetBaseFrequencies != null)
 			optionSetBaseFrequenciesProperty().removeListener(listenerSetBaseFrequencies);
 		// create set Parameters control:
 		listenerSetBaseFrequencies = (c, o, n) -> {
-            switch (n) {
-                case defaultValues -> {
-                    setOptionBaseFrequencies(DEFAULT_BASE_FREQ);
-                    setOptionRateMatrix(DEFAULT_RATE_MATRIX);
-                    setOptionTsTvRatio(DEFAULT_TSTV_RATIO);
-                    setOptionACvATRatio(DEFAULT_AC_VS_AT);
+			switch (n) {
+				case defaultValues -> {
+					setOptionBaseFrequencies(DEFAULT_BASE_FREQ);
+					setOptionRateMatrix(DEFAULT_RATE_MATRIX);
+					setOptionTsTvRatio(DEFAULT_TSTV_RATIO);
+					setOptionACvATRatio(DEFAULT_AC_VS_AT);
 				}
-                case fromChars -> {
-                    final AService<double[]> service = new AService<>(() -> NucleotideModel.computeFreqs(parent, false));
+				case fromChars -> {
+					final AService<double[]> service = new AService<>(() -> NucleotideModel.computeFreqs(parent, false));
 					service.setOnSucceeded((e) -> setOptionBaseFrequencies(service.getValue()));
 					service.setOnFailed((e) -> NotificationManager.showError("Calculation of base frequencies failed: " + service.getException().getMessage()));
 					service.start();
 
-                    // todo: don't know how to estimate QMatrix from data, ask Dave!
-                    setOptionRateMatrix(DEFAULT_RATE_MATRIX);
+					// todo: don't know how to estimate QMatrix from data, ask Dave!
+					setOptionRateMatrix(DEFAULT_RATE_MATRIX);
 				}
-            }
-        };
+			}
+		};
 		optionSetBaseFrequenciesProperty().addListener(listenerSetBaseFrequencies);
 	}
 

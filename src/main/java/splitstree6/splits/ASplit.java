@@ -139,6 +139,6 @@ public final class ASplit extends BiPartition {
 	}
 
 	public ASplit clone() {
-		return new ASplit(getA(), ntax(), getWeight(), getConfidence(),getLabel());
+		return new ASplit(getA(), ntax(), getWeight(), getConfidence(), getLabel());
 	}
 }

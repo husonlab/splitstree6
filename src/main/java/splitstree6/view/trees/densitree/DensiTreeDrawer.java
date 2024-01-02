@@ -286,7 +286,8 @@ public class DensiTreeDrawer {
 			var shape = switch (diagramType) {
 				case TriangularPhylogram, RadialPhylogram -> new Line(p.getX(), p.getY(), q.getX(), q.getY());
 				case RectangularPhylogram -> new Polyline(p.getX(), p.getY(), p.getX(), q.getY(), q.getX(), q.getY());
-				case RoundedPhylogram -> new Path(new MoveTo(p.getX(), p.getY()), new QuadCurveTo(p.getX(), q.getY(), q.getX(), q.getY()));
+				case RoundedPhylogram ->
+						new Path(new MoveTo(p.getX(), p.getY()), new QuadCurveTo(p.getX(), q.getY(), q.getX(), q.getY()));
 			};
 			e.setData(shape);
 			shape.getStyleClass().add("graph-special-edge");

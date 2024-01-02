@@ -64,17 +64,17 @@ public class RerootByHybridNumber {
 		}
 
 		Edge[] number2edge1 = new Edge[tree1.getNumberOfEdges()];
-        Map<Edge, Integer> edge2number1 = new HashMap<>();
-        int count1 = 0;
+		Map<Edge, Integer> edge2number1 = new HashMap<>();
+		int count1 = 0;
 		for (Edge e = tree1.getFirstEdge(); e != null; e = tree1.getNextEdge(e)) {
 			number2edge1[count1] = e;
 			edge2number1.put(e, count1);
 			count1++;
 		}
 
-        Edge[] number2edge2 = new Edge[tree2.getNumberOfEdges()];
-        Map<Edge, Integer> edge2number2 = new HashMap<>();
-        int count2 = 0;
+		Edge[] number2edge2 = new Edge[tree2.getNumberOfEdges()];
+		Map<Edge, Integer> edge2number2 = new HashMap<>();
+		int count2 = 0;
 		for (Edge e = tree2.getFirstEdge(); e != null; e = tree2.getNextEdge(e)) {
 			number2edge2[count2] = e;
 			edge2number2.put(e, count2);
@@ -82,21 +82,21 @@ public class RerootByHybridNumber {
 		}
 
 		// sorted list of all pairs of rooting in increasing sum of rooting unbalancedness
-        SortedSet<Pair<Triplet<Integer, Float, Float>, Triplet<Integer, Float, Float>>> allPairs =
-                new TreeSet<>
-                        ((a, b) -> {
-                            double scoreA = Math.max(Math.abs(a.getFirst().getSecond() - a.getFirst().getThird()), Math.abs(a.getSecond().getSecond() - a.getSecond().getThird()));
-                            double scoreB = Math.max(Math.abs(b.getFirst().getSecond() - b.getFirst().getThird()), Math.abs(b.getSecond().getSecond() - b.getSecond().getThird()));
-                            if (scoreA < scoreB)
-                                return -1;
-                            else if (scoreA > scoreB)
-                                return 1;
-                            else if (a.getFirst().getFirst() < b.getFirst().getFirst())
-                                return -1;
-                            else if (a.getFirst().getFirst() > b.getFirst().getFirst())
+		SortedSet<Pair<Triplet<Integer, Float, Float>, Triplet<Integer, Float, Float>>> allPairs =
+				new TreeSet<>
+						((a, b) -> {
+							double scoreA = Math.max(Math.abs(a.getFirst().getSecond() - a.getFirst().getThird()), Math.abs(a.getSecond().getSecond() - a.getSecond().getThird()));
+							double scoreB = Math.max(Math.abs(b.getFirst().getSecond() - b.getFirst().getThird()), Math.abs(b.getSecond().getSecond() - b.getSecond().getThird()));
+							if (scoreA < scoreB)
+								return -1;
+							else if (scoreA > scoreB)
+								return 1;
+							else if (a.getFirst().getFirst() < b.getFirst().getFirst())
+								return -1;
+							else if (a.getFirst().getFirst() > b.getFirst().getFirst())
 								return 1;
 							else return a.getSecond().getFirst().compareTo(b.getSecond().getFirst());
-                        });
+						});
 
 		// create all pairs of rootings
 		{
@@ -224,7 +224,7 @@ public class RerootByHybridNumber {
 		if (bestScore < originalH) {
 			tree1.setRoot(number2edge1[bestE1], bestSourceLength1, bestTargetLength1, null);
 			tree1.redirectEdgesAwayFromRoot();
-            Set<Node> divertices1 = new HashSet<>();
+			Set<Node> divertices1 = new HashSet<>();
 			for (Node v = tree1.getFirstNode(); v != null; v = tree1.getNextNode(v)) {
 				if (v.getInDegree() == 1 && v.getOutDegree() == 1 && tree1.getLabel(v) == null)
 					divertices1.add(v);
@@ -234,7 +234,7 @@ public class RerootByHybridNumber {
 			}
 			tree2.setRoot(number2edge2[bestE2], bestSourceLength2, bestTargetLength2, null);
 			tree2.redirectEdgesAwayFromRoot();
-            Set<Node> divertices2 = new HashSet<>();
+			Set<Node> divertices2 = new HashSet<>();
 			for (Node v = tree2.getFirstNode(); v != null; v = tree2.getNextNode(v)) {
 				if (v.getInDegree() == 1 && v.getOutDegree() == 1 && tree2.getLabel(v) == null)
 					divertices2.add(v);

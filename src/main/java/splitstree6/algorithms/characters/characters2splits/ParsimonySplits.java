@@ -26,8 +26,8 @@ import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.splits.ASplit;
 import splitstree6.data.parts.AmbiguityCodes;
+import splitstree6.splits.ASplit;
 import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
@@ -131,7 +131,6 @@ public class ParsimonySplits extends Characters2Splits {
 
 	/**
 	 * Computes the p-index of a split:
-	 *
 	 */
 	private int pIndex(boolean gapsAsMissing, int t, BitSet A, CharactersBlock characters) {
 		var value = Integer.MAX_VALUE;
@@ -160,7 +159,6 @@ public class ParsimonySplits extends Characters2Splits {
 
 	/**
 	 * Computes the parsimony-score for the four given taxa:
-	 *
 	 */
 	private int pScore(boolean gapMissingMode, int a1, int a2, int b1, int b2, CharactersBlock characters) {
 		final char missingChar = characters.getMissingCharacter();

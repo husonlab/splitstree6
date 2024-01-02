@@ -270,17 +270,17 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
 
-    private record RowsCols(int rows, int cols) {
-        public static RowsCols valueOf(String str) {
-            if (str != null) {
-                var tokens = StringUtils.split(str, 'x');
-                if (tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]))
-                    return new RowsCols(NumberUtils.parseInt(tokens[0]), NumberUtils.parseInt(tokens[1]));
-            }
-            return null;
-        }
+	private record RowsCols(int rows, int cols) {
+		public static RowsCols valueOf(String str) {
+			if (str != null) {
+				var tokens = StringUtils.split(str, 'x');
+				if (tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]))
+					return new RowsCols(NumberUtils.parseInt(tokens[0]), NumberUtils.parseInt(tokens[1]));
+			}
+			return null;
+		}
 
-        public String toString() {
+		public String toString() {
 			return rows + " x " + cols;
 		}
 	}

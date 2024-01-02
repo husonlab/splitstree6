@@ -67,7 +67,8 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			case "optionFilterAlgorithm" -> "Set the filter algorithm";
 			case "optionWeightThreshold" -> "Set minimum split weight threshold";
 			case "optionConfidenceThreshold" -> "Set the minimum split confidence threshold";
-			case "optionMaximumDimension" -> "Set maximum dimension threshold (necessary to avoid computational overload)";
+			case "optionMaximumDimension" ->
+					"Set maximum dimension threshold (necessary to avoid computational overload)";
 			case "optionRecomputeCycle" -> "Recompute circular ordering";
 			default -> optionName;
 		};
@@ -97,8 +98,10 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 				yield ClosestTree.apply(progress, taxaBlock.getNtax(), parent.getSplits(), parent.getCycle());
 			}
 			 */
-			case GreedyWeaklyCompatible -> GreedyWeaklyCompatible.apply(progress, parent.getSplits(), ASplit::getWeight);
-			case GreedyCircular -> GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), parent.getSplits(), ASplit::getWeight);
+			case GreedyWeaklyCompatible ->
+					GreedyWeaklyCompatible.apply(progress, parent.getSplits(), ASplit::getWeight);
+			case GreedyCircular ->
+					GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), parent.getSplits(), ASplit::getWeight);
 			case BlobTree -> {
 				compatibility = Compatibility.compatible;
 				var result = new ArrayList<ASplit>();

@@ -23,12 +23,12 @@ import javafx.stage.Stage;
 
 public class GeneOrderDialog extends SelectionDialog {
 
-    public GeneOrderDialog(Stage parentStage, String taxonName) {
-        super(parentStage, taxonName, "taxon name");
-        this.setTitle("GeneOrderRequest");
-        introLabel.setText("If entries are available in NCBI for all genes for the selected taxon, the " +
-                "genes' starting positions in the genome can be downloaded. This might take some time. \nThe gene trees " +
-                "will be ordered as genes in the genome of:");
-        startButton.setText("Get gene order from NCBI");
-    }
+	public GeneOrderDialog(Stage parentStage, String taxonName) {
+		super(parentStage, taxonName, "taxon name");
+		this.setTitle("GeneOrderRequest");
+		introLabel.setText("If entries are available in NCBI for all genes for the selected taxon, the " +
+						   "genes' starting positions in the genome can be downloaded. This might take some time. \nThe gene trees " +
+						   "will be ordered as genes in the genome of:");
+		startButton.setText("Get gene order from NCBI");
+	}
 }

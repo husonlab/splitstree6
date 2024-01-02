@@ -24,10 +24,10 @@ import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.SetUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.splits.TreesUtils;
 
 import java.util.*;
 

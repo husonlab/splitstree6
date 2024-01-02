@@ -36,77 +36,76 @@ import java.util.Arrays;
 
 public abstract class ParserDialog extends Stage {
 
-    protected final Label introLabel;
-    protected final TextArea textInputArea;
-    protected final Button startButton;
-    protected final Button cancelButton;
-    protected final Label infoLabel;
-    protected final VBox vBoxOverall;
-    protected final HBox hBoxBottom;
-    protected final VBox vBoxInput;
-    protected final HBox hBoxInput;
-    protected final BooleanProperty parsedProperty = new SimpleBooleanProperty(false);
+	protected final Label introLabel;
+	protected final TextArea textInputArea;
+	protected final Button startButton;
+	protected final Button cancelButton;
+	protected final Label infoLabel;
+	protected final VBox vBoxOverall;
+	protected final HBox hBoxBottom;
+	protected final VBox vBoxInput;
+	protected final HBox hBoxInput;
+	protected final BooleanProperty parsedProperty = new SimpleBooleanProperty(false);
 
-    public ParserDialog(Stage parentStage, String featureName, int expectedNumberOfValues) {
-        this.initStyle(parentStage.getStyle());
-        this.setTitle("ParserDialog");
-        this.initModality(Modality.APPLICATION_MODAL);
-        this.initOwner(parentStage);
+	public ParserDialog(Stage parentStage, String featureName, int expectedNumberOfValues) {
+		this.initStyle(parentStage.getStyle());
+		this.setTitle("ParserDialog");
+		this.initModality(Modality.APPLICATION_MODAL);
+		this.initOwner(parentStage);
 
-        textInputArea = new TextArea();
-        introLabel = new Label("Enter "+featureName+" in current tree order:");
-        introLabel.setWrapText(true);
-        infoLabel = new Label("");
-        startButton = new Button("Import");
-        startButton.setOnAction(e -> {
-            String textInput = textInputArea.getText();
-            ArrayList<String> values = extractFeatureValues(textInput, expectedNumberOfValues);
-            if (values != null) {
-                if (parseFeatureToModel(featureName, values))
-                    this.close();
-                else infoLabel.setText("Import failed");
-            }
-            else {
-                infoLabel.setText("Import failed");
-            }
-        });
-        cancelButton = new Button("Cancel");
-        cancelButton.setOnAction(e -> this.close());
+		textInputArea = new TextArea();
+		introLabel = new Label("Enter " + featureName + " in current tree order:");
+		introLabel.setWrapText(true);
+		infoLabel = new Label("");
+		startButton = new Button("Import");
+		startButton.setOnAction(e -> {
+			String textInput = textInputArea.getText();
+			ArrayList<String> values = extractFeatureValues(textInput, expectedNumberOfValues);
+			if (values != null) {
+				if (parseFeatureToModel(featureName, values))
+					this.close();
+				else infoLabel.setText("Import failed");
+			} else {
+				infoLabel.setText("Import failed");
+			}
+		});
+		cancelButton = new Button("Cancel");
+		cancelButton.setOnAction(e -> this.close());
 
-        vBoxOverall = new VBox(10);
-        vBoxOverall.setPadding(new Insets(10));
-        vBoxInput = new VBox(10);
-        vBoxInput.setPadding(new Insets(10));
-        hBoxInput = new HBox();
-        hBoxInput.getChildren().add(textInputArea);
-        vBoxInput.getChildren().add(hBoxInput);
-        hBoxBottom = new HBox();
-        hBoxBottom.getChildren().addAll(startButton, cancelButton, infoLabel);
-        hBoxBottom.setSpacing(5);
-        vBoxOverall.getChildren().addAll(introLabel, vBoxInput, hBoxBottom);
+		vBoxOverall = new VBox(10);
+		vBoxOverall.setPadding(new Insets(10));
+		vBoxInput = new VBox(10);
+		vBoxInput.setPadding(new Insets(10));
+		hBoxInput = new HBox();
+		hBoxInput.getChildren().add(textInputArea);
+		vBoxInput.getChildren().add(hBoxInput);
+		hBoxBottom = new HBox();
+		hBoxBottom.getChildren().addAll(startButton, cancelButton, infoLabel);
+		hBoxBottom.setSpacing(5);
+		vBoxOverall.getChildren().addAll(introLabel, vBoxInput, hBoxBottom);
 
-        Scene scene = new Scene(vBoxOverall, 300, 200);
-        this.setScene(scene);
-        this.show();
-    }
+		Scene scene = new Scene(vBoxOverall, 300, 200);
+		this.setScene(scene);
+		this.show();
+	}
 
-    ArrayList<String> extractFeatureValues(String textInput, int expectedLength) {
-        String[] values;
-        if (textInput.split("\t").length == expectedLength) values = textInput.split("\t");
-        else if (textInput.split(",").length == expectedLength) values = textInput.split(",");
-        else if (textInput.split(";").length == expectedLength) values = textInput.split(";");
-        else if (textInput.split("\n").length == expectedLength) values = textInput.split("\n");
-        else if (textInput.split(" ").length == expectedLength) values = textInput.split(" ");
-        else return null;
-        for (int i = 0; i < expectedLength; i++) {
-            values[i] = values[i].trim();
-        }
-        return new ArrayList<>(Arrays.stream(values).toList());
-    }
+	ArrayList<String> extractFeatureValues(String textInput, int expectedLength) {
+		String[] values;
+		if (textInput.split("\t").length == expectedLength) values = textInput.split("\t");
+		else if (textInput.split(",").length == expectedLength) values = textInput.split(",");
+		else if (textInput.split(";").length == expectedLength) values = textInput.split(";");
+		else if (textInput.split("\n").length == expectedLength) values = textInput.split("\n");
+		else if (textInput.split(" ").length == expectedLength) values = textInput.split(" ");
+		else return null;
+		for (int i = 0; i < expectedLength; i++) {
+			values[i] = values[i].trim();
+		}
+		return new ArrayList<>(Arrays.stream(values).toList());
+	}
 
-    abstract boolean parseFeatureToModel(String featureName, ArrayList<String> values);
+	abstract boolean parseFeatureToModel(String featureName, ArrayList<String> values);
 
-    public BooleanProperty getParsedProperty() {
-        return parsedProperty;
-    }
+	public BooleanProperty getParsedProperty() {
+		return parsedProperty;
+	}
 }

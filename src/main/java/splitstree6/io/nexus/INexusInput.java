@@ -34,9 +34,9 @@ import java.util.List;
  */
 public interface INexusInput<D extends DataBlock> {
 	/**
-     * get syntax
-     */
-    String getSyntax();
+	 * get syntax
+	 */
+	String getSyntax();
 
 	/**
 	 * @return taxon names, if found

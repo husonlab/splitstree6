@@ -64,7 +64,6 @@ public class SupportValueUtils {
 
 	/**
 	 * set internal node labels from edge labels
-	 *
 	 */
 	public static void setInternalNodeLabelsFromEdgeLabels(PhyloTree tree, EdgeArray<String> edgeLabels) {
 		for (Node v = tree.getFirstNode(); v != null; v = v.getNext()) {

@@ -50,8 +50,7 @@ public class NexusDataBlockInput {
 				title = input.getTitle();
 				link = input.getLink();
 				return dataBlock;
-			}
-            else if (np.peekMatchBeginBlock(TraitsBlock.BLOCK_NAME)) {
+			} else if (np.peekMatchBeginBlock(TraitsBlock.BLOCK_NAME)) {
 				final var input = new TraitsNexusInput();
 				final var dataBlock = new TraitsBlock();
 				input.parse(np, taxa, dataBlock);

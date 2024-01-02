@@ -67,14 +67,14 @@ public class LayoutLabelsCircular {
 						var add = v.isLeaf() ? (maxRadius > Double.MIN_VALUE ? maxRadius - GeometryUtilsFX.magnitude(shape.getTranslateX(), shape.getTranslateY()) : 0) : -10;
 
 						var offset = GeometryUtilsFX.translateByAngle(0, 0, angle, add + labelGap + 0.5 * label.getWidth());
-							label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
-							label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY());
+						label.setTranslateX(shape.getTranslateX() - 0.5 * label.getWidth() + offset.getX());
+						label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight() + offset.getY());
 
-							if (alignLabels && add > 1.1 * labelGap) {
-								var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
-								var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
-								labelConnectors.getChildren().add(new LabelConnector(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY()));
-							}
+						if (alignLabels && add > 1.1 * labelGap) {
+							var offset1 = GeometryUtilsFX.translateByAngle(0, 0, angle, 0.5 * labelGap);
+							var offset2 = GeometryUtilsFX.translateByAngle(0, 0, angle, add + 0.5 * labelGap);
+							labelConnectors.getChildren().add(new LabelConnector(shape.getTranslateX() + offset1.getX(), shape.getTranslateY() + offset1.getY(), shape.getTranslateX() + offset2.getX(), shape.getTranslateY() + offset2.getY()));
+						}
 						label.setAnchor(shape);
 						label.setRotate(angle);
 						label.ensureUpright();

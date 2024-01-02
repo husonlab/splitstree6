@@ -83,11 +83,15 @@ public class AntiConsensusNetwork extends Trees2Splits implements DoNotLoadThisA
 		return switch (optionName) {
 			case "optionSinSplitsRank" -> "The rank of the set of strongly incompatible splits to be shown";
 			case "optionSinsUpToRank" -> "Show all SINs up to selected rank";
-			case "optionMinSpanPercent" -> "Set the minimum amount of the consensus tree that an incompatible split must span";
-			case "optionMaxDistortion" -> "Set the max-distortion. Uses the single-event heuristic, when set to 1, else the multi-event heuristic\n(see the paper for details)";
+			case "optionMinSpanPercent" ->
+					"Set the minimum amount of the consensus tree that an incompatible split must span";
+			case "optionMaxDistortion" ->
+					"Set the max-distortion. Uses the single-event heuristic, when set to 1, else the multi-event heuristic\n(see the paper for details)";
 			case "optionMinWeight" -> "Set the minimum weight for a SIN to be reported";
-			case "optionReferenceTree" -> "By default, uses the majority consensus as the reference 'species' tree. Alternatively, the first or last input tree can be used";
-			case "optionRequireSingleSPR" -> "For distortion=1, require that all members of the SIN are reconciled using the same SPR";
+			case "optionReferenceTree" ->
+					"By default, uses the majority consensus as the reference 'species' tree. Alternatively, the first or last input tree can be used";
+			case "optionRequireSingleSPR" ->
+					"For distortion=1, require that all members of the SIN are reconciled using the same SPR";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -496,7 +500,7 @@ public class AntiConsensusNetwork extends Trees2Splits implements DoNotLoadThisA
 	/**
 	 * determine all splits that are incompatible to the given split and return their total weight
 	 *
-	 * @param incompatible    will contain indices of incompatible splits
+	 * @param incompatible will contain indices of incompatible splits
 	 * @return count
 	 */
 	public static double computeTotalWeightOfIncompatibleReferenceSplits(ASplit split, SplitsBlock referenceSplits, BitSet incompatible) {
@@ -687,20 +691,20 @@ public class AntiConsensusNetwork extends Trees2Splits implements DoNotLoadThisA
 		};
 	}
 
-    /**
-     * set of strongly incompatible (SIN) splits
-     */
-    public static class SIN {
-        private final int treeId;
-        private final String treeName;
-        private final double spanPercent;
-        private final int distortion;
+	/**
+	 * set of strongly incompatible (SIN) splits
+	 */
+	public static class SIN {
+		private final int treeId;
+		private final String treeName;
+		private final double spanPercent;
+		private final int distortion;
 
-        private final ArrayList<ASplit> splits = new ArrayList<>();
-        private double totalWeight = 0;
-        private int rank;
+		private final ArrayList<ASplit> splits = new ArrayList<>();
+		private double totalWeight = 0;
+		private int rank;
 
-        public SIN(int treeId, String treeName, double spanPercent, int distortion) {
+		public SIN(int treeId, String treeName, double spanPercent, int distortion) {
 			this.treeId = treeId;
 			this.treeName = treeName;
 			this.spanPercent = spanPercent;

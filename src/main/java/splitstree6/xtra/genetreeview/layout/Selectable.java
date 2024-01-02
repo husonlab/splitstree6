@@ -21,5 +21,5 @@ package splitstree6.xtra.genetreeview.layout;
 
 public interface Selectable {
 
-    void setSelectedProperty(boolean selected);
+	void setSelectedProperty(boolean selected);
 }

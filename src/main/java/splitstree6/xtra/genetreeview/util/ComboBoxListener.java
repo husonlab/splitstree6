@@ -31,52 +31,52 @@ import javafx.scene.input.KeyEvent;
 
 public class ComboBoxListener implements EventHandler<KeyEvent> {
 
-    private final ComboBox<String> comboBox;
-    private final ObservableList<String> data;
+	private final ComboBox<String> comboBox;
+	private final ObservableList<String> data;
 
-    public ComboBoxListener(final ComboBox<String> comboBox) {
-        this.comboBox = comboBox;
-        data = comboBox.itemsProperty().getValue();
+	public ComboBoxListener(final ComboBox<String> comboBox) {
+		this.comboBox = comboBox;
+		data = comboBox.itemsProperty().getValue();
 
-        this.comboBox.setEditable(true);
-        this.comboBox.setOnKeyPressed(e -> comboBox.hide());
-        this.comboBox.setOnKeyReleased(ComboBoxListener.this);
-    }
+		this.comboBox.setEditable(true);
+		this.comboBox.setOnKeyPressed(e -> comboBox.hide());
+		this.comboBox.setOnKeyReleased(ComboBoxListener.this);
+	}
 
-    @Override
-    public void handle(KeyEvent e) {
+	@Override
+	public void handle(KeyEvent e) {
 
-        if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.LEFT
-                || e.isControlDown() || e.getCode() == KeyCode.HOME
-                || e.getCode() == KeyCode.END || e.getCode() == KeyCode.TAB
-                || e.getCode() == KeyCode.ENTER) {
-            return;
-        }
-        if(e.getCode() == KeyCode.UP) {
-            comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
-            return;
-        }
-        if(e.getCode() == KeyCode.DOWN) {
-            if(!comboBox.isShowing()) {
-                comboBox.show();
-            }
-            comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
-            return;
-        }
+		if (e.getCode() == KeyCode.RIGHT || e.getCode() == KeyCode.LEFT
+			|| e.isControlDown() || e.getCode() == KeyCode.HOME
+			|| e.getCode() == KeyCode.END || e.getCode() == KeyCode.TAB
+			|| e.getCode() == KeyCode.ENTER) {
+			return;
+		}
+		if (e.getCode() == KeyCode.UP) {
+			comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
+			return;
+		}
+		if (e.getCode() == KeyCode.DOWN) {
+			if (!comboBox.isShowing()) {
+				comboBox.show();
+			}
+			comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
+			return;
+		}
 
-        ObservableList<String> list = FXCollections.observableArrayList();
-        for (String item : data) {
-            if (item.toLowerCase().startsWith(
-                    comboBox.getEditor().getText().toLowerCase())) {
-                list.add(item);
-            }
-        }
-        String t = comboBox.getEditor().getText();
-        comboBox.setItems(list);
-        comboBox.getEditor().setText(t);
-        comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
-        if(!list.isEmpty()) {
-            comboBox.show();
-        }
-    }
+		ObservableList<String> list = FXCollections.observableArrayList();
+		for (String item : data) {
+			if (item.toLowerCase().startsWith(
+					comboBox.getEditor().getText().toLowerCase())) {
+				list.add(item);
+			}
+		}
+		String t = comboBox.getEditor().getText();
+		comboBox.setItems(list);
+		comboBox.getEditor().setText(t);
+		comboBox.getEditor().positionCaret(comboBox.getEditor().getText().length());
+		if (!list.isEmpty()) {
+			comboBox.show();
+		}
+	}
 }

@@ -32,28 +32,28 @@ import java.io.OutputStreamWriter;
 
 public class ExportTreesTask extends Task<Void> {
 
-    private final File file;
-    private final Model model;
-    private final ObservableSet<Integer> selection;
+	private final File file;
+	private final Model model;
+	private final ObservableSet<Integer> selection;
 
-    public ExportTreesTask(File file, Model model, ObservableSet<Integer> selection) {
-        this.file = file;
-        this.model = model;
-        this.selection = selection;
-    }
+	public ExportTreesTask(File file, Model model, ObservableSet<Integer> selection) {
+		this.file = file;
+		this.model = model;
+		this.selection = selection;
+	}
 
-    @Override
-    protected Void call() throws Exception {
-        var newickWriter = new NewickWriter();
-        var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
-        var selectedTreesBlock = new TreesBlock();
-        selectedTreesBlock.copy(model.getTreesBlock());
-        selectedTreesBlock.getTrees().removeAll(model.getTreesBlock().getTrees());
-        for (int treeId : selection) {
-            selectedTreesBlock.getTrees().add(model.getGeneTreeSet().getPhyloTree(treeId));
-        }
-        newickWriter.write(writer, model.getTaxaBlock(), selectedTreesBlock);
-        writer.close();
-        return null;
-    }
+	@Override
+	protected Void call() throws Exception {
+		var newickWriter = new NewickWriter();
+		var writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(file)));
+		var selectedTreesBlock = new TreesBlock();
+		selectedTreesBlock.copy(model.getTreesBlock());
+		selectedTreesBlock.getTrees().removeAll(model.getTreesBlock().getTrees());
+		for (int treeId : selection) {
+			selectedTreesBlock.getTrees().add(model.getGeneTreeSet().getPhyloTree(treeId));
+		}
+		newickWriter.write(writer, model.getTaxaBlock(), selectedTreesBlock);
+		writer.close();
+		return null;
+	}
 }

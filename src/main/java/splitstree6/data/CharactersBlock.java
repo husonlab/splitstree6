@@ -153,8 +153,8 @@ public class CharactersBlock extends DataBlock {
 	/**
 	 * sets the value
 	 *
-	 * @param t     in range 1-nTax
-	 * @param pos   in range 1-nChar
+	 * @param t   in range 1-nTax
+	 * @param pos in range 1-nChar
 	 */
 	public void set(int t, int pos, char value) {
 		matrix[t - 1][pos - 1] = Character.toLowerCase(value);
@@ -481,7 +481,7 @@ public class CharactersBlock extends DataBlock {
 		var ch1 = 0;
 		var count1 = 0;
 		var ch2 = 0;
-		var count2=0;
+		var count2 = 0;
 		for (char[] row : matrix) {
 			var ch = row[column - 1];
 			if (ch1 == 0 || ch == ch1) {

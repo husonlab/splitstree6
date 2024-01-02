@@ -45,10 +45,10 @@ public class MicrostatStateLabeler extends StateLabeler {
 
 	@Override
 	public int getMaximumLabelLength() {
-        Character ch = charsUsed.last();
-        int maxVal = (int) ch;
-        return (Integer.toString(maxVal)).length();
-    }
+		Character ch = charsUsed.last();
+		int maxVal = (int) ch;
+		return (Integer.toString(maxVal)).length();
+	}
 
 	@Override
 	public String getSymbolsUsed() {

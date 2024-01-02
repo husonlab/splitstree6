@@ -38,7 +38,7 @@ import java.util.*;
  */
 public class CharactersNexusInput extends NexusIOBase implements INexusInput<CharactersBlock> {
 	private boolean ignoreMatrix = false;
-    private final boolean treatUnknownAsError = false;
+	private final boolean treatUnknownAsError = false;
 
 	public static final String SYNTAX = """
 			BEGIN CHARACTERS;
@@ -218,10 +218,11 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 		if (np.peekMatchIgnoreCase("CharStateLabels")) { // todo: is false for ferment4-diploid (microsat data)
 			np.matchIgnoreCase("CharStateLabels");
 			switch (charactersBlock.getDataType()) {
-                case Protein -> charactersBlock.setStateLabeler(new ProteinStateLabeler());
-                case Microsat -> charactersBlock.setStateLabeler(new MicrostatStateLabeler());
-				default -> charactersBlock.setStateLabeler(new StandardStateLabeler(nchar, charactersBlock.getMissingCharacter(), format.getOptionMatchCharacter(), charactersBlock.getGapCharacter()));
-            }
+				case Protein -> charactersBlock.setStateLabeler(new ProteinStateLabeler());
+				case Microsat -> charactersBlock.setStateLabeler(new MicrostatStateLabeler());
+				default ->
+						charactersBlock.setStateLabeler(new StandardStateLabeler(nchar, charactersBlock.getMissingCharacter(), format.getOptionMatchCharacter(), charactersBlock.getGapCharacter()));
+			}
 
 			charactersBlock.setCharLabeler(new HashMap<>());
 			readCharStateLabels(np, charactersBlock.getCharLabeler(), charactersBlock.getStateLabeler());

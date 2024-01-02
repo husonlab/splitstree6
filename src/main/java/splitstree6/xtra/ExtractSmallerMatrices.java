@@ -32,9 +32,7 @@ import splitstree6.io.writers.distances.PhylipWriter;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.BitSet;
 import java.util.Random;
-import java.util.regex.Pattern;
 
 public class ExtractSmallerMatrices {
 	/**

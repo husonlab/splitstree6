@@ -20,9 +20,13 @@
 package splitstree6.xtra.genetreeview.util;
 
 public interface Command {
-    void undo();
-    void redo();
-    String name();
-    boolean canUndo();
-    boolean canRedo();
+	void undo();
+
+	void redo();
+
+	String name();
+
+	boolean canUndo();
+
+	boolean canRedo();
 }

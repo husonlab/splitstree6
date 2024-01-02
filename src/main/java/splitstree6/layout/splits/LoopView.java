@@ -32,28 +32,28 @@ import java.util.function.Function;
  * Daniel Huson, 1.2020
  */
 public class LoopView extends Polygon {
-    private final ArrayList<Node> nodes;
+	private final ArrayList<Node> nodes;
 
-    public LoopView(ArrayList<Node> nodes, Function<Node, DoubleProperty> nodeXMap, Function<Node, DoubleProperty> nodeYMap) {
-        this.nodes = nodes;
-        setFill(Color.SILVER);
-        setStroke(Color.TRANSPARENT);
+	public LoopView(ArrayList<Node> nodes, Function<Node, DoubleProperty> nodeXMap, Function<Node, DoubleProperty> nodeYMap) {
+		this.nodes = nodes;
+		setFill(Color.SILVER);
+		setStroke(Color.TRANSPARENT);
 
-        for (var i = 0; i < nodes.size(); i++) {
-            var v = nodes.get(i);
-            var x = nodeXMap.apply(v);
-            var y = nodeYMap.apply(v);
-            if (x != null && y != null) {
-                getPoints().addAll(x.get(), y.get());
-                var ix = 2 * i;
-                x.addListener(e -> getPoints().set(ix, x.get()));
-                var iy = 2 * i + 1;
-                y.addListener(e -> getPoints().set(iy, y.get()));
-            }
-        }
-    }
+		for (var i = 0; i < nodes.size(); i++) {
+			var v = nodes.get(i);
+			var x = nodeXMap.apply(v);
+			var y = nodeYMap.apply(v);
+			if (x != null && y != null) {
+				getPoints().addAll(x.get(), y.get());
+				var ix = 2 * i;
+				x.addListener(e -> getPoints().set(ix, x.get()));
+				var iy = 2 * i + 1;
+				y.addListener(e -> getPoints().set(iy, y.get()));
+			}
+		}
+	}
 
-    public ArrayList<Node> getNodes() {
-        return nodes;
-    }
+	public ArrayList<Node> getNodes() {
+		return nodes;
+	}
 }

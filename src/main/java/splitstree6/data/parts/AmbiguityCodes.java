@@ -31,21 +31,21 @@ public class AmbiguityCodes {
 	 * @return all (lowercase) letters associated with the given code, or the nucleotide it self, if not a code
 	 */
 	public static String getNucleotides(char code) {
-        return switch (Character.toLowerCase(code)) {
-            case 'w' -> "at";
-            case 'r' -> "ag";
-            case 'k' -> "gt";
-            case 'y' -> "ct";
-            case 's' -> "cg";
-            case 'm' -> "ac";
-            case 'b' -> "cgt";
-            case 'h' -> "act";
-            case 'd' -> "agt";
-            case 'v' -> "acg";
-            case 'n' -> "acgt";
-            default -> "" + Character.toLowerCase(code); // this is not a code, but a nucleotide
-        };
-    }
+		return switch (Character.toLowerCase(code)) {
+			case 'w' -> "at";
+			case 'r' -> "ag";
+			case 'k' -> "gt";
+			case 'y' -> "ct";
+			case 's' -> "cg";
+			case 'm' -> "ac";
+			case 'b' -> "cgt";
+			case 'h' -> "act";
+			case 'd' -> "agt";
+			case 'v' -> "acg";
+			case 'n' -> "acgt";
+			default -> "" + Character.toLowerCase(code); // this is not a code, but a nucleotide
+		};
+	}
 
 	/**
 	 * is the given letter an ambiguity code?

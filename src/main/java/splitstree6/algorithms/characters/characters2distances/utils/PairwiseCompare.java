@@ -37,7 +37,6 @@ public class PairwiseCompare { // todo: add support for character weights
 
 	/**
 	 * constructor
-	 *
 	 */
 
 	// TODO: SOMETHING SLOWS DOWN THE ALGORITHM WHILE OPEN AMBIG. CHARACTERS. NEED TO FIND OUT!
@@ -230,7 +229,6 @@ public class PairwiseCompare { // todo: add support for character weights
 
 	/**
 	 * golden section
-	 *
 	 */
 	private double goldenSection(SubstitutionModel model, double[][] F, double tmin, double tmax) {
 		final double GS_EPSILON = 0.000001;

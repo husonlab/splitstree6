@@ -54,7 +54,6 @@ public class Mash {
 
 	/**
 	 * run
-	 *
 	 */
 	private void run(String[] args) throws Exception {
 		final ArgsOptions options = new ArgsOptions(args, this, "Computes Mash sketches, Jaccard index and distances");

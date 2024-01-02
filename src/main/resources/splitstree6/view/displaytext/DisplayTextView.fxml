@@ -47,11 +47,6 @@
                             <Tooltip text="Show line numbers"/>
                         </tooltip>
                     </ToggleButton>
-                    <Button fx:id="selectButton" mnemonicParsing="false" text="Select">
-                        <font>
-                            <Font size="10.0"/>
-                        </font>
-                    </Button>
                 </ToolBar>
             </VBox>
         </top>

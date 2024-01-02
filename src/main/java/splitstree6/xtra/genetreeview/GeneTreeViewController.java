@@ -21,7 +21,8 @@ package splitstree6.xtra.genetreeview;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 
 public class GeneTreeViewController {
 
@@ -200,21 +201,27 @@ public class GeneTreeViewController {
 	public MenuItem getOpenMenuItem() {
 		return openMenuItem;
 	}
+
 	public Menu getOpenRecentMenu() {
 		return openRecentMenu;
 	}
+
 	public MenuItem getImportGeneNamesMenuItem() {
 		return importGeneNamesMenuItem;
 	}
+
 	public MenuItem getImportFeatureMenuItem() {
 		return importFeatureMenuItem;
 	}
+
 	public MenuItem getExportSubsetMenuItem() {
 		return exportSubsetMenuItem;
 	}
+
 	public MenuItem getPrintMenuItem() {
 		return printMenuItem;
 	}
+
 	public MenuItem getCloseMenuItem() {
 		return closeMenuItem;
 	}
@@ -223,24 +230,31 @@ public class GeneTreeViewController {
 	public MenuItem getUndoMenuItem() {
 		return undoMenuItem;
 	}
+
 	public MenuItem getRedoMenuItem() {
 		return redoMenuItem;
 	}
+
 	public MenuItem getCopyTaxaMenuItem() {
 		return copyTaxaMenuItem;
 	}
+
 	public MenuItem getCopyImageMenuItem() {
 		return copyImageMenuItem;
 	}
+
 	public MenuItem getCopySelectedNewicksMenuItem() {
 		return copySelectedNewicksMenuItem;
 	}
+
 	public MenuItem getCopySelectedTreesMenuItem() {
 		return copySelectedTreesMenuItem;
 	}
+
 	public MenuItem getPasteMenuItem() {
 		return pasteMenuItem;
 	}
+
 	public MenuItem getDeleteSelectedMenuItem() {
 		return deleteSelectedMenuItem;
 	}
@@ -249,18 +263,23 @@ public class GeneTreeViewController {
 	public MenuItem getSelectAllMenuItem() {
 		return selectAllMenuItem;
 	}
+
 	public MenuItem getSelectNoneMenuItem() {
 		return selectNoneMenuItem;
 	}
+
 	public MenuItem getSelectInverseMenuItem() {
 		return selectInverseMenuItem;
 	}
+
 	public MenuItem getSelectAllTaxaMenuItem() {
 		return selectAllTaxaMenuItem;
 	}
+
 	public MenuItem getSelectNoTaxaMenuItem() {
 		return selectNoTaxaMenuItem;
 	}
+
 	public MenuItem getSelectInverseTaxaMenuItem() {
 		return selectInverseTaxaMenuItem;
 	}
@@ -269,24 +288,31 @@ public class GeneTreeViewController {
 	public ToggleGroup getLayoutGroup() {
 		return layoutGroup;
 	}
+
 	public RadioMenuItem getStackMenuItem() {
 		return stackMenuItem;
 	}
+
 	public RadioMenuItem getCarouselMenuItem() {
 		return carouselMenuItem;
 	}
+
 	public ToggleGroup getOrderGroup() {
 		return orderGroup;
 	}
+
 	public RadioMenuItem getDefaultOrderMenuItem() {
 		return defaultOrderMenuItem;
 	}
+
 	public Menu getTaxonOrderSubMenu() {
 		return taxonOrderSubMenu;
 	}
+
 	public Menu getSimilarityOrderSubMenu() {
 		return similarityOrderSubMenu;
 	}
+
 	public Menu getFeatureOrderSubMenu() {
 		return featureOrderSubMenu;
 	}
@@ -295,42 +321,55 @@ public class GeneTreeViewController {
 	public ToggleGroup getTreeLayoutGroup() {
 		return treeLayoutGroup;
 	}
+
 	public RadioMenuItem getCircularCladoMenuItem() {
 		return circularCladoMenuItem;
 	}
+
 	public RadioMenuItem getCircularPhyloMenuItem() {
 		return circularPhyloMenuItem;
 	}
+
 	public RadioMenuItem getRadialCladoMenuItem() {
 		return radialCladoMenuItem;
 	}
+
 	public RadioMenuItem getRadialPhyloMenuItem() {
 		return radialPhyloMenuItem;
 	}
+
 	public RadioMenuItem getRectangularCladoMenuItem() {
 		return rectangularCladoMenuItem;
 	}
+
 	public RadioMenuItem getRectangularPhyloMenuItem() {
 		return rectangularPhyloMenuItem;
 	}
+
 	public RadioMenuItem getTriangularCladoMenuItem() {
 		return triangularCladoMenuItem;
 	}
+
 	public ToggleGroup getColoringGroup() {
 		return coloringGroup;
 	}
+
 	public RadioMenuItem getNoColoringMenuItem() {
 		return noColoringMenuItem;
 	}
+
 	public RadioMenuItem getMonophyleticColoringMenuItem() {
 		return monophyleticColoringMenuItem;
 	}
+
 	public Menu getSimilarityColoringSubMenu() {
 		return similarityColoringSubMenu;
 	}
+
 	public Menu getFeatureColoringSubMenu() {
 		return featureColoringSubMenu;
 	}
+
 	public MenuItem getFeatureOverviewMenuItem() {
 		return featureOverviewMenuItem;
 	}
@@ -344,9 +383,11 @@ public class GeneTreeViewController {
 	public ToolBar getToolBar() {
 		return toolBar;
 	}
+
 	public Slider getZoomSlider() {
 		return zoomSlider;
 	}
+
 	public ComboBox<String> getSearchGeneComboBox() {
 		return searchGeneComboBox;
 	}
@@ -357,16 +398,22 @@ public class GeneTreeViewController {
 	}
 
 	// Navigation Controls
-	public VBox getvBox() {return vBox;} // vBox as container for colorBar, buttons and slider
+	public VBox getvBox() {
+		return vBox;
+	} // vBox as container for colorBar, buttons and slider
+
 	public Slider getSlider() {
 		return slider;
 	}
+
 	public void setSlider(Slider slider) {
 		this.slider = slider;
 	}
+
 	public Button getNextButton() {
 		return nextButton;
 	}
+
 	public Button getPreviousButton() {
 		return previousButton;
 	}
@@ -375,9 +422,11 @@ public class GeneTreeViewController {
 	public Label getLabel() {
 		return label;
 	}
+
 	public ProgressBar getProgressBar() {
 		return progressBar;
 	}
+
 	public Label getProgressLabel() {
 		return progressLabel;
 	}

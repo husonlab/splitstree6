@@ -19,9 +19,9 @@
 
 package splitstree6.algorithms.characters.characters2view;
 
+import splitstree6.cite.IgnoredInMethodsText;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.cite.IgnoredInMethodsText;
 import splitstree6.workflow.Algorithm;
 
 public abstract class Characters2View extends Algorithm<CharactersBlock, ViewBlock> implements IgnoredInMethodsText {

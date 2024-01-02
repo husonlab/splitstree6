@@ -156,6 +156,13 @@ public class TreeView implements IView {
 		controller.getInnerAnchorPane().getChildren().add(controller.getInnerAnchorPane().getChildren().size() - 1, traitsFormatter.getLegend());
 		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
+		viewTab.emptyProperty().bind(empty);
+		viewTabProperty().addListener((v, o, n) -> {
+			if (o != null)
+				o.emptyProperty().unbind();
+			if (n != null)
+				n.emptyProperty().bind(empty);
+		});
 		trees.addListener((InvalidationListener) e -> {
 			empty.set(trees.isEmpty());
 			if (getOptionTree() == 0 && !trees.isEmpty())

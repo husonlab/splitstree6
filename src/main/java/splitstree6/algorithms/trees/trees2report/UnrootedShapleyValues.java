@@ -25,8 +25,8 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2report.ShapleyValues;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
-import splitstree6.splits.ASplit;
 import splitstree6.data.parts.Taxon;
+import splitstree6.splits.ASplit;
 import splitstree6.splits.SplitUtils;
 
 import java.util.ArrayList;

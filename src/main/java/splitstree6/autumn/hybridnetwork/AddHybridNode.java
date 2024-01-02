@@ -32,7 +32,6 @@ import java.util.Set;
 public class AddHybridNode {
 	/**
 	 * add hybrid node to all given networks
-	 *
 	 */
 	public static void apply(Collection<Root> networks, int taxon) {
 		var roots = networks.toArray(new Root[0]); // need to use array as networks will change
@@ -67,7 +66,6 @@ public class AddHybridNode {
 
 	/**
 	 * recursively does the work
-	 *
 	 */
 	private static void applyRec(Root v, Root hybrid, int taxon, NodeSet visited, Set<Root> toDelete) {
 		if (v.getRemovedTaxa().get(taxon) && !visited.contains(v)) {

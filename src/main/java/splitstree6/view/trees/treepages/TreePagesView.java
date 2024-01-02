@@ -88,7 +88,6 @@ public class TreePagesView implements IView {
 
 	/**
 	 * constructor
-	 *
 	 */
 	public TreePagesView(MainWindow mainWindow, String name, ViewTab viewTab) {
 		this.name.set(name);
@@ -106,6 +105,13 @@ public class TreePagesView implements IView {
 
 		setViewTab(viewTab);
 
+		viewTab.emptyProperty().bind(empty);
+		viewTabProperty().addListener((v, o, n) -> {
+			if (o != null)
+				o.emptyProperty().unbind();
+			if (n != null)
+				n.emptyProperty().bind(empty);
+		});
 		empty.bind(Bindings.isEmpty(getTrees()));
 
 		var taxLabelFormatter = new TaxonLabelFormat(mainWindow, undoManager);

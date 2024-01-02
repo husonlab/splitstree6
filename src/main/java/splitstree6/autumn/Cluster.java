@@ -137,19 +137,19 @@ public class Cluster extends BitSet {
 			int t2 = cluster2.nextSetBit(0);
 			while (true) {
 				if (t1 < t2)
-                    return -1;
-                else if (t1 > t2)
-                    return 1;
-                t1 = cluster1.nextSetBit(t1 + 1);
-                t2 = cluster2.nextSetBit(t2 + 1);
-                if (t1 == -1 && t2 > -1)
-                    return -1;
-                else if (t1 > -1 && t2 == -1)
-                    return 1;
-                else if (t1 == -1 && t2 == -1)
-                    return 0;
-            }
-        };
+					return -1;
+				else if (t1 > t2)
+					return 1;
+				t1 = cluster1.nextSetBit(t1 + 1);
+				t2 = cluster2.nextSetBit(t2 + 1);
+				if (t1 == -1 && t2 > -1)
+					return -1;
+				else if (t1 > -1 && t2 == -1)
+					return 1;
+				else if (t1 == -1 && t2 == -1)
+					return 0;
+			}
+		};
 	}
 
 	/**
@@ -201,7 +201,6 @@ public class Cluster extends BitSet {
 
 	/**
 	 * are two given clusters incompatible?
-	 *
 	 */
 	public static boolean incompatible(BitSet A, BitSet B) {
 		return setminus(A, B).cardinality() > 0 && setminus(B, A).cardinality() > 0
@@ -231,7 +230,6 @@ public class Cluster extends BitSet {
 
 	/**
 	 * print an array of clusters
-	 *
 	 */
 	public static void print(Cluster[] clusters) {
 		for (Cluster cluster : clusters) {
@@ -242,7 +240,6 @@ public class Cluster extends BitSet {
 
 	/**
 	 * compare two bit sets
-	 *
 	 */
 	public static int compare(BitSet A, BitSet B) {
 		int a = A.nextSetBit(0);
@@ -255,7 +252,7 @@ public class Cluster extends BitSet {
 			a = A.nextSetBit(a + 1);
 			b = B.nextSetBit(b + 1);
 		}
-        return Integer.compare(a, b);
+		return Integer.compare(a, b);
 	}
 
 	/**

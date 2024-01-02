@@ -26,20 +26,20 @@ import java.util.ArrayList;
 
 public class GeneNameParser extends ParserDialog {
 
-    private final Model model;
+	private final Model model;
 
-    public GeneNameParser(Stage parentStage, Model model) {
-        super(parentStage, "gene names", model.getGeneTreeSet().size());
-        this.model = model;
-        this.setTitle("GeneNameParser");
-    }
+	public GeneNameParser(Stage parentStage, Model model) {
+		super(parentStage, "gene names", model.getGeneTreeSet().size());
+		this.model = model;
+		this.setTitle("GeneNameParser");
+	}
 
-    @Override
-    boolean parseFeatureToModel(String featureName, ArrayList<String> values) {
-        if (model.getGeneTreeSet().setGeneNames(values)) {
-            parsedProperty.set(true);
-            return true;
-        }
-        return false;
-    }
+	@Override
+	boolean parseFeatureToModel(String featureName, ArrayList<String> values) {
+		if (model.getGeneTreeSet().setGeneNames(values)) {
+			parsedProperty.set(true);
+			return true;
+		}
+		return false;
+	}
 }

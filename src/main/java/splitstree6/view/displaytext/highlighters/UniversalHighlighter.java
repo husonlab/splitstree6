@@ -54,14 +54,14 @@ public class UniversalHighlighter implements Highlighter.IHighlighter {
 
 	);
 
-    @Override
-    public StyleSpans<Collection<String>> computeHighlighting(String text) {
-        var matcher = PATTERN.matcher(text);
-        var lastKwEnd = 0;
-        StyleSpansBuilder<Collection<String>> spansBuilder
-                = new StyleSpansBuilder<>();
+	@Override
+	public StyleSpans<Collection<String>> computeHighlighting(String text) {
+		var matcher = PATTERN.matcher(text);
+		var lastKwEnd = 0;
+		StyleSpansBuilder<Collection<String>> spansBuilder
+				= new StyleSpansBuilder<>();
 
-        while (matcher.find()) {
+		while (matcher.find()) {
 			var styleClass =
 					matcher.group("URL") != null ? "url" :
 							matcher.group("NUMBER") != null ? "number" :
@@ -75,10 +75,10 @@ public class UniversalHighlighter implements Highlighter.IHighlighter {
 																							null; /* never happens */
 			assert styleClass != null;
 			spansBuilder.add(Collections.emptyList(), matcher.start() - lastKwEnd);
-            spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
-            lastKwEnd = matcher.end();
-        }
-        spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
-        return spansBuilder.create();
-    }
+			spansBuilder.add(Collections.singleton(styleClass), matcher.end() - matcher.start());
+			lastKwEnd = matcher.end();
+		}
+		spansBuilder.add(Collections.emptyList(), text.length() - lastKwEnd);
+		return spansBuilder.create();
+	}
 }

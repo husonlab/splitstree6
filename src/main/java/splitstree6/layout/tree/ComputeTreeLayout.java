@@ -140,8 +140,10 @@ public class ComputeTreeLayout {
 		LayoutLabelsRadialPhylogram layoutLabelsRadialPhylogram = null;
 
 		switch (diagram) {
-			case CircularPhylogram, CircularCladogram, RadialCladogram -> LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeAngleMap, labelGap, labelConnectorGroup);
-			case RadialPhylogram -> layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeAngleMap, labelGap);
+			case CircularPhylogram, CircularCladogram, RadialCladogram ->
+					LayoutLabelsCircular.apply(tree, nodeShapeMap, nodeAngleMap, labelGap, labelConnectorGroup);
+			case RadialPhylogram ->
+					layoutLabelsRadialPhylogram = new LayoutLabelsRadialPhylogram(tree, nodeShapeMap, nodeAngleMap, labelGap);
 			default -> LayoutLabelsRectangular.apply(tree, nodeShapeMap, labelGap, labelConnectorGroup);
 		}
 		return new Result(labelConnectorGroup, edgeGroup, nodeGroup, otherLabelsGroup, taxonLabelsGroup, layoutLabelsRadialPhylogram, unitLengthX);

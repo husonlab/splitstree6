@@ -22,7 +22,7 @@ package splitstree6.xtra.genetreeview;
 import javafx.concurrent.Task;
 import javafx.scene.Group;
 import jloda.phylo.PhyloTree;
-import splitstree6.layout.tree.*;
+import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.xtra.genetreeview.layout.TreeSheet;
 import splitstree6.xtra.genetreeview.model.Model;
 import splitstree6.xtra.genetreeview.util.SelectionModelSet;
@@ -31,37 +31,37 @@ import java.util.HashMap;
 
 public class VisualizeTreesTask extends Task<Group> {
 
-    private final Model model;
-    private final double treeWidth;
-    private final double treeHeight;
-    private final TreeDiagramType diagram;
-    private final SelectionModelSet<Integer> taxaSelectionModel;
-    private final HashMap<Integer,SelectionModelSet<Integer>> edgeSelectionModels;
+	private final Model model;
+	private final double treeWidth;
+	private final double treeHeight;
+	private final TreeDiagramType diagram;
+	private final SelectionModelSet<Integer> taxaSelectionModel;
+	private final HashMap<Integer, SelectionModelSet<Integer>> edgeSelectionModels;
 
-    public VisualizeTreesTask(Model model, double treeWidth, double treeHeight, TreeDiagramType diagram,
-                              SelectionModelSet<Integer> taxaSelectionModel,
-                              HashMap<Integer,SelectionModelSet<Integer>> edgeSelectionModels) {
-        this.model = model;
-        this.treeWidth = treeWidth;
-        this.treeHeight = treeHeight;
-        this.diagram = diagram;
-        this.taxaSelectionModel = taxaSelectionModel;
-        this.edgeSelectionModels = edgeSelectionModels;
-    }
+	public VisualizeTreesTask(Model model, double treeWidth, double treeHeight, TreeDiagramType diagram,
+							  SelectionModelSet<Integer> taxaSelectionModel,
+							  HashMap<Integer, SelectionModelSet<Integer>> edgeSelectionModels) {
+		this.model = model;
+		this.treeWidth = treeWidth;
+		this.treeHeight = treeHeight;
+		this.diagram = diagram;
+		this.taxaSelectionModel = taxaSelectionModel;
+		this.edgeSelectionModels = edgeSelectionModels;
+	}
 
-    @Override
-    protected Group call() throws Exception {
-        Group trees = new Group();
-        int treeIndex = 0;
-        for (int treeId : model.getGeneTreeSet().getTreeOrder()) {
-            PhyloTree phyloTree = model.getGeneTreeSet().getPhyloTree(treeId);
-            if (!edgeSelectionModels.containsKey(treeId)) edgeSelectionModels.put(treeId, new SelectionModelSet<>());
-            TreeSheet treeSheet = new TreeSheet(phyloTree, treeId, treeWidth, treeHeight, diagram, model.getTaxaBlock(),
-                    taxaSelectionModel, edgeSelectionModels.get(treeId));
-            trees.getChildren().add(treeIndex, treeSheet);
-            treeIndex++;
-            updateProgress(treeIndex, model.getGeneTreeSet().size());
-        }
-        return trees;
-    }
+	@Override
+	protected Group call() throws Exception {
+		Group trees = new Group();
+		int treeIndex = 0;
+		for (int treeId : model.getGeneTreeSet().getTreeOrder()) {
+			PhyloTree phyloTree = model.getGeneTreeSet().getPhyloTree(treeId);
+			if (!edgeSelectionModels.containsKey(treeId)) edgeSelectionModels.put(treeId, new SelectionModelSet<>());
+			TreeSheet treeSheet = new TreeSheet(phyloTree, treeId, treeWidth, treeHeight, diagram, model.getTaxaBlock(),
+					taxaSelectionModel, edgeSelectionModels.get(treeId));
+			trees.getChildren().add(treeIndex, treeSheet);
+			treeIndex++;
+			updateProgress(treeIndex, model.getGeneTreeSet().size());
+		}
+		return trees;
+	}
 }

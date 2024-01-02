@@ -52,7 +52,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * sets only one half of the split, assumes the rest will be set later
-	 *
 	 */
 	public PartialSplit(BitSet A) {
 		this.A = A;
@@ -61,7 +60,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 	/**
 	 * sets only one half of the split, assumes the rest will be set later
 	 * and weight and confidence
-	 *
 	 */
 	public PartialSplit(BitSet A, float weight, float confidence) {
 		this.A = A;
@@ -71,7 +69,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * constructor given both sides A and B, a weight and confidence
-	 *
 	 */
 	public PartialSplit(BitSet A, BitSet B) {
 		set(A, B);
@@ -79,7 +76,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * constructor given both sides A and B, a weight and confidence
-	 *
 	 */
 	public PartialSplit(BitSet A, BitSet B, float weight, float confidence) {
 		set(A, B, weight, confidence);
@@ -87,7 +83,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * set boths sides
-	 *
 	 */
 	public void set(BitSet A, BitSet B) {
 		if (compareSides(A, B) <= 0) {
@@ -101,7 +96,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * set boths sides and the weight and confidence
-	 *
 	 */
 	public void set(BitSet A, BitSet B, float weight, float confidence) {
 		set(A, B);
@@ -111,7 +105,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * assuming only the first side has been set, sets the second as the complement in all
-	 *
 	 */
 	public void setComplement(BitSet all) {
 		BitSet C = (BitSet) all.clone();
@@ -143,7 +136,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * returns string representation
-	 *
 	 */
 	public String toString() {
 		Writer w = new StringWriter();
@@ -157,7 +149,6 @@ public class PartialSplit implements Comparator<PartialSplit>, Cloneable {
 
 	/**
 	 * writes the partial split
-	 *
 	 */
 	public void write(Writer w) throws IOException {
 		//BitSet bs = A.getBits();

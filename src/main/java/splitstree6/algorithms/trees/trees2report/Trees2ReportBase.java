@@ -25,7 +25,6 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
-import jloda.phylo.PhyloTree;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.IViewChoice;
@@ -37,7 +36,6 @@ import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 

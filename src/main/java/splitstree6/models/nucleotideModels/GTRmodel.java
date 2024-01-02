@@ -117,7 +117,7 @@ public class GTRmodel extends NucleotideModel {
 			for (int j = 0; j < 4; j++) {
 				x += baseFreq[i] * V[i][j] * V[i][j] * D[j];
 			}
-            dist -= x;
+			dist -= x;
 		}
 
 		return dist;

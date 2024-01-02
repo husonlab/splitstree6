@@ -26,42 +26,42 @@ import java.util.Objects;
  * David Bryant and Daniel Huson, 2005
  */
 class NetNode {
-    final int id;
-    NetNode nbr = null; // adjacent node
-    NetNode ch1 = null; // first child
-    NetNode ch2 = null; // second child
-    NetNode next = null; // next in list of active nodes
-    NetNode prev = null; // prev in list of active nodes
-    double Rx = 0;
-    double Sx = 0;
+	final int id;
+	NetNode nbr = null; // adjacent node
+	NetNode ch1 = null; // first child
+	NetNode ch2 = null; // second child
+	NetNode next = null; // next in list of active nodes
+	NetNode prev = null; // prev in list of active nodes
+	double Rx = 0;
+	double Sx = 0;
 
-    NetNode(int id) {
-        this.id = id;
-    }
+	NetNode(int id) {
+		this.id = id;
+	}
 
-    @Override
-    public String toString() {
-        return "[id=" + id
-               + " nbr=" + (nbr == null ? "null" : ("" + nbr.id))
-               + " ch1=" + (ch1 == null ? "null" : ("" + ch1.id))
-               + " ch2=" + (ch2 == null ? "null" : ("" + ch2.id))
-               + " prev=" + (prev == null ? "null" : ("" + prev.id))
-               + " next=" + (next == null ? "null" : ("" + next.id))
-               + " Rx=" + Rx
-               + " Sx=" + Sx
-               + "]";
-    }
+	@Override
+	public String toString() {
+		return "[id=" + id
+			   + " nbr=" + (nbr == null ? "null" : ("" + nbr.id))
+			   + " ch1=" + (ch1 == null ? "null" : ("" + ch1.id))
+			   + " ch2=" + (ch2 == null ? "null" : ("" + ch2.id))
+			   + " prev=" + (prev == null ? "null" : ("" + prev.id))
+			   + " next=" + (next == null ? "null" : ("" + next.id))
+			   + " Rx=" + Rx
+			   + " Sx=" + Sx
+			   + "]";
+	}
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        NetNode netNode = (NetNode) o;
-        return id == netNode.id;
-    }
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		NetNode netNode = (NetNode) o;
+		return id == netNode.id;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 }

@@ -23,11 +23,11 @@ import javafx.stage.Stage;
 
 public class SimilarityCalculationDialog extends SelectionDialog {
 
-    public SimilarityCalculationDialog(Stage parentStage, String selectedTreeName) {
-        super(parentStage, selectedTreeName, "gene tree name");
-        this.setTitle("SimilarityCalculation");
-        introLabel.setText("Tree similarities will be calculated based on pairwise Robinson-Foulds Distances " +
-                "with gene tree:");
-        startButton.setText("Calculate");
-    }
+	public SimilarityCalculationDialog(Stage parentStage, String selectedTreeName) {
+		super(parentStage, selectedTreeName, "gene tree name");
+		this.setTitle("SimilarityCalculation");
+		introLabel.setText("Tree similarities will be calculated based on pairwise Robinson-Foulds Distances " +
+						   "with gene tree:");
+		startButton.setText("Calculate");
+	}
 }

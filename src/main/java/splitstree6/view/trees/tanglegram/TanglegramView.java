@@ -125,6 +125,14 @@ public class TanglegramView implements IView {
 		});
 		setViewTab(viewTab);
 
+		viewTab.emptyProperty().bind(empty);
+		viewTabProperty().addListener((v, o, n) -> {
+			if (o != null)
+				o.emptyProperty().unbind();
+			if (n != null)
+				n.emptyProperty().bind(empty);
+		});
+
 		empty.bind(Bindings.isEmpty(getTrees()));
 
 		controller.getFormatVBox().getChildren().addAll(new TaxonLabelFormat(mainWindow, undoManager), new TaxonMark(mainWindow, undoManager));

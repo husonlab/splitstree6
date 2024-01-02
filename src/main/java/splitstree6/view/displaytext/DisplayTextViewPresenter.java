@@ -114,14 +114,6 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				controller.getTopVBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
 			}
 		});
-
-		controller.getSelectButton().setOnAction(e -> {
-			if (controller.getCodeArea().getSelection().getLength() > 0)
-				codeArea.selectRange(0, 0);
-			else
-				codeArea.selectAll();
-		});
-		controller.getSelectButton().disableProperty().bind(tab.emptyProperty());
 	}
 
 	public void setupMenuItems() {
@@ -243,5 +235,12 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 	@Override
 	public boolean allowFindReplace() {
 		return editable;
+	}
+
+	public void processSelectButtonPressed() {
+		if (tab.getController().getCodeArea().getSelection().getLength() > 0)
+			tab.getController().getCodeArea().selectRange(0, 0);
+		else
+			tab.getController().getCodeArea().selectAll();
 	}
 }

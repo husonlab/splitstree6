@@ -71,5 +71,5 @@ public class ViewNexusInput extends NexusIOBase {
 		}
 		np.matchEndBlock();
 
-    }
+	}
 }

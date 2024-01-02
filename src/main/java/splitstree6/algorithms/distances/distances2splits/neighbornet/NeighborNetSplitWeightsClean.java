@@ -5,7 +5,10 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.splits.ASplit;
 
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.Comparator;
 
 import static java.lang.Math.*;
 import static splitstree6.algorithms.distances.distances2splits.neighbornet.NeighborNetUtilities.*;
@@ -41,7 +44,6 @@ public class NeighborNetSplitWeightsClean {
 		double gcp_kl = 0.9;
 		double gcp_ku = 0.2;
 		double gcp_ke = 0.3;
-
 
 
 		//Stopping conditions - CGNR
@@ -117,19 +119,19 @@ public class NeighborNetSplitWeightsClean {
 					gradientProjection(x, d, params, progress);
 				}
 				case ACTIVESET -> {
-					params.cgnrTolerance = params.projGradBound/2;
+					params.cgnrTolerance = params.projGradBound / 2;
 					params.cgnrIterations = max(50, n * (n - 1) / 2);
 					params.activeSetRho = 0.4;
 					activeSetMethod(x, d, params, progress);
 				}
 				case APGD -> {
-					params.maxIterations = 100*n*n;
+					params.maxIterations = 100 * n * n;
 					params.APGDtheta = 1.0;
-					APGD(x, d, params,progress);
+					APGD(x, d, params, progress);
 				}
 				case IPG -> {
-					params.maxIterations = 100*n*n;
-					IPG(x,d,params,progress);
+					params.maxIterations = 100 * n * n;
+					IPG(x, d, params, progress);
 				}
 
 			}
@@ -155,7 +157,7 @@ public class NeighborNetSplitWeightsClean {
 
 	static public ArrayList<ASplit> computeUse1D(int[] cycle, double[][] distances, NNLSParams params, ProgressListener progress) throws CanceledException {
 		var n = cycle.length - 1;  //Number of taxa
-		var npairs = n*(n-1)/2;
+		var npairs = n * (n - 1) / 2;
 
 		long before = System.currentTimeMillis();
 
@@ -176,16 +178,16 @@ public class NeighborNetSplitWeightsClean {
 
 		//Set up vector distances indexed 1..n in order of the cycle
 		var d = new double[npairs];
-		var index=0;
+		var index = 0;
 		for (var i = 1; i <= n; i++)
 			for (var j = i + 1; j <= n; j++) {
-				d[index] =  distances[cycle[i] - 1][cycle[j] - 1];
+				d[index] = distances[cycle[i] - 1][cycle[j] - 1];
 				index++;
 			}
 
 		double[] Atd = new double[npairs];
-		calcAtx(d, Atd,n);
-		double normAtd = sqrt(sumArraySquared(Atd,n));
+		calcAtx(d, Atd, n);
+		double normAtd = sqrt(sumArraySquared(Atd, n));
 		params.projGradBound = (0.0001 * normAtd) * (0.0001 * normAtd);
 
 		var x = new double[npairs]; //array of split weights
@@ -201,24 +203,24 @@ public class NeighborNetSplitWeightsClean {
 					gradientProjection(x, d, n, params, progress);
 				}
 				case ACTIVESET -> {
-					params.cgnrTolerance = params.projGradBound/2;
+					params.cgnrTolerance = params.projGradBound / 2;
 					params.cgnrIterations = max(50, n * (n - 1) / 2);
 					params.activeSetRho = 0.4;
 					activeSetMethod(x, d, n, params, progress);
 				}
 				case APGD -> {
-					params.maxIterations = 100*n*n;
+					params.maxIterations = 100 * n * n;
 					params.APGDtheta = 0.5;
-					APGD(x, d, n, params,progress);
+					APGD(x, d, n, params, progress);
 				}
 				case IPG -> {
-					params.maxIterations = 100*n*n;
-					IPG(x,d,n, params,progress);
+					params.maxIterations = 100 * n * n;
+					IPG(x, d, n, params, progress);
 				}
 
 			}
 			if (params.activeCleanup) {
-				params.cgnrTolerance = params.projGradBound/2;
+				params.cgnrTolerance = params.projGradBound / 2;
 				params.cgnrIterations = max(50, n * (n - 1) / 2);
 				params.activeSetRho = 0.4;
 				activeSetMethod(x, d, n, params, progress);
@@ -246,25 +248,21 @@ public class NeighborNetSplitWeightsClean {
 	}
 
 
-
-
-
-
 	//*************************************************************************
 	// METHOD IMPLEMENTATIONS
 	//  **************************************************************************/
 
 	/**
 	 * <p>cgnr</p>
-	 *
+	 * <p>
 	 * Implementation of the CGNR algorithm in Saad, "Iterative Methods for Sparse Linear Systems", applied to the
 	 * problem of minimizing ||Ax - d|| such that x_{ij} = 0 for all ij in the activeSet.
 	 *
-	 * @param x             Initial value, overwritten with final value. Initially, we set x[i][j] = 0 for all [i][j] in the active set.
-	 * @param d             square array of distances
-	 * @param activeSet     square array of boolean: specifying active (zero) set.
-	 * @param params        parameters - uses params.cgnrIterations for max number of iterations
-	 *                      and params.tolerance for bound on gradient at convergence
+	 * @param x         Initial value, overwritten with final value. Initially, we set x[i][j] = 0 for all [i][j] in the active set.
+	 * @param d         square array of distances
+	 * @param activeSet square array of boolean: specifying active (zero) set.
+	 * @param params    parameters - uses params.cgnrIterations for max number of iterations
+	 *                  and params.tolerance for bound on gradient at convergence
 	 * @return int          number of iterations
 	 */
 	static public int cgnr(double[][] x, double[][] d, boolean[][] activeSet, NNLSParams params, ProgressListener progress) throws CanceledException {
@@ -320,9 +318,6 @@ public class NeighborNetSplitWeightsClean {
 //			System.err.println();
 
 
-
-
-
 			if (ztz2 < params.cgnrTolerance || k >= params.cgnrIterations)
 				break;
 
@@ -334,7 +329,7 @@ public class NeighborNetSplitWeightsClean {
 			ztz = ztz2;
 
 			if (params.cgnrPrintResiduals)
-				System.err.println("\t\t" + k + "\t" + ztz+"\t"+beta);
+				System.err.println("\t\t" + k + "\t" + ztz + "\t" + beta);
 
 			k++;
 			if (progress != null && (k % n) == 0)
@@ -368,12 +363,12 @@ public class NeighborNetSplitWeightsClean {
 		calcAtx(r, z, n);
 		maskElements(z, activeSet);
 		copyArray(z, p);
-		double ztz = sumArraySquared(z,n);
+		double ztz = sumArraySquared(z, n);
 		var k = 1;
 
 		while (true) {
 			calcAx(p, w, n);
-			var alpha = ztz / sumArraySquared(w,n);
+			var alpha = ztz / sumArraySquared(w, n);
 
 			for (var i = 0; i < x.length; i++) {
 				x[i] += alpha * p[i];
@@ -381,13 +376,12 @@ public class NeighborNetSplitWeightsClean {
 			}
 			calcAtx(r, z, n);
 			maskElements(z, activeSet);
-			var ztz2 = sumArraySquared(z,n);
+			var ztz2 = sumArraySquared(z, n);
 			var beta = ztz2 / ztz;
 
 //			for(int i=0;i<x.length;i++)
 //				System.err.print(x[i]+", ");
 //			System.err.println();
-
 
 
 			if (ztz2 < params.cgnrTolerance || k >= params.cgnrIterations)
@@ -399,7 +393,7 @@ public class NeighborNetSplitWeightsClean {
 			ztz = ztz2;
 
 			if (params.cgnrPrintResiduals)
-				System.err.println("\t" + k + "\t" + ztz + "\t"+beta);
+				System.err.println("\t" + k + "\t" + ztz + "\t" + beta);
 
 			k++;
 			if (progress != null && (k % n) == 0)
@@ -407,15 +401,16 @@ public class NeighborNetSplitWeightsClean {
 		}
 		return k;
 	}
+
 	/**
 	 * activeSetMethod
 	 * Implement the active set method for minimizing ||Ax-d|| over non-negative x.
-	 * @param x starting value - assumed feasible. Overwritten by solution.
-	 * @param d vector of distances
-	 * @param params method parameters.
 	 *
+	 * @param x        starting value - assumed feasible. Overwritten by solution.
+	 * @param d        vector of distances
+	 * @param params   method parameters.
 	 * @param progress pointer to progress bar.
-	 * @throws CanceledException  User cancels calculation.
+	 * @throws CanceledException User cancels calculation.
 	 */
 	static public void activeSetMethod(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
@@ -440,7 +435,6 @@ public class NeighborNetSplitWeightsClean {
 					progress.checkForCancel();
 
 				boolean xstarFeasible = feasibleMoveActiveSet(x, xstar, activeSet, params);
-
 
 
 				if (xstarFeasible && numIterations < params.cgnrIterations)
@@ -483,7 +477,7 @@ public class NeighborNetSplitWeightsClean {
 
 		var startTime = System.currentTimeMillis();
 
-		int npairs = n*(n-1)/2;
+		int npairs = n * (n - 1) / 2;
 		boolean[] activeSet = new boolean[npairs];
 		getActiveEntries(x, activeSet);
 
@@ -503,10 +497,10 @@ public class NeighborNetSplitWeightsClean {
 				if (progress != null)
 					progress.checkForCancel();
 
-				boolean xstarFeasible = feasibleMoveActiveSet(x, xstar, activeSet, scratchInt,scratchInteger,scratch[0],n, params);
+				boolean xstarFeasible = feasibleMoveActiveSet(x, xstar, activeSet, scratchInt, scratchInteger, scratch[0], n, params);
 
 				if (params.printResiduals) {
-					params.log.print("\t" + k + "\t"+params.cgnrIterations+"\t" + params.activeSetRho+"\t"+(System.currentTimeMillis() - startTime) + "\t" + evalProjectedGradientSquared(x, d,scratch[0],scratch[1],n) + "\t" + numberNonzero(x));
+					params.log.print("\t" + k + "\t" + params.cgnrIterations + "\t" + params.activeSetRho + "\t" + (System.currentTimeMillis() - startTime) + "\t" + evalProjectedGradientSquared(x, d, scratch[0], scratch[1], n) + "\t" + numberNonzero(x));
 					params.log.println();
 				}
 
@@ -525,7 +519,7 @@ public class NeighborNetSplitWeightsClean {
 //			System.err.println();
 
 
-			evalGradient(x, d, pgrad,scratch[1],n);
+			evalGradient(x, d, pgrad, scratch[1], n);
 
 //			System.err.print("grad=");
 //			for(int i=0;i<npairs;i++)
@@ -533,10 +527,10 @@ public class NeighborNetSplitWeightsClean {
 //			System.err.println();
 
 
-			for(int i=0;i<npairs;i++)
-				if (x[i]==0)
-					pgrad[i] = min(0,pgrad[i]);
-			double pg = sumArraySquared(pgrad,n);
+			for (int i = 0; i < npairs; i++)
+				if (x[i] == 0)
+					pgrad[i] = min(0, pgrad[i]);
+			double pg = sumArraySquared(pgrad, n);
 
 			if (pg < params.projGradBound) {
 				//System.err.println("Exiting Active set\tpg=" + pg + "\t target = "+ +params.projGradBound+"\tNumber iterations=" + k);
@@ -550,26 +544,28 @@ public class NeighborNetSplitWeightsClean {
 			var pgradmin = 0.0;
 
 			for (int i = 0; i < npairs; i++) {
-					double g_i = pgrad[i];
-					if (activeSet[i] && g_i < pgradmin) {
-						pgradmin = g_i;
-						imin = i;
-					}
+				double g_i = pgrad[i];
+				if (activeSet[i] && g_i < pgradmin) {
+					pgradmin = g_i;
+					imin = i;
+				}
 			}
 			if (pgradmin < 0.0)
 				activeSet[imin] = false;
 		}
 
 	}
+
 	/**
 	 * Move the point x towards point xstar, while still maintaining feasibility.
 	 * <p>
 	 * If xstar is feasible, then returns true. Otherwise, the activeset will change and a proportion
 	 * params.activeSetrho of the infeasible entries in xstar will be added to the active set.
-	 * @param x square matrix --- feasible initial point
-	 * @param xstar   square matrix ---  target point, will generally be infeasible
-	 * @param activeSet    current active set. assumed that xstar will satisfy the active set, and x will be moved
-	 *                     to a point satisfying the active set
+	 *
+	 * @param x         square matrix --- feasible initial point
+	 * @param xstar     square matrix ---  target point, will generally be infeasible
+	 * @param activeSet current active set. assumed that xstar will satisfy the active set, and x will be moved
+	 *                  to a point satisfying the active set
 	 * @param params    uses parameter activeSetRho, which is the proportion of infeasible entries of xstar which will
 	 *                  be added to the active set.
 	 * @return true if xstar is feasible, false otherwise
@@ -579,7 +575,7 @@ public class NeighborNetSplitWeightsClean {
 
 		//First check if xstar is feasible, and return true if it is after moving x to xstar
 		if (minArray(xstar) >= 0.0) {
-			copyArray(xstar,x);
+			copyArray(xstar, x);
 			return true;
 		}
 
@@ -625,36 +621,36 @@ public class NeighborNetSplitWeightsClean {
 
 	static private boolean feasibleMoveActiveSet(double[] x, double[] xstar, boolean[] activeSet, int[] splits, Integer[] indices, double[] vals, int n, NNLSParams params) {
 
-		int npairs = n*(n-1)/2;
+		int npairs = n * (n - 1) / 2;
 		int count = 0;
 
-		for(int i=0;i<npairs;i++) {
-			if (xstar[i]<0) {
-				vals[count]=x[i] / (x[i] - xstar[i]);
+		for (int i = 0; i < npairs; i++) {
+			if (xstar[i] < 0) {
+				vals[count] = x[i] / (x[i] - xstar[i]);
 				splits[count] = i;
 				indices[count] = count;
 				count++;
 			}
 		}
-		if (count==0) {
-			copyArray(xstar,x);
+		if (count == 0) {
+			copyArray(xstar, x);
 			return true;
 		}
 
-		Arrays.sort(indices,0,count,Comparator.comparingDouble(i -> vals[i]));
+		Arrays.sort(indices, 0, count, Comparator.comparingDouble(i -> vals[i]));
 		double tmin = vals[indices[0]];
 		int numToMakeActive = max(1, (int) Math.ceil(count * params.activeSetRho));
-		for(int i=0;i<numToMakeActive;i++)
-			activeSet[splits[indices[i]]]=true;
+		for (int i = 0; i < numToMakeActive; i++)
+			activeSet[splits[indices[i]]] = true;
 
 		//System.err.println("tmin = "+tmin);
 
 
-		for(int i=0;i<npairs;i++)
+		for (int i = 0; i < npairs; i++)
 			if (activeSet[i])
 				x[i] = 0;
 			else
-				x[i] = (1-tmin)*x[i] + tmin*xstar[i];
+				x[i] = (1 - tmin) * x[i] + tmin * xstar[i];
 		return false;
 	}
 
@@ -669,6 +665,7 @@ public class NeighborNetSplitWeightsClean {
 				this.j = j;
 				this.val = val;
 			}
+
 			double val;
 			int i;
 			int j;
@@ -679,12 +676,14 @@ public class NeighborNetSplitWeightsClean {
 
 		public SortedPairs(int n) {
 			nentries = 0;
-			entries = new Entry[n*(n-1)/2];
+			entries = new Entry[n * (n - 1) / 2];
 		}
+
 		public void insert(int i, int j, double val) {
 			entries[nentries] = new Entry(i, j, val);
 			nentries++;
 		}
+
 		public void sort() {
 			Arrays.sort(entries, 0, nentries, Comparator.comparingDouble(o -> o.val));
 		}
@@ -706,11 +705,11 @@ public class NeighborNetSplitWeightsClean {
 	 * Cartis et al. 2011  doi:10.1093/imanum/drr035
 	 * but for the case with no regularisation and simple non-negativity points.
 	 *
-	 * @param x		Starting value
-	 * @param d		Distances
-	 * @param params	Parameters for search
-	 * @param progress   Progress bar (for feedback)
-	 * @throws CanceledException   User presses cancel
+	 * @param x        Starting value
+	 * @param d        Distances
+	 * @param params   Parameters for search
+	 * @param progress Progress bar (for feedback)
+	 * @throws CanceledException User presses cancel
 	 */
 	static public void gradientProjection(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
 
@@ -732,7 +731,7 @@ public class NeighborNetSplitWeightsClean {
 			double pg = evalProjectedGradientSquared(x, d);
 
 			if (params.printResiduals) {
-				System.err.println(k+"\t"+(System.currentTimeMillis()-startTime)+"\t"+pg+"\t"+numberNonzero(x));
+				System.err.println(k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + numberNonzero(x));
 			}
 //			System.err.print("X=");
 //			for(int i=1;i<=n;i++)
@@ -743,7 +742,7 @@ public class NeighborNetSplitWeightsClean {
 			//System.err.println("k="+k+"\tOld pg = "+pg);
 
 			if (pg < params.projGradBound) {
-				System.err.println(" Terminating gradient projection. \t\tpg="+evalProjectedGradientSquared(x, d)+"\ttarget = "+params.projGradBound);
+				System.err.println(" Terminating gradient projection. \t\tpg=" + evalProjectedGradientSquared(x, d) + "\ttarget = " + params.projGradBound);
 				return;
 			}
 			if (progress != null)
@@ -752,7 +751,7 @@ public class NeighborNetSplitWeightsClean {
 	}
 
 	static public void gradientProjection(double[] x, double[] d, int n, NNLSParams params, ProgressListener progress) throws CanceledException {
-		var npairs = n*(n-1)/2;
+		var npairs = n * (n - 1) / 2;
 		var startTime = System.currentTimeMillis();
 		double[] p = new double[npairs];
 		double[][] scratch = new double[2][npairs];
@@ -760,10 +759,10 @@ public class NeighborNetSplitWeightsClean {
 
 		for (var k = 1; k <= params.maxIterations; k++) {
 
-			evalGradient(x, d, p,scratch[0],n);
+			evalGradient(x, d, p, scratch[0], n);
 			scale(p, -1);
 
-			projectedGCP(x, p, d, scratch[0], scratch[1],n, params);
+			projectedGCP(x, p, d, scratch[0], scratch[1], n, params);
 
 //			System.err.print("\tx=");
 //			for(int i=0;i<npairs;i++)
@@ -774,16 +773,16 @@ public class NeighborNetSplitWeightsClean {
 			if (progress != null)
 				progress.checkForCancel();
 
-			double pg = evalProjectedGradientSquared(x, d, scratch[0],scratch[1], n);
+			double pg = evalProjectedGradientSquared(x, d, scratch[0], scratch[1], n);
 			if (params.printResiduals) {
-				params.log.print("\t" + k +"\t"+(System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + numberNonzero(x));
+				params.log.print("\t" + k + "\t" + (System.currentTimeMillis() - startTime) + "\t" + pg + "\t" + numberNonzero(x));
 				params.log.println();
 			}
 
 			//System.err.println("k="+k+"\tNew pg = "+pg);
 
 			if (pg < params.projGradBound) {
-				System.err.println("Exiting GradientProjection\tpg=" + pg + "\t target = "+ +params.projGradBound+"\tNumber iterations=" + k);
+				System.err.println("Exiting GradientProjection\tpg=" + pg + "\t target = " + +params.projGradBound + "\tNumber iterations=" + k);
 				return;
 			}
 			if (progress != null)
@@ -799,30 +798,30 @@ public class NeighborNetSplitWeightsClean {
 	 * but for the case with no regularisation and simple non-negativity points.
 	 * <p></p>
 	 * Given x and p, a GCP is a point y = x^GC such that
-	 * 		y = [x + tp]_+ for some t >= 0.
-	 * 		f(y) <= f(x) - \kappa_u p^T(y-x)
-	 * 	and either
-	 * 	    f(y) >= f(x) - \kappa_l p^T(y-x)
-	 * 	or
-	 *      ||w|| \leq \kappa_e  |p^T(y-x)|
-	 *  where
-	 *      w_i  =   \begin{cases} p_i    if  y_i > 0; max(p_i,0) if y_i = 0 \end{cases}
-	 * 	This second condition is equivalent to (2.6) in Cartis et al. Given y, the tangent
-	 * 	cone for the positive quadrant at y is {w:w_i \geq 0 for all i such that y_i = 0.}
-	 *		The three constants (in the params) are tuning factors which satisfy
-	 *			0 < k_u < k_l < 1 and k_e \in (0,0.5)
+	 * y = [x + tp]_+ for some t >= 0.
+	 * f(y) <= f(x) - \kappa_u p^T(y-x)
+	 * and either
+	 * f(y) >= f(x) - \kappa_l p^T(y-x)
+	 * or
+	 * ||w|| \leq \kappa_e  |p^T(y-x)|
+	 * where
+	 * w_i  =   \begin{cases} p_i    if  y_i > 0; max(p_i,0) if y_i = 0 \end{cases}
+	 * This second condition is equivalent to (2.6) in Cartis et al. Given y, the tangent
+	 * cone for the positive quadrant at y is {w:w_i \geq 0 for all i such that y_i = 0.}
+	 * The three constants (in the params) are tuning factors which satisfy
+	 * 0 < k_u < k_l < 1 and k_e \in (0,0.5)
 	 * <p>
-	 *   The search algorithm
+	 * The search algorithm
 	 *
-	 * @param x  Starting value.This is overwritten by xGC, the Generalized Cauchy point
-	 * @param p  Search direction, typically equal to -\grad f(x)
-	 * @param d  Distances
-	 * @param params  Parameters. WE use gcp_ku,gcp_kl,gcp_ke.
+	 * @param x      Starting value.This is overwritten by xGC, the Generalized Cauchy point
+	 * @param p      Search direction, typically equal to -\grad f(x)
+	 * @param d      Distances
+	 * @param params Parameters. WE use gcp_ku,gcp_kl,gcp_ke.
 	 */
 	private static void projectedGCP(double[][] x, double[][] p, double[][] d, NNLSParams params) {
 		int n = x.length - 1;
 
-		double f0 = evalProjectedf(x,0,p,d);
+		double f0 = evalProjectedf(x, 0, p, d);
 
 		//Locate the largest breakpoint. We start the search at 0.5 times this.
 		double tlimit = 0.0;
@@ -835,34 +834,34 @@ public class NeighborNetSplitWeightsClean {
 
 		double tmin = 0, tmax = Double.MAX_VALUE, tk;
 		if (tlimit > 0.0)
-			tk = 0.5*tlimit;
+			tk = 0.5 * tlimit;
 		else {
 			//For all i,j either p[i][j] >= 0 or x[i][j] = 0 and p[i][j] <0.
 			//We jump to an exact solution.
-			double[][] phat = new double[n+1][n+1];
-			for(int i=1;i<=n;i++)
-				for(int j=i+1;j<=n;j++) {
-					phat[i][j] = max(p[i][j],0.0);
+			double[][] phat = new double[n + 1][n + 1];
+			for (int i = 1; i <= n; i++)
+				for (int j = i + 1; j <= n; j++) {
+					phat[i][j] = max(p[i][j], 0.0);
 				}
 			/* Min 0.5 (A(x+tp) - d)'(A(x+tp) - d) = 0.5 t^2 p'A'Ap - t d'Ap + const
 			t = (Ax-d)'Ap / pA'Ap
 			 */
-			double[][] Ap = new double[n+1][n+1];
-			double[][] Ax = new double[n+1][n+1];
-			calcAx(phat,Ap);
-			calcAx(x,Ax);
-			double rAp=0.0, pAAp = 0.0;
-			for(int i=1;i<=n;i++)
-				for(int j=i+1;j<=n;j++) {
+			double[][] Ap = new double[n + 1][n + 1];
+			double[][] Ax = new double[n + 1][n + 1];
+			calcAx(phat, Ap);
+			calcAx(x, Ax);
+			double rAp = 0.0, pAAp = 0.0;
+			for (int i = 1; i <= n; i++)
+				for (int j = i + 1; j <= n; j++) {
 					double Ap_ij = Ap[i][j];
 					double r_ij = Ax[i][j] - d[i][j];
 					rAp += Ap_ij * r_ij;
-					pAAp+= Ap_ij * Ap_ij;
+					pAAp += Ap_ij * Ap_ij;
 				}
-			tk = -rAp/pAAp; //TODO: Replace rAp with phat^T phat.
+			tk = -rAp / pAAp; //TODO: Replace rAp with phat^T phat.
 		}
 
-		while(true) {
+		while (true) {
 			double fk = evalProjectedf(x, tk, p, d);
 			double ptz = 0.0;
 			for (int i = 1; i <= n; i++)
@@ -899,9 +898,9 @@ public class NeighborNetSplitWeightsClean {
 	}
 
 	private static void projectedGCP(double[] x, double[] p, double[] d, double[] scratch1, double[] scratch2, int n, NNLSParams params) {
-		int npairs = n*(n-1)/2;
+		int npairs = n * (n - 1) / 2;
 
-		double f0 = evalProjectedf(x,0,p,d,scratch1,scratch2,n);
+		double f0 = evalProjectedf(x, 0, p, d, scratch1, scratch2, n);
 
 		//Locate the largest breakpoint. We start the search at 0.5 times this.
 		double tlimit = 0.0;
@@ -913,31 +912,31 @@ public class NeighborNetSplitWeightsClean {
 
 		double tmin = 0, tmax = Double.MAX_VALUE, tk;
 		if (tlimit > 0.0)
-			tk = 0.5*tlimit;
+			tk = 0.5 * tlimit;
 		else {
 			//For all i,j either p[i][j] >= 0 or x[i][j] = 0 and p[i][j] <0.
 			//We jump to an exact solution.
-			for(int i=0;i<npairs;i++)
-				scratch1[i] = max(p[i],0.0); //scratch1 = phat
+			for (int i = 0; i < npairs; i++)
+				scratch1[i] = max(p[i], 0.0); //scratch1 = phat
 
 			/* Min 0.5 (A(x+tp) - d)'(A(x+tp) - d) = 0.5 t^2 p'A'Ap - t d'Ap + const
 			t = (Ax-d)'Ap / pA'Ap
 			 */
-			calcAx(scratch1,scratch2,n); //scratch2 = A * phat
-			calcAx(x,scratch1,n); //scratch1 = Ax
+			calcAx(scratch1, scratch2, n); //scratch2 = A * phat
+			calcAx(x, scratch1, n); //scratch1 = Ax
 
-			double rAp=0.0, pAAp = 0.0;
-			for(int i=0;i<npairs;i++) {
+			double rAp = 0.0, pAAp = 0.0;
+			for (int i = 0; i < npairs; i++) {
 				double Ap_i = scratch2[i];
-				double r_i = scratch1[i]- d[i];
-					rAp += Ap_i * r_i;
-					pAAp+= Ap_i * Ap_i;
-				}
-			tk = -rAp/pAAp; //TODO: Replace rAp with phat^T phat.
+				double r_i = scratch1[i] - d[i];
+				rAp += Ap_i * r_i;
+				pAAp += Ap_i * Ap_i;
+			}
+			tk = -rAp / pAAp; //TODO: Replace rAp with phat^T phat.
 		}
 
-		while(true) {
-			double fk = evalProjectedf(x, tk, p, d,scratch1,scratch2,n);
+		while (true) {
+			double fk = evalProjectedf(x, tk, p, d, scratch1, scratch2, n);
 			double ptz = 0.0;
 			for (int i = 0; i < npairs; i++)
 				ptz += p[i] * (max(x[i] + tk * p[i], 0) - x[i]); //TODO: Check numerical stability here
@@ -949,10 +948,10 @@ public class NeighborNetSplitWeightsClean {
 			} else {
 				double wsum = 0.0;
 				for (int i = 0; i < npairs; i++) {
-						double pij = p[i];
-						if (p[i] > 0 || x[i] + tk * p[i] > 0)
-							wsum += pij * pij;
-					}
+					double pij = p[i];
+					if (p[i] > 0 || x[i] + tk * p[i] > 0)
+						wsum += pij * pij;
+				}
 				if (fk < f0 - params.gcp_kl * ptz && sqrt(wsum) > params.gcp_ke * abs(ptz)) {
 					tmin = tk;
 					if (tmax == Double.MAX_VALUE)
@@ -961,7 +960,7 @@ public class NeighborNetSplitWeightsClean {
 						tk = 0.5 * (tmin + tmax);
 				} else {
 					for (int i = 0; i < npairs; i++)
-						x[i]= max(x[i]+ tk * p[i], 0.0);
+						x[i] = max(x[i] + tk * p[i], 0.0);
 					return;
 				}
 
@@ -988,20 +987,20 @@ public class NeighborNetSplitWeightsClean {
 				diff += rij * rij;
 			}
 
-		return 0.5*(diff - sumArraySquared(d));
+		return 0.5 * (diff - sumArraySquared(d));
 	}
 
 	static private double evalProjectedf(double[] x, double t, double[] p, double[] d, double[] xk, double[] resk, int n) {
-		int npairs = n*(n-1)/2;
+		int npairs = n * (n - 1) / 2;
 
 
 		for (int i = 0; i < npairs; i++)
-				xk[i] = max(x[i] + t * p[i], 0);
-		calcAx(xk, resk,n);
+			xk[i] = max(x[i] + t * p[i], 0);
+		calcAx(xk, resk, n);
 		for (int i = 0; i < npairs; i++)
-			resk[i]-=d[i];
+			resk[i] -= d[i];
 
-		return 0.5*(sumArraySquared(resk,n) - sumArraySquared(d,n)); //TODO - could pass d'd
+		return 0.5 * (sumArraySquared(resk, n) - sumArraySquared(d, n)); //TODO - could pass d'd
 	}
 
 	static public void APGD(double[][] x, double[][] d, NNLSParams params, ProgressListener progress) throws CanceledException {
@@ -1014,9 +1013,6 @@ public class NeighborNetSplitWeightsClean {
 
 		double theta_old;
 		double theta = params.APGDtheta;
-
-
-
 
 
 		var y = new double[n + 1][n + 1];
@@ -1067,13 +1063,13 @@ public class NeighborNetSplitWeightsClean {
 
 			double pg = evalProjectedGradientSquared(x, d);
 			if (params.printResiduals && k % 10 == 0) {
-				params.log.println("\t" + k + "\t" +  params.APGDtheta + "\t"+pg + "\t" + (numberNonzero(x)));
+				params.log.println("\t" + k + "\t" + params.APGDtheta + "\t" + pg + "\t" + (numberNonzero(x)));
 			}
 			if (pg < params.projGradBound || k >= params.maxIterations) {
-				System.err.println("Exiting (old) AGPD\tpg="+pg+"\tk="+k);
+				System.err.println("Exiting (old) AGPD\tpg=" + pg + "\tk=" + k);
 				return;
 			}
-			if (progress!=null)
+			if (progress != null)
 				progress.checkForCancel();
 			k++;
 		}
@@ -1081,7 +1077,7 @@ public class NeighborNetSplitWeightsClean {
 
 
 	static public void APGD(double[] x, double[] d, int n, NNLSParams params, ProgressListener progress) throws CanceledException {
-		var npairs = n*(n-1)/2;
+		var npairs = n * (n - 1) / 2;
 		var startTime = System.currentTimeMillis();
 
 		zeroNegativeEntries(x);
@@ -1131,13 +1127,13 @@ public class NeighborNetSplitWeightsClean {
 
 			double pg = evalProjectedGradientSquared(x, d, g, scratch, n);
 			if (params.printResiduals && k % 10 == 0) {
-				params.log.println("\t" + k + "\t"  + pg + "\t" + (System.currentTimeMillis() - startTime) + "\t" + (numberNonzero(x)));
+				params.log.println("\t" + k + "\t" + pg + "\t" + (System.currentTimeMillis() - startTime) + "\t" + (numberNonzero(x)));
 			}
 			if (pg < params.projGradBound || k >= params.maxIterations) {
 				System.err.println("Exiting AGPD\tpg=" + pg + "\tk=" + k);
 				return;
 			}
-				if (progress!=null)
+			if (progress != null)
 				progress.checkForCancel();
 			k++;
 		}
@@ -1221,7 +1217,7 @@ public class NeighborNetSplitWeightsClean {
 
 	static public void IPG(double[] x, double[] d, int n, NNLSParams params, ProgressListener progress) throws CanceledException {
 
-		var npairs = n*(n-1)/2;
+		var npairs = n * (n - 1) / 2;
 		long startTime = System.currentTimeMillis();
 
 
@@ -1230,7 +1226,7 @@ public class NeighborNetSplitWeightsClean {
 		double offset = 0.0;
 		for (int i = 0; i < npairs; i++)
 			offset += d[i];
-		offset *= 1.0/(n*n*n);
+		offset *= 1.0 / (n * n * n);
 		for (int i = 0; i < npairs; i++)
 			x[i] += offset;
 
@@ -1281,7 +1277,6 @@ public class NeighborNetSplitWeightsClean {
 		}
 
 	}
-
 
 
 }

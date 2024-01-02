@@ -119,6 +119,13 @@ public class AlignmentView implements IView {
 			}
 		});
 
+		viewTab.emptyProperty().bind(empty);
+		viewTabProperty().addListener((v, o, n) -> {
+			if (o != null)
+				o.emptyProperty().unbind();
+			if (n != null)
+				n.emptyProperty().bind(empty);
+		});
 		empty.bind(mainWindow.emptyProperty());
 
 		setViewTab(viewTab);

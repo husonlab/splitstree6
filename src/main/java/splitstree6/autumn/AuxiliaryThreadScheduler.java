@@ -29,25 +29,25 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
  */
 public class AuxiliaryThreadScheduler {
 	final private ScheduledThreadPoolExecutor executor;
-    final static private boolean verbose = true;
+	final static private boolean verbose = true;
 
-    final public static byte PENDING = 0;
-    final public static byte RUNNING = 1;
-    final public static byte DONE = 2;
-    final public static byte DE_SCHEDULED = 2;
+	final public static byte PENDING = 0;
+	final public static byte RUNNING = 1;
+	final public static byte DONE = 2;
+	final public static byte DE_SCHEDULED = 2;
 
-    final private SortedMap<Long, Runnable> scheduledTasks = new TreeMap<>();
-    final private Map<Long, Future> id2future = new HashMap<>();
+	final private SortedMap<Long, Runnable> scheduledTasks = new TreeMap<>();
+	final private Map<Long, Future> id2future = new HashMap<>();
 
-    final private Set<Long> pending = new HashSet<>();
-    final private Set<Long> running = new HashSet<>();
+	final private Set<Long> pending = new HashSet<>();
+	final private Set<Long> running = new HashSet<>();
 
-    /**
+	/**
 	 * create a scheduler
 	 */
-    public AuxiliaryThreadScheduler(int maxNumberOfThreads) {
-        executor = new ScheduledThreadPoolExecutor(maxNumberOfThreads);
-    }
+	public AuxiliaryThreadScheduler(int maxNumberOfThreads) {
+		executor = new ScheduledThreadPoolExecutor(maxNumberOfThreads);
+	}
 
 	/**
 	 * schedule a task to be run on the next available thread
@@ -101,7 +101,6 @@ public class AuxiliaryThreadScheduler {
 
 	/**
 	 * wait for the task to complete.
-	 *
 	 */
 	public void waitFor(long taskId) {
 		var future = id2future.get(taskId);
@@ -114,7 +113,6 @@ public class AuxiliaryThreadScheduler {
 
 	/**
 	 * wait for a set of tasks to complete
-	 *
 	 */
 	public void waitFor(HashSet<Long> taskIds) {
 		for (var taskId : taskIds) {

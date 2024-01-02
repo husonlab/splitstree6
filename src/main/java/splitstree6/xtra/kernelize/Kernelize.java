@@ -92,7 +92,7 @@ public class Kernelize {
 			var count = 0;
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
-					System.err.println("Component " + (++count)+": "+component.getNumberOfNodes()+" clusters");
+					System.err.println("Component " + (++count) + ": " + component.getNumberOfNodes() + " clusters");
 					var reducedTrees = extractTrees(component);
 					System.err.println(reducedTrees.report());
 				}
@@ -101,41 +101,42 @@ public class Kernelize {
 
 		// System.err.println("Blob tree: " + NewickIO.toString(network, false) + ";");
 
-			// run the algorithm on all components:
-			try (NodeArray<TreesAndTaxonClasses> blobNetworksMap = blobTree.newNodeArray()) {
-				for (var component : components) {
-					if (component.getNumberOfNodes() > 1) {
-						var reducedTrees = extractTrees(component);
-						var subnetworks = new TreesAndTaxonClasses(algorithm.apply(reducedTrees.trees()), reducedTrees.taxonClasses());
-						var donorTaxa = BitSetUtils.union(reducedTrees.taxonClasses());
-						var acceptorNode = clusterNodeMap.get(donorTaxa);
-						blobNetworksMap.put(acceptorNode, subnetworks);
-					}
+		// run the algorithm on all components:
+		try (NodeArray<TreesAndTaxonClasses> blobNetworksMap = blobTree.newNodeArray()) {
+			for (var component : components) {
+				if (component.getNumberOfNodes() > 1) {
+					var reducedTrees = extractTrees(component);
+					var subnetworks = new TreesAndTaxonClasses(algorithm.apply(reducedTrees.trees()), reducedTrees.taxonClasses());
+					var donorTaxa = BitSetUtils.union(reducedTrees.taxonClasses());
+					var acceptorNode = clusterNodeMap.get(donorTaxa);
+					blobNetworksMap.put(acceptorNode, subnetworks);
 				}
-				var networks = new ArrayList<PhyloTree>();
-				var numberOfBlobs = blobNetworksMap.size();
-				insertRec(blobTree, clusterNodeMap, blobNetworksMap, numberOfBlobs, new HashSet<Node>(), maxNumberOfResults, networks);
-				for (var network : networks) {
-					for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
-						network.delDivertex(v);
-					}
-					for (var e : network.edges()) {
-						network.setReticulate(e, e.getTarget().getInDegree() > 1);
-					}
-				}
-				return networks;
 			}
+			var networks = new ArrayList<PhyloTree>();
+			var numberOfBlobs = blobNetworksMap.size();
+			insertRec(blobTree, clusterNodeMap, blobNetworksMap, numberOfBlobs, new HashSet<Node>(), maxNumberOfResults, networks);
+			for (var network : networks) {
+				for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
+					network.delDivertex(v);
+				}
+				for (var e : network.edges()) {
+					network.setReticulate(e, e.getTarget().getInDegree() > 1);
+				}
+			}
+			return networks;
+		}
 	}
 
 	/**
 	 * recursively inserts subnetworks in all possible combinations
-	 * @param blobTree the backbone tree
-	 * @param clusterNodeMap maps clusters to the blob tree
-	 * @param blobNetworksMap the blob to networks map
-	 * @param numberOfBlobs total number of blobs (non-trivial connected components in the incompatibity graph)
-	 * @param resolvedBlobs blobs that have been resolved
+	 *
+	 * @param blobTree           the backbone tree
+	 * @param clusterNodeMap     maps clusters to the blob tree
+	 * @param blobNetworksMap    the blob to networks map
+	 * @param numberOfBlobs      total number of blobs (non-trivial connected components in the incompatibity graph)
+	 * @param resolvedBlobs      blobs that have been resolved
 	 * @param maxNumberOfResults max number of desired results
-	 * @param networks resulting networks
+	 * @param networks           resulting networks
 	 */
 	private static void insertRec(PhyloTree blobTree, HashMap<BitSet, Node> clusterNodeMap, NodeArray<TreesAndTaxonClasses> blobNetworksMap,
 								  int numberOfBlobs, Set<Node> resolvedBlobs, int maxNumberOfResults, List<PhyloTree> networks) {

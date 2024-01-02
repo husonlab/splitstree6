@@ -34,16 +34,16 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
-        <javafx.version>17</javafx.version>
+        <javafx.version>20</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
-        <main.class>splitstree6.main.SplitsTree6</main.class>
 
         <gluonfx.plugin.version>1.0.21</gluonfx.plugin.version>
-        <charm.version>6.1.1</charm.version>
+        <charm.version>6.2.3</charm.version>
         <attach.version>4.0.17</attach.version>
         <gluonfx.target></gluonfx.target>
         <app.version>1.0.0</app.version>
 
+        <main.class>splitstree6.main.SplitsTree6</main.class>
     </properties>
 
     <dependencies>
@@ -523,6 +523,7 @@
                                 </providedProvisioningProfile>
                      </releaseConfiguration>
                      </!-->
+                    <verbose>true</verbose>
                 </configuration>
             </plugin>
             <!-->

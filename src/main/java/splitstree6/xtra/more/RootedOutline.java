@@ -47,7 +47,10 @@ import splitstree6.view.trees.tanglegram.optimize.LSATree;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.BitSet;
+import java.util.List;
+import java.util.TreeSet;
 
 /**
  * Greedy rooted outline.

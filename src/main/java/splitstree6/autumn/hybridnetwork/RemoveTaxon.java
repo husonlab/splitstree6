@@ -25,64 +25,64 @@ import splitstree6.autumn.Root;
  * Daniel Huson, 5.2011
  */
 public class RemoveTaxon {
-    /**
-     * remove the named taxon. Children are kept lexicographically sorted
-     *
-     * @param taxon  @return true, if changed
-     */
-    public static boolean apply(Root root, int treeId, int taxon) {
-        if (root.getTaxa().get(taxon)) {
-            root.getTaxa().set(taxon, false);
-            root.getRemovedTaxa().set(taxon, true);
-            var changed = false;
-            for (var e : root.outEdges()) {
-                if (apply((Root) e.getTarget(), treeId, taxon))
-                    changed = true;
-            }
-            if (changed)
-                root.reorderChildren();
-            if (root.getOutDegree() == 0 && root.getInDegree() > 0) {
-                var f = root.getFirstInEdge();
-                f.setInfo(treeId);
-            }
-            return true;
-        }
-        return false;
-    }
+	/**
+	 * remove the named taxon. Children are kept lexicographically sorted
+	 *
+	 * @param taxon @return true, if changed
+	 */
+	public static boolean apply(Root root, int treeId, int taxon) {
+		if (root.getTaxa().get(taxon)) {
+			root.getTaxa().set(taxon, false);
+			root.getRemovedTaxa().set(taxon, true);
+			var changed = false;
+			for (var e : root.outEdges()) {
+				if (apply((Root) e.getTarget(), treeId, taxon))
+					changed = true;
+			}
+			if (changed)
+				root.reorderChildren();
+			if (root.getOutDegree() == 0 && root.getInDegree() > 0) {
+				var f = root.getFirstInEdge();
+				f.setInfo(treeId);
+			}
+			return true;
+		}
+		return false;
+	}
 
-    /**
-     * un-remove the named taxon. Children are kept lexicographically sorted
-     *
-     * @param taxon @return true, if changed
-     */
-    public static boolean unapply(Root root, int taxon) {
-        if (root.getRemovedTaxa().get(taxon)) {
-            root.getRemovedTaxa().set(taxon, false);
-            root.getTaxa().set(taxon, true);
-            var changed = false;
-            var isBelow = false;
-            for (var e = root.getFirstOutEdge(); !isBelow && e != null; e = root.getNextOutEdge(e)) {
-                var w = (Root) e.getTarget();
-                if (w.getTaxa().get(taxon) || w.getRemovedTaxa().get(taxon))
-                    isBelow = true;
-            }
-            if (root.getDegree() > 0 && !isBelow) {
-                var u = root.newNode();
-                u.getTaxa().set(taxon);
-                root.newEdge(root, u);
-                changed = true;
-            } else // is nothing below, add leaf node
-            {
-                for (var e : root.outEdges()) {
-                    if (unapply((Root) e.getTarget(), taxon))
-                        changed = true;
-                }
-            }
-            if (changed)
-                root.reorderChildren();
-            return true;
-        }
-        return false;
-    }
+	/**
+	 * un-remove the named taxon. Children are kept lexicographically sorted
+	 *
+	 * @param taxon @return true, if changed
+	 */
+	public static boolean unapply(Root root, int taxon) {
+		if (root.getRemovedTaxa().get(taxon)) {
+			root.getRemovedTaxa().set(taxon, false);
+			root.getTaxa().set(taxon, true);
+			var changed = false;
+			var isBelow = false;
+			for (var e = root.getFirstOutEdge(); !isBelow && e != null; e = root.getNextOutEdge(e)) {
+				var w = (Root) e.getTarget();
+				if (w.getTaxa().get(taxon) || w.getRemovedTaxa().get(taxon))
+					isBelow = true;
+			}
+			if (root.getDegree() > 0 && !isBelow) {
+				var u = root.newNode();
+				u.getTaxa().set(taxon);
+				root.newEdge(root, u);
+				changed = true;
+			} else // is nothing below, add leaf node
+			{
+				for (var e : root.outEdges()) {
+					if (unapply((Root) e.getTarget(), taxon))
+						changed = true;
+				}
+			}
+			if (changed)
+				root.reorderChildren();
+			return true;
+		}
+		return false;
+	}
 
 }

@@ -23,8 +23,6 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.Property;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import jloda.fx.window.NotificationManager;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
@@ -128,23 +126,23 @@ public class ProteinMLdist extends Characters2Distances {
 	}
 
 	public ProteinModel selectModel(Model model) {
-        ProteinModel themodel;
+		ProteinModel themodel;
 
-        System.err.println("Model name = " + model.toString());
-        //TODO: Add all models
-        themodel = switch (model) {
-            case cpREV45 -> new cpREV45Model();
-            case Dayhoff -> new DayhoffModel();
-            case JTT -> new JTTmodel();
-            case mtMAM -> new mtMAMModel();
-            case mtREV24 -> new mtREV24Model();
-            case pmb -> new pmbModel();
-            case Rhodopsin -> new RhodopsinModel();
-            case WAG -> new WagModel();
-        };
+		System.err.println("Model name = " + model.toString());
+		//TODO: Add all models
+		themodel = switch (model) {
+			case cpREV45 -> new cpREV45Model();
+			case Dayhoff -> new DayhoffModel();
+			case JTT -> new JTTmodel();
+			case mtMAM -> new mtMAMModel();
+			case mtREV24 -> new mtREV24Model();
+			case pmb -> new pmbModel();
+			case Rhodopsin -> new RhodopsinModel();
+			case WAG -> new WagModel();
+		};
 
-        return themodel;
-    }
+		return themodel;
+	}
 
 	// GETTER AND SETTER
 
@@ -172,7 +170,6 @@ public class ProteinMLdist extends Characters2Distances {
 	public void setOptionPropInvariableSites(double pinvar) {
 		this.optionPropInvariableSites.setValue(pinvar);
 	}
-
 
 
 	public double getOptionGamma() {

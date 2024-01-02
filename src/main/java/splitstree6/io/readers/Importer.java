@@ -40,40 +40,40 @@ import java.io.IOException;
  * Daniel Huson, 1.2018
  */
 public class Importer {
-    /**
-     * import from a file
-     *
-     * @return taxa block and data block, or null
-     */
-    public static Pair<TaxaBlock, DataBlock> apply(ProgressListener progress, DataReaderBase<?> reader, String fileName) throws IOException {
-        if (reader == null)
-            throw new IOException("No suitable importer found");
-        TaxaBlock taxaBlock = new TaxaBlock();
-        DataBlock dataBlock;
+	/**
+	 * import from a file
+	 *
+	 * @return taxa block and data block, or null
+	 */
+	public static Pair<TaxaBlock, DataBlock> apply(ProgressListener progress, DataReaderBase<?> reader, String fileName) throws IOException {
+		if (reader == null)
+			throw new IOException("No suitable importer found");
+		TaxaBlock taxaBlock = new TaxaBlock();
+		DataBlock dataBlock;
 
-        if (reader instanceof CharactersReader) {
-            dataBlock = new CharactersBlock();
-            ((CharactersReader) reader).read(progress, fileName, taxaBlock, (CharactersBlock) dataBlock);
-        } else if (reader instanceof GenomesReader) {
-            dataBlock = new GenomesBlock();
-            ((GenomesReader) reader).read(progress, fileName, taxaBlock, (GenomesBlock) dataBlock);
-        } else if (reader instanceof DistancesReader) {
-            dataBlock = new DistancesBlock();
-            ((DistancesReader) reader).read(progress, fileName, taxaBlock, (DistancesBlock) dataBlock);
-        } else if (reader instanceof TreesReader) {
-            dataBlock = new TreesBlock();
-            ((TreesReader) reader).read(progress, fileName, taxaBlock, (TreesBlock) dataBlock);
-        } else if (reader instanceof SplitsReader) {
-            dataBlock = new SplitsBlock();
-            ((SplitsReader) reader).read(progress, fileName, taxaBlock, (SplitsBlock) dataBlock);
-        } else if (reader instanceof NetworkReader) {
-            dataBlock = new NetworkBlock();
-            ((NetworkReader) reader).read(progress, fileName, taxaBlock, (NetworkBlock) dataBlock);
-        } else if (reader instanceof ViewReader) {
-            dataBlock = new ViewBlock();
-            ((ViewReader) reader).read(progress, fileName, taxaBlock, (ViewBlock) dataBlock);
-        } else
-            throw new IOException("Import not implemented for: " + Basic.getShortName(reader.getClass()));
+		if (reader instanceof CharactersReader) {
+			dataBlock = new CharactersBlock();
+			((CharactersReader) reader).read(progress, fileName, taxaBlock, (CharactersBlock) dataBlock);
+		} else if (reader instanceof GenomesReader) {
+			dataBlock = new GenomesBlock();
+			((GenomesReader) reader).read(progress, fileName, taxaBlock, (GenomesBlock) dataBlock);
+		} else if (reader instanceof DistancesReader) {
+			dataBlock = new DistancesBlock();
+			((DistancesReader) reader).read(progress, fileName, taxaBlock, (DistancesBlock) dataBlock);
+		} else if (reader instanceof TreesReader) {
+			dataBlock = new TreesBlock();
+			((TreesReader) reader).read(progress, fileName, taxaBlock, (TreesBlock) dataBlock);
+		} else if (reader instanceof SplitsReader) {
+			dataBlock = new SplitsBlock();
+			((SplitsReader) reader).read(progress, fileName, taxaBlock, (SplitsBlock) dataBlock);
+		} else if (reader instanceof NetworkReader) {
+			dataBlock = new NetworkBlock();
+			((NetworkReader) reader).read(progress, fileName, taxaBlock, (NetworkBlock) dataBlock);
+		} else if (reader instanceof ViewReader) {
+			dataBlock = new ViewBlock();
+			((ViewReader) reader).read(progress, fileName, taxaBlock, (ViewBlock) dataBlock);
+		} else
+			throw new IOException("Import not implemented for: " + Basic.getShortName(reader.getClass()));
         /*
         if (new TraitsNexusInput().isApplicable(fileName)) {
             final TraitsBlock traitsBlock = new TraitsBlock();
@@ -81,6 +81,6 @@ public class Importer {
             new TraitsNexusImporter().parse(progress, fileName, taxaBlock, traitsBlock);
         }
          */
-        return new Pair<>(taxaBlock, dataBlock);
-    }
+		return new Pair<>(taxaBlock, dataBlock);
+	}
 }

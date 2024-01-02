@@ -77,12 +77,12 @@ public class RotateSplit {
 								var wShape = nodeShapeMap.get(w);
 								wShape.setTranslateX(wShape.getTranslateX() + diff.getX());
 								wShape.setTranslateY(wShape.getTranslateY() + diff.getY());
-						});
+							});
+						}
+						graph.edgeStream().filter(f -> graph.getSplit(f) == split).forEach(f -> graph.setAngle(f, graph.getAngle(f) + angle));
 					}
-					graph.edgeStream().filter(f -> graph.getSplit(f) == split).forEach(f -> graph.setAngle(f, graph.getAngle(f) + angle));
 				}
 			}
-		}
 		}
 	}
 }

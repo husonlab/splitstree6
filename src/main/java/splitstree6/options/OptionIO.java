@@ -87,7 +87,8 @@ public class OptionIO {
 										list.add(np.getWordRespectCase());
 									option.getProperty().setValue(list.toArray(new String[0]));
 								}
-								default -> option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
+								default ->
+										option.getProperty().setValue(OptionValueType.parseType(option.getOptionValueType(), np.getWordRespectCase()));
 							}
 
 						} else {

@@ -185,7 +185,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				}
 			}
 		};
-		if (mainWindow.getTaxonSelectionModel().getSelectedItems().size() == 0) {
+		if (mainWindow.getTaxonSelectionModel().getSelectedItems().isEmpty()) {
 			disabledRootings.add(SplitsRooting.OutGroup);
 			disabledRootings.add(SplitsRooting.OutGroupAlt);
 		}
@@ -483,4 +483,5 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	public boolean allowFindReplace() {
 		return true;
 	}
+
 }

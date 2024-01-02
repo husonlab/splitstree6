@@ -23,8 +23,6 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.data.DistancesBlock;
 
-import java.util.Arrays;
-
 /**
  * fix undefined distances
  * Daniel Huson, 2.2018

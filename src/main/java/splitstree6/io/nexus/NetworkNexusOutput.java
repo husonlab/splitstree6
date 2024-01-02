@@ -36,7 +36,6 @@ import java.io.Writer;
 public class NetworkNexusOutput extends NexusIOBase implements INexusOutput<NetworkBlock> {
 	/**
 	 * write the block in nexus format
-	 *
 	 */
 	@Override
 	public void write(Writer w, TaxaBlock taxaBlock, NetworkBlock networkBlock) throws IOException {

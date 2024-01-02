@@ -125,7 +125,7 @@ public class FilesTabPresenter {
 						if (fileCloser != null)
 							fileCloser.accept(file.getPath());
 						if (file.exists() && !file.delete())
-							System.err.println("FAILED to delete: " + file);
+							System.err.println("FAILED to delete file: " + file);
 						controller.getTableView().getItems().remove(fileInfo);
 						javafx.application.Platform.runLater(() -> controller.getTableView().sort());
 					} catch (Exception ex) {
@@ -145,13 +145,18 @@ public class FilesTabPresenter {
 				try {
 					FileUtils.writeLinesToFile(List.of(""), path, false);
 				} catch (IOException ex) {
-					NotificationManager.showError("Failed to create file: " + path + ": " + ex.getMessage());
+					NotificationManager.showError("FAILED to create file: " + path + ": " + ex.getMessage());
 					return;
 				}
 				if (fileOpener != null)
 					fileOpener.accept(path);
-				controller.getTableView().getItems().add(new FileItem(path));
+				var fileItem = new FileItem(path);
+				controller.getTableView().getItems().add(fileItem);
 				javafx.application.Platform.runLater(() -> controller.getTableView().sort());
+				javafx.application.Platform.runLater(() -> {
+					controller.getTableView().getSelectionModel().clearSelection();
+					controller.getTableView().getSelectionModel().select(fileItem);
+				});
 			}
 		});
 

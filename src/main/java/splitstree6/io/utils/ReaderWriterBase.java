@@ -59,9 +59,9 @@ public class ReaderWriterBase {
 		}
 	}
 
-		public String getName() {
-			return getClass().getSimpleName().replaceAll("Writer$", "").replaceAll("Reader$", "");
-		}
+	public String getName() {
+		return getClass().getSimpleName().replaceAll("Writer$", "").replaceAll("Reader$", "");
+	}
 
 	public FileChooser.ExtensionFilter getExtensionFilter() {
 		return new FileChooser.ExtensionFilter(dataType + " (" + StringUtils.toString(getFileExtensions(), " ") + ")", getFileExtensions().stream().map(s -> "*." + s).collect(Collectors.toList()));

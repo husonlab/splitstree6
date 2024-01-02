@@ -26,7 +26,6 @@ import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.NumberUtils;
 
-
 import java.util.*;
 import java.util.function.Function;
 
@@ -245,24 +244,24 @@ public class TreesUtils {
 					stack.pop();
 					var cluster = BitSetUtils.asBitSet(tree.getTaxa(v));
 					for (var w : v.children()) {
-                        cluster.or(nodeClusterMap.get(w));
-                    }
-                    nodeClusterMap.put(v, cluster);
-                }
-            }
-        }
-        tree.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
-        return nodeClusterMap;
-    }
+						cluster.or(nodeClusterMap.get(w));
+					}
+					nodeClusterMap.put(v, cluster);
+				}
+			}
+		}
+		tree.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
+		return nodeClusterMap;
+	}
 
-    /**
-     * collects all hardwired clusters contained in the tree.
-     */
-    public static Set<BitSet> collectAllHardwiredClusters(PhyloTree tree) {
-        var clusters = new HashSet<BitSet>();
+	/**
+	 * collects all hardwired clusters contained in the tree.
+	 */
+	public static Set<BitSet> collectAllHardwiredClusters(PhyloTree tree) {
+		var clusters = new HashSet<BitSet>();
 		collectAllHardwiredClustersRec(tree, tree.getRoot(), clusters);
-        return clusters;
-    }
+		return clusters;
+	}
 
 	public static BitSet collectAllHardwiredClustersRec(PhyloTree tree, Node v, HashSet<BitSet> clusters) {
 		var set = BitSetUtils.asBitSet(tree.getTaxa(v));
@@ -274,7 +273,7 @@ public class TreesUtils {
 		return set;
 	}
 
-    private static record WeightConfidence(double weight, double confidence) {
-    }
+	private static record WeightConfidence(double weight, double confidence) {
+	}
 
 }

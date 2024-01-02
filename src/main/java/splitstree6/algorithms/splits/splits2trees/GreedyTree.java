@@ -22,11 +22,11 @@ package splitstree6.algorithms.splits.splits2trees;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.GreedyCompatible;
 import splitstree6.algorithms.utils.RerootingUtils;
-import splitstree6.splits.TreesUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.splits.ASplit;
+import splitstree6.splits.TreesUtils;
 
 import java.io.IOException;
 

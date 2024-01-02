@@ -23,13 +23,13 @@ package splitstree6.layout.splits;
  * Daniel Huson, 12.2021
  */
 public enum SplitsDiagramType {
-    Splits, Outline, SplitsTopology, OutlineTopology;
+	Splits, Outline, SplitsTopology, OutlineTopology;
 
-    public boolean isUsingWeights() {
-        return this == Outline || this == Splits;
-    }
+	public boolean isUsingWeights() {
+		return this == Outline || this == Splits;
+	}
 
-    public boolean isOutline() {
-        return this == Outline || this == OutlineTopology;
-    }
+	public boolean isOutline() {
+		return this == Outline || this == OutlineTopology;
+	}
 }

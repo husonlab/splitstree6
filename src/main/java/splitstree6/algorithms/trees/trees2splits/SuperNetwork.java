@@ -242,7 +242,6 @@ public class SuperNetwork extends Trees2Splits {
 	/**
 	 * set the weight to the mean weight of all projections of this split and confidence to
 	 * the count of trees containing a projection of the split
-	 *
 	 */
 	private void setWeightsConfidences(Map[] pSplits, BitSet[] supportSet, SplitsBlock splits) {
 		for (int s = 1; s <= splits.getNsplits(); s++) {
@@ -287,7 +286,6 @@ public class SuperNetwork extends Trees2Splits {
 	/**
 	 * sets the weight of a split in the network as the average relative length of the edge
 	 * in the input trees
-	 *
 	 */
 	private void setWeightAverageReleativeLength(Map[] pSplits, BitSet[] supportSet, SplitsBlock splits) {
 		// compute average of weights and num of edges for each input tree
@@ -379,7 +377,6 @@ public class SuperNetwork extends Trees2Splits {
 
 	/**
 	 * runs the closure method. Does this multiple times, if desired
-	 *
 	 */
 	private void computeClosureOuterLoop(ProgressListener progress, Set<PartialSplit> partialSplits) throws CanceledException {
 		this.rand = new Random(getOptionSeed());
@@ -422,7 +419,6 @@ public class SuperNetwork extends Trees2Splits {
 
 	/**
 	 * computes the split closure obtained using the zig-zap rule
-	 *
 	 */
 	private void computeClosure(ProgressListener progress, Set<PartialSplit> partialSplits) throws CanceledException {
 		PartialSplit[] splits;

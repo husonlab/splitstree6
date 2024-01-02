@@ -33,93 +33,93 @@ import java.io.IOException;
  * Daniel Huson, 2.2020
  */
 public class GenomesBlock extends DataBlock {
-    public static final String BLOCK_NAME = "GENOMES";
+	public static final String BLOCK_NAME = "GENOMES";
 
-    private final ObservableList<Genome> genomes;
+	private final ObservableList<Genome> genomes;
 
-    private GenomesFormat format;
+	private GenomesFormat format;
 
-    public GenomesBlock() {
-        genomes = FXCollections.observableArrayList();
-        format = new GenomesFormat();
-    }
+	public GenomesBlock() {
+		genomes = FXCollections.observableArrayList();
+		format = new GenomesFormat();
+	}
 
-    /**
-     * shallow copy
-     */
-    public void copy(GenomesBlock that) {
-        clear();
-        genomes.addAll(that.getGenomes());
-        format = that.getFormat();
-    }
+	/**
+	 * shallow copy
+	 */
+	public void copy(GenomesBlock that) {
+		clear();
+		genomes.addAll(that.getGenomes());
+		format = that.getFormat();
+	}
 
-    @Override
-    public void clear() {
-        super.clear();
-        genomes.clear();
-    }
+	@Override
+	public void clear() {
+		super.clear();
+		genomes.clear();
+	}
 
-    @Override
-    public int size() {
-        return genomes.size();
-    }
+	@Override
+	public int size() {
+		return genomes.size();
+	}
 
-    /**
-     * next the trees
-     *
-     * @return trees
-     */
-    public ObservableList<Genome> getGenomes() {
-        return genomes;
-    }
+	/**
+	 * next the trees
+	 *
+	 * @return trees
+	 */
+	public ObservableList<Genome> getGenomes() {
+		return genomes;
+	}
 
-    public int getNGenomes() {
-        return genomes.size();
-    }
+	public int getNGenomes() {
+		return genomes.size();
+	}
 
-    /**
-     * get t-th genomes
-     *
-     * @param t 1-based
-     * @return tree
-     */
-    public Genome getGenome(int t) {
-        return genomes.get(t - 1);
-    }
+	/**
+	 * get t-th genomes
+	 *
+	 * @param t 1-based
+	 * @return tree
+	 */
+	public Genome getGenome(int t) {
+		return genomes.get(t - 1);
+	}
 
-    @Override
-    public String getBlockName() {
-        return BLOCK_NAME;
-    }
+	@Override
+	public String getBlockName() {
+		return BLOCK_NAME;
+	}
 
-    public void checkGenomesPresent() throws IOException {
-        for (var t = 1; t <= getNGenomes(); t++) {
-            if (getGenome(t).getLength() == 0)
-                throw new IOException("Genome(" + t + "): not present or length 0");
-        }
-    }
+	public void checkGenomesPresent() throws IOException {
+		for (var t = 1; t <= getNGenomes(); t++) {
+			if (getGenome(t).getLength() == 0)
+				throw new IOException("Genome(" + t + "): not present or length 0");
+		}
+	}
 
-    public GenomesFormat getFormat() {
-        return format;
-    }
+	public GenomesFormat getFormat() {
+		return format;
+	}
 
-    public void setFormat(GenomesFormat format) {
-        this.format = format;
-    }
+	public void setFormat(GenomesFormat format) {
+		this.format = format;
+	}
 
-    @Override
-    public void updateShortDescription() {
-        setShortDescription(size() == 1 ? "one genome" : size() + " genomes");
-    }
+	@Override
+	public void updateShortDescription() {
+		setShortDescription(size() == 1 ? "one genome" : size() + " genomes");
+	}
 
-    @Override
-    public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
-        return new GenomesTaxaFilter();
-    }
+	@Override
+	public DataTaxaFilter<? extends DataBlock, ? extends DataBlock> createTaxaDataFilter() {
+		return new GenomesTaxaFilter();
+	}
 
-    @Override
-    public GenomesBlock newInstance() {
-        return (GenomesBlock) super.newInstance();
-    }
+	@Override
+	public GenomesBlock newInstance() {
+		return (GenomesBlock) super.newInstance();
+	}
 
 }

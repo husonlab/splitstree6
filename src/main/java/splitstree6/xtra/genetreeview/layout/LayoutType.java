@@ -21,6 +21,6 @@ package splitstree6.xtra.genetreeview.layout;
 
 public enum LayoutType {
 
-    Stack, Carousel
+	Stack, Carousel
 
 }

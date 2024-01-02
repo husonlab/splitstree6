@@ -44,24 +44,17 @@
                                     <Tooltip text="use child-average or leaf-average to place internal nodes"/>
                                 </tooltip>
                             </ComboBox>
-                            <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+                            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                             <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                             <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
                                     text="Rotate Right"/>
                             <Button fx:id="flipButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
                                     text="Flip"/>
 
-                            <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
-
-                            <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
-                                <tooltip>
-                                    <Tooltip text="Set rows x columns"/>
-                                </tooltip>
-                            </ComboBox>
-                            <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+                            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
 
                             <ComboBox fx:id="treeCBox" minWidth="100.0"/>
-                            <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+                            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
 
                             <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER"
                                           maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity"
@@ -74,7 +67,7 @@
                                     <Font size="12.0"/>
                                 </font>
                             </ToggleButton>
-                            <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+                            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                             <Button fx:id="zoomInButton" contentDisplay="CENTER" maxHeight="20.0"
                                     mnemonicParsing="false" text="Zoom In">
                                 <tooltip>
@@ -114,6 +107,13 @@
           style="-fx-background-color: derive(-fx-base, 20%) derive(-fx-base, 20%);" AnchorPane.rightAnchor="10.0"
           AnchorPane.topAnchor="0.0">
         <children>
+
+            <ComboBox fx:id="rowsColsCBox" editable="true" prefWidth="80.0" promptText="r  x  c">
+                <tooltip>
+                    <Tooltip text="Set rows x columns"/>
+                </tooltip>
+            </ComboBox>
+            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
             <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
                 <tooltip>
                     <Tooltip text="Show the Settings toolbar"/>

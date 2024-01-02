@@ -37,10 +37,10 @@ import jloda.util.progress.ProgressSilent;
 import splitstree6.algorithms.trees.trees2splits.ConsensusOutline;
 import splitstree6.algorithms.trees.trees2splits.ConsensusSplits;
 import splitstree6.data.SplitsBlock;
-import splitstree6.splits.Compatibility;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitNetworkLayout;
 import splitstree6.layout.tree.LabeledNodeShape;
+import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
 import java.util.ArrayList;

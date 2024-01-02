@@ -47,5 +47,9 @@ public class DisplayTextTab extends ViewTab {
 	public void replaceText(String text) {
 		displayTextView.replaceText(text);
 	}
+
+	public DisplayTextView getDisplayTextView() {
+		return displayTextView;
+	}
 }
 

@@ -32,7 +32,6 @@ import java.util.BitSet;
 public class HasseDiagram {
 	/**
 	 * construct the Hasse diagram for a set of clusters
-	 *
 	 */
 	public static PhyloTree constructHasse(BitSet[] clusters) {
 		Arrays.sort(clusters, Cluster.getComparatorByDecreasingSize());

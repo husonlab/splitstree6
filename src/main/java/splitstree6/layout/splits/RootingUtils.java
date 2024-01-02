@@ -25,8 +25,8 @@ import jloda.util.Triplet;
 import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.splits.ASplit;
 import splitstree6.data.parts.Taxon;
+import splitstree6.splits.ASplit;
 import splitstree6.splits.SplitUtils;
 
 import java.io.IOException;
@@ -131,7 +131,7 @@ public class RootingUtils {
 					return new Triplet<>(split2id.get(split), delta, weight - delta);
 				}
 				total += weight;
-				}
+			}
 		}
 		return new Triplet<>(1, 0.0, useWeights ? splitsBlock.get(1).getWeight() : 1);
 	}

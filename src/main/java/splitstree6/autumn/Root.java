@@ -40,7 +40,6 @@ public class Root extends Node {
 
 	/**
 	 * constructor a new root inside an existing graph
-	 *
 	 */
 	public Root(Graph graph) {
 		super(graph);
@@ -48,7 +47,6 @@ public class Root extends Node {
 
 	/**
 	 * constructor a new root inside an existing graph and set the taxa associated with it
-	 *
 	 */
 	public Root(Graph graph, BitSet taxa) {
 		super(graph);
@@ -84,7 +82,6 @@ public class Root extends Node {
 
 	/**
 	 * get all nodes below v
-	 *
 	 */
 	private void getAllNodesBelowRec(Node v, Set<Node> nodes) {
 		for (var w : v.children()) {
@@ -97,7 +94,6 @@ public class Root extends Node {
 
 	/**
 	 * sets the taxa associated with this node
-	 *
 	 */
 	public void setTaxa(BitSet taxa) {
 		this.taxa.clear();
@@ -116,7 +112,6 @@ public class Root extends Node {
 
 	/**
 	 * sets the removed taxa associated with this node
-	 *
 	 */
 	public void setRemovedTaxa(BitSet taxa) {
 		this.removedTaxa.clear();
@@ -135,8 +130,8 @@ public class Root extends Node {
 	/**
 	 * creates a copy of a rooted tree. Sets the taxa for each node
 	 *
-	 * @param graph   graph that contains the rooted tree
-	 * @param tree    input tree
+	 * @param graph graph that contains the rooted tree
+	 * @param tree  input tree
 	 * @return root of copy
 	 */
 	public static Root createACopy(Graph graph, PhyloTree tree, TaxaBlock allTaxa) {
@@ -147,7 +142,6 @@ public class Root extends Node {
 
 	/**
 	 * recursively does the work
-	 *
 	 */
 	public static void copyRec(Node v1, Root v2, TaxaBlock allTaxa) {
 		var taxa = new BitSet();
@@ -179,7 +173,6 @@ public class Root extends Node {
 
 	/**
 	 * creates a new node and sets its taxa
-	 *
 	 */
 	public Root newNode(BitSet taxa) {
 		var v = new Root(getOwner());
@@ -198,7 +191,6 @@ public class Root extends Node {
 
 	/**
 	 * deletes an edge in the graph containing this node
-	 *
 	 */
 	public void deleteEdge(Edge e) {
 		getOwner().deleteEdge(e);
@@ -217,7 +209,6 @@ public class Root extends Node {
 
 	/**
 	 * recursively does the work
-	 *
 	 */
 	private void getAllLeavesRec(Root v, List<Root> result) {
 		for (var e : v.outEdges()) {
@@ -258,7 +249,7 @@ public class Root extends Node {
 		var buf = new StringBuffer();
 		toStringTreeRec(buf, true, false, true);
 		checkTreeRec(this, buf.toString());
-        return buf + ";";
+		return buf + ";";
 	}
 
 	/**
@@ -270,12 +261,11 @@ public class Root extends Node {
 		var buf = new StringBuffer();
 		toStringTreeRec(buf, false, false, false);
 		checkTreeRec(this, buf.toString());
-        return buf + ";";
+		return buf + ";";
 	}
 
 	/**
 	 * recursively do the work
-	 *
 	 */
 	private void toStringTreeRec(StringBuffer buf, boolean labelInternalNodes, boolean oneTaxonPerLeaf, boolean showX) {
 		if (getOutDegree() == 0) {
@@ -304,7 +294,6 @@ public class Root extends Node {
 
 	/**
 	 * check that nodes are consistently labeled by taxa and removedTaxa
-	 *
 	 */
 	private void checkTreeRec(Root root, String string) {
 		if (root.getOutDegree() > 0) {
@@ -321,8 +310,8 @@ public class Root extends Node {
 			if (!root.getTaxa().equals(taxa))
 				throw new RuntimeException("Taxa discrepancy: " + string + ";");
 			if (!root.getRemovedTaxa().equals(removed))
-                throw new RuntimeException("Removed-taxa discrepancy at " + root + ": " + string + ";"
-                        + "\nExpected(root): " + StringUtils.toString(root.getRemovedTaxa()) + ", got(below): " + StringUtils.toString(removed));
+				throw new RuntimeException("Removed-taxa discrepancy at " + root + ": " + string + ";"
+										   + "\nExpected(root): " + StringUtils.toString(root.getRemovedTaxa()) + ", got(below): " + StringUtils.toString(removed));
 			if (root.getOutDegree() == 0 && root.getTaxa().cardinality() == 0 && root.getInDegree() == 1 && root.getFirstInEdge().getInfo() == null)
 				throw new RuntimeException("In-edge without tree id:: " + string + ";");
 		}
@@ -338,9 +327,9 @@ public class Root extends Node {
 		if (getOutDegree() == 0) {
 			buf.append("(").append(getTaxaString()).append(")");
 		} else {
-            toStringNetworkRec(buf, true, false, new HashMap<>(), new Single<>(0));
+			toStringNetworkRec(buf, true, false, new HashMap<>(), new Single<>(0));
 		}
-        return buf + ";";
+		return buf + ";";
 	}
 
 	/**
@@ -353,14 +342,13 @@ public class Root extends Node {
 		if (getOutDegree() == 0)
 			buf.append("(").append(getTaxaString()).append(")");
 		else {
-            toStringNetworkRec(buf, false, true, new HashMap<>(), new Single<>(0));
+			toStringNetworkRec(buf, false, true, new HashMap<>(), new Single<>(0));
 		}
-        return buf + ";";
+		return buf + ";";
 	}
 
 	/**
 	 * recursively do the work
-	 *
 	 */
 	private void toStringNetworkRec(StringBuffer buf, boolean showTaxonIds, boolean oneTaxonPerLeaf, Map<Node, Integer> hybrid2id, Single<Integer> hybridId) {
 		if (hybrid2id.containsKey(this)) {
@@ -460,10 +448,10 @@ public class Root extends Node {
 				}
 				if (t1 == -1 && t2 != -1)
 					return -1;
-                if (t1 != -1 && t2 == -1)
-                    return 1;
-                return 0;
-            });
+				if (t1 != -1 && t2 == -1)
+					return 1;
+				return 0;
+			});
 			var list = new ArrayList<>(Arrays.asList(array));
 			if (v.getInDegree() > 0)
 				list.add(v.getFirstInEdge());
@@ -571,7 +559,7 @@ public class Root extends Node {
 				else if (rank1 > rank2)
 					return 1;
 				else return Integer.compare(e1.getId(), e2.getId());
-            });
+			});
 			var list = new LinkedList<>(Arrays.asList(array));
 			if (v.getInDegree() > 0)
 				list.add(v.getFirstInEdge());
@@ -607,7 +595,6 @@ public class Root extends Node {
 
 	/**
 	 * recursively do the work
-	 *
 	 */
 	private void checkTreeRec(Root v) {
 		if (!v.hasLexicographicChildren())
@@ -656,7 +643,6 @@ public class Root extends Node {
 
 	/**
 	 * recursively does the work
-	 *
 	 */
 	private void copySubNetworkRec(Root v1, Root v2, Map<Root, Root> old2new) {
 		for (var e1 : v1.outEdges()) {

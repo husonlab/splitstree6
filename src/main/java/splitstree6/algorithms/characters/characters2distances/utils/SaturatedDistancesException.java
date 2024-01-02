@@ -30,7 +30,6 @@ public class SaturatedDistancesException extends RuntimeException {
 
 	/**
 	 * Constructor for the exception
-	 *
 	 */
 	public SaturatedDistancesException(String str) {
 		super(str);

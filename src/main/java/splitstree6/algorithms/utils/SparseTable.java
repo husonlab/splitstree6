@@ -115,16 +115,16 @@ public class SparseTable<V> {
 	}
 
 	public static class Key extends Pair<Integer, Integer> {
-        public Key(int i, int j) {
-            super(i, j);
-        }
+		public Key(int i, int j) {
+			super(i, j);
+		}
 
-        public Integer getFirst() {
-            return super.getFirst();
-        }
+		public Integer getFirst() {
+			return super.getFirst();
+		}
 
-        public Integer getSecond() {
-            return super.getSecond();
+		public Integer getSecond() {
+			return super.getSecond();
 		}
 
 		@Override

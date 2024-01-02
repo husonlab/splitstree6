@@ -43,11 +43,11 @@ public class SplitNewick {
 	/**
 	 * reads in a split-newick string and sets up the graph
 	 *
-	 * @param r              reader
-	 * @param r              the input reader
-	 * @param labelTaxonMap  the label taxon map to use. If null, we setup new mapping
+	 * @param r             reader
+	 * @param r             the input reader
+	 * @param labelTaxonMap the label taxon map to use. If null, we setup new mapping
 	 * @param taxonLabelMap if non-null and empty, will return the taxon to label mapping here
-	 * @param graph          the split network
+	 * @param graph         the split network
 	 * @throws IOException
 	 */
 	public static void read(Reader r, Map<String, Integer> labelTaxonMap, Map<Integer, String> taxonLabelMap, PhyloSplitsGraph graph) throws IOException {

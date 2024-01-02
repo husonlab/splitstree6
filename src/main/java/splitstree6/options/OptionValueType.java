@@ -72,17 +72,17 @@ public enum OptionValueType {
 	 * @return true, if text is of given type
 	 */
 	public static boolean isType(OptionValueType type, String text) {
-        return switch (type) {
+		return switch (type) {
 			case Integer, intArray -> NumberUtils.isInteger(text);
 			case Float -> NumberUtils.isFloat(text);
-            case Double, doubleArray, doubleSquareMatrix -> NumberUtils.isDouble(text);
-            case Boolean -> NumberUtils.isBoolean(text);
-            case String -> text.length() > 0;
+			case Double, doubleArray, doubleSquareMatrix -> NumberUtils.isDouble(text);
+			case Boolean -> NumberUtils.isBoolean(text);
+			case String -> text.length() > 0;
 			case stringArray -> text.length() > 0;
 			case Color -> ColorUtilsFX.isColor(text);
 			default -> false;
-        };
-    }
+		};
+	}
 
 	/**
 	 * parses the text and returns an object of the given type

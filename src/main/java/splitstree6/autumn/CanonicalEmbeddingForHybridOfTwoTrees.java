@@ -40,12 +40,12 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
 	 */
 	public static void apply(PhyloTree tree, TaxaBlock allTaxa) throws IOException {
 		if (tree.getRoot() != null && allTaxa.size() > 0) {
-            Map<Node, Integer> order = new HashMap<>();
-            Single<Integer> postOrderNumber = new Single<>(1);
-            order.put(tree.getRoot(), postOrderNumber.get());
-            computePostOrderNumberingRec(tree, tree.getRoot(), allTaxa, order, postOrderNumber);
-            reorderNetworkChildrenRec(tree, tree.getRoot(), order);
-        }
+			Map<Node, Integer> order = new HashMap<>();
+			Single<Integer> postOrderNumber = new Single<>(1);
+			order.put(tree.getRoot(), postOrderNumber.get());
+			computePostOrderNumberingRec(tree, tree.getRoot(), allTaxa, order, postOrderNumber);
+			reorderNetworkChildrenRec(tree, tree.getRoot(), order);
+		}
 	}
 
 	/**
@@ -131,7 +131,7 @@ public class CanonicalEmbeddingForHybridOfTwoTrees {
 			else if (rank1 > rank2)
 				return 1;
 			else return Integer.compare(e1.getId(), e2.getId());
-        });
+		});
 		var list = new LinkedList<>(Arrays.asList(array));
 		if (v.getInDegree() > 0)
 			list.add(v.getFirstInEdge());

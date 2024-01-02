@@ -27,7 +27,6 @@ import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 
-
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Stack;
@@ -59,7 +58,7 @@ public class ConvexHull {
 	 * @param progress         progress listener
 	 * @param nTax             number of taxa (1-based)
 	 * @param taxLabelFunction taxon to label function
-	 * @param splitsList           the splits
+	 * @param splitsList       the splits
 	 * @param graph            the output graph
 	 * @param usedSplits       the indices of splits already in the graph before this algrothm is called
 	 * @throws CanceledException

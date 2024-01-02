@@ -78,8 +78,8 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 	/**
 	 * Checks to see that, for site m, the taxa in q are not missing, gaps, etc.
 	 *
-	 * @param q     array of taxa ids
-	 * @param m     site
+	 * @param q array of taxa ids
+	 * @param m site
 	 * @return true iff all not missing, not gaps, and site not masked
 	 */
 	private static boolean goodSite(CharactersBlock block, int[] q, int m) {

@@ -35,6 +35,7 @@ import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Font;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
@@ -67,6 +68,8 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 	private final MainWindow mainWindow;
 
 	private final Workflow workflow;
+
+	private final Object sync = new Object();
 
 	private boolean colorSchemeSet = false;
 
@@ -127,45 +130,47 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		var alignmentDrawer = new AlignmentDrawer(controller.getImageGroup(), controller.getCanvasGroup(), mainController.getBottomFlowPane());
 
 		updateCanvasListener = e -> {
-			var width = canvasWidth.get();
-			var height = canvasHeight.get();
+			RunAfterAWhile.applyInFXThread(sync, () -> {
+				var width = canvasWidth.get();
+				var height = canvasHeight.get();
 
-			AxisAndScrollBarUpdate.update(controller.getAxis(), controller.getHorizontalScrollBar(), width,
-					view.getOptionUnitWidth(), view.getInputCharacters() != null ? view.getInputCharacters().getNchar() : 0, view);
+				AxisAndScrollBarUpdate.update(controller.getAxis(), controller.getHorizontalScrollBar(), width,
+						view.getOptionUnitWidth(), view.getInputCharacters() != null ? view.getInputCharacters().getNchar() : 0, view);
 
-			alignmentDrawer.updateCanvas(width, height, view.getInputTaxa(), view.getInputCharacters(), view.getConsensusSequence(),
-					view.getOptionColorScheme(), view.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(),
-					view.getActiveTaxa(), view.getActiveSites());
+				alignmentDrawer.updateCanvas(width, height, view.getInputTaxa(), view.getInputCharacters(), view.getConsensusSequence(),
+						view.getOptionColorScheme(), view.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(),
+						view.getActiveTaxa(), view.getActiveSites());
 
 
-			AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), view.getInputCharacters(),
-					view.getActiveSites(), view.getSelectedSites());
+				AxisAndScrollBarUpdate.updateSelection(controller.getRightTopPane(), controller.getAxis(), view.getInputCharacters(),
+						view.getActiveSites(), view.getSelectedSites());
 
-			updateTaxaCellFactory(controller.getTaxaListView(), view.getOptionUnitHeight(), view::isDisabled);
+				updateTaxaCellFactory(controller.getTaxaListView(), view.getOptionUnitHeight(), view::isDisabled);
 
-			alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
-					view.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), view.getSelectedTaxa());
-
-			alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
-					view.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), view.getSelectedSites());
-
-			if (false)
 				alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
 						view.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), view.getSelectedTaxa());
 
-			controller.getSelectionLabel().setText(view.createSelectionString());
+				alignmentDrawer.updateSiteSelection(controller.getSiteSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
+						view.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), view.getSelectedSites());
 
-			// update block increment for vertical scroll bar:
-			{
-				var listViewVerticalScrollBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.VERTICAL);
-				if (listViewVerticalScrollBar != null) {
-					var countVisible = controller.getTaxaListView().getHeight() / controller.getTaxaListView().getFixedCellSize();
-					if (view.getInputTaxa() != null && countVisible < view.getInputTaxa().getNtax()) {
-						controller.getVerticalScrollBar().setBlockIncrement(countVisible / (view.getInputTaxa().getNtax() - countVisible));
-					} else
-						controller.getVerticalScrollBar().setBlockIncrement(1.0);
+				if (false)
+					alignmentDrawer.updateTaxaSelection(controller.getTaxaSelectionGroup(), view.getInputTaxa(), view.getInputCharacters(),
+							view.getOptionUnitHeight(), controller.getVerticalScrollBar(), controller.getAxis(), view.getSelectedTaxa());
+
+				controller.getSelectionLabel().setText(view.createSelectionString());
+
+				// update block increment for vertical scroll bar:
+				{
+					var listViewVerticalScrollBar = BasicFX.getScrollBar(controller.getTaxaListView(), Orientation.VERTICAL);
+					if (listViewVerticalScrollBar != null) {
+						var countVisible = controller.getTaxaListView().getHeight() / controller.getTaxaListView().getFixedCellSize();
+						if (view.getInputTaxa() != null && countVisible < view.getInputTaxa().getNtax()) {
+							controller.getVerticalScrollBar().setBlockIncrement(countVisible / (view.getInputTaxa().getNtax() - countVisible));
+						} else
+							controller.getVerticalScrollBar().setBlockIncrement(1.0);
+					}
 				}
-			}
+			});
 		};
 
 		canvasWidth.addListener(updateCanvasListener);

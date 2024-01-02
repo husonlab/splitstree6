@@ -67,9 +67,12 @@ public class EdgesFormatPresenter {
 			if (n != null) {
 				switch (n) {
 					case None -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByNoneMenuItem());
-					case Weight -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByWeightMenuItem());
-					case Confidence -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceMenuItem());
-					case Probability -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByProbabilityMenuItem());
+					case Weight ->
+							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByWeightMenuItem());
+					case Confidence ->
+							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceMenuItem());
+					case Probability ->
+							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByProbabilityMenuItem());
 				}
 			}
 		});

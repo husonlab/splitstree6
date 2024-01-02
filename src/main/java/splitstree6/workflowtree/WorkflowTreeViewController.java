@@ -44,6 +44,7 @@ public class WorkflowTreeViewController {
 		MaterialIcons.setIcon(addMenuButton, "add");
 		MaterialIcons.setIcon(deleteButton, "delete");
 	}
+
 	public TreeView<String> getWorkflowTreeView() {
 		return workflowTreeView;
 	}

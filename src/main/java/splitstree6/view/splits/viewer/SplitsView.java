@@ -148,6 +148,14 @@ public class SplitsView implements IView {
 		controller.getInnerAnchorPane().getChildren().add(traitsFormatter.getLegend());
 		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
 
+		viewTab.emptyProperty().bind(empty);
+		viewTabProperty().addListener((v, o, n) -> {
+			if (o != null)
+				o.emptyProperty().unbind();
+			if (n != null)
+				n.emptyProperty().bind(empty);
+		});
+
 		splitsBlock.addListener((v, o, n) -> {
 			empty.set(n == null || n.size() == 0);
 			splitSelectionModel.clearSelection();

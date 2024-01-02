@@ -20,9 +20,7 @@
 package splitstree6.io.writers.view;
 
 import jloda.graph.Edge;
-import jloda.graph.EdgeArray;
 import jloda.graph.Node;
-import jloda.graph.NodeArray;
 import jloda.graph.io.GraphGML;
 import jloda.util.StringUtils;
 import splitstree6.data.TaxaBlock;
@@ -32,8 +30,6 @@ import splitstree6.view.splits.viewer.SplitsView;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.BitSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
 
@@ -70,8 +66,8 @@ public class GMLWriter extends ViewWriterBase {
 				};
 				var comment = "Exported from SplitsTreeCE: %,d nodes, %,d edges, %,d splits".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges(), splitsView.getSplitsBlock().getNsplits());
 				var graphLabel = (graph.getName() != null ? graph.getName() : splitsView.getName());
-					GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
-							labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
+				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
+						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
 			}
 		} else if (view instanceof NetworkView networkView) {
 			var graph = networkView.getNetworkBlock().getGraph();

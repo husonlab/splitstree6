@@ -153,7 +153,6 @@ public class CodeAreaSearcher implements ITextSearcher {
 
 	/**
 	 * Selects all occurrences of text in document, subject to options and constraints of document type
-	 *
 	 */
 	public int findAll(String pattern) {
 		//Not implemented for text editors.... as we cannot select multiple chunks of text.
@@ -229,7 +228,7 @@ public class CodeAreaSearcher implements ITextSearcher {
 			int searchFrom = 0;
 			//System.err.println("Searching backwards before " + currentPoint);
 			while (matcher.find(searchFrom) && matcher.end() < currentPoint) {
-                searchFrom = matcher.end();
+				searchFrom = matcher.end();
 				found = true;
 				//System.err.println("\tfound at [" + pos + "," + matcher.end() + "]" + " but still looking");
 			}

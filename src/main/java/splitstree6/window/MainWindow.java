@@ -158,7 +158,7 @@ public class MainWindow implements IMainWindow {
 	@Override
 	public void show(Stage stage, double screenX, double screenY, double width, double height) {
 		this.stage = stage;
-		
+
 		stage.getIcons().addAll(ProgramProperties.getProgramIconsFX());
 
 		var scene = new Scene(root);

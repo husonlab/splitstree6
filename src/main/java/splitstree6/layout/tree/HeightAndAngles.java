@@ -26,10 +26,8 @@ import jloda.graph.NodeArray;
 import jloda.graph.NodeDoubleArray;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.PhyloTree;
-import jloda.util.IteratorUtils;
 import jloda.util.Pair;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +46,6 @@ public class HeightAndAngles {
 
 	/**
 	 * compute the y-coordinates for the parallel view
-	 *
 	 */
 	public static void apply(PhyloTree tree, NodeDoubleArray nodeHeightMap, Averaging averaging) {
 		apply(tree, tree.getRoot(), nodeHeightMap, averaging);
@@ -64,8 +61,7 @@ public class HeightAndAngles {
 			fixSpacing(leafOrder, nodeHeightMap);
 		if (averaging == Averaging.ChildAverage) {
 			computeHeightInternalNodesAsChildAverageRec(tree, root, nodeHeightMap);
-		}
-		else {
+		} else {
 
 			try (NodeArray<Pair<Double, Double>> minMaxBelowMap = tree.newNodeArray()) {
 				tree.nodeStream().filter(tree::isLsaLeaf).forEach(v -> minMaxBelowMap.put(v, new Pair<>(nodeHeightMap.get(v), nodeHeightMap.get(v))));
@@ -126,7 +122,6 @@ public class HeightAndAngles {
 
 	/**
 	 * recursively compute the y coordinate for the internal nodes of a parallel diagram
-	 *
 	 */
 	private static void computeHeightInternalNodesAsChildAverageRec(PhyloTree tree, Node v, NodeDoubleArray nodeHeightMap) {
 		if (v.getOutDegree() > 0) {
@@ -149,7 +144,6 @@ public class HeightAndAngles {
 
 	/**
 	 * fix spacing so that space between any two true leaves is 1
-	 *
 	 */
 	private static void fixSpacing(Collection<Node> leafOrder, NodeDoubleArray yCoord) {
 		var nodes = leafOrder.toArray(new Node[0]);

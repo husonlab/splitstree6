@@ -38,43 +38,43 @@ import static splitstree6.io.readers.ImportManager.UNKNOWN_FORMAT;
  * Daniel Huson, 11.2018
  */
 public class WorkflowDataLoader {
-    /**
-     * loads data into a file
-     */
-    public static void load(Workflow workflow, String inputFile, String inputFormat) throws IOException {
-        final var inputTaxaNode = workflow.getInputTaxaNode();
-        if (inputTaxaNode == null)
-            throw new IOException("Workflow does not have input taxon node");
-        final var inputDataNode = workflow.getInputDataNode();
-        if (inputDataNode == null)
-            throw new IOException("Workflow does not have input data node");
+	/**
+	 * loads data into a file
+	 */
+	public static void load(Workflow workflow, String inputFile, String inputFormat) throws IOException {
+		final var inputTaxaNode = workflow.getInputTaxaNode();
+		if (inputTaxaNode == null)
+			throw new IOException("Workflow does not have input taxon node");
+		final var inputDataNode = workflow.getInputDataNode();
+		if (inputDataNode == null)
+			throw new IOException("Workflow does not have input data node");
 
-        final var dataType = ImportManager.getInstance().getDataType(inputFile);
-        final var fileFormat = (inputFormat.equalsIgnoreCase(UNKNOWN_FORMAT) ? ImportManager.getInstance().getFileFormat(inputFile) : inputFormat);
+		final var dataType = ImportManager.getInstance().getDataType(inputFile);
+		final var fileFormat = (inputFormat.equalsIgnoreCase(UNKNOWN_FORMAT) ? ImportManager.getInstance().getFileFormat(inputFile) : inputFormat);
 
-        if (dataType != null && !fileFormat.equalsIgnoreCase(UNKNOWN_FORMAT)) {
-            final var importer = ImportManager.getInstance().getImporterByDataTypeAndFileFormat(dataType, fileFormat);
-            if (importer == null)
-                throw new IOException("Can't open file '" + inputFile + "': Unknown data type or file format");
-            else {
-                try (final ProgressListener progress = new ProgressPercentage("Loading input data from file: " + inputFile + " (data type: '" + dataType + "' format: '" + fileFormat + "')")) {
-                    var pair = Importer.apply(progress, importer, inputFile);
-                    final var inputTaxa = pair.getFirst();
-                    final var inputData = pair.getSecond();
-                    final var w = new StringWriter();
-                    w.write("#nexus\n");
-                    var exporter = new NexusExporter();
-                    exporter.export(w, inputTaxa, inputData);
-                    try (var np = new NexusStreamParser(new StringReader(w.toString()))) {
-                        NexusImporter.parse(np, inputTaxaNode.getDataBlock(), inputDataNode.getDataBlock());
-                    }
-                    inputTaxaNode.getDataBlock().updateShortDescription();
-                    inputDataNode.getDataBlock().updateShortDescription();
-                }
-                System.err.println("Number of input taxa: " + workflow.getInputTaxaBlock().getNtax());
-            }
-        } else {
-            throw new IOException("Unknown data or file format: " + inputFile);
-        }
-    }
+		if (dataType != null && !fileFormat.equalsIgnoreCase(UNKNOWN_FORMAT)) {
+			final var importer = ImportManager.getInstance().getImporterByDataTypeAndFileFormat(dataType, fileFormat);
+			if (importer == null)
+				throw new IOException("Can't open file '" + inputFile + "': Unknown data type or file format");
+			else {
+				try (final ProgressListener progress = new ProgressPercentage("Loading input data from file: " + inputFile + " (data type: '" + dataType + "' format: '" + fileFormat + "')")) {
+					var pair = Importer.apply(progress, importer, inputFile);
+					final var inputTaxa = pair.getFirst();
+					final var inputData = pair.getSecond();
+					final var w = new StringWriter();
+					w.write("#nexus\n");
+					var exporter = new NexusExporter();
+					exporter.export(w, inputTaxa, inputData);
+					try (var np = new NexusStreamParser(new StringReader(w.toString()))) {
+						NexusImporter.parse(np, inputTaxaNode.getDataBlock(), inputDataNode.getDataBlock());
+					}
+					inputTaxaNode.getDataBlock().updateShortDescription();
+					inputDataNode.getDataBlock().updateShortDescription();
+				}
+				System.err.println("Number of input taxa: " + workflow.getInputTaxaBlock().getNtax());
+			}
+		} else {
+			throw new IOException("Unknown data or file format: " + inputFile);
+		}
+	}
 }

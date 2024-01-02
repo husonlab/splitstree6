@@ -28,9 +28,9 @@ import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.util.IteratorUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.splits.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;

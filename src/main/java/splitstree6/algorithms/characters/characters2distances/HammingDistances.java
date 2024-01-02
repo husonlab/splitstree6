@@ -22,10 +22,7 @@ package splitstree6.algorithms.characters.characters2distances;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.util.ProgramExecutorService;
-import jloda.fx.window.NotificationManager;
-import jloda.util.Counter;
 import jloda.util.Single;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
@@ -37,8 +34,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.DoubleAccumulator;
-import java.util.concurrent.atomic.LongAccumulator;
 
 /**
  * hamming distances

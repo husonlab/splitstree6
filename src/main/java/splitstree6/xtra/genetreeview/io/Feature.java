@@ -26,19 +26,19 @@ import java.util.HashMap;
 
 // class for tableView generation in FeatureOverviewDialog
 public class Feature {
-    private final StringProperty featureName;
-    private final HashMap<String, String> treeName2value;
+	private final StringProperty featureName;
+	private final HashMap<String, String> treeName2value;
 
-    Feature(String name, HashMap<String, String> treeName2value) {
-        featureName = new SimpleStringProperty(name);
-        this.treeName2value = treeName2value;
-    }
+	Feature(String name, HashMap<String, String> treeName2value) {
+		featureName = new SimpleStringProperty(name);
+		this.treeName2value = treeName2value;
+	}
 
-    public String getFeatureName() {
-        return featureName.get();
-    }
+	public String getFeatureName() {
+		return featureName.get();
+	}
 
-    HashMap<String, String> getTreeName2value() {
-        return treeName2value;
-    }
+	HashMap<String, String> getTreeName2value() {
+		return treeName2value;
+	}
 }

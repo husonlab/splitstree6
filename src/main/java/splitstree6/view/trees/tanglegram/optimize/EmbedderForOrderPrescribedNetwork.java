@@ -300,7 +300,6 @@ public class EmbedderForOrderPrescribedNetwork {
 
 	/**
 	 * extend the node2pos ordering to all nodes of the tree
-	 *
 	 */
 	public static void extendNode2PosRec(Node v, Map<Node, Float> node2pos) {
 		if (node2pos.get(v) == null) {
@@ -343,7 +342,6 @@ public class EmbedderForOrderPrescribedNetwork {
 
 	/**
 	 * list labeled leafr nodes in order of appearance
-	 *
 	 */
 	private static Node[] computeOrderedLabeledLeaves(Map<Node, Float> node2pos) {
 		var pos2node = new TreeMap<Float, Node>();
@@ -362,7 +360,6 @@ public class EmbedderForOrderPrescribedNetwork {
 
 	/**
 	 * recursively number each subtree in the forest obtained by ignoring all reticulate edges
-	 *
 	 */
 	private static void computeNode2SubTreeIdRec(Node v, int subTreeId, NodeArray<Integer> node2SubTreeId) {
 		if (node2SubTreeId.get(v) == null) {
@@ -379,7 +376,6 @@ public class EmbedderForOrderPrescribedNetwork {
 
 	/**
 	 * reorder the lsa children of a node
-	 *
 	 */
 	private static void reorderChildren(Node v, final Map<Node, Float> node2pos) {
 		var lsaChildren = ((PhyloTree) v.getOwner()).getLSAChildrenMap().get(v);

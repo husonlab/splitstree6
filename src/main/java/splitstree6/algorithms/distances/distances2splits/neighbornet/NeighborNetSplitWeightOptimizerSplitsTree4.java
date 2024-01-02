@@ -346,8 +346,6 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 		int numOuterLoops = 0;
 
 
-
-
 		int npairs = d.length;
 		if (W.length != npairs || x.length != npairs)
 			throw new IllegalArgumentException("Vectors d,W,x have different dimensions");
@@ -489,14 +487,14 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 
 				//TODO NEW VS OLD
 				double pg = 0.0;
-				for(int i=0;i<npairs;i++) {
+				for (int i = 0; i < npairs; i++) {
 					double pg_i = r[i];
-					if (x[i]==0)
-						pg_i = Math.min(pg_i,0);
-					pg += pg_i*pg_i;
+					if (x[i] == 0)
+						pg_i = Math.min(pg_i, 0);
+					pg += pg_i * pg_i;
 				}
 
-				System.err.println("Exiting old Active Set. pg = "+pg);
+				System.err.println("Exiting old Active Set. pg = " + pg);
 
 				return; /* We have arrived at the constrained optimum */
 			} else

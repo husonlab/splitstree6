@@ -146,6 +146,14 @@ public class NetworkView implements IView {
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));
 
+		viewTab.emptyProperty().bind(empty);
+		viewTabProperty().addListener((v, o, n) -> {
+			if (o != null)
+				o.emptyProperty().unbind();
+			if (n != null)
+				n.emptyProperty().bind(empty);
+		});
+
 		empty.bind(Bindings.createBooleanBinding(() -> getNetworkBlock() == null || getNetworkBlock().size() == 0, networkBlockProperty()));
 
 		viewTab.getAlgorithmBreadCrumbsToolBar().getInfoLabel().textProperty().bind(Bindings.createStringBinding(() -> "n: %,d  v: %,d  e: %,d".formatted(mainWindow.getWorkingTaxa().getNtax(),

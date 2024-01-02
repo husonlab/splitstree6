@@ -319,8 +319,8 @@ public class RadialLabelLayout {
 			return heightProperty.get();
 		}
 
-        public double anchorX() {
-            return anchorXProperty.get();
+		public double anchorX() {
+			return anchorXProperty.get();
 		}
 
 		public double anchorY() {
@@ -328,15 +328,15 @@ public class RadialLabelLayout {
 		}
 	}
 
-    private record Choice(double x, double y, double width, double height, int priority, LayoutItem item) {
-        private boolean intersects(Choice other) {
-            return (x + width >= other.x && x <= other.x + other.width) && (y + height >= other.y && y <= other.y + other.height);
-        }
+	private record Choice(double x, double y, double width, double height, int priority, LayoutItem item) {
+		private boolean intersects(Choice other) {
+			return (x + width >= other.x && x <= other.x + other.width) && (y + height >= other.y && y <= other.y + other.height);
+		}
 
-        public Choice copyWithUpdatedXY(double x, double y) {
-            return new Choice(x, y, width(), height(), priority(), item());
-        }
-    }
+		public Choice copyWithUpdatedXY(double x, double y) {
+			return new Choice(x, y, width(), height(), priority(), item());
+		}
+	}
 
 	private static int compare(Node v, Node w) {
 		if (v.getDegree() < w.getDegree())
@@ -350,6 +350,6 @@ public class RadialLabelLayout {
 	public record Box(Supplier<Double> x, Supplier<Double> y, Supplier<Double> width, Supplier<Double> height) {
 		private boolean intersects(Choice other) {
 			return (x.get() + width.get() >= other.x() && x.get() <= other.x() + other.width()) && (y.get() + height.get() >= other.y() && y.get() <= other.y() + other.height());
-        }
-    }
+		}
+	}
 }

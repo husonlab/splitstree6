@@ -97,7 +97,7 @@ public class ClusterReduction {
 	 * @return two reduced clusters or null
 	 */
 	public static Pair<Root, Root> apply(Root v1, Root v2, Single<Integer> placeHolder) {
-        var pair = applyRec(v1.getTaxa(), v1, v2, new HashSet<>(), placeHolder);
+		var pair = applyRec(v1.getTaxa(), v1, v2, new HashSet<>(), placeHolder);
 		if (!v1.getTaxa().equals(v2.getTaxa()))
 			throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(v1.getTaxa()) + " vs " + StringUtils.toString(v2.getTaxa()));
 
@@ -269,7 +269,7 @@ public class ClusterReduction {
 			if (!taxa1.equals(taxa2))
 				throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(X) + " vs " + StringUtils.toString(Y));
 
-            return new Pair<>(subTreeRoot1, subTreeRoot2);
+			return new Pair<>(subTreeRoot1, subTreeRoot2);
 		} else if (X.equals(Y)) // no pair of connected components, but perhaps both nodes give us a component
 		{
 			if (root1.getInDegree() == 0 || root2.getInDegree() == 0)
@@ -404,7 +404,6 @@ public class ClusterReduction {
 
 	/**
 	 * find a pair of separable bunches of subtrees in both trees.
-	 *
 	 */
 	private static Pair<Set<Node>, Set<Node>> getPairOfSeparatableConnectedComponents(Node v1, Node v2) {
 		// compute intersection graph:
@@ -466,7 +465,6 @@ public class ClusterReduction {
 
 	/**
 	 * get all tree nodes in a connected component of the  intersection graph
-	 *
 	 */
 	private static Pair<Set<Node>, Set<Node>> getNodesInComponent(Node a, Node[] sets1, Node[] sets2) {
 		var seen = new HashSet<Node>();

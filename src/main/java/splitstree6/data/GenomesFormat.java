@@ -26,55 +26,55 @@ import splitstree6.io.nexus.INexusFormat;
  * Daniel Huson, 3.2020
  */
 public class GenomesFormat implements INexusFormat {
-    public enum CharactersType {dna, protein}
+	public enum CharactersType {dna, protein}
 
-    private boolean optionLabels;
-    private boolean optionAccessions;
-    private boolean optionMultiPart;
+	private boolean optionLabels;
+	private boolean optionAccessions;
+	private boolean optionMultiPart;
 
-    private CharactersType charactersType = CharactersType.dna;
+	private CharactersType charactersType = CharactersType.dna;
 
-    /**
-     * the Constructor
-     */
-    public GenomesFormat() {
-    }
+	/**
+	 * the Constructor
+	 */
+	public GenomesFormat() {
+	}
 
-    public GenomesFormat(GenomesFormat src) {
-        optionLabels = src.optionLabels;
-        optionAccessions = src.optionAccessions;
-        optionMultiPart = src.optionMultiPart;
-    }
+	public GenomesFormat(GenomesFormat src) {
+		optionLabels = src.optionLabels;
+		optionAccessions = src.optionAccessions;
+		optionMultiPart = src.optionMultiPart;
+	}
 
-    public boolean isOptionLabels() {
-        return optionLabels;
-    }
+	public boolean isOptionLabels() {
+		return optionLabels;
+	}
 
-    public void setOptionLabels(boolean optionLabels) {
-        this.optionLabels = optionLabels;
-    }
+	public void setOptionLabels(boolean optionLabels) {
+		this.optionLabels = optionLabels;
+	}
 
-    public boolean isOptionAccessions() {
-        return optionAccessions;
-    }
+	public boolean isOptionAccessions() {
+		return optionAccessions;
+	}
 
-    public void setOptionAccessions(boolean optionAccessions) {
-        this.optionAccessions = optionAccessions;
-    }
+	public void setOptionAccessions(boolean optionAccessions) {
+		this.optionAccessions = optionAccessions;
+	}
 
-    public boolean isOptionMultiPart() {
-        return optionMultiPart;
-    }
+	public boolean isOptionMultiPart() {
+		return optionMultiPart;
+	}
 
-    public void setOptionMultiPart(boolean optionMultiPart) {
-        this.optionMultiPart = optionMultiPart;
-    }
+	public void setOptionMultiPart(boolean optionMultiPart) {
+		this.optionMultiPart = optionMultiPart;
+	}
 
-    public CharactersType getCharactersType() {
-        return charactersType;
-    }
+	public CharactersType getCharactersType() {
+		return charactersType;
+	}
 
-    public void setCharactersType(CharactersType charactersType) {
-        this.charactersType = charactersType;
-    }
+	public void setCharactersType(CharactersType charactersType) {
+		this.charactersType = charactersType;
+	}
 }

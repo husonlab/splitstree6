@@ -21,24 +21,25 @@ package splitstree6.xtra.genetreeview.util;
 
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.collections.ObservableSet;
+
 import java.util.Collection;
 
 public interface SelectionModel<T> {
-    boolean select(T t);
+	boolean select(T t);
 
-    boolean setSelected(T t, boolean select);
+	boolean setSelected(T t, boolean select);
 
-    boolean selectAll(Collection<T> list);
+	boolean selectAll(Collection<T> list);
 
-    void clearSelection();
+	void clearSelection();
 
-    boolean clearSelection(T t);
+	boolean clearSelection(T t);
 
-    boolean clearSelection(Collection<T> list);
+	boolean clearSelection(Collection<T> list);
 
-    ObservableSet<T> getSelectedItems();
+	ObservableSet<T> getSelectedItems();
 
-    int size();
+	int size();
 
-    ReadOnlyIntegerProperty sizeProperty();
+	ReadOnlyIntegerProperty sizeProperty();
 }

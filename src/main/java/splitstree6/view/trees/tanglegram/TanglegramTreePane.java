@@ -27,7 +27,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Dimension2D;
 import javafx.scene.Group;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.RunAfterAWhile;

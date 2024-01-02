@@ -26,63 +26,70 @@ import javafx.scene.control.Slider;
 
 public abstract class MultipleFramesLayout {
 
-    protected LayoutType type;
-    protected ObservableList<Node> transformedNodes = null;
-    protected ObservableList<Node> transformedSnapshots = null;
+	protected LayoutType type;
+	protected ObservableList<Node> transformedNodes = null;
+	protected ObservableList<Node> transformedSnapshots = null;
 
-    public MultipleFramesLayout() {
-    };
+	public MultipleFramesLayout() {
+	}
 
-    public void updatePosition(double oldSliderValue, double newSliderValue) {}
+	;
 
-    public void resetNode(Node node) {
-        node.getTransforms().clear();
-        node.translateXProperty().unbind();
-        node.setTranslateX(0);
-        node.setTranslateY(0);
-        node.setTranslateZ(0);
-        node.setRotate(0);
-        if (node.scaleXProperty().isBound()) node.scaleXProperty().unbind();
-        node.setScaleX(1);
-        if (node.scaleYProperty().isBound()) node.scaleYProperty().unbind();
-        node.setScaleY(1);
-        node.setScaleZ(1);
-        node.layoutXProperty().unbind();
-        node.setLayoutX(0);
-    }
+	public void updatePosition(double oldSliderValue, double newSliderValue) {
+	}
 
-    public void initializeNode(Node node, int index) {
-        resetNode(node);
-    };
+	public void resetNode(Node node) {
+		node.getTransforms().clear();
+		node.translateXProperty().unbind();
+		node.setTranslateX(0);
+		node.setTranslateY(0);
+		node.setTranslateZ(0);
+		node.setRotate(0);
+		if (node.scaleXProperty().isBound()) node.scaleXProperty().unbind();
+		node.setScaleX(1);
+		if (node.scaleYProperty().isBound()) node.scaleYProperty().unbind();
+		node.setScaleY(1);
+		node.setScaleZ(1);
+		node.layoutXProperty().unbind();
+		node.setLayoutX(0);
+	}
 
-    void resetCamera(PerspectiveCamera camera) {
-        camera.getTransforms().clear();
-        camera.translateXProperty().unbind();
-        camera.translateZProperty().unbind();
-        camera.setTranslateX(0);
-        camera.setTranslateY(0);
-        camera.setTranslateZ(0);
-        camera.setRotate(0);
-    }
+	public void initializeNode(Node node, int index) {
+		resetNode(node);
+	}
 
-    void setUpZoomSlider(Slider zoomSlider, double min, double max) {
-        zoomSlider.setDisable(false);
-        if (zoomSlider.minProperty().isBound()) zoomSlider.minProperty().unbind();
-        if (zoomSlider.maxProperty().isBound()) zoomSlider.maxProperty().unbind();
-        zoomSlider.setMin(min);
-        zoomSlider.setMax(max);
-        zoomSlider.setValue(zoomSlider.getMin());
-    }
+	;
 
-    void setUpZoomSlider(Slider zoomSlider) {
-        zoomSlider.setDisable(false);
-        if (zoomSlider.minProperty().isBound()) zoomSlider.minProperty().unbind();
-        if (zoomSlider.maxProperty().isBound()) zoomSlider.maxProperty().unbind();
-    }
+	void resetCamera(PerspectiveCamera camera) {
+		camera.getTransforms().clear();
+		camera.translateXProperty().unbind();
+		camera.translateZProperty().unbind();
+		camera.setTranslateX(0);
+		camera.setTranslateY(0);
+		camera.setTranslateZ(0);
+		camera.setRotate(0);
+	}
 
-    public LayoutType getType() {return type;}
+	void setUpZoomSlider(Slider zoomSlider, double min, double max) {
+		zoomSlider.setDisable(false);
+		if (zoomSlider.minProperty().isBound()) zoomSlider.minProperty().unbind();
+		if (zoomSlider.maxProperty().isBound()) zoomSlider.maxProperty().unbind();
+		zoomSlider.setMin(min);
+		zoomSlider.setMax(max);
+		zoomSlider.setValue(zoomSlider.getMin());
+	}
 
-    public int size() {
-        return transformedNodes.size();
-    }
+	void setUpZoomSlider(Slider zoomSlider) {
+		zoomSlider.setDisable(false);
+		if (zoomSlider.minProperty().isBound()) zoomSlider.minProperty().unbind();
+		if (zoomSlider.maxProperty().isBound()) zoomSlider.maxProperty().unbind();
+	}
+
+	public LayoutType getType() {
+		return type;
+	}
+
+	public int size() {
+		return transformedNodes.size();
+	}
 }

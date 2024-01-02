@@ -173,6 +173,7 @@ public class NetworkViewController {
 	public Button getZoomOutButton() {
 		return zoomOutButton;
 	}
+
 	public AnchorPane getInnerAnchorPane() {
 		return innerAnchorPane;
 	}

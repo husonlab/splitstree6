@@ -86,7 +86,7 @@ public class ClusterReduction {
 			string2 = v2.toStringFullTreeX();
 		}
 
-        var pair = applyRec(v1, v2, new HashSet<>(), placeHolderTaxa);
+		var pair = applyRec(v1, v2, new HashSet<>(), placeHolderTaxa);
 		if (!v1.getTaxa().equals(v2.getTaxa()))
 			throw new RuntimeException("Unequal taxon sets: " + StringUtils.toString(v1.getTaxa()) + " vs " + StringUtils.toString(v2.getTaxa()));
 
@@ -252,7 +252,6 @@ public class ClusterReduction {
 
 	/**
 	 * find a pair of separatable bunches of subtrees in both trees.
-	 *
 	 */
 	private static Pair<Set<Node>, Set<Node>> getPairOfSeparatableConnectedComponents(Node v1, Node v2) {
 
@@ -306,7 +305,6 @@ public class ClusterReduction {
 
 	/**
 	 * get all tree nodes in a connected component of the  intersection graph
-	 *
 	 */
 	private static Pair<Set<Node>, Set<Node>> getNodesInComponent(Node a, Node[] sets1, Node[] sets2) {
 		var seen = new HashSet<Node>();

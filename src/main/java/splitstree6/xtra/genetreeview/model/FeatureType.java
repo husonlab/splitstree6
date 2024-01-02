@@ -21,6 +21,6 @@ package splitstree6.xtra.genetreeview.model;
 
 public enum FeatureType {
 
-    NUMERICAL, CATEGORICAL
+	NUMERICAL, CATEGORICAL
 
 }

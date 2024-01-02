@@ -25,29 +25,29 @@ import jloda.phylo.PhyloTree;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-public class SimilarityCalculationTask extends Task<LinkedHashMap<Integer,Integer>> {
+public class SimilarityCalculationTask extends Task<LinkedHashMap<Integer, Integer>> {
 
-    private final ArrayList<GeneTree> geneTrees;
-    private final PhyloTree referenceTree;
+	private final ArrayList<GeneTree> geneTrees;
+	private final PhyloTree referenceTree;
 
-    public SimilarityCalculationTask(ArrayList<GeneTree> geneTrees, PhyloTree referenceTree) {
-        this.geneTrees = geneTrees;
-        this.referenceTree = referenceTree;
-    }
+	public SimilarityCalculationTask(ArrayList<GeneTree> geneTrees, PhyloTree referenceTree) {
+		this.geneTrees = geneTrees;
+		this.referenceTree = referenceTree;
+	}
 
-    @Override
-    protected LinkedHashMap<Integer,Integer> call() throws Exception {
-        LinkedHashMap<Integer,Integer> id2similarities = new LinkedHashMap<>();
-        for (GeneTree geneTree : geneTrees) {
-            int robinsonFouldsDistance = RobinsonFouldsDistance.calculate(referenceTree, geneTree.getPhyloTree());
-            if (robinsonFouldsDistance < 0) {
-                System.out.println("Negative distance calculated with tree "+geneTree.getGeneName());
-                robinsonFouldsDistance = 0;
-            }
-            int maximum = referenceTree.getNumberOfEdges() + geneTree.getPhyloTree().getNumberOfEdges();
-            int similarity = maximum - robinsonFouldsDistance;
-            id2similarities.put(geneTree.getId(), similarity);
-        }
-        return id2similarities;
-    }
+	@Override
+	protected LinkedHashMap<Integer, Integer> call() throws Exception {
+		LinkedHashMap<Integer, Integer> id2similarities = new LinkedHashMap<>();
+		for (GeneTree geneTree : geneTrees) {
+			int robinsonFouldsDistance = RobinsonFouldsDistance.calculate(referenceTree, geneTree.getPhyloTree());
+			if (robinsonFouldsDistance < 0) {
+				System.out.println("Negative distance calculated with tree " + geneTree.getGeneName());
+				robinsonFouldsDistance = 0;
+			}
+			int maximum = referenceTree.getNumberOfEdges() + geneTree.getPhyloTree().getNumberOfEdges();
+			int similarity = maximum - robinsonFouldsDistance;
+			id2similarities.put(geneTree.getId(), similarity);
+		}
+		return id2similarities;
+	}
 }

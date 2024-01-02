@@ -19,9 +19,9 @@
 
 package splitstree6.algorithms.distances.distances2view;
 
+import splitstree6.cite.IgnoredInMethodsText;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.ViewBlock;
-import splitstree6.cite.IgnoredInMethodsText;
 import splitstree6.workflow.Algorithm;
 
 public abstract class Distances2View extends Algorithm<DistancesBlock, ViewBlock> implements IgnoredInMethodsText {

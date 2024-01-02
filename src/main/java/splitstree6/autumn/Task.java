@@ -49,7 +49,6 @@ public class Task implements Runnable {
 
 	/**
 	 * set the runnable
-	 *
 	 */
 	public void setRunnable(Runnable runnable) {
 		this.runnable = runnable;
@@ -94,13 +93,13 @@ public class Task implements Runnable {
 	}
 
 	/**
-     * try to set the status to done
-     */
-    private void setStatusDone() {
-        synchronized (this) {
-            if (status != Status.RUNNING)
-                return;
-            status = Status.DONE;
-        }
-    }
+	 * try to set the status to done
+	 */
+	private void setStatusDone() {
+		synchronized (this) {
+			if (status != Status.RUNNING)
+				return;
+			status = Status.DONE;
+		}
+	}
 }

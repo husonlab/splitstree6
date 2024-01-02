@@ -34,7 +34,6 @@ public class PostProcess {
 
 	/**
 	 * returns full trees or networks for the given rooted trees or networks
-	 *
 	 */
 	public static List<PhyloTree> apply(Root[] roots, TaxaBlock allTaxa, boolean showTaxonIds) {
 		var list = new LinkedList<PhyloTree>();
@@ -65,7 +64,6 @@ public class PostProcess {
 
 	/**
 	 * copies the rooted tree datastructure to the phylotree datastructure
-	 *
 	 */
 	private static void copyRec(Root vSrc, Node vTar, Map<Node, Node> src2tar, TaxaBlock allTaxa, boolean showTaxonIds, PhyloTree tree) {
 		if (vSrc.getOutDegree() == 0) { // is at a leaf, grab the taxon name

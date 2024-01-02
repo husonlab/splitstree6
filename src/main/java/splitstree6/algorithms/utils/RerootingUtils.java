@@ -229,7 +229,7 @@ public class RerootingUtils {
 	}
 
 	public record RootingRecord(Edge edge, double weight, double sourceToLeafMaxDistance,
-									   double targetToLeafMaxDistance) {
+								double targetToLeafMaxDistance) {
 
 		public static Comparator<RootingRecord> comparatorForMidpointRooting() {
 			return (a, b) -> {

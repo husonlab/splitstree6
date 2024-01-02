@@ -40,7 +40,6 @@ public class Option<T> {
 
 	/**
 	 * constructs an option
-	 *
 	 */
 	Option(Property<T> property, String name, String toolTipText) {
 		this.property = property;

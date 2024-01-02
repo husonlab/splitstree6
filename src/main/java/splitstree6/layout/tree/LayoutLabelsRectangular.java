@@ -48,19 +48,19 @@ public class LayoutLabelsRectangular {
 
 				InvalidationListener invalidationListener = a -> {
 					if (label.getWidth() > 0 && label.getHeight() > 0) {
-							if (tree.isLsaLeaf(v)) {
-								var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
-								label.setTranslateX(shape.getTranslateX() + add);
-								if (alignLabels && add > 1.1 * labelGap) {
-									if (label.getUserData() instanceof LabelConnector labelConnector)
-										labelConnectors.getChildren().remove(labelConnector);
-									var labelConnector = new LabelConnector(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY());
-									labelConnectors.getChildren().add(labelConnector);
-									label.setUserData(labelConnector);
-								}
-							} else {
-								label.setTranslateX(shape.getTranslateX() + labelGap);
+						if (tree.isLsaLeaf(v)) {
+							var add = (max > Double.MIN_VALUE ? max - shape.getTranslateX() : 0) + labelGap;
+							label.setTranslateX(shape.getTranslateX() + add);
+							if (alignLabels && add > 1.1 * labelGap) {
+								if (label.getUserData() instanceof LabelConnector labelConnector)
+									labelConnectors.getChildren().remove(labelConnector);
+								var labelConnector = new LabelConnector(shape.getTranslateX() + 0.5 * labelGap, shape.getTranslateY(), shape.getTranslateX() + add - 0.5 * labelGap, shape.getTranslateY());
+								labelConnectors.getChildren().add(labelConnector);
+								label.setUserData(labelConnector);
 							}
+						} else {
+							label.setTranslateX(shape.getTranslateX() + labelGap);
+						}
 						label.setTranslateY(shape.getTranslateY() - 0.5 * label.getHeight());
 					}
 				};

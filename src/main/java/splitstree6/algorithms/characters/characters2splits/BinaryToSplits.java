@@ -30,8 +30,8 @@ import splitstree6.algorithms.utils.SplitsBlockUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.splits.ASplit;
 import splitstree6.data.parts.CharactersType;
+import splitstree6.splits.ASplit;
 import splitstree6.splits.Compatibility;
 
 import java.io.IOException;
@@ -45,106 +45,106 @@ import java.util.List;
  * Daniel Huson, Feb 2004
  */
 public class BinaryToSplits extends Characters2Splits {
-    private final DoubleProperty optionMinSplitWeight = new SimpleDoubleProperty(this, "optionMinSplitWeight", 0.0);
-    private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
-    private final BooleanProperty optionAddAllTrivial = new SimpleBooleanProperty(this, "optionAddAllTrivial", false);
+	private final DoubleProperty optionMinSplitWeight = new SimpleDoubleProperty(this, "optionMinSplitWeight", 0.0);
+	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
+	private final BooleanProperty optionAddAllTrivial = new SimpleBooleanProperty(this, "optionAddAllTrivial", false);
 
-    @Override
-    public List<String> listOptions() {
-        return List.of(optionMinSplitWeight.getName(), optionHighDimensionFilter.getName(), optionAddAllTrivial.getName());
-    }
+	@Override
+	public List<String> listOptions() {
+		return List.of(optionMinSplitWeight.getName(), optionHighDimensionFilter.getName(), optionAddAllTrivial.getName());
+	}
 
-    /**
-     * Applies the method to the given data
-     */
-    public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock chars, SplitsBlock splitsBlock) throws IOException {
-        progress.setMaximum(chars.getNchar());    //initialize maximum progress
-        progress.setProgress(0);
+	/**
+	 * Applies the method to the given data
+	 */
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock chars, SplitsBlock splitsBlock) throws IOException {
+		progress.setMaximum(chars.getNchar());    //initialize maximum progress
+		progress.setProgress(0);
 
-        var clusterCharactersMap = new HashMap<BitSet, BitSet>();
+		var clusterCharactersMap = new HashMap<BitSet, BitSet>();
 
-        for (int c = 1; c <= chars.getNchar(); c++) {
-            // make one side of the split:
-            var current = new BitSet();
-            var stateTaxon1 = chars.get(1, c);
-            for (int t = 1; t <= chars.getNtax(); t++) {
-                if (chars.get(t, c) == stateTaxon1) current.set(t);
-            }
-            if (current.cardinality() < chars.getNtax()) {
-                clusterCharactersMap.put(current, BitSetUtils.add(clusterCharactersMap.getOrDefault(current, new BitSet()), c));
-            }
-            progress.setProgress(c);
-        }
+		for (int c = 1; c <= chars.getNchar(); c++) {
+			// make one side of the split:
+			var current = new BitSet();
+			var stateTaxon1 = chars.get(1, c);
+			for (int t = 1; t <= chars.getNtax(); t++) {
+				if (chars.get(t, c) == stateTaxon1) current.set(t);
+			}
+			if (current.cardinality() < chars.getNtax()) {
+				clusterCharactersMap.put(current, BitSetUtils.add(clusterCharactersMap.getOrDefault(current, new BitSet()), c));
+			}
+			progress.setProgress(c);
+		}
 
-        var computedSplits = new SplitsBlock();
+		var computedSplits = new SplitsBlock();
 
-        for (var cluster : clusterCharactersMap.keySet()) {
-            var sites = clusterCharactersMap.get(cluster);
+		for (var cluster : clusterCharactersMap.keySet()) {
+			var sites = clusterCharactersMap.get(cluster);
 
-            var weight = sites.stream().mapToDouble(chars::getCharacterWeight).sum();
-            if (weight >= getOptionMinSplitWeight()) {
-                var split = new ASplit(cluster, taxaBlock.getNtax(), weight);
-                split.setLabel(StringUtils.toString(sites));
-                computedSplits.getSplits().add(split);
-            }
-        }
+			var weight = sites.stream().mapToDouble(chars::getCharacterWeight).sum();
+			if (weight >= getOptionMinSplitWeight()) {
+				var split = new ASplit(cluster, taxaBlock.getNtax(), weight);
+				split.setLabel(StringUtils.toString(sites));
+				computedSplits.getSplits().add(split);
+			}
+		}
 
-        // add all missing trivial
+		// add all missing trivial
 		computedSplits.getSplits().addAll(SplitsBlockUtilities.createAllMissingTrivial(computedSplits.getSplits(), taxaBlock.getNtax(), isOptionAddAllTrivial() ? 1.0 : 0.0));
 
-        if (isOptionHighDimensionFilter()) {
-            DimensionFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
-        } else
-            splitsBlock.copy(computedSplits);
+		if (isOptionHighDimensionFilter()) {
+			DimensionFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
+		} else
+			splitsBlock.copy(computedSplits);
 
 		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
-        splitsBlock.setFit(-1);
-        splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
-    }
+		splitsBlock.setFit(-1);
+		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
+	}
 
-    @Override
-    public String getCitation() {
-        return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
-    }
+	@Override
+	public String getCitation() {
+		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
+	}
 
-    @Override
-    public boolean isApplicable(TaxaBlock taxaBlock, CharactersBlock parent) {
-        return parent.getDataType() == CharactersType.Standard;
-    }
+	@Override
+	public boolean isApplicable(TaxaBlock taxaBlock, CharactersBlock parent) {
+		return parent.getDataType() == CharactersType.Standard;
+	}
 
-    public double getOptionMinSplitWeight() {
-        return optionMinSplitWeight.get();
-    }
+	public double getOptionMinSplitWeight() {
+		return optionMinSplitWeight.get();
+	}
 
-    public DoubleProperty optionMinSplitWeightProperty() {
-        return optionMinSplitWeight;
-    }
+	public DoubleProperty optionMinSplitWeightProperty() {
+		return optionMinSplitWeight;
+	}
 
-    public void setOptionMinSplitWeight(double optionMinSplitWeight) {
-        this.optionMinSplitWeight.set(optionMinSplitWeight);
-    }
+	public void setOptionMinSplitWeight(double optionMinSplitWeight) {
+		this.optionMinSplitWeight.set(optionMinSplitWeight);
+	}
 
-    public boolean isOptionHighDimensionFilter() {
-        return optionHighDimensionFilter.get();
-    }
+	public boolean isOptionHighDimensionFilter() {
+		return optionHighDimensionFilter.get();
+	}
 
-    public BooleanProperty optionHighDimensionFilterProperty() {
-        return optionHighDimensionFilter;
-    }
+	public BooleanProperty optionHighDimensionFilterProperty() {
+		return optionHighDimensionFilter;
+	}
 
-    public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
-        this.optionHighDimensionFilter.set(optionHighDimensionFilter);
-    }
+	public void setOptionHighDimensionFilter(boolean optionHighDimensionFilter) {
+		this.optionHighDimensionFilter.set(optionHighDimensionFilter);
+	}
 
-    public boolean isOptionAddAllTrivial() {
-        return optionAddAllTrivial.get();
-    }
+	public boolean isOptionAddAllTrivial() {
+		return optionAddAllTrivial.get();
+	}
 
-    public BooleanProperty optionAddAllTrivialProperty() {
-        return optionAddAllTrivial;
-    }
+	public BooleanProperty optionAddAllTrivialProperty() {
+		return optionAddAllTrivial;
+	}
 
-    public void setOptionAddAllTrivial(boolean optionAddAllTrivial) {
-        this.optionAddAllTrivial.set(optionAddAllTrivial);
-    }
+	public void setOptionAddAllTrivial(boolean optionAddAllTrivial) {
+		this.optionAddAllTrivial.set(optionAddAllTrivial);
+	}
 }

@@ -38,7 +38,6 @@ public class F84Model extends NucleotideModel {
 	 * Constructor taking the expected rate of transitions versus transversions (rather
 	 * than the parameter K in Swofford et al, pg 436.)
 	 * We first compute the corresponding K, fill in Q according to the standard model/.
-	 *
 	 */
 	public F84Model(double[] baseFreqs, double TsTv) {
 		super();

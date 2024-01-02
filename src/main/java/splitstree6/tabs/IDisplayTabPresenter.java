@@ -24,7 +24,6 @@ import jloda.fx.find.FindToolBar;
 public interface IDisplayTabPresenter {
 	void setupMenuItems();
 
-
 	FindToolBar getFindToolBar();
 
 	boolean allowFindReplace();

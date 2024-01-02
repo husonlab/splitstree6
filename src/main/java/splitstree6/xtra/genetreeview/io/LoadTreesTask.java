@@ -28,31 +28,31 @@ import java.io.File;
 
 public class LoadTreesTask extends Task<Void> {
 
-    private final File file;
-    private final Model model;
-    private final Stabilizer stabilizer;
+	private final File file;
+	private final Model model;
+	private final Stabilizer stabilizer;
 
-    public LoadTreesTask(File file, Model model, Stabilizer stabilizer) {
-        this.file = file;
-        this.model = model;
-        this.stabilizer = stabilizer;
-    }
+	public LoadTreesTask(File file, Model model, Stabilizer stabilizer) {
+		this.file = file;
+		this.model = model;
+		this.stabilizer = stabilizer;
+	}
 
-    @Override
-    protected Void call() throws Exception {
-        model.load(file);
-        if (model.getTreesBlock().isReticulated()) {
-            var layoutUnoptmized = new LayoutUnoptimized();
-            for (var tree : model.getTreesBlock().getTrees()) {
-                if (tree.isReticulated()) {
-                    layoutUnoptmized.apply(tree);
-                }
-            }
-        }
-        if (!model.getTreesBlock().isReticulated()) {
-            stabilizer.setup(model.getTreesBlock().getTrees());
-            stabilizer.apply(model.getTreesBlock().getTrees());
-        }
-        return null;
-    }
+	@Override
+	protected Void call() throws Exception {
+		model.load(file);
+		if (model.getTreesBlock().isReticulated()) {
+			var layoutUnoptmized = new LayoutUnoptimized();
+			for (var tree : model.getTreesBlock().getTrees()) {
+				if (tree.isReticulated()) {
+					layoutUnoptmized.apply(tree);
+				}
+			}
+		}
+		if (!model.getTreesBlock().isReticulated()) {
+			stabilizer.setup(model.getTreesBlock().getTrees());
+			stabilizer.apply(model.getTreesBlock().getTrees());
+		}
+		return null;
+	}
 }

@@ -27,10 +27,10 @@ import jloda.util.CanceledException;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
-import splitstree6.splits.TreesUtils;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
+import splitstree6.splits.TreesUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;

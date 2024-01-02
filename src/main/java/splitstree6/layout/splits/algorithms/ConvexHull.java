@@ -19,14 +19,9 @@
 
 package splitstree6.layout.splits.algorithms;
 
-import jloda.graph.Edge;
-import jloda.graph.EdgeSet;
-import jloda.graph.Node;
-import jloda.graph.NodeArray;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
-import splitstree6.splits.GraphUtils;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 

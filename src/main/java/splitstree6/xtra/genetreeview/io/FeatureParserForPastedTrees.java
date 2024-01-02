@@ -30,57 +30,56 @@ import java.util.HashMap;
 
 public class FeatureParserForPastedTrees extends ParserDialog {
 
-    private final ArrayList<TextField> inputTextFields = new ArrayList<>();
-    private final HashMap<String,ArrayList<String>> parsedFeatureValues = new HashMap<>();
+	private final ArrayList<TextField> inputTextFields = new ArrayList<>();
+	private final HashMap<String, ArrayList<String>> parsedFeatureValues = new HashMap<>();
 
-    public FeatureParserForPastedTrees(Stage parentStage, ArrayList<String> featureNames, int expectedNumberOfValues) {
-        super(parentStage, featureNames.get(0), expectedNumberOfValues);
-        this.setTitle("FeatureParser");
-        introLabel.setText("Enter feature values for pasted trees:");
+	public FeatureParserForPastedTrees(Stage parentStage, ArrayList<String> featureNames, int expectedNumberOfValues) {
+		super(parentStage, featureNames.get(0), expectedNumberOfValues);
+		this.setTitle("FeatureParser");
+		introLabel.setText("Enter feature values for pasted trees:");
 
-        if (featureNames.size() == 0) this.close();
-        else {
-            vBoxInput.getChildren().clear();
-            for (String featureName : featureNames) {
-                HBox hBoxInput = new HBox(5);
-                hBoxInput.setPadding(new Insets(5));
-                hBoxInput.getChildren().add(new Label(featureName));
-                TextField inputTextField = new TextField();
-                inputTextField.setPromptText("values");
-                hBoxInput.getChildren().add(inputTextField);
-                inputTextFields.add(inputTextField);
-                vBoxInput.getChildren().add(hBoxInput);
-            }
-            startButton.setOnAction(e -> {
-                boolean parsingFailed = false;
-                for (var inputTextField : inputTextFields) {
-                    String textInput = inputTextField.getText();
-                    ArrayList<String> values = extractFeatureValues(textInput, expectedNumberOfValues);
-                    if (values != null) {
-                        parsedFeatureValues.put(featureNames.get(inputTextFields.indexOf(inputTextField)), values);
-                    }
-                    else {
-                        infoLabel.setText("Import failed due to " +
-                                featureNames.get(inputTextFields.indexOf(inputTextField)) + " values");
-                        parsingFailed = true;
-                        break;
-                    }
-                }
-                if (!parsingFailed) {
-                    if (parseFeatureToModel(null, null))
-                        this.close();
-                }
-            });
-        }
-    }
+		if (featureNames.size() == 0) this.close();
+		else {
+			vBoxInput.getChildren().clear();
+			for (String featureName : featureNames) {
+				HBox hBoxInput = new HBox(5);
+				hBoxInput.setPadding(new Insets(5));
+				hBoxInput.getChildren().add(new Label(featureName));
+				TextField inputTextField = new TextField();
+				inputTextField.setPromptText("values");
+				hBoxInput.getChildren().add(inputTextField);
+				inputTextFields.add(inputTextField);
+				vBoxInput.getChildren().add(hBoxInput);
+			}
+			startButton.setOnAction(e -> {
+				boolean parsingFailed = false;
+				for (var inputTextField : inputTextFields) {
+					String textInput = inputTextField.getText();
+					ArrayList<String> values = extractFeatureValues(textInput, expectedNumberOfValues);
+					if (values != null) {
+						parsedFeatureValues.put(featureNames.get(inputTextFields.indexOf(inputTextField)), values);
+					} else {
+						infoLabel.setText("Import failed due to " +
+										  featureNames.get(inputTextFields.indexOf(inputTextField)) + " values");
+						parsingFailed = true;
+						break;
+					}
+				}
+				if (!parsingFailed) {
+					if (parseFeatureToModel(null, null))
+						this.close();
+				}
+			});
+		}
+	}
 
-    @Override
-    boolean parseFeatureToModel(String featureName, ArrayList<String> values) {
-        parsedProperty.setValue(true);
-        return true;
-    }
+	@Override
+	boolean parseFeatureToModel(String featureName, ArrayList<String> values) {
+		parsedProperty.setValue(true);
+		return true;
+	}
 
-    public HashMap<String,ArrayList<String>> getParsedFeatureValues() {
-        return parsedFeatureValues;
-    }
+	public HashMap<String, ArrayList<String>> getParsedFeatureValues() {
+		return parsedFeatureValues;
+	}
 }

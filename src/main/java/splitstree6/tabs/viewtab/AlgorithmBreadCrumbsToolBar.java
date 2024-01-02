@@ -50,187 +50,187 @@ import java.util.List;
  * Daniel Huson, 1.2018
  */
 public class AlgorithmBreadCrumbsToolBar extends HBox {
-    private static final String computingColor = "-fx-background-color: LIGHTBLUE;";
+	private static final String computingColor = "-fx-background-color: LIGHTBLUE;";
 
-    private final ArrayList<ChangeListener<Worker.State>> stateChangeListeners = new ArrayList<>();
+	private final ArrayList<ChangeListener<Worker.State>> stateChangeListeners = new ArrayList<>();
 
-    private final InvalidationListener invalidationListener;
+	private final InvalidationListener invalidationListener;
 
-    private final CopyableLabel infoLabel = new CopyableLabel();
+	private final CopyableLabel infoLabel = new CopyableLabel();
 
-    /**
-     * constructor
-     */
-    public AlgorithmBreadCrumbsToolBar(MainWindow mainWindow, WorkflowNode node) {
-        //infoLabel.setFont(Font.font("Courier new", 10));
-        getStyleClass().add("tool-bar");
-        setStyle("-fx-spacing: 0;");
+	/**
+	 * constructor
+	 */
+	public AlgorithmBreadCrumbsToolBar(MainWindow mainWindow, WorkflowNode node) {
+		//infoLabel.setFont(Font.font("Courier new", 10));
+		getStyleClass().add("tool-bar");
+		setStyle("-fx-spacing: 0;");
 
-        infoLabel.textProperty().addListener((v, o, n) -> {
-            var text = n.replaceAll("\\bn:", "taxa:")
-                    .replaceAll("\\bv:", "nodes:")
-                    .replaceAll("\\be:", "edges:")
-                    .replaceAll("\\bs:", "splits:")
-                    .replaceAll("\\bt:", "trees:")
-                    .replaceAll("\\bh:", "hybrid-number:");
-            infoLabel.setTooltip(text.isBlank() ? null : new Tooltip(text));
-        });
+		infoLabel.textProperty().addListener((v, o, n) -> {
+			var text = n.replaceAll("\\bn:", "taxa:")
+					.replaceAll("\\bv:", "nodes:")
+					.replaceAll("\\be:", "edges:")
+					.replaceAll("\\bs:", "splits:")
+					.replaceAll("\\bt:", "trees:")
+					.replaceAll("\\bh:", "hybrid-number:");
+			infoLabel.setTooltip(text.isBlank() ? null : new Tooltip(text));
+		});
 
-        invalidationListener = e -> {
-            stateChangeListeners.clear();
-            final Workflow workflow = mainWindow.getWorkflow();
-            getChildren().clear();
+		invalidationListener = e -> {
+			stateChangeListeners.clear();
+			final Workflow workflow = mainWindow.getWorkflow();
+			getChildren().clear();
 
-            var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
-            if (editorTab != null) {
-                getChildren().add(makeInputTabBreadCrumb(mainWindow));
-            }
+			var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+			if (editorTab != null) {
+				getChildren().add(makeInputTabBreadCrumb(mainWindow));
+			}
 
-            if (workflow.getInputTaxaFilterNode() != null) {
-                if (!getChildren().isEmpty()) {
-                    var label = new Label("→");
-                    getChildren().add(label);
-                }
-                getChildren().add(makeBreadCrumb(mainWindow, workflow.getInputTaxaFilterNode(), stateChangeListeners));
-            }
-            if (workflow.getWorkingTaxaNode() != null) {
-                var algorithmNodes = getAlgorithmNodesPath(workflow, node);
+			if (workflow.getInputTaxaFilterNode() != null) {
+				if (!getChildren().isEmpty()) {
+					var label = new Label("→");
+					getChildren().add(label);
+				}
+				getChildren().add(makeBreadCrumb(mainWindow, workflow.getInputTaxaFilterNode(), stateChangeListeners));
+			}
+			if (workflow.getWorkingTaxaNode() != null) {
+				var algorithmNodes = getAlgorithmNodesPath(workflow, node);
 
-                for (var aNode : algorithmNodes) {
-                    if (!(aNode.getAlgorithm() instanceof DataTaxaFilter)) {
-                        if (!getChildren().isEmpty()) {
-                            var label = new Label("→");
-                            getChildren().add(label);
-                        }
-                        getChildren().add(makeBreadCrumb(mainWindow, aNode, stateChangeListeners));
-                    }
-                }
-            }
-            getChildren().addAll(new Label("  "), infoLabel);
-        };
-        //mainWindow.getWorkflow().nodes().addListener(new WeakInvalidationListener(invalidationListener));
-        mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
-    }
+				for (var aNode : algorithmNodes) {
+					if (!(aNode.getAlgorithm() instanceof DataTaxaFilter)) {
+						if (!getChildren().isEmpty()) {
+							var label = new Label("→");
+							getChildren().add(label);
+						}
+						getChildren().add(makeBreadCrumb(mainWindow, aNode, stateChangeListeners));
+					}
+				}
+			}
+			getChildren().addAll(new Label("  "), infoLabel);
+		};
+		//mainWindow.getWorkflow().nodes().addListener(new WeakInvalidationListener(invalidationListener));
+		mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(invalidationListener));
+	}
 
-    public List<AlgorithmNode> getAlgorithmNodesPath(Workflow workflow, WorkflowNode node0) {
-        // todo: node is not necessarily present in the workflow (don't know why...), but there is an equivalent node with the same id
-        var node = workflow.nodeStream().filter(v -> v.getId() == node0.getId()).findAny().orElse(node0);
-        for (var v : workflow.nodes()) {
-            if (v.getId() == node.getId()) {
-                node = v;
-                break;
-            }
-        }
+	public List<AlgorithmNode> getAlgorithmNodesPath(Workflow workflow, WorkflowNode node0) {
+		// todo: node is not necessarily present in the workflow (don't know why...), but there is an equivalent node with the same id
+		var node = workflow.nodeStream().filter(v -> v.getId() == node0.getId()).findAny().orElse(node0);
+		for (var v : workflow.nodes()) {
+			if (v.getId() == node.getId()) {
+				node = v;
+				break;
+			}
+		}
 
-        var list = new LinkedList<AlgorithmNode>();
-        while (node != null && workflow.isDerivedNode(node)) {
-            if (node instanceof AlgorithmNode algorithmNode) {
-                list.add(0, algorithmNode);
-            }
-            node = node.getPreferredParent();
-        }
-        return list;
-    }
+		var list = new LinkedList<AlgorithmNode>();
+		while (node != null && workflow.isDerivedNode(node)) {
+			if (node instanceof AlgorithmNode algorithmNode) {
+				list.add(0, algorithmNode);
+			}
+			node = node.getPreferredParent();
+		}
+		return list;
+	}
 
-    public CopyableLabel getInfoLabel() {
-        return infoLabel;
-    }
+	public CopyableLabel getInfoLabel() {
+		return infoLabel;
+	}
 
-    private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {
-        final var button = new Button();
-        button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
+	private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {
+		final var button = new Button();
+		button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
 
-        button.textProperty().bind(algorithmNode.titleProperty());
+		button.textProperty().bind(algorithmNode.titleProperty());
 
-        button.disableProperty().bind(algorithmNode.validProperty().not());
-        final var tooltip = new Tooltip();
-        tooltip.textProperty().bind(algorithmNode.shortDescriptionProperty());
-        button.setTooltip(tooltip);
+		button.disableProperty().bind(algorithmNode.validProperty().not());
+		final var tooltip = new Tooltip();
+		tooltip.textProperty().bind(algorithmNode.shortDescriptionProperty());
+		button.setTooltip(tooltip);
 
-        if (false)
-            button.setGraphic(algorithmNode.getName().endsWith("Filter") ? MaterialIcons.graphic("filter_alt") : MaterialIcons.graphic("settings"));
+		if (false)
+			button.setGraphic(algorithmNode.getName().endsWith("Filter") ? MaterialIcons.graphic("filter_alt") : MaterialIcons.graphic("settings"));
 
-        final Runnable showTab = () -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
+		final Runnable showTab = () -> mainWindow.getAlgorithmTabsManager().showTab(algorithmNode, true);
 
-        button.setOnAction(e -> showTab.run());
+		button.setOnAction(e -> showTab.run());
 
-        if (algorithmNode.getAlgorithm() instanceof ShowTrees showTrees) {
-            button.setOnContextMenuRequested(e -> createViewChoiceMenu(mainWindow.getWorkflow(), algorithmNode, showTrees).show(button, e.getScreenX(), e.getScreenY()));
-        } else if (mainWindow.getWorkflow().isDerivedNode(algorithmNode)) {
-            button.setOnContextMenuRequested(e -> createViewChoiceMenu(mainWindow.getWorkflow(), algorithmNode, showTab).show(button, e.getScreenX(), e.getScreenY()));
-        }
+		if (algorithmNode.getAlgorithm() instanceof ShowTrees showTrees) {
+			button.setOnContextMenuRequested(e -> createViewChoiceMenu(mainWindow.getWorkflow(), algorithmNode, showTrees).show(button, e.getScreenX(), e.getScreenY()));
+		} else if (mainWindow.getWorkflow().isDerivedNode(algorithmNode)) {
+			button.setOnContextMenuRequested(e -> createViewChoiceMenu(mainWindow.getWorkflow(), algorithmNode, showTab).show(button, e.getScreenX(), e.getScreenY()));
+		}
 
-        final ChangeListener<Worker.State> stateChangeListener = (c, o, n) -> {
-            switch (n) {
-                case RUNNING -> {
-                    button.setTextFill(Color.BLACK);
-                    button.setStyle(computingColor);
-                }
-                case FAILED -> {
-                    button.setTextFill(Color.DARKRED);
-                    button.setStyle(null);
-                }
-                default -> {
-                    button.setTextFill(Color.BLACK);
-                    button.setStyle(null);
-                }
-            }
-        };
-        algorithmNode.getService().stateProperty().addListener(new WeakChangeListener<>(stateChangeListener));
-        stateChangeListeners.add(stateChangeListener);
+		final ChangeListener<Worker.State> stateChangeListener = (c, o, n) -> {
+			switch (n) {
+				case RUNNING -> {
+					button.setTextFill(Color.BLACK);
+					button.setStyle(computingColor);
+				}
+				case FAILED -> {
+					button.setTextFill(Color.DARKRED);
+					button.setStyle(null);
+				}
+				default -> {
+					button.setTextFill(Color.BLACK);
+					button.setStyle(null);
+				}
+			}
+		};
+		algorithmNode.getService().stateProperty().addListener(new WeakChangeListener<>(stateChangeListener));
+		stateChangeListeners.add(stateChangeListener);
 
-        return button;
-    }
+		return button;
+	}
 
-    private static Node makeInputTabBreadCrumb(MainWindow mainWindow) {
-        final var button = new Button();
-        button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
-        button.setText("Input");
-        button.disableProperty().bind(mainWindow.getWorkflow().runningProperty());
-        final var tooltip = new Tooltip("Input editor");
-        button.setTooltip(tooltip);
-        button.setOnAction((e) -> {
-            var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
-            mainWindow.getController().getMainTabPane().getSelectionModel().select(editorTab);
-        });
-        return button;
-    }
+	private static Node makeInputTabBreadCrumb(MainWindow mainWindow) {
+		final var button = new Button();
+		button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
+		button.setText("Input");
+		button.disableProperty().bind(mainWindow.getWorkflow().runningProperty());
+		final var tooltip = new Tooltip("Input editor");
+		button.setTooltip(tooltip);
+		button.setOnAction((e) -> {
+			var editorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+			mainWindow.getController().getMainTabPane().getSelectionModel().select(editorTab);
+		});
+		return button;
+	}
 
-    public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode, ShowTrees showTrees) {
-        var menu = new ContextMenu();
-        for (var viewType : ShowTrees.ViewType.values()) {
-            var menuItem = new MenuItem(viewType.name());
-            menuItem.setOnAction(e -> {
-                if (!workflow.isRunning()) {
-                    showTrees.setOptionView(viewType);
-                    algorithmNode.restart();
-                }
-            });
-            menu.getItems().add(menuItem);
-        }
-        return menu;
-    }
+	public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode, ShowTrees showTrees) {
+		var menu = new ContextMenu();
+		for (var viewType : ShowTrees.ViewType.values()) {
+			var menuItem = new MenuItem(viewType.name());
+			menuItem.setOnAction(e -> {
+				if (!workflow.isRunning()) {
+					showTrees.setOptionView(viewType);
+					algorithmNode.restart();
+				}
+			});
+			menu.getItems().add(menuItem);
+		}
+		return menu;
+	}
 
-    public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode0, Runnable runlater) {
-        var menu = new ContextMenu();
+	public static ContextMenu createViewChoiceMenu(Workflow workflow, AlgorithmNode algorithmNode0, Runnable runlater) {
+		var menu = new ContextMenu();
 		for (var algorithm : AlgorithmList.list()) {
-            if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
-                if (algorithm.getFromClass() == algorithmNode0.getAlgorithm().getFromClass()
-                    && algorithm.getToClass() == algorithmNode0.getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter)) {
-                    var menuItem = new MenuItem(algorithm.getName());
-                    menuItem.setOnAction(e -> {
-                        var algorithmNode = (AlgorithmNode) workflow.nodeStream().filter(v -> v.getId() == algorithmNode0.getId()).findAny().orElse(algorithmNode0);
-                        algorithmNode.setAlgorithm(algorithm);
-                        algorithmNode.setTitle(algorithm.getName());
-                        algorithmNode.restart();
-                        if (runlater != null)
-                            Platform.runLater(runlater);
-                    });
-                    menu.getItems().add(menuItem);
-                    menuItem.setDisable(!algorithm.isApplicable(algorithmNode0.getTaxaBlock(), algorithmNode0.getSourceBlock()));
-                }
-            }
-        }
-        return menu;
-    }
+			if (!(algorithm instanceof DoNotLoadThisAlgorithm)) {
+				if (algorithm.getFromClass() == algorithmNode0.getAlgorithm().getFromClass()
+					&& algorithm.getToClass() == algorithmNode0.getAlgorithm().getToClass() && !(algorithm instanceof DataTaxaFilter)) {
+					var menuItem = new MenuItem(algorithm.getName());
+					menuItem.setOnAction(e -> {
+						var algorithmNode = (AlgorithmNode) workflow.nodeStream().filter(v -> v.getId() == algorithmNode0.getId()).findAny().orElse(algorithmNode0);
+						algorithmNode.setAlgorithm(algorithm);
+						algorithmNode.setTitle(algorithm.getName());
+						algorithmNode.restart();
+						if (runlater != null)
+							Platform.runLater(runlater);
+					});
+					menu.getItems().add(menuItem);
+					menuItem.setDisable(!algorithm.isApplicable(algorithmNode0.getTaxaBlock(), algorithmNode0.getSourceBlock()));
+				}
+			}
+		}
+		return menu;
+	}
 }

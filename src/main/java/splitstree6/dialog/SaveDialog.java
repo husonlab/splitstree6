@@ -35,33 +35,33 @@ import static splitstree6.io.nexus.workflow.WorkflowNexusInput.WORKFLOW_FILE_SUF
 
 public class SaveDialog {
 	/**
-     * save dialog
-     *
-     * @param mainWindow the main window
-     */
+	 * save dialog
+	 *
+	 * @param mainWindow the main window
+	 */
 	public static boolean showSaveDialog(MainWindow mainWindow, boolean asWorkflowOnly) {
-        final var fileChooser = new FileChooser();
-        fileChooser.setTitle(asWorkflowOnly ? "Export SplitsTree6 Workflow" : "Save SplitsTree6 file");
+		final var fileChooser = new FileChooser();
+		fileChooser.setTitle(asWorkflowOnly ? "Export SplitsTree6 Workflow" : "Save SplitsTree6 file");
 
 		final var previousDir = new File(ProgramProperties.get("SaveDir", ""));
-        if (previousDir.isDirectory()) {
-            fileChooser.setInitialDirectory(previousDir);
-        } else
-            fileChooser.setInitialDirectory((new File(mainWindow.getFileName()).getParentFile()));
+		if (previousDir.isDirectory()) {
+			fileChooser.setInitialDirectory(previousDir);
+		} else
+			fileChooser.setInitialDirectory((new File(mainWindow.getFileName()).getParentFile()));
 
-        if (!asWorkflowOnly) {
-            fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Files", "*.stree6", "*.nxs", "*.nex"));
-            fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".stree6")));
-        } else {
+		if (!asWorkflowOnly) {
+			fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Files", "*.stree6", "*.nxs", "*.nex"));
+			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), ".stree6")));
+		} else {
 			fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("SplitsTree6 Workflow Files", "*" + WORKFLOW_FILE_SUFFIX));
 			fileChooser.setInitialFileName(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), WORKFLOW_FILE_SUFFIX)));
 		}
 
 		var selectedFile = fileChooser.showSaveDialog(mainWindow.getStage());
-        if (selectedFile != null) {
+		if (selectedFile != null) {
 			return save(mainWindow, asWorkflowOnly, selectedFile);
-        } else return false;
-    }
+		} else return false;
+	}
 
 	public static boolean save(MainWindow mainWindow, boolean asWorkflowOnly, File file) {
 		var result = false;

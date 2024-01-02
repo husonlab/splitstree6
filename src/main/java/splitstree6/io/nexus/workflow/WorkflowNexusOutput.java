@@ -24,11 +24,11 @@ import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.FileUtils;
 import jloda.util.Pair;
+import splitstree6.cite.ExtractMethodsText;
 import splitstree6.data.SplitsTree6Block;
 import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.nexus.SplitsTree6NexusOutput;
 import splitstree6.io.nexus.TaxaNexusOutput;
-import splitstree6.cite.ExtractMethodsText;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -63,7 +63,6 @@ public class WorkflowNexusOutput {
 
 	/**
 	 * write a workflow
-	 *
 	 */
 	public int save(Workflow workflow, Writer w, boolean asWorkflowOnly) throws IOException {
 		SplitsTree6Block splitsTree6Block = new SplitsTree6Block();
@@ -135,8 +134,8 @@ public class WorkflowNexusOutput {
 				setupExporter(algorithm, nexusExporter);
 				nexusExporter.export(w, algorithm.getAlgorithm());
 			}
-            queue.addAll(node.getChildren());
-        }
+			queue.addAll(node.getChildren());
+		}
 
 		return splitsTree6Block.size();
 	}
@@ -144,7 +143,6 @@ public class WorkflowNexusOutput {
 
 	/**
 	 * sets up the exporter so that it reports title and links
-	 *
 	 */
 	private void setupExporter(DataNode dataNode, NexusExporter nexusExporter) {
 		nexusExporter.setTitle(dataNode.getTitle());
@@ -154,7 +152,6 @@ public class WorkflowNexusOutput {
 
 	/**
 	 * sets up the exporter so that it reports title and links
-	 *
 	 */
 	private void setupExporter(AlgorithmNode algorithmNode, NexusExporter nexusExporter) {
 		nexusExporter.setTitle(algorithmNode.getTitle());

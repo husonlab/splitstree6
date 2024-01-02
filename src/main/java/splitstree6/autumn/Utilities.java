@@ -33,7 +33,7 @@ import java.util.Set;
  */
 public class Utilities {
 
-    /**
+	/**
 	 * get the number of reticulations in a cluster network
 	 *
 	 * @return number of reticulate nodes
@@ -64,12 +64,12 @@ public class Utilities {
 		return result.toArray(new Cluster[0]);
 	}
 
-    /**
-     * recursively find all clusters in a tree
-     *
-     * @return all taxa on or below v
-     */
-    private static Cluster extractClustersRec(PhyloTree tree, Node v, TaxaBlock taxa, Set<Cluster> clusters) {
+	/**
+	 * recursively find all clusters in a tree
+	 *
+	 * @return all taxa on or below v
+	 */
+	private static Cluster extractClustersRec(PhyloTree tree, Node v, TaxaBlock taxa, Set<Cluster> clusters) {
 		var clusterV = new Cluster();
 		var label = tree.getLabel(v);
 		if (label != null && label.length() > 0 && taxa.indexOf(label) != -1)

@@ -134,16 +134,16 @@ public class NexmlTreesHandler extends DefaultHandler {
 	}
 
 	@Override
-    public void endElement(String uri, String localName, String qName) {
-        if (qName.equalsIgnoreCase("otus")) {
-            //System.out.println("End Element :" + qName);
-        } else if (qName.equalsIgnoreCase("tree")) {
-            bReadingTree = false;
-            trees.add(tree);
+	public void endElement(String uri, String localName, String qName) {
+		if (qName.equalsIgnoreCase("otus")) {
+			//System.out.println("End Element :" + qName);
+		} else if (qName.equalsIgnoreCase("tree")) {
+			bReadingTree = false;
+			trees.add(tree);
 
-            // if a tree already set as partial, no further check
-            if (partial || otu2taxonId.size() != treeOTUs.size())
-                partial = true;
+			// if a tree already set as partial, no further check
+			if (partial || otu2taxonId.size() != treeOTUs.size())
+				partial = true;
 
 			treeContainsAllTaxa(tree);
 		}
@@ -165,19 +165,19 @@ public class NexmlTreesHandler extends DefaultHandler {
 		return this.rooted;
 	}
 
-    private void treeContainsAllTaxa(PhyloTree tree) {
-        int numOfLabelsInTree = 0;
+	private void treeContainsAllTaxa(PhyloTree tree) {
+		int numOfLabelsInTree = 0;
 
-        for (var v : tree.nodes()) {
-            if (v.getLabel() != null)
-                numOfLabelsInTree++;
-        }
+		for (var v : tree.nodes()) {
+			if (v.getLabel() != null)
+				numOfLabelsInTree++;
+		}
 
-        // todo : fix this
-    }
+		// todo : fix this
+	}
 
 	public static Collection<String> makeCollection(Iterable<String> iter) {
-        Collection<String> list = new ArrayList<>();
+		Collection<String> list = new ArrayList<>();
 		for (String item : iter) {
 			list.add(item);
 		}
