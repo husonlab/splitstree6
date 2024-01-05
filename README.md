@@ -24,9 +24,5 @@ Any workflow can be saved to a file and then applied to other datasets either us
 
 SplitsTreeCE is currently under rapid development. We are currently calling this a "beta" release, which means that we are making this available for testing and feedback. We plan to wrapup programming and to submit a publication by the end of March 2024. 
 
-## Latest news:
-
-Just added export to SVG to the program. Now anything that you see in the program can be exported as individual objects and then edited in a program like LibreOffice or Inkscape. 
-
 
 

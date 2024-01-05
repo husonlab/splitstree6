@@ -1,5 +1,5 @@
 #!/bin/bash
-# Exports nodes from a workflow
+# Launches the gene tree viewer
 #
 # Copyright (C) 2024 Daniel H. Huson
 # This program is free software: you can redistribute it and/or modify
@@ -15,12 +15,11 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
 if [ $# == 0 ]
 then
-        options="-h"
+	options="-h"
 else
-        options=$*
+	options=$*
 fi
 
 bin_dir=$(dirname "$0")       # may be relative path
@@ -36,5 +35,4 @@ modulepath="$jars_dir:$jars2_dir"
 
 java_flags="-server -Duser.language=en -Duser.region=US $vmOptions"
 
-$java $java_flags --module-path=$modulepath --add-modules=splitstreesix splitstree6.tools.ExportWorkflow  $options
-
+$java $java_flags --module-path=$modulepath --add-modules=splitstreesix splitstree6.xtra.genetreeview.GeneTreeView  $options

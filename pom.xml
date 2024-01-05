@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  ~ pom.xml Copyright (C) 2023 Daniel H. Huson
+  ~ pom.xml Copyright (C) 2024 Daniel H. Huson
   ~  
   ~ (Some files contain contributions from other authors, who are then mentioned separately.)
   ~  
@@ -555,6 +555,7 @@
             <properties>
                 <client.target>host</client.target>
             </properties>
+            <!-->
             <dependencies>
                 <dependency>
                     <groupId>com.gluonhq.attach</groupId>
@@ -580,6 +581,7 @@
                     <version>${attach.version}</version>
                 </dependency>
             </dependencies>
+            <!-->
         </profile>
         <profile>
             <id>android</id>

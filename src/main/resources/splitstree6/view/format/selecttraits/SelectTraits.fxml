@@ -1,11 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
 <!--
-  ~  SelectTraits.fxml Copyright (C) 2023 Daniel H. Huson
+  ~  SelectTraits.fxml Copyright (C) 2024 Daniel H. Huson
   ~
   ~  (Some files contain contributions from other authors, who are then mentioned separately.)
   ~
@@ -23,6 +19,10 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
 <Accordion prefWidth="200.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1"
            fx:controller="splitstree6.view.format.selecttraits.SelectTraitsController">
    <panes>

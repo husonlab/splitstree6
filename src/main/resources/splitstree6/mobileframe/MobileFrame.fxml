@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~  MobileFrame.fxml Copyright (C) 2023 Daniel H. Huson
+  ~  MobileFrame.fxml Copyright (C) 2024 Daniel H. Huson
   ~  
   ~  (Some files contain contributions from other authors, who are then mentioned separately.)
   ~  
@@ -25,21 +25,16 @@
 <AnchorPane fx:id="rootPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
             xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.mobileframe.MobileFrameController">
    <children>
-       <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                   AnchorPane.topAnchor="0.0">
-           <center>
-               <TabPane fx:id="tabPane" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER"/>
-           </center>
-           <top>
-               <AnchorPane BorderPane.alignment="CENTER">
-                   <children>
-                       <Pane fx:id="topPane" prefHeight="26.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-                             AnchorPane.topAnchor="0.0"/>
-                       <Label alignment="CENTER" contentDisplay="CENTER" mouseTransparent="true" text="SplitsTree-App"
-                              AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="4.0"/>
-                   </children>
-               </AnchorPane>
-           </top>
-       </BorderPane>
+       <AnchorPane fx:id="topPane" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="26.0"
+                   AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+           <children>
+               <Label alignment="CENTER" contentDisplay="CENTER" mouseTransparent="true" text="SplitsTree-App"
+                      AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                      AnchorPane.topAnchor="0.0"/>
+           </children>
+       </AnchorPane>
+       <TabPane fx:id="tabPane" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308"
+                tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="26.0"/>
    </children>
 </AnchorPane>

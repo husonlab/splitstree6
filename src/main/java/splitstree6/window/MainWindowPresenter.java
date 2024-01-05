@@ -1,5 +1,5 @@
 /*
- * MainWindowPresenter.java Copyright (C) 2023 Daniel H. Huson
+ * MainWindowPresenter.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -135,6 +135,9 @@ public class MainWindowPresenter {
 	public MainWindowPresenter(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 		controller = mainWindow.getController();
+
+		controller.getBottomFlowPane().getChildren().addListener((InvalidationListener) e -> controller.getProgressIndicator().setVisible(!controller.getBottomFlowPane().getChildren().isEmpty()));
+		controller.getProgressIndicator().setProgress(-1);
 
 		var workflowTreeView = mainWindow.getWorkflowTreeView();
 

@@ -1,5 +1,5 @@
 /*
- *  MobileFrameController.java Copyright (C) 2023 Daniel H. Huson
+ *  MobileFrameController.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -35,7 +35,7 @@ public class MobileFrameController {
 	@FXML
 	private TabPane tabPane;
 
-	public Pane getTopToolBar() {
+	public Pane getToolPane() {
 		return topPane;
 	}
 

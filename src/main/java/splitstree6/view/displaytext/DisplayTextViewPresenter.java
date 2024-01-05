@@ -1,5 +1,5 @@
 /*
- * DisplayTextViewPresenter.java Copyright (C) 2023 Daniel H. Huson
+ * DisplayTextViewPresenter.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -46,8 +46,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DisplayTextViewPresenter implements IDisplayTabPresenter {
+	private final double maxFontSize = 128;
+	private final double minFontSize = 6;
 	private final MainWindow mainWindow;
-	private final DisplayTextView tab;
+	private final DisplayTextView view;
 
 	private final FindToolBar findToolBar;
 
@@ -55,12 +57,12 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 	private final BooleanBinding selectionEmpty;
 
-	public DisplayTextViewPresenter(MainWindow mainWindow, DisplayTextView tab, boolean editable) {
+	public DisplayTextViewPresenter(MainWindow mainWindow, DisplayTextView view, boolean editable) {
 		this.mainWindow = mainWindow;
-		this.tab = tab;
+		this.view = view;
 		this.editable = editable;
 
-		var controller = tab.getController();
+		var controller = view.getController();
 
 		var codeArea = controller.getCodeArea();
 
@@ -68,6 +70,13 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 		controller.getWrapTextToggle().selectedProperty().bindBidirectional(codeArea.wrapTextProperty());
 		codeArea.setWrapText(true);
+
+		controller.getCodeArea().getNode().setOnZoom(e -> {
+			if (e.getZoomFactor() > 1 && view.getFontSize() < maxFontSize || e.getZoomFactor() < 1 && view.getFontSize() > minFontSize) {
+				view.setFontSize(e.getZoomFactor() * view.getFontSize());
+				codeArea.setStyle("-fx-font-size: " + view.getFontSize() + "px");
+			}
+		});
 
 		findToolBar = new FindToolBar(mainWindow.getStage(), codeArea.createSearcher());
 		FindReplaceUtils.additionalSetup(findToolBar);
@@ -82,8 +91,8 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		controller.getWrapTextToggle().selectedProperty().bindBidirectional(tab.wrapTextProperty());
-		controller.getLineNumbersToggle().selectedProperty().bindBidirectional(tab.showLineNumbersProperty());
+		controller.getWrapTextToggle().selectedProperty().bindBidirectional(view.wrapTextProperty());
+		controller.getLineNumbersToggle().selectedProperty().bindBidirectional(view.showLineNumbersProperty());
 
 
 		// prevent double paste:
@@ -105,12 +114,12 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			codeArea.focusedProperty().addListener((c, o, n) ->
 					mainWindow.getController().getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(!Clipboard.getSystemClipboard().hasString())));
 		}
-		codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
+		codeArea.setStyle("-fx-font-size: " + view.getFontSize() + "px");
 
-		tab.viewTabProperty().addListener((v, o, n) -> {
+		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null && n.getAlgorithmBreadCrumbsToolBar() != null
 				&& BasicFX.getAllRecursively(controller.getTopVBox(), AlgorithmBreadCrumbsToolBar.class).isEmpty()
-				&& !tab.getViewTab().isClosable()) {
+				&& !view.getViewTab().isClosable()) {
 				controller.getTopVBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
 			}
 		});
@@ -118,12 +127,12 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
-		var controller = tab.getController();
+		var controller = view.getController();
 
 		var codeArea = controller.getCodeArea();
 
 		mainController.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
-		mainController.getPrintMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getPrintMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getCopyMenuItem().setOnAction(e -> codeArea.copy());
 		mainController.getCopyMenuItem().disableProperty().bind(selectionEmpty);
@@ -136,7 +145,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			mainController.getPasteMenuItem().setDisable(false);
 
 			mainController.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
-			mainController.getDeleteMenuItem().disableProperty().bind(tab.emptyProperty().not());
+			mainController.getDeleteMenuItem().disableProperty().bind(view.emptyProperty().not());
 
 			mainController.getUndoButton().setOnAction(e -> codeArea.undo());
 			{
@@ -185,15 +194,15 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			if (result.isPresent()) {
 				final String[] tokens = result.get().split(":");
 				if (tokens.length > 0 && NumberUtils.isInteger(tokens[0]))
-					tab.gotoLine(NumberUtils.parseInt(tokens[0]), tokens.length == 2 && NumberUtils.isInteger(tokens[1]) ? NumberUtils.parseInt(tokens[1]) : 0);
+					view.gotoLine(NumberUtils.parseInt(tokens[0]), tokens.length == 2 && NumberUtils.isInteger(tokens[1]) ? NumberUtils.parseInt(tokens[1]) : 0);
 			}
 		});
 
 		mainController.getSelectAllMenuItem().setOnAction(e -> codeArea.selectAll());
-		mainController.getSelectAllMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getSelectAllMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getSelectNoneMenuItem().setOnAction(e -> codeArea.selectRange(0, 0));
-		mainController.getSelectNoneMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getSelectNoneMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getSelectFromPreviousMenuItem().setOnAction(e -> {
 			for (String word : MainWindowManager.getPreviousSelection()) {
@@ -209,20 +218,20 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		});
 		mainController.getSelectFromPreviousMenuItem().disableProperty().bind(Bindings.isEmpty(MainWindowManager.getPreviousSelection()));
 
-		mainController.getSelectBracketsMenuItem().setOnAction(e -> tab.selectBrackets(codeArea));
-		mainController.getSelectBracketsMenuItem().disableProperty().bind(tab.emptyProperty());
+		mainController.getSelectBracketsMenuItem().setOnAction(e -> view.selectBrackets(codeArea));
+		mainController.getSelectBracketsMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> {
-			tab.setFontSize(1.1 * tab.getFontSize());
-			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
+			view.setFontSize(1.1 * view.getFontSize());
+			codeArea.setStyle("-fx-font-size: " + view.getFontSize() + "px");
 		});
-		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(tab.fontSizeProperty().greaterThan(128));
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(view.fontSizeProperty().greaterThan(maxFontSize));
 
 		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> {
-			tab.setFontSize(1.0 / 1.1 * tab.getFontSize());
-			codeArea.setStyle("-fx-font-size: " + tab.getFontSize() + "px");
+			view.setFontSize(1.0 / 1.1 * view.getFontSize());
+			codeArea.setStyle("-fx-font-size: " + view.getFontSize() + "px");
 		});
-		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(tab.fontSizeProperty().lessThan(6));
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(view.fontSizeProperty().lessThan(minFontSize));
 		mainController.getZoomInMenuItem().setOnAction(null);
 		mainController.getZoomOutMenuItem().setOnAction(null);
 	}
@@ -238,9 +247,9 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 	}
 
 	public void processSelectButtonPressed() {
-		if (tab.getController().getCodeArea().getSelection().getLength() > 0)
-			tab.getController().getCodeArea().selectRange(0, 0);
+		if (view.getController().getCodeArea().getSelection().getLength() > 0)
+			view.getController().getCodeArea().selectRange(0, 0);
 		else
-			tab.getController().getCodeArea().selectAll();
+			view.getController().getCodeArea().selectAll();
 	}
 }

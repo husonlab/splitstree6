@@ -1,5 +1,5 @@
 /*
- *  MobileFramePresenter.java Copyright (C) 2023 Daniel H. Huson
+ *  MobileFramePresenter.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -20,11 +20,14 @@
 package splitstree6.mobileframe;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
 import javafx.collections.ListChangeListener;
+import javafx.geometry.Side;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
+import javafx.scene.layout.AnchorPane;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.window.IMainWindow;
@@ -44,6 +47,8 @@ import java.util.Objects;
 public class MobileFramePresenter {
 	private final MobileFrame view;
 
+	private final Object sync = new Object();
+
 	public MobileFramePresenter(MobileFrame view) {
 		this.view = view;
 		var controller = view.getController();
@@ -61,6 +66,19 @@ public class MobileFramePresenter {
 		});
 
 		controller.getTabPane().getTabs().add(filesTab);
+
+		InvalidationListener listener = e -> {
+			RunAfterAWhile.applyInFXThread(sync, () -> {
+				if (view.getStage().getWidth() > view.getStage().getHeight())
+					controller.getTabPane().setSide(Side.LEFT);
+				else
+					controller.getTabPane().setSide(Side.TOP);
+			});
+		};
+
+		view.getStage().widthProperty().addListener(listener);
+		view.getStage().heightProperty().addListener(listener);
+		listener.invalidated(null);
 
 		MainWindowManager.getInstance().getMainWindows().addListener((ListChangeListener<? super IMainWindow>) e -> {
 			while (e.next()) {
@@ -147,22 +165,15 @@ public class MobileFramePresenter {
 			});
 		});
 
-		controller.getTopToolBar().setOnMousePressed(e -> {
-			showHideTabBar();
-			e.consume();
-		});
-		controller.getTopToolBar().setOnTouchPressed(e -> {
-			showHideTabBar();
-			e.consume();
-		});
-	}
+		var tabPaneTop = controller.getToolPane().getPrefHeight();
 
-	private void showHideTabBar() {
-		view.setHideTabs(!view.isHideTabs());
-		if (view.isHideTabs()) {
-			view.getController().getTabPane().setStyle("-fx-tab-min-height: 0; -fx-tab-max-height: 0; -fx-padding: -4 0 0 0;");
-		} else {
-			view.getController().getTabPane().setStyle("-fx-tab-min-height: 20; -fx-tab-max-height: 30; -fx-padding: 0 0 0 0;");
-		}
+		controller.getToolPane().setOnMousePressed(e -> {
+			AnchorPane.setTopAnchor(view.getController().getTabPane(), 0.0);
+			e.consume();
+		});
+
+		controller.getTabPane().getSelectionModel().selectedItemProperty().addListener(e -> {
+			AnchorPane.setTopAnchor(controller.getTabPane(), tabPaneTop);
+		});
 	}
 }

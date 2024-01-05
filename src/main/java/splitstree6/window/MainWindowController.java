@@ -1,5 +1,5 @@
 /*
- * MainWindowController.java Copyright (C) 2023 Daniel H. Huson
+ * MainWindowController.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -477,6 +477,9 @@ public class MainWindowController {
 	@FXML
 	private Menu viewMenu;
 
+	@FXML
+	private ProgressIndicator progressIndicator;
+
 
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
 
@@ -503,6 +506,8 @@ public class MainWindowController {
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
 		MaterialIcons.setIcon(selectButton, "select_all");
 		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "format_list_bulleted");
+
+		analyzeGenomesMenuItem.getParentMenu().getItems().remove(analyzeGenomesMenuItem);
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -1132,5 +1137,9 @@ public class MainWindowController {
 
 	public ToggleButton getShowWorkflowTreeCheckButton() {
 		return showWorkflowTreeCheckButton;
+	}
+
+	public ProgressIndicator getProgressIndicator() {
+		return progressIndicator;
 	}
 }

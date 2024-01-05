@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.6" transformSequenceNumber="10">
-  <directoryPresets config="../src/main/resources/NOTICE.txt" />
+  <directoryPresets config="../target/SplitsTreeCE-1.0-SNAPSHOT.jar" />
   <application name="SplitsTreeCE" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeCE" publisher="Daniel Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_beta" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
       <variable name="renderingVMOption" />
@@ -35,7 +35,7 @@
           <entry location="install4j-runtime-10.0.5.jar" />
         </exclude>
       </dirEntry>
-      <fileEntry mountPoint="1691242167" file="../target/SplitsTreeCE-1.0-SNAPSHOT.jar" />
+      <fileEntry mountPoint="1691242167" file="../target/SplitsTreeApp-1.0-SNAPSHOT.jar" />
       <fileEntry mountPoint="1691243203" file="../target/dependency/install4j-runtime-10.0.5.jar" />
       <dirEntry mountPoint="1691242153" file="../examples" subDirectory="examples" />
       <fileEntry mountPoint="1691243205" file="../tools/genome-context" fileMode="755" overrideFileMode="true" />
@@ -43,6 +43,7 @@
       <fileEntry mountPoint="1691243205" file="../tools/workflow-export" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/mash-sketches" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/bfilter-tool" fileMode="755" overrideFileMode="true" />
+      <fileEntry mountPoint="1691243205" file="../tools/genetree-viewer" fileMode="755" overrideFileMode="true" />
       <dirEntry mountPoint="1691243210" file="../target/generated-resources/licenses" subDirectory="licenses" />
       <fileEntry mountPoint="1691243207" file="../target/generated-resources/licenses.xml" />
       <fileEntry mountPoint="1691243207" file="../licenses/JLODA-LICENSE.txt" />
@@ -75,7 +76,7 @@
   <launchers>
     <launcher name="SplitsTreeCE" id="1691242142" menuName="SplitsTree CE ">
       <executable name="SplitsTreeCE" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="SplitsTree CE  analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2023 ${compiler:sys.publisher}" internalName="SplitsTreeCE" />
+        <versionInfo include="true" fileDescription="SplitsTree CE  analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2024 ${compiler:sys.publisher}" internalName="SplitsTreeCE" />
       </executable>
       <java mainClass="splitstreesix/splitstree6.main.SplitsTree6" mainMode="module" vmParameters="-server -Duser.language=en -Duser.region=US ${compiler:renderingVMOption}">
         <modulePath>
@@ -257,7 +258,7 @@ return console.askOkCancel(message, true);
               </action>
               <action id="1691243206" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
-                  <property name="files" type="array" class="java.io.File" length="5">
+                  <property name="files" type="array" class="java.io.File" length="6">
                     <element index="0">
                       <object class="java.io.File">
                         <string>tools/genome-context</string>
@@ -281,6 +282,11 @@ return console.askOkCancel(message, true);
                     <element index="4">
                       <object class="java.io.File">
                         <string>tools/bfilter-tool</string>
+                      </object>
+                    </element>
+                    <element index="5">
+                      <object class="java.io.File">
+                        <string>tools/genetree-viewer</string>
                       </object>
                     </element>
                   </property>
@@ -1163,5 +1169,5 @@ return true;</property>
   <buildIds buildAll="false">
     <mediaSet refId="1691242165" />
   </buildIds>
-  <buildOptions verbose="true" />
+  <buildOptions disableSigning="true" disableNotarization="true" />
 </install4j>

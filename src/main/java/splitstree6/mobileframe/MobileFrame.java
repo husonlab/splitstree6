@@ -1,5 +1,5 @@
 /*
- *  MobileFrame.java Copyright (C) 2023 Daniel H. Huson
+ *  MobileFrame.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -20,8 +20,6 @@
 package splitstree6.mobileframe;
 
 import javafx.application.Platform;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.fxml.FXMLLoader;
@@ -60,8 +58,6 @@ public class MobileFrame {
 	private final FilesTab filesTab;
 	private final ObservableMap<MainWindow, Tab> windowTabMap = FXCollections.observableHashMap();
 
-	private final BooleanProperty hideTabs = new SimpleBooleanProperty(this, "hideTabs", false);
-
 	public MobileFrame(Stage stage) {
 		this.stage = stage;
 		stage.setOnHidden(e -> System.exit(0));
@@ -98,14 +94,6 @@ public class MobileFrame {
 
 	public FilesTab getFilesTab() {
 		return filesTab;
-	}
-
-	public boolean isHideTabs() {
-		return hideTabs.get();
-	}
-
-	public void setHideTabs(boolean hideTabs) {
-		this.hideTabs.set(hideTabs);
 	}
 
 	public FileItem findFileInfo(String fileName) {

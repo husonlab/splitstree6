@@ -1,5 +1,5 @@
 /*
- * MainWindow.css Copyright (C) 2023 Daniel H. Huson
+ * MainWindow.css Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -42,6 +42,11 @@ viewer-background {
 .table-view .column-header-background {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
+}
+
+.progress-indicator .text {
+    -fx-text-alignment: transparent;
+    visibity: hidden;
 }
 
 /*

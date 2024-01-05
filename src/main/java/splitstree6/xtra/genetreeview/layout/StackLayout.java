@@ -1,5 +1,5 @@
 /*
- *  StackLayout.java Copyright (C) 2023 Daniel H. Huson
+ *  StackLayout.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,7 +19,9 @@
 
 package splitstree6.xtra.genetreeview.layout;
 
-import javafx.beans.property.*;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.scene.Node;
 import javafx.scene.PerspectiveCamera;
