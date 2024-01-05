@@ -6,13 +6,6 @@ module splitstreesix {
 	requires transitive javafx.swing;
 	requires javafx.base;
 
-	requires transitive com.gluonhq.attach.display;
-	requires transitive com.gluonhq.attach.storage;
-	requires transitive com.gluonhq.attach.util;
-	requires transitive com.gluonhq.charm.glisten;
-	requires transitive com.gluonhq.attach.share;
-	requires transitive com.gluonhq.attach.lifecycle;
-
 	requires org.apache.commons.collections4;
 	requires org.apache.commons.math4.legacy;
 	requires org.apache.commons.math4.legacy.exception;
@@ -20,7 +13,7 @@ module splitstreesix {
 	requires com.install4j.runtime;
 	requires java.sql;
 	requires java.sql.rowset;
-	//requires org.xerial.sqlitejdbc;
+	// requires org.xerial.sqlitejdbc;
 	requires java.desktop;
 	requires org.fxmisc.flowless;
 	requires org.fxmisc.richtext;
@@ -77,11 +70,11 @@ module splitstreesix {
 	opens splitstree6.io.readers.genomes;
 	opens splitstree6.io.readers.distances;
 	opens splitstree6.io.readers.splits;
-	// opens splitstree6.io.readers.taxa;
 	opens splitstree6.io.readers.report;
 	opens splitstree6.io.readers.trees;
 	opens splitstree6.io.readers.network;
 	opens splitstree6.io.readers.view;
+	exports splitstree6.io.readers;
 
 	opens splitstree6.io.writers.characters;
 	opens splitstree6.io.writers.genomes;
@@ -106,9 +99,10 @@ module splitstreesix {
 	opens splitstree6.tabs.algorithms.treefilter;
 	opens splitstree6.tabs.algorithms;
 	opens splitstree6.tabs.algorithms.taxafilter;
-	opens splitstree6.mobileframe.filestab;
-	opens splitstree6.mobileframe;
 
+	exports splitstree6.tabs.workflow;
+	opens splitstree6.tabs.inputeditor;
+	exports splitstree6.tabs.inputeditor;
 
 	opens splitstree6.contextmenus.algorithmnode;
 	opens splitstree6.contextmenus.datanode;
@@ -142,7 +136,6 @@ module splitstreesix {
 	opens splitstree6.view.format.sites;
 	opens splitstree6.view.format.edges;
 
-	//opens splitstree6.view.utils;
 	opens splitstree6.view.alignment;
 	opens splitstree6.view.trees;
 	opens splitstree6.layout.network;
@@ -151,8 +144,17 @@ module splitstreesix {
 	opens splitstree6.dialog.exporting;
 	opens splitstree6.layout;
 	opens splitstree6.algorithms.distances.distances2splits.neighbornet;
+
+	exports splitstree6.dialog;
+	exports splitstree6.dialog.importdialog;
+
 	exports splitstree6.io.utils;
+	exports splitstree6.io;
+	exports splitstree6.io.nexus.workflow;
+	exports splitstree6.data;
 	exports splitstree6.data.parts;
+	exports splitstree6.window;
+	exports splitstree6.workflow;
 
 	opens splitstree6.xtra.genetreeview;
 	opens splitstree6.xtra.outliner;

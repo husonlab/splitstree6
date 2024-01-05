@@ -63,7 +63,7 @@ public class AnalyzeGenomesPresenter {
 		controller.getInputBrowseButton().setOnAction(c -> {
 			final var files = getInputFiles(dialog);
 			if (files != null) {
-				if (controller.getInputTextArea().getText().trim().length() > 0 && !controller.getInputTextArea().getText().trim().endsWith("'")) {
+				if (!controller.getInputTextArea().getText().trim().isEmpty() && !controller.getInputTextArea().getText().trim().endsWith("'")) {
 					controller.getInputTextArea().setText(controller.getInputTextArea().getText().trim() + ",\n" + StringUtils.toString(files, ",\n"));
 				} else
 					controller.getInputTextArea().setText(StringUtils.toString(files, ",\n"));
@@ -71,7 +71,7 @@ public class AnalyzeGenomesPresenter {
 		});
 		controller.getInputTextArea().textProperty().addListener((c, o, n) -> {
 			final String firstLine = StringUtils.getFirstLine(n);
-			if (firstLine.length() > 0) {
+			if (!firstLine.isEmpty()) {
 				final File inputFile = new File(firstLine);
 				if (inputFile.getParentFile().exists()) {
 					controller.getOutputFileTextField().setText(createOutputName(inputFile));
@@ -84,7 +84,7 @@ public class AnalyzeGenomesPresenter {
 			final File outputFile = getOutputFile(stage, controller.getOutputFileTextField().getText());
 			if (outputFile != null) {
 				final String outputFileName;
-				if (FileUtils.getFileSuffix(outputFile.getName()).length() == 0)
+				if (FileUtils.getFileSuffix(outputFile.getName()).isEmpty())
 					outputFileName = outputFile.getPath() + ".stree6";
 				else
 					outputFileName = outputFile.getPath();
@@ -178,7 +178,7 @@ public class AnalyzeGenomesPresenter {
 		dialog.getReferenceIds().addListener((InvalidationListener) e -> {
 			controller.getAddedReferencesLabel().setText(String.valueOf(dialog.getReferenceIds().size()));
 			floatingLabel.setText("Added: " + dialog.getReferenceIds().size());
-			if (dialog.getReferenceIds().size() == 0)
+			if (dialog.getReferenceIds().isEmpty())
 				controller.getStatusFlowPane().getChildren().remove(floatingLabel);
 			else if (!controller.getStatusFlowPane().getChildren().contains(floatingLabel))
 				controller.getStatusFlowPane().getChildren().add(floatingLabel);

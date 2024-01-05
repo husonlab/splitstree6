@@ -535,7 +535,7 @@ public class GeneTreeViewPresenter {
 		final var fileChooser = new FileChooser();
 		fileChooser.setTitle("Open trees");
 		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Newick Trees (tre,tree,trees,new,nwk,treefile)",
-				"*.tre", "*.tree", ".trees", ".new", ".nwk", ".treefile"));
+				"*.tre", "*.tree", "*.trees", "*.new", ".*nwk", "*.treefile"));
 
 		var file = fileChooser.showOpenDialog(stage);
 		openFile(file, stage, controller, model, subScene);

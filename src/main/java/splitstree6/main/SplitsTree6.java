@@ -19,13 +19,10 @@
 
 package splitstree6.main;
 
-import com.gluonhq.attach.storage.StorageService;
-import com.gluonhq.attach.util.Services;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.stage.Stage;
-import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.ArgsOptions;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ProgramProperties;
@@ -39,13 +36,11 @@ import jloda.util.Basic;
 import jloda.util.CanceledException;
 import jloda.util.UsageException;
 import splitstree6.io.FileLoader;
-import splitstree6.mobileframe.MobileFrame;
 import splitstree6.window.MainWindow;
 
 import java.io.File;
 import java.time.Duration;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * the main SplitsTree CE program
@@ -54,9 +49,7 @@ import java.util.Objects;
 public class SplitsTree6 extends Application {
 	private static final ArrayList<String> inputFiles = new ArrayList<>();
 
-	private MobileFrame mobileFrame;
-
-	private static boolean runAsMobileOnDesktop = false;
+	private static boolean desktop = true;
 
 	/**
 	 * main
@@ -104,9 +97,6 @@ public class SplitsTree6 extends Application {
 	}
 
 	protected static void parseArguments(String[] args) throws CanceledException, UsageException {
-		if (!isDesktop())
-			args = new String[0];
-
 		var options = new ArgsOptions(args, SplitsTree6.class, Version.NAME + " - Phylogenetic analysis using trees and networks");
 		options.setAuthors("Daniel H. Huson and David Bryant");
 		options.setLicense(ProgramProperties.getProgramLicence());
@@ -116,9 +106,7 @@ public class SplitsTree6 extends Application {
 		inputFiles.addAll(options.getOption("-i", "input", "Input files to open upon startup", new ArrayList<String>()));
 
 		final String defaultPropertiesFile;
-		if (!isDesktop())
-			defaultPropertiesFile = getPrivateDirectory() + File.separator + "SplitsTree6.def";
-		else if (ProgramProperties.isMacOS())
+		if (ProgramProperties.isMacOS())
 			defaultPropertiesFile = System.getProperty("user.home") + "/Library/Preferences/SplitsTree6.def";
 		else
 			defaultPropertiesFile = System.getProperty("user.home") + File.separator + ".SplitsTree6.def";
@@ -128,7 +116,6 @@ public class SplitsTree6 extends Application {
 		final var silentMode = options.getOption("-S", "silentMode", "Silent mode", false);
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Maximum number of threads to use in a parallel algorithm (0=all available)", 0));
 		ProgramProperties.setConfirmQuit(options.getOption("-q", "confirmQuit", "Confirm quit on exit", ProgramProperties.isConfirmQuit()));
-		runAsMobileOnDesktop = options.getOption("-M", "mobile", "Run mobile version on desktop", false);
 
 		options.done();
 
@@ -155,17 +142,6 @@ public class SplitsTree6 extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		try {
-			if (!isDesktop()) {
-				ZoomableScrollPane.zoomByScroll = false; // zoom by zoom
-				NotificationManager.setShowNotifications(false);
-				NotificationManager.setEchoToConsole(true);
-
-				mobileFrame = new MobileFrame(stage);
-				stage.getScene().getStylesheets().add(Objects.requireNonNull(MainWindow.class.getResource("MainWindow.css")).toExternalForm());
-				//stage.getScene().getStylesheets().add(Objects.requireNonNull(getClass().getResource("MaterialDesign.css")).toExternalForm());
-				stage.getScene().getStylesheets().add("jloda/resources/css/white_pane.css");
-				stage.show();
-			} else {
 				SplashScreen.showSplash(Duration.ofSeconds(5));
 				stage.setTitle("Untitled - " + ProgramProperties.getProgramName());
 				NotificationManager.setShowNotifications(true);
@@ -181,7 +157,6 @@ public class SplitsTree6 extends Application {
 					for (var file : inputFiles)
 						Platform.runLater(() -> FileLoader.apply(false, mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
 				}
-			}
 		} catch (Exception ex) {
 			Basic.caught(ex);
 			throw ex;
@@ -195,37 +170,11 @@ public class SplitsTree6 extends Application {
 	}
 
 	public static boolean isDesktop() {
-		return com.gluonhq.attach.util.Platform.isDesktop() && !runAsMobileOnDesktop;
+		return desktop;
 	}
 
-	private static String userDirectory = null;
-
-	private static String privateDirectory = null;
-
-	public static String getUserDirectory() {
-		if (userDirectory == null) {
-			if (com.gluonhq.attach.util.Platform.isDesktop()) {
-				userDirectory = System.getProperty("user.dir");
-			} else {
-				var storageService = Services.get(StorageService.class).orElseThrow(() -> new RuntimeException("StorageService not available."));
-				var storage = storageService.getPublicStorage("SplitsTree");
-				storage.ifPresent(file -> userDirectory = file.getPath());
-			}
-		}
-		return userDirectory;
-	}
-
-	public static String getPrivateDirectory() {
-		if (privateDirectory == null) {
-			if (com.gluonhq.attach.util.Platform.isDesktop()) {
-				privateDirectory = System.getProperty("java.io.tmpdir");
-			} else {
-				var storageService = Services.get(StorageService.class).orElseThrow(() -> new RuntimeException("StorageService not available."));
-				var storage = storageService.getPrivateStorage();
-				storage.ifPresent(file -> privateDirectory = file.getPath());
-			}
-		}
-		return privateDirectory;
+	public static void setDesktop(boolean desktop) {
+		SplitsTree6.desktop = desktop;
 	}
 }
 

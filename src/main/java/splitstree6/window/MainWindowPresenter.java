@@ -48,7 +48,6 @@ import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.workflow.WorkflowNode;
-import jloda.thirdparty.PngEncoderFX;
 import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
@@ -112,7 +111,6 @@ import splitstree6.workflow.Workflow;
 import splitstree6.workflow.WorkflowDataLoader;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
@@ -431,22 +429,10 @@ public class MainWindowPresenter {
 		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
 				try {
-					if (SplitsTree6.isDesktop()) {
-						var snapshot = focusedDisplayTab.get().getMainNode().snapshot(null, null);
-						var clipboardContent = new ClipboardContent();
-						clipboardContent.putImage(snapshot);
-						Clipboard.getSystemClipboard().setContent(clipboardContent);
-					} else {
-						var saveFile = new File(SplitsTree6.getPrivateDirectory(), "copy-image.png");
-						var pngEncoder = new PngEncoderFX();
-						pngEncoder.setImage(focusedDisplayTab.get().getMainNode().snapshot(null, null));
-						try (var outs = new FileOutputStream(saveFile)) {
-							outs.write(pngEncoder.pngEncode(true));
-						}
-						var clipboardContent = new ClipboardContent();
-						clipboardContent.putFiles(List.of(saveFile));
-						Clipboard.getSystemClipboard().setContent(clipboardContent);
-					}
+					var snapshot = focusedDisplayTab.get().getMainNode().snapshot(null, null);
+					var clipboardContent = new ClipboardContent();
+					clipboardContent.putImage(snapshot);
+					Clipboard.getSystemClipboard().setContent(clipboardContent);
 				} catch (Exception ex) {
 					Basic.caught(ex);
 				}

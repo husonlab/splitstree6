@@ -40,8 +40,6 @@ import java.util.ArrayList;
 public class MainWindowController {
 	@FXML
 	private ToggleButton showWorkflowTreeCheckButton;
-	@FXML
-	private Tooltip fileTooltip;
 
 	@FXML
 	private VBox topVBox;
@@ -495,6 +493,8 @@ public class MainWindowController {
 			topVBox.setPadding(new Insets(30, 0, 0, 0));
 			((Pane) fileMenuButton.getParent()).getChildren().remove(fileMenuButton);
 		}
+		analyzeGenomesMenuItem.getParentMenu().getItems().remove(analyzeGenomesMenuItem); // todo: will make this a standalone program
+
 		algorithmTabPane.setAllowUndock(false);
 		mainTabPane.setAllowUndock(false);
 
@@ -506,8 +506,6 @@ public class MainWindowController {
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
 		MaterialIcons.setIcon(selectButton, "select_all");
 		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "format_list_bulleted");
-
-		analyzeGenomesMenuItem.getParentMenu().getItems().remove(analyzeGenomesMenuItem);
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -564,6 +562,9 @@ public class MainWindowController {
 			rightToolBarPane.applyCss();
 			rightWidth.set(rightToolBarPane.getWidth());
 		});
+
+		if (!SplitsTree6.isDesktop())
+			((Pane) memoryLabel.getParent()).getChildren().remove(memoryLabel);
 	}
 
 	public VBox getTopVBox() {
@@ -1104,10 +1105,6 @@ public class MainWindowController {
 
 	public MenuButton getFileMenuButton() {
 		return fileMenuButton;
-	}
-
-	public Tooltip getFileTooltip() {
-		return fileTooltip;
 	}
 
 	public Button getUndoButton() {
