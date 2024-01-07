@@ -105,6 +105,7 @@ import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.Workflow;
@@ -163,7 +164,9 @@ public class MainWindowPresenter {
 				} else
 					selectedDisplayTab.set(null);
 				setupCommonMenuItems(mainWindow, controller, selectedDisplayTab);
+
 				if (selectedDisplayTab.get() != null && selectedDisplayTab.get().getPresenter() != null) {
+					ExportUtils.setup(mainWindow, null, null);
 					selectedDisplayTab.get().getPresenter().setupMenuItems();
 				}
 				enableAllMenuItemsWithDefinedAction(controller);
@@ -423,8 +426,10 @@ public class MainWindowPresenter {
 				setupSelectButton();
 		});
 
-		controller.getCutMenuItem().setDisable(false);
-		controller.getCopyMenuItem().setDisable(false);
+		if (!controller.getCutMenuItem().disableProperty().isBound())
+			controller.getCutMenuItem().setDisable(false);
+		if (!controller.getCopyMenuItem().disableProperty().isBound())
+			controller.getCopyMenuItem().setDisable(false);
 
 		if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null) {
 			controller.getCopyImageMenuItem().setOnAction(e -> {

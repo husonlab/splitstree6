@@ -81,7 +81,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller = view.getController();
 		mainController = mainWindow.getController();
 
-		setupColorSchemeMenu(view.optionColorSchemeProperty(), controller.getColorSchemeMenuButton());
+		Platform.runLater(() -> setupColorSchemeMenu(view.optionColorSchemeProperty(), controller.getColorSchemeMenuButton()));
 		controller.getColorSchemeMenuButton().disableProperty().bind(view.emptyProperty());
 
 		controller.getTaxaListView().getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);

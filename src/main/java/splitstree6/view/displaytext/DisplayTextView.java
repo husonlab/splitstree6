@@ -73,9 +73,9 @@ public class DisplayTextView implements IView {
 
 		controller.getCodeArea().textProperty().addListener((v, o, n) -> {
 			RunAfterAWhile.applyInFXThread(empty, () -> {
-				empty.set(n.isEmpty());
 				if (getViewTab() != null)
-					getViewTab().setEmpty(n.isEmpty());
+					getViewTab().emptyProperty().bind(empty);
+				empty.set(n.isEmpty());
 			});
 		});
 

@@ -20,6 +20,7 @@
 package splitstree6.dialog.exporting.data;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Scene;
 import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
@@ -63,7 +64,10 @@ public class ExportDialog {
 			var exportDialog = new ExportDialog(mainWindow, dataNode);
 			exportDialog.getStage().show();
 		});
-		menuItem.disableProperty().bind(empty);
+		if (dataNode == null || empty == null)
+			menuItem.disableProperty().bind(new SimpleBooleanProperty(true));
+		else
+			menuItem.disableProperty().bind(empty);
 		return menuItem;
 	}
 

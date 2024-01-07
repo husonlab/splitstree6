@@ -41,7 +41,6 @@ public class DisplayTextTab extends ViewTab {
 			setView(displayTextView);
 			displayTextView.getController().getCodeArea().requestFocus();
 		});
-		displayTextView.getController().getCodeArea().textProperty().addListener(e -> setEmpty(displayTextView.getController().getCodeArea().getText().isEmpty()));
 	}
 
 	public void replaceText(String text) {

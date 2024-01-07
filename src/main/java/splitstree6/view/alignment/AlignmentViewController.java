@@ -235,6 +235,9 @@ public class AlignmentViewController {
 		scrollPane.getContent().setOnScroll(Event::consume);
 		scrollPane.setPannable(false);
 
+		scrollPane.setFitToWidth(true);
+		scrollPane.setFitToHeight(true);
+
 		var pos = toolBar.getItems().indexOf(selectionLabel);
 		toolBar.getItems().add(pos, copyableSelectionLabel);
 		toolBar.getItems().remove(selectionLabel);
@@ -465,25 +468,5 @@ public class AlignmentViewController {
 
 	public Group getImageGroup() {
 		return imageGroup;
-	}
-
-	public static class ListCellWithIcon<T> extends javafx.scene.control.ListCell<T> {
-		private final String name;
-
-		ListCellWithIcon(String name) {
-			this.name = name;
-			MaterialIcons.setIcon(this, "name");
-		}
-
-		@Override
-		protected void updateItem(T item, boolean empty) {
-			super.updateItem(item, empty);
-			if (empty || item == null) {
-				setGraphic(null);
-				setText(null);
-			} else {
-				MaterialIcons.setIcon(this, "name");
-			}
-		}
 	}
 }

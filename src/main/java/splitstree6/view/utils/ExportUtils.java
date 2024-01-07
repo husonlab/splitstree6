@@ -35,7 +35,7 @@ import java.util.List;
  */
 public class ExportUtils {
 	public static void setup(MainWindow mainWindow, DataNode dataNode, ReadOnlyBooleanProperty emptyProperty) {
-		if (dataNode.getDataBlock() instanceof ViewBlock)
+		if (dataNode != null && dataNode.getDataBlock() instanceof ViewBlock)
 			dataNode = dataNode.getPreferredParent().getPreferredParent();
 
 		var mainController = mainWindow.getController();

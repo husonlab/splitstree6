@@ -50,7 +50,6 @@ public class InputEditorTab extends ViewTab {
 				inputEditorView.getController().getCodeArea().requestFocus();
 			});
 		}
-		inputEditorView.getController().getCodeArea().textProperty().addListener(e -> setEmpty(inputEditorView.getController().getCodeArea().getText().isEmpty()));
 	}
 
 	public void importFromFile(String fileName) {
