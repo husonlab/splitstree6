@@ -39,6 +39,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import jloda.fx.dialog.ExportImageDialog;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
 import jloda.fx.util.BasicFX;
@@ -321,6 +322,12 @@ public class MainWindowPresenter {
 		}
 	}
 
+	private Consumer<MainWindow> additionalCommonMenuSetup = null;
+
+	public void setAdditionalCommonMenuSetup(Consumer<MainWindow> additionalCommonMenuSetup) {
+		this.additionalCommonMenuSetup = additionalCommonMenuSetup;
+	}
+
 	private void setupCommonMenuItems(MainWindow mainWindow, MainWindowController controller, ObjectProperty<IDisplayTab> focusedDisplayTab) {
 		var workflow = mainWindow.getWorkflow();
 
@@ -442,12 +449,19 @@ public class MainWindowPresenter {
 					Basic.caught(ex);
 				}
 			});
-			controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 		}
+		controller.getCopyImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
 
 		controller.getCopyNewickMenuItem().setDisable(true);
 
 		controller.getPasteMenuItem().setDisable(true);
+
+		controller.getExportImageMenuItem().setOnAction(e -> {
+			if (focusedDisplayTab.get() != null && focusedDisplayTab.get().getMainNode() != null)
+				ExportImageDialog.show(mainWindow.getFileName(), mainWindow.getStage(), focusedDisplayTab.get().getMainNode());
+		});
+		controller.getExportImageMenuItem().disableProperty().bind(focusedDisplayTab.isNull());
+
 
 		// controller.getDuplicateMenuItem().setOnAction(null);
 		// controller.getDeleteMenuItem().setOnAction(null);
@@ -712,6 +726,9 @@ public class MainWindowPresenter {
 
 		if (stage != null)
 			BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
+
+		if (additionalCommonMenuSetup != null)
+			additionalCommonMenuSetup.accept(mainWindow);
 	}
 
 	public void showInputEditor() {
@@ -837,6 +854,13 @@ public class MainWindowPresenter {
 			controller.getSelectButton().disableProperty().bind(new SimpleBooleanProperty(true));
 	}
 
+	public IDisplayTab getSelectedDisplayTab() {
+		return selectedDisplayTab.get();
+	}
+
+	public ObjectProperty<IDisplayTab> selectedDisplayTabProperty() {
+		return selectedDisplayTab;
+	}
 	private void setupAlgorithmMenuItem(CheckMenuItem menuItem, Algorithm<? extends DataBlock, ? extends DataBlock> algorithm) {
 		setupAlgorithmMenuItem(menuItem, algorithm, null);
 	}

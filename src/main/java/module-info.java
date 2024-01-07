@@ -93,16 +93,17 @@ module splitstreesix {
 
 	opens splitstree6.workflowtree;
 
-	opens splitstree6.tabs.workflow;
-	opens splitstree6.tabs.workflow.algorithm;
-	opens splitstree6.tabs.workflow.data;
+	opens splitstree6.tabs.inputeditor;
 	opens splitstree6.tabs.algorithms.treefilter;
 	opens splitstree6.tabs.algorithms;
 	opens splitstree6.tabs.algorithms.taxafilter;
+	opens splitstree6.tabs.workflow;
+	opens splitstree6.tabs.workflow.algorithm;
+	opens splitstree6.tabs.workflow.data;
 
-	exports splitstree6.tabs.workflow;
-	opens splitstree6.tabs.inputeditor;
+	exports splitstree6.tabs;
 	exports splitstree6.tabs.inputeditor;
+	exports splitstree6.tabs.workflow;
 
 	opens splitstree6.contextmenus.algorithmnode;
 	opens splitstree6.contextmenus.datanode;

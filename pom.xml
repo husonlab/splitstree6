@@ -34,7 +34,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
-        <javafx.version>17</javafx.version>
+        <javafx.version>21.0.1</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <main.class>splitstree6.main.SplitsTree6</main.class>
     </properties>

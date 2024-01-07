@@ -492,6 +492,7 @@ public class MainWindowController {
 			menuBar.setVisible(false);
 			topVBox.setPadding(new Insets(30, 0, 0, 0));
 			((Pane) fileMenuButton.getParent()).getChildren().remove(fileMenuButton);
+			((Pane) memoryLabel.getParent()).getChildren().remove(memoryLabel);
 		}
 		analyzeGenomesMenuItem.getParentMenu().getItems().remove(analyzeGenomesMenuItem); // todo: will make this a standalone program
 
@@ -563,8 +564,6 @@ public class MainWindowController {
 			rightWidth.set(rightToolBarPane.getWidth());
 		});
 
-		if (!SplitsTree6.isDesktop())
-			((Pane) memoryLabel.getParent()).getChildren().remove(memoryLabel);
 	}
 
 	public VBox getTopVBox() {

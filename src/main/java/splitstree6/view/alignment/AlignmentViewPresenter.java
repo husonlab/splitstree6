@@ -81,6 +81,15 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller = view.getController();
 		mainController = mainWindow.getController();
 
+		controller.getScrollPane().setOnZoom(e -> {
+			if ((e.getZoomFactor() > 1 && !controller.getExpandHorizontallyButton().isDisabled() && !controller.getExpandVerticallyButton().isDisabled())
+				|| (e.getZoomFactor() < 1 && !controller.getContractHorizontallyButton().isDisabled() && !controller.getContractVerticallyButton().isDisabled())) {
+				view.setOptionUnitWidth(e.getZoomFactor() * view.getOptionUnitWidth());
+				view.setOptionUnitHeight(e.getZoomFactor() * view.getOptionUnitHeight());
+			}
+			e.consume();
+		});
+
 		Platform.runLater(() -> setupColorSchemeMenu(view.optionColorSchemeProperty(), controller.getColorSchemeMenuButton()));
 		controller.getColorSchemeMenuButton().disableProperty().bind(view.emptyProperty());
 

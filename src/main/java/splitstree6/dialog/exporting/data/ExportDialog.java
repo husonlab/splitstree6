@@ -26,49 +26,53 @@ import javafx.scene.control.MenuItem;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jloda.fx.util.ExtendedFXMLLoader;
+import splitstree6.main.SplitsTree6;
 import splitstree6.main.Version;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataNode;
 
+/**
+ * export dialog
+ * Daniel Huson, 11.21
+ */
 public class ExportDialog {
-	private final Stage stage;
-
-	public ExportDialog(MainWindow mainWindow, DataNode dataNode) {
-
+	/**
+	 * show the export dialog
+	 *
+	 * @param mainWindow
+	 * @param dataNode
+	 */
+	public static void show(MainWindow mainWindow, DataNode dataNode) {
 		var loader = new ExtendedFXMLLoader<ExportDialogController>(ExportDialogController.class);
 		ExportDialogController controller = loader.getController();
 
 		var scene = new Scene(loader.getRoot());
 
-		stage = new Stage();
+		var stage = new Stage();
 		stage.setTitle("Export data - " + dataNode.getTitle() + " - " + Version.NAME);
 		//stage.setAlwaysOnTop(true);
 		stage.setScene(scene);
 		stage.sizeToScene();
-		stage.setX(mainWindow.getStage().getX() + 100);
-		stage.setY(mainWindow.getStage().getY() + 100);
+		stage.setX(SplitsTree6.isDesktop() ? mainWindow.getStage().getX() + 100 : 100);
+		stage.setY(SplitsTree6.isDesktop() ? mainWindow.getStage().getY() + 100 : 100);
 
-		stage.initModality(Modality.WINDOW_MODAL);
+		stage.initModality(Modality.APPLICATION_MODAL);
 		stage.initOwner(mainWindow.getStage());
 
 		new ExportDialogPresenter(mainWindow, controller, stage, dataNode);
+		stage.show();
 	}
 
-	public Stage getStage() {
-		return stage;
-	}
-
+	/**
+	 * create a menu item for this dialog
+	 */
 	public static MenuItem createMenuItem(MainWindow mainWindow, DataNode dataNode, ReadOnlyBooleanProperty empty) {
 		var menuItem = new MenuItem("Export data...");
-		menuItem.setOnAction(e -> {
-			var exportDialog = new ExportDialog(mainWindow, dataNode);
-			exportDialog.getStage().show();
-		});
+		menuItem.setOnAction(e -> ExportDialog.show(mainWindow, dataNode));
 		if (dataNode == null || empty == null)
 			menuItem.disableProperty().bind(new SimpleBooleanProperty(true));
 		else
 			menuItem.disableProperty().bind(empty);
 		return menuItem;
 	}
-
 }

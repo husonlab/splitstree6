@@ -25,6 +25,7 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.*;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.util.StringConverter;
 import jloda.fx.control.CopyableLabel;
@@ -232,11 +233,15 @@ public class AlignmentViewController {
 		rightTopPane.prefHeightProperty().bind(rightTopStackPane.heightProperty());
 		rightTopStackPane.getChildren().add(rightTopPane);
 
-		scrollPane.getContent().setOnScroll(Event::consume);
-		scrollPane.setPannable(false);
-
 		scrollPane.setFitToWidth(true);
 		scrollPane.setFitToHeight(true);
+		// not sure why we are using a scroll pane, we don't want any scrolling, ever:
+		scrollPane.addEventFilter(ScrollEvent.SCROLL, Event::consume);
+		scrollPane.setPannable(false);
+		scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
+		scrollPane.setHmax(0.0);
+		scrollPane.setVmax(0.0);
 
 		var pos = toolBar.getItems().indexOf(selectionLabel);
 		toolBar.getItems().add(pos, copyableSelectionLabel);

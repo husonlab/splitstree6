@@ -54,10 +54,7 @@ public class DataNodeContextMenuPresenter {
 		});
 		controller.getShowTextMenuItem().disableProperty().bind(dataNode.validProperty().not().or(dataNode.allParentsValidProperty().not()));
 
-		controller.getExportMenuItem().setOnAction(e -> {
-			var exportDialog = new ExportDialog(mainWindow, dataNode);
-			exportDialog.getStage().show();
-		});
+		controller.getExportMenuItem().setOnAction(e -> ExportDialog.show(mainWindow, dataNode));
 		controller.getExportMenuItem().disableProperty().bind(dataNode.validProperty().not().or(dataNode.allParentsValidProperty().not()));
 
 		if (workflow.isDerivedNode(dataNode) || workflow.getWorkingDataNode() == dataNode) {

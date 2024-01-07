@@ -23,6 +23,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.util.ProgramProperties;
@@ -32,6 +33,7 @@ import jloda.util.FileUtils;
 import jloda.util.StringUtils;
 import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.writers.ExportManager;
+import splitstree6.main.SplitsTree6;
 import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
 import splitstree6.window.MainWindow;
@@ -52,6 +54,17 @@ public class ExportDialogPresenter {
 		MainWindowManager.getInstance().addAuxiliaryWindow(mainWindow, stage);
 
 		var exporter = new SimpleObjectProperty<DataBlockWriter>();
+
+		if (!SplitsTree6.isDesktop()) {
+			if (controller.getBrowseButton().getParent() instanceof Pane pane) {
+				pane.getChildren().remove(controller.getBrowseButton());
+			}
+			exporter.addListener((v, o, n) -> {
+				var suffix = (n == null ? "" : "." + n.getFileExtensions().get(0));
+				controller.getFileTextField().setText(FileUtils.getFileNameWithoutPath(FileUtils.replaceFileSuffix(mainWindow.getFileName(), "-" + StringUtils.toLowerCaseWithUnderScores(dataNode.getTitle()) + suffix)));
+			});
+			controller.getFileTextField().setText(FileUtils.getFileNameWithoutPathOrSuffix(mainWindow.getFileName()));
+		}
 
 		exporter.addListener((v, o, n) -> setupOptionControls(controller, n));
 
@@ -77,6 +90,7 @@ public class ExportDialogPresenter {
 				controller.getFileTextField().setText(file.getPath());
 		});
 
+
 		controller.getCancelButton().setOnAction(e -> {
 			stage.hide();
 			MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
@@ -91,8 +105,9 @@ public class ExportDialogPresenter {
 				var fileName = controller.getFileTextField().getText();
 				FileUtils.checkFileWritable(fileName, true);
 				exporter.get().write(fileName, mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock());
-				stage.hide();
 				MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
+				stage.hide();
+				System.err.println("Exported " + dataNode.getTitle() + " to file: " + FileUtils.getFileNameWithoutPath(fileName));
 			} catch (Exception ex) {
 				NotificationManager.showError("Export failed: " + ex);
 			}
