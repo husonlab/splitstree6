@@ -545,6 +545,35 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
+		controller.getCanvas().setOnSwipeLeft(e -> {
+			if (e.getTouchCount() == 1) {
+				var sbar = controller.getHorizontalScrollBar();
+				sbar.setValue(Math.max(sbar.getMin(), sbar.getValue() - 0.25 * sbar.getVisibleAmount()));
+				e.consume();
+			}
+		});
+		controller.getCanvas().setOnSwipeRight(e -> {
+			if (e.getTouchCount() == 1) {
+				var sbar = controller.getHorizontalScrollBar();
+				sbar.setValue(Math.min(sbar.getMax() - sbar.getVisibleAmount(), sbar.getValue() + 0.25 * sbar.getVisibleAmount()));
+				e.consume();
+			}
+		});
+		controller.getCanvas().setOnSwipeUp(e -> {
+			if (e.getTouchCount() == 1) {
+				var sbar = controller.getVerticalScrollBar();
+				sbar.setValue(Math.max(sbar.getMin(), sbar.getValue() - 0.25 * sbar.getVisibleAmount()));
+				e.consume();
+			}
+		});
+		controller.getCanvas().setOnSwipeDown(e -> {
+			if (e.getTouchCount() == 1) {
+				var sbar = controller.getVerticalScrollBar();
+				sbar.setValue(Math.min(sbar.getMax() - sbar.getVisibleAmount(), sbar.getValue() + 0.25 * sbar.getVisibleAmount()));
+				e.consume();
+			}
+		});
+
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
 		Platform.runLater(() -> updateCanvasListener.invalidated(null));
 

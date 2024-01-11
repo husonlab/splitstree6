@@ -29,6 +29,7 @@ import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableLabel;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.main.SplitsTree6;
 
 public class DensiTreeViewController {
 
@@ -152,6 +153,9 @@ public class DensiTreeViewController {
 		radialPhylogramToggleItem.setGraphic(TreeDiagramType.RadialPhylogram.icon());
 		rectangularPhylogramToggleItem.setGraphic(TreeDiagramType.RectangularPhylogram.icon());
 		roundedPhylogramToggleItem.setGraphic(TreeDiagramType.iconForRoundedPhylogram());
+
+		if (!SplitsTree6.isDesktop())
+			menuButton.getItems().remove(roundedPhylogramToggleItem);
 
 		diagramToggleGroup.selectToggle(trianglDendrogramToggleItem);
 

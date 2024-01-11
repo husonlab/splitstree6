@@ -24,6 +24,7 @@ import javafx.scene.control.SeparatorMenuItem;
 import jloda.fx.util.BasicFX;
 import splitstree6.data.ViewBlock;
 import splitstree6.dialog.exporting.data.ExportDialog;
+import splitstree6.main.SplitsTree6;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.DataNode;
 
@@ -39,9 +40,13 @@ public class ExportUtils {
 			dataNode = dataNode.getPreferredParent().getPreferredParent();
 
 		var mainController = mainWindow.getController();
-		mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
-				mainController.getCopyImageMenuItem(), new SeparatorMenuItem(), mainController.getPrintMenuItem(),
-				new SeparatorMenuItem(), mainController.getExportImageMenuItem(),
-				ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty))));
+		if (SplitsTree6.isDesktop()) {
+			mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
+					mainController.getCopyImageMenuItem(), new SeparatorMenuItem(), mainController.getPrintMenuItem(),
+					new SeparatorMenuItem(), mainController.getExportImageMenuItem(),
+					ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty))));
+		} else
+			mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
+					mainController.getCopyImageMenuItem())));
 	}
 }

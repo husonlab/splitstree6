@@ -26,11 +26,13 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
+import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
+import javafx.scene.input.SwipeEvent;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
@@ -63,6 +65,8 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		this.view = view;
 		this.controller = view.getController();
 		this.drawer = new DensiTreeDrawer(mainWindow);
+
+		controller.getAnchorPane().addEventHandler(SwipeEvent.ANY, Event::consume);
 
 		controller.getDiagramToggleGroup().selectedToggleProperty().addListener((v, o, n) -> {
 			if (n instanceof RadioMenuItem radioMenuItem) {
@@ -119,6 +123,16 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 			view.setOptionVerticalZoomFactor(1.0 / 1.2 * view.getOptionVerticalZoomFactor());
 			if (view.getOptionDiagram().isRadialOrCircular()) {
 				view.setOptionHorizontalZoomFactor(1.0 / 1.2 * view.getOptionHorizontalZoomFactor());
+			}
+		});
+
+		controller.getCenterPane().setOnZoom(e -> {
+			if ((e.getZoomFactor() < 1 && view.getOptionHorizontalZoomFactor() * e.getZoomFactor() > 0.2)
+				|| (e.getZoomFactor() > 1 && view.getOptionHorizontalZoomFactor() * e.getZoomFactor() < 5)) {
+				view.setOptionHorizontalZoomFactor(e.getZoomFactor() * view.getOptionHorizontalZoomFactor());
+				if (view.getOptionDiagram().isRadialOrCircular()) {
+					view.setOptionVerticalZoomFactor(e.getZoomFactor() * view.getOptionVerticalZoomFactor());
+				}
 			}
 		});
 

@@ -691,8 +691,7 @@ public class MainWindowPresenter {
 						controller.getNewMenuItem(), controller.getEditInputMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
 						controller.getCloseMenuItem(), new SeparatorMenuItem(),
 						controller.getSaveAsMenuItem(), new SeparatorMenuItem())));
-			} else // mobile
-			{
+			} else { // mobile
 				controller.getFileMenuButton().getItems().setAll(BasicFX.copyMenu(List.of(
 						controller.getEditInputMenuItem(), controller.getOpenMenuItem(), new SeparatorMenuItem(),
 						controller.getCloseMenuItem(), new SeparatorMenuItem(),

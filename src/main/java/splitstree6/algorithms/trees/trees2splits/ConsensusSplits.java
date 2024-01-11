@@ -44,7 +44,7 @@ import java.util.concurrent.CountDownLatch;
  */
 public class ConsensusSplits extends Trees2Splits {
 
-	public enum Consensus {Majority, Strict, GreedyCompatible, ConsensusOutline, GreedyWeaklyCompatible, ConsensusNetwork} // todo: add loose?
+	public enum Consensus {Strict, Majority, GreedyCompatible, ConsensusOutline, GreedyWeaklyCompatible, ConsensusNetwork} // todo: add loose?
 
 	public enum EdgeWeights {Mean, TreeSizeWeightedMean, Median, Count, Sum, Uniform, TreeNormalizedSum}
 
@@ -77,30 +77,32 @@ public class ConsensusSplits extends Trees2Splits {
 	 */
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
 		double consensusSplitsThreshold;
+		boolean useHighDimensionsFilter;
 		switch (getOptionConsensus()) {
 			case Majority -> {
-				setOptionHighDimensionFilter(false);
 				setOptionThresholdPercent(0);
 				consensusSplitsThreshold = 50;
+				useHighDimensionsFilter = false;
 			}
 			case Strict -> {
-				setOptionHighDimensionFilter(false);
 				consensusSplitsThreshold = 99.999999; // todo: implement without use of splits
 				setOptionThresholdPercent(0);
+				useHighDimensionsFilter = false;
 			}
 			case ConsensusOutline, GreedyCompatible, GreedyWeaklyCompatible -> {
-				setOptionHighDimensionFilter(false);
 				consensusSplitsThreshold = getOptionThresholdPercent();
+				useHighDimensionsFilter = false;
 			}
 			case ConsensusNetwork -> {
 				consensusSplitsThreshold = getOptionThresholdPercent();
+				useHighDimensionsFilter = isOptionHighDimensionFilter();
 			}
 			default -> throw new RuntimeException("Unhandled case");
 		}
 
 		final var consensusSplits = new ArrayList<ASplit>();
 
-		compute(progress, taxaBlock, treesBlock, consensusSplits, getOptionEdgeWeights(), consensusSplitsThreshold, isOptionHighDimensionFilter());
+		compute(progress, taxaBlock, treesBlock, consensusSplits, getOptionEdgeWeights(), consensusSplitsThreshold, useHighDimensionsFilter);
 
 		splitsBlock.clear();
 
