@@ -53,7 +53,10 @@ public class TreePagesViewController {
 	private Button rotateRightButton;
 
 	@FXML
-	private Button flipButton;
+	private Button flipHorizontalButton;
+
+	@FXML
+	private Button flipVerticalButton;
 
 	@FXML
 	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
@@ -96,7 +99,8 @@ public class TreePagesViewController {
 	private void initialize() {
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
-		MaterialIcons.setIcon(flipButton, "flip");
+		MaterialIcons.setIcon(flipHorizontalButton, "flip");
+		MaterialIcons.setIcon(flipVerticalButton, "flip", "-fx-rotate: 90;", true);
 
 		MaterialIcons.setIcon(zoomInButton, "zoom_in");
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
@@ -148,8 +152,12 @@ public class TreePagesViewController {
 		return rotateRightButton;
 	}
 
-	public Button getFlipButton() {
-		return flipButton;
+	public Button getFlipHorizontalButton() {
+		return flipHorizontalButton;
+	}
+
+	public Button getFlipVerticalButton() {
+		return flipVerticalButton;
 	}
 
 	public ComboBox<HeightAndAngles.Averaging> getAveragingCBox() {

@@ -202,8 +202,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
 		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
 		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
-		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
-		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		controller.getFlipHorizontalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipHorizontal()));
+		controller.getFlipHorizontalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+
+		controller.getFlipVerticalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipVertical()));
+		controller.getFlipVerticalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 		controller.getScaleBar().visibleProperty().bind(toScale.and(showScaleBar));
 
@@ -460,8 +463,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 		mainController.getRotateRightMenuItem().setOnAction(controller.getRotateRightButton().getOnAction());
 		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
-		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
-		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+		mainController.getFlipMenuItem().setOnAction(controller.getFlipHorizontalButton().getOnAction());
+		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipHorizontalButton().disableProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));

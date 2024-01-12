@@ -119,8 +119,7 @@ public class TanglegramViewController {
 
 	@FXML
 	private void initialize() {
-		MaterialIcons.setIcon(flipButton, "swap_vert");
-
+		MaterialIcons.setIcon(flipButton, "flip", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(previousButton, "arrow_left");
 		MaterialIcons.setIcon(nextButton, "arrow_right");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");

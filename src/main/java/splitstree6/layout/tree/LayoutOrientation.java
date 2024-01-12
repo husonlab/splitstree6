@@ -140,15 +140,28 @@ public enum LayoutOrientation {
 		};
 	}
 
-	public LayoutOrientation getFlip() {
+	public LayoutOrientation getFlipHorizontal() {
 		return switch (this) {
 			case Rotate0Deg -> FlipRotate0Deg;
-			case Rotate90Deg -> FlipRotate90Deg;
+			case Rotate90Deg -> FlipRotate270Deg;
 			case Rotate180Deg -> FlipRotate180Deg;
-			case Rotate270Deg -> FlipRotate270Deg;
+			case Rotate270Deg -> FlipRotate90Deg;
 			case FlipRotate0Deg -> Rotate0Deg;
-			case FlipRotate90Deg -> Rotate90Deg;
+			case FlipRotate90Deg -> Rotate270Deg;
 			case FlipRotate180Deg -> Rotate180Deg;
+			case FlipRotate270Deg -> Rotate90Deg;
+		};
+	}
+
+	public LayoutOrientation getFlipVertical() {
+		return switch (this) {
+			case Rotate0Deg -> FlipRotate180Deg;
+			case Rotate90Deg -> FlipRotate90Deg;
+			case Rotate180Deg -> FlipRotate0Deg;
+			case Rotate270Deg -> FlipRotate270Deg;
+			case FlipRotate0Deg -> Rotate180Deg;
+			case FlipRotate90Deg -> Rotate90Deg;
+			case FlipRotate180Deg -> Rotate0Deg;
 			case FlipRotate270Deg -> Rotate270Deg;
 		};
 	}

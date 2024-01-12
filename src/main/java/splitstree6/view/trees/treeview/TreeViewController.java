@@ -63,7 +63,10 @@ public class TreeViewController {
 	private Button rotateRightButton;
 
 	@FXML
-	private Button flipButton;
+	private Button flipHorizontalButton;
+
+	@FXML
+	private Button flipVerticalButton;
 
 	@FXML
 	private ComboBox<HeightAndAngles.Averaging> averagingCBox;
@@ -118,7 +121,8 @@ public class TreeViewController {
 	private void initialize() {
 		MaterialIcons.setIcon(rotateLeftButton, "rotate_left");
 		MaterialIcons.setIcon(rotateRightButton, "rotate_right");
-		MaterialIcons.setIcon(flipButton, "flip");
+		MaterialIcons.setIcon(flipHorizontalButton, "flip");
+		MaterialIcons.setIcon(flipVerticalButton, "flip", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(previousButton, "arrow_left");
 		MaterialIcons.setIcon(nextButton, "arrow_right");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
@@ -257,7 +261,11 @@ public class TreeViewController {
 		return rotateRightButton;
 	}
 
-	public Button getFlipButton() {
-		return flipButton;
+	public Button getFlipHorizontalButton() {
+		return flipHorizontalButton;
+	}
+
+	public Button getFlipVerticalButton() {
+		return flipVerticalButton;
 	}
 }

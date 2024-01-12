@@ -98,7 +98,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		controller.getRotateLeftButton().disableProperty().bind(view.emptyProperty().or(view.emptyProperty()));
 		controller.getRotateRightButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getRotateRight()));
 		controller.getRotateRightButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
-		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
+		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipHorizontal()));
 		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 		var paneWidth = new SimpleDoubleProperty();

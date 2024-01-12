@@ -439,10 +439,13 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getRotateRightMenuItem().setOnAction(controller.getRotateRightButton().getOnAction());
 		mainController.getRotateRightMenuItem().disableProperty().bind(controller.getRotateRightButton().disableProperty());
 
-		controller.getFlipButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlip()));
-		controller.getFlipButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
-		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
-		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+		controller.getFlipHorizontalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipHorizontal()));
+		controller.getFlipHorizontalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
+		mainController.getFlipMenuItem().setOnAction(controller.getFlipHorizontalButton().getOnAction());
+		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipHorizontalButton().disableProperty());
+
+		controller.getFlipVerticalButton().setOnAction(e -> view.setOptionOrientation(view.getOptionOrientation().getFlipVertical()));
+		controller.getFlipVerticalButton().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 
 		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
