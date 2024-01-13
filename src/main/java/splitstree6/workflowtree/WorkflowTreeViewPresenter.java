@@ -23,16 +23,27 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.SetChangeListener;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.workflow.WorkflowNode;
+import splitstree6.data.SplitsBlock;
+import splitstree6.data.TreesBlock;
+import splitstree6.data.ViewBlock;
+import splitstree6.io.nexus.NexusExporter;
+import splitstree6.io.nexus.workflow.WorkflowNexusOutput;
+import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
 import splitstree6.workflow.commands.DeleteCommand;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -48,6 +59,16 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 		var controller = workflowTreeView.getController();
 		var workflow = mainWindow.getWorkflow();
 		var treeView = controller.getWorkflowTreeView();
+
+		var algorithmNodeSelected = new SimpleBooleanProperty(this, "algorithmSelected", false);
+		var dataNodeSelected = new SimpleBooleanProperty(this, "dataSelected", false);
+		var rootNodeSelected = new SimpleBooleanProperty(this, "rootNodeSelected", false);
+
+		treeView.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
+			algorithmNodeSelected.set(n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof AlgorithmNode<?, ?>);
+			dataNodeSelected.set(n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof DataNode<?>);
+			rootNodeSelected.set(n == treeView.getRoot());
+		});
 
 		treeView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
@@ -83,16 +104,18 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 
-		var algorithmNodeSelected = new SimpleBooleanProperty(this, "algorithmSelected", false);
-		treeView.getSelectionModel().selectedItemProperty().addListener((v, o, n) ->
-				algorithmNodeSelected.set(n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof AlgorithmNode<?, ?>));
-		var dataNodeSelected = new SimpleBooleanProperty(this, "dataSelected", false);
+		dataNodeSelected.addListener((v, o, n) -> {
+			if (n && treeView.getSelectionModel().getSelectedItem() instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof DataNode<?> dataNode) {
+				controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTreeView.getUndoManager(), dataNode));
+			} else {
+				controller.getAddMenuButton().getItems().clear();
+			}
+		});
+
 		treeView.getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			if (n instanceof WorkflowTreeItem item && item.getWorkflowNode() instanceof DataNode<?> dataNode) {
 				dataNodeSelected.set(true);
-				controller.getAddMenuButton().getItems().setAll(createAddAlgorithmMenuItems(mainWindow, workflowTreeView.getUndoManager(), dataNode));
 			} else {
-				dataNodeSelected.set(false);
 				controller.getAddMenuButton().getItems().clear();
 			}
 		});
@@ -113,6 +136,39 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		controller.getDeleteButton().disableProperty().bind(algorithmNodeSelected.not());
+
+		controller.getCopyButton().setOnAction(e -> {
+			try (var w = new StringWriter()) {
+				if (treeView.getSelectionModel().getSelectedItem() instanceof WorkflowTreeItem item
+					&& item.getWorkflowNode() instanceof DataNode<?> dataNode) {
+					if (dataNode.getDataBlock() instanceof ViewBlock viewBlock) {
+						if (SplitsTree6.isDesktop()) { // todo: fix problem with pasting image when not running on desktop
+							var image = viewBlock.getViewTab().getMainNode().snapshot(new SnapshotParameters(), null);
+							var content = new ClipboardContent();
+							content.putImage(image);
+							content.putString(viewBlock.getName());
+							Clipboard.getSystemClipboard().setContent(content);
+							return;
+						} else
+							w.write(viewBlock.getName());
+					} else if (dataNode.getDataBlock() instanceof TreesBlock treesBlock) {
+						(new splitstree6.io.writers.trees.NewickWriter()).write(w, mainWindow.getWorkingTaxa(), treesBlock);
+					} else if (dataNode.getDataBlock() instanceof SplitsBlock splitsBlock) {
+						(new splitstree6.io.writers.splits.NewickWriter()).write(w, mainWindow.getWorkingTaxa(), splitsBlock);
+					} else {
+						w.write("#nexus\n");
+						(new NexusExporter()).export(w, mainWindow.getWorkingTaxa(), dataNode.getDataBlock());
+					}
+				} else if (treeView.getSelectionModel().getSelectedItem() == treeView.getRoot()) {
+					(new WorkflowNexusOutput()).save(mainWindow.getWorkflow(), w, false);
+				}
+				var content = new ClipboardContent();
+				content.putString(w.toString());
+				Clipboard.getSystemClipboard().setContent(content);
+			} catch (IOException ignored) {
+			}
+		});
+		controller.getCopyButton().disableProperty().bind(dataNodeSelected.not().and(rootNodeSelected.not()));
 	}
 
 	public void setupMenuItems() {

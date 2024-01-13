@@ -33,6 +33,9 @@
                         <font>
                             <Font size="10.0"/>
                         </font>
+                        <tooltip>
+                            <Tooltip text="Paste text"/>
+                        </tooltip>
                     </Button>
                     <ToggleButton fx:id="wrapTextToggle" contentDisplay="CENTER" layoutX="98.0" layoutY="11.0"
                                   mnemonicParsing="false" selected="true" text="Wrap">

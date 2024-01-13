@@ -29,10 +29,26 @@
     <top>
         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
             <items>
-                <Button fx:id="editButton" mnemonicParsing="false" text="Edit"/>
+                <Button fx:id="editButton" mnemonicParsing="false" text="Edit">
+                    <tooltip>
+                        <Tooltip text="Show data as text or setup algorithm"/>
+                    </tooltip>
+                </Button>
                 <MenuButton fx:id="addMenuButton" mnemonicParsing="false" text="Add">
+                    <tooltip>
+                        <Tooltip text="Add an algorithm"/>
+                    </tooltip>
                 </MenuButton>
-                <Button fx:id="deleteButton" layoutX="68.0" layoutY="12.0" mnemonicParsing="false" text="Delete"/>
+                <Button fx:id="deleteButton" layoutX="68.0" layoutY="12.0" mnemonicParsing="false" text="Delete">
+                    <tooltip>
+                        <Tooltip text="Delete algorithm"/>
+                    </tooltip>
+                </Button>
+                <Button fx:id="copyButton" layoutX="115.0" layoutY="12.0" mnemonicParsing="false" text="Copy">
+                    <tooltip>
+                        <Tooltip text="Copy data"/>
+                    </tooltip>
+                </Button>
             </items>
         </ToolBar>
     </top>

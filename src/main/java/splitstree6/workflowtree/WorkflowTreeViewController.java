@@ -34,6 +34,9 @@ public class WorkflowTreeViewController {
 	private Button deleteButton;
 
 	@FXML
+	private Button copyButton;
+
+	@FXML
 	private Button editButton;
 	@FXML
 	private TreeView<String> workflowTreeView;
@@ -43,6 +46,7 @@ public class WorkflowTreeViewController {
 		MaterialIcons.setIcon(editButton, "edit_note");
 		MaterialIcons.setIcon(addMenuButton, "add");
 		MaterialIcons.setIcon(deleteButton, "delete");
+		MaterialIcons.setIcon(copyButton, "copy");
 	}
 
 	public TreeView<String> getWorkflowTreeView() {
@@ -59,5 +63,9 @@ public class WorkflowTreeViewController {
 
 	public Button getEditButton() {
 		return editButton;
+	}
+
+	public Button getCopyButton() {
+		return copyButton;
 	}
 }

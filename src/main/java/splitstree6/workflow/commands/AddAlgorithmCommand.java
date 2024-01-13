@@ -23,12 +23,10 @@ import javafx.application.Platform;
 import jloda.fx.undo.UndoableRedoableCommand;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.workflow.WorkflowNode;
+import splitstree6.algorithms.network.network2view.ShowNetwork;
 import splitstree6.algorithms.splits.splits2view.ShowSplits;
 import splitstree6.algorithms.trees.trees2view.ShowTrees;
-import splitstree6.data.DistancesBlock;
-import splitstree6.data.SplitsBlock;
-import splitstree6.data.TreesBlock;
-import splitstree6.data.ViewBlock;
+import splitstree6.data.*;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
@@ -80,6 +78,11 @@ public class AddAlgorithmCommand {
 			} else if (algorithm.getToClass() == TreesBlock.class) {
 				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
 				var algorithmNode2 = workflow.newAlgorithmNode(new ShowTrees(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
+				list.add(targetDataNode2);
+				list.add(algorithmNode2);
+			} else if (algorithm.getToClass() == NetworkBlock.class) {
+				var targetDataNode2 = workflow.newDataNode(new ViewBlock());
+				var algorithmNode2 = workflow.newAlgorithmNode(new ShowNetwork(), workflow.getWorkingTaxaNode(), targetDataNode, targetDataNode2);
 				list.add(targetDataNode2);
 				list.add(algorithmNode2);
 			}
