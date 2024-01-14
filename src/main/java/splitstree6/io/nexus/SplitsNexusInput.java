@@ -129,7 +129,7 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 			// for backward compatiblity, we never used this in SplitsTree4...
 			np.findIgnoreCase(formatTokens, "no intervals", false, false);
 			np.findIgnoreCase(formatTokens, "intervals", true, false);
-			if (formatTokens.size() != 0)
+			if (!formatTokens.isEmpty())
 				throw new IOExceptionWithLineNumber(np.lineno(), "'" + formatTokens + "' unexpected in FORMAT");
 
 		}
@@ -171,8 +171,8 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 			splitsBlock.setCycle(cycle);
 		}
 
-		if (np.peekMatchIgnoreCase("SPLITSLABELS")) {
-			np.matchIgnoreCase("SPLITSLABELS");
+		if (np.peekMatchIgnoreCase("SplitsLabels")) {
+			np.matchIgnoreCase("SplitsLabels");
 			for (int s = 1; s <= nsplits; s++) {
 				final String label = (!np.peekMatchIgnoreCase(";") ? np.getWordRespectCase() : null); // string "null" may be in input
 				if (label == null || label.equals("null"))
@@ -244,7 +244,6 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 					setA.set(Integer.parseInt(np.getWordRespectCase()));
 					if (setA.cardinality() == 0 || setA.cardinality() == taxaBlock.getNtax() || !BitSetUtils.contains(taxaBlock.getTaxaSet(), setA))
 						throw new IOExceptionWithLineNumber(np.lineno(), "Illegal split part of size" + setA.cardinality());
-
 				}
 				final BitSet setB = BitSetUtils.minus(taxaBlock.getTaxaSet(), setA);
 				split = new ASplit(setA, setB, weight);

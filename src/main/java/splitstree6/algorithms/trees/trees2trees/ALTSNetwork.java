@@ -31,6 +31,7 @@ import jloda.util.FileUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.IDesktopOnly;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
@@ -45,7 +46,7 @@ import java.util.regex.Pattern;
  * this runs the ALTSNetwork algorithm externally
  * Daniel Huson, 7.2023
  */
-public class ALTSNetwork extends Trees2Trees {
+public class ALTSNetwork extends Trees2Trees implements IDesktopOnly {
 	private final StringProperty optionALTSExecutableFile = new SimpleStringProperty(this, "optionALTSExecutableFile", "");
 
 	{
@@ -75,7 +76,7 @@ public class ALTSNetwork extends Trees2Trees {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		if (getOptionALTSExecutableFile().isBlank())
-			throw new IOException("Please sent executable file");
+			throw new IOException("Please set executable file");
 		var tmp = String.valueOf(System.currentTimeMillis() & ((1 << 20) - 1));
 		var executable = new File(getOptionALTSExecutableFile());
 		FileUtils.checkFileReadableNonEmpty(executable.getAbsolutePath());

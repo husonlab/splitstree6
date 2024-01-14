@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms;
 
+import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Algorithm;
 
 import java.util.ArrayList;
@@ -134,8 +135,10 @@ public class AlgorithmList {
 	}
 
 	private static void add(Collection<Algorithm> algorithms, Collection<String> names, Algorithm algorithm) {
-		var aname = algorithm.getClass().getSimpleName();
-		if (names == null || names.isEmpty() || names.contains(aname))
-			algorithms.add(algorithm);
+		if (SplitsTree6.isDesktop() || !(algorithm instanceof IDesktopOnly)) {
+			var aname = algorithm.getClass().getSimpleName();
+			if (names == null || names.isEmpty() || names.contains(aname))
+				algorithms.add(algorithm);
+		}
 	}
 }
