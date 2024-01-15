@@ -20,11 +20,14 @@
 package splitstree6.xtra.mapview;
 
 import javafx.scene.Node;
-import javafx.scene.control.TextArea;
-import splitstree6.io.nexus.TraitsNexusOutput;
 
-import java.io.IOException;
-import java.io.StringWriter;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
+import splitstree6.data.TraitsBlock;
+import splitstree6.data.parts.Taxon;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 
 
 /**
@@ -32,17 +35,45 @@ import java.io.StringWriter;
  * Niko Kreisz, 11.2023
  */
 public class ComputeMap {
-	public static Node apply(Model model, double targetWidth, double targetHeight) {
-		var text = new TextArea();
-		text.setWrapText(true);
-		text.setEditable(false);
+	public static ArrayList<Node> apply(Model model, double targetWidth, double targetHeight) {
 
-		try (var w = new StringWriter()) {
-			(new TraitsNexusOutput()).write(w, model.getTaxaBlock(), model.getTaxaBlock().getTraitsBlock());
-			text.setText(w.toString());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
+		ArrayList<Node> diagrams = new ArrayList<>();
+		int numOfTraits = model.getTaxaBlock().getTraitsBlock().getNTraits();
+		ArrayList<GeoTrait> geoTraits = new ArrayList<>();
+		TraitsBlock traitsBlock = model.getTaxaBlock().getTraitsBlock();
+
+
+		for(int i = 0; i < numOfTraits; i++){
+			System.out.println("adding trait");
+			ArrayList<String> taxaLabel = new ArrayList<>();
+			System.out.println("adding trait");
+			HashMap<String, Integer> composition = new HashMap<>();
+			System.out.println("adding trait");
+			for(Taxon taxon : model.getTaxaBlock().getTaxa()){
+				taxaLabel.add(taxon.getName());
+				composition.put(taxon.getName(), 4);
+			}
+			System.out.println(model.getTaxaBlock().getTraitsBlock().getTraitLongitude(i));
+			geoTraits.add(new GeoTrait(
+					traitsBlock.getTraitLongitude(i),
+					traitsBlock.getTraitLatitude(i),
+					4,//model.getTaxaBlock().getNtax(),
+					new ArrayList<>(),//taxaLabel,
+					new HashMap<>() //composition
+			));
+			System.out.println("adding trait");
+			System.out.println("Number of traits" + geoTraits.size());
 		}
-		return text;
+
+		System.out.println(geoTraits.size());
+		for(GeoTrait geoTrait : geoTraits){
+			System.out.println("adding" + geoTrait.getLongtitude() + geoTrait.getLatitude());
+			Circle circle = new Circle(5, Color.RED);
+			circle.setTranslateX(geoTrait.getLatitude());
+			circle.setTranslateY(geoTrait.getLongtitude());
+			diagrams.add(circle);
+		}
+
+		return diagrams;
 	}
 }
