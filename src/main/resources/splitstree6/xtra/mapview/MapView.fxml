@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!--
-  ~  MapView.fxml Copyright (C) 2023 Daniel H. Huson
+  ~  MapView.fxml Copyright (C) 2024 Daniel H. Huson
   ~
   ~  (Some files contain contributions from other authors, who are then mentioned separately.)
   ~
@@ -27,20 +27,22 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="1000.0" prefWidth="1400.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.xtra.mapview.MapViewController">
+<AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.xtra.mapview.MapViewController">
     <children>
         <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <center>
                 <StackPane fx:id="stackPane" BorderPane.alignment="CENTER">
                     <children>
-                  <AnchorPane />
+                        <Pane fx:id="mainPane" />
                     </children>
                 </StackPane>
             </center>
@@ -78,7 +80,8 @@
                         <ToolBar fx:id="tooBar" prefHeight="40.0" prefWidth="200.0">
                             <items>
                                 <Button fx:id="redrawButton" disable="true" text="Redraw" />
-                                <Label fx:id="label" text="   " />
+                                <Label fx:id="label" text="Chart-size" />
+                        <Slider fx:id="chartSizeSlider" value="10.0" />
                             </items>
                         </ToolBar>
                     </children>

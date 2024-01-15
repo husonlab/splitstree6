@@ -60,6 +60,9 @@ public class MapViewController {
 	@FXML
 	private Button redrawButton;
 
+	@FXML
+	private Slider chartSizeSlider;
+
 
 	@FXML
 	private void initialize() {
@@ -68,6 +71,10 @@ public class MapViewController {
 
 	public MenuItem getCloseMenuItem() {
 		return closeMenuItem;
+	}
+
+	public Slider getChartSizeSlider() {
+		return chartSizeSlider;
 	}
 
 	public MenuItem getCopyMenuItem() {

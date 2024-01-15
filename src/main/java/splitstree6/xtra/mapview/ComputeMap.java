@@ -74,6 +74,10 @@ public class ComputeMap {
 			diagrams.add(circle);
 		}
 
+		diagrams = new ArrayList<>();
+
+
+
 		return diagrams;
 	}
 }

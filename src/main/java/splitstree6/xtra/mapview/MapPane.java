@@ -23,10 +23,12 @@ import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
+import javafx.scene.chart.PieChart;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
 
 import java.util.List;
 import java.util.function.Function;
@@ -105,7 +107,11 @@ public class MapPane extends StackPane {
 			});
 		}
 
+		if(node.getClass() == PieChart.class){
+			((PieChart) node).setMaxSize(10 , 10);
+		}
 		getUserPane().getChildren().add(node);
+
 	}
 
 	public void place(Node node, Point2D latLong, boolean center) {

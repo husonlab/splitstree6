@@ -20,18 +20,21 @@
 package splitstree6.xtra.mapview;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Objects;
+import java.util.*;
 
 public class MapView extends Application {
 	private final Model model = new Model();
@@ -79,6 +82,21 @@ public class MapView extends Application {
 			mapPane.place(new Label(entry.getValue()), entry.getKey(), true);
 		}
 
+		ArrayList<PieChart> diagramms = createTestDiagramms(controller, locationNameMap);
+		ArrayList<Point2D> locs = new ArrayList<>();
+		for(var all : locationNameMap.entrySet()){
+			locs.add(all.getKey());
+		}
+
+		for(int i = 0; i <diagramms.size() ; i++){
+			diagramms.get(i).setMaxSize(20, 20);
+
+			//diagramms.get(i).maxWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
+			//diagramms.get(i).maxHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
+			//diagramms.get(i).setMaxWidth(10);
+			//diagramms.get(i).setMaxHeight(10);
+			mapPane.place(diagramms.get(i), locs.get(i).getX(), locs.get(i).getY(), true);
+		}
 		controller.getStackPane().getChildren().add(mapPane);
 
 
@@ -109,4 +127,32 @@ public class MapView extends Application {
 	public Model getModel() {
 		return model;
 	}
+
+	private ArrayList<PieChart> createTestDiagramms(MapViewController controller, HashMap<Point2D, String> locs){
+		ArrayList<PieChart> diagramms = new ArrayList<>();
+		for(var point : locs.keySet()){
+			PieChart chart = new PieChart();
+			List data = generateRandomData();
+
+			ObservableList obsList = FXCollections.observableList(data);
+			chart.setData(obsList);
+			diagramms.add(chart);
+		}
+		return diagramms;
+	}
+
+	private List<PieChart.Data> generateRandomData() {
+		List<PieChart.Data> data = new ArrayList<>();
+		Random random = new Random();
+
+		// Generate random data for the pie chart
+		for (int i = 0; i < 5; i++) {
+			String category = "Category " + (i + 1);
+			double value = random.nextDouble() * 100; // Random value between 0 and 100
+			data.add(new PieChart.Data(category, value));
+		}
+
+		return data;
+	}
+
 }
