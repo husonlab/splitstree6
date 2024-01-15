@@ -93,6 +93,9 @@ public class SingleImageMap {
 		Function<Double, Double> longtitudeXFunction = longitude ->
 				factor * (((longitude - LatLongRect.leftLongitude) / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth() - xOffset);
 
+		if(width/height < 1.5) width = height * 1.5;
+		else if(width/height > 1.5) height = width *0.5;
+
 		var croppedImage = new WritableImage((int) width, (int) height);
 
 		var pixelReader = image.getPixelReader();
@@ -105,7 +108,7 @@ public class SingleImageMap {
 		var imageView = new ImageView(croppedImage);
 		imageView.setPreserveRatio(true);
 		imageView.setFitWidth(targetWidth);
-		//imageView.setFitHeight(targetHeight);
+		imageView.setFitHeight(targetHeight);
 
 		return new MapPane(new Rectangle2D(0, 0, targetWidth, targetHeight), List.of(imageView), latitudeYFunction, longtitudeXFunction);
 	}
