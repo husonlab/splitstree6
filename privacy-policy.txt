@@ -6,11 +6,11 @@ This page informs you of our policies regarding the collection, use, and disclos
 
 Information Collection and Use
 
-We do not collect any personally identifiable information while you use our software.
+We do not collect any personally identifiable information while you use our service.
 
 Log Data
 
-We do not log any data when you use our software.
+We do not log any data when you use our service.
 
 Cookies
 
@@ -18,15 +18,15 @@ We do not use cookies.
 
 Service Providers
 
-We do not employ third-party companies or individuals to facilitate our software.
+We do not employ third-party companies or individuals to facilitate our service.
 
 Links to Other Sites
 
-Our software does not contain links to other sites.
+Our service does not contain links to other sites.
 
 Children's Privacy
 
-Our software does not address anyone under the age of 13.
+Our service does not address anyone under the age of 13.
 
 Changes to This Privacy Policy
 
@@ -36,4 +36,4 @@ Contact Us
 
 If you have any questions about this Privacy Policy, please contact us via email.
 
-By using the software, you agree to the collection and use of information in accordance with this policy.
+By using the service, you agree to the collection and use of information in accordance with this policy.
