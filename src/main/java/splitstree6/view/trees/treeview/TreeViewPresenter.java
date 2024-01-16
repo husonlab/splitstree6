@@ -27,6 +27,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
+import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
@@ -180,9 +181,24 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		scrollPane.lockAspectRatioProperty().bind(lockAspectRatio);
 		scrollPane.setRequireShiftOrControlToZoom(false);
-		controller.getScrollPane().setPannable(true);
-
+		scrollPane.setPannable(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
+		scrollPane.contentProperty().addListener((v, o, n) -> {
+			if (n != null) {
+				n.setOnSwipeLeft(e -> {
+					if (!controller.getNextButton().isDisabled())
+						controller.getNextButton().fire();
+					e.consume();
+				});
+				n.setOnSwipeRight(e -> {
+					if (!controller.getPreviousButton().isDisabled())
+						controller.getPreviousButton().fire();
+					e.consume();
+				});
+				n.setOnSwipeUp(Event::consume);
+				n.setOnSwipeDown(Event::consume);
+			}
+		});
 
 		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();
 		view.reticulatedProperty().addListener((v, o, n) -> {

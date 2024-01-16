@@ -56,6 +56,7 @@ import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.splits.Compatibility;
+import splitstree6.view.utils.Icebergs;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -278,6 +279,10 @@ public class SplitNetworkLayout {
 				line.setStroke(Color.GRAY);
 			else
 				line.setStroke(null);
+
+			if (Icebergs.enabled()) {
+				edgesGroup.getChildren().add(Icebergs.create(line, true));
+			}
 
 			edgesGroup.getChildren().add(line);
 

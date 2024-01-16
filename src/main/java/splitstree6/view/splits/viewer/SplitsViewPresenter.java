@@ -25,14 +25,12 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.*;
+import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.DataFormat;
+import javafx.scene.input.*;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
@@ -121,10 +119,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.view = view;
 		this.controller = view.getController();
 
+		controller.getAnchorPane().addEventHandler(SwipeEvent.ANY, Event::consume);
+
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
 		controller.getScrollPane().setPannable(true);
-
 		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * view.getOptionZoomFactor()));
 
 		final ObservableSet<SplitsDiagramType> disabledDiagramTypes = FXCollections.observableSet();

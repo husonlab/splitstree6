@@ -30,13 +30,11 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
+import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.dialog.ExportImageDialog;
@@ -183,15 +181,6 @@ public class MainWindowPresenter {
 		if (controller.getMainTabPane().getSelectionModel().getSelectedItem() instanceof IDisplayTab displayTab)
 			Platform.runLater(() -> selectedDisplayTab.set(displayTab));
 
-		controller.getMainTabPane().setOnSwipeLeft(e -> {
-		});
-		controller.getMainTabPane().setOnSwipeUp(e -> {
-		});
-		controller.getMainTabPane().setOnSwipeRight(e -> {
-		});
-		controller.getMainTabPane().setOnSwipeDown(e -> {
-		});
-
 		controller.getAlgorithmTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
 				disableAllMenuItems(controller);
@@ -201,14 +190,8 @@ public class MainWindowPresenter {
 				Basic.caught(ex);
 			}
 		});
-		controller.getAlgorithmTabPane().setOnSwipeLeft(e -> {
-		});
-		controller.getAlgorithmTabPane().setOnSwipeUp(e -> {
-		});
-		controller.getAlgorithmTabPane().setOnSwipeRight(e -> {
-		});
-		controller.getAlgorithmTabPane().setOnSwipeDown(e -> {
-		});
+
+		controller.getAlgorithmTabPane().addEventHandler(SwipeEvent.ANY, Event::consume);
 
 		controller.getMainTabPane().getTabs().addListener((ListChangeListener<? super Tab>) e -> {
 			while (e.next()) {
