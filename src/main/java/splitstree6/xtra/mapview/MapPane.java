@@ -29,6 +29,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
+import jloda.fx.shapes.CircleShape;
 
 import java.util.List;
 import java.util.function.Function;
@@ -99,7 +100,9 @@ public class MapPane extends StackPane {
 		var location = getLocationOnMap(latitude, longitude);
 		node.setLayoutX(location.getX());
 		node.setLayoutY(location.getY());
+
 		if (center && node instanceof Region region) {
+			//System.out.println("applying css");
 			region.applyCss();
 			Platform.runLater(() -> {
 				region.setLayoutX(region.getLayoutX() - 0.5 * region.getWidth());
@@ -107,9 +110,19 @@ public class MapPane extends StackPane {
 			});
 		}
 
-		if(node.getClass() == PieChart.class){
-			((PieChart) node).setMaxSize(10 , 10);
+
+
+
+
+		if(node instanceof PieChart){
+			System.out.println(((PieChart)node).getWidth() + " " + ((PieChart)node).getHeight());
+			//System.out.println("setting size");
+			//((PieChart) node).setMaxSize(20 , 10);
 		}
+
+
+
+
 		getUserPane().getChildren().add(node);
 
 	}

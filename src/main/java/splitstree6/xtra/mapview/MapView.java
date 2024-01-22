@@ -31,6 +31,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -89,14 +90,33 @@ public class MapView extends Application {
 		}
 
 		for(int i = 0; i <diagramms.size() ; i++){
-			diagramms.get(i).setMaxSize(20, 20);
+			//diagramms.get(i).setMaxSize(20, 20);
 
 			//diagramms.get(i).maxWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
 			//diagramms.get(i).maxHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
 			//diagramms.get(i).setMaxWidth(10);
 			//diagramms.get(i).setMaxHeight(10);
-			mapPane.place(diagramms.get(i), locs.get(i).getX(), locs.get(i).getY(), true);
+			PieChart diagram = diagramms.get(i);
+			diagram.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
+			diagram.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
+			//diagram.setMinWidth(20);
+			//diagram.setMinHeight(20);
+			//diagram.setMaxHeight(20);
+			//diagram.setMaxWidth(20);
+			//diagram.setPrefSize(80,80);
+			System.out.println(diagram.getWidth() + " " + diagram.getHeight());
+
+			diagram.setMinWidth(80);
+			diagram.setMaxWidth(200);
+			diagram.setMinHeight(80);
+			diagram.setMaxHeight(200);
+			diagram.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
+			diagram.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
+
+
+			mapPane.place(diagram, locs.get(i).getX(), locs.get(i).getY(), true);
 		}
+
 		controller.getStackPane().getChildren().add(mapPane);
 
 
@@ -132,6 +152,7 @@ public class MapView extends Application {
 		ArrayList<PieChart> diagramms = new ArrayList<>();
 		for(var point : locs.keySet()){
 			PieChart chart = new PieChart();
+
 			List data = generateRandomData();
 
 			ObservableList obsList = FXCollections.observableList(data);
