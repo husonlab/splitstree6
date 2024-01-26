@@ -31,7 +31,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
- * some computations on trees
+ * some computations on trees and networks
  *
  * Daniel Huson, 1.2024
  */
