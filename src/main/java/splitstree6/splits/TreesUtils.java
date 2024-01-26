@@ -28,6 +28,7 @@ import jloda.util.NumberUtils;
 
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * some computations on trees
@@ -221,13 +222,13 @@ public class TreesUtils {
 	/**
 	 * computes a mapping of tree nodes to represented hardwired cluster. Does not contain the cluster at the root
 	 *
-	 * @param tree input tree, may contain reticulations
+	 * @param network input tree, may contain reticulations
 	 * @return mapping of tree nodes to corresponding hardwired clusters
 	 */
-	public static NodeArray<BitSet> extractClusters(PhyloTree tree) {
-		NodeArray<BitSet> nodeClusterMap = tree.newNodeArray();
+	public static NodeArray<BitSet> extractClusters(PhyloTree network) {
+		NodeArray<BitSet> nodeClusterMap = network.newNodeArray();
 		var stack = new Stack<Node>();
-		stack.push(tree.getRoot());
+		stack.push(network.getRoot());
 		while (!stack.isEmpty()) {
 			var v = stack.peek();
 			if (nodeClusterMap.containsKey(v))
@@ -242,7 +243,7 @@ public class TreesUtils {
 				}
 				if (!hasUnprocessedChild) {
 					stack.pop();
-					var cluster = BitSetUtils.asBitSet(tree.getTaxa(v));
+					var cluster = BitSetUtils.asBitSet(network.getTaxa(v));
 					for (var w : v.children()) {
 						cluster.or(nodeClusterMap.get(w));
 					}
@@ -250,30 +251,58 @@ public class TreesUtils {
 				}
 			}
 		}
-		tree.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
+		network.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
 		return nodeClusterMap;
 	}
 
 	/**
-	 * collects all hardwired clusters contained in the tree.
+	 * collects all hardwired clusters contained in a tree or network
 	 */
-	public static Set<BitSet> collectAllHardwiredClusters(PhyloTree tree) {
+	public static Set<BitSet> collectAllHardwiredClusters(PhyloTree network) {
 		var clusters = new HashSet<BitSet>();
-		collectAllHardwiredClustersRec(tree, tree.getRoot(), clusters);
+		collectAllHardwiredClustersRec(network, network.getRoot(), e -> true, clusters);
 		return clusters;
 	}
 
-	public static BitSet collectAllHardwiredClustersRec(PhyloTree tree, Node v, HashSet<BitSet> clusters) {
-		var set = BitSetUtils.asBitSet(tree.getTaxa(v));
+	public static BitSet collectAllHardwiredClustersRec(PhyloTree network, Node v, Predicate<Edge> useEdge, HashSet<BitSet> clusters) {
+		var set = BitSetUtils.asBitSet(network.getTaxa(v));
 		for (Edge f : v.outEdges()) {
-			var w = f.getTarget();
-			set.or(collectAllHardwiredClustersRec(tree, w, clusters));
+			if (useEdge.test(f)) {
+				var w = f.getTarget();
+				set.or(collectAllHardwiredClustersRec(network, w, useEdge, clusters));
+			}
 		}
 		clusters.add(set);
 		return set;
 	}
 
+
 	private static record WeightConfidence(double weight, double confidence) {
 	}
 
+
+	/**
+	 * collects all softwired clusters contained in a network.
+	 */
+	public static Set<BitSet> collectAllSoftwiredClusters(PhyloTree network) {
+		var reticulateNodes = network.nodeStream().filter(v -> v.getInDegree() > 1).toArray(Node[]::new);
+
+		try (var activeReticulateEdges = network.newEdgeSet()) {
+			var clusters = new HashSet<BitSet>();
+			collectAllSoftwiredClustersRec(reticulateNodes, 0, network, activeReticulateEdges, clusters);
+			return clusters;
+		}
+	}
+
+	private static void collectAllSoftwiredClustersRec(Node[] reticulateNodes, int which, PhyloTree network, Set<Edge> activeReticulateEdges, HashSet<BitSet> clusters) {
+		if (which < reticulateNodes.length) {
+			for (var inEdge : reticulateNodes[which].inEdges()) {
+				activeReticulateEdges.add(inEdge);
+				collectAllSoftwiredClustersRec(reticulateNodes, which + 1, network, activeReticulateEdges, clusters);
+				activeReticulateEdges.remove(inEdge);
+			}
+		} else {
+			collectAllHardwiredClustersRec(network, network.getRoot(), e -> !network.isReticulateEdge(e) || activeReticulateEdges.contains(e), clusters);
+		}
+	}
 }
