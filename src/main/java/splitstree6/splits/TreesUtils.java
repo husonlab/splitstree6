@@ -33,8 +33,7 @@ import java.util.function.Predicate;
 /**
  * some computations on trees
  *
- * @author huson Date: 29-Feb-2004
- * Daria Evseeva,23.01.2017.
+ * Daniel Huson, 1.2024
  */
 public class TreesUtils {
 	/**
