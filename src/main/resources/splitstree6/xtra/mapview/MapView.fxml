@@ -32,24 +32,28 @@
 <?import javafx.scene.input.KeyCodeCombination?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.xtra.mapview.MapViewController">
+<AnchorPane xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="splitstree6.xtra.mapview.MapViewController">
     <children>
-        <BorderPane AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <BorderPane prefHeight="800.0" prefWidth="1200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <center>
                 <StackPane fx:id="stackPane" BorderPane.alignment="CENTER">
-                    <children>
-                        <Pane fx:id="mainPane" />
-                    </children>
+               <children>
+                  <HBox fx:id="hBoxMiddle" prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <StackPane fx:id="mainStackPane" HBox.hgrow="ALWAYS" />
+                     </children>
+                  </HBox>
+               </children>
                 </StackPane>
             </center>
             <top>
                 <VBox fx:id="topPane" BorderPane.alignment="CENTER">
                     <children>
-                        <MenuBar fx:id="menuBar">
+                        <MenuBar fx:id="menuBar" minHeight="25.0">
                             <menus>
                                 <Menu mnemonicParsing="false" text="File">
                                     <items>
@@ -77,11 +81,11 @@
                                 <Menu mnemonicParsing="false" text="Options" />
                             </menus>
                         </MenuBar>
-                        <ToolBar fx:id="tooBar" prefHeight="40.0" prefWidth="200.0">
+                        <ToolBar fx:id="tooBar" minHeight="40.0" prefHeight="40.0" prefWidth="200.0">
                             <items>
                                 <Button fx:id="redrawButton" disable="true" text="Redraw" />
                                 <Label fx:id="label" text="Chart-size" />
-                        <Slider fx:id="chartSizeSlider" value="10.0" />
+                        <Slider fx:id="chartSizeSlider" max="200.0" min="80.0" value="100.0" />
                             </items>
                         </ToolBar>
                     </children>

@@ -21,9 +21,7 @@ package splitstree6.xtra.mapview;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 public class MapViewController {
 
@@ -63,6 +61,27 @@ public class MapViewController {
 	@FXML
 	private Slider chartSizeSlider;
 
+	@FXML
+	private AnchorPane anchorPane;
+
+	@FXML
+	private HBox hBoxMiddle;
+
+	@FXML
+	private StackPane mainStackPane;
+
+
+	public StackPane getMainStackPane() {
+		return mainStackPane;
+	}
+
+	public HBox gethBoxMiddle() {
+		return hBoxMiddle;
+	}
+
+	public AnchorPane getAnchorPane() {
+		return anchorPane;
+	}
 
 	@FXML
 	private void initialize() {

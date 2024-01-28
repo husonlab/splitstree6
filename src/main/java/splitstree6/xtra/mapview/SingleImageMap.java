@@ -84,19 +84,40 @@ public class SingleImageMap {
 
 		var width = (rectangle.rangeLongitude() / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth();
 		var height = (rectangle.rangeLatitude() / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight();
+		double xAddOffset = 0;
+		double yAddOffset = 0;
+
+		System.out.println("Width: " + width +" Height: " + height + " xOffset: " + xOffset +" yOffset: " + yOffset);
+		
+		if(width/height > targetWidth/targetHeight){
+			var modifiedWidth = (targetWidth/targetHeight)*height;
+			xAddOffset = 0.5 * (modifiedWidth-width);
+			width = modifiedWidth;
+		}
+		if(width/height < targetWidth/targetHeight){
+			var modifiedHeight = (targetWidth/targetHeight)*width;
+			yAddOffset = 0.5 * (modifiedHeight-height);
+			height = modifiedHeight;
+		}
+
+		final double xTotalOffset = xAddOffset + xOffset;
+		final double yTotalOffset = yAddOffset + yOffset;
+		xOffset += yAddOffset;
+		yOffset += yAddOffset;
+		System.out.println("Width: " + width +" Height: " + height + " xOffset: " + xOffset +" yOffset: " + yOffset);
 
 		var factor = Math.min(targetSize / width, targetSize / height);
 
 		Function<Double, Double> latitudeYFunction = latitude ->
-				factor * (((LatLongRect.topLatitude - latitude) / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight() - yOffset);
+				factor * (((LatLongRect.topLatitude - latitude) / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight() - yTotalOffset);
 
 		Function<Double, Double> longtitudeXFunction = longitude ->
-				factor * (((longitude - LatLongRect.leftLongitude) / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth() - xOffset);
+				factor * (((longitude - LatLongRect.leftLongitude) / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth() - xTotalOffset);
 
-		if(width/height < 1.5) width = height * 1.5;
-		else if(width/height > 1.5) height = width *0.5;
+
 
 		var croppedImage = new WritableImage((int) width, (int) height);
+
 
 		var pixelReader = image.getPixelReader();
 		for (var i = 0; i < (int) width; i++) {

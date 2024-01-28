@@ -23,7 +23,9 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -31,7 +33,11 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -61,23 +67,39 @@ public class MapView extends Application {
 		root = fxmlLoader.getRoot();
 
 		presenter = new MapViewPresenter(this);
-
+		stage.setScene(new Scene(root));
+		stage.sizeToScene();
+		stage.setTitle("MapView");
+		stage.show();
 
 		var locationNameMap = new HashMap<Point2D, String>();
 
+
 		locationNameMap.put(new Point2D(40.7128, -74.0060), "New York");
-		//locationNameMap.put(new Point2D(51.5074, -0.1278), "London");
+		locationNameMap.put(new Point2D(51.5074, -0.1278), "London");
 		locationNameMap.put(new Point2D(48.52, 9.05), "Tuebingen");
 		//locationNameMap.put(new Point2D(48.4914, 9.2043), "Reutlingen");
 		//locationNameMap.put(new Point2D(48.5363, 9.2846), "Metzingen");
-		locationNameMap.put(new Point2D(1.3521, 103.8198),"Singapore");
-		locationNameMap.put(new Point2D(-33.9249, 18.4241), "Cape Town");
-		locationNameMap.put(new Point2D(-36.88, 174.786991), "Auckland");
-
+		//locationNameMap.put(new Point2D(1.3521, 103.8198),"Singapore");
+		//locationNameMap.put(new Point2D(-33.9249, 18.4241), "Cape Town");
+		//locationNameMap.put(new Point2D(-36.88, 174.786991), "Auckland");
 
 		MapPane mapPane;
 
-		mapPane = SingleImageMap.createMapPane(locationNameMap.keySet(), 1200, 800);
+
+		//System.out.println(bounds.getHeight() + " " + bounds.getWidth());
+		mapPane = SingleImageMap.createMapPane(locationNameMap.keySet(), controller.getStackPane().getWidth(), controller.getStackPane().getHeight());
+
+		controller.getStackPane().getChildren().add(mapPane);
+
+	/*
+		MapPane mapPane;
+		Screen screen = Screen.getPrimary();
+		Rectangle2D bounds = screen.getBounds();
+
+
+		//System.out.println(bounds.getHeight() + " " + bounds.getWidth());
+		mapPane = SingleImageMap.createMapPane(locationNameMap.keySet(), bounds.getWidth(), bounds.getHeight()-190);
 
 		for (var entry : locationNameMap.entrySet()) {
 			mapPane.place(new Label(entry.getValue()), entry.getKey(), true);
@@ -118,14 +140,10 @@ public class MapView extends Application {
 		}
 
 		controller.getStackPane().getChildren().add(mapPane);
+*/
 
 
 
-
-		stage.setScene(new Scene(root));
-		stage.sizeToScene();
-		stage.setTitle("MapView");
-		stage.show();
 	}
 
 	public MapViewController getController() {
