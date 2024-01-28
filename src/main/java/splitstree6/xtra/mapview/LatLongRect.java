@@ -47,19 +47,52 @@ public record LatLongRect(double minLatitude, double minLongitude, double rangeL
 		return minLongitude + rangeLongitude;
 	}
 
-	public static LatLongRect create(Collection<Point2D> latLongPoints, double proportionMargin) {
+	public static LatLongRect create(Collection<Point2D> latLongPoints, double proportionMargin, double aspectRatio) {
 		var minLat = latLongPoints.stream().mapToDouble(Point2D::getX).min().orElse(0);
 		var maxLat = latLongPoints.stream().mapToDouble(Point2D::getX).max().orElse(0);
 		var minLong = latLongPoints.stream().mapToDouble(Point2D::getY).min().orElse(0);
 		var maxLong = latLongPoints.stream().mapToDouble(Point2D::getY).max().orElse(0);
 		if (proportionMargin != 0) { // add a margin
 			var rangeLong = (maxLong - minLong);
+			var rangeLat = (maxLat - minLat);
+			if(rangeLong/rangeLat < aspectRatio){
+				var addLong = (rangeLat*aspectRatio) - rangeLong;
+				minLong -= addLong/2;
+				maxLong += addLong/2;
+				if(minLong < -180){
+					maxLong += -180 - minLong;
+					minLong = -180;
+					if(maxLong > 180)maxLong = 180;
+				}
+				if(maxLong > 180){
+					minLong -= maxLong -180;
+					maxLong = 180;
+					if(minLong < -180) minLong = 180;
+				}
+				rangeLong = rangeLat*aspectRatio;
+			}else if(rangeLong/rangeLat > aspectRatio){
+				var addLat = (rangeLong/aspectRatio) - rangeLat;
+				minLat -= addLat/2;
+				maxLat += addLat/2;
+				if(minLat < -90){
+					maxLat += -90 - minLat;
+					minLat = -90;
+					if(maxLat > 90)maxLat = 90;
+				}
+				if(maxLat > 90){
+					minLat -= maxLat -90;
+					maxLat = 90;
+					if(minLat < -90) minLat = -90;
+				}
+				rangeLong = rangeLat*aspectRatio;
+			}
+
 			minLong = Math.max(leftLongitude, minLong - proportionMargin * rangeLong);
 			maxLong = Math.min(rightLongitude, maxLong + proportionMargin * rangeLong);
-			var rangeLat = (maxLat - minLat);
 			minLat = Math.max(bottomLatitude, minLat - proportionMargin * rangeLat);
 			maxLat = Math.min(topLatitude, maxLat + proportionMargin * rangeLat);
 		}
+		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
 		return new LatLongRect(minLat, minLong, maxLat - minLat, maxLong - minLong);
 	}
 }

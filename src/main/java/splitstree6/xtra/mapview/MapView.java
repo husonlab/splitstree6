@@ -80,26 +80,13 @@ public class MapView extends Application {
 		locationNameMap.put(new Point2D(48.52, 9.05), "Tuebingen");
 		//locationNameMap.put(new Point2D(48.4914, 9.2043), "Reutlingen");
 		//locationNameMap.put(new Point2D(48.5363, 9.2846), "Metzingen");
-		//locationNameMap.put(new Point2D(1.3521, 103.8198),"Singapore");
+		locationNameMap.put(new Point2D(1.3521, 103.8198),"Singapore");
 		//locationNameMap.put(new Point2D(-33.9249, 18.4241), "Cape Town");
 		//locationNameMap.put(new Point2D(-36.88, 174.786991), "Auckland");
 
 		MapPane mapPane;
-
-
-		//System.out.println(bounds.getHeight() + " " + bounds.getWidth());
 		mapPane = SingleImageMap.createMapPane(locationNameMap.keySet(), controller.getStackPane().getWidth(), controller.getStackPane().getHeight());
 
-		controller.getStackPane().getChildren().add(mapPane);
-
-	/*
-		MapPane mapPane;
-		Screen screen = Screen.getPrimary();
-		Rectangle2D bounds = screen.getBounds();
-
-
-		//System.out.println(bounds.getHeight() + " " + bounds.getWidth());
-		mapPane = SingleImageMap.createMapPane(locationNameMap.keySet(), bounds.getWidth(), bounds.getHeight()-190);
 
 		for (var entry : locationNameMap.entrySet()) {
 			mapPane.place(new Label(entry.getValue()), entry.getKey(), true);
@@ -112,35 +99,21 @@ public class MapView extends Application {
 		}
 
 		for(int i = 0; i <diagramms.size() ; i++){
-			//diagramms.get(i).setMaxSize(20, 20);
-
-			//diagramms.get(i).maxWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-			//diagramms.get(i).maxHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-			//diagramms.get(i).setMaxWidth(10);
-			//diagramms.get(i).setMaxHeight(10);
 			PieChart diagram = diagramms.get(i);
 			diagram.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
 			diagram.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-			//diagram.setMinWidth(20);
-			//diagram.setMinHeight(20);
-			//diagram.setMaxHeight(20);
-			//diagram.setMaxWidth(20);
-			//diagram.setPrefSize(80,80);
-			System.out.println(diagram.getWidth() + " " + diagram.getHeight());
-
+			//System.out.println(diagram.getWidth() + " " + diagram.getHeight());
 			diagram.setMinWidth(80);
 			diagram.setMaxWidth(200);
 			diagram.setMinHeight(80);
 			diagram.setMaxHeight(200);
 			diagram.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
 			diagram.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-
-
 			mapPane.place(diagram, locs.get(i).getX(), locs.get(i).getY(), true);
 		}
 
 		controller.getStackPane().getChildren().add(mapPane);
-*/
+
 
 
 

@@ -64,7 +64,8 @@ public class SingleImageMap {
 	 * @return map pane
 	 */
 	public static MapPane createMapPane(Collection<Point2D> latLongPoints, double targetWidth, double targetHeight) {
-		return createMapPane(LatLongRect.create(latLongPoints, 0.10), targetWidth, targetHeight);
+		var aspectRatio = targetWidth/targetHeight;
+		return createMapPane(LatLongRect.create(latLongPoints, 0.10, aspectRatio), targetWidth, targetHeight);
 	}
 
 	/**
@@ -84,35 +85,36 @@ public class SingleImageMap {
 
 		var width = (rectangle.rangeLongitude() / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth();
 		var height = (rectangle.rangeLatitude() / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight();
+		/*
 		double xAddOffset = 0;
 		double yAddOffset = 0;
 
 		System.out.println("Width: " + width +" Height: " + height + " xOffset: " + xOffset +" yOffset: " + yOffset);
-		
+
 		if(width/height > targetWidth/targetHeight){
-			var modifiedWidth = (targetWidth/targetHeight)*height;
-			xAddOffset = 0.5 * (modifiedWidth-width);
-			width = modifiedWidth;
-		}
-		if(width/height < targetWidth/targetHeight){
-			var modifiedHeight = (targetWidth/targetHeight)*width;
+			var modifiedHeight = width / (targetWidth/targetHeight);
 			yAddOffset = 0.5 * (modifiedHeight-height);
 			height = modifiedHeight;
+		}else if(width/height < targetWidth/targetHeight){
+			var modifiedWidth = height / (targetWidth/targetHeight);
+			xAddOffset = 0.5 * (modifiedWidth-width);
+			width = modifiedWidth;
 		}
 
 		final double xTotalOffset = xAddOffset + xOffset;
 		final double yTotalOffset = yAddOffset + yOffset;
-		xOffset += yAddOffset;
+		xOffset += xAddOffset;
 		yOffset += yAddOffset;
+		*/
 		System.out.println("Width: " + width +" Height: " + height + " xOffset: " + xOffset +" yOffset: " + yOffset);
 
 		var factor = Math.min(targetSize / width, targetSize / height);
 
 		Function<Double, Double> latitudeYFunction = latitude ->
-				factor * (((LatLongRect.topLatitude - latitude) / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight() - yTotalOffset);
+				factor * (((LatLongRect.topLatitude - latitude) / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight() - yOffset);
 
 		Function<Double, Double> longtitudeXFunction = longitude ->
-				factor * (((longitude - LatLongRect.leftLongitude) / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth() - xTotalOffset);
+				factor * (((longitude - LatLongRect.leftLongitude) / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth() - xOffset);
 
 
 

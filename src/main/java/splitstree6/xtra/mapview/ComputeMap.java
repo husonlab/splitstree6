@@ -23,6 +23,7 @@ import javafx.scene.Node;
 
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import splitstree6.data.parts.Taxon;
 
@@ -40,20 +41,28 @@ public class ComputeMap {
 		ArrayList<Node> diagrams = new ArrayList<>();
 		int numOfTraits = model.getTaxaBlock().getTraitsBlock().getNTraits();
 		ArrayList<GeoTrait> geoTraits = new ArrayList<>();
+		TaxaBlock taxaBlock = model.getTaxaBlock();
 		TraitsBlock traitsBlock = model.getTaxaBlock().getTraitsBlock();
+
+		System.out.println(numOfTraits);
+		System.out.println(traitsBlock.getTraitLabel(1));
+		for(var taxa : taxaBlock.getTaxa()){
+			System.out.println(taxa.getName());
+			traitsBlock.getTraitId(taxa.getName());
+		}
 
 
 		for(int i = 0; i < numOfTraits; i++){
-			System.out.println("adding trait");
 			ArrayList<String> taxaLabel = new ArrayList<>();
-			System.out.println("adding trait");
 			HashMap<String, Integer> composition = new HashMap<>();
-			System.out.println("adding trait");
+
+
+
 			for(Taxon taxon : model.getTaxaBlock().getTaxa()){
 				taxaLabel.add(taxon.getName());
 				composition.put(taxon.getName(), 4);
 			}
-			System.out.println(model.getTaxaBlock().getTraitsBlock().getTraitLongitude(i));
+
 			geoTraits.add(new GeoTrait(
 					traitsBlock.getTraitLongitude(i),
 					traitsBlock.getTraitLatitude(i),
@@ -61,7 +70,7 @@ public class ComputeMap {
 					new ArrayList<>(),//taxaLabel,
 					new HashMap<>() //composition
 			));
-			System.out.println("adding trait");
+
 			System.out.println("Number of traits" + geoTraits.size());
 		}
 
