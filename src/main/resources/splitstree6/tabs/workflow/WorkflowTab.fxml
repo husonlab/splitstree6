@@ -37,7 +37,7 @@
         </center>
         <top>
             <VBox fx:id="topVBox" BorderPane.alignment="CENTER">
-                <ToolBar fx:id="toolBar" prefHeight="32.0">
+                <ToolBar fx:id="toolBar" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="32.0">
                     <items>
                         <Button fx:id="editButton" mnemonicParsing="false" text="Show"/>
                         <MenuButton fx:id="addMenuButton" mnemonicParsing="false" text="Add">
@@ -45,6 +45,19 @@
                         <Button fx:id="duplicateButton" mnemonicParsing="false" text="Duplicate"/>
                         <Button fx:id="deleteButton" layoutX="125.0" layoutY="10.0" mnemonicParsing="false"
                                 text="Delete"/>
+                        <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0"/>
+                        <Button fx:id="zoomInButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
+                                text="Zoom In">
+                            <tooltip>
+                                <Tooltip text="Zoom in"/>
+                            </tooltip>
+                        </Button>
+                        <Button fx:id="zoomOutButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
+                                text="Zoom Out">
+                            <tooltip>
+                                <Tooltip text="Zoom in"/>
+                            </tooltip>
+                        </Button>
                     </items>
                 </ToolBar>
             </VBox>

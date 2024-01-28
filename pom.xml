@@ -34,7 +34,7 @@
         <maven.compiler.release>17</maven.compiler.release>
         <maven.compiler.target>17</maven.compiler.target>
         <maven.compiler.source>17</maven.compiler.source>
-        <javafx.version>21.0.1</javafx.version>
+        <javafx.version>21.0.2</javafx.version>
         <javafx.plugin.version>0.0.8</javafx.plugin.version>
         <main.class>splitstree6.main.SplitsTree6</main.class>
     </properties>
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
-            <version>19.0.2.1</version>
+            <version>${javafx.version}</version>
         </dependency>
         <dependency>
             <groupId>org.xerial</groupId>
@@ -81,16 +81,7 @@
             <artifactId>commons-collections4</artifactId>
             <version>4.4</version>
         </dependency>
-        <dependency>
-            <groupId>org.apache.pdfbox</groupId>
-            <artifactId>pdfbox</artifactId>
-            <version>3.0.0-beta1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.fxmisc.richtext</groupId>
-            <artifactId>richtextfx</artifactId>
-            <version>0.11.0</version>
-        </dependency>
+
         <!--
         <dependency>
                 <groupId>com.github.lejon</groupId>

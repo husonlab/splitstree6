@@ -1,0 +1,12 @@
+#nexus
+
+[!
+Nicholas P. Tippery, Donald H. Les, Phylogenetic Relationships and Morphological Evolution in Nymphoides (Menyanthaceae),
+Systematic Botany, 36(4), 1101-1113 (2011)
+]
+
+BEGIN TREES;
+PROPERTIES partialTrees=no rooted=yes;
+		[1] tree 'ITS'=[&R] ((((((((((''Nymphoides fallax'',''N. humboldtiana''),''N. rautanenii''),(''N. brevipedicellata'',''N. thunbergiana'')),(((''Nymphoides sp. 1'',''Nymphoides sp. 2''),((''N. parvifolia'',''N. quadrilopa''),''N. furculifolia'')),''N. indica''),''N. coreana'',''N. cristata'',(''N. ezannoi'',(''N. aquatica'',''N. cordata''))),''N. minima''),(''N. beaglensis'',''N. disperma''),(''N. planosperma'',''N. simulans'',''N. spongiosa''),''N. subacuta''),''N. spinulosperma''),(''N. aurantiaca'',''N. cambodiana'')),((((''N. montana'',''N. geminata''),(''N. elliptica'',''N. triangularis'')),''N. exiliflora''),''N. peltata''),''N. crenata''):0.5,((((((''Liparophyllum capitatum'':1,''L. exiguum'':1):1,''L. congestiflorum'':1):1,''L. latifolium'':1):1,''L. exaltatum'':1):1,''L. gunnii'':1):1,''L. lasiosperum'':1):0.5);
+		[2] tree 'matK_trnK'=[&R] ((((((((''Nymphoides fallax'',''N. humboldtiana''),''N. indica'',''N. coreana'',''N. ezannoi''),(''N. aquatica'',''N. cordata''),''N. rautanenii'',''N. brevipedicellata'',''N. thunbergiana'',''N. cristata''),((''Nymphoides sp. 1'',''Nymphoides sp. 2'',''N. parvifolia'',''N. quadrilopa''),''N. furculifolia'')),''N. minima''),''N. beaglensis'',(''N. disperma'',''N. spinulosperma'',''N. montana'')),(''N. peltata'',(''N. planosperma'',''N. simulans'',''N. spongiosa''),(''N. subacuta'',''N. elliptica''),(''N. aurantiaca'',''N. cambodiana''),''N. triangularis''),''N. geminata'',''N. exiliflora'',''N. crenata''):0.5,(''L. gunnii'':1,(((''Liparophyllum capitatum'':1,''L. exiguum'':1):1,''L. congestiflorum'':1):1,''L. latifolium'':1):1,''L. lasiosperum'':1,''L. exaltatum'':1):0.5);
+END;

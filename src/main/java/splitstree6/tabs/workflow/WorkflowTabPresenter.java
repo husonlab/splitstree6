@@ -122,6 +122,11 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 		controller.getDeleteButton().setOnAction(e -> workflowTab.getUndoManager().doAndAdd(DeleteCommand.create(mainWindow.getWorkflow(), nodeToDuplicateOrDelete.get())));
 		controller.getDeleteButton().disableProperty().bind(nodeToDuplicateOrDelete.isNull());
 
+		controller.getZoomInButton().setOnAction(e -> controller.getScrollPane().zoomBy(1.1, 1.1));
+		controller.getZoomInButton().disableProperty().bind(Bindings.isEmpty(mainWindow.getWorkflow().nodes()));
+		controller.getZoomOutButton().setOnAction(e -> controller.getScrollPane().zoomBy(1 / 1.1, 1 / 1.1));
+		controller.getZoomOutButton().disableProperty().bind(Bindings.isEmpty(mainWindow.getWorkflow().nodes()));
+
 	}
 
 	public void setupMenuItems() {
@@ -153,10 +158,10 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 			workflow.nodes().forEach(n -> Platform.runLater(() -> workflow.getSelectionModel().toggleSelection(n)));
 		});
 
-		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> controller.getScrollPane().zoomBy(1.1, 1.1));
-		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(Bindings.isEmpty(mainWindow.getWorkflow().nodes()));
-		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> controller.getScrollPane().zoomBy(1 / 1.1, 1 / 1.1));
-		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(Bindings.isEmpty(mainWindow.getWorkflow().nodes()));
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(controller.getZoomInButton().disableProperty());
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
 		mainController.getZoomInMenuItem().setOnAction(null);
 		mainController.getZoomOutMenuItem().setOnAction(null);
