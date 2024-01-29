@@ -22,17 +22,21 @@ package splitstree6.splits;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.phylo.LSAUtils;
+import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
+import jloda.util.CollectionUtils;
 import jloda.util.NumberUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
 /**
  * some computations on trees and networks
- *
+ * <p>
  * Daniel Huson, 1.2024
  */
 public class TreesUtils {
@@ -303,5 +307,46 @@ public class TreesUtils {
 		} else {
 			collectAllHardwiredClustersRec(network, network.getRoot(), e -> !network.isReticulateEdge(e) || activeReticulateEdges.contains(e), clusters);
 		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		var taxaIdMap = new HashMap<String, Integer>();
+
+		//var network=NewickIO.valueOf("(((e,((((a)#H2:0,c))#H1:0,d)),(((b,#H2:0),#H1:0),#H2:0)));");
+		var network = NewickIO.valueOf("(((e,((c)#H1:0,d)),(((a,#H1:0))#H2:0,((b,#H2:0),#H1:0))))");
+		addAdhocTaxonIds(network, taxaIdMap);
+
+		LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
+		System.err.println(NewickIO.toString(network, false) + ";");
+
+		var softwiredClusters = collectAllSoftwiredClusters(network);
+		System.err.println("network clusters: " + softwiredClusters);
+
+		var lines = new String[]{
+				"((a, (b, c)),(d, e));",
+				"((e, (d, c)),(b, a));",
+				"((e, d),((c, a),b));",
+				"((e, d),(c, (a, b)));"};
+
+		for (var line : lines) {
+			var tree = NewickIO.valueOf(line);
+			addAdhocTaxonIds(tree, taxaIdMap);
+			System.err.println(NewickIO.toString(tree, false) + ";");
+
+			var treeClusters = collectAllHardwiredClusters(tree);
+			System.err.println("tree clusters: " + treeClusters);
+
+			System.err.println("Missing in network: :" + CollectionUtils.difference(treeClusters, softwiredClusters));
+		}
+
+
+	}
+
+	private static void addAdhocTaxonIds(PhyloTree tree, Map<String, Integer> taxaIdMap) {
+		tree.nodeStream().filter(v -> tree.getLabel(v) != null).forEach(v -> {
+			var taxId = taxaIdMap.getOrDefault(tree.getLabel(v), taxaIdMap.size() + 1);
+			tree.addTaxon(v, taxId);
+			taxaIdMap.put(tree.getLabel(v), taxId);
+		});
 	}
 }
