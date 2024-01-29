@@ -84,6 +84,7 @@ public class MapView extends Application {
 		//locationNameMap.put(new Point2D(-33.9249, 18.4241), "Cape Town");
 		//locationNameMap.put(new Point2D(-36.88, 174.786991), "Auckland");
 
+		/*
 		MapPane mapPane;
 		mapPane = SingleImageMap.createMapPane(locationNameMap.keySet(), controller.getStackPane().getWidth(), controller.getStackPane().getHeight());
 
@@ -112,7 +113,9 @@ public class MapView extends Application {
 			mapPane.place(diagram, locs.get(i).getX(), locs.get(i).getY(), true);
 		}
 
-		controller.getStackPane().getChildren().add(mapPane);
+		//controller.getStackPane().getChildren().add(mapPane);
+		*/
+
 
 
 

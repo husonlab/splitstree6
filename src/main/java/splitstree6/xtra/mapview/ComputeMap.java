@@ -18,15 +18,10 @@
  */
 
 package splitstree6.xtra.mapview;
-
 import javafx.scene.Node;
-
-import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.chart.PieChart;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
-import splitstree6.data.parts.Taxon;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,57 +31,60 @@ import java.util.HashMap;
  * Niko Kreisz, 11.2023
  */
 public class ComputeMap {
-	public static ArrayList<Node> apply(Model model, double targetWidth, double targetHeight) {
+	public static ArrayList<GeoTrait> apply(Model model) {
 
-		ArrayList<Node> diagrams = new ArrayList<>();
-		int numOfTraits = model.getTaxaBlock().getTraitsBlock().getNTraits();
+		// Create Geotraits from the model
 		ArrayList<GeoTrait> geoTraits = new ArrayList<>();
 		TaxaBlock taxaBlock = model.getTaxaBlock();
 		TraitsBlock traitsBlock = model.getTaxaBlock().getTraitsBlock();
 
-		System.out.println(numOfTraits);
-		System.out.println(traitsBlock.getTraitLabel(1));
-		for(var taxa : taxaBlock.getTaxa()){
-			System.out.println(taxa.getName());
-			traitsBlock.getTraitId(taxa.getName());
-		}
-
-
-		for(int i = 0; i < numOfTraits; i++){
-			ArrayList<String> taxaLabel = new ArrayList<>();
+		for(int i = 1; i <= traitsBlock.size(); i++){
+			ArrayList<String> taxa = new ArrayList<>();
 			HashMap<String, Integer> composition = new HashMap<>();
 
-
-
-			for(Taxon taxon : model.getTaxaBlock().getTaxa()){
-				taxaLabel.add(taxon.getName());
-				composition.put(taxon.getName(), 4);
+			for(int j = 1; j <= taxaBlock.size(); j++){
+				taxa.add(taxaBlock.get(j).getName());
+				composition.put(taxaBlock.get(j).getName(), (int) traitsBlock.getTraitValue(j,i));
 			}
 
-			geoTraits.add(new GeoTrait(
+			GeoTrait geoTrait = new GeoTrait(
 					traitsBlock.getTraitLongitude(i),
 					traitsBlock.getTraitLatitude(i),
-					4,//model.getTaxaBlock().getNtax(),
-					new ArrayList<>(),//taxaLabel,
-					new HashMap<>() //composition
-			));
-
-			System.out.println("Number of traits" + geoTraits.size());
+					traitsBlock.getNTraits(),
+					taxa,
+					composition
+			);
+			geoTrait.printGeotrait();
+			geoTraits.add(geoTrait);
 		}
 
-		System.out.println(geoTraits.size());
-		for(GeoTrait geoTrait : geoTraits){
-			System.out.println("adding" + geoTrait.getLongtitude() + geoTrait.getLatitude());
-			Circle circle = new Circle(5, Color.RED);
-			circle.setTranslateX(geoTrait.getLatitude());
-			circle.setTranslateY(geoTrait.getLongtitude());
-			diagrams.add(circle);
-		}
 
-		diagrams = new ArrayList<>();
-
-
-
-		return diagrams;
+		return geoTraits;
 	}
 }
+
+/*
+		System.out.println("Taxablock: " + taxaBlock.getNtax());
+		for (var taxa : taxaBlock.getTaxa()){
+			System.out.println("Taxa-name: " + taxa.getName());
+			//System.out.println("Taxa-Info: " + taxa.getInfo());
+		}
+
+		System.out.println("Traitsblock size: " + traitsBlock.size());
+		System.out.println("Labels " + traitsBlock.getTraitLabels().toString());
+		System.out.println("Has lontitude: " + traitsBlock.isSetLatitudeLongitude());
+		System.out.println("val " + traitsBlock.getTraitValue(5, 3));
+		System.out.println("Latitude " + traitsBlock.getTraitLatitude(2));
+		System.out.println("Latitude " + traitsBlock.getTraitLatitude(3));
+		System.out.println("Latitude " + traitsBlock.getTraitLatitude(4));
+		System.out.println("Latitude " + traitsBlock.getTraitLatitude(5));
+
+		for(int i = 1; i <= traitsBlock.size(); i++){
+			System.out.println(traitsBlock.getTraitLongitude(i));
+			System.out.println(traitsBlock.getTraitLatitude(i));
+			for(int j = 1; j <= taxaBlock.size(); j++){
+				System.out.print(taxaBlock.get(j).getName());
+				System.out.println(" " + traitsBlock.getTraitValue(j,i));
+			}
+		}
+*/

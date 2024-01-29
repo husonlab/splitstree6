@@ -36,4 +36,12 @@ public class GeoTrait {
     public HashMap<String, Integer> getCompostion() {
         return compostion;
     }
+
+    public void printGeotrait(){
+        System.out.println("Lat: " + latitude + " Long: " + longtitude + " numTaxa: " + nTaxa);
+        for (var t : taxa){
+            System.out.println("Taxa: " + t.toString() + " comp: " + compostion.get(t));
+        }
+
+    }
 }

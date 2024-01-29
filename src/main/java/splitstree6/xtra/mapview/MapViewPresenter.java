@@ -21,15 +21,21 @@ package splitstree6.xtra.mapview;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.PieChart;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
+import java.util.*;
 
 public class MapViewPresenter {
 
@@ -55,20 +61,60 @@ public class MapViewPresenter {
 
 		controller.getRedrawButton().setOnAction(e -> redraw(mapView));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);
+
+
+
 	}
+
+	public MapPane createMap(MapViewController controller, Model model){
+		var locationNameMap = new HashMap<Point2D, String>();
+		var traitsBlock = model.getTaxaBlock().getTraitsBlock();
+		for(int i = 1; i <= traitsBlock.getNTraits(); i++){
+			locationNameMap.put(new Point2D(traitsBlock.getTraitLatitude(i), traitsBlock.getTraitLongitude(i)), "");
+		}
+		return SingleImageMap.createMapPane(locationNameMap.keySet(), controller.getStackPane().getWidth(), controller.getStackPane().getHeight());
+	}
+
+
+
+
+
 
 	public void redraw(MapView mapView) {
 		var model = mapView.getModel();
 		var controller = mapView.getController();
 
 		try {
-			var width = mapView.getStage().getWidth() - 10;
-			var height = mapView.getStage().getHeight() - 80;
 			controller.getStackPane().getChildren().clear();
-			controller.getStackPane().getChildren().setAll(ComputeMap.apply(model, width, height));
+			MapPane mapPane = createMap(controller, model);
+			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
+			for(var trait : traits){
+				PieChart pieChart = new PieChart();
+				ObservableList obsList = FXCollections.observableList(getPieChartData(trait));
+				pieChart.setData(obsList);
+				pieChart.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
+				pieChart.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
+				pieChart.setMinWidth(80);
+				pieChart.setMaxWidth(200);
+				pieChart.setMinHeight(80);
+				pieChart.setMaxHeight(200);
+				pieChart.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
+				pieChart.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
+				mapPane.place(pieChart, trait.getLatitude(), trait.getLongtitude(), true);
+			}
+			controller.getStackPane().getChildren().add(mapPane);
+
 		} catch (Exception ex) {
 			controller.getLabel().setText("Error: " + ex.getMessage());
 		}
+	}
+
+	public List<PieChart.Data> getPieChartData(GeoTrait trait){
+		List<PieChart.Data> data = new ArrayList<>();
+		for(String taxa : trait.getTaxa()){
+			data.add(new PieChart.Data(taxa, trait.getCompostion().get(taxa)));
+		}
+		return data;
 	}
 
 	private void openFile(Stage stage, MapViewController controller, Model model) {

@@ -115,7 +115,7 @@ public class MapPane extends StackPane {
 
 
 		if(node instanceof PieChart){
-			System.out.println(((PieChart)node).getWidth() + " " + ((PieChart)node).getHeight());
+			//System.out.println(((PieChart)node).getWidth() + " " + ((PieChart)node).getHeight());
 			//System.out.println("setting size");
 			//((PieChart) node).setMaxSize(20 , 10);
 		}
