@@ -349,4 +349,25 @@ public class TreesUtils {
 			taxaIdMap.put(tree.getLabel(v), taxId);
 		});
 	}
+
+	public static List<PhyloTree> getSubTrees(PhyloTree forest) {
+		var taxaIdMap = new HashMap<String, Integer>();
+		addAdhocTaxonIds(forest, taxaIdMap);
+		var list = new ArrayList<PhyloTree>();
+		for (var v : forest.nodeStream().filter(v -> v.getInDegree() == 0).toList()) {
+			var tree = new PhyloTree();
+			var root = tree.copy(forest).get(v);
+			tree.setRoot(root);
+			try (var toDelete = tree.newNodeSet()) {
+				toDelete.addAll(tree.nodes());
+				tree.preorderTraversal(root, toDelete::remove);
+				for (var w : toDelete)
+					tree.deleteNode(w);
+			}
+			addAdhocTaxonIds(tree, taxaIdMap);
+			LSAUtils.computeLSAChildrenMap(tree, tree.newNodeArray());
+			list.add(tree);
+		}
+		return list;
+	}
 }
