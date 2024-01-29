@@ -32,6 +32,7 @@ import javafx.scene.chart.PieChart;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -89,6 +90,7 @@ public class MapViewPresenter {
 			MapPane mapPane = createMap(controller, model);
 			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
 			for(var trait : traits){
+
 				PieChart pieChart = new PieChart();
 				ObservableList obsList = FXCollections.observableList(getPieChartData(trait));
 				pieChart.setData(obsList);
@@ -102,7 +104,22 @@ public class MapViewPresenter {
 				pieChart.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
 				mapPane.place(pieChart, trait.getLatitude(), trait.getLongtitude(), true);
 			}
+			//Legend
+			Map<String, Color> colorMap = new HashMap<>();
+			colorMap.put("seq_1", Color.RED);
+			colorMap.put("seq_2", Color.BLUE);
+			colorMap.put("seq_3", Color.GREEN);
+			colorMap.put("seq_4", Color.YELLOW);
+			colorMap.put("seq_5", Color.ORANGE);
+			colorMap.put("seq_6", Color.PURPLE);
+			colorMap.put("seq_7", Color.CYAN);
+			LegendView legendView = new LegendView(colorMap);
+			//legendView.setTranslateX(50);
+			//legendView.setTranslateY(50);
 			controller.getStackPane().getChildren().add(mapPane);
+			legendView.setMouseTransparent(false);
+
+			controller.getStackPane().getChildren().add(legendView);
 
 		} catch (Exception ex) {
 			controller.getLabel().setText("Error: " + ex.getMessage());
