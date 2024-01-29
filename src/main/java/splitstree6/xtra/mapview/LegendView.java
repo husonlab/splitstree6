@@ -12,6 +12,7 @@ import javafx.scene.shape.Rectangle;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class LegendView extends VBox {
 
@@ -22,6 +23,7 @@ public class LegendView extends VBox {
     public LegendView(Map<String, Color> categoryColors) {
         this.categoryColors = categoryColors;
         createLegend();
+        setPickOnBounds(false);
         setStyle("-fx-background-color: white;");
         setOnMousePressed(this::onMousePressed);
         setOnMouseDragged(this::onMouseDragged);
@@ -60,16 +62,19 @@ public class LegendView extends VBox {
         // Record the initial mouse cursor position
         xOffset = event.getSceneX();
         yOffset = event.getSceneY();
+        //System.out.println("pressed");
     }
 
     private void onMouseDragged(MouseEvent event) {
+        //System.out.println("dragged");
         // Calculate the new position of the LegendView based on mouse movement
         double deltaX = event.getSceneX() - xOffset;
         double deltaY = event.getSceneY() - yOffset;
 
         // Update the LegendView's position
-        setLayoutX(getLayoutX() + deltaX);
-        setLayoutY(getLayoutY() + deltaY);
+
+        setTranslateX(getTranslateX() + deltaX);
+       setTranslateY(getTranslateY() + deltaY);
 
         // Update the mouse cursor position
         xOffset = event.getSceneX();
