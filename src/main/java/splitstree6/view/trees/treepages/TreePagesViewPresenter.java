@@ -50,7 +50,7 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class TreePagesViewPresenter implements IDisplayTabPresenter {
-	private final static ObservableList<String> gridValues = FXCollections.observableArrayList(List.of("3x3", "4x3", "3x5", "4x4", "5x5", "1x1"));
+	private final static ObservableList<String> gridValues = FXCollections.observableArrayList(List.of("3x3", "2x1", "1x2", "2x2", "4x3", "3x4", "4x3", "5x5", "1x1"));
 
 	private final MainWindow mainWindow;
 	private final TreePagesView view;
@@ -134,7 +134,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				view.setOptionCols(n.cols());
 				view.setOptionZoomFactor(1);
 				view.setOptionFontScaleFactor(1);
-				controller.getRowsColsCBox().setValue(n.toString());
+				Platform.runLater(() -> controller.getRowsColsCBox().setValue(n.toString()));
 			}
 		});
 
@@ -238,10 +238,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		});
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
-		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
-		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
-		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
-		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 
 		Platform.runLater(this::setupMenuItems);
 	}
