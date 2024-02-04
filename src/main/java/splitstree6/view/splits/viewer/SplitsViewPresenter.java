@@ -25,12 +25,14 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.*;
-import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.ContextMenuEvent;
+import javafx.scene.input.DataFormat;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
@@ -57,6 +59,7 @@ import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
@@ -118,8 +121,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		this.mainWindow = mainWindow;
 		this.view = view;
 		this.controller = view.getController();
-
-		controller.getAnchorPane().addEventHandler(SwipeEvent.ANY, Event::consume);
 
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
@@ -326,6 +327,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 			}
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
+
+		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 
 		Platform.runLater(this::setupMenuItems);
 	}

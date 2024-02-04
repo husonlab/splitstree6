@@ -52,11 +52,6 @@
             <type>pom</type>
         </dependency>
         <dependency>
-            <groupId>com.install4j</groupId>
-            <artifactId>install4j-runtime</artifactId>
-            <version>10.0.5</version>
-        </dependency>
-        <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-web</artifactId>
             <version>${javafx.version}</version>
@@ -65,6 +60,11 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.41.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.install4j</groupId>
+            <artifactId>install4j-runtime</artifactId>
+            <version>10.0.5</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -106,6 +106,7 @@
                     <mainClass>${main.class}</mainClass>
                 </configuration>
             </plugin>
+            <!-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -119,6 +120,7 @@
                     </execution>
                 </executions>
             </plugin>
+            </!-->
             <!-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -37,17 +37,20 @@ import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
+
+import java.util.List;
 
 /**
  * multi tree view presenter
  * Daniel Huson, 11.2021
  */
 public class TreePagesViewPresenter implements IDisplayTabPresenter {
-	private final static ObservableList<String> gridValues = FXCollections.observableArrayList("1 x 1");
+	private final static ObservableList<String> gridValues = FXCollections.observableArrayList(List.of("3x3", "4x3", "3x5", "4x4", "5x5", "1x1"));
 
 	private final MainWindow mainWindow;
 	private final TreePagesView view;
@@ -113,6 +116,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 
 		controller.getRowsColsCBox().getItems().setAll(gridValues);
+		controller.getRowsColsCBox().setValue(gridValues.get(0));
 		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
 
 		view.optionRowsProperty().addListener((v, o, n) -> {
@@ -233,6 +237,11 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
+
+		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 
 		Platform.runLater(this::setupMenuItems);
 	}

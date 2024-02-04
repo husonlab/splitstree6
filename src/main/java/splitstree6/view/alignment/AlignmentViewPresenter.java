@@ -43,6 +43,7 @@ import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
 import splitstree6.splits.ASplit;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 import splitstree6.window.MainWindowController;
@@ -576,6 +577,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
 		Platform.runLater(() -> updateCanvasListener.invalidated(null));
+
+		SwipeUtils.setOnSwipeLeft(controller.getRoot(), controller.getHorizontalScrollBar());
+		SwipeUtils.setOnSwipeRight(controller.getRoot(), controller.getHorizontalScrollBar());
+		SwipeUtils.setOnSwipeUp(controller.getRoot(), controller.getVerticalScrollBar());
+		SwipeUtils.setOnSwipeDown(controller.getRoot(), controller.getVerticalScrollBar());
 
 		mainWindow.getWorkflow().runningProperty().addListener(e -> updateCharSetSelection(mainWindow, view, controller.getSetsMenu().getItems()));
 	}

@@ -59,6 +59,7 @@ import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.main.SplitsTree6;
 import splitstree6.splits.TreesUtils;
 import splitstree6.view.trees.InteractionSetup;
+import splitstree6.view.utils.Icebergs;
 import splitstree6.window.MainWindow;
 
 import java.util.*;
@@ -315,6 +316,9 @@ public class DensiTreeDrawer {
 					shape.setStrokeWidth(1);
 				}
 			});
+			if (Icebergs.enabled()) {
+				edgesGroup.getChildren().add(Icebergs.create(shape, false));
+			}
 		}
 		// implement show/hide consensus tree:
 		ChangeListener<Boolean> showConsensusListener = (v, o, n) -> edgesGroup.setVisible(n);

@@ -21,7 +21,10 @@ package splitstree6.window;
 
 import splitstree6.main.SplitsTree6;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class StatementFilter {
 	public static InputStream apply(InputStream inputStream, String... tagLabels) {
@@ -98,30 +101,5 @@ public class StatementFilter {
 			return ins;
 		else
 			return apply(ins, "<accelerator>", "</accelerator>");
-	}
-
-	public static void main(String[] args) throws IOException {
-		var text = """
-					<Menu fx:id="helpMenu" text="Help">
-						<MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."/>
-						<SeparatorMenuItem mnemonicParsing="false"/>
-						<MenuItem fx:id="aboutMenuItem" text="About...">
-							<accelerator>
-								<KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP"
-													shortcut="DOWN"/>
-							</accelerator>
-						</MenuItem>
-					</Menu>
-				""";
-
-		try (var ins = new ByteArrayInputStream(text.getBytes())) {
-			var filtered = apply(ins, "<accelerator>", "</accelerator>");
-			try (var r = new BufferedReader(new InputStreamReader(filtered))) {
-				String line;
-				while ((line = r.readLine()) != null) {
-					System.err.println(line);
-				}
-			}
-		}
 	}
 }

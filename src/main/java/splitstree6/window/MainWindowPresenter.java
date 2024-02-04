@@ -30,11 +30,13 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableMap;
-import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.*;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.dialog.ExportImageDialog;
@@ -102,6 +104,7 @@ import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.alignment.AlignmentView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
 import splitstree6.view.utils.ExportUtils;
@@ -114,6 +117,7 @@ import java.io.File;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MainWindowPresenter {
@@ -174,7 +178,6 @@ public class MainWindowPresenter {
 			}
 		};
 
-
 		controller.getMainTabPane().focusedProperty().addListener(listener);
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(listener);
 
@@ -190,8 +193,6 @@ public class MainWindowPresenter {
 				Basic.caught(ex);
 			}
 		});
-
-		controller.getAlgorithmTabPane().addEventHandler(SwipeEvent.ANY, Event::consume);
 
 		controller.getMainTabPane().getTabs().addListener((ListChangeListener<? super Tab>) e -> {
 			while (e.next()) {
@@ -214,10 +215,10 @@ public class MainWindowPresenter {
 
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 
-		BasicFX.applyToAllMenus(controller.getMenuBar(),
+		applyToAllMenuItems(controller.getMenuBar(),
 				m -> !List.of("File", "Edit", "Import", "Window", "Open Recent", "Help").contains(m.getText()),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(mainWindow.emptyProperty())));
-		BasicFX.applyToAllMenus(controller.getMenuBar(),
+		applyToAllMenuItems(controller.getMenuBar(),
 				m -> m.getText().equals("Edit"),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
 
@@ -239,6 +240,7 @@ public class MainWindowPresenter {
 		});
 		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
 
+		SwipeUtils.setConsumeSwipes(controller.getRootPane());
 	}
 
 
@@ -278,6 +280,7 @@ public class MainWindowPresenter {
 		});
 
 
+		controller.getUseFullScreenMenuItem().disableProperty().unbind();
 		BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
 
 		Platform.runLater(() -> {
@@ -982,4 +985,21 @@ public class MainWindowPresenter {
 		}
 	}
 
+	public static void applyToAllMenuItems(MenuBar menuBar, Function<Menu, Boolean> accept, Consumer<MenuItem> callback) {
+		var queue = new LinkedList<>(menuBar.getMenus());
+		while (!queue.isEmpty()) {
+			var menu = queue.pop();
+			if (accept.apply(menu)) {
+				for (var item : menu.getItems()) {
+					if (!(item instanceof SeparatorMenuItem)) {
+						callback.accept(item);
+					}
+					if (item instanceof Menu) {
+						var other = (Menu) item;
+						queue.add(other);
+					}
+				}
+			}
+		}
+	}
 }

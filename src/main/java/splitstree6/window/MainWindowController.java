@@ -20,6 +20,7 @@
 package splitstree6.window;
 
 import javafx.beans.InvalidationListener;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -506,7 +507,7 @@ public class MainWindowController {
 		MaterialIcons.setIcon(increaseFontSizeButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
 		MaterialIcons.setIcon(selectButton, "select_all");
-		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "format_list_bulleted");
+		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "view_sidebar", "-fx-rotate: 180;", true);
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -564,6 +565,17 @@ public class MainWindowController {
 			rightWidth.set(rightToolBarPane.getWidth());
 		});
 
+		mainTabPane.setOnSwipeLeft(Event::consume);
+		mainTabPane.setOnSwipeRight(Event::consume);
+		mainTabPane.setOnSwipeUp(Event::consume);
+		mainTabPane.setOnSwipeDown(Event::consume);
+		mainTabPane.setFocusTraversable(false);
+
+		algorithmTabPane.setOnSwipeLeft(Event::consume);
+		algorithmTabPane.setOnSwipeRight(Event::consume);
+		algorithmTabPane.setOnSwipeUp(Event::consume);
+		algorithmTabPane.setOnSwipeDown(Event::consume);
+		algorithmTabPane.setFocusTraversable(false);
 	}
 
 	public VBox getTopVBox() {

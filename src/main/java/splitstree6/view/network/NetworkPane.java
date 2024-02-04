@@ -34,10 +34,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
-import jloda.fx.util.AService;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.GeometryUtilsFX;
-import jloda.fx.util.ProgramExecutorService;
+import jloda.fx.util.*;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import splitstree6.data.NetworkBlock;
@@ -61,7 +58,6 @@ public class NetworkPane extends StackPane {
 	private final ChangeListener<Number> fontScaleChangeListener;
 	private final ChangeListener<LayoutOrientation> orientChangeListener;
 	private final InvalidationListener layoutLabelsListener;
-	private final InvalidationListener redrawListener;
 
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
@@ -101,8 +97,6 @@ public class NetworkPane extends StackPane {
 
 		layoutLabelsListener = e -> layoutLabels(orientation.get());
 
-		redrawListener = e -> drawNetwork();
-
 		// compute the network in a separate thread:
 		service = new AService<>(mainWindow.getController().getBottomFlowPane());
 		service.setExecutor(ProgramExecutorService.getInstance());
@@ -141,7 +135,7 @@ public class NetworkPane extends StackPane {
 	}
 
 	public void drawNetwork() {
-		service.restart();
+		RunAfterAWhile.applyInFXThread(this, service::restart);
 	}
 
 	public Runnable getRunAfterUpdate() {

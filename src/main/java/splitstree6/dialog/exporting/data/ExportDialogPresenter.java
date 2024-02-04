@@ -20,6 +20,8 @@
 package splitstree6.dialog.exporting.data;
 
 import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
@@ -50,8 +52,14 @@ import java.util.List;
 public class ExportDialogPresenter {
 	private final List<ChangeListener> changeListeners = new ArrayList<>();
 
+	// these two static properties are used to customize the mobile version
+	public static StringProperty fileName = new SimpleStringProperty("");
+	public static StringProperty mobileDirectory = new SimpleStringProperty("");
+
 	public ExportDialogPresenter(MainWindow mainWindow, ExportDialogController controller, Stage stage, DataNode dataNode) {
 		MainWindowManager.getInstance().addAuxiliaryWindow(mainWindow, stage);
+
+		fileName.set("");
 
 		var exporter = new SimpleObjectProperty<DataBlockWriter>();
 
@@ -90,7 +98,6 @@ public class ExportDialogPresenter {
 				controller.getFileTextField().setText(file.getPath());
 		});
 
-
 		controller.getCancelButton().setOnAction(e -> {
 			stage.hide();
 			MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
@@ -103,11 +110,15 @@ public class ExportDialogPresenter {
 		controller.getApplyButton().setOnAction(e -> {
 			try {
 				var fileName = controller.getFileTextField().getText();
+				if (!SplitsTree6.isDesktop()) {
+					fileName = mobileDirectory.get() + File.separator + fileName + ".txt";
+				}
 				FileUtils.checkFileWritable(fileName, true);
 				exporter.get().write(fileName, mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock());
 				MainWindowManager.getInstance().removeAuxiliaryWindow(mainWindow, stage);
 				stage.hide();
 				System.err.println("Exported " + dataNode.getTitle() + " to file: " + FileUtils.getFileNameWithoutPath(fileName));
+				ExportDialogPresenter.fileName.set(fileName);
 			} catch (Exception ex) {
 				NotificationManager.showError("Export failed: " + ex);
 			}
@@ -116,7 +127,7 @@ public class ExportDialogPresenter {
 	}
 
 	/**
-	 * save dialog
+	 * show export dialog
 	 *
 	 * @param mainWindow the main window
 	 * @return true if saved
