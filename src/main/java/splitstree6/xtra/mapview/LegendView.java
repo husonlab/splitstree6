@@ -14,13 +14,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
+
 public class LegendView extends VBox {
 
-    private Map<String, Color> categoryColors;
+    private Map<String, Integer> categoryColors;
     private double xOffset = 0;
     private double yOffset = 0;
 
-    public LegendView(Map<String, Color> categoryColors) {
+    public LegendView(Map<String, Integer> categoryColors) {
         this.categoryColors = categoryColors;
         createLegend();
         setPickOnBounds(false);
@@ -32,9 +34,11 @@ public class LegendView extends VBox {
 
 
     private void createLegend() {
-        for (Map.Entry<String, Color> entry : categoryColors.entrySet()) {
+        for (Map.Entry<String, Integer> entry : categoryColors.entrySet()) {
             String category = entry.getKey();
-            Color color = entry.getValue();
+
+
+            Color color = Color.web(SCHEME1.get(entry.getValue()));
 
             HBox legendEntry = createLegendEntry(category, color);
             getChildren().add(legendEntry);

@@ -18,8 +18,6 @@
  */
 
 package splitstree6.xtra.mapview;
-import javafx.scene.Node;
-import javafx.scene.chart.PieChart;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import java.util.ArrayList;

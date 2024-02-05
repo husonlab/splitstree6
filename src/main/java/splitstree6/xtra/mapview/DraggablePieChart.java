@@ -1,0 +1,64 @@
+package splitstree6.xtra.mapview;
+
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.collections.ObservableList;
+import javafx.scene.chart.PieChart;
+import javafx.scene.paint.Color;
+
+import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
+
+public class DraggablePieChart {
+    private PieChart pieChart;
+    private double offsetX, offsetY;
+
+    private final DoubleProperty centerXProperty = new SimpleDoubleProperty();
+    private final DoubleProperty centerYProperty = new SimpleDoubleProperty();
+
+
+    public DraggablePieChart(ObservableList data) {
+        // Create a PieChart
+        pieChart = new PieChart();
+
+
+        pieChart.setData(data);
+
+
+        // Set up event handlers for dragging
+        pieChart.setOnMousePressed(event -> {
+            System.out.println("pressed");
+            offsetX = event.getSceneX() - pieChart.getLayoutX();
+            offsetY = event.getSceneY() - pieChart.getLayoutY();
+        });
+
+        pieChart.setOnMouseDragged(event -> {
+
+            pieChart.setLayoutX(event.getSceneX() - offsetX);
+            pieChart.setLayoutY(event.getSceneY() - offsetY);
+
+            centerXProperty.set(pieChart.getLayoutX() + pieChart.getBoundsInLocal().getWidth() / 2);
+            centerYProperty.set(pieChart.getLayoutY() + pieChart.getBoundsInLocal().getHeight() / 2);
+            //System.out.println("LayoutX " + pieChart.getLayoutX() + " LayoutY " + pieChart.getLayoutY());
+
+        });
+
+    }
+
+    public void updateCenter(){
+        centerXProperty.set(pieChart.getLayoutX() + pieChart.getBoundsInLocal().getWidth() / 2);
+        centerYProperty.set(pieChart.getLayoutY() + pieChart.getBoundsInLocal().getHeight() / 2);
+    }
+
+    public PieChart getPieChart() {
+        return pieChart;
+    }
+
+    // Provide access to centerX and centerY properties
+    public DoubleProperty centerXProperty() {
+        return centerXProperty;
+    }
+
+    public DoubleProperty centerYProperty() {
+        return centerYProperty;
+    }
+}

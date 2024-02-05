@@ -38,6 +38,8 @@ import javafx.stage.Stage;
 
 import java.util.*;
 
+import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
+
 public class MapViewPresenter {
 
 	public MapViewPresenter(MapView mapView) {
@@ -91,48 +93,57 @@ public class MapViewPresenter {
 			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
 			for(var trait : traits){
 
-				PieChart pieChart = new PieChart();
 				ObservableList obsList = FXCollections.observableList(getPieChartData(trait));
-				pieChart.setData(obsList);
-				pieChart.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-				pieChart.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-				pieChart.setMinWidth(80);
-				pieChart.setMaxWidth(200);
-				pieChart.setMinHeight(80);
-				pieChart.setMaxHeight(200);
-				pieChart.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-				pieChart.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-				mapPane.place(pieChart, trait.getLatitude(), trait.getLongtitude(), true);
+				DraggablePieChart pieChart = new DraggablePieChart(obsList);
+				pieChart.getPieChart().prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
+				pieChart.getPieChart().prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
+				pieChart.getPieChart().setMinWidth(80);
+				pieChart.getPieChart().setMaxWidth(200);
+				pieChart.getPieChart().setMinHeight(80);
+				pieChart.getPieChart().setMaxHeight(200);
+				pieChart.getPieChart().setCenterShape(true);
+				pieChart.getPieChart().prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
+				pieChart.getPieChart().prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
+				mapPane.placeChart(pieChart, trait.getLatitude(), trait.getLongtitude(), true);
+				for(int i = 0; i < pieChart.getPieChart().getData().size(); i++){
+					// Convert Color to CSS representation
+					// Use the cssColor in your style
+					System.out.println("Color " + i);
+					String style = "-fx-pie-color: " + SCHEME1.get(i) + ";";
+					pieChart.getPieChart().getData().get(i).getNode().setStyle(style);
+				}
 			}
 			//Legend
-			Map<String, Color> colorMap = new HashMap<>();
-			colorMap.put("seq_1", Color.RED);
-			colorMap.put("seq_2", Color.BLUE);
-			colorMap.put("seq_3", Color.GREEN);
-			colorMap.put("seq_4", Color.YELLOW);
-			colorMap.put("seq_5", Color.ORANGE);
-			colorMap.put("seq_6", Color.PURPLE);
-			colorMap.put("seq_7", Color.CYAN);
+			Map<String, Integer> colorMap = new HashMap<>();
+			colorMap.put("seq_1", 1);
+			colorMap.put("seq_2", 2);
+			colorMap.put("seq_3", 3);
+			colorMap.put("seq_4", 4);
+			colorMap.put("seq_5", 5);
+			colorMap.put("seq_6", 6);
+			colorMap.put("seq_7", 7);
 			LegendView legendView = new LegendView(colorMap);
-			//legendView.setTranslateX(50);
-			//legendView.setTranslateY(50);
+			legendView.setLayoutX(50);
+			legendView.setLayoutY(50);
 			controller.getStackPane().getChildren().add(mapPane);
 			legendView.setMouseTransparent(false);
 
 			controller.getStackPane().getChildren().add(legendView);
 
 		} catch (Exception ex) {
-			controller.getLabel().setText("Error: " + ex.getMessage());
+			controller.getInfoLabel().setText("Error: " + ex.getMessage());
 		}
 	}
 
 	public List<PieChart.Data> getPieChartData(GeoTrait trait){
 		List<PieChart.Data> data = new ArrayList<>();
-		for(String taxa : trait.getTaxa()){
-			data.add(new PieChart.Data(taxa, trait.getCompostion().get(taxa)));
+		for(int i = 0; i < trait.getnTaxa(); i++){
+			PieChart.Data nData = new PieChart.Data(trait.getTaxa().get(i), trait.getCompostion().get(trait.getTaxa().get(i)));
+			data.add(nData);
 		}
 		return data;
 	}
+
 
 	private void openFile(Stage stage, MapViewController controller, Model model) {
 		final var fileChooser = new FileChooser();
@@ -156,12 +167,12 @@ public class MapViewPresenter {
 			controller.getProgressBar().progressProperty().bind(service.progressProperty());
 			service.setOnSucceeded(v -> {
 				System.out.println("Loading succeeded");
-				controller.getLabel().setText("Taxa: %,d, Characters: %,d".formatted(model.getTaxaBlock().getNtax(),
+				controller.getInfoLabel().setText("Taxa: %,d, Characters: %,d".formatted(model.getTaxaBlock().getNtax(),
 						model.getCharactersBlock().getNchar()));
 			});
 			service.setOnFailed(u -> {
 				System.out.println("Loading characters failed");
-				controller.getLabel().setText("Loading trees failed");
+				controller.getInfoLabel().setText("Loading trees failed");
 			});
 			service.start();
 

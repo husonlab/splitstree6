@@ -22,6 +22,7 @@ package splitstree6.xtra.mapview;
 import javafx.geometry.Point2D;
 
 import java.util.Collection;
+import java.util.Map;
 
 /**
  * a rectangle describing a range of latitude and longitude coordinates
@@ -34,9 +35,7 @@ import java.util.Collection;
 public record LatLongRect(double minLatitude, double minLongitude, double rangeLatitude, double rangeLongitude) {
 	public static final double leftLongitude = -180.0;
 	public static final double rightLongitude = 180.0;
-
 	public static final double topLatitude = 90.0;
-
 	public static final double bottomLatitude = -90.0;
 
 	public double maxLatitude() {
@@ -52,47 +51,99 @@ public record LatLongRect(double minLatitude, double minLongitude, double rangeL
 		var maxLat = latLongPoints.stream().mapToDouble(Point2D::getX).max().orElse(0);
 		var minLong = latLongPoints.stream().mapToDouble(Point2D::getY).min().orElse(0);
 		var maxLong = latLongPoints.stream().mapToDouble(Point2D::getY).max().orElse(0);
-		if (proportionMargin != 0) { // add a margin
-			var rangeLong = (maxLong - minLong);
-			var rangeLat = (maxLat - minLat);
-			if(rangeLong/rangeLat < aspectRatio){
-				var addLong = (rangeLat*aspectRatio) - rangeLong;
-				minLong -= addLong/2;
-				maxLong += addLong/2;
-				if(minLong < -180){
-					maxLong += -180 - minLong;
-					minLong = -180;
-					if(maxLong > 180)maxLong = 180;
-				}
-				if(maxLong > 180){
-					minLong -= maxLong -180;
-					maxLong = 180;
-					if(minLong < -180) minLong = 180;
-				}
-				rangeLong = rangeLat*aspectRatio;
-			}else if(rangeLong/rangeLat > aspectRatio){
-				var addLat = (rangeLong/aspectRatio) - rangeLat;
-				minLat -= addLat/2;
-				maxLat += addLat/2;
-				if(minLat < -90){
-					maxLat += -90 - minLat;
-					minLat = -90;
-					if(maxLat > 90)maxLat = 90;
-				}
-				if(maxLat > 90){
-					minLat -= maxLat -90;
-					maxLat = 90;
-					if(minLat < -90) minLat = -90;
-				}
-				rangeLong = rangeLat*aspectRatio;
-			}
 
+		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+		var rangeLat = Math.abs(minLat - maxLat);
+		var rangeLong = Math.abs(minLong - maxLong);
+		minLong -= proportionMargin * rangeLong;
+		maxLong += proportionMargin * rangeLong;
+		minLat -= proportionMargin * rangeLat;
+		maxLat += proportionMargin * rangeLat;
+		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+
+
+		// Modify range latitude to minimum size
+		rangeLat = Math.abs(minLat - maxLat);
+		rangeLong = Math.abs(minLong - maxLong);
+		if(rangeLat < 10){
+			var addLat = 10 - rangeLat;
+			minLat -= addLat/2;
+			maxLat += addLat/2;
+			rangeLat = 10;
+		}
+
+		// Modify range Longtitude to minimum size
+		if(rangeLong < 15){
+			var addLong = 15 - rangeLong;
+			minLong -= addLong/2;
+			maxLong += addLong/2;
+			rangeLong = 15;
+		}
+
+
+
+		// Fit the computed rectangle to the required aspect ratio
+		if(rangeLong/rangeLat < aspectRatio){
+			var addLong = (rangeLat*aspectRatio) - rangeLong;
+			minLong -= addLong/2;
+			maxLong += addLong/2;
+		}else if(rangeLong/rangeLat > aspectRatio){
+			var addLat = (rangeLong/aspectRatio) - rangeLat;
+			minLat -= addLat/2;
+			maxLat += addLat/2;
+		}
+		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+
+		// Distribute surplus Latitude
+		if(minLat < bottomLatitude){
+			maxLat += (bottomLatitude - minLat);
+			if(maxLat > topLatitude) maxLat = topLatitude;
+			minLat = bottomLatitude;
+		}
+		if(maxLat > topLatitude){
+			minLat -= (maxLat - topLatitude);
+			if(minLat < bottomLatitude)minLat = bottomLatitude;
+			maxLat = topLatitude;
+		}
+
+		// Distribute surplus Longtitude
+		if(minLong < leftLongitude){
+			maxLong += (leftLongitude - minLong);
+			if(maxLong > rightLongitude)maxLong = rightLongitude;
+			minLong = leftLongitude;
+		}
+		if(maxLong > rightLongitude){
+			minLong -= (maxLong - rightLongitude);
+			if(minLong < leftLongitude)minLong = leftLongitude;
+			maxLong = rightLongitude;
+		}
+		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+
+		//rangeLat = Math.abs(minLat - maxLat);
+
+		//minLat -= 2;
+		/*
+		// Add proportion margin if possible
+		rangeLong = Math.abs(minLong - maxLong);
+		rangeLat = Math.abs(minLat - maxLat);
+
+		if (proportionMargin != 0) {
 			minLong = Math.max(leftLongitude, minLong - proportionMargin * rangeLong);
 			maxLong = Math.min(rightLongitude, maxLong + proportionMargin * rangeLong);
 			minLat = Math.max(bottomLatitude, minLat - proportionMargin * rangeLat);
 			maxLat = Math.min(topLatitude, maxLat + proportionMargin * rangeLat);
 		}
+		rangeLong = Math.abs(minLong - maxLong);
+		rangeLat = Math.abs(minLat - maxLat);
+
+		 */
+
+		rangeLong = Math.abs(minLong - maxLong);
+		rangeLat = Math.abs(minLat - maxLat);
+
 		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
-		return new LatLongRect(minLat, minLong, maxLat - minLat, maxLong - minLong);
+		System.out.println("range Lat " + rangeLat + " range long " + rangeLong);
+
+		return new LatLongRect(minLat, minLong, rangeLat, rangeLong);
 	}
 }

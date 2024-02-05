@@ -71,6 +71,21 @@ public class MapViewController {
 	private StackPane mainStackPane;
 
 
+	@FXML
+	private Label labelChartSize;
+
+	@FXML
+	private Label infoLabel;
+
+
+	public Label getInfoLabel() {
+		return infoLabel;
+	}
+
+	public Label getLabelChartSize() {
+		return labelChartSize;
+	}
+
 	public StackPane getMainStackPane() {
 		return mainStackPane;
 	}

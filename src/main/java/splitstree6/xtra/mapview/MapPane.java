@@ -131,6 +131,29 @@ public class MapPane extends StackPane {
 		place(node, latLong.getX(), latLong.getY(), center);
 	}
 
+	public void placeChart (DraggablePieChart node, double latitude, double longitude, boolean center){
+		var location = getLocationOnMap(latitude, longitude);
+		node.getPieChart().setLayoutX(location.getX());
+		node.getPieChart().setLayoutY(location.getY());
+		node.updateCenter();
+
+
+		if (center && (Node) node.getPieChart() instanceof Region region) {
+			//System.out.println("applying css");
+			region.applyCss();
+			Platform.runLater(() -> {
+				region.setLayoutX(region.getLayoutX() - 0.5 * region.getWidth());
+				region.setLayoutY(region.getLayoutY() - 0.5 * region.getHeight());
+			});
+		}
+
+
+		DraggableLine line = new DraggableLine(node);
+		getUserPane().getChildren().add(line.getLine());
+		getUserPane().getChildren().add(node.getPieChart());
+
+	}
+
 
 	public Point2D getLocationOnMap(double latitude, double longitude) {
 		return new Point2D(getMapX(longitude), getMapY(latitude));
