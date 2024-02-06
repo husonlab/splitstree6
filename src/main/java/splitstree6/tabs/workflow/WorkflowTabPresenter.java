@@ -25,6 +25,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.SetChangeListener;
+import javafx.event.Event;
 import javafx.scene.Group;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.SelectionEffectBlue;
@@ -165,6 +166,11 @@ public class WorkflowTabPresenter implements IDisplayTabPresenter {
 
 		mainController.getZoomInMenuItem().setOnAction(null);
 		mainController.getZoomOutMenuItem().setOnAction(null);
+
+		controller.getAnchorPane().setOnSwipeLeft(Event::consume);
+		controller.getAnchorPane().setOnSwipeRight(Event::consume);
+		controller.getAnchorPane().setOnSwipeUp(Event::consume);
+		controller.getAnchorPane().setOnSwipeDown(Event::consume);
 	}
 
 	public WorkflowTabLayout getWorkflowTabLayout() {

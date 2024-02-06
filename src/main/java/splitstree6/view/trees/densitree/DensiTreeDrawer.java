@@ -59,6 +59,7 @@ import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.main.SplitsTree6;
 import splitstree6.splits.TreesUtils;
 import splitstree6.view.trees.InteractionSetup;
+import splitstree6.view.utils.Icebergs;
 import splitstree6.window.MainWindow;
 
 import java.util.*;
@@ -292,6 +293,7 @@ public class DensiTreeDrawer {
 			};
 			e.setData(shape);
 			shape.getStyleClass().add("graph-special-edge");
+			shape.setStrokeWidth(1.5);
 			edgesGroup.getChildren().add(shape);
 			shape.setOnMouseClicked(a -> {
 				if (!a.isShiftDown() && SplitsTree6.isDesktop())
@@ -305,16 +307,20 @@ public class DensiTreeDrawer {
 				});
 				a.consume();
 			});
-			shape.setOnMouseEntered(a -> {
-				if (!a.isStillSincePress()) {
-					shape.setStrokeWidth(5);
-				}
-			});
-			shape.setOnMouseExited(a -> {
-				if (!a.isStillSincePress()) {
-					shape.setStrokeWidth(1);
-				}
-			});
+			if (false) {
+				shape.setOnMouseEntered(a -> {
+					if (!a.isStillSincePress()) {
+						shape.setStrokeWidth(5);
+					}
+				});
+				shape.setOnMouseExited(a -> {
+					shape.setStrokeWidth(1.5);
+				});
+			}
+			/*if (Icebergs.enabled()) */
+			{ // todo: always allow this because the edges are hard to click on
+				edgesGroup.getChildren().add(Icebergs.create(shape, true));
+			}
 		}
 		// implement show/hide consensus tree:
 		ChangeListener<Boolean> showConsensusListener = (v, o, n) -> edgesGroup.setVisible(n);
@@ -493,21 +499,23 @@ public class DensiTreeDrawer {
 			// determine all trees that have same clusters as consensus:
 			var treesWithConsensusTopology = new ArrayList<PhyloTree>();
 			for (var tree : trees) {
-				var nodeClusterMap = TreesUtils.extractClusters(tree);
+				try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
 				if (consensusClusters.equals(new HashSet<>(nodeClusterMap.values()))) {
 					treesWithConsensusTopology.add(tree);
+				}
 				}
 			}
 
 			// compute weights, if trees with consensus clusters exist, use them, otherwise use all
 			var countTrees = 0;
-			for (var tree : treesWithConsensusTopology.size() > 0 ? treesWithConsensusTopology : trees) {
-				var nodeClusterMap = TreesUtils.extractClusters(tree);
-				countTrees++;
-				for (var entry : nodeClusterMap.entrySet()) {
-					var v = entry.getKey();
-					var cluster = entry.getValue();
-					clusterWeightMap.put(cluster, clusterWeightMap.getOrDefault(cluster, 0.0) + (v.getInDegree() > 0 ? tree.getWeight(v.getFirstInEdge()) : 0));
+			for (var tree : !treesWithConsensusTopology.isEmpty() ? treesWithConsensusTopology : trees) {
+				try (var nodeClusterMap = TreesUtils.extractClusters(tree)) {
+					countTrees++;
+					for (var entry : nodeClusterMap.entrySet()) {
+						var v = entry.getKey();
+						var cluster = entry.getValue();
+						clusterWeightMap.put(cluster, clusterWeightMap.getOrDefault(cluster, 0.0) + (v.getInDegree() > 0 ? tree.getWeight(v.getFirstInEdge()) : 0));
+					}
 				}
 			}
 			if (countTrees > 0) {
@@ -568,23 +576,6 @@ public class DensiTreeDrawer {
 
 				label.setFontSize(label.getFontSize() * fontScaleFactor.get());
 			}
-
-			label.setOnMouseEntered(e -> {
-				if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
-					nodeShapeOrLabelEntered = true;
-					label.setScaleX(1.1 * label.getScaleX());
-					label.setScaleY(1.1 * label.getScaleY());
-					e.consume();
-				}
-			});
-			label.setOnMouseExited(e -> {
-				if (nodeShapeOrLabelEntered) {
-					label.setScaleX(label.getScaleX() / 1.1);
-					label.setScaleY(label.getScaleY() / 1.1);
-					nodeShapeOrLabelEntered = false;
-					e.consume();
-				}
-			});
 		}
 		InvalidationListener invalidationListener = e -> {
 			for (var label : BasicFX.getAllRecursively(labelPane, RichTextLabel.class)) {

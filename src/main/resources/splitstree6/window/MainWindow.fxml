@@ -467,7 +467,11 @@
                                 <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="File"/>
                                 <ToggleButton fx:id="showWorkflowTreeCheckButton" mnemonicParsing="false"
-                                              text="Workflow"/>
+                                              text="Side Bar">
+                                    <tooltip>
+                                        <Tooltip text="Show/hide methods sidebar"/>
+                                    </tooltip>
+                                </ToggleButton>
                                 <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false"/>
                             </children>
                         </HBox>
@@ -532,7 +536,8 @@
                                 <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                             </padding>
                             <center>
-                                <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER"/>
+                                <TabPane focusTraversable="false" tabClosingPolicy="UNAVAILABLE"
+                                         BorderPane.alignment="CENTER"/>
                             </center>
                         </BorderPane>
                     </AnchorPane>

@@ -39,6 +39,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.AlgorithmBreadCrumbsToolBar;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceUtils;
 import splitstree6.window.MainWindow;
 
@@ -132,6 +133,8 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				controller.getTopVBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
 			}
 		});
+
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 	}
 
 	public void setupMenuItems() {

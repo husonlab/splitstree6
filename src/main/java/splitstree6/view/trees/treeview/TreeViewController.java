@@ -108,6 +108,9 @@ public class TreeViewController {
 	private ToggleButton formatToggleButton;
 
 	@FXML
+	private ToggleButton showQRCodeButton;
+
+	@FXML
 	private VBox formatVBox;
 
 
@@ -131,6 +134,7 @@ public class TreeViewController {
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
+		MaterialIcons.setIcon(showQRCodeButton, "qr_code");
 
 		zoomableScrollPane.setPannable(true);
 		zoomableScrollPane.setFitToWidth(true);
@@ -267,5 +271,9 @@ public class TreeViewController {
 
 	public Button getFlipVerticalButton() {
 		return flipVerticalButton;
+	}
+
+	public ToggleButton getShowQRCodeButton() {
+		return showQRCodeButton;
 	}
 }

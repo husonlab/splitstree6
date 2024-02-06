@@ -44,10 +44,11 @@ public class LabeledNodeShape extends Group {
 
 	public LabeledNodeShape(RichTextLabel label, Shape shape) {
 		this.label = label;
-		if (shape != null)
+		if (shape != null) {
 			setShape(shape);
+			shape.getStyleClass().add("graph-node");
+		}
 		setId("graph-node"); // the is used to rotate graph
-		getStyleClass().add("graph-node");
 	}
 
 	public void setLabel(RichTextLabel label) {
@@ -59,7 +60,7 @@ public class LabeledNodeShape extends Group {
 	public void setShape(Shape shape) {
 		getChildren().clear();
 		if (shape != null) {
-			if (Icebergs.enabled()) {
+			if (false && Icebergs.enabled()) { // node icebergs seem to get in the way...
 				getChildren().add(Icebergs.create(shape, false));
 			}
 			getChildren().add(shape);

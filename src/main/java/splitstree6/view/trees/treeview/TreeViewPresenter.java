@@ -27,10 +27,10 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
-import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
@@ -53,7 +53,10 @@ import splitstree6.layout.LayoutUtils;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
+import splitstree6.qr.QRViewUtils;
+import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.tanglegram.optimize.EmbeddingOptimizer;
@@ -183,22 +186,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		scrollPane.setRequireShiftOrControlToZoom(false);
 		scrollPane.setPannable(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
-		scrollPane.contentProperty().addListener((v, o, n) -> {
-			if (n != null) {
-				n.setOnSwipeLeft(e -> {
-					if (!controller.getNextButton().isDisabled())
-						controller.getNextButton().fire();
-					e.consume();
-				});
-				n.setOnSwipeRight(e -> {
-					if (!controller.getPreviousButton().isDisabled())
-						controller.getPreviousButton().fire();
-					e.consume();
-				});
-				n.setOnSwipeUp(Event::consume);
-				n.setOnSwipeDown(Event::consume);
-			}
-		});
 
 		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();
 		view.reticulatedProperty().addListener((v, o, n) -> {
@@ -405,6 +392,11 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
+		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
 	}
@@ -485,6 +477,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
 
+		var qrImageView = new SimpleObjectProperty<ImageView>();
+		QRViewUtils.setup(controller.getAnchorPane(), tree, TreeNewickQR.createFunction(), qrImageView, controller.getShowQRCodeButton().selectedProperty());
+
 		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
 
@@ -547,4 +542,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 	public boolean allowFindReplace() {
 		return true;
 	}
+
+	private final ImageView qrImageView = new ImageView();
 }

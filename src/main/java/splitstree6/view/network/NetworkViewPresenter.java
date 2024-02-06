@@ -41,6 +41,7 @@ import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
@@ -180,6 +181,10 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
+		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setConsumeSwipeUp(controller.getAnchorPane());
+		SwipeUtils.setConsumeSwipeDown(controller.getAnchorPane());
 
 		Platform.runLater(this::setupMenuItems);
 	}

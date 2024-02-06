@@ -26,13 +26,11 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.DataFormat;
-import javafx.scene.input.SwipeEvent;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
@@ -41,6 +39,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
@@ -65,8 +64,6 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		this.view = view;
 		this.controller = view.getController();
 		this.drawer = new DensiTreeDrawer(mainWindow);
-
-		controller.getAnchorPane().addEventHandler(SwipeEvent.ANY, Event::consume);
 
 		controller.getDiagramToggleGroup().selectedToggleProperty().addListener((v, o, n) -> {
 			if (n instanceof RadioMenuItem radioMenuItem) {
@@ -212,6 +209,11 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 				view.setOptionEdgeColor(DensiTreeView.DEFAULT_LIGHTMODE_EDGE_COLOR);
 
 		});
+
+		SwipeUtils.setConsumeSwipeLeft(controller.getAnchorPane());
+		SwipeUtils.setConsumeSwipeRight(controller.getAnchorPane());
+		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
 	}
 
 	@Override

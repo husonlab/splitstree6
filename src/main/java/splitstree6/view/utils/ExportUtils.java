@@ -47,6 +47,6 @@ public class ExportUtils {
 					ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty))));
 		} else
 			mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
-					mainController.getCopyImageMenuItem())));
+					mainController.getCopyImageMenuItem(), ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty))));
 	}
 }
