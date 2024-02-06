@@ -96,6 +96,9 @@ public class SplitsViewController {
 	private Button flipVerticalButton;
 
 	@FXML
+	private ToggleButton showQRCodeButton;
+
+	@FXML
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();
@@ -114,6 +117,7 @@ public class SplitsViewController {
 		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
 		MaterialIcons.setIcon(settingsToggleButton, "tune");
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
+		MaterialIcons.setIcon(showQRCodeButton, "qr_code");
 
 		zoomableScrollPane.setFitToWidth(true);
 		zoomableScrollPane.setFitToHeight(true);
@@ -238,6 +242,10 @@ public class SplitsViewController {
 
 	public ZoomButtonsPanel getZoomButtonPane() {
 		return zoomButtonPane;
+	}
+
+	public ToggleButton getShowQRCodeButton() {
+		return showQRCodeButton;
 	}
 }
 

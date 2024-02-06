@@ -18,6 +18,7 @@ module splitstreesix {
 	requires org.fxmisc.flowless;
 	requires org.fxmisc.richtext;
 	requires org.fxmisc.undo;
+	requires com.google.zxing;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
@@ -166,7 +167,6 @@ module splitstreesix {
 	opens splitstree6.xtra.genetreeview;
 	opens splitstree6.xtra.outliner;
 	opens splitstree6.xtra.mapview;
-
 
 	opens splitstree6.algorithms.utils;
 	opens splitstree6.xtra.genetreeview.layout;

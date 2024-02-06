@@ -22,7 +22,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="800.0" style="-fx-background-color: transparent;"
+<AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="1000.0" style="-fx-background-color: transparent;"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="splitstree6.view.splits.viewer.SplitsViewController">
     <BorderPane fx:id="borderPane" style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0.0"
@@ -40,13 +40,12 @@
                             <Tooltip text="Choose rooting method"/>
                         </tooltip>
                     </ComboBox>
-                    <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" selected="true"
-                                  text="i">
+                    <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" text="i">
                         <tooltip>
                             <Tooltip text="Show internal labels"/>
                         </tooltip>
                     </ToggleButton>
-                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
 
                     <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                     <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
@@ -55,7 +54,7 @@
                             text="Flip Horizontal"/>
                     <Button fx:id="flipVerticalButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
                             text="Flip Vertical"/>
-                    <Region minWidth="1.0" prefWidth="1.0" maxWidth="1.0" prefHeight="20.0" HBox.hgrow="NEVER"/>
+                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                     <Button fx:id="zoomInButton" contentDisplay="CENTER" maxHeight="20.0" mnemonicParsing="false"
                             text="Zoom In">
                         <tooltip>
@@ -68,6 +67,14 @@
                             <Tooltip text="Zoom in"/>
                         </tooltip>
                     </Button>
+                    <Region layoutX="504.0" layoutY="10.0" maxWidth="1.0" minWidth="1.0" prefHeight="20.0"
+                            prefWidth="1.0"/>
+                    <ToggleButton fx:id="showQRCodeButton" layoutX="119.0" layoutY="9.0" mnemonicParsing="false"
+                                  text="QR">
+                        <tooltip>
+                            <Tooltip text="Show internal labels"/>
+                        </tooltip>
+                    </ToggleButton>
                 </ToolBar>
             </VBox>
         </top>
