@@ -33,9 +33,7 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.readers.trees.TreesReader;
-import splitstree6.io.writers.distances.PlainTextWriter;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -44,7 +42,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import jloda.util.FileUtils;
 import splitstree6.io.writers.trees.NewickWriter;
-import splitstree6.view.trees.tanglegram.optimize.Taxa;
 
 
 public class AltsNonBinary {
@@ -113,15 +110,6 @@ public class AltsNonBinary {
 		}
 
 		return updatedTreesBlock;
-	}
-
-	private static boolean treeContainsTaxon(PhyloTree tree, String taxon) {
-		for (var leaf : tree.leaves()) {
-			if (leaf.getLabel().equals(taxon)) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 	private static String addTaxonToTree(String treeString, String taxon) {
@@ -266,7 +254,7 @@ public class AltsNonBinary {
 
 			// Start aligning from the second non-null and non-empty sequence
 			for (LinkedList<String> sequence : sequences) {
-				if (sequence != null && !sequence.isEmpty() && !sequence.equals(currentConsensus)) {
+				if (sequence != null && !sequence.isEmpty() && !sequence.equals(new LinkedList<>(List.of(currentConsensus)))) {
 					currentConsensus = scsOfTwoCommaSeparatedLists(new LinkedList<>(List.of(currentConsensus)), sequence);
 				}
 			}
@@ -278,7 +266,7 @@ public class AltsNonBinary {
 		return consensusMap;
 	}
 
-	public static String processConsensusString(String input) {
+	/*public static String processConsensusString(String input) {
 		// Split the input string into parts based on comma
 		List<String> parts = new ArrayList<>(Arrays.asList(input.split(",")));
 
@@ -304,7 +292,7 @@ public class AltsNonBinary {
 
 		// Reconstruct the string without the removed element
 		return String.join(",", parts);
-	}
+	}*/
 
 	private static String scsOfTwoCommaSeparatedLists(LinkedList<String> seq1List, LinkedList<String> seq2List) {
 		// Join all strings in each LinkedList into a single, comma-separated string
@@ -377,26 +365,6 @@ public class AltsNonBinary {
 	}
 
 	/**
-	 * Using map, count the hybridization number. No network created yet.
-	 */
-    /*public static int countHybridization(Map<String, String> map) {
-        ConcurrentHashMap<String, AtomicInteger> elementCounts = new ConcurrentHashMap<>();
-
-        // Using parallel stream to count occurrences of each element
-        map.values().parallelStream()
-                .flatMap(value -> Arrays.stream(value.split("[,/]+")))
-                .filter(element -> !element.isEmpty())
-                .forEach(element -> elementCounts.computeIfAbsent(element, k -> new AtomicInteger(0)).incrementAndGet());
-
-        // Sum up (count - 1) for each element
-        return elementCounts.values().parallelStream()
-                .mapToInt(AtomicInteger::get)
-                .filter(count -> count > 1)
-                .map(count -> count - 1)
-                .sum();
-    }*/
-
-	/**
 	 * Calculates alignments for given trees and corresponding hybridization number
 	 */
 	private static HybridizationResult calculateHybridization(TreesBlock treesBlock, List<String> order) throws IOException {
@@ -462,7 +430,7 @@ public class AltsNonBinary {
 			combinedOrder.add(element); // Add the current element to the fixed positions
 			combinedOrder.addAll(remainingOrder.stream().filter(e -> !e.equals(element)).collect(Collectors.toList())); // Add the rest of the modified order
 
-			int currentHybridization = 0;
+			int currentHybridization;
 			try {
 				HybridizationResult hybridizationResult = calculateHybridization(treesBlock, combinedOrder);
 				currentHybridization = hybridizationResult.getHybridizationScore();
@@ -556,7 +524,7 @@ public class AltsNonBinary {
 
 		for (var n : tree.nodes()){
 			if (n.getInDegree() == 1 && n.getOutDegree() == 1){
-				Edge e = tree.delDivertex(n);
+				tree.delDivertex(n);
 			}
 		}
 
@@ -663,14 +631,5 @@ public class AltsNonBinary {
 		treesBlock.setPartial(false);
 
 		return tree;
-	}
-
-	public static String getKeyByValue(Map<String, Integer> map, Integer value) {
-		for (Map.Entry<String, Integer> entry : map.entrySet()) {
-			if (value.equals(entry.getValue())) {
-				return entry.getKey();
-			}
-		}
-		return null; // Return null if the value is not found
 	}
 }
