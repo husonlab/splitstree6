@@ -313,7 +313,8 @@ public class TreesUtils {
 		var taxaIdMap = new HashMap<String, Integer>();
 
 		//var network=NewickIO.valueOf("(((e,((((a)#H2:0,c))#H1:0,d)),(((b,#H2:0),#H1:0),#H2:0)));");
-		var network = NewickIO.valueOf("(((e,((c)#H1:0,d)),(((a,#H1:0))#H2:0,((b,#H2:0),#H1:0))))");
+		//var network = NewickIO.valueOf("((((((((((((((t4,(t1,t2:2):2),(t5,t11:2):2),(t8,t19:2):2),(t6,((t20,t15:2),t12:2):2):2),(((t13,(t16)#H2),(t18)#H3))#H1),#H3),(t3)#H4),(((((t7,(t9,t17:2):2),#H4),#H3),(((((t10,t14:2),#H4),#H1),#H2))#H6))#H5),#H6),#H1),#H5),#H4),#H1));");
+		var network = NewickIO.valueOf("((((((((((((((t4,(t1,t2:2):2),(t5,t11:2):2),(t8,t19:2):2),(t6,((t20,t15:2),t12:2):2):2),(((t13,(t16)#H2:0),(t18)#H3:0))#H1:0),#H3:0),(t3)#H4:0),(((((t7,(t9,t17:2):2),#H4:0),#H3:0),(((((t10,t14:2),#H4:0),#H1:0),#H2:0))#H6:0))#H5:0),#H6:0),#H1:0),#H5:0),#H4:0),#H1:0));");
 		addAdhocTaxonIds(network, taxaIdMap);
 
 		LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
@@ -322,27 +323,41 @@ public class TreesUtils {
 		var softwiredClusters = collectAllSoftwiredClusters(network);
 		System.err.println("network clusters: " + softwiredClusters);
 
-		var lines = new String[]{
-				"((a, (b, c)),(d, e));",
-				"((e, (d, c)),(b, a));",
-				"((e, d),((c, a),b));",
-				"((e, d),(c, (a, b)));"};
+		String[] lines = new String[]{
+				"(((t10,t14),t3),(((t17,t9),t7),(t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16)))));",
+				"(((((t17,t9),t7),t3),t18),(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),((t13,t16),(t10,t14))));",
+				"((((t17,t9),t7),((t18,(t13,t16)),((t10,t14),((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))))),t3);",
+				"((((t17,t9),t7),((t10,t14),t3)),(t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))));",
+				"(((t10,t14),t3),((((t17,t9),t7),t18),(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))));",
+				"(((((t17,t9),t7),t3),(t10,t14)),(t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))));",
+				"(((((t17,t9),t7),t3),((t13,t16),(t10,t14))),(t18,((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))));",
+				"((t10,t14),(((t17,t9),t7),((t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))),t3)));",
+				"((t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),t13)),((t16,(t10,t14)),(((t17,t9),t7),t3)));",
+				"((t18,t13),(((t16,(t10,t14)),((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))),(((t17,t9),t7),t3)));"};
+
+		/*String[] lines = new String[]{
+				"((a,(b,c)),(d,e));",
+				"((e,(d,c)),(b,a));",
+				"((e,d),((c,a),b));",
+				"((e,d),(c,(a,b)));",
+				"((f,b,c),d,(e,a));",
+		"((a,b),x);"};*/
 
 		for (var line : lines) {
 			var tree = NewickIO.valueOf(line);
 			addAdhocTaxonIds(tree, taxaIdMap);
-			System.err.println(NewickIO.toString(tree, false) + ";");
+			System.out.println(NewickIO.toString(tree, false) + ";");
 
 			var treeClusters = collectAllHardwiredClusters(tree);
-			System.err.println("tree clusters: " + treeClusters);
+			System.out.println("tree clusters: " + treeClusters);
 
-			System.err.println("Missing in network: :" + CollectionUtils.difference(treeClusters, softwiredClusters));
+			System.out.println("Missing in network: :" + CollectionUtils.difference(treeClusters, softwiredClusters));
 		}
 
 
 	}
 
-	private static void addAdhocTaxonIds(PhyloTree tree, Map<String, Integer> taxaIdMap) {
+	public static void addAdhocTaxonIds(PhyloTree tree, Map<String, Integer> taxaIdMap) {
 		tree.nodeStream().filter(v -> tree.getLabel(v) != null).forEach(v -> {
 			var taxId = taxaIdMap.getOrDefault(tree.getLabel(v), taxaIdMap.size() + 1);
 			tree.addTaxon(v, taxId);
