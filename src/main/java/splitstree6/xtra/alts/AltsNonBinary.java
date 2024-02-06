@@ -41,6 +41,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import jloda.util.FileUtils;
 import splitstree6.io.writers.trees.NewickWriter;
+import java.time.Duration;
+import java.time.Instant;
 
 
 public class AltsNonBinary {
@@ -56,18 +58,13 @@ public class AltsNonBinary {
 		loadTrees(infile, taxaBlock, inputTreesBlock);
 
 		List<String>  initialOrder = taxaBlock.getLabels();
-
 		TreesBlock updatedTreesBlock = preProcessTrees(inputTreesBlock);
-		for (var tre : updatedTreesBlock.getTrees()){
-			System.out.println(tre.toBracketString());
-		}
 
-		long startTime = System.nanoTime();
+		Instant start = Instant.now();
 		PhyloTree tree = resultingNetwork(updatedTreesBlock, initialOrder);
 		System.out.println(tree.toBracketString());
-		long endTime = System.nanoTime();
-		long second = (endTime - startTime) / 1_000_000_000;
-		System.out.println("Time: " + second + " second");
+		Instant end = Instant.now();
+		System.out.println("Time taken: " + Duration.between(start, end).toSeconds()+ " seconds");
 
 		var outputTreesBlock = new TreesBlock();
 		outputTreesBlock.getTrees().add(tree);
@@ -404,14 +401,14 @@ public class AltsNonBinary {
 	 */
 	public static PhyloTree resultingNetwork(TreesBlock treesBlock, List<String> initialOrder) throws IOException {
 		List<String> finalOrder = new ArrayList<>();
-		return bestOrderNetwork(treesBlock, initialOrder, finalOrder, Integer.MAX_VALUE);
+		return calculateBestScoreOrder(treesBlock, initialOrder, finalOrder, Integer.MAX_VALUE);
 	}
 
 	/**
 	 * Recursively calculate the order with min num of hybridization, and compute the corresponding network at the end.
 	 * Called in resultingTree
 	 */
-	private static PhyloTree bestOrderNetwork(TreesBlock treesBlock, List<String> remainingOrder, List<String> finalOrder, int currentMinHybridization) throws IOException {
+	private static PhyloTree calculateBestScoreOrder(TreesBlock treesBlock, List<String> remainingOrder, List<String> finalOrder, int currentMinHybridization) throws IOException {
 		if (remainingOrder.isEmpty()) {
 			HybridizationResult result = calculateHybridization(treesBlock, finalOrder);
 			System.err.println("Final Order: " + finalOrder);
@@ -451,7 +448,7 @@ public class AltsNonBinary {
 			remainingOrder.remove(bestEntry.getKey());
 			//findBestOrder(treesBlock, remainingOrder, finalOrder, minHybridization.get());
 		}
-		return bestOrderNetwork(treesBlock, remainingOrder, finalOrder, minHybridization.get());
+		return calculateBestScoreOrder(treesBlock, remainingOrder, finalOrder, minHybridization.get());
 	}
 
 	/**
