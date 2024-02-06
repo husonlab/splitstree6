@@ -21,7 +21,6 @@ package splitstree6.xtra.alts;
 
 import jloda.fx.util.ArgsOptions;
 import jloda.fx.util.ProgramExecutorService;
-import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
