@@ -25,8 +25,11 @@ import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
+import jloda.util.Basic;
+import jloda.util.FileUtils;
 import jloda.util.Pair;
 import jloda.util.UsageException;
+import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -34,20 +37,22 @@ import splitstree6.io.readers.ImportManager;
 import splitstree6.io.readers.trees.TreesReader;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import jloda.util.FileUtils;
-import splitstree6.io.writers.trees.NewickWriter;
-import java.time.Duration;
-import java.time.Instant;
 
 
+/**
+ * implementation of the ALTSNetwork method for non-binary input trees
+ * Banu Cetinkaya, 2023-24
+ */
 public class AltsNonBinary {
 	public static void main(String[] args) throws UsageException, IOException {
-		var options = new ArgsOptions(args, AltsNonBinary.class, "Non-binary version of ALTS");
+		var options = new ArgsOptions(args, AltsNonBinary.class, "Non-binary version of ALTSNetwork");
 		var infile = options.getOptionMandatory("-i", "input", "Input Newick file", "");
 		var outfile = options.getOption("-o", "output", "Output Newick file (.gz or stdout ok)", "stdout");
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Number of threads to use", 4));
@@ -57,38 +62,69 @@ public class AltsNonBinary {
 		TreesBlock inputTreesBlock = new TreesBlock();
 		loadTrees(infile, taxaBlock, inputTreesBlock);
 
-		List<String>  initialOrder = taxaBlock.getLabels();
-		TreesBlock updatedTreesBlock = preProcessTrees(inputTreesBlock);
 
-		Instant start = Instant.now();
-		PhyloTree tree = resultingNetwork(updatedTreesBlock, initialOrder);
-		System.out.println(tree.toBracketString());
-		Instant end = Instant.now();
-		System.out.println("Time taken: " + Duration.between(start, end).toSeconds()+ " seconds");
+		var progress = new ProgressPercentage("Computing hybridization network", -1);
+		// todo: add this to your algorithm and call the method progress.checkForCancel(); frequently
+		// it will throw a UserCanceled exception if the user has indicated to cancel the calculation
+		// when this exception is thrown, stop your code, clean up and then rethrow the exception
 
-		var outputTreesBlock = new TreesBlock();
-		outputTreesBlock.getTrees().add(tree);
+		var start = Instant.now();
+		var networks = apply(inputTreesBlock.getTrees(), progress);
+		var end = Instant.now();
+		System.out.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
+
+		for (var network : networks)
+			System.out.println(network.toBracketString(false));
 
 		System.err.println("Writing: " + outfile);
 		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
-			(new NewickWriter()).write(w, taxaBlock, outputTreesBlock);
+			for (var network : networks) {
+				w.write(NewickIO.toString(network, false) + ";\n");
+			}
 		}
-
 	}
-	public static TreesBlock preProcessTrees(TreesBlock inputTreesBlock) throws IOException {
-		TreesBlock updatedTreesBlock = new TreesBlock();
+
+	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) {
+		try {
+			var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
+			var updatedTrees = preProcessTrees(trees);
+			return resultingNetworks(updatedTrees, initialOrder, progress);
+		} catch (IOException ex) {
+			Basic.caught(ex);
+			return new ArrayList<>();
+		}
+	}
+
+	private static ArrayList<String> getInitialOrder(Collection<PhyloTree> trees) {
+		var order = new ArrayList<String>();
+		{
+			var seen = new HashSet<String>();
+			for (var tree : trees) {
+				tree.nodeStream().filter(v -> tree.getLabel(v) != null).map(tree::getLabel)
+						.filter(label -> !label.isBlank() && !seen.contains(label))
+						.forEach(label -> {
+							order.add(label);
+							seen.add(label);
+						});
+			}
+		}
+		return order;
+	}
+
+	public static List<PhyloTree> preProcessTrees(Collection<PhyloTree> inputTrees) throws IOException {
+		var outputTrees = new ArrayList<PhyloTree>();
 		Set<String> allTaxa = new HashSet<>();
 
 		// Obtain a list of all taxa across all trees
-		for (var tree : inputTreesBlock.getTrees()) {
+		for (var tree : inputTrees) {
 			for (var taxon : tree.leaves()) {
 				allTaxa.add(taxon.getLabel());
 			}
 		}
 
 		// For each tree, determine missing taxa and add them
-		for (var tree : inputTreesBlock.getTrees()) {
-			String modifiedTree = tree.toBracketString();
+		for (var tree : inputTrees) {
+			String modifiedTree = tree.toBracketString(false);
 			Set<String> missingTaxa = new HashSet<>(allTaxa);
 
 			// Identify missing taxa for this tree
@@ -100,12 +136,13 @@ public class AltsNonBinary {
 			for (String missingTaxon : missingTaxa) {
 				modifiedTree = addTaxonToTree(modifiedTree, missingTaxon);
 			}
+			modifiedTree += ";";
 
 			// Add the modified tree to the updatedTreesBlock
-			updatedTreesBlock.getTrees().add(NewickIO.valueOf(modifiedTree)); // Assuming NewickIO.valueOf converts a Newick string to a Tree object
+			outputTrees.add(NewickIO.valueOf(modifiedTree)); // Assuming NewickIO.valueOf converts a Newick string to a Tree object
 		}
 
-		return updatedTreesBlock;
+		return outputTrees;
 	}
 
 	private static String addTaxonToTree(String treeString, String taxon) {
@@ -148,7 +185,7 @@ public class AltsNonBinary {
 					//System.out.println("content: " + contents);
 					String processedContent = processBrackets(contents, order);
 					//System.out.println("processed content: "+processedContent);
-					String smallestRemoved = processedContent.replaceAll("\\b"+Pattern.quote(findSmallestElement(processedContent, order))+"\\b", "").replace(",","/").
+					String smallestRemoved = processedContent.replaceAll("\\b" + Pattern.quote(findSmallestElement(processedContent, order)) + "\\b", "").replace(",", "/").
 							trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
 					//System.out.println("smallest removed: " + smallestRemoved);
 					labelledNewick.append(smallestRemoved);
@@ -158,6 +195,7 @@ public class AltsNonBinary {
 		//System.out.println(labelledNewick);
 		return labelledNewick.toString();
 	}
+
 	private static String processBrackets(String content, List<String> order) {
 		StringBuilder result = new StringBuilder();
 		Stack<Integer> stack = new Stack<>();
@@ -183,6 +221,7 @@ public class AltsNonBinary {
 		}
 		return result.toString();
 	}
+
 	private static String findSmallestElement(String str, List<String> order) {
 		String[] splitStr = str.split(",");
 		String smallest = null;
@@ -201,12 +240,12 @@ public class AltsNonBinary {
 	 * Finds the hyperstring for each taxa
 	 * Starts from leaf go up until no parent found. If leaf encounters its own label, path creation stops there.
 	 */
-	public static LinkedList<String> path(Node leafNode){
+	public static LinkedList<String> path(Node leafNode) {
 		LinkedList<String> path = new LinkedList<>();
 		Node currentNode = leafNode;
-		while(currentNode.getParent() != null){
+		while (currentNode.getParent() != null) {
 			List<String> checkParent = List.of(currentNode.getParent().getLabel().split("/"));
-			if (checkParent.contains(leafNode.getLabel())){
+			if (checkParent.contains(leafNode.getLabel())) {
 				break;
 			}
 			path.add(currentNode.getParent().getLabel());
@@ -245,7 +284,7 @@ public class AltsNonBinary {
 			String currentConsensus = sequences.stream()
 					.filter(seq -> seq != null && !seq.isEmpty())
 					.findFirst()
-					.map(seq -> seq.getFirst())
+					.map(LinkedList::getFirst)
 					.orElse("");
 
 			// Start aligning from the second non-null and non-empty sequence
@@ -307,7 +346,7 @@ public class AltsNonBinary {
 		int n = seq2.length;
 
 		// DP table to store the count of operations required
-		int[][] dp = new int[m+1][n+1];
+		int[][] dp = new int[m + 1][n + 1];
 
 		// Filling the DP table
 		for (int i = 0; i <= m; i++) {
@@ -316,10 +355,10 @@ public class AltsNonBinary {
 					dp[i][j] = j;
 				} else if (j == 0) {
 					dp[i][j] = i;
-				} else if (seq1[i-1].equals(seq2[j-1])) {
-					dp[i][j] = 1 + dp[i-1][j-1];
+				} else if (seq1[i - 1].equals(seq2[j - 1])) {
+					dp[i][j] = 1 + dp[i - 1][j - 1];
 				} else {
-					dp[i][j] = 1 + Math.min(dp[i-1][j], dp[i][j-1]);
+					dp[i][j] = 1 + Math.min(dp[i - 1][j], dp[i][j - 1]);
 				}
 			}
 		}
@@ -329,30 +368,30 @@ public class AltsNonBinary {
 		String[] scs = new String[index];
 		int i = m, j = n;
 		while (i > 0 && j > 0) {
-			if (seq1[i-1].equals(seq2[j-1])) {
-				scs[index-1] = seq1[i-1];
+			if (seq1[i - 1].equals(seq2[j - 1])) {
+				scs[index - 1] = seq1[i - 1];
 				i--;
 				j--;
 				index--;
-			} else if (dp[i-1][j] > dp[i][j-1]) {
-				scs[index-1] = seq2[j-1];
+			} else if (dp[i - 1][j] > dp[i][j - 1]) {
+				scs[index - 1] = seq2[j - 1];
 				j--;
 				index--;
 			} else {
-				scs[index-1] = seq1[i-1];
+				scs[index - 1] = seq1[i - 1];
 				i--;
 				index--;
 			}
 		}
 
 		while (i > 0) {
-			scs[index-1] = seq1[i-1];
+			scs[index - 1] = seq1[i - 1];
 			i--;
 			index--;
 		}
 
 		while (j > 0) {
-			scs[index-1] = seq2[j-1];
+			scs[index - 1] = seq2[j - 1];
 			j--;
 			index--;
 		}
@@ -363,11 +402,11 @@ public class AltsNonBinary {
 	/**
 	 * Calculates alignments for given trees and corresponding hybridization number
 	 */
-	private static HybridizationResult calculateHybridization(TreesBlock treesBlock, List<String> order) throws IOException {
+	private static HybridizationResult calculateHybridization(Collection<PhyloTree> trees, List<String> order) throws IOException {
 		Map<String, LinkedList<LinkedList<String>>> leafNodeHyperStringMap = new HashMap<>();
 
-		for (var tree : treesBlock.getTrees()){
-			PhyloTree labelledTree = NewickIO.valueOf(internalNodeLabeller(tree.toBracketString(), order));
+		for (var tree : trees) {
+			PhyloTree labelledTree = NewickIO.valueOf(internalNodeLabeller(tree.toBracketString(false), order));
 			for (Node node : labelledTree.nodes()) {
 				if (node.isLeaf()) {
 					LinkedList<String> path = path(node);
@@ -376,7 +415,7 @@ public class AltsNonBinary {
 			}
 		}
 
-		Map <String, String> alignments = alignMultipleSequences(leafNodeHyperStringMap);
+		Map<String, String> alignments = alignMultipleSequences(leafNodeHyperStringMap);
 
 		ConcurrentHashMap<String, AtomicInteger> elementCounts = new ConcurrentHashMap<>();
 		// Using parallel stream to count occurrences of each element
@@ -386,7 +425,7 @@ public class AltsNonBinary {
 				.forEach(element -> elementCounts.computeIfAbsent(element, k -> new AtomicInteger(0)).incrementAndGet());
 
 		// Sum up (count - 1) for each element
-		int numOfHyb =  elementCounts.values().parallelStream()
+		int numOfHyb = elementCounts.values().parallelStream()
 				.mapToInt(AtomicInteger::get)
 				.filter(count -> count > 1)
 				.map(count -> count - 1)
@@ -399,18 +438,18 @@ public class AltsNonBinary {
 	/**
 	 * Calls the recursive function and returns the tree
 	 */
-	public static PhyloTree resultingNetwork(TreesBlock treesBlock, List<String> initialOrder) throws IOException {
-		List<String> finalOrder = new ArrayList<>();
-		return calculateBestScoreOrder(treesBlock, initialOrder, finalOrder, Integer.MAX_VALUE);
+	public static List<PhyloTree> resultingNetworks(Collection<PhyloTree> trees, List<String> initialOrder, ProgressListener progress) throws IOException {
+		var finalOrder = new ArrayList<String>();
+		return List.of(calculateBestScoreOrder(trees, initialOrder, finalOrder, Integer.MAX_VALUE));
 	}
 
 	/**
 	 * Recursively calculate the order with min num of hybridization, and compute the corresponding network at the end.
 	 * Called in resultingTree
 	 */
-	private static PhyloTree calculateBestScoreOrder(TreesBlock treesBlock, List<String> remainingOrder, List<String> finalOrder, int currentMinHybridization) throws IOException {
+	private static PhyloTree calculateBestScoreOrder(Collection<PhyloTree> trees, List<String> remainingOrder, List<String> finalOrder, int currentMinHybridization) throws IOException {
 		if (remainingOrder.isEmpty()) {
-			HybridizationResult result = calculateHybridization(treesBlock, finalOrder);
+			HybridizationResult result = calculateHybridization(trees, finalOrder);
 			System.err.println("Final Order: " + finalOrder);
 			//System.out.println("Alignments for best order: " + result.getAlignments());
 			System.err.println("Number of hybridization: " + currentMinHybridization);
@@ -428,7 +467,7 @@ public class AltsNonBinary {
 
 			int currentHybridization;
 			try {
-				HybridizationResult hybridizationResult = calculateHybridization(treesBlock, combinedOrder);
+				HybridizationResult hybridizationResult = calculateHybridization(trees, combinedOrder);
 				currentHybridization = hybridizationResult.getHybridizationScore();
 			} catch (IOException e) {
 				throw new RuntimeException(e);
@@ -448,7 +487,7 @@ public class AltsNonBinary {
 			remainingOrder.remove(bestEntry.getKey());
 			//findBestOrder(treesBlock, remainingOrder, finalOrder, minHybridization.get());
 		}
-		return calculateBestScoreOrder(treesBlock, remainingOrder, finalOrder, minHybridization.get());
+		return calculateBestScoreOrder(trees, remainingOrder, finalOrder, minHybridization.get());
 	}
 
 	/**
@@ -464,20 +503,20 @@ public class AltsNonBinary {
 		List<Pair<Node, String>> connectionsToMake = new ArrayList<>();
 
 		int taxId = 0;
-		for (Map.Entry<String, String> nodes : sortedMap.entrySet()){
+		for (Map.Entry<String, String> nodes : sortedMap.entrySet()) {
 			//create first node in chain
 			Node firstNode = tree.newNode();
 			//firstNode.setLabel(nodes.getKey()+"*");
 			tree.addTaxon(firstNode, taxId);
 			//add key node to the map to draw edges later
-			keyNodesMap.put(nodes.getKey()+"*", firstNode);
+			keyNodesMap.put(nodes.getKey() + "*", firstNode);
 
 			Node previousNode = firstNode;
 
 			//create inner nodes
 			String[] values = nodes.getValue() != null ? nodes.getValue().split(",") : new String[0];
-			for (var value : values){
-				if (value.isBlank()){
+			for (var value : values) {
+				if (value.isBlank()) {
 					continue;
 				}
 				Node currentNode = tree.newNode();
@@ -487,7 +526,7 @@ public class AltsNonBinary {
 				tree.addTaxon(currentNode, taxId);
 
 				String[] innerNodeValues = value.split("/");
-				for (var nonBinaryNode : innerNodeValues){
+				for (var nonBinaryNode : innerNodeValues) {
 					// Store the connection to be made later
 					// For a non-binary node, split the label and make more than one connection
 					connectionsToMake.add(new Pair<>(currentNode, nonBinaryNode));
@@ -500,26 +539,26 @@ public class AltsNonBinary {
 			tree.newEdge(previousNode, leafNode);
 			tree.addTaxon(leafNode, taxId);
 
-			taxId ++;
+			taxId++;
 		}
 
 		// Process stored connections
 		for (Pair<Node, String> connection : connectionsToMake) {
 			Node fromNode = connection.getFirst();
-			Node toNode = keyNodesMap.get(connection.getSecond()+"*");
+			Node toNode = keyNodesMap.get(connection.getSecond() + "*");
 			if (fromNode != null && toNode != null) {
 				tree.newEdge(fromNode, toNode);
 			}
 		}
 
-		for (var n : tree.nodes()){
-			if (n.getInDegree() == 0 ){
+		for (var n : tree.nodes()) {
+			if (n.getInDegree() == 0) {
 				tree.setRoot(n);
 			}
 		}
 
-		for (var n : tree.nodes()){
-			if (n.getInDegree() == 1 && n.getOutDegree() == 1){
+		for (var n : tree.nodes()) {
+			if (n.getInDegree() == 1 && n.getOutDegree() == 1) {
 				tree.delDivertex(n);
 			}
 		}
@@ -530,7 +569,7 @@ public class AltsNonBinary {
 		}
 
 		//System.out.println(tree.toBracketString());
-		String tree1 = tree.toBracketString().replaceAll("##", "#");
+		String tree1 = tree.toBracketString(false).replaceAll("##", "#");
 		return NewickIO.valueOf(tree1);
 	}
 
@@ -549,7 +588,7 @@ public class AltsNonBinary {
 	/**
 	 * Alternative implementation for network
 	 */
-	public static PhyloTree computeNetwork(TreesBlock treesBlock, Map<String, String> taxaSCSmap){
+	public static PhyloTree computeNetwork(TreesBlock treesBlock, Map<String, String> taxaSCSmap) {
 		PhyloTree tree = new PhyloTree();
 
 		//create root
@@ -560,10 +599,10 @@ public class AltsNonBinary {
 
 		// Map to store key nodes
 		Map<String, Node> keyNodesMap = new HashMap<>();
-		for (var keyNodeLabel : taxaSCSmap.keySet()){
+		for (var keyNodeLabel : taxaSCSmap.keySet()) {
 			//create a node to start cascade
 			Node firstNodeInCascade = tree.newNode();
-			firstNodeInCascade.setLabel(keyNodeLabel+"*");
+			firstNodeInCascade.setLabel(keyNodeLabel + "*");
 			tree.addTaxon(firstNodeInCascade, tree.getNumberOfTaxa());
 
 			//connect the keyNode to root
@@ -572,27 +611,27 @@ public class AltsNonBinary {
 			keyNodesMap.put(keyNodeLabel, firstNodeInCascade);
 
 		}
-		int id=0;
+		int id = 0;
 		//traverse through each key's values to create inner nodes
-		for (Map.Entry<String, String> entry : taxaSCSmap.entrySet()){
+		for (Map.Entry<String, String> entry : taxaSCSmap.entrySet()) {
 			//start from first node in cascade and process inner nodes
 			Node previousNode = keyNodesMap.get(entry.getKey());
 
 			//create inner nodes
 			String[] values = entry.getValue() != null ? entry.getValue().split(",") : new String[0];
-			for (var value : values){
-				if (value.isBlank()){
+			for (var value : values) {
+				if (value.isBlank()) {
 					continue;
 				}
 				//create node for each value
 				Node currentNode = tree.newNode();
-				currentNode.setLabel(value+id);
+				currentNode.setLabel(value + id);
 				tree.addTaxon(currentNode, tree.getNumberOfTaxa());
 
 				//add and edge from inner node to its corresponding key node
 				String[] nonBinaryNodes = value.split("/");
-				for (var nonBinaryNode : nonBinaryNodes){
-					tree.newEdge(currentNode,keyNodesMap.get(nonBinaryNode));
+				for (var nonBinaryNode : nonBinaryNodes) {
+					tree.newEdge(currentNode, keyNodesMap.get(nonBinaryNode));
 				}
 				//add an edge from previous node in map to current node
 				tree.newEdge(previousNode, currentNode);
@@ -607,9 +646,9 @@ public class AltsNonBinary {
 			tree.newEdge(previousNode, leafNode);
 		}
 
-		for (var n : tree.nodes()){
+		for (var n : tree.nodes()) {
 			System.out.println(n + " " + n.getLabel());
-			if (n.getInDegree() == 1 && n.getOutDegree() ==1){
+			if (n.getInDegree() == 1 && n.getOutDegree() == 1) {
 				tree.delDivertex(n);
 			}
 		}
@@ -619,7 +658,7 @@ public class AltsNonBinary {
 		}
 
 		if (tree.isReticulated())
-		    treesBlock.setReticulated(true);
+			treesBlock.setReticulated(true);
 
 		LSAUtils.computeLSAChildrenMap(tree, tree.newNodeArray());
 

@@ -19,6 +19,8 @@
 
 package splitstree6.algorithms;
 
+import splitstree6.algorithms.trees.trees2trees.ALTSExternal;
+import splitstree6.algorithms.trees.trees2trees.ALTSNetwork;
 import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Algorithm;
 
@@ -117,12 +119,13 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.SuperNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.TreeSelectorSplits());
-		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ALTSNetwork());
+		add(algorithms, names, new ALTSExternal());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.BootstrapTree());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ClusterNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ConsensusTree());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.EnumerateContainedTrees());
+		add(algorithms, names, new ALTSNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.LooseAndLacy());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.RerootOrReorderTrees());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.RootedConsensusTree());

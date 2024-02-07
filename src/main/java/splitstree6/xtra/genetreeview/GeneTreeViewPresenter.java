@@ -56,6 +56,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.io.readers.trees.NewickReader;
 import splitstree6.layout.tree.TreeDiagramType;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.Stabilizer;
 import splitstree6.xtra.genetreeview.io.*;
 import splitstree6.xtra.genetreeview.layout.*;
@@ -175,11 +176,8 @@ public class GeneTreeViewPresenter {
 			SnapshotParameters parameters = new SnapshotParameters();
 			//parameters.setFill(Color.TRANSPARENT); // for black background
 			parameters.setTransform(javafx.scene.transform.Transform.scale(2, 2));
-			Image image = controller.getCenterPane().snapshot(parameters, writableImage);
-
-			ClipboardContent content = new ClipboardContent();
-			content.putImage(image);
-			Clipboard.getSystemClipboard().setContent(content);
+			var image = controller.getCenterPane().snapshot(parameters, writableImage);
+			ClipboardUtils.putImage(image);
 		});
 
 		controller.getCopySelectedNewicksMenuItem().disableProperty().bind(treeSelectionModel.sizeProperty().isEqualTo(0));

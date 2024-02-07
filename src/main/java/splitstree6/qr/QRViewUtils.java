@@ -31,8 +31,6 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import jloda.fx.util.BasicFX;
@@ -41,6 +39,7 @@ import jloda.fx.util.ProgramExecutorService;
 import jloda.util.Basic;
 import jloda.util.StringUtils;
 import splitstree6.main.SplitsTree6;
+import splitstree6.utils.ClipboardUtils;
 
 import java.util.function.Function;
 
@@ -49,7 +48,6 @@ import java.util.function.Function;
  * Daniel Huson, 2.2024
  */
 public class QRViewUtils {
-
 	/**
 	 * setup QR code view
 	 *
@@ -77,16 +75,8 @@ public class QRViewUtils {
 			if (sourceValue != null) {
 				var stringValue = stringFunction.apply(sourceValue);
 				if (stringValue != null) {
-					copyTextMenuItem.setOnAction(a -> {
-						var content = new ClipboardContent();
-						content.putString(stringValue);
-						Clipboard.getSystemClipboard().setContent(content);
-					});
-					copyImageMenuItem.setOnAction(x -> {
-						var content = new ClipboardContent();
-						content.putImage(qrImageView.getImage());
-						Clipboard.getSystemClipboard().setContent(content);
-					});
+					copyTextMenuItem.setOnAction(a -> ClipboardUtils.putString(stringValue));
+					copyImageMenuItem.setOnAction(x -> ClipboardUtils.putImage(qrImageView.getImage()));
 					contextMenu.show(qrImageView, e.getScreenX(), e.getScreenY());
 					ProgramExecutorService.submit(3000, () -> Platform.runLater(contextMenu::hide));
 				}

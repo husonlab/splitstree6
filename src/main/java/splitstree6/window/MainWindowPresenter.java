@@ -33,8 +33,6 @@ import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
@@ -104,6 +102,7 @@ import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.alignment.AlignmentView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
@@ -428,9 +427,7 @@ public class MainWindowPresenter {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
 				try {
 					var snapshot = focusedDisplayTab.get().getMainNode().snapshot(null, null);
-					var clipboardContent = new ClipboardContent();
-					clipboardContent.putImage(snapshot);
-					Clipboard.getSystemClipboard().setContent(clipboardContent);
+					ClipboardUtils.putImage(snapshot);
 				} catch (Exception ex) {
 					Basic.caught(ex);
 				}

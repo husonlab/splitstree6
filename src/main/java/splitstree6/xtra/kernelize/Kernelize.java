@@ -28,7 +28,6 @@ import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
-import jloda.util.UsageException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.autumn.Cluster;
 import splitstree6.data.TaxaBlock;
@@ -36,7 +35,7 @@ import splitstree6.splits.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -54,7 +53,7 @@ public class Kernelize {
 	 * @param maxNumberOfResults maximum number of solutions to report
 	 * @return computed networks
 	 */
-	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> inputTrees, Function<List<PhyloTree>, List<PhyloTree>> algorithm, int maxNumberOfResults) throws UsageException, IOException {
+	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees, BiFunction<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm, int maxNumberOfResults) throws IOException {
 
 		// setup incompatibility graph
 		var incompatibilityGraph = computeClusterIncompatibilityGraph(inputTrees);
@@ -106,7 +105,7 @@ public class Kernelize {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
 					var reducedTrees = extractTrees(component);
-					var subnetworks = new TreesAndTaxonClasses(algorithm.apply(reducedTrees.trees()), reducedTrees.taxonClasses());
+					var subnetworks = new TreesAndTaxonClasses(algorithm.apply(reducedTrees.trees(), progress), reducedTrees.taxonClasses());
 					var donorTaxa = BitSetUtils.union(reducedTrees.taxonClasses());
 					var acceptorNode = clusterNodeMap.get(donorTaxa);
 					blobNetworksMap.put(acceptorNode, subnetworks);
@@ -380,7 +379,7 @@ public class Kernelize {
 	 * @param trees        reduced trees or networks
 	 * @param taxonClasses the associated taxon equivalence classes
 	 */
-	private record TreesAndTaxonClasses(List<PhyloTree> trees, List<BitSet> taxonClasses) {
+	private record TreesAndTaxonClasses(Collection<PhyloTree> trees, Collection<BitSet> taxonClasses) {
 		public String report() {
 			var buf = new StringBuilder();
 			buf.append("Taxon classes: ");

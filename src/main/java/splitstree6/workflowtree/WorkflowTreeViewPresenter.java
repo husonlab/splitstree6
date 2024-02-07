@@ -37,6 +37,7 @@ import splitstree6.io.nexus.NexusExporter;
 import splitstree6.io.nexus.workflow.WorkflowNexusOutput;
 import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -144,10 +145,7 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 					if (dataNode.getDataBlock() instanceof ViewBlock viewBlock) {
 						if (SplitsTree6.isDesktop()) { // todo: fix problem with pasting image when not running on desktop
 							var image = viewBlock.getViewTab().getMainNode().snapshot(new SnapshotParameters(), null);
-							var content = new ClipboardContent();
-							content.putImage(image);
-							content.putString(viewBlock.getName());
-							Clipboard.getSystemClipboard().setContent(content);
+							ClipboardUtils.put(viewBlock.getName(), image, null);
 							return;
 						} else
 							w.write(viewBlock.getName());
