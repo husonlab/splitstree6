@@ -63,6 +63,11 @@ public class ALTSNetwork extends Trees2Trees {
 			} else {
 				result = Kernelize.apply(progress, taxaBlock, treesBlock.getTrees(), AltsNonBinary::apply, 100000);
 			}
+			for (var tree : result) {
+				for (var v : tree.nodeStream().filter(v -> tree.getLabel(v) != null).toList()) {
+					tree.addTaxon(v, taxaBlock.indexOf(tree.getLabel(v)));
+				}
+			}
 			outputBlock.getTrees().addAll(result);
 			outputBlock.setReticulated(result.stream().anyMatch(PhyloTree::isReticulated));
 		}

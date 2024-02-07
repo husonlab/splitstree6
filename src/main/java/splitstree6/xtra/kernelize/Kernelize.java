@@ -25,6 +25,7 @@ import jloda.graph.NodeArray;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
+import jloda.util.Basic;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.StringUtils;
@@ -113,7 +114,12 @@ public class Kernelize {
 			}
 			var networks = new ArrayList<PhyloTree>();
 			var numberOfBlobs = blobNetworksMap.size();
-			insertRec(blobTree, clusterNodeMap, blobNetworksMap, numberOfBlobs, new HashSet<Node>(), maxNumberOfResults, networks);
+			try {
+				insertRec(blobTree, clusterNodeMap, blobNetworksMap, numberOfBlobs, new HashSet<>(), maxNumberOfResults, networks);
+			} catch (Exception ex) {
+				Basic.caught(ex);
+				throw new IOException(ex);
+			}
 			for (var network : networks) {
 				for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
 					network.delDivertex(v);
