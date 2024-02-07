@@ -26,7 +26,6 @@ import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
-import jloda.util.FileUtils;
 import jloda.util.Pair;
 import jloda.util.UsageException;
 import jloda.util.progress.ProgressListener;
@@ -42,7 +41,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -54,14 +52,13 @@ public class AltsNonBinary {
 	public static void main(String[] args) throws UsageException, IOException {
 		var options = new ArgsOptions(args, AltsNonBinary.class, "Non-binary version of ALTSNetwork");
 		var infile = options.getOptionMandatory("-i", "input", "Input Newick file", "");
-		var outfile = options.getOption("-o", "output", "Output Newick file (.gz or stdout ok)", "stdout");
+		//var outfile = options.getOption("-o", "output", "Output Newick file (.gz or stdout ok)", "stdout");
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Number of threads to use", 4));
 		options.done();
 
 		TaxaBlock taxaBlock = new TaxaBlock();
 		TreesBlock inputTreesBlock = new TreesBlock();
 		loadTrees(infile, taxaBlock, inputTreesBlock);
-
 
 		var progress = new ProgressPercentage("Computing hybridization network", -1);
 		// todo: add this to your algorithm and call the method progress.checkForCancel(); frequently
@@ -76,12 +73,14 @@ public class AltsNonBinary {
 		for (var network : networks)
 			System.out.println(network.toBracketString(false));
 
-		System.err.println("Writing: " + outfile);
-		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
-			for (var network : networks) {
-				w.write(NewickIO.toString(network, false) + ";\n");
-			}
-		}
+		//System.err.println("Writing: " + outfile);
+		//try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
+		//	for (var network : networks) {
+		//		w.write(NewickIO.toString(network, false) + ";\n");
+		//	}
+		//}
+
+		//backTrack(inputTreesBlock.getTrees(), getInitialOrder(inputTreesBlock.getTrees()), 0);
 	}
 
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) {
@@ -171,6 +170,22 @@ public class AltsNonBinary {
 		Deque<Integer> stack = new ArrayDeque<>();
 		StringBuilder labelledNewick = new StringBuilder();
 
+		List<String> newOrder = new ArrayList<>();
+		int charAt = 0;
+		while(newick.charAt(charAt) == '('){
+			charAt++;
+		}
+
+		if ( newick.charAt(charAt) == '\''){
+			for (var element : order){
+				newOrder.add("'"+element+"'");
+			}
+		} else if (newick.charAt(charAt) == '\"') {
+			for (var element : order){
+				newOrder.add("'"+element+"'");
+			}
+		}
+
 		for (int i = 0; i < newick.length(); i++) {
 			char ch = newick.charAt(i);
 
@@ -183,16 +198,16 @@ public class AltsNonBinary {
 					int startIndex = stack.pop();
 					String contents = newick.substring(startIndex + 1, i);
 					//System.out.println("content: " + contents);
-					String processedContent = processBrackets(contents, order);
+					String processedContent = processBrackets(contents, newOrder);
 					//System.out.println("processed content: "+processedContent);
-					String smallestRemoved = processedContent.replaceAll("\\b" + Pattern.quote(findSmallestElement(processedContent, order)) + "\\b", "").replace(",", "/").
-							trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
+					String smallestRemoved = processedContent.trim().replaceAll(findSmallestElement(processedContent, newOrder), "").replaceFirst(",", "").
+							replaceAll(",", "/").replaceAll("/{2,}", "/").trim();
 					//System.out.println("smallest removed: " + smallestRemoved);
 					labelledNewick.append(smallestRemoved);
 				}
 			}
 		}
-		//System.out.println(labelledNewick);
+		System.out.println(labelledNewick);
 		return labelledNewick.toString();
 	}
 
@@ -227,9 +242,9 @@ public class AltsNonBinary {
 		String smallest = null;
 		int smallestOrderIndex = Integer.MAX_VALUE;
 		for (String s : splitStr) {
-			int orderIndex = order.indexOf(s.trim().replaceAll("[()]", ""));
+			int orderIndex = order.indexOf(s.replaceAll("[()]", "").trim());
 			if (orderIndex != -1 && orderIndex < smallestOrderIndex) {
-				smallest = s.trim().replaceAll("[()]", "");
+				smallest = s.replaceAll("[()]", "").trim();
 				smallestOrderIndex = orderIndex;
 			}
 		}
@@ -434,6 +449,38 @@ public class AltsNonBinary {
 		return new HybridizationResult(numOfHyb, alignments);
 	}
 
+	/**
+	 * back tracking test
+	 */
+
+	private static List<HybridizationResult> hybridizationResultList;
+	private static int numOfPermutations = 0;
+
+	public static void backTrack(Collection<PhyloTree> trees, List<String> order, int position) throws IOException {
+		if (numOfPermutations == 10){
+			System.exit(0);
+		} else {
+			if (position == order.size() - 1) {
+				System.out.println(order);
+				numOfPermutations ++;
+				HybridizationResult result = calculateHybridization(trees, order);
+				System.out.println(result.getHybridizationScore());
+
+			} else {
+				for (int i = position; i < order.size(); i++) {
+					swap(order, position, i); // Swap the current element with the element at the position
+					backTrack(trees, order, position + 1); // Recurse for the next position
+					swap(order, i, position); // Swap back to backtrack
+				}
+			}
+		}
+	}
+
+	private static void swap(List<String> list, int i, int j) {
+		String temp = list.get(i);
+		list.set(i, list.get(j));
+		list.set(j, temp);
+	}
 
 	/**
 	 * Calls the recursive function and returns the tree
@@ -568,7 +615,7 @@ public class AltsNonBinary {
 				tree.setReticulate(e, true);
 		}
 
-		//System.out.println(tree.toBracketString());
+		System.out.println(tree.toBracketString());
 		String tree1 = tree.toBracketString(false).replaceAll("##", "#");
 		return NewickIO.valueOf(tree1);
 	}

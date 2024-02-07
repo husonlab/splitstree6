@@ -11,6 +11,8 @@ public class HybridizationResult {
         this.alignments = alignments;
     }
 
+
+
     public int getHybridizationScore() {
         return hybridizationScore;
     }
