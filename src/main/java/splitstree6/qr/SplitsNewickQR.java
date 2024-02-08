@@ -20,6 +20,7 @@
 package splitstree6.qr;
 
 import javafx.util.Pair;
+import jloda.fx.window.NotificationManager;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.splits.SplitNewick;
@@ -35,7 +36,7 @@ import java.util.function.Function;
  */
 public class SplitsNewickQR {
 	public static Function<Pair<TaxaBlock, SplitsBlock>, String> createFunction() {
-		return p -> SplitsNewickQR.apply(p.getKey(), p.getValue(), true, false, 2000);
+		return p -> SplitsNewickQR.apply(p.getKey(), p.getValue(), true, false, 4296);
 	}
 
 	/**
@@ -66,8 +67,31 @@ public class SplitsNewickQR {
 					showConfidences = false;
 				} else if (showWeights) {
 					showWeights = false;
-				} else if (maxLabelLength > 2) {
-					maxLabelLength--;
+				} else {
+					var length = newickString.length();
+					var charactersSaved = 0;
+					while (length - charactersSaved > maxLength) {
+						maxLabelLength--;
+						if (maxLabelLength == 0) {
+							NotificationManager.showWarning("Newick string too long for QR code");
+							return null;
+						}
+						charactersSaved = 0;
+						var seen = new HashSet<String>();
+						for (var t = 1; t <= taxa.getNtax(); t++) {
+							var label0 = taxLabelMap.get(t);
+							if (label0.length() > maxLabelLength)
+								label0 = label0.substring(0, maxLabelLength);
+							var count = 0;
+							var label = label0;
+							while (seen.contains(label)) {
+								label = label0 + (++count);
+							}
+							seen.add(label);
+							charactersSaved = label0.length() - label.length();
+						}
+					}
+					maxLabelLength -= 2;
 					var seen = new HashSet<String>();
 					for (var t = 1; t <= taxa.getNtax(); t++) {
 						var label0 = taxLabelMap.get(t);
@@ -81,8 +105,7 @@ public class SplitsNewickQR {
 						seen.add(label);
 						taxLabelMap.put(t, label);
 					}
-				} else
-					return null;
+				}
 				newickString = SplitNewick.toString(taxLabelMap::get, splits.getSplits(), showWeights, showConfidences) + ";";
 			}
 			return newickString + ";";

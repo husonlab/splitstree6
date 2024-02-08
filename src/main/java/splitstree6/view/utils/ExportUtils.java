@@ -44,9 +44,9 @@ public class ExportUtils {
 			mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
 					mainController.getCopyImageMenuItem(), new SeparatorMenuItem(), mainController.getPrintMenuItem(),
 					new SeparatorMenuItem(), mainController.getExportImageMenuItem(),
-					ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty))));
+					ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty), new SeparatorMenuItem(), mainController.getShowQRCodeMenuItem())));
 		} else
-			mainController.getExportButton().getItems().setAll(BasicFX.copyMenu(List.of(mainController.getCopyMenuItem(),
-					mainController.getCopyImageMenuItem(), ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty))));
+			mainController.getExportButton().getItems().setAll(mainController.getCopyMenuItem(), mainController.getCopyImageMenuItem(),
+					ExportDialog.createMenuItem(mainWindow, dataNode, emptyProperty), new SeparatorMenuItem(), mainController.getShowQRCodeMenuItem());
 	}
 }

@@ -30,7 +30,7 @@ import java.util.function.Function;
  */
 public class TreeNewickQR {
 	public static Function<PhyloTree, String> createFunction() {
-		return t -> TreeNewickQR.apply(t, true, false, false, 2000);
+		return t -> TreeNewickQR.apply(t, true, false, false, 4296);
 	}
 
 	public static String apply(PhyloTree tree0, boolean showWeights, boolean showConfidences, boolean showProbabilities, int maxLength) {
