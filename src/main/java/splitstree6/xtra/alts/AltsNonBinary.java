@@ -66,12 +66,12 @@ public class AltsNonBinary {
 		// when this exception is thrown, stop your code, clean up and then rethrow the exception
 
 		var start = Instant.now();
-		var networks = apply(inputTreesBlock.getTrees(), progress);
+		//var networks = apply(inputTreesBlock.getTrees(), progress);
 		var end = Instant.now();
 		System.out.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
 
-		for (var network : networks)
-			System.out.println(network.toBracketString(false));
+		//for (var network : networks)
+	//		System.out.println(network.toBracketString(false));
 
 		//System.err.println("Writing: " + outfile);
 		//try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
@@ -80,14 +80,13 @@ public class AltsNonBinary {
 		//	}
 		//}
 
-		//backTrack(inputTreesBlock.getTrees(), getInitialOrder(inputTreesBlock.getTrees()), 0);
+		backTrack(inputTreesBlock.getTrees(), getInitialOrder(inputTreesBlock.getTrees()), 0);
 	}
 
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) {
 		try {
 			var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
-			var updatedTrees = preProcessTrees(trees);
-			return resultingNetworks(updatedTrees, initialOrder, progress);
+			return resultingNetworks(trees, initialOrder, progress);
 		} catch (IOException ex) {
 			Basic.caught(ex);
 			return new ArrayList<>();
@@ -108,44 +107,6 @@ public class AltsNonBinary {
 			}
 		}
 		return order;
-	}
-
-	public static List<PhyloTree> preProcessTrees(Collection<PhyloTree> inputTrees) throws IOException {
-		var outputTrees = new ArrayList<PhyloTree>();
-		Set<String> allTaxa = new HashSet<>();
-
-		// Obtain a list of all taxa across all trees
-		for (var tree : inputTrees) {
-			for (var taxon : tree.leaves()) {
-				allTaxa.add(taxon.getLabel());
-			}
-		}
-
-		// For each tree, determine missing taxa and add them
-		for (var tree : inputTrees) {
-			String modifiedTree = tree.toBracketString(false);
-			Set<String> missingTaxa = new HashSet<>(allTaxa);
-
-			// Identify missing taxa for this tree
-			for (var taxon : tree.leaves()) {
-				missingTaxa.remove(taxon.getLabel());
-			}
-
-			// Add each missing taxon directly to the root of the tree
-			for (String missingTaxon : missingTaxa) {
-				modifiedTree = addTaxonToTree(modifiedTree, missingTaxon);
-			}
-			modifiedTree += ";";
-
-			// Add the modified tree to the updatedTreesBlock
-			outputTrees.add(NewickIO.valueOf(modifiedTree)); // Assuming NewickIO.valueOf converts a Newick string to a Tree object
-		}
-
-		return outputTrees;
-	}
-
-	private static String addTaxonToTree(String treeString, String taxon) {
-		return "(" + treeString + "," + taxon + ")";
 	}
 
 	public static void loadTrees(String fileName, TaxaBlock taxaBlock, TreesBlock treesBlock) throws IOException {
@@ -207,7 +168,7 @@ public class AltsNonBinary {
 				}
 			}
 		}
-		System.out.println(labelledNewick);
+		//System.out.println(labelledNewick);
 		return labelledNewick.toString();
 	}
 
@@ -498,6 +459,7 @@ public class AltsNonBinary {
 
 	private static List<HybridizationResult> hybridizationResultList;
 	private static int numOfPermutations = 0;
+	private static int minHybridizationScore = Integer.MAX_VALUE;
 
 	public static void backTrack(Collection<PhyloTree> trees, List<String> order, int position) throws IOException {
 		if (numOfPermutations == 10){
@@ -508,6 +470,7 @@ public class AltsNonBinary {
 				numOfPermutations ++;
 				HybridizationResult result = calculateHybridization(trees, order);
 				System.out.println(result.getHybridizationScore());
+
 
 			} else {
 				for (int i = position; i < order.size(); i++) {
