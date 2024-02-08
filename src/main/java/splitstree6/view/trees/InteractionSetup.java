@@ -183,7 +183,7 @@ public class InteractionSetup {
 					var e = ce.getKey();
 					var clickedHandler = createMouseClickedOnEdgeHandler(taxaBlock, taxonSelectionModel, edgeSelectionModel, e);
 					for (var value : ce.getValueAdded().all()) {
-						if (!value.getId().equals("eisberg")) {
+						if (value.getId() == null || !value.getId().equals("eisberg")) {
 							value.setOnMouseClicked(clickedHandler);
 							value.setOnMouseEntered(mouseEnteredHandler);
 							value.setOnMouseExited(mouseExitedHandler);

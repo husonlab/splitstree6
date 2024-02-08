@@ -67,14 +67,6 @@
                             <Tooltip text="Zoom in"/>
                         </tooltip>
                     </Button>
-                    <Region layoutX="504.0" layoutY="10.0" maxWidth="1.0" minWidth="1.0" prefHeight="20.0"
-                            prefWidth="1.0"/>
-                    <ToggleButton fx:id="showQRCodeButton" layoutX="119.0" layoutY="9.0" mnemonicParsing="false"
-                                  text="QR">
-                        <tooltip>
-                            <Tooltip text="Show internal labels"/>
-                        </tooltip>
-                    </ToggleButton>
                 </ToolBar>
             </VBox>
         </top>

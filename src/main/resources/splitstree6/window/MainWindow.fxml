@@ -324,6 +324,7 @@
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
+                        <CheckMenuItem fx:id="showQRCodeMenuItem" text="Show QR Code"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels">
                             <accelerator>

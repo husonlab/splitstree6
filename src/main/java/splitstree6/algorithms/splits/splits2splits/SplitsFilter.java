@@ -153,8 +153,10 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			child.setThreshold(parent.getThreshold());
 			setShortDescription("using all " + parent.getNsplits() + " splits");
 		} else {
-			if (getOptionRecomputeCycle())
+			if (getOptionRecomputeCycle()) {
 				child.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), child.getSplits()));
+				compatibility = Compatibility.unknown;
+			}
 			else
 				child.setCycle(parent.getCycle());
 

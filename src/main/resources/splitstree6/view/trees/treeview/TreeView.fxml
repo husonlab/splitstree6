@@ -87,17 +87,6 @@
                             <Tooltip text="Contract tree horizontally"/>
                         </tooltip>
                     </Button>
-                    <Region layoutX="618.0" layoutY="10.0" maxWidth="1.0" minWidth="1.0" prefHeight="20.0"
-                            prefWidth="1.0"/>
-                    <ToggleButton fx:id="showQRCodeButton" contentDisplay="CENTER" layoutX="589.0" layoutY="10.0"
-                                  mnemonicParsing="false" text="QR">
-                        <tooltip>
-                            <Tooltip text="Show tree names or details"/>
-                        </tooltip>
-                        <font>
-                            <Font size="12.0"/>
-                        </font>
-                    </ToggleButton>
                 </ToolBar>
             </VBox>
         </top>

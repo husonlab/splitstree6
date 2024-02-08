@@ -73,6 +73,8 @@ import java.util.stream.Collectors;
 public class TreeViewPresenter implements IDisplayTabPresenter {
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
 
+	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
+
 	private final MainWindow mainWindow;
 	private final TreeView view;
 	private final TreeViewController controller;
@@ -225,7 +227,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			view.optionOrientationProperty().addListener(scaleListener);
 			scaleListener.invalidated(null);
 		}
-
 
 		tree.addListener((v, o, n) -> {
 			if (o != null) // not the first tree
@@ -395,6 +396,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 
+		var qrImageView = new SimpleObjectProperty<ImageView>();
+		QRViewUtils.setup(controller.getAnchorPane(), tree, TreeNewickQR.createFunction(), qrImageView, showQRCode);
+
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
 	}
@@ -466,6 +470,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.TriangularCladogram))
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.RectangularCladogram)));
 
+		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
+
 		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
 		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
 		mainController.getRotateRightMenuItem().setOnAction(controller.getRotateRightButton().getOnAction());
@@ -475,9 +482,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(treePane.isNull().or(view.optionDiagramProperty().isNotEqualTo(TreeDiagramType.RadialPhylogram)));
-
-		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getAnchorPane(), tree, TreeNewickQR.createFunction(), qrImageView, controller.getShowQRCodeButton().selectedProperty());
 
 		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}

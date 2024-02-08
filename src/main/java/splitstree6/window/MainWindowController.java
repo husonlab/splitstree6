@@ -222,6 +222,9 @@ public class MainWindowController {
 	private CheckMenuItem showScaleBarMenuItem;
 
 	@FXML
+	private CheckMenuItem showQRCodeMenuItem;
+
+	@FXML
 	private CheckMenuItem useDarkThemeMenuItem;
 
 	@FXML
@@ -442,12 +445,12 @@ public class MainWindowController {
 
 	@FXML
 	private Button redoButton;
+
 	@FXML
 	private Button findButton;
 
 	@FXML
 	private MenuButton exportButton;
-
 
 	@FXML
 	private HBox leftToolBarPane;
@@ -824,6 +827,10 @@ public class MainWindowController {
 
 	public CheckMenuItem getShowScaleBarMenuItem() {
 		return showScaleBarMenuItem;
+	}
+
+	public CheckMenuItem getShowQRCodeMenuItem() {
+		return showQRCodeMenuItem;
 	}
 
 	public CheckMenuItem getUseDarkThemeMenuItem() {
