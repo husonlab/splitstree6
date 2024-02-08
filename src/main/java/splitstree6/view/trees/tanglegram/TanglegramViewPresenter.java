@@ -31,23 +31,27 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.RootedNetworkProperties;
+import jloda.util.StringUtils;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 import static splitstree6.layout.tree.LayoutOrientation.*;
@@ -356,17 +360,28 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
-		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
+		mainController.getCopyMenuItem().setOnAction(e -> {
+			var list = new ArrayList<String>();
+			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
+				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
+			}
+			if (!list.isEmpty()) {
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
+			}
+		});
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
 
+		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			var buf = new StringBuilder();
 			if (tree1.get() != null)
 				buf.append(tree1.get().toBracketString(true)).append(";\n");
 			if (tree2.get() != null)
 				buf.append(tree2.get().toBracketString(true)).append(";\n");
-			BasicFX.putTextOnClipBoard(buf.toString());
+			ClipboardUtils.putString(buf.toString());
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
-		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());

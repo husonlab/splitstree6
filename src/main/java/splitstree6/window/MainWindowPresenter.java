@@ -33,8 +33,10 @@ import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.dialog.ExportImageDialog;
@@ -105,7 +107,9 @@ import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.alignment.AlignmentView;
+import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
+import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
@@ -238,6 +242,8 @@ public class MainWindowPresenter {
 			}
 		});
 		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
+
+		setupImportButton(controller.getImportButton());
 
 		SwipeUtils.setConsumeSwipes(controller.getRootPane());
 	}
@@ -998,5 +1004,35 @@ public class MainWindowPresenter {
 				}
 			}
 		}
+	}
+
+	private void setupImportButton(Button importButton) {
+		importButton.setDisable(true);
+
+		EventHandler<MouseEvent> handler = (e -> {
+			var string = Clipboard.getSystemClipboard().getString();
+			if (string == null)
+				importButton.setDisable(true);
+			else {
+				string = string.trim();
+				importButton.setDisable(!string.startsWith("(") || !string.endsWith(";"));
+			}
+		});
+		mainWindow.getController().getRootPane().setOnMouseEntered(handler);
+		mainWindow.getController().getLeftToolBarPane().setOnMouseEntered(handler);
+
+		importButton.setOnAction(e -> {
+			var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
+			Platform.runLater(() -> {
+				mainWindow.getController().getEditInputMenuItem().fire();
+				Platform.runLater(() -> {
+					var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+					if (inputEditorTab != null) {
+						((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(Clipboard.getSystemClipboard().getString());
+						Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
+					}
+				});
+			});
+		});
 	}
 }

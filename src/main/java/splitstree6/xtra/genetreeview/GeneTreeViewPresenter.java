@@ -37,7 +37,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -165,9 +164,7 @@ public class GeneTreeViewPresenter {
 				for (int taxonId : taxaSelectionModel.getSelectedItems())
 					taxa.append(model.getTaxaBlock().get(taxonId).getName()).append("\n");
 			}
-			ClipboardContent content = new ClipboardContent();
-			content.putString(taxa.toString());
-			Clipboard.getSystemClipboard().setContent(content);
+			ClipboardUtils.putString(taxa.toString());
 		});
 
 		controller.getCopyImageMenuItem().setOnAction(e -> {
@@ -205,9 +202,8 @@ public class GeneTreeViewPresenter {
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
-				var clipboardContent = new ClipboardContent();
-				clipboardContent.putString(newicks.toString());
-				Clipboard.getSystemClipboard().setContent(clipboardContent);
+				ClipboardUtils.putString(newicks.toString());
+
 				System.out.println("Copying succeeded");
 				controller.getProgressLabel().setText("");
 			});
@@ -220,7 +216,6 @@ public class GeneTreeViewPresenter {
 
 		controller.getCopySelectedTreesMenuItem().disableProperty().bind(treeSelectionModel.sizeProperty().isEqualTo(0));
 		controller.getCopySelectedTreesMenuItem().setOnAction(e -> {
-			var clipboardContent = new ClipboardContent();
 			var gridPane = new GridPane();
 			int minColumnNumber = 2;
 			if (treeSelectionModel.size() > 6) {
@@ -259,8 +254,7 @@ public class GeneTreeViewPresenter {
 					treeSelectionModel.select(treeId);
 				}
 				Image image = gridPane.snapshot(null, null);
-				clipboardContent.putImage(image);
-				Clipboard.getSystemClipboard().setContent(clipboardContent);
+				ClipboardUtils.putImage(image);
 			};
 			Platform.runLater(() -> RunAfterAWhile.applyInFXThread("ImageCopying", copyImages));
 		});
@@ -857,7 +851,7 @@ public class GeneTreeViewPresenter {
 			treeSnapshots.getChildren().add(index, new Rectangle());
 			setupTreeSelectionAndSnapshots(treeSheet, treeId);
 		}
-		if (model.getGeneTreeSet().getAvailableFeatures().size() > 0) {
+		if (!model.getGeneTreeSet().getAvailableFeatures().isEmpty()) {
 			for (var tree : pastedGeneTrees) {
 				for (var feature : model.getGeneTreeSet().getAvailableFeatures()) {
 					tree.addFeature(feature, null);

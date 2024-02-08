@@ -479,6 +479,9 @@ public class MainWindowController {
 	@FXML
 	private ProgressIndicator progressIndicator;
 
+	@FXML
+	private Button importButton;
+
 
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
 
@@ -508,6 +511,7 @@ public class MainWindowController {
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
 		MaterialIcons.setIcon(selectButton, "select_all");
 		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "view_sidebar", "-fx-rotate: 180;", true);
+		MaterialIcons.setIcon(importButton, "download");
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -1149,5 +1153,9 @@ public class MainWindowController {
 
 	public ProgressIndicator getProgressIndicator() {
 		return progressIndicator;
+	}
+
+	public Button getImportButton() {
+		return importButton;
 	}
 }

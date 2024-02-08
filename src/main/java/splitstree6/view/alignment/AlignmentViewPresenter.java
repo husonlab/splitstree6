@@ -30,8 +30,6 @@ import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Font;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
@@ -43,6 +41,7 @@ import splitstree6.data.parts.CharactersType;
 import splitstree6.data.parts.Taxon;
 import splitstree6.splits.ASplit;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
@@ -640,9 +639,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					buf.append("\n");
 				}
 			}
-			var clipboardContent = new ClipboardContent();
-			clipboardContent.putString(buf.toString());
-			Clipboard.getSystemClipboard().setContent(clipboardContent);
+			ClipboardUtils.putString(buf.toString());
 		});
 		mainController.getCopyMenuItem().disableProperty().bind(
 				Bindings.createBooleanBinding(() -> view.getSelectedTaxa().isEmpty() && view.getSelectedSites().isEmpty(), view.selectedTaxaProperty(), view.selectedSitesProperty()));

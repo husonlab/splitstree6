@@ -1,0 +1,37 @@
+#nexus [SplitsTree6]
+
+[!
+Network copied from Figure 4 of
+Koblmueller, S., Duftner, N., Sefc, K. M., Aibara, M., Stipacek, M., Blanc, M., Egger, B., & Sturmbauer, C. (2007).
+Reticulate phylogeny of gastropod-shell-breeding cichlids from Lake Tanganyika- the result of repeated introgressive hybridization.
+BMC evolutionary biology, 7, 7. https://doi.org/10.1186/1471-2148-7-7
+]
+
+BEGIN TREES;
+[Number of trees: 1]
+PROPERTIES partialTrees=no rooted=yes reticulated=yes;
+TRANSLATE
+	1 'J.ornatus',
+	2 'V.moorii',
+	3 'T.vittatus',
+	4 'L.ornatipinnis',
+	5 'unnamed',
+	6 'N.calliurus',
+	7 'N.caudopunctatus',
+	8 'N.leloupi',
+	9 'L.lemairii',
+	10 'Lepidiolamprologus',
+	11 'N.multifasciatus',
+	12 'N.similis',
+	13 'N.fasciatus',
+	14 'N.brevis',
+	15 'Altolamprologus',
+	16 'L.speciosus',
+	17 'L.callipterus',
+	18 'L.ocellatus',
+	19 'N.wauthioni',
+	20 'L.meleagris',
+;
+[TREES]
+		[1] tree 'tree-1'=[&R] ((2,3,((5,(11)#H1),((12,#H1),(13)#H2),(6,(14,(16)#H3)),(7,8,9,10,(((17,(19)#H4),#H2),15,((#H3,#H4),(18,(20)#H5))),(#H5)),4)),1);
+END; [TREES]

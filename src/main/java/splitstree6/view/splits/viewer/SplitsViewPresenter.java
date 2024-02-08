@@ -26,14 +26,10 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.DataFormat;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
 import javafx.util.Pair;
@@ -44,7 +40,6 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.window.NotificationManager;
 import jloda.util.BitSetUtils;
 import jloda.util.IteratorUtils;
 import jloda.util.Single;
@@ -64,6 +59,7 @@ import splitstree6.qr.SplitsNewickQR;
 import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
@@ -75,7 +71,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -348,10 +343,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		Platform.runLater(this::setupMenuItems);
 	}
 
-	private void collectZoom(UndoManager undoManager, Node node, Predicate<jloda.graph.Node> predicate, double undoX, double undoY, double doX, double doY) {
-
-	}
-
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
 
@@ -361,22 +352,18 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
 			if (!list.isEmpty()) {
-				var content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
 			}
 		});
-		if (mainWindow.getStage() != null)
-			mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-
-		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			try {
-				BasicFX.putTextOnClipBoard(SplitNewick.toString(t -> mainWindow.getWorkingTaxa().get(t).getName(),
+				ClipboardUtils.putString(SplitNewick.toString(t -> mainWindow.getWorkingTaxa().get(t).getName(),
 						view.getSplitsBlock().getSplits(), true, false) + ";\n");
-			} catch (IOException ex) {
-				NotificationManager.showError("Copy Newick failed: " + ex.getMessage());
+			} catch (IOException ignored) {
 			}
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());

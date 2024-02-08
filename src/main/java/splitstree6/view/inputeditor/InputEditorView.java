@@ -172,5 +172,7 @@ public class InputEditorView extends DisplayTextView implements IView {
 			NotificationManager.showError("Enter data failed: " + ex.getClass().getSimpleName() + ": " + ex.getMessage());
 		}
 	}
+
+
 }
 
