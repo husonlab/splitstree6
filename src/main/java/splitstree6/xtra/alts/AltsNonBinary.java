@@ -175,7 +175,6 @@ public class AltsNonBinary {
 		while(newick.charAt(charAt) == '('){
 			charAt++;
 		}
-
 		if ( newick.charAt(charAt) == '\''){
 			for (var element : order){
 				newOrder.add("'"+element+"'");
@@ -185,12 +184,13 @@ public class AltsNonBinary {
 				newOrder.add("'"+element+"'");
 			}
 		}
+		if (!newOrder.isEmpty()){
+			order = newOrder;
+		}
 
 		for (int i = 0; i < newick.length(); i++) {
 			char ch = newick.charAt(i);
-
 			labelledNewick.append(ch);
-
 			if (ch == '(') {
 				stack.push(i);
 			} else if (ch == ')') {
@@ -198,9 +198,9 @@ public class AltsNonBinary {
 					int startIndex = stack.pop();
 					String contents = newick.substring(startIndex + 1, i);
 					//System.out.println("content: " + contents);
-					String processedContent = processBrackets(contents, newOrder);
+					String processedContent = processBrackets(contents, order);
 					//System.out.println("processed content: "+processedContent);
-					String smallestRemoved = processedContent.trim().replaceAll(findSmallestElement(processedContent, newOrder), "").replaceFirst(",", "").
+					String smallestRemoved = processedContent.trim().replaceAll(findSmallestElement(processedContent, order), "").replaceFirst(",", "").
 							replaceAll(",", "/").replaceAll("/{2,}", "/").trim();
 					//System.out.println("smallest removed: " + smallestRemoved);
 					labelledNewick.append(smallestRemoved);
@@ -309,40 +309,83 @@ public class AltsNonBinary {
 				}
 			}
 
-			consensusMap.put(key, currentConsensus);
+			consensusMap.put(key, postProcessAlignment(currentConsensus));
 			//System.out.println("map: " + consensusMap);
 		}
 
 		return consensusMap;
 	}
 
-	/*public static String processConsensusString(String input) {
-		// Split the input string into parts based on comma
-		List<String> parts = new ArrayList<>(Arrays.asList(input.split(",")));
+	public static String postProcessAlignment(String input) {
+		// Split the input into parts
+		String[] parts = input.split(",");
+		// Use a list for easier manipulation
+		List<String> partsList = new ArrayList<>(Arrays.asList(parts));
 
-		// Temporary list to store elements that are split by slash
-		List<String> tempSlashSeparated;
+		// Process for previous parts
+		for (int i = 0; i < partsList.size(); i++) {
+			if (partsList.get(i).contains("/")) {
+				String[] subParts = partsList.get(i).split("/");
+				boolean allSubPartsFoundPrev = true;
 
-		// Iterate through the parts to find and process slash-separated substrings
-		for (int i = 0; i < parts.size(); i++) {
-			String part = parts.get(i);
-			if (part.contains("/")) {
-				// Split the slash-separated part into individual elements
-				tempSlashSeparated = Arrays.asList(part.split("/"));
+				// Check if all sub-parts are found in the previous parts
+				for (String subPart : subParts) {
+					if (!partsList.subList(0, i).contains(subPart)) {
+						allSubPartsFoundPrev = false;
+						break;
+					}
+				}
 
-				// Check for and remove the first matching element in parts
-				for (String element : tempSlashSeparated) {
-					if (parts.contains(element)) {
-						parts.remove(element);
-						break; // Break after removing the first match
+				// If all sub-parts are found, remove the last occurrence of the last sub-part
+				if (allSubPartsFoundPrev) {
+					for (int j = subParts.length - 1; j >= 0; j--) {
+						int lastIndex = partsList.subList(0, i).lastIndexOf(subParts[j]);
+						if (lastIndex != -1) {
+							partsList.remove(lastIndex);
+							break; // Only remove the last sub-part
+						}
 					}
 				}
 			}
 		}
 
-		// Reconstruct the string without the removed element
-		return String.join(",", parts);
-	}*/
+		// Update the array to reflect removals
+		parts = partsList.toArray(new String[0]);
+
+		// Process for next parts (after updating the list from previous operations)
+		for (int i = 0; i < partsList.size(); i++) {
+			if (partsList.get(i).contains("/")) {
+				String[] subParts = partsList.get(i).split("/");
+				boolean allSubPartsFoundNext = true;
+
+				// Check if all sub-parts are found in the next parts
+				for (String subPart : subParts) {
+					if (!partsList.subList(i + 1, partsList.size()).contains(subPart)) {
+						allSubPartsFoundNext = false;
+						break;
+					}
+				}
+
+				// If all sub-parts are found, remove the first occurrence of the first found sub-part
+				if (allSubPartsFoundNext) {
+					for (String subPart : subParts) {
+						int nextIndex = partsList.subList(i + 1, partsList.size()).indexOf(subPart);
+						if (nextIndex != -1) {
+							partsList.remove(i + 1 + nextIndex);
+							break; // Remove the first occurrence and break
+						}
+					}
+				}
+
+				// Stop after processing the first applicable slash-separated string
+				break;
+			}
+		}
+
+		// Join the remaining parts back into a string
+		return String.join(",", partsList);
+	}
+
 
 	private static String scsOfTwoCommaSeparatedLists(LinkedList<String> seq1List, LinkedList<String> seq2List) {
 		// Join all strings in each LinkedList into a single, comma-separated string
@@ -615,7 +658,6 @@ public class AltsNonBinary {
 				tree.setReticulate(e, true);
 		}
 
-		System.out.println(tree.toBracketString());
 		String tree1 = tree.toBracketString(false).replaceAll("##", "#");
 		return NewickIO.valueOf(tree1);
 	}

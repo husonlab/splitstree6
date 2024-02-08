@@ -314,7 +314,7 @@ public class TreesUtils {
 
 		//var network=NewickIO.valueOf("(((e,((((a)#H2:0,c))#H1:0,d)),(((b,#H2:0),#H1:0),#H2:0)));");
 		//var network = NewickIO.valueOf("((((((((((((((t4,(t1,t2:2):2),(t5,t11:2):2),(t8,t19:2):2),(t6,((t20,t15:2),t12:2):2):2),(((t13,(t16)#H2),(t18)#H3))#H1),#H3),(t3)#H4),(((((t7,(t9,t17:2):2),#H4),#H3),(((((t10,t14:2),#H4),#H1),#H2))#H6))#H5),#H6),#H1),#H5),#H4),#H1));");
-		var network = NewickIO.valueOf("((((((((((((((t4,(t1,t2:2):2),(t5,t11:2):2),(t8,t19:2):2),(t6,((t20,t15:2),t12:2):2):2),(((t13,(t16)#H2:0),(t18)#H3:0))#H1:0),#H3:0),(t3)#H4:0),(((((t7,(t9,t17:2):2),#H4:0),#H3:0),(((((t10,t14:2),#H4:0),#H1:0),#H2:0))#H6:0))#H5:0),#H6:0),#H1:0),#H5:0),#H4:0),#H1:0));");
+		var network = NewickIO.valueOf("(((((((((('Lamprologus speciosus',((('Neolamprologus brevis','Hybrid 1.1 Hybrid 2.1 Hybrid 2.2'),('Neolamprologus calliurus')#H2))#H1),('Hybrid 1.2',#H2)),(((((('Altolamprologus calvus',('Altolamprologus sp. shell','Altolamprologus compressiceps')),('Lamprologus cailipterus','Noalamprologus wauthioni','Noalamprologus fascratus')),('Lamprologus ocellatus')#H4),((((((('Lepidiolamprologus sp. meeli-boulengeri',('Lepidiolamprologus attenuatus')#H6),(('Lepidiolamprologus meeli',('Lepidiolamprologus hecqui')#H7),'Lepidiolamprologus boulengeri')),('Lepidiolamprologus profundicola')#H8),('Lepidiolamprologus elongatus')#H9),('Lepidiolamprologus sp. nov.',#H8),#H6,#H7,#H9),'Lamprologus lemainii'))#H5),('Lamprologus meleagris')#H10,(('Neolamprologus leloupi',('Neolamprologus caudopunctatus')#H12))#H11,('Lamprologus lemairii',#H12)))#H3,('Neolamprologus multifasciatus')#H13),(((('Lamprologus signatus','Lamprologus laparogramma'),'Lamprologus kungweensis'),'Lamprologus omatipinnis'))#H14,('Neolamprologus similis')#H15),((('Julidochromis ornatus',('Telmatochromis vittatus')#H17),('Variabilichromis moorii')#H18))#H16),'Neolamprologus wauthioni'),#H10,#H4),'Lamprologus callipterus','Neolamprologus fasciatus',#H11,#H14,#H13,#H3,#H15,#H5),#H1,#H16,#H18,#H17));");
 		addAdhocTaxonIds(network, taxaIdMap);
 
 		LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
@@ -323,7 +323,7 @@ public class TreesUtils {
 		var softwiredClusters = collectAllSoftwiredClusters(network);
 		System.err.println("network clusters: " + softwiredClusters);
 
-		String[] lines = new String[]{
+		/*String[] lines = new String[]{
 				"(((t10,t14),t3),(((t17,t9),t7),(t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16)))));",
 				"(((((t17,t9),t7),t3),t18),(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),((t13,t16),(t10,t14))));",
 				"((((t17,t9),t7),((t18,(t13,t16)),((t10,t14),((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))))),t3);",
@@ -334,7 +334,7 @@ public class TreesUtils {
 				"((t10,t14),(((t17,t9),t7),((t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))),t3)));",
 				"((t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),t13)),((t16,(t10,t14)),(((t17,t9),t7),t3)));",
 				"((t18,t13),(((t16,(t10,t14)),((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))),(((t17,t9),t7),t3)));"};
-
+		*/
 		/*String[] lines = new String[]{
 				"((a,(b,c)),(d,e));",
 				"((e,(d,c)),(b,a));",
@@ -342,6 +342,11 @@ public class TreesUtils {
 				"((e,d),(c,(a,b)));",
 				"((f,b,c),d,(e,a));",
 		"((a,b),x);"};*/
+
+		String[] lines = new String[]{
+				"(((((((('Lamprologus cailipterus','Noalamprologus wauthioni','Noalamprologus fascratus'),(('Altolamprologus sp. shell','Altolamprologus compressiceps'),'Altolamprologus calvus')),'Lamprologus ocellatus'),((((('Lepidiolamprologus meeli','Lepidiolamprologus hecqui'),'Lepidiolamprologus boulengeri'),('Lepidiolamprologus sp. meeli-boulengeri','Lepidiolamprologus attenuatus')),'Lepidiolamprologus profundicola'),'Lepidiolamprologus elongatus')),('Neolamprologus caudopunctatus','Lamprologus lemairii'),'Lamprologus meleagris','Neolamprologus leloupi'),((('Hybrid 1.1 Hybrid 2.1 Hybrid 2.2','Neolamprologus brevis'),'Lamprologus speciosus'),('Hybrid 1.2','Neolamprologus calliurus')),'Neolamprologus multifasciatus'),((('Lamprologus signatus','Lamprologus laparogramma'),'Lamprologus kungweensis'),'Lamprologus omatipinnis'),'Neolamprologus similis'):0.475,(('Julidochromis ornatus':1,'Telmatochromis vittatus':1):1,'Variabilichromis moorii':1):0.025);",
+				"((((('Lepidiolamprologus meeli','Lepidiolamprologus sp. meeli-boulengeri'),('Lepidiolamprologus sp. nov.','Lepidiolamprologus profundicola'),'Lepidiolamprologus hecqui','Lepidiolamprologus elongatus','Lepidiolamprologus attenuatus'),'Lamprologus lemainii'),(('Neolamprologus wauthioni','Lamprologus speciosus'),'Lamprologus meleagris','Lamprologus ocellatus'),(('Altolamprologus sp. shell','Altolamprologus compressiceps'),'Altolamprologus calvus'),('Neolamprologus leloupi','Neolamprologus caudopunctatus'),('Lamprologus signatus','Lamprologus omatipinnis'),'Lamprologus callipterus','Neolamprologus fasciatus','Neolamprologus multifasciatus','Neolamprologus similis'),('Neolamprologus calliurus','Neolamprologus brevis'),'Julidochromis ornatus','Telmatochromis vittatus','Variabilichromis moorii':0.5);"
+		};
 
 		for (var line : lines) {
 			var tree = NewickIO.valueOf(line);
