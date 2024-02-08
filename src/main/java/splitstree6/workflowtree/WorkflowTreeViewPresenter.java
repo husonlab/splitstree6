@@ -26,8 +26,6 @@ import javafx.collections.SetChangeListener;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.data.SplitsBlock;
@@ -160,9 +158,7 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 				} else if (treeView.getSelectionModel().getSelectedItem() == treeView.getRoot()) {
 					(new WorkflowNexusOutput()).save(mainWindow.getWorkflow(), w, false);
 				}
-				var content = new ClipboardContent();
-				content.putString(w.toString());
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(w.toString());
 			} catch (IOException ignored) {
 			}
 		});

@@ -27,7 +27,6 @@ import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.StageStyle;
@@ -39,6 +38,7 @@ import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.AlgorithmBreadCrumbsToolBar;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceUtils;
 import splitstree6.window.MainWindow;
@@ -110,9 +110,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			if (codeArea.getSelection().getLength() > 0)
 				codeArea.copy();
 			else {
-				var content = new ClipboardContent();
-				content.putString(codeArea.getText());
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(codeArea.getText());
 			}
 		});
 		controller.getCopyButton().disableProperty().bind(view.emptyProperty());

@@ -26,9 +26,6 @@ import javafx.collections.ObservableMap;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.AService;
@@ -41,6 +38,7 @@ import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
@@ -199,9 +197,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
 			if (!list.isEmpty()) {
-				var content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
 			}
 		});
 		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));

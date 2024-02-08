@@ -28,6 +28,7 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.phylo.PhyloTree;
@@ -37,12 +38,14 @@ import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -247,6 +250,19 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
 
+		mainController.getCopyMenuItem().setOnAction(e -> {
+			var list = new ArrayList<String>();
+			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
+				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
+			}
+			if (!list.isEmpty()) {
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
+			}
+		});
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
+
 		mainController.getCopyNewickMenuItem().setOnAction(e -> {
 			var page = view.getPageNumber();
 			var count = view.getOptionCols() * view.getOptionRows();
@@ -256,11 +272,9 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			for (var t = bot; t < top; t++) {
 				buf.append(view.getTrees().get(t).toBracketString(true)).append(";\n");
 			}
-			BasicFX.putTextOnClipBoard(buf.toString());
+			ClipboardUtils.putString(buf.toString());
 		});
 		mainController.getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
-
-		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());

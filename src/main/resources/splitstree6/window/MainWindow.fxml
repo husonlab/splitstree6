@@ -472,6 +472,12 @@
                                         <Tooltip text="Show/hide methods sidebar"/>
                                     </tooltip>
                                 </ToggleButton>
+                                <Region prefWidth="4.0"/>
+                                <Button fx:id="importButton" mnemonicParsing="false" text="Import">
+                                    <tooltip>
+                                        <Tooltip text="Import Newick string from clipboard"/>
+                                    </tooltip>
+                                </Button>
                                 <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false"/>
                             </children>
                         </HBox>

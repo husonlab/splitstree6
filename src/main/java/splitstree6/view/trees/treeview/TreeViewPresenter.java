@@ -31,9 +31,6 @@ import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.control.ZoomableScrollPane;
@@ -56,6 +53,7 @@ import splitstree6.layout.tree.TreeLabel;
 import splitstree6.qr.QRViewUtils;
 import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edges.LabelEdgesBy;
@@ -410,12 +408,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
 			if (!list.isEmpty()) {
-				var content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
+
 			}
 		});
-		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
@@ -423,7 +422,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			var tree = this.tree.get();
 			if (tree != null)
-				BasicFX.putTextOnClipBoard(tree.toBracketString(true) + ";\n");
+				ClipboardUtils.putString(tree.toBracketString(true) + ";\n");
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
 
