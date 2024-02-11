@@ -28,10 +28,16 @@ import javafx.concurrent.Task;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+import javafx.scene.input.DataFormat;
 import javafx.util.Duration;
 import jloda.fx.util.TriConsumer;
+import jloda.util.FileUtils;
+import jloda.util.StringUtils;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.util.List;
 
 /**
@@ -128,11 +134,11 @@ public class ClipboardUtils {
 	}
 
 	public static boolean hasString() {
-		return Clipboard.getSystemClipboard().hasString();
+		return Clipboard.getSystemClipboard().hasContent(DataFormat.PLAIN_TEXT);
 	}
 
 	public static String getString() {
-		return Clipboard.getSystemClipboard().getString();
+		return (String) Clipboard.getSystemClipboard().getContent(DataFormat.PLAIN_TEXT);
 	}
 
 	public static boolean hasImage() {
@@ -162,5 +168,41 @@ public class ClipboardUtils {
 
 	public static ReadOnlyBooleanProperty hasFilesProperty() {
 		return getInstance().hasFiles;
+	}
+
+	public static String getTextFilesContentOrString() {
+		if (hasFiles()) {
+			var files = ClipboardUtils.getFiles();
+			var buf = new StringBuilder();
+			for (var file : files) {
+				if (FileUtils.fileExistsAndIsNonEmpty(file) && isTextFile(file)) {
+					try {
+						buf.append(StringUtils.toString(FileUtils.getLinesFromFile(file.getPath()), "\n"));
+					} catch (IOException ignored) {
+					}
+				}
+			}
+			return buf.toString();
+		} else if (hasString()) {
+			var string = ClipboardUtils.getString().trim();
+			if (FileUtils.fileExistsAndIsNonEmpty(string) && isTextFile(new File(string))) {
+				try {
+					string = StringUtils.toString(FileUtils.getLinesFromFile(string), "\n");
+				} catch (IOException ignored) {
+				}
+			}
+			return string;
+		} else
+			return null;
+	}
+
+	public static boolean isTextFile(File file) {
+		var path = FileSystems.getDefault().getPath(file.getParent(), file.getName());
+		try {
+			var mimeType = Files.probeContentType(path);
+			return mimeType == null || mimeType.equals("text/plain");
+		} catch (IOException e) {
+			return false;
+		}
 	}
 }

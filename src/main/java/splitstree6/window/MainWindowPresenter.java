@@ -115,7 +115,6 @@ import splitstree6.workflow.Workflow;
 import splitstree6.workflow.WorkflowDataLoader;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
@@ -1004,46 +1003,25 @@ public class MainWindowPresenter {
 		}
 	}
 
+	// todo: move to jloda-core
 	private void setupImportButton(Button importButton) {
 		importButton.disableProperty().bind(ClipboardUtils.hasStringProperty().not().and(ClipboardUtils.hasFilesProperty().not()));
 
 		importButton.setOnAction(e -> {
-			String importedString;
-			if (ClipboardUtils.hasFiles()) {
-				var files = ClipboardUtils.getFiles();
-				var buf = new StringBuilder();
-				for (var file : files) {
-					if (FileUtils.fileExistsAndIsNonEmpty(file)) {
-						try {
-							buf.append(StringUtils.toString(FileUtils.getLinesFromFile(file.getPath()), "\n"));
-						} catch (IOException ignored) {
-						}
-					}
-				}
-				importedString = buf.toString();
-			} else if (ClipboardUtils.hasString()) {
-				var string = ClipboardUtils.getString().trim();
-				if (FileUtils.fileExistsAndIsNonEmpty(string)) {
-					try {
-						string = StringUtils.toString(FileUtils.getLinesFromFile(string), "\n");
-					} catch (IOException ignored) {
-					}
-				}
-				importedString = string;
-			} else
-				return;
-
-			var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
-			Platform.runLater(() -> {
-				mainWindow.getController().getEditInputMenuItem().fire();
+			var importedString = ClipboardUtils.getTextFilesContentOrString();
+			if (importedString != null) {
+				var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
 				Platform.runLater(() -> {
-					var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
-					if (inputEditorTab != null) {
-						((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(importedString);
-						Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
-					}
+					mainWindow.getController().getEditInputMenuItem().fire();
+					Platform.runLater(() -> {
+						var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+						if (inputEditorTab != null) {
+							((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(importedString);
+							Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
+						}
+					});
 				});
-			});
+			}
 		});
 	}
 }
