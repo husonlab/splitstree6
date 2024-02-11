@@ -467,6 +467,12 @@
                             <children>
                                 <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="File"/>
+                                <Button fx:id="importButton" mnemonicParsing="false" text="Import">
+                                    <tooltip>
+                                        <Tooltip text="Paste text into new document"/>
+                                    </tooltip>
+                                </Button>
+                                <Region layoutX="179.0" layoutY="10.0" prefWidth="4.0"/>
                                 <ToggleButton fx:id="showWorkflowTreeCheckButton" mnemonicParsing="false"
                                               text="Side Bar">
                                     <tooltip>
@@ -474,11 +480,6 @@
                                     </tooltip>
                                 </ToggleButton>
                                 <Region prefWidth="4.0"/>
-                                <Button fx:id="importButton" mnemonicParsing="false" text="Import">
-                                    <tooltip>
-                                        <Tooltip text="Import Newick string from clipboard"/>
-                                    </tooltip>
-                                </Button>
                                 <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false"/>
                             </children>
                         </HBox>

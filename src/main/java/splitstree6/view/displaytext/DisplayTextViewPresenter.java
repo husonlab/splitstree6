@@ -26,7 +26,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.StageStyle;
@@ -119,8 +118,7 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			controller.getToolBar().getItems().remove(controller.getPasteButton());
 		} else {
 			controller.getPasteButton().setOnAction(e -> codeArea.paste());
-			codeArea.focusedProperty().addListener((v, o, n) ->
-					controller.getPasteButton().disableProperty().bind(new SimpleBooleanProperty(!Clipboard.getSystemClipboard().hasString())));
+			controller.getPasteButton().disableProperty().bind(ClipboardUtils.hasStringProperty().not());
 		}
 		codeArea.setStyle("-fx-font-size: " + view.getFontSize() + "px;");
 

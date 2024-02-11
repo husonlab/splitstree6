@@ -73,13 +73,13 @@ import java.util.stream.Collectors;
 public class TreeViewPresenter implements IDisplayTabPresenter {
 	private final LongProperty updateCounter = new SimpleLongProperty(0L);
 
-	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
-
 	private final MainWindow mainWindow;
 	private final TreeView view;
 	private final TreeViewController controller;
 
 	private final FindToolBar findToolBar;
+
+	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
 
 	private final ObjectProperty<TreePane> treePane = new SimpleObjectProperty<>(this, "treePane");
 	private final ObjectProperty<PhyloTree> tree;

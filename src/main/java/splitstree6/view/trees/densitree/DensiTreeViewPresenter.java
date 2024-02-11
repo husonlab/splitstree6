@@ -22,18 +22,24 @@ package splitstree6.view.trees.densitree;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioMenuItem;
+import javafx.scene.image.ImageView;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.qr.QRViewUtils;
+import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.utils.ClipboardUtils;
 import splitstree6.utils.SwipeUtils;
@@ -54,6 +60,9 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 	private final DensiTreeDrawer drawer;
 
 	private final FindToolBar findToolBar;
+
+	private final ObjectProperty<PhyloTree> consensusTree = new SimpleObjectProperty<>(null);
+	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
 
 
 	public DensiTreeViewPresenter(MainWindow mainWindow, DensiTreeView view, ObjectProperty<Bounds> targetBounds) {
@@ -144,6 +153,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
 					view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
 					view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+			consensusTree.set(drawer.getConsensusTree());
 		};
 
 		targetBounds.addListener(invalidationListener);
@@ -211,6 +221,10 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setConsumeSwipeRight(controller.getAnchorPane());
 		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
 		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+
+		var qrImageView = new SimpleObjectProperty<ImageView>();
+		QRViewUtils.setup(controller.getAnchorPane(), consensusTree, TreeNewickQR.createFunction(), qrImageView, showQRCode);
+
 	}
 
 	@Override
@@ -274,6 +288,9 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+
+		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> drawer.getRadialLabelLayout().layoutLabels());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());
