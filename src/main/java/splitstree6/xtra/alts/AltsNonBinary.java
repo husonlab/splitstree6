@@ -26,6 +26,7 @@ import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
+import jloda.util.FileUtils;
 import jloda.util.Pair;
 import jloda.util.UsageException;
 import jloda.util.progress.ProgressListener;
@@ -41,6 +42,8 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReferenceArray;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 
@@ -49,10 +52,13 @@ import java.util.stream.Collectors;
  * Banu Cetinkaya, 2023-24
  */
 public class AltsNonBinary {
+	private static Set<HybridizationResult> hybridizationResultSet = new HashSet<>();
+	private static int numOfPermutations = 0;
+	private static int minHybridizationScore = Integer.MAX_VALUE;
 	public static void main(String[] args) throws UsageException, IOException {
 		var options = new ArgsOptions(args, AltsNonBinary.class, "Non-binary version of ALTSNetwork");
 		var infile = options.getOptionMandatory("-i", "input", "Input Newick file", "");
-		//var outfile = options.getOption("-o", "output", "Output Newick file (.gz or stdout ok)", "stdout");
+		var outfile = options.getOption("-o", "output", "Output Newick file (.gz or stdout ok)", "stdout");
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Number of threads to use", 4));
 		options.done();
 
@@ -66,27 +72,28 @@ public class AltsNonBinary {
 		// when this exception is thrown, stop your code, clean up and then rethrow the exception
 
 		var start = Instant.now();
-		//var networks = apply(inputTreesBlock.getTrees(), progress);
+		var networks = apply(inputTreesBlock.getTrees(), progress);
 		var end = Instant.now();
 		System.out.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
+		System.out.println(networks.size() + " networks found over " + numOfPermutations + " permutations.");
 
-		//for (var network : networks)
-	//		System.out.println(network.toBracketString(false));
+		for (var network : networks)
+			System.out.println(network.toBracketString(false));
 
-		//System.err.println("Writing: " + outfile);
-		//try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
-		//	for (var network : networks) {
-		//		w.write(NewickIO.toString(network, false) + ";\n");
-		//	}
-		//}
+		System.err.println("Writing: " + outfile);
+		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
+			for (var network : networks) {
+				w.write(NewickIO.toString(network, false) + ";\n");
+			}
+		}
 
-		backTrack(inputTreesBlock.getTrees(), getInitialOrder(inputTreesBlock.getTrees()), 0);
 	}
 
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) {
 		try {
 			var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
-			return resultingNetworks(trees, initialOrder, progress);
+			backTrack(trees, initialOrder, initialOrder.size()-1, 1000);
+			return resultingNetworks(hybridizationResultSet, progress);
 		} catch (IOException ex) {
 			Basic.caught(ex);
 			return new ArrayList<>();
@@ -161,10 +168,11 @@ public class AltsNonBinary {
 					//System.out.println("content: " + contents);
 					String processedContent = processBrackets(contents, order);
 					//System.out.println("processed content: "+processedContent);
-					String smallestRemoved = processedContent.trim().replaceAll(findSmallestElement(processedContent, order), "").replaceFirst(",", "").
-							replaceAll(",", "/").replaceAll("/{2,}", "/").trim();
+					String smallestRemoved = processedContent.trim().replaceAll("\\b" + Pattern.quote(findSmallestElement(processedContent, order)) + "\\b", "").
+							replace(",","/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
 					//System.out.println("smallest removed: " + smallestRemoved);
 					labelledNewick.append(smallestRemoved);
+					//System.out.println(labelledNewick);
 				}
 			}
 		}
@@ -283,63 +291,46 @@ public class AltsNonBinary {
 		// Use a list for easier manipulation
 		List<String> partsList = new ArrayList<>(Arrays.asList(parts));
 
-		// Process for previous parts
+		outerLoop:
 		for (int i = 0; i < partsList.size(); i++) {
 			if (partsList.get(i).contains("/")) {
 				String[] subParts = partsList.get(i).split("/");
-				boolean allSubPartsFoundPrev = true;
+				List<String> subPartsList = Arrays.asList(subParts);
 
-				// Check if all sub-parts are found in the previous parts
-				for (String subPart : subParts) {
-					if (!partsList.subList(0, i).contains(subPart)) {
-						allSubPartsFoundPrev = false;
-						break;
-					}
-				}
-
-				// If all sub-parts are found, remove the last occurrence of the last sub-part
-				if (allSubPartsFoundPrev) {
-					for (int j = subParts.length - 1; j >= 0; j--) {
-						int lastIndex = partsList.subList(0, i).lastIndexOf(subParts[j]);
-						if (lastIndex != -1) {
-							partsList.remove(lastIndex);
-							break; // Only remove the last sub-part
+				// Check for each subPart
+				for (String subPart : subPartsList) {
+					// Check if the current subPart is present in the list (excluding the current part)
+					boolean subPartPresentElsewhere = false;
+					for (int j = 0; j < partsList.size(); j++) {
+						if (j != i && partsList.get(j).equals(subPart)) {
+							subPartPresentElsewhere = true;
+							break;
 						}
 					}
-				}
-			}
-		}
 
-		// Update the array to reflect removals
-		parts = partsList.toArray(new String[0]);
-
-		// Process for next parts (after updating the list from previous operations)
-		for (int i = 0; i < partsList.size(); i++) {
-			if (partsList.get(i).contains("/")) {
-				String[] subParts = partsList.get(i).split("/");
-				boolean allSubPartsFoundNext = true;
-
-				// Check if all sub-parts are found in the next parts
-				for (String subPart : subParts) {
-					if (!partsList.subList(i + 1, partsList.size()).contains(subPart)) {
-						allSubPartsFoundNext = false;
-						break;
+					// If any subPart is not present elsewhere, continue to the next part
+					if (!subPartPresentElsewhere) {
+						continue outerLoop;
 					}
 				}
 
-				// If all sub-parts are found, remove the first occurrence of the first found sub-part
-				if (allSubPartsFoundNext) {
-					for (String subPart : subParts) {
-						int nextIndex = partsList.subList(i + 1, partsList.size()).indexOf(subPart);
-						if (nextIndex != -1) {
-							partsList.remove(i + 1 + nextIndex);
-							break; // Remove the first occurrence and break
-						}
+				// If all subParts are confirmed to be present elsewhere, proceed with removal
+				// Process previous parts
+				for (int j = i - 1; j >= 0; j--) {
+					if (subPartsList.contains(partsList.get(j))) {
+						partsList.remove(j); // Remove the last occurrence found
+						i--; // Adjust the current index after removal
+						break; // Stop after removing the first matching previous part
 					}
 				}
 
-				// Stop after processing the first applicable slash-separated string
-				break;
+				// Process next parts
+				for (int j = i + 1; j < partsList.size(); j++) {
+					if (subPartsList.contains(partsList.get(j))) {
+						partsList.remove(j); // Remove the first occurrence found
+						break; // Stop after removing the first matching next part
+					}
+				}
 			}
 		}
 
@@ -450,51 +441,76 @@ public class AltsNonBinary {
 				.map(count -> count - 1)
 				.sum();
 
-		return new HybridizationResult(numOfHyb, alignments);
+		return new HybridizationResult(numOfHyb, alignments, order);
+	}
+
+	public static List<PhyloTree> resultingNetworks(Set<HybridizationResult> hybridizationResults, ProgressListener progress) throws IOException {
+		List<PhyloTree> trees = new ArrayList<>();
+		for (var result : hybridizationResults){
+			PhyloTree tree = network(result.getAlignments(), result.getOrder());
+			if (!trees.contains(tree)) {
+				trees.add(tree);
+			}
+		}
+		return trees;
 	}
 
 	/**
 	 * back tracking test
 	 */
-
-	private static List<HybridizationResult> hybridizationResultList;
-	private static int numOfPermutations = 0;
-	private static int minHybridizationScore = Integer.MAX_VALUE;
-
-	public static void backTrack(Collection<PhyloTree> trees, List<String> order, int position) throws IOException {
-		if (numOfPermutations == 10){
-			System.exit(0);
+	public static Set<HybridizationResult> backTrack(Collection<PhyloTree> trees, List<String> order, int position, int desiredNumOfPermutations) throws IOException {
+		if (numOfPermutations == factorialRecursive(order.size())-1 || numOfPermutations == desiredNumOfPermutations){
+			return hybridizationResultSet;
 		} else {
-			if (position == order.size() - 1) {
-				System.out.println(order);
+			if (position < 0) {
 				numOfPermutations ++;
-				HybridizationResult result = calculateHybridization(trees, order);
-				System.out.println(result.getHybridizationScore());
-
-
+				HybridizationResult hybridizationResult = calculateHybridization(trees, new ArrayList<>(order));
+				if (hybridizationResult.getHybridizationScore() <= minHybridizationScore){
+					minHybridizationScore = hybridizationResult.getHybridizationScore();
+					//add the first result to the list
+					if (hybridizationResultSet.isEmpty()){
+						hybridizationResultSet.add(hybridizationResult);
+					} else {
+						//if any hyb scores in the set bigger than current min
+						boolean isSmaller = hybridizationResultSet.stream()
+								.anyMatch(result -> result.getHybridizationScore() > minHybridizationScore);
+						//if any hyb scores in the set equal to current min
+						boolean isEqual = hybridizationResultSet.stream()
+								.anyMatch(result -> result.getHybridizationScore() == minHybridizationScore);
+						if (isSmaller){
+							//if smaller found clear the list add new min
+							hybridizationResultSet.clear();
+							hybridizationResultSet.add(hybridizationResult);
+						} else if (isEqual) {
+							hybridizationResultSet.add(hybridizationResult);
+							//System.out.println("equal added: " + order + " " +hybridizationResult.getAlignments());
+						}
+					}
+				}
 			} else {
 				for (int i = position; i < order.size(); i++) {
-					swap(order, position, i); // Swap the current element with the element at the position
-					backTrack(trees, order, position + 1); // Recurse for the next position
-					swap(order, i, position); // Swap back to backtrack
+					Collections.swap(order, position, i); // Swap the current element with the element at the position
+					backTrack(trees, order, position - 1, desiredNumOfPermutations); // Recurse for the next position
+					Collections.swap(order, i, position); // Swap back to backtrack
 				}
 			}
 		}
+		return hybridizationResultSet;
 	}
-
-	private static void swap(List<String> list, int i, int j) {
-		String temp = list.get(i);
-		list.set(i, list.get(j));
-		list.set(j, temp);
+	public static long factorialRecursive(int n) {
+		if (n == 0) {
+			return 1;
+		}
+		return n * factorialRecursive(n - 1);
 	}
 
 	/**
 	 * Calls the recursive function and returns the tree
 	 */
-	public static List<PhyloTree> resultingNetworks(Collection<PhyloTree> trees, List<String> initialOrder, ProgressListener progress) throws IOException {
+	/*public static List<PhyloTree> resultingNetworks(Collection<PhyloTree> trees, List<String> initialOrder, ProgressListener progress) throws IOException {
 		var finalOrder = new ArrayList<String>();
 		return List.of(calculateBestScoreOrder(trees, initialOrder, finalOrder, Integer.MAX_VALUE));
-	}
+	}*/
 
 	/**
 	 * Recursively calculate the order with min num of hybridization, and compute the corresponding network at the end.
@@ -624,6 +640,8 @@ public class AltsNonBinary {
 		String tree1 = tree.toBracketString(false).replaceAll("##", "#");
 		return NewickIO.valueOf(tree1);
 	}
+
+
 
 
 	private static Map<String, String> sortKeysByOrder(Map<String, String> map, List<String> order) {
