@@ -36,7 +36,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.Clipboard;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -797,23 +796,17 @@ public class GeneTreeViewPresenter {
 	}
 
 	private ArrayList<GeneTree> pasteTrees(Stage stage, Model model, GeneTreeViewController controller) {
-		Clipboard clipboard = Clipboard.getSystemClipboard();
 		try {
-			String content;
-			File file;
 			var newickReader = new NewickReader();
 			var newTreeBlock = new TreesBlock();
-			if (clipboard.hasString()) {
-				content = clipboard.getString();
-				file = new File("temp.txt");
-				FileWriter fw = new FileWriter(file);
-				fw.write(content);
-				fw.close();
-				var iterator = new FileLineIterator(file);
+			if (ClipboardUtils.hasString()) {
+				var string = ClipboardUtils.getString();
+				var iterator = new FileLineIterator(FileLineIterator.PREFIX_TO_INDICATE_TO_PARSE_FILENAME_STRING + string);
 				newickReader.read(new ProgressPercentage(), iterator, model.getTaxaBlock(), newTreeBlock);
 
-			} else if (clipboard.hasFiles()) {
-				file = clipboard.getFiles().get(0);
+			} else if (ClipboardUtils.hasFiles()) {
+				// todo: need to read all input files, not just the first
+				var file = ClipboardUtils.getFiles().get(0);
 				newickReader.read(new ProgressPercentage(), file.getPath(), model.getTaxaBlock(), newTreeBlock);
 			} else return null;
 

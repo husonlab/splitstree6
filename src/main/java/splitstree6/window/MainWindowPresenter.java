@@ -33,10 +33,8 @@ import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.dialog.ExportImageDialog;
@@ -997,8 +995,7 @@ public class MainWindowPresenter {
 					if (!(item instanceof SeparatorMenuItem)) {
 						callback.accept(item);
 					}
-					if (item instanceof Menu) {
-						var other = (Menu) item;
+					if (item instanceof Menu other) {
 						queue.add(other);
 					}
 				}
@@ -1006,33 +1003,25 @@ public class MainWindowPresenter {
 		}
 	}
 
+	// todo: move to jloda-core
 	private void setupImportButton(Button importButton) {
-		importButton.setDisable(true);
-
-		EventHandler<MouseEvent> handler = (e -> {
-			var string = Clipboard.getSystemClipboard().getString();
-			if (string == null)
-				importButton.setDisable(true);
-			else {
-				string = string.trim();
-				importButton.setDisable(!string.startsWith("(") || !string.endsWith(";"));
-			}
-		});
-		mainWindow.getController().getRootPane().setOnMouseEntered(handler);
-		mainWindow.getController().getLeftToolBarPane().setOnMouseEntered(handler);
+		importButton.disableProperty().bind(ClipboardUtils.hasStringProperty().not().and(ClipboardUtils.hasFilesProperty().not()));
 
 		importButton.setOnAction(e -> {
-			var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
-			Platform.runLater(() -> {
-				mainWindow.getController().getEditInputMenuItem().fire();
+			var importedString = ClipboardUtils.getTextFilesContentOrString();
+			if (importedString != null) {
+				var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
 				Platform.runLater(() -> {
-					var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
-					if (inputEditorTab != null) {
-						((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(Clipboard.getSystemClipboard().getString());
-						Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
-					}
+					mainWindow.getController().getEditInputMenuItem().fire();
+					Platform.runLater(() -> {
+						var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+						if (inputEditorTab != null) {
+							((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(importedString);
+							Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
+						}
+					});
 				});
-			});
+			}
 		});
 	}
 }
