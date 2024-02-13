@@ -54,7 +54,8 @@ public class Kernelize {
 	 * @return computed networks
 	 */
 	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees,
-										BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm, int maxNumberOfResults) throws IOException {
+										BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm,
+										int maxNumberOfResults, boolean mutualRefinement) throws IOException {
 
 		// setup incompatibility graph
 		var incompatibilityGraph = computeClusterIncompatibilityGraph(inputTrees);
@@ -106,19 +107,24 @@ public class Kernelize {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
 					var reducedTrees = extractTrees(component);
+					if (mutualRefinement) {
+						mutualRefinement(reducedTrees.trees());
+					}
+
+					System.err.println("Input trees:");
+					for (var tree : reducedTrees.trees()) {
+						System.err.println(NewickIO.toString(tree, false) + ";");
+					}
+
 					var networks = algorithm.apply(reducedTrees.trees(), progress);
 					if (true) { // todo: algorithm doesn't return taxon ids
-						System.err.println("Input trees:");
-						for (var tree : reducedTrees.trees()) {
-							System.err.println(NewickIO.toString(tree, false) + ";");
-						}
 						System.err.println("Output networks:");
 						for (var tree : networks) {
 							System.err.println(NewickIO.toString(tree, false) + ";");
 						}
 						if (IteratorUtils.size(networks.iterator().next().getTaxa()) == 0) {
 							var labelTaxonMap = new HashMap<String, Integer>();
-							for (var tree : reducedTrees.trees()) {
+							for (var tree : inputTrees) {
 								for (var v : tree.nodes()) {
 									var label = tree.getLabel(v);
 									if (label != null)
@@ -407,6 +413,37 @@ public class Kernelize {
 		}
 
 		return new TreesAndTaxonClasses(trees, taxonClasses);
+	}
+
+	/**
+	 * performs mutatual refinement of all input trees
+	 *
+	 * @param trees input trees
+	 * @return mut
+	 */
+	public static void mutualRefinement(Collection<PhyloTree> trees) {
+		var incompatibilityGraph = computeClusterIncompatibilityGraph(trees);
+
+		var compatibleClusters = incompatibilityGraph.nodeStream()
+				.filter(v -> v.getDegree() == 0) // compatible with all
+				.filter(v -> ((BitSet) v.getData()).cardinality() < trees.size()) // not in all trees
+				.map(v -> (BitSet) v.getInfo()).toList();
+
+		if (!compatibleClusters.isEmpty()) {
+			var result = new ArrayList<PhyloTree>();
+			for (var tree : trees) {
+				// todo: insert clusters into existing tree
+				var clusters = TreesUtils.collectAllHardwiredClusters(tree);
+				if (!clusters.containsAll(compatibleClusters)) {
+					clusters.addAll(compatibleClusters);
+					var newTree = new PhyloTree();
+					ClusterPoppingAlgorithm.apply(clusters, newTree);
+					result.add(newTree);
+				} else result.add(tree);
+			}
+			trees.clear();
+			trees.addAll(result);
+		}
 	}
 
 	/**

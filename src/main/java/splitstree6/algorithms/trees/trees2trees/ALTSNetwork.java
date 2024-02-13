@@ -40,6 +40,8 @@ import java.util.List;
  */
 public class ALTSNetwork extends Trees2Trees {
 	private final BooleanProperty optionUseKernelization = new SimpleBooleanProperty(this, "optionUseKernelization", false);
+	private final BooleanProperty optionUseMutualRefinement = new SimpleBooleanProperty(this, "optionUseMutualRefinement", false);
+
 	@Override
 	public String getCitation() {
 		return "Zhang et al 2023; Louxin Zhang, Niloufar Niloufar Abhari, Caroline Colijn and Yufeng Wu3." +
@@ -49,7 +51,7 @@ public class ALTSNetwork extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionUseKernelization.getName());
+		return List.of(optionUseKernelization.getName(), optionUseMutualRefinement.getName());
 	}
 
 	@Override
@@ -61,7 +63,7 @@ public class ALTSNetwork extends Trees2Trees {
 			if (!isOptionUseKernelization()) {
 				result = AltsNonBinary.apply(treesBlock.getTrees(), progress);
 			} else {
-				result = Kernelize.apply(progress, taxaBlock, treesBlock.getTrees(), AltsNonBinary::apply, 100000);
+				result = Kernelize.apply(progress, taxaBlock, treesBlock.getTrees(), AltsNonBinary::apply, 100000, isOptionUseMutualRefinement());
 			}
 			for (var tree : result) {
 				for (var v : tree.nodeStream().filter(v -> tree.getLabel(v) != null).toList()) {
@@ -88,5 +90,17 @@ public class ALTSNetwork extends Trees2Trees {
 
 	public void setOptionUseKernelization(boolean optionUseKernelization) {
 		this.optionUseKernelization.set(optionUseKernelization);
+	}
+
+	public boolean isOptionUseMutualRefinement() {
+		return optionUseMutualRefinement.get();
+	}
+
+	public BooleanProperty optionUseMutualRefinementProperty() {
+		return optionUseMutualRefinement;
+	}
+
+	public void setOptionUseMutualRefinement(boolean optionUseMutualRefinement) {
+		this.optionUseMutualRefinement.set(optionUseMutualRefinement);
 	}
 }

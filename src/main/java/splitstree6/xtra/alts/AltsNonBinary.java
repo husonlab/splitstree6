@@ -89,7 +89,7 @@ public class AltsNonBinary {
 	}
 
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) throws IOException {
-			var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
+		var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
 		System.err.println("initial order: " + initialOrder);
 			backTrack(trees, initialOrder, initialOrder.size()-1, 32);
 			return resultingNetworks(hybridizationResultSet, progress);
