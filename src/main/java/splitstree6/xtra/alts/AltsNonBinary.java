@@ -46,6 +46,8 @@ import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import static splitstree6.utils.PathMultiplicityDistance.compute;
+
 
 /**
  * implementation of the ALTSNetwork method for non-binary input trees
@@ -86,13 +88,13 @@ public class AltsNonBinary {
 				w.write(NewickIO.toString(network, false) + ";\n");
 			}
 		}
-
 	}
 
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) {
 		try {
 			var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
-			backTrack(trees, initialOrder, initialOrder.size()-1, 1000);
+			System.out.println("initial order: " + initialOrder);
+			backTrack(trees, initialOrder, initialOrder.size()-1, 32);
 			return resultingNetworks(hybridizationResultSet, progress);
 		} catch (IOException ex) {
 			Basic.caught(ex);
@@ -168,8 +170,16 @@ public class AltsNonBinary {
 					//System.out.println("content: " + contents);
 					String processedContent = processBrackets(contents, order);
 					//System.out.println("processed content: "+processedContent);
-					String smallestRemoved = processedContent.trim().replaceAll("\\b" + Pattern.quote(findSmallestElement(processedContent, order)) + "\\b", "").
-							replace(",","/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
+					String smallest = findSmallestElement(processedContent, order).trim();
+					String smallestRemoved = "";
+					if (smallest.startsWith("'") && smallest.endsWith("'")) {
+						smallest = smallest.substring(1, smallest.length() - 1);
+						smallestRemoved = processedContent.trim().replaceAll("'"+"\\b" + Pattern.quote(smallest) + "\\b"+"'", "").trim().
+								replace(",","/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
+					} else {
+						smallestRemoved = processedContent.trim().replaceAll("\\b" + Pattern.quote(smallest) + "\\b", "").trim().
+								replace(",","/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
+					}
 					//System.out.println("smallest removed: " + smallestRemoved);
 					labelledNewick.append(smallestRemoved);
 					//System.out.println(labelledNewick);
@@ -298,7 +308,7 @@ public class AltsNonBinary {
 				List<String> subPartsList = Arrays.asList(subParts);
 
 				// Check for each subPart
-				for (String subPart : subPartsList) {
+				/*for (String subPart : subPartsList) {
 					// Check if the current subPart is present in the list (excluding the current part)
 					boolean subPartPresentElsewhere = false;
 					for (int j = 0; j < partsList.size(); j++) {
@@ -312,23 +322,36 @@ public class AltsNonBinary {
 					if (!subPartPresentElsewhere) {
 						continue outerLoop;
 					}
-				}
+				}*/
 
-				// If all subParts are confirmed to be present elsewhere, proceed with removal
-				// Process previous parts
-				for (int j = i - 1; j >= 0; j--) {
+				// Process previous parts, remove all except first
+				boolean firstFound = false;
+				for (int j = 0; j < i; j++) {
 					if (subPartsList.contains(partsList.get(j))) {
-						partsList.remove(j); // Remove the last occurrence found
-						i--; // Adjust the current index after removal
-						break; // Stop after removing the first matching previous part
+						if (!firstFound) {
+							firstFound = true; // Skip the first occurrence
+						} else {
+							partsList.remove(j); // Remove the rest
+							i--; // Adjust the current index after removal
+							j--; // Adjust the loop index after removal
+						}
 					}
 				}
 
-				// Process next parts
-				for (int j = i + 1; j < partsList.size(); j++) {
+				// Process next parts, remove all except last
+				int lastIndexOfSubPartAfterI = -1;
+				for (int j = partsList.size() - 1; j > i; j--) {
 					if (subPartsList.contains(partsList.get(j))) {
-						partsList.remove(j); // Remove the first occurrence found
-						break; // Stop after removing the first matching next part
+						lastIndexOfSubPartAfterI = j;
+						break;
+					}
+				}
+
+				for (int j = i + 1; j < lastIndexOfSubPartAfterI; j++) {
+					if (subPartsList.contains(partsList.get(j))) {
+						partsList.remove(j); // Remove until reaching the last occurrence
+						j--; // Adjust the loop index after removal
+						lastIndexOfSubPartAfterI--; // Adjust the target index for removals
 					}
 				}
 			}
@@ -448,11 +471,21 @@ public class AltsNonBinary {
 		List<PhyloTree> trees = new ArrayList<>();
 		for (var result : hybridizationResults){
 			PhyloTree tree = network(result.getAlignments(), result.getOrder());
-			if (!trees.contains(tree)) {
+			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
 				trees.add(tree);
 			}
 		}
 		return trees;
+	}
+
+	private static boolean isTreeAddedToFinalList(List<PhyloTree> trees, PhyloTree newTree){
+		for (var existingTree : trees){
+			double distance = compute(existingTree, newTree);
+			if (distance==0.0){
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -465,7 +498,7 @@ public class AltsNonBinary {
 			if (position < 0) {
 				numOfPermutations ++;
 				HybridizationResult hybridizationResult = calculateHybridization(trees, new ArrayList<>(order));
-				if (hybridizationResult.getHybridizationScore() <= minHybridizationScore){
+				if (hybridizationResult.getHybridizationScore() != 0 && hybridizationResult.getHybridizationScore() <= minHybridizationScore){
 					minHybridizationScore = hybridizationResult.getHybridizationScore();
 					//add the first result to the list
 					if (hybridizationResultSet.isEmpty()){
@@ -481,9 +514,10 @@ public class AltsNonBinary {
 							//if smaller found clear the list add new min
 							hybridizationResultSet.clear();
 							hybridizationResultSet.add(hybridizationResult);
+							//System.out.println("smaller-> score:" + hybridizationResult.getHybridizationScore() + " order: " + hybridizationResult.getOrder() + " alignment: "+ hybridizationResult.getAlignments());
 						} else if (isEqual) {
 							hybridizationResultSet.add(hybridizationResult);
-							//System.out.println("equal added: " + order + " " +hybridizationResult.getAlignments());
+							//System.out.println("equal-> score:" + hybridizationResult.getHybridizationScore() + " order: " + hybridizationResult.getOrder() + " alignment: "+ hybridizationResult.getAlignments());
 						}
 					}
 				}
