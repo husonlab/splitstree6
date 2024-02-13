@@ -25,7 +25,6 @@ import jloda.graph.Node;
 import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
-import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.Pair;
 import jloda.util.UsageException;
@@ -42,7 +41,6 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReferenceArray;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -76,11 +74,11 @@ public class AltsNonBinary {
 		var start = Instant.now();
 		var networks = apply(inputTreesBlock.getTrees(), progress);
 		var end = Instant.now();
-		System.out.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
-		System.out.println(networks.size() + " networks found over " + numOfPermutations + " permutations.");
+		System.err.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
+		System.err.println(networks.size() + " networks found over " + numOfPermutations + " permutations.");
 
 		for (var network : networks)
-			System.out.println(network.toBracketString(false));
+			System.err.println(network.toBracketString(false));
 
 		System.err.println("Writing: " + outfile);
 		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
@@ -90,16 +88,11 @@ public class AltsNonBinary {
 		}
 	}
 
-	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) {
-		try {
+	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) throws IOException {
 			var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
-			System.out.println("initial order: " + initialOrder);
+		System.err.println("initial order: " + initialOrder);
 			backTrack(trees, initialOrder, initialOrder.size()-1, 32);
 			return resultingNetworks(hybridizationResultSet, progress);
-		} catch (IOException ex) {
-			Basic.caught(ex);
-			return new ArrayList<>();
-		}
 	}
 
 	private static ArrayList<String> getInitialOrder(Collection<PhyloTree> trees) {
@@ -167,9 +160,9 @@ public class AltsNonBinary {
 				if (!stack.isEmpty()) {
 					int startIndex = stack.pop();
 					String contents = newick.substring(startIndex + 1, i);
-					//System.out.println("content: " + contents);
+					//System.err.println("content: " + contents);
 					String processedContent = processBrackets(contents, order);
-					//System.out.println("processed content: "+processedContent);
+					//System.err.println("processed content: "+processedContent);
 					String smallest = findSmallestElement(processedContent, order).trim();
 					String smallestRemoved = "";
 					if (smallest.startsWith("'") && smallest.endsWith("'")) {
@@ -180,13 +173,13 @@ public class AltsNonBinary {
 						smallestRemoved = processedContent.trim().replaceAll("\\b" + Pattern.quote(smallest) + "\\b", "").trim().
 								replace(",","/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
 					}
-					//System.out.println("smallest removed: " + smallestRemoved);
+					//System.err.println("smallest removed: " + smallestRemoved);
 					labelledNewick.append(smallestRemoved);
-					//System.out.println(labelledNewick);
+					//System.err.println(labelledNewick);
 				}
 			}
 		}
-		//System.out.println(labelledNewick);
+		//System.err.println(labelledNewick);
 		return labelledNewick.toString();
 	}
 
@@ -203,7 +196,7 @@ public class AltsNonBinary {
 				int startIndex = stack.pop();
 				if (stack.isEmpty()) {
 					String innerContent = content.substring(startIndex + 1, i);
-					//System.out.println("inner content: "+innerContent);
+					//System.err.println("inner content: "+innerContent);
 					String smallest = findSmallestElement(innerContent, order);
 					result.append(content, lastProcessedIndex, startIndex).append(smallest);
 					lastProcessedIndex = i + 1;
@@ -245,7 +238,7 @@ public class AltsNonBinary {
 			path.add(currentNode.getParent().getLabel());
 			currentNode = currentNode.getParent();
 		}
-		//System.out.println(leafNode.getLabel() + " " + reverseLinkedListRecursive(path, 0));
+		//System.err.println(leafNode.getLabel() + " " + reverseLinkedListRecursive(path, 0));
 		return reverseLinkedListRecursive(path, 0);
 	}
 
@@ -289,7 +282,7 @@ public class AltsNonBinary {
 			}
 
 			consensusMap.put(key, postProcessAlignment(currentConsensus));
-			//System.out.println("map: " + consensusMap);
+			//System.err.println("map: " + consensusMap);
 		}
 
 		return consensusMap;
@@ -470,7 +463,7 @@ public class AltsNonBinary {
 	public static List<PhyloTree> resultingNetworks(Set<HybridizationResult> hybridizationResults, ProgressListener progress) throws IOException {
 		List<PhyloTree> trees = new ArrayList<>();
 		for (var result : hybridizationResults){
-			PhyloTree tree = network(result.getAlignments(), result.getOrder());
+			var tree = network(result.getAlignments(), result.getOrder());
 			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
 				trees.add(tree);
 			}
@@ -514,10 +507,10 @@ public class AltsNonBinary {
 							//if smaller found clear the list add new min
 							hybridizationResultSet.clear();
 							hybridizationResultSet.add(hybridizationResult);
-							//System.out.println("smaller-> score:" + hybridizationResult.getHybridizationScore() + " order: " + hybridizationResult.getOrder() + " alignment: "+ hybridizationResult.getAlignments());
+							//System.err.println("smaller-> score:" + hybridizationResult.getHybridizationScore() + " order: " + hybridizationResult.getOrder() + " alignment: "+ hybridizationResult.getAlignments());
 						} else if (isEqual) {
 							hybridizationResultSet.add(hybridizationResult);
-							//System.out.println("equal-> score:" + hybridizationResult.getHybridizationScore() + " order: " + hybridizationResult.getOrder() + " alignment: "+ hybridizationResult.getAlignments());
+							//System.err.println("equal-> score:" + hybridizationResult.getHybridizationScore() + " order: " + hybridizationResult.getOrder() + " alignment: "+ hybridizationResult.getAlignments());
 						}
 					}
 				}
@@ -554,7 +547,7 @@ public class AltsNonBinary {
 		if (remainingOrder.isEmpty()) {
 			HybridizationResult result = calculateHybridization(trees, finalOrder);
 			System.err.println("Final Order: " + finalOrder);
-			//System.out.println("Alignments for best order: " + result.getAlignments());
+			//System.err.println("Alignments for best order: " + result.getAlignments());
 			System.err.println("Number of hybridization: " + currentMinHybridization);
 
 			return network(result.getAlignments(), finalOrder);
@@ -751,7 +744,7 @@ public class AltsNonBinary {
 		}
 
 		for (var n : tree.nodes()) {
-			System.out.println(n + " " + n.getLabel());
+			System.err.println(n + " " + n.getLabel());
 			if (n.getInDegree() == 1 && n.getOutDegree() == 1) {
 				tree.delDivertex(n);
 			}

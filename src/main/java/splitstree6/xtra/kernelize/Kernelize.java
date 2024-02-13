@@ -36,7 +36,6 @@ import splitstree6.splits.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
@@ -54,12 +53,13 @@ public class Kernelize {
 	 * @param maxNumberOfResults maximum number of solutions to report
 	 * @return computed networks
 	 */
-	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees, BiFunction<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm, int maxNumberOfResults) throws IOException {
+	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees,
+										BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm, int maxNumberOfResults) throws IOException {
 
 		// setup incompatibility graph
 		var incompatibilityGraph = computeClusterIncompatibilityGraph(inputTrees);
-		System.err.println("Isolated nodes: " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() == 0).count());
-		System.err.println("Non-isolated:   " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() > 0).count());
+		System.err.println("Compatible clusters:   " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() == 0).count());
+		System.err.println("Incompatible clusters: " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() > 0).count());
 
 		// extract all incompatibility components
 		var components = incompatibilityGraph.extractAllConnectedComponents();
@@ -99,14 +99,44 @@ public class Kernelize {
 			}
 		}
 
-		// System.err.println("Blob tree: " + NewickIO.toString(network, false) + ";");
+		System.err.println("Blob tree: " + NewickIO.toString(blobTree, false) + ";");
 
 		// run the algorithm on all components:
 		try (NodeArray<TreesAndTaxonClasses> blobNetworksMap = blobTree.newNodeArray()) {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
 					var reducedTrees = extractTrees(component);
-					var subnetworks = new TreesAndTaxonClasses(algorithm.apply(reducedTrees.trees(), progress), reducedTrees.taxonClasses());
+					var networks = algorithm.apply(reducedTrees.trees(), progress);
+					if (true) { // todo: algorithm doesn't return taxon ids
+						System.err.println("Input trees:");
+						for (var tree : reducedTrees.trees()) {
+							System.err.println(NewickIO.toString(tree, false) + ";");
+						}
+						System.err.println("Output networks:");
+						for (var tree : networks) {
+							System.err.println(NewickIO.toString(tree, false) + ";");
+						}
+						if (IteratorUtils.size(networks.iterator().next().getTaxa()) == 0) {
+							var labelTaxonMap = new HashMap<String, Integer>();
+							for (var tree : reducedTrees.trees()) {
+								for (var v : tree.nodes()) {
+									var label = tree.getLabel(v);
+									if (label != null)
+										labelTaxonMap.put(label, tree.getTaxon(v));
+								}
+							}
+							for (var network : networks) {
+								for (var v : network.nodes()) {
+									var label = network.getLabel(v);
+									if (label != null) {
+										var taxonId = labelTaxonMap.get(label);
+										network.addTaxon(v, taxonId);
+									}
+								}
+							}
+						}
+					}
+					var subnetworks = new TreesAndTaxonClasses(networks, reducedTrees.taxonClasses());
 					var donorTaxa = BitSetUtils.union(reducedTrees.taxonClasses());
 					var acceptorNode = clusterNodeMap.get(donorTaxa);
 					blobNetworksMap.put(acceptorNode, subnetworks);
@@ -404,5 +434,9 @@ public class Kernelize {
 			}
 			return buf.toString();
 		}
+	}
+
+	public interface BiFunctionWithIOException<S, T, R> {
+		R apply(S s, T t) throws IOException;
 	}
 }

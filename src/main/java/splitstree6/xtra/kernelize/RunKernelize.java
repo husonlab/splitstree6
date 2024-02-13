@@ -37,7 +37,6 @@ import splitstree6.splits.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.BiFunction;
 
 public class RunKernelize {
 	public static void main(String[] args) throws UsageException, IOException {
@@ -80,7 +79,7 @@ public class RunKernelize {
 		System.err.println();
 
 		// setup the algorithm that is used to resolve each incompatibility component
-		BiFunction<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm =
+		Kernelize.BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm =
 				switch (algorithmName) {
 					case "clusternetwork" -> (trees, p) -> {
 						var clusters = new HashSet<BitSet>();
