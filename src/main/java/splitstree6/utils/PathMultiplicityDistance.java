@@ -48,13 +48,7 @@ public class PathMultiplicityDistance {
      * @return distance
      */
     public static double compute(PhyloTree tree1, PhyloTree tree2) {
-        var taxa = BitSetUtils.asBitSet(tree1.getTaxa());
-        taxa.or(BitSetUtils.asBitSet(tree2.getTaxa()));
-
-        var n1PathVectors = collectMuVectors(tree1, taxa);
-        var n2PathVectors = collectMuVectors(tree2, taxa);
-
-        return IteratorUtils.count(SetUtils.symmetricDifference(n1PathVectors, n2PathVectors)) / 2.0;
+        return compute(List.of(tree1, tree2))[0][1];
     }
 
     /**
@@ -67,6 +61,20 @@ public class PathMultiplicityDistance {
         var taxa = new BitSet();
         for (var tree : trees) {
             taxa.or(BitSetUtils.asBitSet(tree.getTaxa()));
+        }
+
+        if (taxa.cardinality() == 0) {
+            var workingTrees = new ArrayList<PhyloTree>();
+            var labelTaxonIdMap = new HashMap<String, Integer>();
+            for (var tree : trees) {
+                var workingTree = new PhyloTree(tree);
+                addAdhocTaxonIds(workingTree, labelTaxonIdMap);
+                workingTrees.add(workingTree);
+            }
+            trees = workingTrees;
+            for (var tree : trees) {
+                taxa.or(BitSetUtils.asBitSet(tree.getTaxa()));
+            }
         }
 
         var pathVectors = new ArrayList<Collection<String>>();
@@ -117,15 +125,13 @@ public class PathMultiplicityDistance {
 
     public static void main(String[] args) throws IOException {
         var input = new String[]{
-                "(((((((((((((t4,(t1,t2)),(t5,t11)),(t19,t8)),(((t20,t15),t12),t6)),((t13,(t16)#H2))#H1),((((t14,t10),#H1),#H2))#H3),(((t18,(((((t9,t17),t7),((t3,#H3))#H6),#H3))#H5),#H1))#H4),#H5),#H6),#H5),#H3),#H4));",
-                "((((((((((((((t2,t1),t4),(t5,t11)),(t19,t8)),(((t20,t15),t12),t6)),((t13,(t16)#H2))#H1),((((t14,t10),#H1),#H2))#H3),(((t18,(((((t17,t9),t7),((t3,#H3))#H6),#H3))#H5),#H1))#H4),#H5),#H6),#H5),#H3),#H4));",
-                "((((((((((((((t1,t2),t4),(t5,t11)),(t19,t8)),(((t20,t15),t12),t6)),((t13,(t16)#H2))#H1),((((t14,t10),#H1),#H2))#H3),(((t18,(((((t17,t9),t7),((t3,#H3))#H6),#H3))#H5),#H1))#H4),#H5),#H6),#H5),#H3),#H4));"};
-
+                "((((((c,((b,(a)#H2))#H1),#H2),((d,((e,#H2))#H4))#H3),f,#H1),#H3,#H4))",
+                "(((((a,(((c,(b)#H2),f,#H2))#H1),#H2),(e,((d,#H1))#H3)),#H1,#H3))"
+        };
         var trees = new ArrayList<PhyloTree>();
         var labelTaxonIdMap = new HashMap<String, Integer>();
         for (var line : input) {
             var tree = NewickIO.valueOf(line);
-            addAdhocTaxonIds(tree, labelTaxonIdMap);
             trees.add(tree);
         }
 
