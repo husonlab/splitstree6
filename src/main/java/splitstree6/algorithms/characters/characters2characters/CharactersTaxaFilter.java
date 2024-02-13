@@ -90,6 +90,7 @@ public class CharactersTaxaFilter extends DataTaxaFilter<CharactersBlock, Charac
 		workingCharacters.setHasAmbiguityCodes(inputCharacters.isHasAmbiguityCodes());
 		workingCharacters.setSymbols(inputCharacters.getSymbols());
 		workingCharacters.setCharacterWeights(inputCharacters.getCharacterWeights());
+		workingCharacters.setCharacterLabels(inputCharacters.getCharacterLabels());
 		workingCharacters.setStateLabeler(inputCharacters.getStateLabeler());
 		workingCharacters.setCharLabeler(inputCharacters.getCharLabeler());
 		workingCharacters.setRespectCase(inputCharacters.isRespectCase());

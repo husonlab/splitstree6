@@ -334,6 +334,8 @@ public class MainWindowPresenter {
 				fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
 				var selectedFile = fileChooser.showOpenDialog(stage);
 				if (selectedFile != null) {
+					if (!selectedFile.getParent().isBlank())
+						ProgramProperties.put("InputDir", selectedFile.getParent());
 					if (!loadingFile.get()) {
 						try {
 							loadingFile.set(true);

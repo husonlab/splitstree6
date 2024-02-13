@@ -89,11 +89,20 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 
 		w.write(";\n");
 		if (characters.getCharacterWeights() != null) {
-			w.write("CHARWEIGHTS");
+			w.write("CHARWEIGHTS\n\t");
 			double[] charWeights = characters.getCharacterWeights();
-			for (int i = 1; i < charWeights.length; i++)
-				w.write(" " + charWeights[i]);
-			w.write(";\n");
+			var count = 0;
+			for (int i = 0; i < charWeights.length; i++) {
+				var value = charWeights[i];
+				if (count >= 100) {
+					w.write("\n\t");
+					count = 0;
+				}
+				var string = " [%d] %s".formatted(i + 1, StringUtils.removeTrailingZerosAfterDot(value));
+				w.write(string);
+				count += string.length();
+			}
+			w.write(";\n\n");
 		}
 
 		// Writes the CharStateLabels only if set
@@ -128,6 +137,24 @@ public class CharactersNexusOutput extends NexusIOBase implements INexusOutput<C
 				}
 			}
 			w.write("\n;\n");
+		}
+		if (characters.getCharacterLabels() != null) {
+			w.write("CHARLABELS\n\t");
+			var charLabels = characters.getCharacterLabels();
+			var count = 0;
+			for (int i = 0; i < charLabels.length; i++) {
+				var label = charLabels[i];
+				if (label == null)
+					label = "null";
+				if (count >= 100) {
+					w.write("\n\t");
+					count = 0;
+				}
+				var string = " [%d] %s".formatted(i + 1, label);
+				w.write(string);
+				count += string.length();
+			}
+			w.write(";\n\n");
 		}
 
 		w.write("MATRIX\n");
