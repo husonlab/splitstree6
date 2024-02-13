@@ -92,7 +92,7 @@ public class ALTSExternal extends Trees2Trees implements IDesktopOnly {
 			var count = 0;
 			try (var w = new BufferedWriter(new FileWriter(inputFile))) {
 				for (var tree0 : treesBlock.getTrees()) {
-					if (IteratorUtils.size(tree0.getTaxa()) == taxaBlock.getNtax() && !treesBlock.isReticulated() && tree0.isBifurcating()) {
+					if (IteratorUtils.size(tree0.getTaxa()) == taxaBlock.getNtax() && !treesBlock.isReticulated()) {
 						var tree = new PhyloTree(tree0);
 						for (var v : tree.nodes()) {
 							if (tree.getLabel(v) != null) {
