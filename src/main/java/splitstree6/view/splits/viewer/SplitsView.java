@@ -79,7 +79,7 @@ public class SplitsView implements IView {
 	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting", SplitsRooting.None);
 	private final DoubleProperty optionRootAngle = new SimpleDoubleProperty(this, "optionRootAngle");
 
-	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence", true);
+	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence");
 
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
@@ -99,6 +99,7 @@ public class SplitsView implements IView {
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Splits);
 		ProgramProperties.track(optionRootAngle, 160.0);
 		ProgramProperties.track(optionOutlineFill, OUTLINE_FILL_COLOR);
+		ProgramProperties.track(optionShowConfidence, false);
 	}
 
 	public List<String> listOptions() {

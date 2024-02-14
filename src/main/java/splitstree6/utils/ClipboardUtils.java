@@ -45,6 +45,8 @@ import java.util.List;
  * Daniel Huson, 2.2024
  */
 public class ClipboardUtils {
+	public static boolean MONITOR_CLIPBOARD = true;
+
 	public static TriConsumer<String, Image, File> copyFunction = (string, image, file) -> {
 		var content = new ClipboardContent();
 		if (string != null)
@@ -75,24 +77,31 @@ public class ClipboardUtils {
 		hasString = new SimpleBooleanProperty(false);
 		hasImage = new SimpleBooleanProperty(false);
 		hasFiles = new SimpleBooleanProperty(false);
-		service = new ScheduledService<>() {
-			@Override
-			protected Task<Void> createTask() {
-				return new Task<>() {
-					@Override
-					protected Void call() {
-						Platform.runLater(() -> {
-							hasString.set(Clipboard.getSystemClipboard().hasString());
-							hasImage.set(Clipboard.getSystemClipboard().hasImage());
-							hasFiles.set(Clipboard.getSystemClipboard().hasFiles());
-						});
-						return null;
-					}
-				};
-			}
-		};
-		service.setPeriod(Duration.millis(500));
-		Platform.runLater(service::start);
+		if (MONITOR_CLIPBOARD) {
+			service = new ScheduledService<>() {
+				@Override
+				protected Task<Void> createTask() {
+					return new Task<>() {
+						@Override
+						protected Void call() {
+							Platform.runLater(() -> {
+								hasString.set(Clipboard.getSystemClipboard().hasString());
+								hasImage.set(Clipboard.getSystemClipboard().hasImage());
+								hasFiles.set(Clipboard.getSystemClipboard().hasFiles());
+							});
+							return null;
+						}
+					};
+				}
+			};
+			service.setPeriod(Duration.millis(500));
+			Platform.runLater(service::start);
+		} else {
+			hasString.set(true);
+			hasImage.set(true);
+			hasFiles.set(true);
+			service = null;
+		}
 	}
 
 	public static void putString(String string) {

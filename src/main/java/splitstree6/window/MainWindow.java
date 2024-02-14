@@ -171,9 +171,9 @@ public class MainWindow implements IMainWindow {
 
 		presenter.setStage(stage);
 
-		getController().getMainTabPane().getTabs().addAll(workflowTab);
+		getController().getMainTabPane().getTabs().add(workflowTab);
 
-		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
+		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(workflowTab));
 
 		InvalidationListener invalidationListener = e -> stage.setTitle(getName() + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName());
 		name.addListener(invalidationListener);

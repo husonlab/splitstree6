@@ -472,7 +472,7 @@
                                         <Tooltip text="Paste text into new document"/>
                                     </tooltip>
                                 </Button>
-                                <Region layoutX="179.0" layoutY="10.0" prefWidth="8.0"/>
+                                <Region layoutX="179.0" layoutY="10.0" prefWidth="10.0"/>
                                 <ToggleButton fx:id="showWorkflowTreeCheckButton" mnemonicParsing="false"
                                               text="Side Bar">
                                     <tooltip>

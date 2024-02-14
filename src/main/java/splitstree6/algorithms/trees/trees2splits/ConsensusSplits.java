@@ -49,7 +49,7 @@ public class ConsensusSplits extends Trees2Splits {
 	public enum EdgeWeights {Mean, TreeSizeWeightedMean, Median, Count, Sum, Uniform, TreeNormalizedSum}
 
 	private final ObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
-	protected final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
+	protected final ObjectProperty<EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", EdgeWeights.Count);
 	protected final DoubleProperty optionThresholdPercent = new SimpleDoubleProperty(this, "optionThresholdPercent", 0.0);
 	protected final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 

@@ -514,7 +514,10 @@ public class MainWindowController {
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
 		MaterialIcons.setIcon(selectButton, "select_all");
 		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "view_sidebar", "-fx-rotate: 180;", true);
-		MaterialIcons.setIcon(importButton, "download");
+		if (SplitsTree6.isDesktop())
+			MaterialIcons.setIcon(importButton, "download");
+		else
+			MaterialIcons.setIcon(importButton, "download", "-fx-padding: 0 5px;", true);
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
