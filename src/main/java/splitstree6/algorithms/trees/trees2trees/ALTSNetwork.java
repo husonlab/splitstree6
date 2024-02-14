@@ -39,6 +39,8 @@ import java.util.List;
  * Daniel Huson, 2.2024
  */
 public class ALTSNetwork extends Trees2Trees {
+	private static boolean warned = false;
+
 	private final BooleanProperty optionUseKernelization = new SimpleBooleanProperty(this, "optionUseKernelization", false);
 	private final BooleanProperty optionUseMutualRefinement = new SimpleBooleanProperty(this, "optionUseMutualRefinement", false);
 
@@ -56,7 +58,10 @@ public class ALTSNetwork extends Trees2Trees {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
-		NotificationManager.showWarning("This is experimental code, under development");
+		if (!warned) {
+			NotificationManager.showWarning("This is experimental code, under development");
+			warned = true;
+		}
 		progress.setTasks("Computing hybridization networks", "(Unknown how long this will really take)");
 		try (var progressMover = new ProgressMover(progress)) {
 			Collection<PhyloTree> result;

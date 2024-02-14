@@ -55,6 +55,7 @@ public class AltsNonBinary {
 	private static Set<HybridizationResult> hybridizationResultSet = new HashSet<>();
 	private static int numOfPermutations = 0;
 	private static int minHybridizationScore = Integer.MAX_VALUE;
+
 	public static void main(String[] args) throws UsageException, IOException {
 		var options = new ArgsOptions(args, AltsNonBinary.class, "Non-binary version of ALTSNetwork");
 		var infile = options.getOptionMandatory("-i", "input", "Input Newick file", "");
@@ -77,18 +78,20 @@ public class AltsNonBinary {
 		System.err.println("Time taken: " + Duration.between(start, end).toSeconds() + " seconds");
 		System.err.println(networks.size() + " networks found over " + numOfPermutations + " permutations.");
 
-		for (var network : networks)
-			System.err.println(network.toBracketString(false));
+		System.err.println(NewickIO.toString(networks, false));
 
 		System.err.println("Writing: " + outfile);
 		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {
-			for (var network : networks) {
-				w.write(NewickIO.toString(network, false) + ";\n");
-			}
+			w.write(NewickIO.toString(networks, false));
 		}
 	}
 
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) throws IOException {
+		// todo: eliminate all static variables
+		hybridizationResultSet.clear();
+		numOfPermutations = 0;
+		minHybridizationScore = Integer.MAX_VALUE;
+
 		var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
 		System.err.println("initial order: " + initialOrder);
 			backTrack(trees, initialOrder, initialOrder.size()-1, 32);
@@ -135,19 +138,19 @@ public class AltsNonBinary {
 
 		List<String> newOrder = new ArrayList<>();
 		int charAt = 0;
-		while(newick.charAt(charAt) == '('){
+		while (newick.charAt(charAt) == '(') {
 			charAt++;
 		}
-		if ( newick.charAt(charAt) == '\''){
-			for (var element : order){
-				newOrder.add("'"+element+"'");
+		if (newick.charAt(charAt) == '\'') {
+			for (var element : order) {
+				newOrder.add("'" + element + "'");
 			}
 		} else if (newick.charAt(charAt) == '\"') {
-			for (var element : order){
-				newOrder.add("'"+element+"'");
+			for (var element : order) {
+				newOrder.add("'" + element + "'");
 			}
 		}
-		if (!newOrder.isEmpty()){
+		if (!newOrder.isEmpty()) {
 			order = newOrder;
 		}
 
@@ -167,11 +170,11 @@ public class AltsNonBinary {
 					String smallestRemoved = "";
 					if (smallest.startsWith("'") && smallest.endsWith("'")) {
 						smallest = smallest.substring(1, smallest.length() - 1);
-						smallestRemoved = processedContent.trim().replaceAll("'"+"\\b" + Pattern.quote(smallest) + "\\b"+"'", "").trim().
-								replace(",","/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
+						smallestRemoved = processedContent.trim().replaceAll("'" + "\\b" + Pattern.quote(smallest) + "\\b" + "'", "").trim().
+								replace(",", "/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
 					} else {
 						smallestRemoved = processedContent.trim().replaceAll("\\b" + Pattern.quote(smallest) + "\\b", "").trim().
-								replace(",","/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
+								replace(",", "/").trim().replaceAll("^/+|/+$", "").replaceAll("/{2,}", "/");
 					}
 					//System.err.println("smallest removed: " + smallestRemoved);
 					labelledNewick.append(smallestRemoved);
@@ -462,19 +465,19 @@ public class AltsNonBinary {
 
 	public static List<PhyloTree> resultingNetworks(Set<HybridizationResult> hybridizationResults, ProgressListener progress) throws IOException {
 		List<PhyloTree> trees = new ArrayList<>();
-		for (var result : hybridizationResults){
+		for (var result : hybridizationResults) {
 			var tree = network(result.getAlignments(), result.getOrder());
-			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
+			if (!trees.contains(tree) && isTreeAddedToFinalList(trees, tree)) {
 				trees.add(tree);
 			}
 		}
 		return trees;
 	}
 
-	private static boolean isTreeAddedToFinalList(List<PhyloTree> trees, PhyloTree newTree){
-		for (var existingTree : trees){
+	private static boolean isTreeAddedToFinalList(List<PhyloTree> trees, PhyloTree newTree) {
+		for (var existingTree : trees) {
 			double distance = compute(existingTree, newTree);
-			if (distance==0.0){
+			if (distance == 0.0) {
 				return false;
 			}
 		}
@@ -485,16 +488,16 @@ public class AltsNonBinary {
 	 * back tracking test
 	 */
 	public static Set<HybridizationResult> backTrack(Collection<PhyloTree> trees, List<String> order, int position, int desiredNumOfPermutations) throws IOException {
-		if (numOfPermutations == factorialRecursive(order.size())-1 || numOfPermutations == desiredNumOfPermutations){
+		if (numOfPermutations == factorialRecursive(order.size()) - 1 || numOfPermutations == desiredNumOfPermutations) {
 			return hybridizationResultSet;
 		} else {
 			if (position < 0) {
-				numOfPermutations ++;
+				numOfPermutations++;
 				HybridizationResult hybridizationResult = calculateHybridization(trees, new ArrayList<>(order));
-				if (hybridizationResult.getHybridizationScore() != 0 && hybridizationResult.getHybridizationScore() <= minHybridizationScore){
+				if (hybridizationResult.getHybridizationScore() != 0 && hybridizationResult.getHybridizationScore() <= minHybridizationScore) {
 					minHybridizationScore = hybridizationResult.getHybridizationScore();
 					//add the first result to the list
-					if (hybridizationResultSet.isEmpty()){
+					if (hybridizationResultSet.isEmpty()) {
 						hybridizationResultSet.add(hybridizationResult);
 					} else {
 						//if any hyb scores in the set bigger than current min
@@ -503,7 +506,7 @@ public class AltsNonBinary {
 						//if any hyb scores in the set equal to current min
 						boolean isEqual = hybridizationResultSet.stream()
 								.anyMatch(result -> result.getHybridizationScore() == minHybridizationScore);
-						if (isSmaller){
+						if (isSmaller) {
 							//if smaller found clear the list add new min
 							hybridizationResultSet.clear();
 							hybridizationResultSet.add(hybridizationResult);
@@ -524,6 +527,7 @@ public class AltsNonBinary {
 		}
 		return hybridizationResultSet;
 	}
+
 	public static long factorialRecursive(int n) {
 		if (n == 0) {
 			return 1;
@@ -667,8 +671,6 @@ public class AltsNonBinary {
 		String tree1 = tree.toBracketString(false).replaceAll("##", "#");
 		return NewickIO.valueOf(tree1);
 	}
-
-
 
 
 	private static Map<String, String> sortKeysByOrder(Map<String, String> map, List<String> order) {

@@ -107,19 +107,21 @@ public class ComputeTreeLayout {
 
 			var point = nodePointMap.get(v);
 
-			nodeShape.setTranslateX(point.getX());
-			nodeShape.setTranslateY(point.getY());
+			if (point != null) {
+				nodeShape.setTranslateX(point.getX());
+				nodeShape.setTranslateY(point.getY());
 
-			if (label != null) {
-				label.setScale(dimensions.fontHeight() / RichTextLabel.getDefaultFont().getSize());
-				label.applyCss();
-				var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
-				if (taxonId != null) {
-					taxonLabelsGroup.getChildren().add(label);
-					nodeShape.setUserData(taxonId);
-				} else {
-					otherLabelsGroup.getChildren().add(label);
-					DraggableUtils.setupDragMouseLayout(label);
+				if (label != null) {
+					label.setScale(dimensions.fontHeight() / RichTextLabel.getDefaultFont().getSize());
+					label.applyCss();
+					var taxonId = IteratorUtils.getFirst(tree.getTaxa(v));
+					if (taxonId != null) {
+						taxonLabelsGroup.getChildren().add(label);
+						nodeShape.setUserData(taxonId);
+					} else {
+						otherLabelsGroup.getChildren().add(label);
+						DraggableUtils.setupDragMouseLayout(label);
+					}
 				}
 			}
 		}

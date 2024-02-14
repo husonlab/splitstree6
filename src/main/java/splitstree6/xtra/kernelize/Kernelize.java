@@ -111,20 +111,15 @@ public class Kernelize {
 						mutualRefinement(reducedTrees.trees());
 					}
 
-					System.err.println("Input trees:");
-					for (var tree : reducedTrees.trees()) {
-						System.err.println(NewickIO.toString(tree, false) + ";");
-					}
-
+					System.err.println("Input trees: " + NewickIO.toString(reducedTrees.trees(), false));
 					var networks = algorithm.apply(reducedTrees.trees(), progress);
+					System.err.println("Output networks: " + NewickIO.toString(networks, false));
+
 					if (true) { // todo: algorithm doesn't return taxon ids
-						System.err.println("Output networks:");
-						for (var tree : networks) {
-							System.err.println(NewickIO.toString(tree, false) + ";");
-						}
+
 						if (IteratorUtils.size(networks.iterator().next().getTaxa()) == 0) {
 							var labelTaxonMap = new HashMap<String, Integer>();
-							for (var tree : inputTrees) {
+							for (var tree : reducedTrees.trees()) {
 								for (var v : tree.nodes()) {
 									var label = tree.getLabel(v);
 									if (label != null)
@@ -209,10 +204,14 @@ public class Kernelize {
 						for (var v : donorNetwork.nodeStream().filter(Node::isLeaf).toList()) {
 							var cluster = BitSetUtils.asBitSet(donorNetwork.getTaxa(v));
 							for (var set : taxonClasses) {
-								if (cluster.get(set.nextSetBit(1)))
+								if (cluster.intersects(set)) {
 									cluster.or(set);
+									break;
+								}
 							}
 							var target = clusterNodeMap.get(cluster);
+							if (target == null)
+								System.err.println("null for: " + StringUtils.toString(cluster));
 							blobTree.newEdge(donor2acceptorMap.get(v), target);
 						}
 					}
