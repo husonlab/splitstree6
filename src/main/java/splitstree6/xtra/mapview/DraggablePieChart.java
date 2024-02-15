@@ -6,6 +6,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
 import javafx.scene.paint.Color;
 
+import java.util.Map;
+
 import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
 
 public class DraggablePieChart {
@@ -42,6 +44,15 @@ public class DraggablePieChart {
 
         });
 
+    }
+
+    public void updateColors(String scheme){
+        Map<Integer, String> colors = ColorSchemes.getScheme(scheme);
+
+        for(int i = 0; i < pieChart.getData().size() ; i++){
+            String style = "-fx-pie-color: " + colors.get(i) + ";";
+            pieChart.getData().get(i).getNode().setStyle(style);
+        }
     }
 
     public void updateCenter(){

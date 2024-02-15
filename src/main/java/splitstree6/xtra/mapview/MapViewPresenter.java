@@ -41,6 +41,8 @@ import java.util.*;
 import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
 
 public class MapViewPresenter {
+	ArrayList<DraggablePieChart> charts = new ArrayList<DraggablePieChart>();
+	LegendView legendView;
 
 	public MapViewPresenter(MapView mapView) {
 		var controller = mapView.getController();
@@ -64,6 +66,12 @@ public class MapViewPresenter {
 
 		controller.getRedrawButton().setOnAction(e -> redraw(mapView));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);
+
+		// Initialize Color choice Box
+		initChoiceBoxColors(controller);
+
+
+
 
 
 
@@ -91,6 +99,7 @@ public class MapViewPresenter {
 			controller.getStackPane().getChildren().clear();
 			MapPane mapPane = createMap(controller, model);
 			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
+
 			for(var trait : traits){
 
 				ObservableList obsList = FXCollections.observableList(getPieChartData(trait));
@@ -105,24 +114,13 @@ public class MapViewPresenter {
 				pieChart.getPieChart().prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
 				pieChart.getPieChart().prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
 				mapPane.placeChart(pieChart, trait.getLatitude(), trait.getLongtitude(), true);
-				for(int i = 0; i < pieChart.getPieChart().getData().size(); i++){
-					// Convert Color to CSS representation
-					// Use the cssColor in your style
-					System.out.println("Color " + i);
-					String style = "-fx-pie-color: " + SCHEME1.get(i) + ";";
-					pieChart.getPieChart().getData().get(i).getNode().setStyle(style);
-				}
+				pieChart.updateColors(controller.getChoiceBoxColorScheme().getValue());
+				charts.add(pieChart);
 			}
 			//Legend
-			Map<String, Integer> colorMap = new HashMap<>();
-			colorMap.put("seq_1", 1);
-			colorMap.put("seq_2", 2);
-			colorMap.put("seq_3", 3);
-			colorMap.put("seq_4", 4);
-			colorMap.put("seq_5", 5);
-			colorMap.put("seq_6", 6);
-			colorMap.put("seq_7", 7);
-			LegendView legendView = new LegendView(colorMap);
+			ArrayList<String> traitLabels = new ArrayList<String>();
+			traitLabels.addAll(model.getTaxaBlock().getLabels());
+			legendView = new LegendView(traitLabels, controller.getChoiceBoxColorScheme().getValue());
 			legendView.setLayoutX(50);
 			legendView.setLayoutY(50);
 			controller.getStackPane().getChildren().add(mapPane);
@@ -183,5 +181,20 @@ public class MapViewPresenter {
 		var parameters = new SnapshotParameters();
 		parameters.setTransform(javafx.scene.transform.Transform.scale(2, 2));
 		return node.snapshot(parameters, null);
+	}
+	private void updateChartColors(String scheme){
+		for(var chart : charts){
+			chart.updateColors(scheme);
+			legendView.updateColors(scheme);
+		}
+	}
+
+	private void initChoiceBoxColors(MapViewController controller){
+		final ObservableList<String> list = FXCollections.observableArrayList("Scheme-1", "Scheme-2", "Scheme-3");
+		controller.getChoiceBoxColorScheme().getItems().addAll(list);
+		controller.getChoiceBoxColorScheme().setValue("Scheme-1");
+		controller.getChoiceBoxColorScheme().valueProperty().addListener((observable, oldValue, newValue) -> {
+			updateChartColors(newValue);
+		});
 	}
 }

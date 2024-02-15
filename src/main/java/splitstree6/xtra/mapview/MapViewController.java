@@ -61,8 +61,6 @@ public class MapViewController {
 	@FXML
 	private Slider chartSizeSlider;
 
-	@FXML
-	private AnchorPane anchorPane;
 
 	@FXML
 	private HBox hBoxMiddle;
@@ -77,6 +75,14 @@ public class MapViewController {
 	@FXML
 	private Label infoLabel;
 
+
+	@FXML
+	private ChoiceBox<String> choiceBoxColorScheme;
+
+
+	public ChoiceBox<String> getChoiceBoxColorScheme() {
+		return choiceBoxColorScheme;
+	}
 
 	public Label getInfoLabel() {
 		return infoLabel;
@@ -94,9 +100,6 @@ public class MapViewController {
 		return hBoxMiddle;
 	}
 
-	public AnchorPane getAnchorPane() {
-		return anchorPane;
-	}
 
 	@FXML
 	private void initialize() {

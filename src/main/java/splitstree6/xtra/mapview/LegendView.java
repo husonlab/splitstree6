@@ -10,6 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -18,27 +19,48 @@ import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
 
 public class LegendView extends VBox {
 
-    private Map<String, Integer> categoryColors;
+    private Map<String, String> categoryColors;
+    private ArrayList<String> taxa;
     private double xOffset = 0;
     private double yOffset = 0;
 
-    public LegendView(Map<String, Integer> categoryColors) {
-        this.categoryColors = categoryColors;
+    public LegendView(ArrayList<String> taxa, String colorScheme) {
+        this.categoryColors = buildColors(taxa, colorScheme);
+        this.taxa = taxa;
         createLegend();
         setPickOnBounds(false);
         setStyle("-fx-background-color: white;");
         setOnMousePressed(this::onMousePressed);
         setOnMouseDragged(this::onMouseDragged);
+        /**/
+    }
 
+    public void updateColors(String scheme){
+        var posX = this.getLayoutX();
+        var posY = this.getLayoutY();
+        buildColors(taxa, scheme);
+        createLegend();
+
+        this.setLayoutX(posX);
+        this.setLayoutY(posY);
+    }
+
+    private Map<String, String> buildColors(ArrayList<String> taxa, String colorScheme) {
+        Map<Integer, String> colors = ColorSchemes.getScheme(colorScheme);
+        Map<String, String> categoryColors = new HashMap<>();
+        for (int i = 0; i < taxa.size(); i++) {
+            categoryColors.put(taxa.get(i), colors.get(i));
+        }
+        return categoryColors;
     }
 
 
     private void createLegend() {
-        for (Map.Entry<String, Integer> entry : categoryColors.entrySet()) {
+        for (Map.Entry<String, String> entry : categoryColors.entrySet()) {
             String category = entry.getKey();
 
 
-            Color color = Color.web(SCHEME1.get(entry.getValue()));
+            Color color = Color.web(entry.getValue());
 
             HBox legendEntry = createLegendEntry(category, color);
             getChildren().add(legendEntry);
@@ -62,6 +84,7 @@ public class LegendView extends VBox {
 
         return legendEntry;
     }
+
     private void onMousePressed(MouseEvent event) {
         // Record the initial mouse cursor position
         xOffset = event.getSceneX();
@@ -78,7 +101,7 @@ public class LegendView extends VBox {
         // Update the LegendView's position
 
         setTranslateX(getTranslateX() + deltaX);
-       setTranslateY(getTranslateY() + deltaY);
+        setTranslateY(getTranslateY() + deltaY);
 
         // Update the mouse cursor position
         xOffset = event.getSceneX();
