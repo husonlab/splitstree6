@@ -24,12 +24,12 @@ import javafx.beans.property.SimpleBooleanProperty;
 import jloda.fx.window.NotificationManager;
 import jloda.phylo.PhyloTree;
 import jloda.util.progress.ProgressListener;
+import splitstree6.algorithms.utils.MutualRefinement;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.utils.ProgressMover;
 import splitstree6.xtra.alts.AltsNonBinary;
 import splitstree6.xtra.kernelize.Kernelize;
-import splitstree6.xtra.kernelize.MutualRefinement;
 
 import java.io.IOException;
 import java.util.Collection;

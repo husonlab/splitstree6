@@ -17,11 +17,12 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.kernelize;
+package splitstree6.algorithms.utils;
 
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import splitstree6.splits.TreesUtils;
+import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
 import java.util.*;
 
