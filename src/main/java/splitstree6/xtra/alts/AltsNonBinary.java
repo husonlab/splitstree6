@@ -90,6 +90,10 @@ public class AltsNonBinary {
 	}
 
 	public static List<PhyloTree> apply(Collection<PhyloTree> trees, ProgressListener progress) throws IOException {
+		hybridizationResultSet.clear();
+		numOfPermutations = 0;
+		minHybridizationScore = Integer.MAX_VALUE;
+
 			var initialOrder = getInitialOrder(trees); // todo: should use taxon ids, not labels
 		System.err.println("initial order: " + initialOrder);
 			backTrack(trees, initialOrder, initialOrder.size()-1, 1000);

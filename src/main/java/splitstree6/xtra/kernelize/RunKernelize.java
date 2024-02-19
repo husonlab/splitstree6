@@ -97,7 +97,7 @@ public class RunKernelize {
 					default -> throw new RuntimeException("--algorithm " + algorithmName + ": not implemented");
 				};
 
-		var networks = Kernelize.apply(new ProgressPercentage(), taxaBlock, inputTrees, algorithm, maxNumberOfNetworks, true);
+		var networks = Kernelize.apply(new ProgressPercentage(), taxaBlock, inputTrees, algorithm, maxNumberOfNetworks);
 
 		System.err.println("Writing networks (" + networks.size() + "): " + outfile + "\n");
 		try (var w = FileUtils.getOutputWriterPossiblyZIPorGZIP(outfile)) {

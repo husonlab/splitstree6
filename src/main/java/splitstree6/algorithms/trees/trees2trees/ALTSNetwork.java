@@ -29,6 +29,7 @@ import splitstree6.data.TreesBlock;
 import splitstree6.utils.ProgressMover;
 import splitstree6.xtra.alts.AltsNonBinary;
 import splitstree6.xtra.kernelize.Kernelize;
+import splitstree6.xtra.kernelize.MutualRefinement;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -53,7 +54,7 @@ public class ALTSNetwork extends Trees2Trees {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionUseKernelization.getName(), optionUseMutualRefinement.getName());
+		return List.of(optionUseMutualRefinement.getName(), optionUseKernelization.getName());
 	}
 
 	@Override
@@ -65,10 +66,17 @@ public class ALTSNetwork extends Trees2Trees {
 		progress.setTasks("Computing hybridization networks", "(Unknown how long this will really take)");
 		try (var progressMover = new ProgressMover(progress)) {
 			Collection<PhyloTree> result;
-			if (!isOptionUseKernelization()) {
-				result = AltsNonBinary.apply(treesBlock.getTrees(), progress);
+
+			Collection<PhyloTree> inputTrees = treesBlock.getTrees();
+			if (isOptionUseMutualRefinement()) {
+				inputTrees = MutualRefinement.apply(inputTrees, true);
+			}
+			if (inputTrees.size() <= 1) {
+				result = inputTrees;
+			} else if (!isOptionUseKernelization()) {
+				result = AltsNonBinary.apply(inputTrees, progress);
 			} else {
-				result = Kernelize.apply(progress, taxaBlock, treesBlock.getTrees(), AltsNonBinary::apply, 100000, isOptionUseMutualRefinement());
+				result = Kernelize.apply(progress, taxaBlock, inputTrees, AltsNonBinary::apply, 100000);
 			}
 			for (var tree : result) {
 				for (var v : tree.nodeStream().filter(v -> tree.getLabel(v) != null).toList()) {

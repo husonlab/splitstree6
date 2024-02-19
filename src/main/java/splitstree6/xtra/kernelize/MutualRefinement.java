@@ -49,12 +49,21 @@ public class MutualRefinement {
 		else {
 			var result = new ArrayList<PhyloTree>();
 			var seen = new HashSet<Set<BitSet>>();
+			var idLabelMap = new HashMap<Integer, String>();
 			for (var tree : trees) {
+				tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
 				var clusters = TreesUtils.collectAllHardwiredClusters(tree);
 				if (!clusters.containsAll(compatibleClusters)) {
 					clusters.addAll(compatibleClusters);
 					var newTree = new PhyloTree();
 					ClusterPoppingAlgorithm.apply(clusters, newTree);
+					if (newTree.getRoot().getOutDegree() == 1) {
+						var v = newTree.getRoot().getFirstOutEdge().getTarget();
+						newTree.deleteNode(newTree.getRoot());
+						newTree.setRoot(v);
+					}
+
+					newTree.nodeStream().filter(newTree::hasTaxa).forEach(v -> newTree.setLabel(v, idLabelMap.get(newTree.getTaxon(v))));
 					if (!removeDuplicateTrees || !seen.contains(clusters)) {
 						result.add(newTree);
 						if (removeDuplicateTrees)
