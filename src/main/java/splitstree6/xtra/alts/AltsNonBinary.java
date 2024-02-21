@@ -19,14 +19,11 @@
 
 package splitstree6.xtra.alts;
 
-import javafx.collections.ObservableList;
 import jloda.fx.util.ArgsOptions;
 import jloda.fx.util.ProgramExecutorService;
 import jloda.graph.Node;
-import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
-import jloda.util.FileUtils;
 import jloda.util.Pair;
 import jloda.util.UsageException;
 import jloda.util.progress.ProgressListener;
@@ -42,6 +39,7 @@ import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -84,7 +82,6 @@ public class AltsNonBinary {
 		//System.err.println("initial order: " + initialOrder);
 		HybridizationContext context = new HybridizationContext();
 		backTrack(trees, initialOrder, labelTaxonIdMap, initialOrder.size()-1, 1000, context);
-		System.err.println("Hybridization score: " + context.minHybridizationScore);
 		return resultingNetworks(context.hybridizationResultSet, labelTaxonIdMap, progress);
 	}
 
@@ -137,7 +134,7 @@ public class AltsNonBinary {
 		Deque<Integer> stack = new ArrayDeque<>();
 		StringBuilder labelledNewick = new StringBuilder();
 
-		String newick = tree.toBracketString(false);
+		String newick = removeEncapsulatingSingleQuotes(tree.toBracketString(false));
 		for (int i = 0; i < newick.length(); i++) {
 			char ch = newick.charAt(i);
 			labelledNewick.append(ch);
@@ -250,6 +247,18 @@ public class AltsNonBinary {
 		}
 		return processedIds;
 	}
+	private static String removeEncapsulatingSingleQuotes(String input) {
+		String regex = "(?<=\\(|,)\\s*'([^']+?)'\\s*(?=\\)|,)";
+		Pattern pattern = Pattern.compile(regex);
+		Matcher matcher = pattern.matcher(input);
+
+		StringBuffer sb = new StringBuffer();
+		while (matcher.find()) {
+			matcher.appendReplacement(sb, "$1");
+		}
+		matcher.appendTail(sb);
+		return sb.toString();
+	}
 
 	/**
 	 *
@@ -350,7 +359,6 @@ public class AltsNonBinary {
 
 			consensusMap.put(key, postProcessAlignment(currentConsensus));
 		}
-
 		return consensusMap;
 	}
 
@@ -473,18 +481,18 @@ public class AltsNonBinary {
 	 * @param labelTaxonIdMap
 	 * @param position
 	 * @param desiredNumOfPermutations
-	 * @param context
 	 * @return set of hybridization results containing number of hybridization, order and alignments
 	 * @throws IOException
 	 */
 	public static Set<HybridizationResult> backTrack(Collection<PhyloTree> trees, LinkedList<Integer> order,
 													 HashMap<String, Integer> labelTaxonIdMap, int position,
-													 int desiredNumOfPermutations, HybridizationContext context) throws IOException {
+													 int desiredNumOfPermutations, HybridizationContext context
+													 ) throws IOException {
 		if (context.numOfPermutations == factorialRecursive(order.size())-1 || context.numOfPermutations == desiredNumOfPermutations){
 			return context.hybridizationResultSet;
 		} else {
 			if (position < 0) {
-				context.numOfPermutations ++;
+				context.numOfPermutations++;
 				HybridizationResult hybridizationResult = calculateHybridization(trees, new LinkedList<>(order), labelTaxonIdMap);
 				//System.err.println("score:" + hybridizationResult.getHybridizationScore() + " order: " + hybridizationResult.getOrder() + " alignment: "+ hybridizationResult.getAlignments());
 				if (hybridizationResult.getHybridizationScore() != 0 && hybridizationResult.getHybridizationScore() <= context.minHybridizationScore){
@@ -494,10 +502,10 @@ public class AltsNonBinary {
 						context.hybridizationResultSet.add(hybridizationResult);
 					} else {
 						//if any hyb scores in the set bigger than current min
-						boolean isSmaller = context.hybridizationResultSet.stream()
+						boolean isSmaller = context.hybridizationResultSet.parallelStream()
 								.anyMatch(result -> result.getHybridizationScore() > context.minHybridizationScore);
 						//if any hyb scores in the set equal to current min
-						boolean isEqual = context.hybridizationResultSet.stream()
+						boolean isEqual = context.hybridizationResultSet.parallelStream()
 								.anyMatch(result -> result.getHybridizationScore() == context.minHybridizationScore);
 						if (isSmaller){
 							//if smaller found clear the list add new min
@@ -540,7 +548,6 @@ public class AltsNonBinary {
 		List<PhyloTree> trees = new ArrayList<>();
 		for (var result : hybridizationResults){
 			var tree = network(result.getAlignments(), result.getOrder(), labelTaxonIdMap);
-			//System.err.println(result.getHybridizationScore() + " " + result.getAlignments() + " " + result.getOrder());
 			if (!trees.contains(tree) && isTreeAddedToFinalList(trees,tree)) {
 				//System.err.println(result.getHybridizationScore() + " " + result.getAlignments() + " " + result.getOrder());
 				trees.add(tree);
