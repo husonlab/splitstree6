@@ -21,6 +21,7 @@ package splitstree6.algorithms.utils;
 
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
+import jloda.util.BitSetUtils;
 import splitstree6.splits.TreesUtils;
 import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
@@ -63,8 +64,12 @@ public class MutualRefinement {
 		var result = new ArrayList<PhyloTree>();
 		var seen = new HashSet<Set<BitSet>>();
 		var idLabelMap = new HashMap<Integer, String>();
+		{
+			for (var tree : trees) {
+				tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
+			}
+		}
 		for (var tree : trees) {
-			tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
 			var treeClusters = TreesUtils.collectAllHardwiredClusters(tree);
 
 			var added = false;
@@ -80,6 +85,14 @@ public class MutualRefinement {
 				} else {
 					var newtree = new PhyloTree();
 					newtree.setName(tree.getName() + "-refined");
+
+					for (var cluster : treeClusters) {
+						for (var t : BitSetUtils.members(cluster)) {
+							if (!idLabelMap.containsKey(t))
+								System.err.println("Taxon with missing label: " + t);
+						}
+					}
+
 					ClusterPoppingAlgorithm.apply(treeClusters, newtree);
 					if (newtree.getRoot().getOutDegree() == 1) {
 						var v = newtree.getRoot().getFirstOutEdge().getTarget();

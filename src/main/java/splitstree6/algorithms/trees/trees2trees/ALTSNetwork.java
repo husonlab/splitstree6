@@ -44,7 +44,7 @@ import java.util.List;
 public class ALTSNetwork extends Trees2Trees {
 	private static boolean warned = false;
 
-	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", true);
+	private final BooleanProperty optionMutualRefinement = new SimpleBooleanProperty(this, "optionMutualRefinement", false);
 
 	private final BooleanProperty optionKernelization = new SimpleBooleanProperty(this, "optionKernelization", false);
 
@@ -75,7 +75,7 @@ public class ALTSNetwork extends Trees2Trees {
 			Collection<PhyloTree> inputTrees;
 			if (getOptionMutualRefinement()) {
 				inputTrees = MutualRefinement.apply(treesBlock.getTrees(), MutualRefinement.Strategy.All, true);
-				if (false)
+				if (true)
 					System.err.println("Refined:\n" + NewickIO.toString(inputTrees, false));
 			} else {
 				inputTrees = new ArrayList<>();
