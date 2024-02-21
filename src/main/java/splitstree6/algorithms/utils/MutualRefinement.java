@@ -26,57 +26,87 @@ import splitstree6.xtra.kernelize.ClusterIncompatibilityGraph;
 
 import java.util.*;
 
+import static splitstree6.algorithms.trees.trees2trees.RootedConsensusTree.isCompatibleWithAll;
+
 /**
  * mutually refines a collection of trees and removes any topological duplicates
  * Daniel Huson, 2.2024
  */
 public class MutualRefinement {
+	public enum Strategy {
+		All, Majority, Compatible
+	}
+
 	/**
 	 * apply mutual refinement
 	 *
-	 * @param trees input trees
-	 * @return output trees
+	 * @param trees            input trees
+	 * @param strategy         All: use all clusters, Majority, use clusters found in the majority of trees,
+	 *                         compatible: refine only using clusters that are compatible will all trees
+	 * @param removeDuplicates remove any duplicate trees after refining
+	 * @return refined trees, with any duplicates removed
 	 */
-	public static Collection<PhyloTree> apply(Collection<PhyloTree> trees, boolean removeDuplicateTrees) {
-		var incompatibilityGraph = ClusterIncompatibilityGraph.apply(trees);
+	public static List<PhyloTree> apply(Collection<PhyloTree> trees, Strategy strategy, boolean removeDuplicates) {
+		var allClusters = switch (strategy) {
+			case Compatible -> {
+				var incompatibilityGraph = ClusterIncompatibilityGraph.apply(trees);
+				yield incompatibilityGraph.nodeStream()
+						.filter(v -> v.getDegree() == 0) // compatible with all
+						.filter(v -> ((BitSet) v.getData()).cardinality() < trees.size()) // not in all trees
+						.map(v -> (BitSet) v.getInfo()).toList();
 
-		var compatibleClusters = incompatibilityGraph.nodeStream()
-				.filter(v -> v.getDegree() == 0) // compatible with all
-				.filter(v -> ((BitSet) v.getData()).cardinality() < trees.size()) // not in all trees
-				.map(v -> (BitSet) v.getInfo()).toList();
+			}
+			case All -> extract(trees, 0);
+			case Majority -> extract(trees, (int) Math.ceil(0.5 * trees.size()));
+		};
 
-		if (compatibleClusters.isEmpty())
-			return trees;
-		else {
-			var result = new ArrayList<PhyloTree>();
-			var seen = new HashSet<Set<BitSet>>();
-			var idLabelMap = new HashMap<Integer, String>();
-			for (var tree : trees) {
-				tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
-				var clusters = TreesUtils.collectAllHardwiredClusters(tree);
-				if (!clusters.containsAll(compatibleClusters)) {
-					clusters.addAll(compatibleClusters);
-					var newTree = new PhyloTree();
-					ClusterPoppingAlgorithm.apply(clusters, newTree);
-					if (newTree.getRoot().getOutDegree() == 1) {
-						var v = newTree.getRoot().getFirstOutEdge().getTarget();
-						newTree.deleteNode(newTree.getRoot());
-						newTree.setRoot(v);
-					}
+		var result = new ArrayList<PhyloTree>();
+		var seen = new HashSet<Set<BitSet>>();
+		var idLabelMap = new HashMap<Integer, String>();
+		for (var tree : trees) {
+			tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
+			var treeClusters = TreesUtils.collectAllHardwiredClusters(tree);
 
-					newTree.nodeStream().filter(newTree::hasTaxa).forEach(v -> newTree.setLabel(v, idLabelMap.get(newTree.getTaxon(v))));
-					if (!removeDuplicateTrees || !seen.contains(clusters)) {
-						result.add(newTree);
-						if (removeDuplicateTrees)
-							seen.add(clusters);
-					}
-				} else if (!removeDuplicateTrees || !seen.contains(clusters)) {
-					result.add(tree);
-					if (removeDuplicateTrees)
-						seen.add(clusters);
+			var added = false;
+			for (var cluster : allClusters) {
+				if (!treeClusters.contains(cluster) && isCompatibleWithAll(cluster, treeClusters)) {
+					treeClusters.add(cluster);
+					added = true;
 				}
 			}
-			return result;
+			if (!removeDuplicates || !seen.contains(treeClusters)) {
+				if (!added) {
+					result.add(new PhyloTree(tree));
+				} else {
+					var newtree = new PhyloTree();
+					newtree.setName(tree.getName() + "-refined");
+					ClusterPoppingAlgorithm.apply(treeClusters, newtree);
+					if (newtree.getRoot().getOutDegree() == 1) {
+						var v = newtree.getRoot().getFirstOutEdge().getTarget();
+						newtree.deleteNode(newtree.getRoot());
+						newtree.setRoot(v);
+					}
+					newtree.nodeStream().filter(newtree::hasTaxa).forEach(v -> newtree.setLabel(v, idLabelMap.get(newtree.getTaxon(v))));
+					result.add(newtree);
+				}
+				if (removeDuplicates)
+					seen.add(treeClusters);
+			}
 		}
+		return result;
+	}
+
+	private static List<BitSet> extract(Collection<PhyloTree> trees, int threshold) {
+		var clusterCountMap = new HashMap<BitSet, Integer>();
+		for (var tree : trees) {
+			for (var cluster : TreesUtils.collectAllHardwiredClusters(tree)) {
+				clusterCountMap.put(cluster, clusterCountMap.getOrDefault(cluster, 0) + 1);
+			}
+		}
+		var list = new ArrayList<>(clusterCountMap.keySet().stream().
+				filter(c -> clusterCountMap.get(c) < trees.size())
+				.filter(c -> clusterCountMap.get(c) > threshold).toList());
+		list.sort((a, b) -> -Integer.compare(clusterCountMap.get(a), clusterCountMap.get(b)));
+		return list;
 	}
 }
