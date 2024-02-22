@@ -64,17 +64,16 @@ public class MutualRefinement {
 		var result = new ArrayList<PhyloTree>();
 		var seen = new HashSet<Set<BitSet>>();
 		var idLabelMap = new HashMap<Integer, String>();
-		{
-			for (var tree : trees) {
-				tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
-			}
-		}
+
 		for (var tree : trees) {
+			tree.nodeStream().filter(v -> tree.getLabel(v) != null && tree.hasTaxa(v)).forEach(v -> idLabelMap.put(tree.getTaxon(v), tree.getLabel(v)));
+
+			var taxa = BitSetUtils.asBitSet(tree.getTaxa());
 			var treeClusters = TreesUtils.collectAllHardwiredClusters(tree);
 
 			var added = false;
 			for (var cluster : allClusters) {
-				if (!treeClusters.contains(cluster) && isCompatibleWithAll(cluster, treeClusters)) {
+				if (BitSetUtils.contains(taxa, cluster) && !treeClusters.contains(cluster) && isCompatibleWithAll(cluster, treeClusters)) {
 					treeClusters.add(cluster);
 					added = true;
 				}
@@ -119,7 +118,13 @@ public class MutualRefinement {
 		var list = new ArrayList<>(clusterCountMap.keySet().stream().
 				filter(c -> clusterCountMap.get(c) < trees.size())
 				.filter(c -> clusterCountMap.get(c) > threshold).toList());
-		list.sort((a, b) -> -Integer.compare(clusterCountMap.get(a), clusterCountMap.get(b)));
+		list.sort((a, b) -> {
+			var value = Integer.compare(clusterCountMap.get(a), clusterCountMap.get(b));
+			if (value != 0)
+				return -value; // more support comes first
+			else
+				return Integer.compare(a.cardinality(), b.cardinality()); // smaller comes first
+		});
 		return list;
 	}
 }
