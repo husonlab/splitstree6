@@ -29,10 +29,12 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -99,6 +101,19 @@ public class MapViewPresenter {
 			controller.getStackPane().getChildren().clear();
 			MapPane mapPane = createMap(controller, model);
 			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
+
+			CountryBounds countryBounds = new CountryBounds();
+			var mapBounds = mapPane.getBounds();
+			ArrayList<CountryBounds.Country> countryLabels = countryBounds.countriesInBound(mapBounds.minLatitude(), mapBounds.minLatitude() + mapBounds.rangeLatitude(),
+																							mapBounds.minLongitude(), mapBounds.minLongitude() + mapBounds.rangeLongitude());
+			for(CountryBounds.Country label : countryLabels){
+				System.out.println(label.name() + label.center_lat() + label.center_lon());
+				DraggableLabel draggableLabel = new DraggableLabel(label.name());
+				draggableLabel.setStyle("-fx-font-size: 16px;");
+				draggableLabel.visibleProperty().bind(controller.getShowLabelsBox().selectedProperty());
+				mapPane.place(draggableLabel, label.center_lon(), label.center_lat(), true);
+
+			}
 
 			for(var trait : traits){
 

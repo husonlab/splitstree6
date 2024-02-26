@@ -29,6 +29,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
 import jloda.fx.shapes.CircleShape;
 
 import java.util.List;
@@ -42,12 +43,15 @@ public class MapPane extends StackPane {
 	private final Pane mapPane;
 	private final Pane userPane;
 
+	LatLongRect bounds;
+
 	private final Function<Double, Double> latitudeYFunction;
 	private final Function<Double, Double> longitudeXFunction;
 
 	MapPane(Rectangle2D bounds, List<ImageView> tiles, Function<Double, Double> latitudeYFunction, Function<Double, Double> longitudeXFunction) {
 		this.latitudeYFunction = latitudeYFunction;
 		this.longitudeXFunction = longitudeXFunction;
+
 
 		mapPane = new Pane();
 		mapPane.setPrefWidth(bounds.getWidth());
@@ -66,6 +70,7 @@ public class MapPane extends StackPane {
 		userPane.setMinHeight(Pane.USE_PREF_SIZE);
 		userPane.setMaxHeight(Pane.USE_PREF_SIZE);
 		userPane.setStyle("-fx-background-color: transparent;");
+
 
 		getChildren().addAll(mapPane, userPane);
 	}
@@ -97,11 +102,14 @@ public class MapPane extends StackPane {
 	 * @param center    center on the location
 	 */
 	public void place(Node node, double latitude, double longitude, boolean center) {
+		System.out.println("label " + latitude + " " + longitude);
 		var location = getLocationOnMap(latitude, longitude);
 		node.setLayoutX(location.getX());
 		node.setLayoutY(location.getY());
 
-		if (center && node instanceof Region region) {
+
+
+		if (center && (Node) node instanceof Region region) {
 			//System.out.println("applying css");
 			region.applyCss();
 			Platform.runLater(() -> {
@@ -109,20 +117,7 @@ public class MapPane extends StackPane {
 				region.setLayoutY(region.getLayoutY() - 0.5 * region.getHeight());
 			});
 		}
-
-
-
-
-
-		if(node instanceof PieChart){
-			//System.out.println(((PieChart)node).getWidth() + " " + ((PieChart)node).getHeight());
-			//System.out.println("setting size");
-			//((PieChart) node).setMaxSize(20 , 10);
-		}
-
-
-
-
+		//System.out.println("Placing " + node.getLayoutX() + " " + node.getLayoutY());
 		getUserPane().getChildren().add(node);
 
 	}
@@ -132,6 +127,7 @@ public class MapPane extends StackPane {
 	}
 
 	public void placeChart (DraggablePieChart node, double latitude, double longitude, boolean center){
+		System.out.println("pie " + latitude + " " + longitude);
 		var location = getLocationOnMap(latitude, longitude);
 		node.getPieChart().setLayoutX(location.getX());
 		node.getPieChart().setLayoutY(location.getY());
@@ -165,5 +161,13 @@ public class MapPane extends StackPane {
 
 	public double getMapY(double latitude) {
 		return latitudeYFunction.apply(latitude);
+	}
+
+	public void setBounds(LatLongRect bounds) {
+		this.bounds = bounds;
+	}
+
+	public LatLongRect getBounds() {
+		return bounds;
 	}
 }

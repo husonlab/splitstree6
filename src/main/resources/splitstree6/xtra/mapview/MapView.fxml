@@ -22,12 +22,14 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.input.KeyCodeCombination?>
@@ -87,9 +89,12 @@
                                 <Button fx:id="redrawButton" disable="true" text="Redraw" />
                                 <Label fx:id="labelChartSize" text="Chart-size" />
                         <Slider fx:id="chartSizeSlider" max="200.0" min="80.0" value="100.0" />
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
                         <Label fx:id="labelColorScheme" text="Color scheme" />
                         <ChoiceBox fx:id="choiceBoxColorScheme" prefWidth="150.0" />
                         <Label fx:id="infoLabel" />
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <CheckBox fx:id="showLabelsBox" mnemonicParsing="false" text="Show countries" />
                             </items>
                         </ToolBar>
                     </children>

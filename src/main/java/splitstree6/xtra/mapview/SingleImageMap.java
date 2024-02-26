@@ -134,6 +134,9 @@ public class SingleImageMap {
 		imageView.setFitWidth(targetWidth);
 		imageView.setFitHeight(targetHeight);
 
-		return new MapPane(new Rectangle2D(0, 0, targetWidth, targetHeight), List.of(imageView), latitudeYFunction, longtitudeXFunction);
+		var mapPane = new MapPane(new Rectangle2D(0, 0, targetWidth, targetHeight), List.of(imageView), latitudeYFunction, longtitudeXFunction);
+		mapPane.setBounds(rectangle);
+		return mapPane;
+
 	}
 }

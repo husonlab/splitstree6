@@ -51,6 +51,7 @@ public class LegendView extends VBox {
         for (int i = 0; i < taxa.size(); i++) {
             categoryColors.put(taxa.get(i), colors.get(i));
         }
+        System.out.println(categoryColors.size());
         return categoryColors;
     }
 
@@ -61,6 +62,7 @@ public class LegendView extends VBox {
 
 
             Color color = Color.web(entry.getValue());
+            //System.out.println(entry.getKey() + " " + entry.getValue());
 
             HBox legendEntry = createLegendEntry(category, color);
             getChildren().add(legendEntry);
@@ -72,6 +74,7 @@ public class LegendView extends VBox {
     }
 
     private HBox createLegendEntry(String category, Color color) {
+        System.out.println(category + " " + color.toString());
         Rectangle colorBox = new Rectangle(20, 15);
         colorBox.setFill(color);
 

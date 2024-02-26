@@ -79,6 +79,12 @@ public class MapViewController {
 	@FXML
 	private ChoiceBox<String> choiceBoxColorScheme;
 
+	@FXML
+	private CheckBox showLabelsBox;
+
+	public CheckBox getShowLabelsBox() {
+		return showLabelsBox;
+	}
 
 	public ChoiceBox<String> getChoiceBoxColorScheme() {
 		return choiceBoxColorScheme;
