@@ -20,11 +20,11 @@
 package splitstree6.xtra.alts;
 
 import jloda.fx.util.ArgsOptions;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.graph.Node;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.Pair;
+import jloda.util.ProgramExecutorService;
 import jloda.util.UsageException;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;

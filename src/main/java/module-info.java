@@ -1,9 +1,9 @@
 module splitstreesix {
-	requires transitive jloda2;
+	requires transitive jloda_core;
+	requires transitive jloda_fx;
 	requires transitive javafx.controls;
 	requires transitive javafx.graphics;
 	requires transitive javafx.fxml;
-	requires transitive javafx.swing;
 	requires javafx.base;
 
 	requires org.apache.commons.collections4;

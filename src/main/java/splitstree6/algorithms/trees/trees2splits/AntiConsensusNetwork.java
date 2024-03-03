@@ -20,7 +20,6 @@
 package splitstree6.algorithms.trees.trees2splits;
 
 import javafx.beans.property.*;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Edge;
 import jloda.graph.Graph;

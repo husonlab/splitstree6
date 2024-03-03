@@ -59,7 +59,6 @@ import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.main.SplitsTree6;
 import splitstree6.splits.TreesUtils;
 import splitstree6.view.trees.InteractionSetup;
-import splitstree6.view.utils.Icebergs;
 import splitstree6.window.MainWindow;
 
 import java.util.*;

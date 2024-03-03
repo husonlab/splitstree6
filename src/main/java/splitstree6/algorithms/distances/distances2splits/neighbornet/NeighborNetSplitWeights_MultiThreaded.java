@@ -1,8 +1,8 @@
 package splitstree6.algorithms.distances.distances2splits.neighbornet;
 
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.util.CanceledException;
+import jloda.util.ProgramExecutorService;
 import jloda.util.progress.ProgressListener;
 import splitstree6.splits.ASplit;
 

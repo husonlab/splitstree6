@@ -19,10 +19,10 @@
 
 package splitstree6.algorithms.splits.splits2report;
 
-import jloda.fx.util.ProgramExecutorService;
 import jloda.util.BitSetUtils;
 import jloda.util.ExecuteInParallel;
 import jloda.util.NumberUtils;
+import jloda.util.ProgramExecutorService;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;

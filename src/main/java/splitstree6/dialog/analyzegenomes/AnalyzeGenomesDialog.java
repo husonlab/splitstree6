@@ -26,8 +26,8 @@ import javafx.collections.ObservableList;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ProgramProperties;
+import jloda.util.ProgramExecutorService;
 import splitstree6.main.Version;
 
 import java.util.Map;

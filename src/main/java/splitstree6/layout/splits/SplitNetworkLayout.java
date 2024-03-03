@@ -37,6 +37,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.DraggableUtils;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.fx.util.Icebergs;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -56,7 +57,6 @@ import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutUtils;
 import splitstree6.layout.tree.RadialLabelLayout;
 import splitstree6.splits.Compatibility;
-import splitstree6.view.utils.Icebergs;
 
 import java.io.IOException;
 import java.util.ArrayList;

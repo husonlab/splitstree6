@@ -23,7 +23,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
-import splitstree6.view.utils.Icebergs;
+import jloda.fx.util.Icebergs;
 
 import java.util.ArrayList;
 

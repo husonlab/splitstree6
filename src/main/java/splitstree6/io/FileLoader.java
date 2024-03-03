@@ -20,10 +20,10 @@
 package splitstree6.io;
 
 import javafx.application.Platform;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.RecentFilesManager;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import jloda.util.ProgramExecutorService;
 import splitstree6.dialog.importdialog.ImportDialog;
 import splitstree6.io.nexus.workflow.WorkflowNexusInput;
 import splitstree6.io.readers.ImportManager;
