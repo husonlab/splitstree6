@@ -28,7 +28,7 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.image.Image;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import splitstree6.utils.ClipboardUtils;
+import jloda.fx.util.ClipboardUtils;
 
 public class MapViewPresenter {
 

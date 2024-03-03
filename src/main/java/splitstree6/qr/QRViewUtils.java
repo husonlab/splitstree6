@@ -34,12 +34,12 @@ import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.DraggableLabel;
 import jloda.util.Basic;
 import jloda.util.ProgramExecutorService;
 import jloda.util.StringUtils;
 import splitstree6.main.SplitsTree6;
-import splitstree6.utils.ClipboardUtils;
 
 import java.util.function.Function;
 
