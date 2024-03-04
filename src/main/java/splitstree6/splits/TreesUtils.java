@@ -22,18 +22,22 @@ package splitstree6.splits;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.phylo.LSAUtils;
+import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
+import jloda.util.CollectionUtils;
 import jloda.util.NumberUtils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
- * some computations on trees
- *
- * @author huson Date: 29-Feb-2004
- * Daria Evseeva,23.01.2017.
+ * some computations on trees and networks
+ * <p>
+ * Daniel Huson, 1.2024
  */
 public class TreesUtils {
 	/**
@@ -221,13 +225,13 @@ public class TreesUtils {
 	/**
 	 * computes a mapping of tree nodes to represented hardwired cluster. Does not contain the cluster at the root
 	 *
-	 * @param tree input tree, may contain reticulations
+	 * @param network input tree, may contain reticulations
 	 * @return mapping of tree nodes to corresponding hardwired clusters
 	 */
-	public static NodeArray<BitSet> extractClusters(PhyloTree tree) {
-		NodeArray<BitSet> nodeClusterMap = tree.newNodeArray();
+	public static NodeArray<BitSet> extractClusters(PhyloTree network) {
+		NodeArray<BitSet> nodeClusterMap = network.newNodeArray();
 		var stack = new Stack<Node>();
-		stack.push(tree.getRoot());
+		stack.push(network.getRoot());
 		while (!stack.isEmpty()) {
 			var v = stack.peek();
 			if (nodeClusterMap.containsKey(v))
@@ -242,7 +246,7 @@ public class TreesUtils {
 				}
 				if (!hasUnprocessedChild) {
 					stack.pop();
-					var cluster = BitSetUtils.asBitSet(tree.getTaxa(v));
+					var cluster = BitSetUtils.asBitSet(network.getTaxa(v));
 					for (var w : v.children()) {
 						cluster.or(nodeClusterMap.get(w));
 					}
@@ -250,30 +254,140 @@ public class TreesUtils {
 				}
 			}
 		}
-		tree.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
+		network.nodeStream().filter(v -> v.getInDegree() != 1).forEach(nodeClusterMap::remove);
 		return nodeClusterMap;
 	}
 
 	/**
-	 * collects all hardwired clusters contained in the tree.
+	 * collects all hardwired clusters contained in a tree or network
 	 */
-	public static Set<BitSet> collectAllHardwiredClusters(PhyloTree tree) {
+	public static Set<BitSet> collectAllHardwiredClusters(PhyloTree network) {
 		var clusters = new HashSet<BitSet>();
-		collectAllHardwiredClustersRec(tree, tree.getRoot(), clusters);
+		collectAllHardwiredClustersRec(network, network.getRoot(), e -> true, clusters);
 		return clusters;
 	}
 
-	public static BitSet collectAllHardwiredClustersRec(PhyloTree tree, Node v, HashSet<BitSet> clusters) {
-		var set = BitSetUtils.asBitSet(tree.getTaxa(v));
+	public static BitSet collectAllHardwiredClustersRec(PhyloTree network, Node v, Predicate<Edge> useEdge, HashSet<BitSet> clusters) {
+		var set = BitSetUtils.asBitSet(network.getTaxa(v));
 		for (Edge f : v.outEdges()) {
-			var w = f.getTarget();
-			set.or(collectAllHardwiredClustersRec(tree, w, clusters));
+			if (useEdge.test(f)) {
+				var w = f.getTarget();
+				set.or(collectAllHardwiredClustersRec(network, w, useEdge, clusters));
+			}
 		}
 		clusters.add(set);
 		return set;
 	}
 
+
 	private static record WeightConfidence(double weight, double confidence) {
 	}
 
+
+	/**
+	 * collects all softwired clusters contained in a network.
+	 */
+	public static Set<BitSet> collectAllSoftwiredClusters(PhyloTree network) {
+		var reticulateNodes = network.nodeStream().filter(v -> v.getInDegree() > 1).toArray(Node[]::new);
+
+		try (var activeReticulateEdges = network.newEdgeSet()) {
+			var clusters = new HashSet<BitSet>();
+			collectAllSoftwiredClustersRec(reticulateNodes, 0, network, activeReticulateEdges, clusters);
+			return clusters;
+		}
+	}
+
+	private static void collectAllSoftwiredClustersRec(Node[] reticulateNodes, int which, PhyloTree network, Set<Edge> activeReticulateEdges, HashSet<BitSet> clusters) {
+		if (which < reticulateNodes.length) {
+			for (var inEdge : reticulateNodes[which].inEdges()) {
+				activeReticulateEdges.add(inEdge);
+				collectAllSoftwiredClustersRec(reticulateNodes, which + 1, network, activeReticulateEdges, clusters);
+				activeReticulateEdges.remove(inEdge);
+			}
+		} else {
+			collectAllHardwiredClustersRec(network, network.getRoot(), e -> !network.isReticulateEdge(e) || activeReticulateEdges.contains(e), clusters);
+		}
+	}
+
+	public static void main(String[] args) throws IOException {
+		var taxaIdMap = new HashMap<String, Integer>();
+
+		//var network=NewickIO.valueOf("(((e,((((a)#H2:0,c))#H1:0,d)),(((b,#H2:0),#H1:0),#H2:0)));");
+		//var network = NewickIO.valueOf("((((((((((((((t4,(t1,t2:2):2),(t5,t11:2):2),(t8,t19:2):2),(t6,((t20,t15:2),t12:2):2):2),(((t13,(t16)#H2),(t18)#H3))#H1),#H3),(t3)#H4),(((((t7,(t9,t17:2):2),#H4),#H3),(((((t10,t14:2),#H4),#H1),#H2))#H6))#H5),#H6),#H1),#H5),#H4),#H1));");
+		var network = NewickIO.valueOf("(((((((((('Lamprologus speciosus',((('Neolamprologus brevis','Hybrid 1.1 Hybrid 2.1 Hybrid 2.2'),('Neolamprologus calliurus')#H2))#H1),('Hybrid 1.2',#H2)),(((((('Altolamprologus calvus',('Altolamprologus sp. shell','Altolamprologus compressiceps')),('Lamprologus cailipterus','Noalamprologus wauthioni','Noalamprologus fascratus')),('Lamprologus ocellatus')#H4),((((((('Lepidiolamprologus sp. meeli-boulengeri',('Lepidiolamprologus attenuatus')#H6),(('Lepidiolamprologus meeli',('Lepidiolamprologus hecqui')#H7),'Lepidiolamprologus boulengeri')),('Lepidiolamprologus profundicola')#H8),('Lepidiolamprologus elongatus')#H9),('Lepidiolamprologus sp. nov.',#H8),#H6,#H7,#H9),'Lamprologus lemainii'))#H5),('Lamprologus meleagris')#H10,(('Neolamprologus leloupi',('Neolamprologus caudopunctatus')#H12))#H11,('Lamprologus lemairii',#H12)))#H3,('Neolamprologus multifasciatus')#H13),(((('Lamprologus signatus','Lamprologus laparogramma'),'Lamprologus kungweensis'),'Lamprologus omatipinnis'))#H14,('Neolamprologus similis')#H15),((('Julidochromis ornatus',('Telmatochromis vittatus')#H17),('Variabilichromis moorii')#H18))#H16),'Neolamprologus wauthioni'),#H10,#H4),'Lamprologus callipterus','Neolamprologus fasciatus',#H11,#H14,#H13,#H3,#H15,#H5),#H1,#H16,#H18,#H17));");
+		addAdhocTaxonIds(network, taxaIdMap);
+
+		LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
+		System.err.println(NewickIO.toString(network, false) + ";");
+
+		var softwiredClusters = collectAllSoftwiredClusters(network);
+		System.err.println("network clusters: " + softwiredClusters);
+
+		/*String[] lines = new String[]{
+				"(((t10,t14),t3),(((t17,t9),t7),(t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16)))));",
+				"(((((t17,t9),t7),t3),t18),(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),((t13,t16),(t10,t14))));",
+				"((((t17,t9),t7),((t18,(t13,t16)),((t10,t14),((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))))),t3);",
+				"((((t17,t9),t7),((t10,t14),t3)),(t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))));",
+				"(((t10,t14),t3),((((t17,t9),t7),t18),(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))));",
+				"(((((t17,t9),t7),t3),(t10,t14)),(t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))));",
+				"(((((t17,t9),t7),t3),((t13,t16),(t10,t14))),(t18,((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))));",
+				"((t10,t14),(((t17,t9),t7),((t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),(t13,t16))),t3)));",
+				"((t18,(((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8))),t13)),((t16,(t10,t14)),(((t17,t9),t7),t3)));",
+				"((t18,t13),(((t16,(t10,t14)),((((t20,t15),t12),t6),(((t5,t11),(t4,(t1,t2))),(t19,t8)))),(((t17,t9),t7),t3)));"};
+		*/
+		/*String[] lines = new String[]{
+				"((a,(b,c)),(d,e));",
+				"((e,(d,c)),(b,a));",
+				"((e,d),((c,a),b));",
+				"((e,d),(c,(a,b)));",
+				"((f,b,c),d,(e,a));",
+		"((a,b),x);"};*/
+
+		String[] lines = new String[]{
+				"(((((((('Lamprologus cailipterus','Noalamprologus wauthioni','Noalamprologus fascratus'),(('Altolamprologus sp. shell','Altolamprologus compressiceps'),'Altolamprologus calvus')),'Lamprologus ocellatus'),((((('Lepidiolamprologus meeli','Lepidiolamprologus hecqui'),'Lepidiolamprologus boulengeri'),('Lepidiolamprologus sp. meeli-boulengeri','Lepidiolamprologus attenuatus')),'Lepidiolamprologus profundicola'),'Lepidiolamprologus elongatus')),('Neolamprologus caudopunctatus','Lamprologus lemairii'),'Lamprologus meleagris','Neolamprologus leloupi'),((('Hybrid 1.1 Hybrid 2.1 Hybrid 2.2','Neolamprologus brevis'),'Lamprologus speciosus'),('Hybrid 1.2','Neolamprologus calliurus')),'Neolamprologus multifasciatus'),((('Lamprologus signatus','Lamprologus laparogramma'),'Lamprologus kungweensis'),'Lamprologus omatipinnis'),'Neolamprologus similis'):0.475,(('Julidochromis ornatus':1,'Telmatochromis vittatus':1):1,'Variabilichromis moorii':1):0.025);",
+				"((((('Lepidiolamprologus meeli','Lepidiolamprologus sp. meeli-boulengeri'),('Lepidiolamprologus sp. nov.','Lepidiolamprologus profundicola'),'Lepidiolamprologus hecqui','Lepidiolamprologus elongatus','Lepidiolamprologus attenuatus'),'Lamprologus lemainii'),(('Neolamprologus wauthioni','Lamprologus speciosus'),'Lamprologus meleagris','Lamprologus ocellatus'),(('Altolamprologus sp. shell','Altolamprologus compressiceps'),'Altolamprologus calvus'),('Neolamprologus leloupi','Neolamprologus caudopunctatus'),('Lamprologus signatus','Lamprologus omatipinnis'),'Lamprologus callipterus','Neolamprologus fasciatus','Neolamprologus multifasciatus','Neolamprologus similis'),('Neolamprologus calliurus','Neolamprologus brevis'),'Julidochromis ornatus','Telmatochromis vittatus','Variabilichromis moorii':0.5);"
+		};
+
+		for (var line : lines) {
+			var tree = NewickIO.valueOf(line);
+			addAdhocTaxonIds(tree, taxaIdMap);
+			System.out.println(NewickIO.toString(tree, false) + ";");
+
+			var treeClusters = collectAllHardwiredClusters(tree);
+			System.out.println("tree clusters: " + treeClusters);
+
+			System.out.println("Missing in network: :" + CollectionUtils.difference(treeClusters, softwiredClusters));
+		}
+
+
+	}
+
+	public static void addAdhocTaxonIds(PhyloTree tree, Map<String, Integer> taxaIdMap) {
+		tree.nodeStream().filter(v -> tree.getLabel(v) != null).forEach(v -> {
+			var taxId = taxaIdMap.getOrDefault(tree.getLabel(v), taxaIdMap.size() + 1);
+			tree.addTaxon(v, taxId);
+			taxaIdMap.put(tree.getLabel(v), taxId);
+		});
+	}
+
+	public static List<PhyloTree> getSubTrees(PhyloTree forest) {
+		var taxaIdMap = new HashMap<String, Integer>();
+		addAdhocTaxonIds(forest, taxaIdMap);
+		var list = new ArrayList<PhyloTree>();
+		for (var v : forest.nodeStream().filter(v -> v.getInDegree() == 0).toList()) {
+			var tree = new PhyloTree();
+			var root = tree.copy(forest).get(v);
+			tree.setRoot(root);
+			try (var toDelete = tree.newNodeSet()) {
+				toDelete.addAll(tree.nodes());
+				tree.preorderTraversal(root, toDelete::remove);
+				for (var w : toDelete)
+					tree.deleteNode(w);
+			}
+			addAdhocTaxonIds(tree, taxaIdMap);
+			LSAUtils.computeLSAChildrenMap(tree, tree.newNodeArray());
+			list.add(tree);
+		}
+		return list;
+	}
 }

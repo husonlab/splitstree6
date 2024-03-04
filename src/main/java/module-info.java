@@ -1,9 +1,9 @@
 module splitstreesix {
-	requires transitive jloda2;
+	requires transitive jloda_core;
+	requires transitive jloda_fx;
 	requires transitive javafx.controls;
 	requires transitive javafx.graphics;
 	requires transitive javafx.fxml;
-	requires transitive javafx.swing;
 	requires javafx.base;
 
 	requires org.apache.commons.collections4;
@@ -18,6 +18,7 @@ module splitstreesix {
 	requires org.fxmisc.flowless;
 	requires org.fxmisc.richtext;
 	requires org.fxmisc.undo;
+	requires com.google.zxing;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
@@ -142,12 +143,15 @@ module splitstreesix {
 	opens splitstree6.layout.network;
 	opens splitstree6.dialog.importdialog;
 
+
 	opens splitstree6.dialog.exporting;
+
 	opens splitstree6.layout;
 	opens splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 	exports splitstree6.dialog;
 	exports splitstree6.dialog.importdialog;
+	exports splitstree6.dialog.exporting.data;
 
 	exports splitstree6.io.utils;
 	exports splitstree6.io;
@@ -157,10 +161,12 @@ module splitstreesix {
 	exports splitstree6.window;
 	exports splitstree6.workflow;
 
+	exports splitstree6.utils;
+	exports splitstree6.view.utils;
+
 	opens splitstree6.xtra.genetreeview;
 	opens splitstree6.xtra.outliner;
 	opens splitstree6.xtra.mapview;
-
 
 	opens splitstree6.algorithms.utils;
 	opens splitstree6.xtra.genetreeview.layout;
@@ -172,5 +178,6 @@ module splitstreesix {
 	opens splitstree6.splits;
 	opens splitstree6.xtra.more;
 	opens splitstree6.xtra.alts;
+
 
 }

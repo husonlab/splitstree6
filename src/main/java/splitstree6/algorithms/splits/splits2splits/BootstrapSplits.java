@@ -20,8 +20,8 @@
 package splitstree6.algorithms.splits.splits2splits;
 
 import javafx.beans.property.*;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.util.Pair;
+import jloda.util.ProgramExecutorService;
 import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;

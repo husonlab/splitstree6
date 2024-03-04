@@ -26,7 +26,6 @@ import splitstree6.data.parts.StateLabeler;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.DataTaxaFilter;
 
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +44,8 @@ public class CharactersBlock extends DataBlock {
 
 	// array of doubles giving the weights for each site. Set to null means all weights are 1.0
 	private double[] characterWeights;
+
+	private String[] characterLabels;
 
 	private boolean diploid = false;
 
@@ -90,6 +91,7 @@ public class CharactersBlock extends DataBlock {
 		gapCharacter = src.gapCharacter;
 		missingCharacter = src.missingCharacter;
 		characterWeights = src.characterWeights;
+		characterLabels = src.characterLabels;
 		diploid = src.diploid;
 		respectCase = src.respectCase;
 		dataType = src.dataType;
@@ -177,26 +179,81 @@ public class CharactersBlock extends DataBlock {
 		}
 	}
 
+	/**
+	 * set character weights
+	 *
+	 * @param characterWeights weights, 0-based
+	 */
 	public void setCharacterWeights(double[] characterWeights) {
 		if (characterWeights == null)
 			this.characterWeights = null;
 		else {
-			this.characterWeights = new double[getNchar()];
-			System.arraycopy(characterWeights, 1, this.characterWeights, 0, characterWeights.length - 1);
-			System.err.println("Debug: charWeights: " + Arrays.toString(this.characterWeights));
+			this.characterWeights = characterWeights;
 		}
 	}
 
+	/**
+	 * get character weights, 0-based
+	 * @return character weights
+	 */
 	public double[] getCharacterWeights() {
 		return this.characterWeights;
 	}
 
+	/**
+	 * gets character weight
+	 * @param pos position, 1-based
+	 * @return weight or 1
+	 */
 	public double getCharacterWeight(int pos) {
 		return characterWeights == null ? 1 : characterWeights[pos - 1];
 	}
 
+	/**
+	 * set weights
+	 * @param pos position 1-based
+	 * @param w weight
+	 */
 	public void setCharacterWeight(int pos, double w) {
 		this.characterWeights[pos - 1] = w;
+	}
+
+	public boolean isUseCharacterLabels() {
+		return characterLabels != null;
+	}
+
+	public void setUseCharacterLabels(boolean use) {
+		if (use) {
+			if (characterLabels == null)
+				characterLabels = new String[getNchar()];
+		} else {
+			characterLabels = null;
+		}
+	}
+
+	/**
+	 * set character labels
+	 *
+	 * @param characterLabels labels, 0-based
+	 */
+	public void setCharacterLabels(String[] characterLabels) {
+		if (characterLabels == null)
+			this.characterLabels = null;
+		else {
+			this.characterLabels = characterLabels;
+		}
+	}
+
+	public String[] getCharacterLabels() {
+		return this.characterLabels;
+	}
+
+	public String getCharacterLabel(int pos) {
+		return characterLabels == null ? "null" : characterLabels[pos - 1];
+	}
+
+	public void setCharacterLabel(int pos, String label) {
+		this.characterLabels[pos - 1] = label;
 	}
 
 	public CharactersType getDataType() {

@@ -23,6 +23,7 @@ import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.Icebergs;
 import jloda.fx.util.MouseDragToTranslate;
 
 import java.util.ArrayList;
@@ -62,14 +63,17 @@ public class LabeledEdgeShape extends Group {
 
 
 	public void setShape(Shape shape) {
-		if (shape == null)
-			getChildren().clear();
-		else
-			getChildren().setAll(shape);
+		getChildren().clear();
+		if (shape != null) {
+			if (Icebergs.enabled()) {
+				getChildren().add(Icebergs.create(shape, false));
+			}
+			getChildren().add(shape);
+		}
 	}
 
 	public Node getShape() {
-		return getChildren().size() == 0 ? null : getChildren().get(0);
+		return getChildren().isEmpty() ? null : getChildren().get(getChildren().size() - 1);
 	}
 
 	public RichTextLabel getLabel() {

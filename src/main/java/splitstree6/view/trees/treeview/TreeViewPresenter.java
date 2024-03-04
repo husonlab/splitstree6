@@ -30,16 +30,16 @@ import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
 import javafx.geometry.Insets;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.util.SwipeUtils;
 import jloda.graph.Graph;
 import jloda.phylo.PhyloTree;
 import jloda.util.Basic;
@@ -52,6 +52,8 @@ import splitstree6.layout.LayoutUtils;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.TreeDiagramType;
 import splitstree6.layout.tree.TreeLabel;
+import splitstree6.qr.QRViewUtils;
+import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.format.edges.LabelEdgesBy;
@@ -76,6 +78,8 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 	private final TreeViewController controller;
 
 	private final FindToolBar findToolBar;
+
+	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
 
 	private final ObjectProperty<TreePane> treePane = new SimpleObjectProperty<>(this, "treePane");
 	private final ObjectProperty<PhyloTree> tree;
@@ -180,8 +184,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		scrollPane.lockAspectRatioProperty().bind(lockAspectRatio);
 		scrollPane.setRequireShiftOrControlToZoom(false);
-		controller.getScrollPane().setPannable(true);
-
+		scrollPane.setPannable(true);
 		scrollPane.setPadding(new Insets(10, 0, 0, 10));
 
 		final ObservableSet<TreeDiagramType> disabledDiagrams = FXCollections.observableSet();
@@ -224,7 +227,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 			view.optionOrientationProperty().addListener(scaleListener);
 			scaleListener.invalidated(null);
 		}
-
 
 		tree.addListener((v, o, n) -> {
 			if (o != null) // not the first tree
@@ -389,6 +391,14 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
+		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+
+		var qrImageView = new SimpleObjectProperty<ImageView>();
+		QRViewUtils.setup(controller.getAnchorPane(), tree, TreeNewickQR.createFunction(), qrImageView, showQRCode);
+
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
 	}
@@ -402,12 +412,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
 			if (!list.isEmpty()) {
-				var content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
+
 			}
 		});
-		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
@@ -415,7 +426,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			var tree = this.tree.get();
 			if (tree != null)
-				BasicFX.putTextOnClipBoard(tree.toBracketString(true) + ";\n");
+				ClipboardUtils.putString(tree.toBracketString(true) + ";\n");
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
 
@@ -458,6 +469,9 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				view.optionDiagramProperty().isEqualTo(TreeDiagramType.CircularCladogram)
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.TriangularCladogram))
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.RectangularCladogram)));
+
+		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());
 		mainController.getRotateLeftMenuItem().disableProperty().bind(controller.getRotateLeftButton().disableProperty());
@@ -531,4 +545,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 	public boolean allowFindReplace() {
 		return true;
 	}
+
+	private final ImageView qrImageView = new ImageView();
 }

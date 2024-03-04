@@ -26,13 +26,12 @@ import javafx.collections.ObservableMap;
 import javafx.collections.SetChangeListener;
 import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.AService;
+import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.util.SwipeUtils;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
@@ -180,6 +179,10 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
+		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setConsumeSwipeUp(controller.getAnchorPane());
+		SwipeUtils.setConsumeSwipeDown(controller.getAnchorPane());
 
 		Platform.runLater(this::setupMenuItems);
 	}
@@ -194,9 +197,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
 			if (!list.isEmpty()) {
-				var content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
 			}
 		});
 		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));

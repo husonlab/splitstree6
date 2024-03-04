@@ -20,7 +20,6 @@
 package splitstree6.dialog.analyzegenomes;
 
 import javafx.collections.ObservableList;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeIntArray;

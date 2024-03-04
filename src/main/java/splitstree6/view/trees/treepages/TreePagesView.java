@@ -74,8 +74,8 @@ public class TreePagesView implements IView {
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	{
-		ProgramProperties.track(optionRows, 1);
-		ProgramProperties.track(optionCols, 1);
+		ProgramProperties.track(optionRows, 2);
+		ProgramProperties.track(optionCols, 3);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
 	}

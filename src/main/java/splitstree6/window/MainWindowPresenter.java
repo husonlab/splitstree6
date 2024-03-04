@@ -33,8 +33,6 @@ import javafx.collections.ObservableMap;
 import javafx.event.EventHandler;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
@@ -42,13 +40,12 @@ import javafx.stage.Stage;
 import jloda.fx.dialog.ExportImageDialog;
 import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.message.MessageWindow;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.Print;
-import jloda.fx.util.RecentFilesManager;
+import jloda.fx.util.*;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
 import jloda.fx.window.SplashScreen;
 import jloda.fx.workflow.WorkflowNode;
+import jloda.util.ProgramProperties;
 import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
@@ -105,7 +102,9 @@ import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
+import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
+import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
@@ -116,6 +115,7 @@ import java.io.File;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class MainWindowPresenter {
@@ -176,21 +176,11 @@ public class MainWindowPresenter {
 			}
 		};
 
-
 		controller.getMainTabPane().focusedProperty().addListener(listener);
 		controller.getMainTabPane().getSelectionModel().selectedItemProperty().addListener(listener);
 
 		if (controller.getMainTabPane().getSelectionModel().getSelectedItem() instanceof IDisplayTab displayTab)
 			Platform.runLater(() -> selectedDisplayTab.set(displayTab));
-
-		controller.getMainTabPane().setOnSwipeLeft(e -> {
-		});
-		controller.getMainTabPane().setOnSwipeUp(e -> {
-		});
-		controller.getMainTabPane().setOnSwipeRight(e -> {
-		});
-		controller.getMainTabPane().setOnSwipeDown(e -> {
-		});
 
 		controller.getAlgorithmTabPane().getSelectionModel().selectedItemProperty().addListener((v, o, n) -> {
 			try {
@@ -200,14 +190,6 @@ public class MainWindowPresenter {
 			} catch (Exception ex) {
 				Basic.caught(ex);
 			}
-		});
-		controller.getAlgorithmTabPane().setOnSwipeLeft(e -> {
-		});
-		controller.getAlgorithmTabPane().setOnSwipeUp(e -> {
-		});
-		controller.getAlgorithmTabPane().setOnSwipeRight(e -> {
-		});
-		controller.getAlgorithmTabPane().setOnSwipeDown(e -> {
 		});
 
 		controller.getMainTabPane().getTabs().addListener((ListChangeListener<? super Tab>) e -> {
@@ -231,10 +213,10 @@ public class MainWindowPresenter {
 
 		splitPanePresenter = new SplitPanePresenter(mainWindow.getController());
 
-		BasicFX.applyToAllMenus(controller.getMenuBar(),
+		applyToAllMenuItems(controller.getMenuBar(),
 				m -> !List.of("File", "Edit", "Import", "Window", "Open Recent", "Help").contains(m.getText()),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(mainWindow.emptyProperty())));
-		BasicFX.applyToAllMenus(controller.getMenuBar(),
+		applyToAllMenuItems(controller.getMenuBar(),
 				m -> m.getText().equals("Edit"),
 				m -> m.disableProperty().bind(mainWindow.getWorkflow().runningProperty()));
 
@@ -256,6 +238,9 @@ public class MainWindowPresenter {
 		});
 		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
 
+		setupImportButton(controller.getImportButton());
+
+		SwipeUtils.setConsumeSwipes(controller.getRootPane());
 	}
 
 
@@ -295,6 +280,7 @@ public class MainWindowPresenter {
 		});
 
 
+		controller.getUseFullScreenMenuItem().disableProperty().unbind();
 		BasicFX.setupFullScreenMenuSupport(stage, controller.getUseFullScreenMenuItem());
 
 		Platform.runLater(() -> {
@@ -345,6 +331,8 @@ public class MainWindowPresenter {
 				fileChooser.getExtensionFilters().addAll(ImportManager.getInstance().getExtensionFilters());
 				var selectedFile = fileChooser.showOpenDialog(stage);
 				if (selectedFile != null) {
+					if (!selectedFile.getParent().isBlank())
+						ProgramProperties.put("InputDir", selectedFile.getParent());
 					if (!loadingFile.get()) {
 						try {
 							loadingFile.set(true);
@@ -442,9 +430,7 @@ public class MainWindowPresenter {
 			controller.getCopyImageMenuItem().setOnAction(e -> {
 				try {
 					var snapshot = focusedDisplayTab.get().getMainNode().snapshot(null, null);
-					var clipboardContent = new ClipboardContent();
-					clipboardContent.putImage(snapshot);
-					Clipboard.getSystemClipboard().setContent(clipboardContent);
+					ClipboardUtils.putImage(snapshot);
 				} catch (Exception ex) {
 					Basic.caught(ex);
 				}
@@ -999,4 +985,42 @@ public class MainWindowPresenter {
 		}
 	}
 
+	public static void applyToAllMenuItems(MenuBar menuBar, Function<Menu, Boolean> accept, Consumer<MenuItem> callback) {
+		var queue = new LinkedList<>(menuBar.getMenus());
+		while (!queue.isEmpty()) {
+			var menu = queue.pop();
+			if (accept.apply(menu)) {
+				for (var item : menu.getItems()) {
+					if (!(item instanceof SeparatorMenuItem)) {
+						callback.accept(item);
+					}
+					if (item instanceof Menu other) {
+						queue.add(other);
+					}
+				}
+			}
+		}
+	}
+
+	// todo: move to jloda-core
+	private void setupImportButton(Button importButton) {
+		importButton.disableProperty().bind(ClipboardUtils.hasStringProperty().not().and(ClipboardUtils.hasFilesProperty().not()));
+
+		importButton.setOnAction(e -> {
+			var importedString = ClipboardUtils.getTextFilesContentOrString();
+			if (importedString != null) {
+				var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
+				Platform.runLater(() -> {
+					mainWindow.getController().getEditInputMenuItem().fire();
+					Platform.runLater(() -> {
+						var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+						if (inputEditorTab != null) {
+							((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(importedString);
+							Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
+						}
+					});
+				});
+			}
+		});
+	}
 }

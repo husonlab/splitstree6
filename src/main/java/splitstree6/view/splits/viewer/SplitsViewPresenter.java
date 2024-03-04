@@ -26,36 +26,34 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.collections.*;
 import javafx.geometry.Bounds;
-import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.DataFormat;
 import javafx.scene.shape.Shape;
 import javafx.stage.Stage;
+import javafx.util.Pair;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.BasicFX;
-import jloda.fx.util.ProgramExecutorService;
+import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.window.NotificationManager;
-import jloda.util.BitSetUtils;
-import jloda.util.IteratorUtils;
-import jloda.util.Single;
-import jloda.util.StringUtils;
+import jloda.fx.util.SwipeUtils;
+import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
+import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.LayoutUtils;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
+import splitstree6.qr.QRViewUtils;
+import splitstree6.qr.SplitsNewickQR;
 import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -69,7 +67,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -90,6 +87,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private final InvalidationListener updateListener;
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
+
+	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
 
 	private final SplitNetworkPane splitNetworkPane;
 
@@ -124,7 +123,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getScrollPane().setLockAspectRatio(true);
 		controller.getScrollPane().setRequireShiftOrControlToZoom(false);
 		controller.getScrollPane().setPannable(true);
-
 		controller.getScrollPane().setUpdateScaleMethod(() -> view.setOptionZoomFactor(controller.getScrollPane().getZoomFactorY() * view.getOptionZoomFactor()));
 
 		final ObservableSet<SplitsDiagramType> disabledDiagramTypes = FXCollections.observableSet();
@@ -328,11 +326,18 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
 
+		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipHorizontalButton().fire());
+		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
+
+		// setup QR-code:
+		var data = new SimpleObjectProperty<Pair<TaxaBlock, SplitsBlock>>();
+		data.bind(Bindings.createObjectBinding(() -> new Pair<>(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getSplitsBlock()), mainWindow.workingTaxaProperty(), view.splitsBlockProperty(), updateCounter));
+		var qrImageView = new SimpleObjectProperty<ImageView>();
+		QRViewUtils.setup(controller.getInnerAnchorPane(), data, SplitsNewickQR.createFunction(), qrImageView, showQRCode);
+
 		Platform.runLater(this::setupMenuItems);
-	}
-
-	private void collectZoom(UndoManager undoManager, Node node, Predicate<jloda.graph.Node> predicate, double undoX, double undoY, double doX, double doY) {
-
 	}
 
 	public void setupMenuItems() {
@@ -344,22 +349,18 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
 			if (!list.isEmpty()) {
-				var content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
 			}
 		});
-		if (mainWindow.getStage() != null)
-			mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-
-		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			try {
-				BasicFX.putTextOnClipBoard(SplitNewick.toString(t -> mainWindow.getWorkingTaxa().get(t).getName(),
+				ClipboardUtils.putString(SplitNewick.toString(t -> mainWindow.getWorkingTaxa().get(t).getName(),
 						view.getSplitsBlock().getSplits(), true, false) + ";\n");
-			} catch (IOException ex) {
-				NotificationManager.showError("Copy Newick failed: " + ex.getMessage());
+			} catch (IOException ignored) {
 			}
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
@@ -418,6 +419,9 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.SplitsTopology).or(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.OutlineTopology)));
+
+		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		controller.getRotateLeftButton().setOnAction(e -> {
 			if (view.getSplitSelectionModel().size() == 0)

@@ -24,7 +24,6 @@ import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.FileChooser;
@@ -77,12 +76,6 @@ public class InputEditorViewPresenter {
 			}
 		});
 
-		codeArea.focusedProperty().addListener((c, o, n) -> {
-			if (n) {
-				mainWindow.getController().getPasteMenuItem().disableProperty().unbind();
-				mainWindow.getController().getPasteMenuItem().disableProperty().set(!Clipboard.getSystemClipboard().hasString());
-			}
-		});
 
 		Platform.runLater(codeArea::requestFocus);
 

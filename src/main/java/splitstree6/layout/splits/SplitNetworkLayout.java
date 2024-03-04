@@ -37,6 +37,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.DraggableUtils;
 import jloda.fx.util.GeometryUtilsFX;
+import jloda.fx.util.Icebergs;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
@@ -278,6 +279,10 @@ public class SplitNetworkLayout {
 				line.setStroke(Color.GRAY);
 			else
 				line.setStroke(null);
+
+			if (Icebergs.enabled()) {
+				edgesGroup.getChildren().add(Icebergs.create(line, true));
+			}
 
 			edgesGroup.getChildren().add(line);
 

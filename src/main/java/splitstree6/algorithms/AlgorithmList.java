@@ -19,11 +19,15 @@
 
 package splitstree6.algorithms;
 
+import jloda.fx.workflow.NamedBase;
+import splitstree6.algorithms.trees.trees2trees.ALTSExternal;
+import splitstree6.algorithms.trees.trees2trees.ALTSNetwork;
 import splitstree6.main.SplitsTree6;
 import splitstree6.workflow.Algorithm;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -117,7 +121,8 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.FilteredSuperNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.SuperNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2splits.TreeSelectorSplits());
-		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ALTSNetwork());
+		add(algorithms, names, new ALTSExternal());
+		add(algorithms, names, new ALTSNetwork());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.AutumnAlgorithm());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.BootstrapTree());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.ClusterNetwork());
@@ -131,6 +136,7 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.TreesFilter2());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2trees.TreesTaxaFilter());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2view.ShowTrees());
+		algorithms.sort(Comparator.comparing(NamedBase::getName));
 		return algorithms;
 	}
 

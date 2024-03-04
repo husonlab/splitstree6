@@ -20,7 +20,6 @@
 package splitstree6.algorithms.genomes.genome2distances;
 
 import javafx.beans.property.*;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.window.NotificationManager;
 import jloda.kmers.GenomeDistanceType;
 import jloda.kmers.mash.MashDistance;

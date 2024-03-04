@@ -24,7 +24,6 @@ import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.stage.Stage;
 import jloda.fx.util.ArgsOptions;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.ResourceManagerFX;
 import jloda.fx.window.NotificationManager;

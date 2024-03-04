@@ -21,7 +21,7 @@ package splitstree6.algorithms.characters.characters2distances;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.fx.util.ProgramExecutorService;
+import jloda.util.ProgramExecutorService;
 import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;

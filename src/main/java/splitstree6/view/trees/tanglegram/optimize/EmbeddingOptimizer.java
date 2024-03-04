@@ -399,7 +399,7 @@ public class EmbeddingOptimizer {
 				System.err.println("second: " + StringUtils.toString(newOrder[1], " "));
 			}
 
-			if (true)
+			if (DEBUG)
 				System.err.println("Smallest crossing number found: " + finalScore);
 			if (DEBUG) {
 				for (var i = 0; i < trees.length; i++) {

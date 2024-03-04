@@ -44,6 +44,9 @@ public class DisplayTextViewController {
 	private ToolBar toolBar;
 
 	@FXML
+	private Button copyButton;
+
+	@FXML
 	private Button pasteButton;
 
 	@FXML
@@ -63,6 +66,7 @@ public class DisplayTextViewController {
 
 	@FXML
 	private void initialize() {
+		MaterialIcons.setIcon(copyButton, "content_copy");
 		MaterialIcons.setIcon(pasteButton, "content_paste");
 		MaterialIcons.setIcon(wrapTextToggle, "wrap_text");
 		MaterialIcons.setIcon(lineNumbersToggle, "format_list_numbered");
@@ -94,6 +98,10 @@ public class DisplayTextViewController {
 
 	public ToolBar getToolBar() {
 		return toolBar;
+	}
+
+	public Button getCopyButton() {
+		return copyButton;
 	}
 
 	public Button getPasteButton() {

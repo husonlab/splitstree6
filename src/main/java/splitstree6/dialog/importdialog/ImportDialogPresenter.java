@@ -117,9 +117,10 @@ public class ImportDialogPresenter {
 			}
 		});
 		controller.getImportButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty().or(
-				Bindings.isNull(controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty()).or(Bindings.equal(controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))
-						.or(Bindings.isNull(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty())).or(Bindings.equal(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))));
-
+				Bindings.isNull(controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty())
+						.or(Bindings.equal(controller.getDataTypeComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))
+						.or(Bindings.isNull(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty()))
+						.or(Bindings.equal(controller.getFileFormatComboBox().getSelectionModel().selectedItemProperty(), "Unknown"))));
 	}
 
 	private static void parseAndLoad(MainWindow mainWindow, String fileName, ImportDialogController controller) {

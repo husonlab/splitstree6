@@ -22,24 +22,26 @@ package splitstree6.view.trees.densitree;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
-import javafx.event.Event;
 import javafx.geometry.Bounds;
 import javafx.scene.control.RadioMenuItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DataFormat;
-import javafx.scene.input.SwipeEvent;
+import javafx.scene.image.ImageView;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.util.BasicFX;
+import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.MainWindowManager;
 import jloda.fx.window.NotificationManager;
+import jloda.phylo.PhyloTree;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.qr.QRViewUtils;
+import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
@@ -59,14 +61,15 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 
 	private final FindToolBar findToolBar;
 
+	private final ObjectProperty<PhyloTree> consensusTree = new SimpleObjectProperty<>(null);
+	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
+
 
 	public DensiTreeViewPresenter(MainWindow mainWindow, DensiTreeView view, ObjectProperty<Bounds> targetBounds) {
 		this.mainWindow = mainWindow;
 		this.view = view;
 		this.controller = view.getController();
 		this.drawer = new DensiTreeDrawer(mainWindow);
-
-		controller.getAnchorPane().addEventHandler(SwipeEvent.ANY, Event::consume);
 
 		controller.getDiagramToggleGroup().selectedToggleProperty().addListener((v, o, n) -> {
 			if (n instanceof RadioMenuItem radioMenuItem) {
@@ -150,6 +153,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 					view.getOptionHorizontalZoomFactor(), view.getOptionVerticalZoomFactor(), view.optionFontScaleFactorProperty(),
 					view.optionShowTreesProperty(), view.isOptionHideFirst10PercentTrees(), view.optionShowConsensusProperty(),
 					view.getOptionStrokeWidth(), view.getOptionEdgeColor(), view.getOptionOtherColor());
+			consensusTree.set(drawer.getConsensusTree());
 		};
 
 		targetBounds.addListener(invalidationListener);
@@ -212,32 +216,41 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 				view.setOptionEdgeColor(DensiTreeView.DEFAULT_LIGHTMODE_EDGE_COLOR);
 
 		});
+
+		SwipeUtils.setConsumeSwipeLeft(controller.getAnchorPane());
+		SwipeUtils.setConsumeSwipeRight(controller.getAnchorPane());
+		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
+
+		var qrImageView = new SimpleObjectProperty<ImageView>();
+		QRViewUtils.setup(controller.getAnchorPane(), consensusTree, TreeNewickQR.createFunction(), qrImageView, showQRCode);
+
 	}
 
 	@Override
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
 
+		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+
 		mainController.getCopyMenuItem().setOnAction(e -> {
 			var list = new ArrayList<String>();
 			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
 				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
 			}
-			if (list.size() > 0) {
-				var content = new ClipboardContent();
-				content.put(DataFormat.PLAIN_TEXT, StringUtils.toString(list, "\n"));
-				Clipboard.getSystemClipboard().setContent(content);
+			if (!list.isEmpty()) {
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
 			}
 		});
-
-		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
-		mainController.getCutMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
-		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainWindow.getController().getCopyNewickMenuItem().setOnAction(e -> {
 			var tree = this.drawer.getConsensusTree();
 			if (tree != null)
-				BasicFX.putTextOnClipBoard(tree.toBracketString(true) + ";\n");
+				ClipboardUtils.putString(tree.toBracketString(true) + ";\n");
 		});
 		mainWindow.getController().getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty().or(controller.getShowConsensusMenuItem().selectedProperty().not()));
 
@@ -275,6 +288,9 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
+
+		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> drawer.getRadialLabelLayout().layoutLabels());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());

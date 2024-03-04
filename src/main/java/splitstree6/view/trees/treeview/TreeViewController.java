@@ -107,6 +107,7 @@ public class TreeViewController {
 	@FXML
 	private ToggleButton formatToggleButton;
 
+
 	@FXML
 	private VBox formatVBox;
 

@@ -20,13 +20,14 @@
 package splitstree6.xtra.kernelize;
 
 import jloda.fx.util.ArgsOptions;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
 import jloda.util.BitSetUtils;
 import jloda.util.FileUtils;
+import jloda.util.ProgramExecutorService;
 import jloda.util.UsageException;
+import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressPercentage;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
@@ -35,11 +36,7 @@ import splitstree6.io.readers.trees.TreesReader;
 import splitstree6.splits.TreesUtils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.HashSet;
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
 
 public class RunKernelize {
 	public static void main(String[] args) throws UsageException, IOException {
@@ -82,9 +79,9 @@ public class RunKernelize {
 		System.err.println();
 
 		// setup the algorithm that is used to resolve each incompatibility component
-		Function<List<PhyloTree>, List<PhyloTree>> algorithm =
+		Kernelize.BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm =
 				switch (algorithmName) {
-					case "clusternetwork" -> trees -> {
+					case "clusternetwork" -> (trees, p) -> {
 						var clusters = new HashSet<BitSet>();
 						for (var tree : trees) {
 							clusters.addAll(TreesUtils.extractClusters(tree).values());
@@ -93,8 +90,8 @@ public class RunKernelize {
 						ClusterPoppingAlgorithm.apply(clusters, network);
 						return List.of(network);
 					};
-					case "trees" -> trees -> trees;
-					case "alts" -> trees -> {
+					case "trees" -> (trees, p) -> trees;
+					case "alts" -> (trees, p) -> {
 						throw new RuntimeException("--algorithm alts: not implemented");
 					};
 					default -> throw new RuntimeException("--algorithm " + algorithmName + ": not implemented");

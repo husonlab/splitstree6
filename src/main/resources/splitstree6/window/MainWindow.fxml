@@ -324,6 +324,7 @@
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
+                        <CheckMenuItem fx:id="showQRCodeMenuItem" text="Show QR Code"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels">
                             <accelerator>
@@ -466,8 +467,19 @@
                             <children>
                                 <MenuButton fx:id="fileMenuButton" contentDisplay="CENTER" mnemonicParsing="false"
                                             text="File"/>
+                                <Button fx:id="importButton" mnemonicParsing="false" text="Import">
+                                    <tooltip>
+                                        <Tooltip text="Paste text into new document"/>
+                                    </tooltip>
+                                </Button>
+                                <Region layoutX="179.0" layoutY="10.0" prefWidth="10.0"/>
                                 <ToggleButton fx:id="showWorkflowTreeCheckButton" mnemonicParsing="false"
-                                              text="Workflow"/>
+                                              text="Side Bar">
+                                    <tooltip>
+                                        <Tooltip text="Show/hide methods sidebar"/>
+                                    </tooltip>
+                                </ToggleButton>
+                                <Region prefWidth="4.0"/>
                                 <ProgressIndicator fx:id="progressIndicator" progress="0.0" visible="false"/>
                             </children>
                         </HBox>
@@ -532,7 +544,8 @@
                                 <Insets bottom="2.0" left="2.0" right="2.0" top="2.0"/>
                             </padding>
                             <center>
-                                <TabPane tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER"/>
+                                <TabPane focusTraversable="false" tabClosingPolicy="UNAVAILABLE"
+                                         BorderPane.alignment="CENTER"/>
                             </center>
                         </BorderPane>
                     </AnchorPane>

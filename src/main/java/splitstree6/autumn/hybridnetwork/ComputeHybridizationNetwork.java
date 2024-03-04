@@ -27,6 +27,7 @@ import org.apache.commons.collections4.map.LRUMap;
 import splitstree6.autumn.*;
 import splitstree6.autumn.hybridnumber.ComputeHybridNumber;
 import splitstree6.data.TaxaBlock;
+import splitstree6.utils.ProgressMover;
 
 import java.io.IOException;
 import java.util.*;
@@ -44,10 +45,7 @@ public class ComputeHybridizationNetwork {
 
 	private final LRUMap<String, Pair<Integer, Collection<Root>>> lookupTable = new LRUMap<>(1000000);
 
-	private long nextTime = 0;
-	private long waitTime = 1000;
-
-	private ProgressListener progressListener;
+	private ProgressListener progress;
 
 	/**
 	 * computes the hybrid number for two multifurcating trees
@@ -58,8 +56,7 @@ public class ComputeHybridizationNetwork {
 		var upperBound = ComputeHybridNumber.apply(tree1, tree2, progress);
 
 		var computeHybridizationNetwork = new ComputeHybridizationNetwork();
-		computeHybridizationNetwork.progressListener = progress;
-		var networks = computeHybridizationNetwork.run(tree1, tree2, upperBound, hybridizationNumber);
+		var networks = computeHybridizationNetwork.run(tree1, tree2, upperBound, hybridizationNumber, progress);
 
 		var label2taxonId = new HashMap<String, Integer>();
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
@@ -93,7 +90,9 @@ public class ComputeHybridizationNetwork {
 	 *
 	 * @return reduced trees
 	 */
-	private PhyloTree[] run(PhyloTree tree1, PhyloTree tree2, int upperBound, Single<Integer> hybridizationNumber) throws IOException {
+	private PhyloTree[] run(PhyloTree tree1, PhyloTree tree2, int upperBound, Single<Integer> hybridizationNumber, ProgressListener progress) throws IOException {
+		this.progress = progress;
+		var startTime = System.currentTimeMillis();
 		verbose = ProgramProperties.get("verbose-HL", false);
 		var allTaxa = new TaxaBlock();
 		var roots = PreProcess.apply(tree1, tree2, allTaxa);
@@ -147,16 +146,13 @@ public class ComputeHybridizationNetwork {
 		root2.reorderSubTree();
 
 		System.err.println("Computing hybridization networks using Autumn algorithm (Autumn algorithm, Huson and Linz, 2016)...");
-		progressListener.setTasks("Computing hybridization networks", "(Unknown how long this will really take)");
-		progressListener.setMaximum(20);
-		progressListener.setProgress(0);
-		var startTime = System.currentTimeMillis();
-		nextTime = startTime + waitTime;
+		this.progress.setTasks("Computing hybridization networks", "(Unknown how long this will really take)");
 		var result = new TreeSet<>(new NetworkComparator());
-		var h = computeRec(root1, root2, false, getAllAliveTaxa(root1, root2), upperBound, result, ">");
-
-
-		fixOrdering(result);
+		int h;
+		try (var progressMover = new ProgressMover(progress)) {
+			h = computeRec(root1, root2, false, getAllAliveTaxa(root1, root2), upperBound, result, ">");
+			fixOrdering(result);
+		}
 
 		if (false) {
 			var maafs = MAAFUtils.computeAllMAAFs(result);
@@ -213,7 +209,7 @@ public class ComputeHybridizationNetwork {
 	 *
 	 * @return cached networks or newly computed networks
 	 */
-	private int cacheComputeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybrids, int k, Collection<Root> totalResults, String depth) throws IOException, CanceledException {
+	private int cacheComputeRec(Root root1, Root root2, boolean isReduced, BitSet candidateHybrids, int k, Collection<Root> totalResults, String depth) throws IOException {
 		if (true) // use caching
 		{
 			var key = root1.toStringTree() + root2.toStringTree() + (candidateHybrids != null ? StringUtils.toString(candidateHybrids) : "");
@@ -254,12 +250,7 @@ public class ComputeHybridizationNetwork {
 			System.err.println(depth + "Tree2: " + root2.toStringFullTreeX());
 		}
 
-		if (System.currentTimeMillis() > nextTime) {
-			progressListener.incrementProgress();
-			nextTime += waitTime;
-			waitTime *= 1.5;
-		} else
-			progressListener.checkForCancel();
+		progress.checkForCancel();
 
 		// root1.reorderSubTree();
 		//  root2.reorderSubTree();

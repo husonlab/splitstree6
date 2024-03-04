@@ -20,7 +20,6 @@
 package splitstree6.tools;
 
 import jloda.fx.util.ArgsOptions;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.kmers.mash.MashSketch;
 import jloda.thirdparty.HexUtils;
 import jloda.util.*;

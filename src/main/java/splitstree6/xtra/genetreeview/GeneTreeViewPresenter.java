@@ -36,8 +36,6 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -45,6 +43,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.ColorSchemeManager;
 import jloda.fx.util.Print;
 import jloda.fx.util.RunAfterAWhile;
@@ -164,9 +163,7 @@ public class GeneTreeViewPresenter {
 				for (int taxonId : taxaSelectionModel.getSelectedItems())
 					taxa.append(model.getTaxaBlock().get(taxonId).getName()).append("\n");
 			}
-			ClipboardContent content = new ClipboardContent();
-			content.putString(taxa.toString());
-			Clipboard.getSystemClipboard().setContent(content);
+			ClipboardUtils.putString(taxa.toString());
 		});
 
 		controller.getCopyImageMenuItem().setOnAction(e -> {
@@ -175,11 +172,8 @@ public class GeneTreeViewPresenter {
 			SnapshotParameters parameters = new SnapshotParameters();
 			//parameters.setFill(Color.TRANSPARENT); // for black background
 			parameters.setTransform(javafx.scene.transform.Transform.scale(2, 2));
-			Image image = controller.getCenterPane().snapshot(parameters, writableImage);
-
-			ClipboardContent content = new ClipboardContent();
-			content.putImage(image);
-			Clipboard.getSystemClipboard().setContent(content);
+			var image = controller.getCenterPane().snapshot(parameters, writableImage);
+			ClipboardUtils.putImage(image);
 		});
 
 		controller.getCopySelectedNewicksMenuItem().disableProperty().bind(treeSelectionModel.sizeProperty().isEqualTo(0));
@@ -207,9 +201,8 @@ public class GeneTreeViewPresenter {
 				} catch (IOException ex) {
 					ex.printStackTrace();
 				}
-				var clipboardContent = new ClipboardContent();
-				clipboardContent.putString(newicks.toString());
-				Clipboard.getSystemClipboard().setContent(clipboardContent);
+				ClipboardUtils.putString(newicks.toString());
+
 				System.out.println("Copying succeeded");
 				controller.getProgressLabel().setText("");
 			});
@@ -222,7 +215,6 @@ public class GeneTreeViewPresenter {
 
 		controller.getCopySelectedTreesMenuItem().disableProperty().bind(treeSelectionModel.sizeProperty().isEqualTo(0));
 		controller.getCopySelectedTreesMenuItem().setOnAction(e -> {
-			var clipboardContent = new ClipboardContent();
 			var gridPane = new GridPane();
 			int minColumnNumber = 2;
 			if (treeSelectionModel.size() > 6) {
@@ -261,8 +253,7 @@ public class GeneTreeViewPresenter {
 					treeSelectionModel.select(treeId);
 				}
 				Image image = gridPane.snapshot(null, null);
-				clipboardContent.putImage(image);
-				Clipboard.getSystemClipboard().setContent(clipboardContent);
+				ClipboardUtils.putImage(image);
 			};
 			Platform.runLater(() -> RunAfterAWhile.applyInFXThread("ImageCopying", copyImages));
 		});
@@ -805,23 +796,17 @@ public class GeneTreeViewPresenter {
 	}
 
 	private ArrayList<GeneTree> pasteTrees(Stage stage, Model model, GeneTreeViewController controller) {
-		Clipboard clipboard = Clipboard.getSystemClipboard();
 		try {
-			String content;
-			File file;
 			var newickReader = new NewickReader();
 			var newTreeBlock = new TreesBlock();
-			if (clipboard.hasString()) {
-				content = clipboard.getString();
-				file = new File("temp.txt");
-				FileWriter fw = new FileWriter(file);
-				fw.write(content);
-				fw.close();
-				var iterator = new FileLineIterator(file);
+			if (ClipboardUtils.hasString()) {
+				var string = ClipboardUtils.getString();
+				var iterator = new FileLineIterator(FileLineIterator.PREFIX_TO_INDICATE_TO_PARSE_FILENAME_STRING + string);
 				newickReader.read(new ProgressPercentage(), iterator, model.getTaxaBlock(), newTreeBlock);
 
-			} else if (clipboard.hasFiles()) {
-				file = clipboard.getFiles().get(0);
+			} else if (ClipboardUtils.hasFiles()) {
+				// todo: need to read all input files, not just the first
+				var file = ClipboardUtils.getFiles().get(0);
 				newickReader.read(new ProgressPercentage(), file.getPath(), model.getTaxaBlock(), newTreeBlock);
 			} else return null;
 
@@ -859,7 +844,7 @@ public class GeneTreeViewPresenter {
 			treeSnapshots.getChildren().add(index, new Rectangle());
 			setupTreeSelectionAndSnapshots(treeSheet, treeId);
 		}
-		if (model.getGeneTreeSet().getAvailableFeatures().size() > 0) {
+		if (!model.getGeneTreeSet().getAvailableFeatures().isEmpty()) {
 			for (var tree : pastedGeneTrees) {
 				for (var feature : model.getGeneTreeSet().getAvailableFeatures()) {
 					tree.addFeature(feature, null);

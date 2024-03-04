@@ -60,7 +60,11 @@ public class WorkflowTabController {
 	@FXML
 	private Button duplicateButton;
 
+	@FXML
+	private Button zoomInButton;
 
+	@FXML
+	private Button zoomOutButton;
 	private ZoomableScrollPane scrollPane;
 
 	@FXML
@@ -72,7 +76,8 @@ public class WorkflowTabController {
 		MaterialIcons.setIcon(addMenuButton, "add");
 		MaterialIcons.setIcon(deleteButton, "delete");
 		MaterialIcons.setIcon(duplicateButton, "content_copy");
-
+		MaterialIcons.setIcon(zoomInButton, "zoom_in");
+		MaterialIcons.setIcon(zoomOutButton, "zoom_out");
 
 		borderPane.getChildren().remove(mainPane);
 		var anchorPane = new AnchorPane(mainPane);
@@ -128,5 +133,13 @@ public class WorkflowTabController {
 
 	public Button getDuplicateButton() {
 		return duplicateButton;
+	}
+
+	public Button getZoomInButton() {
+		return zoomInButton;
+	}
+
+	public Button getZoomOutButton() {
+		return zoomOutButton;
 	}
 }

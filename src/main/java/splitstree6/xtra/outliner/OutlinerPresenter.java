@@ -26,10 +26,9 @@ import javafx.concurrent.Task;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.image.Image;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import jloda.fx.util.ClipboardUtils;
 
 public class OutlinerPresenter {
 
@@ -48,9 +47,7 @@ public class OutlinerPresenter {
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
 
 		controller.getCopyMenuItem().setOnAction(e -> {
-			var clipboardContent = new ClipboardContent();
-			clipboardContent.putImage(createImage(controller.getStackPane()));
-			Clipboard.getSystemClipboard().setContent(clipboardContent);
+			ClipboardUtils.putImage(createImage(controller.getStackPane()));
 		});
 
 		controller.getReferenceCheckbox().selectedProperty().addListener(e -> redraw(outliner));

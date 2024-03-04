@@ -20,6 +20,7 @@
 package splitstree6.window;
 
 import javafx.beans.InvalidationListener;
+import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
@@ -219,6 +220,9 @@ public class MainWindowController {
 
 	@FXML
 	private CheckMenuItem showScaleBarMenuItem;
+
+	@FXML
+	private CheckMenuItem showQRCodeMenuItem;
 
 	@FXML
 	private CheckMenuItem useDarkThemeMenuItem;
@@ -441,12 +445,12 @@ public class MainWindowController {
 
 	@FXML
 	private Button redoButton;
+
 	@FXML
 	private Button findButton;
 
 	@FXML
 	private MenuButton exportButton;
-
 
 	@FXML
 	private HBox leftToolBarPane;
@@ -478,6 +482,9 @@ public class MainWindowController {
 	@FXML
 	private ProgressIndicator progressIndicator;
 
+	@FXML
+	private Button importButton;
+
 
 	private final SplittableTabPane algorithmTabPane = new SplittableTabPane();
 
@@ -506,7 +513,11 @@ public class MainWindowController {
 		MaterialIcons.setIcon(increaseFontSizeButton, "text_increase");
 		MaterialIcons.setIcon(decreaseFontSizeButton, "text_decrease");
 		MaterialIcons.setIcon(selectButton, "select_all");
-		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "format_list_bulleted");
+		MaterialIcons.setIcon(showWorkflowTreeCheckButton, "view_sidebar", "-fx-rotate: 180;", true);
+		if (SplitsTree6.isDesktop())
+			MaterialIcons.setIcon(importButton, "download");
+		else
+			MaterialIcons.setIcon(importButton, "download", "-fx-padding: 0 5px;", true);
 
 		increaseFontSizeButton.setOnAction(e -> increaseFontSizeMenuItem.getOnAction().handle(e));
 		increaseFontSizeButton.disableProperty().bind(increaseFontSizeMenuItem.disableProperty().or(viewMenu.disableProperty()));
@@ -564,6 +575,17 @@ public class MainWindowController {
 			rightWidth.set(rightToolBarPane.getWidth());
 		});
 
+		mainTabPane.setOnSwipeLeft(Event::consume);
+		mainTabPane.setOnSwipeRight(Event::consume);
+		mainTabPane.setOnSwipeUp(Event::consume);
+		mainTabPane.setOnSwipeDown(Event::consume);
+		mainTabPane.setFocusTraversable(false);
+
+		algorithmTabPane.setOnSwipeLeft(Event::consume);
+		algorithmTabPane.setOnSwipeRight(Event::consume);
+		algorithmTabPane.setOnSwipeUp(Event::consume);
+		algorithmTabPane.setOnSwipeDown(Event::consume);
+		algorithmTabPane.setFocusTraversable(false);
 	}
 
 	public VBox getTopVBox() {
@@ -808,6 +830,10 @@ public class MainWindowController {
 
 	public CheckMenuItem getShowScaleBarMenuItem() {
 		return showScaleBarMenuItem;
+	}
+
+	public CheckMenuItem getShowQRCodeMenuItem() {
+		return showQRCodeMenuItem;
 	}
 
 	public CheckMenuItem getUseDarkThemeMenuItem() {
@@ -1137,5 +1163,9 @@ public class MainWindowController {
 
 	public ProgressIndicator getProgressIndicator() {
 		return progressIndicator;
+	}
+
+	public Button getImportButton() {
+		return importButton;
 	}
 }

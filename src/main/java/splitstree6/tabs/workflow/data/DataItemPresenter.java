@@ -21,6 +21,7 @@ package splitstree6.tabs.workflow.data;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.scene.layout.Pane;
 import jloda.fx.icons.MaterialIcons;
 import splitstree6.contextmenus.datanode.DataNodeContextMenu;
 import splitstree6.data.ReportBlock;
@@ -54,6 +55,17 @@ public class DataItemPresenter<D extends DataBlock> {
 			}
 		});
 		controller.getEditButton().disableProperty().bind((selected.and(dataNode.validProperty()).not()));
+
+		controller.getNameLabel().textProperty().addListener((v, o, n) -> {
+			if ("Alignment".equals(n)) {
+				if (controller.getAddMenuButton().getParent() instanceof Pane pane) {
+					pane.getChildren().remove(controller.getAddMenuButton());
+				}
+				if (controller.getStatusPane().getParent() instanceof Pane pane) {
+					pane.getChildren().remove(controller.getStatusPane());
+				}
+			}
+		});
 
 		controller.getNameLabel().textProperty().bind(dataNode.titleProperty());
 

@@ -37,6 +37,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import jloda.fx.util.ClipboardUtils;
 
 import java.util.*;
 
@@ -60,11 +61,7 @@ public class MapViewPresenter {
 
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
 
-		controller.getCopyMenuItem().setOnAction(e -> {
-			var clipboardContent = new ClipboardContent();
-			clipboardContent.putImage(createImage(controller.getStackPane()));
-			Clipboard.getSystemClipboard().setContent(clipboardContent);
-		});
+		controller.getCopyMenuItem().setOnAction(e -> ClipboardUtils.putImage(createImage(controller.getStackPane())));
 
 		controller.getRedrawButton().setOnAction(e -> redraw(mapView));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);

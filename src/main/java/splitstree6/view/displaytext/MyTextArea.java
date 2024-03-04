@@ -32,6 +32,7 @@ import javafx.scene.Node;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.IndexRange;
 import javafx.scene.control.TextArea;
+import javafx.scene.text.Text;
 import jloda.fx.find.ITextSearcher;
 import jloda.fx.find.TextAreaSearcher;
 import org.fxmisc.flowless.VirtualizedScrollPane;
@@ -213,6 +214,15 @@ public class MyTextArea {
 			codeArea.setEditable(editable);
 		else
 			textArea.setEditable(editable);
+	}
+
+	public void setPromptText(String promptText) {
+		if (codeArea != null) {
+			var text = new Text(promptText);
+			text.setStyle("-fx-text-fill: lightgray;");
+			codeArea.setPlaceholder(text);
+		} else
+			textArea.setPromptText(promptText);
 	}
 
 	public ITextSearcher createSearcher() {

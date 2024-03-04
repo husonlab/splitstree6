@@ -21,7 +21,9 @@ package splitstree6.layout.tree;
 
 import javafx.scene.Group;
 import javafx.scene.Node;
+import javafx.scene.shape.Shape;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.Icebergs;
 
 import java.util.ArrayList;
 
@@ -31,7 +33,7 @@ public class LabeledNodeShape extends Group {
 	public LabeledNodeShape() {
 	}
 
-	public LabeledNodeShape(Node shape) {
+	public LabeledNodeShape(Shape shape) {
 		this(null, shape);
 	}
 
@@ -40,12 +42,13 @@ public class LabeledNodeShape extends Group {
 
 	}
 
-	public LabeledNodeShape(RichTextLabel label, Node shape) {
+	public LabeledNodeShape(RichTextLabel label, Shape shape) {
 		this.label = label;
-		if (shape != null)
-			getChildren().add(shape);
+		if (shape != null) {
+			setShape(shape);
+			shape.getStyleClass().add("graph-node");
+		}
 		setId("graph-node"); // the is used to rotate graph
-		getStyleClass().add("graph-node");
 	}
 
 	public void setLabel(RichTextLabel label) {
@@ -54,8 +57,14 @@ public class LabeledNodeShape extends Group {
 			label.getStyleClass().add("graph-label");
 	}
 
-	public void setShape(Node shape) {
-		getChildren().setAll(shape);
+	public void setShape(Shape shape) {
+		getChildren().clear();
+		if (shape != null) {
+			if (false && Icebergs.enabled()) { // node icebergs seem to get in the way...
+				getChildren().add(Icebergs.create(shape, false));
+			}
+			getChildren().add(shape);
+		}
 	}
 
 	public RichTextLabel getLabel() {
@@ -67,7 +76,7 @@ public class LabeledNodeShape extends Group {
 	}
 
 	public boolean hasShape() {
-		return getChildren().size() > 0;
+		return !getChildren().isEmpty();
 	}
 
 	public Iterable<Node> all() {

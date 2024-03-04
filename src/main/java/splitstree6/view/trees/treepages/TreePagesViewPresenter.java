@@ -28,8 +28,11 @@ import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.SwipeUtils;
 import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
@@ -42,12 +45,15 @@ import splitstree6.view.utils.ComboBoxUtils;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * multi tree view presenter
  * Daniel Huson, 11.2021
  */
 public class TreePagesViewPresenter implements IDisplayTabPresenter {
-	private final static ObservableList<String> gridValues = FXCollections.observableArrayList("1 x 1");
+	private final static ObservableList<String> gridValues = FXCollections.observableArrayList(List.of("3x3", "2x1", "1x2", "2x2", "4x3", "3x4", "4x3", "5x5", "1x1"));
 
 	private final MainWindow mainWindow;
 	private final TreePagesView view;
@@ -113,6 +119,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		controller.getAveragingCBox().valueProperty().bindBidirectional(view.optionAveragingProperty());
 
 		controller.getRowsColsCBox().getItems().setAll(gridValues);
+		controller.getRowsColsCBox().setValue(gridValues.get(0));
 		gridValues.addListener((ListChangeListener<? super String>) e -> controller.getRowsColsCBox().getItems().setAll(gridValues));
 
 		view.optionRowsProperty().addListener((v, o, n) -> {
@@ -130,7 +137,7 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 				view.setOptionCols(n.cols());
 				view.setOptionZoomFactor(1);
 				view.setOptionFontScaleFactor(1);
-				controller.getRowsColsCBox().setValue(n.toString());
+				Platform.runLater(() -> controller.getRowsColsCBox().setValue(n.toString()));
 			}
 		});
 
@@ -234,12 +241,27 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		});
 		view.emptyProperty().addListener(e -> view.getRoot().setDisable(view.emptyProperty().get()));
 
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
+
 		Platform.runLater(this::setupMenuItems);
 	}
 
 	@Override
 	public void setupMenuItems() {
 		var mainController = mainWindow.getController();
+
+		mainController.getCopyMenuItem().setOnAction(e -> {
+			var list = new ArrayList<String>();
+			for (var taxon : mainWindow.getTaxonSelectionModel().getSelectedItems()) {
+				list.add(RichTextLabel.getRawText(taxon.getDisplayLabelOrName()).trim());
+			}
+			if (!list.isEmpty()) {
+				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
+			} else {
+				mainWindow.getController().getCopyNewickMenuItem().fire();
+			}
+		});
+		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getCopyNewickMenuItem().setOnAction(e -> {
 			var page = view.getPageNumber();
@@ -250,11 +272,9 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 			for (var t = bot; t < top; t++) {
 				buf.append(view.getTrees().get(t).toBracketString(true)).append(";\n");
 			}
-			BasicFX.putTextOnClipBoard(buf.toString());
+			ClipboardUtils.putString(buf.toString());
 		});
 		mainController.getCopyNewickMenuItem().disableProperty().bind(view.emptyProperty());
-
-		mainController.getCopyMenuItem().disableProperty().bind(mainWindow.getTaxonSelectionModel().sizeProperty().isEqualTo(0));
 
 		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
 		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());

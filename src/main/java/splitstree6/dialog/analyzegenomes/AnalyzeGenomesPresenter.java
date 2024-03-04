@@ -35,13 +35,11 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
+import jloda.fx.util.ProgramProperties;
 import jloda.fx.util.*;
 import jloda.fx.window.NotificationManager;
 import jloda.seq.FastAFileIterator;
-import jloda.util.FileUtils;
-import jloda.util.IFastAIterator;
-import jloda.util.NumberUtils;
-import jloda.util.StringUtils;
+import jloda.util.*;
 
 import java.io.File;
 import java.io.IOException;

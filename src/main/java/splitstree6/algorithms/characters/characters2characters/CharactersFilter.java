@@ -112,6 +112,7 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 		child.setSymbols(parent.getSymbols());
 		child.setRespectCase(parent.isRespectCase());
 		child.setUseCharacterWeights(parent.isUseCharacterWeights());
+		child.setUseCharacterLabels(parent.isUseCharacterLabels());
 
 		if (parent.getCharLabeler() != null)
 			child.setCharLabeler(new HashMap<>());
@@ -124,6 +125,8 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 				}
 				if (parent.isUseCharacterWeights())
 					child.setCharacterWeight(pos, parent.getCharacterWeight(c));
+				if (parent.isUseCharacterLabels())
+					child.setCharacterLabel(pos, parent.getCharacterLabel(c));
 				if (parent.getCharLabeler() != null) {
 					final String label = parent.getCharLabeler().get(c);
 					if (label != null)

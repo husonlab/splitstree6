@@ -26,9 +26,8 @@ import javafx.collections.SetChangeListener;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.util.ClipboardUtils;
 import jloda.fx.workflow.WorkflowNode;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
@@ -144,10 +143,7 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 					if (dataNode.getDataBlock() instanceof ViewBlock viewBlock) {
 						if (SplitsTree6.isDesktop()) { // todo: fix problem with pasting image when not running on desktop
 							var image = viewBlock.getViewTab().getMainNode().snapshot(new SnapshotParameters(), null);
-							var content = new ClipboardContent();
-							content.putImage(image);
-							content.putString(viewBlock.getName());
-							Clipboard.getSystemClipboard().setContent(content);
+							ClipboardUtils.put(viewBlock.getName(), image, null);
 							return;
 						} else
 							w.write(viewBlock.getName());
@@ -162,9 +158,7 @@ public class WorkflowTreeViewPresenter implements IDisplayTabPresenter {
 				} else if (treeView.getSelectionModel().getSelectedItem() == treeView.getRoot()) {
 					(new WorkflowNexusOutput()).save(mainWindow.getWorkflow(), w, false);
 				}
-				var content = new ClipboardContent();
-				content.putString(w.toString());
-				Clipboard.getSystemClipboard().setContent(content);
+				ClipboardUtils.putString(w.toString());
 			} catch (IOException ignored) {
 			}
 		});

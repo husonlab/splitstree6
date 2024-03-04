@@ -59,6 +59,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 				;]
 				[CHARWEIGHTS wgt_1 wgt_2 ... wgt_nchar;]
 				[CHARSTATELABELS character-number [ character-name ][ /state-name [ state-name... ] ], ...;]
+				[CHARLABELS character-name [character-name...];]
 				MATRIX
 					sequence data in specified format
 				;
@@ -118,7 +119,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 			final var tokens = np.getTokensLowerCase("properties", ";");
 			np.findIgnoreCase(tokens, "gammaShape=", Float.MAX_VALUE);
 			np.findIgnoreCase(tokens, "PINVAR=", Float.MAX_VALUE);
-			if (tokens.size() != 0)
+			if (!tokens.isEmpty())
 				throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in PROPERTIES");
 		}
 
@@ -193,7 +194,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 				charactersBlock.setDiploid(diploid);
 			}
 
-			if (formatTokens.size() != 0)
+			if (!formatTokens.isEmpty())
 				throw new IOExceptionWithLineNumber("Unexpected in FORMAT: '" + StringUtils.toString(formatTokens, " ") + "'", np.lineno());
 		}
 
@@ -204,15 +205,18 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 
 		if (np.peekMatchIgnoreCase("CharWeights")) {
 			np.matchIgnoreCase("CharWeights");
-			var charWeights = new double[nchar + 1];
-			for (var i = 1; i <= nchar; i++)
-				charWeights[i] = np.getDouble();
+			var values = new ArrayList<Double>();
+			while (!np.peekMatchIgnoreCase(";")) {
+				values.add(np.getDouble());
+				if (values.size() > nchar)
+					throw new IOExceptionWithLineNumber(np.lineno(), "Too many character weights");
+			}
 			np.matchIgnoreCase(";");
-			charactersBlock.setCharacterWeights(charWeights);
+			charactersBlock.setCharacterWeights(values.stream().mapToDouble(d -> d).toArray());
 		} else
 			charactersBlock.setCharacterWeights(null);
-		// adding CharStateLabels
 
+		// adding CharStateLabels
 		charactersBlock.setCharLabeler(null);
 		charactersBlock.setStateLabeler(null);
 		if (np.peekMatchIgnoreCase("CharStateLabels")) { // todo: is false for ferment4-diploid (microsat data)
@@ -228,9 +232,22 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 			readCharStateLabels(np, charactersBlock.getCharLabeler(), charactersBlock.getStateLabeler());
 			np.matchIgnoreCase(";");
 
-			if (charactersBlock.getSymbols() == null || charactersBlock.getSymbols().length() == 0)
+			if (charactersBlock.getSymbols() == null || charactersBlock.getSymbols().isEmpty())
 				charactersBlock.setSymbols(StringUtils.toString(charactersBlock.getCharLabeler().keySet(), ""));
 		}
+
+		if (np.peekMatchIgnoreCase("CharLabels")) {
+			np.matchIgnoreCase("CharLabels");
+			var labels = new ArrayList<String>();
+			while (!np.peekMatchIgnoreCase(";")) {
+				if (labels.size() > nchar)
+					throw new IOExceptionWithLineNumber(np.lineno(), "Too many character labels");
+				labels.add(np.getWordRespectCase());
+			}
+			np.matchIgnoreCase(";");
+			charactersBlock.setCharacterLabels(labels.toArray(new String[0]));
+		} else
+			charactersBlock.setCharacterLabels(null);
 
 		List<String> taxonNamesFound;
 		final var unknownStates = new TreeSet<Character>();

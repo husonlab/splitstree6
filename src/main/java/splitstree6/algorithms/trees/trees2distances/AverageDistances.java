@@ -19,9 +19,9 @@
 
 package splitstree6.algorithms.trees.trees2distances;
 
-import jloda.fx.util.ProgramExecutorService;
 import jloda.util.CanceledException;
 import jloda.util.NumberUtils;
+import jloda.util.ProgramExecutorService;
 import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import jloda.util.progress.ProgressSilent;

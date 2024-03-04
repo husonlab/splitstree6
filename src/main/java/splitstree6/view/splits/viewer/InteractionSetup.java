@@ -85,7 +85,6 @@ public class InteractionSetup {
 				e.consume();
 			}
 		});
-
 	}
 
 	/**

@@ -95,5 +95,11 @@ viewer-background {
     -fx-spacing: 3mm;
 }
 
+#iceberg {
+    -fx-fill: transparent;
+    -fx-stroke: transparent;
+    -fx-stroke-width: 20;
+}
+
 
 

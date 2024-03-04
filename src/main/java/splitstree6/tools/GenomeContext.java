@@ -20,7 +20,6 @@
 package splitstree6.tools;
 
 import jloda.fx.util.ArgsOptions;
-import jloda.fx.util.ProgramExecutorService;
 import jloda.kmers.mash.MashDistance;
 import jloda.seq.FastAFileIterator;
 import jloda.util.*;

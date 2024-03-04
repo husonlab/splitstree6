@@ -35,6 +35,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.StatementFilter;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.Basic;
@@ -88,7 +89,7 @@ public class MainWindow implements IMainWindow {
 
 		{
 			var fxmlLoader = new FXMLLoader();
-			try (var ins = StatementFilter.applyMobileFXML(Objects.requireNonNull(MainWindowController.class.getResource("MainWindow.fxml")).openStream())) {
+			try (var ins = StatementFilter.applyMobileFXML(Objects.requireNonNull(MainWindowController.class.getResource("MainWindow.fxml")).openStream(), SplitsTree6.isDesktop())) {
 				fxmlLoader.load(ins);
 				root = fxmlLoader.getRoot();
 				controller = fxmlLoader.getController();
@@ -171,9 +172,9 @@ public class MainWindow implements IMainWindow {
 
 		presenter.setStage(stage);
 
-		getController().getMainTabPane().getTabs().addAll(workflowTab);
+		getController().getMainTabPane().getTabs().add(workflowTab);
 
-		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(0));
+		Platform.runLater(() -> getController().getMainTabPane().getSelectionModel().select(workflowTab));
 
 		InvalidationListener invalidationListener = e -> stage.setTitle(getName() + (isDirty() ? "*" : "") + " - " + ProgramProperties.getProgramName());
 		name.addListener(invalidationListener);

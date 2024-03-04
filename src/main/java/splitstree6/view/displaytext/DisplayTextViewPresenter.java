@@ -26,14 +26,11 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextInputDialog;
-import javafx.scene.input.Clipboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.StageStyle;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.Print;
-import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.*;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -104,17 +101,22 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 			});
 		}
 
+		controller.getCopyButton().setOnAction(e -> {
+			if (codeArea.getSelection().getLength() > 0)
+				codeArea.copy();
+			else {
+				ClipboardUtils.putString(codeArea.getText());
+			}
+		});
+		controller.getCopyButton().disableProperty().bind(view.emptyProperty());
+
 		if (!editable) {
 			controller.getToolBar().getItems().remove(controller.getPasteButton());
 		} else {
-			controller.getPasteButton().setOnAction(e -> {
-				codeArea.paste();
-			});
-			controller.getPasteButton().disableProperty().bind(mainWindow.getController().getPasteMenuItem().disableProperty());
-			codeArea.focusedProperty().addListener((c, o, n) ->
-					mainWindow.getController().getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(!Clipboard.getSystemClipboard().hasString())));
+			controller.getPasteButton().setOnAction(e -> codeArea.paste());
+			controller.getPasteButton().disableProperty().bind(ClipboardUtils.hasStringProperty().not());
 		}
-		codeArea.setStyle("-fx-font-size: " + view.getFontSize() + "px");
+		codeArea.setStyle("-fx-font-size: " + view.getFontSize() + "px;");
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null && n.getAlgorithmBreadCrumbsToolBar() != null
@@ -123,6 +125,8 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 				controller.getTopVBox().getChildren().add(0, n.getAlgorithmBreadCrumbsToolBar());
 			}
 		});
+
+		SwipeUtils.setConsumeSwipes(controller.getAnchorPane());
 	}
 
 	public void setupMenuItems() {
@@ -134,15 +138,15 @@ public class DisplayTextViewPresenter implements IDisplayTabPresenter {
 		mainController.getPrintMenuItem().setOnAction(e -> Print.printText(mainWindow.getStage(), codeArea.getText()));
 		mainController.getPrintMenuItem().disableProperty().bind(view.emptyProperty());
 
-		mainController.getCopyMenuItem().setOnAction(e -> codeArea.copy());
-		mainController.getCopyMenuItem().disableProperty().bind(selectionEmpty);
+		mainController.getCopyMenuItem().setOnAction(controller.getCopyButton().getOnAction());
+		mainController.getCopyMenuItem().disableProperty().bind(controller.getCopyButton().disabledProperty());
 
 		if (editable) {
 			mainController.getCutMenuItem().setOnAction(e -> codeArea.cut());
 			mainController.getCutMenuItem().disableProperty().bind(selectionEmpty);
 
-			mainController.getPasteMenuItem().setOnAction(e -> codeArea.paste());
-			mainController.getPasteMenuItem().setDisable(false);
+			mainController.getPasteMenuItem().setOnAction(controller.getPasteButton().getOnAction());
+			mainController.getPasteMenuItem().disableProperty().bind(controller.getPasteButton().disableProperty());
 
 			mainController.getDeleteMenuItem().setOnAction(e -> codeArea.clear());
 			mainController.getDeleteMenuItem().disableProperty().bind(view.emptyProperty().not());

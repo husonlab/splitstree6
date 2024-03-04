@@ -30,12 +30,12 @@ import javafx.collections.ListChangeListener;
 import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
 import javafx.scene.text.Font;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.RunAfterAWhile;
+import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.MainWindowManager;
 import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
@@ -577,6 +577,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		Platform.runLater(() -> updateTaxaListener.invalidated(null));
 		Platform.runLater(() -> updateCanvasListener.invalidated(null));
 
+		SwipeUtils.setOnSwipeLeft(controller.getRoot(), controller.getHorizontalScrollBar());
+		SwipeUtils.setOnSwipeRight(controller.getRoot(), controller.getHorizontalScrollBar());
+		SwipeUtils.setOnSwipeUp(controller.getRoot(), controller.getVerticalScrollBar());
+		SwipeUtils.setOnSwipeDown(controller.getRoot(), controller.getVerticalScrollBar());
+
 		mainWindow.getWorkflow().runningProperty().addListener(e -> updateCharSetSelection(mainWindow, view, controller.getSetsMenu().getItems()));
 	}
 
@@ -634,9 +639,7 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 					buf.append("\n");
 				}
 			}
-			var clipboardContent = new ClipboardContent();
-			clipboardContent.putString(buf.toString());
-			Clipboard.getSystemClipboard().setContent(clipboardContent);
+			ClipboardUtils.putString(buf.toString());
 		});
 		mainController.getCopyMenuItem().disableProperty().bind(
 				Bindings.createBooleanBinding(() -> view.getSelectedTaxa().isEmpty() && view.getSelectedSites().isEmpty(), view.selectedTaxaProperty(), view.selectedSitesProperty()));

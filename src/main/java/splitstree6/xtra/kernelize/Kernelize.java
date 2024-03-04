@@ -19,24 +19,22 @@
 
 package splitstree6.xtra.kernelize;
 
+import jloda.graph.Edge;
 import jloda.graph.Graph;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.graph.algorithms.IsDAG;
+import jloda.phylo.LSAUtils;
 import jloda.phylo.NewickIO;
 import jloda.phylo.PhyloTree;
 import jloda.phylo.algorithms.ClusterPoppingAlgorithm;
-import jloda.util.BitSetUtils;
-import jloda.util.IteratorUtils;
-import jloda.util.StringUtils;
-import jloda.util.UsageException;
+import jloda.util.*;
 import jloda.util.progress.ProgressListener;
-import splitstree6.autumn.Cluster;
 import splitstree6.data.TaxaBlock;
 import splitstree6.splits.TreesUtils;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -54,12 +52,14 @@ public class Kernelize {
 	 * @param maxNumberOfResults maximum number of solutions to report
 	 * @return computed networks
 	 */
-	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, List<PhyloTree> inputTrees, Function<List<PhyloTree>, List<PhyloTree>> algorithm, int maxNumberOfResults) throws UsageException, IOException {
+	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees,
+										BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm,
+										int maxNumberOfResults) throws IOException {
 
 		// setup incompatibility graph
-		var incompatibilityGraph = computeClusterIncompatibilityGraph(inputTrees);
-		System.err.println("Isolated nodes: " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() == 0).count());
-		System.err.println("Non-isolated:   " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() > 0).count());
+		var incompatibilityGraph = ClusterIncompatibilityGraph.apply(inputTrees);
+		System.err.println("Compatible clusters:   " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() == 0).count());
+		System.err.println("Incompatible clusters: " + incompatibilityGraph.nodeStream().filter(v -> v.getDegree() > 0).count());
 
 		// extract all incompatibility components
 		var components = incompatibilityGraph.extractAllConnectedComponents();
@@ -69,6 +69,7 @@ public class Kernelize {
 		// compute the blob-tree:
 		var blobTree = new PhyloTree();
 		var clusterNodeMap = new HashMap<BitSet, Node>();
+		var blobTreeClusters = new ArrayList<BitSet>();
 		{
 			var clusters = new HashSet<BitSet>();
 			for (var component : components) {
@@ -86,6 +87,8 @@ public class Kernelize {
 					clusterNodeMap.put(nodeClusterMap.get(v), v);
 				}
 			}
+			blobTreeClusters.addAll(clusters);
+			blobTreeClusters.sort((a, b) -> -Integer.compare(a.cardinality(), b.cardinality()));
 		}
 
 		if (true) { // report incompatibility components and the associated reduced trees:
@@ -93,28 +96,99 @@ public class Kernelize {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
 					System.err.println("Component " + (++count) + ": " + component.getNumberOfNodes() + " clusters");
-					var reducedTrees = extractTrees(component);
+					for (var v : component.nodes())
+						System.err.print(" " + v.getInfo());
+					System.err.println();
+					var reducedTrees = extractTrees(component, blobTreeClusters);
 					System.err.println(reducedTrees.report());
 				}
 			}
 		}
 
-		// System.err.println("Blob tree: " + NewickIO.toString(network, false) + ";");
+		System.err.println("Blob tree: " + NewickIO.toString(blobTree, false) + ";");
+		if (true) {
+			var tree = new PhyloTree(blobTree);
+			for (var v : tree.nodes()) {
+				if (tree.hasTaxa(v)) {
+					tree.setLabel(v, "t" + tree.getTaxon(v));
+				}
+			}
+			System.err.println("Blob tree: " + NewickIO.toString(tree, false) + ";");
+			checkNetwork("Blob tree", blobTree);
+		}
 
 		// run the algorithm on all components:
 		try (NodeArray<TreesAndTaxonClasses> blobNetworksMap = blobTree.newNodeArray()) {
 			for (var component : components) {
 				if (component.getNumberOfNodes() > 1) {
-					var reducedTrees = extractTrees(component);
-					var subnetworks = new TreesAndTaxonClasses(algorithm.apply(reducedTrees.trees()), reducedTrees.taxonClasses());
-					var donorTaxa = BitSetUtils.union(reducedTrees.taxonClasses());
+					var reducedTreesAndTaxonClasses = extractTrees(component, blobTreeClusters);
+
+					System.err.println("Subproblem input: " + NewickIO.toString(reducedTreesAndTaxonClasses.trees(), false));
+					for (var tree : reducedTreesAndTaxonClasses.trees()) {
+						checkNetwork("subproblem input", tree);
+					}
+
+					var networks = algorithm.apply(reducedTreesAndTaxonClasses.trees(), progress);
+					// restore equivalent taxa
+					if (false) {
+						var taxonEquivalenceClassMap = new HashMap<Integer, BitSet>();
+						for (var equivalenceClass : reducedTreesAndTaxonClasses.taxonClasses()) {
+							if (equivalenceClass.cardinality() > 1) {
+								for (var t : BitSetUtils.members(equivalenceClass)) {
+									taxonEquivalenceClassMap.put(t, equivalenceClass);
+								}
+							}
+						}
+						for (var network : networks) {
+							var leaves = IteratorUtils.asList(network.leaves());
+							for (var v : leaves) {
+								var taxonId = network.getTaxon(v);
+								if (taxonEquivalenceClassMap.containsKey(taxonId)) {
+									var p = v.getParent();
+									for (var t : BitSetUtils.members(taxonEquivalenceClassMap.get(taxonId))) {
+										if (t != taxonId) {
+											var w = network.newNode();
+											w.setLabel("t" + t);
+											network.addTaxon(w, t);
+											network.newEdge(p, w);
+										}
+									}
+								}
+							}
+						}
+					}
+					if (true) { // todo: algorithm doesn't return taxon ids
+						if (IteratorUtils.size(networks.iterator().next().getTaxa()) == 0) {
+							for (var network : networks) {
+								for (var v : network.nodes()) {
+									var label = network.getLabel(v);
+									if (label != null && NumberUtils.isInteger(label.substring(1))) {
+										var taxonId = NumberUtils.parseInt(label.substring(1));
+										network.addTaxon(v, taxonId);
+									}
+								}
+							}
+						}
+					}
+					System.err.println("Subproblem networks: " + NewickIO.toString(networks, false));
+					for (var network : networks) {
+						checkNetwork("Subproblem networks", network);
+					}
+
+					var subnetworks = new TreesAndTaxonClasses(networks, reducedTreesAndTaxonClasses.taxonClasses());
+					var donorTaxa = BitSetUtils.union(reducedTreesAndTaxonClasses.taxonClasses());
 					var acceptorNode = clusterNodeMap.get(donorTaxa);
 					blobNetworksMap.put(acceptorNode, subnetworks);
 				}
 			}
 			var networks = new ArrayList<PhyloTree>();
 			var numberOfBlobs = blobNetworksMap.size();
-			insertRec(blobTree, clusterNodeMap, blobNetworksMap, numberOfBlobs, new HashSet<Node>(), maxNumberOfResults, networks);
+			try {
+				insertRec(blobTree, clusterNodeMap, blobNetworksMap, numberOfBlobs, new HashSet<>(), maxNumberOfResults, networks);
+			} catch (Exception ex) {
+				Basic.caught(ex);
+				throw new IOException(ex);
+			}
 			for (var network : networks) {
 				for (var v : network.nodeStream().filter(v -> v.getInDegree() == 1 && v.getOutDegree() == 1).toList()) {
 					network.delDivertex(v);
@@ -122,6 +196,11 @@ public class Kernelize {
 				for (var e : network.edges()) {
 					network.setReticulate(e, e.getTarget().getInDegree() > 1);
 				}
+				LSAUtils.computeLSAChildrenMap(network, network.newNodeArray());
+				System.err.println(NewickIO.toString(network, false) + ";");
+				if (!checkNetwork("output", network))
+					throw new IOException("Bad output");
+
 			}
 			return networks;
 		}
@@ -150,6 +229,7 @@ public class Kernelize {
 
 					var blobChildren = IteratorUtils.asList(blobNode.children());
 					var addedNodes = new ArrayList<Node>();
+					var addedEdges = new ArrayList<Edge>();
 
 					try (NodeArray<Node> donor2acceptorMap = donorNetwork.newNodeArray()) {
 						for (var v : donorNetwork.nodes()) {
@@ -158,7 +238,7 @@ public class Kernelize {
 							addedNodes.add(w);
 						}
 						for (var e : donorNetwork.edges()) {
-							blobTree.newEdge(donor2acceptorMap.get(e.getSource()), donor2acceptorMap.get(e.getTarget()));
+							addedEdges.add(blobTree.newEdge(donor2acceptorMap.get(e.getSource()), donor2acceptorMap.get(e.getTarget())));
 						}
 						for (var e : IteratorUtils.asList(blobNode.outEdges())) {
 							blobTree.deleteEdge(e);
@@ -167,20 +247,53 @@ public class Kernelize {
 						blobTree.newEdge(blobNode, donor2acceptorMap.get(donorRoot));
 						for (var v : donorNetwork.nodeStream().filter(Node::isLeaf).toList()) {
 							var cluster = BitSetUtils.asBitSet(donorNetwork.getTaxa(v));
-							for (var set : taxonClasses) {
-								if (cluster.get(set.nextSetBit(1)))
-									cluster.or(set);
+							if (true) {
+								for (var set : taxonClasses) {
+									if (cluster.intersects(set)) {
+										cluster.or(set);
+										break;
+									}
+								}
 							}
-							var target = clusterNodeMap.get(cluster);
-							blobTree.newEdge(donor2acceptorMap.get(v), target);
+							var targets = new HashSet<Node>();
+							if (clusterNodeMap.containsKey(cluster))
+								targets.add(clusterNodeMap.get(cluster));
+							else {
+								for (var t : BitSetUtils.members(cluster)) {
+									targets.add(clusterNodeMap.get(BitSetUtils.asBitSet(t)));
+								}
+							}
+							if (targets.size() == 1) {
+								addedEdges.add(blobTree.newEdge(donor2acceptorMap.get(v), targets.iterator().next()));
+							} else {
+								for (var target : targets) {
+									addedEdges.add(blobTree.newEdge(donor2acceptorMap.get(v), target));
+								}
+							}
 						}
 					}
 					insertRec(blobTree, clusterNodeMap, blobNetworksMap, numberOfBlobs, resolvedBlobs, maxNumberOfResults, networks);
-					if (resolvedBlobs.size() == numberOfBlobs) {
-						networks.add(new PhyloTree(blobTree));
+					if (!checkNetwork("blob tree", blobTree)) {
+						System.err.println("What?");
+						var copy = new PhyloTree(blobTree);
+						for (var v : copy.nodes()) {
+							if (v.isLeaf() && copy.getLabel(v) == null)
+								copy.setLabel(v, "What?");
+							if (v.getInDegree() > 1) {
+								for (var e : v.inEdges())
+									copy.setReticulate(e, true);
+							}
+						}
+						System.err.println(NewickIO.toString(copy, false) + ";");
+					}
+					networks.add(new PhyloTree(blobTree));
+					for (var e : addedEdges) {
+						if (e.getOwner() != null)
+							blobTree.deleteEdge(e);
 					}
 					for (var v : addedNodes) {
-						blobTree.deleteNode(v);
+						if (v.getOwner() != null)
+							blobTree.deleteNode(v);
 					}
 					for (var v : blobChildren) {
 						blobTree.newEdge(blobNode, v);
@@ -193,55 +306,14 @@ public class Kernelize {
 	}
 
 	/**
-	 * computes the cluster incompatibility graph for a collection of trees
-	 * in graph, v.getInfo() contains cluster as bit set
-	 * in graph, v.getData() contains indices of all trees that have the cluster, as bit set
-	 *
-	 * @param trees input trees
-	 * @return graph
-	 */
-	public static Graph computeClusterIncompatibilityGraph(Collection<PhyloTree> trees) {
-		var graph = new Graph();
-		// v.getInfo() contains cluster as bit set
-		// v.getData() contains indices of all trees that have the cluster, as bit set
-		var clusterNodeMap = new HashMap<BitSet, Node>();
-		// setup nodes:
-		var treeId = 0;
-		for (var tree : trees) {
-			treeId++;
-			try (var clusterMap = TreesUtils.extractClusters(tree)) {
-				for (var cluster : clusterMap.values()) {
-					var v = clusterNodeMap.computeIfAbsent(cluster, graph::newNode);
-					var which = (BitSet) v.getData();
-					if (which == null) {
-						which = new BitSet();
-						v.setData(which);
-					}
-					which.set(treeId);
-				}
-			}
-		}
-		// setup edges:
-		for (var v = graph.getFirstNode(); v != null; v = v.getNext()) {
-			var cv = (BitSet) v.getInfo();
-			for (var w = v.getNext(); w != null; w = w.getNext()) {
-				var cw = (BitSet) w.getInfo();
-				if (Cluster.incompatible(cv, cw)) {
-					graph.newEdge(v, w);
-				}
-			}
-		}
-		return graph;
-	}
-
-	/**
 	 * for a given set of taxa and clusters, determines all sets of taxa that are equivalent (i.e. not separated by any cluster)
+	 * Also require that any set of equivalent taxa appears in the list of blob tree clusters
 	 *
 	 * @param taxa     all taxa
 	 * @param clusters clusters
 	 * @return list of sets of equivalent taxa
 	 */
-	public static List<BitSet> computeTaxonEquivalenceClasses(BitSet taxa, Collection<BitSet> clusters) {
+	public static List<BitSet> computeTaxonEquivalenceClasses(BitSet taxa, Collection<BitSet> clusters, List<BitSet> blobTreeClusters) {
 		var list = new ArrayList<BitSet>();
 		var mapped = new BitSet();
 		for (var s : BitSetUtils.members(taxa)) {
@@ -258,7 +330,21 @@ public class Kernelize {
 				}
 			}
 		}
-		return list;
+		var result = new ArrayList<BitSet>();
+		for (var set : list) {
+			for (var blobTreeCluster : blobTreeClusters) {
+				if (set.equals(blobTreeCluster)) {
+					result.add(set);
+					break;
+				} else if (BitSetUtils.contains(set, blobTreeCluster)) {
+					result.add(blobTreeCluster);
+					set.andNot(blobTreeCluster);
+					if (set.cardinality() == 0)
+						break;
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -287,20 +373,20 @@ public class Kernelize {
 	/**
 	 * extracts the list of distinct trees from a connected cluster-incompatibility graph
 	 *
-	 * @param graph component
+	 * @param incompatibilityComponent component
 	 * @return distinct trees
 	 */
-	private static TreesAndTaxonClasses extractTrees(Graph graph) {
+	private static TreesAndTaxonClasses extractTrees(Graph incompatibilityComponent, List<BitSet> blobTreeClusters) {
 		var treeIds = new BitSet();
-		for (var v : graph.nodes()) {
-			if (v.getData() instanceof BitSet bits) {
+		for (var v : incompatibilityComponent.nodes()) {
+			if (v.getData() instanceof BitSet bits) { //getData(): trees containing cluster associated with v
 				treeIds.or(bits);
 			}
 		}
 
-		var allClusters = graph.nodeStream().map(v -> (BitSet) v.getInfo()).collect(Collectors.toSet());
+		var allClusters = incompatibilityComponent.nodeStream().map(v -> (BitSet) v.getInfo()).collect(Collectors.toSet());
 		var allTaxa = BitSetUtils.union(allClusters);
-		var taxonClasses = computeTaxonEquivalenceClasses(allTaxa, allClusters);
+		var taxonClasses = computeTaxonEquivalenceClasses(allTaxa, allClusters, blobTreeClusters);
 		var reducedTaxa = BitSetUtils.asBitSet(taxonClasses.stream().mapToInt(t -> t.nextSetBit(1)).toArray());
 
 		var allClusterSets = new ArrayList<Set<BitSet>>();
@@ -309,7 +395,7 @@ public class Kernelize {
 		for (var treeId : BitSetUtils.members(treeIds)) {
 			var clusters = new HashSet<BitSet>();
 			var taxa = new BitSet();
-			for (var v : graph.nodes()) {
+			for (var v : incompatibilityComponent.nodes()) {
 				if (v.getData() instanceof BitSet bits && bits.get(treeId) && v.getInfo() instanceof BitSet cluster) {
 					clusters.add(BitSetUtils.copy(cluster));
 					taxa.or(cluster);
@@ -374,13 +460,57 @@ public class Kernelize {
 		return new TreesAndTaxonClasses(trees, taxonClasses);
 	}
 
+	public static boolean checkNetwork(String label, PhyloTree network) {
+		var ok = true;
+		if (!IsDAG.apply(network)) {
+			System.err.println(label + ": Error: Is not a DAG!");
+			ok = false;
+		}
+		if (network.getRoot() == null) {
+			System.err.println(label + ": Error: root not set");
+			ok = false;
+		} else {
+			if (network.getRoot().getInDegree() > 0) {
+				System.err.println(label + ": Error: root has indegree " + network.getRoot().getInDegree());
+				ok = false;
+			}
+		}
+
+		var roots = network.nodeStream().filter(v -> v.getInDegree() == 0).count();
+		if (roots > 1) {
+			System.err.println(label + ": Error: Too many potential roots: " + roots);
+			ok = false;
+		}
+		var isolatedNodes = network.nodeStream().filter(v -> v.getDegree() == 0).count();
+		if (isolatedNodes > 1) {
+			System.err.println(label + ": Error: has isolated nodes: " + isolatedNodes);
+			ok = false;
+		}
+
+		var leavesWithoutTaxa = network.nodeStream().filter(v -> v.getOutDegree() == 0 && !network.hasTaxa(v)).count();
+		if (leavesWithoutTaxa > 0) {
+			System.err.println(label + ": Error: leaves without taxa: " + leavesWithoutTaxa);
+			ok = false;
+		}
+		var internalWithTaxa = network.nodeStream().filter(v -> v.getOutDegree() != 0 && network.hasTaxa(v)).count();
+
+		if (internalWithTaxa > 0) {
+			System.err.println(label + ": Error: internal nodes with taxa: " + internalWithTaxa);
+			ok = false;
+		}
+		if (ok)
+			System.err.println(label + ": looks ok");
+		return ok;
+
+	}
+
 	/**
 	 * list of trees together will the associated taxon classes
 	 *
 	 * @param trees        reduced trees or networks
 	 * @param taxonClasses the associated taxon equivalence classes
 	 */
-	private record TreesAndTaxonClasses(List<PhyloTree> trees, List<BitSet> taxonClasses) {
+	private record TreesAndTaxonClasses(Collection<PhyloTree> trees, Collection<BitSet> taxonClasses) {
 		public String report() {
 			var buf = new StringBuilder();
 			buf.append("Taxon classes: ");
@@ -399,5 +529,9 @@ public class Kernelize {
 			}
 			return buf.toString();
 		}
+	}
+
+	public interface BiFunctionWithIOException<S, T, R> {
+		R apply(S s, T t) throws IOException;
 	}
 }

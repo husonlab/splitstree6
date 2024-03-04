@@ -182,10 +182,12 @@ public class InteractionSetup {
 				if (ce.wasAdded()) {
 					var e = ce.getKey();
 					var clickedHandler = createMouseClickedOnEdgeHandler(taxaBlock, taxonSelectionModel, edgeSelectionModel, e);
-					for (var node : ce.getValueAdded().all()) {
-						node.setOnMouseClicked(clickedHandler);
-						node.setOnMouseEntered(mouseEnteredHandler);
-						node.setOnMouseExited(mouseExitedHandler);
+					for (var value : ce.getValueAdded().all()) {
+						if (value.getId() == null || !value.getId().equals("eisberg")) {
+							value.setOnMouseClicked(clickedHandler);
+							value.setOnMouseEntered(mouseEnteredHandler);
+							value.setOnMouseExited(mouseExitedHandler);
+						}
 					}
 				}
 			});
@@ -395,9 +397,11 @@ public class InteractionSetup {
 			if (me.getSource() instanceof Shape shape) {
 				shape.setUserData(shape.getStrokeWidth());
 				shape.setStrokeWidth(shape.getStrokeWidth() + 4);
+				me.consume();
 			} else if (me.getSource() instanceof RichTextLabel label) {
 				label.setScaleX(1.1 * label.getScaleX());
 				label.setScaleY(1.1 * label.getScaleY());
+				me.consume();
 			}
 		};
 	}
@@ -406,9 +410,11 @@ public class InteractionSetup {
 		return me -> {
 			if (me.getSource() instanceof Shape shape) {
 				shape.setStrokeWidth(shape.getStrokeWidth() - 4);
+				me.consume();
 			} else if (me.getSource() instanceof RichTextLabel label) {
 				label.setScaleX(1 / 1.1 * label.getScaleX());
 				label.setScaleY(1 / 1.1 * label.getScaleY());
+				me.consume();
 			}
 		};
 	}
