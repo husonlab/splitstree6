@@ -435,7 +435,7 @@ public class MainWindowController {
 	private FlowPane bottomFlowPane;
 
 	@FXML
-	private Label memoryLabel;
+	private Label memoryUsageLabel;
 
 	@FXML
 	private MenuButton fileMenuButton;
@@ -499,7 +499,7 @@ public class MainWindowController {
 			menuBar.setVisible(false);
 			topVBox.setPadding(new Insets(30, 0, 0, 0));
 			((Pane) fileMenuButton.getParent()).getChildren().remove(fileMenuButton);
-			((Pane) memoryLabel.getParent()).getChildren().remove(memoryLabel);
+			((Pane) memoryUsageLabel.getParent()).getChildren().remove(memoryUsageLabel);
 		}
 		analyzeGenomesMenuItem.getParentMenu().getItems().remove(analyzeGenomesMenuItem); // todo: will make this a standalone program
 
@@ -1116,8 +1116,8 @@ public class MainWindowController {
 		return bottomFlowPane;
 	}
 
-	public Label getMemoryLabel() {
-		return memoryLabel;
+	public Label getMemoryUsageLabel() {
+		return memoryUsageLabel;
 	}
 
 	public SplittableTabPane getAlgorithmTabPane() {

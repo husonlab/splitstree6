@@ -565,7 +565,7 @@
                     <HBox.margin>
                         <Insets/>
                     </HBox.margin>
-                    <Label fx:id="memoryLabel" alignment="CENTER_RIGHT" text="Memory" textFill="DARKGRAY">
+                    <Label fx:id="memoryUsageLabel" alignment="CENTER_RIGHT" text="Memory" textFill="DARKGRAY">
                         <font>
                             <Font size="12.0"/>
                         </font>

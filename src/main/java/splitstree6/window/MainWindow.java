@@ -103,7 +103,7 @@ public class MainWindow implements IMainWindow {
 				.and(Bindings.createBooleanBinding(() -> getTabByClass(InputEditorTab.class) == null, controller.getMainTabPane().getTabs())));
 
 		final MemoryUsage memoryUsage = MemoryUsage.getInstance();
-		controller.getMemoryLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
+		controller.getMemoryUsageLabel().textProperty().bind(memoryUsage.memoryUsageStringProperty());
 
 		methodsTab = new DisplayTextTab(this, "How to Cite", false);
 		methodsTab.setGraphic(MaterialIcons.graphic("notes"));
