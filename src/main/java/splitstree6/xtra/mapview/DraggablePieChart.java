@@ -6,12 +6,15 @@ import javafx.collections.ObservableList;
 import javafx.scene.chart.PieChart;
 import javafx.scene.paint.Color;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
 
 public class DraggablePieChart {
     private PieChart pieChart;
+    private ArrayList<Integer> colorIndexes = new ArrayList<>();
     private double offsetX, offsetY;
 
     private final DoubleProperty centerXProperty = new SimpleDoubleProperty();
@@ -24,6 +27,7 @@ public class DraggablePieChart {
 
 
         pieChart.setData(data);
+
 
 
         // Set up event handlers for dragging
@@ -46,11 +50,26 @@ public class DraggablePieChart {
 
     }
 
+    public void saveColorIDs(ArrayList<String> traits){
+        for(var trait : traits){
+            System.out.print(" " + trait.toString());
+        }
+        ArrayList<Integer> indexes = new ArrayList<>();
+        var data = pieChart.getData();
+        for(PieChart.Data label : data){
+            System.out.println(" trait " + label.getName() + " color " + traits.indexOf(label.getName()));
+            indexes.add(traits.indexOf(label.getName()));
+        }
+        colorIndexes = indexes;
+        System.out.println("ind length" + colorIndexes.size());
+    }
+
     public void updateColors(String scheme){
         Map<Integer, String> colors = ColorSchemes.getScheme(scheme);
 
         for(int i = 0; i < pieChart.getData().size() ; i++){
-            String style = "-fx-pie-color: " + colors.get(i) + ";";
+            System.out.println(" Chart color" + colorIndexes.get(i));
+            String style = "-fx-pie-color: " + colors.get(colorIndexes.get(i)) + ";";
             pieChart.getData().get(i).getNode().setStyle(style);
         }
     }

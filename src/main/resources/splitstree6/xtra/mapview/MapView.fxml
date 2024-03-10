@@ -92,9 +92,12 @@
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
                         <Label fx:id="labelColorScheme" text="Color scheme" />
                         <ChoiceBox fx:id="choiceBoxColorScheme" prefWidth="150.0" />
-                        <Label fx:id="infoLabel" />
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
                         <CheckBox fx:id="showLabelsBox" mnemonicParsing="false" text="Show countries" />
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <CheckBox fx:id="checkBoxLegend" mnemonicParsing="false" text="Hide Legend" />
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <Label fx:id="infoLabel" />
                             </items>
                         </ToolBar>
                     </children>

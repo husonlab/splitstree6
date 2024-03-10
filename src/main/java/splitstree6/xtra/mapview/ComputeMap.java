@@ -41,8 +41,10 @@ public class ComputeMap {
 			HashMap<String, Integer> composition = new HashMap<>();
 
 			for(int j = 1; j <= taxaBlock.size(); j++){
-				taxa.add(taxaBlock.get(j).getName());
-				composition.put(taxaBlock.get(j).getName(), (int) traitsBlock.getTraitValue(j,i));
+				if((int) traitsBlock.getTraitValue(j,i) > 0){
+					taxa.add(taxaBlock.get(j).getName());
+					composition.put(taxaBlock.get(j).getName(), (int) traitsBlock.getTraitValue(j,i));
+				}
 			}
 
 			GeoTrait geoTrait = new GeoTrait(

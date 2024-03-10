@@ -75,12 +75,24 @@ public class MapViewController {
 	@FXML
 	private Label infoLabel;
 
+	@FXML
+	private CheckBox checkBoxLegend;
 
 	@FXML
 	private ChoiceBox<String> choiceBoxColorScheme;
 
 	@FXML
 	private CheckBox showLabelsBox;
+
+
+	@FXML
+	private void initialize() {
+		progressBar.setVisible(false);
+	}
+
+	public CheckBox getCheckBoxLegend() {
+		return checkBoxLegend;
+	}
 
 	public CheckBox getShowLabelsBox() {
 		return showLabelsBox;
@@ -92,24 +104,6 @@ public class MapViewController {
 
 	public Label getInfoLabel() {
 		return infoLabel;
-	}
-
-	public Label getLabelChartSize() {
-		return labelChartSize;
-	}
-
-	public StackPane getMainStackPane() {
-		return mainStackPane;
-	}
-
-	public HBox gethBoxMiddle() {
-		return hBoxMiddle;
-	}
-
-
-	@FXML
-	private void initialize() {
-		progressBar.setVisible(false);
 	}
 
 	public MenuItem getCloseMenuItem() {

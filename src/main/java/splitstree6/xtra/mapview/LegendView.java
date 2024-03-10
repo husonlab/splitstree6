@@ -21,6 +21,7 @@ public class LegendView extends VBox {
 
     private Map<String, String> categoryColors;
     private ArrayList<String> taxa;
+    boolean large_legend = false;
     private double xOffset = 0;
     private double yOffset = 0;
 
@@ -57,32 +58,44 @@ public class LegendView extends VBox {
 
 
     private void createLegend() {
+
+        if(taxa.size() > 20)large_legend = true;
+        boolean second_row = false;
+        HBox hBox = new HBox();
         for (Map.Entry<String, String> entry : categoryColors.entrySet()) {
             String category = entry.getKey();
-
-
             Color color = Color.web(entry.getValue());
             //System.out.println(entry.getKey() + " " + entry.getValue());
-
             HBox legendEntry = createLegendEntry(category, color);
-            getChildren().add(legendEntry);
+
+            if(large_legend && !second_row){
+                hBox.getChildren().add(legendEntry);
+                second_row = true;
+            } else if (large_legend && second_row){
+                //System.out.println("second row");
+                hBox.getChildren().add(legendEntry);
+                getChildren().add(hBox);
+                hBox = new HBox();
+                second_row = false;
+            } else getChildren().add(legendEntry);
             setMaxSize(Pane.USE_PREF_SIZE, Pane.USE_PREF_SIZE);
         }
+        getChildren().add(hBox);
 
         setSpacing(5);
         setAlignment(Pos.CENTER_LEFT);
     }
 
     private HBox createLegendEntry(String category, Color color) {
-        System.out.println(category + " " + color.toString());
-        Rectangle colorBox = new Rectangle(20, 15);
+        //System.out.println(category + " " + color.toString());
+        Rectangle colorBox = new Rectangle(10, 8);
         colorBox.setFill(color);
 
 
         Label categoryLabel = new Label(category);
 
-        HBox legendEntry = new HBox(10, colorBox, categoryLabel);
-        legendEntry.setPadding(new Insets(10));
+        HBox legendEntry = new HBox(5, colorBox, categoryLabel);
+        legendEntry.setPadding(new Insets(5));
         legendEntry.setAlignment(Pos.CENTER_LEFT);
 
         return legendEntry;

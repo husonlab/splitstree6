@@ -37,7 +37,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import jloda.fx.util.ClipboardUtils;
+//import jloda.fx.util.ClipboardUtils;
 
 import java.util.*;
 
@@ -61,7 +61,7 @@ public class MapViewPresenter {
 
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
 
-		controller.getCopyMenuItem().setOnAction(e -> ClipboardUtils.putImage(createImage(controller.getStackPane())));
+		//controller.getCopyMenuItem().setOnAction(e -> ClipboardUtils.putImage(createImage(controller.getStackPane())));
 
 		controller.getRedrawButton().setOnAction(e -> redraw(mapView));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);
@@ -99,12 +99,15 @@ public class MapViewPresenter {
 			MapPane mapPane = createMap(controller, model);
 			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
 
+			ArrayList<String> traitLabels = new ArrayList<String>();
+			traitLabels.addAll(model.getTaxaBlock().getLabels());
+
 			CountryBounds countryBounds = new CountryBounds();
 			var mapBounds = mapPane.getBounds();
 			ArrayList<CountryBounds.Country> countryLabels = countryBounds.countriesInBound(mapBounds.minLatitude(), mapBounds.minLatitude() + mapBounds.rangeLatitude(),
 																							mapBounds.minLongitude(), mapBounds.minLongitude() + mapBounds.rangeLongitude());
 			for(CountryBounds.Country label : countryLabels){
-				System.out.println(label.name() + label.center_lat() + label.center_lon());
+				//System.out.println(label.name() + label.center_lat() + label.center_lon());
 				DraggableLabel draggableLabel = new DraggableLabel(label.name());
 				draggableLabel.setStyle("-fx-font-size: 16px;");
 				draggableLabel.visibleProperty().bind(controller.getShowLabelsBox().selectedProperty());
@@ -113,6 +116,7 @@ public class MapViewPresenter {
 			}
 
 			for(var trait : traits){
+				System.out.println("trait " + trait.getLatitude() + " " + trait.getLongtitude());
 
 				ObservableList obsList = FXCollections.observableList(getPieChartData(trait));
 				DraggablePieChart pieChart = new DraggablePieChart(obsList);
@@ -126,18 +130,17 @@ public class MapViewPresenter {
 				pieChart.getPieChart().prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
 				pieChart.getPieChart().prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
 				mapPane.placeChart(pieChart, trait.getLatitude(), trait.getLongtitude(), true);
+				pieChart.saveColorIDs(traitLabels);
 				pieChart.updateColors(controller.getChoiceBoxColorScheme().getValue());
 				charts.add(pieChart);
 			}
 			//Legend
-			ArrayList<String> traitLabels = new ArrayList<String>();
-			traitLabels.addAll(model.getTaxaBlock().getLabels());
 			legendView = new LegendView(traitLabels, controller.getChoiceBoxColorScheme().getValue());
 			legendView.setLayoutX(50);
 			legendView.setLayoutY(50);
 			controller.getStackPane().getChildren().add(mapPane);
 			legendView.setMouseTransparent(false);
-
+			legendView.visibleProperty().bind(controller.getCheckBoxLegend().selectedProperty().not());
 			controller.getStackPane().getChildren().add(legendView);
 
 		} catch (Exception ex) {
@@ -148,6 +151,7 @@ public class MapViewPresenter {
 	public List<PieChart.Data> getPieChartData(GeoTrait trait){
 		List<PieChart.Data> data = new ArrayList<>();
 		for(int i = 0; i < trait.getnTaxa(); i++){
+			System.out.println("seq " + trait.getTaxa().get(i) + " comp " + trait.getCompostion().get(trait.getTaxa().get(i)));
 			PieChart.Data nData = new PieChart.Data(trait.getTaxa().get(i), trait.getCompostion().get(trait.getTaxa().get(i)));
 			data.add(nData);
 		}

@@ -102,7 +102,7 @@ public class MapPane extends StackPane {
 	 * @param center    center on the location
 	 */
 	public void place(Node node, double latitude, double longitude, boolean center) {
-		System.out.println("label " + latitude + " " + longitude);
+		//System.out.println("label " + latitude + " " + longitude);
 		var location = getLocationOnMap(latitude, longitude);
 		node.setLayoutX(location.getX());
 		node.setLayoutY(location.getY());

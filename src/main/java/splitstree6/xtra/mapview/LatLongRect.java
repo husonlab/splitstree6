@@ -52,14 +52,14 @@ public record LatLongRect(double minLatitude, double minLongitude, double rangeL
 		var minLong = latLongPoints.stream().mapToDouble(Point2D::getY).min().orElse(0);
 		var maxLong = latLongPoints.stream().mapToDouble(Point2D::getY).max().orElse(0);
 
-		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+		//System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
 		var rangeLat = Math.abs(minLat - maxLat);
 		var rangeLong = Math.abs(minLong - maxLong);
 		minLong -= proportionMargin * rangeLong;
 		maxLong += proportionMargin * rangeLong;
 		minLat -= proportionMargin * rangeLat;
 		maxLat += proportionMargin * rangeLat;
-		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+		//System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
 
 
 		// Modify range latitude to minimum size
@@ -92,7 +92,7 @@ public record LatLongRect(double minLatitude, double minLongitude, double rangeL
 			minLat -= addLat/2;
 			maxLat += addLat/2;
 		}
-		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+		//System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
 
 		// Distribute surplus Latitude
 		if(minLat < bottomLatitude){

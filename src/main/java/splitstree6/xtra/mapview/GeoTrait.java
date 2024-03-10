@@ -12,7 +12,7 @@ public class GeoTrait {
     public GeoTrait(double longtitude, double latitude, int nTaxa, ArrayList<String> taxa, HashMap<String, Integer> compostion) {
         this.longtitude = longtitude;
         this.latitude = latitude;
-        this.nTaxa = nTaxa;
+        this.nTaxa = compostion.size();
         this.taxa = taxa;
         this.compostion = compostion;
     }
@@ -38,8 +38,9 @@ public class GeoTrait {
     }
 
     public void printGeotrait(){
+        System.out.println("New Geotrait");
         System.out.println("Lat: " + latitude + " Long: " + longtitude + " numTaxa: " + nTaxa);
-        for (var t : taxa){
+        for (var t : compostion.keySet()){
             System.out.println("Taxa: " + t.toString() + " comp: " + compostion.get(t));
         }
 

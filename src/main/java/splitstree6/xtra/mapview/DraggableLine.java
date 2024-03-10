@@ -19,6 +19,7 @@ class DraggableLine {
         double centerX = draggablePieChart.getPieChart().getLayoutX() + draggablePieChart.getPieChart().getWidth() / 2;
         double centerY = draggablePieChart.getPieChart().getLayoutY() + draggablePieChart.getPieChart().getHeight() / 2;
 
+        System.out.println("pos start " + centerX + " " + centerY);
         line.setStartX(centerX);
         line.setStartY(centerY);
         line.setEndX(centerX);
@@ -31,6 +32,7 @@ class DraggableLine {
 
         line.endXProperty().bind(draggablePieChart.centerXProperty());
         line.endYProperty().bind(draggablePieChart.centerYProperty());
+        System.out.println("pos post bind " + line.getEndX() + " " + line.getEndY());
     }
 
     public Line getLine() {

@@ -29,6 +29,7 @@ import splitstree6.io.readers.characters.CharactersReader;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * simple data model
