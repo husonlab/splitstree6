@@ -49,6 +49,17 @@ public class EnumerateContainedTrees extends Trees2Trees {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		if (optionName.equals(optionRemoveDuplicates.getName()))
+			return "suppress duplicate trees in output";
+
+		else return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getShortDescription() {
 		return "Enumerates all contained trees.";
 	}

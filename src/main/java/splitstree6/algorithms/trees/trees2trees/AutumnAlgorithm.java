@@ -45,6 +45,18 @@ public class AutumnAlgorithm extends Trees2Trees {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		return switch (optionName) {
+			case "optionFirstTree" -> "index of the first tree";
+			case "optionSecondTree" -> "index of the second tree";
+			default -> super.getToolTip(optionName);
+		};
+	}
+
+	@Override
 	public String getCitation() {
 		return "Huson and Linz 2018; D.H. Huson and S. Linz. Autumn Algorithm—Computation of Hybridization Networks for Realistic Phylogenetic Trees. "
 			   + "IEEE/ACM Transactions on Computational Biology and Bioinformatics: 15:398-420, 2018.";

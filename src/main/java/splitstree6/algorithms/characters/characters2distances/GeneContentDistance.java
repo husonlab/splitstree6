@@ -59,6 +59,8 @@ public class GeneContentDistance extends Characters2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		if (optionName.equals("optionMethod"))
 			return "Choose Maximum likelihood distance estimation (Huson and Steel 2004, eq. 4), or shared genes distance (Snel et al, 1997)";
 		else

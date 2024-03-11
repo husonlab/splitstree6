@@ -21,6 +21,7 @@ package splitstree6.algorithms;
 
 import jloda.fx.workflow.NamedBase;
 import splitstree6.algorithms.characters.characters2distances.NeiLiRestrictionDistance;
+import splitstree6.algorithms.characters.characters2distances.ProteinMLDist;
 import splitstree6.algorithms.characters.characters2distances.UncorrectedP;
 import splitstree6.algorithms.trees.trees2trees.ALTSExternal;
 import splitstree6.algorithms.trees.trees2trees.ALTSNetwork;
@@ -58,7 +59,7 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.LogDet());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.NeiMiller());
 		add(algorithms, names, new NeiLiRestrictionDistance());
-		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.ProteinMLdist());
+		add(algorithms, names, new ProteinMLDist());
 		add(algorithms, names, new UncorrectedP());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Upholt());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.F81());

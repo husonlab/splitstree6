@@ -55,6 +55,15 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		if (optionInferenceAlgorithm.getName().equals(optionName))
+			return "the inference algorithm to be used";
+		else return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getCitation() {
 		return "Bryant & Moulton 2004; " +
 			   "D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. " +

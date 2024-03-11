@@ -70,8 +70,9 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 	private ChangeListener<SetParameters> listenerSetBaseFrequencies = null;
 	private ChangeListener<SetParameters> listenerSetSiteVarParams = null;
 
-
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		return switch (optionName) {
 			case "optionPropInvariableSites" -> "Proportion of invariable sites";
 			case "optionGamma" -> "Alpha value for the Gamma distribution";

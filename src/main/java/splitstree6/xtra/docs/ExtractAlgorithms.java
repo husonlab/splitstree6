@@ -47,14 +47,23 @@ public class ExtractAlgorithms {
 						method, fromName.replaceAll("Block", "block"), toName.replaceAll("Block", "block")));
 
 				var description = algorithm.getShortDescription();
-				if (description != null && !description.isBlank()) {
-					buf.append(" It ").append(Character.toLowerCase(description.charAt(0))).append(description.substring(1));
+				if (description != null && description.length() > 2) {
+					buf.append(" It ").append(description.substring(0, 1).toLowerCase()).append(description.substring(1));
 				}
 
 				buf.append("\n");
 
 				var options = OptionIO.optionsUsage(algorithm);
-				if (!options.isBlank())
+				if (!options.isBlank()) {
+					buf.append("\n{\\footnotesize\\obeylines\n");
+					for (var line : StringUtils.toList(options)) {
+						var pos = line.indexOf("-");
+						if (pos > 0) {
+							buf.append("\\verb^%s^ - %s%n".formatted(line.substring(0, pos).trim(), line.substring(pos + 1).trim()));
+						} else buf.append(line).append("\n");
+					}
+					buf.append("}\n");
+				} else if (!options.isBlank())
 					buf.append("%nOptions:%n{\\footnotesize%n\\begin{verbatim}%n%s\\end{verbatim}%n}%n".formatted(options));
 				var citations = algorithm.getCitation();
 				if (citations != null && !citations.isBlank()) {

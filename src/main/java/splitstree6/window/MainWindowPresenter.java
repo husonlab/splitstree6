@@ -49,7 +49,7 @@ import jloda.util.ProgramProperties;
 import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
-import splitstree6.algorithms.characters.characters2distances.ProteinMLdist;
+import splitstree6.algorithms.characters.characters2distances.ProteinMLDist;
 import splitstree6.algorithms.characters.characters2distances.UncorrectedP;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
@@ -572,7 +572,7 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getK3stMenuItem(), new K3ST());
 		setupAlgorithmMenuItem(controller.getF81MenuItem(), new F81());
 		setupAlgorithmMenuItem(controller.getF84MenuItem(), new F84());
-		setupAlgorithmMenuItem(controller.getProteinMLDistanceMenuItem(), new ProteinMLdist());
+		setupAlgorithmMenuItem(controller.getProteinMLDistanceMenuItem(), new ProteinMLDist());
 		setupAlgorithmMenuItem(controller.getGeneContentDistanceMenuItem(), new GeneContentDistance());
 		setupAlgorithmMenuItem(controller.getNjMenuItem(), new NeighborJoining());
 		setupAlgorithmMenuItem(controller.getBioNJMenuItem(), new BioNJ());

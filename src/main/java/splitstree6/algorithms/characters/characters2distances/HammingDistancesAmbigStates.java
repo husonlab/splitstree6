@@ -47,10 +47,12 @@ public class HammingDistancesAmbigStates extends Characters2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		if (optionName.equals(optionNormalize.getName())) {
 			return "Normalize distances";
 		} else if (optionName.equals(optionHandleAmbiguousStates.getName())) {
-			return "Choose way to handle ambiguous nucleotides";
+			return "Choose how to handle ambiguous states";
 		} else
 			return super.getToolTip(optionName);
 	}

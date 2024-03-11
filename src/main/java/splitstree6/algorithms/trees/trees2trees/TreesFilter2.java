@@ -50,6 +50,8 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		return switch (optionName) {
 			case "optionRequireAllTaxa" -> "Keep only trees that have the full set of taxa";
 			case "optionMinNumberOfTaxa" -> "Keep only trees that have at least this number of taxa";

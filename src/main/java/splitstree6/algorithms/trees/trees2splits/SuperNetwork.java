@@ -76,6 +76,9 @@ public class SuperNetwork extends Trees2Splits {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+
 		if (optionEdgeWeights.getName().equals(optionName)) {
 			return "Determine how to calculate edge weights in resulting network";
 		} else if (noOptionLeastSquare.getName().equals(optionName)) {

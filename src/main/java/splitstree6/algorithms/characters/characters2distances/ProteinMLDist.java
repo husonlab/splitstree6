@@ -1,5 +1,5 @@
 /*
- * ProteinMLdist.java Copyright (C) 2024 Daniel H. Huson
+ * ProteinMLDist.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -44,7 +44,7 @@ import java.util.List;
  * @author bryant
  */
 
-public class ProteinMLdist extends Characters2Distances {
+public class ProteinMLDist extends Characters2Distances {
 	public enum Model {cpREV45, Dayhoff, JTT, mtMAM, mtREV24, pmb, Rhodopsin, WAG}
 
 	private final Property<Model> optionModel = new SimpleObjectProperty<>(this, "optionModel", Model.JTT);
@@ -70,6 +70,8 @@ public class ProteinMLdist extends Characters2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		if (optionName.equals(optionPropInvariableSites.getName())) {
 			return "Proportion of invariable sites";
 		} else if (optionName.equals(optionGamma.getName())) {

@@ -52,6 +52,17 @@ public class PhylogeneticDiversity extends Trees2ReportBase {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		if (optionRooted.getName().equals(optionName))
+			return "interpret trees as rooted?";
+		else
+			return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getCitation() {
 		return "Faith 1992;Faith, D.P. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10 (1992)";
 	}

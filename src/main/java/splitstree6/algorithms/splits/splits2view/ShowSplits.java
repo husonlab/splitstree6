@@ -50,6 +50,15 @@ public class ShowSplits extends Splits2View {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		if (optionView.getName().equals(optionName))
+			return "the type of splits viewer to use";
+		else return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getShortDescription() {
 		return "Provides interactive visualizations of split networks.";
 	}

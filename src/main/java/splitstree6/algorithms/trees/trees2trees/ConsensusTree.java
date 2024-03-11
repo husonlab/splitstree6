@@ -48,6 +48,9 @@ public class ConsensusTree extends Trees2Trees {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+
 		if (optionName.equals(optionEdgeWeights.getName()))
 			return "Determine how to calculate edge weights in resulting network";
 		else if (optionName.equals(optionConsensus.getName()))

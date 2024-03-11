@@ -60,7 +60,14 @@ public class ClusterNetwork extends Trees2Trees {
 
 	@Override
 	public String getToolTip(String optionName) {
-		return optionName;
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		return switch (optionName) {
+			case "optionEdgeWeights" -> "compute edge weights";
+			case "optionThresholdPercent" -> "minimum percentage of trees that a cluster must appear in";
+			default -> super.getToolTip(optionName);
+		};
 	}
 
 	@Override

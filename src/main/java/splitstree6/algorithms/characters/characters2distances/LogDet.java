@@ -108,6 +108,9 @@ public class LogDet extends Characters2Distances {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+
 		if (optionName.equals(optionPropInvariableSites.getName())) {
 			return "Proportion of invariable sites";
 		} else if (optionName.equals(optionFudgeFactor.getName())) {

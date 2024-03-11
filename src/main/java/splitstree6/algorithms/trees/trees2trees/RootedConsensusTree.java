@@ -47,6 +47,8 @@ public class RootedConsensusTree extends Trees2Trees {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		if (optionName.equals(optionConsensus.getName()))
 			return "Consensus method to use";
 		else

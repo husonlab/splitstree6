@@ -54,6 +54,15 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		if (optionName.equals(optionMethod.getName()))
+			return "choose the type of index calculation";
+		else return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getCitation() {
 		if (getOptionMethod().equals(Method.FairProportions))
 			return "D Redding 2004;Redding, D. Incorporating genetic distinctness and reserve occupancy into a conservation priorisation approach. Master’s thesis. University of East Anglia (2003)";

@@ -50,13 +50,15 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		return switch (optionName) {
-			case "ExcludeGapSites" -> "Exclude all sites that contain a gap";
-			case "ExcludeConstantSites" -> "Exclude all sites that are constant";
-			case "ExcludeParsimonyUninformativeSites" -> "Exclude all sites that are parsimony uninformative";
-			case "ExcludeFirstCodonPosition" -> "Exclude first and then every third site";
-			case "ExcludeSecondCodonPosition" -> "Exclude second and then every third site";
-			case "ExcludeThirdCodonPosition" -> "Exclude third and then every third site";
+			case "optionExcludeGapSites" -> "Exclude all sites that contain a gap";
+			case "optionExcludeConstantSites" -> "Exclude all sites that are constant";
+			case "optionExcludeParsimonyUninformativeSites" -> "Exclude all sites that are parsimony uninformative";
+			case "optionExcludeFirstCodonPosition" -> "Exclude first and then every third site";
+			case "optionExcludeSecondCodonPosition" -> "Exclude second and then every third site";
+			case "optionExcludeThirdCodonPosition" -> "Exclude third and then every third site";
 			default -> optionName;
 		};
 	}

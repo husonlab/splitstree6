@@ -71,6 +71,9 @@ public class ALTSExternal extends Trees2Trees implements IDesktopOnly {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
 		if (optionName.equals(optionALTSExecutableFile.getName())) {
 			return "Download and compile ALTSNetwork program from https://github.com/LX-Zhang/AAST, then set this parameter to the executable.\n" +
 				   "Note that the program requires fully resolved trees as input and any unresolved trees will be ignored";

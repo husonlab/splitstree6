@@ -68,6 +68,19 @@ public class ALTSNetwork extends Trees2Trees {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		return switch (optionName) {
+			case "optionMutualRefinement" -> "mutually refine trees during preprocessing";
+			case "optionKernelization" -> "perform kernelization during preprocessing";
+			case "optionRemoveDuplicates" -> "remove duplicate networks in output";
+			default -> super.getToolTip(optionName);
+		};
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, TreesBlock outputBlock) throws IOException {
 		if (!warned) {
 			NotificationManager.showWarning("This is experimental code, under development");

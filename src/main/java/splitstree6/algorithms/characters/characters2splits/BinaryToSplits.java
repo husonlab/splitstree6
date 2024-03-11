@@ -55,6 +55,18 @@ public class BinaryToSplits extends Characters2Splits {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		return switch (optionName) {
+			case "optionMinSplitWeight" -> "Minimum split weight threshold";
+			case "optionHighDimensionFilter" -> "Activate high-dimensional filter to avoid exponential graph size";
+			case "optionAddAllTrivial" -> "Ensure all trival splits are present";
+			default -> optionName;
+		};
+	}
+
+	@Override
 	public String getCitation() {
 		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
 	}

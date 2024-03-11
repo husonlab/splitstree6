@@ -54,6 +54,15 @@ public class ShowTrees extends Trees2View {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		if (optionName.equals(optionView.getName()))
+			return "the type of viewer to use";
+		else return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getShortDescription() {
 		return "Provides several types of interactive visualizations of trees.";
 	}

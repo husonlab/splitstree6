@@ -60,6 +60,10 @@ public class LooseAndLacy extends Trees2Trees {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+
 		if (optionName.equals(optionSpeciesDefinition.getName())) {
 			return "Species definition to use";
 		} else if (optionName.equals(optionTraitNumber.getName())) {

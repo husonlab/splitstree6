@@ -55,6 +55,18 @@ public class DnaToSplits extends Characters2Splits {
 		return List.of(optionMethod.getName(), optionMinSplitWeight.getName(), optionHighDimensionFilter.getName());
 	}
 
+	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		return switch (optionName) {
+			case "optionMethod" -> "Use either majority-state-vs-others or RY alphabet";
+			case "optionMinSplitWeight" -> "Minimum split weight threshold";
+			case "optionHighDimensionFilter" -> "Activate high-dimensional filter to avoid exponential graph size";
+			default -> optionName;
+		};
+	}
+
 	/**
 	 * Applies the method to the given data
 	 */

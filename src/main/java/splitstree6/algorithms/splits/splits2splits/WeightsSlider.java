@@ -50,10 +50,13 @@ public class WeightsSlider extends Splits2Splits implements IFilter {
 
 	@Override
 	public String getToolTip(String optionName) {
-		return switch (optionName) {
-			case "optionWeightThreshold" -> "Set minimum split weight threshold";
-			default -> optionName;
-		};
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		if (optionName.equals("optionWeightThreshold"))
+			return "Set minimum split weight threshold";
+		else
+			return super.getToolTip(optionName);
 	}
 
 	public String getShortDescription() {

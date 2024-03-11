@@ -42,10 +42,12 @@ public class TreeSelector extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		if (optionName.equals(optionWhich.getName())) {
 			return "Which tree to use";
-		}
-		return optionName;
+		} else
+			return super.getToolTip(optionName);
 	}
 
 	@Override

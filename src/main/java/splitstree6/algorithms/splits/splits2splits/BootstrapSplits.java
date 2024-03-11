@@ -72,6 +72,8 @@ public class BootstrapSplits extends Splits2Splits {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		if (optionName.equals(optionReplicates.getName()))
 			return "Number of bootstrap replicates";
 		else if (optionName.equals(optionShowAllSplits.getName()))

@@ -67,6 +67,8 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		return switch (optionName) {
 			case "optionFilterAlgorithm" -> "Set the filter algorithm";
 			case "optionWeightThreshold" -> "Set minimum split weight threshold";

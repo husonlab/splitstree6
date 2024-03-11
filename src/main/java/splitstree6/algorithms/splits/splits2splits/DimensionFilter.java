@@ -65,6 +65,8 @@ public class DimensionFilter extends Splits2Splits implements IFilter {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
 		if (optionName.equals(optionMaxDimension.getName())) {
 			return "Heuristically remove splits that create configurations of a higher dimension than this threshold";
 		}

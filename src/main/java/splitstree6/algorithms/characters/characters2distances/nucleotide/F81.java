@@ -47,7 +47,8 @@ public class F81 extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
+		return Arrays.asList("optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites",
+				"optionSetSiteVarParams", "optionUseML_Distances");
 	}
 
 	@Override

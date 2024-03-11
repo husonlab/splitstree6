@@ -66,15 +66,16 @@ public class ExternalProgram extends Characters2Trees {
 	}
 
 	@Override
-	public String getToolTip(String option) {
-		if (option.equals(optionProgramCall.getName()))
-			return "Specification of external program: replace 'path-to-program' by path to program and\nuse '%i' and '%o' as place-holders for the program's input and output files";
-		else if (option.equals(optionCharactersFormat.getName()))
-			return "Specify the format to write out the current data in";
-		else if (option.equals(optionName.getName()))
-			return "Specify a name for this calculation";
-		else
-			return null;
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		return switch (optionName) {
+			case "optionProgramCall" ->
+					"Specification of external program: replace 'path-to-program' by path to program and\nuse '%i' and '%o' as place-holders for the program's input and output files";
+			case "optionCharactersFormat" -> "Specify the format to write out the current data in";
+			case "optionName" -> "Specify a name for this calculation";
+			default -> optionName;
+		};
 	}
 
 	@Override

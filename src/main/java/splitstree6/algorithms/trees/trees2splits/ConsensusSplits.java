@@ -69,6 +69,9 @@ public class ConsensusSplits extends Trees2Splits {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
 		if (optionName.equals(optionConsensus.getName()))
 			return "Consensus method";
 		else if (optionName.equals(optionEdgeWeights.getName()))

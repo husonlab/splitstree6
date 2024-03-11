@@ -71,6 +71,23 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		if (optionRootBy.getName().equals(optionName))
+			return "determine how to reroot";
+		else if (optionRearrangeBy.getName().equals(optionName))
+			return "determine how to rearrange";
+		else if (optionReorder.getName().equals(optionName))
+			return "determine how to reorder";
+		else if (optionOutGroupTaxa.getName().equals(optionName))
+			return "the list of outgroup taxa";
+		else
+			return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getShortDescription() {
 		return "Reroot, or change the order of children, on all trees.";
 	}

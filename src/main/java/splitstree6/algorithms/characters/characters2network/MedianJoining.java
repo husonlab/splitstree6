@@ -43,6 +43,15 @@ public class MedianJoining extends Characters2Network {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option"))
+			optionName = "option" + optionName;
+		if (optionEpsilon.getName().equals(optionName))
+			return "balances accuracy (smaller value) and efficiency (larger value)";
+		else return super.getToolTip(optionName);
+	}
+
+	@Override
 	public String getShortDescription() {
 		return "Computes a haplotype network using the median-joining method.";
 	}

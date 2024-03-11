@@ -165,8 +165,8 @@ public class OptionIO {
 							buf.append(" <").append(option.getOptionValueType().toString()).append(">");
 						if (optionsCarrier instanceof Algorithm<?, ?> algorithm) {
 							var usage = algorithm.getToolTip(name);
-							if (usage != null && !usage.equals(name)) {
-								buf.append(" (usage: %s)".formatted(usage));
+							if (usage != null && !usage.equals(name) && usage.length() > 2) {
+								buf.append(" - %s".formatted(usage.substring(0, 1).toLowerCase() + usage.substring(1)));
 							}
 						}
 						buf.append("\n");

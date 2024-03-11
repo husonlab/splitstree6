@@ -57,6 +57,20 @@ abstract public class Trees2ReportBase extends Algorithm<TreesBlock, ReportBlock
 		return List.of(optionApplyTo.getName(), optionWhichTree.getName());
 	}
 
+	@Override
+	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
+		if (optionName.equals(optionApplyTo.getName()))
+			return "determine whether to one or all trees";
+		else if (optionName.equals(optionWhichTree.getName()))
+			return "the index of the tree that the method will be applied to";
+
+		else return super.getToolTip(optionName);
+
+	}
+
 	public Trees2ReportBase() {
 		super(TreesBlock.class, ReportBlock.class);
 
