@@ -36,6 +36,12 @@ import java.util.*;
  * Daniel Huson, 2.2023
  */
 public class ListOneRSPRTrees extends Trees2ReportBase {
+
+	@Override
+	public String getShortDescription() {
+		return "Determines which trees are exactly on rSPR away from each other.";
+	}
+
 	public ListOneRSPRTrees() {
 		setOptionApplyTo(ApplyTo.AllTrees);
 	}

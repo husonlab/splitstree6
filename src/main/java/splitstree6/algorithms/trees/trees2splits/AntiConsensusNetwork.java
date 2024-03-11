@@ -73,6 +73,11 @@ public class AntiConsensusNetwork extends Trees2Splits implements DoNotLoadThisA
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates the anti-consensus rooted network for a set of rooted trees.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return Arrays.asList(optionSinRank.getName(), optionAllSinsUpToRank.getName(), optionMaxDistortion.getName(), optionRequireSingleSPR.getName(), optionMinSpanPercent.getName(), optionMinWeight.getName(), optionReferenceTree.getName());
 	}

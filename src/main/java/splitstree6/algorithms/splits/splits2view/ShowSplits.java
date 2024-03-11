@@ -49,6 +49,11 @@ public class ShowSplits extends Splits2View {
 		return List.of(optionView.getName());
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Provides interactive visualizations of split networks.";
+	}
+
 	public ShowSplits() {
 		super();
 

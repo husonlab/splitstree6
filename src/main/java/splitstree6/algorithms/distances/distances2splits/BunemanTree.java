@@ -48,6 +48,11 @@ public class BunemanTree extends Distances2Splits implements IToCompatibleSplits
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes a set of compatible splits using the Buneman tree method.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws IOException {
 		if (SplitsBlockUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;

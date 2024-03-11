@@ -41,15 +41,16 @@ public class NeiMiller extends Characters2Distances {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
+	public String getShortDescription() {
+		return "Estimates the average number of nucleotide substitutions from restriction data.";
+	}
 
+	@Override
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 		int nchar = charactersBlock.getNchar();
 		int ntax = charactersBlock.getNtax();
 
 		distancesBlock.setNtax(ntax);
-
-
-		//distancesBlock.setNtax(ntax);
 
 		boolean warned_sij = false, warned_dhij = false, warned_dist = false;
 

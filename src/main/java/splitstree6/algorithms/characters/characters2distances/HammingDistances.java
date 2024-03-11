@@ -53,6 +53,11 @@ public class HammingDistances extends Characters2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes distances based on the number of character-state differences.";
+	}
+
+	@Override
 	public String getToolTip(String optionName) {
 		if (optionName.equals(optionNormalize.getName()))
 			return "Normalize distances";

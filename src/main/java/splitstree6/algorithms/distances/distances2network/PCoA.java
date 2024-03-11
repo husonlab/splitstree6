@@ -58,6 +58,11 @@ public class PCoA extends Distances2Network {
 		return "Gower 1966; Gower, J. C. (1966). Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53(3-4), 325-338.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Performs principal coordinates analysis.";
+	}
+
 	public List<String> listOptions() {
 		return List.of(optionFirstCoordinate.getName(), optionSecondCoordinate.getName());
 	}

@@ -84,4 +84,9 @@ public class BaseFreqDistance extends Characters2Distances {
 		}
 		progress.close();
 	}
+
+	@Override
+	public String getShortDescription() {
+		return "Calculates distances from differences in the base composition.";
+	}
 }

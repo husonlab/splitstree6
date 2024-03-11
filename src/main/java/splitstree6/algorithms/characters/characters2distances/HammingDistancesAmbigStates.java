@@ -61,6 +61,11 @@ public class HammingDistancesAmbigStates extends Characters2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return (new HammingDistances().getShortDescription());
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distancesBlock) throws IOException {
 		progress.setMaximum(taxa.getNtax());
 

@@ -60,6 +60,11 @@ public class CredibilityNetwork extends Trees2Splits implements DoNotLoadThisAlg
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes a credibility network using Beran's algorithm.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionLevel.getName(), optionHighDimensionFilter.getName());
 	}

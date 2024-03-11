@@ -62,6 +62,11 @@ public class CharactersFilter extends Characters2Characters implements IFilter {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Provides several ways of filtering characters.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock parent, CharactersBlock child) {
 		child.clear();
 

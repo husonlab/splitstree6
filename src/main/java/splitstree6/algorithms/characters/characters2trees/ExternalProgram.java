@@ -49,15 +49,20 @@ public class ExternalProgram extends Characters2Trees {
 	private final StringProperty optionProgramCall = new SimpleStringProperty(this, "optionProgramCall");
 	private final StringProperty optionName = new SimpleStringProperty(this, "optionName");
 
+	{
+		ProgramProperties.track(optionProgramCall, "path-to-program %i %o");
+		ProgramProperties.track(optionCharactersFormat, CharactersFormat::valueOf, CharactersFormat.Phylip);
+		ProgramProperties.track(optionName, "external");
+	}
+
 	@Override
 	public List<String> listOptions() {
 		return List.of(optionName.getName(), optionProgramCall.getName(), optionCharactersFormat.getName());
 	}
 
-	{
-		ProgramProperties.track(optionProgramCall, "path-to-program %i %o");
-		ProgramProperties.track(optionCharactersFormat, CharactersFormat::valueOf, CharactersFormat.Phylip);
-		ProgramProperties.track(optionName, "external");
+	@Override
+	public String getShortDescription() {
+		return "Runs an external program.";
 	}
 
 	@Override

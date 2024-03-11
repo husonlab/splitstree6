@@ -40,7 +40,6 @@ import java.util.Collection;
  */
 public class PhiTest extends AnalyzeCharactersBase {
 
-
 	final static int WINDOWSIZE = 100;
 
 	private int num_inform;
@@ -54,6 +53,11 @@ public class PhiTest extends AnalyzeCharactersBase {
 	public String getCitation() {
 		return "Bruen, Philippe & Bryant 2005; " +
 			   "Bruen TC, Philippe H, Bryant D. A simple and robust statistical test for detecting the presence of recombination. Genetics 17(4):2665-81, 2006";
+	}
+
+	@Override
+	public String getShortDescription() {
+		return "Performs a statistical test for detecting the presence of recombination.";
 	}
 
 	@Override

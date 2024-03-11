@@ -55,6 +55,11 @@ public class ShowNetwork extends Network2View {
 		return List.of(optionView.getName());
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Provides interactive visualizations of networks.";
+	}
+
 	public ShowNetwork() {
 		super();
 

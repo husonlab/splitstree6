@@ -49,6 +49,11 @@ public class Codominant extends Characters2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes the co-dominant genetic distance.";
+	}
+
+	@Override
 	public String getToolTip(String optionName) {
 		if (optionName.equals(optionUseSquareRoot.getName()))
 			return "Use the final distance as square root of the loci contribution. Otherwise: loci averages";

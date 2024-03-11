@@ -45,6 +45,10 @@ public class SplitDecomposition extends Distances2Splits {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes a set of weakly-compatible splits using the split-decomposition method.";
+	}
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distancesBlock, SplitsBlock splitsBlock) throws IOException {
 		if (SplitsBlockUtilities.computeSplitsForLessThan4Taxa(taxaBlock, distancesBlock, splitsBlock))
 			return;

@@ -45,6 +45,11 @@ public class TreesFilter extends Trees2Trees implements IFilter {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Allows the user to interactively filter trees.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) throws IOException {
 		final var totalTaxa = taxaBlock.getNtax();
 		var partial = false;
@@ -63,7 +68,7 @@ public class TreesFilter extends Trees2Trees implements IFilter {
 		}
 		child.setPartial(partial);
 
-		if (OptionDisabledTrees.size() == 0)
+		if (OptionDisabledTrees.isEmpty())
 			setShortDescription("using all " + parent.size() + " trees");
 		else
 			setShortDescription("using " + child.size() + " of " + parent.size() + " trees");

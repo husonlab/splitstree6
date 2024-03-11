@@ -32,7 +32,7 @@ import java.util.BitSet;
 import java.util.Collection;
 
 /**
- * compute shapley values
+ * compute phylogenetic diversity
  * Daniel Huson, 2.2023
  */
 public class PhylogeneticDiversity extends Splits2ReportBase {
@@ -46,6 +46,11 @@ public class PhylogeneticDiversity extends Splits2ReportBase {
 	public String getCitation() {
 		return "Volkmann et al 2014;Volkmann L, Martyn I, Moulton V, Spillner A, Mooers AO." +
 			   " Prioritizing populations for conservation using phylogenetic networks. PLoS ONE 9(2):e88945 (2014)";
+	}
+
+	@Override
+	public String getShortDescription() {
+		return "Calculates the phylogenetic diversity for selected taxa.";
 	}
 
 	/**

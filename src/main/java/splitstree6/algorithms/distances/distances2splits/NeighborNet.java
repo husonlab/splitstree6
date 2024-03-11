@@ -62,6 +62,11 @@ public class NeighborNet extends Distances2Splits implements IToCircularSplits {
 			   "Bryant & Huson 2023;D. Bryant and D.H. Huson, NeighborNet- improved algorithms and implementation. Front. Bioinform. 3, 2023";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes a set of cyclic splits using the neighbor-net method.";
+	}
+
 	/**
 	 * run the neighbor net algorithm
 	 */

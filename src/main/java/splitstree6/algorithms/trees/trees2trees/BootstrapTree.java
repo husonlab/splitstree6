@@ -75,6 +75,11 @@ public class BootstrapTree extends Trees2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Performs bootstrapping on trees.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputTrees, TreesBlock outputTreesBlock) throws IOException {
 		setOptionReplicates(Math.max(1, optionReplicates.get()));
 

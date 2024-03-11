@@ -50,6 +50,11 @@ public class TreeSelectorSplits extends Trees2Splits {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Selects a single tree and extracts its splits.";
+	}
+
+	@Override
 	public String getToolTip(String optionName) {
 		if (optionName.equals(optionWhich.getName())) {
 			return "Which tree to use";

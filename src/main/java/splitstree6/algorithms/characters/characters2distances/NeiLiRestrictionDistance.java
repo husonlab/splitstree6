@@ -47,6 +47,11 @@ public class NeiLiRestrictionDistance extends Characters2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates distances for restriction data.";
+	}
+
+	@Override
 	public String getToolTip(String optionName) {
 		if (optionName.equals(optionRestrictionSiteLength.getName()))
 			return "Expected length of restriction site (4-8 bp)";

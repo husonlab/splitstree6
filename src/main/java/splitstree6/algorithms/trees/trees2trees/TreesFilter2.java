@@ -62,6 +62,11 @@ public class TreesFilter2 extends Trees2Trees implements IFilter {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Provides several options for filtering trees.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) {
 		if (!isActive()) {
 			child.getTrees().addAll(parent.getTrees());

@@ -49,6 +49,11 @@ public class TreeSelector extends Trees2Trees implements IFilter {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Allows the user to select one from a list of trees.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock ignored, TreesBlock parent, TreesBlock child) {
 		setOptionWhich(Math.max(1, Math.min(parent.size(), optionWhich.get())));
 		child.getTrees().add(parent.getTree(getOptionWhich()));

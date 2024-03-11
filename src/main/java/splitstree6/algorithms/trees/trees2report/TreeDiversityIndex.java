@@ -54,14 +54,6 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 	}
 
 	@Override
-	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
-		return switch (getOptionMethod()) {
-			case FairProportions -> reportFairProportions(progress, taxaBlock, treesBlock);
-			case EqualSplits -> reportEqualSplits(progress, taxaBlock, treesBlock);
-		};
-	}
-
-	@Override
 	public String getCitation() {
 		if (getOptionMethod().equals(Method.FairProportions))
 			return "D Redding 2004;Redding, D. Incorporating genetic distinctness and reserve occupancy into a conservation priorisation approach. Master’s thesis. University of East Anglia (2003)";
@@ -69,6 +61,18 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 			return "Redding & Mooers 2006;Redding, D.W., Mooers, A.Ø., 2006. Incorporating evolutionary measures into conservation prioritization. Conservation Biology 20, 1670–1678.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Calculates the fair-proportion and equal-splits values on trees.";
+	}
+
+	@Override
+	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
+		return switch (getOptionMethod()) {
+			case FairProportions -> reportFairProportions(progress, taxaBlock, treesBlock);
+			case EqualSplits -> reportEqualSplits(progress, taxaBlock, treesBlock);
+		};
+	}
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock treesBlock) {

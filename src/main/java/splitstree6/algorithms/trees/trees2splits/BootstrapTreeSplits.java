@@ -53,6 +53,11 @@ public class BootstrapTreeSplits extends Trees2Splits {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Performs bootstrapping on trees.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionReplicates.getName(), optionMinPercent.getName(), optionShowAllSplits.getName(), optionRandomSeed.getName(), optionHighDimensionFilter.getName());
 	}

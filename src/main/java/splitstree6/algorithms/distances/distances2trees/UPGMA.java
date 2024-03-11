@@ -48,6 +48,11 @@ public class UPGMA extends Distances2Trees implements IToSingleTree {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes a rooted phylogenetic tree using the UPGMA method.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances, TreesBlock trees) throws IOException {
 		trees.setPartial(false);
 		trees.setRooted(true);

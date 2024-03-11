@@ -58,6 +58,11 @@ public class ConsensusSplits extends Trees2Splits {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Provides several consensus methods.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionConsensus.getName(), optionEdgeWeights.getName(), optionThresholdPercent.getName(), optionHighDimensionFilter.getName());
 	}

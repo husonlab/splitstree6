@@ -40,6 +40,11 @@ public class ConsensusNetwork extends ConsensusSplits {
 			   "In  G.  Benson  and  R.  Page,  editors, Proceedings  of  “Workshop  on Algorithms in Bioinformatics, volume 2812 of LNBI, pages 165–176. Springer, 2003.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes the consensus network.";
+	}
+
 	public List<String> listOptions() {
 		return List.of(optionEdgeWeights.getName(), optionThresholdPercent.getName(), optionHighDimensionFilter.getName());
 	}

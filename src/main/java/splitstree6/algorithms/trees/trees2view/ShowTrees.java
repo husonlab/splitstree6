@@ -53,6 +53,10 @@ public class ShowTrees extends Trees2View {
 		return List.of(optionView.getName());
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Provides several types of interactive visualizations of trees.";
+	}
 	public ShowTrees() {
 		super();
 		validListener = (v, o, n) -> {

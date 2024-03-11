@@ -61,6 +61,10 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 		return List.of(optionWeightThreshold.getName(), optionConfidenceThreshold.getName(), optionMaximumDimension.getName(), optionFilterAlgorithm.getName(), optionRecomputeCycle.getName());
 	}
 
+	public String getShortDescription() {
+		return "Provides several ways of filtering splits.";
+	}
+
 	@Override
 	public String getToolTip(String optionName) {
 		return switch (optionName) {

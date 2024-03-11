@@ -51,6 +51,11 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Estimates the proportion of invariant sites using capture-recapture.";
+	}
+
+	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
 		var proportion = estimatePropInvariableSites(progress, charactersBlock);
 		return "Invariable sites: %,d of %,d (%.1f%%)%n".formatted(Math.round(charactersBlock.getNchar() * proportion), charactersBlock.getNchar(), 100 * proportion);

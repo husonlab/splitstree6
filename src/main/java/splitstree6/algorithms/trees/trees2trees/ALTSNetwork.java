@@ -58,6 +58,11 @@ public class ALTSNetwork extends Trees2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes one or more rooted networks that contain all input trees using the M-ALTS algorithm.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionMutualRefinement.getName(), optionRemoveDuplicates.getName(), optionKernelization.getName());
 	}

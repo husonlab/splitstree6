@@ -52,14 +52,19 @@ public class PhylogeneticDiversity extends Trees2ReportBase {
 	}
 
 	@Override
-	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
-		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());
-		return report(progress, taxaBlock, treesBlock, taxa, getOptionRooted());
+	public String getCitation() {
+		return "Faith 1992;Faith, D.P. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10 (1992)";
 	}
 
 	@Override
-	public String getCitation() {
-		return "Faith 1992;Faith, D.P. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10 (1992)";
+	public String getShortDescription() {
+		return "Calculates the phylogenetic diversity for selected taxa.";
+	}
+
+	@Override
+	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
+		var taxa = BitSetUtils.asBitSet(selectedTaxa.stream().mapToInt(taxaBlock::indexOf).toArray());
+		return report(progress, taxaBlock, treesBlock, taxa, getOptionRooted());
 	}
 
 	public static String report(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, BitSet selectedTaxa, boolean rooted) throws CanceledException {

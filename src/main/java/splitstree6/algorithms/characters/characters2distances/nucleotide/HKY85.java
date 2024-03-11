@@ -46,6 +46,11 @@ public class HKY85 extends Nucleotides2DistancesBase {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates distances under the Hasegawa-Kishino-Yano model.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return Arrays.asList("optionTsTvRatio", "optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams");
 	}

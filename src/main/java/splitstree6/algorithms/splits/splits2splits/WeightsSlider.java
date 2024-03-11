@@ -56,6 +56,10 @@ public class WeightsSlider extends Splits2Splits implements IFilter {
 		};
 	}
 
+	public String getShortDescription() {
+		return "Allows one to interactively filter splits by their weight.";
+	}
+
 	/**
 	 * do the computation
 	 */

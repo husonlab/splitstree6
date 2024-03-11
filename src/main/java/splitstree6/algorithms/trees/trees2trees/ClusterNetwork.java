@@ -69,6 +69,11 @@ public class ClusterNetwork extends Trees2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes the cluster network that contains all input trees (in the hardwired sense).";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) {
 		var clusterCountWeightMap = new HashMap<BitSet, Pair<Integer, Double>>();
 

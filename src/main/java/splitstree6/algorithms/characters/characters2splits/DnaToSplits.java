@@ -163,6 +163,11 @@ public class DnaToSplits extends Characters2Splits {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Converts DNA characters directly into splits.";
+	}
+
+	@Override
 	public boolean isApplicable(TaxaBlock taxaBlock, CharactersBlock parent) {
 		return parent.getDataType().isNucleotides();
 	}

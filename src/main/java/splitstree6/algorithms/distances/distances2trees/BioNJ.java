@@ -51,6 +51,11 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes an unrooted phylogenetic tree using the Bio-NJ method.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock distances, TreesBlock trees) throws IOException {
 		trees.setPartial(false);
 		trees.setRooted(true);

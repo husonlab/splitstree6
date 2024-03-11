@@ -40,6 +40,10 @@ public class GreedyTree extends Splits2Trees {
 		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
 	}
 
+	public String getShortDescription() {
+		return "Produces a phylogenetic tree based on greedily selecting a compatible set of splits.";
+	}
+
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, SplitsBlock splits, TreesBlock trees) throws IOException {
 		progress.setTasks("Greedy Tree", "Extracting compatible splits...");

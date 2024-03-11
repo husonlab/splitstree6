@@ -60,6 +60,11 @@ public class ALTSExternal extends Trees2Trees implements IDesktopOnly {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Runs an external implementation of the ALTS algorithm.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionALTSExecutableFile.getName());
 	}

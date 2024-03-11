@@ -41,6 +41,11 @@ public class Jaccard extends Characters2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes distances based on the Jaccard index.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 		final int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);

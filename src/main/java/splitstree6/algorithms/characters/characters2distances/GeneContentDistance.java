@@ -48,6 +48,11 @@ public class GeneContentDistance extends Characters2Distances {
 				"Snel et al 1997; B. Snel, P. Bork and MA Huynen. Genome phylogeny based on gene content, Nature Genetics, 21:108-110, 1997.");
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes distances based on the presence/absence of genes.";
+	}
+
 	public List<String> listOptions() {
 		return List.of(optionMethod.getName());
 	}

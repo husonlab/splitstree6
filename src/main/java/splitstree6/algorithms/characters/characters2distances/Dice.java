@@ -44,6 +44,11 @@ public class Dice extends Characters2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes distances using the Dice coefficient distance.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 
 		int ntax = taxaBlock.getNtax();

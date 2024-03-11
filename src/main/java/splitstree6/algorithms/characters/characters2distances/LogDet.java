@@ -97,6 +97,11 @@ public class LogDet extends Characters2Distances {
 		return "Steel 1994; M.A. Steel. Recovering a tree from the leaf colorations it generates under a Markov model. Appl. Math. Lett., 7(2):19–24, 1994.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes distances using the Log-Det method.";
+	}
+
 	public List<String> listOptions() {
 		return List.of(optionPropInvariableSites.getName(), optionFudgeFactor.getName(), optionFillZeros.getName());
 	}

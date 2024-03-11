@@ -47,6 +47,11 @@ public class ShapleyValues extends Splits2ReportBase {
 			   " Prioritizing populations for conservation using phylogenetic networks. PLoS ONE 9(2):e88945 (2014)";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Calculates Shapley values on splits.";
+	}
+
 	public static String report(TaxaBlock taxaBlock, Collection<ASplit> splits) {
 		var total = splits.stream().mapToDouble(ASplit::getWeight).sum();
 

@@ -44,6 +44,10 @@ public class NeighborJoining extends Distances2Trees implements IToSingleTree {
 			   "Molecular Biology and Evolution, 4:406-425, 1987.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes an unrooted phylogenetic tree using the neighbor-joining method.";
+	}
 	/**
 	 * compute the neighbor joining tree
 	 */

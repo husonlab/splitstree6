@@ -67,6 +67,11 @@ public class Mash extends Genomes2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes mash distances.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, GenomesBlock genomesBlock, DistancesBlock distancesBlock) throws IOException {
 
 		try {

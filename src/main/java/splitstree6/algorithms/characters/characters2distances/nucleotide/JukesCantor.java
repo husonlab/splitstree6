@@ -39,6 +39,11 @@ public class JukesCantor extends Nucleotides2DistancesBase {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates distances under the Jukes-Cantor model.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of("optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}

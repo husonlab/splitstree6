@@ -62,6 +62,11 @@ public class ConsensusTree extends Trees2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Provides several methods for computing a consensus tree.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) throws IOException {
 		if (parent.getNTrees() <= 1)
 			child.getTrees().addAll(parent.getTrees());

@@ -42,6 +42,10 @@ public class AverageConsensus extends Trees2Splits {
 			   "Systematic Biology, 46(2):306-312 (1997).";
 	}
 
+	public String getShortDescription() {
+		return "Calculates average consensus tree.";
+	}
+
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
 		var pairwiseDistances = new DistancesBlock();

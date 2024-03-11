@@ -36,7 +36,12 @@ public class DeltaScore extends Distances2ReportBase {
 	@Override
 	public String getCitation() {
 		return "Holland et al 2002;" +
-			   "B. R. Holland, K. T. Huber, A. Dress, V. Moulton, δ Plots: A Tool for Analyzing Phylogenetic Distance Data, Molecular Biology and Evolution, 19(12):2051–2059, 2002.";
+			   "B. R. Holland, K. T. Huber, A. Dress, V. Moulton, Delta Plots: A tool for analyzing phylogenetic distance data, Molecular Biology and Evolution, 19(12):2051–2059, 2002.";
+	}
+
+	@Override
+	public String getShortDescription() {
+		return "Calculates the delta score.";
 	}
 
 	@Override

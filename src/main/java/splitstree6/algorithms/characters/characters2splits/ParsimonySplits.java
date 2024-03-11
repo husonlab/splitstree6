@@ -46,6 +46,10 @@ public class ParsimonySplits extends Characters2Splits {
 		return "Bandelt and Dress 1992; H.-J.Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. Advances in Mathematics, 92:47–105, 1992.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes weakly-compatible splits directly from DNA characters.";
+	}
 
 	@Override
 	public String getToolTip(String optionName) {

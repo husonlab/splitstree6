@@ -54,6 +54,16 @@ public class BinaryToSplits extends Characters2Splits {
 		return List.of(optionMinSplitWeight.getName(), optionHighDimensionFilter.getName(), optionAddAllTrivial.getName());
 	}
 
+	@Override
+	public String getCitation() {
+		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
+	}
+
+	@Override
+	public String getShortDescription() {
+		return "Converts binary characters directly into splits.";
+	}
+
 	/**
 	 * Applies the method to the given data
 	 */
@@ -100,11 +110,6 @@ public class BinaryToSplits extends Characters2Splits {
 		splitsBlock.setCycle(SplitsBlockUtilities.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
 		splitsBlock.setFit(-1);
 		splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
-	}
-
-	@Override
-	public String getCitation() {
-		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
 	}
 
 	@Override

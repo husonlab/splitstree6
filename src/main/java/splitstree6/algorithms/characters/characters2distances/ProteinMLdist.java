@@ -59,6 +59,11 @@ public class ProteinMLdist extends Characters2Distances {
 			   "Molecular Systematics, pages 407–514. Sinauer Associates, Inc., 2nd edition, 1996.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes distances for proteins using maximum-likelihood estimation.";
+	}
+
 	public List<String> listOptions() {
 		return List.of(optionModel.getName(), optionPropInvariableSites.getName(), optionGamma.getName());
 	}

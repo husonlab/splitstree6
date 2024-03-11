@@ -49,6 +49,11 @@ public class LooseAndLacy extends Trees2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes the `loose' and `lacy' species for a given tree and taxon trait.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionSpeciesDefinition.getName(), optionTraitNumber.getName(), optionUseAllTraits.getName());
 	}

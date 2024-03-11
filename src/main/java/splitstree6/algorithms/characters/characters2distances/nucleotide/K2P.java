@@ -44,6 +44,11 @@ public class K2P extends Nucleotides2DistancesBase {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates distances under the Kimura-2P model.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return Arrays.asList("optionTsTvRatio", "optionGamma", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}

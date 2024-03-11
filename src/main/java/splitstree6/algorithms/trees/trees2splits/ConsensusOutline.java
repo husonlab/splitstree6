@@ -41,6 +41,11 @@ public class ConsensusOutline extends ConsensusSplits implements IToCircularSpli
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes the consensus outline.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionEdgeWeights.getName(), optionThresholdPercent.getName());
 	}

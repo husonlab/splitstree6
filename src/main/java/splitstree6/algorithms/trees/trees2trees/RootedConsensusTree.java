@@ -54,6 +54,11 @@ public class RootedConsensusTree extends Trees2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Provides several methods for computing a rooted consensus tree.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) throws IOException {
 		child.setRooted(true);
 		child.setReticulated(false);

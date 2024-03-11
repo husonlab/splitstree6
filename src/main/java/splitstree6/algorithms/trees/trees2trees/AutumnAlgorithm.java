@@ -51,6 +51,11 @@ public class AutumnAlgorithm extends Trees2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes all minimum hybridization networks using the Autumn algorithm";
+	}
+
+	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
 		return datablock.getNTrees() >= 2 && !datablock.isReticulated();
 	}

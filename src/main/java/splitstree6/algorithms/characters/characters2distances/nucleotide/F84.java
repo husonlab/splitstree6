@@ -41,6 +41,11 @@ public class F84 extends Nucleotides2DistancesBase {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates distances under the Felsenstein84 model.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return Arrays.asList("optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}

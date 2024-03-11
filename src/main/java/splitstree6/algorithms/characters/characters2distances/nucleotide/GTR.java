@@ -42,6 +42,11 @@ public class GTR extends Nucleotides2DistancesBase {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates distances under the general time-reversible model.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return Arrays.asList("optionPropInvariableSites", "optionSetSiteVarParams", "optionRateMatrix", "optionUseML_Distances");
 	}

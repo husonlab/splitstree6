@@ -70,6 +70,11 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 		return List.of(optionRootBy.getName(), optionRearrangeBy.getName(), optionReorder.getName(), optionOutGroupTaxa.getName());
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Reroot, or change the order of children, on all trees.";
+	}
+
 	public RerootOrReorderTrees() {
 		this.selectionInvalidationListener = observable -> {
 			if (getNode() != null) {

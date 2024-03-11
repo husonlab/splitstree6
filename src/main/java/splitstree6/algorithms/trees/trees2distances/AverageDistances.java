@@ -49,6 +49,11 @@ public class AverageDistances extends Trees2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates the average distances between taxa over a set of trees.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, DistancesBlock distancesBlock) throws IOException {
 		var nTax = taxaBlock.getNtax();
 		distancesBlock.setNtax(nTax);

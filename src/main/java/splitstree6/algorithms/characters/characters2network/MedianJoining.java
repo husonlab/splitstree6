@@ -43,6 +43,11 @@ public class MedianJoining extends Characters2Network {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes a haplotype network using the median-joining method.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, NetworkBlock networkBlock) throws IOException {
 		var medianJoiningCalculator = new MedianJoiningCalculator();
 		medianJoiningCalculator.setOptionEpsilon(getOptionEpsilon());

@@ -60,10 +60,14 @@ public class BootstrapSplits extends Splits2Splits {
 	private final IntegerProperty optionRandomSeed = new SimpleIntegerProperty(this, "optionRandomSeed", 42);
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
-
 	@Override
 	public List<String> listOptions() {
 		return List.of(optionReplicates.getName(), optionMinPercent.getName(), optionShowAllSplits.getName(), optionRandomSeed.getName(), optionHighDimensionFilter.getName());
+	}
+
+	@Override
+	public String getShortDescription() {
+		return "Performs bootstrapping on splits.";
 	}
 
 	@Override

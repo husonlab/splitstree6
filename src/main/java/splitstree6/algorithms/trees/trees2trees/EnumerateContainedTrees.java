@@ -49,11 +49,16 @@ public class EnumerateContainedTrees extends Trees2Trees {
 	}
 
 	@Override
-	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock parent, TreesBlock child) throws IOException {
-		child.setPartial(parent.isPartial());
-		child.setReticulated(false);
-		for (var t = 1; t <= parent.getNTrees(); t++) {
-			var network = parent.getTree(t);
+	public String getShortDescription() {
+		return "Enumerates all contained trees.";
+	}
+
+	@Override
+	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock inputTreesBlock, TreesBlock outputTreesBlock) throws IOException {
+		outputTreesBlock.setPartial(inputTreesBlock.isPartial());
+		outputTreesBlock.setReticulated(false);
+		for (var t = 1; t <= inputTreesBlock.getNTrees(); t++) {
+			var network = inputTreesBlock.getTree(t);
 			var containedTrees = extractContainedTrees(network);
 			if (isOptionRemoveDuplicates())
 				containedTrees = removeDuplicates(containedTrees);
@@ -61,9 +66,9 @@ public class EnumerateContainedTrees extends Trees2Trees {
 				var tree = containedTrees.get(i);
 				tree.setName(network.getName() + "-" + (i + 1));
 			}
-			child.getTrees().addAll(containedTrees);
+			outputTreesBlock.getTrees().addAll(containedTrees);
 		}
-		System.err.printf("Total number of trees enumerated: %,d%n", child.getNTrees());
+		System.err.printf("Total number of trees enumerated: %,d%n", outputTreesBlock.getNTrees());
 	}
 
 	/**

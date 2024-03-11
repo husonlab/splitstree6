@@ -42,6 +42,11 @@ public class MinSpanningTree extends Distances2Trees {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes a minimum spanning tree.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock inputData, TreesBlock outputData) throws IOException {
 		var minSpanningNetwork = new MinSpanningNetwork();
 		minSpanningNetwork.setOptionMinSpanningTree(true);

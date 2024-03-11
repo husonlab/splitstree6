@@ -55,6 +55,11 @@ public class Upholt extends Characters2Distances {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Calculates distances for restriction data.";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 		final int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);

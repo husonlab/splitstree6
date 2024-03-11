@@ -46,6 +46,11 @@ public class ExtractAlgorithms {
 				buf.append("The ``%s'' algorithm takes a %s as input and produces a %s as output.".formatted(
 						method, fromName.replaceAll("Block", "block"), toName.replaceAll("Block", "block")));
 
+				var description = algorithm.getShortDescription();
+				if (description != null && !description.isBlank()) {
+					buf.append(" It ").append(Character.toLowerCase(description.charAt(0))).append(description.substring(1));
+				}
+
 				buf.append("\n");
 
 				var options = OptionIO.optionsUsage(algorithm);
@@ -58,6 +63,7 @@ public class ExtractAlgorithms {
 						citations = citations.substring(pos + 1);
 					buf.append("%nSee: %s%n".formatted(citations));
 				}
+
 				var line = buf.toString().replaceAll("&", "\\\\&")
 						.replaceAll("(?i)\\bDna\\b", "DNA");
 

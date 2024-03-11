@@ -46,6 +46,11 @@ public class MinSpanningNetwork extends Distances2Network {
 		return "Excoffier & Smouse 1994; Excoffier L, Smouse PE. Using allele frequencies and geographic subdivision to reconstruct gene trees within a species: molecular variance parsimony (1994) Genetics.136(1):343-59.";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Computes a minimum spanning network.";
+	}
+
 	private final DoubleProperty optionEpsilon = new SimpleDoubleProperty(this, "optionEpsilon", 0);
 	private final BooleanProperty optionMinSpanningTree = new SimpleBooleanProperty(this, "optionMinSpanningTree", false);
 

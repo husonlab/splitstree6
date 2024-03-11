@@ -64,6 +64,11 @@ public class SuperNetwork extends Trees2Splits {
 	}
 
 	@Override
+	public String getShortDescription() {
+		return "Computes a super network using the Z-closure method.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return Arrays.asList(optionEdgeWeights.getName(), optionSuperTree.getName(), optionNumberOfRuns.getName(),
 				optionApplyRefineHeuristic.getName(), optionSeed.getName(), optionHighDimensionFilter.getName());

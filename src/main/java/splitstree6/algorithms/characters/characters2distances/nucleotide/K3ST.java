@@ -49,6 +49,11 @@ public class K3ST extends Nucleotides2DistancesBase {
 			   "Proc. Natl. Acad. Sci. USA 78 (1981) 454–45";
 	}
 
+	@Override
+	public String getShortDescription() {
+		return "Calculates distances under the Kimura-3P model.";
+	}
+
 	public List<String> listOptions() {
 		return Arrays.asList("optionTsTvRatio", "optionACvATRatio", "optionGamma", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}
