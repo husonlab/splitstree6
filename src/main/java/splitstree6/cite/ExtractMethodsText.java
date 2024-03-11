@@ -159,11 +159,11 @@ public class ExtractMethodsText {
 														}
 													}
 													line = MethodWithOutputTemplate.formatted(name, keys,
-															(optionsReport.length() > 0 ? " (" + optionsReport + ")" : ""),
+															(!optionsReport.isEmpty() ? " (" + optionsReport + ")" : ""),
 															targetBlock.getShortDescription(), (targetKey.isBlank() ? "" : targetKey));
 
 												} else {
-													line = MethodTemplate.formatted(name, keys, optionsReport.length() > 0 ? " (" + optionsReport + ")" : "");
+													line = MethodTemplate.formatted(name, keys, !optionsReport.isEmpty() ? " (" + optionsReport + ")" : "");
 												}
 												if (!set.contains(line)) {
 													buf.append(line);
@@ -180,7 +180,7 @@ public class ExtractMethodsText {
 					}
 				}
 				buf.append("\n");
-				if (allKeysAndPapers.size() > 0) {
+				if (!allKeysAndPapers.isEmpty()) {
 					buf.append("References:\n");
 
 					for (Pair<String, String> pair : allKeysAndPapers) {

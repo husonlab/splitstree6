@@ -57,7 +57,7 @@ public class CholeskyDecomposition implements java.io.Serializable {
 		n = Arg.getRowDimension();
 		L = new double[n][n];
 		isspd = (Arg.getColumnDimension() == n);
-		// Main loop.
+		// ExtractAlgorithms loop.
 		for (int j = 0; j < n; j++) {
 			double[] Lrowj = L[j];
 			double d = 0.0;
@@ -109,7 +109,7 @@ public class CholeskyDecomposition implements java.io.Serializable {
       n = Arg.getColumnDimension();
       R = new double[n][n];
       isspd = (Arg.getColumnDimension() == n);
-      // Main loop.
+      // ExtractAlgorithms loop.
       for (int j = 0; j < n; j++) {
          double d = 0.0;
          for (int k = 0; k < j; k++) {

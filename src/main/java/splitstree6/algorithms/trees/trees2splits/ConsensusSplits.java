@@ -53,6 +53,11 @@ public class ConsensusSplits extends Trees2Splits {
 	protected final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	@Override
+	public String getCitation() {
+		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionConsensus.getName(), optionEdgeWeights.getName(), optionThresholdPercent.getName(), optionHighDimensionFilter.getName());
 	}

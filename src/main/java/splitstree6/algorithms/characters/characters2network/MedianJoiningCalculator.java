@@ -62,7 +62,7 @@ public class MedianJoiningCalculator extends QuasiMedianBase {
 	}
 
 	/**
-	 * Main loop of the median joining algorithm
+	 * ExtractAlgorithms loop of the median joining algorithm
 	 */
 	private void computeMedianJoiningMainLoop(ProgressListener progress, Set<String> input, double[] weights, int epsilon, Set<String> outputSequences) throws CanceledException {
 		outputSequences.addAll(input);

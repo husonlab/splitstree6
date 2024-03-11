@@ -177,7 +177,7 @@ public class MinSpanningNetwork extends Distances2Network {
 		var buf = new StringBuilder();
 		for (var i = 0; i < sequence1.length(); i++) {
 			if (Character.toLowerCase(sequence1.charAt(i)) != Character.toLowerCase(sequence2.charAt(i))) {
-				if (buf.length() > 0)
+				if (!buf.isEmpty())
 					buf.append(",");
 				buf.append(i + 1);
 			}

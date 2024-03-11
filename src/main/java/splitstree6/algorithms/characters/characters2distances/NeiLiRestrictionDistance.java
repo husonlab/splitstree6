@@ -1,5 +1,5 @@
 /*
- * Nei_Li_RestrictionDistance.java Copyright (C) 2024 Daniel H. Huson
+ * NeiLiRestrictionDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -37,7 +37,7 @@ import java.io.IOException;
  * @author David Bryant, 2008?
  */
 
-public class Nei_Li_RestrictionDistance extends Characters2Distances {
+public class NeiLiRestrictionDistance extends Characters2Distances {
 
 	private final DoubleProperty optionRestrictionSiteLength = new SimpleDoubleProperty(this, "optionRestrictionSiteLength", 6.0);
 

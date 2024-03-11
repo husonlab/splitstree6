@@ -36,6 +36,11 @@ import java.util.List;
  */
 public class ConsensusOutline extends ConsensusSplits implements IToCircularSplits {
 	@Override
+	public String getCitation() {
+		return "Huson and Cetinkaya (2023);DH Huson and B Cetinkaya, Visualizing incompatibilities in phylogenetic trees using consensus outlines, Front. Bioinform. (2023) ";
+	}
+
+	@Override
 	public List<String> listOptions() {
 		return List.of(optionEdgeWeights.getName(), optionThresholdPercent.getName());
 	}

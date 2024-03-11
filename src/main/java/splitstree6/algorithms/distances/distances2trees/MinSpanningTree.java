@@ -35,6 +35,12 @@ import java.io.IOException;
  * Daniel Huson, 4.2022
  */
 public class MinSpanningTree extends Distances2Trees {
+
+	@Override
+	public String getCitation() {
+		return (new MinSpanningNetwork()).getCitation();
+	}
+
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, DistancesBlock inputData, TreesBlock outputData) throws IOException {
 		var minSpanningNetwork = new MinSpanningNetwork();

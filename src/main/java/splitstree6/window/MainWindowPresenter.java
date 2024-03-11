@@ -50,7 +50,7 @@ import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
 import splitstree6.algorithms.characters.characters2distances.ProteinMLdist;
-import splitstree6.algorithms.characters.characters2distances.Uncorrected_P;
+import splitstree6.algorithms.characters.characters2distances.UncorrectedP;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2report.EstimateInvariableSites;
@@ -563,7 +563,7 @@ public class MainWindowPresenter {
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
-		setupAlgorithmMenuItem(controller.getUncorrectedPMenuItem(), new Uncorrected_P());
+		setupAlgorithmMenuItem(controller.getUncorrectedPMenuItem(), new UncorrectedP());
 		setupAlgorithmMenuItem(controller.getLogDetMenuItem(), new LogDet());
 		setupAlgorithmMenuItem(controller.getHky85MenuItem(), new HKY85());
 		setupAlgorithmMenuItem(controller.getJukesCantorMenuItem(), new JukesCantor());

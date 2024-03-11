@@ -258,7 +258,7 @@ public class SingularValueDecomposition implements java.io.Serializable {
 			}
 		}
 
-		// Main iteration loop for the singular values.
+		// ExtractAlgorithms iteration loop for the singular values.
 
 		int pp = p - 1;
 		int iter = 0;

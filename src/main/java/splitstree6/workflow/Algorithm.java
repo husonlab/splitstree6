@@ -20,7 +20,6 @@
 package splitstree6.workflow;
 
 import jloda.util.Basic;
-import jloda.util.StringUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.taxa.taxa2taxa.Taxa2Taxa;
 import splitstree6.cite.IHasCitations;
@@ -61,7 +60,7 @@ public abstract class Algorithm<S extends DataBlock, T extends DataBlock> extend
 	}
 
 	public String getToolTip(String optionName) {
-		return "Set the " + StringUtils.fromCamelCase(optionName).toLowerCase();
+		return optionName;
 	}
 
 	public abstract void compute(ProgressListener progress, TaxaBlock taxaBlock, S inputData, T outputData) throws IOException;

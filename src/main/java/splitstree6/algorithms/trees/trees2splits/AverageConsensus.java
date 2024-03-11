@@ -36,6 +36,13 @@ import java.io.IOException;
 
 public class AverageConsensus extends Trees2Splits {
 	@Override
+	public String getCitation() {
+		return "Lapointe and Cucumel (1997);Francois-Joseph Lapointe, Guy Cucumel, " +
+			   "The Average Consensus Procedure: Combination of Weighted Trees Containing Identical or Overlapping Sets of Taxa. " +
+			   "Systematic Biology, 46(2):306-312 (1997).";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, SplitsBlock splitsBlock) throws IOException {
 		var pairwiseDistances = new DistancesBlock();
 		var averageDistances = new AverageDistances();

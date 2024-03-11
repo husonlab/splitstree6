@@ -23,6 +23,7 @@ import javafx.beans.property.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2splits.BootstrapSplits;
 import splitstree6.algorithms.trees.IToSingleTree;
+import splitstree6.algorithms.trees.trees2trees.BootstrapTree;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -45,6 +46,11 @@ public class BootstrapTreeSplits extends Trees2Splits {
 	private final BooleanProperty optionShowAllSplits = new SimpleBooleanProperty(this, "optionShowAllSplits", false);
 	private final IntegerProperty optionRandomSeed = new SimpleIntegerProperty(this, "optionRandomSeed", 42);
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
+
+	@Override
+	public String getCitation() {
+		return (new BootstrapTree()).getCitation();
+	}
 
 	@Override
 	public List<String> listOptions() {

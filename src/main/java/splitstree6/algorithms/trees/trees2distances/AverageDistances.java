@@ -42,6 +42,13 @@ import java.util.concurrent.TimeUnit;
 
 public class AverageDistances extends Trees2Distances {
 	@Override
+	public String getCitation() {
+		return "Lapointe and Cucumel (1997);Francois-Joseph Lapointe, Guy Cucumel, " +
+			   "The Average Consensus Procedure: Combination of Weighted Trees Containing Identical or Overlapping Sets of Taxa. " +
+			   "Systematic Biology, 46(2):306-312 (1997).";
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, TreesBlock treesBlock, DistancesBlock distancesBlock) throws IOException {
 		var nTax = taxaBlock.getNtax();
 		distancesBlock.setNtax(nTax);
@@ -127,7 +134,7 @@ public class AverageDistances extends Trees2Distances {
 			var allDistances = new double[nTax + 1][nTax + 1];
 			for (var i = 1; i < allDistances.length; i++) {
 				for (var j = 1; j < allDistances.length; j++) {
-					var value = 0;
+					var value = 0.0;
 					for (double[][] v : distances) {
 						value += v[i][j];
 					}

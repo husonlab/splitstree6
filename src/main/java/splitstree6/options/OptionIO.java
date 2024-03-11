@@ -21,7 +21,9 @@ package splitstree6.options;
 
 import javafx.beans.property.StringProperty;
 import jloda.util.IOExceptionWithLineNumber;
+import jloda.util.StringUtils;
 import jloda.util.parse.NexusStreamParser;
+import splitstree6.workflow.Algorithm;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -44,7 +46,7 @@ public class OptionIO {
 
 			if (!np.peekMatchIgnoreCase(";")) {
 				final var allOptionsCarried = new ArrayList<>(Option.getAllOptions(optionsCarrier));
-				if (allOptionsCarried.size() > 0) {
+				if (!allOptionsCarried.isEmpty()) {
 					final var nameOptionMap = new HashMap<String, Option>();
 					for (var option : allOptionsCarried) {
 						nameOptionMap.put(option.getName(), option);
@@ -123,12 +125,12 @@ public class OptionIO {
 	public static void writeOptions(Writer w, IOptionsCarrier optionsCarrier) throws IOException {
 		if (optionsCarrier != null) {
 			final var options = new ArrayList<>(Option.getAllOptions(optionsCarrier));
-			if (options.size() > 0) {
+			if (!options.isEmpty()) {
 				w.write("OPTIONS\n");
 				boolean first = true;
 				for (var option : options) {
 					final var valueString = OptionValueType.toStringType(option.getOptionValueType(), option.getProperty().getValue());
-					if (valueString.length() > 0) {
+					if (!valueString.isEmpty()) {
 						if (first)
 							first = false;
 						else
@@ -142,5 +144,36 @@ public class OptionIO {
 				w.write(";\n");
 			}
 		}
+	}
+
+	/**
+	 * write options
+	 */
+	public static String optionsUsage(IOptionsCarrier optionsCarrier) {
+		var buf = new StringBuilder();
+		if (optionsCarrier != null) {
+			final var options = new ArrayList<>(Option.getAllOptions(optionsCarrier));
+			if (!options.isEmpty()) {
+				for (var option : options) {
+					final var valueString = OptionValueType.toStringType(option.getOptionValueType(), option.getProperty().getValue());
+					if (!valueString.isEmpty()) {
+						var name = option.getName();
+						buf.append("    ").append(name).append(" = ");
+						if (option.getOptionValueType() == OptionValueType.Enum) {
+							buf.append(" {").append(StringUtils.toString(option.getLegalValues(), " | ")).append("}");
+						} else
+							buf.append(" <").append(option.getOptionValueType().toString()).append(">");
+						if (optionsCarrier instanceof Algorithm<?, ?> algorithm) {
+							var usage = algorithm.getToolTip(name);
+							if (usage != null && !usage.equals(name)) {
+								buf.append(" (usage: %s)".formatted(usage));
+							}
+						}
+						buf.append("\n");
+					}
+				}
+			}
+		}
+		return buf.toString();
 	}
 }

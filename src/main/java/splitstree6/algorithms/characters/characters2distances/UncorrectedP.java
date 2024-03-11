@@ -1,5 +1,5 @@
 /*
- * Uncorrected_P.java Copyright (C) 2024 Daniel H. Huson
+ * UncorrectedP.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -23,5 +23,5 @@ package splitstree6.algorithms.characters.characters2distances;
  * uncorrected-p is just another name for Hamming distances
  * Daniel Huson, 2006
  */
-public class Uncorrected_P extends HammingDistances {
+public class UncorrectedP extends HammingDistances {
 }

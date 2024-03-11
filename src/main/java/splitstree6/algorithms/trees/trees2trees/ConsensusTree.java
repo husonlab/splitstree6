@@ -58,7 +58,7 @@ public class ConsensusTree extends Trees2Trees {
 
 	@Override
 	public String getCitation() {
-		return "Bryant 2001;D. Bryant, A classification of consensus methods for phylogenetics}, in Bioconsensus, 2001";
+		return "Bryant 2001;D. Bryant, A classification of consensus methods for phylogenetics, in Bioconsensus, 2001";
 	}
 
 	@Override

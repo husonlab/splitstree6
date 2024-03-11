@@ -151,7 +151,7 @@ public class LUDecomposition implements java.io.Serializable {
          piv[i] = i;
       }
       pivsign = 1;
-      // Main loop.
+      // ExtractAlgorithms loop.
       for (int k = 0; k < n; k++) {
          // Find pivot.
          int p = k;

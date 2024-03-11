@@ -1,0 +1,894 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{fullpage}
+\usepackage{parskip} 
+
+
+
+
+
+\title{SplitsTree Community Edition - Documented methods}
+\author{Daniel H. Huson and Dave Bryant}
+\date{March 2024}
+
+\begin{document}
+
+\maketitle
+
+
+\section{List of algorithms sorted by input}
+
+
+\subsection{Input Characters Block}
+
+\subsubsection{Base Freq Distance}
+
+The ``Base Freq Distance'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+\subsubsection{Binary To Splits}
+
+The ``Binary To Splits'' algorithm takes a Characters block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    MinSplitWeight =  <Double>
+    HighDimensionFilter =  <Boolean>
+    AddAllTrivial =  <Boolean>
+\end{verbatim}
+}
+
+See: D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.
+
+\subsubsection{Characters Filter}
+
+The ``Characters Filter'' algorithm takes a Characters block as input and produces a Characters block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    ExcludeGapSites =  <Boolean> (usage: Exclude all sites that contain a gap)
+    ExcludeParsimonyUninformativeSites =  <Boolean> (usage: Exclude all sites that are parsimony uninformative)
+    ExcludeConstantSites =  <Boolean> (usage: Exclude all sites that are constant)
+    ExcludeFirstCodonPosition =  <Boolean> (usage: Exclude first and then every third site)
+    ExcludeSecondCodonPosition =  <Boolean> (usage: Exclude second and then every third site)
+    ExcludeThirdCodonPosition =  <Boolean> (usage: Exclude third and then every third site)
+\end{verbatim}
+}
+
+\subsubsection{Codominant}
+
+The ``Codominant'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+See:  Smouse PE, Peakall R. Spatial autocorrelation analysis of individual multiallele and multilocus genetic structure. Heredity, 82, 561-573, 1999.
+
+\subsubsection{Dice}
+
+The ``Dice'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+See:  Dice, Lee R. (1945). Measures of the Amount of Ecologic Association Between Species. Ecology. 26 (3): 297–302.
+
+\subsubsection{DNA To Splits}
+
+The ``DNA To Splits'' algorithm takes a Characters block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Method =  {MajorityState | RYAlphabet}
+    MinSplitWeight =  <Double>
+    HighDimensionFilter =  <Boolean>
+\end{verbatim}
+}
+
+See: D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.
+
+\subsubsection{Estimate Invariable Sites}
+
+The ``Estimate Invariable Sites'' algorithm takes a Characters block as input and produces a Report block as output.
+
+See:  MA Steel, DH Huson, and PJ Lockhart. Invariable site models and their use in phylogeny reconstruction. Sys. Biol. 49(2):225-232, 2000
+
+\subsubsection{External Program}
+
+The ``External Program'' algorithm takes a Characters block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Name =  <String>
+    ProgramCall =  <String>
+    CharactersFormat =  {Phylip | Nexus | FastA}
+\end{verbatim}
+}
+
+\subsubsection{F81}
+
+The ``F81'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    BaseFrequencies =  <doubleArray>
+    SetBaseFrequencies =  {fromChars | defaultValues}
+    PropInvariableSites =  <Double>
+    SetSiteVarParams =  {fromChars | defaultValues}
+    UseML_Distances =  <Boolean>
+\end{verbatim}
+}
+
+See:  Felsenstein J (1981). Evolutionary trees from DNA sequences: a maximum likelihood approach. Journal of Molecular Evolution. 17 (6): 368–376.
+
+\subsubsection{F84}
+
+The ``F84'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    BaseFrequencies =  <doubleArray>
+    SetBaseFrequencies =  {fromChars | defaultValues}
+    PropInvariableSites =  <Double>
+    SetSiteVarParams =  {fromChars | defaultValues}
+    UseML_Distances =  <Boolean>
+\end{verbatim}
+}
+
+See:  Felsenstein J, Churchill GA (1996). A Hidden Markov Model approach to variation among sites in rate of evolution, and the branching order in hominoidea. Molecular Biology and Evolution. 13 (1): 93–104.
+
+\subsubsection{GTR}
+
+The ``GTR'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    PropInvariableSites =  <Double>
+    SetSiteVarParams =  {fromChars | defaultValues}
+    RateMatrix =  <doubleSquareMatrix>
+    UseML_Distances =  <Boolean>
+\end{verbatim}
+}
+
+See:  Tavaré S (1986). Some Probabilistic and Statistical Problems in the Analysis of DNA Sequences. Lectures on Mathematics in the Life Sciences. 17: 57–86
+
+\subsubsection{Gene Content Distance}
+
+The ``Gene Content Distance'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Method =  {MLE | SharedGenes}
+\end{verbatim}
+}
+
+See:  D.H. Huson  and  M. Steel. Phylogenetic  trees  based  on  gene  content. Bioinformatics, 20(13):2044–9, 2004.
+
+\subsubsection{HKY85}
+
+The ``HKY85'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    TsTvRatio =  <Double>
+    BaseFrequencies =  <doubleArray>
+    SetBaseFrequencies =  {fromChars | defaultValues}
+    PropInvariableSites =  <Double>
+    SetSiteVarParams =  {fromChars | defaultValues}
+\end{verbatim}
+}
+
+See:  Hasegawa M, Kishino H, Yano T. Dating of human-ape splitting by a molecular clock of mitochondrial DNA. Journal of Molecular Evolution. 22 (2): 160–174. PMID 3934395. doi:10.1007/BF02101694, 1985.
+
+\subsubsection{Hamming Distances}
+
+The ``Hamming Distances'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Normalize =  <Boolean>
+\end{verbatim}
+}
+
+See:  Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
+
+\subsubsection{Hamming Distances Ambig States}
+
+The ``Hamming Distances Ambig States'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Normalize =  <Boolean>
+    HandleAmbiguousStates =  {Ignore | AverageStates | MatchStates}
+\end{verbatim}
+}
+
+See:  Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
+
+\subsubsection{Jaccard}
+
+The ``Jaccard'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+See:  Jaccard, Paul (1901). Étude comparative de la distribution florale dans une portion des Alpes et des Jura, Bulletin de la Société Vaudoise des Sciences Naturelles, 37: 547–579.
+
+\subsubsection{Jukes Cantor}
+
+The ``Jukes Cantor'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    PropInvariableSites =  <Double>
+    SetSiteVarParams =  {fromChars | defaultValues}
+    UseML_Distances =  <Boolean>
+\end{verbatim}
+}
+
+See:  Jukes TH \& Cantor CR (1969). Evolution of Protein Molecules. New York: Academic Press. pp. 21–132
+
+\subsubsection{K2P}
+
+The ``K2P'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    TsTvRatio =  <Double>
+    Gamma =  <Double>
+    PropInvariableSites =  <Double>
+    SetSiteVarParams =  {fromChars | defaultValues}
+    UseML_Distances =  <Boolean>
+\end{verbatim}
+}
+
+See:  Kimura M (1980). A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences. Journal of Molecular Evolution. 16 (2): 111–120.
+
+\subsubsection{K3ST}
+
+The ``K3ST'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    TsTvRatio =  <Double>
+    ACvATRatio =  <Double>
+    Gamma =  <Double>
+    PropInvariableSites =  <Double>
+    SetSiteVarParams =  {fromChars | defaultValues}
+    UseML_Distances =  <Boolean>
+\end{verbatim}
+}
+
+See:  M. Kimura, Estimation of evolutionary sequences between homologous nucleotide sequences, Proc. Natl. Acad. Sci. USA 78 (1981) 454–45
+
+\subsubsection{Log Det}
+
+The ``Log Det'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    PropInvariableSites =  <Double>
+    FudgeFactor =  <Boolean>
+    FillZeros =  <Boolean>
+\end{verbatim}
+}
+
+See:  M.A. Steel. Recovering a tree from the leaf colorations it generates under a Markov model. Appl. Math. Lett., 7(2):19–24, 1994.
+
+\subsubsection{Median Joining}
+
+The ``Median Joining'' algorithm takes a Characters block as input and produces a Network block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Epsilon =  <Integer>
+\end{verbatim}
+}
+
+See: H. -J. Bandelt, P. Forster, and A. Röhl. Median-joining networks for inferring intraspecific phylogenies. Molecular Biology and Evolution, 16:37–48, 1999.
+
+\subsubsection{Nei Li Restriction Distance}
+
+The ``Nei Li Restriction Distance'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+See: M Nei and W H Li. Mathematical model for studying genetic variation in terms of restriction endonucleases, PNAS 79(1):5269-5273, 1979.
+
+\subsubsection{Nei Miller}
+
+The ``Nei Miller'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+See:  M. Nei and J.C. Miller. A simple method for estimating average number of nucleotide substitutions within and between populations from restriction data. Genetics, 125:873–879, 1990.
+
+\subsubsection{Parsimony Splits}
+
+The ``Parsimony Splits'' algorithm takes a Characters block as input and produces a Splits block as output.
+
+See:  H.-J.Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. Advances in Mathematics, 92:47–105, 1992.
+
+\subsubsection{Phi Test}
+
+The ``Phi Test'' algorithm takes a Characters block as input and produces a Report block as output.
+
+See:  Bruen TC, Philippe H, Bryant D. A simple and robust statistical test for detecting the presence of recombination. Genetics 17(4):2665-81, 2006
+
+\subsubsection{Protein M Ldist}
+
+The ``Protein M Ldist'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Model =  {cpREV45 | Dayhoff | JTT | mtMAM | mtREV24 | pmb | Rhodopsin | WAG}
+    PropInvariableSites =  <Double>
+    Gamma =  <Double>
+\end{verbatim}
+}
+
+See:  D.L. Swofford, G.J. Olsen, P.J. Waddell, and  D.M. Hillis. Chapter  11:  Phylogenetic inference. In D. M. Hillis, C. Moritz, and B. K. Mable, editors, Molecular Systematics, pages 407–514. Sinauer Associates, Inc., 2nd edition, 1996.
+
+\subsubsection{Uncorrected P}
+
+The ``Uncorrected P'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Normalize =  <Boolean>
+\end{verbatim}
+}
+
+See:  Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
+
+\subsubsection{Upholt}
+
+The ``Upholt'' algorithm takes a Characters block as input and produces a Distances block as output.
+
+See:  Upholt WB. Estimation of DNA sequence divergence from comparison of restriction endonuclease digests. Nucleic Acids Res. 1977;4(5):1257-65.
+
+\subsection{Input Distances Block}
+
+\subsubsection{Bio NJ}
+
+The ``Bio NJ'' algorithm takes a Distances block as input and produces a Trees block as output.
+
+See:  O. Gascuel, BIONJ: an improved version of the NJ algorithm based on a simple model of sequence data. Molecular Biology and Evolution. 1997 14:685-695.
+
+\subsubsection{Buneman Tree}
+
+The ``Buneman Tree'' algorithm takes a Distances block as input and produces a Splits block as output.
+
+See:  H.-J. Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. Advances in Mathematics, 92:47–105, 1992.
+
+\subsubsection{Delta Score}
+
+The ``Delta Score'' algorithm takes a Distances block as input and produces a Report block as output.
+
+See: B. R. Holland, K. T. Huber, A. Dress, V. Moulton, ? Plots: A Tool for Analyzing Phylogenetic Distance Data, Molecular Biology and Evolution, 19(12):2051–2059, 2002.
+
+\subsubsection{Min Spanning Network}
+
+The ``Min Spanning Network'' algorithm takes a Distances block as input and produces a Network block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Epsilon =  <Double>
+    MinSpanningTree =  <Boolean>
+\end{verbatim}
+}
+
+See:  Excoffier L, Smouse PE. Using allele frequencies and geographic subdivision to reconstruct gene trees within a species: molecular variance parsimony (1994) Genetics.136(1):343-59.
+
+\subsubsection{Min Spanning Tree}
+
+The ``Min Spanning Tree'' algorithm takes a Distances block as input and produces a Trees block as output.
+
+See:  Excoffier L, Smouse PE. Using allele frequencies and geographic subdivision to reconstruct gene trees within a species: molecular variance parsimony (1994) Genetics.136(1):343-59.
+
+\subsubsection{Neighbor Joining}
+
+The ``Neighbor Joining'' algorithm takes a Distances block as input and produces a Trees block as output.
+
+See:  N. Saitou and M. Nei. The Neighbor-Joining method: a new method for reconstructing phylogenetic trees. Molecular Biology and Evolution, 4:406-425, 1987.
+
+\subsubsection{Neighbor Net}
+
+The ``Neighbor Net'' algorithm takes a Distances block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    InferenceAlgorithm =  {GradientProjection | ActiveSet | APGD | SplitsTree4}
+\end{verbatim}
+}
+
+See:  D. Bryant and V. Moulton. Neighbor-net: An agglomerative method for the construction of phylogenetic networks. Molecular Biology and Evolution, 21(2):255– 265, 2004.;Bryant \& Huson 2023;D. Bryant and D.H. Huson, NeighborNet- improved algorithms and implementation. Front. Bioinform. 3, 2023
+
+\subsubsection{P Co A}
+
+The ``P Co A'' algorithm takes a Distances block as input and produces a Network block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    FirstCoordinate =  <Integer> (usage: Choose principal component for the x Axis)
+    SecondCoordinate =  <Integer> (usage: Choose principal component for the y Axis)
+\end{verbatim}
+}
+
+See:  Gower, J. C. (1966). Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53(3-4), 325-338.
+
+\subsubsection{Split Decomposition}
+
+The ``Split Decomposition'' algorithm takes a Distances block as input and produces a Splits block as output.
+
+See:  H.-J.Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. Advances in Mathematics, 92:47–105, 1992.
+
+\subsubsection{UPGMA}
+
+The ``UPGMA'' algorithm takes a Distances block as input and produces a Trees block as output.
+
+See:  R.R. Sokal and C.D.Michener. A statistical method for evaluating systematic relationships. University of Kansas Scientific Bulletin, 28:1409-1438, 1958.
+
+\subsection{Input Splits Block}
+
+\subsubsection{Bootstrap Splits}
+
+The ``Bootstrap Splits'' algorithm takes a Splits block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Replicates =  <Integer>
+    MinPercent =  <Double>
+    ShowAllSplits =  <Boolean>
+    RandomSeed =  <Integer>
+    HighDimensionFilter =  <Boolean>
+\end{verbatim}
+}
+
+See: Felsenstein J. Confidence limits on phylogenies: an approach using the bootstrap. Evolution. 1985;39(4):783-791
+
+\subsubsection{Dimension Filter}
+
+The ``Dimension Filter'' algorithm takes a Splits block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    MaxDimension =  <Integer>
+\end{verbatim}
+}
+
+\subsubsection{Greedy Tree}
+
+The ``Greedy Tree'' algorithm takes a Splits block as input and produces a Trees block as output.
+
+See: D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.
+
+\subsubsection{Phylogenetic Diversity}
+
+The ``Phylogenetic Diversity'' algorithm takes a Splits block as input and produces a Report block as output.
+
+See: Volkmann L, Martyn I, Moulton V, Spillner A, Mooers AO. Prioritizing populations for conservation using phylogenetic networks. PLoS ONE 9(2):e88945 (2014)
+
+\subsubsection{Shapley Values}
+
+The ``Shapley Values'' algorithm takes a Splits block as input and produces a Report block as output.
+
+See: Volkmann L, Martyn I, Moulton V, Spillner A, Mooers AO. Prioritizing populations for conservation using phylogenetic networks. PLoS ONE 9(2):e88945 (2014)
+
+\subsubsection{Show Splits}
+
+The ``Show Splits'' algorithm takes a Splits block as input and produces a View block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    View =  {SplitsNetwork}
+\end{verbatim}
+}
+
+\subsubsection{Splits Filter}
+
+The ``Splits Filter'' algorithm takes a Splits block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    WeightThreshold =  <Float>
+    ConfidenceThreshold =  <Float>
+    MaximumDimension =  <Integer>
+    FilterAlgorithm =  {None | GreedyCompatible | GreedyCircular | GreedyWeaklyCompatible | BlobTree}
+    RecomputeCycle =  <Boolean>
+\end{verbatim}
+}
+
+\subsubsection{Weights Slider}
+
+The ``Weights Slider'' algorithm takes a Splits block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    WeightThreshold =  <Double>
+\end{verbatim}
+}
+
+\subsection{Input Trees Block}
+
+\subsubsection{ALTS External}
+
+The ``ALTS External'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    ALTSExecutableFile =  <String>
+\end{verbatim}
+}
+
+See:  Louxin Zhang, Niloufar Niloufar Abhari, Caroline Colijn and Yufeng Wu3. A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023
+
+\subsubsection{ALTS Network}
+
+The ``ALTS Network'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    MutualRefinement =  <Boolean>
+    RemoveDuplicates =  <Boolean>
+    Kernelization =  <Boolean>
+\end{verbatim}
+}
+
+See:  Louxin Zhang, Niloufar Niloufar Abhari, Caroline Colijn and Yufeng Wu3. A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023;Zhang et al, 2024; Louxin Zhang, Banu Cetinkaya and Daniel H Huson. Hybrization networks from multiple trees, in preparation.
+
+\subsubsection{Autumn Algorithm}
+
+The ``Autumn Algorithm'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    FirstTree =  <Integer>
+    SecondTree =  <Integer>
+\end{verbatim}
+}
+
+See:  D.H. Huson and S. Linz. Autumn Algorithm—Computation of Hybridization Networks for Realistic Phylogenetic Trees. IEEE/ACM Transactions on Computational Biology and Bioinformatics: 15:398-420, 2018.
+
+\subsubsection{Average Consensus}
+
+The ``Average Consensus'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+See: Francois-Joseph Lapointe, Guy Cucumel, The Average Consensus Procedure: Combination of Weighted Trees Containing Identical or Overlapping Sets of Taxa. Systematic Biology, 46(2):306-312 (1997).
+
+\subsubsection{Average Distances}
+
+The ``Average Distances'' algorithm takes a Trees block as input and produces a Distances block as output.
+
+See: Francois-Joseph Lapointe, Guy Cucumel, The Average Consensus Procedure: Combination of Weighted Trees Containing Identical or Overlapping Sets of Taxa. Systematic Biology, 46(2):306-312 (1997).
+
+\subsubsection{Bootstrap Tree}
+
+The ``Bootstrap Tree'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Replicates =  <Integer>
+    TransferBootstrap =  <Boolean>
+    MinPercent =  <Double>
+    RandomSeed =  <Integer>
+\end{verbatim}
+}
+
+See: Felsenstein J. Confidence limits on phylogenies: an approach using the bootstrap. Evolution, 39(4):783-791 (1985);
+
+\subsubsection{Bootstrap Tree Splits}
+
+The ``Bootstrap Tree Splits'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Replicates =  <Integer>
+    MinPercent =  <Double>
+    ShowAllSplits =  <Boolean>
+    RandomSeed =  <Integer>
+    HighDimensionFilter =  <Boolean>
+\end{verbatim}
+}
+
+See: Felsenstein J. Confidence limits on phylogenies: an approach using the bootstrap. Evolution, 39(4):783-791 (1985);
+
+\subsubsection{Cluster Network}
+
+The ``Cluster Network'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    EdgeWeights =  {Mean | Count | Sum | Uniform}
+    ThresholdPercent =  <Double>
+\end{verbatim}
+}
+
+See:  D.H. Huson and R. Rupp (2008) Summarizing multiple gene trees using cluster networks. In: Crandall, K.A., Lagergren, J. (eds) Algorithms in Bioinformatics. WABI 2008. Lecture Notes in Computer Science(), vol 5251.
+
+\subsubsection{Consensus Network}
+
+The ``Consensus Network'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    EdgeWeights =  {Mean | TreeSizeWeightedMean | Median | Count | Sum | Uniform | TreeNormalizedSum}
+    ThresholdPercent =  <Double>
+    HighDimensionFilter =  <Boolean>
+\end{verbatim}
+}
+
+See:  B. Holland and V. Moulton. Consensus networks:  A method for visualizing incompatibilities in  collections  of  trees. In  G.  Benson  and  R.  Page,  editors, Proceedings  of  “Workshop  on Algorithms in Bioinformatics, volume 2812 of LNBI, pages 165–176. Springer, 2003.
+
+\subsubsection{Consensus Outline}
+
+The ``Consensus Outline'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    EdgeWeights =  {Mean | TreeSizeWeightedMean | Median | Count | Sum | Uniform | TreeNormalizedSum}
+    ThresholdPercent =  <Double>
+\end{verbatim}
+}
+
+See: DH Huson and B Cetinkaya, Visualizing incompatibilities in phylogenetic trees using consensus outlines, Front. Bioinform. (2023) 
+
+\subsubsection{Consensus Splits}
+
+The ``Consensus Splits'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Consensus =  {Strict | Majority | GreedyCompatible | ConsensusOutline | GreedyWeaklyCompatible | ConsensusNetwork}
+    EdgeWeights =  {Mean | TreeSizeWeightedMean | Median | Count | Sum | Uniform | TreeNormalizedSum}
+    ThresholdPercent =  <Double>
+    HighDimensionFilter =  <Boolean>
+\end{verbatim}
+}
+
+See: D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.
+
+\subsubsection{Consensus Tree}
+
+The ``Consensus Tree'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Consensus =  {Majority | Greedy | Strict}
+    EdgeWeights =  {Mean | TreeSizeWeightedMean | Median | Count | Sum | Uniform | TreeNormalizedSum}
+\end{verbatim}
+}
+
+See: D. Bryant, A classification of consensus methods for phylogenetics, in Bioconsensus, 2001
+
+\subsubsection{Enumerate Contained Trees}
+
+The ``Enumerate Contained Trees'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    RemoveDuplicates =  <Boolean>
+\end{verbatim}
+}
+
+\subsubsection{Filtered Super Network}
+
+The ``Filtered Super Network'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    MinNumberTrees =  <Integer> (usage: Set the min number trees)
+    MaxDistortionScore =  <Integer> (usage: Set the max distortion score)
+    UseTotalScore =  <Boolean> (usage: Set the use total score)
+\end{verbatim}
+}
+
+See: James B. Whitfield, Sydney A. Cameron, Daniel H. Huson, Mike A. Steel. Filtered Z-Closure Supernetworks for Extracting and Visualizing Recurrent Signal from Incongruent Gene Trees, Systematic Biology, Volume 57, Issue 6, 1 December 2008, Pages 939–947.
+
+\subsubsection{List One RSPR Trees}
+
+The ``List One RSPR Trees'' algorithm takes a Trees block as input and produces a Report block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    ApplyTo =  {OneTree | AllTrees}
+    WhichTree =  <Integer>
+\end{verbatim}
+}
+
+\subsubsection{Loose And Lacy}
+
+The ``Loose And Lacy'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    SpeciesDefinition =  {Loose | Lacy | Both}
+    TraitNumber =  <Integer>
+    UseAllTraits =  <Boolean>
+\end{verbatim}
+}
+
+See: Anica Hoppe, Sonja Tuerpitz, Mike Steel. Species notions that combine phylogenetic trees and phenotypic partitions. arXiv:1711.08145v1.
+
+\subsubsection{Phylogenetic Diversity}
+
+The ``Phylogenetic Diversity'' algorithm takes a Trees block as input and produces a Report block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Rooted =  <Boolean>
+    ApplyTo =  {OneTree | AllTrees}
+    WhichTree =  <Integer>
+\end{verbatim}
+}
+
+See: Faith, D.P. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10 (1992)
+
+\subsubsection{Reroot Or Reorder Trees}
+
+The ``Reroot Or Reorder Trees'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    RootBy =  {Off | MidPoint | OutGroup}
+    RearrangeBy =  {Off | RotateChildren | RotateSubTrees | ReverseChildren | ReverseSubTrees}
+    Reorder =  {Off | ByTaxa | Lexicographically | ReverseOrder | LadderizedUp | LadderizedDown | LadderizedRandom | Stabilize}
+\end{verbatim}
+}
+
+\subsubsection{Rooted Consensus Tree}
+
+The ``Rooted Consensus Tree'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Consensus =  {Majority | Strict | Greedy}
+\end{verbatim}
+}
+
+\subsubsection{Show Trees}
+
+The ``Show Trees'' algorithm takes a Trees block as input and produces a View block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    View =  {TreeView | TreePages | Tanglegram | DensiTree}
+\end{verbatim}
+}
+
+\subsubsection{Super Network}
+
+The ``Super Network'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    EdgeWeights =  {AverageRelative | Mean | TreeSizeWeightedMean | Sum | Min | None}
+    SuperTree =  <Boolean>
+    NumberOfRuns =  <Integer>
+    ApplyRefineHeuristic =  <Boolean>
+    Seed =  <Integer>
+    HighDimensionFilter =  <Boolean>
+\end{verbatim}
+}
+
+See: D.H. Huson, T. Dezulian, T. Kloepper, and M. A. Steel. Phylogenetic super-networks from partial trees. IEEE/ACM Transactions in Computational Biology and Bioinformatics, 1(4):151–158, 2004.
+
+\subsubsection{Tree Diversity Index}
+
+The ``Tree Diversity Index'' algorithm takes a Trees block as input and produces a Report block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Method =  {FairProportions | EqualSplits}
+    ApplyTo =  {OneTree | AllTrees}
+    WhichTree =  <Integer>
+\end{verbatim}
+}
+
+See: Redding, D. Incorporating genetic distinctness and reserve occupancy into a conservation priorisation approach. Master’s thesis. University of East Anglia (2003)
+
+\subsubsection{Tree Selector}
+
+The ``Tree Selector'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Which =  <Integer>
+\end{verbatim}
+}
+
+\subsubsection{Tree Selector Splits}
+
+The ``Tree Selector Splits'' algorithm takes a Trees block as input and produces a Splits block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    Which =  <Integer>
+\end{verbatim}
+}
+
+\subsubsection{Trees Filter}
+
+The ``Trees Filter'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+\subsubsection{Trees Filter 2}
+
+The ``Trees Filter 2'' algorithm takes a Trees block as input and produces a Trees block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    RequireAllTaxa =  <Boolean>
+    MinNumberOfTaxa =  <Integer>
+    MinNumberOfTaxa =  <Integer>
+    MinEdgeLength =  <Double>
+    MinConfidence =  <Double>
+    UniformEdgeLengths =  <Boolean>
+\end{verbatim}
+}
+
+\subsubsection{Unrooted Shapley Values}
+
+The ``Unrooted Shapley Values'' algorithm takes a Trees block as input and produces a Report block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    ApplyTo =  {OneTree | AllTrees}
+    WhichTree =  <Integer>
+\end{verbatim}
+}
+
+See: Haake C.J., Kashiwada A., Su F.E. The Shapley value of phylogenetic trees. J Math Biol 56:479–497 (2008) 
+
+\subsection{Input Network Block}
+
+\subsubsection{Show Network}
+
+The ``Show Network'' algorithm takes a Network block as input and produces a View block as output.
+
+Options:
+{\footnotesize
+\begin{verbatim}
+    View =  {Network | Text}
+\end{verbatim}
+}
+
+
+
+\end{document}
