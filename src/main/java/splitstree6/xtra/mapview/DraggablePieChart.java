@@ -44,7 +44,6 @@ public class DraggablePieChart {
 
             centerXProperty.set(pieChart.getLayoutX() + pieChart.getBoundsInLocal().getWidth() / 2);
             centerYProperty.set(pieChart.getLayoutY() + pieChart.getBoundsInLocal().getHeight() / 2);
-            //System.out.println("LayoutX " + pieChart.getLayoutX() + " LayoutY " + pieChart.getLayoutY());
 
         });
 

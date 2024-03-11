@@ -38,7 +38,7 @@ public class SingleImageMap {
 	private static Image image;
 
 	static {
-		//setMap("Equal-Earth-Map-0.jpg");
+		//setMap("Blue_Marble_2002.png");
 		setMap("2_no_clouds_16k.jpg");
 	}
 

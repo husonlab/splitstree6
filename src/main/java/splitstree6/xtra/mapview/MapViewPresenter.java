@@ -21,6 +21,8 @@ package splitstree6.xtra.mapview;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -34,11 +36,16 @@ import javafx.scene.image.Image;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import org.locationtech.jts.geom.Geometry;
 //import jloda.fx.util.ClipboardUtils;
 
+import java.io.IOException;
+import java.text.ParseException;
 import java.util.*;
 
 import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
@@ -102,18 +109,22 @@ public class MapViewPresenter {
 			ArrayList<String> traitLabels = new ArrayList<String>();
 			traitLabels.addAll(model.getTaxaBlock().getLabels());
 
-			CountryBounds countryBounds = new CountryBounds();
-			var mapBounds = mapPane.getBounds();
-			ArrayList<CountryBounds.Country> countryLabels = countryBounds.countriesInBound(mapBounds.minLatitude(), mapBounds.minLatitude() + mapBounds.rangeLatitude(),
-																							mapBounds.minLongitude(), mapBounds.minLongitude() + mapBounds.rangeLongitude());
-			for(CountryBounds.Country label : countryLabels){
-				//System.out.println(label.name() + label.center_lat() + label.center_lon());
-				DraggableLabel draggableLabel = new DraggableLabel(label.name());
-				draggableLabel.setStyle("-fx-font-size: 16px;");
-				draggableLabel.visibleProperty().bind(controller.getShowLabelsBox().selectedProperty());
-				mapPane.place(draggableLabel, label.center_lon(), label.center_lat(), true);
+			CountryFinder countryFinder = new CountryFinder();
 
+			var mapBounds = mapPane.getBounds();
+			ArrayList<CountryFinder.Country> countryLabels = countryFinder.getCountriesForAlpha2Codes(mapBounds.minLatitude(), mapBounds.maxLatitude(), mapBounds.minLongitude(), mapBounds.maxLongitude());
+
+			for(CountryFinder.Country label : countryLabels){
+				//System.out.println(label.name() + label.center_lat() + label.center_lon());
+				System.out.println(" Adding label: " + label.name() + " " + label.latitude() + " " + label.longitude());
+				DraggableLabel draggableLabel = new DraggableLabel(label.name(), controller);
+				//Font font = Font.font("Arial", FontWeight.BOLD, 24);
+				//draggableLabel.setFont(font);
+				//draggableLabel.setStyle("-fx-font-size: 24px;");
+				//draggableLabel.visibleProperty().bind(controller.getShowLabelsBox().selectedProperty());
+				mapPane.place(draggableLabel, label.longitude(), label.latitude(), true);
 			}
+
 
 			for(var trait : traits){
 				System.out.println("trait " + trait.getLatitude() + " " + trait.getLongtitude());
@@ -192,6 +203,7 @@ public class MapViewPresenter {
 
 		}
 	}
+
 
 	private Image createImage(Node node) {
 		var parameters = new SnapshotParameters();
