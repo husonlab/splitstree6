@@ -48,7 +48,7 @@ public class ReaderWriterBase {
 	}
 
 	public boolean accepts(String file) {
-		if (fileExtensions.size() == 0 || file.endsWith(".tmp") || FileUtils.getFileSuffix(file).length() > 4)
+		if (fileExtensions.isEmpty() || file.endsWith(".tmp") || FileUtils.getFileSuffix(file).length() > 4)
 			return true;
 		else {
 			for (var ex : fileExtensions) {

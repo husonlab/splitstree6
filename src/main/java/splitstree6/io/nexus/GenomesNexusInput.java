@@ -37,20 +37,20 @@ import java.util.List;
 public class GenomesNexusInput extends NexusIOBase implements INexusInput<GenomesBlock> {
 	public static final String SYNTAX = """
 			BEGIN GENOMES;
-			\t[TITLE {title};]
-			\t[LINK {type} = {title};]
-			\t[DIMENSIONS NTAX=number-of-taxa;]
-			\t[FORMAT
-			\t\t[LABELS={YES|NO}]
-			\t\t[ACCESSIONS={YES|NO}]
-			\t\t[MULTIPART={YES|NO}]
-			\t\t[FILES={YES|NO}]
-			\t;]
-			\tMATRIX
-			\t\t[label] [accession] length {sequence | [number-of-parts] length {sequence|{file://file offset}} ...  length {sequence|{file offset}}},
-			\t\t...
-			\t\t[label] [accession] length {sequence | [number-of-parts] length {sequence|{file://file offset}} ...  length {sequence|{file offset}}}
-			\t;]
+				[TITLE {title};]
+				[LINK {type} = {title};]
+				[DIMENSIONS NTAX=number-of-taxa;]
+				[FORMAT
+					[LABELS={YES|NO}]
+					[ACCESSIONS={YES|NO}]
+					[MULTIPART={YES|NO}]
+					[FILES={YES|NO}]
+				;]
+				MATRIX
+				  [label] [accession] length {sequence | [#parts] length {sequence|{file:.. offset}} .. length {sequence|{file offset}}},
+				  ...
+				  [label] [accession] length {sequence | [#parts] length {sequence|{file:.. offset}} .. length {sequence|{file offset}}}
+				;]
 			END;
 			""";
 

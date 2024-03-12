@@ -122,5 +122,4 @@ public class StockholmImporter extends CharactersReader {
 		var line = StringUtils.getFirstLine(text);
 		return line.replaceAll("\\s+", "").toUpperCase().startsWith("#STOCKHOLM");
 	}
-
 }

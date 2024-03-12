@@ -1,1 +1,2 @@
 - allow user to set scale explicitly, e.g. 1 unit = 144pixels.
+- preorder algorithms in pop-up menus

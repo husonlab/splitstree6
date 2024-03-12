@@ -17,13 +17,37 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.docs;
+package splitstree6.xtra.latex;
 
 import splitstree6.io.nexus.*;
 
 public class NexusToLaTeX {
 	public static void main(String[] args) {
+		var header = """
+				\\documentclass{article}
+				\\usepackage{graphicx}
+				\\usepackage{hyperref}
+				\\usepackage{fullpage}
+				\\usepackage{parskip}\s
+				     
+				\\title{SplitsTree Community Edition - Nexus blocks}
+				\\author{Daniel H. Huson and Dave Bryant}
+				\\date{March 2024}
+				    
+				\\begin{document}
+				    
+				\\maketitle
+								
+				\\section{Main data blocks and their `Nexus format' syntax}
+
+				""";
+
+		var footer = """
+				\\end{document}
+				""";
 		var buf = new StringBuilder();
+
+		buf.append(header);
 
 		buf.append(output("Taxa block", TaxaNexusInput.DESCRIPTION, TaxaNexusInput.SYNTAX));
 
@@ -49,13 +73,15 @@ public class NexusToLaTeX {
 
 		buf.append(output("Genomes block", GenomesNexusInput.DESCRIPTION, GenomesNexusInput.SYNTAX));
 
+		buf.append(footer);
+
 		System.out.println(buf.toString());
 	}
 
 	public static String output(String name, String description, String syntax) {
-		return "\\subsection{%s}\n%n%s%n".formatted(name, description) +
-			   "\\begin{verbatim}\n" +
-			   syntax +
-			   "\\end{verbatim}\n\n";
+		return "\\subsection{%s}\n%n%s%n".formatted(name, description.replaceAll("\t", "    ")) +
+			   "{\\footnotesize\\begin{verbatim}\n" +
+			   syntax.replaceAll("\t", "    ") +
+			   "\\end{verbatim}}\n\n";
 	}
 }

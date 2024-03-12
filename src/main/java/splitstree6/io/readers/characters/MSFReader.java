@@ -49,7 +49,6 @@ public class MSFReader extends CharactersReader {
 		boolean charStarted = false;
 
 		try (FileLineIterator it = new FileLineIterator(fileName)) {
-
 			progressListener.setMaximum(it.getMaximumProgress());
 			progressListener.setProgress(0);
 			int linesCounter = 0;
@@ -86,7 +85,7 @@ public class MSFReader extends CharactersReader {
 
 				if (charStarted) {
 					String taxon = cutTaxonFromLine(line, taxa2seq.keySet());
-					if (!taxon.equals("")) {
+					if (!taxon.isEmpty()) {
 						String chars = line.replaceAll("\\s+", "");
 						chars = chars.substring(taxon.length());
 						checkIfCharactersValid(chars, linesCounter, "" + getMissing() + getGap());

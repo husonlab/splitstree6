@@ -218,6 +218,5 @@ public class PhylipReader extends CharactersReader {
 		var tokens = text.trim().split("\\s+");
 		return tokens.length == 2 && NumberUtils.isInteger(tokens[0]) && NumberUtils.isInteger(tokens[1]);
 	}
-
 }
 

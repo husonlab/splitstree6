@@ -110,7 +110,7 @@ public class ExportManager {
 		var suffix = FileUtils.getFileSuffix(selectedFile.getName());
 		if (suffix == null) {
 			var exporter = getExporterByName(clazz, exporterName);
-			if (exporter != null && exporter.getFileExtensions().size() > 0) {
+			if (exporter != null && !exporter.getFileExtensions().isEmpty()) {
 				return FileUtils.replaceFileSuffix(selectedFile, "." + exporter.getFileExtensions().get(0));
 			}
 		}
@@ -133,6 +133,14 @@ public class ExportManager {
 		return null;
 	}
 
+	public List<DataBlockWriter> getExporters(Class<? extends DataBlock> clazz) {
+		var result = new ArrayList<DataBlockWriter>();
+		for (var exporter : exporters) {
+			if (exporter.getFromClass() == clazz)
+				result.add(exporter);
+		}
+		return result;
+	}
 	/**
 	 * write a datablock using the named exporter
 	 */

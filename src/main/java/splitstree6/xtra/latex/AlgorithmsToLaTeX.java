@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.docs;
+package splitstree6.xtra.latex;
 
 import jloda.util.StringUtils;
 import org.apache.commons.collections4.list.TreeList;
@@ -50,11 +50,13 @@ public class AlgorithmsToLaTeX {
 				    
 				\\maketitle
 								
+				\\section{Algorithms}
+								
 				""";
+
 		var footer = """
 				\\end{document}
-								
-					""";
+				""";
 		var ordering = List.of("Characters Block", "Distances Block", "Splits Block", "Trees Block", "Network Block", "View Block", "Report Block");
 
 		var fromLineMap = new HashMap<String, List<String>>();
