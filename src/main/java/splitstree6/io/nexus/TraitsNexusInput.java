@@ -54,6 +54,11 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block contains traits associated with the input taxa. Each trait has a label,
+			optional latitude and longitude, and a value, which can either be a number or a string.
+			""";
+
 	public String getSyntax() {
 		return SYNTAX;
 	}
@@ -101,13 +106,13 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 				throw new IOExceptionWithLineNumber("Format 'no labels' invalid because no taxLabels given in TAXA block", np.lineno());
 
 			final var separator = np.findIgnoreCase(formatTokens, "separator=", StringUtils.toString(TraitsNexusFormat.Separator.values(), " "), "");
-			if (separator.length() > 0) {
+			if (!separator.isEmpty()) {
 				format.setOptionSeparator(separator);
 			}
 
 			format.setOptionMissingCharacter(Character.toLowerCase(np.findIgnoreCase(formatTokens, "missing=", null, '?')));
 
-			if (formatTokens.size() != 0)
+			if (!formatTokens.isEmpty())
 				throw new IOExceptionWithLineNumber("Unexpected in FORMAT: '" + StringUtils.toString(formatTokens, " ") + "'", np.lineno());
 		}
 

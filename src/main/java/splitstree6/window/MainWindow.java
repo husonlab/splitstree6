@@ -35,6 +35,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.StatementFilter;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
@@ -53,6 +54,7 @@ import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.view.alignment.AlignmentView;
 import splitstree6.workflow.Workflow;
 import splitstree6.workflowtree.WorkflowTreeView;
+import splitstree6.xtra.latex.MenusToLaTeX;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -143,6 +145,11 @@ public class MainWindow implements IMainWindow {
 		name.set("Untitled");
 
 		presenter = new MainWindowPresenter(this);
+
+		if (true) {
+			var obj = new Object();
+			RunAfterAWhile.applyInFXThread(obj, () -> System.out.println(MenusToLaTeX.apply(controller.getMenuBar())));
+		}
 	}
 
 	@Override

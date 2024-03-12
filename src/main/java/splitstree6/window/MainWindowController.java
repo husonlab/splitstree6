@@ -162,9 +162,6 @@ public class MainWindowController {
 	private MenuItem gotoLineMenuItem;
 
 	@FXML
-	private MenuItem preferencesMenuItem;
-
-	@FXML
 	private MenuItem selectAllMenuItem;
 
 	@FXML
@@ -750,10 +747,6 @@ public class MainWindowController {
 
 	public MenuItem getGotoLineMenuItem() {
 		return gotoLineMenuItem;
-	}
-
-	public MenuItem getPreferencesMenuItem() {
-		return preferencesMenuItem;
 	}
 
 	public MenuItem getSelectAllMenuItem() {

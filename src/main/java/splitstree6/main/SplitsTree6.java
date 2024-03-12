@@ -81,7 +81,6 @@ public class SplitsTree6 extends Application {
 		SplashScreen.setVersionString(ProgramProperties.getProgramVersion());
 		SplashScreen.setImageResourceName("SplitsTree6-splash.png");
 
-
 		try {
 			parseArguments(args);
 		} catch (Throwable th) {

@@ -23,6 +23,7 @@ import javafx.stage.FileChooser;
 import jloda.util.Basic;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TreesBlock;
+import splitstree6.io.readers.characters.StockholmReader;
 import splitstree6.io.utils.DataReaderBase;
 import splitstree6.io.utils.IDataReaderNoAutoDetect;
 import splitstree6.workflow.DataBlock;
@@ -45,7 +46,7 @@ public class ImportManager {
 	private ImportManager() {
 		readers.add(new splitstree6.io.readers.characters.FastAReader());
 		readers.add(new splitstree6.io.readers.characters.MSFReader());
-		readers.add(new splitstree6.io.readers.characters.StockholmImporter());
+		readers.add(new StockholmReader());
 		readers.add(new splitstree6.io.readers.characters.NexusReader());
 		readers.add(new splitstree6.io.readers.characters.PhylipReader());
 		readers.add(new splitstree6.io.readers.distances.NexusReader());

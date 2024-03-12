@@ -47,9 +47,9 @@ public class GenomesNexusInput extends NexusIOBase implements INexusInput<Genome
 					[FILES={YES|NO}]
 				;]
 				MATRIX
-				  [label] [accession] length {sequence | [#parts] length {sequence|{file:.. offset}} .. length {sequence|{file offset}}},
-				  ...
-				  [label] [accession] length {sequence | [#parts] length {sequence|{file:.. offset}} .. length {sequence|{file offset}}}
+				 	[label] [accession] length {sequence | [#parts] length {sequence|{file:.. offset}} .. length {sequence|{file offset}}},
+				 	...
+				 	[label] [accession] length {sequence | [#parts] length {sequence|{file:.. offset}} .. length {sequence|{file offset}}}
 				;]
 			END;
 			""";

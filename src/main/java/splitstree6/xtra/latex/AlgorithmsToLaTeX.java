@@ -29,34 +29,15 @@ import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 import java.util.HashMap;
 import java.util.List;
 
+import static splitstree6.xtra.latex.IOToLaTeX.FOOTER;
+import static splitstree6.xtra.latex.IOToLaTeX.HEADER;
+
 /**
  * outputs a LaTeX document containing a description of all algorithms
  * Daniel Huson, 3.2024
  */
 public class AlgorithmsToLaTeX {
 	public static void main(String[] args) {
-		var header = """
-				\\documentclass{article}
-				\\usepackage{graphicx}
-				\\usepackage{hyperref}
-				\\usepackage{fullpage}
-				\\usepackage{parskip}\s
-				     
-				\\title{SplitsTree Community Edition - Algorithms}
-				\\author{Daniel H. Huson and Dave Bryant}
-				\\date{March 2024}
-				    
-				\\begin{document}
-				    
-				\\maketitle
-								
-				\\section{Algorithms}
-								
-				""";
-
-		var footer = """
-				\\end{document}
-				""";
 		var ordering = List.of("Characters Block", "Distances Block", "Splits Block", "Trees Block", "Network Block", "View Block", "Report Block");
 
 		var fromLineMap = new HashMap<String, List<String>>();
@@ -107,7 +88,7 @@ public class AlgorithmsToLaTeX {
 			}
 		}
 
-		System.out.println(header);
+		System.out.println(HEADER);
 
 		if (true) {
 			System.out.println("\\section{List of algorithms sorted by input}\n\n");
@@ -132,7 +113,7 @@ public class AlgorithmsToLaTeX {
 				}
 			}
 		}
-		System.out.println(footer);
+		System.out.println(FOOTER);
 
 	}
 }

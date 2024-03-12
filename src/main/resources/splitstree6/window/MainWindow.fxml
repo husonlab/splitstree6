@@ -32,14 +32,15 @@
             <VBox fx:id="topVBox" minHeight="0.0" BorderPane.alignment="CENTER">
                 <MenuBar fx:id="menuBar" VBox.vgrow="NEVER">
                     <Menu fx:id="fileMenu" text="File">
-                        <MenuItem fx:id="newMenuItem" text="New...">
+                        <MenuItem fx:id="newMenuItem" text="New..." userData="Create a new document and open it">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="N" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open...">
+                        <MenuItem fx:id="openMenuItem" mnemonicParsing="false" text="Open..."
+                                  userData="Open an existing file and process it">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="O" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
@@ -47,13 +48,14 @@
                         </MenuItem>
                         <Menu fx:id="openRecentMenu" text="Open Recent"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="replaceDataMenuItem" text="Replace Data...">
+                        <MenuItem fx:id="replaceDataMenuItem" text="Replace Data..."
+                                  userData="Replace the current input data">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="editInputMenuItem" text="Edit Input...">
+                        <MenuItem fx:id="editInputMenuItem" text="Edit Input..." userData="Open the input editor tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="U" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
@@ -62,29 +64,34 @@
                         <Menu mnemonicParsing="false" text="Import">
                             <items>
                                 <MenuItem fx:id="importDialogMenuItem" mnemonicParsing="false"
-                                          text="Data Import Dialog..."/>
+                                          text="Data Import Dialog..." userData="Open the data import dialog"/>
                                 <SeparatorMenuItem/>
                                 <MenuItem fx:id="importTaxonTraitsMenuItem" mnemonicParsing="false"
-                                          text="Taxon Traits..."/>
+                                          text="Taxon Traits..." userData="Import taxon traits from a text file"/>
                                 <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
-                                          text="Taxon Display Labels..."/>
+                                          text="Taxon Display Labels..."
+                                          userData="Import taxon display labels from a text file"/>
                                 <SeparatorMenuItem/>
                                 <MenuItem fx:id="importMultipleTreeFilesMenuItem" mnemonicParsing="false"
-                                          text="Trees from Multiple Files..."/>
-                                <MenuItem fx:id="importTreeNamesMenuItem" mnemonicParsing="false" text="Tree Names..."/>
+                                          text="Trees from Multiple Files..."
+                                          userData="Load trees from multiple input files into one document"/>
+                                <MenuItem fx:id="importTreeNamesMenuItem" mnemonicParsing="false" text="Tree Names..."
+                                          userData="Import tree names from a text file"/>
                             </items>
                         </Menu>
                         <SeparatorMenuItem mnemonicParsing="false"/>
 
-                        <MenuItem fx:id="analyzeGenomesMenuItem" text="Analyze Genomes..."/>
+                        <MenuItem fx:id="analyzeGenomesMenuItem" text="Analyze Genomes..."
+                                  userData="Open the analyze genomes dialog"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="saveMenuItem" text="Save">
+                        <MenuItem fx:id="saveMenuItem" text="Save" userData="Save the current document">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="saveAsMenuItem" text="Save As...">
+                        <MenuItem fx:id="saveAsMenuItem" text="Save As..."
+                                  userData="Save the current document to a chosen file">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
@@ -93,17 +100,21 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu mnemonicParsing="false" text="Export">
                             <items>
-                                <MenuItem fx:id="exportImageMenuItem" text="Export Image..."/>
+                                <MenuItem fx:id="exportImageMenuItem" text="Export Image..."
+                                          userData="Export an image of the selected tab"/>
 
-                                <MenuItem fx:id="exportTaxonTraitsMenuItem" text="Taxon Traits..."/>
+                                <MenuItem fx:id="exportTaxonTraitsMenuItem" text="Taxon Traits..."
+                                          userData="Export the taxon traits to a text file"/>
                                 <MenuItem fx:id="exportTaxonDisplayLabelsMenuItem" mnemonicParsing="false"
-                                          text="Taxon Display Labels..."/>
-                                <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."/>
+                                          text="Taxon Display Labels..."
+                                          userData="Export the taxon display labels to a text file"/>
+                                <MenuItem fx:id="exportWorkflowMenuItem" text="Export Workflow..."
+                                          userData="Export the current analysis as a workflow"/>
                             </items>
                         </Menu>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="pageSetupMenuItem" text="Page Setup..."/>
-                        <MenuItem fx:id="printMenuItem" text="Print...">
+                        <MenuItem fx:id="pageSetupMenuItem" text="Page Setup..." userData="Page setup for printing"/>
+                        <MenuItem fx:id="printMenuItem" text="Print..." userData="Print the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
@@ -112,17 +123,18 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu fx:id="toolsMenu" text="Tools">
                             <MenuItem fx:id="GroupIdenticalHaplotypesFilesMenuItem"
-                                      text="Group Identical Haplotypes...">
+                                      text="Group Identical Haplotypes..."
+                                      userData="Load a file of sequences and group identical haplotypes">
                             </MenuItem>
                         </Menu>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="closeMenuItem" text="Close">
+                        <MenuItem fx:id="closeMenuItem" text="Close" userData="Close the current document">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="quitMenuItem" text="Quit">
+                        <MenuItem fx:id="quitMenuItem" text="Quit" userData="Quit the program">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="Q" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
@@ -155,10 +167,12 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="copyNewickMenuItem" text="Copy Newick">
+                        <MenuItem fx:id="copyNewickMenuItem" text="Copy Newick"
+                                  userData="Copy the tree(s) and networks(s) from the current tab to the system clipboard">
                         </MenuItem>
 
-                        <MenuItem fx:id="copyImageMenuItem" text="Copy Image">
+                        <MenuItem fx:id="copyImageMenuItem" text="Copy Image"
+                                  userData="Copy an image of the current tab to the system clipboard">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
@@ -185,69 +199,72 @@
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="findMenuItem" text="Find...">
+                        <CheckMenuItem fx:id="findMenuItem" text="Find..."
+                                       userData="Open the find dialog for the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="F" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </CheckMenuItem>
-                        <MenuItem fx:id="findAgainMenuItem" text="Find Again">
+                        <MenuItem fx:id="findAgainMenuItem" text="Find Again"
+                                  userData="Find next match int the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <CheckMenuItem fx:id="replaceMenuItem" text="Replace...">
+                        <CheckMenuItem fx:id="replaceMenuItem" text="Replace..."
+                                       userData="Open the replace dialog for the current tab">
                         </CheckMenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="gotoLineMenuItem" text="Goto Line...">
+                        <MenuItem fx:id="gotoLineMenuItem" text="Goto Line..."
+                                  userData="Go to a specific line in current text tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="preferencesMenuItem" text="Preferences...">
-                            <accelerator>
-                                <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="DOWN"
-                                                    shortcut="DOWN"/>
-                            </accelerator>
-                        </MenuItem>
                     </Menu>
                     <Menu text="Select">
-                        <MenuItem fx:id="selectAllMenuItem" text="Select All">
+                        <MenuItem fx:id="selectAllMenuItem" text="Select All"
+                                  userData="Select all taxa or text in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="selectNoneMenuItem" text="Select None">
+                        <MenuItem fx:id="selectNoneMenuItem" text="Select None"
+                                  userData="De-select all taxa or text in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="A" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="selectInverseMenuItem" text="Select Inverse">
+                        <MenuItem fx:id="selectInverseMenuItem" text="Select Inverse"
+                                  userData="Invert the selection in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="I" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="selectFromPreviousMenuItem" text="From Previous Window">
+                        <MenuItem fx:id="selectFromPreviousMenuItem" text="From Previous Window"
+                                  userData="Select taxa in current tab that were selected in the previously focused window">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="P" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="selectBracketsMenuItem" text="Brackets">
+                        <MenuItem fx:id="selectBracketsMenuItem" text="Brackets"
+                                  userData="Select text between matching brackets">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="B" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="selectCompatibleSitesMenuItem" text="Compatible Sites">
+                        <MenuItem fx:id="selectCompatibleSitesMenuItem" text="Compatible Sites"
+                                  userData="Select all compatible sites in the alignment tab">
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu fx:id="selectSetsMenu" text="Sets">
@@ -323,10 +340,12 @@
                         <MenuItem fx:id="flipMenuItem" text="Flip">
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"/>
-                        <CheckMenuItem fx:id="showQRCodeMenuItem" text="Show QR Code"/>
+                        <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"
+                                       userData="Show a scale bar in the current tab"/>
+                        <CheckMenuItem fx:id="showQRCodeMenuItem" text="Show QR Code"
+                                       userData="Show or hide a QR code for the tree or network in the current tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels">
+                        <MenuItem fx:id="layoutLabelsMenuItem" text="Layout Labels" userData="Rerun label layout">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="L" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
@@ -335,17 +354,23 @@
                     </Menu>
 
                     <Menu text="Data">
-                        <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa..."/>
-                        <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."/>
-                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees..."/>
-                        <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits..."/>
-                        <MenuItem fx:id="splitsSliderMenuItem" text="Splits Slider..."/>
+                        <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa..." userData="Show the filter taxa tab"/>
+                        <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."
+                                  userData="Shows the alignment tab"/>
+                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees..."
+                                  userData="Show the filter trees tab"/>
+                        <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits..."
+                                  userData="Show the filter splits tab"/>
+                        <MenuItem fx:id="splitsSliderMenuItem" text="Splits Slider..."
+                                  userData="Show the splits slider (filter by weight) tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="traitsMenuItem" text="Edit Traits..."/>
+                        <MenuItem fx:id="traitsMenuItem" text="Edit Traits..." userData="Show the edit traits tab"/>
                     </Menu>
                     <Menu text="Distances">
-                        <CheckMenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"/>
-                        <CheckMenuItem fx:id="logDetMenuItem" text="Log Det"/>
+                        <CheckMenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"
+                                       userData="Compute distances based on the number of character-state differences"/>
+                        <CheckMenuItem fx:id="logDetMenuItem" text="Log Det"
+                                       userData="Compute distances using the Log-Det method"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="hky85MenuItem" text="HKY 85"/>
                         <CheckMenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"/>

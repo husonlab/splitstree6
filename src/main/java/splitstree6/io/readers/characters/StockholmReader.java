@@ -1,5 +1,5 @@
 /*
- * StockholmImporter.java Copyright (C) 2024 Daniel H. Huson
+ * StockholmReader.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -32,9 +32,9 @@ import java.util.ArrayList;
 
 import static splitstree6.io.readers.characters.FastAReader.checkIfCharactersValid;
 
-public class StockholmImporter extends CharactersReader {
+public class StockholmReader extends CharactersReader {
 
-	public StockholmImporter() {
+	public StockholmReader() {
 		setFileExtensions("stk", "sto", "stockholm");
 	}
 

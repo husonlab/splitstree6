@@ -495,8 +495,6 @@ public class MainWindowPresenter {
 
 		// controller.getGotoLineMenuItem().setOnAction(null);
 
-		controller.getPreferencesMenuItem().setOnAction(null);
-
 		controller.getSelectAllMenuItem().setOnAction(e -> mainWindow.getTaxonSelectionModel().selectAll(mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa()));
 		controller.getSelectAllMenuItem().disableProperty().bind(mainWindow.emptyProperty());
 

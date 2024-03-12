@@ -1,5 +1,5 @@
 /*
- *  NexusToLaTeX.java Copyright (C) 2024 Daniel H. Huson
+ *  BlocksToLaTeX.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -29,29 +29,21 @@ import splitstree6.workflow.DataBlock;
 import java.lang.reflect.InvocationTargetException;
 
 public class IOToLaTeX {
-	public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-		var header = """
+	public static final String HEADER = """
 				\\documentclass{article}
 				\\usepackage{graphicx}
 				\\usepackage{hyperref}
 				\\usepackage{fullpage}
 				\\usepackage{parskip}\s
 				     
-				\\title{SplitsTree Community Edition - Importers}
-				\\author{Daniel H. Huson and Dave Bryant}
-				\\date{March 2024}
-				    
 				\\begin{document}
-				    
-				\\maketitle
-								
+			    								
 				""";
 
-		var footer = """
-				\\end{document}
-				""";
+	public static final String FOOTER = "\n\\end{document}\n";
 
-		System.out.println(header);
+	public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
+		System.out.println(HEADER);
 
 		System.out.println("\\section{Supported import formats}\n");
 
@@ -72,7 +64,7 @@ public class IOToLaTeX {
 						   outputExporters(NetworkBlock.class) +
 						   outputExporters(GenomesBlock.class));
 
-		System.out.println(footer);
+		System.out.println(FOOTER);
 	}
 
 	public static String outputImporters(Class<? extends DataBlock> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
@@ -96,7 +88,7 @@ public class IOToLaTeX {
 		var exportManager = ExportManager.getInstance();
 		var formats = exportManager.getExporters(clazz).stream().map(ReaderWriterBase::getName).filter(n -> !n.equals("PlainText")).toList();
 
-		buf.append("Can import %s data in the following formats: %s.%n%n"
+		buf.append("Can export %s data in the following formats: %s.%n%n"
 				.formatted(blockName, StringUtils.toString(formats, ", ")));
 		return buf.toString();
 	}
