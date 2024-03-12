@@ -207,7 +207,7 @@
                             </accelerator>
                         </CheckMenuItem>
                         <MenuItem fx:id="findAgainMenuItem" text="Find Again"
-                                  userData="Find next match int the current tab">
+                                  userData="Find next match in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="G" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
@@ -372,84 +372,130 @@
                         <CheckMenuItem fx:id="logDetMenuItem" text="Log Det"
                                        userData="Compute distances using the Log-Det method"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="hky85MenuItem" text="HKY 85"/>
-                        <CheckMenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"/>
-                        <CheckMenuItem fx:id="k2pMenuItem" text="K2P"/>
-                        <CheckMenuItem fx:id="k3stMenuItem" text="K3ST"/>
-                        <CheckMenuItem fx:id="f81MenuItem" text="F81"/>
-                        <CheckMenuItem fx:id="f84MenuItem" text="F84"/>
+                        <CheckMenuItem fx:id="hky85MenuItem" text="HKY 85"
+                                       userData="Compute distances using the Hasegawa-Kishino-Yano model"/>
+                        <CheckMenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"
+                                       userData="Compute distances using the Jukes-Cantor model"/>
+                        <CheckMenuItem fx:id="k2pMenuItem" text="K2P"
+                                       userData="Compute distances using the Kimura-2P model"/>
+                        <CheckMenuItem fx:id="k3stMenuItem" text="K3ST"
+                                       userData="Compute distances using the Kimura-3ST model"/>
+                        <CheckMenuItem fx:id="f81MenuItem" text="F81"
+                                       userData="Compute distances using the Felsenstein-1981 model"/>
+                        <CheckMenuItem fx:id="f84MenuItem" text="F84"
+                                       userData="Compute distances using the Felsenstein-1984 model"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"/>
+                        <CheckMenuItem fx:id="proteinMLDistanceMenuItem" text="Protein ML Dist"
+                                       userData="Compute distances for proteins using maximum-likelihood estimation"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="geneContentDistanceMenuItem" text="Gene Content Distance"/>
+                        <CheckMenuItem fx:id="geneContentDistanceMenuItem" text="Gene Content Distance"
+                                       userData="Compute distances based on the presence/absence of genes"/>
                     </Menu>
                     <Menu text="Tree">
-                        <CheckMenuItem fx:id="njMenuItem" text="NJ"/>
-                        <CheckMenuItem fx:id="bioNJMenuItem" text="BioNJ"/>
-                        <CheckMenuItem fx:id="upgmaMenuItem" text="UPGMA"/>
+                        <CheckMenuItem fx:id="njMenuItem" text="NJ"
+                                       userData="Compute a tree from distances using the Neighbor-Joining method"/>
+                        <CheckMenuItem fx:id="bioNJMenuItem" text="BioNJ"
+                                       userData="Compute a tree from distances using the Bio-NJ method"/>
+                        <CheckMenuItem fx:id="upgmaMenuItem" text="UPGMA"
+                                       userData="Compute a rooted tree from distances using the UPGMA method"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="bunemanTreeMenuItem" text="Buneman Tree"/>
+                        <CheckMenuItem fx:id="bunemanTreeMenuItem" text="Buneman Tree"
+                                       userData="Compute a tree from distances using the Buneman tree method"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"/>
+                        <CheckMenuItem fx:id="consensusTreeMenuItem" text="Consensus Tree"
+                                       userData="Compute a consensus tree"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="minSpanningTreeMenuItem" text="Minimum Spanning Tree"/>
+                        <CheckMenuItem fx:id="minSpanningTreeMenuItem" text="Minimum Spanning Tree"
+                                       userData="Compute a minimum spanning tree from distances"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="rerootOrReorderTreesMenuItem" text="Reroot Or Reorder Trees"/>
+                        <CheckMenuItem fx:id="rerootOrReorderTreesMenuItem" text="Reroot Or Reorder Trees"
+                                       userData="Open the reroot or reorder tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"/>
-                        <CheckMenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"/>
+                        <CheckMenuItem fx:id="viewSingleTreeMenuItem" text="Show Single Tree"
+                                       userData="Show a single tree in a tab"/>
+                        <CheckMenuItem fx:id="viewTreePagesMenuItem" text="Show Tree Pages"
+                                       userData="Show multiple trees in a tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="viewTanglegramMenuItem" text="Show Tanglegram"/>
-                        <CheckMenuItem fx:id="viewDensiTreeMenuItem" text="Show DensiTree"/>
+                        <CheckMenuItem fx:id="viewTanglegramMenuItem" text="Show Tanglegram"
+                                       userData="Show two trees as a tanglegram"/>
+                        <CheckMenuItem fx:id="viewDensiTreeMenuItem" text="Show DensiTree"
+                                       userData="Show a Bayesian chain of trees as a densi-tree"/>
                     </Menu>
                     <Menu text="Network">
-                        <CheckMenuItem fx:id="neighborNetMenuItem" text="Neighbor Net"/>
-                        <CheckMenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"/>
-                        <CheckMenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"/>
+                        <CheckMenuItem fx:id="neighborNetMenuItem" text="Neighbor Net"
+                                       userData="Compute a planar split network from distances using the Neighbor-Net method"/>
+                        <CheckMenuItem fx:id="splitDecompositionMenuItem" text="Split Decomposition"
+                                       userData="Compute a split network from distances using the split-decomposition method"/>
+                        <CheckMenuItem fx:id="parsimonySplitsMenuItem" text="Parsimony Splits"
+                                       userData="Compute a split network from DNA sequences using the parsimony-splits method"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="consensusSplitsMenuItem" text="Consensus Splits"/>
-                        <CheckMenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"/>
-                        <CheckMenuItem fx:id="consensusOutlineMenuItem" text="Consensus Outline"/>
-                        <CheckMenuItem fx:id="superNetworkMenuItem" text="Super Network"/>
+                        <CheckMenuItem fx:id="consensusSplitsMenuItem" text="Consensus Splits"
+                                       userData="Open the consensus splits tab"/>
+                        <CheckMenuItem fx:id="consensusNetworkMenuItem" text="Consensus Network"
+                                       userData="Compute a consensus network from trees"/>
+                        <CheckMenuItem fx:id="consensusOutlineMenuItem" text="Consensus Outline"
+                                       userData="Compute a consensus outline from trees"/>
+                        <CheckMenuItem fx:id="superNetworkMenuItem" text="Super Network"
+                                       userData="Compute a super network from trees on unequal taxon sets"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"/>
-                        <CheckMenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"/>
+                        <CheckMenuItem fx:id="medianJoiningMenuItem" text="Median Joining Network"
+                                       userData="Compute a haplotype network from DNA sequences using the median-joining algorithm"/>
+                        <CheckMenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"
+                                       userData="Compute a minimum spanning network from distances"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"/>
-                        <CheckMenuItem fx:id="clusterNetworkMenuItem" text="Cluster Network"/>
+                        <CheckMenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"
+                                       userData="Compute a minimum hybridization network for two rooted trees using the autumn algorithm"/>
+                        <CheckMenuItem fx:id="clusterNetworkMenuItem" text="Cluster Network"
+                                       userData="Compute a cluster network from trees"/>
 
                     </Menu>
                     <Menu text="Analysis">
-                        <CheckMenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."/>
-                        <CheckMenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network..."/>
-                        <CheckMenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network..."/>
+                        <CheckMenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."
+                                       userData="Perform bootstrapping on a tree calculation from sequences"/>
+                        <CheckMenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network..."
+                                       userData="Perform bootstrapping on a tree calculation from sequences, producing a network"/>
+                        <CheckMenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network..."
+                                       userData="Perform bootstrapping on a split network calculation from sequences"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites"/>
-                        <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"/>
-                        <MenuItem fx:id="phiTestMenuItem" text="Conduct Phi Test for Recombination"/>
+                        <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites"
+                                  userData="Estimate the proportion of invariable sites"/>
+                        <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"
+                                  userData="Compute the delta score from distances"/>
+                        <MenuItem fx:id="phiTestMenuItem" text="Conduct Phi Test for Recombination"
+                                  userData="Run the Phi Test to detect recombination in sequences"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="computeSplitsPhylogeneticDiversityMenuItem"
-                                  text="Splits Phylogenetic Diversity"/>
-                        <MenuItem fx:id="computeSplitsShapleyValuesMenuItem" text="Splits Shapley Values"/>
+                                  text="Splits Phylogenetic Diversity"
+                                  userData="Computes the phylogenetic diversity for selected taxa on splits"/>
+                        <MenuItem fx:id="computeSplitsShapleyValuesMenuItem" text="Splits Shapley Values"
+                                  userData="Computes Shapely values on splits"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="computeTreePhylogeneticDiversityMenuItem" text="Tree Phylogenetic Diversity"/>
+                        <MenuItem fx:id="computeTreePhylogeneticDiversityMenuItem" text="Tree Phylogenetic Diversity"
+                                  userData="Computes the phylogenetic diversity for selected taxa on trees"/>
                         <MenuItem fx:id="computeRootedTreeFairProportionMenuItem"
-                                  text="Rooted Tree Fair Proportion Diversity Index"/>
+                                  text="Rooted Tree Fair Proportion Diversity Index"
+                                  userData="Compute rooted-tree fair-proportion diversity index"/>
                         <MenuItem fx:id="computeRootedTreeEqualSplitsMenuItem"
-                                  text="Rooted Tree Equal Splits Diversity Index"/>
-                        <MenuItem fx:id="computeUnrootedTreeShapleyMenuItem" text="Unrooted Tree Shapley Values"/>
+                                  text="Rooted Tree Equal Splits Diversity Index"
+                                  userData="Compute rooted-tree equal-splits diversity index"/>
+                        <MenuItem fx:id="computeUnrootedTreeShapleyMenuItem" text="Unrooted Tree Shapley Values"
+                                  userData="Computes Shapely values on unrooted trees"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="pcoaMenuItem" text="PCoA"/>
+                        <CheckMenuItem fx:id="pcoaMenuItem" text="PCoA"
+                                       userData="Perform principal coordinate analysis on distances"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="showWorkflowMenuItem" text="Show Workflow"/>
+                        <MenuItem fx:id="showWorkflowMenuItem" text="Show Workflow" userData="Show the workflow tab"/>
                     </Menu>
                     <Menu fx:id="windowMenu" text="Window">
-                        <CheckMenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."/>
-                        <MenuItem fx:id="setWindowSizeMenuItem" text="Set Window Size..."/>
+                        <CheckMenuItem fx:id="showMessageWindowMenuItem" text="Show Message Window..."
+                                       userData="Show or hide the message window"/>
+                        <MenuItem fx:id="setWindowSizeMenuItem" text="Set Window Size..."
+                                  userData="Set the window size"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                     </Menu>
                     <Menu fx:id="helpMenu" text="Help">
-                        <MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."/>
+                        <MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."
+                                  userData="Check whether an update is available for download"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="aboutMenuItem" text="About...">
                             <accelerator>

@@ -23,15 +23,21 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 
+import static splitstree6.xtra.latex.IOToLaTeX.FOOTER;
+import static splitstree6.xtra.latex.IOToLaTeX.HEADER;
+
 /**
  * write out all items in the menu bar in LaTeX
  */
 public class MenusToLaTeX {
 	public static String apply(MenuBar menuBar) {
-		var buf = new StringBuilder("\\section{The main menu bar}\n\n");
+		var buf = new StringBuilder();
+		buf.append(HEADER);
+		buf.append("\\section{The main menu bar}\n\n");
 		for (var menu : menuBar.getMenus()) {
 			buf.append(applyRec(menu, 0));
 		}
+		buf.append(FOOTER);
 		return buf.toString();
 	}
 
