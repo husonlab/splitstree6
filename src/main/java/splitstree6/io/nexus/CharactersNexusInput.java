@@ -66,6 +66,13 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block maintains a set of characters or a multiple sequence alignment.
+			There is a fixed number of taxa and characters or positions.
+			Several different formats are supported. Characters can have weights
+			and both characters and their states can have labels.
+			""";
+
 	@Override
 	public String getSyntax() {
 		return SYNTAX;
@@ -115,7 +122,7 @@ public class CharactersNexusInput extends NexusIOBase implements INexusInput<Cha
 			np.matchIgnoreCase(";");
 		}
 
-		if (np.peekMatchIgnoreCase("PROPERTIES")) { // legacy: SPlitsTree4 might reportFairProportions this, we ignore it
+		if (np.peekMatchIgnoreCase("PROPERTIES")) { // legacy: SPlitsTree4 might report this, we ignore it
 			final var tokens = np.getTokensLowerCase("properties", ";");
 			np.findIgnoreCase(tokens, "gammaShape=", Float.MAX_VALUE);
 			np.findIgnoreCase(tokens, "PINVAR=", Float.MAX_VALUE);

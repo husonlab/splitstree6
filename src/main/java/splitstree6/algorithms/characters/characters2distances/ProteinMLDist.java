@@ -113,12 +113,6 @@ public class ProteinMLDist extends Characters2Distances {
 
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
-
-				if (dist != -1.0) {
-					var variance = seqPair.bulmerVariance(dist, 0.93);
-					distancesBlock.setVariance(s, t, variance);
-					distancesBlock.setVariance(t, s, variance);
-				}
 				progress.incrementProgress();
 			}
 		}

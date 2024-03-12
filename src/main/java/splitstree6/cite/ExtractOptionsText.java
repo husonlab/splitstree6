@@ -27,7 +27,7 @@ import splitstree6.workflow.Algorithm;
 import java.util.ArrayList;
 
 /**
- * reportFairProportions options used by algorithm
+ * report options used by algorithm
  * Daniel Huson, 10.2021
  */
 public class ExtractOptionsText {

@@ -27,8 +27,6 @@ public class DistancesBlock extends DataBlock {
 	public static final String BLOCK_NAME = "DISTANCES";
 
 	private double[][] distances;
-	private double[][] variances;
-	private String varType = "ols";
 
 	private DistancesFormat format = new DistancesFormat();
 
@@ -44,7 +42,6 @@ public class DistancesBlock extends DataBlock {
 	 */
 	public void copy(DistancesBlock that) {
 		distances = that.getDistances();
-		variances = that.getVariances();
 		format = that.getFormat();
 	}
 
@@ -52,12 +49,10 @@ public class DistancesBlock extends DataBlock {
 	public void clear() {
 		super.clear();
 		distances = new double[0][0];
-		variances = null;
 	}
 
 	public void setNtax(int n) {
 		distances = new double[n][n];
-		variances = null;
 	}
 
 	@Override
@@ -95,52 +90,11 @@ public class DistancesBlock extends DataBlock {
 	}
 
 	/**
-	 * gets the variances,  indices 1-based
-	 *
-	 * @return variances or -1, if not set
-	 */
-	public double getVariance(int s, int t) {
-		if (variances != null)
-			return variances[s - 1][t - 1];
-		else
-			return -1;
-	}
-
-	public String getVarType() {
-		return varType;
-	}
-
-	public void setVarType(String varType) {
-		this.varType = varType;
-	}
-
-	/**
-	 * sets the variances,  indices 1-based
-	 */
-	public void setVariance(int s, int t, double value) {
-		synchronized (this) {
-			if (variances == null) {
-				variances = new double[distances.length][distances.length];
-			}
-		}
-		variances[s - 1][t - 1] = value;
-	}
-
-	public void clearVariances() {
-		variances = null;
-	}
-
-	public boolean isVariances() {
-		return variances != null;
-	}
-
-	/**
 	 * set distances, change dimensions if necessary. If dimensions are changed, delete variances
 	 */
 	public void set(double[][] distances) {
 		if (this.distances.length != distances.length) {
 			this.distances = new double[distances.length][distances.length];
-			variances = null;
 		}
 
 		for (int i = 0; i < distances.length; i++) {
@@ -148,21 +102,6 @@ public class DistancesBlock extends DataBlock {
 		}
 	}
 
-	/**
-	 * set values, change dimensions if necessary
-	 */
-	public void set(double[][] distances, double[][] variances) {
-		if (this.distances == null || this.distances.length != distances.length)
-			this.distances = new double[distances.length][distances.length];
-
-		if (this.variances == null || this.variances.length != variances.length)
-			this.variances = new double[variances.length][variances.length];
-
-		for (int i = 0; i < distances.length; i++) {
-			System.arraycopy(distances[i], 0, this.distances[i], 0, distances.length);
-			System.arraycopy(variances[i], 0, this.variances[i], 0, distances.length);
-		}
-	}
 
 	/**
 	 * gets distances, 0-based
@@ -171,10 +110,6 @@ public class DistancesBlock extends DataBlock {
 	 */
 	public double[][] getDistances() {
 		return distances;
-	}
-
-	public double[][] getVariances() {
-		return variances;
 	}
 
 	@Override

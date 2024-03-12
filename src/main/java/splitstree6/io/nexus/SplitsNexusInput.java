@@ -38,7 +38,6 @@ import java.util.List;
  * Daniel Huson, 2.2018
  */
 public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsBlock> {
-	// "\t\t[LeastSquares]\n" + // only present for compatibility with SplitsTree4
 	public static final String SYNTAX = """
 			BEGIN SPLITS;
 				[TITLE {title};]
@@ -67,8 +66,13 @@ public class SplitsNexusInput extends NexusIOBase implements INexusInput<SplitsB
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block maintains a set of splits, usually with weights, sometimes with confidence values,
+			and usually with a suitable cycle for layout purposes.
+			""";
+
 	/**
-	 * reportFairProportions the syntax for this block
+	 * reports the syntax for this block
 	 *
 	 * @return syntax string
 	 */

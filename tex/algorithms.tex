@@ -4,15 +4,13 @@
 \usepackage{fullpage}
 \usepackage{parskip} 
 
-
-\title{SplitsTree Community Edition - Documented methods}
+\title{SplitsTree Community Edition - Algorithms}
 \author{Daniel H. Huson and Dave Bryant}
 \date{March 2024}
 
 \begin{document}
 
 \maketitle
-
 
 
 \section{List of algorithms sorted by input}
@@ -601,7 +599,7 @@ See: James B. Whitfield, Sydney A. Cameron, Daniel H. Huson, Mike A. Steel. Filt
 The ``List One RSPR Trees'' algorithm takes a Trees block as input and produces a Report block as output. It determines which trees are exactly on rSPR away from each other.
 
 {\footnotesize\obeylines
-\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to one or all trees
+\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to apply to one or all trees
 \verb^WhichTree =  <Integer>^ - the index of the tree that the method will be applied to
 }
 
@@ -623,7 +621,7 @@ The ``Phylogenetic Diversity'' algorithm takes a Trees block as input and produc
 
 {\footnotesize\obeylines
 \verb^Rooted =  <Boolean>^ - interpret trees as rooted?
-\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to one or all trees
+\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to apply to one or all trees
 \verb^WhichTree =  <Integer>^ - the index of the tree that the method will be applied to
 }
 
@@ -676,7 +674,7 @@ The ``Tree Diversity Index'' algorithm takes a Trees block as input and produces
 
 {\footnotesize\obeylines
 \verb^Method =  {FairProportions | EqualSplits}^ - choose the type of index calculation
-\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to one or all trees
+\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to apply to one or all trees
 \verb^WhichTree =  <Integer>^ - the index of the tree that the method will be applied to
 }
 
@@ -720,7 +718,7 @@ The ``Trees Filter 2'' algorithm takes a Trees block as input and produces a Tre
 The ``Unrooted Shapley Values'' algorithm takes a Trees block as input and produces a Report block as output. It calculates unrooted Shapley values on trees.
 
 {\footnotesize\obeylines
-\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to one or all trees
+\verb^ApplyTo =  {OneTree | AllTrees}^ - determine whether to apply to one or all trees
 \verb^WhichTree =  <Integer>^ - the index of the tree that the method will be applied to
 }
 

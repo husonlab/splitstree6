@@ -1,5 +1,5 @@
 /*
- *  ExtractAlgorithms.java Copyright (C) 2024 Daniel H. Huson
+ *  AlgorithmsToLaTeX.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -29,8 +29,32 @@ import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 import java.util.HashMap;
 import java.util.List;
 
-public class ExtractAlgorithms {
+/**
+ * outputs a LaTeX document containing a description of all algorithms
+ * Daniel Huson, 3.2024
+ */
+public class AlgorithmsToLaTeX {
 	public static void main(String[] args) {
+		var header = """
+				\\documentclass{article}
+				\\usepackage{graphicx}
+				\\usepackage{hyperref}
+				\\usepackage{fullpage}
+				\\usepackage{parskip}\s
+				     
+				\\title{SplitsTree Community Edition - Algorithms}
+				\\author{Daniel H. Huson and Dave Bryant}
+				\\date{March 2024}
+				    
+				\\begin{document}
+				    
+				\\maketitle
+								
+				""";
+		var footer = """
+				\\end{document}
+								
+					""";
 		var ordering = List.of("Characters Block", "Distances Block", "Splits Block", "Trees Block", "Network Block", "View Block", "Report Block");
 
 		var fromLineMap = new HashMap<String, List<String>>();
@@ -81,8 +105,9 @@ public class ExtractAlgorithms {
 			}
 		}
 
+		System.out.println(header);
+
 		if (true) {
-			System.out.println("\n");
 			System.out.println("\\section{List of algorithms sorted by input}\n\n");
 			for (var key : ordering) {
 				if (fromLineMap.containsKey(key)) {
@@ -95,7 +120,6 @@ public class ExtractAlgorithms {
 		}
 
 		if (false) {
-			System.out.println("\n");
 			System.out.println("\\section{List of algorithms sorted by output}\n\n");
 			for (var key : ordering) {
 				if (toLineMap.containsKey(key)) {
@@ -106,5 +130,7 @@ public class ExtractAlgorithms {
 				}
 			}
 		}
+		System.out.println(footer);
+
 	}
 }

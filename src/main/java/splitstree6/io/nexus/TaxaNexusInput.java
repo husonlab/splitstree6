@@ -47,6 +47,14 @@ public class TaxaNexusInput extends NexusIOBase {
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block maintains the list of all taxa in the analysis.
+			There is a fixed number (n) of taxa and each has an id 1..n and label associated with it.
+			Optionally, an info string can be provided for each taxon.
+			Optionally, a display label can be provided for each taxon. This many include certain HTML tags
+			that are used to render the label.
+			""";
+
 	public String getSyntax() {
 		return SYNTAX;
 	}

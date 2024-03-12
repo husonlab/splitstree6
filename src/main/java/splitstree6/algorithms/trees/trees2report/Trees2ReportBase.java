@@ -40,7 +40,7 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * perform an analysis on trees and then provides a reportFairProportions
+ * perform an analysis on trees and then provides a report
  * Daniel Huson, 2.2023
  */
 abstract public class Trees2ReportBase extends Algorithm<TreesBlock, ReportBlock> implements IViewChoice {
@@ -63,7 +63,7 @@ abstract public class Trees2ReportBase extends Algorithm<TreesBlock, ReportBlock
 			optionName = "option" + optionName;
 		}
 		if (optionName.equals(optionApplyTo.getName()))
-			return "determine whether to one or all trees";
+			return "determine whether to apply to one or all trees";
 		else if (optionName.equals(optionWhichTree.getName()))
 			return "the index of the tree that the method will be applied to";
 

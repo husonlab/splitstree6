@@ -47,7 +47,7 @@ public class NexusHighlighter implements Highlighter.IHighlighter {
 
 	private static final String[] BLOCKS = new String[]{
 			"data", "taxa", "characters", "distances", "trees", "sets",
-			"splits", "network", "traits", "analysis", "viewer", "reportFairProportions",
+			"splits", "network", "traits", "analysis", "viewer", "report",
 			"splitstree6", "traits"
 	};
 

@@ -203,14 +203,13 @@ public class NeighborNetSplitWeightOptimizerSplitsTree4 {
 		for (int i = 0; i < ntax; i++)
 			for (int j = i + 1; j < ntax; j++) {
 				double dij = dist.get(ordering[i + 1], ordering[j + 1]);
-				if (var.equalsIgnoreCase("ols"))
-					v[index] = 1.0;
-				else if (var.equalsIgnoreCase("fm1"))
+				if (var.equalsIgnoreCase("fm1"))
 					v[index] = dij;
 				else if (var.equalsIgnoreCase("fm2"))
 					v[index] = dij * dij;
-				else
-					v[index] = dist.getVariance(ordering[i + 1], ordering[j + 1]);
+				else // (var.equalsIgnoreCase("ols"))
+					v[index] = 1.0;
+
 				index++;
 			}
 		return v;

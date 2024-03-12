@@ -46,6 +46,10 @@ public class AlgorithmNexusInput extends NexusIOBase {
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block represents an algorithm.
+			""";
+
 	/**
 	 * get syntax
 	 */

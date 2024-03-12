@@ -53,6 +53,12 @@ public class TreesNexusInput extends NexusIOBase implements INexusInput<TreesBlo
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block maintains a list of trees. These can be rooted or unrooted
+			phylogenetic trees, or rooted phylogenetic networks. Trees can
+			partial in the sense that they need to contain all taxa.
+			""";
+
 	@Override
 	public String getSyntax() {
 		return SYNTAX;

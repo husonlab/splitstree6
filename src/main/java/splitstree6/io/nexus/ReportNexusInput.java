@@ -31,7 +31,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 
 /**
- * reportFairProportions block nexus input
+ * report block nexus input
  * Daniel Huson, 2.2023
  */
 public class ReportNexusInput extends NexusIOBase {
@@ -43,6 +43,10 @@ public class ReportNexusInput extends NexusIOBase {
 					text...
 				;
 			END;
+			""";
+
+	public static final String DESCRIPTION = """
+			This block represents a textual report.
 			""";
 
 	public String getSyntax() {

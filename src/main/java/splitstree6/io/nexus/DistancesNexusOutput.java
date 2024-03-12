@@ -91,46 +91,6 @@ public class DistancesNexusOutput extends NexusIOBase implements INexusOutput<Di
 			}
 			w.write(";\n");
 		}
-
-		// write variances, if present
-		if (format.isOptionVariancesIO() && distancesBlock.isVariances()) {
-			w.write("VARMATRIX\n");
-
-			for (var t = 1; t <= distancesBlock.getNtax(); t++) {
-				if (format.isOptionLabels()) {
-					w.write("[" + t + "]");
-					w.write(" '" + taxaBlock.get(t).getName() + "'");
-					pad(w, taxaBlock, t);
-
-				}
-				int left;
-				int right;
-
-				// both
-				switch (format.getOptionTriangle()) {
-					case Lower -> {
-						left = 1;//1;
-						right = t - diag;//t-1+diag;
-					}
-					case Upper -> {
-						left = t + diag;//t-1+diag;
-						right = distancesBlock.getNtax();
-						for (int i = 1; i < t; i++)
-							w.write("      ");
-					}
-					default -> {
-						left = 1;
-						right = distancesBlock.getNtax();
-					}
-				}
-
-				for (var q = left; q <= right; q++) {
-					w.write(StringUtils.removeTrailingZerosAfterDot(String.format(" %.6f", distancesBlock.getVariance(t, q))));
-				}
-				w.write("\n");
-			}
-			w.write(";\n");
-		}
 		w.write("END; [DISTANCES]\n");
 	}
 

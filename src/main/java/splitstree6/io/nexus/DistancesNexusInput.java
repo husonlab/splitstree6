@@ -35,8 +35,7 @@ import java.util.List;
  * Daniel Huson, 2.2018
  */
 public class DistancesNexusInput extends NexusIOBase implements INexusInput<DistancesBlock> {
-	public static final String SYNTAX =
-			"""
+	public static final String SYNTAX = """
 					BEGIN DISTANCES;
 						[TITLE {title};]
 						[LINK {type} = {title};]
@@ -49,12 +48,12 @@ public class DistancesNexusInput extends NexusIOBase implements INexusInput<Dist
 						MATRIX
 							distance data in specified format
 						;
-						[VARMATRIX
-							variance data in same specified format
-						;]
 					END;
 					""";
 
+	public static final String DESCRIPTION = """
+			This block maintains a distance matrix of size nTax times nTax.
+			""";
 
 	@Override
 	public String getSyntax() {
@@ -108,7 +107,7 @@ public class DistancesNexusInput extends NexusIOBase implements INexusInput<Dist
 				// for compatibilty with splitstree3, swallow missing=?
 				np.findIgnoreCase(tokens, "missing=", null, '?');
 
-				if (tokens.size() != 0)
+				if (!tokens.isEmpty())
 					throw new IOExceptionWithLineNumber(np.lineno(), "'" + tokens + "' unexpected in FORMAT");
 			}
 
@@ -159,46 +158,6 @@ public class DistancesNexusInput extends NexusIOBase implements INexusInput<Dist
 				}
 				np.matchIgnoreCase(";");
 			}
-
-			if (np.peekMatchIgnoreCase("VARMATRIX")) {
-				np.matchIgnoreCase("VARMATRIX");
-				for (var t = 1; t <= distancesBlock.getNtax(); t++) {
-					if (format.isOptionLabels()) {
-						np.matchLabelRespectCase(taxaBlock.getLabel(t));
-					}
-
-					if (format.isOptionVariancesIO())
-						distancesBlock.setVariance(t, t, 0);
-
-					final int left;
-					final int right;
-
-					if (lower) {
-						left = 1;
-						right = t - diag;
-					} else if (upper) {
-						left = t + diag;
-						right = distancesBlock.getNtax();
-					} else // both
-					{
-						left = 1;
-						right = distancesBlock.getNtax();
-					}
-
-					for (var q = left; q <= right; q++) {
-						var z = np.getDouble();
-
-						if (format.isOptionVariancesIO()) {
-							if (both)
-								distancesBlock.setVariance(t, q, z);
-							else
-								distancesBlock.setVariance(t, q, z);
-						}
-					}
-				}
-				np.matchIgnoreCase(";");
-			}
-
 			np.matchEndBlock();
 
 			if (both) {

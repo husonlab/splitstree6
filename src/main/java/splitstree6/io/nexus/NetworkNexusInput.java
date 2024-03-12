@@ -59,6 +59,10 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block maintains a network, such as a haplotype network or just a set of points (for PCoA).
+			""";
+
 	@Override
 	public String getSyntax() {
 		return SYNTAX;
@@ -154,7 +158,7 @@ public class NetworkNexusInput extends NexusIOBase implements INexusInput<Networ
 				if (np.peekMatchIgnoreCase("label")) {
 					np.matchIgnoreCase("label=");
 					graph.setLabel(v, np.getWordRespectCase());
-					if (taxaBlock.getLabels().size() == 0) {
+					if (taxaBlock.getLabels().isEmpty()) {
 						taxonNamesFound.add(graph.getLabel(v));
 						graph.addTaxon(v, taxonNamesFound.size());
 					} else {

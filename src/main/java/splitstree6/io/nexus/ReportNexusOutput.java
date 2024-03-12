@@ -27,7 +27,7 @@ import java.io.IOException;
 import java.io.Writer;
 
 /**
- * reportFairProportions nexus output
+ * report block nexus output
  * Daniel Huson, 2.2023
  */
 public class ReportNexusOutput extends NexusIOBase implements INexusOutput<ReportBlock> {

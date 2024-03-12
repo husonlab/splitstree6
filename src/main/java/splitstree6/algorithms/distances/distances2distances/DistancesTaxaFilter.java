@@ -50,8 +50,6 @@ public class DistancesTaxaFilter extends DataTaxaFilter<DistancesBlock, Distance
 					final int originalJ = originalTaxaBlock.indexOf(b);
 					final int modifiedJ = modifiedTaxaBlock.indexOf(b);
 					outputData.set(modifiedI, modifiedJ, inputData.get(originalI, originalJ));
-					if (inputData.isVariances())
-						outputData.setVariance(modifiedI, modifiedJ, inputData.getVariance(originalI, originalJ));
 				}
 				progress.incrementProgress();
 			}

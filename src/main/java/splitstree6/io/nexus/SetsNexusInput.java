@@ -51,6 +51,10 @@ public class SetsNexusInput extends NexusIOBase implements INexusInput<SetsBlock
 		return SYNTAX;
 	}
 
+	public static final String DESCRIPTION = """
+			This block represents a collection of taxon sets and/or character sets.
+			""";
+
 	@Override
 	public List<String> parse(NexusStreamParser np, TaxaBlock taxaBlock, SetsBlock setBlock) throws IOException {
 		setBlock.clear();

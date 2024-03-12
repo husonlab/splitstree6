@@ -45,7 +45,7 @@ import splitstree6.workflow.AlgorithmNode;
 import java.util.*;
 
 /**
- * reportFairProportions trees by midpoint or outgroup, and/or ladderize
+ * reroots trees by midpoint or outgroup, and/or ladderize
  * Daniel Huson, 11.2021
  */
 public class RerootOrReorderTrees extends Trees2Trees implements IFilter {

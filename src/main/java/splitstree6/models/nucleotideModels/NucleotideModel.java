@@ -443,12 +443,6 @@ public abstract class NucleotideModel implements SubstitutionModel {
 
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
-
-				if (dist != -1) {
-					final double var = seqPair.bulmerVariance(dist, 0.75);
-					distancesBlock.setVariance(s, t, var);
-					distancesBlock.setVariance(t, s, var);
-				}
 			}
 			progress.incrementProgress();
 		}

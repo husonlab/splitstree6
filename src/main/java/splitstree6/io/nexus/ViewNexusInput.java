@@ -46,6 +46,10 @@ public class ViewNexusInput extends NexusIOBase {
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block represents a viewer.
+			""";
+
 	public String getSyntax() {
 		return SYNTAX;
 	}

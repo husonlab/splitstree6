@@ -54,6 +54,9 @@ public class GenomesNexusInput extends NexusIOBase implements INexusInput<Genome
 			END;
 			""";
 
+	public static final String DESCRIPTION = """
+			This block represents a collection of genomes.
+			""";
 
 	@Override
 	public String getSyntax() {
