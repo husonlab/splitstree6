@@ -146,9 +146,12 @@ public class MainWindow implements IMainWindow {
 
 		presenter = new MainWindowPresenter(this);
 
-		if (false) {
+		if (MenusToLaTeX.active) {
 			var obj = new Object();
-			RunAfterAWhile.applyInFXThread(obj, () -> System.out.println(MenusToLaTeX.apply(controller.getMenuBar())));
+			RunAfterAWhile.applyInFXThread(obj, () -> {
+				System.out.println(MenusToLaTeX.apply(controller.getMenuBar()));
+				System.exit(0);
+			});
 		}
 	}
 

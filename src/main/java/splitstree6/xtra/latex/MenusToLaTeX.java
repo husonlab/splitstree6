@@ -22,6 +22,7 @@ package splitstree6.xtra.latex;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
+import splitstree6.main.SplitsTree6;
 
 import static splitstree6.xtra.latex.IOToLaTeX.FOOTER;
 import static splitstree6.xtra.latex.IOToLaTeX.HEADER;
@@ -30,6 +31,13 @@ import static splitstree6.xtra.latex.IOToLaTeX.HEADER;
  * write out all items in the menu bar in LaTeX
  */
 public class MenusToLaTeX {
+	public static boolean active = false;
+
+	public static void main(String[] args) {
+		active = true;
+		SplitsTree6.main(args);
+	}
+
 	public static String apply(MenuBar menuBar) {
 		var buf = new StringBuilder();
 		buf.append(HEADER);
