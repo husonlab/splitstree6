@@ -72,7 +72,7 @@ public class ClusterNetwork extends Trees2Trees {
 
 	@Override
 	public String getCitation() {
-		return "Huson & Rupp (2008); D.H. Huson and R. Rupp (2008) Summarizing multiple gene trees using cluster networks. In: Crandall, K.A., Lagergren, J. (eds) Algorithms in Bioinformatics. WABI 2008. Lecture Notes in Computer Science(), vol 5251.";
+		return "Huson & Rupp 2008; D.H. Huson and R. Rupp (2008) Summarizing multiple gene trees using cluster networks. In: Crandall, K.A., Lagergren, J. (eds) Algorithms in Bioinformatics. WABI 2008. Lecture Notes in Computer Science(), vol 5251.";
 	}
 
 	@Override

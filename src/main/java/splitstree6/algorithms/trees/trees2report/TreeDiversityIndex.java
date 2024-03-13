@@ -64,10 +64,8 @@ public class TreeDiversityIndex extends Trees2ReportBase {
 
 	@Override
 	public String getCitation() {
-		if (getOptionMethod().equals(Method.FairProportions))
-			return "D Redding 2004;Redding, D. Incorporating genetic distinctness and reserve occupancy into a conservation priorisation approach. Master’s thesis. University of East Anglia (2003)";
-		else
-			return "Redding & Mooers 2006;Redding, D.W., Mooers, A.Ø. Incorporating evolutionary measures into conservation prioritization. Conservation Biology 20, 1670–1678 (2006)";
+		return "Redding 2003;D. Redding, Incorporating genetic distinctness and reserve occupancy into a conservation priorisation approach. Master’s thesis. University of East Anglia (2003);" +
+			   "Redding & Mooers 2006;Redding, D.W., Mooers, A.Ø. Incorporating evolutionary measures into conservation prioritization. Conservation Biology 20, 1670–1678 (2006)";
 	}
 
 	@Override

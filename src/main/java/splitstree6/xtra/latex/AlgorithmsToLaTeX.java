@@ -87,10 +87,29 @@ public class AlgorithmsToLaTeX {
 					buf.append("%nOptions:%n{\\footnotesize%n\\begin{verbatim}%n%s\\end{verbatim}%n}%n".formatted(options));
 				var citations = algorithm.getCitation();
 				if (citations != null && !citations.isBlank()) {
-					var pos = citations.indexOf(";");
-					if (pos > 0)
-						citations = citations.substring(pos + 1);
-					buf.append("%nSee: %s%n".formatted(citations));
+					var tokens = citations.split(";");
+					if (tokens.length >= 2) {
+						if (false) {
+							buf.append("\nSee:\n");
+							for (int i = 0; i < tokens.length - 1; i += 2) { // Subtract 1 to avoid out of bounds in the last iteration
+								var ref = tokens[i].replaceAll(" and ", "").replaceAll("&", "").replaceAll(" ", "").replaceAll(",", "");
+								var citation = tokens[i + 1];
+								buf.append("%n%s \\citep{%s}%n".formatted(citation, ref));
+							}
+						} else {
+							if (tokens.length == 2)
+								buf.append("Reference: \\citep{");
+							else
+								buf.append("References: \\citep{");
+							for (int i = 0; i < tokens.length - 1; i += 2) { // Subtract 1 to avoid out of bounds in the last iteration
+								if (i > 0)
+									buf.append(",");
+								var ref = tokens[i].replaceAll(" and ", "").replaceAll("&", "").replaceAll(" ", "");
+								buf.append(ref);
+							}
+							buf.append("}\n");
+						}
+					}
 				}
 
 				var line = buf.toString().replaceAll("&", "\\\\&")
@@ -126,7 +145,7 @@ public class AlgorithmsToLaTeX {
 				}
 			}
 		}
+		System.out.println("\\bibliographystyle{plainnat}\n\\bibliography{bibliography}");
 		System.out.println(FOOTER);
-
 	}
 }

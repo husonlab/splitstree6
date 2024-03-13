@@ -43,7 +43,7 @@ import java.util.concurrent.TimeUnit;
 public class AverageDistances extends Trees2Distances {
 	@Override
 	public String getCitation() {
-		return "Lapointe and Cucumel (1997);Francois-Joseph Lapointe, Guy Cucumel, " +
+		return "Lapointe and Cucumel 1997;FJ Lapointe and G. Cucumel, " +
 			   "The Average Consensus Procedure: Combination of Weighted Trees Containing Identical or Overlapping Sets of Taxa. " +
 			   "Systematic Biology, 46(2):306-312 (1997).";
 	}

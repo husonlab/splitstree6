@@ -35,6 +35,7 @@ public class IOToLaTeX {
 			\\usepackage{hyperref}
 			\\usepackage{fullpage}
 			\\usepackage{parskip}
+			\\usepackage{natbib}
 			\\usepackage{makeidx}
 			   
 			\\makeindex
