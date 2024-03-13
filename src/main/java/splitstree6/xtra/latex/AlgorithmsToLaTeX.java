@@ -27,6 +27,7 @@ import splitstree6.workflow.DataTaxaFilter;
 import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import static splitstree6.xtra.latex.IOToLaTeX.FOOTER;
@@ -43,13 +44,24 @@ public class AlgorithmsToLaTeX {
 		var fromLineMap = new HashMap<String, List<String>>();
 		var toLineMap = new HashMap<String, List<String>>();
 
+		var labels = new HashSet<String>();
+
 		for (var algorithm : AlgorithmList.list()) {
 			if (!(algorithm instanceof DataTaxaFilter || algorithm instanceof DoNotLoadThisAlgorithm)) {
 				var method = StringUtils.fromCamelCase(algorithm.getClass().getSimpleName());
 				var fromName = StringUtils.fromCamelCase(algorithm.getFromClass().getSimpleName());
 				var toName = StringUtils.fromCamelCase(algorithm.getToClass().getSimpleName());
 				var buf = new StringBuilder();
-				buf.append("\\subsubsection{%s}%n%n".formatted(StringUtils.fromCamelCase(algorithm.getClass().getSimpleName())));
+				var name = StringUtils.fromCamelCase(algorithm.getClass().getSimpleName());
+				var label = algorithm.getClass().getSimpleName();
+				var count = 0;
+				while (labels.contains(label)) {
+					count++;
+					label = algorithm.getClass().getSimpleName() + count;
+				}
+				labels.add(label);
+				buf.append("\\subsubsection{%s}\\index{%s}\\label{alg:%s}%n%n"
+						.formatted(name, name, label));
 				buf.append("The ``%s'' algorithm takes a %s as input and produces a %s as output.".formatted(
 						method, fromName.replaceAll("Block", "block"), toName.replaceAll("Block", "block")));
 

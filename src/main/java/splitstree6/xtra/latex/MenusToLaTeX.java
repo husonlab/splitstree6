@@ -52,7 +52,7 @@ public class MenusToLaTeX {
 	public static String applyRec(Menu menu, int level) {
 		var buf = new StringBuilder();
 		if (level == 0) {
-			buf.append("\\subsection{The %s menu}%n%n%n".formatted(menu.getText()));
+			buf.append("\\subsection{The %s menu}\\index{%s menu}%n%n%n".formatted(menu.getText(), menu.getText()));
 			buf.append("This menu has the following items:\n\n");
 		} else {
 			buf.append("This %s-menu has the following items:\n\n".formatted("sub".repeat(level)));
@@ -63,7 +63,7 @@ public class MenusToLaTeX {
 				if (item instanceof Menu subMenu) {
 					applyRec(subMenu, level + 1);
 				} else {
-					var text = item.getText();
+					var text = "%s \\index{%s menu item}".formatted(item.getText(), item.getText());
 					if (item.getUserData() != null)
 						text += " - " + item.getUserData().toString();
 					buf.append("\\item %s%n".formatted(text));

@@ -46,7 +46,7 @@ public class BlocksToLaTeX {
 	}
 
 	public static String output(String name, String description, String syntax) {
-		return "\\subsection{%s}\n%n%s%n".formatted(name, description.replaceAll("\t", "    ")) +
+		return "\\subsection{%s}\\index{%s}%n%n%s%n".formatted(name, name, description.replaceAll("\t", "    ")) +
 			   "{\\footnotesize\\begin{verbatim}\n" +
 			   syntax.replaceAll("\t", "  ") +
 			   "\\end{verbatim}}\n\n";
