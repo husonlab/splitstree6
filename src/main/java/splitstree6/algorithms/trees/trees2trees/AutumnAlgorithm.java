@@ -58,7 +58,7 @@ public class AutumnAlgorithm extends Trees2Trees {
 
 	@Override
 	public String getCitation() {
-		return "Huson and Linz 2018; D.H. Huson and S. Linz. Autumn Algorithm—Computation of Hybridization Networks for Realistic Phylogenetic Trees. "
+		return "Huson & Linz 2018; D.H. Huson and S. Linz. Autumn Algorithm—Computation of Hybridization Networks for Realistic Phylogenetic Trees. "
 			   + "IEEE/ACM Transactions on Computational Biology and Bioinformatics: 15:398-420, 2018.";
 	}
 

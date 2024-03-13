@@ -52,9 +52,9 @@ public class ALTSNetwork extends Trees2Trees {
 
 	@Override
 	public String getCitation() {
-		return "Zhang et al 2023; Louxin Zhang, Niloufar Niloufar Abhari, Caroline Colijn and Yufeng Wu3." +
-			   " A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023;" +
-			   "Zhang et al, 2024; Louxin Zhang, Banu Cetinkaya and Daniel H Huson. Hybrization networks from multiple trees, in preparation.";
+		return "Zhang et al 2023; L. Zhang, N. Abhari, C. Colijn and Y Wu." +
+			   " A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023;"
+			   + "Zhang et al, 2024; L. Zhang, B. Cetinkaya and DH Huson. Hybridization networks from phylogenetic trees, in preparation.";
 	}
 
 	@Override

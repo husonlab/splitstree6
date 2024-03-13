@@ -46,11 +46,6 @@ public class GenomesLoader extends DataLoader<SourceBlock, GenomesBlock> {
 	}
 
 	@Override
-	public String getCitation() {
-		return null;
-	}
-
-	@Override
 	public boolean isApplicable(TaxaBlock taxa, SourceBlock sourceBlock) {
 		return super.isApplicable(taxa, sourceBlock) && sourceBlock.getSources().size() == 1;
 	}

@@ -53,11 +53,6 @@ public class SplitsLoader extends DataLoader<SourceBlock, SplitsBlock> {
 	}
 
 	@Override
-	public String getCitation() {
-		return null;
-	}
-
-	@Override
 	public boolean isApplicable(TaxaBlock taxa, SourceBlock sourceBlock) {
 		return super.isApplicable(taxa, sourceBlock) && sourceBlock.getSources().size() == 1;
 	}

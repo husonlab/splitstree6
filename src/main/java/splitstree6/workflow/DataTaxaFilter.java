@@ -44,9 +44,4 @@ public abstract class DataTaxaFilter<S extends DataBlock, T extends DataBlock> e
 	}
 
 	public abstract void filter(ProgressListener progress, TaxaBlock originalTaxaBlock, TaxaBlock modifiedTaxaBlock, S inputData, T outputData) throws IOException;
-
-	@Override
-	public String getCitation() {
-		return null;
-	}
 }

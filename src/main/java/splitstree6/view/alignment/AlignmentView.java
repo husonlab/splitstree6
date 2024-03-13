@@ -402,7 +402,6 @@ public class AlignmentView implements IView {
 		return null;
 	}
 
-
 	public ColorScheme getOptionColorScheme() {
 		return optionColorScheme.get();
 	}

@@ -51,7 +51,7 @@ public class PhiTest extends AnalyzeCharactersBase {
 
 	@Override
 	public String getCitation() {
-		return "Bruen, Philippe & Bryant 2005; " +
+		return "Bruen et al 2005; " +
 			   "Bruen TC, Philippe H, Bryant D. A simple and robust statistical test for detecting the presence of recombination. Genetics 17(4):2665-81, 2006";
 	}
 

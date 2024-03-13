@@ -43,7 +43,7 @@ import java.util.BitSet;
 public class BunemanTree extends Distances2Splits implements IToCompatibleSplits {
 	@Override
 	public String getCitation() {
-		return "Bandelt and Dress 1992; H.-J. Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. " +
+		return "Bandelt & Dress 1992; H.-J. Bandelt and A.W.M.Dress. A canonical decomposition theory for metrics on a finite set. " +
 			   "Advances in Mathematics, 92:47–105, 1992.";
 	}
 

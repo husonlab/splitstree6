@@ -45,7 +45,7 @@ public class LooseAndLacy extends Trees2Trees {
 
 	@Override
 	public String getCitation() {
-		return "Hoppe et al (2018);Anica Hoppe, Sonja Tuerpitz, Mike Steel. Species notions that combine phylogenetic trees and phenotypic partitions. arXiv:1711.08145v1.";
+		return "Hoppe et al 2019;A. Hoppe, S. Tuerpitz, MA Steel. Species notions that combine phylogenetic trees and phenotypic partitions. Journal of Mathematical Biology, 78:117–134, 2019.";
 	}
 
 	@Override

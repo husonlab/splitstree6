@@ -55,7 +55,7 @@ public class ALTSExternal extends Trees2Trees implements IDesktopOnly {
 
 	@Override
 	public String getCitation() {
-		return "Zhang et al 2023; Louxin Zhang, Niloufar Niloufar Abhari, Caroline Colijn and Yufeng Wu3." +
+		return "Zhang et al 2023; L. Zhang, N. Abhari, C. Colijn and Y Wu." +
 			   " A fast and scalable method for inferring phylogenetic networks from trees by aligning lineage taxon strings. Genome Res. 2023";
 	}
 

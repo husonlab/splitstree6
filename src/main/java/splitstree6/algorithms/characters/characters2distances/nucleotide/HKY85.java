@@ -40,7 +40,7 @@ import java.util.List;
 public class HKY85 extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Hasegawa, Kishino, Yano 1985;" +
+		return "Hasegawa et al 1985;" +
 			   " Hasegawa M, Kishino H, Yano T. Dating of human-ape splitting by a molecular clock of mitochondrial DNA." +
 			   " Journal of Molecular Evolution. 22 (2): 160–174. PMID 3934395. doi:10.1007/BF02101694, 1985.";
 	}

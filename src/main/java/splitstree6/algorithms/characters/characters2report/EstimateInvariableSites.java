@@ -46,7 +46,7 @@ public class EstimateInvariableSites extends AnalyzeCharactersBase {
 
 	@Override
 	public String getCitation() {
-		return "Steel, Huson and Lockhart 2000; " +
+		return "Steel et al 2000; " +
 			   "MA Steel, DH Huson, and PJ Lockhart. Invariable site models and their use in phylogeny reconstruction. Sys. Biol. 49(2):225-232, 2000";
 	}
 

@@ -44,7 +44,7 @@ public class GeneContentDistance extends Characters2Distances {
 	@Override
 	public String getCitation() {
 		return (getOptionMethod() == Method.MLE ?
-				"Huson and Steel 2004; D.H. Huson  and  M. Steel. Phylogenetic  trees  based  on  gene  content. Bioinformatics, 20(13):2044–9, 2004." :
+				"Huson & 2004; D.H. Huson  and  M. Steel. Phylogenetic  trees  based  on  gene  content. Bioinformatics, 20(13):2044–9, 2004." :
 				"Snel et al 1997; B. Snel, P. Bork and MA Huynen. Genome phylogeny based on gene content, Nature Genetics, 21:108-110, 1997.");
 	}
 

@@ -46,11 +46,6 @@ public class CharactersLoader extends DataLoader<SourceBlock, CharactersBlock> {
 	}
 
 	@Override
-	public String getCitation() {
-		return null;
-	}
-
-	@Override
 	public boolean isApplicable(TaxaBlock taxa, SourceBlock sourceBlock) {
 		return super.isApplicable(taxa, sourceBlock) && sourceBlock.getSources().size() == 1;
 	}

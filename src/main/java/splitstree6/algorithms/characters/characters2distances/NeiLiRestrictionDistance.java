@@ -43,7 +43,7 @@ public class NeiLiRestrictionDistance extends Characters2Distances {
 
 	@Override
 	public String getCitation() {
-		return "Nei and Li 1979;M Nei and W H Li. Mathematical model for studying genetic variation in terms of restriction endonucleases, PNAS 79(1):5269-5273, 1979.";
+		return "Nei & Li 1979;M Nei and W H Li. Mathematical model for studying genetic variation in terms of restriction endonucleases, PNAS 79(1):5269-5273, 1979.";
 	}
 
 	@Override
