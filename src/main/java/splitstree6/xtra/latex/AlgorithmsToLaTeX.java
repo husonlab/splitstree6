@@ -74,6 +74,7 @@ public class AlgorithmsToLaTeX {
 
 				var options = OptionIO.optionsUsage(algorithm);
 				if (!options.isBlank()) {
+					buf.append("The algorithm has the following options:\n");
 					buf.append("\n{\\footnotesize\\obeylines\n");
 					for (var line : StringUtils.toList(options)) {
 						var pos = line.indexOf("-");
