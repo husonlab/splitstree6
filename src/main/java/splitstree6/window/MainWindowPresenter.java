@@ -110,6 +110,7 @@ import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.Workflow;
 import splitstree6.workflow.WorkflowDataLoader;
+import splitstree6.xtra.latex.MenusToLaTeX;
 
 import java.io.File;
 import java.time.Duration;
@@ -454,12 +455,14 @@ public class MainWindowPresenter {
 
 		if (controller.getFindMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
 			controller.getFindMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
-			controller.getFindMenuItem().setUserData(null);
+			if (!MenusToLaTeX.active)
+				controller.getFindMenuItem().setUserData(null);
 		}
 		controller.getFindMenuItem().setDisable(true);
 		if (controller.getReplaceMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
 			controller.getReplaceMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
-			controller.getReplaceMenuItem().setUserData(null);
+			if (!MenusToLaTeX.active)
+				controller.getReplaceMenuItem().setUserData(null);
 		}
 		controller.getReplaceMenuItem().setDisable(true);
 
@@ -469,14 +472,16 @@ public class MainWindowPresenter {
 				{
 					var booleanProperty = findToolBar.showFindToolBarProperty();
 					controller.getFindMenuItem().selectedProperty().bindBidirectional(booleanProperty);
-					controller.getFindMenuItem().setUserData(booleanProperty);
+					if (!MenusToLaTeX.active)
+						controller.getFindMenuItem().setUserData(booleanProperty);
 					controller.getFindMenuItem().setDisable(false);
 				}
 				{
 					if (focusedDisplayTab.get().getPresenter().allowFindReplace()) {
 						var booleanProperty = findToolBar.showReplaceToolBarProperty();
 						controller.getReplaceMenuItem().selectedProperty().bindBidirectional(booleanProperty);
-						controller.getReplaceMenuItem().setUserData(booleanProperty);
+						if (!MenusToLaTeX.active)
+							controller.getReplaceMenuItem().setUserData(booleanProperty);
 						controller.getReplaceMenuItem().setDisable(false);
 					}
 				}
@@ -943,12 +948,14 @@ public class MainWindowPresenter {
 	private void updateFindReplace() {
 		if (controller.getFindMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
 			controller.getFindMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
-			controller.getFindMenuItem().setUserData(null);
+			if (!MenusToLaTeX.active)
+				controller.getFindMenuItem().setUserData(null);
 		}
 		controller.getFindMenuItem().setDisable(true);
 		if (controller.getReplaceMenuItem().getUserData() instanceof BooleanProperty booleanProperty) {
 			controller.getReplaceMenuItem().selectedProperty().unbindBidirectional(booleanProperty);
-			controller.getReplaceMenuItem().setUserData(null);
+			if (!MenusToLaTeX.active)
+				controller.getReplaceMenuItem().setUserData(null);
 		}
 		controller.getReplaceMenuItem().setDisable(true);
 
@@ -958,14 +965,16 @@ public class MainWindowPresenter {
 				{
 					var booleanProperty = findToolBar.showFindToolBarProperty();
 					controller.getFindMenuItem().selectedProperty().bindBidirectional(booleanProperty);
-					controller.getFindMenuItem().setUserData(booleanProperty);
+					if (!MenusToLaTeX.active)
+						controller.getFindMenuItem().setUserData(booleanProperty);
 					controller.getFindMenuItem().setDisable(false);
 				}
 				{
 					if (selectedDisplayTab.get().getPresenter().allowFindReplace()) {
 						var booleanProperty = findToolBar.showReplaceToolBarProperty();
 						controller.getReplaceMenuItem().selectedProperty().bindBidirectional(booleanProperty);
-						controller.getReplaceMenuItem().setUserData(booleanProperty);
+						if (!MenusToLaTeX.active)
+							controller.getReplaceMenuItem().setUserData(booleanProperty);
 						controller.getReplaceMenuItem().setDisable(false);
 					}
 				}

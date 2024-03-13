@@ -35,7 +35,6 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.MemoryUsage;
 import jloda.fx.util.ProgramProperties;
-import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.StatementFilter;
 import jloda.fx.window.IMainWindow;
 import jloda.fx.window.MainWindowManager;
@@ -147,8 +146,7 @@ public class MainWindow implements IMainWindow {
 		presenter = new MainWindowPresenter(this);
 
 		if (MenusToLaTeX.active) {
-			var obj = new Object();
-			RunAfterAWhile.applyInFXThread(obj, () -> {
+			Platform.runLater(() -> {
 				System.out.println(MenusToLaTeX.apply(controller.getMenuBar()));
 				System.exit(0);
 			});

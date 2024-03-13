@@ -59,7 +59,7 @@ public class MenusToLaTeX {
 		}
 		buf.append("\\begin{itemize}\n");
 		for (var item : menu.getItems()) {
-			if (!(item instanceof SeparatorMenuItem)) {
+			if (!(item instanceof SeparatorMenuItem) && !(item.getText().equals("Untitled"))) {
 				if (item instanceof Menu subMenu) {
 					applyRec(subMenu, level + 1);
 				} else {
@@ -71,6 +71,6 @@ public class MenusToLaTeX {
 			}
 		}
 		buf.append("\\end{itemize}\n\n");
-		return buf.toString();
+		return buf.toString().replaceAll("\\.\\.\\.", "\\\\dots");
 	}
 }

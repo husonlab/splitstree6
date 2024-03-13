@@ -30,18 +30,18 @@ import java.lang.reflect.InvocationTargetException;
 
 public class IOToLaTeX {
 	public static final String HEADER = """
-				\\documentclass{article}
-				\\usepackage{graphicx}
-				\\usepackage{hyperref}
-				\\usepackage{fullpage}
+			\\documentclass{article}
+			\\usepackage{graphicx}
+			\\usepackage{hyperref}
+			\\usepackage{fullpage}
 			\\usepackage{parskip}
 			\\usepackage{makeidx}
 			   
 			\\makeindex
 			    
-				\\begin{document}
+			\\begin{document}
 			    								
-				""";
+			""";
 
 	public static final String FOOTER = """
 			   
@@ -78,12 +78,12 @@ public class IOToLaTeX {
 		var dataBlock = clazz.getDeclaredConstructor().newInstance();
 		var blockName = dataBlock.getBlockName().toLowerCase();
 		var buf = new StringBuilder();
-		buf.append("\\subsection{Importers for a %s block}\\index{%s import}%n%n".formatted(blockName, blockName));
+		buf.append("\\subsection{Importers for a %s block}\\index{%s data import}%n%n".formatted(blockName, capitalizeFirst(blockName)));
 		var importManager = ImportManager.getInstance();
 		var formats = importManager.getReaders(clazz).stream().map(ReaderWriterBase::getName).toList();
 
 		buf.append("Can import %s data in the following formats: %s.%n".formatted(blockName, StringUtils.toString(formats, ", ")));
-		buf.append("\\index{").append(StringUtils.toString(formats, " import}, \\index{")).append(" import}\n\n");
+		buf.append("\\index{").append(StringUtils.toString(formats, " format import}, \\index{")).append(" format import}\n\n");
 		return buf.toString();
 	}
 
@@ -91,13 +91,23 @@ public class IOToLaTeX {
 		var dataBlock = clazz.getDeclaredConstructor().newInstance();
 		var blockName = dataBlock.getBlockName().toLowerCase();
 		var buf = new StringBuilder();
-		buf.append("\\subsection{Exporters for a %s block}\\index{%s export}%n".formatted(blockName, blockName));
+		buf.append("\\subsection{Exporters for a %s block}\\index{%s data export}%n".formatted(blockName, capitalizeFirst(blockName)));
 		var exportManager = ExportManager.getInstance();
 		var formats = exportManager.getExporters(clazz).stream().map(ReaderWriterBase::getName).filter(n -> !n.equals("PlainText")).toList();
 
 		buf.append("Can export %s data in the following formats: %s.%n".formatted(blockName, StringUtils.toString(formats, ", ")));
-		buf.append("\\index{").append(StringUtils.toString(formats, " export}, \\index{")).append(" export}\n\n");
+		buf.append("\\index{").append(StringUtils.toString(formats, " format export}, \\index{")).append(" format export}\n\n");
 
 		return buf.toString();
+	}
+
+
+	public static String capitalizeFirst(String string) {
+		for (var i = 0; i < string.length(); i++) {
+			if (!Character.isWhitespace(string.charAt(i))) {
+				return string.substring(0, i) + Character.toUpperCase(string.charAt(i)) + string.substring(i + 1);
+			}
+		}
+		return string;
 	}
 }

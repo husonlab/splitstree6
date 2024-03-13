@@ -142,33 +142,35 @@
                         </MenuItem>
                     </Menu>
                     <Menu fx:id="editMenu" text="Edit">
-                        <MenuItem fx:id="undoMenuItem" text="Undo">
+                        <MenuItem fx:id="undoMenuItem" text="Undo" userData="Undo">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="redoMenuItem" text="Redo">
+                        <MenuItem fx:id="redoMenuItem" text="Redo" userData="Redo">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="Z" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="cutMenuItem" text="Cut">
+                        <MenuItem fx:id="cutMenuItem" text="Cut"
+                                  userData="Copy selected text in a text tab or nodes in a workflow tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="X" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="copyMenuItem" text="Copy">
+                        <MenuItem fx:id="copyMenuItem" text="Copy"
+                                  userData="Copy selected text in a text tab or nodes in a workflow tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="C" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <MenuItem fx:id="copyNewickMenuItem" text="Copy Newick"
-                                  userData="Copy the tree(s) and networks(s) from the current tab to the system clipboard">
+                                  userData="Copy tree(s) and networks(s) from the current tab to the system clipboard">
                         </MenuItem>
 
                         <MenuItem fx:id="copyImageMenuItem" text="Copy Image"
@@ -178,21 +180,24 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="pasteMenuItem" text="Paste">
+                        <MenuItem fx:id="pasteMenuItem" text="Paste"
+                                  userData="Paste text in a text tab or nodes in a workflow tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="V" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="duplicateMenuItem" text="Duplicate">
+                        <MenuItem fx:id="duplicateMenuItem" text="Duplicate"
+                                  userData="Duplicate selected nodes in a workflow tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="D" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="deleteMenuItem" text="Delete">
+                        <MenuItem fx:id="deleteMenuItem" text="Delete"
+                                  userData="Delete selected text in a text tab or nodes in a workflow tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="BACK_SPACE" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
@@ -271,73 +276,85 @@
                         </Menu>
                     </Menu>
                     <Menu fx:id="viewMenu" text="View">
-                        <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false" text="Use Dark Theme"/>
-                        <MenuItem fx:id="useFullScreenMenuItem" mnemonicParsing="false" text="Enter Full Screen">
+                        <CheckMenuItem fx:id="useDarkThemeMenuItem" mnemonicParsing="false" text="Use Dark Theme"
+                                       userData="Toggle dark mode"/>
+                        <MenuItem fx:id="useFullScreenMenuItem" mnemonicParsing="false" text="Enter Full Screen"
+                                  userData="Toggle full-screen mode">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="F" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size">
+                        <MenuItem fx:id="increaseFontSizeMenuItem" text="Increase Font Size"
+                                  userData="Increase the font size in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="ADD" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size">
+                        <MenuItem fx:id="decreaseFontSizeMenuItem" text="Decrease Font Size"
+                                  userData="Decrease the font size in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="MINUS" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="zoomInMenuItem" text="Zoom In">
+                        <MenuItem fx:id="zoomInMenuItem" text="Zoom In"
+                                  userData="Increase the scale factor in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="zoomOutMenuItem" text="Zoom Out">
+                        <MenuItem fx:id="zoomOutMenuItem" text="Zoom Out"
+                                  userData="Decrease the scale factor in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="zoomInHorizontalMenuItem" text="Zoom In Horizontal">
+                        <MenuItem fx:id="zoomInHorizontalMenuItem" text="Zoom In Horizontal"
+                                  userData="Increase the horizontal scale factor in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="DOWN" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="zoomOutHorizontalMenuItem" text="Zoom Out Horizontal">
+                        <MenuItem fx:id="zoomOutHorizontalMenuItem" text="Zoom Out Horizontal"
+                                  userData="Decrease the horizontal scale factor in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="UP" control="UP" meta="UP" shift="DOWN"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="resetMenuItem" mnemonicParsing="false" text="Reset">
+                        <MenuItem fx:id="resetMenuItem" mnemonicParsing="false" text="Reset"
+                                  userData="Reset the scale factor in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="DIGIT0" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="rotateLeftMenuItem" text="Rotate Left">
+                        <MenuItem fx:id="rotateLeftMenuItem" text="Rotate Left"
+                                  userData="Left rotate the tree or network, or selected splits, in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="LEFT" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="rotateRightMenuItem" text="Rotate Right">
+                        <MenuItem fx:id="rotateRightMenuItem" text="Rotate Right"
+                                  userData="Right rotate the tree or network, or selected splits, in the current tab">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="RIGHT" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
-                        <MenuItem fx:id="flipMenuItem" text="Flip">
+                        <MenuItem fx:id="flipMenuItem" text="Flip"
+                                  userData="Flip the tree or network in the current tab">
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="showScaleBarMenuItem" text="Show Scale Bar"
@@ -497,7 +514,7 @@
                         <MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."
                                   userData="Check whether an update is available for download"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="aboutMenuItem" text="About...">
+                        <MenuItem fx:id="aboutMenuItem" text="About..." userData="Show version number and license">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
