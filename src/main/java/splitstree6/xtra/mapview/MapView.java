@@ -20,13 +20,28 @@
 package splitstree6.xtra.mapview;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.chart.PieChart;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Circle;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.util.Objects;
+import java.util.*;
 
 public class MapView extends Application {
 	private final Model model = new Model();
@@ -52,11 +67,11 @@ public class MapView extends Application {
 		root = fxmlLoader.getRoot();
 
 		presenter = new MapViewPresenter(this);
-
 		stage.setScene(new Scene(root));
 		stage.sizeToScene();
 		stage.setTitle("MapView");
 		stage.show();
+		var locationNameMap = new HashMap<Point2D, String>();
 	}
 
 	public MapViewController getController() {
