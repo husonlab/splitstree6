@@ -37,12 +37,12 @@ import java.util.List;
 public class F84 extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Felsenstein & Churchill 1996; Felsenstein J, Churchill GA (1996). A Hidden Markov Model approach to variation among sites in rate of evolution, and the branching order in hominoidea. Molecular Biology and Evolution. 13 (1): 93–104.";
+		return "Felsenstein & Churchill 1996; J. Felsenstein and GA Churchill. A Hidden Markov Model approach to variation among sites in rate of evolution, and the branching order in hominoidea. Molecular Biology and Evolution. 13 (1): 93–104, 1996.";
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Calculates distances under the Felsenstein84 model.";
+		return "Calculates distances under the Felsenstein-84 model.";
 	}
 
 	@Override

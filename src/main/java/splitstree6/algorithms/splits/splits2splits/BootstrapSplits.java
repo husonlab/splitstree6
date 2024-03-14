@@ -302,6 +302,6 @@ public class BootstrapSplits extends Splits2Splits {
 
 	@Override
 	public String getCitation() {
-		return "Felsenstein 1985;Felsenstein J. Confidence limits on phylogenies: an approach using the bootstrap. Evolution. 1985;39(4):783-791";
+		return "Felsenstein 1985;J. Felsenstein. Confidence limits on phylogenies: an approach using the bootstrap. Evolution, 39(4):783-791, 1985.";
 	}
 }

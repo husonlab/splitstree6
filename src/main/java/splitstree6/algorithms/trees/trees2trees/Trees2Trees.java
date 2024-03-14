@@ -210,7 +210,7 @@ public abstract class Trees2Trees extends Algorithm<TreesBlock, TreesBlock> {
 
 		@Override
 		public String getCitation() {
-			return "Francis et al, 2021; A Francis, DH Huson and MA Steel. Normalising phylogenetic networks. Molecular Phylogenetics and Evolution, 163 (2021)";
+			return "Francis et al, 2021; A Francis, DH Huson and MA Steel. Normalising phylogenetic networks. Molecular Phylogenetics and Evolution, 163, 2021.";
 		}
 
 		@Override

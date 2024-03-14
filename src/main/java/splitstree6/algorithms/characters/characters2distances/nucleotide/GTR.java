@@ -38,7 +38,7 @@ import java.util.List;
 public class GTR extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Tavaré 1986; Tavaré S (1986). Some Probabilistic and Statistical Problems in the Analysis of DNA Sequences. Lectures on Mathematics in the Life Sciences. 17: 57–86";
+		return "Tavaré 1986; S. Tavaré. Some Probabilistic and Statistical Problems in the Analysis of DNA Sequences. Lectures on Mathematics in the Life Sciences. 17:57–86, 1986.";
 	}
 
 	@Override

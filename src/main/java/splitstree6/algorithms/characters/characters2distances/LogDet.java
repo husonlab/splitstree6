@@ -94,7 +94,7 @@ public class LogDet extends Characters2Distances {
 
 	@Override
 	public String getCitation() {
-		return "Steel 1994; M.A. Steel. Recovering a tree from the leaf colorations it generates under a Markov model. Appl. Math. Lett., 7(2):19–24, 1994.";
+		return "Steel 1994; MA Steel. Recovering a tree from the leaf colorations it generates under a Markov model. Appl. Math. Lett., 7(2):19–24, 1994.";
 	}
 
 	@Override

@@ -45,7 +45,7 @@ public class Codominant extends Characters2Distances {
 
 	@Override
 	public String getCitation() {
-		return "Smouse & Peakall 1999; Smouse PE, Peakall R. Spatial autocorrelation analysis of individual multiallele and multilocus genetic structure. Heredity, 82, 561-573, 1999.";
+		return "Smouse & Peakall 1999; PE Smouse and R. Peakall. Spatial autocorrelation analysis of individual multiallele and multilocus genetic structure. Heredity, 82:561–573, 1999.";
 	}
 
 	@Override

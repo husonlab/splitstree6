@@ -38,7 +38,7 @@ public class ConsensusNetwork extends ConsensusSplits {
 	public String getCitation() {
 		return "Holland et al 2004; BR Holland, KT Huber, V Moulton, and PJ Lockhart." +
 			   " Using consensus networks to visualize contradictory evidence for species phylogeny." +
-			   " Molecular Biology and Evolution, 21 (7):1459–1461, 2004 ";
+			   " Molecular Biology and Evolution, 21 (7):1459–1461, 2004.";
 	}
 
 	@Override

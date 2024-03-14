@@ -234,7 +234,7 @@ public class DensiTreeView implements IView {
 
 	@Override
 	public String getCitation() {
-		return "Bouckaert 2010; RR Bouckaert. DensiTree: making sense of sets of phylogenetic trees, Bioinformatics 26(1):1372–1373 (2010)";
+		return "Bouckaert 2010; RR Bouckaert. DensiTree: making sense of sets of phylogenetic trees, Bioinformatics 26(1):1372–1373, 2010.";
 	}
 
 	public ViewTab getViewTab() {

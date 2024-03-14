@@ -46,7 +46,7 @@ public class UnrootedShapleyValues extends Trees2ReportBase {
 
 	@Override
 	public String getCitation() {
-		return "Haake et al 2008;Haake C.J., Kashiwada A., Su F.E. The Shapley value of phylogenetic trees. J Math Biol 56:479–497 (2008) ";
+		return "Haake et al 2008;CJ Haake, A. Kashiwada and FE Su. The Shapley value of phylogenetic trees. J Math Biol 56:479–497, 2008.";
 	}
 
 	@Override

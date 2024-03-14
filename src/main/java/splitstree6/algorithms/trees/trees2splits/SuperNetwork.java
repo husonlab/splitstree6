@@ -60,7 +60,7 @@ public class SuperNetwork extends Trees2Splits {
 	@Override
 	public String getCitation() {
 		return "Huson et al 2004;DH Huson, T. Dezulian, T. Kloepper, and MA Steel. Phylogenetic super-networks from partial trees. " +
-			   "IEEE/ACM Transactions in Computational Biology and Bioinformatics, 1(4):151–158, 2004.";
+			   "IEEE/ACM TCBB, 1(4):151–158, 2004.";
 	}
 
 	@Override

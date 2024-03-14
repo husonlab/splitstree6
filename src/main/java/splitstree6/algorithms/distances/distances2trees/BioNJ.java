@@ -47,7 +47,7 @@ public class BioNJ extends Distances2Trees implements IToSingleTree {
 	public String getCitation() {
 		return "Gascuel 1997; " +
 			   "O. Gascuel, BIONJ: an improved version of the NJ algorithm based on a simple model of sequence data. " +
-			   "Molecular Biology and Evolution. 1997 14:685-695.";
+			   "Molecular Biology and Evolution. 14:685-695, 1997.";
 	}
 
 	@Override

@@ -40,7 +40,7 @@ import java.util.List;
 public class K2P extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Kimura 1980; Kimura M (1980). A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences. Journal of Molecular Evolution. 16 (2): 111–120.";
+		return "Kimura 1980; M. Kimura. A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences. Journal of Molecular Evolution. 16(2):111–120, 1980.";
 	}
 
 	@Override

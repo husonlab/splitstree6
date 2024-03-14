@@ -37,7 +37,7 @@ import java.io.IOException;
 public class GreedyTree extends Splits2Trees {
 	@Override
 	public String getCitation() {
-		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
+		return "Huson et al 2012;DH Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
 	}
 
 	public String getShortDescription() {

@@ -376,6 +376,6 @@ public class TanglegramView implements IView {
 	public String getCitation() {
 		return "Scornavacca et al, 2011; " +
 			   "C. Scornavacca, F. Zickmann and D.H. Huson. Tanglegrams for rooted phylogenetic trees and networks. " +
-			   "Bioinformatics, 27(13):i248–i256, 2011";
+			   "Bioinformatics, 27(13):i248–i256, 2011.";
 	}
 }

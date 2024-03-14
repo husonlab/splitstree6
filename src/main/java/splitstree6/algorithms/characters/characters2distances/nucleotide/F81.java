@@ -37,12 +37,12 @@ import java.util.List;
 public class F81 extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Felsenstein 1981; Felsenstein J (1981). Evolutionary trees from DNA sequences: a maximum likelihood approach. Journal of Molecular Evolution. 17 (6): 368–376.";
+		return "Felsenstein 1981; J. Felsenstein, Evolutionary trees from DNA sequences: a maximum likelihood approach. Journal of Molecular Evolution. 17 (6): 368–376, 1981.";
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Calculates distances under the Felsenstein81 model.";
+		return "Calculates distances under the Felsenstein-81 model.";
 	}
 
 	@Override

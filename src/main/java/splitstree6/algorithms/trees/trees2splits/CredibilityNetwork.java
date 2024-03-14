@@ -56,7 +56,7 @@ public class CredibilityNetwork extends Trees2Splits implements DoNotLoadThisAlg
 	public String getCitation() {
 		return "Huson & Bryant 2006; " +
 			   "DH Huson and D Bryant. Application of Phylogenetic Networks in Evolutionary Studies. " +
-			   "Mol. Biol. Evol. 23(2):254–267. 2006";
+			   "Mol. Biol. Evol. 23(2):254–267, 2006.";
 	}
 
 	@Override

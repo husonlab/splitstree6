@@ -37,7 +37,7 @@ import java.util.List;
 public class ConsensusOutline extends ConsensusSplits implements IToCircularSplits {
 	@Override
 	public String getCitation() {
-		return "Huson & Cetinkaya 2023;DH Huson and B Cetinkaya, Visualizing incompatibilities in phylogenetic trees using consensus outlines, Front. Bioinform. (2023) ";
+		return "Huson & Cetinkaya 2023;DH Huson and B Cetinkaya, Visualizing incompatibilities in phylogenetic trees using consensus outlines, Front. Bioinform, 2023.";
 	}
 
 	@Override

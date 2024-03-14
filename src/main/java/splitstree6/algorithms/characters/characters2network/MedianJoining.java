@@ -79,7 +79,7 @@ public class MedianJoining extends Characters2Network {
 
 	@Override
 	public String getCitation() {
-		return "Bandelt et al 1999;H. -J. Bandelt, P. Forster, and A. Röhl. Median-joining networks for inferring intraspecific phylogenies. Molecular Biology and Evolution, 16:37–48, 1999.";
+		return "Bandelt et al 1999;HJ Bandelt, P. Forster, and A. Röhl. Median-joining networks for inferring intraspecific phylogenies. Molecular Biology and Evolution, 16:37–48, 1999.";
 	}
 
 	public int getOptionEpsilon() {

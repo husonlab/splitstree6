@@ -49,7 +49,7 @@ public class HammingDistances extends Characters2Distances {
 
 	@Override
 	public String getCitation() {
-		return "Hamming 1950; Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.";
+		return "Hamming 1950;RW Hamming. Error detecting and error correcting codes. Bell System Technical Journal, 29(2):147–160 1950.";
 	}
 
 	@Override

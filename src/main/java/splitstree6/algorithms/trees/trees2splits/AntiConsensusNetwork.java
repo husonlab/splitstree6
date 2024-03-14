@@ -69,7 +69,7 @@ public class AntiConsensusNetwork extends Trees2Splits implements DoNotLoadThisA
 
 	@Override
 	public String getCitation() {
-		return "Huson et al. 2020;D.H. Huson, M.A. Steel and others. Anti-consensus: manuscript in preparation";
+		return "Huson et al. 2020;DH Huson, MA Steel and others. Anti-consensus: manuscript in preparation.";
 	}
 
 	@Override

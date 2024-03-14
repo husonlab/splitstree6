@@ -64,7 +64,7 @@ public class PhylogeneticDiversity extends Trees2ReportBase {
 
 	@Override
 	public String getCitation() {
-		return "Faith 1992;Faith, D.P. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10 (1992)";
+		return "Faith 1992;DP Faith. Conservation evaluation and phylogenetic diversity. Biological Conservation 61, 1–10, 1992.";
 	}
 
 	@Override

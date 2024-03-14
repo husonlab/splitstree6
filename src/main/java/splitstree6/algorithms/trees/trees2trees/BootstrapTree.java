@@ -316,9 +316,9 @@ public class BootstrapTree extends Trees2Trees {
 	@Override
 	public String getCitation() {
 		if (!getOptionTransferBootstrap())
-			return "Felsenstein 1985;Felsenstein J. Confidence limits on phylogenies: an approach using the bootstrap. Evolution, 39(4):783-791 (1985);";
+			return "Felsenstein 1985;J. Felsenstein. Confidence limits on phylogenies: an approach using the bootstrap. Evolution, 39(4):783-791, 1985.;";
 		else
-			return "Lemoine et al 2018;F. Lemoine, JB Entfellner, E. Wilkinson, et al. Renewing Felsenstein’s phylogenetic bootstrap in the era of big data. Nature 556, 452–456 (2018);";
+			return "Lemoine et al 2018;F. Lemoine, JB Entfellner, E. Wilkinson, et al. Renewing Felsenstein’s phylogenetic bootstrap in the era of big data. Nature 556, 452–456, 2018.";
 	}
 }
 

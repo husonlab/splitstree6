@@ -171,7 +171,7 @@ public class DnaToSplits extends Characters2Splits {
 
 	@Override
 	public String getCitation() {
-		return "Huson et al 2012;D.H. Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
+		return "Huson et al 2012;DH Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
 	}
 
 	@Override

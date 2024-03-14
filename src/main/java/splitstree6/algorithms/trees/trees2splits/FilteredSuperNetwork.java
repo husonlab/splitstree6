@@ -51,9 +51,9 @@ public class FilteredSuperNetwork extends SuperNetwork {
 
 	@Override
 	public String getCitation() {
-		return "Whitfield et al 2008;JB Whitfield, SA Cameron, DH Huson, MA Steel. " +
+		return "Whitfield et al 2008;JB Whitfield, SA Cameron, DH Huson and MA Steel. " +
 			   "Filtered Z-Closure Supernetworks for Extracting and Visualizing Recurrent Signal from Incongruent Gene Trees, " +
-			   "Systematic Biology, 57(6):939-947 (2008)";
+			   "Systematic Biology, 57(6):939-947, 2008.";
 	}
 
 	public List<String> listOptions() {
