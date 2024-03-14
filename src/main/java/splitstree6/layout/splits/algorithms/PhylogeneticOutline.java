@@ -226,7 +226,7 @@ public class PhylogeneticOutline {
 	}
 
 	public static String getCitation() {
-		return "Bagci et al, 2021;Bagci C, Bryant D, Cetinkaya B, Huson DH. Microbial Phylogenetic Context Using Phylogenetic Outlines. Genome Biol Evol. 13(9) 2021";
+		return "Bagci et al 2021;C. Bagci, D. Bryant, B. Cetinkaya and DH Huson. Microbial Phylogenetic Context Using Phylogenetic Outlines. Genome Biol Evol. 13(9), 2021.";
 	}
 
 	static class Event {

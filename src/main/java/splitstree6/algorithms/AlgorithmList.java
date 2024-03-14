@@ -20,9 +20,7 @@
 package splitstree6.algorithms;
 
 import jloda.fx.workflow.NamedBase;
-import splitstree6.algorithms.characters.characters2distances.NeiLiRestrictionDistance;
-import splitstree6.algorithms.characters.characters2distances.ProteinMLDist;
-import splitstree6.algorithms.characters.characters2distances.UncorrectedP;
+import splitstree6.algorithms.characters.characters2distances.*;
 import splitstree6.algorithms.trees.trees2trees.ALTSExternal;
 import splitstree6.algorithms.trees.trees2trees.ALTSNetwork;
 import splitstree6.main.SplitsTree6;
@@ -50,18 +48,17 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2characters.CharactersFilter());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2characters.CharactersTaxaFilter());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.BaseFreqDistance());
-		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Codominant());
+		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.GeneSharingDistance());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Dice());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.GeneContentDistance());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.HammingDistances());
-		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.HammingDistancesAmbigStates());
+		add(algorithms, names, new HammingDistances());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Jaccard());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.LogDet());
-		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.NeiMiller());
 		add(algorithms, names, new NeiLiRestrictionDistance());
 		add(algorithms, names, new ProteinMLDist());
-		add(algorithms, names, new UncorrectedP());
-		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.Upholt());
+		add(algorithms, names, new PDistance());
+		add(algorithms, names, new UpholtRestrictionDistance());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.F81());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.F84());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.nucleotide.GTR());

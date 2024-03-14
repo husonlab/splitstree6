@@ -384,8 +384,8 @@
                         <MenuItem fx:id="traitsMenuItem" text="Edit Traits..." userData="Show the edit traits tab"/>
                     </Menu>
                     <Menu text="Distances">
-                        <CheckMenuItem fx:id="uncorrectedPMenuItem" text="Uncorrected P"
-                                       userData="Compute distances based on the number of character-state differences"/>
+                        <CheckMenuItem fx:id="pDistanceMenuItem" text="P Distances"
+                                       userData="Compute distances based on the normalized number of character-state differences"/>
                         <CheckMenuItem fx:id="logDetMenuItem" text="Log Det"
                                        userData="Compute distances using the Log-Det method"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
@@ -478,7 +478,9 @@
                                   userData="Estimate the proportion of invariable sites"/>
                         <MenuItem fx:id="computeDeltaScoreMenuItem" text="Compute Delta Score"
                                   userData="Compute the delta score from distances"/>
-                        <MenuItem fx:id="phiTestMenuItem" text="Conduct Phi Test for Recombination"
+                        <MenuItem fx:id="phiTestMenuItem" text="Run Phi Test for Recombination"
+                                  userData="Run the Phi Test to detect recombination in sequences"/>
+                        <MenuItem fx:id="tajimaDMenuItem" text="Compute Tajima's D"
                                   userData="Run the Phi Test to detect recombination in sequences"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="computeSplitsPhylogeneticDiversityMenuItem"

@@ -1,5 +1,5 @@
 /*
- * NeiLiRestrictionDistance.java Copyright (C) 2024 Daniel H. Huson
+ * UpholtRestrictionDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -33,13 +33,12 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Implements the NeiLi (1979) distance for restriction site data.
+ * Implements the UpholtRestrictionDistance (1979) distance for restriction site data.
  *
- * @author David Bryant, 2008?
+ * @author bryant
  */
 
-public class NeiLiRestrictionDistance extends Characters2Distances {
-
+public class UpholtRestrictionDistance extends Characters2Distances {
 	private final DoubleProperty optionRestrictionSiteLength = new SimpleDoubleProperty(this, "optionRestrictionSiteLength");
 
 	{
@@ -47,8 +46,17 @@ public class NeiLiRestrictionDistance extends Characters2Distances {
 	}
 
 	@Override
+	public String getToolTip(String optionName) {
+		if (optionName.equals(optionRestrictionSiteLength.getName()))
+			return "Expected length of restriction site (~4-8 bp)";
+		else
+			return optionName;
+	}
+
+	@Override
 	public String getCitation() {
-		return "Nei & Li 1979;M Nei and WH Li. Mathematical model for studying genetic variation in terms of restriction endonucleases, PNAS 79(1):5269-5273, 1979.";
+		return "UpholtRestrictionDistance 1977; WB UpholtRestrictionDistance. Estimation of DNA sequence divergence from comparison of restriction endonuclease digests. " +
+			   "Nucleic Acids Res., 4(5):1257-65, 1997.";
 	}
 
 	@Override
@@ -57,53 +65,39 @@ public class NeiLiRestrictionDistance extends Characters2Distances {
 	}
 
 	@Override
-	public String getToolTip(String optionName) {
-		if (optionName.equals(optionRestrictionSiteLength.getName()))
-			return "Expected length of restriction site (4-8 bp)";
-		else
-			return optionName;
-	}
-
-	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 		final int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);
 
-		progress.setTasks("Nei Li (1979) Restriction Site Distance", "Init.");
+		progress.setTasks("UpholtRestrictionDistance distance", "Init.");
 		progress.setMaximum(ntax);
-
 
 		for (int s = 1; s <= ntax; s++) {
 			for (int t = s + 1; t <= ntax; t++) {
-
+				//System.err.println(s+","+t);
 				PairwiseCompare seqPair = new PairwiseCompare(charactersBlock, s, t);
-				final double[][] F = seqPair.getF();
+				double[][] F = seqPair.getF();
 				double dist = -1.0;
-				if (F != null) {
-					final double ns = F[1][0] + F[1][1];
-					final double nt = F[0][1] + F[1][1];
-					final double nst = F[1][1];
 
-					if (nst == 0) {
-						dist = -1;
-					} else {
-						final double s_hat = 2.0 * nst / (ns + nt);
-						final double a = (4.0 * Math.pow(s_hat, 1.0 / (2 * getOptionRestrictionSiteLength())) - 1.0) / 3.0;
-						if (a <= 0.0) {
-							dist = -1;
-						} else
-							dist = -1.5 * Math.log(a);
+				if (F != null) {
+
+					double ns = F[1][0] + F[1][1];
+					double nt = F[0][1] + F[1][1];
+					double nst = F[1][1];
+
+					if (nst != 0) {
+						double s_hat = 2.0 * nst / (ns + nt);
+						dist = -Math.log(s_hat) / getOptionRestrictionSiteLength();
 					}
 				}
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
-
 			}
 			progress.incrementProgress();
 		}
 		FixUndefinedDistances.apply(distancesBlock);
 
-		progress.close();
+		progress.reportTaskCompleted();
 	}
 
 	@Override
@@ -122,4 +116,5 @@ public class NeiLiRestrictionDistance extends Characters2Distances {
 	public void setOptionRestrictionSiteLength(double restrictionSiteLength) {
 		this.optionRestrictionSiteLength.setValue(restrictionSiteLength);
 	}
+
 }

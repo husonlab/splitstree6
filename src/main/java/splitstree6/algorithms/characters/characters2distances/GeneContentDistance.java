@@ -19,8 +19,6 @@
 
 package splitstree6.algorithms.characters.characters2distances;
 
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.BitSetUtils;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
@@ -29,7 +27,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.CharactersType;
 
 import java.util.BitSet;
-import java.util.List;
 
 /**
  * Gene content distance
@@ -37,10 +34,6 @@ import java.util.List;
  */
 
 public class GeneContentDistance extends Characters2Distances {
-	public enum Method {MLE, SharedGenes}
-
-	private final ObjectProperty<Method> optionMethod = new SimpleObjectProperty<>(this, "optionMethod", Method.MLE);
-
 	@Override
 	public String getCitation() {
 		return "Huson & Steel 2004; DH Huson and MA Steel. Phylogenetic trees based on gene content. Bioinformatics, 20(13):2044–2049, 2004.";
@@ -49,10 +42,6 @@ public class GeneContentDistance extends Characters2Distances {
 	@Override
 	public String getShortDescription() {
 		return "Computes distances based on the presence/absence of genes.";
-	}
-
-	public List<String> listOptions() {
-		return List.of(optionMethod.getName());
 	}
 
 	@Override
@@ -68,26 +57,7 @@ public class GeneContentDistance extends Characters2Distances {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) {
 		final var geneSets = computeGeneSets(charactersBlock);
-		if (getOptionMethod().equals(Method.SharedGenes))
-			computeSharedGenes(distancesBlock, taxaBlock.getNtax(), geneSets);
-		else
-			computeMLE(distancesBlock, taxaBlock.getNtax(), geneSets);
-	}
-
-	/**
-	 * computes the SnelBork et al distance
-	 */
-	private static void computeSharedGenes(DistancesBlock dist, int ntax, BitSet[] geneSets) {
-		dist.setNtax(ntax);
-		for (var i = 1; i <= ntax; i++) {
-			dist.set(i, i, 0.0);
-			for (var j = i + 1; j <= ntax; j++) {
-				var d = 1.0 - ((double) BitSetUtils.intersection(geneSets[i], geneSets[j]).cardinality()
-							   / (double) Math.min(geneSets[i].cardinality(), geneSets[j].cardinality()));
-				dist.set(i, j, d);
-				dist.set(j, i, d);
-			}
-		}
+		computeMLE(distancesBlock, taxaBlock.getNtax(), geneSets);
 	}
 
 	/**
@@ -145,19 +115,5 @@ public class GeneContentDistance extends Characters2Distances {
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
 		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard && datablock.getSymbols().contains("1");
-	}
-
-	//GETTER AND SETTER
-
-	public Method getOptionMethod() {
-		return optionMethod.get();
-	}
-
-	public ObjectProperty<Method> optionMethodProperty() {
-		return optionMethod;
-	}
-
-	public void setOptionMethod(Method method) {
-		this.optionMethod.set(method);
 	}
 }

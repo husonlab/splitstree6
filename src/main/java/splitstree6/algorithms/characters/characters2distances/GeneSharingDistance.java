@@ -1,5 +1,5 @@
 /*
- * Upholt.java Copyright (C) 2024 Daniel H. Huson
+ * Dice.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -19,8 +19,6 @@
 
 package splitstree6.algorithms.characters.characters2distances;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
@@ -32,66 +30,55 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Implements the Upholt (1979) distance for restriction site data.
+ * Calculates distances using the Dice coefficient distance
+ * <p>
+ * Created on Nov 2007
  *
  * @author bryant
  */
 
-public class Upholt extends Characters2Distances {
-	private final DoubleProperty optionRestrictionSiteLength = new SimpleDoubleProperty(this, "optionRestrictionSiteLength", 6.0);
-
+public class GeneSharingDistance extends Characters2Distances {
 	@Override
-	public String getToolTip(String optionName) {
-		if (optionName.equals(optionRestrictionSiteLength.getName()))
-			return "Expected length of restriction site (~4-8 bp)";
-		else
-			return optionName;
-	}
-
-	@Override
-	public String getCitation() {
-		return "Upholt 1977; WB Upholt. Estimation of DNA sequence divergence from comparison of restriction endonuclease digests. " +
-			   "Nucleic Acids Res., 4(5):1257-65, 1997.";
+	public String getCitation() { // is this the correct citation?
+		return "Snel et al 1997; B. Snel, P. Bork and MA Huynen. Genome phylogeny based on gene content, Nature Genetics, 21:108-110, 1997.";
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Calculates distances for restriction data.";
+		return "Computes distances using the gene-sharing distance.";
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-		final int ntax = taxaBlock.getNtax();
+
+		int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);
 
-		progress.setTasks("Upholt distance", "Init.");
+		progress.setTasks("Gene-sharing distance", "Init.");
 		progress.setMaximum(ntax);
 
-		for (int s = 1; s <= ntax; s++) {
-			for (int t = s + 1; t <= ntax; t++) {
-				//System.err.println(s+","+t);
-				PairwiseCompare seqPair = new PairwiseCompare(charactersBlock, s, t);
-				double[][] F = seqPair.getF();
-				double dist = -1.0;
-
+		for (var s = 1; s <= ntax; s++) {
+			for (var t = s + 1; t <= ntax; t++) {
+				var seqPair = new PairwiseCompare(charactersBlock, s, t);
+				var dist = -1.0;
+				var F = seqPair.getF();
 				if (F != null) {
+					var a = F[1][1];
+					var b = F[1][0];
+					var c = F[0][1];
 
-					double ns = F[1][0] + F[1][1];
-					double nt = F[0][1] + F[1][1];
-					double nst = F[1][1];
-
-					if (nst != 0) {
-						double s_hat = 2.0 * nst / (ns + nt);
-						dist = -Math.log(s_hat) / getOptionRestrictionSiteLength();
+					if (2 * a + b + c > 0.0) {
+						dist = 1.0 - a / Math.min(a + b, a + c);
 					}
 				}
+
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
 			}
 			progress.incrementProgress();
 		}
-		FixUndefinedDistances.apply(distancesBlock);
 
+		FixUndefinedDistances.apply(distancesBlock);
 		progress.reportTaskCompleted();
 	}
 
@@ -99,17 +86,6 @@ public class Upholt extends Characters2Distances {
 	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
 		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard;
 	}
-
-	public double getOptionRestrictionSiteLength() {
-		return this.optionRestrictionSiteLength.getValue();
-	}
-
-	public DoubleProperty optionRestrictionSiteLengthProperty() {
-		return this.optionRestrictionSiteLength;
-	}
-
-	public void setOptionRestrictionSiteLength(double restrictionSiteLength) {
-		this.optionRestrictionSiteLength.setValue(restrictionSiteLength);
-	}
-
 }
+
+

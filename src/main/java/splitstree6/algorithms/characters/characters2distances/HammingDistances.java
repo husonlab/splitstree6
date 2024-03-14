@@ -20,109 +20,172 @@
 package splitstree6.algorithms.characters.characters2distances;
 
 import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.Property;
 import javafx.beans.property.SimpleBooleanProperty;
-import jloda.util.ProgramExecutorService;
-import jloda.util.Single;
+import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.characters.characters2distances.utils.FixUndefinedDistances;
 import splitstree6.algorithms.characters.characters2distances.utils.PairwiseCompare;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
+import splitstree6.data.parts.AmbiguityCodes;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
-/**
- * hamming distances
- *
- * @author Daniel Huson, 2003, 2017
- */
 public class HammingDistances extends Characters2Distances {
-	private final BooleanProperty optionNormalize = new SimpleBooleanProperty(this, "optionNormalize", true);
+
+	public enum AmbiguousOptions {Ignore, AverageStates, MatchStates}
+
+	private final BooleanProperty optionNormalize = new SimpleBooleanProperty(this, "optionNormalize", false);
+	private final Property<AmbiguousOptions> optionHandleAmbiguousStates = new SimpleObjectProperty<>(this, "optionHandleAmbiguousStates", AmbiguousOptions.Ignore);
 
 	public List<String> listOptions() {
-		return List.of(optionNormalize.getName());
+		return List.of(optionHandleAmbiguousStates.getName());
 	}
 
 	@Override
-	public String getCitation() {
-		return "Hamming 1950;RW Hamming. Error detecting and error correcting codes. Bell System Technical Journal, 29(2):147–160 1950.";
-	}
-
-	@Override
-	public String getShortDescription() {
-		return "Computes distances based on the number of character-state differences.";
-	}
-
 	public String getToolTip(String optionName) {
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
-		if (optionName.equals(optionNormalize.getName()))
+		if (optionName.equals(optionNormalize.getName())) {
 			return "Normalize distances";
-		else
+		} else if (optionName.equals(optionHandleAmbiguousStates.getName())) {
+			return "Choose how to handle ambiguous states";
+		} else
 			return super.getToolTip(optionName);
 	}
 
 	@Override
+	public String getCitation() {
+		return "Hamming 1950; Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.";
+	}
+
+	@Override
+	public String getShortDescription() {
+		return (new HammingDistances().getShortDescription());
+	}
+
+	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distancesBlock) throws IOException {
-		progress.setMaximum(((long) taxa.getNtax() * taxa.getNtax()) / 2 - taxa.getNtax());
+		progress.setMaximum(taxa.getNtax());
 
 		distancesBlock.setNtax(characters.getNtax());
 
-		var service = Executors.newFixedThreadPool(ProgramExecutorService.getNumberOfCoresToUse());
-
-		var exception = new Single<IOException>(null);
-		final int ntax = taxa.getNtax();
-
-		try {
-			for (int s0 = 1; s0 <= ntax; s0++) {
-				for (int t0 = s0 + 1; t0 <= ntax; t0++) {
-					final var s = s0;
-					final var t = t0;
-					service.submit(() -> {
-						if (exception.isNull()) {
-							try {
-								final PairwiseCompare seqPair = new PairwiseCompare(characters, s, t);
-								var dist = -1.0;
-
-								final var F = seqPair.getF();
-
-								if (F != null) {
-									var p = 1.0;
-									for (var x = 0; x < seqPair.getNumStates(); x++) {
-										p = p - F[x][x];
-									}
-									if (!isOptionNormalize())
-										p = Math.round(p * seqPair.getNumNotMissing());
-									dist = p;
-								}
-								distancesBlock.set(s, t, dist);
-								distancesBlock.set(t, s, dist);
-								progress.incrementProgress();
-							} catch (IOException ex) {
-								exception.setIfCurrentValueIsNull(ex);
-							}
+		if (optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.MatchStates)
+			&& characters.getDataType().isNucleotides() && characters.isHasAmbiguityCodes())
+			computeMatchStatesHamming(taxa, characters, distancesBlock);
+		else {
+			// all the same here
+			var ntax = taxa.getNtax();
+			for (var s = 1; s <= ntax; s++) {
+				for (var t = s + 1; t <= ntax; t++) {
+					var seqPair = new PairwiseCompare(characters, s, t, optionHandleAmbiguousStates.getValue().equals(AmbiguousOptions.Ignore));
+					var F = seqPair.getF();
+					var dist = -1.0;
+					if (F != null) {
+						var p = 1.0;
+						for (int x = 0; x < seqPair.getNumStates(); x++) {
+							p = p - F[x][x];
 						}
-					});
+
+						if (!isOptionNormalize())
+							p = Math.round(p * seqPair.getNumNotMissing());
+						dist = p;
+					}
+					distancesBlock.set(s, t, dist);
+					distancesBlock.set(t, s, dist);
 				}
-			}
-		} finally {
-			service.shutdown();
-			try {
-				service.awaitTermination(1000, TimeUnit.DAYS);
-			} catch (InterruptedException ignored) {
+				progress.incrementProgress();
 			}
 		}
-
-		if (exception.isNotNull())
-			throw exception.get();
-
 		FixUndefinedDistances.apply(distancesBlock);
 		progress.reportTaskCompleted();
 	}
+
+	/**
+	 * Computes 'Best match' Hamming distances with a given characters block.
+	 *
+	 * @param taxa       the taxa
+	 * @param characters the input characters
+	 */
+	private void computeMatchStatesHamming(TaxaBlock taxa, CharactersBlock characters, DistancesBlock distances) {
+		final String ALLSTATES = "acgt" + AmbiguityCodes.CODES;
+		final int ntax = taxa.getNtax();
+		final int nstates = ALLSTATES.length();
+
+		/* Fill in the costs ascribed to comparing different allele combinations */
+		final double[][] weights = new double[nstates][nstates];
+		for (int s1 = 0; s1 < nstates; s1++)
+			for (int s2 = 0; s2 < nstates; s2++)
+				weights[s1][s2] = stringDiff(AmbiguityCodes.getNucleotides(ALLSTATES.charAt(s1)),
+						AmbiguityCodes.getNucleotides(ALLSTATES.charAt(s2)));
+
+        /*for (char s1 : ALLSTATES.toCharArray())
+            for (char s2 : ALLSTATES.toCharArray())
+                weights[s1][s2] = stringDiff(AmbiguityCodes.getNucleotides(s1), AmbiguityCodes.getNucleotides(s2));*/
+
+		/*Fill in the distance matrix */
+		for (int s = 1; s <= ntax; s++) {
+			for (int t = s + 1; t <= ntax; t++) {
+
+				double[][] F = getFmatrix(ALLSTATES, characters, s, t);
+				double diff = 0.0;
+				for (int s1 = 0; s1 < F.length; s1++)
+					for (int s2 = 0; s2 < F.length; s2++)
+						diff += F[s1][s2] * weights[s1][s2];
+
+				distances.set(s, t, (float) diff);
+				distances.set(t, s, (float) diff);
+			}
+		}
+	}
+
+	private double stringDiff(String s1, String s2) {
+		int matchCount = 0;
+		for (int i = 0; i < s1.length(); i++) {
+			char ch = s1.charAt(i);
+			if (s2.indexOf(ch) >= 0) {
+				matchCount++;
+			}
+		}
+		for (int i = 0; i < s2.length(); i++) {
+			char ch = s2.charAt(i);
+			if (s1.indexOf(ch) >= 0) {
+				matchCount++;
+			}
+		}
+
+		return 1.0 - (double) matchCount / ((double) s1.length() + s2.length());
+		//SAME IN INVERSE.
+	}
+
+	private double[][] getFmatrix(String ALLSTATES, CharactersBlock characters, int i, int j) {
+		int nstates = ALLSTATES.length();
+		double[][] F = new double[nstates][nstates];
+		double fsum = 0.0;
+		for (int k = 1; k <= characters.getNchar(); k++) {
+			char ch1 = characters.get(i, k);
+			char ch2 = characters.get(j, k);
+			int state1 = ALLSTATES.indexOf(ch1);
+			int state2 = ALLSTATES.indexOf(ch2);
+			if (state1 >= 0 && state2 >= 0) {
+				F[state1][state2] += 1.0;
+				fsum += 1.0;
+			}
+		}
+		if (fsum > 0.0) {
+			for (int x = 0; x < nstates; x++)
+				for (int y = 0; y < nstates; y++)
+					F[x][y] = F[x][y] / fsum;
+
+		}
+
+		return F;
+	}
+
+	// GETTERS AND SETTERS
 
 	public boolean isOptionNormalize() {
 		return optionNormalize.getValue();
@@ -135,4 +198,22 @@ public class HammingDistances extends Characters2Distances {
 	public void setOptionNormalize(boolean optionNormalize) {
 		this.optionNormalize.setValue(optionNormalize);
 	}
+
+	public AmbiguousOptions getOptionHandleAmbiguousStates() {
+		return this.optionHandleAmbiguousStates.getValue();
+	}
+
+	public Property<AmbiguousOptions> optionHandleAmbiguousStatesProperty() {
+		return this.optionHandleAmbiguousStates;
+	}
+
+	public void setOptionHandleAmbiguousStates(AmbiguousOptions optionHandleAmbiguousStates) {
+		this.optionHandleAmbiguousStates.setValue(optionHandleAmbiguousStates);
+	}
+
+	@Override
+	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
+		return super.isApplicable(taxa, datablock) && datablock.getDataType().isNucleotides();
+	}
+
 }

@@ -49,12 +49,13 @@ import jloda.util.ProgramProperties;
 import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
+import splitstree6.algorithms.characters.characters2distances.PDistance;
 import splitstree6.algorithms.characters.characters2distances.ProteinMLDist;
-import splitstree6.algorithms.characters.characters2distances.UncorrectedP;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2report.EstimateInvariableSites;
 import splitstree6.algorithms.characters.characters2report.PhiTest;
+import splitstree6.algorithms.characters.characters2report.TajimaD;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
 import splitstree6.algorithms.distances.distances2network.PCoA;
@@ -566,7 +567,7 @@ public class MainWindowPresenter {
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
-		setupAlgorithmMenuItem(controller.getUncorrectedPMenuItem(), new UncorrectedP());
+		setupAlgorithmMenuItem(controller.getpDistanceMenuItem(), new PDistance());
 		setupAlgorithmMenuItem(controller.getLogDetMenuItem(), new LogDet());
 		setupAlgorithmMenuItem(controller.getHky85MenuItem(), new HKY85());
 		setupAlgorithmMenuItem(controller.getJukesCantorMenuItem(), new JukesCantor());
@@ -632,6 +633,9 @@ public class MainWindowPresenter {
 
 		controller.getPhiTestMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new PhiTest()));
 		controller.getPhiTestMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new PhiTest()));
+
+		controller.getTajimaDMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TajimaD()));
+		controller.getTajimaDMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TajimaD()));
 
 		controller.getEstimateInvariableSitesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new EstimateInvariableSites()));
 		controller.getEstimateInvariableSitesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new EstimateInvariableSites()));

@@ -416,9 +416,7 @@ public class EqualAngle {
 	}
 
 	public static String getCitation() {
-		return "Dress & Huson 2004; " +
-			   "A.W.M. Dress and D.H. Huson, Constructing splits graphs, " +
+		return "Dress & Huson 2004;AWM Dress and DH. Huson, Constructing splits graphs, " +
 			   "IEEE/ACM Transactions on Computational Biology and Bioinformatics 1(3):109-115, 2004.";
 	}
-
 }

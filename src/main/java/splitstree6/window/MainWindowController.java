@@ -246,7 +246,7 @@ public class MainWindowController {
 	private MenuItem traitsMenuItem;
 
 	@FXML
-	private CheckMenuItem uncorrectedPMenuItem;
+	private CheckMenuItem pDistanceMenuItem;
 
 	@FXML
 	private CheckMenuItem logDetMenuItem;
@@ -361,6 +361,9 @@ public class MainWindowController {
 
 	@FXML
 	private MenuItem phiTestMenuItem;
+
+	@FXML
+	private MenuItem tajimaDMenuItem;
 
 	@FXML
 	private MenuItem computeRootedTreeFairProportionMenuItem;
@@ -861,8 +864,8 @@ public class MainWindowController {
 		return traitsMenuItem;
 	}
 
-	public CheckMenuItem getUncorrectedPMenuItem() {
-		return uncorrectedPMenuItem;
+	public CheckMenuItem getpDistanceMenuItem() {
+		return pDistanceMenuItem;
 	}
 
 	public CheckMenuItem getLogDetMenuItem() {
@@ -1015,6 +1018,10 @@ public class MainWindowController {
 
 	public MenuItem getPhiTestMenuItem() {
 		return phiTestMenuItem;
+	}
+
+	public MenuItem getTajimaDMenuItem() {
+		return tajimaDMenuItem;
 	}
 
 	public MenuItem getComputeRootedTreeFairProportionMenuItem() {
