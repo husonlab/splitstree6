@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.mapview;
+package splitstree6.xtra.mapview.mapbuilder;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
@@ -86,31 +86,10 @@ public class SingleImageMap {
 
 		var width = (rectangle.rangeLongitude() / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth();
 		var height = (rectangle.rangeLatitude() / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight();
-		/*
-		double xAddOffset = 0;
-		double yAddOffset = 0;
-
-		System.out.println("Width: " + width +" Height: " + height + " xOffset: " + xOffset +" yOffset: " + yOffset);
-
-		if(width/height > targetWidth/targetHeight){
-			var modifiedHeight = width / (targetWidth/targetHeight);
-			yAddOffset = 0.5 * (modifiedHeight-height);
-			height = modifiedHeight;
-		}else if(width/height < targetWidth/targetHeight){
-			var modifiedWidth = height / (targetWidth/targetHeight);
-			xAddOffset = 0.5 * (modifiedWidth-width);
-			width = modifiedWidth;
-		}
-
-		final double xTotalOffset = xAddOffset + xOffset;
-		final double yTotalOffset = yAddOffset + yOffset;
-		xOffset += xAddOffset;
-		yOffset += yAddOffset;
-		*/
-		System.out.println("Width: " + width +" Height: " + height + " xOffset: " + xOffset +" yOffset: " + yOffset);
 
 		var factor = Math.min(targetSize / width, targetSize / height);
 
+		// Set the conversion functions for latitude and longitude
 		Function<Double, Double> latitudeYFunction = latitude ->
 				factor * (((LatLongRect.topLatitude - latitude) / (LatLongRect.topLatitude - LatLongRect.bottomLatitude)) * image.getHeight() - yOffset);
 
@@ -118,10 +97,8 @@ public class SingleImageMap {
 				factor * (((longitude - LatLongRect.leftLongitude) / (LatLongRect.rightLongitude - LatLongRect.leftLongitude)) * image.getWidth() - xOffset);
 
 
-
+		// Crop image to show the relvant part of the map
 		var croppedImage = new WritableImage((int) width, (int) height);
-
-
 		var pixelReader = image.getPixelReader();
 		for (var i = 0; i < (int) width; i++) {
 			for (var j = 0; j < (int) height; j++) {
@@ -134,9 +111,9 @@ public class SingleImageMap {
 		imageView.setFitWidth(targetWidth);
 		imageView.setFitHeight(targetHeight);
 
+
 		var mapPane = new MapPane(new Rectangle2D(0, 0, targetWidth, targetHeight), List.of(imageView), latitudeYFunction, longtitudeXFunction);
 		mapPane.setBounds(rectangle);
 		return mapPane;
-
 	}
 }

@@ -71,55 +71,7 @@ public class MapView extends Application {
 		stage.sizeToScene();
 		stage.setTitle("MapView");
 		stage.show();
-
 		var locationNameMap = new HashMap<Point2D, String>();
-
-
-		locationNameMap.put(new Point2D(40.7128, -74.0060), "New York");
-		locationNameMap.put(new Point2D(51.5074, -0.1278), "London");
-		locationNameMap.put(new Point2D(48.52, 9.05), "Tuebingen");
-		//locationNameMap.put(new Point2D(48.4914, 9.2043), "Reutlingen");
-		//locationNameMap.put(new Point2D(48.5363, 9.2846), "Metzingen");
-		locationNameMap.put(new Point2D(1.3521, 103.8198),"Singapore");
-		//locationNameMap.put(new Point2D(-33.9249, 18.4241), "Cape Town");
-		//locationNameMap.put(new Point2D(-36.88, 174.786991), "Auckland");
-
-		/*
-		MapPane mapPane;
-		mapPane = SingleImageMap.createMapPane(locationNameMap.keySet(), controller.getStackPane().getWidth(), controller.getStackPane().getHeight());
-
-
-		for (var entry : locationNameMap.entrySet()) {
-			mapPane.place(new Label(entry.getValue()), entry.getKey(), true);
-		}
-
-		ArrayList<PieChart> diagramms = createTestDiagramms(controller, locationNameMap);
-		ArrayList<Point2D> locs = new ArrayList<>();
-		for(var all : locationNameMap.entrySet()){
-			locs.add(all.getKey());
-		}
-
-		for(int i = 0; i <diagramms.size() ; i++){
-			PieChart diagram = diagramms.get(i);
-			diagram.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-			diagram.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-			//System.out.println(diagram.getWidth() + " " + diagram.getHeight());
-			diagram.setMinWidth(80);
-			diagram.setMaxWidth(200);
-			diagram.setMinHeight(80);
-			diagram.setMaxHeight(200);
-			diagram.prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-			diagram.prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-			mapPane.place(diagram, locs.get(i).getX(), locs.get(i).getY(), true);
-		}
-
-		//controller.getStackPane().getChildren().add(mapPane);
-		*/
-
-
-
-
-
 	}
 
 	public MapViewController getController() {
@@ -141,33 +93,4 @@ public class MapView extends Application {
 	public Model getModel() {
 		return model;
 	}
-
-	private ArrayList<PieChart> createTestDiagramms(MapViewController controller, HashMap<Point2D, String> locs){
-		ArrayList<PieChart> diagramms = new ArrayList<>();
-		for(var point : locs.keySet()){
-			PieChart chart = new PieChart();
-
-			List data = generateRandomData();
-
-			ObservableList obsList = FXCollections.observableList(data);
-			chart.setData(obsList);
-			diagramms.add(chart);
-		}
-		return diagramms;
-	}
-
-	private List<PieChart.Data> generateRandomData() {
-		List<PieChart.Data> data = new ArrayList<>();
-		Random random = new Random();
-
-		// Generate random data for the pie chart
-		for (int i = 0; i < 5; i++) {
-			String category = "Category " + (i + 1);
-			double value = random.nextDouble() * 100; // Random value between 0 and 100
-			data.add(new PieChart.Data(category, value));
-		}
-
-		return data;
-	}
-
 }

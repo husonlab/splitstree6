@@ -180,6 +180,8 @@ module splitstreesix {
 	opens splitstree6.splits;
 	opens splitstree6.xtra.more;
 	opens splitstree6.xtra.alts;
+    opens splitstree6.xtra.mapview.nodes;
+	opens splitstree6.xtra.mapview.mapbuilder;
 
 
 }

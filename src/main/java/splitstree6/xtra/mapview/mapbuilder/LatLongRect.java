@@ -17,12 +17,11 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.mapview;
+package splitstree6.xtra.mapview.mapbuilder;
 
 import javafx.geometry.Point2D;
 
 import java.util.Collection;
-import java.util.Map;
 
 /**
  * a rectangle describing a range of latitude and longitude coordinates
@@ -38,28 +37,49 @@ public record LatLongRect(double minLatitude, double minLongitude, double rangeL
 	public static final double topLatitude = 90.0;
 	public static final double bottomLatitude = -90.0;
 
+	/**
+	 * Calculates and returns the maximum latitude value within the geographic rectangle.
+	 *
+	 * @return The maximum latitude value within the rectangle.
+	 */
 	public double maxLatitude() {
 		return minLatitude + rangeLatitude;
 	}
 
+	/**
+	 * Calculates and returns the maximum longitude value within the geographic rectangle.
+	 *
+	 * @return The maximum longitude value within the rectangle.
+	 */
 	public double maxLongitude() {
 		return minLongitude + rangeLongitude;
 	}
 
+	/**
+	 * Creates a rectangular geographic region (LatLongRect) that encloses a collection of latitude/longitude points,
+	 * considering the windows aspect ratio, a proportionmarigin and minimum/maximum values for longitude/latitude.
+	 *
+	 * @param latLongPoints   A collection of latitude/longitude points to be enclosed by the rectangle.
+	 * @param proportionMargin  The proportion margin to be added to the latitude and longitude ranges.
+	 * @param aspectRatio  The desired aspect ratio of the resulting rectangle.
+	 * @return  A LatLongRect object representing the computed rectangular geographic region.
+	 */
 	public static LatLongRect create(Collection<Point2D> latLongPoints, double proportionMargin, double aspectRatio) {
 		var minLat = latLongPoints.stream().mapToDouble(Point2D::getX).min().orElse(0);
 		var maxLat = latLongPoints.stream().mapToDouble(Point2D::getX).max().orElse(0);
 		var minLong = latLongPoints.stream().mapToDouble(Point2D::getY).min().orElse(0);
 		var maxLong = latLongPoints.stream().mapToDouble(Point2D::getY).max().orElse(0);
 
-		//System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+
 		var rangeLat = Math.abs(minLat - maxLat);
 		var rangeLong = Math.abs(minLong - maxLong);
+
+		// Add proportion margin to the longtitude/latitude range
 		minLong -= proportionMargin * rangeLong;
 		maxLong += proportionMargin * rangeLong;
 		minLat -= proportionMargin * rangeLat;
 		maxLat += proportionMargin * rangeLat;
-		//System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
+
 
 
 		// Modify range latitude to minimum size
@@ -92,7 +112,6 @@ public record LatLongRect(double minLatitude, double minLongitude, double rangeL
 			minLat -= addLat/2;
 			maxLat += addLat/2;
 		}
-		//System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
 
 		// Distribute surplus Latitude
 		if(minLat < bottomLatitude){
@@ -117,33 +136,10 @@ public record LatLongRect(double minLatitude, double minLongitude, double rangeL
 			if(minLong < leftLongitude)minLong = leftLongitude;
 			maxLong = rightLongitude;
 		}
-		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
 
-		//rangeLat = Math.abs(minLat - maxLat);
-
-		//minLat -= 2;
-		/*
-		// Add proportion margin if possible
-		rangeLong = Math.abs(minLong - maxLong);
-		rangeLat = Math.abs(minLat - maxLat);
-
-		if (proportionMargin != 0) {
-			minLong = Math.max(leftLongitude, minLong - proportionMargin * rangeLong);
-			maxLong = Math.min(rightLongitude, maxLong + proportionMargin * rangeLong);
-			minLat = Math.max(bottomLatitude, minLat - proportionMargin * rangeLat);
-			maxLat = Math.min(topLatitude, maxLat + proportionMargin * rangeLat);
-		}
-		rangeLong = Math.abs(minLong - maxLong);
-		rangeLat = Math.abs(minLat - maxLat);
-
-		 */
 
 		rangeLong = Math.abs(minLong - maxLong);
 		rangeLat = Math.abs(minLat - maxLat);
-
-		System.out.println("min Lat " + minLat + " max Lat " + maxLat + " min long " + minLong + " max long " + maxLong);
-		System.out.println("range Lat " + rangeLat + " range long " + rangeLong);
-
 		return new LatLongRect(minLat, minLong, rangeLat, rangeLong);
 	}
 }

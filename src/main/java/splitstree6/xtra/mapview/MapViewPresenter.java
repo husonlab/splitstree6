@@ -21,8 +21,6 @@ package splitstree6.xtra.mapview;
 
 import javafx.application.Platform;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
@@ -31,32 +29,34 @@ import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.PieChart;
-import javafx.scene.control.Label;
 import javafx.scene.image.Image;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import org.locationtech.jts.geom.Geometry;
-//import jloda.fx.util.ClipboardUtils;
+import jloda.fx.util.ClipboardUtils;
+import splitstree6.xtra.mapview.mapbuilder.ComputeMap;
+import splitstree6.xtra.mapview.mapbuilder.MapPane;
+import splitstree6.xtra.mapview.mapbuilder.SingleImageMap;
+import splitstree6.xtra.mapview.nodes.*;
 
-import java.io.IOException;
-import java.text.ParseException;
 import java.util.*;
 
-import static splitstree6.xtra.mapview.ColorSchemes.SCHEME1;
-
+/**
+ * Presenter class for the MapView.
+ * Nikolas Kreisz 01.2024
+ */
 public class MapViewPresenter {
 	ArrayList<DraggablePieChart> charts = new ArrayList<DraggablePieChart>();
 	LegendView legendView;
 
+	/**
+	 * Constructs a MapViewPresenter with the given MapView.
+	 *
+	 * @param mapView The MapView instance to associate with the presenter.
+	 */
 	public MapViewPresenter(MapView mapView) {
 		var controller = mapView.getController();
 		var model = mapView.getModel();
+
 
 		var emptyProperty = new SimpleBooleanProperty(true);
 		model.lastUpdateProperty().addListener(e -> Platform.runLater(() -> emptyProperty.set(model.getCharactersBlock().getNtax() == 0)));
@@ -68,112 +68,24 @@ public class MapViewPresenter {
 
 		controller.getCloseMenuItem().setOnAction(e -> Platform.exit());
 
-		//controller.getCopyMenuItem().setOnAction(e -> ClipboardUtils.putImage(createImage(controller.getStackPane())));
+		controller.getCopyMenuItem().setOnAction(e -> ClipboardUtils.putImage(createImage(controller.getStackPane())));
 
 		controller.getRedrawButton().setOnAction(e -> redraw(mapView));
 		controller.getRedrawButton().disableProperty().bind(emptyProperty);
 
-		// Initialize Color choice Box
+		// Initialize UI elements
 		initChoiceBoxColors(controller);
-
-
-
-
-
-
 	}
-
-	public MapPane createMap(MapViewController controller, Model model){
-		var locationNameMap = new HashMap<Point2D, String>();
-		var traitsBlock = model.getTaxaBlock().getTraitsBlock();
-		for(int i = 1; i <= traitsBlock.getNTraits(); i++){
-			locationNameMap.put(new Point2D(traitsBlock.getTraitLatitude(i), traitsBlock.getTraitLongitude(i)), "");
-		}
-		return SingleImageMap.createMapPane(locationNameMap.keySet(), controller.getStackPane().getWidth(), controller.getStackPane().getHeight());
-	}
-
-
-
-
-
-
-	public void redraw(MapView mapView) {
-		var model = mapView.getModel();
-		var controller = mapView.getController();
-
-		try {
-			controller.getStackPane().getChildren().clear();
-			MapPane mapPane = createMap(controller, model);
-			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
-
-			ArrayList<String> traitLabels = new ArrayList<String>();
-			traitLabels.addAll(model.getTaxaBlock().getLabels());
-
-			CountryFinder countryFinder = new CountryFinder();
-
-			var mapBounds = mapPane.getBounds();
-			ArrayList<CountryFinder.Country> countryLabels = countryFinder.getCountriesForAlpha2Codes(mapBounds.minLatitude(), mapBounds.maxLatitude(), mapBounds.minLongitude(), mapBounds.maxLongitude());
-
-			for(CountryFinder.Country label : countryLabels){
-				//System.out.println(label.name() + label.center_lat() + label.center_lon());
-				System.out.println(" Adding label: " + label.name() + " " + label.latitude() + " " + label.longitude());
-				DraggableLabel draggableLabel = new DraggableLabel(label.name(), controller);
-				//Font font = Font.font("Arial", FontWeight.BOLD, 24);
-				//draggableLabel.setFont(font);
-				//draggableLabel.setStyle("-fx-font-size: 24px;");
-				//draggableLabel.visibleProperty().bind(controller.getShowLabelsBox().selectedProperty());
-				mapPane.place(draggableLabel, label.longitude(), label.latitude(), true);
-			}
-
-
-			for(var trait : traits){
-				System.out.println("trait " + trait.getLatitude() + " " + trait.getLongtitude());
-
-				ObservableList obsList = FXCollections.observableList(getPieChartData(trait));
-				DraggablePieChart pieChart = new DraggablePieChart(obsList);
-				pieChart.getPieChart().prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-				pieChart.getPieChart().prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-				pieChart.getPieChart().setMinWidth(80);
-				pieChart.getPieChart().setMaxWidth(200);
-				pieChart.getPieChart().setMinHeight(80);
-				pieChart.getPieChart().setMaxHeight(200);
-				pieChart.getPieChart().setCenterShape(true);
-				pieChart.getPieChart().prefWidthProperty().bind(controller.getChartSizeSlider().valueProperty());
-				pieChart.getPieChart().prefHeightProperty().bind(controller.getChartSizeSlider().valueProperty());
-				mapPane.placeChart(pieChart, trait.getLatitude(), trait.getLongtitude(), true);
-				pieChart.saveColorIDs(traitLabels);
-				pieChart.updateColors(controller.getChoiceBoxColorScheme().getValue());
-				charts.add(pieChart);
-			}
-			//Legend
-			legendView = new LegendView(traitLabels, controller.getChoiceBoxColorScheme().getValue());
-			legendView.setLayoutX(50);
-			legendView.setLayoutY(50);
-			controller.getStackPane().getChildren().add(mapPane);
-			legendView.setMouseTransparent(false);
-			legendView.visibleProperty().bind(controller.getCheckBoxLegend().selectedProperty().not());
-			controller.getStackPane().getChildren().add(legendView);
-
-		} catch (Exception ex) {
-			controller.getInfoLabel().setText("Error: " + ex.getMessage());
-		}
-	}
-
-	public List<PieChart.Data> getPieChartData(GeoTrait trait){
-		List<PieChart.Data> data = new ArrayList<>();
-		for(int i = 0; i < trait.getnTaxa(); i++){
-			System.out.println("seq " + trait.getTaxa().get(i) + " comp " + trait.getCompostion().get(trait.getTaxa().get(i)));
-			PieChart.Data nData = new PieChart.Data(trait.getTaxa().get(i), trait.getCompostion().get(trait.getTaxa().get(i)));
-			data.add(nData);
-		}
-		return data;
-	}
-
-
+	/**
+	 * Opens a file with traits and loads it into the model.
+	 *
+	 * @param stage     The JavaFX stage to display the file chooser dialog.
+	 * @param controller The controller associated with the map view.
+	 * @param model      The model to load the file into.
+	 */
 	private void openFile(Stage stage, MapViewController controller, Model model) {
 		final var fileChooser = new FileChooser();
 		fileChooser.setTitle("Open file with traits");
-
 		var file = fileChooser.showOpenDialog(stage);
 		if (file != null) {
 			var service = new Service<Integer>() {
@@ -183,6 +95,7 @@ public class MapViewPresenter {
 						@Override
 						protected Integer call() throws Exception {
 							model.load(file);
+							System.out.println("Loading new model at:" + String.valueOf(model.getLastUpdate()));
 							return model.getCharactersBlock().getNtax();
 						}
 					};
@@ -200,23 +113,118 @@ public class MapViewPresenter {
 				controller.getInfoLabel().setText("Loading trees failed");
 			});
 			service.start();
-
 		}
 	}
+	/**
+	 * Redraws the map view based on the current state of the MapView.
+	 *
+	 * @param mapView The MapView containing the model, controller, and UI elements.
+	 */
+	public void redraw(MapView mapView) {
+		var model = mapView.getModel();
+		var controller = mapView.getController();
 
+		try {
+			// Clear previous map
+			controller.getStackPane().getChildren().clear();
+			// Calculate the image shown in the map pane
+			MapPane mapPane = createMap(controller, model);
+			// Compile traits and labels from the model
+			ArrayList<GeoTrait> traits = ComputeMap.apply(model);
+			ArrayList<String> traitLabels = new ArrayList<String>();
+			traitLabels.addAll(model.getTaxaBlock().getLabels());
 
+			// Calculate, create and place the country labels
+			CountryFinder countryFinder = new CountryFinder();
+			var mapBounds = mapPane.getBounds();
+			ArrayList<CountryFinder.Country> countryLabels = countryFinder.getCountriesForAlpha2Codes(mapBounds.minLatitude(), mapBounds.maxLatitude(), mapBounds.minLongitude(), mapBounds.maxLongitude());
+			for(CountryFinder.Country label : countryLabels){
+				DraggableLabel draggableLabel = new DraggableLabel(label.name(), controller);
+				mapPane.place(draggableLabel, label.latitude(), label.longitude(), true);
+			}
+
+			// Create and place the pie charts
+			for(var trait : traits){
+				ObservableList obsList = FXCollections.observableList(getPieChartData(trait));
+				DraggablePieChart pieChart = new DraggablePieChart(obsList, controller);
+				mapPane.placeChart(pieChart, trait.getLatitude(), trait.getlongitude(), true);
+				pieChart.saveColorIDs(traitLabels);
+				pieChart.updateColors(controller.getChoiceBoxColorScheme().getValue());
+				charts.add(pieChart);
+			}
+
+			// Calculate, Create and place the LegendView
+			legendView = new LegendView(traitLabels, controller.getChoiceBoxColorScheme().getValue(), controller);
+			legendView.setMouseTransparent(false);
+			legendView.visibleProperty().bind(controller.getCheckBoxLegend().selectedProperty().not());
+			mapPane.place(legendView);
+
+			controller.getStackPane().getChildren().add(mapPane);
+		} catch (Exception ex) {
+			controller.getInfoLabel().setText("Error: " + ex.getMessage());
+		}
+	}
+	/**
+	 * Creates a map pane based on geographical data from the model and the controller's settings.
+	 * This method populates the map with location points extracted from the model's taxa block.
+	 *
+	 * @param controller The map view controller providing settings and UI components.
+	 * @param model      The model containing geographical data.
+	 * @return A MapPane instance representing the populated map.
+	 */
+	public MapPane createMap(MapViewController controller, Model model){
+		var locationNameMap = new HashMap<Point2D, String>();
+		var traitsBlock = model.getTaxaBlock().getTraitsBlock();
+		for(int i = 1; i <= traitsBlock.getNTraits(); i++){
+			locationNameMap.put(new Point2D(traitsBlock.getTraitLatitude(i), traitsBlock.getTraitLongitude(i)), "");
+		}
+		return SingleImageMap.createMapPane(locationNameMap.keySet(), controller.getStackPane().getWidth(), controller.getStackPane().getHeight());
+	}
+	/**
+	 * Retrieves pie chart data from a given geographical trait.
+	 * Each data point in the pie chart represents a taxon along with its composition.
+	 *
+	 * @param trait The geographical trait containing taxonomic data.
+	 * @return A list of PieChart.Data objects representing the taxonomic composition.
+	 */
+	public List<PieChart.Data> getPieChartData(GeoTrait trait){
+		List<PieChart.Data> data = new ArrayList<>();
+		for(int i = 0; i < trait.getnTaxa(); i++){
+			PieChart.Data nData = new PieChart.Data(trait.getTaxa().get(i), trait.getCompostion().get(trait.getTaxa().get(i)));
+			data.add(nData);
+		}
+		return data;
+	}
+	/**
+	 * Creates an image snapshot of a JavaFX node with a 2x scale.
+	 *
+	 * @param node The JavaFX node to capture as an image.
+	 * @return The generated image.
+	 */
 	private Image createImage(Node node) {
 		var parameters = new SnapshotParameters();
 		parameters.setTransform(javafx.scene.transform.Transform.scale(2, 2));
 		return node.snapshot(parameters, null);
 	}
+	/**
+	 * Updates the colors of all charts and their associated legend views
+	 * based on the specified color scheme.
+	 *
+	 * @param scheme The name of the color scheme to apply.
+	 */
 	private void updateChartColors(String scheme){
 		for(var chart : charts){
 			chart.updateColors(scheme);
 			legendView.updateColors(scheme);
 		}
 	}
-
+	/**
+	 * Initializes the choice box for selecting color schemes in the map view controller.
+	 * Adds predefined color schemes to the choice box and sets a default value.
+	 * Also attaches a listener to update chart colors when a new scheme is selected.
+	 *
+	 * @param controller The map view controller containing the choice box.
+	 */
 	private void initChoiceBoxColors(MapViewController controller){
 		final ObservableList<String> list = FXCollections.observableArrayList("Scheme-1", "Scheme-2", "Scheme-3");
 		controller.getChoiceBoxColorScheme().getItems().addAll(list);

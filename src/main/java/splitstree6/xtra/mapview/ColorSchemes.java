@@ -2,8 +2,17 @@ package splitstree6.xtra.mapview;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The ColorSchemes class provides static methods to retrieve predefined color schemes.
+ * Each color scheme is represented as a map of integer indices to hexadecimal color codes.
+ */
 public class ColorSchemes {
-
+    /**
+     * Returns a color scheme map based on the specified label.
+     *
+     * @param label The label indicating the desired color scheme.
+     * @return A map representing the color scheme.
+     */
     public static Map<Integer, String> getScheme(String label){
         switch (label){
             case "Scheme-1":
@@ -15,7 +24,7 @@ public class ColorSchemes {
             default: return SCHEME1;
         }
     }
-
+    /** Predefined color scheme 1. */
     public static final Map<Integer, String> SCHEME1 = new HashMap<>();
     static {
         SCHEME1.put(0, "#A9D5C0");
@@ -69,8 +78,7 @@ public class ColorSchemes {
         SCHEME1.put(48, "#228B22");
         SCHEME1.put(49, "#8A2BE2");
     }
-
-
+    /** Predefined color scheme 2. */
     public static final Map<Integer, String> SCHEME2 = new HashMap<>();
     static {
         SCHEME2.put(0, "#FF5733");
@@ -114,7 +122,7 @@ public class ColorSchemes {
         SCHEME2.put(38, "#3399FF");
         SCHEME2.put(39, "#3399FF");
     }
-
+    /** Predefined color scheme 3. */
     public static final Map<Integer, String> SCHEME3 = new HashMap<>();
     static {
         SCHEME3.put(0, "#00FF00");

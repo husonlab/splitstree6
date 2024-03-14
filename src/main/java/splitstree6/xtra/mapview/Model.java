@@ -29,24 +29,41 @@ import splitstree6.io.readers.characters.CharactersReader;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+
 
 /**
- * simple data model
+ * The Model class represents the main data model of the application.
+ * It manages taxa and characters blocks and provides methods to load data from files.
+ * Nikolas Kreisz 1.2024
  */
 public class Model {
 	private final TaxaBlock taxaBlock = new TaxaBlock();
 	private final CharactersBlock charactersBlock = new CharactersBlock();
 	private final LongProperty lastUpdate = new SimpleLongProperty(this, "lastUpdate", 0L);
 
+	/**
+	 * Gets the taxa block managed by the model.
+	 *
+	 * @return The taxa block.
+	 */
 	public TaxaBlock getTaxaBlock() {
 		return taxaBlock;
 	}
-
+	/**
+	 * Gets the characters block managed by the model.
+	 *
+	 * @return The characters block.
+	 */
 	public CharactersBlock getCharactersBlock() {
 		return charactersBlock;
 	}
-
+	/**
+	 * Loads data from the specified file into the model.
+	 * Clears the existing characters and taxa blocks before loading.
+	 *
+	 * @param file The file to load.
+	 * @throws IOException If an I/O error occurs during loading.
+	 */
 	public void load(File file) throws IOException {
 		charactersBlock.clear();
 		taxaBlock.clear();
@@ -60,15 +77,25 @@ public class Model {
 			incrementLastUpdate();
 		} else throw new IOException("File does not contain characters");
 	}
-
+	/**
+	 * Gets the last update time of the model.
+	 *
+	 * @return The last update time in milliseconds.
+	 */
 	public long getLastUpdate() {
 		return lastUpdate.get();
 	}
-
+	/**
+	 * Gets the property representing the last update time of the model.
+	 *
+	 * @return The property for observing the last update time.
+	 */
 	public LongProperty lastUpdateProperty() {
 		return lastUpdate;
 	}
-
+	/**
+	 * Increments the last update time to the current system time.
+	 */
 	public void incrementLastUpdate() {
 		lastUpdate.set(System.currentTimeMillis());
 	}

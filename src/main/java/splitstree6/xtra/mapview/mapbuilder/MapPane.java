@@ -17,27 +17,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.mapview;
+package splitstree6.xtra.mapview.mapbuilder;
 
 import javafx.application.Platform;
 import javafx.geometry.Point2D;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
-import javafx.scene.chart.PieChart;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Rectangle;
-import jloda.fx.shapes.CircleShape;
+import splitstree6.xtra.mapview.nodes.DraggableLine;
+import splitstree6.xtra.mapview.nodes.DraggablePieChart;
 
 import java.util.List;
 import java.util.function.Function;
 
 /**
- * a world map view consisting of a lower pane showing the map and an upper pane containing user items
- * Daniel Huson, 12.2023
+ * A world map view consisting of a lower pane showing the map and an upper pane containing user items.
+ * This class facilitates the visualization of geographic data by providing methods to place nodes and charts
+ * on specific latitude and longitude coordinates within the map.
+ *
+ * Daniel Huson, December 2023
  */
 public class MapPane extends StackPane {
 	private final Pane mapPane;
@@ -48,6 +49,14 @@ public class MapPane extends StackPane {
 	private final Function<Double, Double> latitudeYFunction;
 	private final Function<Double, Double> longitudeXFunction;
 
+	/**
+	 * Constructs a MapPane with the specified bounds, tiles, and mapping functions.
+	 *
+	 * @param bounds            The bounds (Rectangle2D) of the map.
+	 * @param tiles             The list of ImageView tiles representing the map.
+	 * @param latitudeYFunction The function to map latitude values to Y-coordinates on the map.
+	 * @param longitudeXFunction The function to map longitude values to X-coordinates on the map.
+	 */
 	MapPane(Rectangle2D bounds, List<ImageView> tiles, Function<Double, Double> latitudeYFunction, Function<Double, Double> longitudeXFunction) {
 		this.latitudeYFunction = latitudeYFunction;
 		this.longitudeXFunction = longitudeXFunction;
@@ -102,32 +111,42 @@ public class MapPane extends StackPane {
 	 * @param center    center on the location
 	 */
 	public void place(Node node, double latitude, double longitude, boolean center) {
-		//System.out.println("label " + latitude + " " + longitude);
 		var location = getLocationOnMap(latitude, longitude);
 		node.setLayoutX(location.getX());
 		node.setLayoutY(location.getY());
 
-
-
 		if (center && (Node) node instanceof Region region) {
-			//System.out.println("applying css");
 			region.applyCss();
 			Platform.runLater(() -> {
 				region.setLayoutX(region.getLayoutX() - 0.5 * region.getWidth());
 				region.setLayoutY(region.getLayoutY() - 0.5 * region.getHeight());
 			});
 		}
-		//System.out.println("Placing " + node.getLayoutX() + " " + node.getLayoutY());
 		getUserPane().getChildren().add(node);
 
 	}
-
+	/**
+	 * Allows the user to place a node using POINT2D
+	 *
+	 * @param node      The node to be placed.
+	 * @param latLong   The latitude and longitude coordinates representing the location where the node will be placed.
+	 *                  The latitude should be between -90 and 90 degrees, and the longitude should be between -180 and 180 degrees.
+	 * @param center    Indicates whether to center the place the center of the node at thge specified location.
+	 */
 	public void place(Node node, Point2D latLong, boolean center) {
 		place(node, latLong.getX(), latLong.getY(), center);
 	}
 
+	/**
+	 * Places a DraggablePieChart node at the specified latitude and longitude coordinates on the map (user-pane).
+	 * This method also adds a DraggableLine representing the connection between the pie chart and its associated node.
+	 *
+	 * @param node      The DraggablePieChart node to be placed.
+	 * @param latitude  The latitude value (-90 to 90).
+	 * @param longitude The longitude value (-180 to 180).
+	 * @param center    Indicates whether to center the node at the specified location.
+	 */
 	public void placeChart (DraggablePieChart node, double latitude, double longitude, boolean center){
-		System.out.println("pie " + latitude + " " + longitude);
 		var location = getLocationOnMap(latitude, longitude);
 		node.getPieChart().setLayoutX(location.getX());
 		node.getPieChart().setLayoutY(location.getY());
@@ -135,7 +154,6 @@ public class MapPane extends StackPane {
 
 
 		if (center && (Node) node.getPieChart() instanceof Region region) {
-			//System.out.println("applying css");
 			region.applyCss();
 			Platform.runLater(() -> {
 				region.setLayoutX(region.getLayoutX() - 0.5 * region.getWidth());
@@ -143,30 +161,62 @@ public class MapPane extends StackPane {
 			});
 		}
 
-
 		DraggableLine line = new DraggableLine(node);
 		getUserPane().getChildren().add(line.getLine());
 		getUserPane().getChildren().add(node.getPieChart());
 
 	}
-
-
+	/**
+	 * Places a node at the default coordinates (20, 20) within the user pane.
+	 *
+	 * @param node The node to be placed.
+	 */
+	public void place(Node node){
+		node.setLayoutX(20);
+		node.setLayoutY(20);
+		userPane.getChildren().add(node);
+	}
+	/**
+	 * Retrieves the Point2D location on the map corresponding to the given latitude and longitude coordinates.
+	 *
+	 * @param latitude  The latitude value (-90 to 90).
+	 * @param longitude The longitude value (-180 to 180).
+	 * @return The Point2D location on the map.
+	 */
 	public Point2D getLocationOnMap(double latitude, double longitude) {
 		return new Point2D(getMapX(longitude), getMapY(latitude));
 	}
-
+	/**
+	 * Calculates and returns the X-coordinate on the map corresponding to the given longitude value.
+	 *
+	 * @param longitude The longitude value (-180 to 180).
+	 * @return The X-coordinate on the map.
+	 */
 	public double getMapX(double longitude) {
 		return longitudeXFunction.apply(longitude);
 	}
-
+	/**
+	 * Calculates and returns the Y-coordinate on the map corresponding to the given latitude value.
+	 *
+	 * @param latitude The latitude value (-90 to 90).
+	 * @return The Y-coordinate on the map.
+	 */
 	public double getMapY(double latitude) {
 		return latitudeYFunction.apply(latitude);
 	}
-
+	/**
+	 * Sets the bounds (LatLongRect) of the map.
+	 *
+	 * @param bounds The bounds of the map.
+	 */
 	public void setBounds(LatLongRect bounds) {
 		this.bounds = bounds;
 	}
-
+	/**
+	 * Retrieves the bounds (LatLongRect) of the map.
+	 *
+	 * @return The bounds of the map.
+	 */
 	public LatLongRect getBounds() {
 		return bounds;
 	}

@@ -44,14 +44,7 @@ public class MapViewController {
 	private StackPane stackPane;
 
 	@FXML
-	private ToolBar tooBar;
-
-	@FXML
-	private VBox topPane;
-
-	@FXML
 	private ProgressBar progressBar;
-
 	@FXML
 	private Label label;
 
@@ -60,17 +53,6 @@ public class MapViewController {
 
 	@FXML
 	private Slider chartSizeSlider;
-
-
-	@FXML
-	private HBox hBoxMiddle;
-
-	@FXML
-	private StackPane mainStackPane;
-
-
-	@FXML
-	private Label labelChartSize;
 
 	@FXML
 	private Label infoLabel;
@@ -83,7 +65,6 @@ public class MapViewController {
 
 	@FXML
 	private CheckBox showLabelsBox;
-
 
 	@FXML
 	private void initialize() {
@@ -126,24 +107,12 @@ public class MapViewController {
 		return label;
 	}
 
-	public MenuBar getMenuBar() {
-		return menuBar;
-	}
-
 	public MenuItem getOpenMenuItem() {
 		return openMenuItem;
 	}
 
 	public StackPane getStackPane() {
 		return stackPane;
-	}
-
-	public ToolBar getTooBar() {
-		return tooBar;
-	}
-
-	public VBox getTopPane() {
-		return topPane;
 	}
 
 	public ProgressBar getProgressBar() {

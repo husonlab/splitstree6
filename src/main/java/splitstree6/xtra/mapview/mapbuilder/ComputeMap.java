@@ -17,18 +17,28 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.mapview;
+package splitstree6.xtra.mapview.mapbuilder;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
+import splitstree6.xtra.mapview.nodes.GeoTrait;
+import splitstree6.xtra.mapview.Model;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 
 /**
- * compute a map visualization for the given model
- * Niko Kreisz, 11.2023
+ * Compute class that processes a model and returns the corresponding GeoTrait objects
+ * Nikolas Kreisz, 11.2023
  */
 public class ComputeMap {
+
+	/**
+	 * Creates a list of GeoTraits based on the given Model.
+	 *
+	 * @param model The Model object containing taxa and traits information.
+	 * @return An ArrayList of GeoTraits representing traits extracted from the model.
+	 */
 	public static ArrayList<GeoTrait> apply(Model model) {
 
 		// Create Geotraits from the model
@@ -54,37 +64,8 @@ public class ComputeMap {
 					taxa,
 					composition
 			);
-			geoTrait.printGeotrait();
 			geoTraits.add(geoTrait);
 		}
-
-
 		return geoTraits;
 	}
 }
-
-/*
-		System.out.println("Taxablock: " + taxaBlock.getNtax());
-		for (var taxa : taxaBlock.getTaxa()){
-			System.out.println("Taxa-name: " + taxa.getName());
-			//System.out.println("Taxa-Info: " + taxa.getInfo());
-		}
-
-		System.out.println("Traitsblock size: " + traitsBlock.size());
-		System.out.println("Labels " + traitsBlock.getTraitLabels().toString());
-		System.out.println("Has lontitude: " + traitsBlock.isSetLatitudeLongitude());
-		System.out.println("val " + traitsBlock.getTraitValue(5, 3));
-		System.out.println("Latitude " + traitsBlock.getTraitLatitude(2));
-		System.out.println("Latitude " + traitsBlock.getTraitLatitude(3));
-		System.out.println("Latitude " + traitsBlock.getTraitLatitude(4));
-		System.out.println("Latitude " + traitsBlock.getTraitLatitude(5));
-
-		for(int i = 1; i <= traitsBlock.size(); i++){
-			System.out.println(traitsBlock.getTraitLongitude(i));
-			System.out.println(traitsBlock.getTraitLatitude(i));
-			for(int j = 1; j <= taxaBlock.size(); j++){
-				System.out.print(taxaBlock.get(j).getName());
-				System.out.println(" " + traitsBlock.getTraitValue(j,i));
-			}
-		}
-*/
