@@ -261,9 +261,6 @@ public class MainWindowController {
 	private CheckMenuItem k2pMenuItem;
 
 	@FXML
-	private CheckMenuItem k3stMenuItem;
-
-	@FXML
 	private CheckMenuItem f81MenuItem;
 
 	@FXML
@@ -882,10 +879,6 @@ public class MainWindowController {
 
 	public CheckMenuItem getK2pMenuItem() {
 		return k2pMenuItem;
-	}
-
-	public CheckMenuItem getK3stMenuItem() {
-		return k3stMenuItem;
 	}
 
 	public CheckMenuItem getF81MenuItem() {

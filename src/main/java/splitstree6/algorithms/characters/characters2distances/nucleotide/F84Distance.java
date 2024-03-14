@@ -1,5 +1,5 @@
 /*
- * GTR.java Copyright (C) 2024 Daniel H. Huson
+ * F84Distance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -23,40 +23,41 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.models.nucleotideModels.GTRmodel;
+import splitstree6.models.nucleotideModels.F84Model;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Computes the distance matrix from a set of characters using the General Time Revisible model.
- *
- * @author Dave Bryant, 2004
+ * Implements the Felsenstein84 DNA distance model
+ * David Bryant and Daniel Huson, 2004
  */
 
-public class GTR extends Nucleotides2DistancesBase {
+public class F84Distance extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Tavaré 1986; S. Tavaré. Some Probabilistic and Statistical Problems in the Analysis of DNA Sequences. Lectures on Mathematics in the Life Sciences. 17:57–86, 1986.";
+		return "Felsenstein & Churchill 1996; J. Felsenstein and GA Churchill. A Hidden Markov Model approach to variation among sites in rate of evolution, and the branching order in hominoidea. Molecular Biology and Evolution. 13 (1): 93–104, 1996.";
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Calculates distances under the general time-reversible model.";
+		return "Calculates distances under the Felsenstein-84 model.";
 	}
 
 	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("optionPropInvariableSites", "optionSetSiteVarParams", "optionRateMatrix", "optionUseML_Distances");
+		return Arrays.asList("optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
 	}
+
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 
-		progress.setTasks("GTR Distance", "Computing...");
+		progress.setTasks("Felsenstein 1984 distance", "Computing...");
+		progress.setMaximum(taxaBlock.getNtax());
 
-		var model = new GTRmodel(getOptionRateMatrix(), getOptionBaseFrequencies());
+		final F84Model model = new F84Model(getOptionBaseFrequencies(), getOptionTsTvRatio());
 		model.setPropInvariableSites(getOptionPropInvariableSites());
 		model.setGamma(DEFAULT_GAMMA);
 

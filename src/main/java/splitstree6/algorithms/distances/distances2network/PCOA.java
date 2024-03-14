@@ -38,7 +38,7 @@ import java.util.Map;
 /**
  * computes a minimum spanning network
  */
-public class PCoA extends Distances2Network {
+public class PCOA extends Distances2Network {
 	private Matrix distanceMatrix;
 	private double totalSquaredDistance;
 	private int rank;
@@ -183,7 +183,7 @@ public class PCoA extends Distances2Network {
 		}
 		progress.incrementProgress();
 
-		networkBlock.setInfoString("PCoA on %,d taxa,  PC-%d (%s%%) vs PC-%d (%s%%)".formatted(taxaBlock.getNtax(),
+		networkBlock.setInfoString("PCOA on %,d taxa,  PC-%d (%s%%) vs PC-%d (%s%%)".formatted(taxaBlock.getNtax(),
 				getOptionFirstCoordinate(), StringUtils.removeTrailingZerosAfterDot("%.1f", percentExplained[getOptionFirstCoordinate() - 1]),
 				getOptionSecondCoordinate(), StringUtils.removeTrailingZerosAfterDot("%.1f", percentExplained[getOptionSecondCoordinate() - 1])));
 	}

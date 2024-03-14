@@ -43,7 +43,7 @@ import splitstree6.models.SubstitutionModel;
  * <p/>
  * Generic 4x4 nucleotide model, for a general Q matrix.
  * <p/>
- * We are given the Q matrix, which is assumed to be a valid GTR rate matrix.
+ * We are given the Q matrix, which is assumed to be a valid GTRDistance rate matrix.
  */
 public abstract class NucleotideModel implements SubstitutionModel {
 
@@ -84,7 +84,7 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	 * @param baseFrequencies (0..3)
 	 */
 	public void setRateMatrix(double[][] Q, double[] baseFrequencies) {
-		//Test GTR property.
+		//Test GTRDistance property.
 		for (int i = 0; i < 4; i++) {
 			for (int j = i + 1; j < 4; j++) {
 				if (Math.abs(baseFrequencies[i] * Q[i][j] - baseFrequencies[j] * Q[j][i]) > EPSILON)

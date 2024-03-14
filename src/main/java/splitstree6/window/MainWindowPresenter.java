@@ -50,7 +50,7 @@ import jloda.util.*;
 import splitstree6.algorithms.characters.characters2distances.GeneContentDistance;
 import splitstree6.algorithms.characters.characters2distances.LogDet;
 import splitstree6.algorithms.characters.characters2distances.PDistance;
-import splitstree6.algorithms.characters.characters2distances.ProteinMLDist;
+import splitstree6.algorithms.characters.characters2distances.ProteinMLDistance;
 import splitstree6.algorithms.characters.characters2distances.nucleotide.*;
 import splitstree6.algorithms.characters.characters2network.MedianJoining;
 import splitstree6.algorithms.characters.characters2report.EstimateInvariableSites;
@@ -58,7 +58,7 @@ import splitstree6.algorithms.characters.characters2report.PhiTest;
 import splitstree6.algorithms.characters.characters2report.TajimaD;
 import splitstree6.algorithms.characters.characters2splits.ParsimonySplits;
 import splitstree6.algorithms.distances.distances2network.MinSpanningNetwork;
-import splitstree6.algorithms.distances.distances2network.PCoA;
+import splitstree6.algorithms.distances.distances2network.PCOA;
 import splitstree6.algorithms.distances.distances2report.DeltaScore;
 import splitstree6.algorithms.distances.distances2splits.BunemanTree;
 import splitstree6.algorithms.distances.distances2splits.NeighborNet;
@@ -569,14 +569,13 @@ public class MainWindowPresenter {
 
 		setupAlgorithmMenuItem(controller.getpDistanceMenuItem(), new PDistance());
 		setupAlgorithmMenuItem(controller.getLogDetMenuItem(), new LogDet());
-		setupAlgorithmMenuItem(controller.getHky85MenuItem(), new HKY85());
-		setupAlgorithmMenuItem(controller.getJukesCantorMenuItem(), new JukesCantor());
+		setupAlgorithmMenuItem(controller.getHky85MenuItem(), new HKY85Distance());
+		setupAlgorithmMenuItem(controller.getJukesCantorMenuItem(), new JukesCantorDistance());
 
-		setupAlgorithmMenuItem(controller.getK2pMenuItem(), new K2P());
-		setupAlgorithmMenuItem(controller.getK3stMenuItem(), new K3ST());
-		setupAlgorithmMenuItem(controller.getF81MenuItem(), new F81());
-		setupAlgorithmMenuItem(controller.getF84MenuItem(), new F84());
-		setupAlgorithmMenuItem(controller.getProteinMLDistanceMenuItem(), new ProteinMLDist());
+		setupAlgorithmMenuItem(controller.getK2pMenuItem(), new K2PDistance());
+		setupAlgorithmMenuItem(controller.getF81MenuItem(), new F81Distance());
+		setupAlgorithmMenuItem(controller.getF84MenuItem(), new F84Distance());
+		setupAlgorithmMenuItem(controller.getProteinMLDistanceMenuItem(), new ProteinMLDistance());
 		setupAlgorithmMenuItem(controller.getGeneContentDistanceMenuItem(), new GeneContentDistance());
 		setupAlgorithmMenuItem(controller.getNjMenuItem(), new NeighborJoining());
 		setupAlgorithmMenuItem(controller.getBioNJMenuItem(), new BioNJ());
@@ -622,7 +621,7 @@ public class MainWindowPresenter {
 		setupAlgorithmMenuItem(controller.getHybridizationNetworkMenuItem(), new AutumnAlgorithm());
 		setupAlgorithmMenuItem(controller.getClusterNetworkMenuItem(), new ClusterNetwork());
 
-		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCoA());
+		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCOA());
 		//setupAlgorithmMenuItem(controller.getTsneMenuItem(), new TSne());
 		setupAlgorithmMenuItem(controller.getBootStrapTreeMenuItem(), new BootstrapTree());
 		setupAlgorithmMenuItem(controller.getBootstrapTreeAsNetworkMenuItem(), new BootstrapTreeSplits());

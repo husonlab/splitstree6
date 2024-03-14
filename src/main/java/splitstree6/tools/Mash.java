@@ -56,13 +56,13 @@ public class Mash {
 	 * run
 	 */
 	private void run(String[] args) throws Exception {
-		final ArgsOptions options = new ArgsOptions(args, this, "Computes Mash sketches, Jaccard index and distances");
+		final ArgsOptions options = new ArgsOptions(args, this, "Computes Mash sketches, JaccardDistance index and distances");
 		options.setVersion(ProgramProperties.getProgramVersion());
 		options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
 		options.setAuthors("Daniel H. Huson");
 
 		var command = options.getCommand(ArgsOptions.createCommand("sketch", "Compute sketches"),
-				ArgsOptions.createCommand("jaccard", "Compute Jaccard indices"),
+				ArgsOptions.createCommand("jaccard", "Compute JaccardDistance indices"),
 				ArgsOptions.createCommand("distances", "Compute Mash distances"));
 
 		options.comment("Input and output");

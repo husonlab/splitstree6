@@ -1,5 +1,5 @@
 /*
- * ProteinMLDist.java Copyright (C) 2024 Daniel H. Huson
+ * ProteinMLDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -44,7 +44,7 @@ import java.util.List;
  * @author bryant
  */
 
-public class ProteinMLDist extends Characters2Distances {
+public class ProteinMLDistance extends Characters2Distances {
 	public enum Model {cpREV45, Dayhoff, JTT, mtMAM, mtREV24, pmb, Rhodopsin, WAG}
 
 	private final Property<Model> optionModel = new SimpleObjectProperty<>(this, "optionModel", Model.JTT);

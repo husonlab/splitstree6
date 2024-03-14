@@ -1,5 +1,5 @@
 /*
- * Dice.java Copyright (C) 2024 Daniel H. Huson
+ * DiceDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -30,7 +30,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Calculates distances using the Dice coefficient distance
+ * Calculates distances using the DiceDistance coefficient distance
  * <p>
  * Created on Nov 2007
  *

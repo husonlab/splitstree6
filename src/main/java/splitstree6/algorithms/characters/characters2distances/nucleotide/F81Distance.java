@@ -1,5 +1,5 @@
 /*
- * F81.java Copyright (C) 2024 Daniel H. Huson
+ * F81Distance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -34,7 +34,7 @@ import java.util.List;
  * Dave Bryant, 2004
  */
 
-public class F81 extends Nucleotides2DistancesBase {
+public class F81Distance extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
 		return "Felsenstein 1981; J. Felsenstein, Evolutionary trees from DNA sequences: a maximum likelihood approach. Journal of Molecular Evolution. 17 (6): 368–376, 1981.";

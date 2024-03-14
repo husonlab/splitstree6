@@ -41,7 +41,7 @@ public class GTRmodel extends NucleotideModel {
 	/**
 	 * General time reversible model
 	 *
-	 * @param basefreqs Takes a provisional Q matrix and the base frequencies. Under the GTR properties, the matrix
+	 * @param basefreqs Takes a provisional Q matrix and the base frequencies. Under the GTRDistance properties, the matrix
 	 *                  Pi Q is symmetric. We enforce this as follows:
 	 *                  FOR OFF-DIAGONAL
 	 *                  First we construct X = PiQ

@@ -80,7 +80,7 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 					"Use maximum likelihood estimation of distances (rather than exact distances)";
 			case "optionTsTvRatio" -> "Ratio of transitions vs transversions";
 			case "optionBaseFrequencies" -> "Base frequencies (in order ACGT/U)";
-			case "optionRateMatrix" -> "Rate matrix for GTR (in order ACGT/U)";
+			case "optionRateMatrix" -> "Rate matrix for GTRDistance (in order ACGT/U)";
 			case "optionSetBaseFrequencies" ->
 					"Set base frequencies to default values, or to estimations from characters (using Capture-recapture for invariable sites)";
 			case "optionSetSiteVarParams" ->

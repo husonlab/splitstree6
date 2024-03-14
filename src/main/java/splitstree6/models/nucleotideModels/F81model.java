@@ -26,12 +26,12 @@
 package splitstree6.models.nucleotideModels;
 
 /**
- * F81 model
+ * F81Distance model
  */
 public class F81model extends NucleotideModel {
 	/**
 	 * Constructor taking the base frequencies and building the
-	 * Q matrix of Felsenstein's F81 model (1981).
+	 * Q matrix of Felsenstein's F81Distance model (1981).
 	 */
 	public F81model(double[] basefreqs) {
 

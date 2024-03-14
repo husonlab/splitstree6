@@ -29,7 +29,7 @@ package splitstree6.models.nucleotideModels;
 import splitstree6.algorithms.characters.characters2distances.utils.SaturatedDistancesException;
 
 /**
- * K2P model
+ * K2PDistance model
  * Miguel and David Bryant, 2005
  */
 public class K2Pmodel extends NucleotideModel {

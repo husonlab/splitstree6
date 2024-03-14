@@ -1,5 +1,5 @@
 /*
- * K3ST.java Copyright (C) 2024 Daniel H. Huson
+ * HKY85Distance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -23,50 +23,54 @@ import jloda.util.progress.ProgressListener;
 import splitstree6.data.CharactersBlock;
 import splitstree6.data.DistancesBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.models.nucleotideModels.K3STmodel;
+import splitstree6.models.nucleotideModels.HKY85model;
 
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
 /**
- * Calculates distances using the Kimura-3ST model
+ * Computes the Hasegawa, Kishino and Yano distance for a set of characters.
  * <p>
  * Created on 12-Jun-2004
  *
- * @author DJB
+ * @author Mig
  */
 
-public class K3ST extends Nucleotides2DistancesBase {
-
-	//private double[][] QMatrix; //Q Matrix provided by user for ML estimation. //todo not used?
-
-	// ACGT transversions vs ATGC transversions
-
+public class HKY85Distance extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Kimura 1981; M. Kimura, Estimation of evolutionary sequences between homologous nucleotide sequences, PNAS, 78:454–45, 1981.";
+		return "Hasegawa et al 1985;" +
+			   " M. Hasegawa, H. Kishino and T. Yano. Dating of human-ape splitting by a molecular clock of mitochondrial DNA." +
+			   " Journal of Molecular Evolution. 22(2):160–174, 1985.";
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Calculates distances under the Kimura-3P model.";
+		return "Calculates distances under the Hasegawa-Kishino-Yano model.";
 	}
 
+	@Override
 	public List<String> listOptions() {
-		return Arrays.asList("optionTsTvRatio", "optionACvATRatio", "optionGamma", "optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
+		return Arrays.asList("optionTsTvRatio", "optionBaseFrequencies", "optionSetBaseFrequencies", "optionPropInvariableSites", "optionSetSiteVarParams");
+	}
+
+	public HKY85Distance() {
+		super();
+		setOptionUseML_Distances(true);
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-		progress.setTasks("K3ST Distance", "Init.");
-		progress.setMaximum(taxaBlock.getNtax());
 
-		var model = new K3STmodel(getOptionTsTvRatio(), getOptionACvATRatio());
+		progress.setTasks("HKY85Distance distance", "Computing...");
+
+		var model = new HKY85model(getOptionBaseFrequencies(), getOptionTsTvRatio());
 		model.setPropInvariableSites(getOptionPropInvariableSites());
-		model.setGamma(getOptionGamma());
+		model.setGamma(DEFAULT_GAMMA);
 
+		setOptionUseML_Distances(true);
 		model.apply(progress, charactersBlock, distancesBlock, isOptionUseML_Distances());
+		// there is no exact formular
 	}
-	// GETTER AND SETTER
 }

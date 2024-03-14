@@ -395,8 +395,6 @@
                                        userData="Compute distances using the Jukes-Cantor model"/>
                         <CheckMenuItem fx:id="k2pMenuItem" text="K2P"
                                        userData="Compute distances using the Kimura-2P model"/>
-                        <CheckMenuItem fx:id="k3stMenuItem" text="K3ST"
-                                       userData="Compute distances using the Kimura-3ST model"/>
                         <CheckMenuItem fx:id="f81MenuItem" text="F81"
                                        userData="Compute distances using the Felsenstein-1981 model"/>
                         <CheckMenuItem fx:id="f84MenuItem" text="F84"

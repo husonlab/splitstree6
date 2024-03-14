@@ -64,7 +64,7 @@ public class HammingDistances extends Characters2Distances {
 
 	@Override
 	public String getShortDescription() {
-		return (new HammingDistances().getShortDescription());
+		return "Computes the Hamming distance, that is the number of differences between sequences";
 	}
 
 	@Override

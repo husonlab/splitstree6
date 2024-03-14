@@ -1,5 +1,5 @@
 /*
- *  JukesCantor.java Copyright (C) 2024 Daniel H. Huson
+ *  JukesCantorDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -32,10 +32,10 @@ import java.util.List;
  * implements the Jukes Cantor transformation
  * Daniel Huson, 2.2019
  */
-public class JukesCantor extends Nucleotides2DistancesBase {
+public class JukesCantorDistance extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
-		return "Jukes & Cantor 1969; TH Jukes Tand CR Cantor CR. Evolution of Protein Molecules. New York: Academic Press., 21–132, 1996.";
+		return "Jukes & Cantor 1969; TH Jukes and CR Cantor. Evolution of Protein Molecules. New York: Academic Press., 21–132, 1996.";
 	}
 
 	@Override
@@ -45,7 +45,11 @@ public class JukesCantor extends Nucleotides2DistancesBase {
 
 	@Override
 	public List<String> listOptions() {
-		return List.of("optionPropInvariableSites", "optionSetSiteVarParams", "optionUseML_Distances");
+		return List.of("optionPropInvariableSites", "optionSetSiteVarParams");
+	}
+
+	public JukesCantorDistance() {
+		setOptionUseML_Distances(false);
 	}
 
 	@Override

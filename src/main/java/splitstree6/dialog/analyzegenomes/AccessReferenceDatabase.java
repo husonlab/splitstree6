@@ -405,7 +405,7 @@ public class AccessReferenceDatabase implements Closeable {
 	}
 
 	/**
-	 * find all genomes that have non-zero Jaccard index when compared with the query
+	 * find all genomes that have non-zero JaccardDistance index when compared with the query
 	 */
 	public Collection<Map.Entry<Integer, Double>> findSimilar(ProgressListener progress, double maxDistance, boolean includeStrains, Collection<byte[]> query, boolean ignoreUnusableTaxa) throws SQLException, IOException {
 		final var mash_k = getMashK();

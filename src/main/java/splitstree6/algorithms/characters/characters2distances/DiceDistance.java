@@ -1,5 +1,5 @@
 /*
- * Jaccard.java Copyright (C) 2024 Daniel H. Huson
+ * DiceDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -30,46 +30,49 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Calculates distances using the Jaccard coefficient distance
+ * Calculates distances using the DiceDistance coefficient distance
+ * <p>
+ * Created on Nov 2007
  *
- * @author Dave Bryant, 2009
+ * @author bryant
  */
-public class Jaccard extends Characters2Distances {
+
+public class DiceDistance extends Characters2Distances {
 	@Override
-	public String getCitation() {
-		return "Jaccard 1901; P. Jaccard. Étude comparative de la distribution florale dans une portion des Alpes et des Jura, Bulletin de la Société Vaudoise des Sciences Naturelles, 37: 547–579, 1901.";
+	public String getCitation() { // is this the correct citation?
+		return "DiceDistance 1945;LR DiceDistance. Measures of the amount of ecologic association between species. Ecology, 26(3):297–302, 1945.";
 	}
 
 	@Override
 	public String getShortDescription() {
-		return "Computes distances based on the Jaccard index.";
+		return "Computes distances using the DiceDistance coefficient distance.";
 	}
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-		final int ntax = taxaBlock.getNtax();
+
+		int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);
 
-		progress.setTasks("Jaccard distance", "Init.");
+		progress.setTasks("DiceDistance distance", "Init.");
 		progress.setMaximum(ntax);
 
-		for (int s = 1; s <= ntax; s++) {
-			for (int t = s + 1; t <= ntax; t++) {
-				//System.err.println(s+","+t);
-				final PairwiseCompare seqPair = new PairwiseCompare(charactersBlock, s, t);
-				final double[][] F = seqPair.getF();
-
+		for (var s = 1; s <= ntax; s++) {
+			for (var t = s + 1; t <= ntax; t++) {
+				var seqPair = new PairwiseCompare(charactersBlock, s, t);
 				var dist = -1.0;
-
+				var F = seqPair.getF();
 				if (F != null) {
-					double b = F[1][0];
-					double c = F[0][1];
-					double a = F[1][1];
 
-					if (a + b + c > 0.0) {
-						dist = 1.0 - 2 * a / (2 * a + b + c);
+					var b = F[1][0];
+					var c = F[0][1];
+					var a = F[1][1];
+
+					if (2 * a + b + c > 0.0) {
+						dist = 1.0 - 2.0 * a / (2.0 * a + b + c);
 					}
 				}
+
 				distancesBlock.set(s, t, dist);
 				distancesBlock.set(t, s, dist);
 			}
@@ -85,3 +88,5 @@ public class Jaccard extends Characters2Distances {
 		return super.isApplicable(taxa, datablock) && datablock.getDataType() == CharactersType.Standard;
 	}
 }
+
+

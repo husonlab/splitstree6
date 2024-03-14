@@ -1,5 +1,5 @@
 /*
- * K2P.java Copyright (C) 2024 Daniel H. Huson
+ * K2PDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -37,7 +37,7 @@ import java.util.List;
  * @author DJB
  */
 
-public class K2P extends Nucleotides2DistancesBase {
+public class K2PDistance extends Nucleotides2DistancesBase {
 	@Override
 	public String getCitation() {
 		return "Kimura 1980; M. Kimura. A simple method for estimating evolutionary rates of base substitutions through comparative studies of nucleotide sequences. Journal of Molecular Evolution. 16(2):111–120, 1980.";
@@ -55,7 +55,7 @@ public class K2P extends Nucleotides2DistancesBase {
 
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
-		progress.setTasks("K2P Distance", "Init.");
+		progress.setTasks("K2PDistance Distance", "Init.");
 		progress.setMaximum(taxaBlock.getNtax());
 
 		var model = new K2Pmodel(getOptionTsTvRatio());

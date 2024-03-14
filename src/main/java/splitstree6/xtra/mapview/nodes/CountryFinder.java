@@ -1,8 +1,10 @@
 package splitstree6.xtra.mapview.nodes;
 
-import de.westnordost.countryboundaries.CountryBoundaries;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
@@ -94,6 +96,7 @@ public class CountryFinder {
         URL resource = CountryFinder.class.getResource("boundaries360x180.ser");
         File file = new File(resource.toURI());
         byte[] bytes = Files.readAllBytes(file.toPath());
+        /*
         CountryBoundaries boundaries = CountryBoundaries.load(new ByteArrayInputStream(bytes));
         var alpha2Codes = boundaries.getIntersectingIds(minLong,minLat,maxLong,maxLat);
         ArrayList<Country> countries = new ArrayList<>();
@@ -106,6 +109,8 @@ public class CountryFinder {
             }
         }
         return countries;
+        */
+        return null;
     }
 
 
