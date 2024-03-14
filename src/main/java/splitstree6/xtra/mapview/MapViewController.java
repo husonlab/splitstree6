@@ -21,9 +21,7 @@ package splitstree6.xtra.mapview;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 
 public class MapViewController {
 
@@ -46,28 +44,55 @@ public class MapViewController {
 	private StackPane stackPane;
 
 	@FXML
-	private ToolBar tooBar;
-
-	@FXML
-	private VBox topPane;
-
-	@FXML
 	private ProgressBar progressBar;
-
 	@FXML
 	private Label label;
 
 	@FXML
 	private Button redrawButton;
 
+	@FXML
+	private Slider chartSizeSlider;
+
+	@FXML
+	private Label infoLabel;
+
+	@FXML
+	private CheckBox checkBoxLegend;
+
+	@FXML
+	private ChoiceBox<String> choiceBoxColorScheme;
+
+	@FXML
+	private CheckBox showLabelsBox;
 
 	@FXML
 	private void initialize() {
 		progressBar.setVisible(false);
 	}
 
+	public CheckBox getCheckBoxLegend() {
+		return checkBoxLegend;
+	}
+
+	public CheckBox getShowLabelsBox() {
+		return showLabelsBox;
+	}
+
+	public ChoiceBox<String> getChoiceBoxColorScheme() {
+		return choiceBoxColorScheme;
+	}
+
+	public Label getInfoLabel() {
+		return infoLabel;
+	}
+
 	public MenuItem getCloseMenuItem() {
 		return closeMenuItem;
+	}
+
+	public Slider getChartSizeSlider() {
+		return chartSizeSlider;
 	}
 
 	public MenuItem getCopyMenuItem() {
@@ -82,24 +107,12 @@ public class MapViewController {
 		return label;
 	}
 
-	public MenuBar getMenuBar() {
-		return menuBar;
-	}
-
 	public MenuItem getOpenMenuItem() {
 		return openMenuItem;
 	}
 
 	public StackPane getStackPane() {
 		return stackPane;
-	}
-
-	public ToolBar getTooBar() {
-		return tooBar;
-	}
-
-	public VBox getTopPane() {
-		return topPane;
 	}
 
 	public ProgressBar getProgressBar() {

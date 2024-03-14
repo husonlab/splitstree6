@@ -97,6 +97,16 @@
             <artifactId>richtextfx</artifactId>
             <version>0.11.2</version>
         </dependency>
+        <dependency>
+            <groupId>org.locationtech.jts</groupId>
+            <artifactId>jts-core</artifactId>
+            <version>1.18.1</version>
+        </dependency>
+        <dependency>
+            <groupId>de.westnordost</groupId>
+            <artifactId>countryboundaries</artifactId>
+            <version>2.1</version>
+        </dependency>
         <!--
         <dependency>
                 <groupId>com.github.lejon</groupId>

@@ -10,6 +10,8 @@ module splitstreesix {
 	requires org.apache.commons.math4.legacy;
 	requires org.apache.commons.math4.legacy.exception;
 
+	requires org.locationtech.jts;
+	requires countryboundaries;
 	requires com.install4j.runtime;
 	requires java.sql;
 	requires java.sql.rowset;
@@ -178,6 +180,8 @@ module splitstreesix {
 	opens splitstree6.splits;
 	opens splitstree6.xtra.more;
 	opens splitstree6.xtra.alts;
+    opens splitstree6.xtra.mapview.nodes;
+	opens splitstree6.xtra.mapview.mapbuilder;
 
 
 }
