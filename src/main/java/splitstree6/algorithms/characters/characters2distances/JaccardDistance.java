@@ -37,7 +37,7 @@ import java.io.IOException;
 public class JaccardDistance extends Characters2Distances {
 	@Override
 	public String getCitation() {
-		return "JaccardDistance 1901; P. JaccardDistance. Étude comparative de la distribution florale dans une portion des Alpes et des Jura, Bulletin de la Société Vaudoise des Sciences Naturelles, 37: 547–579, 1901.";
+		return "Jaccard 1901; P. Jaccard. Étude comparative de la distribution florale dans une portion des Alpes et des Jura, Bulletin de la Société Vaudoise des Sciences Naturelles, 37: 547–579, 1901.";
 	}
 
 	@Override

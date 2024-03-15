@@ -40,7 +40,7 @@ import java.io.IOException;
 public class DiceDistance extends Characters2Distances {
 	@Override
 	public String getCitation() { // is this the correct citation?
-		return "DiceDistance 1945;LR DiceDistance. Measures of the amount of ecologic association between species. Ecology, 26(3):297–302, 1945.";
+		return "Dice 1945;LR Dice. Measures of the amount of ecologic association between species. Ecology, 26(3):297–302, 1945.";
 	}
 
 	@Override

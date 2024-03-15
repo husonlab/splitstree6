@@ -1,5 +1,5 @@
 /*
- * HammingDistances.java Copyright (C) 2024 Daniel H. Huson
+ * HammingDistance.java Copyright (C) 2024 Daniel H. Huson
  *
  * (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -34,7 +34,7 @@ import splitstree6.data.parts.AmbiguityCodes;
 import java.io.IOException;
 import java.util.List;
 
-public class HammingDistances extends Characters2Distances {
+public class HammingDistance extends Characters2Distances {
 
 	public enum AmbiguousOptions {Ignore, AverageStates, MatchStates}
 

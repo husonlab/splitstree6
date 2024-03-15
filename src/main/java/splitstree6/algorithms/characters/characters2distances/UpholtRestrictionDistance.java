@@ -55,7 +55,7 @@ public class UpholtRestrictionDistance extends Characters2Distances {
 
 	@Override
 	public String getCitation() {
-		return "UpholtRestrictionDistance 1977; WB UpholtRestrictionDistance. Estimation of DNA sequence divergence from comparison of restriction endonuclease digests. " +
+		return "Upholt 1977; WB Upholt. Estimation of DNA sequence divergence from comparison of restriction endonuclease digests. " +
 			   "Nucleic Acids Res., 4(5):1257-65, 1997.";
 	}
 

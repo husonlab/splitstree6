@@ -24,7 +24,7 @@ package splitstree6.algorithms.characters.characters2distances;
  * PDistance-p is just another name for normalized Hamming distances
  * Daniel Huson, 2006
  */
-public class PDistance extends HammingDistances {
+public class PDistance extends HammingDistance {
 	public PDistance() {
 		super();
 		setOptionNormalize(true);

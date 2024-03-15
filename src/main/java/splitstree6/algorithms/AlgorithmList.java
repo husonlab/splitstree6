@@ -53,8 +53,8 @@ public class AlgorithmList {
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.GeneSharingDistance());
 		add(algorithms, names, new DiceDistance());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.GeneContentDistance());
-		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.HammingDistances());
-		add(algorithms, names, new HammingDistances());
+		add(algorithms, names, new HammingDistance());
+		add(algorithms, names, new HammingDistance());
 		add(algorithms, names, new JaccardDistance());
 		add(algorithms, names, new splitstree6.algorithms.characters.characters2distances.LogDet());
 		add(algorithms, names, new NeiLiRestrictionDistance());
