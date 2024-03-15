@@ -11,7 +11,7 @@ Methods:
 Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 100 taxa and 100 DNA sequences of length 897.
 After removal of 90 taxa, the input consisted of 10 taxa and 10 DNA sequences of length 897.
-The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 10 x 10 distance matrix.
+The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 10 x 10 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 27 splits, cyclic.
 The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
 
@@ -1533,16 +1533,16 @@ tax10 ttttttt?attt?ta?t
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE 'Hamming Distances';
+TITLE 'Hamming Distance';
 LINK CHARACTERS = 'Working Characters';
-NAME 'Hamming Distances';
+NAME 'Hamming Distance';
 OPTIONS
 	Normalize = 'true';
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE 'Distances';
-LINK ALGORITHM = 'Hamming Distances';
+LINK ALGORITHM = 'Hamming Distance';
 DIMENSIONS ntax=10;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
@@ -1612,13 +1612,13 @@ TITLE 'Show Splits';
 LINK SPLITS = 'Splits';
 NAME 'Show Splits';
 OPTIONS
-	View = 'SplitsNetwork';
+	View = 'SplitNetwork';
 END; [ALGORITHM]
 
 BEGIN VIEW;
-TITLE 'SplitsNetwork';
+TITLE 'SplitNetwork';
 LINK ALGORITHM = 'Show Splits';
-NAME 'SplitsNetwork';
+NAME 'SplitNetwork';
 INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',

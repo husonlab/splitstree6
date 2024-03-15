@@ -53,7 +53,7 @@ import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.qr.QRViewUtils;
-import splitstree6.qr.SplitsNewickQR;
+import splitstree6.qr.SplitNewickQR;
 import splitstree6.splits.Compatibility;
 import splitstree6.splits.SplitNewick;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -335,7 +335,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		var data = new SimpleObjectProperty<Pair<TaxaBlock, SplitsBlock>>();
 		data.bind(Bindings.createObjectBinding(() -> new Pair<>(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getSplitsBlock()), mainWindow.workingTaxaProperty(), view.splitsBlockProperty(), updateCounter));
 		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getInnerAnchorPane(), data, SplitsNewickQR.createFunction(), qrImageView, showQRCode);
+		QRViewUtils.setup(controller.getInnerAnchorPane(), data, SplitNewickQR.createFunction(), qrImageView, showQRCode);
 
 		Platform.runLater(this::setupMenuItems);
 	}

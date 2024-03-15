@@ -21,7 +21,7 @@ a comment and will be ignored by the program.
 Methods:
 Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 7 taxa and 7 DNA sequences of length 56.
-The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 7 x 7 distance matrix.
+The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 7 x 7 distance matrix.
 The Median Joining method (Bandelt et al, 1999) was used (default options) so as to obtain 9 nodes and 11 edges.
 
 References:
@@ -156,9 +156,9 @@ seq_7 atatacggggata---gtaga----aaaatgtgtgtgtgttttttttttcatgtga
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE 'Hamming Distances';
+TITLE 'Hamming Distance';
 LINK CHARACTERS = 'Working Characters';
-NAME 'Hamming Distances';
+NAME 'Hamming Distance';
 OPTIONS
 	Normalize = 'true';
 END; [ALGORITHM]
@@ -173,7 +173,7 @@ END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE 'Distances';
-LINK ALGORITHM = 'Hamming Distances';
+LINK ALGORITHM = 'Hamming Distance';
 DIMENSIONS ntax=7;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX

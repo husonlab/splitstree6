@@ -287,13 +287,13 @@ TITLE 'Show Splits';
 LINK SPLITS = 'Splits';
 NAME 'Show Splits';
 OPTIONS
-	View = 'SplitsNetwork';
+	View = 'SplitNetwork';
 END; [ALGORITHM]
 
 BEGIN VIEW;
-TITLE 'SplitsNetwork';
+TITLE 'SplitNetwork';
 LINK ALGORITHM = 'Show Splits';
-NAME 'SplitsNetwork';
+NAME 'SplitNetwork';
 INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Outline',

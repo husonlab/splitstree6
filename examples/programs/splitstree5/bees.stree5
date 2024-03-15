@@ -10,7 +10,7 @@ END; [SPLITSTREE5]
 Methods:
 Analysis was performed using SplitsTree5 5.0.0_alpha (Huson 1998, Huson and Bryant 2006).
 The original input consisted of 6 taxa and 6 DNA character sequences of length 677.
-The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 6x6 distance matrix.
+The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 6x6 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 12 splits, cyclic.
 The Splits Network Algorithm method (Dress & Huson 2004) was used (default options) so as to obtain a splits network with 18 nodes and 22 edges.
 
@@ -209,16 +209,16 @@ MATRIX
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE HammingDistances;
+TITLE HammingDistance;
 LINK CHARACTERS = WorkingCharacters;
-ALGORITHM HammingDistances;
+ALGORITHM HammingDistance;
 OPTIONS
 	Normalize = true;
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE Distances;
-LINK ALGORITHM = HammingDistances;
+LINK ALGORITHM = HammingDistance;
 DIMENSIONS ntax=6;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
@@ -265,9 +265,9 @@ MATRIX
 END; [SPLITS]
 
 BEGIN ALGORITHM;
-TITLE SplitsNetworkAlgorithm;
+TITLE SplitNetworkAlgorithm;
 LINK SPLITS = Splits;
-ALGORITHM SplitsNetworkAlgorithm;
+ALGORITHM SplitNetworkAlgorithm;
 OPTIONS
 	Algorithm = EqualAngleConvexHull,
 	UseWeights = true,
@@ -275,10 +275,10 @@ OPTIONS
 END; [ALGORITHM]
 
 BEGIN VIEWER;
-TITLE SplitsNetworkViewer;
-LINK ALGORITHM = SplitsNetworkAlgorithm;
+TITLE SplitNetworkViewer;
+LINK ALGORITHM = SplitNetworkAlgorithm;
 DIMENSIONS nNodes=18 nEdges=22;
-FORMAT type=SplitsNetworkViewer;
+FORMAT type=SplitNetworkViewer;
 NODES
 	N: 1 -160.7617 325.9793f S: Circle -160.7617 325.9793 0.5 0.5 0xffffffff,
 	N: 2 -160.7617 331.1916f S: Circle -160.7617 331.1916 1 1 0xffffffff L: 'A.andrenof' -198.9023 363.2541 0x000000ff 'Arial,Regular,16' T: 1,

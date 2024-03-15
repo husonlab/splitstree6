@@ -337,9 +337,9 @@ MATRIX
 END; [SPLITS]
 
 BEGIN ALGORITHM;
-TITLE SplitsNetworkAlgorithm;
+TITLE SplitNetworkAlgorithm;
 LINK SPLITS = Splits;
-ALGORITHM SplitsNetworkAlgorithm;
+ALGORITHM SplitNetworkAlgorithm;
 OPTIONS
 	Algorithm = EqualAngleConvexHull,
 	UseWeights = true,
@@ -347,10 +347,10 @@ OPTIONS
 END; [ALGORITHM]
 
 BEGIN VIEWER;
-TITLE SplitsNetworkViewer;
-LINK ALGORITHM = SplitsNetworkAlgorithm;
+TITLE SplitNetworkViewer;
+LINK ALGORITHM = SplitNetworkAlgorithm;
 DIMENSIONS nNodes=619 nEdges=1119;
-FORMAT type=SplitsNetworkViewer;
+FORMAT type=SplitNetworkViewer;
 NODES
 	N: 1 159.705 208.8915f S: Circle 159.705 208.8915 0.5 0.5 0xffffffff,
 	N: 2 159.705 310.2632f S: Circle 159.705 310.2632 1 1 0xffffffff L: 'L1' 151.8065 317.3257 0x000000ff 'Arial,Regular,16' T: 1,

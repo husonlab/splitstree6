@@ -39,9 +39,9 @@ import java.util.List;
  * Daniel Huson, 11.2021
  */
 public class ShowSplits extends Splits2View {
-	public enum ViewType {SplitsNetwork}
+	public enum ViewType {SplitNetwork}
 
-	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.SplitsNetwork);
+	private final ObjectProperty<ViewType> optionView = new SimpleObjectProperty<>(this, "optionView", ViewType.SplitNetwork);
 	private final ChangeListener<Boolean> validListener;
 
 	@Override
@@ -92,11 +92,11 @@ public class ShowSplits extends Splits2View {
 		// if a view already is set in the tab, simply update its data, otherwise set it up and put it into the tab:
 
 		switch (getOptionView()) {
-			case SplitsNetwork -> {
+			case SplitNetwork -> {
 				if (!(viewBlock.getView() instanceof SplitsView)) {
 					Platform.runLater(() -> {
 						var mainWindow = getNode().getOwner().getMainWindow();
-						var view = new SplitsView(mainWindow, ViewType.SplitsNetwork.name(), viewBlock.getViewTab());
+						var view = new SplitsView(mainWindow, ViewType.SplitNetwork.name(), viewBlock.getViewTab());
 						viewBlock.setView(view);
 					});
 				}

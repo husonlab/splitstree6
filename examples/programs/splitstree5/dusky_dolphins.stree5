@@ -10,7 +10,7 @@ END; [SPLITSTREE5]
 Methods:
 Analysis was performed using SplitsTree5 5.0.0_alpha (Huson 1998, Huson and Bryant 2006).
 The original input consisted of 36 taxa and 36 DNA character sequences of length 60.
-The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 36x36 distance matrix.
+The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 36x36 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 91 splits, cyclic.
 The Splits Network Algorithm method (Dress & Huson 2004) was used (default options) so as to obtain a splits network with 281 nodes and 469 edges.
 
@@ -215,16 +215,16 @@ P7     ..a..............c.c....a.c.....g....................g.c....
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE HammingDistances;
+TITLE HammingDistance;
 LINK CHARACTERS = WorkingCharacters;
-ALGORITHM HammingDistances;
+ALGORITHM HammingDistance;
 OPTIONS
 	Normalize = true;
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE Distances;
-LINK ALGORITHM = HammingDistances;
+LINK ALGORITHM = HammingDistance;
 DIMENSIONS ntax=36;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
@@ -380,9 +380,9 @@ MATRIX
 END; [SPLITS]
 
 BEGIN ALGORITHM;
-TITLE SplitsNetworkAlgorithm;
+TITLE SplitNetworkAlgorithm;
 LINK SPLITS = Splits;
-ALGORITHM SplitsNetworkAlgorithm;
+ALGORITHM SplitNetworkAlgorithm;
 OPTIONS
 	Algorithm = EqualAngleConvexHull,
 	UseWeights = true,
@@ -390,10 +390,10 @@ OPTIONS
 END; [ALGORITHM]
 
 BEGIN VIEWER;
-TITLE SplitsNetworkViewer;
-LINK ALGORITHM = SplitsNetworkAlgorithm;
+TITLE SplitNetworkViewer;
+LINK ALGORITHM = SplitNetworkAlgorithm;
 DIMENSIONS nNodes=281 nEdges=469;
-FORMAT type=SplitsNetworkViewer;
+FORMAT type=SplitNetworkViewer;
 NODES
 	N: 1 93.6579 114.4989f S: Circle 93.6579 114.4989 1 1 0xffffffff L: 'A1.1' 82.7115 120.8671 0x000000ff 'Arial,Regular,16' T: 1,
 	N: 3 79.7841 176.9516f S: Circle 79.7841 176.9516 1 1 0xffffffff L: 'A1.3' 61.7223 183.7862 0x000000ff 'Arial,Regular,16' T: 3,

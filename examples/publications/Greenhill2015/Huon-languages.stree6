@@ -24,7 +24,7 @@ McElhanon, K.A. 1967. Preliminary Observations on Huon Peninsula Languages. Ocea
 Methods:
 Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 14 taxa and 14 Standard sequences of length 391.
-The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 14 x 14 distance matrix.
+The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 14 x 14 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 40 splits, cyclic.
 The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
 
@@ -239,16 +239,16 @@ tobo    10000101100100000001100000110010000000100101000000001000000101100000011
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE 'Hamming Distances';
+TITLE 'Hamming Distance';
 LINK CHARACTERS = 'Working Characters';
-NAME 'Hamming Distances';
+NAME 'Hamming Distance';
 OPTIONS
 	Normalize = 'true';
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE 'Distances';
-LINK ALGORITHM = 'Hamming Distances';
+LINK ALGORITHM = 'Hamming Distance';
 DIMENSIONS ntax=14;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
@@ -333,13 +333,13 @@ TITLE 'Show Splits';
 LINK SPLITS = 'Splits';
 NAME 'Show Splits';
 OPTIONS
-	View = 'SplitsNetwork';
+	View = 'SplitNetwork';
 END; [ALGORITHM]
 
 BEGIN VIEW;
-TITLE 'SplitsNetwork';
+TITLE 'SplitNetwork';
 LINK ALGORITHM = 'Show Splits';
-NAME 'SplitsNetwork';
+NAME 'SplitNetwork';
 INPUT 'SPLITS';
 OPTIONS
 	Diagram = 'Splits',

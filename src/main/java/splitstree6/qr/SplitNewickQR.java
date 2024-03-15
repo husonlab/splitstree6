@@ -34,9 +34,9 @@ import java.util.function.Function;
  * utilities for compressing the length of a Newick string for a set of splits
  * Daniel Huson, 2.2024
  */
-public class SplitsNewickQR {
+public class SplitNewickQR {
 	public static Function<Pair<TaxaBlock, SplitsBlock>, String> createFunction() {
-		return p -> SplitsNewickQR.apply(p.getKey(), p.getValue(), true, false, 4296);
+		return p -> SplitNewickQR.apply(p.getKey(), p.getValue(), true, false, 4296);
 	}
 
 	/**

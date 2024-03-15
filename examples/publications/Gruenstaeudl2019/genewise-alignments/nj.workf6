@@ -63,16 +63,16 @@ MATRIX
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE 'Hamming Distances';
+TITLE 'Hamming Distance';
 LINK CHARACTERS = 'Working Characters';
-NAME 'Hamming Distances';
+NAME 'Hamming Distance';
 OPTIONS
 	Normalize = 'true';
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE 'Distances';
-LINK ALGORITHM = 'Hamming Distances';
+LINK ALGORITHM = 'Hamming Distance';
 DIMENSIONS ntax=0;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX

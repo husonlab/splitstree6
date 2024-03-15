@@ -521,7 +521,7 @@ TITLE 'Show Splits';
 LINK SPLITS = 'Splits';
 NAME 'Show Splits';
 OPTIONS
-	View = 'SplitsNetwork';
+	View = 'SplitNetwork';
 END; [ALGORITHM]
 
 BEGIN VIEW;
