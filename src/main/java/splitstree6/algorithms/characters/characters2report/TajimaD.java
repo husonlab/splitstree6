@@ -121,7 +121,7 @@ public class TajimaD extends AnalyzeCharactersBase {
 			text = "indicates declining population";
 		else text = "test is inconclusive";
 
-		return "Tajima's D = %.1f - %s (calculation based on %d sites)%n".formatted(D, text, length);
+		return "Tajima's D = %.4f - %s (calculation based on %d sites)%n".formatted(D, text, length);
 	}
 
 	@Override
