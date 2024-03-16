@@ -20,6 +20,7 @@
 package splitstree6.window;
 
 import javafx.beans.InvalidationListener;
+import javafx.beans.property.Property;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -37,6 +38,8 @@ import jloda.util.Single;
 import splitstree6.main.SplitsTree6;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MainWindowController {
 	@FXML
@@ -1160,5 +1163,23 @@ public class MainWindowController {
 
 	public Button getImportButton() {
 		return importButton;
+	}
+
+	private final Map<Property, Property> bidirectionalBoundPairs = new HashMap<>();
+
+	/**
+	 * use this to ensure that bidirectional bindings to menu items are kept unique
+	 *
+	 * @param uniquelyBoundProperty
+	 * @param otherProperty
+	 * @param <T>
+	 */
+	public <T> void setupSingleBidirectionalBinding(Property<T> uniquelyBoundProperty, Property<T> otherProperty) {
+		var previous = bidirectionalBoundPairs.get(uniquelyBoundProperty);
+		if (previous != null)
+			uniquelyBoundProperty.unbindBidirectional(previous);
+		bidirectionalBoundPairs.put(uniquelyBoundProperty, otherProperty);
+		uniquelyBoundProperty.setValue(otherProperty.getValue());
+		uniquelyBoundProperty.bindBidirectional(otherProperty);
 	}
 }

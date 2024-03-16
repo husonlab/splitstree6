@@ -88,8 +88,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 
 	private final BooleanProperty showScaleBar = new SimpleBooleanProperty(true);
 
-	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
-
 	private final SplitNetworkPane splitNetworkPane;
 
 	private final SetChangeListener<Taxon> selectionChangeListener;
@@ -155,8 +153,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagramTypes, null));
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagramTypes, null));
 		controller.getDiagramCBox().getItems().addAll(SplitsDiagramType.values());
-		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
-
+		controller.getDiagramCBox().valueProperty().bind(view.optionDiagramProperty());
 
 		final ObservableSet<SplitsRooting> disabledRootings = FXCollections.observableSet();
 
@@ -201,6 +198,12 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getScaleBar().factorXProperty().bind(view.optionZoomFactorProperty());
 
 		controller.getFitLabel().visibleProperty().bind(controller.getScaleBar().visibleProperty());
+
+		// setup QR-code:
+		var data = new SimpleObjectProperty<Pair<TaxaBlock, SplitsBlock>>();
+		data.bind(Bindings.createObjectBinding(() -> new Pair<>(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getSplitsBlock()), mainWindow.workingTaxaProperty(), view.splitsBlockProperty(), updateCounter));
+		var qrImageView = new SimpleObjectProperty<ImageView>();
+		QRViewUtils.setup(controller.getInnerAnchorPane(), data, SplitNewickQR.createFunction(), qrImageView, view.optionShowQRCodeProperty());
 
 		var paneWidth = new SimpleDoubleProperty();
 		var paneHeight = new SimpleDoubleProperty();
@@ -331,12 +334,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setOnSwipeUp(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 
-		// setup QR-code:
-		var data = new SimpleObjectProperty<Pair<TaxaBlock, SplitsBlock>>();
-		data.bind(Bindings.createObjectBinding(() -> new Pair<>(mainWindow.getWorkflow().getWorkingTaxaBlock(), view.getSplitsBlock()), mainWindow.workingTaxaProperty(), view.splitsBlockProperty(), updateCounter));
-		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getInnerAnchorPane(), data, SplitNewickQR.createFunction(), qrImageView, showQRCode);
-
 		Platform.runLater(this::setupMenuItems);
 	}
 
@@ -417,10 +414,11 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> updateLabelLayout());
 		mainController.getLayoutLabelsMenuItem().disableProperty().bind(view.emptyProperty());
 
-		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
+		mainController.setupSingleBidirectionalBinding(mainController.getShowScaleBarMenuItem().selectedProperty(), showScaleBar);
+		mainController.getShowScaleBarMenuItem().setOnAction(e -> showScaleBar.set(!mainController.getShowScaleBarMenuItem().isSelected()));
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.SplitsTopology).or(view.optionDiagramProperty().isEqualTo(SplitsDiagramType.OutlineTopology)));
 
-		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.setupSingleBidirectionalBinding(mainController.getShowQRCodeMenuItem().selectedProperty(), view.optionShowQRCodeProperty());
 		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		controller.getRotateLeftButton().setOnAction(e -> {

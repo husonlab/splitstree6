@@ -79,8 +79,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 	private final FindToolBar findToolBar;
 
-	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
-
 	private final ObjectProperty<TreePane> treePane = new SimpleObjectProperty<>(this, "treePane");
 	private final ObjectProperty<PhyloTree> tree;
 
@@ -397,7 +395,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipVerticalButton().fire());
 
 		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getAnchorPane(), tree, TreeNewickQR.createFunction(), qrImageView, showQRCode);
+		QRViewUtils.setup(controller.getAnchorPane(), tree, TreeNewickQR.createFunction(), qrImageView, view.optionShowQRCodeProperty());
 
 		Platform.runLater(this::setupMenuItems);
 		updateListener.invalidated(null);
@@ -415,7 +413,6 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				ClipboardUtils.putString(StringUtils.toString(list, "\n"));
 			} else {
 				mainWindow.getController().getCopyNewickMenuItem().fire();
-
 			}
 		});
 		mainController.getCopyMenuItem().disableProperty().bind(view.emptyProperty());
@@ -464,13 +461,13 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getSelectInverseMenuItem().setOnAction(e -> mainWindow.getWorkflow().getWorkingTaxaBlock().getTaxa().forEach(t -> mainWindow.getTaxonSelectionModel().toggleSelection(t)));
 		mainController.getSelectInverseMenuItem().disableProperty().bind(view.emptyProperty());
 
-		mainController.getShowScaleBarMenuItem().selectedProperty().bindBidirectional(showScaleBar);
+		mainController.setupSingleBidirectionalBinding(mainController.getShowScaleBarMenuItem().selectedProperty(), showScaleBar);
 		mainController.getShowScaleBarMenuItem().disableProperty().bind(
 				view.optionDiagramProperty().isEqualTo(TreeDiagramType.CircularCladogram)
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.TriangularCladogram))
 						.or(view.optionDiagramProperty().isEqualTo(TreeDiagramType.RectangularCladogram)));
 
-		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.setupSingleBidirectionalBinding(mainController.getShowQRCodeMenuItem().selectedProperty(), view.optionShowQRCodeProperty());
 		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getRotateLeftMenuItem().setOnAction(controller.getRotateLeftButton().getOnAction());

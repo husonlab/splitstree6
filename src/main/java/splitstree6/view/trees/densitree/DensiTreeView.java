@@ -88,6 +88,8 @@ public class DensiTreeView implements IView {
 	private final BooleanProperty optionJitter = new SimpleBooleanProperty(this, "optionJitter", false);
 	private final BooleanProperty optionColorIncompatibleEdges = new SimpleBooleanProperty(this, "optionColorIncompatibleEdges", true);
 
+	private final BooleanProperty optionShowQRCode = new SimpleBooleanProperty(this, "optionShowQRCode");
+
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	private final DoubleProperty optionStrokeWidth = new SimpleDoubleProperty(this, "optionStrokeWidth");
@@ -104,6 +106,7 @@ public class DensiTreeView implements IView {
 		ProgramProperties.track(optionShowConsensus, true);
 		ProgramProperties.track(optionJitter, false);
 		ProgramProperties.track(optionColorIncompatibleEdges, false);
+		ProgramProperties.track(optionShowQRCode, false);
 		if (startup) {
 			startup = false;
 			optionDiagram.set(DensiTreeDiagramType.TriangularPhylogram);
@@ -125,7 +128,7 @@ public class DensiTreeView implements IView {
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionAveraging.getName(), optionRerootAndRescale.getName(), optionShowTrees.getName(), optionHideFirst10PercentTrees.getName(), optionShowConsensus.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
-				optionFontScaleFactor.getName(), optionJitter.getName(), optionColorIncompatibleEdges.getName());
+				optionFontScaleFactor.getName(), optionJitter.getName(), optionColorIncompatibleEdges.getName(), optionShowQRCode.getName());
 	}
 
 	public DensiTreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -449,5 +452,13 @@ public class DensiTreeView implements IView {
 
 	public void setOptionOtherColor(Color optionOtherColor) {
 		this.optionOtherColor.set(optionOtherColor);
+	}
+
+	public boolean isOptionShowQRCode() {
+		return optionShowQRCode.get();
+	}
+
+	public BooleanProperty optionShowQRCodeProperty() {
+		return optionShowQRCode;
 	}
 }

@@ -92,6 +92,8 @@ public class SplitsView implements IView {
 
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
+	private final BooleanProperty optionShowQRCode = new SimpleBooleanProperty(this, "optionShowQRCode");
+
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	// setup properties:
@@ -100,12 +102,14 @@ public class SplitsView implements IView {
 		ProgramProperties.track(optionRootAngle, 160.0);
 		ProgramProperties.track(optionOutlineFill, OUTLINE_FILL_COLOR);
 		ProgramProperties.track(optionShowConfidence, false);
+		ProgramProperties.track(optionShowQRCode, false);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(),
-				optionShowConfidence.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
+				optionShowConfidence.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(),
+				optionShowQRCode.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -328,16 +332,16 @@ public class SplitsView implements IView {
 		return optionShowConfidence;
 	}
 
-	public void setOptionShowConfidence(boolean optionShowConfidence) {
-		this.optionShowConfidence.set(optionShowConfidence);
-	}
-
-	public String[] getOptionActiveTraits() {
-		return optionActiveTraits.get();
-	}
-
 	public ObjectProperty<String[]> optionActiveTraitsProperty() {
 		return optionActiveTraits;
+	}
+
+	public boolean isOptionShowQRCode() {
+		return optionShowQRCode.get();
+	}
+
+	public BooleanProperty optionShowQRCodeProperty() {
+		return optionShowQRCode;
 	}
 
 	public SplitsViewController getController() {

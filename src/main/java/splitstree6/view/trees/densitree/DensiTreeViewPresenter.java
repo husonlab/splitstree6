@@ -22,7 +22,6 @@ package splitstree6.view.trees.densitree;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -62,8 +61,6 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 	private final FindToolBar findToolBar;
 
 	private final ObjectProperty<PhyloTree> consensusTree = new SimpleObjectProperty<>(null);
-	private final BooleanProperty showQRCode = new SimpleBooleanProperty(false);
-
 
 	public DensiTreeViewPresenter(MainWindow mainWindow, DensiTreeView view, ObjectProperty<Bounds> targetBounds) {
 		this.mainWindow = mainWindow;
@@ -223,7 +220,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		SwipeUtils.setOnSwipeDown(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
 
 		var qrImageView = new SimpleObjectProperty<ImageView>();
-		QRViewUtils.setup(controller.getAnchorPane(), consensusTree, TreeNewickQR.createFunction(), qrImageView, showQRCode);
+		QRViewUtils.setup(controller.getAnchorPane(), consensusTree, TreeNewickQR.createFunction(), qrImageView, view.optionShowQRCodeProperty());
 
 	}
 
@@ -289,7 +286,7 @@ public class DensiTreeViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipButton().disableProperty());
 
-		mainController.getShowQRCodeMenuItem().selectedProperty().bindBidirectional(showQRCode);
+		mainController.setupSingleBidirectionalBinding(mainController.getShowQRCodeMenuItem().selectedProperty(), view.optionShowQRCodeProperty());
 		mainController.getShowQRCodeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getLayoutLabelsMenuItem().setOnAction(e -> drawer.getRadialLabelLayout().layoutLabels());

@@ -52,7 +52,7 @@ public class HammingDistance extends Characters2Distances {
 		if (optionName.equals(optionNormalize.getName())) {
 			return "Normalize distances";
 		} else if (optionName.equals(optionHandleAmbiguousStates.getName())) {
-			return "Choose how to handle ambiguous states";
+			return "Choose how to handle ambiguous states (nucleotide data only)";
 		} else
 			return super.getToolTip(optionName);
 	}
@@ -70,6 +70,9 @@ public class HammingDistance extends Characters2Distances {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxa, CharactersBlock characters, DistancesBlock distancesBlock) throws IOException {
 		progress.setMaximum(taxa.getNtax());
+
+		if (!characters.getDataType().isNucleotides())
+			setOptionHandleAmbiguousStates(AmbiguousOptions.Ignore);
 
 		distancesBlock.setNtax(characters.getNtax());
 
@@ -213,7 +216,7 @@ public class HammingDistance extends Characters2Distances {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, CharactersBlock datablock) {
-		return super.isApplicable(taxa, datablock) && datablock.getDataType().isNucleotides();
+		return super.isApplicable(taxa, datablock);
 	}
 
 }

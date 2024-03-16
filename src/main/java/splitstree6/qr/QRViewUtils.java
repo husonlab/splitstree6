@@ -25,9 +25,7 @@ import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.ReadOnlyObjectProperty;
-import javafx.scene.control.ContextMenu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tooltip;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
@@ -39,7 +37,6 @@ import jloda.fx.util.DraggableLabel;
 import jloda.util.Basic;
 import jloda.util.ProgramExecutorService;
 import jloda.util.StringUtils;
-import splitstree6.main.SplitsTree6;
 
 import java.util.function.Function;
 
@@ -66,47 +63,40 @@ public class QRViewUtils {
 		qrImageView.setPreserveRatio(true);
 		qrImageView.setFitHeight(256);
 
-		var copyTextMenuItem = new MenuItem("Copy Text");
-		var copyImageMenuItem = new MenuItem("Copy Image");
-		var contextMenu = new ContextMenu(copyTextMenuItem, copyImageMenuItem);
+		var copyMenuItem = new MenuItem("Copy");
+		var smallMenuItem = new RadioMenuItem("Small");
+		var mediumMenuItem = new RadioMenuItem("Medium");
+		var largeMenuItem = new RadioMenuItem("Large");
+		var group = new ToggleGroup();
+		group.getToggles().addAll(smallMenuItem, mediumMenuItem, largeMenuItem);
+		group.selectedToggleProperty().addListener((v, o, n) -> {
+			if (n == smallMenuItem) {
+				qrImageView.setScaleX(0.5);
+				qrImageView.setScaleY(0.5);
+			} else if (n == largeMenuItem) {
+				qrImageView.setScaleX(1.5);
+				qrImageView.setScaleY(1.5);
+			} else {
+				qrImageView.setScaleX(1);
+				qrImageView.setScaleY(1);
+			}
+		});
+		group.selectToggle(mediumMenuItem);
+
+		var contextMenu = new ContextMenu(copyMenuItem, new SeparatorMenuItem(), smallMenuItem, mediumMenuItem, largeMenuItem);
 
 		qrImageView.setOnContextMenuRequested(e -> {
 			var sourceValue = source.get();
 			if (sourceValue != null) {
 				var stringValue = stringFunction.apply(sourceValue);
 				if (stringValue != null) {
-					copyTextMenuItem.setOnAction(a -> ClipboardUtils.putString(stringValue));
-					copyImageMenuItem.setOnAction(x -> ClipboardUtils.putImage(qrImageView.getImage()));
+					copyMenuItem.setOnAction(a -> ClipboardUtils.put(stringValue, qrImageView.getImage(), null));
 					contextMenu.show(qrImageView, e.getScreenX(), e.getScreenY());
 					ProgramExecutorService.submit(3000, () -> Platform.runLater(contextMenu::hide));
 				}
 			}
 		});
-		if (SplitsTree6.isDesktop()) {
-			qrImageView.setOnScroll(e -> {
-				if (e.getDeltaY() > 0) {
-					if (qrImageView.getScaleX() < 5) {
-						qrImageView.setScaleX(1.1 * qrImageView.getScaleX());
-						qrImageView.setScaleY(1.1 * qrImageView.getScaleY());
-					}
-				} else if (e.getDeltaY() < 0) {
-					if (qrImageView.getScaleX() > 0.2) {
-						qrImageView.setScaleX(1 / 1.1 * qrImageView.getScaleX());
-						qrImageView.setScaleY(1 / 1.1 * qrImageView.getScaleY());
-					}
-				}
-				e.consume();
-			});
-		} else {
-			qrImageView.setOnZoom(e -> {
-				if ((e.getZoomFactor() > 1 && e.getZoomFactor() * qrImageView.getScaleX() < 5)
-					|| (e.getZoomFactor() < 1 && e.getZoomFactor() * qrImageView.getScaleX() > 0.2)) {
-					qrImageView.setScaleX(e.getZoomFactor() * qrImageView.getScaleX());
-					qrImageView.setScaleY(e.getZoomFactor() * qrImageView.getScaleY());
-				}
-				e.consume();
-			});
-		}
+
 		AnchorPane.setBottomAnchor(qrImageView, 20.0);
 		AnchorPane.setLeftAnchor(qrImageView, 20.0);
 		DraggableLabel.makeDraggable(qrImageView);

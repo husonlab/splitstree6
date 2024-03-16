@@ -93,6 +93,8 @@ public class TreeView implements IView {
 
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
+	private final BooleanProperty optionShowQRCode = new SimpleBooleanProperty(this, "optionShowQRCode");
+
 	private final ObjectProperty<Bounds> targetBounds = new SimpleObjectProperty<>(this, "targetBounds");
 
 	private final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
@@ -103,6 +105,7 @@ public class TreeView implements IView {
 	{
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
 		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
+		ProgramProperties.track(optionShowQRCode, false);
 	}
 
 	public List<String> listOptions() {
@@ -110,7 +113,8 @@ public class TreeView implements IView {
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionEdits.getName(),
 				optionTreeLabels.getName(), optionLabelEdgesBy.getName(),
-				optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName());
+				optionActiveTraits.getName(), optionTraitLegend.getName(),
+				optionTraitSize.getName(), optionShowQRCode.getName());
 	}
 
 	public TreeView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -342,6 +346,13 @@ public class TreeView implements IView {
 		this.optionEdits.set(optionEdits);
 	}
 
+	public boolean isOptionShowQRCode() {
+		return optionShowQRCode.get();
+	}
+
+	public BooleanProperty optionShowQRCodeProperty() {
+		return optionShowQRCode;
+	}
 
 	public double getOptionHorizontalZoomFactor() {
 		return optionHorizontalZoomFactor.get();
