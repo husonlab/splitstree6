@@ -136,7 +136,7 @@ public class DataNodeContextMenuPresenter {
 					}
 			}
 		}
-		list.sort(Comparator.comparing(Pair::getKey));
+		// list.sort(Comparator.comparing(Pair::getKey));
 
 		var result = new ArrayList<MenuItem>();
 		for (var pair : list) {
