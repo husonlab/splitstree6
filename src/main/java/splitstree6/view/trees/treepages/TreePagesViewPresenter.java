@@ -37,8 +37,8 @@ import jloda.phylo.PhyloTree;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.view.findreplace.FindReplaceTaxa;
 import splitstree6.view.utils.ComboBoxUtils;
@@ -210,8 +210,8 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 
 		{
 			var labelProperty = new SimpleStringProperty();
-			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), view.getOptionTreeLabels().label(), labelProperty, TreeLabel.labels());
-			labelProperty.addListener((v, o, n) -> view.setOptionTreeLabels(TreeLabel.valueOfLabel(n)));
+			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), view.getOptionTreeLabels().label(), labelProperty, "-", "n", "d");
+			labelProperty.addListener((v, o, n) -> view.setOptionTreeLabels(PaneLabel.valueOfLabel(n)));
 		}
 
 		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());

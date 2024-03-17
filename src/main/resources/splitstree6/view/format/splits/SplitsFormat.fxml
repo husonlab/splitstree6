@@ -77,9 +77,8 @@
                             </tooltip>
                         </ColorPicker>
                         <Button fx:id="resetLineColorButton" ellipsisString="" graphicTextGap="0.0"
-                                maxHeight="-Infinity"
-                                maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
-                                prefHeight="24.0" prefWidth="24.0"
+                                maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                                mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0"
                                 style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
                             <font>
                                 <Font size="10.0"/>
@@ -114,9 +113,8 @@
                             </value>
                         </ColorPicker>
                         <Button fx:id="resetOutlineFillColorButton" ellipsisString="" graphicTextGap="0.0"
-                                maxHeight="-Infinity"
-                                maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" mnemonicParsing="false"
-                                prefHeight="24.0" prefWidth="24.0"
+                                maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                                mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0"
                                 style="-fx-background-color: transparent; -fx-border-style: null;" text="↻">
                             <font>
                                 <Font size="10.0"/>
@@ -133,6 +131,23 @@
                         </Button>
                     </HBox>
                     <Separator prefWidth="200.0"/>
+                    <HBox alignment="CENTER_LEFT" layoutX="15.0" layoutY="85.0" spacing="6.0">
+                        <children>
+                            <Label text="Labels"/>
+                            <MenuButton fx:id="labelByMenuButton" mnemonicParsing="false" prefWidth="125.0" text="None">
+                                <items>
+                                    <RadioMenuItem fx:id="labelByNoneMenuItem" mnemonicParsing="false" text="None"/>
+                                    <SeparatorMenuItem mnemonicParsing="false"/>
+                                    <RadioMenuItem fx:id="labelByWeightMenuItem" mnemonicParsing="false" text="Weight"/>
+                                    <RadioMenuItem fx:id="labelByConfidenceMenuItem" mnemonicParsing="false"
+                                                   text="Confidence"/>
+                                    <RadioMenuItem fx:id="labelBySplitIdMenuItem" mnemonicParsing="false"
+                                                   text="Split Id"/>
+                                </items>
+                            </MenuButton>
+                        </children>
+                    </HBox>
+                    <Separator layoutX="15.0" layoutY="116.0" prefWidth="200.0"/>
                     <HBox alignment="CENTER_LEFT" spacing="10.0">
                         <Label text="Rotate">
                             <font>

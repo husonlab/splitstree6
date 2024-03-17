@@ -20,6 +20,7 @@
 package splitstree6.view.format.splits;
 
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Shape;
@@ -27,6 +28,7 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.graph.Node;
+import splitstree6.layout.splits.LabelSplitsBy;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.tree.LabeledNodeShape;
 
@@ -41,6 +43,8 @@ public class SplitsFormat extends Group {
 	private final SplitsFormatController controller;
 	private final SplitsFormatPresenter presenter;
 
+	private final ObjectProperty<LabelSplitsBy> optionLabelSplitsBy = new SimpleObjectProperty<>(this, "optionLabelSplitsBy", LabelSplitsBy.None);
+
 	public SplitsFormat(UndoManager undoManager, SelectionModel<Integer> splitSelectionModel, Map<Node, LabeledNodeShape> nodeShapeMap,
 						Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
 						ObjectProperty<Color> optionOutlineFill, ObjectProperty<String[]> editsProperty) {
@@ -49,10 +53,15 @@ public class SplitsFormat extends Group {
 		getChildren().add(loader.getRoot());
 
 		presenter = new SplitsFormatPresenter(undoManager, controller, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram,
-				optionOutlineFill, editsProperty);
+				optionOutlineFill, editsProperty, optionLabelSplitsBy);
 	}
 
 	public SplitsFormatPresenter getPresenter() {
 		return presenter;
+	}
+
+
+	public ObjectProperty<LabelSplitsBy> optionLabelSplitsByProperty() {
+		return optionLabelSplitsBy;
 	}
 }

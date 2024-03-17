@@ -44,15 +44,9 @@
                     </ComboBox>
 
                     <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
-                    <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
-                    <Button fx:id="rotateRightButton" mnemonicParsing="false" text="Rotate Right"/>
-                    <Button fx:id="flipHorizontalButton" mnemonicParsing="false" text="Flip Horizontal"/>
-                    <Button fx:id="flipVerticalButton" mnemonicParsing="false" text="Flip Vertical"/>
-
-                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
                     <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" maxHeight="-Infinity"
                                   maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="24.0" text="n">
+                                  mnemonicParsing="false" prefHeight="24.0" prefWidth="30.0" text="n">
                         <tooltip>
                             <Tooltip text="Show tree names or details"/>
                         </tooltip>
@@ -60,6 +54,12 @@
                             <Font size="12.0"/>
                         </font>
                     </ToggleButton>
+
+                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
+                    <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
+                    <Button fx:id="rotateRightButton" mnemonicParsing="false" text="Rotate Right"/>
+                    <Button fx:id="flipHorizontalButton" mnemonicParsing="false" text="Flip Horizontal"/>
+                    <Button fx:id="flipVerticalButton" mnemonicParsing="false" text="Flip Vertical"/>
 
                     <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
 

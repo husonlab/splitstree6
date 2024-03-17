@@ -58,9 +58,32 @@ public class SplitsFormatController {
 	private TitledPane titledPane;
 
 	@FXML
+	private RadioMenuItem labelByConfidenceMenuItem;
+
+	@FXML
+	private MenuButton labelByMenuButton;
+
+	@FXML
+	private RadioMenuItem labelByNoneMenuItem;
+
+	@FXML
+	private RadioMenuItem labelBySplitIdMenuItem;
+
+	@FXML
+	private RadioMenuItem labelByWeightMenuItem;
+
+	private final ToggleGroup labelByToggleGroup = new ToggleGroup();
+
+	@FXML
 	private void initialize() {
 		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
 		outlineFillLabel.disableProperty().bind(outlineFillColorPicker.disableProperty());
+
+		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelBySplitIdMenuItem);
+		labelByToggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
+			if (n != null)
+				labelByMenuButton.setText(((RadioMenuItem) n).getText());
+		});
 	}
 
 
@@ -98,5 +121,29 @@ public class SplitsFormatController {
 
 	public Button getResetWidthButton() {
 		return resetWidthButton;
+	}
+
+	public RadioMenuItem getLabelByConfidenceMenuItem() {
+		return labelByConfidenceMenuItem;
+	}
+
+	public MenuButton getLabelByMenuButton() {
+		return labelByMenuButton;
+	}
+
+	public RadioMenuItem getLabelByNoneMenuItem() {
+		return labelByNoneMenuItem;
+	}
+
+	public RadioMenuItem getLabelBySplitIdMenuItem() {
+		return labelBySplitIdMenuItem;
+	}
+
+	public RadioMenuItem getLabelByWeightMenuItem() {
+		return labelByWeightMenuItem;
+	}
+
+	public ToggleGroup getLabelByToggleGroup() {
+		return labelByToggleGroup;
 	}
 }

@@ -50,8 +50,8 @@ import jloda.util.progress.ProgressSilent;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.LayoutUtils;
 import splitstree6.layout.tree.HeightAndAngles;
+import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.layout.tree.TreeLabel;
 import splitstree6.qr.QRViewUtils;
 import splitstree6.qr.TreeNewickQR;
 import splitstree6.tabs.IDisplayTabPresenter;
@@ -161,12 +161,19 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 
 		{
 			var labelProperty = new SimpleStringProperty();
-			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), view.getOptionTreeLabels().label(), labelProperty, TreeLabel.labels());
-			labelProperty.addListener((v, o, n) -> view.setOptionTreeLabels(TreeLabel.valueOfLabel(n)));
+			BasicFX.makeMultiStateToggle(controller.getShowTreeNamesToggleButton(), view.getOptionPaneLabel().label(), labelProperty, "-", "n", "d", "s", "N", "D");
+			labelProperty.addListener((v, o, n) -> {
+				var value = PaneLabel.valueOfLabel(n);
+				showScaleBar.set(value.showScaleBar());
+				view.setOptionPaneLabel(value);
+			});
+			showScaleBar.set(view.getOptionPaneLabel().showScaleBar());
 		}
-		view.optionTreeLabelsProperty().addListener((v, o, n) -> TreeLabel.setLabel(tree.get(), n, controller.getTreeNameLabel()));
-		tree.addListener((v, o, n) -> TreeLabel.setLabel(n, view.getOptionTreeLabels(), controller.getTreeNameLabel()));
-		TreeLabel.setLabel(tree.get(), view.getOptionTreeLabels(), controller.getTreeNameLabel());
+		view.optionPaneLabelProperty().addListener((v, o, n) -> {
+			PaneLabel.setLabel(tree.get(), n, controller.getTreeNameLabel());
+		});
+		tree.addListener((v, o, n) -> PaneLabel.setLabel(n, view.getOptionPaneLabel(), controller.getTreeNameLabel()));
+		PaneLabel.setLabel(tree.get(), view.getOptionPaneLabel(), controller.getTreeNameLabel());
 
 		var toScale = new SimpleBooleanProperty(this, "toScale", view.getOptionDiagram().isPhylogram());
 		var lockAspectRatio = new SimpleBooleanProperty(this, "lockAspectRatio");
@@ -364,7 +371,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		var undoManager = view.getUndoManager();
 
 		view.optionDiagramProperty().addListener((v, o, n) -> undoManager.add("diagram", view.optionDiagramProperty(), o, n));
-		view.optionTreeLabelsProperty().addListener((v, o, n) -> undoManager.add("show tree names", view.optionTreeLabelsProperty(), o, n));
+		view.optionPaneLabelProperty().addListener((v, o, n) -> undoManager.add("show tree names", view.optionPaneLabelProperty(), o, n));
 		view.optionAveragingProperty().addListener((v, o, n) -> undoManager.add("node averaging", view.optionAveragingProperty(), o, n));
 		view.optionOrientationProperty().addListener((v, o, n) -> undoManager.add("orientation", view.optionOrientationProperty(), o, n));
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));

@@ -32,6 +32,8 @@ import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.undo.UndoableRedoableCommandList;
 import jloda.graph.Node;
+import splitstree6.data.SplitsBlock;
+import splitstree6.layout.splits.LabelSplitsBy;
 import splitstree6.layout.splits.RotateSplit;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.tree.LabeledNodeShape;
@@ -47,6 +49,8 @@ import java.util.Map;
  * Daniel Huson, 1.2022
  */
 public class SplitsFormatPresenter {
+	private final SplitsFormatController controller;
+
 	private final InvalidationListener selectionListener;
 
 	final private SelectionModel<Integer> splitSelectionModel;
@@ -58,12 +62,30 @@ public class SplitsFormatPresenter {
 
 	public SplitsFormatPresenter(UndoManager undoManager, SplitsFormatController controller, SelectionModel<Integer> splitSelectionModel,
 								 Map<Node, LabeledNodeShape> nodeShapeMap, Map<Integer, ArrayList<Shape>> splitShapeMap, ObjectProperty<SplitsDiagramType> optionDiagram,
-								 ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty) {
-
+								 ObjectProperty<Color> outlineFill, ObjectProperty<String[]> editsProperty, ObjectProperty<LabelSplitsBy> optionLabelSplitsBy) {
+		this.controller = controller;
 		this.splitSelectionModel = splitSelectionModel;
 		this.undoManager = undoManager;
 		this.editsProperty = editsProperty;
 		this.nodeShapeMap = nodeShapeMap;
+
+		controller.getLabelByNoneMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.None));
+		controller.getLabelByWeightMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.Weight));
+		controller.getLabelByConfidenceMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.Confidence));
+		controller.getLabelBySplitIdMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.SplitId));
+		optionLabelSplitsBy.addListener((v, o, n) -> {
+			if (n != null) {
+				switch (n) {
+					case None -> controller.getLabelByToggleGroup().selectToggle(controller.getLabelByNoneMenuItem());
+					case Weight ->
+							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByWeightMenuItem());
+					case Confidence ->
+							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceMenuItem());
+					case SplitId ->
+							controller.getLabelByToggleGroup().selectToggle(controller.getLabelBySplitIdMenuItem());
+				}
+			}
+		});
 
 		var strokeWidth = new SimpleDoubleProperty(1.0);
 		controller.getWidthCBox().getItems().addAll(0.1, 0.5, 1, 2, 3, 4, 5, 6, 8, 10, 20);
@@ -229,5 +251,17 @@ public class SplitsFormatPresenter {
 			RotateSplit.apply(splits, -5, nodeShapeMap);
 			editsProperty.set(SplitNetworkEdits.addAngles(oldEdits, splits, -5));
 		});
+	}
+
+	public void updateMenus(SplitsBlock splitsBlock) {
+		controller.getLabelByWeightMenuItem().setDisable(splitsBlock == null || splitsBlock.getNsplits() == 0);
+		controller.getLabelByConfidenceMenuItem().setDisable(splitsBlock == null || splitsBlock.getNsplits() == 0 || !splitsBlock.hasConfidenceValues());
+		controller.getLabelBySplitIdMenuItem().setDisable(splitsBlock == null || splitsBlock.getNsplits() == 0);
+
+		if (controller.getLabelByWeightMenuItem().isSelected() && controller.getLabelByWeightMenuItem().isDisable()
+			|| controller.getLabelByConfidenceMenuItem().isSelected() && controller.getLabelByConfidenceMenuItem().isDisable()
+			|| controller.getLabelBySplitIdMenuItem().isSelected() && controller.getLabelBySplitIdMenuItem().isDisable()) {
+			Platform.runLater(() -> controller.getLabelByNoneMenuItem().setSelected(true));
+		}
 	}
 }

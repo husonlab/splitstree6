@@ -41,10 +41,7 @@ import jloda.util.ProgramExecutorService;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.parts.Taxon;
-import splitstree6.layout.splits.LoopView;
-import splitstree6.layout.splits.SplitNetworkLayout;
-import splitstree6.layout.splits.SplitsDiagramType;
-import splitstree6.layout.splits.SplitsRooting;
+import splitstree6.layout.splits.*;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
 import splitstree6.layout.tree.LayoutUtils;
@@ -78,7 +75,7 @@ public class SplitNetworkPane extends StackPane {
 							ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight, ReadOnlyObjectProperty<SplitsDiagramType> diagram,
 							ReadOnlyObjectProperty<LayoutOrientation> orientation,
 							ReadOnlyObjectProperty<SplitsRooting> rooting, ReadOnlyDoubleProperty rootAngle, ReadOnlyDoubleProperty labelScaleFactor,
-							ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength,
+							ReadOnlyObjectProperty<LabelSplitsBy> labelSplitBy, DoubleProperty unitLength,
 							ObservableMap<Integer, RichTextLabel> taxonLabelMap,
 							ObservableMap<Node, LabeledNodeShape> nodeLabeledShapeMap,
 							ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
@@ -115,7 +112,7 @@ public class SplitNetworkPane extends StackPane {
 				return new Group();
 
 			var result = splitNetworkLayout.apply(service.getProgressListener(), taxaBlock.get(), splitsBlock.get(), diagram.get(),
-					rooting.get(), rootAngle.get(), taxonSelectionModel, splitSelectionModel, showConfidence, unitLength, getPrefWidth() - 4, getPrefHeight() - 16,
+					rooting.get(), rootAngle.get(), taxonSelectionModel, splitSelectionModel, labelSplitBy, unitLength, getPrefWidth() - 4, getPrefHeight() - 16,
 					taxonLabelMap, nodeLabeledShapeMap, splitShapeMap, loopViews);
 
 			result.setId("networkGroup");

@@ -37,11 +37,13 @@ import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.ProgramProperties;
 import splitstree6.data.SplitsBlock;
+import splitstree6.layout.splits.LabelSplitsBy;
 import splitstree6.layout.splits.LoopView;
 import splitstree6.layout.splits.SplitsDiagramType;
 import splitstree6.layout.splits.SplitsRooting;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.PaneLabel;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.selecttraits.SelectTraits;
 import splitstree6.view.format.splits.SplitsFormat;
@@ -64,7 +66,7 @@ public class SplitsView implements IView {
 	private final SplitsViewController controller;
 	private final SplitsViewPresenter presenter;
 
-	private final SplitsFormat splitsFormat;
+	private final SplitsFormat splitsFormatter;
 
 	private final ObjectProperty<ViewTab> viewTab = new SimpleObjectProperty<>(this, "viewTab");
 
@@ -79,12 +81,14 @@ public class SplitsView implements IView {
 	private final ObjectProperty<SplitsRooting> optionRooting = new SimpleObjectProperty<>(this, "optionRooting", SplitsRooting.None);
 	private final DoubleProperty optionRootAngle = new SimpleDoubleProperty(this, "optionRootAngle");
 
-	private final BooleanProperty optionShowConfidence = new SimpleBooleanProperty(this, "optionShowConfidence");
-
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
 
+	private final ObjectProperty<PaneLabel> optionPaneLabel = new SimpleObjectProperty<>(this, "optionTreeLabels");
+
 	private final ObjectProperty<Color> optionOutlineFill = new SimpleObjectProperty<>(this, "optionOutlineFill");
+
+	private final ObjectProperty<LabelSplitsBy> optionLabelSplitsBy = new SimpleObjectProperty<>(this, "optionLabelSplitsBy", LabelSplitsBy.None);
 
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
 	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
@@ -101,15 +105,15 @@ public class SplitsView implements IView {
 		ProgramProperties.track(optionDiagram, SplitsDiagramType::valueOf, SplitsDiagramType.Splits);
 		ProgramProperties.track(optionRootAngle, 160.0);
 		ProgramProperties.track(optionOutlineFill, OUTLINE_FILL_COLOR);
-		ProgramProperties.track(optionShowConfidence, false);
+		ProgramProperties.track(optionPaneLabel, PaneLabel::valueOf, PaneLabel.ScaleBarNone);
 		ProgramProperties.track(optionShowQRCode, false);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionRooting.getName(), optionZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionRootAngle.getName(), optionOutlineFill.getName(), optionEdits.getName(),
-				optionShowConfidence.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(),
-				optionShowQRCode.getName());
+				optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionPaneLabel.getName(),
+				optionLabelSplitsBy.getName(), optionShowQRCode.getName());
 	}
 
 	public SplitsView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -134,7 +138,12 @@ public class SplitsView implements IView {
 
 		setViewTab(viewTab);
 
-		splitsFormat = new SplitsFormat(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
+		splitsFormatter = new SplitsFormat(undoManager, splitSelectionModel, nodeShapeMap, splitShapeMap, optionDiagram, optionOutlineFill, optionEditsProperty());
+		optionLabelSplitsBy.bindBidirectional(splitsFormatter.optionLabelSplitsByProperty());
+
+		splitsBlock.addListener((v, o, n) -> {
+			splitsFormatter.getPresenter().updateMenus(n);
+		});
 
 		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
 		traitsFormatter.setNodeShapeMap(nodeShapeMap);
@@ -146,7 +155,7 @@ public class SplitsView implements IView {
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
-		controller.getFormatVBox().getChildren().addAll(new TaxonLabelFormat(mainWindow, undoManager), new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow), splitsFormat);
+		controller.getFormatVBox().getChildren().addAll(new TaxonLabelFormat(mainWindow, undoManager), new TaxonMark(mainWindow, undoManager), traitsFormatter, new SelectTraits(mainWindow), splitsFormatter);
 
 		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
 		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 35.0);
@@ -239,6 +248,17 @@ public class SplitsView implements IView {
 		return null;
 	}
 
+	public PaneLabel getOptionPaneLabel() {
+		return optionPaneLabel.get();
+	}
+
+	public ObjectProperty<PaneLabel> optionPaneLabelProperty() {
+		return optionPaneLabel;
+	}
+
+	public void setOptionPaneLabel(PaneLabel optionPaneLabel) {
+		this.optionPaneLabel.set(optionPaneLabel);
+	}
 
 	public SplitsDiagramType getOptionDiagram() {
 		return optionDiagram.get();
@@ -324,14 +344,6 @@ public class SplitsView implements IView {
 		return optionOutlineFill;
 	}
 
-	public boolean isOptionShowConfidence() {
-		return optionShowConfidence.get();
-	}
-
-	public BooleanProperty optionShowConfidenceProperty() {
-		return optionShowConfidence;
-	}
-
 	public ObjectProperty<String[]> optionActiveTraitsProperty() {
 		return optionActiveTraits;
 	}
@@ -342,6 +354,18 @@ public class SplitsView implements IView {
 
 	public BooleanProperty optionShowQRCodeProperty() {
 		return optionShowQRCode;
+	}
+
+	public LabelSplitsBy getOptionLabelSplitsBy() {
+		return optionLabelSplitsBy.get();
+	}
+
+	public ObjectProperty<LabelSplitsBy> optionLabelSplitsByProperty() {
+		return optionLabelSplitsBy;
+	}
+
+	public void setOptionLabelSplitsBy(LabelSplitsBy optionLabelSplitsBy) {
+		this.optionLabelSplitsBy.set(optionLabelSplitsBy);
 	}
 
 	public SplitsViewController getController() {
@@ -364,7 +388,7 @@ public class SplitsView implements IView {
 		return splitSelectionModel;
 	}
 
-	public SplitsFormat getSplitsFormat() {
-		return splitsFormat;
+	public SplitsFormat getSplitsFormatter() {
+		return splitsFormatter;
 	}
 }

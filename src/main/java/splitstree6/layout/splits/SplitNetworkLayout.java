@@ -19,10 +19,12 @@
 
 package splitstree6.layout.splits;
 
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
@@ -61,6 +63,7 @@ import splitstree6.splits.Compatibility;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 
@@ -78,6 +81,8 @@ public class SplitNetworkLayout {
 	private final NodeArray<Point2D> nodePointMap = graph.newNodeArray();
 	private final ArrayList<ArrayList<Node>> loops = new ArrayList<>();
 
+	private InvalidationListener updateSplitLabels;
+
 	public SplitNetworkLayout() {
 		labelLayout = new RadialLabelLayout();
 	}
@@ -91,7 +96,7 @@ public class SplitNetworkLayout {
 					   ObservableList<LoopView> loopViews) throws IOException {
 		return apply(progress, taxaBlock0, splitsBlock0, SplitsDiagramType.Outline,
 				SplitsRooting.None, 0, new SetSelectionModel<Taxon>(), new SetSelectionModel<Integer>(),
-				new SimpleBooleanProperty(false), unitLength, width, height,
+				new SimpleObjectProperty<>(LabelSplitsBy.None), unitLength, width, height,
 				taxonLabelMap,
 				nodeShapeMap,
 				splitShapeMap,
@@ -106,7 +111,7 @@ public class SplitNetworkLayout {
 	public Group apply(ProgressListener progress, TaxaBlock taxaBlock0, SplitsBlock splitsBlock0, SplitsDiagramType diagram,
 					   SplitsRooting rooting, double rootAngle,
 					   SelectionModel<Taxon> taxonSelectionModel, SelectionModel<Integer> splitSelectionModel,
-					   ReadOnlyBooleanProperty showConfidence, DoubleProperty unitLength, double width, double height,
+					   ReadOnlyObjectProperty<LabelSplitsBy> labelSplitBy, DoubleProperty unitLength, double width, double height,
 					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, // todo: this should be input
 					   ObservableMap<Node, LabeledNodeShape> nodeShapeMap,
 					   ObservableMap<Integer, ArrayList<Shape>> splitShapeMap,
@@ -263,8 +268,10 @@ public class SplitNetworkLayout {
 
 		var edgesGroup = new Group();
 
-		var confidenceLabels = new Group();
+		var splitLabels = new Group();
 		var splitsWithConfidenceLabels = new BitSet();
+
+		var splitLabelMap = new HashMap<Integer, Label>();
 
 		for (var e : graph.edges()) {
 			var line = new Line();
@@ -289,18 +296,54 @@ public class SplitNetworkLayout {
 			var split = graph.getSplit(e);
 			splitShapeMap.computeIfAbsent(split, s -> new ArrayList<>()).add(line);
 
-			if (split <= splitsBlock.getNsplits() && splitsBlock.get(split).getConfidence() > 0.05 && !splitsWithConfidenceLabels.get(split)) {
-				splitsWithConfidenceLabels.set(split);
-				var label = new Label(StringUtils.removeTrailingZerosAfterDot("%.1f", splitsBlock.get(split).getConfidence()));
-				if (false)
-					label.setStyle("-fx-background-color: rgba(128,128,128,0.2)");
+			if (!splitLabelMap.containsKey(split)) {
+				var label = new Label();
+				splitLabelMap.put(split, label);
 				placeLabel(line, label);
 				label.effectProperty().bind(line.effectProperty());
 				DraggableUtils.setupDragMouseLayout(label, () -> splitSelectionModel.select(split));
-				confidenceLabels.getChildren().add(label);
+				splitLabels.getChildren().add(label);
 			}
 			progress.incrementProgress();
 		}
+
+		updateSplitLabels = e -> {
+			switch (labelSplitBy.get()) {
+				case None -> splitLabels.setVisible(false);
+				case SplitId -> {
+					splitLabels.setVisible(true);
+					for (var id : splitLabelMap.keySet()) {
+						var label = splitLabelMap.get(id);
+						label.setVisible(true);
+						label.setText(String.valueOf(id));
+					}
+				}
+				case Weight -> {
+					splitLabels.setVisible(true);
+					for (var id : splitLabelMap.keySet()) {
+						var label = splitLabelMap.get(id);
+						label.setVisible(true);
+						var weight = splitsBlock.get(id).getWeight();
+						label.setText(StringUtils.removeTrailingZerosAfterDot(weight > 0 ? "%.2f" : "%.6f", splitsBlock.get(id).getWeight()));
+					}
+				}
+				case Confidence -> {
+					splitLabels.setVisible(true);
+					for (var id : splitLabelMap.keySet()) {
+						var label = splitLabelMap.get(id);
+						if (id <= splitsBlock.getNsplits() && splitsBlock.get(id).getConfidence() > 0.05 && !splitsWithConfidenceLabels.get(id)) {
+							label.setVisible(true);
+							label.setText(StringUtils.removeTrailingZerosAfterDot("%.6f", splitsBlock.get(id).getConfidence()));
+						} else
+							label.setVisible(false);
+					}
+				}
+			}
+		};
+
+		labelSplitBy.addListener(new WeakInvalidationListener(updateSplitLabels));
+		// labelSplitBy.addListener(updateSplitLabels);
+		Platform.runLater(() -> updateSplitLabels.invalidated(null));
 
 		var loopsGroup = new Group();
 		for (var loop : loops) {
@@ -310,9 +353,7 @@ public class SplitNetworkLayout {
 		}
 		progress.reportTaskCompleted();
 
-		confidenceLabels.visibleProperty().bind(showConfidence);
-
-		return new Group(loopsGroup, edgesGroup, confidenceLabels, nodesGroup, nodeLabelsGroup);
+		return new Group(loopsGroup, edgesGroup, splitLabels, nodesGroup, nodeLabelsGroup);
 	}
 
 	private void placeLabel(Line line, Label label) {

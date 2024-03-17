@@ -83,7 +83,8 @@ public class TreeView implements IView {
 	private final DoubleProperty optionHorizontalZoomFactor = new SimpleDoubleProperty(this, "optionHorizontalZoomFactor", 1.0);
 	private final DoubleProperty optionVerticalZoomFactor = new SimpleDoubleProperty(this, "optionVerticalZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
-	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
+
+	private final ObjectProperty<PaneLabel> optionPaneLabel = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
 	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
 
@@ -104,7 +105,7 @@ public class TreeView implements IView {
 	// create properties:
 	{
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
-		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
+		ProgramProperties.track(optionPaneLabel, PaneLabel::valueOf, PaneLabel.ScaleBarNone);
 		ProgramProperties.track(optionShowQRCode, false);
 	}
 
@@ -112,7 +113,7 @@ public class TreeView implements IView {
 		return List.of(optionTree.getName(), optionDiagram.getName(), optionAveraging.getName(), optionOrientation.getName(),
 				optionHorizontalZoomFactor.getName(), optionVerticalZoomFactor.getName(),
 				optionFontScaleFactor.getName(), optionEdits.getName(),
-				optionTreeLabels.getName(), optionLabelEdgesBy.getName(),
+				optionPaneLabel.getName(), optionLabelEdgesBy.getName(),
 				optionActiveTraits.getName(), optionTraitLegend.getName(),
 				optionTraitSize.getName(), optionShowQRCode.getName());
 	}
@@ -145,7 +146,6 @@ public class TreeView implements IView {
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 
 		var edgesFormatter = new EdgesFormat(undoManager, edgeSelectionModel, edgeShapeMap, optionEditsProperty());
-		if (false) edgesFormatter.optionLabelEdgesByProperty().set(getOptionLabelEdgesBy());
 		optionLabelEdgesBy.bindBidirectional(edgesFormatter.optionLabelEdgesByProperty());
 
 		treeProperty().addListener((v, o, n) -> {
@@ -310,16 +310,16 @@ public class TreeView implements IView {
 		this.optionAveraging.set(optionAveraging);
 	}
 
-	public TreeLabel getOptionTreeLabels() {
-		return optionTreeLabels.get();
+	public PaneLabel getOptionPaneLabel() {
+		return optionPaneLabel.get();
 	}
 
-	public ObjectProperty<TreeLabel> optionTreeLabelsProperty() {
-		return optionTreeLabels;
+	public ObjectProperty<PaneLabel> optionPaneLabelProperty() {
+		return optionPaneLabel;
 	}
 
-	public void setOptionTreeLabels(TreeLabel optionTreeLabel) {
-		this.optionTreeLabels.set(optionTreeLabel);
+	public void setOptionPaneLabel(PaneLabel optionPaneLabel) {
+		this.optionPaneLabel.set(optionPaneLabel);
 	}
 
 	public LabelEdgesBy getOptionLabelEdgesBy() {

@@ -66,7 +66,7 @@ public class SplitsViewController {
 	private Button zoomOutButton;
 
 	@FXML
-	private ToggleButton showInternalLabelsToggleButton;
+	private ToggleButton showScalarBarFitToggleButton;
 
 	@FXML
 	private AnchorPane outerAnchorPane;
@@ -195,8 +195,8 @@ public class SplitsViewController {
 		return zoomableScrollPane;
 	}
 
-	public ToggleButton showInternalLabelsToggleButton() {
-		return showInternalLabelsToggleButton;
+	public ToggleButton getShowScalarBarFitToggle() {
+		return showScalarBarFitToggleButton;
 	}
 
 	public ScaleBar getScaleBar() {

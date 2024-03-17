@@ -88,13 +88,14 @@ public class AlgorithmList {
 
 		add(algorithms, names, new PDistance());
 		add(algorithms, names, new HammingDistance());
+		add(algorithms, names, new LogDet());
+
 		add(algorithms, names, new JukesCantorDistance());
 		add(algorithms, names, new K2PDistance());
 		add(algorithms, names, new F81Distance());
 		add(algorithms, names, new HKY85Distance());
 		add(algorithms, names, new F84Distance());
 		add(algorithms, names, new GTRDistance());
-		add(algorithms, names, new LogDet());
 		add(algorithms, names, new ProteinMLDistance());
 
 		add(algorithms, names, new DiceDistance());
@@ -119,6 +120,8 @@ public class AlgorithmList {
 		add(algorithms, names, new BunemanTree());
 
 		add(algorithms, names, new MedianJoining());
+		add(algorithms, names, new ParsimonySplits());
+
 		add(algorithms, names, new MinSpanningNetwork());
 		add(algorithms, names, new MinSpanningTree());
 
@@ -129,13 +132,14 @@ public class AlgorithmList {
 		add(algorithms, names, new DeltaScore());
 		add(algorithms, names, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity());
 		add(algorithms, names, new ShapleyValues());
-		add(algorithms, names, new AverageDistances());
 		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity());
 		add(algorithms, names, new TreeDiversityIndex());
 		add(algorithms, names, new TajimaD());
 		add(algorithms, names, new UnrootedShapleyValues());
 
-		add(algorithms, names, new ParsimonySplits());
+
+		add(algorithms, names, new RerootOrReorderTrees());
+
 
 		add(algorithms, names, new GreedyTree());
 		add(algorithms, names, new AntiConsensusNetwork());
@@ -159,11 +163,11 @@ public class AlgorithmList {
 		add(algorithms, names, new ClusterNetwork());
 		add(algorithms, names, new ConsensusTree());
 
-		add(algorithms, names, new RerootOrReorderTrees());
 
 		add(algorithms, names, new LooseAndLacy());
 		add(algorithms, names, new EnumerateContainedTrees());
 		add(algorithms, names, new ListOneRSPRTrees());
+		add(algorithms, names, new AverageDistances());
 
 		add(algorithms, names, new CharactersFilter());
 		add(algorithms, names, new CharactersLoader());

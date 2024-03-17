@@ -32,8 +32,8 @@ import jloda.fx.util.ProgramProperties;
 import jloda.phylo.PhyloTree;
 import splitstree6.layout.tree.HeightAndAngles;
 import splitstree6.layout.tree.LayoutOrientation;
+import splitstree6.layout.tree.PaneLabel;
 import splitstree6.layout.tree.TreeDiagramType;
-import splitstree6.layout.tree.TreeLabel;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.taxlabel.TaxonLabelFormat;
 import splitstree6.view.format.taxmark.TaxonMark;
@@ -66,7 +66,7 @@ public class TreePagesView implements IView {
 
 	private final IntegerProperty pageNumber = new SimpleIntegerProperty(this, "pageNumber", 1); // 1-based
 
-	private final ObjectProperty<TreeLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
+	private final ObjectProperty<PaneLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
 
 	private final DoubleProperty optionZoomFactor = new SimpleDoubleProperty(this, "optionZoomFactor", 1.0);
 	private final DoubleProperty optionFontScaleFactor = new SimpleDoubleProperty(this, "optionFontScaleFactor", 1.0);
@@ -77,7 +77,7 @@ public class TreePagesView implements IView {
 		ProgramProperties.track(optionRows, 2);
 		ProgramProperties.track(optionCols, 3);
 		ProgramProperties.track(optionAveraging, HeightAndAngles.Averaging::valueOf, HeightAndAngles.Averaging.ChildAverage);
-		ProgramProperties.track(optionTreeLabels, TreeLabel::valueOf, TreeLabel.Name);
+		ProgramProperties.track(optionTreeLabels, PaneLabel::valueOf, PaneLabel.Name);
 	}
 
 	public List<String> listOptions() {
@@ -285,16 +285,16 @@ public class TreePagesView implements IView {
 		this.optionFontScaleFactor.set(optionFontScaleFactor);
 	}
 
-	public TreeLabel getOptionTreeLabels() {
+	public PaneLabel getOptionTreeLabels() {
 		return optionTreeLabels.get();
 	}
 
-	public ObjectProperty<TreeLabel> optionTreeLabelsProperty() {
+	public ObjectProperty<PaneLabel> optionTreeLabelsProperty() {
 		return optionTreeLabels;
 	}
 
-	public void setOptionTreeLabels(TreeLabel optionTreeLabel) {
-		this.optionTreeLabels.set(optionTreeLabel);
+	public void setOptionTreeLabels(PaneLabel optionPaneLabel) {
+		this.optionTreeLabels.set(optionPaneLabel);
 	}
 
 	public ViewTab getViewTab() {

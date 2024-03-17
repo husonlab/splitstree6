@@ -45,15 +45,6 @@
                                 </tooltip>
                             </ComboBox>
                             <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
-                            <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
-                            <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
-                                    text="Rotate Right"/>
-                            <Button fx:id="flipHorizontalButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
-                                    text="Flip Horizontal"/>
-                            <Button fx:id="flipVerticalButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
-                                    text="Flip Vertical"/>
-
-                            <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
 
                             <ComboBox fx:id="treeCBox" minWidth="100.0"/>
                             <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
@@ -70,6 +61,13 @@
                                 </font>
                             </ToggleButton>
                             <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
+                            <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
+                            <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"
+                                    text="Rotate Right"/>
+                            <Button fx:id="flipHorizontalButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
+                                    text="Flip Horizontal"/>
+                            <Button fx:id="flipVerticalButton" layoutX="236.0" layoutY="8.0" mnemonicParsing="false"
+                                    text="Flip Vertical"/>
                             <Button fx:id="zoomInButton" contentDisplay="CENTER" maxHeight="20.0"
                                     mnemonicParsing="false" text="Zoom In">
                                 <tooltip>

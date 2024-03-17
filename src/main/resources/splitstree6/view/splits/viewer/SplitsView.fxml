@@ -40,12 +40,11 @@
                             <Tooltip text="Choose rooting method"/>
                         </tooltip>
                     </ComboBox>
-                    <ToggleButton fx:id="showInternalLabelsToggleButton" mnemonicParsing="false" text="i">
+                    <ToggleButton fx:id="showScalarBarFitToggleButton" mnemonicParsing="false" text="-">
                         <tooltip>
                             <Tooltip text="Show internal labels"/>
                         </tooltip>
                     </ToggleButton>
-                    <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
 
                     <Button fx:id="rotateLeftButton" mnemonicParsing="false" text="Rotate Left"/>
                     <Button fx:id="rotateRightButton" layoutX="154.0" layoutY="8.0" mnemonicParsing="false"

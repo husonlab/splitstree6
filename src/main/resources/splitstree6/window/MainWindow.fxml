@@ -389,14 +389,14 @@
                         <CheckMenuItem fx:id="logDetMenuItem" text="Log Det"
                                        userData="Compute distances using the Log-Det method"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <CheckMenuItem fx:id="hky85MenuItem" text="HKY 85"
-                                       userData="Compute distances using the Hasegawa-Kishino-Yano model"/>
                         <CheckMenuItem fx:id="jukesCantorMenuItem" text="Jukes Cantor"
                                        userData="Compute distances using the Jukes-Cantor model"/>
                         <CheckMenuItem fx:id="k2pMenuItem" text="K2P"
                                        userData="Compute distances using the Kimura-2P model"/>
                         <CheckMenuItem fx:id="f81MenuItem" text="F81"
                                        userData="Compute distances using the Felsenstein-1981 model"/>
+                        <CheckMenuItem fx:id="hky85MenuItem" text="HKY 85"
+                                       userData="Compute distances using the Hasegawa-Kishino-Yano model"/>
                         <CheckMenuItem fx:id="f84MenuItem" text="F84"
                                        userData="Compute distances using the Felsenstein-1984 model"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
