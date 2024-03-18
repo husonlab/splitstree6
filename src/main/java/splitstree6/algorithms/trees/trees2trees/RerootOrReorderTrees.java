@@ -22,7 +22,9 @@ package splitstree6.algorithms.trees.trees2trees;
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.WeakInvalidationListener;
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Edge;
@@ -63,11 +65,12 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 
 	private final ObjectProperty<String[]> optionOutGroupTaxa = new SimpleObjectProperty<>(this, "optionOutGroupTaxa", new String[0]);
 
+	private final BooleanProperty optionRescale = new SimpleBooleanProperty(this, "optionRescale", false);
 
 	private final InvalidationListener selectionInvalidationListener;
 
 	public List<String> listOptions() {
-		return List.of(optionRootBy.getName(), optionRearrangeBy.getName(), optionReorder.getName(), optionOutGroupTaxa.getName());
+		return List.of(optionRootBy.getName(), optionRearrangeBy.getName(), optionReorder.getName(), optionOutGroupTaxa.getName(), optionRescale.getName());
 	}
 
 	@Override
@@ -83,8 +86,9 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 			return "determine how to reorder";
 		else if (optionOutGroupTaxa.getName().equals(optionName))
 			return "the list of outgroup taxa";
-		else
-			return super.getToolTip(optionName);
+		else if (optionRescale.getName().equals(optionName))
+			return "rescale each tree to total length of 100";
+		return super.getToolTip(optionName);
 	}
 
 	@Override
@@ -290,6 +294,19 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 				}
 			}
 		}
+
+		if (isOptionRescale()) {
+			try {
+				ExecuteInParallel.apply(trees, tree -> {
+					var totalWeight = tree.edgeStream().mapToDouble(tree::getWeight).filter(w -> w > 0).sum();
+					if (totalWeight > 0) {
+						var factor = 100.0 / totalWeight;
+						tree.edgeStream().forEach(e -> tree.setWeight(e, Math.max(0.0, factor * tree.getWeight(e))));
+					}
+				}, ProgramExecutorService.getNumberOfCoresToUse());
+			} catch (Exception ignored) {
+			}
+		}
 	}
 
 	private Node findNodeAboveAll(PhyloTree tree, BitSet outGroupTaxonSet) {
@@ -382,6 +399,18 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 
 	public void setOptionRearrangeBy(RearrangeBy optionRearrangeBy) {
 		this.optionRearrangeBy.set(optionRearrangeBy);
+	}
+
+	public boolean isOptionRescale() {
+		return optionRescale.get();
+	}
+
+	public BooleanProperty optionRescaleProperty() {
+		return optionRescale;
+	}
+
+	public void setOptionRescale(boolean rescale) {
+		this.optionRescale.set(rescale);
 	}
 
 	@Override

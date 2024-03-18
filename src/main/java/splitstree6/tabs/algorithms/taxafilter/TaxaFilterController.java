@@ -77,6 +77,10 @@ public class TaxaFilterController {
 	@FXML
 	private FlowPane htmlInfoFlowPane;
 
+	@FXML
+	private void initialize() {
+	}
+
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
 	}
@@ -144,4 +148,5 @@ public class TaxaFilterController {
 	public FlowPane getHtmlInfoFlowPane() {
 		return htmlInfoFlowPane;
 	}
+
 }

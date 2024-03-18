@@ -19,12 +19,10 @@
 package splitstree6.tabs.algorithms.treefilter;
 
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
+import jloda.fx.icons.MaterialIcons;
 
 public class TreeFilterTabController {
 
@@ -60,6 +58,14 @@ public class TreeFilterTabController {
 
 	@FXML
 	private Label infoLabel;
+
+	@FXML
+	private MenuButton menuButton;
+
+	@FXML
+	private void initialize() {
+		MaterialIcons.setIcon(menuButton, "edit");
+	}
 
 	public AnchorPane getAnchorPane() {
 		return anchorPane;
@@ -103,5 +109,9 @@ public class TreeFilterTabController {
 
 	public Label getInfoLabel() {
 		return infoLabel;
+	}
+
+	public MenuButton getMenuButton() {
+		return menuButton;
 	}
 }

@@ -67,6 +67,8 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		this.taxaFilter = (TaxaFilter) taxaEditorNode.getAlgorithm();
 		this.controller = tab.getTaxaFilterController();
 
+		tab.getController().getMainPane();
+
 		var inputTaxonBlock = mainWindow.getWorkflow().getInputTaxaBlock();
 		var workingTaxonBlock = mainWindow.getWorkflow().getWorkingTaxaBlock();
 
@@ -210,13 +212,16 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		activeChangedListener.invalidated(null);
 
 		var setsMenu = setupEditMenuButton(tab.getController().getMenuButton(), controller.getActiveColumn().getContextMenu(), controller.getDisplayLabelColumn().getContextMenu());
+		tab.getController().getMenuButton().setVisible(true);
+		tab.getController().getMenuButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 
 		mainWindow.getWorkflow().runningProperty().addListener(e -> MainWindowPresenter.updateTaxSetSelection(mainWindow, setsMenu.getItems()));
+
 	}
 
 	public static Menu setupEditMenuButton(MenuButton menuButton, ContextMenu... sourceMenus) {
 		for (var contextMenu : sourceMenus) {
-			if (menuButton.getItems().size() > 0)
+			if (!menuButton.getItems().isEmpty())
 				menuButton.getItems().add(new SeparatorMenuItem());
 
 			for (var menuItem : contextMenu.getItems()) {
@@ -237,7 +242,6 @@ public class TaxaFilterPresenter implements IDisplayTabPresenter {
 		}
 		var menu = new Menu("Select");
 		menuButton.getItems().addAll(new SeparatorMenuItem(), menu);
-		menuButton.setVisible(true);
 		return menu;
 	}
 

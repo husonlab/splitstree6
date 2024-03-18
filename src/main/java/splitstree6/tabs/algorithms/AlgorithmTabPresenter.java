@@ -67,15 +67,13 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 		algorithmTab.setGraphic(label);
 
 		controller.getMainPane().disableProperty().bind(runningProperty);
-		controller.getMenuButton().disableProperty().bind(runningProperty);
 
 		//AutoCompleteComboBox.install(controller.getAlgorithmCBox());
 
 		controller.getAlgorithmCBox().valueProperty().addListener((v, o, n) -> {
 			var algorithm = (Algorithm) n;
 			algorithmTab.setAlgorithm(algorithm);
-			var tooltip = (algorithm == null ? null
-					: new Tooltip(algorithm.getName() + (algorithm.getCitation() == null ? "" : "\n" + StringUtils.fold(algorithm.getCitation().replaceAll(".*;", ""), 80))));
+			var tooltip = (algorithm == null ? null : new Tooltip(algorithm.getName() + (algorithm.getCitation() == null ? "" : "\n" + StringUtils.fold(algorithm.getCitation().replaceAll(".*;", ""), 80))));
 			controller.getAlgorithmCBox().setTooltip(tooltip);
 		});
 		controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
@@ -93,7 +91,6 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 				label.setText(n.getName());
 			}
 		});
-		controller.getMenuButton().disableProperty().bind(runningProperty);
 	}
 
 	public void setupOptionControls(AlgorithmTab algorithmTab, AlgorithmTabController controller, Algorithm algorithm) {

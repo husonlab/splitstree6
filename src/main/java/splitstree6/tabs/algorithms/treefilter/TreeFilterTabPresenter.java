@@ -109,7 +109,8 @@ public class TreeFilterTabPresenter implements IDisplayTabPresenter {
 		});
 		controller.getDeactivateSelectedMenuItem().disableProperty().bind(Bindings.isEmpty(tableView.getSelectionModel().getSelectedItems()));
 
-		setupEditMenuButton(algorithmController.getMenuButton(), controller.getActiveColumn().getContextMenu());
+		setupEditMenuButton(controller.getMenuButton(), controller.getActiveColumn().getContextMenu());
+		controller.getMenuButton().disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 	}
 
 

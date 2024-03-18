@@ -40,6 +40,7 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 	private Pane mainPane;
 
 	@FXML
+
 	private ChoiceBox<Algorithm<S, T>> algorithmCBox;
 
 	@FXML
@@ -52,7 +53,7 @@ public class AlgorithmTabController<S extends DataBlock, T extends DataBlock> {
 	private void initialize() {
 		MaterialIcons.setIcon(menuButton, "edit");
 		MaterialIcons.setIcon(applyButton, "play_circle");
-		menuButton.setVisible(false);
+		menuButton.setVisible(false); // only used in taxa filter
 	}
 
 	public ChoiceBox<Algorithm<S, T>> getAlgorithmCBox() {
