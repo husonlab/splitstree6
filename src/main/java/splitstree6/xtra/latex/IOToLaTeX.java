@@ -29,29 +29,11 @@ import splitstree6.workflow.DataBlock;
 import java.lang.reflect.InvocationTargetException;
 
 public class IOToLaTeX {
-	public static final String HEADER = """
-			\\documentclass{article}
-			\\usepackage{graphicx}
-			\\usepackage{hyperref}
-			\\usepackage{fullpage}
-			\\usepackage{parskip}
-			\\usepackage{natbib}
-			\\usepackage{makeidx}
-			   
-			\\makeindex
-			    
-			\\begin{document}
-			    								
-			""";
-
-	public static final String FOOTER = """
-			   
-			\\clearpage
-			\\printindex
-			\\end{document}""";
-
 	public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-		System.out.println(HEADER);
+		System.out.println("\\chapter{Supported import and export formats}\n");
+
+		System.out.println("The program support several widely-used import and export formats.\n");
+
 
 		System.out.println("\\section{Supported import formats}\n");
 
@@ -71,8 +53,6 @@ public class IOToLaTeX {
 						   outputExporters(SplitsBlock.class) +
 						   outputExporters(NetworkBlock.class) +
 						   outputExporters(GenomesBlock.class));
-
-		System.out.println(FOOTER);
 	}
 
 	public static String outputImporters(Class<? extends DataBlock> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {

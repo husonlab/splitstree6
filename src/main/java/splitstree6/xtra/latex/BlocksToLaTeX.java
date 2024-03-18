@@ -21,14 +21,11 @@ package splitstree6.xtra.latex;
 
 import splitstree6.io.nexus.*;
 
-import static splitstree6.xtra.latex.IOToLaTeX.FOOTER;
-import static splitstree6.xtra.latex.IOToLaTeX.HEADER;
-
 public class BlocksToLaTeX {
 	public static void main(String[] args) {
 
-		System.out.println(HEADER +
-						   "\\section{Main data blocks and their `Nexus format' syntax}\n\n" +
+		System.out.println("\\chapter{Main data blocks}\n\n" +
+						   "SplitsTree is organized around data blocks that correspond to ``Nexus'' blocks \\citep{Maddisonetal1997}.\n\n" +
 						   output("Taxa block", TaxaNexusInput.DESCRIPTION, TaxaNexusInput.SYNTAX) +
 						   output("Traits block", TraitsNexusInput.DESCRIPTION, TraitsNexusInput.SYNTAX) +
 						   output("Characters block", CharactersNexusInput.DESCRIPTION, CharactersNexusInput.SYNTAX) +
@@ -41,12 +38,12 @@ public class BlocksToLaTeX {
 						   output("Report block", ReportNexusInput.DESCRIPTION, ReportNexusInput.SYNTAX) +
 						   output("Sets block", SetsNexusInput.DESCRIPTION, SetsNexusInput.SYNTAX) +
 						   output("SplitsTree6 block", SplitsTree6NexusInput.DESCRIPTION, SplitsTree6NexusInput.SYNTAX) +
-						   output("Genomes block", GenomesNexusInput.DESCRIPTION, GenomesNexusInput.SYNTAX) +
-						   FOOTER);
+						   output("Genomes block", GenomesNexusInput.DESCRIPTION, GenomesNexusInput.SYNTAX)
+		);
 	}
 
 	public static String output(String name, String description, String syntax) {
-		return "\\subsection{%s}\\index{%s}%n%n%s%n".formatted(name, name, description.replaceAll("\t", "    ")) +
+		return "\\section{%s}\\index{%s}%n%n%s%n".formatted(name, name, description.replaceAll("\t", "    ")) +
 			   "{\\footnotesize\\begin{verbatim}\n" +
 			   syntax.replaceAll("\t", "  ") +
 			   "\\end{verbatim}}\n\n";

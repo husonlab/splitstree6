@@ -30,9 +30,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import static splitstree6.xtra.latex.IOToLaTeX.FOOTER;
-import static splitstree6.xtra.latex.IOToLaTeX.HEADER;
-
 /**
  * outputs a LaTeX document containing a description of all algorithms
  * Daniel Huson, 3.2024
@@ -120,13 +117,17 @@ public class AlgorithmsToLaTeX {
 			}
 		}
 
-		System.out.println(HEADER);
-
 		if (true) {
-			System.out.println("\\section{List of algorithms sorted by input}\n\n");
+			System.out.println(
+					"""
+							\\chapter{Algorithms}
+							  
+							Here we list of all provided algorithms, organized by input data.
+							"""
+			);
 			for (var key : ordering) {
 				if (fromLineMap.containsKey(key)) {
-					System.out.printf("\\subsection{Input %s}%n%n", key);
+					System.out.printf("\\section{Input %s}%n%n", key);
 					for (var line : fromLineMap.get(key)) {
 						System.out.println(line);
 					}
@@ -135,17 +136,21 @@ public class AlgorithmsToLaTeX {
 		}
 
 		if (false) {
-			System.out.println("\\section{List of algorithms sorted by output}\n\n");
+			System.out.println(
+					"""
+							\\chapter{Algorithms}
+											
+							Here we list of all provided algorithms, organized by output data.
+							"""
+			);
 			for (var key : ordering) {
 				if (toLineMap.containsKey(key)) {
-					System.out.printf("\\subsection{Output %s}%n%n", key);
+					System.out.printf("\\section{Output %s}%n%n", key);
 					for (var line : toLineMap.get(key)) {
 						System.out.println(line);
 					}
 				}
 			}
 		}
-		System.out.println("\\bibliographystyle{plainnat}\n\\bibliography{bibliography}");
-		System.out.println(FOOTER);
 	}
 }

@@ -24,9 +24,6 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.SeparatorMenuItem;
 import splitstree6.main.SplitsTree6;
 
-import static splitstree6.xtra.latex.IOToLaTeX.FOOTER;
-import static splitstree6.xtra.latex.IOToLaTeX.HEADER;
-
 /**
  * write out all items in the menu bar in LaTeX
  */
@@ -40,19 +37,25 @@ public class MenusToLaTeX {
 
 	public static String apply(MenuBar menuBar) {
 		var buf = new StringBuilder();
-		buf.append(HEADER);
-		buf.append("\\section{The main menu bar}\n\n");
+		buf.append("""
+				\\chapter{The main menu bar}
+								
+				All functionality of the program can be used
+				directly from the main window. In addition,
+				the program provides menus to access the most
+				often used features.
+								
+				""");
 		for (var menu : menuBar.getMenus()) {
 			buf.append(applyRec(menu, 0));
 		}
-		buf.append(FOOTER);
 		return buf.toString();
 	}
 
 	public static String applyRec(Menu menu, int level) {
 		var buf = new StringBuilder();
 		if (level == 0) {
-			buf.append("\\subsection{The %s menu}\\index{%s menu}%n%n%n".formatted(menu.getText(), menu.getText()));
+			buf.append("\\section{The %s menu}\\index{%s menu}%n%n%n".formatted(menu.getText(), menu.getText()));
 			buf.append("This menu has the following items:\n\n");
 		} else {
 			buf.append("This %s-menu has the following items:\n\n".formatted("sub".repeat(level)));
