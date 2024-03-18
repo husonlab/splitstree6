@@ -32,6 +32,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import jloda.fx.control.CopyableLabel;
+import jloda.fx.control.RichTextLabel;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.AService;
@@ -47,6 +48,7 @@ import splitstree6.layout.tree.*;
 import splitstree6.view.format.edges.LabelEdgesBy;
 import splitstree6.view.trees.InteractionSetup;
 
+import java.util.OptionalDouble;
 import java.util.function.Consumer;
 
 /**
@@ -255,5 +257,15 @@ public class TreePane extends StackPane {
 
 	public SelectionModel<Edge> getEdgeSelectionModel() {
 		return edgeSelectionModel;
+	}
+
+	public OptionalDouble getMinLabelHeight() {
+		var minHeight = Double.MAX_VALUE;
+		for (var label : BasicFX.getAllRecursively(result.taxonLabels(), RichTextLabel.class)) {
+			var height = label.getLayoutBounds().getHeight();
+			if (height > 0)
+				minHeight = Math.min(minHeight, height);
+		}
+		return (minHeight < Double.MAX_VALUE ? OptionalDouble.of(minHeight) : OptionalDouble.empty());
 	}
 }

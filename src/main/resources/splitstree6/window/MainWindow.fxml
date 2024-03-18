@@ -121,13 +121,6 @@
                             </accelerator>
                         </MenuItem>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <Menu fx:id="toolsMenu" text="Tools">
-                            <MenuItem fx:id="GroupIdenticalHaplotypesFilesMenuItem"
-                                      text="Group Identical Haplotypes..."
-                                      userData="Load a file of sequences and group identical haplotypes">
-                            </MenuItem>
-                        </Menu>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="closeMenuItem" text="Close" userData="Close the current document">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="W" control="UP" meta="UP" shift="UP"
@@ -374,6 +367,10 @@
                         <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa..." userData="Show the filter taxa tab"/>
                         <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."
                                   userData="Shows the alignment tab"/>
+                        <MenuItem fx:id="GroupIdenticalHaplotypesMenuItem"
+                                  text="Group Identical Haplotypes..."
+                                  userData="Group identical haplotypes">
+                        </MenuItem>
                         <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees..."
                                   userData="Show the filter trees tab"/>
                         <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits..."

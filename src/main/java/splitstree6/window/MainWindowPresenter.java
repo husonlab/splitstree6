@@ -93,6 +93,9 @@ import splitstree6.dialog.importing.ImportTaxonDisplayLabels;
 import splitstree6.dialog.importing.ImportTaxonTraits;
 import splitstree6.dialog.importing.ImportTreeNames;
 import splitstree6.io.FileLoader;
+import splitstree6.io.nexus.CharactersNexusOutput;
+import splitstree6.io.nexus.TaxaNexusOutput;
+import splitstree6.io.nexus.TraitsNexusOutput;
 import splitstree6.io.readers.ImportManager;
 import splitstree6.io.utils.ReaderWriterBase;
 import splitstree6.main.CheckForUpdate;
@@ -102,6 +105,7 @@ import splitstree6.tabs.displaytext.DisplayTextTab;
 import splitstree6.tabs.inputeditor.InputEditorTab;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
+import splitstree6.utils.CollapseIdenticalHyplotypes;
 import splitstree6.view.alignment.AlignmentView;
 import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
@@ -114,6 +118,8 @@ import splitstree6.workflow.WorkflowDataLoader;
 import splitstree6.xtra.latex.MenusToLaTeX;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.Duration;
 import java.util.*;
 import java.util.function.Consumer;
@@ -398,7 +404,25 @@ public class MainWindowPresenter {
 		controller.getPageSetupMenuItem().setOnAction(e -> Print.showPageLayout(stage));
 		controller.getPageSetupMenuItem().disableProperty().bind(workflow.runningProperty());
 
-		controller.getGroupIdenticalHaplotypesFilesMenuItem().setOnAction(null);
+		controller.getGroupIdenticalHaplotypesMenuItem().setOnAction(e -> {
+			if (workflow.getWorkingDataBlock() instanceof CharactersBlock charactersBlock) {
+				var output = CollapseIdenticalHyplotypes.apply(workflow.getWorkingTaxaBlock(), charactersBlock);
+				if (output != null) {
+					try {
+						var w = new StringWriter();
+						w.write("#nexus\n");
+						(new TaxaNexusOutput()).write(w, output.getFirst());
+						(new TraitsNexusOutput()).write(w, output.getFirst(), output.getSecond());
+						(new CharactersNexusOutput()).write(w, output.getFirst(), output.getThird());
+						openString(w.toString());
+					} catch (IOException ex) {
+						NotificationManager.showError("Failed: " + ex.getMessage());
+					}
+				}
+			}
+
+		});
+		controller.getGroupIdenticalHaplotypesMenuItem().disableProperty().bind(controller.getFilterCharactersMenuItem().disableProperty());
 
 		controller.getQuitMenuItem().setOnAction(e -> {
 			while (MainWindowManager.getInstance().size() > 0) {
@@ -1018,20 +1042,24 @@ public class MainWindowPresenter {
 
 		importButton.setOnAction(e -> {
 			var importedString = ClipboardUtils.getTextFilesContentOrString();
-			if (importedString != null) {
-				var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
-				Platform.runLater(() -> {
-					mainWindow.getController().getEditInputMenuItem().fire();
-					Platform.runLater(() -> {
-						var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
-						if (inputEditorTab != null) {
-							((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(importedString);
-							Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
-						}
-					});
-				});
-			}
+			openString(importedString);
 		});
+	}
+
+	public static void openString(String string) {
+		if (string != null) {
+			var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
+			Platform.runLater(() -> {
+				mainWindow.getController().getEditInputMenuItem().fire();
+				Platform.runLater(() -> {
+					var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
+					if (inputEditorTab != null) {
+						((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(string);
+						Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
+					}
+				});
+			});
+		}
 	}
 
 }

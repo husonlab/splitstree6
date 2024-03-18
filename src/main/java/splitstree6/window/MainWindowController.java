@@ -114,7 +114,7 @@ public class MainWindowController {
 	private MenuItem importTreeNamesMenuItem;
 
 	@FXML
-	private MenuItem GroupIdenticalHaplotypesFilesMenuItem;
+	private MenuItem GroupIdenticalHaplotypesMenuItem;
 
 	@FXML
 	private MenuItem closeMenuItem;
@@ -684,8 +684,8 @@ public class MainWindowController {
 		return selectButton;
 	}
 
-	public MenuItem getGroupIdenticalHaplotypesFilesMenuItem() {
-		return GroupIdenticalHaplotypesFilesMenuItem;
+	public MenuItem getGroupIdenticalHaplotypesMenuItem() {
+		return GroupIdenticalHaplotypesMenuItem;
 	}
 
 	public MenuItem getCloseMenuItem() {

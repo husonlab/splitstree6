@@ -96,6 +96,9 @@ public class TreeViewController {
 	private Button contractHorizontallyButton;
 
 	@FXML
+	private Button expandCollapseVerticallyButton;
+
+	@FXML
 	private AnchorPane outerAnchorPane;
 
 	@FXML
@@ -130,6 +133,7 @@ public class TreeViewController {
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandCollapseVerticallyButton, "sync_alt", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
 
@@ -232,6 +236,10 @@ public class TreeViewController {
 
 	public Button getContractHorizontallyButton() {
 		return contractHorizontallyButton;
+	}
+
+	public Button getExpandCollapseVerticallyButton() {
+		return expandCollapseVerticallyButton;
 	}
 
 	public AnchorPane getInnerAnchorPane() {

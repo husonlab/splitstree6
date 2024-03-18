@@ -71,7 +71,6 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	public void setTraitValueLabel(int taxonId, int traitId, String label) {
 		if (matrixOfLabels == null)
 			matrixOfLabels = new String[matrix.length][getNTraits()]; // lazy create
-
 		matrixOfLabels[taxonId - 1][traitId - 1] = label;
 	}
 
@@ -205,15 +204,15 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 		matrix = new double[targetTaxa.size()][srcTraits.getNTraits()];
 		matrixOfLabels = null; // will be set in setTraitValueLabel if required
 		for (var tarId = 1; tarId <= targetTaxa.getNtax(); tarId++) {
-			var taxon = targetTaxa.get(tarId);
-			final int srcId = srcTaxa.indexOf(taxon);
+			var label = targetTaxa.getLabel(tarId);
+			final int srcId = srcTaxa.indexOf(label);
 			for (int traitId = 1; traitId <= srcTraits.getNTraits(); traitId++) {
+				var value = srcTraits.getTraitValue(srcId, traitId);
 				setTraitValue(tarId, traitId, srcTraits.getTraitValue(srcId, traitId));
 				if (srcTraits.matrixOfLabels != null) {
 					setTraitValueLabel(tarId, traitId, srcTraits.getTraitValueLabel(srcId, traitId));
 				}
 			}
-			tarId++;
 		}
 	}
 

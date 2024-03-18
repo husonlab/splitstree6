@@ -338,6 +338,7 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 		controller.getContractHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor((1.0 / 1.1) * view.getOptionHorizontalZoomFactor()));
 		controller.getContractHorizontallyButton().disableProperty().bind(view.emptyProperty().or(lockAspectRatio));
 
+
 		controller.getExpandHorizontallyButton().setOnAction(e -> view.setOptionHorizontalZoomFactor(1.1 * view.getOptionHorizontalZoomFactor()));
 		controller.getExpandHorizontallyButton().disableProperty().bind(view.emptyProperty().or(lockAspectRatio).or(view.optionHorizontalZoomFactorProperty().greaterThan(8.0 / 1.1)));
 
@@ -354,6 +355,29 @@ public class TreeViewPresenter implements IDisplayTabPresenter {
 				view.setOptionHorizontalZoomFactor((1.0 / 1.1) * view.getOptionHorizontalZoomFactor());
 		});
 		controller.getContractVerticallyButton().disableProperty().bind(view.emptyProperty());
+
+		controller.getExpandCollapseVerticallyButton().setOnAction(e -> {
+			var minLabelHeight = treePane.get().getMinLabelHeight();
+			if (minLabelHeight.isPresent()) {
+				if (minLabelHeight.getAsDouble() < 10) {
+					var factor = 14.0 / minLabelHeight.getAsDouble();
+					view.setOptionVerticalZoomFactor(factor * view.getOptionVerticalZoomFactor());
+					if (lockAspectRatio.get()) {
+						view.setOptionHorizontalZoomFactor(factor * view.getOptionHorizontalZoomFactor());
+					}
+				} else {
+					// fit to pane:
+					var total = (controller.getScrollPane().getVerticalScrollBar().getMax() - controller.getScrollPane().getVerticalScrollBar().getMin());
+					var extent = controller.getScrollPane().getVerticalScrollBar().getVisibleAmount();
+					var factor = extent / total;
+					view.setOptionVerticalZoomFactor(factor * view.getOptionVerticalZoomFactor());
+					if (lockAspectRatio.get()) {
+						view.setOptionHorizontalZoomFactor(factor * view.getOptionHorizontalZoomFactor());
+					}
+				}
+			}
+		});
+		controller.getExpandCollapseVerticallyButton().disableProperty().bind(view.emptyProperty());
 
 		findToolBar = FindReplaceTaxa.create(mainWindow, view.getUndoManager());
 		findToolBar.setShowFindToolBar(false);

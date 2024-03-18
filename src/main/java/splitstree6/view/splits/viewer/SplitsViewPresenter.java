@@ -82,8 +82,6 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 	private final SplitsView view;
 	private final SplitsViewController controller;
 
-	private final ObjectProperty<PaneLabel> optionTreeLabels = new SimpleObjectProperty<>(this, "optionTreeLabels");
-
 	private final FindToolBar findToolBar;
 
 	private final InvalidationListener selectionListener;
@@ -156,7 +154,7 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		controller.getDiagramCBox().setButtonCell(ComboBoxUtils.createButtonCell(disabledDiagramTypes, null));
 		controller.getDiagramCBox().setCellFactory(ComboBoxUtils.createCellFactory(disabledDiagramTypes, null));
 		controller.getDiagramCBox().getItems().addAll(SplitsDiagramType.values());
-		controller.getDiagramCBox().valueProperty().bind(view.optionDiagramProperty());
+		controller.getDiagramCBox().valueProperty().bindBidirectional(view.optionDiagramProperty());
 
 		final ObservableSet<SplitsRooting> disabledRootings = FXCollections.observableSet();
 
@@ -299,6 +297,8 @@ public class SplitsViewPresenter implements IDisplayTabPresenter {
 		view.optionFontScaleFactorProperty().addListener(e -> {
 			ProgramExecutorService.submit(100, () -> Platform.runLater(() -> splitNetworkPane.layoutLabels(view.getOptionOrientation())));
 		});
+
+		BasicFX.reportChanges(view.optionDiagramProperty());
 
 		splitsBlock.addListener(updateListener);
 		view.optionDiagramProperty().addListener(updateListener);

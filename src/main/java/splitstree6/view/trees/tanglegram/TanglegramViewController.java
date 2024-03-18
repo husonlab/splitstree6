@@ -64,6 +64,9 @@ public class TanglegramViewController {
 	private Button contractHorizontallyButton;
 
 	@FXML
+	private Button expandCollapseVerticallyButton;
+
+	@FXML
 	private ComboBox<String> tree1CBox;
 
 	@FXML
@@ -126,6 +129,7 @@ public class TanglegramViewController {
 		MaterialIcons.setIcon(formatToggleButton, "format_shapes");
 		MaterialIcons.setIcon(expandHorizontallyButton, "unfold_more", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(contractHorizontallyButton, "unfold_less", "-fx-rotate: 90;", true);
+		MaterialIcons.setIcon(expandCollapseVerticallyButton, "sync_alt", "-fx-rotate: 90;", true);
 		MaterialIcons.setIcon(expandVerticallyButton, "unfold_more");
 		MaterialIcons.setIcon(contractVerticallyButton, "unfold_less");
 
@@ -204,6 +208,10 @@ public class TanglegramViewController {
 
 	public Button getContractHorizontallyButton() {
 		return contractHorizontallyButton;
+	}
+
+	public Button getExpandCollapseVerticallyButton() {
+		return expandCollapseVerticallyButton;
 	}
 
 	public ComboBox<String> getTree1CBox() {

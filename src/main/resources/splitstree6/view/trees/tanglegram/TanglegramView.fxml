@@ -89,6 +89,11 @@
                                     <Tooltip text="Contract tree horizontally"/>
                                 </tooltip>
                             </Button>
+                            <Button fx:id="expandCollapseVerticallyButton" mnemonicParsing="false" text="Fit">
+                                <tooltip>
+                                    <Tooltip text="Expand or collapse tree vertically"/>
+                                </tooltip>
+                            </Button>
                         </ToolBar>
                     </children>
                 </AnchorPane>

@@ -44,8 +44,8 @@
                     </ComboBox>
 
                     <Region maxWidth="1.0" minWidth="1.0" prefHeight="20.0" prefWidth="1.0" HBox.hgrow="NEVER"/>
-                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" maxHeight="-Infinity"
-                                  maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+                    <ToggleButton fx:id="showTreeNamesToggleButton" contentDisplay="CENTER" focusTraversable="false"
+                                  maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
                                   mnemonicParsing="false" prefHeight="24.0" prefWidth="30.0" text="n">
                         <tooltip>
                             <Tooltip text="Show tree names or details"/>
@@ -85,6 +85,11 @@
                     <Button fx:id="contractHorizontallyButton" mnemonicParsing="false" text="C Horz">
                         <tooltip>
                             <Tooltip text="Contract tree horizontally"/>
+                        </tooltip>
+                    </Button>
+                    <Button fx:id="expandCollapseVerticallyButton" mnemonicParsing="false" text="Fit">
+                        <tooltip>
+                            <Tooltip text="Expand or collapse tree vertically"/>
                         </tooltip>
                     </Button>
                 </ToolBar>

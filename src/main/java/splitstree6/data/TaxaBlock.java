@@ -362,7 +362,7 @@ public class TaxaBlock extends DataBlock {
 	 */
 	public static boolean hasInfos(TaxaBlock taxaBlock) {
 		for (var t = 1; t <= taxaBlock.getNtax(); t++)
-			if (taxaBlock.get(t).getInfo() != null && taxaBlock.get(t).getInfo().length() > 0)
+			if (taxaBlock.get(t).getInfo() != null && !taxaBlock.get(t).getInfo().isEmpty())
 				return true;
 		return false;
 	}

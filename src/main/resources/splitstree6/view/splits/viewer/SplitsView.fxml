@@ -40,7 +40,8 @@
                             <Tooltip text="Choose rooting method"/>
                         </tooltip>
                     </ComboBox>
-                    <ToggleButton fx:id="showScalarBarFitToggleButton" mnemonicParsing="false" text="-">
+                    <ToggleButton fx:id="showScalarBarFitToggleButton" focusTraversable="false" mnemonicParsing="false"
+                                  text="-">
                         <tooltip>
                             <Tooltip text="Show internal labels"/>
                         </tooltip>

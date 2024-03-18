@@ -46,6 +46,8 @@ public class TanglegramTreePane extends Group {
 	private final InvalidationListener updater;
 	private Runnable runAfterUpdate;
 
+	private TreePane treePane;
+
 	private final BooleanProperty changingOrientation = new SimpleBooleanProperty(this, "changingOrientation", false);
 
 	public TanglegramTreePane(Stage stage, TaxaBlock taxaBlock, SelectionModel<Taxon> taxonSelectionModel,
@@ -57,7 +59,7 @@ public class TanglegramTreePane extends Group {
 				Platform.runLater(() -> {
 					getChildren().clear();
 					if (dimensions.get().getWidth() > 0 && dimensions.get().getHeight() > 0 && tree.get() != null) {
-						var treePane = new TreePane(stage, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
+						treePane = new TreePane(stage, taxaBlock, tree.get(), taxonSelectionModel, dimensions.get().getWidth(), dimensions.get().getHeight(),
 								optionDiagram.get(), LabelEdgesBy.None, optionAveraging.get(), optionOrientation, fontScaleFactor, new SimpleObjectProperty<>(PaneLabel.None),
 								null, nodeShapeMap, FXCollections.observableHashMap());
 
@@ -90,5 +92,9 @@ public class TanglegramTreePane extends Group {
 
 	public BooleanProperty changingOrientationProperty() {
 		return changingOrientation;
+	}
+
+	public TreePane getTreePane() {
+		return treePane;
 	}
 }

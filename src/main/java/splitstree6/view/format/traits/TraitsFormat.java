@@ -249,7 +249,7 @@ public class TraitsFormat extends Pane {
 									ColorSchemeManager.setPieChartColors(pieChart, legend.getColorSchemeName());
 									pieChart.setStyle("-fx-padding: -10;"); // remove white space around pie
 
-									if (tooltipBuf.length() > 0) {
+									if (!tooltipBuf.isEmpty()) {
 										Tooltip.install(pieChart, new Tooltip(tooltipBuf.toString()));
 									}
 								}

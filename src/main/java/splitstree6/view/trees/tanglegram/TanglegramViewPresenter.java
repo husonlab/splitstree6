@@ -29,6 +29,7 @@ import javafx.collections.ObservableMap;
 import javafx.collections.ObservableSet;
 import javafx.geometry.Bounds;
 import javafx.geometry.Dimension2D;
+import javafx.geometry.Orientation;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import jloda.fx.control.RichTextLabel;
@@ -327,6 +328,36 @@ public class TanglegramViewPresenter implements IDisplayTabPresenter {
 
 		controller.getContractVerticallyButton().setOnAction(e -> view.setOptionVerticalZoomFactor((1.0 / 1.1) * view.getOptionVerticalZoomFactor()));
 		controller.getContractVerticallyButton().disableProperty().bind(view.emptyProperty());
+
+		controller.getExpandCollapseVerticallyButton().setOnAction(e -> {
+			if (tree1Pane.getTreePane() != null && tree2Pane.getTreePane() != null) {
+				var minLabelHeight1 = tree1Pane.getTreePane().getMinLabelHeight();
+				var minLabelHeight2 = tree2Pane.getTreePane().getMinLabelHeight();
+
+				if (minLabelHeight1.isPresent() && minLabelHeight2.isPresent()) {
+					var minHeight = Math.min(minLabelHeight1.getAsDouble(), minLabelHeight2.getAsDouble());
+					if (minHeight < 10) {
+						var factor = 14.0 / minHeight;
+						if (factor > 0) {
+							view.setOptionFontScaleFactor(factor * view.getOptionFontScaleFactor());
+							view.setOptionVerticalZoomFactor(factor * view.getOptionVerticalZoomFactor());
+						}
+					} else {
+						var scrollBar = BasicFX.getScrollBar(controller.getScrollPane(), Orientation.VERTICAL);
+						if (scrollBar != null) {
+							var total = (scrollBar.getMax() - scrollBar.getMin());
+							var extent = scrollBar.getVisibleAmount();
+							var factor = extent / total;
+							if (factor > 0) {
+								view.setOptionFontScaleFactor(factor * view.getOptionFontScaleFactor());
+								view.setOptionVerticalZoomFactor(factor * view.getOptionVerticalZoomFactor());
+							}
+						}
+					}
+				}
+			}
+		});
+		controller.getExpandCollapseVerticallyButton().disableProperty().bind(view.emptyProperty());
 
 		view.viewTabProperty().addListener((v, o, n) -> {
 			if (n != null) {
