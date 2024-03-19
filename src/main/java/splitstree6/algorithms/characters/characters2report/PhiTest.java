@@ -430,12 +430,11 @@ public class PhiTest extends AnalyzeCharactersBase {
 		System.err.println("P-value:\t" + pval);
 		return pval;
 	}
-
-
-	public void findBlocks(CharactersBlock characters, int numBreakPoints) {
+	
+	public void findBlocks(ProgressListener progress, CharactersBlock characters, int numBreakPoints) throws CanceledException {
 		//ToDo: check to see if this is already done. Perhaps Characters should be passed
 		//to the constructor.
-		get_sorted_alignment(characters);
+		get_sorted_alignment(progress, characters);
 
 		double[][] f = new double[numBreakPoints + 1][num_inform];
 		int[][] F = new int[numBreakPoints + 1][num_inform];
