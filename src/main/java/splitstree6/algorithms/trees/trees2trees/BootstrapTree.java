@@ -259,8 +259,42 @@ public class BootstrapTree extends Trees2Trees {
 				}
 			}
 		}
-		for (var e : toContract) {
-			tree.contract(e);
+		System.err.println("Contracting: " + toContract.size());
+		if (false) {
+			for (var e : toContract) {
+				tree.contract(e);
+			}
+		} else {
+			while (!toContract.isEmpty()) {
+				var e = toContract.iterator().next();
+				tree.deleteEdge(e);
+				var s = e.getSource();
+				var t = e.getTarget();
+				for (var f : s.inEdges()) {
+					var g = tree.newEdge(f.getSource(), t);
+					if (tree.hasEdgeWeights())
+						tree.setWeight(g, tree.getWeight(f));
+					if (tree.hasEdgeConfidences())
+						tree.setConfidence(g, tree.getConfidence(f));
+					if (tree.hasEdgeProbabilities())
+						tree.setProbability(g, tree.getProbability(f));
+					if (toContract.remove(f))
+						toContract.add(g);
+				}
+				for (var f : s.outEdges()) {
+					var g = tree.newEdge(t, f.getTarget());
+					if (tree.hasEdgeWeights())
+						tree.setWeight(g, tree.getWeight(f));
+					if (tree.hasEdgeConfidences())
+						tree.setConfidence(g, tree.getConfidence(f));
+					if (tree.hasEdgeProbabilities())
+						tree.setProbability(g, tree.getProbability(f));
+					if (toContract.remove(f))
+						toContract.add(g);
+				}
+				tree.deleteNode(s);
+				break;
+			}
 		}
 	}
 
