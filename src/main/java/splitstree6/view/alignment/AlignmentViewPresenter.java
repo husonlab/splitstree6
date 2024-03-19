@@ -461,9 +461,11 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 		controller.getSelectAllNonInformativeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		controller.getSelectRangeMenuItem().setOnAction(e -> {
-			var result = SetParameterDialog.apply(mainWindow.getStage(), "Enter range of sites to select", "");
+			var range = ProgramProperties.get("SelectRange", "");
+			var result = SetParameterDialog.apply(mainWindow.getStage(), "Enter range of sites to select", range);
 			if (result != null) {
 				try {
+					ProgramProperties.put("SelectRange", range);
 					var sites = BitSetUtils.union(BitSetUtils.copy(view.getSelectedSites()),
 							BitSetUtils.asBitSet(NumberUtils.parsePositiveIntegers(result, false)));
 					sites.and(BitSetUtils.asBitSet(BitSetUtils.range(1, view.getInputCharacters().getNchar() + 1)));
