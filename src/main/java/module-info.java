@@ -112,7 +112,7 @@ module splitstreesix {
 
 	exports splitstree6.xtra;
 	exports splitstree6.main;
-	opens splitstree6.tools;
+	exports splitstree6.tools;
 
 	opens splitstree6.layout.splits;
 	opens splitstree6.layout.tree;

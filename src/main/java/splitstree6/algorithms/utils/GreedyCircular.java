@@ -20,10 +20,7 @@
 package splitstree6.algorithms.utils;
 
 import jloda.graph.algorithms.PQTree;
-import jloda.util.CanceledException;
-import jloda.util.CollectionUtils;
-import jloda.util.IteratorUtils;
-import jloda.util.StringUtils;
+import jloda.util.*;
 import jloda.util.progress.ProgressListener;
 import splitstree6.splits.ASplit;
 
@@ -44,7 +41,7 @@ public class GreedyCircular {
 	 *
 	 * @return compatible splits
 	 */
-	public static ArrayList<ASplit> apply(ProgressListener progress, BitSet taxaSet, final List<ASplit> splits, Function<ASplit, Double> weight) throws CanceledException {
+	public static Pair<ArrayList<ASplit>, ArrayList<Integer>> apply(ProgressListener progress, BitSet taxaSet, final List<ASplit> splits, Function<ASplit, Double> weight) throws CanceledException {
 		progress.setSubtask("Greedy circular");
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
@@ -62,12 +59,31 @@ public class GreedyCircular {
 
 		var pqTree = new PQTree(taxaSet);
 
-		for (ASplit split : sorted) {
+		for (var split : sorted) {
 			var set = split.getPartNotContaining(1);
 			if (pqTree.accept(set)) {
 				result.add(split);
 			}
 			progress.incrementProgress();
+		}
+
+		if (false) {
+			var ordering = pqTree.extractAnOrdering();
+			System.err.println("Ordering: " + ordering);
+			for (var split : result) {
+				var set = split.getPartNotContaining(1);
+				var minPos = Integer.MAX_VALUE;
+				var maxPos = Integer.MIN_VALUE;
+				for (var i = 0; i < ordering.size(); i++) {
+					if (set.get(ordering.get(i))) {
+						minPos = Math.min(minPos, i);
+						maxPos = Math.max(maxPos, i);
+					}
+				}
+				if (Math.abs(maxPos - minPos) + 1 != set.cardinality()) {
+					System.err.println("Error in ordering for: " + set);
+				}
+			}
 		}
 
 		if (false) {
@@ -110,6 +126,6 @@ public class GreedyCircular {
 			progress.reportTaskCompleted();
 		}
 
-		return result;
+		return new Pair<>(result, pqTree.extractAnOrdering());
 	}
 }

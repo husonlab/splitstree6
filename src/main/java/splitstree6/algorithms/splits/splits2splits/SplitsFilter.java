@@ -107,7 +107,7 @@ public class SplitsFilter extends Splits2Splits implements IFilter {
 			case GreedyWeaklyCompatible ->
 					GreedyWeaklyCompatible.apply(progress, parent.getSplits(), ASplit::getWeight);
 			case GreedyCircular ->
-					GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), parent.getSplits(), ASplit::getWeight);
+					GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), parent.getSplits(), ASplit::getWeight).getFirst();
 			case BlobTree -> {
 				compatibility = Compatibility.compatible;
 				var result = new ArrayList<ASplit>();

@@ -58,7 +58,11 @@
                                       text="Second Codon Position"/>
                             <MenuItem fx:id="selectCodon2MenuItem" mnemonicParsing="false" text="Third Codon Position"/>
                             <SeparatorMenuItem mnemonicParsing="false"/>
-                            <Menu fx:id="setsMenu" text="Sets"/>
+                            <Menu fx:id="setsMenu" text="Sets">
+                                <items>
+                                    <MenuItem fx:id="selectRangeMenuItem" mnemonicParsing="false" text="Range..."/>
+                                </items>
+                            </Menu>
                             <SeparatorMenuItem mnemonicParsing="false"/>
                             <MenuItem fx:id="selectSynapomorphiesMenuItem" mnemonicParsing="false"
                                       text="Synapomorphies"/>

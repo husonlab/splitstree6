@@ -125,8 +125,9 @@ public class ConsensusSplits extends Trees2Splits {
 				splitsBlock.setCompatibility(Compatibility.compatible);
 			}
 			case ConsensusOutline -> {
-				splitsBlock.getSplits().addAll(GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), consensusSplits, ASplit::getConfidence));
-				splitsBlock.setCycle(SplitUtils.computeCycle(taxaBlock.getNtax(), splitsBlock.getSplits()));
+				var pair = GreedyCircular.apply(progress, taxaBlock.getTaxaSet(), consensusSplits, ASplit::getConfidence);
+				splitsBlock.getSplits().addAll(pair.getFirst());
+				splitsBlock.setCycle(pair.getSecond());
 				splitsBlock.setCompatibility(Compatibility.compute(taxaBlock.getNtax(), splitsBlock.getSplits(), splitsBlock.getCycle()));
 			}
 			case GreedyWeaklyCompatible -> {

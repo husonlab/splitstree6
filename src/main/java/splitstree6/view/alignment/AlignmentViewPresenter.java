@@ -31,12 +31,14 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.text.Font;
+import jloda.fx.dialog.SetParameterDialog;
 import jloda.fx.find.FindToolBar;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.ClipboardUtils;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SwipeUtils;
 import jloda.fx.window.MainWindowManager;
+import jloda.fx.window.NotificationManager;
 import jloda.util.*;
 import splitstree6.algorithms.utils.CharactersUtilities;
 import splitstree6.data.parts.CharactersType;
@@ -48,6 +50,7 @@ import splitstree6.window.MainWindow;
 import splitstree6.window.MainWindowController;
 import splitstree6.workflow.Workflow;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.List;
@@ -456,6 +459,23 @@ public class AlignmentViewPresenter implements IDisplayTabPresenter {
 			}
 		});
 		controller.getSelectAllNonInformativeMenuItem().disableProperty().bind(view.emptyProperty());
+
+		controller.getSelectRangeMenuItem().setOnAction(e -> {
+			var result = SetParameterDialog.apply(mainWindow.getStage(), "Enter range of sites to select", "");
+			if (result != null) {
+				try {
+					var sites = BitSetUtils.union(BitSetUtils.copy(view.getSelectedSites()),
+							BitSetUtils.asBitSet(NumberUtils.parsePositiveIntegers(result, false)));
+					sites.and(BitSetUtils.asBitSet(BitSetUtils.range(1, view.getInputCharacters().getNchar() + 1)));
+					view.setSelectedSites(sites);
+				} catch (IOException ex) {
+					NotificationManager.showError("Failed to parse pane: " + ex.getMessage());
+				}
+			}
+
+		});
+		controller.getSelectRangeMenuItem().disableProperty().bind(view.emptyProperty());
+
 
 		controller.getEnableAllTaxaMenuItem().setOnAction(e -> {
 			var inputTaxa = view.getInputTaxa();

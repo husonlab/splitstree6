@@ -44,7 +44,7 @@ public class PhylipWriter extends DistancesWriterBase {
 	public PhylipWriter() {
 		setFileExtensions("dist", "dst", "phylip", "phy");
 		ProgramProperties.track(optionTriangular, false);
-		ProgramProperties.track(optionTruncateLabels, false);
+		ProgramProperties.track(optionTruncateLabels, true);
 	}
 
 	@Override

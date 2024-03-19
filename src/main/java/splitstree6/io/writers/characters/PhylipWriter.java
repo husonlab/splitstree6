@@ -49,6 +49,7 @@ public class PhylipWriter extends CharactersWriterBase {
 		ProgramProperties.track(optionInterleaved, false);
 		ProgramProperties.track(optionInterleaveLabels, false);
 		ProgramProperties.track(optionLineLength, 40);
+		ProgramProperties.track(optionTruncateLabels, true);
 	}
 
 	public void write(Writer w, TaxaBlock taxa, CharactersBlock characters) throws IOException {

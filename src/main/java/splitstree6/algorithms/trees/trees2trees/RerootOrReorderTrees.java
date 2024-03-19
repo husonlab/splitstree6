@@ -129,23 +129,22 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 				trees.addAll(inputData.getTrees());
 			}
 			case MidPoint -> {
-				// todo: parallelize
-				optionOutGroupTaxa.set(new String[0]);
-				for (PhyloTree orig : inputData.getTrees()) {
-					final var tree = new PhyloTree();
-					tree.copy(orig);
-					if (tree.getRoot() == null) {
-						tree.setRoot(tree.getFirstNode());
-						tree.redirectEdgesAwayFromRoot();
-					}
-					RerootingUtils.rerootByMidpoint(tree);
-					trees.add(tree);
-					outputData.setRooted(true);
+				for (var tree : inputData.getTrees()) {
+					trees.add(new PhyloTree(tree));
 				}
+				try {
+					ExecuteInParallel.apply(trees, tree -> {
+						if (tree.getRoot() == null) {
+							tree.setRoot(tree.getFirstNode());
+							tree.redirectEdgesAwayFromRoot();
+						}
+						RerootingUtils.rerootByMidpoint(tree);
+					}, ProgramExecutorService.getNumberOfCoresToUse());
+				} catch (Exception ignored) {
+				}
+				outputData.setRooted(true);
 			}
 			case OutGroup -> {
-				// todo: parallelize
-
 				selectionInvalidationListener.invalidated(null);
 
 				final var outGroupTaxonSet = new BitSet();
@@ -155,17 +154,19 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 						outGroupTaxonSet.set(index);
 				}
 
-				for (var originalTree : inputData.getTrees()) {
-					if (originalTree.getNumberOfNodes() > 0) {
-						final PhyloTree tree = new PhyloTree(originalTree);
+				for (var tree : inputData.getTrees()) {
+					trees.add(new PhyloTree(tree));
+				}
+				try {
+					ExecuteInParallel.apply(trees, tree -> {
 						if (tree.getRoot() == null) {
 							tree.setRoot(tree.getFirstNode());
 							tree.redirectEdgesAwayFromRoot();
 						}
 						if (outGroupTaxonSet.cardinality() > 0)
 							RerootingUtils.rerootByOutgroup(tree, outGroupTaxonSet);
-						trees.add(tree);
-					}
+					}, ProgramExecutorService.getNumberOfCoresToUse());
+				} catch (Exception ignored) {
 				}
 				outputData.setRooted(true);
 			}

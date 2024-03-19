@@ -106,7 +106,7 @@ public class RootedOutline extends Trees2Trees {
 
 		var circularSplits = new SplitsBlock();
 		circularSplits.getSplits().addAll(GreedyCircular.apply(new ProgressSilent(), rootedTaxaBlock.getTaxaSet(), rootedSplits.getSplits(),
-				rootedSplits.hasConfidenceValues() ? ASplit::getConfidence : ASplit::getWeight));
+				rootedSplits.hasConfidenceValues() ? ASplit::getConfidence : ASplit::getWeight).getFirst());
 
 		if (false) {
 			try (var w = new StringWriter()) {
@@ -231,7 +231,7 @@ public class RootedOutline extends Trees2Trees {
 
 		var circularSplits = new SplitsBlock();
 		circularSplits.getSplits().addAll(GreedyCircular.apply(new ProgressSilent(), rootedTaxaBlock.getTaxaSet(), rootedSplits.getSplits(),
-				rootedSplits.hasConfidenceValues() ? ASplit::getConfidence : ASplit::getWeight));
+				rootedSplits.hasConfidenceValues() ? ASplit::getConfidence : ASplit::getWeight).getFirst());
 
 		if (false) {
 			try (var w = new StringWriter()) {

@@ -127,47 +127,36 @@ public class AlgorithmList {
 
 		add(algorithms, names, new PCOA());
 
-		add(algorithms, names, new EstimateInvariableSites());
-		add(algorithms, names, new PhiTest());
-		add(algorithms, names, new DeltaScore());
-		add(algorithms, names, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity());
-		add(algorithms, names, new ShapleyValues());
-		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity());
-		add(algorithms, names, new TreeDiversityIndex());
-		add(algorithms, names, new TajimaD());
-		add(algorithms, names, new UnrootedShapleyValues());
 
+		add(algorithms, names, new ALTSExternal());
+		add(algorithms, names, new ALTSNetwork());
+		add(algorithms, names, new AutumnAlgorithm());
 
-		add(algorithms, names, new RerootOrReorderTrees());
-
-
-		add(algorithms, names, new GreedyTree());
 		add(algorithms, names, new AntiConsensusNetwork());
 		add(algorithms, names, new AverageConsensus());
 		add(algorithms, names, new BootstrapSplits());
 		add(algorithms, names, new BootstrapTreeSplits());
 		add(algorithms, names, new BootstrapTree());
+		add(algorithms, names, new ClusterNetwork());
+		add(algorithms, names, new ConsensusTree());
 		add(algorithms, names, new ConsensusNetwork());
 		add(algorithms, names, new ConsensusOutline());
 		add(algorithms, names, new ConsensusSplits());
-		add(algorithms, names, new RootedConsensusTree());
-
-		add(algorithms, names, new CredibilityNetwork());
 		add(algorithms, names, new FilteredSuperNetwork());
+		add(algorithms, names, new GreedyTree());
+
+		add(algorithms, names, new RootedConsensusTree());
+		add(algorithms, names, new RerootOrReorderTrees());
+
+		add(algorithms, names, new ShowTrees());
 		add(algorithms, names, new SuperNetwork());
+		add(algorithms, names, new TreesFilter());
+		add(algorithms, names, new TreesFilter2());
+
+		add(algorithms, names, new TreeSelector());
 		add(algorithms, names, new TreeSelectorSplits());
 
-		add(algorithms, names, new ALTSExternal());
-		add(algorithms, names, new ALTSNetwork());
-		add(algorithms, names, new AutumnAlgorithm());
-		add(algorithms, names, new ClusterNetwork());
-		add(algorithms, names, new ConsensusTree());
-
-
-		add(algorithms, names, new LooseAndLacy());
-		add(algorithms, names, new EnumerateContainedTrees());
-		add(algorithms, names, new ListOneRSPRTrees());
-		add(algorithms, names, new AverageDistances());
+		add(algorithms, names, new CredibilityNetwork());
 
 		add(algorithms, names, new CharactersFilter());
 		add(algorithms, names, new CharactersLoader());
@@ -182,17 +171,30 @@ public class AlgorithmList {
 		add(algorithms, names, new NetworkTaxaFilter());
 		add(algorithms, names, new ShowNetwork());
 		add(algorithms, names, new ShowSplits());
-		add(algorithms, names, new ShowTrees());
 		add(algorithms, names, new SplitsFilter());
 		add(algorithms, names, new SplitsLoader());
 		add(algorithms, names, new SplitsTaxaFilter());
 		add(algorithms, names, new TaxaFilter());
-		add(algorithms, names, new TreeSelector());
-		add(algorithms, names, new TreesFilter());
-		add(algorithms, names, new TreesFilter2());
 		add(algorithms, names, new TreesLoader());
 		add(algorithms, names, new TreesTaxaFilter());
 		add(algorithms, names, new WeightsSlider());
+
+		add(algorithms, names, new EstimateInvariableSites());
+		add(algorithms, names, new PhiTest());
+		add(algorithms, names, new DeltaScore());
+		add(algorithms, names, new splitstree6.algorithms.splits.splits2report.PhylogeneticDiversity());
+		add(algorithms, names, new ShapleyValues());
+		add(algorithms, names, new splitstree6.algorithms.trees.trees2report.PhylogeneticDiversity());
+		add(algorithms, names, new TreeDiversityIndex());
+		add(algorithms, names, new TajimaD());
+		add(algorithms, names, new UnrootedShapleyValues());
+
+		add(algorithms, names, new AverageDistances());
+		add(algorithms, names, new EnumerateContainedTrees());
+		add(algorithms, names, new LooseAndLacy());
+		add(algorithms, names, new ListOneRSPRTrees());
+
+
 		return algorithms;
 	}
 

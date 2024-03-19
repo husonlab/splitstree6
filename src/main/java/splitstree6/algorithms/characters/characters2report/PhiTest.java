@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 import java.util.Collection;
 
 /**
@@ -62,7 +63,7 @@ public class PhiTest extends AnalyzeCharactersBase {
 	@Override
 	String runAnalysis(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, Collection<Taxon> selectedTaxa) throws CanceledException {
 
-		var pval = approxPhi(charactersBlock);
+		var pval = approxPhi(progress, charactersBlock);
 		pval = NumberUtils.roundSigFig(pval, 4);
 		String result;
 
@@ -120,12 +121,6 @@ public class PhiTest extends AnalyzeCharactersBase {
 
 		adjacency_matrix = new boolean[total_states][total_states];
 
-
-		for (i = 0; i < total_states; i++) {
-			for (j = 0; j < total_states; j++) {
-				adjacency_matrix[i][j] = false;
-			}
-		}
 
 		/* Initialize stuff for DFS... */
 		DFS_adjacency = new node[total_states];
@@ -237,7 +232,7 @@ public class PhiTest extends AnalyzeCharactersBase {
 	 * For each site i in the resulting alignment, sitePositions[i] is the corresponding site
 	 * in the original alignment
 	 */
-	private void get_sorted_alignment(CharactersBlock characters, boolean removeUninformative) {
+	private void get_sorted_alignment(ProgressListener progress, CharactersBlock characters) throws CanceledException {
 
 		this.ntax = characters.getNtax();
 		int nchar = characters.getNchar();
@@ -258,9 +253,7 @@ public class PhiTest extends AnalyzeCharactersBase {
 		for (int j = 1; j <= nchar; j++) {
 			//Form a table of states in this character - array mapping states to ids.
 			char[] thisSite = new char[ntax];
-			for (int s = 0; s < nstates; s++) {
-				symbol_map[s] = unassigned;
-			}
+			Arrays.fill(symbol_map, unassigned);
 			informative = false;
 			int numassigned = 0;
 			appearsTwice = -1;
@@ -285,12 +278,13 @@ public class PhiTest extends AnalyzeCharactersBase {
 					thisSite[i - 1] = missing;
 			}
 			//Check if informative or not
-			if (informative || !removeUninformative) {
+			if (informative || !true) {
 				this.nstates[charCount] = numassigned;
 				this.alignment[charCount] = thisSite;
 				sitePositions[charCount] = j;
 				charCount++;
 			}
+			progress.checkForCancel();
 		}
 		System.err.println("Found " + charCount + " informative sites");
 
@@ -298,13 +292,14 @@ public class PhiTest extends AnalyzeCharactersBase {
 
 	}
 
-	private double computePval(int optk) {
+	private double computePval(ProgressListener progress, int optk) throws CanceledException {
 		int[] fi = new int[this.num_inform];
 		int[] gi = new int[this.num_inform];
 		double u, v, w;
 
 		int phi_sum = 0;
 
+		progress.setMaximum((long) (num_inform - 1) * (num_inform) / 2L);
 		for (int i = 0; i < num_inform; i++) {
 			for (int j = i + 1; j < num_inform; j++) {
 				int inc = pair_score(i, j);
@@ -314,6 +309,7 @@ public class PhiTest extends AnalyzeCharactersBase {
 				gi[j] += inc * inc;
 				if (j - i <= optk)
 					phi_sum += inc;
+				progress.incrementProgress();
 			}
 		}
 
@@ -413,11 +409,11 @@ public class PhiTest extends AnalyzeCharactersBase {
 	}
 
 
-	double approxPhi(CharactersBlock characters) {
+	double approxPhi(ProgressListener progress, CharactersBlock characters) throws CanceledException {
 
 		//Get a sorted alignment... each row corresponds to a character, and the array contains
 		//only informative characters.
-		get_sorted_alignment(characters, true);
+		get_sorted_alignment(progress, characters);
 
 		//Compute the optK value used in the Phi test (number of off-diagonal rows)
 		int num_sites = characters.getNchar();
@@ -425,12 +421,12 @@ public class PhiTest extends AnalyzeCharactersBase {
 		if (optk < 1) optk = 1;
 
 		if (num_inform < 2 * optk) {
-			return -1.0; //An 'unsuccessul'
+			return -1.0;
 		}
 
-		System.err.println("Using windowsize of " + WINDOWSIZE + " with k as " + optk);
+		System.err.println("Using window-size of " + WINDOWSIZE + " with k as " + optk);
 
-		double pval = computePval(optk);
+		var pval = computePval(progress, optk);
 		System.err.println("P-value:\t" + pval);
 		return pval;
 	}
@@ -439,7 +435,7 @@ public class PhiTest extends AnalyzeCharactersBase {
 	public void findBlocks(CharactersBlock characters, int numBreakPoints) {
 		//ToDo: check to see if this is already done. Perhaps Characters should be passed
 		//to the constructor.
-		get_sorted_alignment(characters, true);
+		get_sorted_alignment(characters);
 
 		double[][] f = new double[numBreakPoints + 1][num_inform];
 		int[][] F = new int[numBreakPoints + 1][num_inform];

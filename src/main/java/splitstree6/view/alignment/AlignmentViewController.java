@@ -180,6 +180,9 @@ public class AlignmentViewController {
 	private MenuItem enableSelectedTaxaMenuItem;
 
 	@FXML
+	private MenuItem selectRangeMenuItem;
+
+	@FXML
 	private Label selectionLabel;
 
 	@FXML
@@ -473,5 +476,9 @@ public class AlignmentViewController {
 
 	public Group getImageGroup() {
 		return imageGroup;
+	}
+
+	public MenuItem getSelectRangeMenuItem() {
+		return selectRangeMenuItem;
 	}
 }
