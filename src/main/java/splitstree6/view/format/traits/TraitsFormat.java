@@ -19,7 +19,10 @@
 
 package splitstree6.view.format.traits;
 
-import javafx.beans.property.*;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
@@ -31,10 +34,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
 import jloda.fx.control.Legend;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.ColorSchemeManager;
-import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.*;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
 import jloda.util.StringUtils;
@@ -62,11 +62,12 @@ public class TraitsFormat extends Pane {
 	private final Legend legend;
 
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits", new String[]{ALL});
-	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
+	private final ObjectProperty<FuzzyBoolean> optionTraitLegend = new SimpleObjectProperty<>(this, "optionTraitLegend", FuzzyBoolean.True);
+
 	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
 
 	{
-		ProgramProperties.track(optionTraitLegend, true);
+		ProgramProperties.track(optionTraitLegend, FuzzyBoolean::valueOf, FuzzyBoolean.True);
 		ProgramProperties.track(optionTraitSize, 64);
 	}
 
@@ -86,6 +87,8 @@ public class TraitsFormat extends Pane {
 		legend = new Legend(FXCollections.observableArrayList(), "Twenty", Orientation.VERTICAL);
 		legend.setScalingType(Legend.ScalingType.sqrt);
 		legend.circleMinSizeProperty().bind(optionTraitSizeProperty().multiply(0.5));
+
+		legend.showProperty().bindBidirectional(optionTraitLegend);
 
 		presenter = new TraitsFormatPresenter(mainWindow, this, controller, undoManager);
 	}
@@ -124,16 +127,8 @@ public class TraitsFormat extends Pane {
 		return StringUtils.getIndex(traitName, getOptionActiveTraits()) >= 0;
 	}
 
-	public boolean getOptionTraitLegend() {
-		return optionTraitLegend.get();
-	}
-
-	public BooleanProperty optionTraitLegendProperty() {
+	public ObjectProperty<FuzzyBoolean> optionTraitLegendProperty() {
 		return optionTraitLegend;
-	}
-
-	public void setOptionTraitLegend(boolean optionTraitLegend) {
-		this.optionTraitLegend.set(optionTraitLegend);
 	}
 
 	public int getOptionTraitSize() {

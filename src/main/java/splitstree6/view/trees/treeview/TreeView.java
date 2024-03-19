@@ -36,6 +36,7 @@ import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.undo.UndoManager;
 import jloda.fx.util.DraggableLabel;
 import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.FuzzyBoolean;
 import jloda.fx.util.ProgramProperties;
 import jloda.graph.Edge;
 import jloda.phylo.PhyloTree;
@@ -88,9 +89,9 @@ public class TreeView implements IView {
 
 	private final ObjectProperty<LabelEdgesBy> optionLabelEdgesBy = new SimpleObjectProperty<>(this, "optionLabelEdgesBy", LabelEdgesBy.None);
 
-	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits");
-	private final BooleanProperty optionTraitLegend = new SimpleBooleanProperty(this, "optionTraitLegend");
-	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
+	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits", new String[0]);
+	private final ObjectProperty<FuzzyBoolean> optionTraitLegend = new SimpleObjectProperty<>(this, "optionTraitLegend", FuzzyBoolean.False);
+	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize", 64);
 
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
@@ -138,9 +139,10 @@ public class TreeView implements IView {
 
 		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
 		traitsFormatter.setNodeShapeMap(nodeShapeMap);
-		optionActiveTraits.bindBidirectional(traitsFormatter.optionActiveTraitsProperty());
-		optionTraitLegend.bindBidirectional(traitsFormatter.optionTraitLegendProperty());
-		optionTraitSize.bindBidirectional(traitsFormatter.optionTraitSizeProperty());
+
+		traitsFormatter.optionActiveTraitsProperty().bindBidirectional(optionActiveTraits);
+		traitsFormatter.optionTraitLegendProperty().bindBidirectional(optionTraitLegend);
+		traitsFormatter.optionTraitSizeProperty().bindBidirectional(optionTraitSize);
 		traitsFormatter.getLegend().scaleProperty().bind(optionHorizontalZoomFactorProperty());
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());

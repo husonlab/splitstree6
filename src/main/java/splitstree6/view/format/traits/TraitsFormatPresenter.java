@@ -26,6 +26,7 @@ import javafx.collections.ObservableList;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.SeparatorMenuItem;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.FuzzyBoolean;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 import splitstree6.window.MainWindow;
@@ -39,11 +40,10 @@ public class TraitsFormatPresenter {
 	public TraitsFormatPresenter(MainWindow mainWindow, TraitsFormat traitsFormat, TraitsFormatController controller, UndoManager undoManager) {
 		controller.getMaxSizeField().setText(String.valueOf(traitsFormat.getOptionTraitSize()));
 
-		traitsFormat.optionTraitLegendProperty().bindBidirectional(controller.getLegendCBox().selectedProperty());
 		traitsFormat.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
 		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> traitsFormat.setOptionTraitSize(NumberUtils.parseInt(n)));
 
-		traitsFormat.getLegend().visibleProperty().bindBidirectional(traitsFormat.optionTraitLegendProperty());
+		FuzzyBoolean.setupCheckBox(controller.getLegendCBox(), traitsFormat.getLegend().showProperty());
 
 		traitsFormat.optionActiveTraitsProperty().addListener(e -> {
 			traitMenuItems.forEach(m -> m.setSelected(traitsFormat.isTraitActive(m.getText())));
