@@ -462,11 +462,11 @@
 
                     </Menu>
                     <Menu text="Analysis">
-                        <CheckMenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree..."
+                        <MenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree"
                                        userData="Perform bootstrapping on a tree calculation from sequences"/>
-                        <CheckMenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network..."
+                        <MenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network"
                                        userData="Perform bootstrapping on a tree calculation from sequences, producing a network"/>
-                        <CheckMenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network..."
+                        <MenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network"
                                        userData="Perform bootstrapping on a split network calculation from sequences"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites"

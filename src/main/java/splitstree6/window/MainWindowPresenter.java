@@ -647,9 +647,15 @@ public class MainWindowPresenter {
 
 		setupAlgorithmMenuItem(controller.getPcoaMenuItem(), new PCOA());
 		//setupAlgorithmMenuItem(controller.getTsneMenuItem(), new TSne());
-		setupAlgorithmMenuItem(controller.getBootStrapTreeMenuItem(), new BootstrapTree());
-		setupAlgorithmMenuItem(controller.getBootstrapTreeAsNetworkMenuItem(), new BootstrapTreeSplits());
-		setupAlgorithmMenuItem(controller.getBootStrapNetworkMenuItem(), new BootstrapSplits());
+
+		controller.getBootStrapTreeMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTree()));
+		controller.getBootStrapTreeMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTree()));
+
+		controller.getBootstrapTreeAsNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapTreeSplits()));
+		controller.getBootstrapTreeAsNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapTreeSplits()));
+
+		controller.getBootStrapNetworkMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new BootstrapSplits()));
+		controller.getBootStrapNetworkMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new BootstrapSplits()));
 
 		controller.getComputeDeltaScoreMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new DeltaScore()));
 		controller.getComputeDeltaScoreMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new DeltaScore()));

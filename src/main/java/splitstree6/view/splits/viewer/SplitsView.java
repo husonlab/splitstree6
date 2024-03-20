@@ -144,6 +144,9 @@ public class SplitsView implements IView {
 
 		splitsBlock.addListener((v, o, n) -> {
 			splitsFormatter.getPresenter().updateMenus(n);
+			if (optionLabelSplitsBy.get() == LabelSplitsBy.None && n != null && n.hasConfidenceValues()) {
+				optionLabelSplitsBy.set(LabelSplitsBy.Confidence);
+			}
 		});
 
 		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);

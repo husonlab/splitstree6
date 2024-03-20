@@ -345,13 +345,13 @@ public class MainWindowController {
 	private CheckMenuItem pcoaMenuItem;
 
 	@FXML
-	private CheckMenuItem bootStrapTreeMenuItem;
+	private MenuItem bootStrapTreeMenuItem;
 
 	@FXML
-	private CheckMenuItem bootstrapTreeAsNetworkMenuItem;
+	private MenuItem bootstrapTreeAsNetworkMenuItem;
 
 	@FXML
-	private CheckMenuItem bootStrapNetworkMenuItem;
+	private MenuItem bootStrapNetworkMenuItem;
 
 	@FXML
 	private MenuItem estimateInvariableSitesMenuItem;
@@ -992,15 +992,15 @@ public class MainWindowController {
 		return pcoaMenuItem;
 	}
 
-	public CheckMenuItem getBootStrapTreeMenuItem() {
+	public MenuItem getBootStrapTreeMenuItem() {
 		return bootStrapTreeMenuItem;
 	}
 
-	public CheckMenuItem getBootstrapTreeAsNetworkMenuItem() {
+	public MenuItem getBootstrapTreeAsNetworkMenuItem() {
 		return bootstrapTreeAsNetworkMenuItem;
 	}
 
-	public CheckMenuItem getBootStrapNetworkMenuItem() {
+	public MenuItem getBootStrapNetworkMenuItem() {
 		return bootStrapNetworkMenuItem;
 	}
 
