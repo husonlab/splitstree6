@@ -121,13 +121,16 @@ public class SplitNewick {
 			var pos2tax = new TreeMap<Integer, Integer>();
 			{
 				// here we surround the taxon pattern by (?=( and )) to allow overlapping matches to get both a and b in a,b
-				var matcher = Pattern.compile("(?=([(,|]('{0,1}[a-zA-z]+[^#<>(:,)|]*)[:,|)]))").matcher(newickString);
+				var matcher = Pattern.compile("(?=([(,|]('{0,1}[a-zA-z0-9]+[^#<>(:,)|]*)[:,|)]))").matcher(newickString);
 				while (matcher.find()) {
 					var label = matcher.group(2);
-					if (label.startsWith("'") && label.endsWith("'") && label.length() > 1)
-						label = label.substring(1, label.length() - 1);
-					var t = labelTaxonMap.get(label);
-					pos2tax.put(matcher.start(2), t);
+					// label must contain at least one letter:
+					if (Pattern.compile("[a-zA-Z_]").matcher(label).find()) {
+						if (label.startsWith("'") && label.endsWith("'") && label.length() > 1)
+							label = label.substring(1, label.length() - 1);
+						var t = labelTaxonMap.get(label);
+						pos2tax.put(matcher.start(2), t);
+					}
 				}
 			}
 
@@ -165,7 +168,7 @@ public class SplitNewick {
 							if (matcher.group(1) != null)
 								System.err.println("Found: " + newickString.substring(matcher.start(1), matcher.end(1)));
 							if (matcher.group(2) != null)
-								System.err.println("Found: " + newickString.substring(matcher.start(1), matcher.end(2)));
+								System.err.println("Found: " + newickString.substring(matcher.start(2), matcher.end(2)));
 						}
 
 					}
@@ -290,8 +293,15 @@ public class SplitNewick {
 			return "";
 		else {
 			Function<Integer, String> taxonLabelFunction;
-			if (true)
-				taxonLabelFunction = taxonLabelFunction0;
+			if (true) {
+				taxonLabelFunction = t -> {
+					var label = taxonLabelFunction0.apply(t);
+					if (NumberUtils.isInteger(label))
+						return "_";
+					else
+						return label;
+				};
+			}
 			else if (false)
 				taxonLabelFunction = t -> "t" + t;
 			else if (false)
@@ -314,7 +324,7 @@ public class SplitNewick {
 				}
 			}
 
-			// System.err.println("Ordering:" + StringUtils.toString(ordering.stream().map(taxonLabel).collect(Collectors.toList()), ","));
+			//System.err.println("Ordering:" + StringUtils.toString(ordering.stream().map(taxonLabel).collect(Collectors.toList()), ","));
 
 			var taxonRank = new HashMap<Integer, Integer>();
 			for (int rank = 0; rank < ordering.size(); rank++) {
@@ -480,7 +490,7 @@ public class SplitNewick {
 							if (!backSplits.contains(split) && split.getWeight() > 0)
 								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
 						}
-						if (lines.size() > 0) {
+						if (!lines.isEmpty()) {
 							System.err.println("In input, not in output: " + lines.size());
 							System.err.println(StringUtils.toString(lines, "\n"));
 						}
@@ -491,7 +501,7 @@ public class SplitNewick {
 							if (!splits.contains(split) && split.getWeight() > 0)
 								lines.add("%s: %s".formatted(StringUtils.toString(split.getPartNotContaining(ordering.get(0))), StringUtils.removeTrailingZerosAfterDot("%.8f", split.getWeight())));
 						}
-						if (lines.size() > 0) {
+						if (!lines.isEmpty()) {
 							System.err.println("In output, not in input: " + lines.size());
 							System.err.println(StringUtils.toString(lines, "\n"));
 						}
