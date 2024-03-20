@@ -367,7 +367,7 @@ public class MainWindowPresenter {
 		controller.getImportTaxonTraitsMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
 
 		controller.getImportMultipleTreeFilesMenuItem().setOnAction(e -> ImportMultipleTrees.apply(mainWindow));
-		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(mainWindow.emptyProperty().not());
+		controller.getImportMultipleTreeFilesMenuItem().disableProperty().bind(workflow.runningProperty());
 
 		controller.getImportTreeNamesMenuItem().setOnAction(e -> ImportTreeNames.apply(mainWindow));
 		controller.getImportTreeNamesMenuItem().disableProperty().bind(workflow.runningProperty().or(

@@ -63,9 +63,13 @@ public class LabeledEdgeShape extends Group {
 
 
 	public void setShape(Shape shape) {
+		setShape(shape, Icebergs.enabled());
+	}
+
+	public void setShape(Shape shape, boolean useIceberg) {
 		getChildren().clear();
 		if (shape != null) {
-			if (Icebergs.enabled()) {
+			if (useIceberg) {
 				getChildren().add(Icebergs.create(shape, false));
 			}
 			getChildren().add(shape);

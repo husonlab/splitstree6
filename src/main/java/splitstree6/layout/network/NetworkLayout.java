@@ -128,7 +128,7 @@ public class NetworkLayout {
 				if (false && graph.getNumberOfEdges() == 0 && label != null) { // todo: allow user to use marks for nodes
 					nodeShape.setShape(RichTextLabel.getMark(label.getText()));
 				} else
-					nodeShape.setShape(new Circle(v.getDegree() == 1 ? 3 : 2));
+					nodeShape.setShape(new Circle(v.getDegree() == 1 ? 3 : 2), true);
 
 				nodesGroup.getChildren().add(nodeShape);
 

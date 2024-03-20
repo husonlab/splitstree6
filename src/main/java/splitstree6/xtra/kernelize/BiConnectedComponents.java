@@ -27,7 +27,7 @@ import java.util.Stack;
 
 /**
  * use Tarjan's algorithm to determine all bi-connected components
- * todo: this is untested
+ * todo: this is broken?
  * Daniel Huson, 2.2024
  */
 public class BiConnectedComponents {

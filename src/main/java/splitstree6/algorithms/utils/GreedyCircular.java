@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.function.Function;
 
 /**
- * greedy compute weakly compatible splits
+ * greedily compute circular splits
  * Daniel Huson, 12/31/16.
  */
 public class GreedyCircular {
@@ -42,7 +42,7 @@ public class GreedyCircular {
 	 * @return compatible splits
 	 */
 	public static Pair<ArrayList<ASplit>, ArrayList<Integer>> apply(ProgressListener progress, BitSet taxaSet, final List<ASplit> splits, Function<ASplit, Double> weight) throws CanceledException {
-		progress.setSubtask("Greedy circular");
+		progress.setSubtask("Greedy outline");
 		progress.setMaximum(splits.size());
 		progress.setProgress(0);
 
