@@ -24,7 +24,8 @@ import splitstree6.io.nexus.*;
 public class BlocksToLaTeX {
 	public static void main(String[] args) {
 
-		System.out.println("\\chapter{Main data blocks}\n\n" +
+		System.out.println("% This file is auto-generated from code, please don't hand edit.\n\n" +
+						   "\\chapter{Main data blocks}\n\n" +
 						   "SplitsTree is organized around data blocks that correspond to ``Nexus'' blocks \\citep{Maddisonetal1997}.\n\n" +
 						   output("Taxa block", TaxaNexusInput.DESCRIPTION, TaxaNexusInput.SYNTAX) +
 						   output("Traits block", TraitsNexusInput.DESCRIPTION, TraitsNexusInput.SYNTAX) +
@@ -40,6 +41,7 @@ public class BlocksToLaTeX {
 						   output("SplitsTree6 block", SplitsTree6NexusInput.DESCRIPTION, SplitsTree6NexusInput.SYNTAX) +
 						   output("Genomes block", GenomesNexusInput.DESCRIPTION, GenomesNexusInput.SYNTAX)
 		);
+		System.out.println("% EOF");
 	}
 
 	public static String output(String name, String description, String syntax) {

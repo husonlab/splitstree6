@@ -38,6 +38,8 @@ public class MenusToLaTeX {
 	public static String apply(MenuBar menuBar) {
 		var buf = new StringBuilder();
 		buf.append("""
+				% This file is auto-generated from code, please don't hand edit.
+					
 				\\chapter{The main menu bar}
 								
 				All functionality of the program can be used
@@ -49,6 +51,7 @@ public class MenusToLaTeX {
 		for (var menu : menuBar.getMenus()) {
 			buf.append(applyRec(menu, 0));
 		}
+		buf.append("\n % EOF\n");
 		return buf.toString();
 	}
 

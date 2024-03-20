@@ -120,14 +120,16 @@ public class AlgorithmsToLaTeX {
 		if (true) {
 			System.out.println(
 					"""
-							\\chapter{Algorithms}
-							  
+							% This file is auto-generated from code, please don't hand edit.
+							       				
+							\\chapter{Algorithms}\\label{ch:algorithms}
+												
 							Here we list of all provided algorithms, organized by input data.
 							"""
 			);
 			for (var key : ordering) {
 				if (fromLineMap.containsKey(key)) {
-					System.out.printf("\\section{Input %s}%n%n", key);
+					System.out.printf("\\section{Algorithms on a %s}%n%n", key);
 					for (var line : fromLineMap.get(key)) {
 						System.out.println(line);
 					}
@@ -145,12 +147,13 @@ public class AlgorithmsToLaTeX {
 			);
 			for (var key : ordering) {
 				if (toLineMap.containsKey(key)) {
-					System.out.printf("\\section{Output %s}%n%n", key);
+					System.out.printf("\\section{Algorithms that produce a %s}%n%n", key);
 					for (var line : toLineMap.get(key)) {
 						System.out.println(line);
 					}
 				}
 			}
 		}
+		System.out.println("\n % EOF");
 	}
 }

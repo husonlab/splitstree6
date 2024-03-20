@@ -16,6 +16,9 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
+ */
+
+/*
  * This class has been implemented using some code
  * from https://stackoverflow.com/questions/19924852/autocomplete-combobox-in-javafx
  */

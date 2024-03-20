@@ -364,21 +364,21 @@
                     </Menu>
 
                     <Menu text="Data">
-                        <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa..." userData="Show the filter taxa tab"/>
+                        <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa" userData="Show the filter taxa tab"/>
                         <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."
                                   userData="Shows the alignment tab"/>
                         <MenuItem fx:id="GroupIdenticalHaplotypesMenuItem"
                                   text="Group Identical Haplotypes..."
-                                  userData="Group identical haplotypes">
+                                  userData="Group identical haplotypes and open as new document">
                         </MenuItem>
-                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees..."
+                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees"
                                   userData="Show the filter trees tab"/>
-                        <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits..."
+                        <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits"
                                   userData="Show the filter splits tab"/>
-                        <MenuItem fx:id="splitsSliderMenuItem" text="Splits Slider..."
+                        <MenuItem fx:id="splitsSliderMenuItem" text="Splits Slider"
                                   userData="Show the splits slider (filter by weight) tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="traitsMenuItem" text="Edit Traits..." userData="Show the edit traits tab"/>
+                        <MenuItem fx:id="traitsMenuItem" text="Edit Traits" userData="Show the edit traits tab"/>
                     </Menu>
                     <Menu text="Distances">
                         <CheckMenuItem fx:id="pDistanceMenuItem" text="P Distances"

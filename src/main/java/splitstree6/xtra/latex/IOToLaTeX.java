@@ -1,5 +1,5 @@
 /*
- *  BlocksToLaTeX.java Copyright (C) 2024 Daniel H. Huson
+ *  IOToLaTeX.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -30,7 +30,11 @@ import java.lang.reflect.InvocationTargetException;
 
 public class IOToLaTeX {
 	public static void main(String[] args) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-		System.out.println("\\chapter{Supported import and export formats}\n");
+		System.out.println("""
+				% This file is auto-generated from code, please don't hand edit.
+				            	
+				\\chapter{Supported import and export formats}
+				""");
 
 		System.out.println("The program support several widely-used import and export formats.\n");
 
@@ -53,6 +57,8 @@ public class IOToLaTeX {
 						   outputExporters(SplitsBlock.class) +
 						   outputExporters(NetworkBlock.class) +
 						   outputExporters(GenomesBlock.class));
+
+		System.out.println("\n % EOF");
 	}
 
 	public static String outputImporters(Class<? extends DataBlock> clazz) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
