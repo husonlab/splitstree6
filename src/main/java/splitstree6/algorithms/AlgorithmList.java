@@ -151,7 +151,8 @@ public class AlgorithmList {
 		add(algorithms, names, new ShowTrees());
 		add(algorithms, names, new SuperNetwork());
 		add(algorithms, names, new TreesFilter());
-		add(algorithms, names, new TreesFilter2());
+		add(algorithms, names, new TreesFilterMore());
+		add(algorithms, names, new TreesEdgesFilter());
 
 		add(algorithms, names, new TreeSelector());
 		add(algorithms, names, new TreeSelectorSplits());

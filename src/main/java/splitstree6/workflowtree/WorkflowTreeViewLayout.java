@@ -23,7 +23,6 @@ import javafx.collections.ListChangeListener;
 import javafx.scene.control.TreeItem;
 import jloda.fx.workflow.WorkflowNode;
 import jloda.util.Basic;
-import splitstree6.data.TaxaBlock;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 import splitstree6.workflow.DataNode;
@@ -96,13 +95,13 @@ public class WorkflowTreeViewLayout {
 					// todo: add input source
 					treeView.getRoot().setExpanded(true);
 				} else if (workflow.isInputTaxaNode(dataNode)) {
-					var inputTaxa = (TaxaBlock) dataNode.getDataBlock();
 					var item = new WorkflowTreeItem(mainWindow, dataNode);
 					nodeItemMap.put(dataNode, item);
 					treeView.getRoot().getChildren().add(item);
 					inputTaxaItem = item;
 					/*
-					if(inputTaxa.getTraitsBlock()!=null && inputTaxa.getTraitsBlock().getNTraits()>0) {
+						var inputTaxa = (TaxaBlock) dataNode.getDataBlock();
+						if(inputTaxa.getTraitsBlock()!=null && inputTaxa.getTraitsBlock().getNTraits()>0) {
 						var traitsBlockNode=workflow.newDataNode(inputTaxa.getTraitsBlock());
 						var traitsBlockItem=new WorkflowTreeItem(mainWindow,traitsBlockNode);
 						inputTaxaItem.getChildren().add(traitsBlockItem);
@@ -168,12 +167,10 @@ public class WorkflowTreeViewLayout {
 								if (parentItem != null) {
 									if (parentNode instanceof AlgorithmNode && node instanceof DataNode dataNode && parentNode == dataNode.getPreferredParent()) {
 										parentItem.getChildren().add(item);
-										compress(parentItem);
 										break;
 
 									} else if (parentNode instanceof DataNode && node instanceof AlgorithmNode algorithmNode && parentNode == algorithmNode.getPreferredParent()) {
 										parentItem.getChildren().add(item);
-										compress(parentItem);
 										break;
 									}
 								}
@@ -198,29 +195,10 @@ public class WorkflowTreeViewLayout {
 		};
 	}
 
-	private void compress(WorkflowTreeItem item) {
-		var changed = true;
-		do {
-			changed = false;
-			if (item.getWorkflowNode().getPreferredParent() != null && item.getWorkflowNode().getPreferredParent().getChildren().size() == 1 && item.getChildren().size() == 1) {
-				var parent = (WorkflowTreeItem) item.getParent();
-				if (parent != null && parent.getChildren().size() > 0) {
-					if (parent.getChildren().indexOf(item) == parent.getChildren().size() - 1) {
-						var childOfItem = (WorkflowTreeItem) item.getChildren().remove(0);
-						parent.getChildren().add(childOfItem);
-						item = childOfItem;
-						changed = true;
-					}
-				}
-			}
-		}
-		while (changed);
-	}
-
 	private boolean isNotContainedInTreeView(WorkflowTreeItem item) {
 		var queue = new LinkedList<TreeItem<String>>();
 		queue.add(treeView.getRoot());
-		while (queue.size() > 0) {
+		while (!queue.isEmpty()) {
 			var other = queue.pop();
 			if (other.getChildren().contains(item))
 				return false;

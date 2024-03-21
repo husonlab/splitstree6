@@ -123,6 +123,8 @@ public class RerootOrReorderTrees extends Trees2Trees implements IFilter {
 		var trees = outputData.getTrees();
 		trees.clear();
 
+		outputData.setPartial(inputData.isPartial());
+
 		switch (getOptionRootBy()) {
 			case Off -> {
 				optionOutGroupTaxa.set(new String[0]);

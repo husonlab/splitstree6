@@ -583,6 +583,9 @@ public class MainWindowPresenter {
 
 		controller.getFilterTreesMenuItem().setOnAction(null);
 
+		controller.getFilterTreesMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new TreesFilter()));
+		controller.getFilterTreesMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new TreesFilter()));
+
 		controller.getFilterSplitsMenuItem().setOnAction(e -> AttachAlgorithm.apply(mainWindow, new SplitsFilter()));
 		controller.getFilterSplitsMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new SplitsFilter()));
 
