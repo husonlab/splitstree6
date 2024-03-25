@@ -27,7 +27,6 @@ import splitstree6.io.utils.DataBlockWriter;
 import splitstree6.io.utils.ReaderWriterBase;
 import splitstree6.workflow.DataBlock;
 
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
@@ -141,15 +140,21 @@ public class ExportManager {
 		}
 		return result;
 	}
+
 	/**
 	 * write a datablock using the named exporter
 	 */
 	public void exportFile(String fileName, TaxaBlock taxaBlock, DataBlock dataBlock, String exporterName) throws IOException {
-		try (var w = new BufferedWriter(FileUtils.getOutputWriterPossiblyZIPorGZIP(fileName))) {
-			write(taxaBlock, dataBlock, exporterName, w);
-		}
+		exportFile(FileUtils.getOutputWriterPossiblyZIPorGZIP(fileName), taxaBlock, dataBlock, exporterName);
 		RecentFilesManager.getInstance().insertRecentFile(fileName);
 		NotificationManager.showInformation(String.format("Wrote %,d bytes to file: %s", (new File(fileName)).length(), fileName));
+	}
+
+	/**
+	 * write a datablock using the named exporter
+	 */
+	public void exportFile(Writer w, TaxaBlock taxaBlock, DataBlock dataBlock, String exporterName) throws IOException {
+		write(taxaBlock, dataBlock, exporterName, w);
 	}
 
 	/**

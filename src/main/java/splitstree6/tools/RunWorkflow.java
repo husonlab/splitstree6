@@ -98,7 +98,7 @@ public class RunWorkflow extends Application {
 		final var inputWorkflowFile = new File(options.getOptionMandatory("-w", "workflow", "File containing SplitsTree6 workflow", ""));
 		var inputFiles = options.getOptionMandatory("-i", "input", "File(s) containing input data (or directory)", new String[0]);
 		final var inputFormat = options.getOption("-f", "format", "Input format", ImportManager.getInstance().getAllFileFormats(), ImportManager.UNKNOWN_FORMAT);
-		var outputFiles = options.getOption("-o", "output", "Output file(s) (or directory or stdout)", new String[]{"stdout"});
+		var outputFiles = options.getOption("-o", "output", "Output file(s) (single or multiple files, a directory, stdout or .gz ok)", new String[]{"stdout"});
 
 		final var nodeName = options.getOption("-n", "node", "Title of node to be exported (if none given, will save whole file)", "");
 		final var exportFormat = options.getOption("-e", "exporter", "Name of exporter to use",
@@ -130,10 +130,10 @@ public class RunWorkflow extends Application {
 		if (!inputWorkflowFile.canRead())
 			throw new IOException("File not found or unreadable: " + inputWorkflowFile);
 
-		if ((nodeName.length() == 0) != (exportFormat.length() == 0))
+		if ((nodeName.isEmpty()) != (exportFormat.isEmpty()))
 			throw new IOException("Must specify both node name (using -n or --node) and exporter (using -e or --exporter), or none");
 
-		final boolean exportCompleteWorkflow = (nodeName.length() == 0);
+		final boolean exportCompleteWorkflow = (nodeName.isEmpty());
 
 		// Setup and check input files:
 		if (inputFiles.length == 1) {
@@ -173,13 +173,16 @@ public class RunWorkflow extends Application {
 						var name = FileUtils.replaceFileSuffix(input.getName(), "-out" + extension);
 						outputFiles[i] = (new File(output.getPath(), name)).getPath();
 					}
-				} else if (inputFiles.length > 1 && !outputFiles[0].equals("stdout")) {
-					throw new IOException("Too few output files specified");
 				}
 			}
-			if (!outputFiles[0].equals("stdout") && outputFiles.length != inputFiles.length) {
-				throw new IOException("Number of output files " + outputFiles.length + " does not match number of input files " + inputFiles.length);
+			if (outputFiles.length != 1 && outputFiles.length != inputFiles.length) {
+				throw new IOException("Number of output files: " + outputFiles.length + ": must be 1 or match the number of input files " + inputFiles.length);
 			}
+		}
+		var appendToFile = (outputFiles.length == 1 && !outputFiles[0].equals("stdout") && inputFiles.length > 1);
+
+		if (appendToFile && exportCompleteWorkflow) {
+			System.err.println("Exporting multiple workflows to one file? This is not the mode that you are looking for.");
 		}
 
 		if (!WorkflowNexusInput.isApplicable(inputWorkflowFile.getPath()))
@@ -203,72 +206,88 @@ public class RunWorkflow extends Application {
 		System.err.println("Loaded workflow has " + workflow.getNumberOfDataNodes() + " data nodes and " + IteratorUtils.size(workflow.algorithmNodes()) + " algorithms");
 		System.err.println("Number of input taxa: " + inputTaxaNode.getDataBlock().getNtax());
 
-		for (var i = 0; i < inputFiles.length; i++) {
-			final var inputFile = inputFiles[i];
-			System.err.println("++++ Processing " + inputFile + " (" + (i + 1) + " of " + inputFiles.length + ") ++++");
+		var outputWriter = (appendToFile ? FileUtils.getOutputWriterPossiblyZIPorGZIP(outputFiles[0]) : null);
+		try {
+			for (var i = 0; i < inputFiles.length; i++) {
+				final var inputFile = inputFiles[i];
+				System.err.println("++++ Processing " + inputFile + " (" + (i + 1) + " of " + inputFiles.length + ") ++++");
 
-			if (false) {
-				System.out.println("++++++++orig++++++++:");
-				(new WorkflowNexusOutput()).save(workflow, "stdout", false);
-			}
+				if (false) {
+					System.out.println("++++++++orig++++++++:");
+					(new WorkflowNexusOutput()).save(workflow, "stdout", false);
+				}
 
-			workflow.clearData();
-			if (false) {
-				System.out.println("++++++++cleared++++++++:");
-				(new WorkflowNexusOutput()).save(workflow, "stdout", false);
-			}
+				workflow.clearData();
+				if (false) {
+					System.out.println("++++++++cleared++++++++:");
+					(new WorkflowNexusOutput()).save(workflow, "stdout", false);
+				}
 
-			WorkflowDataLoader.load(workflow, inputFile, inputFormat);
-			if (false) {
-				System.out.println("++++++++loaded++++++++:");
-				(new WorkflowNexusOutput()).save(workflow, "stdout", false);
-			}
+				WorkflowDataLoader.load(workflow, inputFile, inputFormat);
+				if (false) {
+					System.out.println("++++++++loaded++++++++:");
+					(new WorkflowNexusOutput()).save(workflow, "stdout", false);
+				}
 
-			// update workflow:
-			{
-				final var latch = new CountDownLatch(1);
-				var start = System.currentTimeMillis();
-				ChangeListener<Boolean> listener = (v, o, n) -> {
-					if (o)
-						System.err.println("Running workflow...");
-					if (n) {
-						latch.countDown();
-						System.err.printf("done (%.1fs)%n", (System.currentTimeMillis() - start) / 1000.0);
+				// update workflow:
+				{
+					final var latch = new CountDownLatch(1);
+					var start = System.currentTimeMillis();
+					ChangeListener<Boolean> listener = (v, o, n) -> {
+						if (o)
+							System.err.println("Running workflow...");
+						if (n) {
+							latch.countDown();
+							System.err.printf("done (%.1fs)%n", (System.currentTimeMillis() - start) / 1000.0);
+						}
+					};
+					//workflow.getWorkingDataNode().setValid(false);
+					workflow.validProperty().addListener(listener);
+					try {
+						Platform.runLater(() -> workflow.getInputTaxaFilterNode().restart());
+						// wait for end of update:
+						latch.await();
+					} finally {
+						workflow.validProperty().removeListener(listener);
 					}
-				};
-				//workflow.getWorkingDataNode().setValid(false);
-				workflow.validProperty().addListener(listener);
+				}
+
+				if (false) {
+					System.out.println("++++++++processed++++++++:");
+					(new WorkflowNexusOutput()).save(workflow, "stdout", false);
+				}
+
+				// save updated workflow:
 				try {
-					Platform.runLater(() -> workflow.getInputTaxaFilterNode().restart());
-					// wait for end of update:
-					latch.await();
+					final var outputFile = (outputFiles.length == inputFiles.length ? outputFiles[i] : outputFiles[0]);
+					if (!appendToFile) {
+						outputWriter = FileUtils.getOutputWriterPossiblyZIPorGZIP(outputFile);
+						System.err.println("Saving to: " + outputFile);
+					}
+					if (exportCompleteWorkflow) {
+						(new WorkflowNexusOutput()).save(workflow, outputWriter, false);
+						System.err.println("done");
+						System.err.println("Saved workflow has " + workflow.getNumberOfDataNodes() + " data nodes and " + IteratorUtils.size(workflow.algorithmNodes()) + " algorithms");
+					} else {
+						final var dataNode = workflow.findDataNode(nodeName);
+						if (dataNode == null)
+							throw new IOException("Node with title '" + nodeName + "': not found");
+						ExportManager.getInstance().exportFile(outputWriter, workflow.getWorkingTaxaBlock(), dataNode.getDataBlock(), exportFormat);
+					}
+				} catch (IOException e) {
+					System.err.println("Save FAILED: " + e.getMessage());
 				} finally {
-					workflow.validProperty().removeListener(listener);
+					if (!appendToFile && outputWriter != null) {
+						outputWriter.close();
+					}
 				}
 			}
-
-			if (false) {
-				System.out.println("++++++++processed++++++++:");
-				(new WorkflowNexusOutput()).save(workflow, "stdout", false);
-			}
-
-			// save updated workflow:
-			try {
-				final var outputFile = (outputFiles.length == inputFiles.length ? outputFiles[i] : outputFiles[0]);
-				System.err.println("Saving to: " + outputFile);
-				if (exportCompleteWorkflow) {
-					(new WorkflowNexusOutput()).save(workflow, outputFile, false);
-					System.err.println("done");
-					System.err.println("Saved workflow has " + workflow.getNumberOfDataNodes() + " data nodes and " + IteratorUtils.size(workflow.algorithmNodes()) + " algorithms");
-				} else {
-					final var dataNode = workflow.findDataNode(nodeName);
-					if (dataNode == null)
-						throw new IOException("Node with title '" + nodeName + "': not found");
-					ExportManager.getInstance().exportFile(outputFile, workflow.getWorkingTaxaBlock(), dataNode.getDataBlock(), exportFormat);
-				}
-			} catch (IOException e) {
-				System.err.println("Save FAILED: " + e.getMessage());
+		} finally {
+			if (appendToFile && outputWriter != null) {
+				System.err.println("Wrote output to: " + outputFiles[0]);
+				outputWriter.close();
 			}
 		}
+
 	}
 }
