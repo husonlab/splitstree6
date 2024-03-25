@@ -21,6 +21,7 @@ package splitstree6.tabs.algorithms;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
@@ -39,6 +40,8 @@ import splitstree6.options.Option;
 import splitstree6.options.OptionControlCreator;
 import splitstree6.splits.ASplit;
 import splitstree6.tabs.IDisplayTabPresenter;
+import splitstree6.tabs.algorithms.taxafilter.TaxaFilterTab;
+import splitstree6.tabs.algorithms.treefilter.TreeFilterTab;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.AlgorithmNode;
@@ -76,7 +79,10 @@ public class AlgorithmTabPresenter implements IDisplayTabPresenter {
 			var tooltip = (algorithm == null ? null : new Tooltip(algorithm.getName() + (algorithm.getCitation() == null ? "" : "\n" + StringUtils.fold(algorithm.getCitation().replaceAll(".*;", ""), 80))));
 			controller.getAlgorithmCBox().setTooltip(tooltip);
 		});
-		controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
+		if (algorithmTab instanceof TaxaFilterTab || algorithmTab instanceof TreeFilterTab)
+			controller.getAlgorithmCBox().disableProperty().bind(new SimpleBooleanProperty(true));
+		else
+			controller.getAlgorithmCBox().disableProperty().bind(runningProperty.or(Bindings.size(controller.getAlgorithmCBox().getItems()).lessThanOrEqualTo(1)));
 
 		if (algorithmTab.getAlgorithm() != null) {
 			setupOptionControls(algorithmTab, controller, algorithmTab.getAlgorithm());
