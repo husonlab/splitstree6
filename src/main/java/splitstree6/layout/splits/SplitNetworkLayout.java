@@ -331,9 +331,20 @@ public class SplitNetworkLayout {
 					splitLabels.setVisible(true);
 					for (var id : splitLabelMap.keySet()) {
 						var label = splitLabelMap.get(id);
-						if (id <= splitsBlock.getNsplits() && splitsBlock.get(id).getConfidence() > 0.05 && !splitsWithConfidenceLabels.get(id)) {
+						if (id <= splitsBlock.getNsplits() && splitsBlock.get(id).getConfidence() > 0.01 && !splitsWithConfidenceLabels.get(id)) {
 							label.setVisible(true);
 							label.setText(StringUtils.removeTrailingZerosAfterDot("%.6f", splitsBlock.get(id).getConfidence()));
+						} else
+							label.setVisible(false);
+					}
+				}
+				case ConfidenceX100 -> {
+					splitLabels.setVisible(true);
+					for (var id : splitLabelMap.keySet()) {
+						var label = splitLabelMap.get(id);
+						if (id <= splitsBlock.getNsplits() && splitsBlock.get(id).getConfidence() > 0.05 && !splitsWithConfidenceLabels.get(id)) {
+							label.setVisible(true);
+							label.setText(StringUtils.removeTrailingZerosAfterDot("%.1f", 100d * splitsBlock.get(id).getConfidence()));
 						} else
 							label.setVisible(false);
 					}

@@ -20,5 +20,5 @@
 package splitstree6.layout.splits;
 
 public enum LabelSplitsBy {
-	None, Weight, Confidence, SplitId
+	None, Weight, Confidence, ConfidenceX100, SplitId
 }

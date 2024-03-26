@@ -19,4 +19,4 @@
 
 package splitstree6.view.format.edges;
 
-public enum LabelEdgesBy {None, Weight, Confidence, Probability}
+public enum LabelEdgesBy {None, Weight, Confidence, ConfidenceX100, Probability}

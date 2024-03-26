@@ -147,6 +147,11 @@ public class TreePane extends StackPane {
 					if (phyloTree.hasEdgeConfidences())
 						phyloTree.edgeStream().filter(e -> !e.getTarget().isLeaf()).forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeConfidences().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.3f", phyloTree.getConfidence(e)) : null));
 				}
+				case ConfidenceX100 -> {
+					phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
+					if (phyloTree.hasEdgeConfidences())
+						phyloTree.edgeStream().filter(e -> !e.getTarget().isLeaf()).forEach(e -> phyloTree.setLabel(e, phyloTree.getEdgeConfidences().containsKey(e) ? StringUtils.removeTrailingZerosAfterDot("%.1f", 100d * phyloTree.getConfidence(e)) : null));
+				}
 				case Probability -> {
 					phyloTree.edgeStream().forEach(e -> phyloTree.setLabel(e, null));
 					if (phyloTree.hasEdgeProbabilities())

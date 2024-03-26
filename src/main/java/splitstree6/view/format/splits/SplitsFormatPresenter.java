@@ -72,6 +72,7 @@ public class SplitsFormatPresenter {
 		controller.getLabelByNoneMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.None));
 		controller.getLabelByWeightMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.Weight));
 		controller.getLabelByConfidenceMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.Confidence));
+		controller.getLabelByConfidenceX100MenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.ConfidenceX100));
 		controller.getLabelBySplitIdMenuItem().selectedProperty().addListener(e -> optionLabelSplitsBy.set(LabelSplitsBy.SplitId));
 		optionLabelSplitsBy.addListener((v, o, n) -> {
 			if (n != null) {
@@ -81,6 +82,8 @@ public class SplitsFormatPresenter {
 							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByWeightMenuItem());
 					case Confidence ->
 							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceMenuItem());
+					case ConfidenceX100 ->
+							controller.getLabelByToggleGroup().selectToggle(controller.getLabelByConfidenceX100MenuItem());
 					case SplitId ->
 							controller.getLabelByToggleGroup().selectToggle(controller.getLabelBySplitIdMenuItem());
 				}
@@ -256,10 +259,12 @@ public class SplitsFormatPresenter {
 	public void updateMenus(SplitsBlock splitsBlock) {
 		controller.getLabelByWeightMenuItem().setDisable(splitsBlock == null || splitsBlock.getNsplits() == 0);
 		controller.getLabelByConfidenceMenuItem().setDisable(splitsBlock == null || splitsBlock.getNsplits() == 0 || !splitsBlock.hasConfidenceValues());
+		controller.getLabelByConfidenceX100MenuItem().setDisable(splitsBlock == null || splitsBlock.getNsplits() == 0 || !splitsBlock.hasConfidenceValues());
 		controller.getLabelBySplitIdMenuItem().setDisable(splitsBlock == null || splitsBlock.getNsplits() == 0);
 
 		if (controller.getLabelByWeightMenuItem().isSelected() && controller.getLabelByWeightMenuItem().isDisable()
 			|| controller.getLabelByConfidenceMenuItem().isSelected() && controller.getLabelByConfidenceMenuItem().isDisable()
+			|| controller.getLabelByConfidenceX100MenuItem().isSelected() && controller.getLabelByConfidenceMenuItem().isDisable()
 			|| controller.getLabelBySplitIdMenuItem().isSelected() && controller.getLabelBySplitIdMenuItem().isDisable()) {
 			Platform.runLater(() -> controller.getLabelByNoneMenuItem().setSelected(true));
 		}

@@ -141,6 +141,8 @@
                                     <RadioMenuItem fx:id="labelByWeightMenuItem" mnemonicParsing="false" text="Weight"/>
                                     <RadioMenuItem fx:id="labelByConfidenceMenuItem" mnemonicParsing="false"
                                                    text="Confidence"/>
+                                    <RadioMenuItem fx:id="labelByConfidenceX100MenuItem" mnemonicParsing="false"
+                                                   text="Confidence x 100"/>
                                     <RadioMenuItem fx:id="labelBySplitIdMenuItem" mnemonicParsing="false"
                                                    text="Split Id"/>
                                 </items>

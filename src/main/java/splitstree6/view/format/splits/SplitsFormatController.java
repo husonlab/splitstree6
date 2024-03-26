@@ -61,6 +61,9 @@ public class SplitsFormatController {
 	private RadioMenuItem labelByConfidenceMenuItem;
 
 	@FXML
+	private RadioMenuItem labelByConfidenceX100MenuItem;
+
+	@FXML
 	private MenuButton labelByMenuButton;
 
 	@FXML
@@ -79,7 +82,7 @@ public class SplitsFormatController {
 		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
 		outlineFillLabel.disableProperty().bind(outlineFillColorPicker.disableProperty());
 
-		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelBySplitIdMenuItem);
+		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByConfidenceX100MenuItem, labelBySplitIdMenuItem);
 		labelByToggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
 			if (n != null)
 				labelByMenuButton.setText(((RadioMenuItem) n).getText());
@@ -125,6 +128,10 @@ public class SplitsFormatController {
 
 	public RadioMenuItem getLabelByConfidenceMenuItem() {
 		return labelByConfidenceMenuItem;
+	}
+
+	public RadioMenuItem getLabelByConfidenceX100MenuItem() {
+		return labelByConfidenceX100MenuItem;
 	}
 
 	public MenuButton getLabelByMenuButton() {

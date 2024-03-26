@@ -34,6 +34,9 @@ public class EdgesFormatController {
 	private RadioMenuItem labelByConfidenceMenuItem;
 
 	@FXML
+	private RadioMenuItem labelByConfidenceX100MenuItem;
+
+	@FXML
 	private MenuButton labelByMenuButton;
 
 	@FXML
@@ -56,7 +59,7 @@ public class EdgesFormatController {
 	@FXML
 	private void initialize() {
 		widthCBox.setConverter(new FormatStringConverter<>(NumberFormat.getInstance()));
-		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByProbabilityMenuItem);
+		labelByToggleGroup.getToggles().addAll(labelByNoneMenuItem, labelByWeightMenuItem, labelByConfidenceMenuItem, labelByConfidenceX100MenuItem, labelByProbabilityMenuItem);
 		labelByToggleGroup.selectedToggleProperty().addListener((v, o, n) -> {
 			if (n != null)
 				labelByMenuButton.setText(((RadioMenuItem) n).getText());
@@ -77,6 +80,10 @@ public class EdgesFormatController {
 
 	public RadioMenuItem getLabelByConfidenceMenuItem() {
 		return labelByConfidenceMenuItem;
+	}
+
+	public RadioMenuItem getLabelByConfidenceX100MenuItem() {
+		return labelByConfidenceX100MenuItem;
 	}
 
 	public RadioMenuItem getLabelByNoneMenuItem() {
