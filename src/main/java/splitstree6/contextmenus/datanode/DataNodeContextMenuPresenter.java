@@ -142,7 +142,10 @@ public class DataNodeContextMenuPresenter {
 		for (var pair : list) {
 			var menuItem = new MenuItem(pair.getKey());
 			menuItem.setOnAction(e -> undoManager.doAndAdd(AddAlgorithmCommand.create(mainWindow, dataNode, pair.getValue())));
-			menuItem.setDisable(mainWindow.getWorkflow().getWorkingTaxaBlock() == null || !pair.getValue().isApplicable(mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock()));
+			menuItem.disableProperty().bind(Bindings.createBooleanBinding(
+					() -> (mainWindow.getWorkflow().getWorkingTaxaBlock() == null
+						   || !pair.getValue().isApplicable(mainWindow.getWorkflow().getWorkingTaxaBlock(), dataNode.getDataBlock())),
+					mainWindow.getWorkflow().validProperty()));
 			result.add(menuItem);
 		}
 		return result;
