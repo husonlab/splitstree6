@@ -145,6 +145,7 @@ public class AlgorithmList {
 		add(algorithms, names, new FilteredSuperNetwork());
 		add(algorithms, names, new GreedyTree());
 
+		add(algorithms, names, new NormalizeRootedNetworks());
 		add(algorithms, names, new RootedConsensusTree());
 		add(algorithms, names, new RerootOrReorderTrees());
 

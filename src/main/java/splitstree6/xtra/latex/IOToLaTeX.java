@@ -34,12 +34,12 @@ public class IOToLaTeX {
 				% This file is auto-generated from code, please don't hand edit.
 				            	
 				\\chapter{Supported import and export formats}
+				\\label{chapter:formats}
+								
+				The program support several widely-used import and export formats.
+								
+				\\section{Supported import formats}
 				""");
-
-		System.out.println("The program support several widely-used import and export formats.\n");
-
-
-		System.out.println("\\section{Supported import formats}\n");
 
 		System.out.println(outputImporters(CharactersBlock.class) +
 						   outputImporters(DistancesBlock.class) +

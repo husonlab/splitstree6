@@ -122,7 +122,8 @@ public class AlgorithmsToLaTeX {
 					"""
 							% This file is auto-generated from code, please don't hand edit.
 							       				
-							\\chapter{Algorithms}\\label{ch:algorithms}
+							\\chapter{Algorithms}
+							\\label{chapter:algorithms}
 												
 							Here we list of all provided algorithms, organized by input data.
 							"""
@@ -141,6 +142,7 @@ public class AlgorithmsToLaTeX {
 			System.out.println(
 					"""
 							\\chapter{Algorithms}
+							\\label{chapter:algorithms}
 											
 							Here we list of all provided algorithms, organized by output data.
 							"""

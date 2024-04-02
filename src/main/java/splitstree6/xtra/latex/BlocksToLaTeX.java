@@ -25,7 +25,8 @@ public class BlocksToLaTeX {
 	public static void main(String[] args) {
 
 		System.out.println("% This file is auto-generated from code, please don't hand edit.\n\n" +
-						   "\\chapter{Main data blocks}\n\n" +
+						   "\\chapter{Main data blocks}\n" +
+						   "\\label{chapter:main-data-blocks\n\n" +
 						   "SplitsTree is organized around data blocks that correspond to ``Nexus'' blocks \\citep{Maddisonetal1997}.\n\n" +
 						   output("Taxa block", TaxaNexusInput.DESCRIPTION, TaxaNexusInput.SYNTAX) +
 						   output("Traits block", TraitsNexusInput.DESCRIPTION, TraitsNexusInput.SYNTAX) +

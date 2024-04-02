@@ -1045,18 +1045,13 @@ public class MainWindowPresenter {
 		}
 	}
 
-	// todo: move to jloda-core
-	private void setupImportButton(Button importButton) {
+	public static void setupImportButton(Button importButton) {
 		importButton.disableProperty().bind(ClipboardUtils.hasStringProperty().not().and(ClipboardUtils.hasFilesProperty().not()));
-
-		importButton.setOnAction(e -> {
-			var importedString = ClipboardUtils.getTextFilesContentOrString();
-			openString(importedString);
-		});
+		importButton.setOnAction(e -> openString(ClipboardUtils.getTextFilesContentOrString()));
 	}
 
 	public static void openString(String string) {
-		if (string != null) {
+		if (string != null && !string.isBlank()) {
 			var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
 			Platform.runLater(() -> {
 				mainWindow.getController().getEditInputMenuItem().fire();
@@ -1070,5 +1065,4 @@ public class MainWindowPresenter {
 			});
 		}
 	}
-
 }
