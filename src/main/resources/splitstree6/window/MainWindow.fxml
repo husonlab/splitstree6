@@ -480,12 +480,12 @@
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="computeSplitsPhylogeneticDiversityMenuItem"
                                   text="Splits Phylogenetic Diversity"
-                                  userData="Computes the phylogenetic diversity for selected taxa on splits"/>
+                                  userData="Compute the phylogenetic diversity for selected taxa on splits"/>
                         <MenuItem fx:id="computeSplitsShapleyValuesMenuItem" text="Splits Shapley Values"
-                                  userData="Computes Shapely values on splits"/>
+                                  userData="Compute Shapely values on splits"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="computeTreePhylogeneticDiversityMenuItem" text="Tree Phylogenetic Diversity"
-                                  userData="Computes the phylogenetic diversity for selected taxa on trees"/>
+                                  userData="Compute the phylogenetic diversity for selected taxa on trees"/>
                         <MenuItem fx:id="computeRootedTreeFairProportionMenuItem"
                                   text="Rooted Tree Fair Proportion Diversity Index"
                                   userData="Compute rooted-tree fair-proportion diversity index"/>
@@ -493,7 +493,7 @@
                                   text="Rooted Tree Equal Splits Diversity Index"
                                   userData="Compute rooted-tree equal-splits diversity index"/>
                         <MenuItem fx:id="computeUnrootedTreeShapleyMenuItem" text="Unrooted Tree Shapley Values"
-                                  userData="Computes Shapely values on unrooted trees"/>
+                                  userData="Compute Shapely values on unrooted trees"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="pcoaMenuItem" text="PCoA"
                                        userData="Perform principal coordinate analysis on distances"/>
@@ -511,7 +511,8 @@
                         <MenuItem fx:id="checkForUpdatesMenuItem" text="Check For Updates..."
                                   userData="Check whether an update is available for download"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
-                        <MenuItem fx:id="aboutMenuItem" text="About..." userData="Show version number and license">
+                        <MenuItem fx:id="aboutMenuItem" text="About..."
+                                  userData="Show splash screen (authors, version number and license).">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="H" control="UP" meta="UP" shift="UP"
                                                     shortcut="DOWN"/>
