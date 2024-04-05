@@ -134,6 +134,7 @@ public class AlgorithmList {
 
 		add(algorithms, names, new AntiConsensusNetwork());
 		add(algorithms, names, new AverageConsensus());
+		add(algorithms, names, new BlobTree());
 		add(algorithms, names, new BootstrapSplits());
 		add(algorithms, names, new BootstrapTreeSplits());
 		add(algorithms, names, new BootstrapTree());
@@ -144,6 +145,7 @@ public class AlgorithmList {
 		add(algorithms, names, new ConsensusSplits());
 		add(algorithms, names, new FilteredSuperNetwork());
 		add(algorithms, names, new GreedyTree());
+		add(algorithms, names, new LSATree());
 
 		add(algorithms, names, new NormalizeRootedNetworks());
 		add(algorithms, names, new RootedConsensusTree());
@@ -157,6 +159,7 @@ public class AlgorithmList {
 
 		add(algorithms, names, new TreeSelector());
 		add(algorithms, names, new TreeSelectorSplits());
+		add(algorithms, names, new UniqueTopologies());
 
 		add(algorithms, names, new CredibilityNetwork());
 

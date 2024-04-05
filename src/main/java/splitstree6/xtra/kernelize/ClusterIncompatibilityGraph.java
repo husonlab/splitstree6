@@ -35,11 +35,11 @@ import java.util.HashMap;
  */
 public class ClusterIncompatibilityGraph {
 	/**
-	 * computes the cluster incompatibility graph for a collection of trees
+	 * computes the cluster incompatibility graph for a collection of trees of rooted networks
 	 * in graph, v.getInfo() contains cluster as bit set
 	 * in graph, v.getData() contains indices of all trees that have the cluster, as bit set
 	 *
-	 * @param trees input trees
+	 * @param trees input trees or networks
 	 * @return graph
 	 */
 	public static Graph apply(Collection<PhyloTree> trees) {

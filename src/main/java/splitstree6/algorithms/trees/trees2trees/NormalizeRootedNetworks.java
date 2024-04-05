@@ -48,6 +48,8 @@ public class NormalizeRootedNetworks extends Trees2Trees {
 		progress.setMaximum(inputData.getNTrees());
 		progress.setProgress(0);
 		outputData.clear();
+		outputData.setRooted(true)
+		;
 		for (var inputTree : inputData.getTrees()) {
 			var outputTree = new PhyloTree();
 			outputTree.setName(inputTree.getName());
@@ -97,12 +99,12 @@ public class NormalizeRootedNetworks extends Trees2Trees {
 
 	@Override
 	public boolean isApplicable(TaxaBlock taxa, TreesBlock datablock) {
-		return datablock.isReticulated();
+		return datablock.isReticulated() && datablock.isRooted();
 	}
 
 	static private void apply(PhyloTree inputGraph, Function<Node, Point2D> inputCoordinatesGetter, PhyloTree outputGraph, BiConsumer<Node, Point2D> outputCoordinatesSetter) {
 		var visibleAndLeaves = RootedNetworkProperties.computeAllVisibleNodes(inputGraph, List.of(inputGraph.getRoot()));
-		visibleAndLeaves.addAll(inputGraph.nodeStream().filter(v -> v.getOutDegree() == 0).collect(Collectors.toList()));
+		visibleAndLeaves.addAll(inputGraph.nodeStream().filter(v -> v.getOutDegree() == 0).toList());
 
 		var sourceRoot = inputGraph.getRoot();
 
