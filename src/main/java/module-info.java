@@ -141,6 +141,9 @@ module splitstreesix {
 
 	opens splitstree6.view.alignment;
 	opens splitstree6.view.trees;
+
+	opens splitstree6.view.worldmap;
+
 	opens splitstree6.layout.network;
 	opens splitstree6.dialog.importdialog;
 

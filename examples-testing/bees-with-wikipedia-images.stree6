@@ -10,7 +10,7 @@ END; [SPLITSTREE6]
 Methods:
 Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
 The original input consisted of 6 taxa and 6 DNA sequences of length 677.
-The Hamming Distances method (Hamming 1950) was used (default options) so as to obtain a 6 x 6 distance matrix.
+The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 6 x 6 distance matrix.
 The Neighbor Net method (Bryant & Moulton 2004) was used (default options) so as to obtain 11 splits, cyclic.
 The Show Splits method was used (default options) so as to obtain a Splits Network visualization (Dress & Huson 2004).
 
@@ -228,16 +228,16 @@ MATRIX
 END; [CHARACTERS]
 
 BEGIN ALGORITHM;
-TITLE 'Hamming Distances';
+TITLE 'Hamming Distance';
 LINK CHARACTERS = 'Working Characters';
-NAME 'Hamming Distances';
+NAME 'Hamming Distance';
 OPTIONS
 	Normalize = 'true';
 END; [ALGORITHM]
 
 BEGIN DISTANCES;
 TITLE 'Distances';
-LINK ALGORITHM = 'Hamming Distances';
+LINK ALGORITHM = 'Hamming Distance';
 DIMENSIONS ntax=6;
 FORMAT labels=left diagonal triangle=Both;
 MATRIX
