@@ -36,10 +36,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class WorldMap extends Group {
-	public static double X0 = 25;
-	public static double Y0 = 5;
-	public static double DX = 642;
-	public static double DY = 520;
+	// do not change these values, they crucial for correct mapping of lat-long coordinates
+	public static final double X0 = 25;
+	public static final double Y0 = 24;
+	public static final double DX = 642;
+	public static final double DY = 476;
 
 	public static double WRAP_AROUND_LONGITUDE = -169.0;
 
@@ -205,18 +206,24 @@ public class WorldMap extends Group {
 			for (var lon = -180; lon <= 180; lon += 10) {
 				var start = millerProjection(-90, lon, false);
 				var end = millerProjection(90, lon, false);
-				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-				line.setStrokeWidth(0.25);
-				line.setStroke(Color.GRAY);
-				group.getChildren().add(line);
+				var strokeWidth = (Math.abs(lon) % 30 == 0) ? 0.75 : 0.25;
+				if (strokeWidth == 0.75) {
+					var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
+					line.setStrokeWidth(strokeWidth);
+					line.setStroke(Color.GRAY);
+					group.getChildren().add(line);
+				}
 			}
 			for (var lat = -90; lat <= 90; lat += 10) {
 				var start = millerProjection(lat, -180, false);
 				var end = millerProjection(lat, 180, false);
-				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-				line.setStrokeWidth(0.25);
-				line.setStroke(Color.GRAY);
-				group.getChildren().add(line);
+				var strokeWidth = (Math.abs(lat) % 30 == 0) ? 0.75 : 0.25;
+				if (strokeWidth == 0.75) {
+					var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
+					line.setStrokeWidth(strokeWidth);
+					line.setStroke(Color.GRAY);
+					group.getChildren().add(line);
+				}
 			}
 		}
 
