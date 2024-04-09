@@ -37,6 +37,7 @@ public class Try extends Application {
 		var worldMap2 = new WorldMap();
 
 		var hbox = new HBox(worldMap1, worldMap2);
+		hbox.setStyle("-fx-padding: 10;");
 		hbox.setSpacing(-23);
 
 		var scrollPane = new ZoomableScrollPane(hbox);

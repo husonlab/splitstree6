@@ -66,18 +66,21 @@ public class WorldMap extends Group {
 		box = new Group();
 
 		grid = createGrid();
-		if (false) {
-			var topLeft = millerProjection(90, WRAP_AROUND_LONGITUDE - 1);
-			var bottomRight = millerProjection(-90, WRAP_AROUND_LONGITUDE + 1);
+		if (true) {
+			var topLeft = millerProjection(90, -180, false);
+			var bottomRight = millerProjection(-90, 180, false);
 			var rect = new Rectangle(Math.min(topLeft.getX(), bottomRight.getX()),
-					Math.min(topLeft.getY(), bottomRight.getY()), Math.abs(topLeft.getX() - bottomRight.getX()), Math.abs(topLeft.getY() - bottomRight.getY()));
+					Math.min(topLeft.getY(), bottomRight.getY()),
+					Math.abs(topLeft.getX() - bottomRight.getX()),
+					Math.abs(topLeft.getY() - bottomRight.getY()));
+			rect.setStroke(Color.GRAY);
 			rect.setFill(Color.TRANSPARENT);
-			rect.setStroke(Color.BLUE);
+			rect.setStrokeWidth(0.25);
 			box.getChildren().add(rect);
 		}
 		userItems = new Group();
 
-		getChildren().addAll(grid, box, outlines, oceans, countries, continents, userItems);
+		getChildren().addAll(box, grid, outlines, oceans, countries, continents, userItems);
 	}
 
 	public Runnable createUpdateScaleMethod(ZoomableScrollPane scrollPane) {
@@ -181,49 +184,22 @@ public class WorldMap extends Group {
 		var minY = Double.MAX_VALUE;
 		var maxY = Double.MIN_VALUE;
 
-		for (var lon = -180.0; lon <= 180; lon += 90) {
-			for (var lat = -90.0; lat <= 90.0; lat += 90.0) {
-				var label = new RichTextLabel("(%.0f,%.0f)".formatted(lat, lon));
-				var point = millerProjection(lat, lon);
-				minX = Math.min(minX, point.getX());
-				maxX = Math.max(maxX, point.getX());
-				minY = Math.min(minY, point.getY());
-				maxY = Math.max(maxY, point.getY());
-
-				if (false) {
-					label.setTranslateX(point.getX());
-					label.setTranslateY(point.getY());
-					label.layoutBoundsProperty().addListener((v, o, n) -> {
-						label.setLayoutX(-0.5 * n.getWidth());
-						label.setLayoutY(-0.5 * n.getHeight());
-					});
-					group.getChildren().add(label);
-				}
-			}
-		}
-
 		if (true) {
-			for (var lon = -180; lon <= 180; lon += 10) {
+			for (var lon = -180; lon <= 180; lon += 30) {
 				var start = millerProjection(-90, lon, false);
 				var end = millerProjection(90, lon, false);
-				var strokeWidth = (Math.abs(lon) % 30 == 0) ? 0.75 : 0.25;
-				if (strokeWidth == 0.75) {
 					var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-					line.setStrokeWidth(strokeWidth);
+				line.setStrokeWidth(0.25);
 					line.setStroke(Color.GRAY);
 					group.getChildren().add(line);
-				}
 			}
-			for (var lat = -90; lat <= 90; lat += 10) {
+			for (var lat = -90; lat <= 90; lat += 30) {
 				var start = millerProjection(lat, -180, false);
 				var end = millerProjection(lat, 180, false);
-				var strokeWidth = (Math.abs(lat) % 30 == 0) ? 0.75 : 0.25;
-				if (strokeWidth == 0.75) {
 					var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-					line.setStrokeWidth(strokeWidth);
+				line.setStrokeWidth(0.25);
 					line.setStroke(Color.GRAY);
 					group.getChildren().add(line);
-				}
 			}
 		}
 
