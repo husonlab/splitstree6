@@ -55,19 +55,19 @@ public class AlgorithmItemPresenter {
 
 		node.getService().runningProperty().addListener((v, o, n) -> {
 			if (n) {
-				MaterialIcons.setIcon(controller.getPlayButton(), "cancel_outlined");
+				MaterialIcons.setIcon(controller.getPlayButton(), MaterialIcons.stop_circle);
 				controller.getPlayButton().setOnAction(e -> node.getService().cancel());
 				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Stop this algorithm");
 			} else {
-				MaterialIcons.setIcon(controller.getPlayButton(), "play_circle");
+				MaterialIcons.setIcon(controller.getPlayButton(), MaterialIcons.play_circle);
 				controller.getPlayButton().setOnAction(e -> node.restart());
 				controller.getPlayButton().disableProperty().bind((node.getService().runningProperty().not().and(node.allParentsValidProperty()).and(selected)).not());
 				controller.getPlayButton().getTooltip().setText("Run this algorithm");
 			}
 		});
 
-		controller.getNameLabel().setGraphic(node.getName().endsWith("Filter") ? MaterialIcons.graphic("filter_alt") : MaterialIcons.graphic("settings"));
+		controller.getNameLabel().setGraphic(node.getName().endsWith("Filter") ? MaterialIcons.graphic(MaterialIcons.filter_alt) : MaterialIcons.graphic(MaterialIcons.settings));
 
 		if (!mainWindow.getWorkflow().isDerivedNode(node)) {
 			controller.getNameLabel().setStyle("-fx-text-fill: darkgray");
@@ -77,7 +77,7 @@ public class AlgorithmItemPresenter {
 
 		node.validProperty().addListener((v, o, n) -> {
 			if (!n)
-				controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("schedule", "-fx-text-fill: yellow;"));
+				controller.getIconPane().getChildren().setAll(MaterialIcons.graphic(MaterialIcons.schedule, "-fx-text-fill: yellow;"));
 		});
 
 		var progressIndicator = new ProgressIndicator();
@@ -90,11 +90,11 @@ public class AlgorithmItemPresenter {
 		node.getService().stateProperty().addListener((v, o, n) -> {
 			switch (n) {
 				case CANCELLED, FAILED ->
-						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("close", "-fx-text-fill: red;"));
+						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic(MaterialIcons.close, "-fx-text-fill: red;"));
 				case READY, SCHEDULED ->
-						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("schedule", "-fx-text-fill: yellow;"));
+						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic(MaterialIcons.schedule, "-fx-text-fill: yellow;"));
 				case SUCCEEDED ->
-						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic("done", "-fx-text-fill: green;"));
+						controller.getIconPane().getChildren().setAll(MaterialIcons.graphic(MaterialIcons.done, "-fx-text-fill: green;"));
 				case RUNNING -> controller.getIconPane().getChildren().setAll(progressIndicator);
 			}
 		});

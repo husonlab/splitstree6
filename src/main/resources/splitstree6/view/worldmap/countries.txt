@@ -1,0 +1,105 @@
+China	35.8617	104.1954
+India	20.5937	78.9629
+United States	37.0902	-95.7129
+Indonesia	-0.7893	113.9213
+Pakistan	30.3753	69.3451
+Brazil	-14.2350	-51.9253
+Nigeria	9.0820	8.6753
+Bangladesh	23.6850	90.3563
+Russia	64.6863	97.7453
+Mexico	23.6345	-102.5528
+Japan	36.2048	138.2529
+Ethiopia	9.1450	40.4897
+Philippines	12.8797	121.7740
+Egypt	26.8206	30.8025
+Vietnam	14.0583	108.2772
+DR	Congo	-4.0383	21.7587
+Turkey	38.9637	35.2433
+Iran	32.4279	53.6880
+Germany	51.1657	10.4515
+Thailand	15.8700	100.9925
+United Kingdom	55.3781	-3.4360
+France	46.6034	1.8883
+Italy	41.8719	12.5674
+Tanzania	-6.3690	34.8888
+South	Africa	-30.5595	22.9375
+Myanmar	21.9162	95.9560
+Kenya	-0.0236	37.9062
+South	Korea	35.9078	127.7669
+Colombia	4.5709	-74.2973
+Spain	40.4637	-3.7492
+Uganda	1.3733	32.2903
+Argentina	-38.4161	-63.6167
+Algeria	28.0339	1.6596
+Sudan	12.8628	30.2176
+Ukraine	48.3794	31.1656
+Iraq	33.2232	43.6793
+Afghanistan	33.9391	67.7100
+Poland	51.9194	19.1451
+Canada	61.0667	-107.9917
+Morocco	31.7917	-7.0926
+Saudi	Arabia	23.8859	45.0792
+Uzbekistan	41.3775	64.5853
+Peru	-9.1900	-75.0152
+Malaysia	4.2105	101.9758
+Angola	-11.2027	17.8739
+Ghana	7.9465	-1.0232
+Mozambique	-18.6657	35.5296
+
+Yemen	15.5527	48.5164
+Nepal	28.3949	84.1240
+Venezuela	6.4238	-66.5897
+Madagascar	-18.7669	46.8691
+Cameroon	7.3697	12.3547
+Côte	d'Ivoire	7.5400	-5.5471
+North	Korea	40.3399	127.5101
+Australia	-25.2744	133.7751
+Niger	17.6078	8.0817
+Taiwan	23.6978	120.9605
+Sri Lanka    7.8731   80.7718
+Burkina	Faso	12.2383	-1.5616
+Mali	17.5707	-3.9962
+Romania	45.9432	24.9668
+Malawi	-13.2543	34.3015
+Syria	34.8021	38.9968
+Kazakhstan	48.0196	66.9237
+Chile	-35.6751	-71.5430
+Zambia	-13.1339	27.8493
+Guatemala	15.7835	-90.2308
+Ecuador	-1.8312	-78.1834
+Netherlands	52.1326	5.2913
+Senegal	14.4974	-14.4524
+Cambodia	12.5657	104.9910
+Chad	15.4542	18.7322
+Somalia	5.1521	46.1996
+Zimbabwe	-19.0154	29.1549
+Guinea	9.9456	-9.6966
+Rwanda	-1.9403	29.8739
+Benin	9.3077	2.3158
+Tunisia	33.8869	9.5375
+Bolivia	-16.2902	-63.5887
+Haiti	18.9712	-72.2852
+Cuba	21.5218	-77.7812
+Burundi	-3.3731	29.9189
+South	Sudan	6.8769	31.3069
+Dominican Republic	18.7357	-70.1627
+Czech Republic	49.8175	15.4724
+Greece	39.0742	21.8243
+Jordan	30.5852	36.2384
+Portugal	39.3999	-8.2245
+Sweden	60.1282	18.6435
+Azerbaijan	40.1431	47.5769
+United Arab Emirates	23.4241	53.8478
+Hungary	47.1625	19.5033
+Belarus	53.7098	27.9534
+Tajikistan	38.8610	71.2761
+Austria	47.5162	14.5501
+Papua New Guinea	-6.3147	143.9555
+Switzerland	46.8182	8.2275
+Israel	31.0461	34.8516
+Sierra Leone	8.4606	-11.7799
+Togo	8.6195	0.8248
+New Zealand	-40.9006	174.8860
+Singapore	1.3521	103.8198
+Greenland	71.7069	-42.6043
+Iceland	64.9631	-19.0208

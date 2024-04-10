@@ -1,0 +1,6 @@
+Africa	7.1881	21.0938
+Asia	34.0479	100.6197
+Europe	54.5260	15.2551
+North America	54.5260	-105.2551
+South America	-14.2350	-51.9253
+Australia	-25.2744	133.7751

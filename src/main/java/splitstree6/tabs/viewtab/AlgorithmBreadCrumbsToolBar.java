@@ -138,7 +138,7 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 
 	private static Node makeBreadCrumb(MainWindow mainWindow, AlgorithmNode algorithmNode, ArrayList<ChangeListener<Worker.State>> stateChangeListeners) {
 		final var button = new Button();
-		button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
+		button.getStylesheets().add(MaterialIcons.getStyleSheet());
 
 		button.textProperty().bind(algorithmNode.titleProperty());
 
@@ -184,7 +184,7 @@ public class AlgorithmBreadCrumbsToolBar extends HBox {
 
 	private static Node makeInputTabBreadCrumb(MainWindow mainWindow) {
 		final var button = new Button();
-		button.getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
+		button.getStylesheets().add(MaterialIcons.getStyleSheet());
 		button.setText("Input");
 		button.disableProperty().bind(mainWindow.getWorkflow().runningProperty());
 		final var tooltip = new Tooltip("Input editor");

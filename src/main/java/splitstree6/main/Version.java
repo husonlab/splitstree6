@@ -24,8 +24,8 @@ package splitstree6.main;
  * Daniel Huson, 6.2017
  */
 public class Version {
-	static public final String NAME = "SplitsTree CE";
-	static public final String SHORT_DESCRIPTION = "SplitsTree CE (version 6.3.2-beta, built 8 Apr 2024)";
-	static public final String VERSION = "6.0.0_alpha";
+	static public final String NAME = "SplitsTree App";
+	static public final String SHORT_DESCRIPTION = "SplitsTree App (version 6.3.2-beta, built 8 Apr 2024)";
+	static public final String VERSION = "6.0.0";
 
 }

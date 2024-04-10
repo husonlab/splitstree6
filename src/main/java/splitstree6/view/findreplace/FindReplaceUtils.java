@@ -55,13 +55,13 @@ public class FindReplaceUtils {
 						region.setStyle("-fx-background-color: transparent;");
 						items.set(i, region);
 					} else if (item instanceof Button) {
-						((Button) item).getStylesheets().add(MaterialIcons.getInstance().getStyleSheet());
+						((Button) item).getStylesheets().add(MaterialIcons.getStyleSheet());
 					}
 				}
 			}
 		var findFromFileButton = findToolBar.getController().getFindFromFileButton();
 		if (SplitsTree6.isDesktop())
-			MaterialIcons.setIcon(findFromFileButton, "upload", "-fx-font-size: 12;", true);
+			MaterialIcons.setIcon(findFromFileButton, MaterialIcons.upload, "-fx-font-size: 12;", true);
 		else
 			findToolBar.getController().getToolBar().getItems().remove(findFromFileButton);
 		findToolBar.getController().getAnchorPane().getChildren().remove(findToolBar.getController().getCloseButton());
