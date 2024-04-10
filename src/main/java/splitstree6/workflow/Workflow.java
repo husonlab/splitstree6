@@ -385,7 +385,6 @@ public class Workflow extends jloda.fx.workflow.Workflow {
 		return mainWindow;
 	}
 
-
 	/**
 	 * if the input data is a characters block, use this to setup the alignment viewer
 	 */

@@ -1,5 +1,5 @@
 /*
- *  Try.java Copyright (C) 2024 Daniel H. Huson
+ *  WorldMap.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,10 +17,13 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.worldmap;
+package splitstree6.utils.worldmap;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
@@ -28,6 +31,8 @@ import javafx.scene.text.Text;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.BasicFX;
+import jloda.fx.util.DraggableUtils;
+import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 
@@ -42,6 +47,8 @@ public class WorldMap extends Group {
 	public static final double DX = 642;
 	public static final double DY = 476;
 
+	private static boolean verbose = false;
+
 	public static double WRAP_AROUND_LONGITUDE = -169.0;
 
 	private final Group outlines;
@@ -49,20 +56,28 @@ public class WorldMap extends Group {
 	private final Group countries;
 	private final Group oceans;
 
-	private final Group userItems;
+	private final Group userItems = new Group();
 
 	private final Group box;
 
 	private final Group grid;
 
-	public WorldMap() throws IOException {
+	private final Group notUserItems = new Group();
+
+	private InvalidationListener darkModeInvalidationListener;
+
+	public WorldMap() {
 		super(new Group());
 
-		outlines = createOutlines();
-		continents = createGroup("continents.txt");
-		countries = createGroup("countries.txt");
-		countries.setVisible(false);
-		oceans = createGroup("oceans.txt");
+		try {
+			outlines = createOutlines();
+			continents = createGroup("continents.txt");
+			countries = createGroup("countries.txt");
+			countries.setVisible(false);
+			oceans = createGroup("oceans.txt");
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
 		box = new Group();
 
 		grid = createGrid();
@@ -73,21 +88,33 @@ public class WorldMap extends Group {
 					Math.min(topLeft.getY(), bottomRight.getY()),
 					Math.abs(topLeft.getX() - bottomRight.getX()),
 					Math.abs(topLeft.getY() - bottomRight.getY()));
-			rect.setStroke(Color.GRAY);
+			rect.setStroke(Color.TRANSPARENT);
 			rect.setFill(Color.TRANSPARENT);
 			rect.setStrokeWidth(0.25);
 			box.getChildren().add(rect);
 		}
-		userItems = new Group();
+		notUserItems.getChildren().addAll(box, grid, outlines, oceans, countries, continents);
+		getChildren().addAll(notUserItems, userItems);
 
-		getChildren().addAll(box, grid, outlines, oceans, countries, continents, userItems);
+		darkModeInvalidationListener = e -> {
+			var dark = MainWindowManager.isUseDarkTheme();
+			for (var shape : BasicFX.getAllRecursively(this, Shape.class)) {
+				if (dark && shape.getStroke() != null && shape.getStroke().equals(Color.BLACK))
+					shape.setStroke(Color.WHITE);
+				if (!dark && shape.getStroke() != null && shape.getStroke().equals(Color.WHITE))
+					shape.setStroke(Color.BLACK);
+			}
+		};
+		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(darkModeInvalidationListener));
+		if (MainWindowManager.isUseDarkTheme())
+			darkModeInvalidationListener.invalidated(null);
 	}
 
 	public Runnable createUpdateScaleMethod(ZoomableScrollPane scrollPane) {
 		return () -> {
-			for (var node : BasicFX.getAllChildrenRecursively(getChildren())) {
-				var factorX = scrollPane.getZoomFactorX();
-				var factorY = scrollPane.getZoomFactorY();
+			var factorX = scrollPane.getZoomFactorX();
+			var factorY = scrollPane.getZoomFactorY();
+			for (var node : BasicFX.getAllChildrenRecursively(notUserItems.getChildren())) {
 				if (node instanceof Path path) {
 					for (var element : path.getElements()) {
 						if (element instanceof MoveTo moveTo) {
@@ -124,6 +151,11 @@ public class WorldMap extends Group {
 				countries.setVisible(scrollPane.getZoomX() > 1.8);
 				continents.setVisible(scrollPane.getZoomX() <= 1.8);
 			}
+			for (var node : userItems.getChildren()) {
+				node.setTranslateX(factorX * node.getTranslateX());
+				node.setTranslateY(factorY * node.getTranslateY());
+
+			}
 		};
 	}
 
@@ -158,6 +190,7 @@ public class WorldMap extends Group {
 								if (!path.getElements().isEmpty())
 									group.getChildren().add(path);
 								path = new Path();
+								path.getStyleClass().add("graph-edge");
 							}
 							path.getElements().add(new MoveTo(scale * x, scale * y));
 						} else if (tokens[2].equals("l")) {
@@ -169,10 +202,11 @@ public class WorldMap extends Group {
 			if (!path.getElements().isEmpty())
 				group.getChildren().add(path);
 		}
-		System.err.println("Lines:");
-
-		System.err.println("x: " + minX + " - " + maxX);
-		System.err.println("y: " + minY + " - " + maxY);
+		if (verbose) {
+			System.err.println("Lines:");
+			System.err.println("x: " + minX + " - " + maxX);
+			System.err.println("y: " + minY + " - " + maxY);
+		}
 
 		return group;
 	}
@@ -203,13 +237,14 @@ public class WorldMap extends Group {
 			}
 		}
 
-		System.err.println("grid:");
-		System.err.println("x: " + minX + " - " + maxX);
-		System.err.println("y: " + minY + " - " + maxY);
+		if (verbose) {
+			System.err.println("grid:");
+			System.err.println("x: " + minX + " - " + maxX);
+			System.err.println("y: " + minY + " - " + maxY);
+		}
 
 		return group;
 	}
-
 
 	private Group createGroup(String resource) throws IOException {
 		var group = new Group();
@@ -219,6 +254,7 @@ public class WorldMap extends Group {
 				var tokens = StringUtils.split(line, '\t');
 				if (tokens.length == 3 && NumberUtils.isDouble(tokens[1]) && NumberUtils.isDouble(tokens[2])) {
 					var label = new RichTextLabel(tokens[0]);
+					label.getStyleClass().add("above-label");
 					var point = millerProjection(NumberUtils.parseDouble(tokens[1]), NumberUtils.parseDouble(tokens[2]));
 					label.setTranslateX(point.getX());
 					label.setTranslateY(point.getY());
@@ -226,8 +262,9 @@ public class WorldMap extends Group {
 						label.setLayoutX(-0.5 * n.getWidth());
 						label.setLayoutY(-0.5 * n.getHeight());
 					});
-					label.setBackgroundColor(Color.WHITE.deriveColor(1, 1, 1, 0.8));
+					//label.setBackgroundColor(Color.WHITE.deriveColor(1, 1, 1, 0.8));
 					// label.setBackgroundColor(Color.WHITE);
+					DraggableUtils.setupDragMouseTranslate(label);
 					group.getChildren().add(label);
 				}
 			}
@@ -304,5 +341,12 @@ public class WorldMap extends Group {
 
 	public Group getGrid() {
 		return grid;
+	}
+
+	public void addUserItem(Node node, double latitude, double longitude) {
+		var point = millerProjection(latitude, longitude, true);
+		node.setTranslateX(point.getX());
+		node.setTranslateY(point.getY());
+		getUserItems().getChildren().add(node);
 	}
 }

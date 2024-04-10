@@ -107,7 +107,6 @@ public class NetworkViewController {
 		outerAnchorPane.getChildren().remove(formatVBox);
 		outerAnchorPane.getChildren().add(formatVBox);
 
-
 		AnchorPane.setTopAnchor(infoLabel, 5.0);
 		AnchorPane.setLeftAnchor(infoLabel, 20.0);
 		innerAnchorPane.getChildren().add(infoLabel);
@@ -184,14 +183,6 @@ public class NetworkViewController {
 
 	public VBox getFormatVBox() {
 		return formatVBox;
-	}
-
-	public ToggleButton getSettingsToggleButton() {
-		return settingsToggleButton;
-	}
-
-	public ToggleButton getFormatToggleButton() {
-		return formatToggleButton;
 	}
 
 	public ZoomableScrollPane getScrollPane() {

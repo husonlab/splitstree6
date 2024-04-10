@@ -249,6 +249,9 @@ public class MainWindowController {
 	private MenuItem traitsMenuItem;
 
 	@FXML
+	private MenuItem worldMapMenuItem;
+
+	@FXML
 	private CheckMenuItem pDistanceMenuItem;
 
 	@FXML
@@ -862,6 +865,10 @@ public class MainWindowController {
 
 	public MenuItem getTraitsMenuItem() {
 		return traitsMenuItem;
+	}
+
+	public MenuItem getWorldMapMenuItem() {
+		return worldMapMenuItem;
 	}
 
 	public CheckMenuItem getpDistanceMenuItem() {

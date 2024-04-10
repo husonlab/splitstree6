@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.view.worldmap;
+package splitstree6.utils.worldmap;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -28,6 +28,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import jloda.fx.control.ZoomableScrollPane;
+import jloda.fx.window.MainWindowManager;
 
 public class Try extends Application {
 	@Override
@@ -38,6 +39,7 @@ public class Try extends Application {
 
 		var hbox = new HBox(worldMap1, worldMap2);
 		hbox.setStyle("-fx-padding: 10;");
+		hbox.getStyleClass().add("viewer-background");
 		hbox.setSpacing(-23);
 
 		var scrollPane = new ZoomableScrollPane(hbox);
@@ -80,10 +82,16 @@ public class Try extends Application {
 			}
 		});
 
+		var dark = new ToggleButton("Dark");
+		dark.selectedProperty().bindBidirectional(MainWindowManager.useDarkThemeProperty());
+		dark.selectedProperty().addListener((v, o, n) -> MainWindowManager.ensureDarkTheme(stage, n));
+
 		var root = new BorderPane();
-		root.setTop(new ToolBar(zoomIn, zoomOut, showCountries, showContinents, showGrid, showWrapAround));
+		root.setTop(new ToolBar(zoomIn, zoomOut, showCountries, showContinents, showGrid, showWrapAround, dark));
 		root.setCenter(scrollPane);
 		stage.setScene(new Scene(root, 900, 800));
+		stage.getScene().getStylesheets().add("jloda/resources/css/white_pane.css");
+
 		stage.show();
 	}
 }

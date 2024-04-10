@@ -132,6 +132,7 @@ module splitstreesix {
 
 	opens splitstree6.view.format.taxmark;
 	opens splitstree6.view.format.densitree;
+	opens splitstree6.view.format.locations;
 	opens splitstree6.view.format.taxlabel;
 	opens splitstree6.view.format.splits;
 	opens splitstree6.view.format.traits;
@@ -185,6 +186,7 @@ module splitstreesix {
 	opens splitstree6.xtra.draw;
 	opens splitstree6.xtra.mapview.nodes;
 	opens splitstree6.xtra.mapview.mapbuilder;
+	opens splitstree6.utils.worldmap;
 
 
 }

@@ -37,21 +37,21 @@ public class TraitsFormatPresenter {
 
 	private final ObservableList<CheckMenuItem> traitMenuItems = FXCollections.observableArrayList();
 
-	public TraitsFormatPresenter(MainWindow mainWindow, TraitsFormat traitsFormat, TraitsFormatController controller, UndoManager undoManager) {
-		controller.getMaxSizeField().setText(String.valueOf(traitsFormat.getOptionTraitSize()));
+	public TraitsFormatPresenter(MainWindow mainWindow, TraitsFormat format, TraitsFormatController controller, UndoManager undoManager) {
+		controller.getMaxSizeField().setText(String.valueOf(format.getOptionTraitSize()));
 
-		traitsFormat.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
-		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> traitsFormat.setOptionTraitSize(NumberUtils.parseInt(n)));
+		format.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
+		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> format.setOptionTraitSize(NumberUtils.parseInt(n)));
 
-		FuzzyBoolean.setupCheckBox(controller.getLegendCBox(), traitsFormat.getLegend().showProperty());
+		FuzzyBoolean.setupCheckBox(controller.getLegendCBox(), format.getLegend().showProperty());
 
-		traitsFormat.optionActiveTraitsProperty().addListener(e -> {
-			traitMenuItems.forEach(m -> m.setSelected(traitsFormat.isTraitActive(m.getText())));
-			traitsFormat.updateNodes();
+		format.optionActiveTraitsProperty().addListener(e -> {
+			traitMenuItems.forEach(m -> m.setSelected(format.isTraitActive(m.getText())));
+			format.updateNodes();
 		});
 
 		traitsBlockListener = e -> {
-			var traitsBlock = traitsFormat.getTraitsBlock();
+			var traitsBlock = format.getTraitsBlock();
 			if (traitsBlock != null) {
 				if (traitsBlock.getNumberNumericalTraits() == 0) {
 					controller.getTitledPane().setDisable(true);
@@ -64,9 +64,9 @@ public class TraitsFormatPresenter {
 						var menuItem = new CheckMenuItem(label);
 						menuItem.setSelected(true);
 						menuItem.selectedProperty().addListener((b, o, n) -> {
-							var oldState = traitsFormat.getOptionActiveTraits().clone();
+							var oldState = format.getOptionActiveTraits().clone();
 							var newState = StringUtils.addOrRemove(oldState, label, menuItem.isSelected());
-							undoManager.doAndAdd("activate trait", () -> traitsFormat.setOptionActiveTraits(oldState), () -> traitsFormat.setOptionActiveTraits(newState));
+							undoManager.doAndAdd("activate trait", () -> format.setOptionActiveTraits(oldState), () -> format.setOptionActiveTraits(newState));
 						});
 						traitMenuItems.add(menuItem);
 					}
@@ -76,32 +76,32 @@ public class TraitsFormatPresenter {
 			}
 		};
 		controller.getShowAllMenuItem().setOnAction(e -> {
-			var oldState = traitsFormat.getOptionActiveTraits().clone();
-			var newState = traitsFormat.getTraitsBlock().getTraitLabels().toArray(new String[0]);
-			undoManager.doAndAdd("activate all traits", () -> traitsFormat.setOptionActiveTraits(oldState), () -> traitsFormat.setOptionActiveTraits(newState));
+			var oldState = format.getOptionActiveTraits().clone();
+			var newState = format.getTraitsBlock().getTraitLabels().toArray(new String[0]);
+			undoManager.doAndAdd("activate all traits", () -> format.setOptionActiveTraits(oldState), () -> format.setOptionActiveTraits(newState));
 		});
 		controller.getShowNoneMenuItem().setOnAction(e -> {
-			var oldState = traitsFormat.getOptionActiveTraits().clone();
+			var oldState = format.getOptionActiveTraits().clone();
 			var newState = new String[0];
-			undoManager.doAndAdd("deactivate all traits", () -> traitsFormat.setOptionActiveTraits(oldState), () -> traitsFormat.setOptionActiveTraits(newState));
+			undoManager.doAndAdd("deactivate all traits", () -> format.setOptionActiveTraits(oldState), () -> format.setOptionActiveTraits(newState));
 		});
 
-		traitsFormat.traitsBlockProperty().addListener(new WeakInvalidationListener(traitsBlockListener));
+		format.traitsBlockProperty().addListener(new WeakInvalidationListener(traitsBlockListener));
 		traitsBlockListener.invalidated(null);
 
-		traitsFormat.optionActiveTraitsProperty().addListener(e -> {
-			if (traitsFormat.isAllTraitsActive())
+		format.optionActiveTraitsProperty().addListener(e -> {
+			if (format.isAllTraitsActive())
 				controller.getShowMenuButton().setText("All");
-			else if (traitsFormat.isNoneTraitsActive())
+			else if (format.isNoneTraitsActive())
 				controller.getShowMenuButton().setText("None");
 			else
 				controller.getShowMenuButton().setText("Some");
 		});
 
-		traitsFormat.optionTraitSizeProperty().addListener((v, o, n) -> undoManager.add("traits node size", traitsFormat.optionTraitSizeProperty(), o, n));
-		traitsFormat.optionTraitLegendProperty().addListener((v, o, n) -> undoManager.add("show legend", traitsFormat.optionTraitLegendProperty(), o, n));
+		format.optionTraitSizeProperty().addListener((v, o, n) -> undoManager.add("traits node size", format.optionTraitSizeProperty(), o, n));
+		format.optionTraitLegendProperty().addListener((v, o, n) -> undoManager.add("show legend", format.optionTraitLegendProperty(), o, n));
 
-		traitsFormat.optionTraitSizeProperty().addListener(e -> traitsFormat.updateNodes());
-		traitsFormat.optionTraitLegendProperty().addListener(e -> traitsFormat.updateNodes());
+		format.optionTraitSizeProperty().addListener(e -> format.updateNodes());
+		format.optionTraitLegendProperty().addListener(e -> format.updateNodes());
 	}
 }

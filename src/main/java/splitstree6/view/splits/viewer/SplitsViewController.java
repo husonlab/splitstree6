@@ -94,7 +94,7 @@ public class SplitsViewController {
 
 	@FXML
 	private Button flipVerticalButton;
-	@FXML
+
 	private final ZoomableScrollPane zoomableScrollPane = new ZoomableScrollPane(null);
 
 	private final ScaleBar scaleBar = new ScaleBar();

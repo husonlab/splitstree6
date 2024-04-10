@@ -379,6 +379,7 @@
                                   userData="Show the splits slider (filter by weight) tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="traitsMenuItem" text="Edit Traits" userData="Show the edit traits tab"/>
+                        <MenuItem fx:id="worldMapMenuItem" text="World Map" userData="Show the world map tab"/>
                     </Menu>
                     <Menu text="Distances">
                         <CheckMenuItem fx:id="pDistanceMenuItem" text="P Distances"

@@ -111,6 +111,7 @@ import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
 import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.view.utils.ExportUtils;
+import splitstree6.view.worldmap.EnsureWorldMap;
 import splitstree6.workflow.Algorithm;
 import splitstree6.workflow.DataBlock;
 import splitstree6.workflow.Workflow;
@@ -593,6 +594,9 @@ public class MainWindowPresenter {
 		controller.getSplitsSliderMenuItem().disableProperty().bind(AttachAlgorithm.createDisableProperty(mainWindow, new WeightsSlider()));
 
 		controller.getTraitsMenuItem().setOnAction(null);
+
+		controller.getWorldMapMenuItem().setOnAction(e -> EnsureWorldMap.apply(mainWindow));
+		controller.getWorldMapMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
 
 		setupAlgorithmMenuItem(controller.getpDistanceMenuItem(), new PDistance());
 		setupAlgorithmMenuItem(controller.getLogDetMenuItem(), new LogDet());
