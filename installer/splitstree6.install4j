@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.6" transformSequenceNumber="10">
   <directoryPresets config="../target/SplitsTreeApp-1.0.0-SNAPSHOT.jar" />
-  <application name="SplitsTreeCE" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeCE" publisher="Daniel Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_beta" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
+  <application name="SplitsTreeApp" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeApp" publisher="Daniel H. Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_beta" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
       <variable name="renderingVMOption" />
     </variables>
@@ -35,7 +35,7 @@
           <entry location="install4j-runtime-10.0.5.jar" />
         </exclude>
       </dirEntry>
-      <fileEntry mountPoint="1691242167" file="../target/SplitsTreeCE-1.0.0-SNAPSHOT.jar" />
+      <fileEntry mountPoint="1691242167" file="../target/SplitsTreeApp-1.0.0-SNAPSHOT.jar" />
       <fileEntry mountPoint="1691243203" file="../target/dependency/install4j-runtime-10.0.5.jar" />
       <dirEntry mountPoint="1691242153" file="../examples" subDirectory="examples" />
       <fileEntry mountPoint="1691243205" file="../tools/genome-context" fileMode="755" overrideFileMode="true" />
@@ -51,8 +51,8 @@
       <fileEntry mountPoint="675425072" file="../src/main/resources/NOTICE.txt" />
     </entries>
     <components>
-      <component name="SplitsTreeCE" id="1691242194" changeable="false">
-        <description>SplitsTree CE program.</description>
+      <component name="SplitsTreeApp" id="1691242194" changeable="false">
+        <description>The SplitsTree App.</description>
         <include>
           <entry location="jars" />
           <entry location="jars2" />
@@ -60,7 +60,7 @@
           <entry location="Licenses" />
           <entry location="LICENSE.txt" />
           <entry location="NOTICE.txt" />
-          <entry location="SplitsTreeCE" fileType="launcher" />
+          <entry location="SplitsTreeApp" fileType="launcher" />
         </include>
       </component>
       <component name="Examples" id="1691243204">
@@ -74,9 +74,9 @@
     </components>
   </files>
   <launchers>
-    <launcher name="SplitsTreeCE" id="1691242142" menuName="SplitsTree CE ">
-      <executable name="SplitsTreeCE" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="SplitsTree CE  analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2024 ${compiler:sys.publisher}" internalName="SplitsTreeCE" />
+    <launcher name="SplitsTreeApp" id="1691242142" menuName="SplitsTree App ">
+      <executable name="SplitsTreeApp" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
+        <versionInfo include="true" fileDescription="SplitsTree app - analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2024 ${compiler:sys.publisher}" internalName="SplitsTreeApp" />
       </executable>
       <java mainClass="splitstreesix/splitstree6.main.SplitsTree6" mainMode="module" vmParameters="-server -Duser.language=en -Duser.region=US ${compiler:renderingVMOption}">
         <modulePath>
@@ -304,7 +304,7 @@ return console.askOkCancel(message, true);
           <screen id="1691242246" beanClass="com.install4j.runtime.beans.screens.FormScreen">
             <serializedBean>
               <property name="subTitle" type="string">Check for updates how often?</property>
-              <property name="title" type="string">SplitsTree CE Updater</property>
+              <property name="title" type="string">SplitsTree App Updater</property>
             </serializedBean>
             <formComponents>
               <formComponent id="1691242248" beanClass="com.install4j.runtime.beans.formcomponents.UpdateScheduleSelectorComponent" />
@@ -312,8 +312,8 @@ return console.askOkCancel(message, true);
           </screen>
           <screen id="1691242249" beanClass="com.install4j.runtime.beans.screens.FormScreen">
             <serializedBean>
-              <property name="subTitle" type="string">Set maximum allowed memory usage for SplitsTree CE </property>
-              <property name="title" type="string">Set SplitsTree CE  memory</property>
+              <property name="subTitle" type="string">Set maximum allowed memory usage for SplitsTree App </property>
+              <property name="title" type="string">Set SplitsTree App memory</property>
             </serializedBean>
             <condition>	!context.getMediaName().toLowerCase().contains("windows") || context.getMediaName().toLowerCase().contains("x64") || context.getMediaName().toLowerCase().contains("64bits") </condition>
             <actions>
@@ -330,7 +330,7 @@ return console.askOkCancel(message, true);
             <formComponents>
               <formComponent id="1691242250" beanClass="com.install4j.runtime.beans.formcomponents.NumberSpinnerComponent">
                 <serializedBean>
-                  <property name="helpText" type="string">Set maximum amount of memory that SplitsTree CE  may use.</property>
+                  <property name="helpText" type="string">Set maximum amount of memory that SplitsTree App  may use.</property>
                   <property name="initialValue" type="int" value="2" />
                   <property name="labelText" type="string">Set max memory usage (in gigabytes)</property>
                   <property name="maxValue" type="int" value="512" />
@@ -1158,8 +1158,8 @@ return true;</property>
         <variable name="renderingVMOption" value="-Dprism.forceGPU=true" />
       </variables>
     </unixInstaller>
-    <macosFolder name="Mac OS X Folder" id="1691242165" installDir="SplitsTreeCE" overridePrincipalLanguage="true" architecture="universal" compressDmg="true" signLaunchers="true" />
-    <windows name="Windows64bit" id="1691242288" installDir="SplitsTreeCE" overridePrincipalLanguage="true" architecture="64">
+    <macosFolder name="Mac OS X Folder" id="1691242165" installDir="SplitsTreeApp" overridePrincipalLanguage="true" architecture="universal" compressDmg="true" signLaunchers="true" />
+    <windows name="Windows64bit" id="1691242288" installDir="SplitsTreeApp" overridePrincipalLanguage="true" architecture="64">
       <overriddenPrincipalLanguage id="409" />
       <exclude>
         <entry location="tools" />
