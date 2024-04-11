@@ -379,7 +379,6 @@
                                   userData="Show the splits slider (filter by weight) tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="traitsMenuItem" text="Edit Traits" userData="Show the edit traits tab"/>
-                        <MenuItem fx:id="worldMapMenuItem" text="World Map" userData="Show the world map tab"/>
                     </Menu>
                     <Menu text="Distances">
                         <CheckMenuItem fx:id="pDistanceMenuItem" text="P Distances"
@@ -455,6 +454,7 @@
                                        userData="Compute a haplotype network from DNA sequences using the median-joining algorithm"/>
                         <CheckMenuItem fx:id="minSpanningNetworkMenuItem" text="Min Spanning Network"
                                        userData="Compute a minimum spanning network from distances"/>
+                        <MenuItem fx:id="worldMapMenuItem" text="World Map" userData="Show the world map tab"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <CheckMenuItem fx:id="hybridizationNetworkMenuItem" text="Hybridization Network"
                                        userData="Compute a minimum hybridization network for two rooted trees using the autumn algorithm"/>

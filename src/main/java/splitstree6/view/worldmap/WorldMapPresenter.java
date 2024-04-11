@@ -19,11 +19,14 @@
 
 package splitstree6.view.worldmap;
 
+import javafx.application.Platform;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import jloda.fx.find.FindToolBar;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.utils.worldmap.WorldMap;
+import splitstree6.view.utils.ExportUtils;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
@@ -33,14 +36,19 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 	private final WorldMap worldMap1;
 	private final WorldMap worldMap2;
 
+	private final WorldMapView view;
+	private final MainWindow mainWindow;
+
 	public WorldMapPresenter(MainWindow mainWindow, WorldMapView view) {
+		this.mainWindow = mainWindow;
+		this.view = view;
 		var controller = view.getController();
 
 		worldMap1 = new WorldMap();
 		worldMap2 = new WorldMap();
 
 		var hbox = new HBox();
-		hbox.setStyle("-fx-padding: 10;");
+		hbox.setStyle("-fx-padding: 10 10 10 60;");
 		hbox.getStyleClass().add("viewer-background");
 		hbox.setSpacing(-20);
 
@@ -93,11 +101,22 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		if (view.optionTwoCopiesProperty().get() && !hbox.getChildren().contains(worldMap2)) {
 			hbox.getChildren().add(worldMap2);
 		}
+
+		Platform.runLater(this::setupMenuItems);
 	}
 
 	@Override
 	public void setupMenuItems() {
+		var controller = view.getController();
+		var mainController = mainWindow.getController();
+		mainController.getShowQRCodeMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
+		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
+		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
+
+		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
+		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
+		ExportUtils.setup(mainWindow, null, view.emptyProperty());
 	}
 
 	@Override

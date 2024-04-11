@@ -89,7 +89,6 @@ public class WorkflowNexusInput {
 				mainWindow.setFileName(fileName);
 				NotificationManager.showInformation("Loaded file: " + fileName + ", workflow nodes: " + inputWorkFlow.size());
 				workflow.shallowCopy(inputWorkFlow);
-				workflow.ensureAlignmentView();
 
 				if (!isWorkflowFile(fileName)) {
 					for (var node : workflow.algorithmNodes()) {

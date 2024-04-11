@@ -190,6 +190,7 @@ public class WorldMap extends Group {
 								if (!path.getElements().isEmpty())
 									group.getChildren().add(path);
 								path = new Path();
+								path.setStrokeWidth(0.5);
 								path.getStyleClass().add("graph-edge");
 							}
 							path.getElements().add(new MoveTo(scale * x, scale * y));
@@ -253,7 +254,7 @@ public class WorldMap extends Group {
 				var line = reader.readLine();
 				var tokens = StringUtils.split(line, '\t');
 				if (tokens.length == 3 && NumberUtils.isDouble(tokens[1]) && NumberUtils.isDouble(tokens[2])) {
-					var label = new RichTextLabel(tokens[0]);
+					var label = new Text(tokens[0]);
 					label.getStyleClass().add("above-label");
 					var point = millerProjection(NumberUtils.parseDouble(tokens[1]), NumberUtils.parseDouble(tokens[2]));
 					label.setTranslateX(point.getX());

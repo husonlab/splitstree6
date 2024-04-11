@@ -113,6 +113,7 @@ public class NetworkViewController {
 		infoLabel.setFont(Font.font(infoLabel.getFont().getFamily(), 16));
 
 		DraggableLabel.makeDraggable(infoLabel);
+		infoLabel.setVisible(false);
 
 		settingsToggleButton.setSelected(false);
 

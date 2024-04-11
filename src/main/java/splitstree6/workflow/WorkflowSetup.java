@@ -64,7 +64,6 @@ public class WorkflowSetup {
 		}
 		if (clazz.equals(CharactersBlock.class)) {
 			workflow.setupInputAndWorkingNodes(sourceBlock, new CharactersLoader(), new TaxaBlock(), new CharactersBlock());
-			workflow.ensureAlignmentView();
 			var distancesNode = workflow.newDataNode(new DistancesBlock());
 			workflow.newAlgorithmNode(new PDistance(), workflow.getWorkingTaxaNode(), workflow.getWorkingDataNode(), distancesNode);
 			var splitsNode = workflow.newDataNode(new SplitsBlock());

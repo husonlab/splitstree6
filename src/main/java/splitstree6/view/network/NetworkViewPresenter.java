@@ -23,19 +23,13 @@ import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.property.*;
 import javafx.collections.ObservableMap;
-import javafx.collections.SetChangeListener;
-import javafx.collections.WeakSetChangeListener;
 import javafx.geometry.Bounds;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
-import jloda.fx.util.AService;
-import jloda.fx.util.ClipboardUtils;
-import jloda.fx.util.RunAfterAWhile;
-import jloda.fx.util.SwipeUtils;
+import jloda.fx.util.*;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
 import splitstree6.data.NetworkBlock;
-import splitstree6.data.parts.Taxon;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.tree.LabeledEdgeShape;
 import splitstree6.layout.tree.LabeledNodeShape;
@@ -61,9 +55,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private final NetworkPane networkPane;
 
 	private final InteractionSetup interactionSetup;
-
-	private final SetChangeListener<Taxon> selectionChangeListener;
-
 
 	/**
 	 * the network view presenter
@@ -166,25 +157,21 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		view.optionFontScaleFactorProperty().addListener((v, o, n) -> undoManager.add("font size", view.optionFontScaleFactorProperty(), o, n));
 		view.optionZoomFactorProperty().addListener((v, o, n) -> undoManager.add("zoom factor", view.optionZoomFactorProperty(), o, n));
 
-		var object = new Object();
-		selectionChangeListener = e -> {
-			if (e.wasAdded()) {
-				RunAfterAWhile.applyInFXThreadOrClearIfAlreadyWaiting(object, () -> {
-					var taxon = e.getElementAdded();
-					var v = networkBlock.get().getGraph().getTaxon2Node(mainWindow.getWorkingTaxa().indexOf(taxon));
-					var node = nodeShapeMap.get(v);
-					controller.getScrollPane().ensureVisible(node);
-				});
-			}
-		};
-		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(new WeakSetChangeListener<>(selectionChangeListener));
-
 		SwipeUtils.setOnSwipeLeft(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
 		SwipeUtils.setOnSwipeRight(controller.getAnchorPane(), () -> controller.getFlipButton().fire());
 		SwipeUtils.setConsumeSwipeUp(controller.getAnchorPane());
 		SwipeUtils.setConsumeSwipeDown(controller.getAnchorPane());
 
 		Platform.runLater(this::setupMenuItems);
+
+		RunAfterAWhile.applyInFXThread(this, () -> {
+			if (mainWindow.getWorkflow().getWorkingTaxaBlock() != null && mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock() != null
+				&& mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().size() > 0) {
+				view.optionTraitLegendProperty().set(FuzzyBoolean.True);
+				view.optionActiveTraitsProperty().set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().getTraitLabels().toArray(new String[0]));
+			}
+		});
+
 	}
 
 	@Override

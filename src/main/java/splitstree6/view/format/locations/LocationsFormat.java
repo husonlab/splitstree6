@@ -23,8 +23,6 @@ import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.geometry.Orientation;
 import javafx.scene.layout.Pane;
@@ -44,8 +42,6 @@ public class LocationsFormat extends Pane {
 	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
 	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
 
-	private final ChangeListener<Boolean> validListener;
-
 	private final IntegerProperty optionLocationSize = new SimpleIntegerProperty(this, "optionLocationSize");
 
 	private final ObjectProperty<FuzzyBoolean> optionLocationLegend = new SimpleObjectProperty<>(this, "optionLocationLegend", FuzzyBoolean.True);
@@ -63,18 +59,9 @@ public class LocationsFormat extends Pane {
 		controller = loader.getController();
 		getChildren().add(loader.getRoot());
 
-		validListener = (v, o, n) -> {
-			workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
-			if (n)
-				traitsBlock.set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock());
-		};
-		workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
-		mainWindow.getWorkflow().validProperty().addListener(new WeakChangeListener<>(validListener));
-
 		legend = new Legend(FXCollections.observableArrayList(), "Twenty", Orientation.VERTICAL);
 		legend.setScalingType(Legend.ScalingType.sqrt);
 		legend.circleMinSizeProperty().bind(optionLocationSizeProperty().multiply(0.5));
-
 		legend.showProperty().bindBidirectional(optionLocationLegend);
 
 		presenter = new LocationsFormatPresenter(this, undoManager);

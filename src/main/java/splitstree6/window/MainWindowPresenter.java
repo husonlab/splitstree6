@@ -111,11 +111,7 @@ import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
 import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.view.utils.ExportUtils;
-import splitstree6.view.worldmap.EnsureWorldMap;
-import splitstree6.workflow.Algorithm;
-import splitstree6.workflow.DataBlock;
-import splitstree6.workflow.Workflow;
-import splitstree6.workflow.WorkflowDataLoader;
+import splitstree6.workflow.*;
 import splitstree6.xtra.latex.MenusToLaTeX;
 
 import java.io.File;
@@ -144,6 +140,13 @@ public class MainWindowPresenter {
 	public MainWindowPresenter(MainWindow mainWindow) {
 		this.mainWindow = mainWindow;
 		controller = mainWindow.getController();
+
+		mainWindow.getWorkflow().runningProperty().addListener((v, o, n) -> {
+			if (!n) {
+				WorkflowUtils.ensureAlignmentView(mainWindow.getWorkflow());
+				WorkflowUtils.ensureWorldMapView(mainWindow.getWorkflow(), false);
+			}
+		});
 
 		controller.getBottomFlowPane().getChildren().addListener((InvalidationListener) e -> controller.getProgressIndicator().setVisible(!controller.getBottomFlowPane().getChildren().isEmpty()));
 		controller.getProgressIndicator().setProgress(-1);
@@ -595,7 +598,7 @@ public class MainWindowPresenter {
 
 		controller.getTraitsMenuItem().setOnAction(null);
 
-		controller.getWorldMapMenuItem().setOnAction(e -> EnsureWorldMap.apply(mainWindow));
+		controller.getWorldMapMenuItem().setOnAction(e -> WorkflowUtils.ensureWorldMapView(mainWindow.getWorkflow(), true));
 		controller.getWorldMapMenuItem().disableProperty().bind(workflow.runningProperty().or(mainWindow.emptyProperty()));
 
 		setupAlgorithmMenuItem(controller.getpDistanceMenuItem(), new PDistance());
@@ -889,6 +892,7 @@ public class MainWindowPresenter {
 	public ObjectProperty<IDisplayTab> selectedDisplayTabProperty() {
 		return selectedDisplayTab;
 	}
+
 	private void setupAlgorithmMenuItem(CheckMenuItem menuItem, Algorithm<? extends DataBlock, ? extends DataBlock> algorithm) {
 		setupAlgorithmMenuItem(menuItem, algorithm, null);
 	}

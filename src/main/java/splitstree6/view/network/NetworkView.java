@@ -84,7 +84,6 @@ public class NetworkView implements IView {
 	private final ObservableMap<jloda.graph.Node, LabeledNodeShape> nodeShapeMap = FXCollections.observableHashMap();
 	private final ObservableMap<jloda.graph.Edge, LabeledEdgeShape> edgeShapeMap = FXCollections.observableHashMap();
 
-
 	{
 		ProgramProperties.track(optionDiagram, DiagramType::valueOf, DiagramType.Network);
 		ProgramProperties.track(optionOrientation, LayoutOrientation::valueOf, LayoutOrientation.Rotate0Deg);
@@ -116,15 +115,15 @@ public class NetworkView implements IView {
 
 		var taxLabelFormatter = new TaxonLabelFormat(mainWindow, undoManager);
 
-		var traitsFormatter = new TraitsFormat(mainWindow, undoManager);
-		traitsFormatter.setNodeShapeMap(nodeShapeMap);
+		var traitsFormat = new TraitsFormat(mainWindow, undoManager);
+		traitsFormat.setNodeShapeMap(nodeShapeMap);
 
-		traitsFormatter.optionActiveTraitsProperty().bindBidirectional(optionActiveTraits);
-		traitsFormatter.optionTraitLegendProperty().bindBidirectional(optionTraitLegend);
-		traitsFormatter.optionTraitSizeProperty().bindBidirectional(optionTraitSize);
-		traitsFormatter.getLegend().scaleProperty().bind(optionZoomFactorProperty());
-		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
-		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
+		traitsFormat.optionActiveTraitsProperty().bindBidirectional(optionActiveTraits);
+		traitsFormat.optionTraitLegendProperty().bindBidirectional(optionTraitLegend);
+		traitsFormat.optionTraitSizeProperty().bindBidirectional(optionTraitSize);
+		traitsFormat.getLegend().scaleProperty().bind(optionZoomFactorProperty());
+		traitsFormat.setRunAfterUpdateNodes(presenter::updateLabelLayout);
+		presenter.updateCounterProperty().addListener(e -> traitsFormat.updateNodes());
 
 		var sitesFormat = new SitesFormat(undoManager);
 		sitesFormat.optionSitesStyleProperty().bindBidirectional(optionSitesStyle);
@@ -138,12 +137,12 @@ public class NetworkView implements IView {
 			sitesFormat.setDisable(n == null || n.getGraph().getNumberOfEdges() == 0);
 		});
 
-		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormatter, sitesFormat);
+		controller.getFormatVBox().getChildren().addAll(taxLabelFormatter, new TaxonMark(mainWindow, undoManager), traitsFormat, sitesFormat);
 
-		AnchorPane.setLeftAnchor(traitsFormatter.getLegend(), 5.0);
-		AnchorPane.setTopAnchor(traitsFormatter.getLegend(), 30.0);
-		controller.getInnerAnchorPane().getChildren().add(traitsFormatter.getLegend());
-		DraggableLabel.makeDraggable(traitsFormatter.getLegend());
+		AnchorPane.setLeftAnchor(traitsFormat.getLegend(), 5.0);
+		AnchorPane.setTopAnchor(traitsFormat.getLegend(), 30.0);
+		controller.getInnerAnchorPane().getChildren().add(traitsFormat.getLegend());
+		DraggableLabel.makeDraggable(traitsFormat.getLegend());
 
 		undoManager.undoableProperty().addListener(e -> mainWindow.setDirty(true));
 		optionDiagramProperty().addListener(e -> mainWindow.setDirty(true));

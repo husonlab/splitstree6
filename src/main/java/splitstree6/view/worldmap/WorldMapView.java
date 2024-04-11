@@ -20,20 +20,21 @@
 package splitstree6.view.worldmap;
 
 import javafx.application.Platform;
+import javafx.beans.InvalidationListener;
+import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.WeakChangeListener;
 import javafx.scene.Node;
 import javafx.scene.chart.PieChart;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
+import javafx.scene.shape.Shape;
+import javafx.util.Pair;
 import jloda.fx.icons.MaterialIcons;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.BasicFX;
-import jloda.fx.util.ExtendedFXMLLoader;
-import jloda.fx.util.ProgramProperties;
+import jloda.fx.util.*;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
-import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.locations.LocationsFormat;
 import splitstree6.view.utils.IView;
@@ -65,7 +66,10 @@ public class WorldMapView implements IView {
 	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
 	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
 
-	private final ChangeListener<Boolean> validListener;
+	private final StringProperty colorSchemeName = new SimpleStringProperty(this, "colorSchemeName");
+	private final InvalidationListener validListener;
+
+	private final InvalidationListener selectionListener;
 
 	{
 		ProgramProperties.track(optionShowContinentNames, true);
@@ -92,30 +96,64 @@ public class WorldMapView implements IView {
 		presenter = new WorldMapPresenter(mainWindow, this);
 		empty.bind(Bindings.isEmpty(presenter.getWorldMap1().getUserItems().getChildren()));
 
-		var locationsFormatter = new LocationsFormat(mainWindow, undoManager);
-		controller.getFormatVBox().getChildren().addAll(locationsFormatter);
+		var formatter = new LocationsFormat(mainWindow, undoManager);
+		controller.getFormatVBox().getChildren().addAll(formatter);
 		controller.getFormatVBox().setDisable(false);
-		locationsFormatter.optionLocationSizeProperty().addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
+		formatter.optionLocationSizeProperty().addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
+		colorSchemeName.bindBidirectional(formatter.getLegend().colorSchemeNameProperty());
+
 		traitsBlock.addListener(e -> {
-			updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, getMaxCount(), locationsFormatter.getOptionLocationSize());
-			locationsFormatter.getLegend().setUnitRadius(getMaxCount());
+			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, colorSchemeName.get(), formatter.getOptionLocationSize());
+			if (maxCount > 0)
+				formatter.getLegend().setUnitRadius(0.5 * formatter.getOptionLocationSize() / Math.sqrt(maxCount));
+			else
+				formatter.getLegend().setUnitRadius(0);
 		});
 
-		validListener = (v, o, n) -> {
-			workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
-			if (n)
-				traitsBlock.set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock());
+		AnchorPane.setLeftAnchor(formatter.getLegend(), 5.0);
+		AnchorPane.setTopAnchor(formatter.getLegend(), 30.0);
+		controller.getInnerAnchorPane().getChildren().add(formatter.getLegend());
+		DraggableLabel.makeDraggable(formatter.getLegend());
+
+		validListener = e -> {
+			if (mainWindow.getWorkflow().isValid()) {
+				workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
+				if (workingTaxa.get() != null) {
+					traitsBlock.set(workingTaxa.get().getTraitsBlock());
+					formatter.getLegend().getLabels().setAll(workingTaxa.get().getLabels());
+					formatter.getLegend().getActive().addAll(workingTaxa.get().getLabels());
+				} else {
+					traitsBlock.set(null);
+				}
+			}
 		};
 		workingTaxa.set(mainWindow.getWorkflow().getWorkingTaxaBlock());
-		mainWindow.getWorkflow().validProperty().addListener(new WeakChangeListener<>(validListener));
+		mainWindow.getWorkflow().validProperty().addListener(new WeakInvalidationListener(validListener));
 
 		setViewTab(viewTab);
 
-		Platform.runLater(() -> {
-			updateTraitsData(mainWindow.getWorkingTaxa(), mainWindow.getWorkingTaxa().getTraitsBlock(), presenter,
-					getMaxCount(), locationsFormatter.getOptionLocationSize());
-			locationsFormatter.getLegend().setUnitRadius(getMaxCount());
-		});
+		Platform.runLater(() -> validListener.invalidated(null));
+
+		selectionListener = e -> {
+			for (var shape : BasicFX.getAllRecursively(getPresenter().getWorldMap1().getUserItems(), Shape.class)) {
+				shape.setEffect(null);
+				if (shape.getUserData() instanceof String string) {
+					if (mainWindow.getWorkingTaxa() != null) {
+						var taxon = mainWindow.getWorkingTaxa().get(string);
+						if (taxon != null && mainWindow.getTaxonSelectionModel().isSelected(taxon)) {
+							shape.setEffect(SelectionEffectBlue.getInstance());
+							if (shape.getParent() instanceof Pane pane) {
+								pane.getChildren().remove(shape);
+								pane.getChildren().add(shape);
+
+							}
+						}
+					}
+				}
+			}
+		};
+		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(selectionListener);
+		selectionListener.invalidated(null);
 	}
 
 	@Override
@@ -165,13 +203,14 @@ public class WorldMapView implements IView {
 	}
 
 	@Override
-	public IDisplayTabPresenter getPresenter() {
+	public WorldMapPresenter getPresenter() {
 		return presenter;
 	}
 
 	public WorldMapController getController() {
 		return controller;
 	}
+
 
 	@Override
 	public String getCitation() {
@@ -213,65 +252,53 @@ public class WorldMapView implements IView {
 		}
 	}
 
-	private double getMaxCount() {
-		var max = 0.0;
-		if (workingTaxa.get() != null && traitsBlock.get() != null) {
-			var taxa = workingTaxa.get();
-			var traits = traitsBlock.get();
-			for (var traitId = 1; traitId < traits.getNTraits(); traitId++) {
-				var count = 0.0;
-				var lat = traits.getTraitLatitude(traitId);
-				var lon = traits.getTraitLongitude(traitId);
-				if (lat != 0 || lon != 0) {
-					for (var t = 1; t <= taxa.getNtax(); t++) {
-						var value = traits.getTraitValue(t, traitId);
-						count += value;
-					}
-				}
-				max = Math.max(max, count);
-			}
-		}
-		return max;
-	}
+	private static double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, String colorSchemeName, double maxSize) {
+		if (taxaBlock != null && traitsBlock != null) {
+			var maxCount = computeMaxCount(taxaBlock, traitsBlock);
+			presenter.getWorldMap1().getUserItems().getChildren().clear();
+			presenter.getWorldMap2().getUserItems().getChildren().clear();
 
-	private static void updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, double maxCount, double maxSize) {
-		presenter.getWorldMap1().getUserItems().getChildren().clear();
-		presenter.getWorldMap2().getUserItems().getChildren().clear();
-
-		if (taxaBlock != null && traitsBlock != null && traitsBlock.size() > 0) {
 			for (var traitId = 1; traitId < traitsBlock.getNTraits(); traitId++) {
 				var lat = traitsBlock.getTraitLatitude(traitId);
 				var lon = traitsBlock.getTraitLongitude(traitId);
 				if (lat != 0 || lon != 0) {
-					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, traitId, maxCount, maxSize), lat, lon);
-					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, traitId, maxCount, maxSize), lat, lon);
+					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lat, lon);
+					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lat, lon);
 				}
 			}
-		}
+			return maxCount;
+		} else return 0;
 	}
 
-	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, int traitId, double maxCount, double maxSize) {
-		var chart = new PieChart();
-		chart.setLabelsVisible(false);
-		chart.setLegendVisible(false);
-		var count = 0.0;
+	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, String colorSchemeName, int traitId, double maxCount, double maxSize) {
+		var chart = new BasicPieChart(traitsBlock.getTraitLabel(traitId));
+		chart.setColorScheme(colorSchemeName);
+		var total = 0.0;
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {
 			var value = traitsBlock.getTraitValue(t, traitId);
-			chart.getData().add(new PieChart.Data(taxaBlock.getLabel(t), value));
-			count += value;
+			chart.getData().add(new Pair<>(taxaBlock.getLabel(t), value));
+			total += value;
 		}
-		chart.widthProperty().addListener((v, o, n) -> chart.setLayoutX(-0.5 * n.doubleValue()));
-		chart.heightProperty().addListener((v, o, n) -> chart.setLayoutY(-0.5 * n.doubleValue()));
-
-
-		chart.setMinWidth(maxSize);
-		chart.setMinHeight(maxSize);
-		chart.setPrefWidth(maxSize);
-		chart.setPrefHeight(maxSize);
-		if (count < maxCount) {
-			chart.setScaleX(count / maxCount);
-			chart.setScaleY(count / maxCount);
-		}
+		if (maxCount > 0)
+			chart.setRadius(0.5 * maxSize / Math.sqrt(maxCount) * Math.sqrt(total));
+		else chart.setRadius(0);
 		return chart;
+	}
+
+	private static double computeMaxCount(TaxaBlock taxaBlock, TraitsBlock traitsBlock) {
+		var max = 0.0;
+		for (var traitId = 1; traitId < traitsBlock.getNTraits(); traitId++) {
+			var count = 0.0;
+			var lat = traitsBlock.getTraitLatitude(traitId);
+			var lon = traitsBlock.getTraitLongitude(traitId);
+			if (lat != 0 || lon != 0) {
+				for (var t = 1; t <= taxaBlock.getNtax(); t++) {
+					var value = traitsBlock.getTraitValue(t, traitId);
+					count += value;
+				}
+			}
+			max = Math.max(max, count);
+		}
+		return max;
 	}
 }
