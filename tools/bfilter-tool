@@ -29,7 +29,7 @@ jars2_dir="$bin_dir/../jars2"
 jre_dir=${installer:sys.preferredJre}
 
 java=$jre_dir/bin/java
-vmOptions=$(grep "^-" "$bin_dir/../SplitsTreeCE.vmoptions")
+vmOptions=$(grep "^-" "$bin_dir/../SplitsTree.vmoptions")
 modulepath="$jars_dir:$jars2_dir"
 
 java_flags="-server -Duser.language=en -Duser.region=US $vmOptions"

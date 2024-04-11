@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<install4j version="10.0.6" transformSequenceNumber="10">
-  <directoryPresets config="../target/SplitsTreeApp-1.0.0-SNAPSHOT.jar" />
-  <application name="SplitsTreeApp" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTreeApp" publisher="Daniel H. Huson and David Bryant" publisherWeb="https://www.splitstree.org" version="0.0.0_beta" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
+<install4j version="10.0.7" transformSequenceNumber="10">
+  <directoryPresets config="../target/SplitsTree-1.0.0-SNAPSHOT.jar" />
+  <application name="SplitsTree" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTree" publisher="Daniel H. Huson and David Bryant" publisherWeb="http://splitstree.husonlab.org" version="6.0.0" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
       <variable name="renderingVMOption" />
     </variables>
@@ -15,7 +15,7 @@
         <entry>install4j*</entry>
       </macSearchedJars>
     </codeSigning>
-    <jreBundles jdkProviderId="Liberica" release="20/20.0.2+10">
+    <jreBundles jdkProviderId="Liberica" release="22/22+37">
       <modules />
     </jreBundles>
   </application>
@@ -35,7 +35,7 @@
           <entry location="install4j-runtime-10.0.5.jar" />
         </exclude>
       </dirEntry>
-      <fileEntry mountPoint="1691242167" file="../target/SplitsTreeApp-1.0.0-SNAPSHOT.jar" />
+      <fileEntry mountPoint="1691242167" file="../target/SplitsTree-1.0.0-SNAPSHOT.jar" />
       <fileEntry mountPoint="1691243203" file="../target/dependency/install4j-runtime-10.0.5.jar" />
       <dirEntry mountPoint="1691242153" file="../examples" subDirectory="examples" />
       <fileEntry mountPoint="1691243205" file="../tools/genome-context" fileMode="755" overrideFileMode="true" />
@@ -51,7 +51,7 @@
       <fileEntry mountPoint="675425072" file="../src/main/resources/NOTICE.txt" />
     </entries>
     <components>
-      <component name="SplitsTreeApp" id="1691242194" changeable="false">
+      <component name="SplitsTree" id="1691242194" changeable="false">
         <description>The SplitsTree App.</description>
         <include>
           <entry location="jars" />
@@ -60,7 +60,7 @@
           <entry location="Licenses" />
           <entry location="LICENSE.txt" />
           <entry location="NOTICE.txt" />
-          <entry location="SplitsTreeApp" fileType="launcher" />
+          <entry location="SplitsTree" fileType="launcher" />
         </include>
       </component>
       <component name="Examples" id="1691243204">
@@ -74,9 +74,9 @@
     </components>
   </files>
   <launchers>
-    <launcher name="SplitsTreeApp" id="1691242142" menuName="SplitsTree App ">
-      <executable name="SplitsTreeApp" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
-        <versionInfo include="true" fileDescription="SplitsTree app - analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2024 ${compiler:sys.publisher}" internalName="SplitsTreeApp" />
+    <launcher name="SplitsTree" id="1691242142" menuName="SplitsTree ">
+      <executable name="SplitsTree" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
+        <versionInfo include="true" fileDescription="SplitsTree App - analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2024 ${compiler:sys.publisher}" internalName="SplitsTree" />
       </executable>
       <java mainClass="splitstreesix/splitstree6.main.SplitsTree6" mainMode="module" vmParameters="-server -Duser.language=en -Duser.region=US ${compiler:renderingVMOption}">
         <modulePath>
@@ -1158,8 +1158,8 @@ return true;</property>
         <variable name="renderingVMOption" value="-Dprism.forceGPU=true" />
       </variables>
     </unixInstaller>
-    <macosFolder name="Mac OS X Folder" id="1691242165" installDir="SplitsTreeApp" overridePrincipalLanguage="true" architecture="universal" compressDmg="true" signLaunchers="true" />
-    <windows name="Windows64bit" id="1691242288" installDir="SplitsTreeApp" overridePrincipalLanguage="true" architecture="64">
+    <macosFolder name="Mac OS X Folder" id="1691242165" installDir="SplitsTree" overridePrincipalLanguage="true" architecture="universal" compressDmg="true" signLaunchers="true" />
+    <windows name="Windows64bit" id="1691242288" installDir="SplitsTree" overridePrincipalLanguage="true" architecture="64">
       <overriddenPrincipalLanguage id="409" />
       <exclude>
         <entry location="tools" />

@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import splitstree6.main.Version;
 
 /**
  * ask whether to discard changes
@@ -42,7 +43,7 @@ public class AskToDiscardChanges {
 		alert.initModality(Modality.APPLICATION_MODAL);
 		alert.initOwner(stage);
 
-		alert.setTitle("Confirm " + message + " of Changes - SplitsTreeCE");
+		alert.setTitle("Confirm " + message + " of Changes - " + Version.NAME);
 		alert.setHeaderText("There are unsaved changes.");
 		alert.setContentText(message + " existing changes?");
 

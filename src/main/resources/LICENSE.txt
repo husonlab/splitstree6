@@ -1,4 +1,4 @@
-SplitsTreeCE https://github.com/husonlab/splitstree6
+SplitsTree https://github.com/husonlab/splitstree6
 
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007

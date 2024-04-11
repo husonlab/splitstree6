@@ -4,7 +4,7 @@ out/
 !**/src/test/**/out/
 
 .idea
-splitstreeCE.iml
+*.iml
 
 ### Eclipse ###
 .apt_generated

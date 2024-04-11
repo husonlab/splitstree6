@@ -64,7 +64,7 @@ public class GMLWriter extends ViewWriterBase {
 					case "weight" -> StringUtils.removeTrailingZerosAfterDot("%.8f", graph.getWeight(e));
 					default -> null;
 				};
-				var comment = "Exported from SplitsTreeCE: %,d nodes, %,d edges, %,d splits".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges(), splitsView.getSplitsBlock().getNsplits());
+				var comment = "Exported from SplitsTree: %,d nodes, %,d edges, %,d splits".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges(), splitsView.getSplitsBlock().getNsplits());
 				var graphLabel = (graph.getName() != null ? graph.getName() : splitsView.getName());
 				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
 						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);
@@ -88,7 +88,7 @@ public class GMLWriter extends ViewWriterBase {
 					case "sites" -> networkView.getNetworkBlock().getEdgeData(e).get("sites");
 					default -> null;
 				};
-				var comment = "Exported from SplitsTreeCE: %,d nodes, %,d edges,".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges());
+				var comment = "Exported from SplitsTree: %,d nodes, %,d edges,".formatted(graph.getNumberOfNodes(), graph.getNumberOfEdges());
 				var graphLabel = (graph.getName() != null ? graph.getName() : networkView.getName());
 				GraphGML.writeGML(graph, comment, graphLabel, false, 1, w,
 						labelNodes, labelNodeValue, labelEdges, labelEdgeValue);

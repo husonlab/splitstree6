@@ -24,10 +24,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>org.husonlab</groupId>
-    <artifactId>SplitsTreeCE</artifactId>
+    <artifactId>SplitsTree</artifactId>
     <version>1.0.0-SNAPSHOT</version>
 
-    <name>SplitsTreeCE</name>
+    <name>SplitsTree</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -131,7 +131,7 @@
                     <mainClass>${main.class}</mainClass>
                 </configuration>
             </plugin>
-            <!-->
+
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -145,7 +145,7 @@
                     </execution>
                 </executions>
             </plugin>
-            </!-->
+
             <!-->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
