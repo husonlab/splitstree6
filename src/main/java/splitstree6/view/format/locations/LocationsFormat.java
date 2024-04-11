@@ -24,6 +24,7 @@ import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.layout.Pane;
 import jloda.fx.control.Legend;
@@ -63,6 +64,9 @@ public class LocationsFormat extends Pane {
 		legend.setScalingType(Legend.ScalingType.sqrt);
 		legend.circleMinSizeProperty().bind(optionLocationSizeProperty().multiply(0.5));
 		legend.showProperty().bindBidirectional(optionLocationLegend);
+
+		legend.getStyleClass().add("viewer-background");
+		legend.setPadding(new Insets(3, 3, 3, 3));
 
 		presenter = new LocationsFormatPresenter(this, undoManager);
 	}

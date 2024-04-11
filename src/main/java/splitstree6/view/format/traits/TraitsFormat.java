@@ -27,6 +27,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
+import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Tooltip;
@@ -89,6 +90,9 @@ public class TraitsFormat extends Pane {
 		legend = new Legend(FXCollections.observableArrayList(), "Twenty", Orientation.VERTICAL);
 		legend.setScalingType(Legend.ScalingType.sqrt);
 		legend.circleMinSizeProperty().bind(optionTraitSizeProperty().multiply(0.5));
+
+		legend.getStyleClass().add("viewer-background");
+		legend.setPadding(new Insets(3, 3, 3, 3));
 
 		legend.showProperty().bindBidirectional(optionTraitLegend);
 
