@@ -47,6 +47,7 @@
                         <ToggleButton fx:id="twoCopiesToggleButton" mnemonicParsing="false" text="Two"/>
                         <Button fx:id="zoomInButton" mnemonicParsing="false" text="Zoom in"/>
                         <Button fx:id="zoomOutButton" mnemonicParsing="false" text="Zoom out"/>
+                         <Button fx:id="zoomToFitButton" mnemonicParsing="false" text="Zoom to Fit"/>
                      </items>
                   </ToolBar>
                </children>

@@ -101,11 +101,20 @@ public class PhylipReader extends CharactersReader {
 							}
 						} else {
 							if (taxonName == null) {
-								taxonName = line.substring(0, 10).trim();
-								taxonName = StringUtils.getUniqueName(taxonName, taxaSet);
+								var labelLength = 10;
+								var seqStart = 10;
+								if (StringUtils.countOccurrences(line, '\t') == 1) {
+									labelLength = line.indexOf('\t');
+									seqStart = labelLength + 1;
+								} else if (containsSingleRunOfSpaces(line)) {
+									labelLength = line.indexOf(" ");
+									seqStart = line.lastIndexOf(" ") + 1;
+								}
+								taxonName = StringUtils.getUniqueName(line.substring(0, labelLength).trim(), taxaSet);
 								taxaSet.add(taxonName);
+								var sequence = line.substring(seqStart).replaceAll("\\s+", "");
 								sequenceBuffer.setLength(0);
-								sequenceBuffer.append(line.substring(10).replaceAll("\\s+", ""));
+								sequenceBuffer.append(sequence);
 							} else
 								sequenceBuffer.append(line.replaceAll("\\s+", ""));
 							if (sequenceBuffer.length() == nChar) {
@@ -117,7 +126,7 @@ public class PhylipReader extends CharactersReader {
 						}
 					}
 				}
-				if (sequenceBuffer.length() > 0) {
+				if (!sequenceBuffer.isEmpty()) {
 					taxonNames.add(taxonName);
 					var sequence = sequenceBuffer.toString();
 					if (getMissing() == 0 && sequence.contains("?"))
@@ -137,12 +146,12 @@ public class PhylipReader extends CharactersReader {
 				for (int i = 0; i < sequences.size(); i++) {
 					var seq = sequences.get(i);
 					if (seq.length() != nChar)
-						throw new IOException(String.format("SequenceType %d: expected %d characters, found: %d", (i + 1), nChar, seq.length()));
+						throw new IOException(String.format("Sequence %d: expected %d characters, found: %d", (i + 1), nChar, seq.length()));
 
 					for (int j = 0; j < seq.length(); j++) {
 						var ch = seq.charAt(j);
 						if (Character.isWhitespace(ch))
-							throw new IOException(String.format("SequenceType %d contains whitespace: %100s", (i + 1), seq));
+							throw new IOException(String.format("Sequence %d contains whitespace: %100s", (i + 1), seq));
 						characters.set(i + 1, j + 1, seq.charAt(j));
 					}
 				}
@@ -171,12 +180,20 @@ public class PhylipReader extends CharactersReader {
 							}
 							continue;
 						} else if (taxonNames.size() < nTax) {
-							var name = line.substring(0, 10).trim();
-							name = StringUtils.getUniqueName(name, taxaSet);
-							taxaSet.add(name);
-							taxonNames.add(name);
+							var labelLength = 10;
+							var seqStart = 10;
+							if (StringUtils.countOccurrences(line, '\t') == 1) {
+								labelLength = line.indexOf('\t');
+								seqStart = labelLength + 1;
+							} else if (containsSingleRunOfSpaces(line)) {
+								labelLength = line.indexOf(" ");
+								seqStart = line.lastIndexOf(" ") + 1;
+							}
+							var taxonName = StringUtils.getUniqueName(line.substring(0, labelLength).trim(), taxaSet);
+							taxaSet.add(taxonName);
+							taxonNames.add(taxonName);
 							sequenceBuffers.add(new StringBuilder());
-							sequenceBuffers.get(which).append(line.substring(10).replaceAll("\\s+", ""));
+							sequenceBuffers.get(which).append(line.substring(seqStart).replaceAll("\\s+", ""));
 						} else if (line.startsWith(taxonNames.get(which))) {
 							sequenceBuffers.get(which).append(line.substring(10).replaceAll("\\s+", ""));
 						} else
@@ -205,6 +222,22 @@ public class PhylipReader extends CharactersReader {
 				}
 			}
 		}
+	}
+
+	private static boolean containsSingleRunOfSpaces(String line) {
+		var state = 0; // 0: before, 1: during, 2: after run of spaces
+		for (var i = 0; i < line.length(); i++) {
+			if (line.charAt(i) == ' ') {
+				if (state == 0) {
+					state = 1;
+				} else if (state == 2)
+					return false; // multiple runs
+			} else {
+				if (state == 1)
+					state = 2;
+			}
+		}
+		return state == 2;
 	}
 
 	@Override

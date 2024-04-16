@@ -57,12 +57,12 @@ public class UniqueTopologies extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Filter trees and rooted networks unique topologies (using hardwired clusters).";
+		return "Filter trees or rooted networks return all unique topologies (using hardwired clusters).";
 	}
 
 	@Override
 	public String getCitation() {
-		return "Huson et al 2012;DH Huson, R. Rupp and C. Scornavacca, Phylogenetic Networks, Cambridge, 2012.";
+		return super.getCitation();
 	}
 
 	@Override

@@ -26,7 +26,7 @@ public class BlocksToLaTeX {
 
 		System.out.println("% This file is auto-generated from code, please don't hand edit.\n\n" +
 						   "\\chapter{Main data blocks}\n" +
-						   "\\label{chapter:main-data-blocks\n\n" +
+						   "\\label{chapter:main-data-blocks}\n\n" +
 						   "SplitsTree is organized around data blocks that correspond to ``Nexus'' blocks \\citep{Maddisonetal1997}.\n\n" +
 						   output("Taxa block", TaxaNexusInput.DESCRIPTION, TaxaNexusInput.SYNTAX) +
 						   output("Traits block", TraitsNexusInput.DESCRIPTION, TraitsNexusInput.SYNTAX) +
@@ -46,7 +46,7 @@ public class BlocksToLaTeX {
 	}
 
 	public static String output(String name, String description, String syntax) {
-		return "\\section{%s}\\index{%s}%n%n%s%n".formatted(name, name, description.replaceAll("\t", "    ")) +
+		return "\\section{%s}\\index{%s}\\label{sec:%s}%n%n%s%n".formatted(name, name, name.toLowerCase().replaceAll(" ", "-"), description.replaceAll("\t", "    ")) +
 			   "{\\footnotesize\\begin{verbatim}\n" +
 			   syntax.replaceAll("\t", "  ") +
 			   "\\end{verbatim}}\n\n";

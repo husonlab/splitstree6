@@ -22,7 +22,6 @@ package splitstree6.algorithms.trees.trees2trees;
 import javafx.beans.property.SimpleObjectProperty;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.splits.splits2trees.GreedyTree;
-import splitstree6.algorithms.trees.trees2splits.ConsensusNetwork;
 import splitstree6.algorithms.trees.trees2splits.ConsensusSplits;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -38,12 +37,15 @@ import java.util.List;
 public class ConsensusTree extends Trees2Trees {
 	public enum Consensus {Majority, Greedy, Strict}
 
+	public enum EdgeWeights {Mean, TreeSizeWeightedMean}
+
+	;
+
 	private final SimpleObjectProperty<Consensus> optionConsensus = new SimpleObjectProperty<>(this, "optionConsensus", Consensus.Majority);
-	private final SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeights = new SimpleObjectProperty<>(this, "optionEdgeWeights", ConsensusNetwork.EdgeWeights.TreeSizeWeightedMean);
 
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionConsensus.getName(), optionEdgeWeights.getName());
+		return List.of(optionConsensus.getName());
 	}
 
 	@Override
@@ -51,9 +53,7 @@ public class ConsensusTree extends Trees2Trees {
 		if (!optionName.startsWith("option"))
 			optionName = "option" + optionName;
 
-		if (optionName.equals(optionEdgeWeights.getName()))
-			return "Determine how to calculate edge weights in resulting network";
-		else if (optionName.equals(optionConsensus.getName()))
+		if (optionName.equals(optionConsensus.getName()))
 			return "Consensus method to use";
 		else
 			return super.getToolTip(optionName);
@@ -76,7 +76,7 @@ public class ConsensusTree extends Trees2Trees {
 		else {
 			final ConsensusSplits consensusTreeSplits = new ConsensusSplits();
 			consensusTreeSplits.setOptionConsensus(getOptionConsensus().name());
-			consensusTreeSplits.setOptionEdgeWeights(getOptionEdgeWeights());
+			consensusTreeSplits.setOptionEdgeWeights(ConsensusSplits.EdgeWeights.Mean);
 			final SplitsBlock splitsBlock = new SplitsBlock();
 			consensusTreeSplits.compute(progress, taxaBlock, parent, splitsBlock);
 			final GreedyTree greedyTree = new GreedyTree();
@@ -100,17 +100,4 @@ public class ConsensusTree extends Trees2Trees {
 	public void setOptionConsensus(Consensus optionConsensus) {
 		this.optionConsensus.set(optionConsensus);
 	}
-
-	public ConsensusNetwork.EdgeWeights getOptionEdgeWeights() {
-		return optionEdgeWeights.get();
-	}
-
-	public SimpleObjectProperty<ConsensusNetwork.EdgeWeights> optionEdgeWeightsProperty() {
-		return optionEdgeWeights;
-	}
-
-	public void setOptionEdgeWeights(ConsensusNetwork.EdgeWeights optionEdgeWeights) {
-		this.optionEdgeWeights.set(optionEdgeWeights);
-	}
-
 }

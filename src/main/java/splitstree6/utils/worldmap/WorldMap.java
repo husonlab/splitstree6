@@ -25,6 +25,7 @@ import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
 import javafx.scene.text.Text;
@@ -40,7 +41,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class WorldMap extends Group {
+public class WorldMap extends Pane {
 	// do not change these values, they crucial for correct mapping of lat-long coordinates
 	public static final double X0 = 25;
 	public static final double Y0 = 24;
@@ -56,6 +57,8 @@ public class WorldMap extends Group {
 	private final Group countries;
 	private final Group oceans;
 
+	private final Rectangle dataRectangle;
+
 	private final Group userItems = new Group();
 
 	private final Group box;
@@ -67,7 +70,10 @@ public class WorldMap extends Group {
 	private InvalidationListener darkModeInvalidationListener;
 
 	public WorldMap() {
-		super(new Group());
+		dataRectangle = new Rectangle(0, 0, 0, 0);
+		dataRectangle.setFill(Color.TRANSPARENT);
+		dataRectangle.setStroke(Color.GRAY);
+		dataRectangle.setStrokeWidth(0.5);
 
 		try {
 			outlines = createOutlines();
@@ -81,17 +87,17 @@ public class WorldMap extends Group {
 		box = new Group();
 
 		grid = createGrid();
-		if (true) {
+		{
 			var topLeft = millerProjection(90, -180, false);
 			var bottomRight = millerProjection(-90, 180, false);
-			var rect = new Rectangle(Math.min(topLeft.getX(), bottomRight.getX()),
+			var worldRectangle = new Rectangle(Math.min(topLeft.getX(), bottomRight.getX()),
 					Math.min(topLeft.getY(), bottomRight.getY()),
 					Math.abs(topLeft.getX() - bottomRight.getX()),
 					Math.abs(topLeft.getY() - bottomRight.getY()));
-			rect.setStroke(Color.TRANSPARENT);
-			rect.setFill(Color.TRANSPARENT);
-			rect.setStrokeWidth(0.25);
-			box.getChildren().add(rect);
+			worldRectangle.setStroke(Color.TRANSPARENT);
+			worldRectangle.setFill(Color.TRANSPARENT);
+			worldRectangle.setStrokeWidth(0.25);
+			box.getChildren().addAll(worldRectangle, dataRectangle);
 		}
 		notUserItems.getChildren().addAll(box, grid, outlines, oceans, countries, continents);
 		getChildren().addAll(notUserItems, userItems);
@@ -135,8 +141,8 @@ public class WorldMap extends Group {
 					label.setTranslateX(factorX * label.getTranslateX());
 					label.setTranslateY(factorY * label.getTranslateY());
 				} else if (node instanceof Rectangle rectangle) {
-					rectangle.setLayoutX(factorX * rectangle.getLayoutX());
-					rectangle.setLayoutY(factorY * rectangle.getLayoutY());
+					rectangle.setX(factorX * rectangle.getX());
+					rectangle.setY(factorY * rectangle.getY());
 					rectangle.setWidth(factorX * rectangle.getWidth());
 					rectangle.setHeight(factorY * rectangle.getHeight());
 				} else if (node instanceof Line line) {
@@ -349,5 +355,38 @@ public class WorldMap extends Group {
 		node.setTranslateX(point.getX());
 		node.setTranslateY(point.getY());
 		getUserItems().getChildren().add(node);
+
+		growRect(dataRectangle, point);
+	}
+
+	private void growRect(Rectangle rect, Point2D point) {
+		if (rect.getX() == 0 && rect.getX() == 0 && rect.getWidth() == 0 && rect.getHeight() == 0) {
+			rect.setX(point.getX());
+			rect.setY(point.getY());
+		} else {
+			var topLeft = new Point2D(rect.getX(), rect.getY());
+			var bottomRight = new Point2D(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
+
+			if (point.getX() < topLeft.getX()) {
+				topLeft = new Point2D(point.getX(), topLeft.getY());
+				rect.setX(topLeft.getX());
+				rect.setWidth(bottomRight.getX() - topLeft.getX());
+			} else if (point.getX() > bottomRight.getX()) {
+				bottomRight = new Point2D(point.getX(), bottomRight.getY());
+				rect.setWidth(bottomRight.getX() - topLeft.getX());
+			}
+			if (point.getY() < topLeft.getY()) {
+				topLeft = new Point2D(topLeft.getX(), point.getY());
+				rect.setY(topLeft.getY());
+				rect.setHeight(bottomRight.getY() - topLeft.getY());
+			} else if (point.getY() > bottomRight.getY()) {
+				bottomRight = new Point2D(bottomRight.getX(), point.getY());
+				rect.setHeight(bottomRight.getY() - topLeft.getY());
+			}
+		}
+	}
+
+	public Rectangle getDataRectangle() {
+		return dataRectangle;
 	}
 }

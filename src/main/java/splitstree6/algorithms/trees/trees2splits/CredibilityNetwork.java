@@ -32,7 +32,6 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 import splitstree6.splits.ASplit;
 import splitstree6.splits.Compatibility;
-import splitstree6.workflow.interfaces.DoNotLoadThisAlgorithm;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -47,10 +46,14 @@ import java.util.List;
  * @author Daniel Huson and David Bryant
  */
 
-public class CredibilityNetwork extends Trees2Splits implements DoNotLoadThisAlgorithm {
+public class CredibilityNetwork extends Trees2Splits {
 
 	private final DoubleProperty optionLevel = new SimpleDoubleProperty(this, "optionLevel", .95);
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
+
+	public CredibilityNetwork() {
+
+	}
 
 	@Override
 	public String getCitation() {
@@ -72,7 +75,7 @@ public class CredibilityNetwork extends Trees2Splits implements DoNotLoadThisAlg
 	@Override
 	public String getToolTip(String optionName) {
 		if (optionName.equals(optionLevel.getName())) {
-			return "Set the level";
+			return "Set the level (between 0 and 1)";
 		}
 		return optionName;
 	}
@@ -162,8 +165,7 @@ public class CredibilityNetwork extends Trees2Splits implements DoNotLoadThisAlg
 
 		splitsBlock.clear();
 		if (isOptionHighDimensionFilter()) {
-			var dimensionsFilter = new DimensionFilter();
-			dimensionsFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
+			DimensionFilter.apply(progress, 4, computedSplits.getSplits(), splitsBlock.getSplits());
 		} else
 			splitsBlock.copy(computedSplits);
 

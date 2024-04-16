@@ -56,7 +56,9 @@ public class IOToLaTeX {
 						   outputExporters(TreesBlock.class) +
 						   outputExporters(SplitsBlock.class) +
 						   outputExporters(NetworkBlock.class) +
-						   outputExporters(GenomesBlock.class));
+						   outputExporters(GenomesBlock.class) +
+						   outputExporters(ViewBlock.class)
+		);
 
 		System.out.println("\n % EOF");
 	}
@@ -65,12 +67,12 @@ public class IOToLaTeX {
 		var dataBlock = clazz.getDeclaredConstructor().newInstance();
 		var blockName = dataBlock.getBlockName().toLowerCase();
 		var buf = new StringBuilder();
-		buf.append("\\subsection{Importers for a %s block}\\index{%s data import}%n%n".formatted(blockName, capitalizeFirst(blockName)));
+		buf.append("\\subsection{Importers for a %s block}\\index{%s data import}\\label{sec:importers-%s}%n%n".formatted(blockName, capitalizeFirst(blockName), blockName));
 		var importManager = ImportManager.getInstance();
-		var formats = importManager.getReaders(clazz).stream().map(ReaderWriterBase::getName).toList();
+		var formats = importManager.getReaders(clazz).stream().map(ReaderWriterBase::getName).filter(n -> !n.isBlank()).toList();
 
 		buf.append("Can import %s data in the following formats: %s.%n".formatted(blockName, StringUtils.toString(formats, ", ")));
-		buf.append("\\index{").append(StringUtils.toString(formats, " format import}, \\index{")).append(" format import}\n\n");
+		buf.append("\\index{").append(StringUtils.toString(formats, " format import} \\index{")).append(" format import}\n\n");
 		return buf.toString();
 	}
 
@@ -78,12 +80,12 @@ public class IOToLaTeX {
 		var dataBlock = clazz.getDeclaredConstructor().newInstance();
 		var blockName = dataBlock.getBlockName().toLowerCase();
 		var buf = new StringBuilder();
-		buf.append("\\subsection{Exporters for a %s block}\\index{%s data export}%n".formatted(blockName, capitalizeFirst(blockName)));
+		buf.append("\\subsection{Exporters for a %s block}\\index{%s data export}\\label{sec:exporters-%s}%n".formatted(blockName, capitalizeFirst(blockName), blockName));
 		var exportManager = ExportManager.getInstance();
-		var formats = exportManager.getExporters(clazz).stream().map(ReaderWriterBase::getName).filter(n -> !n.equals("PlainText")).toList();
+		var formats = exportManager.getExporters(clazz).stream().map(ReaderWriterBase::getName).filter(n -> !n.isBlank() && !n.equals("PlainText")).toList();
 
 		buf.append("Can export %s data in the following formats: %s.%n".formatted(blockName, StringUtils.toString(formats, ", ")));
-		buf.append("\\index{").append(StringUtils.toString(formats, " format export}, \\index{")).append(" format export}\n\n");
+		buf.append("\\index{").append(StringUtils.toString(formats, " format export} \\index{")).append(" format export}\n\n");
 
 		return buf.toString();
 	}

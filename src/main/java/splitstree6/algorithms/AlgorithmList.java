@@ -128,9 +128,9 @@ public class AlgorithmList {
 		add(algorithms, names, new PCOA());
 
 
-		add(algorithms, names, new ALTSExternal());
-		add(algorithms, names, new ALTSNetwork());
 		add(algorithms, names, new AutumnAlgorithm());
+		add(algorithms, names, new ALTSNetwork());
+		add(algorithms, names, new ALTSExternal());
 
 		add(algorithms, names, new AntiConsensusNetwork());
 		add(algorithms, names, new AverageConsensus());

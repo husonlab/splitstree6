@@ -73,6 +73,62 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 			hbox.setSpacing(1.0 / 1.1 * hbox.getSpacing());
 		});
 
+		controller.getZoomToFitButton().setOnAction(e -> {
+			var paneRect = worldMap1.localToScreen(worldMap1.getBoundsInLocal());
+			var dataRect = worldMap1.getDataRectangle().localToScreen(worldMap1.getDataRectangle().getBoundsInLocal());
+
+			var scale = Math.min(paneRect.getWidth() / dataRect.getWidth(), paneRect.getHeight() / dataRect.getHeight());
+
+			System.err.println("scale: " + scale);
+			if (scale > 0) {
+				scale *= 0.5;
+				scrollPane.zoomBy(scale / scrollPane.getZoomX(), scale / scrollPane.getZoomY());
+				Platform.runLater(() -> {
+					var allRect = hbox.localToScreen(hbox.getBoundsInLocal());
+					var dataRect2 = worldMap1.getDataRectangle().localToScreen(worldMap1.getDataRectangle().getBoundsInLocal());
+					var scrollPaneRect = scrollPane.localToScreen(scrollPane.getBoundsInLocal());
+
+					var hbar = scrollPane.getHorizontalScrollBar();
+					System.err.println("hBar: " + hbar.getMin() + " - " + hbar.getMax() + ", " + hbar.getVisibleAmount() + " value: " + hbar.getValue());
+
+					var vbar = scrollPane.getVerticalScrollBar();
+					System.err.println("vbar: " + vbar.getMin() + " - " + vbar.getMax() + ", " + vbar.getVisibleAmount() + " value: " + vbar.getValue());
+
+					{
+						var center = scrollPane.screenToLocal(dataRect2.getCenterX(), dataRect2.getCenterY());
+
+						var h = (hbar.getMax() - hbar.getMin() + hbar.getVisibleAmount()) / allRect.getWidth() * (center.getX() - allRect.getMinX());
+
+						double hValue = (center.getX() - scrollPaneRect.getWidth()) / 2 / (allRect.getWidth() - scrollPaneRect.getWidth());
+						double vValue = (center.getY() - scrollPaneRect.getHeight()) / 2 / (allRect.getHeight() - scrollPaneRect.getHeight());
+
+						scrollPane.setHvalue(hValue);
+						scrollPane.setHvalue(vValue);
+					}
+
+					if (false) {
+
+						System.err.println("dataRect: " + dataRect);
+
+						System.err.println("allRect: " + allRect);
+
+						System.err.println("scrollPaneRect: " + scrollPaneRect);
+
+
+						System.err.println("dataRect2: " + dataRect2);
+
+						var hValue = Math.max(0, dataRect2.getCenterX() / (allRect.getWidth()) - 0.5 * hbar.getVisibleAmount());
+						var vValue = 1.0 - Math.max(0, dataRect2.getCenterY() / (allRect.getHeight()) - 0.5 * vbar.getVisibleAmount());
+						Platform.runLater(() -> {
+							hbar.setValue(hValue);
+							vbar.setValue(vValue);
+						});
+					}
+
+				});
+			}
+		});
+
 		for (var worldMap : List.of(worldMap1, worldMap2)) {
 			worldMap.getContinents().visibleProperty().bindBidirectional(view.optionShowContinentNamesProperty());
 			worldMap.getCountries().visibleProperty().bindBidirectional(view.optionShowCountryNamesProperty());

@@ -43,6 +43,7 @@ import jloda.fx.util.Icebergs;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeArray;
+import jloda.graph.NotOwnerException;
 import jloda.phylo.PhyloSplitsGraph;
 import jloda.util.CanceledException;
 import jloda.util.StringUtils;
@@ -213,55 +214,58 @@ public class SplitNetworkLayout {
 		var nodeLabelsGroup = new Group();
 
 		for (var v : graph.nodes()) {
-			var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
-			var point = nodePointMap.get(v);
+			try {
+				var isRootNode = (rootSplit > 0 && v.getDegree() == 1 && graph.getSplit(v.getFirstAdjacentEdge()) == rootSplit);
+				var point = nodePointMap.get(v);
 
-			var labeledNode = new LabeledNodeShape(new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5));
-			labeledNode.setTranslateX(point.getX());
-			labeledNode.setTranslateY(point.getY());
+				var labeledNode = new LabeledNodeShape(new Circle(v.getDegree() == 1 && !isRootNode ? 1 : 0.5));
+				labeledNode.setTranslateX(point.getX());
+				labeledNode.setTranslateY(point.getY());
 
-			nodesGroup.getChildren().add(labeledNode);
+				nodesGroup.getChildren().add(labeledNode);
 
-			var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
+				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 
-			if (graph.getNumberOfTaxa(v) == 1) {
-				labeledNode.setUserData(taxaBlock.get(graph.getTaxon(v)));
-			}
-
-			nodeShapeMap.put(v, labeledNode);
-
-			if (label != null && !isRootNode) {
 				if (graph.getNumberOfTaxa(v) == 1) {
-					taxonLabelMap.put(graph.getTaxon(v), label);
+					labeledNode.setUserData(taxaBlock.get(graph.getTaxon(v)));
 				}
 
-				labeledNode.setLabel(label);
+				nodeShapeMap.put(v, labeledNode);
 
-				label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
-				label.setTranslateX(labeledNode.getTranslateX() + 10);
-				label.setTranslateY(labeledNode.getTranslateY() + 10);
-				label.setUserData(labeledNode);
-				nodeLabelsGroup.getChildren().add(label);
+				if (label != null && !isRootNode) {
+					if (graph.getNumberOfTaxa(v) == 1) {
+						taxonLabelMap.put(graph.getTaxon(v), label);
+					}
 
-				label.applyCss();
+					labeledNode.setLabel(label);
 
-				double angle = v.adjacentEdgesStream(false).mapToDouble(graph::getAngle).average().orElse(0);
-				if (rootSplit == 0 && v == graph.getTaxon2Node(1)) {
-					angle += 180;
+					label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
+					label.setTranslateX(labeledNode.getTranslateX() + 10);
+					label.setTranslateY(labeledNode.getTranslateY() + 10);
+					label.setUserData(labeledNode);
+					nodeLabelsGroup.getChildren().add(label);
+
+					label.applyCss();
+
+					double angle = v.adjacentEdgesStream(false).mapToDouble(graph::getAngle).average().orElse(0);
+					if (rootSplit == 0 && v == graph.getTaxon2Node(1)) {
+						angle += 180;
+					}
+					var translateXProperty = labeledNode.translateXProperty();
+					var translateYProperty = labeledNode.translateYProperty();
+					labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
+							xOffset -> {
+								label.setLayoutX(0);
+								label.translateXProperty().bind(translateXProperty.add(xOffset));
+							},
+							yOffset -> {
+								label.setLayoutY(0);
+								label.translateYProperty().bind(translateYProperty.add(yOffset));
+							});
+
+					labelLayout.addAvoidable(() -> labeledNode.getTranslateX() - 0.5 * labeledNode.prefWidth(0), () -> labeledNode.getTranslateY() - 0.5 * labeledNode.prefHeight(0), () -> labeledNode.prefWidth(0), () -> labeledNode.prefHeight(0));
 				}
-				var translateXProperty = labeledNode.translateXProperty();
-				var translateYProperty = labeledNode.translateYProperty();
-				labelLayout.addItem(translateXProperty, translateYProperty, angle, label.widthProperty(), label.heightProperty(),
-						xOffset -> {
-							label.setLayoutX(0);
-							label.translateXProperty().bind(translateXProperty.add(xOffset));
-						},
-						yOffset -> {
-							label.setLayoutY(0);
-							label.translateYProperty().bind(translateYProperty.add(yOffset));
-						});
-
-				labelLayout.addAvoidable(() -> labeledNode.getTranslateX() - 0.5 * labeledNode.prefWidth(0), () -> labeledNode.getTranslateY() - 0.5 * labeledNode.prefHeight(0), () -> labeledNode.prefWidth(0), () -> labeledNode.prefHeight(0));
+			} catch (NotOwnerException ignored) {
 			}
 			progress.incrementProgress();
 		}

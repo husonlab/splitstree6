@@ -107,9 +107,7 @@ import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.utils.CollapseIdenticalHyplotypes;
 import splitstree6.view.alignment.AlignmentView;
-import splitstree6.view.displaytext.DisplayTextView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
-import splitstree6.view.inputeditor.InputEditorView;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.workflow.*;
 import splitstree6.xtra.latex.MenusToLaTeX;
@@ -250,7 +248,7 @@ public class MainWindowPresenter {
 		});
 		controller.getFindButton().disableProperty().bind(controller.getFindMenuItem().disableProperty());
 
-		setupImportButton(controller.getImportButton());
+		ImportButtonUtils.setup(controller.getImportButton());
 
 		SwipeUtils.setConsumeSwipes(controller.getRootPane());
 	}
@@ -418,7 +416,7 @@ public class MainWindowPresenter {
 						(new TaxaNexusOutput()).write(w, output.getFirst());
 						(new TraitsNexusOutput()).write(w, output.getFirst(), output.getSecond());
 						(new CharactersNexusOutput()).write(w, output.getFirst(), output.getThird());
-						openString(w.toString());
+						ImportButtonUtils.openString(w.toString());
 					} catch (IOException ex) {
 						NotificationManager.showError("Failed: " + ex.getMessage());
 					}
@@ -1053,24 +1051,4 @@ public class MainWindowPresenter {
 		}
 	}
 
-	public static void setupImportButton(Button importButton) {
-		importButton.disableProperty().bind(ClipboardUtils.hasStringProperty().not().and(ClipboardUtils.hasFilesProperty().not()));
-		importButton.setOnAction(e -> openString(ClipboardUtils.getTextFilesContentOrString()));
-	}
-
-	public static void openString(String string) {
-		if (string != null && !string.isBlank()) {
-			var mainWindow = (MainWindow) MainWindowManager.getInstance().createAndShowWindow(true);
-			Platform.runLater(() -> {
-				mainWindow.getController().getEditInputMenuItem().fire();
-				Platform.runLater(() -> {
-					var inputEditorTab = (InputEditorTab) mainWindow.getTabByClass(InputEditorTab.class);
-					if (inputEditorTab != null) {
-						((DisplayTextView) inputEditorTab.getView()).getController().getCodeArea().replaceText(string);
-						Platform.runLater(() -> ((InputEditorView) inputEditorTab.getView()).parseAndLoad());
-					}
-				});
-			});
-		}
-	}
 }

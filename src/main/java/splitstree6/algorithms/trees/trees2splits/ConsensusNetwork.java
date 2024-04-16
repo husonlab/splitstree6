@@ -19,6 +19,7 @@
 
 package splitstree6.algorithms.trees.trees2splits;
 
+import jloda.fx.util.ProgramProperties;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.SplitsBlock;
 import splitstree6.data.TaxaBlock;
@@ -52,6 +53,7 @@ public class ConsensusNetwork extends ConsensusSplits {
 
 	public ConsensusNetwork() {
 		setOptionThresholdPercent(30);
+		ProgramProperties.track(optionEdgeWeightsProperty(), EdgeWeights::valueOf, EdgeWeights.Count);
 	}
 
 	/**

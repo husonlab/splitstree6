@@ -52,7 +52,7 @@ public class PhylipReader extends DistancesReader {
 			while (it.hasNext()) {
 				final var line = it.next().trim();
 
-				if (line.startsWith("#") || line.length() == 0)
+				if (line.startsWith("#") || line.isEmpty())
 					continue;
 				if (row == 0) {
 					numberOfTaxa = Integer.parseInt(line);

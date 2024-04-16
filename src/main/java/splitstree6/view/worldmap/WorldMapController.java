@@ -73,6 +73,9 @@ public class WorldMapController {
 	private Button zoomOutButton;
 
 	@FXML
+	private Button zoomToFitButton;
+
+	@FXML
 	private ToggleButton settingsToggleButton;
 
 	@FXML
@@ -86,8 +89,9 @@ public class WorldMapController {
 	@FXML
 	private void initialize() {
 		MaterialIcons.setIcon(twoCopiesToggleButton, MaterialIcons.indeterminate_check_box, "-fx-rotate: 90;", true);
-		MaterialIcons.setIcon(zoomInButton, MaterialIcons.zoom_in);
-		MaterialIcons.setIcon(zoomOutButton, MaterialIcons.zoom_out);
+		MaterialIcons.setIcon(zoomInButton, MaterialIcons.zoom_in_map);
+		MaterialIcons.setIcon(zoomOutButton, MaterialIcons.zoom_out_map);
+		MaterialIcons.setIcon(zoomToFitButton, MaterialIcons.center_focus_weak);
 		MaterialIcons.setIcon(showDataButton, MaterialIcons.pie_chart);
 		MaterialIcons.setIcon(settingsToggleButton, MaterialIcons.tune);
 		MaterialIcons.setIcon(formatToggleButton, MaterialIcons.format_shapes);
@@ -174,5 +178,9 @@ public class WorldMapController {
 
 	public ToggleButton getFormatToggleButton() {
 		return formatToggleButton;
+	}
+
+	public Button getZoomToFitButton() {
+		return zoomToFitButton;
 	}
 }

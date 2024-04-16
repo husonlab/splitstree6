@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <install4j version="10.0.7" transformSequenceNumber="10">
   <directoryPresets config="../target/SplitsTree-1.0.0-SNAPSHOT.jar" />
-  <application name="SplitsTree" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTree" publisher="Daniel H. Huson and David Bryant" publisherWeb="http://splitstree.husonlab.org" version="6.0.0" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
+  <application name="SplitsTree App" applicationId="5610-7746-7010-9445" mediaDir="../../../builds" shortName="SplitsTree" publisher="Daniel H. Huson and David Bryant" publisherWeb="http://splitstree.husonlab.org" version="6.0.0" allPathsRelative="true" macVolumeId="b8c0a1154e563a9a" javaMinVersion="16">
     <variables>
       <variable name="renderingVMOption" />
     </variables>
@@ -74,7 +74,7 @@
     </components>
   </files>
   <launchers>
-    <launcher name="SplitsTree" id="1691242142" menuName="SplitsTree ">
+    <launcher name="SplitsTree" id="1691242142" menuName="SplitsTree App ">
       <executable name="SplitsTree" iconSet="true" redirectStdout="true" executableMode="gui" singleInstance="true" checkConsoleParameter="true" dpiAware="false">
         <versionInfo include="true" fileDescription="SplitsTree App - analysis of phylogenetic trees and networks" legalCopyright="Copyright (C) 2024 ${compiler:sys.publisher}" internalName="SplitsTree" />
       </executable>
@@ -1153,13 +1153,13 @@ return true;</property>
     </styles>
   </installerGui>
   <mediaSets>
-    <unixInstaller name="Unix Installer" id="1691242146" installDir="splitstree6" overridePrincipalLanguage="true" require64BitVm="true">
+    <unixInstaller name="Unix Installer" id="1691242146" installDir="splitstreeapp" overridePrincipalLanguage="true" require64BitVm="true">
       <variables>
         <variable name="renderingVMOption" value="-Dprism.forceGPU=true" />
       </variables>
     </unixInstaller>
-    <macosFolder name="Mac OS X Folder" id="1691242165" installDir="SplitsTree" overridePrincipalLanguage="true" architecture="universal" compressDmg="true" signLaunchers="true" />
-    <windows name="Windows64bit" id="1691242288" installDir="SplitsTree" overridePrincipalLanguage="true" architecture="64">
+    <macosFolder name="Mac OS X Folder" id="1691242165" installDir="SplitsTreeApp" overridePrincipalLanguage="true" architecture="universal" compressDmg="true" signLaunchers="true" />
+    <windows name="Windows64bit" id="1691242288" installDir="SplitsTreeApp" overridePrincipalLanguage="true" architecture="64">
       <overriddenPrincipalLanguage id="409" />
       <exclude>
         <entry location="tools" />

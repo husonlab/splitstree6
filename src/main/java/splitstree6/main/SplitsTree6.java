@@ -51,6 +51,8 @@ public class SplitsTree6 extends Application {
 
 	private static boolean desktop = true;
 
+	private static boolean showSplash;
+
 	/**
 	 * main
 	 *
@@ -111,12 +113,14 @@ public class SplitsTree6 extends Application {
 			defaultPropertiesFile = System.getProperty("user.home") + File.separator + ".SplitsTree6.def";
 
 		final var propertiesFile = options.getOption("-p", "propertiesFile", "Properties file", defaultPropertiesFile);
-		final var showVersion = options.getOption("-V", "version", "Show version string", false);
+		showSplash = !options.getOption("-s", "hideSplash", "Hide startup splash screen", false);
 		final var silentMode = options.getOption("-S", "silentMode", "Silent mode", false);
+		Basic.setDebugMode(options.getOption("-d", "debug", "Debug mode", false));
 		ProgramExecutorService.setNumberOfCoresToUse(options.getOption("-t", "threads", "Maximum number of threads to use in a parallel algorithm (0=all available)", 0));
 		ProgramProperties.setConfirmQuit(options.getOption("-q", "confirmQuit", "Confirm quit on exit", ProgramProperties.isConfirmQuit()));
 
 		options.done();
+		System.err.println("Java version: " + System.getProperty("java.version"));
 
 		ProgramProperties.load(propertiesFile);
 
@@ -124,12 +128,6 @@ public class SplitsTree6 extends Application {
 			Basic.stopCollectingStdErr();
 			Basic.hideSystemErr();
 			Basic.hideSystemOut();
-		}
-
-		if (showVersion) {
-			System.err.println(ProgramProperties.getProgramVersion());
-			System.err.println(jloda.util.Version.getVersion(SplitsTree6.class, ProgramProperties.getProgramName()));
-			System.err.println("Java version: " + System.getProperty("java.version"));
 		}
 	}
 
@@ -141,6 +139,7 @@ public class SplitsTree6 extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		try {
+			if (showSplash)
 				SplashScreen.showSplash(Duration.ofSeconds(5));
 				stage.setTitle("Untitled - " + ProgramProperties.getProgramName());
 				NotificationManager.setShowNotifications(true);
