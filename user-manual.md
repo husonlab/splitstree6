@@ -1,13 +1,3 @@
----
-author:
-- Daniel H. Huson and David Bryant
-bibliography:
-- main.bib
-title: |
-  The SplitsTree App User-Manual\
-  SplitsTree App (version 6.3.1-beta, built 26 Mar 2024)
----
-
 # SplitsTree App User Manual
 
 ## Daniel H. Huson and David Bryant
