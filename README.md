@@ -6,6 +6,10 @@ The new SplitsTree App is designed as an open source project that provides a wid
 
 One main aim of this program is to make it easy to compute both trees and networks, hopefully encouraging researchers to use phylogenetic networks when appropriate. A second aim is to bring together the calculation of both unrooted and rooted trees and networks into one program. Moreover, the program explicitly supports the import and export of data in many different formats, making it easy to use the program in collaboration with other programs.
 
+## User manual
+
+The user manual for this software is available as a [PDF](./SplitsTree_App_Manual.pdf) and also an online [page](./user_manual.pdf).
+
 ## Explicit representations of workflows
 
 A key novel feature of the SplitsTree App is that all data, algorithms and parameters are explicitly modeled as a "workflow", that is, a graph that represents the provenance of a result. While a casual user will interact with the program via menu items and other controls, an advanced user can directly edit and interact with the workflow so as to setup an analysis that goes beyond the basic analyses offered by the program. Another novel feature of the program is that the workflow is analyzed so as to produce a textual representation of the analysis, together with all relevant citations, thus providing the framework for a "methods section" of a corresponding paper.
