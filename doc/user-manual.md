@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.6, built 13 Apr 2024)
+SplitsTree App (version 6.3.7, built 17 Apr 2024)
 
 ## Introduction
 
@@ -285,7 +285,7 @@ the tab.
 
 The toolbar provides items for determining how to draw the trees,
 choices are between rectangular, triangular, rounded and radial
-phylogram. (The rounded phylogram are time-consuming to draw and can
+phylogram. (The rounded phylograms are time-consuming to draw and can
 cause problems.) In addition, there are buttons for rotating, flipping
 and zooming.
 
@@ -365,10 +365,8 @@ latitude and longitude specifications .
 There is a `Show` menu button to determine whether country names,
 continent names and/or oceans should appear as labels. There is a button
 to determine whether to show two copies of the map side-by-side for
-Pacific-centric data.
-
-Additional controls to help focus on local regions will be added in the
-future.
+Pacific-centric data. There is a button to zoom to the shown haplotype
+data.
 
 ## Workflow graph tab
 
@@ -509,9 +507,9 @@ That simplicity came with limitations. For example, to compare the
 result of analyses using different parameters or distance methods it was
 necessary to duplicate the whole file and start again.
 
-SplitsTreeCE implements a far more sophisticated system for workflows.
-It is still straightforward to run a simple linear workflow as in
-SplitsTree4, but it is now possible to branch that workflow at any
+The SplitsTree App implements a far more sophisticated system for
+workflows. It is still straightforward to run a simple linear workflow
+as in SplitsTree4, but it is now possible to branch that workflow at any
 point, exploring alternative parameters or methods. The use of frames
 make it easy to view the results of different analyses side-by-side.
 
@@ -519,8 +517,8 @@ The branching structure of a document's workflow can be viewed in the
 side panel (as a hierarchy) or in the workflow panel (as a graph). To
 illustrate, open the example file `ungulates.nex` which can be found in
 the directory `publications/WelkerEtal2015` in the Examples directory.
-By default, SplitsTreeCE creates a network by running NeighborNet and
-using the $p$-distance. Switching to the workflow panel displays the
+By default, the SplitsTree App creates a network by running NeighborNet
+and using the $p$-distance. Switching to the workflow panel displays the
 (linear) workflow for this initial analysis .
 
 ![Right hand side of the workflow created when `ungulates.nex` is
@@ -938,9 +936,9 @@ we show the densi-tree consensus on the left and the outline consensus
 on the right (rooted by the three taxa at the top of both diagrams).
 ](figs/densi-vs-outline.png)
 
-### Confidence networks
+### Credibility networks
 
-The idea behind a *confidence network* is to choose the threshold in a
+The idea behind a *credibility network* is to choose the threshold in a
 consensus network so that at least $95\%$ of the trees have *all* their
 splits contained in that network. The method was originally designed as
 a way to create confidence intervals from bootstrap distributions
@@ -948,10 +946,10 @@ a way to create confidence intervals from bootstrap distributions
 shortcomings of empirical bootstrap distributions, meant that the
 confidence sets produced were massive. The same machinery can be readily
 applied to samples from the posterior distribution of trees in a
-Bayesian analysis, in which case the network represents a confidence
+Bayesian analysis, in which case the network represents a credibility
 set.
 
-The main option in a confidence network is the level, which is $0.95$
+The main option in a credibility network is the level, which is $0.95$
 by default. This is the proportion of input trees which will have their
 splits contained in the network. Decreasing this number produces smaller
 networks.
@@ -1962,9 +1960,9 @@ algorithm. The algorithm has the following options:
 
 `ALTSExecutableFile =  <String>` - download and compile ALTSNetwork
 program from https://github.com/LX-Zhang/AAST, then set this parameter
-to the executable. Note that the program requires fully resolved trees
-as input and any unresolved trees will be ignored Reference:
-[@Zhangetal2023]
+to the executable.
+`Note that the program requires fully resolved trees as input and any unresolved trees will be ignored`
+Reference: [@Zhangetal2023]
 
 #### Average Consensus
 
@@ -2178,7 +2176,7 @@ The "Tree Selector Splits" algorithm takes a Trees block as input and
 produces a Splits block as output. It selects a single tree and extracts
 its splits. The algorithm has the following options:
 
-Which = \<Integer\>
+`    Which =  <Integer>`
 
 #### Unique Topologies
 
@@ -2192,11 +2190,12 @@ has the following options:
 #### Confidence Network
 
 The "Confidence Network" algorithm takes a Trees block as input and
-produces a Splits block as output. It computes a confidence network
+produces a Splits block as output. It computes a credibility network
 using Beran's algorithm. The algorithm has the following options:
 
-Level = \<Double\> HighDimensionFilter = \<Boolean\> Reference:
-[@HusonBryant2006]
+`Level =  <Double>` - set the level (between 0 and 1)
+`HighDimensionFilter =  <Boolean>` - heuristically remove splits causing
+high-dimensional consensus network Reference: [@HusonBryant2006]
 
 #### Phylogenetic Diversity
 
@@ -2624,6 +2623,12 @@ includes a Wikipedia image of the represented species of bees. By
 right-clicking on the *A. Koschev* label, the display-label editor was
 opened for this label. ](figs/bees-with-images.png)
 
+## Acknowledgments {#acknowledgments .unnumbered}
+
+We thank Daria Evseeva for working on the code with us. We thank Celine
+Scornavacca for her implementation of the tanglegram layout. This
+program uses the JAMA library in the neighbor-net algorithm.
+
 Citations
 
 Bagci, C., D. Bryant, B. Cetinkaya, and DH Huson. 2021. “Microbial
@@ -2742,7 +2747,6 @@ Transactions on Computational Biology and Bioinformatics* 15: 398–420.
 
 Huson, DH, and R. Rupp. 2008. “Summarizing Multiple Gene Trees Using
 Cluster Networks.” In *Algorithms in Bioinformatics. WABI 2008*. Vol.
-
 5251. Lecture Notes in Computer Science.
 
 Huson, DH, R. Rupp, and C. Scornavacca. 2012. *Phylogenetic Networks*.
@@ -2779,7 +2783,7 @@ Felsenstein’s Phylogenetic Bootstrap in the Era of Big Data.” *Nature*
 
 Maddison, DR, DL Swofford, and WP Maddison. 1997. “NEXUS: An Extensible
 File Format for Systematic Information.” *Systematic Biology* 46 (4):
-590–621. <https://doi.org/10.1093/sysbio/46.4.590>.
+590–621.
 
 Nei, M., and WH Li. 1979. “Mathematical Model for Studying Genetic
 Variation in Terms of Restriction Endonucleases.” *Proceedings of the
@@ -2854,3 +2858,4 @@ Lineage Taxon Strings.” *Genome Res*.
 
 Zhang, L., B. Cetinkaya, and DH Huson. TBD. “Hybrization Networks from
 Multiple Trees, in Preparation.” *TBD*, TBD.
+

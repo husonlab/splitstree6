@@ -43,6 +43,9 @@ public class WorldMapController {
 	private CheckMenuItem countryNamesCheckMenuItem;
 
 	@FXML
+	private CheckMenuItem boundingBoxMenuItem;
+
+	@FXML
 	private CheckMenuItem gridCheckMenuItem;
 
 	@FXML
@@ -126,6 +129,10 @@ public class WorldMapController {
 
 	public CheckMenuItem getCountryNamesCheckMenuItem() {
 		return countryNamesCheckMenuItem;
+	}
+
+	public CheckMenuItem getBoundingBoxMenuItem() {
+		return boundingBoxMenuItem;
 	}
 
 	public CheckMenuItem getGridCheckMenuItem() {

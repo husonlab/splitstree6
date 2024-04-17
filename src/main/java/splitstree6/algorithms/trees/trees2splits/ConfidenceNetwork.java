@@ -52,7 +52,6 @@ public class ConfidenceNetwork extends Trees2Splits {
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
 	public ConfidenceNetwork() {
-
 	}
 
 	@Override
@@ -74,10 +73,15 @@ public class ConfidenceNetwork extends Trees2Splits {
 
 	@Override
 	public String getToolTip(String optionName) {
+		if (!optionName.startsWith("option")) {
+			optionName = "option" + optionName;
+		}
 		if (optionName.equals(optionLevel.getName())) {
 			return "Set the level (between 0 and 1)";
-		}
-		return optionName;
+		} else if (optionName.equals(optionHighDimensionFilter.getName()))
+			return "Heuristically remove splits causing high-dimensional consensus network";
+		else
+			return super.getToolTip(optionName);
 	}
 
 	@Override

@@ -58,6 +58,9 @@ public class WorldMapView implements IView {
 	private final BooleanProperty optionShowContinentNames = new SimpleBooleanProperty(this, "optionShowContinentNames");
 	private final BooleanProperty optionShowCountryNames = new SimpleBooleanProperty(this, "optionShowContinentNames");
 	private final BooleanProperty optionShowOceanNames = new SimpleBooleanProperty(this, "optionShowOceanNames");
+
+	private final BooleanProperty optionShowBoundingBox = new SimpleBooleanProperty(this, "optionShowBoundingBox");
+
 	private final BooleanProperty optionShowGrid = new SimpleBooleanProperty(this, "optionShowGrid");
 
 	private final BooleanProperty optionShowData = new SimpleBooleanProperty(this, "optionShowData");
@@ -76,13 +79,14 @@ public class WorldMapView implements IView {
 		ProgramProperties.track(optionShowCountryNames, false);
 		ProgramProperties.track(optionShowOceanNames, true);
 		ProgramProperties.track(optionShowGrid, false);
+		ProgramProperties.track(optionShowBoundingBox, true);
 		ProgramProperties.track(optionTwoCopies, false);
 		ProgramProperties.track(optionShowData, true);
 	}
 
 	public List<String> listOptions() {
 		return List.of(optionShowContinentNames.getName(), optionShowCountryNames.getName(), optionShowOceanNames.getName(),
-				optionShowGrid.getName(), optionTwoCopies.getName());
+				optionShowBoundingBox.getName(), optionShowGrid.getName(), optionTwoCopies.getName());
 	}
 
 	public WorldMapView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -103,7 +107,7 @@ public class WorldMapView implements IView {
 		colorSchemeName.bindBidirectional(formatter.getLegend().colorSchemeNameProperty());
 
 		traitsBlock.addListener(e -> {
-			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, colorSchemeName.get(), formatter.getOptionLocationSize());
+			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, controller, colorSchemeName.get(), formatter.getOptionLocationSize());
 			if (maxCount > 0)
 				formatter.getLegend().setUnitRadius(0.5 * formatter.getOptionLocationSize() / Math.sqrt(maxCount));
 			else
@@ -198,8 +202,8 @@ public class WorldMapView implements IView {
 
 	@Override
 	public void clear() {
-		presenter.getWorldMap1().getUserItems().getChildren().clear();
-		presenter.getWorldMap2().getUserItems().getChildren().clear();
+		presenter.getWorldMap1().clear();
+		presenter.getWorldMap2().clear();
 	}
 
 	@Override
@@ -233,6 +237,10 @@ public class WorldMapView implements IView {
 		return optionShowGrid;
 	}
 
+	public BooleanProperty optionShowBoundingBoxProperty() {
+		return optionShowBoundingBox;
+	}
+
 	public BooleanProperty optionTwoCopiesProperty() {
 		return optionTwoCopies;
 	}
@@ -252,11 +260,11 @@ public class WorldMapView implements IView {
 		}
 	}
 
-	private static double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, String colorSchemeName, double maxSize) {
+	private static double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, WorldMapController controller, String colorSchemeName, double maxSize) {
 		if (taxaBlock != null && traitsBlock != null) {
 			var maxCount = computeMaxCount(taxaBlock, traitsBlock);
-			presenter.getWorldMap1().getUserItems().getChildren().clear();
-			presenter.getWorldMap2().getUserItems().getChildren().clear();
+			presenter.getWorldMap1().clear();
+			presenter.getWorldMap2().clear();
 
 			for (var traitId = 1; traitId < traitsBlock.getNTraits(); traitId++) {
 				var lat = traitsBlock.getTraitLatitude(traitId);
@@ -266,6 +274,11 @@ public class WorldMapView implements IView {
 					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lat, lon);
 				}
 			}
+
+			presenter.getWorldMap1().expandDataRectangle(0.2);
+			presenter.getWorldMap2().expandDataRectangle(0.2);
+
+			Platform.runLater(() -> controller.getZoomToFitButton().getOnAction().handle(null));
 			return maxCount;
 		} else return 0;
 	}

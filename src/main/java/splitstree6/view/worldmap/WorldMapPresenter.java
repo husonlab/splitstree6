@@ -20,9 +20,13 @@
 package splitstree6.view.worldmap;
 
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
 import jloda.fx.find.FindToolBar;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.utils.worldmap.WorldMap;
@@ -39,18 +43,19 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 	private final WorldMapView view;
 	private final MainWindow mainWindow;
 
+	private final WorldMapController controller;
+
 	public WorldMapPresenter(MainWindow mainWindow, WorldMapView view) {
 		this.mainWindow = mainWindow;
 		this.view = view;
-		var controller = view.getController();
+		controller = view.getController();
 
 		worldMap1 = new WorldMap();
 		worldMap2 = new WorldMap();
 
 		var hbox = new HBox();
-		hbox.setStyle("-fx-padding: 10 10 10 60;");
 		hbox.getStyleClass().add("viewer-background");
-		hbox.setSpacing(-20);
+		hbox.setSpacing(-40);
 
 		var scrollPane = controller.getZoomableScrollPane();
 		scrollPane.setContent(hbox);
@@ -64,68 +69,32 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 
 		controller.getZoomInButton().setOnAction(e -> {
 			scrollPane.zoomBy(1.1, 1.1);
-			hbox.setSpacing(1.1 * hbox.getSpacing());
+			if (hbox.getSpacing() != 0)
+				hbox.setSpacing(1.1 * hbox.getSpacing());
+			Platform.runLater(this::centerOnData);
 		});
 		// todo: add disable binding
 		controller.getZoomOutButton().setOnAction(e ->
 		{
 			scrollPane.zoomBy(1.0 / 1.1, 1.0 / 1.1);
-			hbox.setSpacing(1.0 / 1.1 * hbox.getSpacing());
+			if (hbox.getSpacing() != 0)
+				hbox.setSpacing(1.0 / 1.1 * hbox.getSpacing());
+			Platform.runLater(this::centerOnData);
 		});
 
 		controller.getZoomToFitButton().setOnAction(e -> {
+
 			var paneRect = worldMap1.localToScreen(worldMap1.getBoundsInLocal());
 			var dataRect = worldMap1.getDataRectangle().localToScreen(worldMap1.getDataRectangle().getBoundsInLocal());
 
 			var scale = Math.min(paneRect.getWidth() / dataRect.getWidth(), paneRect.getHeight() / dataRect.getHeight());
 
-			System.err.println("scale: " + scale);
+			// todo: not sure why the scale is not correct, needs fixing
 			if (scale > 0) {
-				scale *= 0.5;
+				scale *= 0.7;
 				scrollPane.zoomBy(scale / scrollPane.getZoomX(), scale / scrollPane.getZoomY());
-				Platform.runLater(() -> {
-					var allRect = hbox.localToScreen(hbox.getBoundsInLocal());
-					var dataRect2 = worldMap1.getDataRectangle().localToScreen(worldMap1.getDataRectangle().getBoundsInLocal());
-					var scrollPaneRect = scrollPane.localToScreen(scrollPane.getBoundsInLocal());
-
-					var hbar = scrollPane.getHorizontalScrollBar();
-					System.err.println("hBar: " + hbar.getMin() + " - " + hbar.getMax() + ", " + hbar.getVisibleAmount() + " value: " + hbar.getValue());
-
-					var vbar = scrollPane.getVerticalScrollBar();
-					System.err.println("vbar: " + vbar.getMin() + " - " + vbar.getMax() + ", " + vbar.getVisibleAmount() + " value: " + vbar.getValue());
-
-					{
-						var center = scrollPane.screenToLocal(dataRect2.getCenterX(), dataRect2.getCenterY());
-
-						var h = (hbar.getMax() - hbar.getMin() + hbar.getVisibleAmount()) / allRect.getWidth() * (center.getX() - allRect.getMinX());
-
-						double hValue = (center.getX() - scrollPaneRect.getWidth()) / 2 / (allRect.getWidth() - scrollPaneRect.getWidth());
-						double vValue = (center.getY() - scrollPaneRect.getHeight()) / 2 / (allRect.getHeight() - scrollPaneRect.getHeight());
-
-						scrollPane.setHvalue(hValue);
-						scrollPane.setHvalue(vValue);
-					}
-
-					if (false) {
-
-						System.err.println("dataRect: " + dataRect);
-
-						System.err.println("allRect: " + allRect);
-
-						System.err.println("scrollPaneRect: " + scrollPaneRect);
-
-
-						System.err.println("dataRect2: " + dataRect2);
-
-						var hValue = Math.max(0, dataRect2.getCenterX() / (allRect.getWidth()) - 0.5 * hbar.getVisibleAmount());
-						var vValue = 1.0 - Math.max(0, dataRect2.getCenterY() / (allRect.getHeight()) - 0.5 * vbar.getVisibleAmount());
-						Platform.runLater(() -> {
-							hbar.setValue(hValue);
-							vbar.setValue(vValue);
-						});
-					}
-
-				});
+				scrollPane.applyCss();
+				Platform.runLater(this::centerOnData);
 			}
 		});
 
@@ -135,6 +104,12 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 			worldMap.getOceans().visibleProperty().bindBidirectional(view.optionShowOceanNamesProperty());
 			worldMap.getGrid().visibleProperty().bindBidirectional(view.optionShowGridProperty());
 			worldMap.getUserItems().visibleProperty().bindBidirectional(view.optionShowDataProperty());
+			worldMap.getDataRectangle().strokeProperty().bind(Bindings.createObjectBinding(() -> (view.optionShowBoundingBoxProperty().get() ? Color.LAVENDER : Color.TRANSPARENT), view.optionShowBoundingBoxProperty()));
+		}
+
+		hbox.getChildren().add(worldMap1);
+		if (view.optionTwoCopiesProperty().get() && !hbox.getChildren().contains(worldMap2)) {
+			hbox.getChildren().add(worldMap2);
 		}
 
 		controller.getTwoCopiesToggleButton().selectedProperty().addListener((v, o, n) -> {
@@ -153,12 +128,34 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		controller.getTwoCopiesToggleButton().selectedProperty().bindBidirectional(view.optionTwoCopiesProperty());
 		controller.getShowDataButton().selectedProperty().bindBidirectional(view.optionShowDataProperty());
 
-		hbox.getChildren().add(worldMap1);
-		if (view.optionTwoCopiesProperty().get() && !hbox.getChildren().contains(worldMap2)) {
-			hbox.getChildren().add(worldMap2);
-		}
-
 		Platform.runLater(this::setupMenuItems);
+	}
+
+	public void centerOnData() {
+		var scrollPane = controller.getZoomableScrollPane();
+		var contentPane = (Pane) scrollPane.getContent();
+
+		Point2D previous;
+		var delta = new Point2D(Double.MAX_VALUE, Double.MAX_VALUE);
+		do {
+			previous = delta;
+			var scrollPaneRect = scrollPane.localToScreen(scrollPane.getBoundsInLocal());
+			var targetOnScreen = new Point2D(scrollPaneRect.getCenterX(), scrollPaneRect.getCenterY());
+
+			var dataRect = worldMap1.getDataRectangle().localToScreen(worldMap1.getDataRectangle().getBoundsInLocal());
+			var dataCenter = new Point2D(dataRect.getCenterX(), dataRect.getCenterY());
+			var allRect = contentPane.localToScreen(contentPane.getBoundsInLocal());
+
+			delta = targetOnScreen.subtract(dataCenter);
+
+			scrollPane.setHvalue(scrollPane.getHvalue() - delta.getX() / allRect.getWidth());
+			scrollPane.setVvalue(scrollPane.getVvalue() - delta.getY() / allRect.getHeight());
+			scrollPane.applyCss();
+
+		}
+		while ((Math.abs(delta.getX()) >= 1 || Math.abs(delta.getY()) >= 1) &&
+			   (Math.abs(delta.getX()) < Math.abs(previous.getX()) || Math.abs(delta.getY()) < Math.abs(previous.getY())));
+
 	}
 
 	@Override

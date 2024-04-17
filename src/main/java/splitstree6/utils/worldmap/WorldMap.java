@@ -67,13 +67,13 @@ public class WorldMap extends Pane {
 
 	private final Group notUserItems = new Group();
 
-	private InvalidationListener darkModeInvalidationListener;
+	private final InvalidationListener darkModeInvalidationListener;
 
 	public WorldMap() {
 		dataRectangle = new Rectangle(0, 0, 0, 0);
 		dataRectangle.setFill(Color.TRANSPARENT);
-		dataRectangle.setStroke(Color.GRAY);
-		dataRectangle.setStrokeWidth(0.5);
+		dataRectangle.setStroke(Color.TRANSPARENT);
+		dataRectangle.setStrokeWidth(1);
 
 		try {
 			outlines = createOutlines();
@@ -114,6 +114,14 @@ public class WorldMap extends Pane {
 		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(darkModeInvalidationListener));
 		if (MainWindowManager.isUseDarkTheme())
 			darkModeInvalidationListener.invalidated(null);
+	}
+
+	public void clear() {
+		userItems.getChildren().clear();
+		dataRectangle.setX(0);
+		dataRectangle.setY(0);
+		dataRectangle.setWidth(0);
+		dataRectangle.setHeight(0);
 	}
 
 	public Runnable createUpdateScaleMethod(ZoomableScrollPane scrollPane) {
@@ -359,7 +367,7 @@ public class WorldMap extends Pane {
 		growRect(dataRectangle, point);
 	}
 
-	private void growRect(Rectangle rect, Point2D point) {
+	private static void growRect(Rectangle rect, Point2D point) {
 		if (rect.getX() == 0 && rect.getX() == 0 && rect.getWidth() == 0 && rect.getHeight() == 0) {
 			rect.setX(point.getX());
 			rect.setY(point.getY());
@@ -388,5 +396,21 @@ public class WorldMap extends Pane {
 
 	public Rectangle getDataRectangle() {
 		return dataRectangle;
+	}
+
+	public void expandDataRectangle(double marginProportion) {
+		expandRectangle(dataRectangle, marginProportion);
+	}
+
+	private static void expandRectangle(Rectangle rect, double marginProportion) {
+		var topLeft = new Point2D(rect.getX(), rect.getY());
+		var bottomRight = new Point2D(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
+
+		topLeft = new Point2D(Math.max(X0, (1 - marginProportion) * topLeft.getX()), Math.max(Y0, (1 - marginProportion) * topLeft.getY()));
+		bottomRight = new Point2D(Math.min(X0 + DX, (1 + marginProportion) * bottomRight.getX()), Math.min(Y0 + DY, (1 + marginProportion) * bottomRight.getY()));
+		rect.setX(topLeft.getX());
+		rect.setY(topLeft.getY());
+		rect.setWidth(Math.abs(bottomRight.getX() - topLeft.getX()));
+		rect.setHeight(Math.abs(bottomRight.getY() - topLeft.getY()));
 	}
 }

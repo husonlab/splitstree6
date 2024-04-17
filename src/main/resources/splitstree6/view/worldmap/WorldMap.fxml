@@ -19,7 +19,6 @@
   ~  along with this program.  If not, see <http://www.gnu.org/licenses/>.
   -->
 
-
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <AnchorPane fx:id="anchorPane" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/18"
@@ -37,17 +36,41 @@
                               <CheckMenuItem fx:id="countryNamesCheckMenuItem" mnemonicParsing="false"
                                              text="Country Names"/>
                               <CheckMenuItem fx:id="continentNamesCheckMenuItem" mnemonicParsing="false"
-                                             text="Continenent Names"/>
+                                             text="Continent Names"/>
                               <CheckMenuItem fx:id="oceansCheckMenuItem" mnemonicParsing="false" text="Oceans"/>
+                              <CheckMenuItem fx:id="boundingBoxMenuItem" mnemonicParsing="false" text="Bounding Box"/>
                               <CheckMenuItem fx:id="gridCheckMenuItem" mnemonicParsing="false" text="Grid"/>
                            </items>
+                           <tooltip>
+                              <Tooltip text="What map features to show"/>
+                           </tooltip>
                         </MenuButton>
-                        <ToggleButton fx:id="showDataButton" mnemonicParsing="false" text="Show data"/>
+                        <ToggleButton fx:id="showDataButton" mnemonicParsing="false" text="Show data">
+                           <tooltip>
+                              <Tooltip text="Show or hide haplotype data"/>
+                           </tooltip>
+                        </ToggleButton>
 
-                        <ToggleButton fx:id="twoCopiesToggleButton" mnemonicParsing="false" text="Two"/>
-                        <Button fx:id="zoomInButton" mnemonicParsing="false" text="Zoom in"/>
-                        <Button fx:id="zoomOutButton" mnemonicParsing="false" text="Zoom out"/>
-                         <Button fx:id="zoomToFitButton" mnemonicParsing="false" text="Zoom to Fit"/>
+                        <ToggleButton fx:id="twoCopiesToggleButton" mnemonicParsing="false" text="Two">
+                           <tooltip>
+                              <Tooltip text="Show two copies of the map for Pacific data"/>
+                           </tooltip>
+                        </ToggleButton>
+                        <Button fx:id="zoomInButton" mnemonicParsing="false" text="Zoom in">
+                           <tooltip>
+                              <Tooltip text="Zoom in"/>
+                           </tooltip>
+                        </Button>
+                        <Button fx:id="zoomOutButton" mnemonicParsing="false" text="Zoom out">
+                           <tooltip>
+                              <Tooltip text="Zoom out"/>
+                           </tooltip>
+                        </Button>
+                        <Button fx:id="zoomToFitButton" mnemonicParsing="false" text="Zoom to Fit">
+                           <tooltip>
+                              <Tooltip text="Zoom to fit haplotype data"/>
+                           </tooltip>
+                        </Button>
                      </items>
                   </ToolBar>
                </children>
@@ -68,9 +91,10 @@
             </AnchorPane>
          </center>
       </BorderPane>
-   </children>
-   <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" spacing="5.0" style="-fx-background-color: derive(-fx-base, 20%);"
-         AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="0.0">
+
+      <HBox alignment="BOTTOM_RIGHT" prefHeight="30.0" spacing="5.0"
+            style="-fx-background-color: derive(-fx-base, 20%);" AnchorPane.rightAnchor="10.0"
+            AnchorPane.topAnchor="0.0">
       <children>
          <ToggleButton fx:id="settingsToggleButton" contentDisplay="CENTER" focusTraversable="false" text="Settings">
             <tooltip>
@@ -82,7 +106,7 @@
                <Tooltip text="Show the Format toolbar"/>
             </tooltip>
          </ToggleButton>
-
       </children>
    </HBox>
+   </children>
 </AnchorPane>

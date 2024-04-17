@@ -77,7 +77,7 @@ public class AlgorithmsToLaTeX {
 						var pos = line.indexOf("-");
 						if (pos > 0) {
 							buf.append("\\verb^%s^ - %s%n".formatted(line.substring(0, pos).trim(), line.substring(pos + 1).trim()));
-						} else buf.append(line).append("\n");
+						} else buf.append("\\verb^").append(line).append("^").append("\n");
 					}
 					buf.append("}\n");
 				} else if (!options.isBlank())
