@@ -8,7 +8,8 @@ One main aim of this program is to make it easy to compute both trees and networ
 
 ## User manual
 
-The user manual for this software is available as an online [page](https://github.com/husonlab/splitstree6/blob/main/user-manual.md).
+The user manual for this software is available as an
+online [page](https://github.com/husonlab/splitstree6/blob/main/doc/user-manual.md).
 
 ## Explicit representations of workflows
 

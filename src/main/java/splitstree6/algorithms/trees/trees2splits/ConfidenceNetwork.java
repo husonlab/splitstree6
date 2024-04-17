@@ -1,5 +1,5 @@
 /*
- *  CredibilityNetwork.java Copyright (C) 2024 Daniel H. Huson
+ *  ConfidenceNetwork.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -39,19 +39,19 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Implements a credibility network networks using Beran's algorithm
+ * Implements a confidence network networks using Beran's algorithm
  * <p>
  * Created on 07.06.2017
  *
  * @author Daniel Huson and David Bryant
  */
 
-public class CredibilityNetwork extends Trees2Splits {
+public class ConfidenceNetwork extends Trees2Splits {
 
 	private final DoubleProperty optionLevel = new SimpleDoubleProperty(this, "optionLevel", .95);
 	private final BooleanProperty optionHighDimensionFilter = new SimpleBooleanProperty(this, "optionHighDimensionFilter", true);
 
-	public CredibilityNetwork() {
+	public ConfidenceNetwork() {
 
 	}
 

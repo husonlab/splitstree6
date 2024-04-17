@@ -938,9 +938,9 @@ we show the densi-tree consensus on the left and the outline consensus
 on the right (rooted by the three taxa at the top of both diagrams).
 ](figs/densi-vs-outline.png)
 
-### Credibility networks
+### Confidence networks
 
-The idea behind a *credibility network* is to choose the threshold in a
+The idea behind a *confidence network* is to choose the threshold in a
 consensus network so that at least $95\%$ of the trees have *all* their
 splits contained in that network. The method was originally designed as
 a way to create confidence intervals from bootstrap distributions
@@ -948,10 +948,10 @@ a way to create confidence intervals from bootstrap distributions
 shortcomings of empirical bootstrap distributions, meant that the
 confidence sets produced were massive. The same machinery can be readily
 applied to samples from the posterior distribution of trees in a
-Bayesian analysis, in which case the network represents a credibility
+Bayesian analysis, in which case the network represents a confidence
 set.
 
-The main option in a credibility network is the level, which is $0.95$
+The main option in a confidence network is the level, which is $0.95$
 by default. This is the proportion of input trees which will have their
 splits contained in the network. Decreasing this number produces smaller
 networks.
@@ -2189,10 +2189,10 @@ has the following options:
 
 `Unrooted =  <Boolean>` - ignore location of root
 
-#### Credibility Network
+#### Confidence Network
 
-The "Credibility Network" algorithm takes a Trees block as input and
-produces a Splits block as output. It computes a credibility network
+The "Confidence Network" algorithm takes a Trees block as input and
+produces a Splits block as output. It computes a confidence network
 using Beran's algorithm. The algorithm has the following options:
 
 Level = \<Double\> HighDimensionFilter = \<Boolean\> Reference:

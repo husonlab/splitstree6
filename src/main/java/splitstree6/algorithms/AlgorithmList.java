@@ -161,7 +161,7 @@ public class AlgorithmList {
 		add(algorithms, names, new TreeSelectorSplits());
 		add(algorithms, names, new UniqueTopologies());
 
-		add(algorithms, names, new CredibilityNetwork());
+		add(algorithms, names, new ConfidenceNetwork());
 
 		add(algorithms, names, new CharactersFilter());
 		add(algorithms, names, new CharactersLoader());
