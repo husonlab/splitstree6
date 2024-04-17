@@ -631,7 +631,7 @@ at the left of the toolbar (.
 
 ### Split decomposition
 
-Given a distance matrix, the the split decomposition method
+Given a distance matrix, the split decomposition method
 [@BandeltDress1992] can selected in the Network menu, or on a distances
 node in the workflow. *Split decomposition* is a predecessor of
 NeighborNet, though the structures of the two methods are quite
