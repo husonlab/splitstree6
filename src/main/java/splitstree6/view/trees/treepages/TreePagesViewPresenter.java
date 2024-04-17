@@ -291,6 +291,10 @@ public class TreePagesViewPresenter implements IDisplayTabPresenter {
 		mainController.getFlipMenuItem().setOnAction(controller.getFlipHorizontalButton().getOnAction());
 		mainController.getFlipMenuItem().disableProperty().bind(controller.getFlipHorizontalButton().disableProperty());
 
+		mainController.getShowQRCodeMenuItem().setSelected(false);
+		mainController.getShowQRCodeMenuItem().disableProperty().unbind();
+		mainController.getShowQRCodeMenuItem().setDisable(true);
+
 		ExportUtils.setup(mainWindow, view.getViewTab().getDataNode(), view.emptyProperty());
 	}
 

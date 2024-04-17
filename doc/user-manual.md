@@ -936,20 +936,20 @@ we show the densi-tree consensus on the left and the outline consensus
 on the right (rooted by the three taxa at the top of both diagrams).
 ](figs/densi-vs-outline.png)
 
-### Credibility networks
+### Confidence networks
 
-The idea behind a *credibility network* is to choose the threshold in a
-consensus network so that at least $95\%$ of the trees have *all* their
+The idea behind a *confidence network* is to choose the threshold in a
+consensus network so that at least 95% of the trees have *all* their
 splits contained in that network. The method was originally designed as
 a way to create confidence intervals from bootstrap distributions
 [@HusonBryant2006], however the dimensionality of the problem, and
 shortcomings of empirical bootstrap distributions, meant that the
 confidence sets produced were massive. The same machinery can be readily
 applied to samples from the posterior distribution of trees in a
-Bayesian analysis, in which case the network represents a credibility
+Bayesian analysis, in which case the network represents a confidence
 set.
 
-The main option in a credibility network is the level, which is $0.95$
+The main option in a confidence network is the level, which is $0.95$
 by default. This is the proportion of input trees which will have their
 splits contained in the network. Decreasing this number produces smaller
 networks.

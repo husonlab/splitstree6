@@ -21,7 +21,6 @@ package splitstree6.view.worldmap;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -162,7 +161,10 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 	public void setupMenuItems() {
 		var controller = view.getController();
 		var mainController = mainWindow.getController();
-		mainController.getShowQRCodeMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
+
+		mainController.getShowQRCodeMenuItem().setSelected(false);
+		mainController.getShowQRCodeMenuItem().disableProperty().unbind();
+		mainController.getShowQRCodeMenuItem().setDisable(true);
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
