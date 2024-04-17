@@ -2623,13 +2623,13 @@ includes a Wikipedia image of the represented species of bees. By
 right-clicking on the *A. Koschev* label, the display-label editor was
 opened for this label. ](figs/bees-with-images.png)
 
-## Acknowledgments {#acknowledgments .unnumbered}
+## Acknowledgments
 
 We thank Daria Evseeva for working on the code with us. We thank Celine
 Scornavacca for her implementation of the tanglegram layout. This
 program uses the JAMA library in the neighbor-net algorithm.
 
-Citations
+## References
 
 Bagci, C., D. Bryant, B. Cetinkaya, and DH Huson. 2021. “Microbial
 Phylogenetic Context Using Phylogenetic Outlines.” *Genome Biology and
