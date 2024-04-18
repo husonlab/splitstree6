@@ -59,7 +59,7 @@ public class AlgorithmsToLaTeX {
 				labels.add(label);
 				buf.append("\\subsubsection{%s}\\index{%s}\\label{alg:%s}%n%n"
 						.formatted(name, name, label));
-				buf.append("The ``%s'' algorithm takes a %s as input and produces a %s as output.".formatted(
+				buf.append("The {\\em %s} algorithm takes a %s as input and produces a %s as output.".formatted(
 						method, fromName.replaceAll("Block", "block"), toName.replaceAll("Block", "block")));
 
 				var description = algorithm.getShortDescription();
@@ -72,9 +72,14 @@ public class AlgorithmsToLaTeX {
 				var options = OptionIO.optionsUsage(algorithm);
 				if (!options.isBlank()) {
 					buf.append("The algorithm has the following options:\n");
-					buf.append("\n{\\footnotesize\\obeylines\n");
+					buf.append("\n{\\footnotesize\n");
+					var first = true;
 					for (var line : StringUtils.toList(options)) {
 						var pos = line.indexOf("-");
+						if (first)
+							first = false;
+						else
+							buf.append("\n");
 						if (pos > 0) {
 							buf.append("\\verb^%s^ - %s%n".formatted(line.substring(0, pos).trim(), line.substring(pos + 1).trim()));
 						} else buf.append("\\verb^").append(line).append("^").append("\n");
@@ -86,26 +91,17 @@ public class AlgorithmsToLaTeX {
 				if (citations != null && !citations.isBlank()) {
 					var tokens = citations.split(";");
 					if (tokens.length >= 2) {
-						if (false) {
-							buf.append("\nSee:\n");
-							for (int i = 0; i < tokens.length - 1; i += 2) { // Subtract 1 to avoid out of bounds in the last iteration
-								var ref = tokens[i].replaceAll(" and ", "").replaceAll("&", "").replaceAll(" ", "").replaceAll(",", "");
-								var citation = tokens[i + 1];
-								buf.append("%n%s \\citep{%s}%n".formatted(citation, ref));
-							}
-						} else {
-							if (tokens.length == 2)
-								buf.append("Reference: \\citep{");
-							else
-								buf.append("References: \\citep{");
-							for (int i = 0; i < tokens.length - 1; i += 2) { // Subtract 1 to avoid out of bounds in the last iteration
-								if (i > 0)
-									buf.append(",");
-								var ref = tokens[i].replaceAll(" and ", "").replaceAll("&", "").replaceAll(" ", "");
-								buf.append(ref);
-							}
-							buf.append("}\n");
+						if (tokens.length == 2)
+							buf.append("\nReference: \\citep{");
+						else
+							buf.append("\nReferences: \\citep{");
+						for (int i = 0; i < tokens.length - 1; i += 2) { // Subtract 1 to avoid out of bounds in the last iteration
+							if (i > 0)
+								buf.append(",");
+							var ref = tokens[i].replaceAll(" and ", "").replaceAll("&", "").replaceAll(" ", "");
+							buf.append(ref);
 						}
+						buf.append("}\n");
 					}
 				}
 
@@ -117,42 +113,21 @@ public class AlgorithmsToLaTeX {
 			}
 		}
 
-		if (true) {
-			System.out.println(
-					"""
-							% This file is auto-generated from code, please don't hand edit.
-							       				
-							\\chapter{Algorithms}
-							\\label{chapter:algorithms}
-												
-							Here we list of all provided algorithms, organized by input data.
-							"""
-			);
-			for (var key : ordering) {
-				if (fromLineMap.containsKey(key)) {
-					System.out.printf("\\section{Algorithms on a %s}%n%n", key);
-					for (var line : fromLineMap.get(key)) {
-						System.out.println(line);
-					}
-				}
-			}
-		}
-
-		if (false) {
-			System.out.println(
-					"""
-							\\chapter{Algorithms}
-							\\label{chapter:algorithms}
+		System.out.println(
+				"""
+						% This file is auto-generated from code, please don't hand edit.
+						       				
+						\\chapter{Algorithms}
+						\\label{chapter:algorithms}
 											
-							Here we list of all provided algorithms, organized by output data.
-							"""
-			);
-			for (var key : ordering) {
-				if (toLineMap.containsKey(key)) {
-					System.out.printf("\\section{Algorithms that produce a %s}%n%n", key);
-					for (var line : toLineMap.get(key)) {
-						System.out.println(line);
-					}
+						Here we list of all provided algorithms, organized by input data.
+						"""
+		);
+		for (var key : ordering) {
+			if (fromLineMap.containsKey(key)) {
+				System.out.printf("\\section{Algorithms on a %s}%n%n", key);
+				for (var line : fromLineMap.get(key)) {
+					System.out.println(line);
 				}
 			}
 		}

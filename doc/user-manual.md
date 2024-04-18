@@ -4,6 +4,7 @@
 
 SplitsTree App (version 6.3.7, built 17 Apr 2024)
 
+
 ## Introduction
 
 The SplitsTree App is new software for exploring and analyzing
@@ -44,7 +45,7 @@ of the supported formats .
 
 If the data you provide is set of characters (or multiple sequence
 alignment), then by default, the SplitsTree app will compute P-distances
-and then will run neighbor-net to obtain a split network . If you
+and then will run Neighbor Net to obtain a split network . If you
 provide a distance matrix, then this will also result in a split network
 being displayed. If you supply trees, then the first tree will be
 displayed .
@@ -239,8 +240,7 @@ cladogram or phylogram. There is a button that toggles addition
 information (such as name of the tree, if any, and number of nodes,
 edges and leaves). In addition, there are buttons for rotating, flipping
 and zooming. At the right side of the tool bar, there is a text input
-field for setting the dimensions of a page in the format
-$\mbox{\it rows} \times \mbox{\it cols}$.
+field for setting the dimensions of a page in the format *rows x cols*.
 
 The side panel contains items for styling the taxon labels and for
 adding marks to the taxa.
@@ -498,9 +498,9 @@ parameters of the algorithm.
 ## Using the workflow
 
 In SplitsTree4, data analysis was based on a simple linear sequence. To
-construct a NeighborNet, for example, one might input character data,
+construct a Neighbor Net, for example, one might input character data,
 apply a transform to infer a distance matrix, apply another transform to
-produce the set of splits in the Neighbor-Net and another transform for
+produce the set of splits in the Neighbor Net and another transform for
 convert those splits into a network on the screen.
 
 That simplicity came with limitations. For example, to compare the
@@ -517,7 +517,7 @@ The branching structure of a document's workflow can be viewed in the
 side panel (as a hierarchy) or in the workflow panel (as a graph). To
 illustrate, open the example file `ungulates.nex` which can be found in
 the directory `publications/WelkerEtal2015` in the Examples directory.
-By default, the SplitsTree App creates a network by running NeighborNet
+By default, the SplitsTree App creates a network by running Neighbor Net
 and using the $p$-distance. Switching to the workflow panel displays the
 (linear) workflow for this initial analysis .
 
@@ -534,7 +534,7 @@ node and any descendants of that node.
 ![Attaching a BioNJ algorithm to an existing Distances
 block.](figs/Ungulate2.png)
 
-Suppose we want to compare a network computed by the NeighborNet
+Suppose we want to compare a network computed by the Neighbor Net
 algorithm with a tree obtained using BioNJ. Assuming both are to be
 computed from the same distance matrix, we can select the corresponding
 node and choose BioNJ from the popup menu marked with a plus (either on
@@ -549,7 +549,7 @@ analysis.](figs/Ungulate3.png)
 This analysis also creates a new window tab. Right-click on a tab to get
 a context menu that allows you to split the main tab pane into two
 parts, then drag the tabs to the left or right panes to view both the
-NeighborNet network and the BioNJ tree side-by-side.
+Neighbor Net network and the BioNJ tree side-by-side.
 
 ## Building trees
 
@@ -578,12 +578,12 @@ right-hand-side of the tree window:
 
 . .
 
-## NeighborNet and other split network methods
+## Neighbor Net and other split network methods
 
-### NeighborNet
+### Neighbor Net
 
-Given a distance matrix as input, the NeighborNet algorithm operates in
-three stages. First, an agglomerative method is used to identify a
+Given a distance matrix as input, the *Neighbor Net* algorithm operates
+in three stages. First, an agglomerative method is used to identify a
 circular ordering of the taxa. The splits computed by the algorithm are
 a subset of the set of all splits that can be formed from consecutive
 sets of taxa in that ordering. Second, a heavily customized algorithm is
@@ -593,13 +593,13 @@ Finally, a planar split network algorithm takes the weighted splits and
 produces the split network representation. A complete description of the
 entire process is available in [@BryantHuson2023].
 
-There is a single option available in NeighborNet, the method used to
+There is a single option available in Neighbor Net, the method used to
 infer split weights. We found that the Active Set method performed
 better than the other methods, and this is the default and recommended
 option. We have left the other algorithms as options in order to enable
 a repeat of the analysis in [@BryantHuson2023].
 
-When NeighborNet is called, SplitsTree produces a split block and a
+When Neighbor Net is called, SplitsTree produces a split block and a
 split network block in the workflow. As we stress in [@HusonBryant2006],
 the main information in the network is the set of weighted splits. Think
 of the network as a means of visualising the splits, in the sense that
@@ -629,19 +629,19 @@ and is generally much faster to compute and draw. To switch back and
 forward between the graph mode and the outline mode use the pop-up menu
 at the left of the toolbar (.
 
-### Split decomposition
+### Split Decomposition
 
-Given a distance matrix, the split decomposition method
+Given a distance matrix, the *Split Decomposition* method
 [@BandeltDress1992] can selected in the Network menu, or on a distances
-node in the workflow. *Split decomposition* is a predecessor of
-NeighborNet, though the structures of the two methods are quite
-different. Split decomposition works by inferring a set of splits
-satisfying a quartet condition in the distance matrix. Split
-decomposition produces a set of weakly compatible splits and, as such,
-can produce more complex split networks than those produced by
-NeighborNet. The resulting split network will not necessarily be planar.
-In practice, the conservative nature of the selection criteria means
-that Split Decomposition produces far fewer splits than NeighborNet.
+node in the workflow. *Split Decomposition* is a predecessor of Neighbor
+Net, though the structures of the two methods are quite different. Split
+Decomposition works by inferring a set of splits satisfying a quartet
+condition in the distance matrix. Split Decomposition produces a set of
+weakly compatible splits and, as such, can produce more complex split
+networks than those produced by Neighbor Net. The resulting split
+network will not necessarily be planar. In practice, the conservative
+nature of the selection criteria means that Split Decomposition produces
+far fewer splits than Neighbor Net.
 
 ### Splits in characters
 
@@ -670,11 +670,11 @@ other states (assumed derived) at each site.
 
 The *Parsimony Splits* method , introduced by [@BandeltDress1992],
 produces a set of weakly compatible splits directly from character taxa.
-The method is quartet based, like split decomposition, but for each four
+The method is quartet based, like Split Decomposition, but for each four
 taxa, it determines the two most frequent pairings of two taxa versus
 the other two taxa.
 
-## Haplotype Networks
+## Haplotype networks
 
 A haplotype network is an elegant and efficient way to represent
 character or sequence data. Each node corresponds to a particular
@@ -695,7 +695,7 @@ along that edge. This can be modified using the side panel which appears
 when clicking the preferences icon in the top right of the network
 panel.
 
-### Minimum Spanning Network
+### Minimum spanning network
 
 A minimum spanning tree for a graph is a connected subgraph of minimum
 weight. Sometimes there is a unique minimum spanning tree; other times
@@ -707,24 +707,24 @@ Hamming distance between the corresponding sequences. Other distance
 measures can be used, but the Hamming distance is appropriate for
 Haplotype Network construction.
 
-The Minimum Spanning Network is formed from all those edges in the graph
-which appear in every Minimum Spanning Tree .
+The minimum spanning network is formed from all those edges in the graph
+which appear in every minimum spanning tree .
 
 A minimum spanning network is constructed from a characters block by
 first determining Hamming distances (right click on the characters block
 and select `Add Algorithm -> Hamming distance`). Then right click on the
 distance block produced and add the `Min Spanning Network` algorithm.
 
-### Median Joining Network
+### Median Joining network
 
-MedianJoining is probably the most highly-cited method for constructing
+Median Joining is probably the most highly-cited method for constructing
 phylogenetic networks. The implementation in SplitsTree is based on the
 method described in [@Bandeltetal1999]. The Median-Joining network
 method makes repeated use of minimum spanning networks, each time
 augmenting the set of observed sequences with putative ancestral
 sequences.
 
-A Median Joining network is constructed from a characters block via the
+A Median-Joining network is constructed from a characters block via the
 Network menu, or by adding an algorithm to the workflow. The method
 comes with a single option $\epsilon$ that is an integer controlling a
 threshold determining when two sequences are considered adjacent. In
@@ -750,11 +750,11 @@ be explicitly interpreted as representing speciation events.
 Explicit phylogenetic networks are necessarily rooted. The Autumn
 algorithm [@HusonLinz2018] produces an explicit rooted phylogenetic
 network in which reticulations may be interpreted as putative
-hybridization or HGT events. However, just because a phylogenetic has a
-root does not mean that it is explicit. For example, the Cluster Network
-algorithm takes as input a set of rooted trees and aims at displaying
-all their clusters as a rooted network (in the hardwired sense
-[@Husonetal2012]). Here, the reticulate nodes do not have a direct
+hybridization or HGT events. However, just because a phylogenetic tree
+has a root does not mean that it is explicit. For example, the Cluster
+Network algorithm takes as input a set of rooted trees and aims at
+displaying all their clusters as a rooted network (in the hardwired
+sense [@Husonetal2012]). Here, the reticulate nodes do not have a direct
 biological interpretation.
 
 ### Hybrization networks
@@ -939,7 +939,7 @@ on the right (rooted by the three taxa at the top of both diagrams).
 ### Confidence networks
 
 The idea behind a *confidence network* is to choose the threshold in a
-consensus network so that at least 95% of the trees have *all* their
+consensus network so that at least $95\%$ of the trees have *all* their
 splits contained in that network. The method was originally designed as
 a way to create confidence intervals from bootstrap distributions
 [@HusonBryant2006], however the dimensionality of the problem, and
@@ -949,8 +949,8 @@ applied to samples from the posterior distribution of trees in a
 Bayesian analysis, in which case the network represents a confidence
 set.
 
-The main option in a confidence network is the level, which is $0.95$
-by default. This is the proportion of input trees which will have their
+The main option in a confidence network is the level, which is $0.95$ by
+default. This is the proportion of input trees which will have their
 splits contained in the network. Decreasing this number produces smaller
 networks.
 
@@ -1515,369 +1515,478 @@ Here we list of all provided algorithms, organized by input data.
 
 #### P Distance
 
-The "P Distance" algorithm takes a Characters block as input and
+The *P Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes the normalized Hamming
 distance. The algorithm has the following options:
 
 `HandleAmbiguousStates = {Ignore | AverageStates | MatchStates}` -
-choose how to handle ambiguous states (nucleotide data only) Reference:
-[@Hamming1950]
+choose how to handle ambiguous states (nucleotide data only)
+
+Reference: [@Hamming1950]
 
 #### Hamming Distance
 
-The "Hamming Distance" algorithm takes a Characters block as input and
+The *Hamming Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes the Hamming distance,
 that is the number of differences between sequences The algorithm has
 the following options:
 
 `HandleAmbiguousStates = {Ignore | AverageStates | MatchStates}` -
-choose how to handle ambiguous states (nucleotide data only) Reference:
-[@Hamming1950]
+choose how to handle ambiguous states (nucleotide data only)
+
+Reference: [@Hamming1950]
 
 #### Log Det
 
-The "Log Det" algorithm takes a Characters block as input and produces a
+The *Log Det* algorithm takes a Characters block as input and produces a
 Distances block as output. It computes distances using the Log-Det
 method. The algorithm has the following options:
 
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `FudgeFactor =  <Boolean>` - input missing matrix entries using LDDist
-method `FillZeros =  <Boolean>` - replace zeros with small numbers in
-rows/columns with values Reference: [@Steel1994]
+method
+
+`FillZeros =  <Boolean>` - replace zeros with small numbers in
+rows/columns with values
+
+Reference: [@Steel1994]
 
 #### Jukes Cantor Distance
 
-The "Jukes Cantor Distance" algorithm takes a Characters block as input
+The *Jukes Cantor Distance* algorithm takes a Characters block as input
 and produces a Distances block as output. It calculates distances under
 the Jukes-Cantor model. The algorithm has the following options:
 
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `SetSiteVarParams = {fromChars | defaultValues}` - set site variation
 parameters to default values, or to estimations from characters
+
 Reference: [@JukesCantor1969]
 
 #### K2P Distance
 
-The "K2P Distance" algorithm takes a Characters block as input and
+The *K2P Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It calculates distances under the
 Kimura-2P model. The algorithm has the following options:
 
 `TsTvRatio =  <Double>` - ratio of transitions vs transversions
+
 `Gamma =  <Double>` - alpha value for the Gamma distribution
+
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `SetSiteVarParams = {fromChars | defaultValues}` - set site variation
 parameters to default values, or to estimations from characters
+
 `UseML_Distances =  <Boolean>` - use maximum likelihood estimation of
-distances (rather than exact distances) Reference: [@Kimura1980]
+distances (rather than exact distances)
+
+Reference: [@Kimura1980]
 
 #### F81 Distance
 
-The "F81 Distance" algorithm takes a Characters block as input and
+The *F81 Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It calculates distances under the
 Felsenstein-81 model. The algorithm has the following options:
 
 `BaseFrequencies =  <doubleArray>` - base frequencies (in order ACGT/U)
+
 `SetBaseFrequencies = {fromChars | defaultValues}` - set base
 frequencies to default values, or to estimations from characters (using
 Capture-recapture for invariable sites)
+
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `SetSiteVarParams = {fromChars | defaultValues}` - set site variation
 parameters to default values, or to estimations from characters
+
 `UseML_Distances =  <Boolean>` - use maximum likelihood estimation of
-distances (rather than exact distances) Reference: [@Felsenstein1981]
+distances (rather than exact distances)
+
+Reference: [@Felsenstein1981]
 
 #### HKY85 Distance
 
-The "HKY85 Distance" algorithm takes a Characters block as input and
+The *HKY85 Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It calculates distances under the
 Hasegawa-Kishino-Yano model. The algorithm has the following options:
 
 `TsTvRatio =  <Double>` - ratio of transitions vs transversions
+
 `BaseFrequencies =  <doubleArray>` - base frequencies (in order ACGT/U)
+
 `SetBaseFrequencies = {fromChars | defaultValues}` - set base
 frequencies to default values, or to estimations from characters (using
 Capture-recapture for invariable sites)
+
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `SetSiteVarParams = {fromChars | defaultValues}` - set site variation
 parameters to default values, or to estimations from characters
+
 Reference: [@Hasegawaetal1985]
 
 #### F84 Distance
 
-The "F84 Distance" algorithm takes a Characters block as input and
+The *F84 Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It calculates distances under the
 Felsenstein-84 model. The algorithm has the following options:
 
 `BaseFrequencies =  <doubleArray>` - base frequencies (in order ACGT/U)
+
 `SetBaseFrequencies = {fromChars | defaultValues}` - set base
 frequencies to default values, or to estimations from characters (using
 Capture-recapture for invariable sites)
+
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `SetSiteVarParams = {fromChars | defaultValues}` - set site variation
 parameters to default values, or to estimations from characters
+
 `UseML_Distances =  <Boolean>` - use maximum likelihood estimation of
-distances (rather than exact distances) Reference:
-[@FelsensteinChurchill1996]
+distances (rather than exact distances)
+
+Reference: [@FelsensteinChurchill1996]
 
 #### GTR Distance
 
-The "GTR Distance" algorithm takes a Characters block as input and
+The *GTR Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It calculates distances under the
 general time-reversible model. The algorithm has the following options:
 
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `SetSiteVarParams = {fromChars | defaultValues}` - set site variation
 parameters to default values, or to estimations from characters
+
 `RateMatrix =  <doubleSquareMatrix>` - rate matrix for GTRDistance (in
-order ACGT/U) `UseML_Distances =  <Boolean>` - use maximum likelihood
-estimation of distances (rather than exact distances) Reference:
-[@Tavaré1986]
+order ACGT/U)
+
+`UseML_Distances =  <Boolean>` - use maximum likelihood estimation of
+distances (rather than exact distances)
+
+Reference: [@Tavaré1986]
 
 #### Protein ML Distance
 
-The "Protein ML Distance" algorithm takes a Characters block as input
+The *Protein ML Distance* algorithm takes a Characters block as input
 and produces a Distances block as output. It computes distances for
 proteins using maximum-likelihood estimation. The algorithm has the
 following options:
 
 `Model = {cpREV45 | Dayhoff | JTT | mtMAM | mtREV24 | pmb | Rhodopsin | WAG}` -
 choose an amino acid substitution model
+
 `PropInvariableSites =  <Double>` - proportion of invariable sites
+
 `Gamma =  <Double>` - alpha parameter for gamma distribution. Negative
-gamma = Equal rates Reference: [@Swoffordetal1996]
+gamma = Equal rates
+
+Reference: [@Swoffordetal1996]
 
 #### Dice Distance
 
-The "Dice Distance" algorithm takes a Characters block as input and
+The *Dice Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes distances using the
-DiceDistance coefficient distance. Reference: [@Dice1945]
+DiceDistance coefficient distance.
+
+Reference: [@Dice1945]
 
 #### Jaccard Distance
 
-The "Jaccard Distance" algorithm takes a Characters block as input and
+The *Jaccard Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It computes distances based on the
-JaccardDistance index. Reference: [@Jaccard1901]
+JaccardDistance index.
+
+Reference: [@Jaccard1901]
 
 #### Gene Content Distance
 
-The "Gene Content Distance" algorithm takes a Characters block as input
+The *Gene Content Distance* algorithm takes a Characters block as input
 and produces a Distances block as output. It computes distances based on
-the presence/absence of genes. Reference: [@HusonSteel2004]
+the presence/absence of genes.
+
+Reference: [@HusonSteel2004]
 
 #### Gene Sharing Distance
 
-The "Gene Sharing Distance" algorithm takes a Characters block as input
+The *Gene Sharing Distance* algorithm takes a Characters block as input
 and produces a Distances block as output. It computes distances using
-the gene-sharing distance. Reference: [@Sneletal1997]
+the gene-sharing distance.
+
+Reference: [@Sneletal1997]
 
 #### Upholt Restriction Distance
 
-The "Upholt Restriction Distance" algorithm takes a Characters block as
+The *Upholt Restriction Distance* algorithm takes a Characters block as
 input and produces a Distances block as output. It calculates distances
-for restriction data. Reference: [@Upholt1977]
+for restriction data.
+
+Reference: [@Upholt1977]
 
 #### Nei Li Restriction Distance
 
-The "Nei Li Restriction Distance" algorithm takes a Characters block as
+The *Nei Li Restriction Distance* algorithm takes a Characters block as
 input and produces a Distances block as output. It calculates distances
-for restriction data. Reference: [@NeiLi1979]
+for restriction data.
+
+Reference: [@NeiLi1979]
 
 #### Base Freq Distance
 
-The "Base Freq Distance" algorithm takes a Characters block as input and
+The *Base Freq Distance* algorithm takes a Characters block as input and
 produces a Distances block as output. It calculates distances from
 differences in the base composition.
 
 #### Binary To Splits
 
-The "Binary To Splits" algorithm takes a Characters block as input and
+The *Binary To Splits* algorithm takes a Characters block as input and
 produces a Splits block as output. It converts binary characters
 directly into splits. The algorithm has the following options:
 
 `MinSplitWeight =  <Double>` - minimum split weight threshold
+
 `HighDimensionFilter =  <Boolean>` - activate high-dimensional filter to
-avoid exponential graph size `AddAllTrivial =  <Boolean>` - ensure all
-trival splits are present Reference: [@Husonetal2012]
+avoid exponential graph size
+
+`AddAllTrivial =  <Boolean>` - ensure all trival splits are present
+
+Reference: [@Husonetal2012]
 
 #### DNA To Splits
 
-The "DNA To Splits" algorithm takes a Characters block as input and
+The *DNA To Splits* algorithm takes a Characters block as input and
 produces a Splits block as output. It converts DNA characters directly
 into splits. The algorithm has the following options:
 
 `Method = {MajorityState | RYAlphabet}` - use either
-majority-state-vs-others or RY alphabet `MinSplitWeight =  <Double>` -
-minimum split weight threshold `HighDimensionFilter =  <Boolean>` -
-activate high-dimensional filter to avoid exponential graph size
+majority-state-vs-others or RY alphabet
+
+`MinSplitWeight =  <Double>` - minimum split weight threshold
+
+`HighDimensionFilter =  <Boolean>` - activate high-dimensional filter to
+avoid exponential graph size
+
 Reference: [@Husonetal2012]
 
 #### Median Joining
 
-The "Median Joining" algorithm takes a Characters block as input and
+The *Median Joining* algorithm takes a Characters block as input and
 produces a Network block as output. It computes a haplotype network
 using the median-joining method. The algorithm has the following
 options:
 
 `Epsilon =  <Integer>` - balances accuracy (smaller value) and
-efficiency (larger value) Reference: [@Bandeltetal1999]
+efficiency (larger value)
+
+Reference: [@Bandeltetal1999]
 
 #### Parsimony Splits
 
-The "Parsimony Splits" algorithm takes a Characters block as input and
+The *Parsimony Splits* algorithm takes a Characters block as input and
 produces a Splits block as output. It computes weakly-compatible splits
-directly from DNA characters. Reference: [@BandeltDress1992]
+directly from DNA characters.
+
+Reference: [@BandeltDress1992]
 
 #### Characters Filter
 
-The "Characters Filter" algorithm takes a Characters block as input and
+The *Characters Filter* algorithm takes a Characters block as input and
 produces a Characters block as output. It provides several ways of
 filtering characters. The algorithm has the following options:
 
 `ExcludeGapSites =  <Boolean>` - exclude all sites that contain a gap
+
 `ExcludeParsimonyUninformativeSites =  <Boolean>` - exclude all sites
-that are parsimony uninformative `ExcludeConstantSites =  <Boolean>` -
-exclude all sites that are constant
+that are parsimony uninformative
+
+`ExcludeConstantSites =  <Boolean>` - exclude all sites that are
+constant
+
 `ExcludeFirstCodonPosition =  <Boolean>` - exclude first and then every
-third site `ExcludeSecondCodonPosition =  <Boolean>` - exclude second
-and then every third site `ExcludeThirdCodonPosition =  <Boolean>` -
-exclude third and then every third site
+third site
+
+`ExcludeSecondCodonPosition =  <Boolean>` - exclude second and then
+every third site
+
+`ExcludeThirdCodonPosition =  <Boolean>` - exclude third and then every
+third site
 
 #### External Program
 
-The "External Program" algorithm takes a Characters block as input and
+The *External Program* algorithm takes a Characters block as input and
 produces a Trees block as output. It runs an external program. The
 algorithm has the following options:
 
 `Name =  <String>` - specify a name for this calculation
+
 `ProgramCall =  <String>` - specification of external program: replace
-'path-to-program' by path to program and `use '%i' and '%o' as place` -
-holders for the program's input and output files
+'path-to-program' by path to program and
+
+`use '%i' and '%o' as place` - holders for the program's input and
+output files
+
 `CharactersFormat = {Phylip | Nexus | FastA}` - specify the format to
 write out the current data in
 
 #### Estimate Invariable Sites
 
-The "Estimate Invariable Sites" algorithm takes a Characters block as
+The *Estimate Invariable Sites* algorithm takes a Characters block as
 input and produces a Report block as output. It estimates the proportion
-of invariant sites using capture-recapture. Reference: [@Steeletal2000]
+of invariant sites using capture-recapture.
+
+Reference: [@Steeletal2000]
 
 #### Phi Test
 
-The "Phi Test" algorithm takes a Characters block as input and produces
+The *Phi Test* algorithm takes a Characters block as input and produces
 a Report block as output. It performs a statistical test for detecting
-the presence of recombination. Reference: [@Bruenetal2006]
+the presence of recombination.
+
+Reference: [@Bruenetal2006]
 
 #### Tajima D
 
-The "Tajima D" algorithm takes a Characters block as input and produces
+The *Tajima D* algorithm takes a Characters block as input and produces
 a Report block as output. It performs Tajima's D test to determine
 whether a DNA sequence is evolving neutrally. The algorithm has the
 following options:
 
 `ExcludeGapSites =  <Boolean>` - exclude gapped sites from calculation.
+
 Reference: [@Tajima1989]
 
 ## Algorithms on a Distances Block
 
 #### Neighbor Joining
 
-The "Neighbor Joining" algorithm takes a Distances block as input and
+The *Neighbor Joining* algorithm takes a Distances block as input and
 produces a Trees block as output. It computes an unrooted phylogenetic
-tree using the neighbor-joining method. Reference: [@SaitouNei1987]
+tree using the neighbor-joining method.
+
+Reference: [@SaitouNei1987]
 
 #### Bio NJ
 
-The "Bio NJ" algorithm takes a Distances block as input and produces a
+The *Bio NJ* algorithm takes a Distances block as input and produces a
 Trees block as output. It computes an unrooted phylogenetic tree using
-the Bio-NJ method. Reference: [@Gascuel1997]
+the Bio-NJ method.
+
+Reference: [@Gascuel1997]
 
 #### UPGMA
 
-The "UPGMA" algorithm takes a Distances block as input and produces a
+The *UPGMA* algorithm takes a Distances block as input and produces a
 Trees block as output. It computes a rooted phylogenetic tree using the
-UPGMA method. Reference: [@SokalMichener1958]
+UPGMA method.
+
+Reference: [@SokalMichener1958]
 
 #### Neighbor Net
 
-The "Neighbor Net" algorithm takes a Distances block as input and
+The *Neighbor Net* algorithm takes a Distances block as input and
 produces a Splits block as output. It computes a set of cyclic splits
 using the neighbor-net method. The algorithm has the following options:
 
 `InferenceAlgorithm = {GradientProjection | ActiveSet | APGD | SplitsTree4}` -
-the inference algorithm to be used References:
-[@BryantMoulton2004; @BryantHuson2023]
+the inference algorithm to be used
+
+References: [@BryantMoulton2004; @BryantHuson2023]
 
 #### Split Decomposition
 
-The "Split Decomposition" algorithm takes a Distances block as input and
+The *Split Decomposition* algorithm takes a Distances block as input and
 produces a Splits block as output. It computes a set of
 weakly-compatible splits using the split-decomposition method.
+
 Reference: [@BandeltDress1992]
 
 #### Buneman Tree
 
-The "Buneman Tree" algorithm takes a Distances block as input and
+The *Buneman Tree* algorithm takes a Distances block as input and
 produces a Splits block as output. It computes a set of compatible
-splits using the Buneman tree method. Reference: [@BandeltDress1992]
+splits using the Buneman tree method.
+
+Reference: [@BandeltDress1992]
 
 #### Min Spanning Network
 
-The "Min Spanning Network" algorithm takes a Distances block as input
+The *Min Spanning Network* algorithm takes a Distances block as input
 and produces a Network block as output. It computes a minimum spanning
 network. The algorithm has the following options:
 
 `Epsilon =  <Double>` - weighted genetic distance measure. Low:
 MedianJoining, High: full median network
+
 `MinSpanningTree =  <Boolean>` - calculate minimum spanning tree
+
 Reference: [@ExcoffierSmouse1994]
 
 #### Min Spanning Tree
 
-The "Min Spanning Tree" algorithm takes a Distances block as input and
+The *Min Spanning Tree* algorithm takes a Distances block as input and
 produces a Trees block as output. It computes a minimum spanning tree.
+
 Reference: [@ExcoffierSmouse1994]
 
 #### PCOA
 
-The "PCOA" algorithm takes a Distances block as input and produces a
+The *PCOA* algorithm takes a Distances block as input and produces a
 Network block as output. It performs principal coordinates analysis. The
 algorithm has the following options:
 
 `FirstCoordinate =  <Integer>` - choose principal component for the x
-Axis `SecondCoordinate =  <Integer>` - choose principal component for
-the y Axis Reference: [@Gower1966]
+Axis
+
+`SecondCoordinate =  <Integer>` - choose principal component for the y
+Axis
+
+Reference: [@Gower1966]
 
 #### Delta Score
 
-The "Delta Score" algorithm takes a Distances block as input and
+The *Delta Score* algorithm takes a Distances block as input and
 produces a Report block as output. It calculates the delta score.
+
 Reference: [@Hollandetal2002]
 
 ## Algorithms on a Splits Block
 
 #### Bootstrap Splits
 
-The "Bootstrap Splits" algorithm takes a Splits block as input and
+The *Bootstrap Splits* algorithm takes a Splits block as input and
 produces a Splits block as output. It performs bootstrapping on splits.
 The algorithm has the following options:
 
 `Replicates =  <Integer>` - number of bootstrap replicates
+
 `MinPercent =  <Double>` - minimum percentage support for a split to be
-included `ShowAllSplits =  <Boolean>` - show all bootstrap splits, not
-just the original splits `RandomSeed =  <Integer>` - if non-zero, is
-used as seed for random number generator
+included
+
+`ShowAllSplits =  <Boolean>` - show all bootstrap splits, not just the
+original splits
+
+`RandomSeed =  <Integer>` - if non-zero, is used as seed for random
+number generator
+
 `HighDimensionFilter =  <Boolean>` - heuristically remove splits causing
-high-dimensional network Reference: [@Felsenstein1985]
+high-dimensional network
+
+Reference: [@Felsenstein1985]
 
 #### Greedy Tree
 
-The "Greedy Tree" algorithm takes a Splits block as input and produces a
+The *Greedy Tree* algorithm takes a Splits block as input and produces a
 Trees block as output. It produces a phylogenetic tree based on greedily
-selecting a compatible set of splits. Reference: [@Husonetal2012]
+selecting a compatible set of splits.
+
+Reference: [@Husonetal2012]
 
 #### Dimension Filter
 
-The "Dimension Filter" algorithm takes a Splits block as input and
+The *Dimension Filter* algorithm takes a Splits block as input and
 produces a Splits block as output. It heuristically removes splits that
 lead to high-dimensional boxes in a split network. The algorithm has the
 following options:
@@ -1887,7 +1996,7 @@ configurations of a higher dimension than this threshold
 
 #### Show Splits
 
-The "Show Splits" algorithm takes a Splits block as input and produces a
+The *Show Splits* algorithm takes a Splits block as input and produces a
 View block as output. It provides interactive visualizations of split
 networks. The algorithm has the following options:
 
@@ -1895,21 +2004,26 @@ networks. The algorithm has the following options:
 
 #### Splits Filter
 
-The "Splits Filter" algorithm takes a Splits block as input and produces
+The *Splits Filter* algorithm takes a Splits block as input and produces
 a Splits block as output. It provides several ways of filtering splits.
 The algorithm has the following options:
 
 `WeightThreshold =  <Float>` - set minimum split weight threshold
+
 `ConfidenceThreshold =  <Float>` - set the minimum split confidence
-threshold `MaximumDimension =  <Integer>` - set maximum dimension
-threshold (necessary to avoid computational overload)
+threshold
+
+`MaximumDimension =  <Integer>` - set maximum dimension threshold
+(necessary to avoid computational overload)
+
 `FilterAlgorithm = {None | GreedyCompatible | GreedyCircular | GreedyWeaklyCompatible | BlobTree}` -
-set the filter algorithm `RecomputeCycle =  <Boolean>` - recompute
-circular ordering
+set the filter algorithm
+
+`RecomputeCycle =  <Boolean>` - recompute circular ordering
 
 #### Weights Slider
 
-The "Weights Slider" algorithm takes a Splits block as input and
+The *Weights Slider* algorithm takes a Splits block as input and
 produces a Splits block as output. It allows one to interactively filter
 splits by their weight. The algorithm has the following options:
 
@@ -1917,179 +2031,229 @@ splits by their weight. The algorithm has the following options:
 
 #### Phylogenetic Diversity
 
-The "Phylogenetic Diversity" algorithm takes a Splits block as input and
+The *Phylogenetic Diversity* algorithm takes a Splits block as input and
 produces a Report block as output. It calculates the phylogenetic
-diversity for selected taxa. Reference: [@Volkmannetal2014]
+diversity for selected taxa.
+
+Reference: [@Volkmannetal2014]
 
 #### Shapley Values
 
-The "Shapley Values" algorithm takes a Splits block as input and
+The *Shapley Values* algorithm takes a Splits block as input and
 produces a Report block as output. It calculates Shapley values on
-splits. Reference: [@Volkmannetal2014]
+splits.
+
+Reference: [@Volkmannetal2014]
 
 ## Algorithms on a Trees Block
 
 #### Autumn Algorithm
 
-The "Autumn Algorithm" algorithm takes a Trees block as input and
+The *Autumn Algorithm* algorithm takes a Trees block as input and
 produces a Trees block as output. It computes all minimum hybridization
 networks using the Autumn algorithm The algorithm has the following
 options:
 
 `FirstTree =  <Integer>` - index of the first tree
-`SecondTree =  <Integer>` - index of the second tree Reference:
-[@HusonLinz2018]
+
+`SecondTree =  <Integer>` - index of the second tree
+
+Reference: [@HusonLinz2018]
 
 #### ALTS Network
 
-The "ALTS Network" algorithm takes a Trees block as input and produces a
+The *ALTS Network* algorithm takes a Trees block as input and produces a
 Trees block as output. It computes one or more rooted networks that
 contain all input trees using the M-ALTS algorithm. The algorithm has
 the following options:
 
 `MutualRefinement =  <Boolean>` - mutually refine trees during
-preprocessing `RemoveDuplicates =  <Boolean>` - remove duplicate
-networks in output `Kernelization =  <Boolean>` - perform kernelization
-during preprocessing References: [@Zhangetal2023; @Zhangetal2024]
+preprocessing
+
+`RemoveDuplicates =  <Boolean>` - remove duplicate networks in output
+
+`Kernelization =  <Boolean>` - perform kernelization during
+preprocessing
+
+References: [@Zhangetal2023; @Zhangetal2024]
 
 #### ALTS External
 
-The "ALTS External" algorithm takes a Trees block as input and produces
+The *ALTS External* algorithm takes a Trees block as input and produces
 a Trees block as output. It runs an external implementation of the ALTS
 algorithm. The algorithm has the following options:
 
 `ALTSExecutableFile =  <String>` - download and compile ALTSNetwork
 program from https://github.com/LX-Zhang/AAST, then set this parameter
 to the executable.
+
 `Note that the program requires fully resolved trees as input and any unresolved trees will be ignored`
+
 Reference: [@Zhangetal2023]
 
 #### Average Consensus
 
-The "Average Consensus" algorithm takes a Trees block as input and
+The *Average Consensus* algorithm takes a Trees block as input and
 produces a Splits block as output. It calculates average consensus tree.
+
 Reference: [@LapointeCucumel1997]
 
 #### Blob Tree
 
-The "Blob Tree" algorithm takes a Trees block as input and produces a
+The *Blob Tree* algorithm takes a Trees block as input and produces a
 Trees block as output. It extract the blob tree from a rooted network
-(by contracting all non-trivial bi-connected components). Reference:
-[@Husonetal2012]
+(by contracting all non-trivial bi-connected components).
+
+Reference: [@Husonetal2012]
 
 #### Bootstrap Tree Splits
 
-The "Bootstrap Tree Splits" algorithm takes a Trees block as input and
+The *Bootstrap Tree Splits* algorithm takes a Trees block as input and
 produces a Splits block as output. It performs bootstrapping on trees.
 The algorithm has the following options:
 
 `Replicates =  <Integer>` - number of bootstrap replicates
+
 `MinPercent =  <Double>` - minimum percentage support for a split to be
-included `ShowAllSplits =  <Boolean>` - show all bootstrap splits, not
-just the original splits `RandomSeed =  <Integer>` - if non-zero, is
-used as seed for random number generator
+included
+
+`ShowAllSplits =  <Boolean>` - show all bootstrap splits, not just the
+original splits
+
+`RandomSeed =  <Integer>` - if non-zero, is used as seed for random
+number generator
+
 `HighDimensionFilter =  <Boolean>` - heuristically remove splits causing
-high-dimensional network Reference: [@Felsenstein1985]
+high-dimensional network
+
+Reference: [@Felsenstein1985]
 
 #### Bootstrap Tree
 
-The "Bootstrap Tree" algorithm takes a Trees block as input and produces
+The *Bootstrap Tree* algorithm takes a Trees block as input and produces
 a Trees block as output. It performs bootstrapping on trees. The
 algorithm has the following options:
 
 `Replicates =  <Integer>` - number of bootstrap replicates
+
 `TransferBootstrap =  <Boolean>` - use transform bootstrapping (TBE),
-less susceptible to rouge taxa `MinPercent =  <Double>` - minimum
-percentage support for a branch to be included
+less susceptible to rouge taxa
+
+`MinPercent =  <Double>` - minimum percentage support for a branch to be
+included
+
 `RandomSeed =  <Integer>` - if non-zero, is used as seed for random
-number generator Reference: [@Felsenstein1985]
+number generator
+
+Reference: [@Felsenstein1985]
 
 #### Cluster Network
 
-The "Cluster Network" algorithm takes a Trees block as input and
+The *Cluster Network* algorithm takes a Trees block as input and
 produces a Trees block as output. It computes the cluster network that
 contains all input trees (in the hardwired sense). The algorithm has the
 following options:
 
 `EdgeWeights = {Mean | Count | Sum | Uniform}` - compute edge weights
+
 `ThresholdPercent =  <Double>` - minimum percentage of trees that a
-cluster must appear in Reference: [@HusonRupp2008]
+cluster must appear in
+
+Reference: [@HusonRupp2008]
 
 #### Consensus Tree
 
-The "Consensus Tree" algorithm takes a Trees block as input and produces
+The *Consensus Tree* algorithm takes a Trees block as input and produces
 a Trees block as output. It provides several methods for computing a
 consensus tree. The algorithm has the following options:
 
 `Consensus = {Majority | Greedy | Strict}` - consensus method to use
+
 Reference: [@Bryant2001]
 
 #### Consensus Network
 
-The "Consensus Network" algorithm takes a Trees block as input and
+The *Consensus Network* algorithm takes a Trees block as input and
 produces a Splits block as output. It computes the consensus network.
 The algorithm has the following options:
 
 `EdgeWeights = {Mean | TreeSizeWeightedMean | Median | Count | Sum | Uniform | TreeNormalizedSum}` -
 how to calculate edge weights in resulting network
+
 `ThresholdPercent =  <Double>` - threshold for percent of input trees
 that split has to occur in for it to appear in the output
+
 `HighDimensionFilter =  <Boolean>` - heuristically remove splits causing
-high-dimensional consensus network Reference: [@Hollandetal2004]
+high-dimensional consensus network
+
+Reference: [@Hollandetal2004]
 
 #### Consensus Outline
 
-The "Consensus Outline" algorithm takes a Trees block as input and
+The *Consensus Outline* algorithm takes a Trees block as input and
 produces a Splits block as output. It computes the consensus outline.
 The algorithm has the following options:
 
 `EdgeWeights = {Mean | TreeSizeWeightedMean | Median | Count | Sum | Uniform | TreeNormalizedSum}` -
 how to calculate edge weights in resulting network
+
 `ThresholdPercent =  <Double>` - threshold for percent of input trees
-that split has to occur in for it to appear in the output Reference:
-[@HusonCetinkaya2023]
+that split has to occur in for it to appear in the output
+
+Reference: [@HusonCetinkaya2023]
 
 #### Consensus Splits
 
-The "Consensus Splits" algorithm takes a Trees block as input and
+The *Consensus Splits* algorithm takes a Trees block as input and
 produces a Splits block as output. It provides several consensus
 methods. The algorithm has the following options:
 
 `Consensus = {Strict | Majority | GreedyCompatible | ConsensusOutline | GreedyWeaklyCompatible | ConsensusNetwork}` -
 consensus method
+
 `EdgeWeights = {Mean | TreeSizeWeightedMean | Median | Count | Sum | Uniform | TreeNormalizedSum}` -
 how to calculate edge weights in resulting network
+
 `ThresholdPercent =  <Double>` - threshold for percent of input trees
 that split has to occur in for it to appear in the output
+
 `HighDimensionFilter =  <Boolean>` - heuristically remove splits causing
-high-dimensional consensus network Reference: [@Husonetal2012]
+high-dimensional consensus network
+
+Reference: [@Husonetal2012]
 
 #### Filtered Super Network
 
-The "Filtered Super Network" algorithm takes a Trees block as input and
+The *Filtered Super Network* algorithm takes a Trees block as input and
 produces a Splits block as output. It computes a super network using the
 Z-closure method. The algorithm has the following options:
 
 `MinNumberTrees =  <Integer>` - set the min number trees
+
 `MaxDistortionScore =  <Integer>` - set the max distortion score
-`UseTotalScore =  <Boolean>` - set the use total score Reference:
-[@Whitfieldetal2008]
+
+`UseTotalScore =  <Boolean>` - set the use total score
+
+Reference: [@Whitfieldetal2008]
 
 #### LSA Tree
 
-The "LSA Tree" algorithm takes a Trees block as input and produces a
+The *LSA Tree* algorithm takes a Trees block as input and produces a
 Trees block as output. It extract the LSA tree from a rooted network.
+
 Reference: [@Husonetal2012]
 
 #### Normalize Rooted Networks
 
-The "Normalize Rooted Networks" algorithm takes a Trees block as input
+The *Normalize Rooted Networks* algorithm takes a Trees block as input
 and produces a Trees block as output. It the Normalize Rooted Networks
-algorithm Reference: [@Francisetal2021]
+algorithm
+
+Reference: [@Francisetal2021]
 
 #### Rooted Consensus Tree
 
-The "Rooted Consensus Tree" algorithm takes a Trees block as input and
+The *Rooted Consensus Tree* algorithm takes a Trees block as input and
 produces a Trees block as output. It provides several methods for
 computing a rooted consensus tree. The algorithm has the following
 options:
@@ -2098,20 +2262,23 @@ options:
 
 #### Reroot Or Reorder Trees
 
-The "Reroot Or Reorder Trees" algorithm takes a Trees block as input and
+The *Reroot Or Reorder Trees* algorithm takes a Trees block as input and
 produces a Trees block as output. It reroot, or change the order of
 children, on all trees. The algorithm has the following options:
 
 `RootBy = {Off | MidPoint | OutGroup}` - determine how to reroot
+
 `RearrangeBy = {Off | RotateChildren | RotateSubTrees | ReverseChildren | ReverseSubTrees}` -
 determine how to rearrange
+
 `Reorder = {Off | ByTaxa | Lexicographically | ReverseOrder | LadderizedUp | LadderizedDown | LadderizedRandom | Stabilize}` -
-determine how to reorder `Rescale =  <Boolean>` - rescale each tree to
-total length of 100
+determine how to reorder
+
+`Rescale =  <Boolean>` - rescale each tree to total length of 100
 
 #### Show Trees
 
-The "Show Trees" algorithm takes a Trees block as input and produces a
+The *Show Trees* algorithm takes a Trees block as input and produces a
 View block as output. It provides several types of interactive
 visualizations of trees. The algorithm has the following options:
 
@@ -2120,51 +2287,68 @@ viewer to use
 
 #### Super Network
 
-The "Super Network" algorithm takes a Trees block as input and produces
+The *Super Network* algorithm takes a Trees block as input and produces
 a Splits block as output. It computes a super network using the
 Z-closure method. The algorithm has the following options:
 
 `EdgeWeights = {AverageRelative | Mean | TreeSizeWeightedMean | Sum | Min | None}` -
 determine how to calculate edge weights in resulting network
+
 `SuperTree =  <Boolean>` - enforce the strong induction property, which
-results in a super tree `NumberOfRuns =  <Integer>` - number of runs
-using random permutations of the input splits
+results in a super tree
+
+`NumberOfRuns =  <Integer>` - number of runs using random permutations
+of the input splits
+
 `ApplyRefineHeuristic =  <Boolean>` - apply a simple refinement
-heuristic `Seed =  <Integer>` - set seed used for random permutations
+heuristic
+
+`Seed =  <Integer>` - set seed used for random permutations
+
 `HighDimensionFilter =  <Boolean>` - heuristically remove splits causing
-high-dimensional network Reference: [@Husonetal2004]
+high-dimensional network
+
+Reference: [@Husonetal2004]
 
 #### Trees Filter
 
-The "Trees Filter" algorithm takes a Trees block as input and produces a
+The *Trees Filter* algorithm takes a Trees block as input and produces a
 Trees block as output. It allows the user to interactively filter trees.
 
 #### Trees Filter More
 
-The "Trees Filter More" algorithm takes a Trees block as input and
+The *Trees Filter More* algorithm takes a Trees block as input and
 produces a Trees block as output. It provides several options for
 filtering trees. The algorithm has the following options:
 
 `RequireAllTaxa =  <Boolean>` - keep only trees that have the full set
-of taxa `MinNumberOfTaxa =  <Integer>` - keep only trees that have at
-least this number of taxa `MinTotalTreeLength =  <Double>` - keep only
-trees that have at least this total length
+of taxa
+
+`MinNumberOfTaxa =  <Integer>` - keep only trees that have at least this
+number of taxa
+
+`MinTotalTreeLength =  <Double>` - keep only trees that have at least
+this total length
 
 #### Trees Edges Filter
 
-The "Trees Edges Filter" algorithm takes a Trees block as input and
+The *Trees Edges Filter* algorithm takes a Trees block as input and
 produces a Trees block as output. It provides several options for
 filtering trees. The algorithm has the following options:
 
 `MinEdgeLength =  <Double>` - keep only edges that have this minimum
-length `MinConfidence =  <Double>` - keep only edges that have this
-minimum confidence value `UniformEdgeLengths =  <Boolean>` - change all
-edge weights to 1 `Rescale =  <Boolean>` - rescale each tree to total
-length of 100
+length
+
+`MinConfidence =  <Double>` - keep only edges that have this minimum
+confidence value
+
+`UniformEdgeLengths =  <Boolean>` - change all edge weights to 1
+
+`Rescale =  <Boolean>` - rescale each tree to total length of 100
 
 #### Tree Selector
 
-The "Tree Selector" algorithm takes a Trees block as input and produces
+The *Tree Selector* algorithm takes a Trees block as input and produces
 a Trees block as output. It allows the user to select one from a list of
 trees. The algorithm has the following options:
 
@@ -2172,7 +2356,7 @@ trees. The algorithm has the following options:
 
 #### Tree Selector Splits
 
-The "Tree Selector Splits" algorithm takes a Trees block as input and
+The *Tree Selector Splits* algorithm takes a Trees block as input and
 produces a Splits block as output. It selects a single tree and extracts
 its splits. The algorithm has the following options:
 
@@ -2180,7 +2364,7 @@ its splits. The algorithm has the following options:
 
 #### Unique Topologies
 
-The "Unique Topologies" algorithm takes a Trees block as input and
+The *Unique Topologies* algorithm takes a Trees block as input and
 produces a Trees block as output. It filter trees or rooted networks
 return all unique topologies (using hardwired clusters). The algorithm
 has the following options:
@@ -2189,57 +2373,75 @@ has the following options:
 
 #### Confidence Network
 
-The "Confidence Network" algorithm takes a Trees block as input and
+The *Confidence Network* algorithm takes a Trees block as input and
 produces a Splits block as output. It computes a credibility network
 using Beran's algorithm. The algorithm has the following options:
 
 `Level =  <Double>` - set the level (between 0 and 1)
+
 `HighDimensionFilter =  <Boolean>` - heuristically remove splits causing
-high-dimensional consensus network Reference: [@HusonBryant2006]
+high-dimensional consensus network
+
+Reference: [@HusonBryant2006]
 
 #### Phylogenetic Diversity
 
-The "Phylogenetic Diversity" algorithm takes a Trees block as input and
+The *Phylogenetic Diversity* algorithm takes a Trees block as input and
 produces a Report block as output. It calculates the phylogenetic
 diversity for selected taxa. The algorithm has the following options:
 
 `Rooted =  <Boolean>` - interpret trees as rooted?
+
 `ApplyTo = {OneTree | AllTrees}` - determine whether to apply to one or
-all trees `WhichTree =  <Integer>` - the index of the tree that the
-method will be applied to Reference: [@Faith1992]
+all trees
+
+`WhichTree =  <Integer>` - the index of the tree that the method will be
+applied to
+
+Reference: [@Faith1992]
 
 #### Tree Diversity Index
 
-The "Tree Diversity Index" algorithm takes a Trees block as input and
+The *Tree Diversity Index* algorithm takes a Trees block as input and
 produces a Report block as output. It calculates the fair-proportion and
 equal-splits values on trees. The algorithm has the following options:
 
 `Method = {FairProportions | EqualSplits}` - choose the type of index
-calculation `ApplyTo = {OneTree | AllTrees}` - determine whether to
-apply to one or all trees `WhichTree =  <Integer>` - the index of the
-tree that the method will be applied to References:
-[@Redding2003; @ReddingMooers2006]
+calculation
+
+`ApplyTo = {OneTree | AllTrees}` - determine whether to apply to one or
+all trees
+
+`WhichTree =  <Integer>` - the index of the tree that the method will be
+applied to
+
+References: [@Redding2003; @ReddingMooers2006]
 
 #### Unrooted Shapley Values
 
-The "Unrooted Shapley Values" algorithm takes a Trees block as input and
+The *Unrooted Shapley Values* algorithm takes a Trees block as input and
 produces a Report block as output. It calculates unrooted Shapley values
 on trees. The algorithm has the following options:
 
 `ApplyTo = {OneTree | AllTrees}` - determine whether to apply to one or
-all trees `WhichTree =  <Integer>` - the index of the tree that the
-method will be applied to Reference: [@Haakeetal2008]
+all trees
+
+`WhichTree =  <Integer>` - the index of the tree that the method will be
+applied to
+
+Reference: [@Haakeetal2008]
 
 #### Average Distances
 
-The "Average Distances" algorithm takes a Trees block as input and
+The *Average Distances* algorithm takes a Trees block as input and
 produces a Distances block as output. It calculates the average
-distances between taxa over a set of trees. Reference:
-[@LapointeCucumel1997]
+distances between taxa over a set of trees.
+
+Reference: [@LapointeCucumel1997]
 
 #### Enumerate Contained Trees
 
-The "Enumerate Contained Trees" algorithm takes a Trees block as input
+The *Enumerate Contained Trees* algorithm takes a Trees block as input
 and produces a Trees block as output. It enumerates all contained trees.
 The algorithm has the following options:
 
@@ -2247,29 +2449,35 @@ The algorithm has the following options:
 
 #### Loose And Lacy
 
-The "Loose And Lacy" algorithm takes a Trees block as input and produces
+The *Loose And Lacy* algorithm takes a Trees block as input and produces
 a Trees block as output. It computes the 'loose' and 'lacy' species for
 a given tree and taxon trait. The algorithm has the following options:
 
 `SpeciesDefinition = {Loose | Lacy | Both}` - species definition to use
+
 `TraitNumber =  <Integer>` - number of specific trait to use
-`UseAllTraits =  <Boolean>` - use all traits Reference: [@Hoppeetal2019]
+
+`UseAllTraits =  <Boolean>` - use all traits
+
+Reference: [@Hoppeetal2019]
 
 #### List One RSPR Trees
 
-The "List One RSPR Trees" algorithm takes a Trees block as input and
+The *List One RSPR Trees* algorithm takes a Trees block as input and
 produces a Report block as output. It determines which trees are exactly
 on rSPR away from each other. The algorithm has the following options:
 
 `ApplyTo = {OneTree | AllTrees}` - determine whether to apply to one or
-all trees `WhichTree =  <Integer>` - the index of the tree that the
-method will be applied to
+all trees
+
+`WhichTree =  <Integer>` - the index of the tree that the method will be
+applied to
 
 ## Algorithms on a Network Block
 
 #### Show Network
 
-The "Show Network" algorithm takes a Network block as input and produces
+The *Show Network* algorithm takes a Network block as input and produces
 a View block as output. It provides interactive visualizations of
 networks. The algorithm has the following options:
 
