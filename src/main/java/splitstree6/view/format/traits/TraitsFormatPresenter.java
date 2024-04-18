@@ -41,7 +41,7 @@ public class TraitsFormatPresenter {
 		controller.getMaxSizeField().setText(String.valueOf(format.getOptionTraitSize()));
 
 		format.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
-		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> format.setOptionTraitSize(NumberUtils.parseInt(n)));
+		controller.getMaxSizeField().setOnAction(e -> format.setOptionTraitSize(NumberUtils.parseInt(controller.getMaxSizeField().getText())));
 
 		FuzzyBoolean.setupCheckBox(controller.getLegendCBox(), format.getLegend().showProperty());
 

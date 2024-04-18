@@ -26,10 +26,9 @@ import jloda.util.NumberUtils;
 public class LocationsFormatPresenter {
 	public LocationsFormatPresenter(LocationsFormat format, UndoManager undoManager) {
 		var controller = format.getController();
-		controller.getMaxSizeField().setText(String.valueOf(format.getOptionLocationSize()));
 
-		format.optionLocationSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
-		controller.getMaxSizeField().textProperty().addListener((v, o, n) -> format.setOptionLocationSize(NumberUtils.parseInt(n)));
+		controller.getMaxSizeField().setText(String.valueOf(format.getOptionLocationSize()));
+		controller.getMaxSizeField().setOnAction(e -> format.optionLocationSizeProperty().set(NumberUtils.parseInt(controller.getMaxSizeField().getText())));
 
 		FuzzyBoolean.setupCheckBox(controller.getLegendCBox(), format.getLegend().showProperty());
 

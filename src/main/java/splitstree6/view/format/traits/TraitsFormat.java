@@ -29,14 +29,17 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
-import javafx.scene.chart.PieChart;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Shape;
 import javafx.util.Pair;
 import jloda.fx.control.Legend;
 import jloda.fx.undo.UndoManager;
-import jloda.fx.util.*;
+import jloda.fx.util.BasicFX;
+import jloda.fx.util.ExtendedFXMLLoader;
+import jloda.fx.util.FuzzyBoolean;
+import jloda.fx.util.ProgramProperties;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
 import jloda.util.StringUtils;
@@ -188,7 +191,7 @@ public class TraitsFormat extends Pane {
 				for (var v : nodeShapeMap.keySet()) {
 					var nodeShape = nodeShapeMap.get(v);
 					if (nodeShape != null) {
-						nodeShape.getChildren().removeAll(BasicFX.getAllRecursively(nodeShape, PieChart.class));
+						nodeShape.getChildren().removeAll(BasicFX.getAllRecursively(nodeShape, BasicPieChart.class));
 
 						if (v.getOwner() == graph && graph.getNumberOfTaxa(v) == 1) {
 							var taxonId = graph.getTaxon(v);
@@ -203,7 +206,6 @@ public class TraitsFormat extends Pane {
 									}
 								}
 							} else {
-								if (true) {
 									var chart = new BasicPieChart(workingTaxa.get().getLabel(taxonId));
 									chart.setColorScheme(legend.getColorSchemeName());
 									var sum = 0.0;
@@ -235,11 +237,12 @@ public class TraitsFormat extends Pane {
 										chart.setRadius(0.5 * pieSize);
 
 										var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
-										if (shapes.size() == 1) {
-											var shape = shapes.iterator().next();
-											if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
-												shape.setScaleX(pieSize / shape.prefWidth(0));
-												shape.setScaleY(pieSize / shape.prefHeight(0));
+										for (var shape : shapes) {
+											if (shape instanceof Circle && !"iceberg".equals(shape.getId())) {
+												if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
+													shape.setScaleX(pieSize / shape.prefWidth(0));
+													shape.setScaleY(pieSize / shape.prefHeight(0));
+												}
 											}
 										}
 										nodeShape.getChildren().add(chart);
@@ -248,59 +251,6 @@ public class TraitsFormat extends Pane {
 											Tooltip.install(chart, new Tooltip(tooltipBuf.toString()));
 										}
 									}
-								} else {
-									var pieChart = new PieChart();
-									pieChart.setLabelsVisible(false);
-									pieChart.setLegendVisible(false);
-
-									var sum = 0.0;
-									var max = 0.0;
-
-									for (var trait : traitsBlock.getNumericalTraitLabels()) {
-										if (isTraitActive(trait))
-											max = Math.max(max, getTraitsBlock().getMax(trait));
-									}
-
-									var tooltipBuf = new StringBuilder();
-
-									for (var traitId : traitsBlock.numericalTraits()) {
-										var label = traitsBlock.getTraitLabel(traitId);
-										if (isTraitActive(label)) {
-											var value = traitsBlock.getTraitValue(taxonId, traitId);
-											tooltipBuf.append(String.format("%s: %,.2f%n", label, value));
-											sum += value;
-											pieChart.getData().add(new PieChart.Data(traitsBlock.getTraitLabel(traitId), value));
-										} else
-											pieChart.getData().add(new PieChart.Data(traitsBlock.getTraitLabel(traitId), 0));
-									}
-
-									if (sum > 0) {
-										var pieSize = (Math.sqrt(sum) / Math.sqrt(max)) * getOptionTraitSize();
-										unitSize = Math.max(unitSize, (1 / Math.sqrt(max)) * getOptionTraitSize());
-										pieChart.setMinSize(5, 5);
-										pieChart.setPrefSize(pieSize, pieSize);
-										pieChart.setMaxSize(pieSize, pieSize);
-										pieChart.setLayoutX(-0.5 * pieSize);
-										pieChart.setLayoutY(-0.5 * pieSize);
-
-										var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
-										if (shapes.size() == 1) {
-											var shape = shapes.iterator().next();
-											if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
-												shape.setScaleX(pieSize / shape.prefWidth(0));
-												shape.setScaleY(pieSize / shape.prefHeight(0));
-											}
-										}
-
-										nodeShape.getChildren().add(pieChart);
-										ColorSchemeManager.setPieChartColors(pieChart, legend.getColorSchemeName());
-										pieChart.setStyle("-fx-padding: -10;"); // remove white space around pie
-
-										if (!tooltipBuf.isEmpty()) {
-											Tooltip.install(pieChart, new Tooltip(tooltipBuf.toString()));
-										}
-									}
-								}
 							}
 						}
 					}

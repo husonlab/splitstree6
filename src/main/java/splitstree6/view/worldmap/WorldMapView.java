@@ -25,7 +25,6 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.Node;
-import javafx.scene.chart.PieChart;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
@@ -252,7 +251,7 @@ public class WorldMapView implements IView {
 	private void updatePies(double oldSize, double newSize) {
 		if (oldSize > 1 && newSize > 1) {
 			for (var worldMap : List.of(presenter.getWorldMap1(), presenter.getWorldMap2())) {
-				for (var pie : BasicFX.getAllRecursively(worldMap, PieChart.class)) {
+				for (var pie : BasicFX.getAllRecursively(worldMap, BasicPieChart.class)) {
 					pie.setScaleX(pie.getScaleX() / oldSize * newSize);
 					pie.setScaleY(pie.getScaleY() / oldSize * newSize);
 				}

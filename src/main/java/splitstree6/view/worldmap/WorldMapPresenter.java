@@ -97,6 +97,8 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 			}
 		});
 
+		controller.getBoundingBoxMenuItem().selectedProperty().bindBidirectional(view.optionShowBoundingBoxProperty());
+
 		for (var worldMap : List.of(worldMap1, worldMap2)) {
 			worldMap.getContinents().visibleProperty().bindBidirectional(view.optionShowContinentNamesProperty());
 			worldMap.getCountries().visibleProperty().bindBidirectional(view.optionShowCountryNamesProperty());

@@ -32,16 +32,11 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.ExtendedFXMLLoader;
 import jloda.fx.util.FuzzyBoolean;
 import jloda.fx.util.ProgramProperties;
-import splitstree6.data.TaxaBlock;
-import splitstree6.data.TraitsBlock;
 import splitstree6.window.MainWindow;
 
 public class LocationsFormat extends Pane {
 	private final LocationsFormatController controller;
 	private final LocationsFormatPresenter presenter;
-
-	private final ObjectProperty<TaxaBlock> workingTaxa = new SimpleObjectProperty<>();
-	private final ObjectProperty<TraitsBlock> traitsBlock = new SimpleObjectProperty<>();
 
 	private final IntegerProperty optionLocationSize = new SimpleIntegerProperty(this, "optionLocationSize");
 

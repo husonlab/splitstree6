@@ -59,6 +59,10 @@ public class BasicPieChart extends Pane {
 		colorScheme.addListener(invalidationListener);
 		radius.addListener(invalidationListener);
 		setName(name);
+
+		layoutXProperty().bind(radius.multiply(-1));
+		layoutYProperty().bind(radius.multiply(-1));
+
 	}
 
 	private void update() {
@@ -81,8 +85,10 @@ public class BasicPieChart extends Pane {
 				var delta = 360.0 / total * value;
 				var arc = new Arc();
 				arc.setType(ArcType.ROUND);
-				arc.setRadiusX(getRadius());
-				arc.setRadiusY(getRadius());
+				arc.centerXProperty().bind(radius);
+				arc.centerYProperty().bind(radius);
+				arc.radiusXProperty().bind(radius);
+				arc.radiusYProperty().bind(radius);
 				arc.setStartAngle(angle);
 				arc.setLength(delta);
 				arc.setFill(colorScheme.get(i % colorScheme.size()));
