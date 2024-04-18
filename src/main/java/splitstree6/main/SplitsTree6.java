@@ -47,6 +47,8 @@ import java.util.ArrayList;
  * Daniel Huson, 2020
  */
 public class SplitsTree6 extends Application {
+	public static boolean nodeZoomOnMouseOver = false;
+
 	private static final ArrayList<String> inputFiles = new ArrayList<>();
 
 	private static boolean desktop = true;

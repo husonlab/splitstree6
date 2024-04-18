@@ -26,6 +26,8 @@ import javafx.collections.ObservableMap;
 import javafx.geometry.Bounds;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.find.FindToolBar;
+import jloda.fx.selection.SelectionModel;
+import jloda.fx.selection.SetSelectionModel;
 import jloda.fx.util.*;
 import jloda.graph.Node;
 import jloda.util.StringUtils;
@@ -55,6 +57,10 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 	private final NetworkPane networkPane;
 
 	private final InteractionSetup interactionSetup;
+
+	private final SelectionModel<LabeledNodeShape> networkNodeSelection = new SetSelectionModel<>();
+
+	private boolean first = true;
 
 	/**
 	 * the network view presenter
@@ -98,29 +104,35 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 			paneHeight.set(n.getHeight() - 80);
 		});
 
-		networkPane = new NetworkPane(mainWindow, mainWindow.workingTaxaProperty(), networkBlock, mainWindow.getTaxonSelectionModel(),
+
+		networkPane = new NetworkPane(mainWindow, mainWindow.workingTaxaProperty(), networkBlock,
 				paneWidth, paneHeight, view.optionDiagramProperty(), view.optionOrientationProperty(),
 				view.optionZoomFactorProperty(), view.optionFontScaleFactorProperty(),
 				taxonLabelMap, nodeShapeMap, edgeShapeMap);
 
-		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, view.getUndoManager(), view.optionEditsProperty(), mainWindow.getTaxonSelectionModel());
+		interactionSetup = new InteractionSetup(mainWindow.getStage(), networkPane, view.getUndoManager(), view.optionEditsProperty(),
+				t -> mainWindow.getWorkingTaxa().get(t), networkNodeSelection, mainWindow.getTaxonSelectionModel());
 
 		networkPane.setRunAfterUpdate(() -> {
 			var taxa = mainWindow.getWorkflow().getWorkingTaxaBlock();
 			interactionSetup.apply(taxonLabelMap, nodeShapeMap,
 					t -> (t >= 1 && t <= taxa.getNtax() ? taxa.get(t) : null), taxa::indexOf);
 
-			if (view.getOptionEdits().length > 0) {
-				AService.run(() -> {
-					Thread.sleep(700); // wait long enough for all label layouting to finish
-					Platform.runLater(() -> {
-						NetworkEdits.applyEdits(view.getOptionEdits(), nodeShapeMap, edgeShapeMap);
-						NetworkEdits.clearEdits(view.optionEditsProperty());
+
+			if (first) {
+				first = false;
+				if (view.getOptionEdits().length > 0) {
+					AService.run(() -> {
+						Thread.sleep(700); // wait long enough for all label layouting to finish
+						Platform.runLater(() -> {
+							NetworkEdits.applyEdits(view.getOptionEdits(), nodeShapeMap, edgeShapeMap);
+							NetworkEdits.clearEdits(view.optionEditsProperty());
+						});
+						return null;
+					}, k -> {
+					}, k -> {
 					});
-					return null;
-				}, k -> {
-				}, k -> {
-				});
+				}
 			}
 
 			updateCounter.set(updateCounter.get() + 1);
@@ -171,7 +183,6 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 				view.optionActiveTraitsProperty().set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().getTraitLabels().toArray(new String[0]));
 			}
 		});
-
 	}
 
 	@Override
@@ -194,13 +205,35 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 
 		mainController.getPasteMenuItem().disableProperty().bind(new SimpleBooleanProperty(true));
 
-		mainWindow.getController().getIncreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
-		mainWindow.getController().getIncreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
-		mainWindow.getController().getDecreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor((1.0 / 1.2) * view.getOptionFontScaleFactor()));
-		mainWindow.getController().getDecreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor(1.2 * view.getOptionFontScaleFactor()));
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> view.setOptionFontScaleFactor((1.0 / 1.2) * view.getOptionFontScaleFactor()));
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(view.emptyProperty());
 
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
+
+		mainController.getSelectAllMenuItem().setOnAction(e -> networkNodeSelection.getSelectedItems().addAll(BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class)));
+		mainController.getSelectAllMenuItem().disableProperty().bind(view.emptyProperty());
+
+		mainController.getSelectInverseMenuItem().setOnAction(e -> {
+			for (var shape : BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class)) {
+				networkNodeSelection.toggleSelection(shape);
+			}
+		});
+		mainController.getSelectInverseMenuItem().disableProperty().bind(view.emptyProperty());
+
+		mainController.getSelectNoneMenuItem().setOnAction(e -> networkNodeSelection.clearSelection());
+		mainController.getSelectNoneMenuItem().disableProperty().bind(view.emptyProperty());
+
+		mainController.getSelectButton().setOnAction(e -> {
+			var all = BasicFX.getAllRecursively(view.getMainNode(), LabeledNodeShape.class);
+			if (networkNodeSelection.size() < all.size())
+				mainController.getSelectAllMenuItem().fire();
+			else
+				mainController.getSelectNoneMenuItem().fire();
+		});
+		mainController.getSelectButton().disableProperty().bind(view.emptyProperty());
 
 		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());

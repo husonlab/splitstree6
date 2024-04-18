@@ -108,6 +108,7 @@ import splitstree6.tabs.workflow.WorkflowTab;
 import splitstree6.utils.CollapseIdenticalHyplotypes;
 import splitstree6.view.alignment.AlignmentView;
 import splitstree6.view.displaytext.DisplayTextViewPresenter;
+import splitstree6.view.network.NetworkViewPresenter;
 import splitstree6.view.utils.ExportUtils;
 import splitstree6.workflow.*;
 import splitstree6.xtra.latex.MenusToLaTeX;
@@ -444,8 +445,10 @@ public class MainWindowPresenter {
 
 		updateUndoRedo();
 		setupSelectButton();
+
 		workflow.runningProperty().addListener((v, o, n) -> {
-			if (!n)
+			// todo: need to do this more generically, at present only network view sets up its own select button
+			if (!n && !(getSelectedDisplayTab().getPresenter() instanceof NetworkViewPresenter))
 				setupSelectButton();
 		});
 

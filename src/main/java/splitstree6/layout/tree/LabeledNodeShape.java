@@ -26,9 +26,12 @@ import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.Icebergs;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 
 public class LabeledNodeShape extends Group {
 	private RichTextLabel label;
+
+	private BitSet taxa;
 
 	public LabeledNodeShape() {
 	}
@@ -88,5 +91,21 @@ public class LabeledNodeShape extends Group {
 		if (label != null)
 			list.add(label);
 		return list;
+	}
+
+	public Shape getShape() {
+		for (var node : getChildren()) {
+			if (node instanceof Shape shape)
+				return shape;
+		}
+		return null;
+	}
+
+	public BitSet getTaxa() {
+		return taxa;
+	}
+
+	public void setTaxa(BitSet taxa) {
+		this.taxa = taxa;
 	}
 }

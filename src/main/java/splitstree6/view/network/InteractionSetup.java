@@ -20,29 +20,29 @@
 package splitstree6.view.network;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
 import javafx.beans.property.ObjectProperty;
-import javafx.event.EventHandler;
+import javafx.collections.SetChangeListener;
 import javafx.geometry.Point2D;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.label.EditLabelDialog;
 import jloda.fx.selection.SelectionModel;
 import jloda.fx.undo.UndoManager;
+import jloda.fx.util.RunAfterAWhile;
 import jloda.fx.util.SelectionEffectBlue;
 import jloda.graph.Node;
 import jloda.phylo.PhyloGraph;
+import jloda.util.BitSetUtils;
 import jloda.util.Single;
 import splitstree6.data.parts.Taxon;
 import splitstree6.layout.tree.LabeledNodeShape;
 import splitstree6.main.SplitsTree6;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -65,16 +65,22 @@ public class InteractionSetup {
 
 	private final SelectionModel<Taxon> taxonSelectionModel;
 
+	private final SelectionModel<LabeledNodeShape> networkNodeSelectionModel;
 
-	private InvalidationListener taxonSelectionInvalidationListener;
+	private final SetChangeListener<Taxon> taxonSelectionListener;
+
+	private Map<Node, LabeledNodeShape> nodeShapeMap;
 
 	/**
 	 * constructor
 	 */
-	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, ObjectProperty<String[]> edits, SelectionModel<Taxon> taxonSelectionModel) {
+	public InteractionSetup(Stage stage, Pane pane, UndoManager undoManager, ObjectProperty<String[]> edits,
+							Function<Integer, Taxon> idTaxonMap,
+							SelectionModel<LabeledNodeShape> networkNodeSelectionModel, SelectionModel<Taxon> taxonSelectionModel) {
 		this.stage = stage;
 		this.edits = edits;
 		this.undoManager = undoManager;
+		this.networkNodeSelectionModel = networkNodeSelectionModel;
 		this.taxonSelectionModel = taxonSelectionModel;
 
 		pane.setOnMouseClicked(e -> {
@@ -83,12 +89,86 @@ public class InteractionSetup {
 				e.consume();
 			}
 		});
+
+		var inUpdate = new Single<>(false);
+
+		networkNodeSelectionModel.getSelectedItems().addListener((SetChangeListener<? super LabeledNodeShape>) e -> {
+			if (!inUpdate.get()) {
+				inUpdate.set(true);
+				try {
+					if (e.wasAdded()) {
+						var shape = e.getElementAdded();
+						shape.setEffect(SelectionEffectBlue.getInstance());
+						if (shape.getTaxa() != null) {
+							Platform.runLater(() -> {
+								if (shape.getTaxa() != null)
+									taxonSelectionModel.getSelectedItems().addAll(BitSetUtils.asList(shape.getTaxa()).stream().map(idTaxonMap).toList());
+							});
+						}
+					} else if (e.wasRemoved()) {
+						var shape = e.getElementRemoved();
+						shape.setEffect(null);
+						if (shape.getTaxa() != null) {
+							Platform.runLater(() -> {
+								if (shape.getTaxa() != null)
+									taxonSelectionModel.getSelectedItems().removeAll(BitSetUtils.asList(shape.getTaxa()).stream().map(idTaxonMap).toList());
+							});
+						}
+					}
+				} finally {
+					inUpdate.set(false);
+				}
+			}
+		});
+
+		taxonSelectionListener = e -> {
+			if (!inUpdate.get()) {
+				inUpdate.set(true);
+				try {
+					if (e.wasAdded()) {
+						var taxon = e.getElementAdded();
+						if (nodeShapeMap != null) {
+							for (var shape : nodeShapeMap.values()) {
+								if (shape.getTaxa() != null) {
+									for (var t : BitSetUtils.members(shape.getTaxa())) {
+										if (idTaxonMap.apply(t) == taxon) {
+											// not sure why this is necessary, without, selection can flicker
+											RunAfterAWhile.applyInFXThread(shape, () -> networkNodeSelectionModel.select(shape));
+											return;
+										}
+									}
+								}
+							}
+						}
+					} else if (e.wasRemoved()) {
+						var taxon = e.getElementRemoved();
+						if (nodeShapeMap != null) {
+							for (var shape : nodeShapeMap.values()) {
+								if (shape.getTaxa() != null) {
+									for (var t : BitSetUtils.members(shape.getTaxa())) {
+										if (idTaxonMap.apply(t) == taxon) {
+											// not sure why this is necessary, without, selection can flicker
+											RunAfterAWhile.applyInFXThread(shape, () -> networkNodeSelectionModel.clearSelection(shape));
+											return;
+										}
+									}
+								}
+							}
+						}
+					}
+				} finally {
+					inUpdate.set(false);
+				}
+			}
+		};
+		taxonSelectionModel.getSelectedItems().addListener(taxonSelectionListener);
 	}
 
 	/**
 	 * setup network mouse interaction
 	 */
 	public void apply(Map<Integer, RichTextLabel> taxonLabelMap, Map<Node, LabeledNodeShape> nodeShapeMap, Function<Integer, Taxon> idTaxonMap, Function<Taxon, Integer> taxonIdMap) {
+		this.nodeShapeMap = nodeShapeMap;
 		for (var node : nodeShapeMap.keySet()) {
 			var shape = nodeShapeMap.get(node);
 			shape.translateXProperty().addListener((v, o, n) -> {
@@ -97,38 +177,27 @@ public class InteractionSetup {
 			shape.translateYProperty().addListener((v, o, n) -> {
 				edits.set(NetworkEdits.addTranslateNodeEdits(edits.get(), List.of(node), shape.getTranslateX(), shape.getTranslateY()));
 			});
-			shape.setOnMouseEntered(e -> {
-				if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
-					nodeShapeOrLabelEntered = true;
-					shape.setScaleX(1.2 * shape.getScaleX());
-					shape.setScaleY(1.2 * shape.getScaleY());
-					e.consume();
-				}
-			});
-			shape.setOnMouseExited(e -> {
-				if (nodeShapeOrLabelEntered) {
-					shape.setScaleX(shape.getScaleX() / 1.2);
-					shape.setScaleY(shape.getScaleY() / 1.2);
-					nodeShapeOrLabelEntered = false;
-					e.consume();
-				}
-			});
 
 			var start = new Single<Point2D>();
 			var end = new Single<Point2D>();
 
+			var selectedShapes = new ArrayList<LabeledNodeShape>();
 			shape.setOnMousePressed(e -> {
 				mouseDownX = e.getScreenX();
 				mouseDownY = e.getScreenY();
 				start.set(new Point2D(mouseDownX, mouseDownY));
 				end.set(start.get());
+				selectedShapes.clear();
+				selectedShapes.addAll(networkNodeSelectionModel.getSelectedItems());
 				e.consume();
 			});
 			shape.setOnMouseDragged(e -> {
 				var dx = e.getScreenX() - mouseDownX;
 				var dy = e.getScreenY() - mouseDownY;
-				shape.setTranslateX(shape.getTranslateX() + dx);
-				shape.setTranslateY(shape.getTranslateY() + dy);
+				for (var selected : selectedShapes) {
+					selected.setTranslateX(selected.getTranslateX() + dx);
+					selected.setTranslateY(selected.getTranslateY() + dy);
+				}
 				mouseDownX = e.getScreenX();
 				mouseDownY = e.getScreenY();
 				end.set(new Point2D(mouseDownX, mouseDownY));
@@ -136,15 +205,30 @@ public class InteractionSetup {
 			});
 			shape.setOnMouseReleased(e -> {
 				if (!e.isStillSincePress()) {
-					undoManager.add("move node",
+					undoManager.add("move nodes",
 							() -> {
-								shape.setTranslateX(shape.getTranslateX() - (end.get().getX() - start.get().getX()));
-								shape.setTranslateY(shape.getTranslateY() - (end.get().getY() - start.get().getY()));
+								for (var selected : selectedShapes) {
+									selected.setTranslateX(selected.getTranslateX() - (end.get().getX() - start.get().getX()));
+									selected.setTranslateY(selected.getTranslateY() - (end.get().getY() - start.get().getY()));
+								}
 							},
 							() -> {
-								shape.setTranslateX(shape.getTranslateX() + (end.get().getX() - start.get().getX()));
-								shape.setTranslateY(shape.getTranslateY() + (end.get().getY() - start.get().getY()));
+								for (var selected : selectedShapes) {
+									selected.setTranslateX(selected.getTranslateX() + (end.get().getX() - start.get().getX()));
+									selected.setTranslateY(selected.getTranslateY() + (end.get().getY() - start.get().getY()));
+								}
 							});
+				}
+			});
+		}
+
+		for (var shape : nodeShapeMap.values()) {
+			shape.setOnMouseClicked(e -> {
+				if (e.isStillSincePress()) {
+					if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
+						networkNodeSelectionModel.clearSelection();
+					networkNodeSelectionModel.toggleSelection(shape);
+					e.consume();
 				}
 			});
 		}
@@ -172,37 +256,14 @@ public class InteractionSetup {
 							shape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 							label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 
-							shape.setOnMouseEntered(e -> {
-								if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
-									nodeShapeOrLabelEntered = true;
-									shape.setScaleX(1.2 * shape.getScaleX());
-									shape.setScaleY(1.2 * shape.getScaleY());
-									label.setScaleX(1.1 * label.getScaleX());
-									label.setScaleY(1.1 * label.getScaleY());
-									e.consume();
-								}
-							});
-							shape.setOnMouseExited(e -> {
-								if (nodeShapeOrLabelEntered) {
-									shape.setScaleX(shape.getScaleX() / 1.2);
-									shape.setScaleY(shape.getScaleY() / 1.2);
-									label.setScaleX(label.getScaleX() / 1.1);
-									label.setScaleY(label.getScaleY() / 1.1);
-									nodeShapeOrLabelEntered = false;
-									e.consume();
-								}
-							});
-
-							final EventHandler<MouseEvent> mouseClickedHandler = e -> {
+							label.setOnMouseClicked(e -> {
 								if (e.isStillSincePress()) {
 									if (!e.isShiftDown() && !e.isShortcutDown() && SplitsTree6.isDesktop())
 										taxonSelectionModel.clearSelection();
 									taxonSelectionModel.toggleSelection(taxon);
 									e.consume();
 								}
-							};
-							shape.setOnMouseClicked(mouseClickedHandler);
-							label.setOnMouseClicked(mouseClickedHandler);
+							});
 
 							label.setOnMouseEntered(shape.getOnMouseEntered());
 							label.setOnMouseExited(shape.getOnMouseExited());
@@ -255,20 +316,6 @@ public class InteractionSetup {
 				} catch (Exception ignored) {
 				}
 			}
-			taxonSelectionInvalidationListener = e -> {
-				for (var t : taxonLabelMap.keySet()) {
-					var taxon = idTaxonMap.apply(t);
-					if (taxon != null) {
-						var label = taxonLabelMap.get(t);
-						label.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
-						var shape = nodeShapeMap.get(graph.getTaxon2Node(t));
-						if (shape != null)
-							shape.setEffect(taxonSelectionModel.isSelected(taxon) ? SelectionEffectBlue.getInstance() : null);
-					}
-				}
-			};
-			taxonSelectionModel.getSelectedItems().addListener(new WeakInvalidationListener(taxonSelectionInvalidationListener));
-			taxonSelectionInvalidationListener.invalidated(null);
 		}
 	}
 

@@ -179,7 +179,7 @@ public class RadialLabelLayout {
 					var remainingItems = new ArrayList<>(items);
 					var selectedChoices = new ArrayList<Choice>();
 
-					while (nodeList.size() > 0) {
+			while (!nodeList.isEmpty()) {
 						var v = nodeList.remove(0);
 						var mustReSort = (v.getDegree() > 0);
 						var item = ((Choice) v.getData()).item();

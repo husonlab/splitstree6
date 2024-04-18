@@ -33,7 +33,6 @@ import javafx.scene.Group;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import jloda.fx.control.RichTextLabel;
-import jloda.fx.selection.SelectionModel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.GeometryUtilsFX;
@@ -43,7 +42,6 @@ import jloda.graph.Node;
 import jloda.util.ProgramExecutorService;
 import splitstree6.data.NetworkBlock;
 import splitstree6.data.TaxaBlock;
-import splitstree6.data.parts.Taxon;
 import splitstree6.layout.network.DiagramType;
 import splitstree6.layout.network.NetworkLayout;
 import splitstree6.layout.tree.LabeledEdgeShape;
@@ -72,7 +70,7 @@ public class NetworkPane extends StackPane {
 	/**
 	 * network pane
 	 */
-	public NetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<NetworkBlock> networkBlock, SelectionModel<Taxon> taxonSelectionModel,
+	public NetworkPane(MainWindow mainWindow, ReadOnlyObjectProperty<TaxaBlock> taxaBlock, ReadOnlyObjectProperty<NetworkBlock> networkBlock,
 					   ReadOnlyDoubleProperty boxWidth, ReadOnlyDoubleProperty boxHeight,
 					   ReadOnlyObjectProperty<DiagramType> diagram, ReadOnlyObjectProperty<LayoutOrientation> orientation, ReadOnlyDoubleProperty zoomFactor, ReadOnlyDoubleProperty labelScaleFactor,
 					   ObservableMap<Integer, RichTextLabel> taxonLabelMap, ObservableMap<Node, LabeledNodeShape> nodeShapeMap, ObservableMap<Edge, LabeledEdgeShape> edgeShapeMap) {

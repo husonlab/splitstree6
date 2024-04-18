@@ -163,8 +163,10 @@ public class InteractionSetup {
 						for (var node : labeledShape.all()) {
 							node.setOnMouseClicked(handler);
 							node.setOnContextMenuRequested(contextMenuHander);
-							node.setOnMouseEntered(mouseEnteredHandler);
-							node.setOnMouseExited(mouseExitedHandler);
+							if (SplitsTree6.nodeZoomOnMouseOver) {
+								node.setOnMouseEntered(mouseEnteredHandler);
+								node.setOnMouseExited(mouseExitedHandler);
+							}
 						}
 						labeledShape.getLabel().setOnMousePressed(mousePressedOnTaxonLabelHandler);
 						labeledShape.getLabel().setOnMouseDragged(mouseDraggedOnTaxonLabelHandler);
@@ -185,8 +187,10 @@ public class InteractionSetup {
 					for (var value : ce.getValueAdded().all()) {
 						if (value.getId() == null || !value.getId().equals("eisberg")) {
 							value.setOnMouseClicked(clickedHandler);
-							value.setOnMouseEntered(mouseEnteredHandler);
-							value.setOnMouseExited(mouseExitedHandler);
+							if (SplitsTree6.nodeZoomOnMouseOver) {
+								value.setOnMouseEntered(mouseEnteredHandler);
+								value.setOnMouseExited(mouseExitedHandler);
+							}
 						}
 					}
 				}

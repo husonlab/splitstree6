@@ -33,6 +33,7 @@ import jloda.graph.Node;
 import jloda.graph.NodeArray;
 import jloda.graph.fmm.FastMultiLayerMethodLayout;
 import jloda.graph.fmm.FastMultiLayerMethodOptions;
+import jloda.util.BitSetUtils;
 import jloda.util.CanceledException;
 import jloda.util.progress.ProgressListener;
 import splitstree6.data.NetworkBlock;
@@ -124,11 +125,21 @@ public class NetworkLayout {
 				nodeShape.setTranslateX(point.getX());
 				nodeShape.setTranslateY(point.getY());
 
+				if (graph.hasTaxa(v))
+					nodeShape.setTaxa(BitSetUtils.asBitSet(graph.getTaxa(v)));
+
 				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 				if (false && graph.getNumberOfEdges() == 0 && label != null) { // todo: allow user to use marks for nodes
 					nodeShape.setShape(RichTextLabel.getMark(label.getText()));
 				} else
 					nodeShape.setShape(new Circle(v.getDegree() == 1 ? 3 : 2), true);
+
+				for (var node : nodeShape.getChildren()) {
+					if ("iceberg".equals(node.getId())) {
+						var stroke = 20 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
+						node.setStyle("-fx-stroke-width: " + stroke + ";");
+					}
+				}
 
 				nodesGroup.getChildren().add(nodeShape);
 

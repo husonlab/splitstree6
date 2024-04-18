@@ -123,7 +123,7 @@ public class TraitsFormat extends Pane {
 	}
 
 	public boolean isAllTraitsActive() {
-		return getOptionActiveTraits().length == 1 && getOptionActiveTraits()[0].equals(ALL) || getOptionActiveTraits().length > 0 && getOptionActiveTraits().length >= traitsBlock.get().getNumberNumericalTraits();
+		return getOptionActiveTraits().length == 1 && getOptionActiveTraits()[0].equals(ALL) || getOptionActiveTraits().length > 0 && traitsBlock.get() != null && getOptionActiveTraits().length >= traitsBlock.get().getNumberNumericalTraits();
 	}
 
 	public boolean isNoneTraitsActive() {

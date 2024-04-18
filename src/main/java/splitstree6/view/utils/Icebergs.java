@@ -25,6 +25,7 @@ import javafx.beans.binding.Bindings;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.*;
+import splitstree6.main.SplitsTree6;
 
 /**
  * icebergs
@@ -152,16 +153,20 @@ public class Icebergs {
 				});
 			}
 			EventHandler<MouseEvent> handler = shape::fireEvent;
-			iceberg.setOnMouseEntered(handler);
-			iceberg.setOnMouseExited(handler);
-			iceberg.onMouseEnteredProperty().addListener((v, o, n) -> {
-				if (n != handler)
-					Platform.runLater(() -> iceberg.setOnMouseEntered(handler));
-			});
-			iceberg.onMouseExitedProperty().addListener((v, o, n) -> {
-				if (n != handler)
-					Platform.runLater(() -> iceberg.setOnMouseExited(handler));
-			});
+			if (SplitsTree6.nodeZoomOnMouseOver) {
+				iceberg.setOnMouseEntered(handler);
+				iceberg.setOnMouseExited(handler);
+			}
+			if (SplitsTree6.nodeZoomOnMouseOver) {
+				iceberg.onMouseEnteredProperty().addListener((v, o, n) -> {
+					if (n != handler)
+						Platform.runLater(() -> iceberg.setOnMouseEntered(handler));
+				});
+				iceberg.onMouseExitedProperty().addListener((v, o, n) -> {
+					if (n != handler)
+						Platform.runLater(() -> iceberg.setOnMouseExited(handler));
+				});
+			}
 
 			iceberg.setId("iceberg");
 			return iceberg;

@@ -107,26 +107,28 @@ public class InteractionSetup {
 						nodeShape.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 						label.setOnContextMenuRequested(m -> showContextMenu(m, stage, undoManager, label));
 
-						nodeShape.setOnMouseEntered(e -> {
-							if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
-								nodeShapeOrLabelEntered = true;
-								nodeShape.setScaleX(1.2 * nodeShape.getScaleX());
-								nodeShape.setScaleY(1.2 * nodeShape.getScaleY());
-								label.setScaleX(1.1 * label.getScaleX());
-								label.setScaleY(1.1 * label.getScaleY());
-								e.consume();
-							}
-						});
-						nodeShape.setOnMouseExited(e -> {
-							if (nodeShapeOrLabelEntered) {
-								nodeShape.setScaleX(nodeShape.getScaleX() / 1.2);
-								nodeShape.setScaleY(nodeShape.getScaleY() / 1.2);
-								label.setScaleX(label.getScaleX() / 1.1);
-								label.setScaleY(label.getScaleY() / 1.1);
-								nodeShapeOrLabelEntered = false;
-								e.consume();
-							}
-						});
+						if (SplitsTree6.nodeZoomOnMouseOver) {
+							nodeShape.setOnMouseEntered(e -> {
+								if (!e.isStillSincePress() && !nodeShapeOrLabelEntered) {
+									nodeShapeOrLabelEntered = true;
+									nodeShape.setScaleX(1.2 * nodeShape.getScaleX());
+									nodeShape.setScaleY(1.2 * nodeShape.getScaleY());
+									label.setScaleX(1.1 * label.getScaleX());
+									label.setScaleY(1.1 * label.getScaleY());
+									e.consume();
+								}
+							});
+							nodeShape.setOnMouseExited(e -> {
+								if (nodeShapeOrLabelEntered) {
+									nodeShape.setScaleX(nodeShape.getScaleX() / 1.2);
+									nodeShape.setScaleY(nodeShape.getScaleY() / 1.2);
+									label.setScaleX(label.getScaleX() / 1.1);
+									label.setScaleY(label.getScaleY() / 1.1);
+									nodeShapeOrLabelEntered = false;
+									e.consume();
+								}
+							});
+						}
 
 						final EventHandler<MouseEvent> mouseClickedHandler = e -> {
 							if (e.isStillSincePress()) {
@@ -139,8 +141,10 @@ public class InteractionSetup {
 						nodeShape.setOnMouseClicked(mouseClickedHandler);
 						label.setOnMouseClicked(mouseClickedHandler);
 
-						label.setOnMouseEntered(nodeShape.getOnMouseEntered());
-						label.setOnMouseExited(nodeShape.getOnMouseExited());
+						if (SplitsTree6.nodeZoomOnMouseOver) {
+							label.setOnMouseEntered(nodeShape.getOnMouseEntered());
+							label.setOnMouseExited(nodeShape.getOnMouseExited());
+						}
 
 						label.setOnMousePressed(e -> {
 							if (taxonSelectionModel.isSelected(taxon)) {
@@ -174,22 +178,24 @@ public class InteractionSetup {
 				for (var shape : splitShapesMap.get(splitId)) {
 					shape.setPickOnBounds(false);
 
-					shape.setOnMouseEntered(e -> {
-						if (!e.isStillSincePress() && !edgeShapeEntered) {
-							edgeShapeEntered = true;
-							shape.setUserData(shape.getStrokeWidth());
-							shape.setStrokeWidth(shape.getStrokeWidth() + 4);
-							e.consume();
-						}
-					});
-					shape.setOnMouseExited(e -> {
-						if (edgeShapeEntered) {
-							shape.setStrokeWidth(shape.getStrokeWidth() - 4);
-							shape.setUserData(null);
-							edgeShapeEntered = false;
-							e.consume();
-						}
-					});
+					if (SplitsTree6.nodeZoomOnMouseOver) {
+						shape.setOnMouseEntered(e -> {
+							if (!e.isStillSincePress() && !edgeShapeEntered) {
+								edgeShapeEntered = true;
+								shape.setUserData(shape.getStrokeWidth());
+								shape.setStrokeWidth(shape.getStrokeWidth() + 4);
+								e.consume();
+							}
+						});
+						shape.setOnMouseExited(e -> {
+							if (edgeShapeEntered) {
+								shape.setStrokeWidth(shape.getStrokeWidth() - 4);
+								shape.setUserData(null);
+								edgeShapeEntered = false;
+								e.consume();
+							}
+						});
+					}
 
 					shape.setOnMouseClicked(e -> {
 						if (e.isStillSincePress() && idSplitMap.apply(splitId) != null) {

@@ -307,14 +307,16 @@ public class DensiTreeDrawer {
 				a.consume();
 			});
 			if (false) {
-				shape.setOnMouseEntered(a -> {
-					if (!a.isStillSincePress()) {
-						shape.setStrokeWidth(5);
-					}
-				});
-				shape.setOnMouseExited(a -> {
-					shape.setStrokeWidth(1.5);
-				});
+				if (SplitsTree6.nodeZoomOnMouseOver) {
+					shape.setOnMouseEntered(a -> {
+						if (!a.isStillSincePress()) {
+							shape.setStrokeWidth(5);
+						}
+					});
+					shape.setOnMouseExited(a -> {
+						shape.setStrokeWidth(1.5);
+					});
+				}
 			}
 			/*if (Icebergs.enabled()) */
 			{ // todo: always allow this because the edges are hard to click on
