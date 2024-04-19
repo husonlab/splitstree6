@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.10, built 18 Apr 2024)
+SplitsTree App (version 6.3.10, built 19 Apr 2024)
 
 
 ## Introduction
