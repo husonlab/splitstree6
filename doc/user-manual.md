@@ -133,11 +133,11 @@ main tab):
 
 - A *selection button* to select all or none.
 
-- A *Find button* that you press to open the find dialog, press again
+- A *find button* that you press to open the find dialog, press again
   to open the replace dialog (if available) and once again to close
   the dialog.
 
-- A *export button* that gives access to items for copying, exporting
+- An *export button* that gives access to items for copying, exporting
   or printing the data or image associated with the current tab. An
   additional item is provided for showing or hiding the *QR code*
   associated with a given tree or network.
