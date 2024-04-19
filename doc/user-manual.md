@@ -2365,9 +2365,8 @@ its splits. The algorithm has the following options:
 #### Unique Topologies
 
 The *Unique Topologies* algorithm takes a Trees block as input and
-produces a Trees block as output. It filter trees or rooted networks
-return all unique topologies (using hardwired clusters). The algorithm
-has the following options:
+produces a Trees block as output. Filter trees or rooted networks returning all unique topologies (using hardwired
+clusters). The algorithm has the following options:
 
 `Unrooted =  <Boolean>` - ignore location of root
 

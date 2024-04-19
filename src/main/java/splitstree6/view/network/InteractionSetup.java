@@ -192,33 +192,38 @@ public class InteractionSetup {
 				e.consume();
 			});
 			shape.setOnMouseDragged(e -> {
-				var dx = e.getScreenX() - mouseDownX;
-				var dy = e.getScreenY() - mouseDownY;
-				for (var selected : selectedShapes) {
-					selected.setTranslateX(selected.getTranslateX() + dx);
-					selected.setTranslateY(selected.getTranslateY() + dy);
+				if (selectedShapes.contains(shape)) {
+					var dx = e.getScreenX() - mouseDownX;
+					var dy = e.getScreenY() - mouseDownY;
+					for (var selected : selectedShapes) {
+						selected.setTranslateX(selected.getTranslateX() + dx);
+						selected.setTranslateY(selected.getTranslateY() + dy);
+					}
+					mouseDownX = e.getScreenX();
+					mouseDownY = e.getScreenY();
+					end.set(new Point2D(mouseDownX, mouseDownY));
 				}
-				mouseDownX = e.getScreenX();
-				mouseDownY = e.getScreenY();
-				end.set(new Point2D(mouseDownX, mouseDownY));
 				e.consume();
 			});
 			shape.setOnMouseReleased(e -> {
-				if (!e.isStillSincePress()) {
-					undoManager.add("move nodes",
-							() -> {
-								for (var selected : selectedShapes) {
-									selected.setTranslateX(selected.getTranslateX() - (end.get().getX() - start.get().getX()));
-									selected.setTranslateY(selected.getTranslateY() - (end.get().getY() - start.get().getY()));
-								}
-							},
-							() -> {
-								for (var selected : selectedShapes) {
-									selected.setTranslateX(selected.getTranslateX() + (end.get().getX() - start.get().getX()));
-									selected.setTranslateY(selected.getTranslateY() + (end.get().getY() - start.get().getY()));
-								}
-							});
+				if (selectedShapes.contains(shape)) {
+					if (!e.isStillSincePress()) {
+						undoManager.add("move nodes",
+								() -> {
+									for (var selected : selectedShapes) {
+										selected.setTranslateX(selected.getTranslateX() - (end.get().getX() - start.get().getX()));
+										selected.setTranslateY(selected.getTranslateY() - (end.get().getY() - start.get().getY()));
+									}
+								},
+								() -> {
+									for (var selected : selectedShapes) {
+										selected.setTranslateX(selected.getTranslateX() + (end.get().getX() - start.get().getX()));
+										selected.setTranslateY(selected.getTranslateY() + (end.get().getY() - start.get().getY()));
+									}
+								});
+					}
 				}
+				e.consume();
 			});
 		}
 

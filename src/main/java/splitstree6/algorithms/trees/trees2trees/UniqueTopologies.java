@@ -57,7 +57,7 @@ public class UniqueTopologies extends Trees2Trees implements IFilter {
 
 	@Override
 	public String getShortDescription() {
-		return "Filter trees or rooted networks return all unique topologies (using hardwired clusters).";
+		return "Filter trees or rooted networks returning all unique topologies (using hardwired clusters).";
 	}
 
 	@Override

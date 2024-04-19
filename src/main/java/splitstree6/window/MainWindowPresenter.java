@@ -448,7 +448,7 @@ public class MainWindowPresenter {
 
 		workflow.runningProperty().addListener((v, o, n) -> {
 			// todo: need to do this more generically, at present only network view sets up its own select button
-			if (!n && !(getSelectedDisplayTab().getPresenter() instanceof NetworkViewPresenter))
+			if (!n && !(getSelectedDisplayTab() != null && getSelectedDisplayTab().getPresenter() instanceof NetworkViewPresenter))
 				setupSelectButton();
 		});
 
