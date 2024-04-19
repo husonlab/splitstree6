@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import jloda.fx.control.RichTextLabel;
@@ -131,8 +132,14 @@ public class NetworkLayout {
 				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
 				if (false && graph.getNumberOfEdges() == 0 && label != null) { // todo: allow user to use marks for nodes
 					nodeShape.setShape(RichTextLabel.getMark(label.getText()));
-				} else
-					nodeShape.setShape(new Circle(v.getDegree() == 1 ? 3 : 2), true);
+				} else {
+					var circle = new Circle(v.getDegree() == 1 ? 3 : 2);
+					circle.setFill(Color.WHITE);
+					circle.setStroke(Color.BLACK);
+					var stroke = 1 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
+					circle.setStyle("-fx-stroke-width: " + stroke + ";");
+					nodeShape.setShape(circle, true);
+				}
 
 				for (var node : nodeShape.getChildren()) {
 					if ("iceberg".equals(node.getId())) {
