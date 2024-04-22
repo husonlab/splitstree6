@@ -614,8 +614,8 @@ selected .
 
 Click on an edge in the split network to select that split. The edges
 associated to that split can be rotated using the rotate buttons in the
-toolbar or the arrows in the side panel which appears when you click the
-rightmost of these two icons .
+toolbar or the arrows in the side panel which appears when you click on the
+right-hand icon.
 
 ![If one or more splits are selected, then highlighted buttons can be
 used to change the angles of the selected
@@ -627,7 +627,7 @@ representation [@Bagcietal2021] constructs just the outer perimeter of
 the network. This is sufficient to represent all of the split weights,
 and is generally much faster to compute and draw. To switch back and
 forward between the graph mode and the outline mode use the pop-up menu
-at the left of the toolbar (.
+at the left of the toolbar.
 
 ### Split Decomposition
 
@@ -795,7 +795,7 @@ cluster-popping algorithm [@Husonetal2012]. This is a fast algorithm
 that provides a network that contains all input trees. However, it does
 not aim at minimizing the hybridization number.
 
-# Consensus Trees and Networks
+# Consensus trees and networks
 
 The methods in this chapter all attempt to summarise information
 contained in a set of trees. (Most also work if the input contains
@@ -835,7 +835,7 @@ and adding the algorithm 'Average Consensus' . Alternatively, add an
 'Average Distances' algorithm to the tree block. This creates a new
 distance block which can be output or analysed using a method of choice.
 
-### Strict, Majority rule and Greedy consensus methods
+### Strict-, majority- and greedy-consensus methods
 
 The strict consensus, majority rule consensus and greedy consensus are
 three of the oldest and most widely used consensus methods in
