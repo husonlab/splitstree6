@@ -150,7 +150,7 @@ public class NewickReader extends TreesReader {
 					}
 				}
 
-				if (taxonNamesFound.size() == 0) {
+				if (taxonNamesFound.isEmpty()) {
 					for (var name : labelList) {
 						taxonNamesFound.add(name);
 						orderedTaxonNames.add(name);
@@ -172,7 +172,7 @@ public class NewickReader extends TreesReader {
 				}
 				for (var v : tree.nodes()) {
 					final var label = tree.getLabel(v);
-					if (label != null && label.length() > 0) {
+					if (label != null && !label.isEmpty()) {
 						if (taxonNamesFound.contains(label)) { // need to check that this is a taxon name, could also be a number placed on the root...
 							tree.addTaxon(v, taxName2Id.get(label));
 						}

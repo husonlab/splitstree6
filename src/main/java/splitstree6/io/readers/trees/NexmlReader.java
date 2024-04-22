@@ -23,6 +23,7 @@ import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.algorithms.IsTree;
 import jloda.phylo.PhyloTree;
+import jloda.util.Basic;
 import jloda.util.FileUtils;
 import jloda.util.NumberUtils;
 import jloda.util.progress.ProgressListener;
@@ -37,7 +38,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.HashSet;
-import java.util.stream.Collectors;
 
 /**
  * nexml tree importer
@@ -68,6 +68,7 @@ public class NexmlReader extends TreesReader {
 
 			boolean hasRootWithOutdegree2 = false;
 
+			var count = 0;
 			for (PhyloTree t : handler.getTrees()) {
 				if (IsTree.apply(t)) {
 					if (t.getRoot() == null) {
@@ -82,6 +83,7 @@ public class NexmlReader extends TreesReader {
 						if (!hasRootWithOutdegree2 && t.getRoot().getOutDegree() == 2)
 							hasRootWithOutdegree2 = true;
 					}
+					t.setName(FileUtils.getFileNameWithoutPathOrSuffix(fileName) + (++count));
 					trees.getTrees().add(t); // todo: problem with multiple trees import?
 				} else if (System.currentTimeMillis() > lastWarning + 5000) {
 					NotificationManager.showWarning("Skipping rooted network...");
@@ -98,7 +100,7 @@ public class NexmlReader extends TreesReader {
 				for (var tree : trees.getTrees()) {
 					labels.addAll(tree.nodeStream()
 							.filter(v -> v.getLabel() != null && (v.getOutDegree() == 0 || !NumberUtils.isDouble(v.getLabel())))
-							.map(Node::getLabel).collect(Collectors.toList()));
+							.map(Node::getLabel).toList());
 				}
 				taxa.addTaxaByNames(labels);
 				for (var tree : trees.getTrees()) {
@@ -130,7 +132,7 @@ public class NexmlReader extends TreesReader {
 						return true;
 				}
 			} catch (IOException ex) {
-				ex.printStackTrace();
+				Basic.caught(ex);
 			}
 			return false;
 		}
