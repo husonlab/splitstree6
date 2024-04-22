@@ -40,7 +40,7 @@ public class ComputeHybridNumber {
 	final public static int LARGE = 1000;
 	public static final boolean checking = false;
 
-	final private LRUMap lookupTable = new LRUMap(5000000);
+	final private LRUMap<String, Integer> lookupTable = new LRUMap<>(5000000);
 	final private ProgressListener progressListener;
 
 	private long startTime = 0;
@@ -51,7 +51,7 @@ public class ComputeHybridNumber {
 
 	private boolean initialized = false;
 
-	boolean silent = false;
+	boolean verbose = false;
 
 	final private int additionalThreads;
 	final private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor;
@@ -105,9 +105,11 @@ public class ComputeHybridNumber {
 		}
 
 		if (bestScore.get() == LARGE) { // no upper bound given, use cluster network
-			System.err.print("Computing upper bound using cluster network: ");
+			if (verbose)
+				System.err.print("Computing upper bound using cluster network: ");
 			int upperBound = Utilities.getNumberOfReticulationsInClusterNetwork(tree1, tree2);
-			System.err.println(upperBound);
+			if (verbose)
+				System.err.println(upperBound);
 			bestScore.set(upperBound);
 		}
 
@@ -124,7 +126,7 @@ public class ComputeHybridNumber {
 			throw new IOException("None of the taxa in tree1 are contained in tree2");
 
 		if (onlyTree1.cardinality() > 0) {
-			if (!silent)
+			if (verbose)
 				System.err.println("Killing all taxa only present in tree1: " + onlyTree1.cardinality());
 			for (int t = onlyTree1.nextSetBit(0); t != -1; t = onlyTree1.nextSetBit(t + 1)) {
 				BitSet one = new BitSet();
@@ -134,7 +136,7 @@ public class ComputeHybridNumber {
 		}
 
 		if (onlyTree2.cardinality() > 0) {
-			if (!silent)
+			if (verbose)
 				System.err.println("Killing all taxa only present in tree2: " + onlyTree2.cardinality());
 			for (int t = onlyTree2.nextSetBit(0); t != -1; t = onlyTree2.nextSetBit(t + 1)) {
 				BitSet one = new BitSet();
@@ -147,11 +149,11 @@ public class ComputeHybridNumber {
 			throw new IOException("Trees have unequal taxon sets (even after killing)");
 
 		// run the refine algorithm
-		if (!silent)
+		if (verbose)
 			System.err.println("Computing common refinement of both trees");
 		Refine.apply(root1, root2);
 
-		if (true) {
+		if (verbose) {
 			System.err.println(root1.toStringTree());
 			System.err.println(root2.toStringTree());
 		}
@@ -164,15 +166,15 @@ public class ComputeHybridNumber {
 		root1.reorderSubTree();
 		root2.reorderSubTree();
 
-		if (!silent)
+		if (verbose)
 			System.err.println("Computing hybridization number using Autumn algorithm...");
-		if (!silent)
+		if (verbose)
 			System.err.println("(Number of worker threads: " + (additionalThreads + 1) + ")");
 
 		int result = computeHybridNumberRec(root1, root2, false, null, null, true, 0, new ValuesList());
-		if (!silent)
+		if (verbose)
 			System.err.println("(Result: " + result + ")");
-		if (!silent)
+		if (verbose)
 			System.err.println("Hybridization number: " + bestScore.get());
 		if (bestScore.get() > result)
 			throw new IOException("bestScore > result: " + bestScore.get() + " " + result);
@@ -187,8 +189,10 @@ public class ComputeHybridNumber {
 	 */
 	protected int done() {
 		System.err.println("Best score: " + bestScore.get());
-		System.err.println("Time: " + ((System.currentTimeMillis() - startTime) / 1000) + " secs");
-		System.err.println("(Size of lookup table: " + lookupTable.size() + ")");
+		if (verbose) {
+			System.err.println("Time: " + ((System.currentTimeMillis() - startTime) / 1000) + " secs");
+			System.err.println("(Size of lookup table: " + lookupTable.size() + ")");
+		}
 		lookupTable.clear();
 		scheduledThreadPoolExecutor.shutdown();
 		System.gc();
@@ -262,8 +266,8 @@ public class ComputeHybridNumber {
 				final Value score1 = new Value(0);
 				final Value score2 = new Value(1);  // because the cluster could not be reduced using an subtree reduction, can assume that we will need one reticulation for this
 
-				final boolean verbose = ProgramProperties.get("verbose-HL-parallel", false);
-				if (verbose)
+				final boolean verboseParallel = ProgramProperties.get("verbose-HL-parallel", false);
+				if (verboseParallel)
 					System.err.println("Starting parallel loop");
 
 				final CountDownLatch countDownLatch = new CountDownLatch(2);
@@ -272,7 +276,7 @@ public class ComputeHybridNumber {
 				// create task:
 				final var task1 = new splitstree6.autumn.Task(() -> {
 					try {
-						if (verbose) {
+						if (verboseParallel) {
 							System.err.println("Launching thread on cluster-reduction");
 							System.err.println("Active threads " + scheduledThreadPoolExecutor.getActiveCount());
 						}
@@ -293,7 +297,7 @@ public class ComputeHybridNumber {
 
 				final var task2 = new splitstree6.autumn.Task(() -> {
 					try {
-						if (verbose) {
+						if (verboseParallel) {
 							System.err.println("Launching thread on cluster-reduction");
 							System.err.println("Active threads " + scheduledThreadPoolExecutor.getActiveCount());
 						}
@@ -318,11 +322,11 @@ public class ComputeHybridNumber {
 				task1.run(); // try to run task1 in current thread if it hasn't yet started execution. If the task is already running or has completed, will simply return
 
 				try {
-					if (verbose)
+					if (verboseParallel)
 						System.err.println("waiting...");
 					// wait until all tasks have completed
 					countDownLatch.await();
-					if (verbose)
+					if (verboseParallel)
 						System.err.println("done");
 				} catch (InterruptedException e) {
 					Basic.caught(e);

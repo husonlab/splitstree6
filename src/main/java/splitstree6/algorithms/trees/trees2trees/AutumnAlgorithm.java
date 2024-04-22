@@ -19,12 +19,16 @@
 
 package splitstree6.algorithms.trees.trees2trees;
 
+import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import jloda.phylo.PhyloTree;
 import jloda.util.BitSetUtils;
 import jloda.util.Single;
 import jloda.util.progress.ProgressListener;
 import splitstree6.autumn.hybridnetwork.ComputeHybridizationNetwork;
+import splitstree6.autumn.hybridnumber.RerootByHybridNumber;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TreesBlock;
 
@@ -39,9 +43,11 @@ public class AutumnAlgorithm extends Trees2Trees {
 	private final IntegerProperty optionFirstTree = new SimpleIntegerProperty(this, "optionFirstTree", 1);
 	private final IntegerProperty optionSecondTree = new SimpleIntegerProperty(this, "optionSecondTree", 2);
 
+	private final BooleanProperty optionRerootToMinimize = new SimpleBooleanProperty(this, "optionRerootToMinimize", false);
 	@Override
 	public List<String> listOptions() {
-		return List.of(optionFirstTree.getName(), optionSecondTree.getName());
+		return List.of(optionFirstTree.getName(), optionSecondTree.getName(),
+				optionRerootToMinimize.getName());
 	}
 
 	@Override
@@ -52,6 +58,7 @@ public class AutumnAlgorithm extends Trees2Trees {
 		return switch (optionName) {
 			case "optionFirstTree" -> "index of the first tree";
 			case "optionSecondTree" -> "index of the second tree";
+			case "optionRerootToMinimize" -> "reroot input trees to minimize hybridization number";
 			default -> super.getToolTip(optionName);
 		};
 	}
@@ -78,6 +85,11 @@ public class AutumnAlgorithm extends Trees2Trees {
 		var firstTree = inputData.getTree(Math.max(1, Math.min(getOptionFirstTree(), inputData.getNTrees())));
 		var secondTree = inputData.getTree(Math.max(1, Math.min(getOptionSecondTree(), inputData.getNTrees())));
 
+		if (isOptionRerootToMinimize()) {
+			firstTree = new PhyloTree(firstTree);
+			secondTree = new PhyloTree(secondTree);
+			RerootByHybridNumber.apply(firstTree, secondTree, progress);
+		}
 		outputData.getTrees().addAll(ComputeHybridizationNetwork.apply(taxaBlock, firstTree, secondTree, progress, hybridNumber));
 		outputData.setReticulated(hybridNumber.get() > 0);
 		var taxa = BitSetUtils.union(BitSetUtils.asBitSet(firstTree.getTaxa()), BitSetUtils.asBitSet(secondTree.getTaxa()));
@@ -107,5 +119,13 @@ public class AutumnAlgorithm extends Trees2Trees {
 
 	public void setOptionSecondTree(int optionSecondTree) {
 		this.optionSecondTree.set(optionSecondTree);
+	}
+
+	public boolean isOptionRerootToMinimize() {
+		return optionRerootToMinimize.get();
+	}
+
+	public BooleanProperty optionRerootToMinimizeProperty() {
+		return optionRerootToMinimize;
 	}
 }

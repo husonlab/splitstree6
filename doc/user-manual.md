@@ -2,7 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.10, built 19 Apr 2024)
+SplitsTree App (version 6.3.13, built 22 Apr 2024)
 
 
 ## Introduction
@@ -2057,6 +2057,8 @@ options:
 `FirstTree =  <Integer>` - index of the first tree
 
 `SecondTree =  <Integer>` - index of the second tree
+
+`RerootToMinimize =  <Boolean>`- reroot input trees to minimize hybridization number
 
 Reference: [@HusonLinz2018]
 

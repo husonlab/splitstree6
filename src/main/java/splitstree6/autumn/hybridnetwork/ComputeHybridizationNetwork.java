@@ -134,7 +134,8 @@ public class ComputeHybridizationNetwork {
 		}
 
 		// run the refine algorithm
-		System.err.println("Computing common refinement of both trees");
+		if (verbose)
+			System.err.println("Computing common refinement of both trees");
 		Refine.apply(root1, root2);
 
 		if (tree1.getRoot() == null || tree2.getRoot() == null) {
@@ -145,7 +146,7 @@ public class ComputeHybridizationNetwork {
 		root1.reorderSubTree();
 		root2.reorderSubTree();
 
-		System.err.println("Computing hybridization networks using Autumn algorithm (Autumn algorithm, Huson and Linz, 2016)...");
+		System.err.println("Computing hybridization networks using Autumn algorithm");
 		this.progress.setTasks("Computing hybridization networks", "(Unknown how long this will really take)");
 		var result = new TreeSet<>(new NetworkComparator());
 		int h;
@@ -176,7 +177,8 @@ public class ComputeHybridizationNetwork {
 
 		BitSet missingTaxa = Cluster.union(onlyTree1, onlyTree2);
 		if (missingTaxa.cardinality() > 0) {
-			System.err.println("Reattaching killed taxa: " + missingTaxa.cardinality());
+			if (verbose)
+				System.err.println("Reattaching killed taxa: " + missingTaxa.cardinality());
 			for (var r : result) {
 				for (var t : BitSetUtils.members(missingTaxa)) {
 					RemoveTaxon.unapply(r, t);
@@ -187,9 +189,11 @@ public class ComputeHybridizationNetwork {
 		System.err.println("Hybridization number: " + h);
 		hybridizationNumber.set(h);
 		System.err.println("Total networks: " + result.size());
-		System.err.println("Time: " + ((System.currentTimeMillis() - startTime) / 1000) + " secs");
+		if (verbose)
+			System.err.println("Time: " + ((System.currentTimeMillis() - startTime) / 1000) + " secs");
 
-		System.err.println("(Size lookup table: " + lookupTable.size() + ", number of times used: " + numberOfLookups + ")");
+		if (verbose)
+			System.err.println("(Size lookup table: " + lookupTable.size() + ", number of times used: " + numberOfLookups + ")");
 		lookupTable.clear();
 		System.gc();
 
@@ -462,7 +466,7 @@ public class ComputeHybridizationNetwork {
 			else {
 				var queue = new LinkedList<Root>();
 				queue.add(root);
-				while (queue.size() > 0) {
+				while (!queue.isEmpty()) {
 					root = queue.poll();
 					for (var e : root.outEdges()) {
 						var w = (Root) e.getTarget();

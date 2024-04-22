@@ -22,12 +22,14 @@ package splitstree6.autumn.hybridnumber;
 import jloda.graph.Edge;
 import jloda.graph.Node;
 import jloda.phylo.PhyloTree;
-import jloda.util.*;
+import jloda.util.CanceledException;
+import jloda.util.Pair;
+import jloda.util.Triplet;
 import jloda.util.progress.ProgressListener;
 import splitstree6.algorithms.utils.RerootingUtils;
+import splitstree6.autumn.Utilities;
 import splitstree6.data.TaxaBlock;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.util.*;
 
@@ -119,7 +121,7 @@ public class RerootByHybridNumber {
 			rerootingTriplets2.clear();
 		}
 
-		int bestScore = ComputeHybridNumber.LARGE;
+		int bestScore = Utilities.getNumberOfReticulationsInClusterNetwork(tree1, tree2);
 		int originalH = bestScore;
 		int bestE1 = -1;
 		float bestSourceLength1 = 0;
@@ -129,11 +131,6 @@ public class RerootByHybridNumber {
 
 		int bestE2 = -1;
 
-		if (ProgramProperties.isUseGUI()) {
-			String result = JOptionPane.showInputDialog(null, "Enter max h", "" + bestScore);
-			if (result != null && NumberUtils.isInteger(result))
-				bestScore = Integer.parseInt(result);
-		}
 		System.err.println("Rooting trees by hybrid number");
 		progressListener.setTasks("Rooting trees by hybrid number", "Comparing trees");
 		progressListener.setMaximum(allPairs.size());
@@ -143,7 +140,7 @@ public class RerootByHybridNumber {
 
 		try {
 			computeHybridNumber = new ComputeHybridNumber(progressListener);
-			computeHybridNumber.silent = true;
+			computeHybridNumber.verbose = false;
 
 			int count = 0;
 			var allTaxa = new TaxaBlock();
