@@ -41,8 +41,6 @@
       <fileEntry mountPoint="1691243205" file="../tools/genome-context" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/workflow-run" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/workflow-export" fileMode="755" overrideFileMode="true" />
-      <fileEntry mountPoint="1691243205" file="../tools/mash-sketches" fileMode="755" overrideFileMode="true" />
-      <fileEntry mountPoint="1691243205" file="../tools/bfilter-tool" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/genetree-viewer" fileMode="755" overrideFileMode="true" />
       <dirEntry mountPoint="1691243210" file="../target/generated-resources/licenses" subDirectory="licenses" />
       <fileEntry mountPoint="1691243207" file="../target/generated-resources/licenses.xml" />

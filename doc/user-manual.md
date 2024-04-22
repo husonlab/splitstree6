@@ -27,7 +27,7 @@ mtDNA.](figs/opening-example.png)
 # Using SplitsTree
 
 In this chapter we give an overview of how the interface of the
-SplitsTree app is organised. Later we provide more detail on the actual
+SplitsTree app is organised. Later we provide more details on the actual
 methods and procedures.
 
 ## Getting started
