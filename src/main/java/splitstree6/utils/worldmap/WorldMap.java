@@ -43,7 +43,7 @@ import java.io.InputStreamReader;
 
 public class WorldMap extends Pane {
 	// do not change these values, they crucial for correct mapping of lat-long coordinates
-	public static final double X0 = 25;
+	public static final double X0 = 19;
 	public static final double Y0 = 24;
 	public static final double DX = 642;
 	public static final double DY = 476;
