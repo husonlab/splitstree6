@@ -20,6 +20,7 @@
 package splitstree6.dialog.analyzegenomes;
 
 import javafx.collections.ObservableList;
+import jloda.connect.DatabaseConnector;
 import jloda.fx.window.NotificationManager;
 import jloda.graph.Node;
 import jloda.graph.NodeIntArray;
@@ -101,7 +102,7 @@ public class AccessReferenceDatabase implements Closeable {
 		if (!FileUtils.fileExistsAndIsNonEmpty(dbFile))
 			throw new IOException("File not found or empty: " + dbFile);
 
-		connection = DatabaseConnector.createSQLiteConnection(dbFile, readOnly);
+		connection = DatabaseConnector.connect(dbFile, readOnly);
 
 		unusableTaxa.addAll(executeQueryInt("SELECT taxon_id FROM genomes WHERE fasta_url is NULL or fasta_url='';", 1));
 

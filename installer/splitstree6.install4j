@@ -41,7 +41,6 @@
       <fileEntry mountPoint="1691243205" file="../tools/genome-context" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/workflow-run" fileMode="755" overrideFileMode="true" />
       <fileEntry mountPoint="1691243205" file="../tools/workflow-export" fileMode="755" overrideFileMode="true" />
-      <fileEntry mountPoint="1691243205" file="../tools/genetree-viewer" fileMode="755" overrideFileMode="true" />
       <dirEntry mountPoint="1691243210" file="../target/generated-resources/licenses" subDirectory="licenses" />
       <fileEntry mountPoint="1691243207" file="../target/generated-resources/licenses.xml" />
       <fileEntry mountPoint="1691243207" file="../licenses/JLODA-LICENSE.txt" />
@@ -256,7 +255,7 @@ return console.askOkCancel(message, true);
               </action>
               <action id="1691243206" beanClass="com.install4j.runtime.beans.actions.text.ReplaceInstallerVariablesAction" actionElevationType="elevated" rollbackBarrierExitCode="0">
                 <serializedBean>
-                  <property name="files" type="array" class="java.io.File" length="6">
+                  <property name="files" type="array" class="java.io.File" length="5">
                     <element index="0">
                       <object class="java.io.File">
                         <string>tools/genome-context</string>
@@ -280,11 +279,6 @@ return console.askOkCancel(message, true);
                     <element index="4">
                       <object class="java.io.File">
                         <string>tools/bfilter-tool</string>
-                      </object>
-                    </element>
-                    <element index="5">
-                      <object class="java.io.File">
-                        <string>tools/genetree-viewer</string>
                       </object>
                     </element>
                   </property>

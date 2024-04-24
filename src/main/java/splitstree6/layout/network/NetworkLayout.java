@@ -134,7 +134,7 @@ public class NetworkLayout {
 					nodeShape.setShape(RichTextLabel.getMark(label.getText()));
 				} else {
 					var circle = new Circle(v.getDegree() == 1 ? 3 : 2);
-					circle.setFill(Color.WHITE);
+					circle.setFill(Color.BLACK);
 					circle.setStroke(Color.BLACK);
 					var stroke = 1 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
 					circle.setStyle("-fx-stroke-width: " + stroke + ";");

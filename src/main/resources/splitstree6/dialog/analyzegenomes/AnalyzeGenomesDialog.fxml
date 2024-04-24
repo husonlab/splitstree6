@@ -33,7 +33,7 @@
             <top>
                 <HBox alignment="CENTER" prefHeight="30.0" BorderPane.alignment="CENTER">
                     <children>
-                        <Label text="Analyze contigs, genomes and other unaligned sequences"/>
+                        <Label text="Phylogenetic context of draft genomes and other unaligned sequences"/>
                     </children>
                 </HBox>
             </top>

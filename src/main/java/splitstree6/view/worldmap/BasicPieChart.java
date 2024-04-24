@@ -78,6 +78,22 @@ public class BasicPieChart extends Pane {
 		var buf = new StringBuilder();
 		if (getName() != null)
 			buf.append(getName()).append("\n");
+
+		if (data.isEmpty()) {
+			var arc = new Arc();
+			arc.setType(ArcType.ROUND);
+			arc.centerXProperty().bind(radius);
+			arc.centerYProperty().bind(radius);
+			arc.radiusXProperty().bind(radius);
+			arc.radiusYProperty().bind(radius);
+			arc.setStartAngle(angle);
+			arc.setLength(360);
+			arc.setFill(Color.WHITE);
+			arc.setStrokeWidth(0.25);
+			arc.setStroke(Color.WHITE);
+			arc.setUserData(name);
+			getChildren().add(arc);
+		} else {
 		for (var i = 0; i < data.size(); i++) {
 			var value = data.get(i).getValue();
 			if (value > 0) {
@@ -93,12 +109,13 @@ public class BasicPieChart extends Pane {
 				arc.setLength(delta);
 				arc.setFill(colorScheme.get(i % colorScheme.size()));
 				arc.setStrokeWidth(0.25);
-				arc.setStroke(Color.WHITE);
+				arc.setStroke(Color.BLACK);
 				arc.setUserData(name);
 				angle += delta;
 				getChildren().add(arc);
 				buf.append("%s: %s%n".formatted(name, StringUtils.removeTrailingZerosAfterDot("%.1f", value)));
 			}
+		}
 		}
 		Tooltip.install(this, new Tooltip(buf.toString()));
 	}

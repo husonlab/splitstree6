@@ -85,7 +85,7 @@ public class InteractionSetup {
 
 		pane.setOnMouseClicked(e -> {
 			if (e.isStillSincePress() && !e.isShiftDown()) {
-				Platform.runLater(taxonSelectionModel::clearSelection);
+				Platform.runLater(networkNodeSelectionModel::clearSelection);
 				e.consume();
 			}
 		});

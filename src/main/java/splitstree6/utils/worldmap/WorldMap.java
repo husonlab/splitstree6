@@ -77,10 +77,10 @@ public class WorldMap extends Pane {
 
 		try {
 			outlines = createOutlines();
-			continents = createGroup("continents.txt");
-			countries = createGroup("countries.txt");
+			continents = createGroup("continents.dat");
+			countries = createGroup("countries.dat");
 			countries.setVisible(false);
-			oceans = createGroup("oceans.txt");
+			oceans = createGroup("oceans.dat");
 		} catch (IOException ex) {
 			throw new RuntimeException(ex);
 		}
@@ -185,7 +185,7 @@ public class WorldMap extends Pane {
 		var minY = Double.MAX_VALUE;
 		var maxY = Double.MIN_VALUE;
 
-		try (var r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("lines.txt")))) {
+		try (var r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("lines.dat")))) {
 			while (r.ready()) {
 				var line = r.readLine();
 				if (!line.startsWith("#")) {

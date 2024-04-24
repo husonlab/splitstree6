@@ -81,7 +81,7 @@ public class AnalyzeGenomesDialog {
 		controller = extendedFXMLLoader.getController();
 
 		stage = new Stage();
-		stage.setTitle("Analyze Genomes - " + Version.NAME);
+		stage.setTitle("Analyze Draft Genomes - " + Version.NAME);
 		stage.getIcons().setAll(ProgramProperties.getProgramIconsFX());
 
 		stage.setScene(new Scene(extendedFXMLLoader.getRoot()));

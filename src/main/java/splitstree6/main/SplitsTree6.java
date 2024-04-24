@@ -157,6 +157,7 @@ public class SplitsTree6 extends Application {
 					for (var file : inputFiles)
 						Platform.runLater(() -> FileLoader.apply(false, mainWindow, file, e -> NotificationManager.showError("Open file failed: " + e)));
 				}
+
 		} catch (Exception ex) {
 			Basic.caught(ex);
 			throw ex;
@@ -172,6 +173,7 @@ public class SplitsTree6 extends Application {
 	public static boolean isDesktop() {
 		return desktop;
 	}
+
 
 	public static void setDesktop(boolean desktop) {
 		SplitsTree6.desktop = desktop;
