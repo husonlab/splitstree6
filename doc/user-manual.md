@@ -2,8 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.11, built 22 Apr 2024)
-
+SplitsTree App (version 6.3.12, built 24 Apr 2024)
 ## Introduction
 
 The SplitsTree App is new software for exploring and analyzing
