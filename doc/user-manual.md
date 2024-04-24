@@ -2,8 +2,7 @@
 
 ## Daniel H. Huson and David Bryant
 
-SplitsTree App (version 6.3.13, built 22 Apr 2024)
-
+SplitsTree App (version 6.3.11, built 22 Apr 2024)
 
 ## Introduction
 
@@ -493,6 +492,38 @@ An algorithm tab has a run button (at the right) to execute the
 algorithm and may contain some optional input items (below) to set
 parameters of the algorithm.
 
+## The draft genome dialog
+
+The SplitsTree App supports the calculation of the *phylogenetic
+context* of a draft prokaryotic genome [@Bagcietal2021]. One or more
+files (FastA format) each containing one or more sequences representing
+draft genomes (or metagenomic assembly bins) can be imported into the
+program and then compared against a set of GTDB reference genomes
+[@Parksetal2018] using mash distances [@Ondovetal2016] and then
+represented as a phylogenetic outline.
+
+The dialog is opened using the `File->Analyze Draft Genomes...` menu
+item and is setup using three tabs, as shown in Figure.
+
+<figure>
+<div class="tabular">
+<p><span>cc</span> <img src="figs/draft-genomes-a.png"
+style="height:5cm" alt="image" />&amp; <img
+src="figs/draft-genomes-b.png" style="height:5cm" alt="image" /><br />
+<span><img src="figs/draft-genomes-c.png" style="height:6cm"
+alt="image" /></span><br />
+</p>
+</div>
+<figcaption> The first tab is used to specify the input files, the type
+of input (DNA or protein sequences) and whether to use files or FastA
+records as input genomes. Also, specify the output file (and whether to
+store input sequences as sequences or as references to files). The
+second tab is used to edit the labels of genomes. The third tab is used
+to specify the database to compare against (downloaded from the
+SplitsTree page), the distance to search in, and distance within which
+to include references. </figcaption>
+</figure>
+
 # Building trees and networks
 
 ## Using the workflow
@@ -614,8 +645,8 @@ selected .
 
 Click on an edge in the split network to select that split. The edges
 associated to that split can be rotated using the rotate buttons in the
-toolbar or the arrows in the side panel which appears when you click on the
-right-hand icon.
+toolbar or the arrows in the side panel which appears when you click the
+icon on the right .
 
 ![If one or more splits are selected, then highlighted buttons can be
 used to change the angles of the selected
@@ -627,7 +658,7 @@ representation [@Bagcietal2021] constructs just the outer perimeter of
 the network. This is sufficient to represent all of the split weights,
 and is generally much faster to compute and draw. To switch back and
 forward between the graph mode and the outline mode use the pop-up menu
-at the left of the toolbar.
+at the left of the toolbar .
 
 ### Split Decomposition
 
@@ -973,6 +1004,8 @@ This menu has the following items:
 - Edit Input... - Open the input editor tab
 
 - Save - Save the current document
+
+- Analyze Draft Genomes... - Open the microbial draft genome analyzer
 
 - Save As... - Save the current document to a chosen file
 
@@ -2058,7 +2091,8 @@ options:
 
 `SecondTree =  <Integer>` - index of the second tree
 
-`RerootToMinimize =  <Boolean>`- reroot input trees to minimize hybridization number
+`RerootToMinimize =  <Boolean>` - reroot input trees to minimize
+hybridization number
 
 Reference: [@HusonLinz2018]
 
@@ -2367,8 +2401,9 @@ its splits. The algorithm has the following options:
 #### Unique Topologies
 
 The *Unique Topologies* algorithm takes a Trees block as input and
-produces a Trees block as output. Filter trees or rooted networks returning all unique topologies (using hardwired
-clusters). The algorithm has the following options:
+produces a Trees block as output. Filter trees or rooted networks
+returning all unique topologies (using hardwired clusters). The
+algorithm has the following options:
 
 `Unrooted =  <Boolean>` - ignore location of root
 
@@ -2838,6 +2873,7 @@ We thank Daria Evseeva for working on the code with us. We thank Celine
 Scornavacca for her implementation of the tanglegram layout. This
 program uses the JAMA library in the neighbor-net algorithm.
 
+
 ## References
 
 Bagci, C., D. Bryant, B. Cetinkaya, and DH Huson. 2021. “Microbial
@@ -3005,6 +3041,11 @@ Restriction Data.” *Genetics* 125: 873–79.
 Ondov, BD, TJ Treangen, P. Melsted, AB Mallonee, NH Bergman, S. Koren,
 and AM Phillippy. 2016. “Mash: Fast Genome and Metagenome Distance
 Estimation Using MinHash.” *Genome Biol* 17 (132).
+
+Parks, Donovan H., Maria Chuvochina, D. W. Waite, Christian Rinke, A.
+Skarshewski, P. A. Chaumeil, and Phil Hugenholtz. 2018. “A Standardized
+Bacterial Taxonomy Based on Genome Phylogeny Substantially Revises the
+Tree of Life.” *Nature Biotechnology* 36 (10): 996–1004.
 
 Redding, D. 2003. “Incorporating Genetic Distinctness and Reserve
 Occupancy into a Conservation Priorisation Approach.” Master’s thesis,

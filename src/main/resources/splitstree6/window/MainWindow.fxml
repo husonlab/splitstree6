@@ -61,6 +61,10 @@
                                                     shortcut="DOWN"/>
                             </accelerator>
                         </MenuItem>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
+                        <MenuItem fx:id="analyzeGenomesMenuItem" mnemonicParsing="false" text="Analyze Draft Genomes..."
+                                  userData="Open the microbial draft genome analyzer"/>
+                        <SeparatorMenuItem mnemonicParsing="false"/>
                         <Menu mnemonicParsing="false" text="Import">
                             <items>
                                 <MenuItem fx:id="importDialogMenuItem" mnemonicParsing="false"
@@ -79,11 +83,6 @@
                                           userData="Import tree names from a text file"/>
                             </items>
                         </Menu>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
-
-                        <MenuItem fx:id="analyzeGenomesMenuItem" text="Analyze Genomes..."
-                                  userData="Open the analyze genomes dialog"/>
-                        <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="saveMenuItem" text="Save" userData="Save the current document">
                             <accelerator>
                                 <KeyCodeCombination alt="UP" code="S" control="UP" meta="UP" shift="UP"
@@ -367,12 +366,10 @@
                         <MenuItem fx:id="filterTaxaMenuItem" text="Filter Taxa" userData="Show the filter taxa tab"/>
                         <MenuItem fx:id="filterCharactersMenuItem" text="Filter Characters..."
                                   userData="Shows the alignment tab"/>
-                        <MenuItem fx:id="GroupIdenticalHaplotypesMenuItem"
-                                  text="Group Identical Haplotypes..."
+                        <MenuItem fx:id="GroupIdenticalHaplotypesMenuItem" text="Group Identical Haplotypes..."
                                   userData="Group identical haplotypes and open as new document">
                         </MenuItem>
-                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees"
-                                  userData="Show the filter trees tab"/>
+                        <MenuItem fx:id="filterTreesMenuItem" text="Filter Trees" userData="Show the filter trees tab"/>
                         <MenuItem fx:id="filterSplitsMenuItem" text="Filter Splits"
                                   userData="Show the filter splits tab"/>
                         <MenuItem fx:id="splitsSliderMenuItem" text="Splits Slider"
@@ -464,11 +461,11 @@
                     </Menu>
                     <Menu text="Analysis">
                         <MenuItem fx:id="bootStrapTreeMenuItem" text="Bootstrap Tree"
-                                       userData="Perform bootstrapping on a tree calculation from sequences"/>
+                                  userData="Perform bootstrapping on a tree calculation from sequences"/>
                         <MenuItem fx:id="bootstrapTreeAsNetworkMenuItem" text="Bootstrap Tree as Network"
-                                       userData="Perform bootstrapping on a tree calculation from sequences, producing a network"/>
+                                  userData="Perform bootstrapping on a tree calculation from sequences, producing a network"/>
                         <MenuItem fx:id="bootStrapNetworkMenuItem" text="Bootstrap Splits Network"
-                                       userData="Perform bootstrapping on a split network calculation from sequences"/>
+                                  userData="Perform bootstrapping on a split network calculation from sequences"/>
                         <SeparatorMenuItem mnemonicParsing="false"/>
                         <MenuItem fx:id="estimateInvariableSitesMenuItem" text="Estimate Invariable Sites"
                                   userData="Estimate the proportion of invariable sites"/>

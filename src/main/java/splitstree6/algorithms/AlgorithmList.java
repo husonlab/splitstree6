@@ -127,7 +127,6 @@ public class AlgorithmList {
 
 		add(algorithms, names, new PCOA());
 
-
 		add(algorithms, names, new AutumnAlgorithm());
 		add(algorithms, names, new ALTSNetwork());
 		add(algorithms, names, new ALTSExternal());

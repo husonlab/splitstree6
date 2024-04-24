@@ -10,16 +10,15 @@ module splitstreesix {
 	requires org.apache.commons.math4.legacy;
 	requires org.apache.commons.math4.legacy.exception;
 
-	requires countryboundaries;
 	requires com.install4j.runtime;
 	requires java.sql;
 	requires java.sql.rowset;
-	// requires org.xerial.sqlitejdbc;
 	requires java.desktop;
 	requires org.fxmisc.flowless;
 	requires org.fxmisc.richtext;
 	requires org.fxmisc.undo;
 	requires com.google.zxing;
+	requires org.xerial.sqlitejdbc;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;
@@ -76,6 +75,15 @@ module splitstreesix {
 	opens splitstree6.io.readers.trees;
 	opens splitstree6.io.readers.network;
 	opens splitstree6.io.readers.view;
+
+	exports splitstree6.io.readers.characters;
+	exports splitstree6.io.readers.genomes;
+	exports splitstree6.io.readers.distances;
+	exports splitstree6.io.readers.splits;
+	exports splitstree6.io.readers.report;
+	exports splitstree6.io.readers.trees;
+	exports splitstree6.io.readers.network;
+	exports splitstree6.io.readers.view;
 	exports splitstree6.io.readers;
 
 	opens splitstree6.io.writers.characters;
@@ -87,6 +95,16 @@ module splitstreesix {
 	opens splitstree6.io.writers.report;
 	opens splitstree6.io.writers.network;
 	opens splitstree6.io.writers.view;
+
+	exports splitstree6.io.writers.characters;
+	exports splitstree6.io.writers.genomes;
+	exports splitstree6.io.writers.distances;
+	exports splitstree6.io.writers.splits;
+	exports splitstree6.io.writers.trees;
+	exports splitstree6.io.writers.taxa;
+	exports splitstree6.io.writers.report;
+	exports splitstree6.io.writers.network;
+	exports splitstree6.io.writers.view;
 
 	opens splitstree6.window;
 
@@ -151,7 +169,12 @@ module splitstreesix {
 
 	opens splitstree6.dialog.exporting;
 
-	opens splitstree6.layout;
+	exports splitstree6.layout;
+	exports splitstree6.layout.tree;
+	exports splitstree6.layout.splits;
+	exports splitstree6.layout.network;
+	exports splitstree6.view.trees.tanglegram.optimize;
+
 	opens splitstree6.algorithms.distances.distances2splits.neighbornet;
 
 	exports splitstree6.dialog;
@@ -169,24 +192,14 @@ module splitstreesix {
 	exports splitstree6.utils;
 	exports splitstree6.view.utils;
 
-	opens splitstree6.xtra.genetreeview;
 	opens splitstree6.xtra.outliner;
-	opens splitstree6.xtra.mapview;
 
 	opens splitstree6.algorithms.utils;
-	opens splitstree6.xtra.genetreeview.layout;
-	opens splitstree6.xtra.genetreeview.io;
-	opens splitstree6.xtra.genetreeview.model;
-	opens splitstree6.xtra.genetreeview.util;
 	exports splitstree6.xtra.more;
 	exports splitstree6.splits;
 	opens splitstree6.splits;
 	opens splitstree6.xtra.more;
 	opens splitstree6.xtra.alts;
 	opens splitstree6.xtra.draw;
-	opens splitstree6.xtra.mapview.nodes;
-	opens splitstree6.xtra.mapview.mapbuilder;
 	opens splitstree6.utils.worldmap;
-
-
 }

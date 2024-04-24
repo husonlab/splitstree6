@@ -19,26 +19,34 @@
 
 package splitstree6.dialog.analyzegenomes;
 
-
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.Executor;
 
 public class DatabaseConnector {
-	public static Connection createSQLiteConnection(String fileName, Boolean readOnly) {
-	/*
-		final SQLiteConfig config = new SQLiteConfig();
-		config.setCacheSize(10000);
-		config.setReadOnly(readOnly);
-
-		try {
-			return config.createConnection("jdbc:sqlite:" + fileName);
-		} catch (SQLException e) {
-			Basic.caught(e);
+	public static Connection createSQLiteConnection(String fileName, Boolean readOnly) throws SQLException {
+		/*
+		if(SplitsTree6.isDesktop()) {
+				var url = "jdbc:sqlite:" + fileName;
+			try {
+				Class.forName("org.sqlite.JDBC");
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			}
+			return DriverManager.getConnection(url);
 		}
+		else
 		*/
 		return createEmptyConnection();
+		/*
+		{
+			var config = new org.sqlite.SQLiteConfig();
+			config.setCacheSize(10000);
+			config.setReadOnly(readOnly);
+			return config.createConnection("jdbc:sqlite:" + fileName);
+		}
+		*/
 	}
 
 	public static Connection createEmptyConnection() {

@@ -1,9 +1,9 @@
 #nexus [SplitsTree6]
 
 BEGIN SPLITSTREE6;
-DIMENSIONS nDataNodes=9 nAlgorithms=6;
-PROGRAM version='SplitsTree6 (version 0.0.9-alpha, built 25 May 2022)';
-WORKFLOW creationDate='1653755376628'; [Sat May 28 18:29:36 CEST 2022]
+DIMENSIONS nDataNodes=9 nAlgorithms=5;
+PROGRAM version='SplitsTree App (version 6.3.11, built 22 Apr 2024)';
+WORKFLOW creationDate='1713942891134'; [Wed Apr 24 09:14:51 CEST 2024]
 END; [SPLITSTREE6]
 
 [!
@@ -15,18 +15,15 @@ with DNASP.]
 Input:
 Source: http://popart.otago.ac.nz/examplenex.shtml
 This is an example of a Nexus file, modified from a sample file distributed
-with DNASP. It should run in PopART. Any text appearing between square braces is
-a comment and will be ignored by the program.
+with DNASP.
 
 Methods:
-Analysis was performed using SplitsTree6 6.0.0_alpha (Huson and Bryant 2006).
+Analysis was performed using SplitsTree CE 6.0.0 (Huson and Bryant 2006).
 The original input consisted of 7 taxa and 7 DNA sequences of length 56.
-The Hamming Distance method (Hamming 1950) was used (default options) so as to obtain a 7 x 7 distance matrix.
-The Median Joining method (Bandelt et al, 1999) was used (default options) so as to obtain 9 nodes and 11 edges.
+The Median Joining method (Bandelt et al 1999) was used (default options) so as to obtain 9 nodes and 11 edges.
 
 References:
-Bandelt et al, 1999: H. -J. Bandelt, P. Forster, and A. Röhl. Median-joining networks for inferring intraspecific phylogenies. Molecular Biology and Evolution, 16:37–48, 1999.
-Hamming 1950: Hamming, Richard W. Error detecting and error correcting codes. Bell System Technical Journal. 29 (2): 147–160. MR 0035935, 1950.
+Bandelt et al 1999: HJ Bandelt, P. Forster, and A. Röhl. Median-joining networks for inferring intraspecific phylogenies. Molecular Biology and Evolution, 16:37–48, 1999.
 Huson and Bryant 2006: D.H. Huson and D. Bryant. Application of phylogenetic networks in evolutionary studies. Molecular Biology and Evolution, 23:254–267, 2006.
 ]
 
@@ -142,26 +139,17 @@ TITLE 'Working Characters';
 LINK ALGORITHM = 'Input Data Filter';
 DIMENSIONS ntax=7 nchar=56;
 FORMAT
-	datatype='DNA' missing=? gap=- symbols="acgt" labels=left transpose=no interleave=yes;
+	datatype='DNA' missing=? matchChar=. gap=- symbols="acgt" labels=left transpose=no interleave=no;
 MATRIX
 seq_1 atatacggggtta---ttaga----aaaatgtgtgtgtgttttttttttcatgtgg
-seq_2 atatac--ggata---ttaca----agaatctatgtctgctttctttttcatgtgg
-seq_3 atatacggggata---ttata----agaatgtgtgtgtgttttttttttcatgtgg
-seq_4 atatacggggata---gtagt----aaaatgtgtgtgtgttttttttttcatgtga
-seq_5 atatacggggata---gtagg----aaaatgtgtgtgtgttttttttttcatgtgc
-seq_6 atatacggggata---gtagc----aaaatgtgtgtgtgttttttttttcatgtgt
-seq_7 atatacggggata---gtaga----aaaatgtgtgtgtgttttttttttcatgtga
-
+seq_2 ......--..a........c......g...c.a...c..c...c............
+seq_3 ..........a........t......g.............................
+seq_4 ..........a.....g...t..................................a
+seq_5 ..........a.....g...g..................................c
+seq_6 ..........a.....g...c..................................t
+seq_7 ..........a.....g......................................a
 ;
 END; [CHARACTERS]
-
-BEGIN ALGORITHM;
-TITLE 'Hamming Distance';
-LINK CHARACTERS = 'Working Characters';
-NAME 'Hamming Distance';
-OPTIONS
-	Normalize = 'true';
-END; [ALGORITHM]
 
 BEGIN ALGORITHM;
 TITLE 'Median Joining';
@@ -171,29 +159,13 @@ OPTIONS
 	Epsilon = 0;
 END; [ALGORITHM]
 
-BEGIN DISTANCES;
-TITLE 'Distances';
-LINK ALGORITHM = 'Hamming Distance';
-DIMENSIONS ntax=7;
-FORMAT labels=left diagonal triangle=Both;
-MATRIX
-[1] 'seq_1'   0 0.170213 0.061224 0.081633 0.081633 0.081633 0.061224
-[2] 'seq_2'   0.170213 0 0.12766 0.212766 0.212766 0.212766 0.191489
-[3] 'seq_3'   0.061224 0.12766 0 0.102041 0.102041 0.102041 0.081633
-[4] 'seq_4'   0.081633 0.212766 0.102041 0 0.040816 0.040816 0.020408
-[5] 'seq_5'   0.081633 0.212766 0.102041 0.040816 0 0.040816 0.040816
-[6] 'seq_6'   0.081633 0.212766 0.102041 0.040816 0.040816 0 0.040816
-[7] 'seq_7'   0.061224 0.191489 0.081633 0.020408 0.040816 0.040816 0
-;
-END; [DISTANCES]
-
 BEGIN NETWORK;
 TITLE 'Network';
 LINK ALGORITHM = 'Median Joining';
-DIMENSIONS nNodes=9 nEdges=11;
-	TYPE=HaplotypeNetwork;
-	PROPERTIES info ='Median-joining network';
-NODES
+DIMENSIONS nVertices=9 nEdges=11;
+TYPE HaplotypeNetwork;
+PROPERTIES info ='Median-joining network';
+VERTICES
 	id=1 label='seq_7' states='atatacggggata---gtaga----aaaatgtgtgtgtgttttttttttcatgtga',
 	id=2 label='seq_6' states='atatacggggata---gtagc----aaaatgtgtgtgtgttttttttttcatgtgt',
 	id=3 states='atatacggggata---gtagc----aaaatgtgtgtgtgttttttttttcatgtga',
@@ -237,8 +209,8 @@ OPTIONS
 	Orientation = 'Rotate0Deg',
 	ZoomFactor = 1,
 	FontScaleFactor = 1,
-	ActiveTraits = '*All*',
-	TraitLegend = 'true',
+	ActiveTraits = 'Europe' 'Asia' 'Africa' 'Australia' 'America',
+	TraitLegend = 'True',
 	TraitSize = 64,
-	SitesStyle = 'Labels';
+	SitesStyle = 'Hatches';
 END; [VIEW]

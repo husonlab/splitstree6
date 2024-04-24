@@ -504,7 +504,6 @@ public class MainWindowController {
 			((Pane) fileMenuButton.getParent()).getChildren().remove(fileMenuButton);
 			((Pane) memoryUsageLabel.getParent()).getChildren().remove(memoryUsageLabel);
 		}
-		analyzeGenomesMenuItem.getParentMenu().getItems().remove(analyzeGenomesMenuItem); // todo: will make this a standalone program
 
 		algorithmTabPane.setAllowUndock(false);
 		mainTabPane.setAllowUndock(false);
