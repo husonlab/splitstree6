@@ -502,15 +502,12 @@ program and then compared against a set of GTDB reference genomes
 represented as a phylogenetic outline.
 
 The dialog is opened using the `File->Analyze Draft Genomes...` menu
-item and is setup using three tabs, as shown in Figure.
+item and is setup using three tabs, as shown in the Figure.
 
 <figure>
 <div class="tabular">
-<p><span>cc</span> <img src="figs/draft-genomes-a.png"
-style="height:5cm" alt="image" />&amp; <img
-src="figs/draft-genomes-b.png" style="height:5cm" alt="image" /><br />
-<span><img src="figs/draft-genomes-c.png" style="height:6cm"
-alt="image" /></span><br />
+<p><span>cc</span> <img src="figs/draft-genomes-a.png" style="height:5cm" alt="image" />&amp; <img src="figs/draft-genomes-b.png" style="height:5cm" alt="image" /><br />
+<span><img src="figs/draft-genomes-c.png" style="height:6cm" alt="image" /></span><br />
 </p>
 </div>
 <figcaption> The first tab is used to specify the input files, the type
