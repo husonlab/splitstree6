@@ -19,55 +19,43 @@
 
 package splitstree6.utils.worldmap;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.WeakInvalidationListener;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
-import javafx.scene.control.Label;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.*;
+import javafx.scene.shape.Line;
+import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
-import jloda.fx.control.RichTextLabel;
-import jloda.fx.control.ZoomableScrollPane;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableUtils;
-import jloda.fx.window.MainWindowManager;
 import jloda.util.NumberUtils;
 import jloda.util.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class WorldMap extends Pane {
-	// do not change these values, they crucial for correct mapping of lat-long coordinates
-	public static final double X0 = 19;
-	public static final double Y0 = 24;
-	public static final double DX = 642;
-	public static final double DY = 476;
+	private final Group landMasses;
 
-	private static boolean verbose = false;
-
-	public static double WRAP_AROUND_LONGITUDE = -169.0;
-
-	private final Group outlines;
-	private final Group continents;
 	private final Group countries;
+	private final Group continents;
 	private final Group oceans;
+
+	private final Group grid;
 
 	private final Rectangle dataRectangle;
 
 	private final Group userItems = new Group();
 
-	private final Group box;
-
-	private final Group grid;
-
-	private final Group notUserItems = new Group();
-
-	private final InvalidationListener darkModeInvalidationListener;
+	private double scale = 1.0;
 
 	public WorldMap() {
 		dataRectangle = new Rectangle(0, 0, 0, 0);
@@ -75,45 +63,21 @@ public class WorldMap extends Pane {
 		dataRectangle.setStroke(Color.TRANSPARENT);
 		dataRectangle.setStrokeWidth(1);
 
-		try {
-			outlines = createOutlines();
-			continents = createGroup("continents.dat");
-			countries = createGroup("countries.dat");
-			countries.setVisible(false);
-			oceans = createGroup("oceans.dat");
-		} catch (IOException ex) {
-			throw new RuntimeException(ex);
-		}
-		box = new Group();
+		var bottomLeft = millerProjection(-180, 90);
+		var topRight = millerProjection(180, -90);
+		var worldRectangle = new Rectangle(bottomLeft.getX(), bottomLeft.getY(), topRight.getX() - bottomLeft.getX(), topRight.getY() - bottomLeft.getY());
+		worldRectangle.setStroke(Color.TRANSPARENT);
+		worldRectangle.setFill(Color.TRANSPARENT);
+		worldRectangle.setStrokeWidth(0.25);
 
+		landMasses = createLandMasses();
 		grid = createGrid();
-		{
-			var topLeft = millerProjection(90, -180, false);
-			var bottomRight = millerProjection(-90, 180, false);
-			var worldRectangle = new Rectangle(Math.min(topLeft.getX(), bottomRight.getX()),
-					Math.min(topLeft.getY(), bottomRight.getY()),
-					Math.abs(topLeft.getX() - bottomRight.getX()),
-					Math.abs(topLeft.getY() - bottomRight.getY()));
-			worldRectangle.setStroke(Color.TRANSPARENT);
-			worldRectangle.setFill(Color.TRANSPARENT);
-			worldRectangle.setStrokeWidth(0.25);
-			box.getChildren().addAll(worldRectangle, dataRectangle);
-		}
-		notUserItems.getChildren().addAll(box, grid, outlines, oceans, countries, continents);
-		getChildren().addAll(notUserItems, userItems);
 
-		darkModeInvalidationListener = e -> {
-			var dark = MainWindowManager.isUseDarkTheme();
-			for (var shape : BasicFX.getAllRecursively(this, Shape.class)) {
-				if (dark && shape.getStroke() != null && shape.getStroke().equals(Color.BLACK))
-					shape.setStroke(Color.WHITE);
-				if (!dark && shape.getStroke() != null && shape.getStroke().equals(Color.WHITE))
-					shape.setStroke(Color.BLACK);
-			}
-		};
-		MainWindowManager.useDarkThemeProperty().addListener(new WeakInvalidationListener(darkModeInvalidationListener));
-		if (MainWindowManager.isUseDarkTheme())
-			darkModeInvalidationListener.invalidated(null);
+		continents = createGroup("continents.dat");
+		countries = createGroup("countries.dat");
+		countries.setVisible(false);
+		oceans = createGroup("oceans.dat");
+		getChildren().addAll(worldRectangle, grid, dataRectangle, landMasses, countries, continents, oceans, userItems);
 	}
 
 	public void clear() {
@@ -124,247 +88,226 @@ public class WorldMap extends Pane {
 		dataRectangle.setHeight(0);
 	}
 
-	public Runnable createUpdateScaleMethod(ZoomableScrollPane scrollPane) {
-		return () -> {
-			var factorX = scrollPane.getZoomFactorX();
-			var factorY = scrollPane.getZoomFactorY();
-			for (var node : BasicFX.getAllChildrenRecursively(notUserItems.getChildren())) {
-				if (node instanceof Path path) {
-					for (var element : path.getElements()) {
-						if (element instanceof MoveTo moveTo) {
-							moveTo.setX(factorX * moveTo.getX());
-							moveTo.setY(factorY * moveTo.getY());
-						} else if (element instanceof LineTo lineTo) {
-							lineTo.setX(factorX * lineTo.getX());
-							lineTo.setY(factorY * lineTo.getY());
-						}
-					}
-				} else if (node instanceof RichTextLabel label) {
-					label.setTranslateX(factorX * label.getTranslateX());
-					label.setTranslateY(factorY * label.getTranslateY());
-				} else if (node instanceof Label label) {
-					label.setTranslateX(factorX * label.getTranslateX());
-					label.setTranslateY(factorY * label.getTranslateY());
-				} else if (node instanceof Text label) {
-					label.setTranslateX(factorX * label.getTranslateX());
-					label.setTranslateY(factorY * label.getTranslateY());
-				} else if (node instanceof Rectangle rectangle) {
-					rectangle.setX(factorX * rectangle.getX());
-					rectangle.setY(factorY * rectangle.getY());
-					rectangle.setWidth(factorX * rectangle.getWidth());
-					rectangle.setHeight(factorY * rectangle.getHeight());
-				} else if (node instanceof Line line) {
-					line.setStartX(factorX * line.getStartX());
-					line.setEndX(factorX * line.getEndX());
-					line.setStartY(factorY * line.getStartY());
-					line.setEndY(factorY * line.getEndY());
-				} else if (node instanceof Arc arc) {
-					arc.setCenterX(factorX * arc.getCenterX());
-					arc.setCenterY(factorY * arc.getCenterY());
-				} else if (node instanceof Shape) {
-					node.setScaleX(factorX * node.getScaleX());
-					node.setScaleY(factorY * node.getScaleY());
+	public void addUserItem(Node node, double longitude, double latitude) {
+		var point = millerProjection(longitude, latitude);
+		node.setTranslateX(scale * point.getX());
+		node.setTranslateY(scale * point.getY());
+		getUserItems().getChildren().add(node);
+		growRect(dataRectangle, point);
+	}
+
+	public void changeScale(double oldFactor, double newFactor) {
+		var factor = newFactor / oldFactor;
+		scale *= factor;
+
+		for (var node : BasicFX.getAllRecursively(this, Node.class)) {
+			if (node instanceof Polygon polygon) {
+				var points = new ArrayList<Double>();
+				for (var p : polygon.getPoints()) {
+					points.add(factor * p);
 				}
-			}
-			for (var node : userItems.getChildren()) {
-				node.setTranslateX(factorX * node.getTranslateX());
-				node.setTranslateY(factorY * node.getTranslateY());
-			}
-		};
-	}
-
-	private Group createOutlines() throws IOException {
-
-		var group = new Group();
-		Path path = new Path();
-
-		var scale = 1.0;
-
-		var minX = Double.MAX_VALUE;
-		var maxX = Double.MIN_VALUE;
-		var minY = Double.MAX_VALUE;
-		var maxY = Double.MIN_VALUE;
-
-		try (var r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("lines.dat")))) {
-			while (r.ready()) {
-				var line = r.readLine();
-				if (!line.startsWith("#")) {
-					var tokens = line.split("\\s");
-					var x = NumberUtils.parseDouble(tokens[0]);
-					var y = NumberUtils.parseDouble(tokens[1]);
-
-					minX = Math.min(minX, x);
-					maxX = Math.max(maxX, x);
-					minY = Math.min(minY, y);
-					maxY = Math.max(maxY, y);
-
-					if (tokens.length == 3) {
-						if (tokens[2].equals("m")) {
-							if (false) {
-								if (!path.getElements().isEmpty())
-									group.getChildren().add(path);
-								path = new Path();
-								path.setStrokeWidth(0.5);
-								path.getStyleClass().add("graph-edge");
-							}
-							path.getElements().add(new MoveTo(scale * x, scale * y));
-						} else if (tokens[2].equals("l")) {
-							path.getElements().add(new LineTo(scale * x, scale * y));
-						}
-					}
-				}
-			}
-			if (!path.getElements().isEmpty())
-				group.getChildren().add(path);
-		}
-		if (verbose) {
-			System.err.println("Lines:");
-			System.err.println("x: " + minX + " - " + maxX);
-			System.err.println("y: " + minY + " - " + maxY);
-		}
-
-		return group;
-	}
-
-	private static Group createGrid() {
-		var group = new Group();
-		var minX = Double.MAX_VALUE;
-		var maxX = Double.MIN_VALUE;
-		var minY = Double.MAX_VALUE;
-		var maxY = Double.MIN_VALUE;
-
-		if (true) {
-			for (var lon = -180; lon <= 180; lon += 30) {
-				var start = millerProjection(-90, lon, false);
-				var end = millerProjection(90, lon, false);
-					var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-				line.setStrokeWidth(0.25);
-					line.setStroke(Color.GRAY);
-					group.getChildren().add(line);
-			}
-			for (var lat = -90; lat <= 90; lat += 30) {
-				var start = millerProjection(lat, -180, false);
-				var end = millerProjection(lat, 180, false);
-					var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
-				line.setStrokeWidth(0.25);
-					line.setStroke(Color.GRAY);
-					group.getChildren().add(line);
+				polygon.getPoints().setAll(points);
+			} else if (node instanceof Rectangle rectangle) {
+				if (!rectangle.translateXProperty().isBound())
+					rectangle.setTranslateX(factor * rectangle.getTranslateX());
+				if (!rectangle.translateYProperty().isBound())
+					rectangle.setTranslateY(factor * rectangle.getTranslateY());
+				if (!rectangle.widthProperty().isBound())
+					rectangle.setWidth(rectangle.getWidth() * factor);
+				if (!rectangle.heightProperty().isBound())
+					rectangle.setHeight(rectangle.getHeight() * factor);
+			} else if (node instanceof Line line) {
+				if (!line.startXProperty().isBound())
+					line.setStartX(factor * line.getStartX());
+				if (!line.endXProperty().isBound())
+					line.setEndX(factor * line.getEndX());
+				if (!line.startYProperty().isBound())
+					line.setStartY(factor * line.getStartY());
+				if (!line.endYProperty().isBound())
+					line.setEndY(factor * line.getEndY());
+			} else {
+				if (!node.translateXProperty().isBound())
+					node.setTranslateX(factor * node.getTranslateX());
+				if (!node.translateYProperty().isBound())
+					node.setTranslateY(factor * node.getTranslateY());
 			}
 		}
-
-		if (verbose) {
-			System.err.println("grid:");
-			System.err.println("x: " + minX + " - " + maxX);
-			System.err.println("y: " + minY + " - " + maxY);
-		}
-
-		return group;
 	}
 
-	private Group createGroup(String resource) throws IOException {
-		var group = new Group();
-		try (var reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(resource)))) {
-			while (reader.ready()) {
-				var line = reader.readLine();
-				var tokens = StringUtils.split(line, '\t');
-				if (tokens.length == 3 && NumberUtils.isDouble(tokens[1]) && NumberUtils.isDouble(tokens[2])) {
-					var label = new Text(tokens[0]);
-					label.getStyleClass().add("above-label");
-					var point = millerProjection(NumberUtils.parseDouble(tokens[1]), NumberUtils.parseDouble(tokens[2]));
-					label.setTranslateX(point.getX());
-					label.setTranslateY(point.getY());
-					label.layoutBoundsProperty().addListener((v, o, n) -> {
-						label.setLayoutX(-0.5 * n.getWidth());
-						label.setLayoutY(-0.5 * n.getHeight());
-					});
-					//label.setBackgroundColor(Color.WHITE.deriveColor(1, 1, 1, 0.8));
-					// label.setBackgroundColor(Color.WHITE);
-					DraggableUtils.setupDragMouseTranslate(label);
-					group.getChildren().add(label);
-				}
-			}
-		}
-		return group;
-	}
-
-	public static Point2D millerProjection(double latitude, double longitude) {
-		return millerProjection(latitude, longitude, true);
-	}
-
-
-	public static Point2D millerProjection(double latitude, double longitude, boolean wrapAround) {
-		// this is wrap-around to the right
-		if (wrapAround && longitude <= WRAP_AROUND_LONGITUDE) {
-			System.err.println(longitude + " -> " + (180 + Math.abs(180 + longitude)));
-			longitude = 180 + Math.abs(180 + longitude);
-		}
-
-		var x = (longitude + 180) / 360 * DX + X0;
-		//var y = Math.log(Math.tan(Math.PI / 4.0 + Math.toRadians(latitude) / 2.0)) ;
-		var y = 5.0 / 4.0 * Math.log(Math.tan(Math.PI / 4.0 + (2.0 / 5.0) * Math.toRadians(latitude)));
-
-		y = Y0 + (2.3034125 - y) / (2 * 2.3034125) * DY;
-		//y=RECT[3]+RECT[1]-(y-2.3034125)/(2*2.3034125)*RECT[3];
-		//y=540-(y+230);
-		//y=540*(1-(y+210)/360);
-		return new Point2D(x, y);
-	}
-
-	public static double getX0() {
-		return X0;
-	}
-
-	public static double getY0() {
-		return Y0;
-	}
-
-	public static double getDX() {
-		return DX;
-	}
-
-	public static double getDY() {
-		return DY;
-	}
-
-	public static double getWrapAroundLongitude() {
-		return WRAP_AROUND_LONGITUDE;
-	}
-
-	public Group getOutlines() {
-		return outlines;
-	}
-
-	public Group getContinents() {
-		return continents;
-	}
-
-	public Group getCountries() {
-		return countries;
-	}
-
-	public Group getOceans() {
-		return oceans;
+	public Group getLandMasses() {
+		return landMasses;
 	}
 
 	public Group getUserItems() {
 		return userItems;
 	}
 
-	public Group getBox() {
-		return box;
-	}
-
 	public Group getGrid() {
 		return grid;
 	}
 
-	public void addUserItem(Node node, double latitude, double longitude) {
-		var point = millerProjection(latitude, longitude, true);
-		node.setTranslateX(point.getX());
-		node.setTranslateY(point.getY());
-		getUserItems().getChildren().add(node);
+	public Group getCountries() {
+		return countries;
+	}
 
-		growRect(dataRectangle, point);
+	public Group getContinents() {
+		return continents;
+	}
+
+	public Group getOceans() {
+		return oceans;
+	}
+
+	private static int calculateArrayDepth(JsonNode node) {
+		// Base case: if the node is not an array, return 0
+		if (!node.isArray()) {
+			return 0;
+		}
+
+		// Initialize the maximum depth to 0
+		int maxDepth = 0;
+
+		for (var element : node) {
+			int depth = calculateArrayDepth(element);
+			if (depth > maxDepth) {
+				maxDepth = depth;
+			}
+		}
+		return maxDepth + 1;
+	}
+
+	private static Point2D millerProjection(double longitude, double latitude) {
+		var dx = 180;
+		var fx = 800 / 360;
+		var dy = 2.3034125433763912;
+		var fy = 594 / 4.606825086752782;
+
+		return new Point2D(fx * (longitude + dx), 594 - fy * (((5.0 / 4.0 * Math.log(Math.tan(Math.PI / 4 + 2 * Math.toRadians(latitude) / 5)))) + dy));
+	}
+
+	private Group createLandMasses() {
+		var group = new Group();
+
+		var verbose = false;
+		try (var r = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("world-outline-low-precision_759.dat")))) {
+			var json = r.lines().collect(Collectors.joining("\n"));
+
+			var objectMapper = new ObjectMapper();
+			var rootNode = objectMapper.readTree(json);
+
+			// Accessing properties of the root node
+			var type = rootNode.get("type").asText();
+			if (verbose)
+				System.err.println("Type: " + type);
+
+			// Accessing properties of features array
+			var featuresNode = rootNode.get("features");
+			for (var featureNode : featuresNode) {
+
+				var featureType = featureNode.get("type").asText();
+				var id = featureNode.get("id").asText();
+
+				// Accessing properties object
+				var propertiesNode = featureNode.get("properties");
+				var name = propertiesNode.get("name").asText();
+
+
+				// Accessing geometry object
+				var geometryNode = featureNode.get("geometry");
+				var geometryType = geometryNode.get("type").asText();
+
+				var coordinatesNode = geometryNode.get("coordinates");
+
+				if (verbose) {
+					System.err.println("Feature Type: " + featureType);
+					System.err.println("ID: " + id);
+					System.err.println("Name: " + name);
+					System.err.println("Geometry Type: " + geometryType);
+				}
+
+				// Assuming coordinates are always a nested array of arrays
+
+				var parts = 0;
+				if (coordinatesNode.isArray()) {
+					var depth = calculateArrayDepth(coordinatesNode);
+					if (depth == 3) {
+						for (JsonNode level2 : coordinatesNode) {
+							if (level2.isArray()) {
+								var polygon = new Polygon();
+								for (JsonNode level3 : level2) {
+									var longitude = level3.get(0).asDouble();
+									var latitude = level3.get(1).asDouble();
+									var projection = millerProjection(longitude, latitude);
+									polygon.getPoints().addAll(projection.getX(), projection.getY());
+									if (verbose) {
+										System.err.printf("Long/lat: %.2f %.2f proj: %.2f %.2f%n", longitude, latitude, projection.getX(), projection.getY());
+									}
+								}
+								polygon.setFill(Color.WHITESMOKE);
+								polygon.setStroke(Color.BLACK);
+								Tooltip.install(polygon, new Tooltip(name));
+								polygon.setId(name);
+								group.getChildren().add(polygon);
+							}
+						}
+					} else if (depth == 4) {
+						for (JsonNode level2 : coordinatesNode) {
+							if (level2.isArray()) {
+								for (JsonNode level3 : level2) {
+									if (level3.isArray()) {
+										var polygon = new Polygon();
+										if (verbose)
+											System.err.println("part " + (++parts));
+										for (JsonNode level4 : level3) {
+											var longitude = level4.get(0).asDouble();
+											var latitude = level4.get(1).asDouble();
+											var projection = millerProjection(longitude, latitude);
+											polygon.getPoints().addAll(projection.getX(), projection.getY());
+											if (verbose) {
+												System.err.printf("Long/lat: %.2f %.2f proj: %.2f %.2f%n", longitude, latitude, projection.getX(), projection.getY());
+											}
+										}
+
+										polygon.setFill(Color.WHITESMOKE);
+										polygon.setStroke(Color.BLACK);
+										Tooltip.install(polygon, new Tooltip(name));
+										polygon.setId(name);
+										group.getChildren().add(polygon);
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+			if (verbose)
+				System.err.println();
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+		return group;
+	}
+
+	private Group createGrid() {
+		var group = new Group();
+
+			for (var lon = -180; lon <= 180; lon += 30) {
+				var start = millerProjection(lon, -90);
+				var end = millerProjection(lon, 90);
+				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
+				line.setStrokeWidth(0.25);
+				line.setStroke(Color.GRAY);
+				group.getChildren().add(line);
+			}
+			for (var lat = -90; lat <= 90; lat += 30) {
+				var start = millerProjection(-180, lat);
+				var end = millerProjection(180, lat);
+				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
+				line.setStrokeWidth(0.25);
+				line.setStroke(Color.GRAY);
+				group.getChildren().add(line);
+			}
+		return group;
 	}
 
 	private static void growRect(Rectangle rect, Point2D point) {
@@ -394,6 +337,34 @@ public class WorldMap extends Pane {
 		}
 	}
 
+	private Group createGroup(String resource) {
+		var group = new Group();
+		try (var reader = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(resource)))) {
+			while (reader.ready()) {
+				var line = reader.readLine();
+				var tokens = StringUtils.split(line, '\t');
+				if (tokens.length == 3 && NumberUtils.isDouble(tokens[1]) && NumberUtils.isDouble(tokens[2])) {
+					var label = new Text(tokens[0]);
+					label.getStyleClass().add("above-label");
+					var point = millerProjection(NumberUtils.parseDouble(tokens[1]), NumberUtils.parseDouble(tokens[2]));
+					label.setTranslateX(point.getX());
+					label.setTranslateY(point.getY());
+					label.layoutBoundsProperty().addListener((v, o, n) -> {
+						label.setLayoutX(-0.5 * n.getWidth());
+						label.setLayoutY(-0.5 * n.getHeight());
+					});
+					//label.setBackgroundColor(Color.WHITE.deriveColor(1, 1, 1, 0.8));
+					// label.setBackgroundColor(Color.WHITE);
+					DraggableUtils.setupDragMouseTranslate(label);
+					group.getChildren().add(label);
+				}
+			}
+		} catch (IOException ex) {
+			throw new RuntimeException(ex);
+		}
+		return group;
+	}
+
 	public Rectangle getDataRectangle() {
 		return dataRectangle;
 	}
@@ -406,8 +377,8 @@ public class WorldMap extends Pane {
 		var topLeft = new Point2D(rect.getX(), rect.getY());
 		var bottomRight = new Point2D(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
 
-		topLeft = new Point2D(Math.max(X0, (1 - marginProportion) * topLeft.getX()), Math.max(Y0, (1 - marginProportion) * topLeft.getY()));
-		bottomRight = new Point2D(Math.min(X0 + DX, (1 + marginProportion) * bottomRight.getX()), Math.min(Y0 + DY, (1 + marginProportion) * bottomRight.getY()));
+		topLeft = new Point2D((1 - marginProportion) * topLeft.getX(), (1 - marginProportion) * topLeft.getY());
+		bottomRight = new Point2D((1 + marginProportion) * bottomRight.getX(), (1 + marginProportion) * bottomRight.getY());
 		rect.setX(topLeft.getX());
 		rect.setY(topLeft.getY());
 		rect.setWidth(Math.abs(bottomRight.getX() - topLeft.getX()));

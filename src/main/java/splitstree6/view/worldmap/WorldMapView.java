@@ -34,6 +34,7 @@ import jloda.fx.undo.UndoManager;
 import jloda.fx.util.*;
 import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
+import splitstree6.main.SplitsTree6;
 import splitstree6.tabs.viewtab.ViewTab;
 import splitstree6.view.format.locations.LocationsFormat;
 import splitstree6.view.utils.IView;
@@ -95,7 +96,6 @@ public class WorldMapView implements IView {
 		var loader = new ExtendedFXMLLoader<WorldMapController>(WorldMapController.class);
 		controller = loader.getController();
 
-		// this is the target area for the tree page:
 		presenter = new WorldMapPresenter(mainWindow, this);
 		empty.bind(Bindings.isEmpty(presenter.getWorldMap1().getUserItems().getChildren()));
 
@@ -104,6 +104,14 @@ public class WorldMapView implements IView {
 		controller.getFormatVBox().setDisable(false);
 		formatter.optionLocationSizeProperty().addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
 		colorSchemeName.bindBidirectional(formatter.getLegend().colorSchemeNameProperty());
+
+		formatter.getLegend().setClickOnLabel((e, label) -> {
+			if (label == null || !e.isShiftDown() || !SplitsTree6.isDesktop())
+				mainWindow.getTaxonSelectionModel().clearSelection();
+			var taxon = mainWindow.getWorkingTaxa().get(label);
+			if (taxon != null)
+				Platform.runLater(() -> mainWindow.getTaxonSelectionModel().toggleSelection(taxon));
+		});
 
 		traitsBlock.addListener(e -> {
 			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, controller, colorSchemeName.get(), formatter.getOptionLocationSize());
@@ -266,11 +274,11 @@ public class WorldMapView implements IView {
 			presenter.getWorldMap2().clear();
 
 			for (var traitId = 1; traitId < traitsBlock.getNTraits(); traitId++) {
-				var lat = traitsBlock.getTraitLatitude(traitId);
 				var lon = traitsBlock.getTraitLongitude(traitId);
+				var lat = traitsBlock.getTraitLatitude(traitId);
 				if (lat != 0 || lon != 0) {
-					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lat, lon);
-					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lat, lon);
+					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lon, lat);
+					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lon, lat);
 				}
 			}
 

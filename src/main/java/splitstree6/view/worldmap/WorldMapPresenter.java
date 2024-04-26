@@ -21,6 +21,7 @@ package splitstree6.view.worldmap;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
@@ -54,46 +55,47 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 
 		var hbox = new HBox();
 		hbox.getStyleClass().add("viewer-background");
-		hbox.setSpacing(-40);
+		hbox.setSpacing(-5);
 
 		var scrollPane = controller.getZoomableScrollPane();
 		scrollPane.setContent(hbox);
 
-		var update1 = worldMap1.createUpdateScaleMethod(scrollPane);
-		var update2 = worldMap2.createUpdateScaleMethod(scrollPane);
+		var zoom = new SimpleDoubleProperty(1.0);
+		zoom.addListener((v, o, n) -> {
+			worldMap1.changeScale(o.doubleValue(), n.doubleValue());
+			worldMap2.changeScale(o.doubleValue(), n.doubleValue());
+		});
+
+		scrollPane.setAllowZoom(false);
+
 		scrollPane.setUpdateScaleMethod(() -> {
-			update1.run();
-			update2.run();
+			zoom.set(zoom.get() * scrollPane.getZoomX());
 		});
 
 		controller.getZoomInButton().setOnAction(e -> {
-			scrollPane.zoomBy(1.1, 1.1);
-			if (hbox.getSpacing() != 0)
-				hbox.setSpacing(1.1 * hbox.getSpacing());
+			zoom.set(zoom.get() * 1.1);
 			Platform.runLater(this::centerOnData);
 		});
 		// todo: add disable binding
 		controller.getZoomOutButton().setOnAction(e ->
 		{
-			scrollPane.zoomBy(1.0 / 1.1, 1.0 / 1.1);
-			if (hbox.getSpacing() != 0)
-				hbox.setSpacing(1.0 / 1.1 * hbox.getSpacing());
+			zoom.set(zoom.get() / 1.1);
 			Platform.runLater(this::centerOnData);
 		});
 
 		controller.getZoomToFitButton().setOnAction(e -> {
-
 			var paneRect = worldMap1.localToScreen(worldMap1.getBoundsInLocal());
 			var dataRect = worldMap1.getDataRectangle().localToScreen(worldMap1.getDataRectangle().getBoundsInLocal());
 
-			var scale = Math.min(paneRect.getWidth() / dataRect.getWidth(), paneRect.getHeight() / dataRect.getHeight());
+			if (!worldMap1.getUserItems().getChildren().isEmpty() && dataRect.getHeight() > 0 && dataRect.getWidth() > 0) {
+				var scale = Math.min(paneRect.getWidth() / dataRect.getWidth(), paneRect.getHeight() / dataRect.getHeight());
 
-			// todo: not sure why the scale is not correct, needs fixing
-			if (scale > 0) {
-				scale *= 0.7;
-				scrollPane.zoomBy(scale / scrollPane.getZoomX(), scale / scrollPane.getZoomY());
-				scrollPane.applyCss();
-				Platform.runLater(this::centerOnData);
+				// todo: not sure why the scale is not correct, needs fixing
+				if (scale > 0) {
+					zoom.set(scale);
+					scrollPane.applyCss();
+					Platform.runLater(this::centerOnData);
+				}
 			}
 		});
 
@@ -186,9 +188,9 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		return false;
 	}
 
-	public void addNode(Supplier<Node> supplier, double latitude, double longitude) {
-		worldMap1.addUserItem(supplier.get(), latitude, longitude);
-		worldMap2.addUserItem(supplier.get(), latitude, longitude);
+	public void addNode(Supplier<Node> supplier, double longitude, double latitude) {
+		worldMap1.addUserItem(supplier.get(), longitude, latitude);
+		worldMap2.addUserItem(supplier.get(), longitude, latitude);
 	}
 
 	public WorldMap getWorldMap1() {

@@ -20,6 +20,7 @@ module splitstreesix {
 	requires org.fxmisc.undo;
 	requires com.google.zxing;
 	requires org.xerial.sqlitejdbc;
+	requires com.fasterxml.jackson.databind;
 
 	opens splitstree6.resources.icons;
 	opens splitstree6.resources.images;

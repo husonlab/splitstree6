@@ -59,6 +59,7 @@ public class BasicPieChart extends Pane {
 		colorScheme.addListener(invalidationListener);
 		radius.addListener(invalidationListener);
 		setName(name);
+		setId("basic-pie-chart");
 
 		layoutXProperty().bind(radius.multiply(-1));
 		layoutYProperty().bind(radius.multiply(-1));
