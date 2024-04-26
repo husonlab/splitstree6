@@ -158,17 +158,17 @@ public class WorldMap extends Pane {
 					line.setEndX(factorX * line.getEndX());
 					line.setStartY(factorY * line.getStartY());
 					line.setEndY(factorY * line.getEndY());
+				} else if (node instanceof Arc arc) {
+					arc.setCenterX(factorX * arc.getCenterX());
+					arc.setCenterY(factorY * arc.getCenterY());
 				} else if (node instanceof Shape) {
 					node.setScaleX(factorX * node.getScaleX());
 					node.setScaleY(factorY * node.getScaleY());
 				}
-				countries.setVisible(scrollPane.getZoomX() > 1.8);
-				continents.setVisible(scrollPane.getZoomX() <= 1.8);
 			}
 			for (var node : userItems.getChildren()) {
 				node.setTranslateX(factorX * node.getTranslateX());
 				node.setTranslateY(factorY * node.getTranslateY());
-
 			}
 		};
 	}

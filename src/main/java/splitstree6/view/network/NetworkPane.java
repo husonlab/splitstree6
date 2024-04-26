@@ -30,8 +30,11 @@ import javafx.beans.value.WeakChangeListener;
 import javafx.collections.ObservableMap;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.*;
+import javafx.scene.text.Text;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.AService;
 import jloda.fx.util.BasicFX;
@@ -88,8 +91,8 @@ public class NetworkPane extends StackPane {
 		labelScaleFactor.addListener(new WeakChangeListener<>(fontScaleChangeListener));
 
 		zoomChangedListener = (v, o, n) -> {
-			setScaleX(getScaleX() / o.doubleValue() * n.doubleValue());
-			setScaleY(getScaleY() / o.doubleValue() * n.doubleValue());
+			updateScale(n.doubleValue() / o.doubleValue(), this);
+
 		};
 		zoomFactor.addListener(new WeakChangeListener<>(zoomChangedListener));
 
@@ -134,6 +137,69 @@ public class NetworkPane extends StackPane {
 		});
 
 		service.setOnFailed(a -> System.err.println("Draw network failed: " + service.getException()));
+	}
+
+
+	public void updateScale(double factor, Pane pane) {
+		for (var node : BasicFX.getAllChildrenRecursively(pane.getChildren())) {
+			if (node instanceof Path path) {
+				for (var element : path.getElements()) {
+					if (element instanceof MoveTo moveTo) {
+						moveTo.setX(factor * moveTo.getX());
+						moveTo.setY(factor * moveTo.getY());
+					} else if (element instanceof LineTo lineTo) {
+						lineTo.setX(factor * lineTo.getX());
+						lineTo.setY(factor * lineTo.getY());
+					}
+				}
+			} else if (node instanceof RichTextLabel label) {
+				if (!label.translateXProperty().isBound())
+					label.setTranslateX(factor * label.getTranslateX());
+				if (!label.translateYProperty().isBound())
+					label.setTranslateY(factor * label.getTranslateY());
+			} else if (node instanceof Label label) {
+				if (!label.translateXProperty().isBound())
+					label.setTranslateX(factor * label.getTranslateX());
+				if (!label.translateYProperty().isBound())
+					label.setTranslateY(factor * label.getTranslateY());
+			} else if (node instanceof Text label) {
+				label.setTranslateX(factor * label.getTranslateX());
+				label.setTranslateY(factor * label.getTranslateY());
+			} else if (node instanceof Rectangle rectangle) {
+				rectangle.setX(factor * rectangle.getX());
+				rectangle.setY(factor * rectangle.getY());
+				rectangle.setWidth(factor * rectangle.getWidth());
+				rectangle.setHeight(factor * rectangle.getHeight());
+			} else if (node instanceof Line line) {
+				if (!line.startXProperty().isBound())
+					line.setStartX(factor * line.getStartX());
+				if (!line.endXProperty().isBound())
+					line.setEndX(factor * line.getEndX());
+				if (!line.startYProperty().isBound())
+					line.setStartY(factor * line.getStartY());
+				if (!line.endYProperty().isBound())
+					line.setEndY(factor * line.getEndY());
+			} else if (node instanceof Circle circle) {
+				if (!circle.centerXProperty().isBound())
+					circle.setCenterX(factor * circle.getCenterX());
+				if (!circle.centerYProperty().isBound())
+					circle.setCenterY(factor * circle.getCenterY());
+			} else if (node instanceof Arc arc) {
+				if (!arc.centerXProperty().isBound())
+					arc.setCenterX(factor * arc.getCenterX());
+				if (!arc.centerYProperty().isBound())
+					arc.setCenterY(factor * arc.getCenterY());
+			} else if (node instanceof Shape) {
+				if (!node.scaleXProperty().isBound())
+					node.setScaleX(factor * node.getScaleX());
+				if (!node.scaleYProperty().isBound())
+					node.setScaleY(factor * node.getScaleY());
+			}
+			if (!node.translateXProperty().isBound())
+				node.setTranslateX(factor * node.getTranslateX());
+			if (!node.translateYProperty().isBound())
+				node.setTranslateY(factor * node.getTranslateY());
+		}
 	}
 
 	public void drawNetwork() {

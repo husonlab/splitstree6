@@ -121,7 +121,6 @@ public class NetworkView implements IView {
 		traitsFormat.optionActiveTraitsProperty().bindBidirectional(optionActiveTraits);
 		traitsFormat.optionTraitLegendProperty().bindBidirectional(optionTraitLegend);
 		traitsFormat.optionTraitSizeProperty().bindBidirectional(optionTraitSize);
-		traitsFormat.getLegend().scaleProperty().bind(optionZoomFactorProperty());
 		traitsFormat.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormat.updateNodes());
 
