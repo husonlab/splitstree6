@@ -880,10 +880,11 @@ public class MainWindowPresenter {
 				}
 			}
 		});
-		if (selectedDisplayTab.get() != null)
+		if (selectedDisplayTab.get() != null) {
 			controller.getSelectButton().disableProperty().bind(selectedDisplayTab.get().emptyProperty());
-		else
+		} else {
 			controller.getSelectButton().disableProperty().bind(new SimpleBooleanProperty(true));
+		}
 	}
 
 	public IDisplayTab getSelectedDisplayTab() {

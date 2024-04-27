@@ -27,6 +27,7 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.control.Tooltip;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
@@ -35,6 +36,8 @@ import javafx.util.Pair;
 import jloda.fx.util.ColorSchemeManager;
 import jloda.fx.util.RunAfterAWhile;
 import jloda.util.StringUtils;
+
+import java.util.function.BiConsumer;
 
 /**
  * this is a very basic pie chart
@@ -48,6 +51,8 @@ public class BasicPieChart extends Pane {
 	private final DoubleProperty radius = new SimpleDoubleProperty(this, "radius", 32);
 
 	private final StringProperty name = new SimpleStringProperty(this, "name", null);
+
+	private BiConsumer<MouseEvent, String> clickOnLabel;
 
 	public BasicPieChart() {
 		this(null);
@@ -115,6 +120,12 @@ public class BasicPieChart extends Pane {
 				angle += delta;
 				getChildren().add(arc);
 				buf.append("%s: %s%n".formatted(name, StringUtils.removeTrailingZerosAfterDot("%.1f", value)));
+				arc.setOnMouseClicked(e -> {
+					if (getClickOnLabel() != null) {
+						getClickOnLabel().accept(e, name);
+						e.consume();
+					}
+				});
 			}
 		}
 		}
@@ -159,5 +170,13 @@ public class BasicPieChart extends Pane {
 
 	public void setName(String name) {
 		this.name.set(name);
+	}
+
+	public BiConsumer<MouseEvent, String> getClickOnLabel() {
+		return clickOnLabel;
+	}
+
+	public void setClickOnLabel(BiConsumer<MouseEvent, String> clickOnLabel) {
+		this.clickOnLabel = clickOnLabel;
 	}
 }

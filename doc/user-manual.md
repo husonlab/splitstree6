@@ -2757,7 +2757,7 @@ Here is a summary of the most important options:
 
 - Use the `-w` option to specify the workflow file.
 
-- Use the `-i` to list the input files or a directory that that
+- Use the `-i` option to list the input files or a directory that that
   contains the input files.
 
 - Use the `-f` option to specify the file format of the input files.
@@ -2766,7 +2766,7 @@ Here is a summary of the most important options:
   input files, if a specified directories contains some files that
   should not be used.
 
-- Optionally, use the `-r` to recursively visit all directories
+- Optionally, use the `-r` option to recursively visit all directories
   contained in the specified input directory.
 
 - Use the `-o` option to specify the output file or files. If you
@@ -2777,7 +2777,7 @@ Here is a summary of the most important options:
   written to the console. If output files end on `.gz` then the will
   be written in gzip format.
 
-- Use the `-n` to specify a specific data node to be saved to output.
+- Use the `-n` option to specify a specific data node to be saved to output.
   For example, if your analysis generates a trees block called
   `Trees`, then you can specify `-n Trees` to output the trees. If
   this option is not specified, then the whole workflow is output

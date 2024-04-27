@@ -25,6 +25,7 @@ import javafx.beans.WeakInvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.*;
 import javafx.scene.Node;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Shape;
@@ -41,6 +42,7 @@ import splitstree6.view.utils.IView;
 import splitstree6.window.MainWindow;
 
 import java.util.List;
+import java.util.function.BiConsumer;
 
 public class WorldMapView implements IView {
 	private final MainWindow mainWindow;
@@ -53,7 +55,7 @@ public class WorldMapView implements IView {
 
 	private final StringProperty name = new SimpleStringProperty(this, "name");
 
-	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", true);
+	private final BooleanProperty empty = new SimpleBooleanProperty(this, "empty", false);
 
 	private final BooleanProperty optionShowContinentNames = new SimpleBooleanProperty(this, "optionShowContinentNames");
 	private final BooleanProperty optionShowCountryNames = new SimpleBooleanProperty(this, "optionShowContinentNames");
@@ -73,6 +75,8 @@ public class WorldMapView implements IView {
 	private final InvalidationListener validListener;
 
 	private final InvalidationListener selectionListener;
+
+	private final BiConsumer<MouseEvent, String> clickOnLabel;
 
 	{
 		ProgramProperties.track(optionShowContinentNames, true);
@@ -98,6 +102,7 @@ public class WorldMapView implements IView {
 
 		presenter = new WorldMapPresenter(mainWindow, this);
 		empty.bind(Bindings.isEmpty(presenter.getWorldMap1().getUserItems().getChildren()));
+		viewTab.emptyProperty().bind(empty);
 
 		var formatter = new LocationsFormat(mainWindow, undoManager);
 		controller.getFormatVBox().getChildren().addAll(formatter);
@@ -165,6 +170,16 @@ public class WorldMapView implements IView {
 		};
 		mainWindow.getTaxonSelectionModel().getSelectedItems().addListener(selectionListener);
 		selectionListener.invalidated(null);
+
+		clickOnLabel = (e, label) -> {
+			if (label == null || !e.isShiftDown() || !SplitsTree6.isDesktop())
+				mainWindow.getTaxonSelectionModel().clearSelection();
+			if (label != null) {
+				var taxon = mainWindow.getWorkingTaxa().get(label);
+				if (taxon != null)
+					mainWindow.getTaxonSelectionModel().select(taxon);
+			}
+		};
 	}
 
 	@Override
@@ -267,18 +282,18 @@ public class WorldMapView implements IView {
 		}
 	}
 
-	private static double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, WorldMapController controller, String colorSchemeName, double maxSize) {
+	private double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, WorldMapController controller, String colorSchemeName, double maxSize) {
 		if (taxaBlock != null && traitsBlock != null) {
 			var maxCount = computeMaxCount(taxaBlock, traitsBlock);
 			presenter.getWorldMap1().clear();
 			presenter.getWorldMap2().clear();
 
 			for (var traitId = 1; traitId < traitsBlock.getNTraits(); traitId++) {
-				var lon = traitsBlock.getTraitLongitude(traitId);
 				var lat = traitsBlock.getTraitLatitude(traitId);
+				var lon = traitsBlock.getTraitLongitude(traitId);
 				if (lat != 0 || lon != 0) {
-					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lon, lat);
-					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize), lon, lat);
+					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize, clickOnLabel), lat, lon);
+					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize, clickOnLabel), lat, lon);
 				}
 			}
 
@@ -290,8 +305,9 @@ public class WorldMapView implements IView {
 		} else return 0;
 	}
 
-	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, String colorSchemeName, int traitId, double maxCount, double maxSize) {
+	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, String colorSchemeName, int traitId, double maxCount, double maxSize, BiConsumer<MouseEvent, String> clickOnLabel) {
 		var chart = new BasicPieChart(traitsBlock.getTraitLabel(traitId));
+		chart.setClickOnLabel(clickOnLabel);
 		chart.setColorScheme(colorSchemeName);
 		var total = 0.0;
 		for (var t = 1; t <= taxaBlock.getNtax(); t++) {

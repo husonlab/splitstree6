@@ -21,12 +21,15 @@ package splitstree6.view.worldmap;
 
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import jloda.fx.find.FindToolBar;
 import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.utils.worldmap.WorldMap;
@@ -55,10 +58,13 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 
 		var hbox = new HBox();
 		hbox.getStyleClass().add("viewer-background");
-		hbox.setSpacing(-5);
+		hbox.setSpacing(0);
+		HBox.setHgrow(worldMap1, Priority.NEVER);
+		HBox.setHgrow(worldMap2, Priority.NEVER);
 
 		var scrollPane = controller.getZoomableScrollPane();
 		scrollPane.setContent(hbox);
+		scrollPane.setFitToWidth(false);
 
 		var zoom = new SimpleDoubleProperty(1.0);
 		zoom.addListener((v, o, n) -> {
@@ -66,11 +72,7 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 			worldMap2.changeScale(o.doubleValue(), n.doubleValue());
 		});
 
-		scrollPane.setAllowZoom(false);
-
-		scrollPane.setUpdateScaleMethod(() -> {
-			zoom.set(zoom.get() * scrollPane.getZoomX());
-		});
+		scrollPane.setUpdateScaleMethod(() -> zoom.set(zoom.get() * scrollPane.getZoomFactorY()));
 
 		controller.getZoomInButton().setOnAction(e -> {
 			zoom.set(zoom.get() * 1.1);
@@ -89,8 +91,6 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 
 			if (!worldMap1.getUserItems().getChildren().isEmpty() && dataRect.getHeight() > 0 && dataRect.getWidth() > 0) {
 				var scale = Math.min(paneRect.getWidth() / dataRect.getWidth(), paneRect.getHeight() / dataRect.getHeight());
-
-				// todo: not sure why the scale is not correct, needs fixing
 				if (scale > 0) {
 					zoom.set(scale);
 					scrollPane.applyCss();
@@ -111,14 +111,19 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		}
 
 		hbox.getChildren().add(worldMap1);
+		var pane = new Pane();
+		HBox.setHgrow(pane, Priority.ALWAYS);
+		hbox.getChildren().add(pane);
+
 		if (view.optionTwoCopiesProperty().get() && !hbox.getChildren().contains(worldMap2)) {
 			hbox.getChildren().add(worldMap2);
 		}
 
 		controller.getTwoCopiesToggleButton().selectedProperty().addListener((v, o, n) -> {
 			if (n) {
-				if (!hbox.getChildren().contains(worldMap2))
-					hbox.getChildren().add(worldMap2);
+				if (!hbox.getChildren().contains(worldMap2)) {
+					hbox.getChildren().add(1, worldMap2);
+				}
 			} else {
 				hbox.getChildren().remove(worldMap2);
 			}
@@ -173,6 +178,17 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		mainController.getZoomInMenuItem().setOnAction(controller.getZoomInButton().getOnAction());
 		mainController.getZoomInMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 
+		var labelsVisible = new SimpleBooleanProperty(false);
+		labelsVisible.bind(worldMap1.getContinents().visibleProperty().or(worldMap1.getCountries().visibleProperty()).or(worldMap1.getOceans().visibleProperty()));
+		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> {
+			worldMap1.setFont(Font.font(worldMap1.getFont().getName(), worldMap1.getFont().getSize() * 1.1));
+		});
+		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(labelsVisible.not().and(Bindings.createBooleanBinding(() -> worldMap1.getFont().getSize() < 128, worldMap1.fontProperty())));
+		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> {
+			worldMap1.setFont(Font.font(worldMap1.getFont().getName(), worldMap1.getFont().getSize() / 1.1));
+		});
+		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(labelsVisible.not().and(Bindings.createBooleanBinding(() -> worldMap1.getFont().getSize() > 6, worldMap1.fontProperty())));
+
 		mainController.getZoomOutMenuItem().setOnAction(controller.getZoomOutButton().getOnAction());
 		mainController.getZoomOutMenuItem().disableProperty().bind(controller.getZoomOutButton().disableProperty());
 		ExportUtils.setup(mainWindow, null, view.emptyProperty());
@@ -189,8 +205,8 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 	}
 
 	public void addNode(Supplier<Node> supplier, double longitude, double latitude) {
-		worldMap1.addUserItem(supplier.get(), longitude, latitude);
-		worldMap2.addUserItem(supplier.get(), longitude, latitude);
+		worldMap1.addUserItem(supplier.get(), latitude, longitude);
+		worldMap2.addUserItem(supplier.get(), latitude, longitude);
 	}
 
 	public WorldMap getWorldMap1() {

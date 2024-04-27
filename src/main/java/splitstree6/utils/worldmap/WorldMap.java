@@ -21,6 +21,9 @@ package splitstree6.utils.worldmap;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import javafx.application.Platform;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -30,6 +33,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import jloda.fx.util.BasicFX;
 import jloda.fx.util.DraggableUtils;
@@ -57,18 +61,24 @@ public class WorldMap extends Pane {
 
 	private double scale = 1.0;
 
+	private final ObjectProperty<Font> font = new SimpleObjectProperty(Font.getDefault());
+
+
 	public WorldMap() {
 		dataRectangle = new Rectangle(0, 0, 0, 0);
 		dataRectangle.setFill(Color.TRANSPARENT);
 		dataRectangle.setStroke(Color.TRANSPARENT);
 		dataRectangle.setStrokeWidth(1);
 
-		var bottomLeft = millerProjection(-180, 90);
-		var topRight = millerProjection(180, -90);
+		var bottomLeft = millerProjection(90, -180);
+		var topRight = millerProjection(-90, 180);
 		var worldRectangle = new Rectangle(bottomLeft.getX(), bottomLeft.getY(), topRight.getX() - bottomLeft.getX(), topRight.getY() - bottomLeft.getY());
-		worldRectangle.setStroke(Color.TRANSPARENT);
 		worldRectangle.setFill(Color.TRANSPARENT);
+		worldRectangle.setStroke(Color.TRANSPARENT);
 		worldRectangle.setStrokeWidth(0.25);
+
+		prefWidthProperty().bind(worldRectangle.widthProperty());
+		prefHeightProperty().bind(worldRectangle.heightProperty());
 
 		landMasses = createLandMasses();
 		grid = createGrid();
@@ -176,7 +186,7 @@ public class WorldMap extends Pane {
 		return maxDepth + 1;
 	}
 
-	private static Point2D millerProjection(double longitude, double latitude) {
+	private static Point2D millerProjection(double latitude, double longitude) {
 		var dx = 180;
 		var fx = 800 / 360;
 		var dy = 2.3034125433763912;
@@ -235,9 +245,10 @@ public class WorldMap extends Pane {
 							if (level2.isArray()) {
 								var polygon = new Polygon();
 								for (JsonNode level3 : level2) {
-									var longitude = level3.get(0).asDouble();
+									// Note: the file provides the coordinates as longitude latitude
 									var latitude = level3.get(1).asDouble();
-									var projection = millerProjection(longitude, latitude);
+									var longitude = level3.get(0).asDouble();
+									var projection = millerProjection(latitude, longitude);
 									polygon.getPoints().addAll(projection.getX(), projection.getY());
 									if (verbose) {
 										System.err.printf("Long/lat: %.2f %.2f proj: %.2f %.2f%n", longitude, latitude, projection.getX(), projection.getY());
@@ -261,7 +272,7 @@ public class WorldMap extends Pane {
 										for (JsonNode level4 : level3) {
 											var longitude = level4.get(0).asDouble();
 											var latitude = level4.get(1).asDouble();
-											var projection = millerProjection(longitude, latitude);
+											var projection = millerProjection(latitude, longitude);
 											polygon.getPoints().addAll(projection.getX(), projection.getY());
 											if (verbose) {
 												System.err.printf("Long/lat: %.2f %.2f proj: %.2f %.2f%n", longitude, latitude, projection.getX(), projection.getY());
@@ -292,16 +303,16 @@ public class WorldMap extends Pane {
 		var group = new Group();
 
 			for (var lon = -180; lon <= 180; lon += 30) {
-				var start = millerProjection(lon, -90);
-				var end = millerProjection(lon, 90);
+				var start = millerProjection(-90, lon);
+				var end = millerProjection(90, lon);
 				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
 				line.setStrokeWidth(0.25);
 				line.setStroke(Color.GRAY);
 				group.getChildren().add(line);
 			}
 			for (var lat = -90; lat <= 90; lat += 30) {
-				var start = millerProjection(-180, lat);
-				var end = millerProjection(180, lat);
+				var start = millerProjection(lat, -180);
+				var end = millerProjection(lat, 180);
 				var line = new Line(start.getX(), start.getY(), end.getX(), end.getY());
 				line.setStrokeWidth(0.25);
 				line.setStroke(Color.GRAY);
@@ -345,6 +356,7 @@ public class WorldMap extends Pane {
 				var tokens = StringUtils.split(line, '\t');
 				if (tokens.length == 3 && NumberUtils.isDouble(tokens[1]) && NumberUtils.isDouble(tokens[2])) {
 					var label = new Text(tokens[0]);
+					label.fontProperty().bind(font);
 					label.getStyleClass().add("above-label");
 					var point = millerProjection(NumberUtils.parseDouble(tokens[1]), NumberUtils.parseDouble(tokens[2]));
 					label.setTranslateX(point.getX());
@@ -353,10 +365,15 @@ public class WorldMap extends Pane {
 						label.setLayoutX(-0.5 * n.getWidth());
 						label.setLayoutY(-0.5 * n.getHeight());
 					});
+					label.applyCss();
 					//label.setBackgroundColor(Color.WHITE.deriveColor(1, 1, 1, 0.8));
 					// label.setBackgroundColor(Color.WHITE);
 					DraggableUtils.setupDragMouseTranslate(label);
 					group.getChildren().add(label);
+					Platform.runLater(() -> {
+						label.setLayoutX(-0.5 * label.getLayoutBounds().getWidth());
+						label.setLayoutY(-0.5 * label.getLayoutBounds().getHeight());
+					});
 				}
 			}
 		} catch (IOException ex) {
@@ -383,5 +400,17 @@ public class WorldMap extends Pane {
 		rect.setY(topLeft.getY());
 		rect.setWidth(Math.abs(bottomRight.getX() - topLeft.getX()));
 		rect.setHeight(Math.abs(bottomRight.getY() - topLeft.getY()));
+	}
+
+	public Font getFont() {
+		return font.get();
+	}
+
+	public ObjectProperty<Font> fontProperty() {
+		return font;
+	}
+
+	public void setFont(Font font) {
+		this.font.set(font);
 	}
 }
