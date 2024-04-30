@@ -162,8 +162,8 @@ public class ShortestCommonMultiHyperSequence {
 	 * @param args ignored
 	 */
 	public static void main(String[] args) {
-		var a = MultiHyperSequence.parse("1; 2; 3 4 5; 6; 7 8; 9;");
-		var b = MultiHyperSequence.parse("1 2; 3; 4 5;  7 | 8; 9;");
+		var a = MultiHyperSequence.parse("1 : 2 : 3 4 5 : 6 : 7 8: 9");
+		var b = MultiHyperSequence.parse("1 2 : 3 : 4 5 :  7 : 8: 9");
 
 		System.err.println("Input:");
 		System.err.println("a= " + a);

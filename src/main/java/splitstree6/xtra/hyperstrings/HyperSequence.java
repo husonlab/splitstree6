@@ -40,7 +40,7 @@ public record HyperSequence(ArrayList<BitSet> array) {
 	 */
 	public static HyperSequence parse(String values) {
 		var sequence = new HyperSequence();
-		for (var word : StringUtils.split(values, ';')) {
+		for (var word : StringUtils.split(values, ':')) {
 			sequence.add(BitSetUtils.asBitSet(StringUtils.parseArrayOfIntegers(word)));
 		}
 		return sequence;

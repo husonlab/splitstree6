@@ -27,8 +27,6 @@ import java.util.ArrayList;
 import java.util.BitSet;
 
 public class ShortestCommonHyperSequence {
-
-
 	public static HyperSequence align(HyperSequence a, HyperSequence b) {
 		var m = a.size();
 		var n = b.size();
@@ -130,8 +128,8 @@ public class ShortestCommonHyperSequence {
 
 
 	public static void main(String[] args) {
-		var a = HyperSequence.parse("1; 2; 3 4 5; 6; 7;");
-		var b = HyperSequence.parse("1 2; 3; 4 5;  7;");
+		var a = HyperSequence.parse("1 : 2 : 3 4 5 : 6 : 7");
+		var b = HyperSequence.parse("1 2 : 3 : 4 5 :  7");
 
 		System.err.println("Input:");
 		System.err.println("a= " + a);

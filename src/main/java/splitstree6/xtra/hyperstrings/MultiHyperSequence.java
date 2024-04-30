@@ -41,7 +41,7 @@ public record MultiHyperSequence(ArrayList<Set<BitSet>> array) {
 	 */
 	public static MultiHyperSequence parse(String values) {
 		var sequence = new MultiHyperSequence();
-		for (var word : StringUtils.split(values, ';')) {
+		for (var word : StringUtils.split(values, ':')) {
 			var tokens = StringUtils.split(word, '|');
 			var set = new TreeSet<BitSet>(Comparator.comparing(StringUtils::toString));
 			for (var part : tokens) {
@@ -56,13 +56,13 @@ public record MultiHyperSequence(ArrayList<Set<BitSet>> array) {
 	/**
 	 * to string method in a format that can be parsed
 	 *
-	 * @return string, e.g. "1 2; 3; 4 5;  7 | 8; 9;"
+	 * @return string, e.g. "1 2: 3: 4 5 :  7 | 8 : 9"
 	 */
 	public String toString() {
 		var buf = new StringBuilder();
 		for (var sets : array) {
 			if (!buf.isEmpty())
-				buf.append(" : ");
+				buf.append(" ; ");
 			buf.append(toString(sets));
 		}
 		return buf.toString();
