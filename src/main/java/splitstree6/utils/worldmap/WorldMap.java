@@ -68,7 +68,7 @@ public class WorldMap extends Pane {
 		dataRectangle = new Rectangle(0, 0, 0, 0);
 		dataRectangle.setFill(Color.TRANSPARENT);
 		dataRectangle.setStroke(Color.TRANSPARENT);
-		dataRectangle.setStrokeWidth(1);
+		dataRectangle.setStrokeWidth(2);
 
 		var bottomLeft = millerProjection(90, -180);
 		var topRight = millerProjection(-90, 180);
@@ -87,7 +87,7 @@ public class WorldMap extends Pane {
 		countries = createGroup("countries.dat");
 		countries.setVisible(false);
 		oceans = createGroup("oceans.dat");
-		getChildren().addAll(worldRectangle, grid, dataRectangle, landMasses, countries, continents, oceans, userItems);
+		getChildren().addAll(worldRectangle, grid, landMasses, countries, continents, oceans, dataRectangle, userItems);
 	}
 
 	public void clear() {
@@ -118,10 +118,10 @@ public class WorldMap extends Pane {
 				}
 				polygon.getPoints().setAll(points);
 			} else if (node instanceof Rectangle rectangle) {
-				if (!rectangle.translateXProperty().isBound())
-					rectangle.setTranslateX(factor * rectangle.getTranslateX());
-				if (!rectangle.translateYProperty().isBound())
-					rectangle.setTranslateY(factor * rectangle.getTranslateY());
+				if (!rectangle.xProperty().isBound())
+					rectangle.setX(factor * rectangle.getX());
+				if (!rectangle.yProperty().isBound())
+					rectangle.setY(factor * rectangle.getY());
 				if (!rectangle.widthProperty().isBound())
 					rectangle.setWidth(rectangle.getWidth() * factor);
 				if (!rectangle.heightProperty().isBound())
@@ -391,15 +391,17 @@ public class WorldMap extends Pane {
 	}
 
 	private static void expandRectangle(Rectangle rect, double marginProportion) {
-		var topLeft = new Point2D(rect.getX(), rect.getY());
-		var bottomRight = new Point2D(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
+		if (false) { // this doesn't seem to work well
+			var topLeft = new Point2D(rect.getX(), rect.getY());
+			var bottomRight = new Point2D(rect.getX() + rect.getWidth(), rect.getY() + rect.getHeight());
 
-		topLeft = new Point2D((1 - marginProportion) * topLeft.getX(), (1 - marginProportion) * topLeft.getY());
-		bottomRight = new Point2D((1 + marginProportion) * bottomRight.getX(), (1 + marginProportion) * bottomRight.getY());
-		rect.setX(topLeft.getX());
-		rect.setY(topLeft.getY());
-		rect.setWidth(Math.abs(bottomRight.getX() - topLeft.getX()));
-		rect.setHeight(Math.abs(bottomRight.getY() - topLeft.getY()));
+			topLeft = new Point2D((1 - marginProportion) * topLeft.getX(), (1 - marginProportion) * topLeft.getY());
+			bottomRight = new Point2D((1 + marginProportion) * bottomRight.getX(), (1 + marginProportion) * bottomRight.getY());
+			rect.setX(topLeft.getX());
+			rect.setY(topLeft.getY());
+			rect.setWidth(Math.abs(bottomRight.getX() - topLeft.getX()));
+			rect.setHeight(Math.abs(bottomRight.getY() - topLeft.getY()));
+		}
 	}
 
 	public Font getFont() {
