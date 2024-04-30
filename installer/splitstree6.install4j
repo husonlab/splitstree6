@@ -13,6 +13,7 @@
         <entry>sqlite-jdbc-*</entry>
         <entry>libi4jinst*</entry>
         <entry>install4j*</entry>
+        <entry>netlib-*</entry>
       </macSearchedJars>
     </codeSigning>
     <jreBundles jdkProviderId="Liberica" release="22/22+37">

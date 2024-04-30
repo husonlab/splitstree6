@@ -61,9 +61,9 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	private double gamma = 0.0;
 
 	/**
-	 * computes the exact distance.
+	 * computes the exact editDistance.
 	 *
-	 * @return exact distance
+	 * @return exact editDistance
 	 */
 	abstract public double exactDistance(double[][] F);
 
@@ -202,7 +202,7 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	}
 
 	/**
-	 * Compute the X_ij value for this distance. This is the probability of observing state i at the beginning
+	 * Compute the X_ij value for this editDistance. This is the probability of observing state i at the beginning
 	 * and state j at the end, or pi_i P_{ij}(t).
 	 *
 	 * @param i first state (0..3)
@@ -218,7 +218,7 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	}
 
 	/**
-	 * Compute the P_ij value for this distance. This is the probability of observing state state j at the end
+	 * Compute the P_ij value for this editDistance. This is the probability of observing state state j at the end
 	 * conditional on state i at the beginning or P_{ij}(t).
 	 *
 	 * @param i first state (0..3)
@@ -410,7 +410,7 @@ public abstract class NucleotideModel implements SubstitutionModel {
 	}
 
 	/**
-	 * computeConsensusAndCycle the model and fill the distance
+	 * computeConsensusAndCycle the model and fill the editDistance
 	 *
 	 * @param progress used to display the progress
 	 */
@@ -425,13 +425,13 @@ public abstract class NucleotideModel implements SubstitutionModel {
 				double dist = -1.0;
 
 				if (useML) {
-					//Maximum likelihood distance
+					//Maximum likelihood editDistance
 					try {
 						dist = seqPair.mlDistance(this);
 					} catch (SaturatedDistancesException e) {
 					}
 				} else {
-					//Exact distance
+					//Exact editDistance
 					final double[][] F = seqPair.getF();
 					if (F != null) {
 						try {

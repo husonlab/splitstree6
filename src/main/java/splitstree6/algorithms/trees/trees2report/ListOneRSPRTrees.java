@@ -79,7 +79,7 @@ public class ListOneRSPRTrees extends Trees2ReportBase {
 		var clusters2 = new HashSet<>(TreesUtils.extractClusters(tree2).values());
 
 		if (allCompatible(clusters1, clusters2))
-			return false; // rSPR distance is 0
+			return false; // rSPR editDistance is 0
 
 		var clusters1sorted = new ArrayList<>(clusters1);
 		clusters1sorted.sort(Comparator.comparingInt(BitSet::cardinality));

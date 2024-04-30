@@ -45,7 +45,7 @@ public abstract class Nucleotides2DistancesBase extends Characters2Distances {
 	protected final static double DEFAULT_GAMMA = -1;        //Negative gamma corresponds to equals rates
 	protected final static double DEFAULT_PROP_INVARIABLE_SITES = 0.0;
 
-	protected final static double[] DEFAULT_BASE_FREQ = {0.25, 0.25, 0.25, 0.25};  //Use the exact distance by default - transforms without exact distances should set useML = false
+	protected final static double[] DEFAULT_BASE_FREQ = {0.25, 0.25, 0.25, 0.25};  //Use the exact editDistance by default - transforms without exact distances should set useML = false
 
 	protected final static double DEFAULT_TSTV_RATIO = 2.0;  //default is no difference between transitions and transversions
 	protected final static double DEFAULT_AC_VS_AT = 2.0;

@@ -70,11 +70,11 @@
                                 <MenuItem fx:id="importDialogMenuItem" mnemonicParsing="false"
                                           text="Data Import Dialog..." userData="Open the data import dialog"/>
                                 <SeparatorMenuItem/>
-                                <MenuItem fx:id="importTaxonTraitsMenuItem" mnemonicParsing="false"
-                                          text="Taxon Traits..." userData="Import taxon traits from a text file"/>
                                 <MenuItem fx:id="importTaxonDisplayMenuItem" mnemonicParsing="false"
                                           text="Taxon Display Labels..."
                                           userData="Import taxon display labels from a text file"/>
+                                <MenuItem fx:id="importTaxonTraitsMenuItem" mnemonicParsing="false"
+                                          text="Taxon Traits..." userData="Import taxon traits from a text file"/>
                                 <SeparatorMenuItem/>
                                 <MenuItem fx:id="importMultipleTreeFilesMenuItem" mnemonicParsing="false"
                                           text="Trees from Multiple Files..."

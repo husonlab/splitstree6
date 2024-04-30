@@ -242,7 +242,7 @@ public class IncrementalFitting {
 	 * taxa. After that, we greedily choose the taxon which hasn't been inserted in the order but which has the
 	 * greatest summed distances to those already placed.
 	 *
-	 * @param d distance matrix. Assumed symmetric and non-negative
+	 * @param d editDistance matrix. Assumed symmetric and non-negative
 	 * @return permutation of 1,...,n, returned in an integer array (indices 1..n)
 	 */
 	static private int[] maxDivergenceOrder(double[][] d) {

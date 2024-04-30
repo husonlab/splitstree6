@@ -136,8 +136,10 @@ public class NetworkLayout {
 					var circle = new Circle(v.getDegree() == 1 ? 3 : 2);
 					circle.setFill(Color.BLACK);
 					circle.setStroke(Color.BLACK);
-					var stroke = 1 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
-					circle.setStyle("-fx-stroke-width: " + stroke + ";");
+					{
+						var stroke = 1 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
+						circle.setStyle("-fx-stroke-width: " + stroke + ";");
+					}
 					nodeShape.setShape(circle, true);
 				}
 

@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Computes the distance matrix from a set of characters using the General Time Revisible model.
+ * Computes the editDistance matrix from a set of characters using the General Time Revisible model.
  *
  * @author Dave Bryant, 2004
  */

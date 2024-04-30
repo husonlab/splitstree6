@@ -30,7 +30,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Calculates distances using the JaccardDistance coefficient distance
+ * Calculates distances using the JaccardDistance coefficient editDistance
  *
  * @author Dave Bryant, 2009
  */
@@ -50,7 +50,7 @@ public class JaccardDistance extends Characters2Distances {
 		final int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);
 
-		progress.setTasks("JaccardDistance distance", "Init.");
+		progress.setTasks("JaccardDistance editDistance", "Init.");
 		progress.setMaximum(ntax);
 
 		for (int s = 1; s <= ntax; s++) {

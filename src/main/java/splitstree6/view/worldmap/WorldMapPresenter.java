@@ -182,10 +182,12 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		labelsVisible.bind(worldMap1.getContinents().visibleProperty().or(worldMap1.getCountries().visibleProperty()).or(worldMap1.getOceans().visibleProperty()));
 		mainController.getIncreaseFontSizeMenuItem().setOnAction(e -> {
 			worldMap1.setFont(Font.font(worldMap1.getFont().getName(), worldMap1.getFont().getSize() * 1.1));
+			worldMap2.setFont(Font.font(worldMap2.getFont().getName(), worldMap2.getFont().getSize() * 1.1));
 		});
 		mainController.getIncreaseFontSizeMenuItem().disableProperty().bind(labelsVisible.not().and(Bindings.createBooleanBinding(() -> worldMap1.getFont().getSize() < 128, worldMap1.fontProperty())));
 		mainController.getDecreaseFontSizeMenuItem().setOnAction(e -> {
 			worldMap1.setFont(Font.font(worldMap1.getFont().getName(), worldMap1.getFont().getSize() / 1.1));
+			worldMap2.setFont(Font.font(worldMap2.getFont().getName(), worldMap2.getFont().getSize() / 1.1));
 		});
 		mainController.getDecreaseFontSizeMenuItem().disableProperty().bind(labelsVisible.not().and(Bindings.createBooleanBinding(() -> worldMap1.getFont().getSize() > 6, worldMap1.fontProperty())));
 

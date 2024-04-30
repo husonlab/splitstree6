@@ -76,8 +76,8 @@ public class GenomeContext {
 
 		options.comment("Filtering");
 		var minSketchIntersection = options.getOption("-ms", "minSketchIntersect", "Minimum sketch intersection size", 1);
-		final var maxDistance = options.getOption("-md", "maxDistance", "Max mash distance (if set, overrides --minSketchIntersect)", 1d);
-		final var best = options.getOption("-ub", "useBest", "Use best distance only", false);
+		final var maxDistance = options.getOption("-md", "maxDistance", "Max mash editDistance (if set, overrides --minSketchIntersect)", 1d);
+		final var best = options.getOption("-ub", "useBest", "Use best editDistance only", false);
 		final var maxCount = options.getOption("-m", "max", "Max number of genomes to return", 25);
 
 		options.comment("Reporting:");

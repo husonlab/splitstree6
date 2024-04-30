@@ -35,7 +35,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * runs tSNE on a distance matrix
+ * runs tSNE on a editDistance matrix
  * Daniel Huson, 5.2021
  */
 public class TSne extends Distances2Network {

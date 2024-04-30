@@ -168,7 +168,7 @@ public class AnalyzeGenomesController {
 
 		mashDistancesChart.setLegendVisible(false);
 		mashDistancesChart.setAnimated(false);
-		mashDistancesXAxis.setLabel("Mash distance");
+		mashDistancesXAxis.setLabel("Mash editDistance");
 		mashDistancesXAxis.setLowerBound(0);
 		mashDistancesXAxis.setUpperBound(0.9);
 		mashDistancesXAxis.setTickUnit(0.1);

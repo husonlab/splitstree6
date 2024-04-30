@@ -55,7 +55,7 @@ public class PCOA extends Distances2Network {
 
 	@Override
 	public String getCitation() {
-		return "Gower 1966; JC Gower,. Some distance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53(3-4):325-338, 1996.";
+		return "Gower 1966; JC Gower,. Some editDistance properties of latent root and vector methods used in multivariate analysis. Biometrika, 53(3-4):325-338, 1996.";
 	}
 
 	@Override

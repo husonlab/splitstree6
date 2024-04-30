@@ -208,17 +208,22 @@ public class TraitsFormat extends Pane {
 							} else {
 									var chart = new BasicPieChart(workingTaxa.get().getLabel(taxonId));
 									chart.setColorScheme(legend.getColorSchemeName());
-									var sum = 0.0;
 									var max = 0.0;
 
-									for (var trait : traitsBlock.getNumericalTraitLabels()) {
-										if (isTraitActive(trait))
-											max = Math.max(max, getTraitsBlock().getMax(trait));
+								for (var t = 1; t <= workingTaxa.get().getNtax(); t++) {
+									var tsum = 0.0;
+									for (var trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
+										if (traitsBlock.isNumerical(trait) && isTraitActive(traitsBlock.getTraitLabel(trait))) {
+											tsum += traitsBlock.getTraitValue(t, trait);
+										}
+									}
+									max = Math.max(max, tsum);
 									}
 
 									var tooltipBuf = new StringBuilder();
 
-									for (var traitId : traitsBlock.numericalTraits()) {
+								var sum = 0.0;
+								for (var traitId : traitsBlock.numericalTraits()) {
 										var label = traitsBlock.getTraitLabel(traitId);
 										if (isTraitActive(label)) {
 											var value = traitsBlock.getTraitValue(taxonId, traitId);
@@ -238,11 +243,8 @@ public class TraitsFormat extends Pane {
 
 										var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
 										for (var shape : shapes) {
-											if (shape instanceof Circle && !"iceberg".equals(shape.getId())) {
-												if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
-													shape.setScaleX(pieSize / shape.prefWidth(0));
-													shape.setScaleY(pieSize / shape.prefHeight(0));
-												}
+											if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
+												circle.setRadius(pieSize / circle.getRadius());
 											}
 										}
 										nodeShape.getChildren().add(chart);

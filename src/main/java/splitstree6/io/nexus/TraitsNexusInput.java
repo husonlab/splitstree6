@@ -129,7 +129,9 @@ public class TraitsNexusInput extends NexusIOBase implements INexusInput<TraitsB
 
 		np.matchIgnoreCase("TRAITLABELS");
 		for (var j = 1; j <= ntraits; j++) {
-			traitsBlock.setTraitLabel(j, np.getWordRespectCase());
+			var word = np.getWordRespectCase();
+			System.err.println(j + " " + word);
+			traitsBlock.setTraitLabel(j, word);
 		}
 		np.matchIgnoreCase(";");
 

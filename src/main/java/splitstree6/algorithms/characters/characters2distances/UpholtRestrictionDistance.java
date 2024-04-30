@@ -33,7 +33,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Implements the UpholtRestrictionDistance (1979) distance for restriction site data.
+ * Implements the UpholtRestrictionDistance (1979) editDistance for restriction site data.
  *
  * @author bryant
  */
@@ -69,7 +69,7 @@ public class UpholtRestrictionDistance extends Characters2Distances {
 		final int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);
 
-		progress.setTasks("UpholtRestrictionDistance distance", "Init.");
+		progress.setTasks("UpholtRestrictionDistance editDistance", "Init.");
 		progress.setMaximum(ntax);
 
 		for (int s = 1; s <= ntax; s++) {

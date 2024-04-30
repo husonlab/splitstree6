@@ -107,11 +107,6 @@
             <artifactId>richtextfx</artifactId>
             <version>0.11.2</version>
         </dependency>
-        <dependency>
-            <groupId>nz.ac.waikato.cms.weka</groupId>
-            <artifactId>weka-stable</artifactId>
-            <version>3.8.4</version>
-        </dependency>
         <!--
         <dependency>
                 <groupId>com.github.lejon</groupId>
@@ -164,6 +159,7 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>license-maven-plugin</artifactId>
@@ -177,6 +173,7 @@
                     </execution>
                 </executions>
             </plugin>
+            </!-->
         </plugins>
     </build>
     <repositories>

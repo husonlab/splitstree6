@@ -46,13 +46,13 @@ public class DistancesNexusInput extends NexusIOBase implements INexusInput<Dist
 							[LABELS={LEFT|NO}]
 						;]
 						MATRIX
-							distance data in specified format
+					editDistance data in specified format
 						;
 					END;
 					""";
 
 	public static final String DESCRIPTION = """
-			This block maintains a distance matrix of size nTax times nTax.
+			This block maintains a editDistance matrix of size nTax times nTax.
 			""";
 
 	@Override

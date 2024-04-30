@@ -49,9 +49,9 @@ public class F81model extends NucleotideModel {
 	}
 
 	/**
-	 * get exact distance
+	 * get exact editDistance
 	 *
-	 * @return exact distance
+	 * @return exact editDistance
 	 */
 	public double exactDistance(double[][] F) {
 		final double[] freq = getNormedBaseFreq();

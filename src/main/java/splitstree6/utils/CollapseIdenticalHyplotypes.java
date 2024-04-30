@@ -27,13 +27,10 @@ import splitstree6.data.TaxaBlock;
 import splitstree6.data.TraitsBlock;
 import splitstree6.data.parts.Taxon;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 public class CollapseIdenticalHyplotypes {
 	public static Triplet<TaxaBlock, TraitsBlock, CharactersBlock> apply(TaxaBlock inputTaxa, CharactersBlock inputCharacters) {
-		var taxCountMapx = new TreeMap<Integer, Integer>();
 		var taxLabelMap = new TreeMap<Integer, List<String>>();
 		for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 			taxLabelMap.computeIfAbsent(t, k -> new ArrayList<>()).add(inputTaxa.getLabel(t));
@@ -52,6 +49,8 @@ public class CollapseIdenticalHyplotypes {
 				}
 			}
 		}
+		var inputTraits = inputTaxa.getTraitsBlock();
+
 		var outputNTax = (int) taxLabelMap.entrySet().stream().filter(e -> !e.getValue().isEmpty()).count();
 		var nchar = inputCharacters.getNchar();
 		var outputTaxa = new TaxaBlock();
@@ -72,31 +71,62 @@ public class CollapseIdenticalHyplotypes {
 		var outputMatrix = outputCharacters.getMatrix();
 
 		var outputTraits = new TraitsBlock();
-		outputTraits.setDimensions(outputNTax, outputNTax);
 
-		var which = 0;
-		var outId = 0;
-		for (var e : taxLabelMap.entrySet().stream().filter(e -> !e.getValue().isEmpty()).toList()) {
-			var inId = e.getKey();
-			var members = e.getValue();
-			outId++;
 
-			var name = (members.size() == 1 ? inputTaxa.getLabel(inId) : "TYPE" + (++which));
+		if (inputTraits == null || inputTraits.getNTraits() == 0)
+			outputTraits.setDimensions(outputNTax, outputNTax);
+		else
+			outputTraits.setDimensions(outputNTax, 0);
 
-			outputTraits.setTraitLabel(outId, name);
-			for (var i = 1; i <= outputNTax; i++) {
-				outputTraits.setTraitValue(outId, i, i == outId ? members.size() : 0);
+
+		var outInMap = new HashMap<Integer, int[]>();
+
+		{
+			var which = 0;
+			var outId = 0;
+			for (var e : taxLabelMap.entrySet().stream().filter(e -> !e.getValue().isEmpty()).toList()) {
+				var inId = e.getKey();
+				var members = e.getValue();
+				outId++;
+
+				var name = (members.size() == 1 ? inputTaxa.getLabel(inId) : "TYPE" + (++which));
+
+				if (inputTraits == null) {
+					outputTraits.setTraitLabel(outId, name);
+					for (var i = 1; i <= outputNTax; i++) {
+						outputTraits.setTraitValue(outId, i, i == outId ? members.size() : 0);
+					}
+				}
+
+				var taxon = new Taxon(name);
+				taxon.setInfo(StringUtils.toString(members, ","));
+				outputTaxa.add(taxon);
+				outInMap.put(outputTaxa.indexOf(taxon), members.stream().mapToInt(inputTaxa::indexOf).toArray());
+				System.arraycopy(inputMatrix[inId - 1], 0, outputMatrix[outId - 1], 0, inputMatrix[inId - 1].length);
 			}
-
-			var taxon = new Taxon(name);
-			taxon.setInfo(StringUtils.toString(members, ","));
-			outputTaxa.add(taxon);
-			System.arraycopy(inputMatrix[inId - 1], 0, outputMatrix[outId - 1], 0, inputMatrix[inId - 1].length);
 		}
 		if (countCollapsed == 0) {
 			NotificationManager.showInformation("All haplotypes unique");
 			return null;
 		} else {
+
+			if (inputTraits != null) {
+				for (var inTraitId = 1; inTraitId <= inputTraits.getNTraits(); inTraitId++) {
+					if (inputTraits.isNumerical(inTraitId)) {
+						var traitLabel = inputTraits.getTraitLabel(inTraitId);
+						var outTraitId = outputTraits.addTrait(traitLabel);
+						if (inputTraits.isSetLatitudeLongitude()) {
+							outputTraits.setTraitLatitude(outTraitId, inputTraits.getTraitLatitude(inTraitId));
+							outputTraits.setTraitLongitude(outTraitId, inputTraits.getTraitLongitude(inTraitId));
+						}
+						var traitId = inTraitId;
+						for (var outTax = 1; outTax <= outputTaxa.getNtax(); outTax++) {
+							var sum = Arrays.stream(outInMap.get(outTax)).mapToDouble(t -> inputTraits.getTraitValue(t, traitId)).sum();
+							outputTraits.setTraitValue(outTax, outTraitId, (float) sum);
+						}
+					}
+				}
+			}
 			NotificationManager.showInformation("Unique haplotypes: " + outputTaxa.getNtax());
 			return new Triplet<>(outputTaxa, outputTraits, outputCharacters);
 		}

@@ -19,18 +19,18 @@
 
 package splitstree6.dialog.importing;
 
+import javafx.geometry.Point2D;
 import javafx.stage.FileChooser;
 import jloda.fx.util.TextFileFilter;
 import jloda.fx.window.NotificationManager;
 import jloda.util.*;
 import splitstree6.data.TraitsBlock;
 import splitstree6.window.MainWindow;
-import splitstree6.workflow.Workflow;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * allows user to import traits
@@ -56,41 +56,83 @@ public class ImportTaxonTraits {
 			try {
 				if (!isTraitsFile(file))
 					throw new IOException("Traits import file must start with 'traits' keyword");
+				ProgramProperties.put("TaxonTraitsFile", file.getPath());
 				try (var it = new FileLineIterator(file)) {
-					String[] traitsLine = null;
+					String[] traitNames = null;
 					var taxonValuesMap = new HashMap<String, String[]>();
+					var traitLocations = new HashMap<String, Point2D>();
+
+					var seen = 0;
 
 					for (var line : it.lines()) {
-						line = line.trim();
+						line = line.trim().replaceAll("'", "_");
 						if (!line.startsWith("#")) {
 							var tokens = StringUtils.split(line, '\t');
 							if (tokens.length > 0) {
-								if (traitsLine == null) {
-									traitsLine = tokens;
-									System.err.println("Traits: " + StringUtils.toString(traitsLine, 1, traitsLine.length, ", "));
+								if (seen == 0) {
+									traitNames = tokens;
+									if (false)
+										System.err.println("Traits: " + StringUtils.toString(traitNames, 1, traitNames.length, ", "));
+									seen++;
 								} else {
-									if (tokens.length != traitsLine.length)
-										throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected %,d values, got: %,d".formatted(traitsLine.length, tokens.length));
-									for (var t = 1; t < tokens.length; t++) {
-										taxonValuesMap.put(tokens[0], tokens);
+									if (seen == 1 && line.startsWith("Coordinates")) {
+										if (tokens.length != traitNames.length) {
+											throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected %,d pairs of coordinates 'lat,long', got: %,d".formatted(traitNames.length, tokens.length));
+										}
+										for (int t = 1; t < traitNames.length; t++) {
+											var values = StringUtils.split(tokens[t], ',');
+											if (values.length != 2 || !NumberUtils.isDouble(values[0]) || !NumberUtils.isDouble(values[1]))
+												throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected pair of coordinates, got: " + tokens[t]);
+											traitLocations.put(traitNames[t], new Point2D(NumberUtils.parseDouble(values[0]), NumberUtils.parseDouble(values[1])));
+										}
+										seen++;
+									} else {
+										if (tokens.length == 3 && Arrays.stream(traitNames).anyMatch(n -> n.equals(tokens[1])) && NumberUtils.isDouble(tokens[2])) {
+											var length = traitNames.length;
+											var values = taxonValuesMap.computeIfAbsent(tokens[0],
+													k -> {
+														var array = new String[length];
+														Arrays.fill(array, "0");
+														return array;
+													});
+											for (var t = 0; t < traitNames.length; t++) {
+												if (traitNames[t].equals(tokens[1]))
+													values[t] = String.valueOf(NumberUtils.parseDouble(values[t]) + NumberUtils.parseDouble(tokens[2]));
+											}
+										} else {
+											if (tokens.length != traitNames.length)
+												throw new IOExceptionWithLineNumber(it.getLineNumber(), "Expected %,d values, got: %,d".formatted(traitNames.length, tokens.length));
+											taxonValuesMap.put(tokens[0], tokens);
+										}
+										seen++;
 									}
 								}
 							}
 						}
 					}
-					ProgramProperties.put("TaxonTraitsFile", file.getPath());
 
-					if (traitsLine != null && traitsLine.length > 1) {
+					if (traitNames != null && traitNames.length > 1) {
 						var inputTaxa = mainWindow.getWorkflow().getInputTaxaBlock();
+						for (var label : inputTaxa.getLabels()) {
+							if (!taxonValuesMap.containsKey(label))
+								System.err.println("Taxon not found in file: " + label);
+						}
+
 						if (!taxonValuesMap.keySet().containsAll(inputTaxa.getLabels())) {
 							throw new IOException("Imported taxon labels do not include all existing labels");
 						}
 						var traitsBlock = new TraitsBlock();
-						traitsBlock.setDimensions(inputTaxa.getNtax(), traitsLine.length - 1);
-						for (var tr = 1; tr < traitsLine.length; tr++) {
-							traitsBlock.setTraitLabel(tr, traitsLine[tr]);
+						traitsBlock.setDimensions(inputTaxa.getNtax(), traitNames.length - 1);
+						for (var tr = 1; tr < traitNames.length; tr++) {
+							var name = traitNames[tr];
+							traitsBlock.setTraitLabel(tr, name);
+							if (traitLocations.containsKey(name)) {
+								var latlong = traitLocations.get(name);
+								traitsBlock.setTraitLatitude(tr, (float) latlong.getX());
+								traitsBlock.setTraitLongitude(tr, (float) latlong.getY());
+							}
 						}
-						var traitCount = new int[traitsLine.length];
+						var traitCount = new int[traitNames.length];
 						for (var t = 1; t <= inputTaxa.getNtax(); t++) {
 							var valuesLine = taxonValuesMap.get(inputTaxa.getLabel(t));
 							for (var tr = 1; tr < valuesLine.length; tr++) {
@@ -110,30 +152,6 @@ public class ImportTaxonTraits {
 			} catch (IOException ex) {
 				NotificationManager.showError("Import failed: " + ex);
 			}
-		}
-	}
-
-	/**
-	 * update the given display labels
-	 *
-	 * @param workflow            the workflow
-	 * @param nameDisplayLabelMap mapping of taxon names to the desired display labels
-	 */
-	public static void apply(Workflow workflow, Map<String, String> nameDisplayLabelMap) {
-		var taxonBlock = workflow.getWorkingTaxaBlock();
-		if (taxonBlock != null) {
-			var count = 0;
-			for (var name : nameDisplayLabelMap.keySet()) {
-				var taxon = taxonBlock.get(name);
-				if (taxon != null) {
-					var displayLabel = nameDisplayLabelMap.get(name);
-					if (!displayLabel.equals(taxon.getDisplayLabelOrName())) {
-						taxon.setDisplayLabel(nameDisplayLabelMap.get(name));
-						count++;
-					}
-				}
-			}
-			NotificationManager.showInformation("Applied %,d display labels".formatted(count));
 		}
 	}
 

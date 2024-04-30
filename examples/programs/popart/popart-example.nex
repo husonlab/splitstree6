@@ -57,13 +57,13 @@ order of TraitLabels. Separator can be comma, space, or tab.]
   TraitLongitude 16.75 87.3311 26.5 134.355 -76;
   TraitLabels Europe Asia Africa Australia America;
   Matrix
-seq_2 10,5,0,6,0
-seq_7 0,0,5,0,0
-seq_5 4,0,10,0,0
-seq_4 0,0,0,4,2
-seq_3 0,0,0,3,5
 seq_1 0,0,0,3,3
+seq_2 10,5,0,6,0
+seq_3 0,0,0,3,5
+seq_4 0,0,0,4,2
+seq_5 4,0,10,0,0
 seq_6 0,0,0,7,3
+seq_7 0,0,5,0,0
 ;
 
 END;

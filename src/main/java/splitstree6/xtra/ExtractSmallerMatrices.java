@@ -59,13 +59,13 @@ public class ExtractSmallerMatrices {
 	 * run the program
 	 */
 	public void run(String[] args) throws Exception {
-		final ArgsOptions options = new ArgsOptions(args, this.getClass(), "Extract smaller matrices from a large distance matrix");
+		final ArgsOptions options = new ArgsOptions(args, this.getClass(), "Extract smaller matrices from a large editDistance matrix");
 		options.setVersion(ProgramProperties.getProgramVersion());
 		options.setLicense("This is free software, licensed under the terms of the GNU General Public License, Version 3.");
 		options.setAuthors("Daniel H. Huson");
 
 		options.comment("Input and output");
-		var input = options.getOptionMandatory("-i", "input", "Input distance file (.gz ok)", "");
+		var input = options.getOptionMandatory("-i", "input", "Input editDistance file (.gz ok)", "");
 		var output = options.getOption("-o", "output", "Output file name (directory or .gz ok, use %s for size and %t for replicate)",
 				FileUtils.replaceFileSuffixKeepGZ(input, "-%s-%r" + FileUtils.getFileSuffix(input)));
 

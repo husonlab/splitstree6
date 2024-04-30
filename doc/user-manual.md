@@ -2581,6 +2581,74 @@ Can export genomes data in the following formats: Nexus.
 
 Can export view data in the following formats: GML, Nexus.
 
+## Taxon display labels import
+
+Taxon display labels can be imported from a text file. Each line of the
+file must contain two tab-separated entries. The first entry is the
+taxon name, as used in the input data, and the second entry is the
+corresponding display label, which may contain HTML formatting.
+
+Here is an example. The first label has font size 24 and text color
+blue. The second label is shown in bold. The remaining four labels have
+a yellow background.
+
+``` 
+Co90-125	<size "24"><c blue>Co90-125
+s428	<b>s428
+s421	<bg yellow>s421
+s433	<bg yellow>s433
+s434	<bg yellow>s434
+s498	<bg yellow>s498
+```
+
+## Traits import
+
+Traits can be imported from a text file. The first line of the file must
+define the names of the traits. The line must start with the keyword
+`Traits` and then must contain a list of the names of the different
+traits, separated by tabs
+
+Then there must be one line for each taxon. The first entry must be the
+taxon name and this must be followed by one value for each of the listed
+traits, separated by tabs.
+
+Here is an example defining five traits, `Europe` to `America`, for
+seven taxa `seq_1` to `seq_7`. In this case, the trait values are
+counts.
+
+The second line starting with the key word `Coordinates` is optional.
+When present, it provides the latitude and longitude associated with
+each trait.
+
+``` 
+Traits	Europe   Asia    Africa  Australia   America
+Coordinates   53,16.75    43.68,87.33    5.4,26.5    -25.61,134.35  0,-76	
+seq_1   0	0	0	3	3
+seq_2	10	5	0	6	0
+seq_3	0	0	0	3	5
+seq_4	0	0	0	4	2
+seq_5	4	0	10	0	0
+seq_6	0	0	0	7	3
+seq_7	0	0	5	0	0
+```
+
+The program also supports a second way of specifying taxon-trait
+associations. After specifying the first one or two lines, the taxon-trait
+counts can also be specified by listing a taxon, a trait and then the
+desired count, like this:
+
+``` 
+Traits	Europe   Asia    Africa  Australia   America
+Coordinates   53,16.75    43.68,87.33    5.4,26.5    -25.61,134.35  0,-76
+seq_1   Australia   3
+seq_1   America   3
+seq_2   Europe  10
+seq_2   Asia  5
+seq_2   Australia  6
+...
+
+
+```
 # Workflow
 
 SplitsTree is designed around the concept of a workflow. This is a

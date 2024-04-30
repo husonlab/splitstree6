@@ -30,7 +30,7 @@ import splitstree6.data.parts.CharactersType;
 import java.io.IOException;
 
 /**
- * Calculates distances using the DiceDistance coefficient distance
+ * Calculates distances using the DiceDistance coefficient editDistance
  * <p>
  * Created on Nov 2007
  *
@@ -45,7 +45,7 @@ public class GeneSharingDistance extends Characters2Distances {
 
 	@Override
 	public String getShortDescription() {
-		return "Computes distances using the gene-sharing distance.";
+		return "Computes distances using the gene-sharing editDistance.";
 	}
 
 	@Override
@@ -54,7 +54,7 @@ public class GeneSharingDistance extends Characters2Distances {
 		int ntax = taxaBlock.getNtax();
 		distancesBlock.setNtax(ntax);
 
-		progress.setTasks("Gene-sharing distance", "Init.");
+		progress.setTasks("Gene-sharing editDistance", "Init.");
 		progress.setMaximum(ntax);
 
 		for (var s = 1; s <= ntax; s++) {

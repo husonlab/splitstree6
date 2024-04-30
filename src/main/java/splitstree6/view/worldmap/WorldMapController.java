@@ -100,6 +100,7 @@ public class WorldMapController {
 		MaterialIcons.setIcon(formatToggleButton, MaterialIcons.format_shapes);
 
 		zoomableScrollPane.setPannable(true);
+		zoomableScrollPane.setMouseScrollZoomFactor(1.05);
 		zoomableScrollPane.setLockAspectRatio(true);
 		centerPane.getChildren().add(zoomableScrollPane);
 

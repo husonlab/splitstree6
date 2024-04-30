@@ -60,8 +60,44 @@ public class TraitsBlock extends DataBlock implements IAdditionalDataBlock {
 	public void clear() {
 		setDimensions(0, 0);
 		matrixOfLabels = null;
-		traitLongitude = null;
 		traitLatitude = null;
+		traitLongitude = null;
+	}
+
+	public int addTrait(String traitLabel) {
+		var oldNTax = matrix.length;
+		var oldNTraits = matrix.length == 0 ? 0 : matrix[0].length;
+		{
+			var tmp = new double[oldNTax][oldNTraits + 1];
+			for (var tax = 0; tax < oldNTax; tax++) {
+				System.arraycopy(matrix[tax], 0, tmp[tax], 0, oldNTraits);
+			}
+			matrix = tmp;
+		}
+		if (matrixOfLabels != null) {
+			var tmp = new String[oldNTax][oldNTraits + 1];
+			for (var tax = 0; tax < oldNTax; tax++) {
+				System.arraycopy(matrixOfLabels[tax], 0, tmp[tax], 0, oldNTraits);
+			}
+			matrixOfLabels = tmp;
+		}
+		if (labels != null) {
+			var tmp = new String[oldNTraits + 1];
+			System.arraycopy(labels, 0, tmp, 0, oldNTraits);
+			labels = tmp;
+			labels[oldNTraits] = traitLabel;
+		}
+		if (traitLatitude != null) {
+			var tmp = new float[oldNTraits + 1];
+			System.arraycopy(traitLatitude, 0, tmp, 0, oldNTraits);
+			traitLatitude = tmp;
+		}
+		if (traitLongitude != null) {
+			var tmp = new float[oldNTraits + 1];
+			System.arraycopy(traitLongitude, 0, tmp, 0, oldNTraits);
+			traitLongitude = tmp;
+		}
+		return oldNTraits + 1;
 	}
 
 	public void setTraitValue(int taxonId, int traitId, double value) {

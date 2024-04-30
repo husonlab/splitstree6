@@ -30,7 +30,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Computes the Hasegawa, Kishino and Yano distance for a set of characters.
+ * Computes the Hasegawa, Kishino and Yano editDistance for a set of characters.
  * <p>
  * Created on 12-Jun-2004
  *
@@ -63,7 +63,7 @@ public class HKY85Distance extends Nucleotides2DistancesBase {
 	@Override
 	public void compute(ProgressListener progress, TaxaBlock taxaBlock, CharactersBlock charactersBlock, DistancesBlock distancesBlock) throws IOException {
 
-		progress.setTasks("HKY85Distance distance", "Computing...");
+		progress.setTasks("HKY85Distance editDistance", "Computing...");
 
 		var model = new HKY85model(getOptionBaseFrequencies(), getOptionTsTvRatio());
 		model.setPropInvariableSites(getOptionPropInvariableSites());

@@ -62,7 +62,7 @@ public class NeighborNetCycleSplitsTree4 {
 	}
 
 	/**
-	 * Sets up the working matrix. The original distance matrix is enlarged to
+	 * Sets up the working matrix. The original editDistance matrix is enlarged to
 	 * handle the maximum number of nodes
 	 *
 	 * @param dist Distance block 0-based
@@ -71,7 +71,7 @@ public class NeighborNetCycleSplitsTree4 {
 	private static double[][] setupMatrix(int nTax, double[][] dist) {
 		int max_num_nodes = 3 * nTax - 5;
 		double[][] mat = new double[max_num_nodes][max_num_nodes];
-		/* Copy the distance matrix into a larger, scratch distance matrix */
+		/* Copy the editDistance matrix into a larger, scratch editDistance matrix */
 		for (int i = 1; i <= nTax; i++) {
 			System.arraycopy(dist[i - 1], 0, mat[i], 1, nTax);
 			Arrays.fill(mat[i], nTax + 1, max_num_nodes, 0.0);
@@ -316,7 +316,7 @@ public class NeighborNetCycleSplitsTree4 {
 		u.nbr = v;
 		v.nbr = u;
 
-		/* Update distance matrix */
+		/* Update editDistance matrix */
 
 		for (NetNode p = nodesHead.next; p != null; p = p.next) {
 			mat[u.id][p.id] = mat[p.id][u.id] = (2.0 / 3.0) * mat[x.id][p.id] + mat[y.id][p.id] / 3.0;
