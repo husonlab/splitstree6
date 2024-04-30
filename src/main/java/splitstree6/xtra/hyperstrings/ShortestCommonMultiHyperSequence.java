@@ -91,7 +91,7 @@ public class ShortestCommonMultiHyperSequence {
 			CollectionUtils.reverseInPlace(bTrace);
 		}
 
-		if (true) { // write out the trace:
+		if (true) { // write out the alignment:
 			var bufA = new StringBuilder();
 			var bufB = new StringBuilder();
 
