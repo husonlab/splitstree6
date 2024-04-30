@@ -1,5 +1,5 @@
 /*
- *  ShortestCommonHyperSequence.java Copyright (C) 2024 Daniel H. Huson
+ *  ShortestCommonMultiHyperSequence.java Copyright (C) 2024 Daniel H. Huson
  *
  *  (Some files contain contributions from other authors, who are then mentioned separately.)
  *
@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.more;
+package splitstree6.xtra.hyperstrings;
 
 import jloda.util.BitSetUtils;
 import jloda.util.CollectionUtils;

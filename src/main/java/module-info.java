@@ -204,4 +204,6 @@ module splitstreesix {
 	opens splitstree6.xtra.alts;
 	opens splitstree6.xtra.draw;
 	opens splitstree6.utils.worldmap;
+
+	exports splitstree6.xtra.hyperstrings;
 }

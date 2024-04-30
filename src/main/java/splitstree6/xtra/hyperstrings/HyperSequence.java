@@ -17,7 +17,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package splitstree6.xtra.more;
+package splitstree6.xtra.hyperstrings;
 
 import jloda.util.BitSetUtils;
 import jloda.util.StringUtils;
