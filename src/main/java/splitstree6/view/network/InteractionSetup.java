@@ -99,6 +99,8 @@ public class InteractionSetup {
 					if (e.wasAdded()) {
 						var shape = e.getElementAdded();
 						shape.setEffect(SelectionEffectBlue.getInstance());
+						if (shape.getLabel() != null)
+							shape.getLabel().setEffect(SelectionEffectBlue.getInstance());
 						if (shape.getTaxa() != null) {
 							Platform.runLater(() -> {
 								if (shape.getTaxa() != null)
@@ -108,6 +110,9 @@ public class InteractionSetup {
 					} else if (e.wasRemoved()) {
 						var shape = e.getElementRemoved();
 						shape.setEffect(null);
+						if (shape.getLabel() != null)
+							shape.getLabel().setEffect(null);
+
 						if (shape.getTaxa() != null) {
 							Platform.runLater(() -> {
 								if (shape.getTaxa() != null)

@@ -103,8 +103,7 @@ public class NetworkLayout {
 			} else {
 				for (var v : graph.nodes())
 					if (graph.getNumberOfTaxa(v) > 0) {
-						var angle = computeLabelAngle(v, nodePointMap);
-						nodeAngleMap.put(v, angle);
+						nodeAngleMap.put(v, computeLabelAngle(v, nodePointMap));
 					}
 			}
 
