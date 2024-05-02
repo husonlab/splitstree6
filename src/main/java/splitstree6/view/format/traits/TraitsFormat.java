@@ -19,9 +19,9 @@
 
 package splitstree6.view.format.traits;
 
-import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.WeakChangeListener;
@@ -70,11 +70,11 @@ public class TraitsFormat extends Pane {
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits", new String[]{ALL});
 	private final ObjectProperty<FuzzyBoolean> optionTraitLegend = new SimpleObjectProperty<>(this, "optionTraitLegend", FuzzyBoolean.True);
 
-	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize");
+	private final DoubleProperty optionMaxCircleRadius = new SimpleDoubleProperty(this, "optionTraitSize");
 
 	{
 		ProgramProperties.track(optionTraitLegend, FuzzyBoolean::valueOf, FuzzyBoolean.True);
-		ProgramProperties.track(optionTraitSize, 64);
+		ProgramProperties.track(optionMaxCircleRadius, 32.0);
 	}
 
 	public TraitsFormat(MainWindow mainWindow, UndoManager undoManager) {
@@ -92,7 +92,7 @@ public class TraitsFormat extends Pane {
 
 		legend = new Legend(FXCollections.observableArrayList(), "Twenty", Orientation.VERTICAL);
 		legend.setScalingType(Legend.ScalingType.sqrt);
-		legend.circleMinSizeProperty().bind(optionTraitSizeProperty().multiply(0.5));
+		legend.maxCircleRadiusProperty().bindBidirectional(optionMaxCircleRadiusProperty());
 
 		legend.getStyleClass().add("viewer-background");
 		legend.setPadding(new Insets(3, 3, 3, 3));
@@ -140,16 +140,16 @@ public class TraitsFormat extends Pane {
 		return optionTraitLegend;
 	}
 
-	public int getOptionTraitSize() {
-		return optionTraitSize.get();
+	public double getOptionMaxCircleRadius() {
+		return optionMaxCircleRadius.get();
 	}
 
-	public IntegerProperty optionTraitSizeProperty() {
-		return optionTraitSize;
+	public DoubleProperty optionMaxCircleRadiusProperty() {
+		return optionMaxCircleRadius;
 	}
 
-	public void setOptionTraitSize(int optionTraitSize) {
-		this.optionTraitSize.set(optionTraitSize);
+	public void setOptionMaxCircleRadius(double optionMaxCircleRadius) {
+		this.optionMaxCircleRadius.set(optionMaxCircleRadius);
 	}
 
 
@@ -185,7 +185,19 @@ public class TraitsFormat extends Pane {
 					}
 				}
 
-				var unitSize = 0.0;
+				var maxOverAllNodes = 0.0;
+
+				for (var v : nodeShapeMap.keySet()) {
+					for (var t = 1; t <= workingTaxa.get().getNtax(); t++) {
+						var sum = 0.0;
+						for (var trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
+							if (traitsBlock.isNumerical(trait) && isTraitActive(traitsBlock.getTraitLabel(trait))) {
+								sum += traitsBlock.getTraitValue(t, trait);
+							}
+						}
+						maxOverAllNodes = Math.max(maxOverAllNodes, sum);
+					}
+				}
 
 				var graph = graphOptional.get();
 				for (var v : nodeShapeMap.keySet()) {
@@ -197,68 +209,52 @@ public class TraitsFormat extends Pane {
 							var taxonId = graph.getTaxon(v);
 
 							if (isNoneTraitsActive()) {
-								var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
-								if (shapes.size() == 1) {
-									var shape = shapes.iterator().next();
-									if (shape.prefWidth(0) > 0 && shape.prefHeight(0) > 0) {
-										shape.setScaleX(1);
-										shape.setScaleY(1);
+								for (var shape : BasicFX.getAllRecursively(nodeShape, Shape.class)) {
+									if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
+										circle.setRadius(v.getOutDegree() == 1 ? 1 : 0.5);
 									}
 								}
 							} else {
-									var chart = new BasicPieChart(workingTaxa.get().getLabel(taxonId));
-									chart.setColorScheme(legend.getColorSchemeName());
-									var max = 0.0;
+								var chart = new BasicPieChart(workingTaxa.get().getLabel(taxonId));
+								chart.setColorScheme(legend.getColorSchemeName());
 
-								for (var t = 1; t <= workingTaxa.get().getNtax(); t++) {
-									var tsum = 0.0;
-									for (var trait = 1; trait <= traitsBlock.getNTraits(); trait++) {
-										if (traitsBlock.isNumerical(trait) && isTraitActive(traitsBlock.getTraitLabel(trait))) {
-											tsum += traitsBlock.getTraitValue(t, trait);
-										}
-									}
-									max = Math.max(max, tsum);
-									}
-
-									var tooltipBuf = new StringBuilder();
+								var tooltipBuf = new StringBuilder();
 
 								var sum = 0.0;
 								for (var traitId : traitsBlock.numericalTraits()) {
-										var label = traitsBlock.getTraitLabel(traitId);
-										if (isTraitActive(label)) {
-											var value = traitsBlock.getTraitValue(taxonId, traitId);
-											if (value > 0) {
-												tooltipBuf.append(String.format("%s: %,.2f%n", label, value));
-											}
-											sum += value;
-											chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), value));
-										} else
-											chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), 0.0));
-									}
-
-									if (sum > 0) {
-										var pieSize = (Math.sqrt(sum) / Math.sqrt(max)) * getOptionTraitSize();
-										unitSize = Math.max(unitSize, (1 / Math.sqrt(max)) * getOptionTraitSize());
-										chart.setRadius(0.5 * pieSize);
-
-										var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
-										for (var shape : shapes) {
-											if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
-												circle.setRadius(pieSize / circle.getRadius());
-											}
+									var label = traitsBlock.getTraitLabel(traitId);
+									if (isTraitActive(label)) {
+										var value = traitsBlock.getTraitValue(taxonId, traitId);
+										if (value > 0) {
+											tooltipBuf.append(String.format("%s: %,.2f%n", label, value));
 										}
-										nodeShape.getChildren().add(chart);
+										sum += value;
+										chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), value));
+									} else
+										chart.getData().add(new Pair<>(traitsBlock.getTraitLabel(traitId), 0.0));
+								}
 
-										if (!tooltipBuf.isEmpty()) {
-											Tooltip.install(chart, new Tooltip(tooltipBuf.toString()));
+								if (sum > 0) {
+									var pieSize = (Math.sqrt(sum) / Math.sqrt(maxOverAllNodes)) * getOptionMaxCircleRadius();
+									chart.setRadius(pieSize);
+
+									var shapes = BasicFX.getAllRecursively(nodeShape, Shape.class);
+									for (var shape : shapes) {
+										if (shape instanceof Circle circle && !"iceberg".equals(shape.getId())) {
+											circle.setRadius(pieSize);
 										}
 									}
+									nodeShape.getChildren().add(chart);
+
+									if (!tooltipBuf.isEmpty()) {
+										Tooltip.install(chart, new Tooltip(tooltipBuf.toString()));
+									}
+								}
 							}
 						}
 					}
 				}
-				legend.setUnitRadius(0.5 * unitSize);
-				legend.setScalingType(Legend.ScalingType.sqrt);
+				legend.setMaxCount(maxOverAllNodes);
 			}
 		}
 		if (getRunAfterUpdateNodes() != null)

@@ -28,10 +28,7 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import jloda.fx.control.RichTextLabel;
 import jloda.fx.util.GeometryUtilsFX;
-import jloda.graph.Edge;
-import jloda.graph.EdgeArray;
-import jloda.graph.Node;
-import jloda.graph.NodeArray;
+import jloda.graph.*;
 import jloda.graph.fmm.FastMultiLayerMethodLayout;
 import jloda.graph.fmm.FastMultiLayerMethodOptions;
 import jloda.util.BitSetUtils;
@@ -105,8 +102,10 @@ public class NetworkLayout {
 
 			} else {
 				for (var v : graph.nodes())
-					if (graph.getNumberOfTaxa(v) > 0)
-						nodeAngleMap.put(v, computeLabelAngle(v, nodePointMap));
+					if (graph.getNumberOfTaxa(v) > 0) {
+						var angle = computeLabelAngle(v, nodePointMap);
+						nodeAngleMap.put(v, angle);
+					}
 			}
 
 			var dimensions = computeFontHeightGraphWidthHeight(taxaBlock.getNtax(), t -> taxaBlock.get(t).displayLabelProperty(), graph, true, width, height);
@@ -121,71 +120,74 @@ public class NetworkLayout {
 			var nodeLabelsGroup = new Group();
 
 			for (var v : graph.nodes()) {
-				var point = nodePointMap.get(v);
-				var nodeShape = new LabeledNodeShape();
-				nodeShape.setTranslateX(point.getX());
-				nodeShape.setTranslateY(point.getY());
+				try {
+					var point = nodePointMap.get(v);
+					var labeledNode = new LabeledNodeShape();
+					labeledNode.setTranslateX(point.getX());
+					labeledNode.setTranslateY(point.getY());
 
-				if (graph.hasTaxa(v))
-					nodeShape.setTaxa(BitSetUtils.asBitSet(graph.getTaxa(v)));
+					if (graph.hasTaxa(v))
+						labeledNode.setTaxa(BitSetUtils.asBitSet(graph.getTaxa(v)));
 
-				var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
-				if (false && graph.getNumberOfEdges() == 0 && label != null) { // todo: allow user to use marks for nodes
-					nodeShape.setShape(RichTextLabel.getMark(label.getText()));
-				} else {
-					var circle = new Circle(v.getDegree() == 1 ? 3 : 2);
-					circle.setFill(Color.BLACK);
-					circle.setStroke(Color.BLACK);
-					{
-						var stroke = 1 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
-						circle.setStyle("-fx-stroke-width: " + stroke + ";");
+					var label = LayoutUtils.getLabel(t -> taxaBlock.get(t).displayLabelProperty(), graph, v);
+					if (false && graph.getNumberOfEdges() == 0 && label != null) { // todo: allow user to use marks for nodes
+						labeledNode.setShape(RichTextLabel.getMark(label.getText()));
+					} else {
+						var circle = new Circle(v.getDegree() == 1 ? 3 : 2);
+						circle.setFill(Color.BLACK);
+						circle.setStroke(Color.BLACK);
+						{
+							var stroke = 1 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
+							circle.setStyle("-fx-stroke-width: " + stroke + ";");
+						}
+						labeledNode.setShape(circle, true);
 					}
-					nodeShape.setShape(circle, true);
-				}
 
-				for (var node : nodeShape.getChildren()) {
-					if ("iceberg".equals(node.getId())) {
-						var stroke = 20 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
-						node.setStyle("-fx-stroke-width: " + stroke + ";");
+					for (var node : labeledNode.getChildren()) {
+						if ("iceberg".equals(node.getId())) {
+							var stroke = 20 / fontHeight; // this is a work-around for the fact that the border of the icebergs is way too thick
+							node.setStyle("-fx-stroke-width: " + stroke + ";");
+						}
 					}
-				}
 
-				nodesGroup.getChildren().add(nodeShape);
-
-				if (graph.getNumberOfTaxa(v) == 1) {
-					nodeShape.setUserData(taxaBlock.get(graph.getTaxon(v)));
-				}
-				newNodeShapeMap.put(v, nodeShape);
-
-				if (label != null) {
-					nodeShape.setLabel(label);
+					nodesGroup.getChildren().add(labeledNode);
 
 					if (graph.getNumberOfTaxa(v) == 1) {
-						taxonLabelMap.put(graph.getTaxon(v), label);
+						labeledNode.setUserData(taxaBlock.get(graph.getTaxon(v)));
 					}
+					newNodeShapeMap.put(v, labeledNode);
 
-					label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
-					label.setTranslateX(nodeShape.getTranslateX() + 10);
-					label.setTranslateY(nodeShape.getTranslateY() + 10);
-					label.setUserData(nodeShape);
-					nodeLabelsGroup.getChildren().add(label);
+					if (label != null) {
+						labeledNode.setLabel(label);
 
-					label.applyCss();
+						if (graph.getNumberOfTaxa(v) == 1) {
+							taxonLabelMap.put(graph.getTaxon(v), label);
+						}
 
-					var translateXProperty = nodeShape.translateXProperty();
-					var translateYProperty = nodeShape.translateYProperty();
+						label.setScale(fontHeight / RichTextLabel.getDefaultFont().getSize());
+						label.setTranslateX(labeledNode.getTranslateX() + 10);
+						label.setTranslateY(labeledNode.getTranslateY() + 10);
+						label.setUserData(labeledNode);
+						nodeLabelsGroup.getChildren().add(label);
 
-					labelLayout.addItem(translateXProperty, translateYProperty, nodeAngleMap.get(v), label.widthProperty(), label.heightProperty(),
-							xOffset -> {
-								label.setLayoutX(0);
-								label.translateXProperty().bind(translateXProperty.add(xOffset));
-							},
-							yOffset -> {
-								label.setLayoutY(0);
-								label.translateYProperty().bind(translateYProperty.add(yOffset));
-							});
+						label.applyCss();
 
-					labelLayout.addAvoidable(() -> nodeShape.getTranslateX() - 0.5 * nodeShape.prefWidth(0), () -> nodeShape.getTranslateY() - 0.5 * nodeShape.prefHeight(0), () -> nodeShape.prefWidth(0), () -> nodeShape.prefHeight(0));
+						var translateXProperty = labeledNode.translateXProperty();
+						var translateYProperty = labeledNode.translateYProperty();
+
+						labelLayout.addItem(translateXProperty, translateYProperty, nodeAngleMap.get(v), label.widthProperty(), label.heightProperty(),
+								xOffset -> {
+									label.setLayoutX(0);
+									label.translateXProperty().bind(translateXProperty.add(xOffset));
+								},
+								yOffset -> {
+									label.setLayoutY(0);
+									label.translateYProperty().bind(translateYProperty.add(yOffset));
+								});
+
+						labelLayout.addAvoidable(() -> labeledNode.getTranslateX() - 0.5 * labeledNode.prefWidth(0), () -> labeledNode.getTranslateY() - 0.5 * labeledNode.prefHeight(0), () -> labeledNode.prefWidth(0), () -> labeledNode.prefHeight(0));
+					}
+				} catch (NotOwnerException ignored) {
 				}
 				progress.incrementProgress();
 			}

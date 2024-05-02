@@ -138,8 +138,8 @@ public class TaxaBlock extends DataBlock {
 	 * @return taxon
 	 */
 	public Taxon get(int t) {
-		if (t == 0)
-			throw new IndexOutOfBoundsException("0");
+		if (t <= 0)
+			throw new IndexOutOfBoundsException(t - 1);
 		return taxa.get(t - 1);
 	}
 

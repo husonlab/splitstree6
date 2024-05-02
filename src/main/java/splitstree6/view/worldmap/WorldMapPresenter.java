@@ -62,6 +62,11 @@ public class WorldMapPresenter implements IDisplayTabPresenter {
 		HBox.setHgrow(worldMap1, Priority.NEVER);
 		HBox.setHgrow(worldMap2, Priority.NEVER);
 
+		hbox.setOnMousePressed(e -> {
+			if (!e.isShiftDown())
+				mainWindow.getTaxonSelectionModel().clearSelection();
+		});
+
 		var scrollPane = controller.getZoomableScrollPane();
 		scrollPane.setContent(hbox);
 		scrollPane.setFitToWidth(false);

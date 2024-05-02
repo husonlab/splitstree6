@@ -356,6 +356,7 @@ public class WorldMap extends Pane {
 				var tokens = StringUtils.split(line, '\t');
 				if (tokens.length == 3 && NumberUtils.isDouble(tokens[1]) && NumberUtils.isDouble(tokens[2])) {
 					var label = new Text(tokens[0]);
+					DraggableUtils.setupDragMouseTranslate(label);
 					label.fontProperty().bind(font);
 					label.getStyleClass().add("above-label");
 					var point = millerProjection(NumberUtils.parseDouble(tokens[1]), NumberUtils.parseDouble(tokens[2]));
@@ -368,7 +369,6 @@ public class WorldMap extends Pane {
 					label.applyCss();
 					//label.setBackgroundColor(Color.WHITE.deriveColor(1, 1, 1, 0.8));
 					// label.setBackgroundColor(Color.WHITE);
-					DraggableUtils.setupDragMouseTranslate(label);
 					group.getChildren().add(label);
 					Platform.runLater(() -> {
 						label.setLayoutX(-0.5 * label.getLayoutBounds().getWidth());

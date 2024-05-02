@@ -19,10 +19,6 @@
 
 package splitstree6.view.format.locations;
 
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;
@@ -38,16 +34,8 @@ public class LocationsFormat extends Pane {
 	private final LocationsFormatController controller;
 	private final LocationsFormatPresenter presenter;
 
-	private final IntegerProperty optionLocationSize = new SimpleIntegerProperty(this, "optionLocationSize");
-
-	private final ObjectProperty<FuzzyBoolean> optionLocationLegend = new SimpleObjectProperty<>(this, "optionLocationLegend", FuzzyBoolean.True);
-
 	private final Legend legend;
 
-	{
-		ProgramProperties.track(optionLocationSize, 64);
-		ProgramProperties.track(optionLocationLegend, FuzzyBoolean::valueOf, FuzzyBoolean.True);
-	}
 
 	public LocationsFormat(MainWindow mainWindow, UndoManager undoManager) {
 
@@ -56,38 +44,15 @@ public class LocationsFormat extends Pane {
 		getChildren().add(loader.getRoot());
 
 		legend = new Legend(FXCollections.observableArrayList(), "Twenty", Orientation.VERTICAL);
+		ProgramProperties.track(legend.maxCircleRadiusProperty(), 32.0);
+		ProgramProperties.track(legend.showProperty(), FuzzyBoolean::valueOf, FuzzyBoolean.True);
+
 		legend.setScalingType(Legend.ScalingType.sqrt);
-		legend.circleMinSizeProperty().bind(optionLocationSizeProperty().multiply(0.5));
-		legend.showProperty().bindBidirectional(optionLocationLegend);
 
 		legend.getStyleClass().add("viewer-background");
 		legend.setPadding(new Insets(3, 3, 3, 3));
 
 		presenter = new LocationsFormatPresenter(this, undoManager);
-	}
-
-	public int getOptionLocationSize() {
-		return optionLocationSize.get();
-	}
-
-	public IntegerProperty optionLocationSizeProperty() {
-		return optionLocationSize;
-	}
-
-	public FuzzyBoolean getOptionLocationLegend() {
-		return optionLocationLegend.get();
-	}
-
-	public ObjectProperty<FuzzyBoolean> optionLocationLegendProperty() {
-		return optionLocationLegend;
-	}
-
-	public void setOptionLocationSize(int optionLocationSize) {
-		this.optionLocationSize.set(optionLocationSize);
-	}
-
-	public void setOptionLocationLegend(FuzzyBoolean optionLocationLegend) {
-		this.optionLocationLegend.set(optionLocationLegend);
 	}
 
 	public LocationsFormatController getController() {

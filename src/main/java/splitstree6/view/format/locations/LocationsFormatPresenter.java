@@ -27,12 +27,12 @@ public class LocationsFormatPresenter {
 	public LocationsFormatPresenter(LocationsFormat format, UndoManager undoManager) {
 		var controller = format.getController();
 
-		controller.getMaxSizeField().setText(String.valueOf(format.getOptionLocationSize()));
-		controller.getMaxSizeField().setOnAction(e -> format.optionLocationSizeProperty().set(NumberUtils.parseInt(controller.getMaxSizeField().getText())));
+		controller.getMaxSizeField().setText(String.valueOf(Math.round(format.getLegend().getMaxCircleRadius())));
+		controller.getMaxSizeField().setOnAction(e -> format.getLegend().setMaxCircleRadius(NumberUtils.parseInt(controller.getMaxSizeField().getText())));
 
 		FuzzyBoolean.setupCheckBox(controller.getLegendCBox(), format.getLegend().showProperty());
 
-		format.optionLocationSizeProperty().addListener((v, o, n) -> undoManager.add("traits node size", format.optionLocationSizeProperty(), o, n));
-		format.optionLocationLegendProperty().addListener((v, o, n) -> undoManager.add("show legend", format.optionLocationLegendProperty(), o, n));
+		format.getLegend().maxCircleRadiusProperty().addListener((v, o, n) -> undoManager.add("traits node size", format.getLegend().maxCircleRadiusProperty(), o, n));
+		format.getLegend().maxCircleRadiusProperty().addListener((v, o, n) -> undoManager.add("show legend", format.getLegend().maxCircleRadiusProperty(), o, n));
 	}
 }

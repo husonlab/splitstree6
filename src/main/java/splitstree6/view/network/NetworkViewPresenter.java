@@ -179,10 +179,7 @@ public class NetworkViewPresenter implements IDisplayTabPresenter {
 		RunAfterAWhile.applyInFXThread(this, () -> {
 			if (mainWindow.getWorkflow().getWorkingTaxaBlock() != null && mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock() != null
 				&& mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().size() > 0) {
-				if (mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().size() <= 12)
-					view.optionTraitLegendProperty().set(FuzzyBoolean.True);
-				else
-					view.optionTraitLegendProperty().set(FuzzyBoolean.Indeterminant);
+				view.optionTraitLegendProperty().set(FuzzyBoolean.True);
 				view.optionActiveTraitsProperty().set(mainWindow.getWorkflow().getWorkingTaxaBlock().getTraitsBlock().getTraitLabels().toArray(new String[0]));
 			}
 		});

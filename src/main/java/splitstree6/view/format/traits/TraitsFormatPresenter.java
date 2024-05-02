@@ -38,10 +38,10 @@ public class TraitsFormatPresenter {
 	private final ObservableList<CheckMenuItem> traitMenuItems = FXCollections.observableArrayList();
 
 	public TraitsFormatPresenter(MainWindow mainWindow, TraitsFormat format, TraitsFormatController controller, UndoManager undoManager) {
-		controller.getMaxSizeField().setText(String.valueOf(format.getOptionTraitSize()));
+		controller.getMaxSizeField().setText(String.valueOf(format.getOptionMaxCircleRadius()));
 
-		format.optionTraitSizeProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
-		controller.getMaxSizeField().setOnAction(e -> format.setOptionTraitSize(NumberUtils.parseInt(controller.getMaxSizeField().getText())));
+		format.optionMaxCircleRadiusProperty().addListener((v, o, n) -> controller.getMaxSizeField().setText(String.valueOf(n.intValue())));
+		controller.getMaxSizeField().setOnAction(e -> format.setOptionMaxCircleRadius(NumberUtils.parseInt(controller.getMaxSizeField().getText())));
 
 		FuzzyBoolean.setupCheckBox(controller.getLegendCBox(), format.getLegend().showProperty());
 
@@ -98,10 +98,10 @@ public class TraitsFormatPresenter {
 				controller.getShowMenuButton().setText("Some");
 		});
 
-		format.optionTraitSizeProperty().addListener((v, o, n) -> undoManager.add("traits node size", format.optionTraitSizeProperty(), o, n));
+		format.optionMaxCircleRadiusProperty().addListener((v, o, n) -> undoManager.add("traits node size", format.optionMaxCircleRadiusProperty(), o, n));
 		format.optionTraitLegendProperty().addListener((v, o, n) -> undoManager.add("show legend", format.optionTraitLegendProperty(), o, n));
 
-		format.optionTraitSizeProperty().addListener(e -> format.updateNodes());
+		format.optionMaxCircleRadiusProperty().addListener(e -> format.updateNodes());
 		format.optionTraitLegendProperty().addListener(e -> format.updateNodes());
 	}
 }

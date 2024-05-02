@@ -142,8 +142,7 @@ public class TreeView implements IView {
 
 		traitsFormatter.optionActiveTraitsProperty().bindBidirectional(optionActiveTraits);
 		traitsFormatter.optionTraitLegendProperty().bindBidirectional(optionTraitLegend);
-		traitsFormatter.optionTraitSizeProperty().bindBidirectional(optionTraitSize);
-		traitsFormatter.getLegend().scaleProperty().bind(optionHorizontalZoomFactorProperty());
+		traitsFormatter.optionMaxCircleRadiusProperty().bindBidirectional(optionTraitSize);
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 

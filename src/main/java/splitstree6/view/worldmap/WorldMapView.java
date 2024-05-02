@@ -61,6 +61,8 @@ public class WorldMapView implements IView {
 	private final BooleanProperty optionShowCountryNames = new SimpleBooleanProperty(this, "optionShowContinentNames");
 	private final BooleanProperty optionShowOceanNames = new SimpleBooleanProperty(this, "optionShowOceanNames");
 
+	private final DoubleProperty optionMaxCircleRadius = new SimpleDoubleProperty(this, "optionMaxCircleRadius", 32.0);
+
 	private final BooleanProperty optionShowBoundingBox = new SimpleBooleanProperty(this, "optionShowBoundingBox");
 
 	private final BooleanProperty optionShowGrid = new SimpleBooleanProperty(this, "optionShowGrid");
@@ -90,7 +92,7 @@ public class WorldMapView implements IView {
 
 	public List<String> listOptions() {
 		return List.of(optionShowContinentNames.getName(), optionShowCountryNames.getName(), optionShowOceanNames.getName(),
-				optionShowBoundingBox.getName(), optionShowGrid.getName(), optionTwoCopies.getName());
+				optionShowBoundingBox.getName(), optionShowGrid.getName(), optionTwoCopies.getName(), optionMaxCircleRadius.getName());
 	}
 
 	public WorldMapView(MainWindow mainWindow, String name, ViewTab viewTab) {
@@ -107,7 +109,9 @@ public class WorldMapView implements IView {
 		var formatter = new LocationsFormat(mainWindow, undoManager);
 		controller.getFormatVBox().getChildren().addAll(formatter);
 		controller.getFormatVBox().setDisable(false);
-		formatter.optionLocationSizeProperty().addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
+		optionMaxCircleRadius.addListener((v, o, n) -> updatePies(o.doubleValue(), n.doubleValue()));
+		formatter.getLegend().maxCircleRadiusProperty().addListener((v, o, n) -> Platform.runLater(() -> setOptionMaxCircleRadius(n.doubleValue())));
+		optionMaxCircleRadius.addListener((v, o, n) -> Platform.runLater(() -> formatter.getLegend().setMaxCircleRadius(n.doubleValue())));
 		colorSchemeName.bindBidirectional(formatter.getLegend().colorSchemeNameProperty());
 
 		formatter.getLegend().setClickOnLabel((e, label) -> {
@@ -119,11 +123,8 @@ public class WorldMapView implements IView {
 		});
 
 		traitsBlock.addListener(e -> {
-			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, controller, colorSchemeName.get(), formatter.getOptionLocationSize());
-			if (maxCount > 0)
-				formatter.getLegend().setUnitRadius(0.5 * formatter.getOptionLocationSize() / Math.sqrt(maxCount));
-			else
-				formatter.getLegend().setUnitRadius(0);
+			var maxCount = updateTraitsData(workingTaxa.get(), traitsBlock.get(), presenter, controller, colorSchemeName.get(), getOptionMaxCircleRadius());
+			formatter.getLegend().setMaxCount(maxCount);
 		});
 
 		AnchorPane.setLeftAnchor(formatter.getLegend(), 5.0);
@@ -282,7 +283,7 @@ public class WorldMapView implements IView {
 		}
 	}
 
-	private double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, WorldMapController controller, String colorSchemeName, double maxSize) {
+	private double updateTraitsData(TaxaBlock taxaBlock, TraitsBlock traitsBlock, WorldMapPresenter presenter, WorldMapController controller, String colorSchemeName, double maxRadius) {
 		if (taxaBlock != null && traitsBlock != null) {
 			var maxCount = computeMaxCount(taxaBlock, traitsBlock);
 			presenter.getWorldMap1().clear();
@@ -292,8 +293,8 @@ public class WorldMapView implements IView {
 				var lat = traitsBlock.getTraitLatitude(traitId);
 				var lon = traitsBlock.getTraitLongitude(traitId);
 				if (lat != 0 || lon != 0) {
-					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize, clickOnLabel), lat, lon);
-					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxSize, clickOnLabel), lat, lon);
+					presenter.getWorldMap1().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxRadius, clickOnLabel), lat, lon);
+					presenter.getWorldMap2().addUserItem(setupChart(taxaBlock, traitsBlock, colorSchemeName, traitId, maxCount, maxRadius, clickOnLabel), lat, lon);
 				}
 			}
 
@@ -305,7 +306,7 @@ public class WorldMapView implements IView {
 		} else return 0;
 	}
 
-	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, String colorSchemeName, int traitId, double maxCount, double maxSize, BiConsumer<MouseEvent, String> clickOnLabel) {
+	private static Node setupChart(TaxaBlock taxaBlock, TraitsBlock traitsBlock, String colorSchemeName, int traitId, double maxCount, double maxRadius, BiConsumer<MouseEvent, String> clickOnLabel) {
 		var chart = new BasicPieChart(traitsBlock.getTraitLabel(traitId));
 		chart.setClickOnLabel(clickOnLabel);
 		chart.setColorScheme(colorSchemeName);
@@ -316,7 +317,7 @@ public class WorldMapView implements IView {
 			total += value;
 		}
 		if (maxCount > 0)
-			chart.setRadius(0.5 * maxSize / Math.sqrt(maxCount) * Math.sqrt(total));
+			chart.setRadius(maxRadius / Math.sqrt(maxCount) * Math.sqrt(total));
 		else chart.setRadius(0);
 		return chart;
 	}
@@ -336,5 +337,17 @@ public class WorldMapView implements IView {
 			max = Math.max(max, count);
 		}
 		return max;
+	}
+
+	public double getOptionMaxCircleRadius() {
+		return optionMaxCircleRadius.get();
+	}
+
+	public DoubleProperty optionMaxCircleRadiusProperty() {
+		return optionMaxCircleRadius;
+	}
+
+	public void setOptionMaxCircleRadius(double optionMaxCircleRadius) {
+		this.optionMaxCircleRadius.set(optionMaxCircleRadius);
 	}
 }

@@ -72,7 +72,8 @@ public class NetworkView implements IView {
 
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits", new String[0]);
 	private final ObjectProperty<FuzzyBoolean> optionTraitLegend = new SimpleObjectProperty<>(this, "optionTraitLegend", FuzzyBoolean.False);
-	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize", 64);
+
+	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize", 32);
 
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
@@ -91,7 +92,7 @@ public class NetworkView implements IView {
 	}
 
 	public List<String> listOptions() {
-		return List.of(optionDiagram.getName(), optionOrientation.getName(), optionZoomFactor.getName(),
+		return List.of(optionDiagram.getName(), optionOrientation.getName(),
 				optionFontScaleFactor.getName(), optionActiveTraits.getName(), optionTraitLegend.getName(), optionTraitSize.getName(), optionSitesStyle.getName(),
 				optionEdits.getName());
 	}
@@ -120,7 +121,7 @@ public class NetworkView implements IView {
 
 		traitsFormat.optionActiveTraitsProperty().bindBidirectional(optionActiveTraits);
 		traitsFormat.optionTraitLegendProperty().bindBidirectional(optionTraitLegend);
-		traitsFormat.optionTraitSizeProperty().bindBidirectional(optionTraitSize);
+		traitsFormat.optionMaxCircleRadiusProperty().bindBidirectional(optionTraitSize);
 		traitsFormat.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormat.updateNodes());
 

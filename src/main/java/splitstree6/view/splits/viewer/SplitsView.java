@@ -93,7 +93,8 @@ public class SplitsView implements IView {
 
 	private final ObjectProperty<String[]> optionActiveTraits = new SimpleObjectProperty<>(this, "optionActiveTraits", new String[0]);
 	private final ObjectProperty<FuzzyBoolean> optionTraitLegend = new SimpleObjectProperty<FuzzyBoolean>(this, "optionTraitLegend", FuzzyBoolean.False);
-	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize", 64);
+
+	private final IntegerProperty optionTraitSize = new SimpleIntegerProperty(this, "optionTraitSize", 32);
 
 	private final ObjectProperty<String[]> optionEdits = new SimpleObjectProperty<>(this, "optionEdits", new String[0]);
 
@@ -154,8 +155,7 @@ public class SplitsView implements IView {
 
 		traitsFormatter.optionActiveTraitsProperty().bindBidirectional(optionActiveTraits);
 		traitsFormatter.optionTraitLegendProperty().bindBidirectional(optionTraitLegend);
-		traitsFormatter.optionTraitSizeProperty().bindBidirectional(optionTraitSize);
-		traitsFormatter.getLegend().scaleProperty().bind(optionZoomFactorProperty());
+		traitsFormatter.optionMaxCircleRadiusProperty().bindBidirectional(optionTraitSize);
 		traitsFormatter.setRunAfterUpdateNodes(presenter::updateLabelLayout);
 		presenter.updateCounterProperty().addListener(e -> traitsFormatter.updateNodes());
 

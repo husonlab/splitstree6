@@ -131,7 +131,7 @@ public class InteractionSetup {
 							for (var shape : nodeShapeMap.values()) {
 								if (shape.getTaxa() != null) {
 									for (var t : BitSetUtils.members(shape.getTaxa())) {
-										if (idTaxonMap.apply(t) == taxon) {
+										if (idTaxonMap.apply(t).equals(taxon)) {
 											// not sure why this is necessary, without, selection can flicker
 											RunAfterAWhile.applyInFXThread(shape, () -> networkNodeSelectionModel.select(shape));
 											return;
@@ -146,7 +146,7 @@ public class InteractionSetup {
 							for (var shape : nodeShapeMap.values()) {
 								if (shape.getTaxa() != null) {
 									for (var t : BitSetUtils.members(shape.getTaxa())) {
-										if (idTaxonMap.apply(t) == taxon) {
+										if (idTaxonMap.apply(t).equals(taxon)) {
 											// not sure why this is necessary, without, selection can flicker
 											RunAfterAWhile.applyInFXThread(shape, () -> networkNodeSelectionModel.clearSelection(shape));
 											return;
