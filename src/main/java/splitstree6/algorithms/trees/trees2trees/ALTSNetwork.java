@@ -65,7 +65,9 @@ public class ALTSNetwork extends Trees2Trees {
 			} else {
 				result = AltsNonBinary.apply(inputTrees, progress);
 			}
+			var count = 0;
 			for (var tree : result) {
+				tree.setName("N" + (++count));
 				for (var v : tree.nodeStream().filter(v -> tree.getLabel(v) != null).toList()) {
 					tree.addTaxon(v, taxaBlock.indexOf(tree.getLabel(v)));
 				}

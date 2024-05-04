@@ -30,8 +30,9 @@ import splitstree6.tabs.IDisplayTabPresenter;
 import splitstree6.window.MainWindow;
 import splitstree6.workflow.AlgorithmNode;
 
+import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Objects;
 
 import static splitstree6.tabs.algorithms.taxafilter.TaxaFilterPresenter.setupEditMenuButton;
 import static splitstree6.tabs.algorithms.taxafilter.TaxaFilterPresenter.updateColumnWidths;
@@ -61,7 +62,10 @@ public class TreeFilterTabPresenter implements IDisplayTabPresenter {
 			var parentNode = treesFilterNode.getPreferredParent();
 			if (parentNode != null) {
 				var treesBlock = ((TreesBlock) parentNode.getDataBlock());
-				var disabled = new HashSet<>(List.of(treesFilter.getOptionDisabledTrees()));
+				var disabled = new HashSet<>();
+				if (treesFilter.getOptionDisabledTrees() != null) {
+					disabled.addAll(Arrays.stream(treesFilter.getOptionDisabledTrees()).filter(Objects::nonNull).toList());
+				}
 				for (var t = 1; t <= treesBlock.getNTrees(); t++) {
 					var item = new TreeFilterTableItem(t, treesBlock.getTree(t));
 					item.setActive(!disabled.contains(item.getName()));

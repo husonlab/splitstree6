@@ -43,6 +43,7 @@ import java.util.stream.Collectors;
 public class Kernelize {
 	private static boolean verbose = false;
 
+
 	/**
 	 * run the given algorithm on each minimal subproblem
 	 *
@@ -54,7 +55,7 @@ public class Kernelize {
 	 * @return computed networks
 	 */
 	public static List<PhyloTree> apply(ProgressListener progress, TaxaBlock taxaBlock, Collection<PhyloTree> inputTrees,
-										BiFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Collection<PhyloTree>> algorithm,
+										TriFunctionWithIOException<Collection<PhyloTree>, ProgressListener, Integer, Collection<PhyloTree>> algorithm,
 										int maxNumberOfResults) throws IOException {
 
 		// setup incompatibility graph
@@ -138,7 +139,7 @@ public class Kernelize {
 						checkNetwork("subproblem input", tree);
 					}
 
-					var networks = algorithm.apply(reducedTreesAndTaxonClasses.trees(), progress);
+					var networks = algorithm.apply(reducedTreesAndTaxonClasses.trees(), progress, maxNumberOfResults);
 
 					if (verbose) {
 						for (var network : networks) {
@@ -560,7 +561,7 @@ public class Kernelize {
 		}
 	}
 
-	public interface BiFunctionWithIOException<S, T, R> {
-		R apply(S s, T t) throws IOException;
+	public interface TriFunctionWithIOException<S, T, U, R> {
+		R apply(S s, T t, U u) throws IOException;
 	}
 }
